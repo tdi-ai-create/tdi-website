@@ -15,7 +15,7 @@ interface SparklineProps {
 
 export function Sparkline({
   data,
-  color = theme.primary,
+  color = theme.accent,
   height = 24,
   width = 80,
   showDots = false,

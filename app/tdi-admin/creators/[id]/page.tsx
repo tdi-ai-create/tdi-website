@@ -89,7 +89,7 @@ const statusConfig: Record<
   },
   available: {
     icon: Circle,
-    color: 'text-[#9B7CB8]',
+    color: 'text-[#8B5CF6]',
     bg: 'bg-amber-50',
     label: 'Available',
   },
@@ -630,7 +630,7 @@ export default function TDIAdminCreatorDetailPage() {
             href="/tdi-admin/creators"
             className="inline-block px-6 py-3 rounded-lg font-medium transition-colors"
             style={{
-              backgroundColor: theme.primary,
+              backgroundColor: theme.accent,
               color: '#2B3A67',
               fontFamily: "'DM Sans', sans-serif",
             }}
@@ -646,7 +646,7 @@ export default function TDIAdminCreatorDetailPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: theme.primary }} />
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: theme.accent }} />
           <p className="text-gray-600" style={{ fontFamily: "'DM Sans', sans-serif" }}>
             Loading creator details...
           </p>
@@ -665,7 +665,7 @@ export default function TDIAdminCreatorDetailPage() {
           <Link
             href="/tdi-admin/creators"
             className="mt-4 inline-block"
-            style={{ color: theme.primary }}
+            style={{ color: theme.accent }}
           >
             Back to creators
           </Link>
@@ -746,7 +746,7 @@ export default function TDIAdminCreatorDetailPage() {
                 )}
               </button>
             </div>
-            <p className="mt-2 font-medium capitalize" style={{ color: theme.primary }}>
+            <p className="mt-2 font-medium capitalize" style={{ color: theme.accent }}>
               Current Phase: {creator.current_phase.replace('_', ' ')}
             </p>
             {creator.course_title && (
@@ -775,7 +775,7 @@ export default function TDIAdminCreatorDetailPage() {
                   cx="40"
                   cy="40"
                   r="35"
-                  stroke={theme.primary}
+                  stroke={theme.accent}
                   strokeWidth="6"
                   fill="none"
                   strokeLinecap="round"
@@ -967,7 +967,7 @@ export default function TDIAdminCreatorDetailPage() {
                                 onClick={() => handleApprove(milestone.id, milestone.title)}
                                 disabled={isProcessing}
                                 className="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5"
-                                style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+                                style={{ backgroundColor: theme.accent, color: '#2B3A67' }}
                               >
                                 {isProcessing ? (
                                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -1014,7 +1014,7 @@ export default function TDIAdminCreatorDetailPage() {
                   className="font-semibold mb-4 flex items-center gap-2"
                   style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
                 >
-                  <Users className="w-4 h-4" style={{ color: theme.primary }} />
+                  <Users className="w-4 h-4" style={{ color: theme.accent }} />
                   Admin Actions
                 </h3>
                 <div className="space-y-3">
@@ -1038,7 +1038,7 @@ export default function TDIAdminCreatorDetailPage() {
                     <button
                       onClick={() => setShowPublishModal(true)}
                       className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors"
-                      style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+                      style={{ backgroundColor: theme.accent, color: '#2B3A67' }}
                     >
                       <Rocket className="w-4 h-4" />
                       {creator.publish_status === 'scheduled' ? 'Change Schedule' : 'Publish'}
@@ -1074,7 +1074,7 @@ export default function TDIAdminCreatorDetailPage() {
                 <button
                   onClick={() => setIsEditingDetails(true)}
                   className="text-sm hover:opacity-80"
-                  style={{ color: theme.primary }}
+                  style={{ color: theme.accent }}
                 >
                   Edit
                 </button>
@@ -1140,7 +1140,7 @@ export default function TDIAdminCreatorDetailPage() {
                     onClick={handleSaveDetails}
                     disabled={isSaving}
                     className="flex-1 px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1"
-                    style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+                    style={{ backgroundColor: theme.accent, color: '#2B3A67' }}
                   >
                     {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                     Save
@@ -1187,7 +1187,7 @@ export default function TDIAdminCreatorDetailPage() {
                 className="font-semibold flex items-center gap-2"
                 style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
               >
-                <Settings className="w-4 h-4" style={{ color: theme.primary }} />
+                <Settings className="w-4 h-4" style={{ color: theme.accent }} />
                 Creator Settings
               </h3>
               {isSettingsExpanded ? (
@@ -1417,7 +1417,7 @@ export default function TDIAdminCreatorDetailPage() {
                 className="font-semibold flex items-center gap-2"
                 style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
               >
-                <Globe className="w-4 h-4" style={{ color: theme.primary }} />
+                <Globe className="w-4 h-4" style={{ color: theme.accent }} />
                 Publish Status
               </h3>
             </div>
@@ -1465,7 +1465,7 @@ export default function TDIAdminCreatorDetailPage() {
                     <button
                       onClick={() => setShowPublishModal(true)}
                       className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
-                      style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+                      style={{ backgroundColor: theme.accent, color: '#2B3A67' }}
                     >
                       <Rocket className="w-4 h-4" />
                       {creator.publish_status === 'scheduled' ? 'Change' : 'Publish'}
@@ -1530,7 +1530,7 @@ export default function TDIAdminCreatorDetailPage() {
                           onClick={handleSavePostLaunchNotes}
                           disabled={isSavingPostLaunch}
                           className="flex-1 px-2 py-1 text-xs font-medium rounded text-white"
-                          style={{ backgroundColor: theme.primary }}
+                          style={{ backgroundColor: theme.accent }}
                         >
                           {isSavingPostLaunch ? 'Saving...' : 'Save'}
                         </button>
@@ -1572,7 +1572,7 @@ export default function TDIAdminCreatorDetailPage() {
                       <button
                         onClick={() => setShowStartNewProjectModal(true)}
                         className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors"
-                        style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+                        style={{ backgroundColor: theme.accent, color: '#2B3A67' }}
                       >
                         <Sparkles className="w-4 h-4" />
                         Start New Project
@@ -1599,7 +1599,7 @@ export default function TDIAdminCreatorDetailPage() {
                 className="font-semibold flex items-center gap-2 mb-3"
                 style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
               >
-                <History className="w-4 h-4" style={{ color: theme.primary }} />
+                <History className="w-4 h-4" style={{ color: theme.accent }} />
                 Previous Projects
               </h3>
               <div className="text-sm">
@@ -1647,7 +1647,7 @@ export default function TDIAdminCreatorDetailPage() {
                     type="submit"
                     disabled={!newNote.trim() || isAddingNote}
                     className="px-3 py-1.5 text-sm font-medium rounded-lg disabled:opacity-50 flex items-center gap-1"
-                    style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+                    style={{ backgroundColor: theme.accent, color: '#2B3A67' }}
                   >
                     {isAddingNote ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                     Add Note
@@ -1702,7 +1702,7 @@ export default function TDIAdminCreatorDetailPage() {
                 <button
                   onClick={() => setIsEditingWebsite(true)}
                   className="text-sm hover:opacity-80"
-                  style={{ color: theme.primary }}
+                  style={{ color: theme.accent }}
                 >
                   Edit
                 </button>
@@ -1799,7 +1799,7 @@ export default function TDIAdminCreatorDetailPage() {
                     onClick={handleSaveWebsiteSettings}
                     disabled={isSavingWebsite}
                     className="flex-1 px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1"
-                    style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+                    style={{ backgroundColor: theme.accent, color: '#2B3A67' }}
                   >
                     {isSavingWebsite ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                     Save
@@ -1861,9 +1861,9 @@ export default function TDIAdminCreatorDetailPage() {
               <div className="flex items-center gap-3">
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: theme.light }}
+                  style={{ backgroundColor: theme.accentLight }}
                 >
-                  <Rocket size={24} style={{ color: theme.primary }} />
+                  <Rocket size={24} style={{ color: theme.accent }} />
                 </div>
                 <div>
                   <h2
@@ -1887,7 +1887,7 @@ export default function TDIAdminCreatorDetailPage() {
                   <div
                     className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                       publishAction === 'publish_now'
-                        ? 'border-[#9B7CB8] bg-[#F3EDF8]'
+                        ? 'border-[#8B5CF6] bg-[#EDE9FE]'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                     onClick={() => setPublishAction('publish_now')}
@@ -1902,7 +1902,7 @@ export default function TDIAdminCreatorDetailPage() {
                     />
                     <div
                       className="w-10 h-10 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: publishAction === 'publish_now' ? theme.primary : '#F3F4F6' }}
+                      style={{ backgroundColor: publishAction === 'publish_now' ? theme.accent : '#F3F4F6' }}
                     >
                       <Rocket size={20} className={publishAction === 'publish_now' ? 'text-white' : 'text-gray-500'} />
                     </div>
@@ -1917,7 +1917,7 @@ export default function TDIAdminCreatorDetailPage() {
                   <div
                     className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                       publishAction === 'schedule'
-                        ? 'border-[#9B7CB8] bg-[#F3EDF8]'
+                        ? 'border-[#8B5CF6] bg-[#EDE9FE]'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                     onClick={() => setPublishAction('schedule')}
@@ -1932,7 +1932,7 @@ export default function TDIAdminCreatorDetailPage() {
                     />
                     <div
                       className="w-10 h-10 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: publishAction === 'schedule' ? theme.primary : '#F3F4F6' }}
+                      style={{ backgroundColor: publishAction === 'schedule' ? theme.accent : '#F3F4F6' }}
                     >
                       <Calendar size={20} className={publishAction === 'schedule' ? 'text-white' : 'text-gray-500'} />
                     </div>
@@ -1956,7 +1956,7 @@ export default function TDIAdminCreatorDetailPage() {
                       value={scheduledDate}
                       onChange={(e) => setScheduledDate(e.target.value)}
                       min={new Date().toISOString().split('T')[0]}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#9B7CB8]/50 focus:border-[#9B7CB8]"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/50 focus:border-[#8B5CF6]"
                     />
                   </div>
                   <div>
@@ -1968,7 +1968,7 @@ export default function TDIAdminCreatorDetailPage() {
                       onChange={(e) => setPublishNotes(e.target.value)}
                       placeholder="e.g., Coordinating with social media campaign..."
                       rows={2}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#9B7CB8]/50 focus:border-[#9B7CB8]"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/50 focus:border-[#8B5CF6]"
                     />
                   </div>
                 </div>
@@ -1992,7 +1992,7 @@ export default function TDIAdminCreatorDetailPage() {
                 onClick={() => handlePublishStatusUpdate(publishAction)}
                 disabled={isPublishing || (publishAction === 'schedule' && !scheduledDate)}
                 className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+                style={{ backgroundColor: theme.accent, color: '#2B3A67' }}
               >
                 {isPublishing ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -2025,9 +2025,9 @@ export default function TDIAdminCreatorDetailPage() {
               <div className="flex items-center gap-3">
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: theme.light }}
+                  style={{ backgroundColor: theme.accentLight }}
                 >
-                  <Sparkles size={24} style={{ color: theme.primary }} />
+                  <Sparkles size={24} style={{ color: theme.accent }} />
                 </div>
                 <div>
                   <h2
@@ -2080,7 +2080,7 @@ export default function TDIAdminCreatorDetailPage() {
                 onClick={handleStartNewProject}
                 disabled={isStartingNewProject}
                 className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
-                style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+                style={{ backgroundColor: theme.accent, color: '#2B3A67' }}
               >
                 {isStartingNewProject ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

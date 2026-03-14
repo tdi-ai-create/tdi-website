@@ -77,7 +77,7 @@ function SidebarNavItem({
 }) {
   const content = (
     <>
-      <Icon size={20} className={active ? '' : 'text-gray-400'} style={active ? { color: theme.primary } : undefined} />
+      <Icon size={20} className={active ? '' : 'text-gray-400'} style={active ? { color: theme.accent } : undefined} />
       <span className={active ? 'font-semibold' : ''}>{children}</span>
     </>
   );
@@ -88,8 +88,8 @@ function SidebarNavItem({
 
   const activeStyles = active
     ? {
-        backgroundColor: `${theme.primary}10`,
-        color: theme.primary,
+        backgroundColor: `${theme.accent}10`,
+        color: theme.accent,
       }
     : undefined;
 
@@ -117,8 +117,8 @@ function TabButton({ active, onClick, children, disabled }: { active: boolean; o
       className="px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2"
       style={{
         fontFamily: "'DM Sans', sans-serif",
-        borderColor: active ? theme.primary : 'transparent',
-        color: active ? theme.primary : disabled ? '#D1D5DB' : '#6B7280',
+        borderColor: active ? theme.accent : 'transparent',
+        color: active ? theme.accent : disabled ? '#D1D5DB' : '#6B7280',
         cursor: disabled ? 'not-allowed' : 'pointer',
       }}
     >
@@ -131,8 +131,8 @@ function TabButton({ active, onClick, children, disabled }: { active: boolean; o
 function EmptyState({ icon: Icon, title, description, action }: { icon: React.ElementType; title: string; description: string; action?: React.ReactNode }) {
   return (
     <div className="text-center py-12">
-      <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: theme.light }}>
-        <Icon size={24} style={{ color: theme.primary }} />
+      <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: theme.accentLight }}>
+        <Icon size={24} style={{ color: theme.accent }} />
       </div>
       <h3 className="font-medium text-gray-900 mb-1">{title}</h3>
       <p className="text-sm text-gray-500 mb-4">{description}</p>
@@ -191,13 +191,13 @@ function QuickWinsTab() {
             placeholder="Search Quick Wins..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
           />
         </div>
         <button
           onClick={() => setShowCreateForm(true)}
           className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2"
-          style={{ backgroundColor: theme.primary }}
+          style={{ backgroundColor: theme.accent }}
         >
           <Plus size={16} />
           Create Quick Win
@@ -315,7 +315,7 @@ function MediaTab() {
         <div className="flex-1" />
         <button
           className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2"
-          style={{ backgroundColor: theme.primary }}
+          style={{ backgroundColor: theme.accent }}
         >
           <Upload size={16} />
           Upload Files
@@ -323,7 +323,7 @@ function MediaTab() {
       </div>
 
       {/* Upload Zone */}
-      <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 mb-6 text-center hover:border-[#0D9488] transition-colors cursor-pointer">
+      <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 mb-6 text-center hover:border-[#00B5AD] transition-colors cursor-pointer">
         <Upload size={32} className="mx-auto mb-3 text-gray-400" />
         <p className="text-sm text-gray-600 mb-1">Drag and drop files here, or click to browse</p>
         <p className="text-xs text-gray-400">Supports videos, images, and PDFs</p>
@@ -382,7 +382,7 @@ function CalendarTab() {
 
   const typeColors: Record<string, string> = {
     course: 'bg-blue-500',
-    'quick-win': 'bg-[#0D9488]',
+    'quick-win': 'bg-[#00B5AD]',
     download: 'bg-green-500',
   };
 
@@ -437,7 +437,7 @@ function CalendarTab() {
         </div>
         <button
           className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2"
-          style={{ backgroundColor: theme.primary }}
+          style={{ backgroundColor: theme.accent }}
         >
           <Plus size={16} />
           Schedule Content
@@ -451,7 +451,7 @@ function CalendarTab() {
           <span className="text-sm text-gray-600">Courses</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-[#0D9488]" />
+          <div className="w-3 h-3 rounded-full bg-[#00B5AD]" />
           <span className="text-sm text-gray-600">Quick Wins</span>
         </div>
         <div className="flex items-center gap-2">
@@ -528,7 +528,7 @@ function FeedbackTab() {
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#FFF8E7' }}>
-              <Star size={24} style={{ color: theme.primary }} />
+              <Star size={24} style={{ color: theme.accent }} />
             </div>
             <div>
               <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>4.6</p>
@@ -583,7 +583,7 @@ function FeedbackTab() {
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">{item.course}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      <Star size={14} className="text-[#0D9488] fill-[#0D9488]" />
+                      <Star size={14} className="text-[#00B5AD] fill-[#00B5AD]" />
                       <span className="text-sm font-medium text-gray-900">{item.rating}</span>
                     </div>
                   </td>
@@ -618,7 +618,7 @@ function FeedbackTab() {
                 <span className="font-medium">21%</span>
               </div>
               <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-full bg-[#0D9488] rounded-full" style={{ width: '21%' }} />
+                <div className="h-full bg-[#00B5AD] rounded-full" style={{ width: '21%' }} />
               </div>
             </div>
             <div>
@@ -640,7 +640,7 @@ function FeedbackTab() {
               <div className="flex items-center gap-2 mb-2">
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} size={12} className={star <= 5 ? 'text-[#0D9488] fill-[#0D9488]' : 'text-gray-300'} />
+                    <Star key={star} size={12} className={star <= 5 ? 'text-[#00B5AD] fill-[#00B5AD]' : 'text-gray-300'} />
                   ))}
                 </div>
                 <span className="text-xs text-gray-500">2 hours ago</span>
@@ -652,7 +652,7 @@ function FeedbackTab() {
               <div className="flex items-center gap-2 mb-2">
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} size={12} className={star <= 4 ? 'text-[#0D9488] fill-[#0D9488]' : 'text-gray-300'} />
+                    <Star key={star} size={12} className={star <= 4 ? 'text-[#00B5AD] fill-[#00B5AD]' : 'text-gray-300'} />
                   ))}
                 </div>
                 <span className="text-xs text-gray-500">1 day ago</span>
@@ -767,7 +767,7 @@ function FreeRotationTab() {
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#FFF8E7' }}>
-              <Zap size={24} style={{ color: theme.primary }} />
+              <Zap size={24} style={{ color: theme.accent }} />
             </div>
             <div>
               <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>{freeRotatingQuickWins.length}</p>
@@ -883,7 +883,7 @@ function FreeRotationTab() {
                             ? 'border border-red-200 text-red-600 hover:bg-red-50'
                             : 'text-white hover:opacity-90'
                         }`}
-                        style={!course.is_free_rotating ? { backgroundColor: theme.primary } : undefined}
+                        style={!course.is_free_rotating ? { backgroundColor: theme.accent } : undefined}
                       >
                         {updating === course.id ? 'Updating...' : course.is_free_rotating ? 'Remove from Free' : 'Make Free'}
                       </button>
@@ -949,7 +949,7 @@ function FreeRotationTab() {
                             ? 'border border-red-200 text-red-600 hover:bg-red-50'
                             : 'text-white hover:opacity-90'
                         }`}
-                        style={!qw.is_free_rotating ? { backgroundColor: theme.primary } : undefined}
+                        style={!qw.is_free_rotating ? { backgroundColor: theme.accent } : undefined}
                       >
                         {updating === qw.id ? 'Updating...' : qw.is_free_rotating ? 'Remove from Free' : 'Make Free'}
                       </button>
@@ -1017,7 +1017,7 @@ export default function HubProductionPage() {
             <div className="flex items-center gap-2">
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: theme.primary }}
+                style={{ backgroundColor: theme.accent }}
               >
                 <BookOpen className="w-4 h-4 text-white" />
               </div>

@@ -345,7 +345,7 @@ export default function PartnershipDetailPage() {
             href="/tdi-admin/leadership"
             className="inline-block px-6 py-3 rounded-lg font-medium transition-colors"
             style={{
-              backgroundColor: theme.primary,
+              backgroundColor: theme.accent,
               color: '#2B3A67',
               fontFamily: "'DM Sans', sans-serif",
             }}
@@ -473,7 +473,7 @@ export default function PartnershipDetailPage() {
                 href={`/partners/${partnership.slug}-dashboard`}
                 target="_blank"
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
-                style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+                style={{ backgroundColor: theme.accent, color: '#2B3A67' }}
               >
                 <ExternalLink className="w-4 h-4" />
                 View Dashboard

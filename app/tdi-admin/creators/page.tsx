@@ -70,7 +70,7 @@ const USMapChart = dynamic(() => import('@/components/tdi-admin/USMapChart'), {
   ssr: false,
   loading: () => (
     <div className="h-[300px] flex items-center justify-center bg-gray-50 rounded-lg">
-      <Loader2 className="w-6 h-6 animate-spin" style={{ color: theme.primary }} />
+      <Loader2 className="w-6 h-6 animate-spin" style={{ color: theme.accent }} />
     </div>
   ),
 });
@@ -702,7 +702,7 @@ export default function CreatorStudioPage() {
             href="/tdi-admin/hub"
             className="inline-block px-6 py-3 rounded-lg font-medium transition-colors"
             style={{
-              backgroundColor: theme.primary,
+              backgroundColor: theme.accent,
               color: 'white',
               fontFamily: "'DM Sans', sans-serif",
             }}
@@ -719,7 +719,7 @@ export default function CreatorStudioPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: theme.primary }} />
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: theme.accent }} />
           <p className="text-gray-600" style={{ fontFamily: "'DM Sans', sans-serif" }}>
             Loading Creator Studio...
           </p>
@@ -788,7 +788,7 @@ export default function CreatorStudioPage() {
   ];
 
   const pathChartData = [
-    { name: 'Course', value: pathCounts.course, color: theme.primary },
+    { name: 'Course', value: pathCounts.course, color: theme.accent },
     { name: 'Blog', value: pathCounts.blog, color: '#B8A1D4' },
     { name: 'Download', value: pathCounts.download, color: '#D4C1E8' },
     { name: 'Not Set', value: pathCounts.notSet, color: '#E8E0F0' },
@@ -1314,7 +1314,7 @@ export default function CreatorStudioPage() {
                           className={`w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium flex-shrink-0 ${
                             hasPostLaunchNotes && !isWaitingOnTDI ? 'bg-green-500' : ''
                           }`}
-                          style={{ backgroundColor: hasPostLaunchNotes && !isWaitingOnTDI ? undefined : theme.primary }}
+                          style={{ backgroundColor: hasPostLaunchNotes && !isWaitingOnTDI ? undefined : theme.accent }}
                         >
                           {hasPostLaunchNotes && !isWaitingOnTDI ? (
                             <Check className="w-4 h-4" />
@@ -1345,7 +1345,7 @@ export default function CreatorStudioPage() {
                             Published
                           </span>
                         ) : (
-                          <p className="text-xs font-medium flex-shrink-0" style={{ color: theme.primary }}>
+                          <p className="text-xs font-medium flex-shrink-0" style={{ color: theme.accent }}>
                             {getRelativeTime(creator.lastActivityDate)}
                           </p>
                         )}
@@ -1356,7 +1356,7 @@ export default function CreatorStudioPage() {
                     <button
                       onClick={() => handleStatCardClick('waitingOnTDI')}
                       className="w-full text-center text-xs pt-1"
-                      style={{ color: theme.primary }}
+                      style={{ color: theme.accent }}
                     >
                       View all {needsAttentionCount} items →
                     </button>
@@ -1457,9 +1457,9 @@ export default function CreatorStudioPage() {
               </h3>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { key: 'blog', icon: FileText, label: 'Blog', count: pathCounts.blog, color: theme.primary },
-                  { key: 'download', icon: DownloadIcon, label: 'Download', count: pathCounts.download, color: theme.primary },
-                  { key: 'course', icon: BookOpen, label: 'Course', count: pathCounts.course, color: theme.primary },
+                  { key: 'blog', icon: FileText, label: 'Blog', count: pathCounts.blog, color: theme.accent },
+                  { key: 'download', icon: DownloadIcon, label: 'Download', count: pathCounts.download, color: theme.accent },
+                  { key: 'course', icon: BookOpen, label: 'Course', count: pathCounts.course, color: theme.accent },
                   { key: 'notSet', icon: HelpCircle, label: 'Not Set', count: pathCounts.notSet, color: '#E8927C' },
                 ].map((path) => {
                   const IconComponent = path.icon;
@@ -1471,12 +1471,12 @@ export default function CreatorStudioPage() {
                     >
                       <div
                         className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: theme.light }}
+                        style={{ backgroundColor: theme.accentLight }}
                       >
                         <IconComponent className="w-5 h-5" style={{ color: path.color }} />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold leading-none" style={{ color: theme.primary }}>{path.count}</p>
+                        <p className="text-2xl font-bold leading-none" style={{ color: theme.accent }}>{path.count}</p>
                         <p className="text-sm text-gray-500">{path.label}</p>
                       </div>
                     </button>
@@ -1529,7 +1529,7 @@ export default function CreatorStudioPage() {
                                 <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                                   <div
                                     className="h-full rounded-full"
-                                    style={{ width: `${percentage}%`, backgroundColor: theme.primary }}
+                                    style={{ width: `${percentage}%`, backgroundColor: theme.accent }}
                                   />
                                 </div>
                               </div>
@@ -1542,8 +1542,8 @@ export default function CreatorStudioPage() {
 
                   <div className="pt-4 border-t border-gray-100">
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="rounded-lg p-3 text-center" style={{ backgroundColor: theme.light }}>
-                        <p className="text-2xl font-bold" style={{ color: theme.primary }}>
+                      <div className="rounded-lg p-3 text-center" style={{ backgroundColor: theme.accentLight }}>
+                        <p className="text-2xl font-bold" style={{ color: theme.accent }}>
                           {locationData.creatorsWithLocation}
                         </p>
                         <p className="text-xs text-gray-600">With Location</p>
@@ -1757,7 +1757,7 @@ export default function CreatorStudioPage() {
                       checked={selectedCreatorIds.size === filteredCreators.length && filteredCreators.length > 0}
                       onChange={toggleAllCreators}
                       className="w-4 h-4 rounded border-gray-300 cursor-pointer"
-                      style={{ accentColor: theme.primary }}
+                      style={{ accentColor: theme.accent }}
                     />
                   </th>
                   <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
@@ -1845,7 +1845,7 @@ export default function CreatorStudioPage() {
                             checked={isSelected}
                             onChange={() => toggleCreatorSelection(creator.id)}
                             className="w-4 h-4 rounded border-gray-300 cursor-pointer"
-                            style={{ accentColor: theme.primary }}
+                            style={{ accentColor: theme.accent }}
                           />
                         </td>
                         {/* Creator */}
@@ -1853,7 +1853,7 @@ export default function CreatorStudioPage() {
                           <div className="flex items-center gap-3">
                             <div
                               className="w-9 h-9 rounded-full flex items-center justify-center text-white font-medium flex-shrink-0"
-                              style={{ backgroundColor: creator.progressPercentage === 100 ? '#22c55e' : theme.primary }}
+                              style={{ backgroundColor: creator.progressPercentage === 100 ? '#22c55e' : theme.accent }}
                             >
                               {creator.name.charAt(0).toUpperCase()}
                             </div>
@@ -1899,7 +1899,7 @@ export default function CreatorStudioPage() {
                                   className="h-full rounded-full"
                                   style={{
                                     width: `${creator.progressPercentage}%`,
-                                    backgroundColor: creator.progressPercentage === 100 ? '#22c55e' : theme.primary
+                                    backgroundColor: creator.progressPercentage === 100 ? '#22c55e' : theme.accent
                                   }}
                                 />
                               </div>

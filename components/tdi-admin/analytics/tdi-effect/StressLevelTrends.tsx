@@ -51,7 +51,7 @@ export function StressLevelTrends({
     return (
       <ChartCard title="Stress Level Changes Over Time" subtitle="Loading...">
         <div className="h-[300px] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.primary }} />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accent }} />
         </div>
       </ChartCard>
     );
@@ -125,7 +125,7 @@ export function StressLevelTrends({
           className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
             viewMode === 'overall' ? '' : 'text-gray-500 hover:bg-gray-100'
           }`}
-          style={viewMode === 'overall' ? { backgroundColor: `${theme.primary}15`, color: theme.primary } : undefined}
+          style={viewMode === 'overall' ? { backgroundColor: `${theme.accent}15`, color: theme.accent } : undefined}
         >
           Overall
         </button>
@@ -134,7 +134,7 @@ export function StressLevelTrends({
           className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
             viewMode === 'bySchool' ? '' : 'text-gray-500 hover:bg-gray-100'
           }`}
-          style={viewMode === 'bySchool' ? { backgroundColor: `${theme.primary}15`, color: theme.primary } : undefined}
+          style={viewMode === 'bySchool' ? { backgroundColor: `${theme.accent}15`, color: theme.accent } : undefined}
         >
           By School
         </button>
@@ -179,9 +179,9 @@ export function StressLevelTrends({
                 type="monotone"
                 dataKey="avgStress"
                 name="Avg Stress"
-                stroke={theme.primary}
+                stroke={theme.accent}
                 strokeWidth={2}
-                dot={{ r: 4, fill: theme.primary }}
+                dot={{ r: 4, fill: theme.accent }}
                 activeDot={{ r: 6 }}
               />
             ) : (

@@ -82,7 +82,7 @@ export function GlobalFilters({
             className={`flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-lg ${ADMIN_TRANSITIONS.default} hover:border-gray-300`}
             style={{ boxShadow: ADMIN_SHADOWS.card }}
           >
-            <Calendar size={16} style={{ color: theme.primary }} />
+            <Calendar size={16} style={{ color: theme.accent }} />
             <span
               className="text-sm font-medium text-gray-700"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
@@ -108,8 +108,8 @@ export function GlobalFilters({
                   }`}
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
-                    color: dateRange.preset === preset.value ? theme.primary : undefined,
-                    backgroundColor: dateRange.preset === preset.value ? `${theme.primary}08` : undefined,
+                    color: dateRange.preset === preset.value ? theme.accent : undefined,
+                    backgroundColor: dateRange.preset === preset.value ? `${theme.accent}08` : undefined,
                   }}
                 >
                   {preset.label}
@@ -141,7 +141,7 @@ export function GlobalFilters({
             onClick={onExportPDF}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg ${ADMIN_TRANSITIONS.default}`}
             style={{
-              backgroundColor: theme.primary,
+              backgroundColor: theme.accent,
               color: 'white',
             }}
           >

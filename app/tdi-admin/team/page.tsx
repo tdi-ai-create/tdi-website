@@ -225,7 +225,7 @@ export default function TeamManagementPage() {
               fontFamily: "'Source Serif 4', Georgia, serif",
               fontSize: '28px',
               color: '#2B3A67',
-              borderLeft: `4px solid ${theme.primary}`,
+              borderLeft: `4px solid ${theme.accent}`,
               paddingLeft: '16px',
             }}
           >

@@ -47,7 +47,7 @@ export function EngagementByPartnership({
     return (
       <ChartCard title="Engagement by Partnership Group" subtitle="Loading...">
         <div className="h-[350px] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.primary }} />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accent }} />
         </div>
       </ChartCard>
     );

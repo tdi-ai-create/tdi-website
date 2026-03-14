@@ -119,7 +119,7 @@ export function SchoolImpactCards({
     return (
       <ChartCard title="School Impact Overview" subtitle="Loading...">
         <div className="h-[300px] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.primary }} />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accent }} />
         </div>
       </ChartCard>
     );
@@ -237,7 +237,7 @@ export function SchoolImpactCards({
                     }}
                     className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-all"
                     style={{
-                      backgroundColor: theme.primary,
+                      backgroundColor: theme.accent,
                       color: 'white',
                     }}
                   >

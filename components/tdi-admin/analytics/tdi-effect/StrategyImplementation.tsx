@@ -31,7 +31,7 @@ export function StrategyImplementation({
     return (
       <ChartCard title="Strategy Implementation Tracking" subtitle="Loading...">
         <div className="h-[300px] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.primary }} />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accent }} />
         </div>
       </ChartCard>
     );
@@ -100,7 +100,7 @@ export function StrategyImplementation({
           <div
             className="absolute inset-0"
             style={{
-              background: `conic-gradient(from 180deg, ${isAtTarget ? '#10B981' : theme.primary} 0deg, ${isAtTarget ? '#10B981' : theme.primary} ${gaugeAngle}deg, transparent ${gaugeAngle}deg)`,
+              background: `conic-gradient(from 180deg, ${isAtTarget ? '#10B981' : theme.accent} 0deg, ${isAtTarget ? '#10B981' : theme.accent} ${gaugeAngle}deg, transparent ${gaugeAngle}deg)`,
               borderRadius: '100px 100px 0 0',
             }}
           />
@@ -113,7 +113,7 @@ export function StrategyImplementation({
 
           {/* Value display */}
           <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-center">
-            <p className="text-3xl font-bold" style={{ color: isAtTarget ? '#10B981' : theme.primary }}>
+            <p className="text-3xl font-bold" style={{ color: isAtTarget ? '#10B981' : theme.accent }}>
               {displayRate}%
             </p>
           </div>
@@ -196,7 +196,7 @@ export function StrategyImplementation({
       {/* Comparison callout */}
       <div className="mt-4 p-3 bg-gray-50 rounded-lg text-xs text-gray-600">
         <span className="font-medium">TDI Impact:</span> Teachers implementing strategies at{' '}
-        <span className="font-semibold" style={{ color: theme.primary }}>
+        <span className="font-semibold" style={{ color: theme.accent }}>
           {displayRate > industryAverage
             ? `${Math.round((displayRate / industryAverage) * 10) / 10}x`
             : `${displayRate}%`}

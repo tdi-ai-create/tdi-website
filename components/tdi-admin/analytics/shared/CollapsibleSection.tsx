@@ -36,7 +36,7 @@ export function CollapsibleSection({
         <div className="flex items-center gap-3">
           <div
             className="w-1 h-8 rounded-full"
-            style={{ backgroundColor: theme.primary }}
+            style={{ backgroundColor: theme.accent }}
           />
           <div className="text-left">
             <div className="flex items-center gap-2">
@@ -53,8 +53,8 @@ export function CollapsibleSection({
                 <span
                   className="px-2 py-0.5 text-xs font-medium rounded-full"
                   style={{
-                    backgroundColor: `${theme.primary}15`,
-                    color: theme.primary,
+                    backgroundColor: `${theme.accent}15`,
+                    color: theme.accent,
                   }}
                 >
                   {badge}
@@ -73,12 +73,12 @@ export function CollapsibleSection({
         </div>
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center"
-          style={{ backgroundColor: `${theme.primary}10` }}
+          style={{ backgroundColor: `${theme.accent}10` }}
         >
           {isOpen ? (
-            <ChevronUp size={18} style={{ color: theme.primary }} />
+            <ChevronUp size={18} style={{ color: theme.accent }} />
           ) : (
-            <ChevronDown size={18} style={{ color: theme.primary }} />
+            <ChevronDown size={18} style={{ color: theme.accent }} />
           )}
         </div>
       </button>

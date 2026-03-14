@@ -27,7 +27,7 @@ export function CoursePopularity({ data, isLoading = false }: CoursePopularityPr
     return (
       <ChartCard title="Course Popularity Rankings" subtitle="Loading...">
         <div className="h-[400px] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.primary }} />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accent }} />
         </div>
       </ChartCard>
     );
@@ -128,7 +128,7 @@ export function CoursePopularity({ data, isLoading = false }: CoursePopularityPr
                       )}
                     </div>
                   </td>
-                  <td className="py-3 px-2 text-right font-semibold" style={{ color: theme.primary }}>
+                  <td className="py-3 px-2 text-right font-semibold" style={{ color: theme.accent }}>
                     {course.totalEnrolled.toLocaleString()}
                   </td>
                   <td className="py-3 px-2">
@@ -137,7 +137,7 @@ export function CoursePopularity({ data, isLoading = false }: CoursePopularityPr
                         className="h-full rounded-full transition-all duration-500"
                         style={{
                           width: `${barWidth}%`,
-                          backgroundColor: isTop3 ? '#10B981' : isBottom3 ? '#F59E0B' : theme.primary,
+                          backgroundColor: isTop3 ? '#10B981' : isBottom3 ? '#F59E0B' : theme.accent,
                         }}
                       />
                     </div>

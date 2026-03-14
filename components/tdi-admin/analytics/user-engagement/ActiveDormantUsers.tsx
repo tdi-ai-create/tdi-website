@@ -48,7 +48,7 @@ export function ActiveDormantUsers({
     return (
       <ChartCard title="Active vs Dormant Users" subtitle="Loading...">
         <div className="h-[350px] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.primary }} />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accent }} />
         </div>
       </ChartCard>
     );
@@ -167,7 +167,7 @@ export function ActiveDormantUsers({
               <button
                 onClick={copyEmails}
                 className="flex items-center gap-1 px-2 py-1 text-xs rounded-md transition-all hover:bg-gray-100"
-                style={{ color: theme.primary }}
+                style={{ color: theme.accent }}
               >
                 {copied ? <Check size={12} /> : <Copy size={12} />}
                 {copied ? 'Copied!' : 'Copy Emails'}

@@ -21,8 +21,8 @@ import {
 } from 'lucide-react';
 
 const theme = {
-  primary: '#0D9488',
-  light: '#CCFBF1',
+  accent: '#00B5AD',
+  accentLight: '#E0F7F6',
 };
 
 // Course categories
@@ -336,7 +336,7 @@ function CreateCourseModal({
             onClick={handleSubmit}
             disabled={!form.title.trim() || isSubmitting}
             className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ backgroundColor: theme.primary }}
+            style={{ backgroundColor: theme.accent }}
           >
             {isSubmitting ? 'Creating...' : 'Create Course'}
           </button>
@@ -432,9 +432,9 @@ function EmptyState({ onCreateClick }: { onCreateClick: () => void }) {
     <div className="text-center py-16">
       <div
         className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
-        style={{ backgroundColor: theme.light }}
+        style={{ backgroundColor: theme.accentLight }}
       >
-        <BookOpen size={32} style={{ color: theme.primary }} />
+        <BookOpen size={32} style={{ color: theme.accent }} />
       </div>
       <h3 className="font-semibold text-gray-900 mb-2">No courses yet</h3>
       <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
@@ -443,7 +443,7 @@ function EmptyState({ onCreateClick }: { onCreateClick: () => void }) {
       <button
         onClick={onCreateClick}
         className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2 mx-auto"
-        style={{ backgroundColor: theme.primary }}
+        style={{ backgroundColor: theme.accent }}
       >
         <Plus size={16} />
         Create Course
@@ -661,7 +661,7 @@ export function CoursesTab() {
         <button
           onClick={() => setShowCreateModal(true)}
           className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2 transition-colors hover:opacity-90"
-          style={{ backgroundColor: theme.primary }}
+          style={{ backgroundColor: theme.accent }}
         >
           <Plus size={16} />
           New Course

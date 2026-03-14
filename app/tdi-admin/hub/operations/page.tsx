@@ -22,13 +22,13 @@ const theme = PORTAL_THEMES.hub;
 // Dynamic import for USMapChart to avoid SSR issues with D3
 const USMapChart = dynamic(() => import('@/components/tdi-admin/USMapChart'), {
   ssr: false,
-  loading: () => <div className="h-[350px] flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.primary }}></div></div>
+  loading: () => <div className="h-[350px] flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accent }}></div></div>
 });
 
 // Dynamic import for AnalyticsDashboard (comprehensive analytics)
 const AnalyticsDashboard = dynamic(() => import('@/components/tdi-admin/analytics/AnalyticsDashboard').then(mod => ({ default: mod.AnalyticsDashboard })), {
   ssr: false,
-  loading: () => <div className="py-12 text-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: theme.primary }}></div><p className="text-gray-500 mt-3">Loading analytics...</p></div>
+  loading: () => <div className="py-12 text-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: theme.accent }}></div><p className="text-gray-500 mt-3">Loading analytics...</p></div>
 });
 import {
   LineChart,
@@ -105,7 +105,7 @@ function SidebarNavItem({
 }) {
   const content = (
     <>
-      <Icon size={20} className={active ? '' : 'text-gray-400'} style={active ? { color: theme.primary } : undefined} />
+      <Icon size={20} className={active ? '' : 'text-gray-400'} style={active ? { color: theme.accent } : undefined} />
       <span className={active ? 'font-semibold' : ''}>{children}</span>
     </>
   );
@@ -116,8 +116,8 @@ function SidebarNavItem({
 
   const activeStyles = active
     ? {
-        backgroundColor: `${theme.primary}10`,
-        color: theme.primary,
+        backgroundColor: `${theme.accent}10`,
+        color: theme.accent,
       }
     : undefined;
 
@@ -144,8 +144,8 @@ function StatCard({ label, value, icon: Icon, trend }: { label: string; value: s
     <div
       className="bg-white rounded-xl p-5 transition-all duration-200 group"
       style={{
-        backgroundColor: theme.light,
-        borderLeft: `3px solid ${theme.primary}`,
+        backgroundColor: theme.accentLight,
+        borderLeft: `3px solid ${theme.accent}`,
         boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
       }}
     >
@@ -155,7 +155,7 @@ function StatCard({ label, value, icon: Icon, trend }: { label: string; value: s
             className="text-[28px] font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
             style={{
               fontFamily: "'DM Sans', sans-serif",
-              color: theme.primary,
+              color: theme.accent,
             }}
           >
             {value}
@@ -169,9 +169,9 @@ function StatCard({ label, value, icon: Icon, trend }: { label: string; value: s
         </div>
         <div
           className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
-          style={{ backgroundColor: `${theme.primary}15` }}
+          style={{ backgroundColor: `${theme.accent}15` }}
         >
-          <Icon className="w-6 h-6" style={{ color: theme.primary }} />
+          <Icon className="w-6 h-6" style={{ color: theme.accent }} />
         </div>
       </div>
       {trend && (
@@ -193,8 +193,8 @@ function TabButton({ active, onClick, children, disabled }: { active: boolean; o
       className="px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2"
       style={{
         fontFamily: "'DM Sans', sans-serif",
-        borderColor: active ? theme.primary : 'transparent',
-        color: active ? theme.primary : disabled ? '#D1D5DB' : '#6B7280',
+        borderColor: active ? theme.accent : 'transparent',
+        color: active ? theme.accent : disabled ? '#D1D5DB' : '#6B7280',
         cursor: disabled ? 'not-allowed' : 'pointer',
       }}
     >
@@ -208,7 +208,7 @@ function TableHeader({ children, sortable, sorted, onSort }: { children: React.R
   return (
     <th
       className={`text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${sortable ? 'cursor-pointer hover:text-gray-700' : ''}`}
-      style={{ backgroundColor: theme.light }}
+      style={{ backgroundColor: theme.accentLight }}
       onClick={sortable ? onSort : undefined}
     >
       <div className="flex items-center gap-1">
@@ -225,8 +225,8 @@ function TableHeader({ children, sortable, sorted, onSort }: { children: React.R
 function EmptyState({ icon: Icon, title, description }: { icon: React.ElementType; title: string; description: string }) {
   return (
     <div className="text-center py-12">
-      <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: theme.light }}>
-        <Icon size={24} style={{ color: theme.primary }} />
+      <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: theme.accentLight }}>
+        <Icon size={24} style={{ color: theme.accent }} />
       </div>
       <h3 className="font-medium text-gray-900 mb-1">{title}</h3>
       <p className="text-sm text-gray-500">{description}</p>
@@ -313,7 +313,7 @@ function AccountsTab() {
             placeholder="Search by name or school..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
           />
         </div>
         <select
@@ -542,7 +542,7 @@ function EnrollmentsTab() {
             placeholder="Search by user or course..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
           />
         </div>
         <select
@@ -599,7 +599,7 @@ function EnrollmentsTab() {
                         <div className="w-20 h-2 bg-gray-100 rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full"
-                            style={{ width: `${enrollment.progress_pct || 0}%`, backgroundColor: enrollment.status === 'completed' ? '#16A34A' : theme.primary }}
+                            style={{ width: `${enrollment.progress_pct || 0}%`, backgroundColor: enrollment.status === 'completed' ? '#16A34A' : theme.accent }}
                           />
                         </div>
                         <span className="text-xs text-gray-500">{enrollment.progress_pct || 0}%</span>
@@ -733,7 +733,7 @@ function CertificatesTab() {
             placeholder="Search by user, course, or verification code..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
           />
         </div>
         <button
@@ -964,27 +964,27 @@ function ReportsTab() {
             placeholder="State (e.g., TX, CA)"
             value={reportFilters.state}
             onChange={(e) => setReportFilters({ ...reportFilters, state: e.target.value })}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
           />
           <input
             type="text"
             placeholder="School/Organization"
             value={reportFilters.org}
             onChange={(e) => setReportFilters({ ...reportFilters, org: e.target.value })}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
           />
           <input
             type="date"
             value={reportFilters.dateFrom}
             onChange={(e) => setReportFilters({ ...reportFilters, dateFrom: e.target.value })}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
           />
           <span className="flex items-center text-gray-400">to</span>
           <input
             type="date"
             value={reportFilters.dateTo}
             onChange={(e) => setReportFilters({ ...reportFilters, dateTo: e.target.value })}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
           />
           {(reportFilters.state || reportFilters.org || reportFilters.dateFrom || reportFilters.dateTo) && (
             <button
@@ -1004,7 +1004,7 @@ function ReportsTab() {
           <div
             key={report.id}
             className={`bg-white rounded-lg border p-5 transition-all ${
-              selectedReport === report.id ? 'border-[#0D9488] shadow-sm' : 'border-gray-200 hover:border-[#0D9488] hover:shadow-sm'
+              selectedReport === report.id ? 'border-[#00B5AD] shadow-sm' : 'border-gray-200 hover:border-[#00B5AD] hover:shadow-sm'
             }`}
           >
             <h3 className="font-semibold text-gray-900 mb-2" style={{ fontFamily: "'DM Sans', sans-serif" }}>
@@ -1016,7 +1016,7 @@ function ReportsTab() {
                 onClick={() => generateReport(report.id)}
                 disabled={isGenerating === report.id}
                 className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors flex items-center justify-center gap-2"
-                style={{ backgroundColor: theme.primary }}
+                style={{ backgroundColor: theme.accent }}
               >
                 {isGenerating === report.id ? (
                   <>
@@ -1051,7 +1051,7 @@ function ReportsTab() {
             <button
               onClick={() => downloadCSV(selectedReport)}
               className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2"
-              style={{ backgroundColor: '#0D9488' }}
+              style={{ backgroundColor: '#00B5AD' }}
             >
               <Download size={14} />
               Download CSV
@@ -1158,7 +1158,7 @@ function ReportsTab() {
 }
 
 // Color palette for charts (Hub uses teal as primary, with complementary colors for contrast)
-const CHART_COLORS = ['#0D9488', '#115E59', '#3B82F6', '#16A34A', '#F59E0B', '#E8927C', '#6366F1', '#EC4899'];
+const CHART_COLORS = ['#00B5AD', '#007A75', '#3B82F6', '#16A34A', '#F59E0B', '#E8927C', '#6366F1', '#EC4899'];
 
 // ANALYTICS & REPORTS TAB (Combined)
 function AnalyticsReportsTab() {
@@ -1236,11 +1236,11 @@ function AnalyticsReportsTab() {
         <title>Analytics Report - ${new Date().toLocaleDateString()}</title>
         <style>
           body { font-family: system-ui, -apple-system, sans-serif; padding: 40px; color: #1f2937; }
-          h1 { color: #0D9488; margin-bottom: 8px; }
+          h1 { color: #00B5AD; margin-bottom: 8px; }
           .subtitle { color: #6b7280; margin-bottom: 24px; }
           .stats { display: flex; gap: 20px; margin-bottom: 32px; }
-          .stat-card { padding: 16px; background: #f9fafb; border-radius: 8px; border-left: 3px solid #0D9488; }
-          .stat-value { font-size: 24px; font-weight: bold; color: #0D9488; }
+          .stat-card { padding: 16px; background: #f9fafb; border-radius: 8px; border-left: 3px solid #00B5AD; }
+          .stat-value { font-size: 24px; font-weight: bold; color: #00B5AD; }
           .stat-label { font-size: 12px; color: #6b7280; }
           table { width: 100%; border-collapse: collapse; margin-top: 24px; }
           th { text-align: left; padding: 12px; background: #f9fafb; font-size: 12px; text-transform: uppercase; color: #6b7280; border-bottom: 1px solid #e5e7eb; }
@@ -1307,9 +1307,9 @@ function AnalyticsReportsTab() {
           onClick={() => setAnalyticsView('full')}
           className="px-4 py-2 text-sm font-medium rounded-lg transition-all"
           style={{
-            backgroundColor: isFull ? `${theme.primary}15` : 'transparent',
-            color: isFull ? theme.primary : '#6B7280',
-            border: isFull ? `1px solid ${theme.primary}30` : '1px solid transparent',
+            backgroundColor: isFull ? `${theme.accent}15` : 'transparent',
+            color: isFull ? theme.accent : '#6B7280',
+            border: isFull ? `1px solid ${theme.accent}30` : '1px solid transparent',
           }}
         >
           Full Analytics
@@ -1318,9 +1318,9 @@ function AnalyticsReportsTab() {
           onClick={() => setAnalyticsView('overview')}
           className="px-4 py-2 text-sm font-medium rounded-lg transition-all"
           style={{
-            backgroundColor: !isFull ? `${theme.primary}15` : 'transparent',
-            color: !isFull ? theme.primary : '#6B7280',
-            border: !isFull ? `1px solid ${theme.primary}30` : '1px solid transparent',
+            backgroundColor: !isFull ? `${theme.accent}15` : 'transparent',
+            color: !isFull ? theme.accent : '#6B7280',
+            border: !isFull ? `1px solid ${theme.accent}30` : '1px solid transparent',
           }}
         >
           Quick Overview
@@ -1372,7 +1372,7 @@ function AnalyticsReportsTab() {
                 <XAxis dataKey="month" tick={{ fontSize: 10 }} stroke="#9CA3AF" />
                 <YAxis tick={{ fontSize: 10 }} stroke="#9CA3AF" />
                 <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#0D9488" strokeWidth={2} dot={{ fill: '#0D9488', r: 3 }} name="Enrollments" />
+                <Line type="monotone" dataKey="value" stroke="#00B5AD" strokeWidth={2} dot={{ fill: '#00B5AD', r: 3 }} name="Enrollments" />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -1404,7 +1404,7 @@ function AnalyticsReportsTab() {
                 <XAxis dataKey="month" tick={{ fontSize: 10 }} stroke="#9CA3AF" />
                 <YAxis tick={{ fontSize: 10 }} stroke="#9CA3AF" />
                 <Tooltip />
-                <Bar dataKey="value" fill={theme.primary} radius={[4, 4, 0, 0]} name="PD Hours" />
+                <Bar dataKey="value" fill={theme.accent} radius={[4, 4, 0, 0]} name="PD Hours" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -1508,7 +1508,7 @@ function AnalyticsReportsTab() {
             <button
               onClick={exportPDF}
               className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2"
-              style={{ backgroundColor: theme.primary }}
+              style={{ backgroundColor: theme.accent }}
             >
               <FileText size={14} />
               Export PDF
@@ -1758,25 +1758,25 @@ function AnalyticsTab() {
         {activeFilterCount > 0 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #F3F4F6' }}>
             {filters.state && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.1)', color: '#0D9488', fontSize: '12px', borderRadius: '9999px' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.1)', color: '#00B5AD', fontSize: '12px', borderRadius: '9999px' }}>
                 State: {filters.state}
                 <button onClick={() => setFilters({ ...filters, state: '' })} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}><X size={12} /></button>
               </span>
             )}
             {filters.org && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.1)', color: '#0D9488', fontSize: '12px', borderRadius: '9999px' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.1)', color: '#00B5AD', fontSize: '12px', borderRadius: '9999px' }}>
                 Org: {filters.org.length > 15 ? filters.org.slice(0, 15) + '...' : filters.org}
                 <button onClick={() => setFilters({ ...filters, org: '' })} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}><X size={12} /></button>
               </span>
             )}
             {filters.role !== 'all' && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.15)', color: '#115E59', fontSize: '12px', borderRadius: '9999px' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.15)', color: '#007A75', fontSize: '12px', borderRadius: '9999px' }}>
                 Role: {filters.role.replace('_', ' ')}
                 <button onClick={() => setFilters({ ...filters, role: 'all' })} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}><X size={12} /></button>
               </span>
             )}
             {filters.gradeLevel !== 'all' && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.15)', color: '#115E59', fontSize: '12px', borderRadius: '9999px' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.15)', color: '#007A75', fontSize: '12px', borderRadius: '9999px' }}>
                 Grade: {filters.gradeLevel}
                 <button onClick={() => setFilters({ ...filters, gradeLevel: 'all' })} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}><X size={12} /></button>
               </span>
@@ -1897,7 +1897,7 @@ function AnalyticsTab() {
                     <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <Tooltip />
-                    <Line type="monotone" dataKey="value" stroke="#0D9488" strokeWidth={2} dot={{ fill: '#0D9488' }} name="Enrollments" />
+                    <Line type="monotone" dataKey="value" stroke="#00B5AD" strokeWidth={2} dot={{ fill: '#00B5AD' }} name="Enrollments" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -1929,7 +1929,7 @@ function AnalyticsTab() {
                     <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <Tooltip />
-                    <Bar dataKey="value" fill={theme.primary} radius={[4, 4, 0, 0]} name="PD Hours" />
+                    <Bar dataKey="value" fill={theme.accent} radius={[4, 4, 0, 0]} name="PD Hours" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -2001,7 +2001,7 @@ function AnalyticsTab() {
                       tickFormatter={(value) => value.length > 25 ? value.slice(0, 25) + '...' : value}
                     />
                     <Tooltip />
-                    <Bar dataKey="enrollments" fill="#0D9488" radius={[0, 4, 4, 0]} name="Enrollments" />
+                    <Bar dataKey="enrollments" fill="#00B5AD" radius={[0, 4, 4, 0]} name="Enrollments" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -2119,7 +2119,7 @@ function AnalyticsTab() {
                       <XAxis dataKey="grade" tick={{ fontSize: 11 }} stroke="#9CA3AF" />
                       <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                       <Tooltip />
-                      <Bar dataKey="count" fill="#0D9488" radius={[4, 4, 0, 0]} name="Users" />
+                      <Bar dataKey="count" fill="#00B5AD" radius={[4, 4, 0, 0]} name="Users" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -2139,7 +2139,7 @@ function AnalyticsTab() {
                       <XAxis dataKey="range" tick={{ fontSize: 11 }} stroke="#9CA3AF" />
                       <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                       <Tooltip />
-                      <Bar dataKey="count" fill={theme.primary} radius={[4, 4, 0, 0]} name="Users" />
+                      <Bar dataKey="count" fill={theme.accent} radius={[4, 4, 0, 0]} name="Users" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -2185,7 +2185,7 @@ function AnalyticsTab() {
               <h3 className="font-semibold text-gray-900">Geographic Distribution</h3>
               <p className="text-sm text-gray-500">
                 Users located across {analytics?.totalStatesWithUsers || analytics?.stateDistribution?.length || 0} states
-                {filters.state && <span className="ml-2 text-[#0D9488]">(filtered to {filters.state})</span>}
+                {filters.state && <span className="ml-2 text-[#00B5AD]">(filtered to {filters.state})</span>}
               </p>
             </div>
             {analytics?.stateDistribution?.length > 0 ? (
@@ -2211,7 +2211,7 @@ function AnalyticsTab() {
                           onClick={() => setFilters({ ...filters, state: filters.state === item.state ? '' : item.state })}
                           className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors ${
                             filters.state === item.state
-                              ? 'bg-[#0D9488]/10 border border-[#0D9488]'
+                              ? 'bg-[#00B5AD]/10 border border-[#00B5AD]'
                               : 'hover:bg-gray-50 border border-transparent'
                           }`}
                         >
@@ -2295,7 +2295,7 @@ function AnalyticsTab() {
             </div>
             <div className="bg-white rounded-lg border border-gray-200 p-5">
               <p className="text-sm text-gray-500 mb-1">Users Improved</p>
-              <p className="text-2xl font-bold" style={{ color: '#0D9488' }}>{stats.improvementRate || 0}%</p>
+              <p className="text-2xl font-bold" style={{ color: '#00B5AD' }}>{stats.improvementRate || 0}%</p>
               <p className="text-xs text-gray-400">Lower stress score</p>
             </div>
             <div className="bg-white rounded-lg border border-gray-200 p-5">
@@ -2338,7 +2338,7 @@ function AnalyticsTab() {
                     <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <YAxis domain={[1, 10]} tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <Tooltip />
-                    <Line type="monotone" dataKey="avgScore" stroke={theme.primary} strokeWidth={2} dot={{ fill: theme.primary }} name="Avg Stress" />
+                    <Line type="monotone" dataKey="avgScore" stroke={theme.accent} strokeWidth={2} dot={{ fill: theme.accent }} name="Avg Stress" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -2366,7 +2366,7 @@ function AnalyticsTab() {
                       <Tooltip />
                       <Bar dataKey="count" name="Activity" radius={[4, 4, 0, 0]}>
                         {analytics!.activityByDay.map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={entry.isPeak ? theme.dark : theme.primary} />
+                          <Cell key={`cell-${index}`} fill={entry.isPeak ? theme.accentDark : theme.accent} />
                         ))}
                       </Bar>
                     </BarChart>
@@ -2390,7 +2390,7 @@ function AnalyticsTab() {
                       <Tooltip />
                       <Bar dataKey="count" name="Activity" radius={[4, 4, 0, 0]}>
                         {analytics!.activityByHour.map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={entry.isPeak ? theme.dark : theme.primary} />
+                          <Cell key={`cell-${index}`} fill={entry.isPeak ? theme.accentDark : theme.accent} />
                         ))}
                       </Bar>
                     </BarChart>
@@ -2413,7 +2413,7 @@ function AnalyticsTab() {
                     <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <Tooltip />
-                    <Line type="monotone" dataKey="users" stroke="#0D9488" strokeWidth={2} dot={{ fill: '#0D9488' }} name="Active Users" />
+                    <Line type="monotone" dataKey="users" stroke="#00B5AD" strokeWidth={2} dot={{ fill: '#00B5AD' }} name="Active Users" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -2423,7 +2423,7 @@ function AnalyticsTab() {
           </div>
 
           {/* Peak Times Summary */}
-          <div className="bg-gradient-to-r from-[#0D9488]/10 to-[#115E59]/10 rounded-lg p-5 border border-[#0D9488]/20">
+          <div className="bg-gradient-to-r from-[#00B5AD]/10 to-[#007A75]/10 rounded-lg p-5 border border-[#00B5AD]/20">
             <h3 className="font-semibold text-gray-900 mb-3">Peak Activity Summary</h3>
             <div className="grid md:grid-cols-3 gap-4">
               <div>
@@ -2502,7 +2502,7 @@ function TipsTab() {
             placeholder="Enter a new tip..."
             value={newTip}
             onChange={(e) => setNewTip(e.target.value)}
-            className="w-full p-2 border border-gray-200 rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+            className="w-full p-2 border border-gray-200 rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
             rows={2}
           />
           <div className="flex items-center gap-2 mt-2">
@@ -2519,7 +2519,7 @@ function TipsTab() {
             <button
               onClick={handleAddTip}
               className="px-3 py-1.5 rounded text-sm font-medium text-white"
-              style={{ backgroundColor: theme.primary }}
+              style={{ backgroundColor: theme.accent }}
             >
               Add Tip
             </button>
@@ -2678,11 +2678,11 @@ function EmailsTab() {
             placeholder="Enter email address..."
             value={testEmail}
             onChange={(e) => setTestEmail(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+            className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
           />
           <button
             className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2"
-            style={{ backgroundColor: theme.primary }}
+            style={{ backgroundColor: theme.accent }}
           >
             <Send size={16} />
             Send Test
@@ -2746,7 +2746,7 @@ export default function HubOperationsPage() {
             <div className="flex items-center gap-2">
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: theme.primary }}
+                style={{ backgroundColor: theme.accent }}
               >
                 <BookOpen className="w-4 h-4 text-white" />
               </div>

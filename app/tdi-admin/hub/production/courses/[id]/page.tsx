@@ -40,8 +40,8 @@ import {
 } from 'lucide-react';
 
 const theme = {
-  primary: '#0D9488',
-  light: '#CCFBF1',
+  primary: '#00B5AD',
+  light: '#E0F7F6',
 };
 
 const CATEGORIES = [

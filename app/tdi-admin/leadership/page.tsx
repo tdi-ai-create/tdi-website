@@ -313,7 +313,7 @@ export default function LeadershipDashboardPage() {
             href="/tdi-admin/hub"
             className="inline-block px-6 py-3 rounded-lg font-medium transition-colors"
             style={{
-              backgroundColor: theme.primary,
+              backgroundColor: theme.accent,
               color: '#2B3A67',
               fontFamily: "'DM Sans', sans-serif",
             }}
@@ -335,7 +335,7 @@ export default function LeadershipDashboardPage() {
             fontFamily: "'Source Serif 4', Georgia, serif",
             fontSize: '28px',
             color: '#1a1a2e',
-            borderLeft: `4px solid ${theme.primary}`,
+            borderLeft: `4px solid ${theme.accent}`,
             paddingLeft: '16px',
           }}
         >
@@ -355,8 +355,8 @@ export default function LeadershipDashboardPage() {
           <div
             className="bg-white rounded-xl p-5 transition-all duration-200 group"
             style={{
-              backgroundColor: theme.light,
-              borderLeft: `3px solid ${theme.primary}`,
+              backgroundColor: theme.accentLight,
+              borderLeft: `3px solid ${theme.accent}`,
               boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
             }}
           >
@@ -364,7 +364,7 @@ export default function LeadershipDashboardPage() {
               <div>
                 <p
                   className="text-[28px] font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.primary }}
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.activeCount}
                 </p>
@@ -374,9 +374,9 @@ export default function LeadershipDashboardPage() {
               </div>
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
-                style={{ backgroundColor: `${theme.primary}15` }}
+                style={{ backgroundColor: `${theme.accent}15` }}
               >
-                <Check className="w-6 h-6" style={{ color: theme.primary }} />
+                <Check className="w-6 h-6" style={{ color: theme.accent }} />
               </div>
             </div>
           </div>
@@ -384,8 +384,8 @@ export default function LeadershipDashboardPage() {
           <div
             className="bg-white rounded-xl p-5 transition-all duration-200 group"
             style={{
-              backgroundColor: theme.light,
-              borderLeft: `3px solid ${theme.primary}`,
+              backgroundColor: theme.accentLight,
+              borderLeft: `3px solid ${theme.accent}`,
               boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
             }}
           >
@@ -393,7 +393,7 @@ export default function LeadershipDashboardPage() {
               <div>
                 <p
                   className="text-[28px] font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.primary }}
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.totalEducators}
                 </p>
@@ -403,9 +403,9 @@ export default function LeadershipDashboardPage() {
               </div>
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
-                style={{ backgroundColor: `${theme.primary}15` }}
+                style={{ backgroundColor: `${theme.accent}15` }}
               >
-                <Users className="w-6 h-6" style={{ color: theme.primary }} />
+                <Users className="w-6 h-6" style={{ color: theme.accent }} />
               </div>
             </div>
           </div>
@@ -413,8 +413,8 @@ export default function LeadershipDashboardPage() {
           <div
             className="bg-white rounded-xl p-5 transition-all duration-200 group"
             style={{
-              backgroundColor: theme.light,
-              borderLeft: `3px solid ${theme.primary}`,
+              backgroundColor: theme.accentLight,
+              borderLeft: `3px solid ${theme.accent}`,
               boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
             }}
           >
@@ -422,7 +422,7 @@ export default function LeadershipDashboardPage() {
               <div>
                 <p
                   className="text-[28px] font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.primary }}
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.pendingSetup}
                 </p>
@@ -432,9 +432,9 @@ export default function LeadershipDashboardPage() {
               </div>
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
-                style={{ backgroundColor: `${theme.primary}15` }}
+                style={{ backgroundColor: `${theme.accent}15` }}
               >
-                <Clock className="w-6 h-6" style={{ color: theme.primary }} />
+                <Clock className="w-6 h-6" style={{ color: theme.accent }} />
               </div>
             </div>
           </div>
@@ -442,8 +442,8 @@ export default function LeadershipDashboardPage() {
           <div
             className="bg-white rounded-xl p-5 transition-all duration-200 group"
             style={{
-              backgroundColor: theme.light,
-              borderLeft: `3px solid ${theme.primary}`,
+              backgroundColor: theme.accentLight,
+              borderLeft: `3px solid ${theme.accent}`,
               boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
             }}
           >
@@ -451,7 +451,7 @@ export default function LeadershipDashboardPage() {
               <div>
                 <p
                   className="text-[28px] font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.primary }}
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.awaitingAccept}
                 </p>
@@ -461,9 +461,9 @@ export default function LeadershipDashboardPage() {
               </div>
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
-                style={{ backgroundColor: `${theme.primary}15` }}
+                style={{ backgroundColor: `${theme.accent}15` }}
               >
-                <Mail className="w-6 h-6" style={{ color: theme.primary }} />
+                <Mail className="w-6 h-6" style={{ color: theme.accent }} />
               </div>
             </div>
           </div>
@@ -482,10 +482,10 @@ export default function LeadershipDashboardPage() {
               className="flex items-center gap-2 px-4 py-2 rounded-t-lg font-medium transition-all relative"
               style={{
                 backgroundColor: isActive ? 'white' : 'transparent',
-                color: isActive ? theme.primary : '#6B7280',
+                color: isActive ? theme.accent : '#6B7280',
                 fontFamily: "'DM Sans', sans-serif",
                 borderBottom: isActive
-                  ? `2px solid ${theme.primary}`
+                  ? `2px solid ${theme.accent}`
                   : '2px solid transparent',
                 marginBottom: '-2px',
               }}
@@ -545,7 +545,7 @@ export default function LeadershipDashboardPage() {
                     href="/admin/partnerships"
                     className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 hover:opacity-90"
                     style={{
-                      backgroundColor: theme.primary,
+                      backgroundColor: theme.accent,
                       color: 'white',
                       fontFamily: "'DM Sans', sans-serif",
                     }}

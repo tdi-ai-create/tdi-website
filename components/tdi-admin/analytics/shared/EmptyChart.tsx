@@ -26,9 +26,9 @@ export function EmptyChart({
     <div className="flex flex-col items-center justify-center h-full min-h-[200px] text-center px-4">
       <div
         className="w-14 h-14 rounded-full flex items-center justify-center mb-4"
-        style={{ backgroundColor: `${theme.primary}10` }}
+        style={{ backgroundColor: `${theme.accent}10` }}
       >
-        <Icon size={24} style={{ color: theme.primary }} />
+        <Icon size={24} style={{ color: theme.accent }} />
       </div>
       <h4
         className="font-medium mb-1"
@@ -50,8 +50,8 @@ export function EmptyChart({
           onClick={onAction}
           className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
           style={{
-            backgroundColor: `${theme.primary}15`,
-            color: theme.primary,
+            backgroundColor: `${theme.accent}15`,
+            color: theme.accent,
           }}
         >
           {actionLabel}

@@ -9,12 +9,12 @@ import { BookOpen, Palette, Building2, Users, LogOut, ShieldAlert } from 'lucide
 import type { User } from '@supabase/supabase-js';
 import { getPortalTheme } from '@/lib/tdi-admin/theme';
 
-// Portal accent colors (extended for nav styling) - Updated per design spec
+// Portal accent colors (extended for nav styling) - Approved color system v1.0
 const PORTAL_COLORS = {
-  hub: { accent: '#0D9488', light: '#F0FDFA', bg15: 'rgba(13, 148, 136, 0.15)', border30: 'rgba(13, 148, 136, 0.3)' },
-  creators: { accent: '#6B5CE7', light: '#F3EDF8', bg15: 'rgba(107, 92, 231, 0.15)', border30: 'rgba(107, 92, 231, 0.3)' },
-  leadership: { accent: '#1E3A5F', light: '#EEF2F6', bg15: 'rgba(30, 58, 95, 0.15)', border30: 'rgba(30, 58, 95, 0.3)' },
-  team: { accent: '#6B7280', light: '#F9FAFB', bg15: 'rgba(107, 114, 128, 0.15)', border30: 'rgba(107, 114, 128, 0.3)' },
+  hub: { accent: '#00B5AD', light: '#E0F7F6', bg15: 'rgba(0, 181, 173, 0.15)', border30: 'rgba(0, 181, 173, 0.3)' },
+  creators: { accent: '#8B5CF6', light: '#EDE9FE', bg15: 'rgba(139, 92, 246, 0.15)', border30: 'rgba(139, 92, 246, 0.3)' },
+  leadership: { accent: '#16A34A', light: '#DCFCE7', bg15: 'rgba(22, 163, 74, 0.15)', border30: 'rgba(22, 163, 74, 0.3)' },
+  team: { accent: '#F59E0B', light: '#FEF3C7', bg15: 'rgba(245, 158, 11, 0.15)', border30: 'rgba(245, 158, 11, 0.3)' },
 };
 
 // Navigation tabs configuration

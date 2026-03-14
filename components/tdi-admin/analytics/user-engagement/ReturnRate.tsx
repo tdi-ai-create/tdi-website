@@ -37,7 +37,7 @@ export function ReturnRate({
     return (
       <ChartCard title="Return Rate Over Time" subtitle="Loading...">
         <div className="h-[300px] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.primary }} />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accent }} />
         </div>
       </ChartCard>
     );
@@ -122,9 +122,9 @@ export function ReturnRate({
               type="monotone"
               dataKey="returningUsers"
               name="Returning Users"
-              stroke={theme.primary}
+              stroke={theme.accent}
               strokeWidth={2}
-              dot={{ r: 3, fill: theme.primary }}
+              dot={{ r: 3, fill: theme.accent }}
               activeDot={{ r: 5 }}
             />
             <Line
@@ -143,9 +143,9 @@ export function ReturnRate({
 
       {/* Summary stats */}
       <div className="mt-4 grid grid-cols-3 gap-4">
-        <div className="p-3 rounded-lg" style={{ backgroundColor: `${theme.primary}10` }}>
+        <div className="p-3 rounded-lg" style={{ backgroundColor: `${theme.accent}10` }}>
           <p className="text-xs text-gray-500 mb-1">Avg Returning/Week</p>
-          <p className="text-lg font-semibold" style={{ color: theme.primary }}>
+          <p className="text-lg font-semibold" style={{ color: theme.accent }}>
             {avgReturning}
           </p>
         </div>

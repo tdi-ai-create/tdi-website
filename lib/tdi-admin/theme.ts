@@ -1,42 +1,53 @@
 /**
- * Portal Theme Configuration
- * Each TDI Admin portal section has its own accent color identity
+ * TDI Admin Portal Theme System v1.0
+ * Approved color system for portal section identities
  */
 
+export type PortalSection = 'hub' | 'creators' | 'leadership' | 'team';
+
 export interface PortalTheme {
-  primary: string;
-  light: string;
-  dark: string;
-  name: 'hub' | 'creators' | 'leadership' | 'team';
+  accent:      string;  // primary color used for highlights, buttons, etc.
+  accentLight: string;  // lighter shade for backgrounds, hover states
+  accentDark:  string;  // darker shade for borders, pressed states
+  label:       string;  // Display label for the section
+  name:        string;  // Full name of the section
+  section:     PortalSection;
 }
 
-// Theme definitions - Updated accent colors per design spec
-export const PORTAL_THEMES = {
+export const PORTAL_THEMES: Record<PortalSection, PortalTheme> = {
   hub: {
-    primary: '#0D9488',      // Teal
-    light: '#F0FDFA',
-    dark: '#115E59',
-    name: 'hub' as const,
+    accent:      '#00B5AD',
+    accentLight: '#E0F7F6',
+    accentDark:  '#007A75',
+    label:       'HUB',
+    name:        'Learning Hub',
+    section:     'hub',
   },
   creators: {
-    primary: '#6B5CE7',      // Purple/Lavender
-    light: '#F3EDF8',
-    dark: '#5145B5',
-    name: 'creators' as const,
+    accent:      '#8B5CF6',
+    accentLight: '#EDE9FE',
+    accentDark:  '#5B21B6',
+    label:       'CREATORS',
+    name:        'Creator Studio',
+    section:     'creators',
   },
   leadership: {
-    primary: '#1E3A5F',      // Navy
-    light: '#EEF2F6',
-    dark: '#152A45',
-    name: 'leadership' as const,
+    accent:      '#16A34A',
+    accentLight: '#DCFCE7',
+    accentDark:  '#166534',
+    label:       'LEADERSHIP',
+    name:        'Leadership Corner',
+    section:     'leadership',
   },
   team: {
-    primary: '#6B7280',      // Neutral grey
-    light: '#F9FAFB',
-    dark: '#4B5563',
-    name: 'team' as const,
+    accent:      '#F59E0B',
+    accentLight: '#FEF3C7',
+    accentDark:  '#B45309',
+    label:       'TEAM',
+    name:        'Team Resources',
+    section:     'team',
   },
-} as const;
+};
 
 /**
  * Get the portal theme based on the current route

@@ -32,7 +32,7 @@ export function DropoffFunnel({
     return (
       <ChartCard title="Course Drop-off Analysis" subtitle="Loading...">
         <div className="h-[350px] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.primary }} />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accent }} />
         </div>
       </ChartCard>
     );
@@ -125,14 +125,14 @@ export function DropoffFunnel({
                       width: `${Math.max(width, 10)}%`,
                       backgroundColor: stage.isDropoff
                         ? '#FEE2E2'
-                        : `${theme.primary}${Math.round(15 + (width / 100) * 85).toString(16).padStart(2, '0')}`,
-                      borderLeft: stage.isDropoff ? '3px solid #EF4444' : `3px solid ${theme.primary}`,
+                        : `${theme.accent}${Math.round(15 + (width / 100) * 85).toString(16).padStart(2, '0')}`,
+                      borderLeft: stage.isDropoff ? '3px solid #EF4444' : `3px solid ${theme.accent}`,
                     }}
                   >
                     <span
                       className="text-sm font-medium truncate"
                       style={{
-                        color: stage.isDropoff ? '#DC2626' : theme.dark,
+                        color: stage.isDropoff ? '#DC2626' : theme.accentDark,
                       }}
                     >
                       {stage.stage}
@@ -146,8 +146,8 @@ export function DropoffFunnel({
                   <span
                     className="text-sm px-2 py-0.5 rounded-full"
                     style={{
-                      backgroundColor: stage.isDropoff ? '#FEE2E2' : `${theme.primary}15`,
-                      color: stage.isDropoff ? '#DC2626' : theme.primary,
+                      backgroundColor: stage.isDropoff ? '#FEE2E2' : `${theme.accent}15`,
+                      color: stage.isDropoff ? '#DC2626' : theme.accent,
                     }}
                   >
                     {stage.percentage}%

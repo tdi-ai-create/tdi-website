@@ -37,7 +37,7 @@ export function TimeToComplete({ data, isLoading = false }: TimeToCompleteProps)
     return (
       <ChartCard title="Time to Complete Courses" subtitle="Loading...">
         <div className="h-[300px] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.primary }} />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accent }} />
         </div>
       </ChartCard>
     );
@@ -146,7 +146,7 @@ export function TimeToComplete({ data, isLoading = false }: TimeToCompleteProps)
               {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={entry.isOutlier ? '#F59E0B' : theme.primary}
+                  fill={entry.isOutlier ? '#F59E0B' : theme.accent}
                 />
               ))}
             </Bar>
@@ -156,7 +156,7 @@ export function TimeToComplete({ data, isLoading = false }: TimeToCompleteProps)
 
       <div className="mt-4 flex items-center gap-4 text-xs text-gray-500">
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded" style={{ backgroundColor: theme.primary }} />
+          <div className="w-3 h-3 rounded" style={{ backgroundColor: theme.accent }} />
           <span>Normal</span>
         </div>
         <div className="flex items-center gap-1">

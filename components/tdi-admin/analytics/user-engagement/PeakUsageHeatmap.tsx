@@ -48,7 +48,7 @@ export function PeakUsageHeatmap({
     return (
       <ChartCard title="Peak Usage Times" subtitle="Loading...">
         <div className="h-[300px] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.primary }} />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accent }} />
         </div>
       </ChartCard>
     );
@@ -115,7 +115,7 @@ export function PeakUsageHeatmap({
                       minWidth: 24,
                       minHeight: 24,
                       backgroundColor: getColorIntensity(value, maxValue),
-                      border: isPeak ? `2px solid ${theme.primary}` : undefined,
+                      border: isPeak ? `2px solid ${theme.accent}` : undefined,
                     }}
                     title={`${day} ${getHourLabel(hour)}: ${value} sessions`}
                   >
@@ -150,8 +150,8 @@ export function PeakUsageHeatmap({
         <div
           className="text-sm px-3 py-1.5 rounded-lg"
           style={{
-            backgroundColor: `${theme.primary}10`,
-            color: theme.primary,
+            backgroundColor: `${theme.accent}10`,
+            color: theme.accent,
           }}
         >
           <span className="font-medium">Most active:</span> {heatmapData.peakTime.day} at {heatmapData.peakTime.hour}

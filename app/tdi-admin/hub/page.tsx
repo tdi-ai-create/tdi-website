@@ -64,7 +64,7 @@ function SidebarNavItem({
 }) {
   const content = (
     <>
-      <Icon size={20} className={active ? '' : 'text-gray-400'} style={active ? { color: theme.primary } : undefined} />
+      <Icon size={20} className={active ? '' : 'text-gray-400'} style={active ? { color: theme.accent } : undefined} />
       <span className={active ? 'font-semibold' : ''}>{children}</span>
     </>
   );
@@ -75,8 +75,8 @@ function SidebarNavItem({
 
   const activeStyles = active
     ? {
-        backgroundColor: `${theme.primary}10`,
-        color: theme.primary,
+        backgroundColor: `${theme.accent}10`,
+        color: theme.accent,
       }
     : undefined;
 
@@ -111,8 +111,8 @@ function StatCard({
     <div
       className="group bg-white rounded-xl p-5 text-left transition-all duration-200"
       style={{
-        backgroundColor: theme.light,
-        borderLeft: `3px solid ${theme.primary}`,
+        backgroundColor: theme.accentLight,
+        borderLeft: `3px solid ${theme.accent}`,
         boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
       }}
     >
@@ -120,7 +120,7 @@ function StatCard({
         <div>
           <p
             className="text-3xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-            style={{ color: theme.primary }}
+            style={{ color: theme.accent }}
           >
             {typeof value === 'number' ? value.toLocaleString() : value}
           </p>
@@ -129,9 +129,9 @@ function StatCard({
         </div>
         <div
           className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
-          style={{ backgroundColor: `${theme.primary}15` }}
+          style={{ backgroundColor: `${theme.accent}15` }}
         >
-          <Icon className="w-6 h-6" style={{ color: theme.primary }} />
+          <Icon className="w-6 h-6" style={{ color: theme.accent }} />
         </div>
       </div>
     </div>
@@ -163,9 +163,9 @@ function SectionCard({
       <div className="flex items-start justify-between mb-4">
         <div
           className="w-12 h-12 rounded-xl flex items-center justify-center"
-          style={{ backgroundColor: theme.light }}
+          style={{ backgroundColor: theme.accentLight }}
         >
-          <Icon size={24} style={{ color: theme.primary }} />
+          <Icon size={24} style={{ color: theme.accent }} />
         </div>
         <ChevronRight
           size={20}
@@ -177,7 +177,7 @@ function SectionCard({
       <ul className="space-y-2">
         {features.map((feature, i) => (
           <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: theme.primary }} />
+            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: theme.accent }} />
             {feature}
           </li>
         ))}
@@ -256,7 +256,7 @@ export default function HubAdminPage() {
             <div className="flex items-center gap-2">
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: theme.primary }}
+                style={{ backgroundColor: theme.accent }}
               >
                 <BookOpen className="w-4 h-4 text-white" />
               </div>
@@ -412,11 +412,11 @@ export default function HubAdminPage() {
                 href="/tdi-admin/hub/operations"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
                 style={{
-                  color: theme.primary,
-                  borderColor: theme.primary,
+                  color: theme.accent,
+                  borderColor: theme.accent,
                   backgroundColor: 'transparent',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.light)}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 <BarChart3 size={16} />
@@ -426,11 +426,11 @@ export default function HubAdminPage() {
                 href="/tdi-admin/hub/production"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
                 style={{
-                  color: theme.primary,
-                  borderColor: theme.primary,
+                  color: theme.accent,
+                  borderColor: theme.accent,
                   backgroundColor: 'transparent',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.light)}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 <FileText size={16} />
@@ -440,11 +440,11 @@ export default function HubAdminPage() {
                 href="/tdi-admin/hub/production"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
                 style={{
-                  color: theme.primary,
-                  borderColor: theme.primary,
+                  color: theme.accent,
+                  borderColor: theme.accent,
                   backgroundColor: 'transparent',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.light)}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 <Zap size={16} />
@@ -454,11 +454,11 @@ export default function HubAdminPage() {
                 href="/tdi-admin/hub/operations"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
                 style={{
-                  color: theme.primary,
-                  borderColor: theme.primary,
+                  color: theme.accent,
+                  borderColor: theme.accent,
                   backgroundColor: 'transparent',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.light)}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 <Download size={16} />
@@ -468,11 +468,11 @@ export default function HubAdminPage() {
                 href="/tdi-admin/hub/operations"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
                 style={{
-                  color: theme.primary,
-                  borderColor: theme.primary,
+                  color: theme.accent,
+                  borderColor: theme.accent,
                   backgroundColor: 'transparent',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.light)}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 <Mail size={16} />

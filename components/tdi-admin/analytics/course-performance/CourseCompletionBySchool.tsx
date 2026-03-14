@@ -18,7 +18,7 @@ const theme = PORTAL_THEMES.hub;
 
 // Color palette for courses
 const COURSE_COLORS = [
-  '#0D9488', // teal (primary)
+  '#00B5AD', // teal (primary)
   '#6366F1', // indigo
   '#F59E0B', // amber
   '#EC4899', // pink
@@ -58,7 +58,7 @@ export function CourseCompletionBySchool({
     return (
       <ChartCard title="Course Completion Rates by School" subtitle="Loading...">
         <div className="h-[300px] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.primary }} />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accent }} />
         </div>
       </ChartCard>
     );
@@ -119,7 +119,7 @@ export function CourseCompletionBySchool({
           value={selectedCourse}
           onChange={(e) => setSelectedCourse(e.target.value)}
           className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2"
-          style={{ fontFamily: "'DM Sans', sans-serif", focusRing: theme.primary } as React.CSSProperties}
+          style={{ fontFamily: "'DM Sans', sans-serif", focusRing: theme.accent } as React.CSSProperties}
         >
           <option value="all">All Courses</option>
           {courses.map(c => (
@@ -174,7 +174,7 @@ export function CourseCompletionBySchool({
                     <td className="py-2 px-2 text-gray-600">{course.courseTitle.substring(0, 30)}</td>
                     <td className="py-2 px-2 text-right text-gray-600">{course.enrolled}</td>
                     <td className="py-2 px-2 text-right text-gray-600">{course.completed}</td>
-                    <td className="py-2 px-2 text-right font-medium" style={{ color: theme.primary }}>{course.completionRate}%</td>
+                    <td className="py-2 px-2 text-right font-medium" style={{ color: theme.accent }}>{course.completionRate}%</td>
                   </tr>
                 ))
             )}
