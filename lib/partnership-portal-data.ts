@@ -28,6 +28,35 @@ export interface Partnership {
   primary_contact_name: string | null;
   address: string | null;
   website: string | null;
+  // Migration 015 - Dashboard data columns
+  observation_days_used?: number;
+  virtual_sessions_used?: number;
+  executive_sessions_used?: number;
+  staff_enrolled?: number;
+  hub_login_pct?: number;
+  love_notes_count?: number;
+  high_engagement_pct?: number;
+  cost_per_educator?: number;
+  momentum_status?: 'Strong' | 'Building' | 'Needs Attention';
+  momentum_detail?: string;
+  data_updated_at?: string;
+  // Migration 016 - Dynamic Dashboard Foundation
+  partnership_goal?: string;
+  teacher_stress_score?: number;
+  strategy_implementation_pct?: number;
+  retention_intent_score?: number;
+  next_steps_notes?: string;
+  year2_planning_notes?: string;
+  per_educator_value_note?: string;
+}
+
+// Dashboard defaults for example mode
+export interface DashboardDefault {
+  id: string;
+  metric_name: string;
+  example_value: string;
+  example_label?: string;
+  data_source?: string;
 }
 
 export interface Organization {
