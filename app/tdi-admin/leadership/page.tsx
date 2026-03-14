@@ -859,51 +859,72 @@ export default function LeadershipDashboardPage() {
                 <p>No active partnerships with dashboards yet.</p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-2 gap-4">
                 {activePartnerships.map((partnership) => {
                   // Use legacy_dashboard_url if available, otherwise fall back to slug-based URL
                   const dashboardUrl = partnership.legacy_dashboard_url || `/partners/${partnership.slug}-dashboard`;
 
                   return (
-                    <Link
+                    <div
                       key={partnership.id}
-                      href={dashboardUrl}
-                      target="_blank"
-                      className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-amber-400 hover:bg-amber-50 transition-all group"
+                      className="p-5 rounded-xl border border-gray-200 bg-white transition-all hover:shadow-md"
+                      style={{
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                      }}
                     >
-                      <div
-                        className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          partnership.partnership_type === 'district'
-                            ? 'bg-purple-100 text-purple-600'
-                            : 'bg-blue-100 text-blue-600'
-                        }`}
-                      >
-                        {partnership.partnership_type === 'district' ? (
-                          <Building2 className="w-6 h-6" />
-                        ) : (
-                          <School className="w-6 h-6" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p
-                          className="font-medium truncate"
-                          style={{ color: '#2B3A67' }}
+                      {/* Badges Row */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full font-medium ${
+                            phaseColors[partnership.contract_phase]
+                          }`}
                         >
-                          {partnership.org_name || partnership.contact_name}
-                        </p>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <span
-                            className={`px-1.5 py-0.5 rounded ${
-                              phaseColors[partnership.contract_phase]
-                            }`}
-                          >
-                            {partnership.contract_phase}
-                          </span>
-                          <span className="capitalize">{partnership.partnership_type}</span>
-                        </div>
+                          {partnership.contract_phase}
+                        </span>
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full font-medium ${
+                            partnership.partnership_type === 'district'
+                              ? 'bg-purple-100 text-purple-700'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}
+                        >
+                          {partnership.partnership_type === 'district' ? 'District' : 'School'}
+                        </span>
                       </div>
-                      <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-amber-600 transition-colors" />
-                    </Link>
+
+                      {/* School/District Name */}
+                      <h3
+                        className="font-semibold text-lg mb-1 truncate"
+                        style={{ color: '#2B3A67', fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        {partnership.org_name || partnership.contact_name}
+                      </h3>
+
+                      {/* Contact */}
+                      <p className="text-sm text-gray-500 mb-4">
+                        Contact: {partnership.primary_contact_name || partnership.contact_name}
+                      </p>
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-3">
+                        <Link
+                          href={dashboardUrl}
+                          target="_blank"
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition-all hover:opacity-90"
+                          style={{ backgroundColor: theme.accent }}
+                        >
+                          Open Dashboard
+                          <ExternalLink className="w-4 h-4" />
+                        </Link>
+                        <Link
+                          href={`/tdi-admin/leadership/${partnership.id}`}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          View Details
+                          <ChevronRight className="w-4 h-4" />
+                        </Link>
+                      </div>
+                    </div>
                   );
                 })}
               </div>

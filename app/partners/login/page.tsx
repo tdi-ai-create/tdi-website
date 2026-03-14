@@ -44,19 +44,15 @@ function PartnerLoginContent() {
   const showPage = animationComplete && timerDone;
 
   // Helper to look up partnership and redirect
-  const lookupAndRedirect = async (userId: string) => {
-    const response = await fetch('/api/partners/get-dashboard', {
-      headers: {
-        'x-user-id': userId,
-      },
-    });
+  const lookupAndRedirect = async () => {
+    const response = await fetch('/api/partners/me');
     const data = await response.json();
-    if (data.success && data.slug) {
-      router.push(`/partners/${data.slug}-dashboard`);
+    if (data.redirect) {
+      router.push(data.redirect);
     } else {
       // No partnership found for this user
       setPageState('error');
-      setErrorMessage('Welcome! We don\'t have a partnership linked to this email yet. If you received an invite from TDI, please use the invite link first to set up your account. Questions? Contact Rae@TeachersDeserveIt.com');
+      setErrorMessage(data.error || 'Welcome! We don\'t have a partnership linked to this email yet. If you received an invite from TDI, please use the invite link first to set up your account. Questions? Contact Rae@TeachersDeserveIt.com');
     }
   };
 
@@ -65,7 +61,7 @@ function PartnerLoginContent() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        lookupAndRedirect(session.user.id);
+        lookupAndRedirect();
       }
     };
     checkSession();
@@ -84,7 +80,7 @@ function PartnerLoginContent() {
             action: 'login',
           }),
         });
-        lookupAndRedirect(session.user.id);
+        lookupAndRedirect();
       }
     });
 
@@ -146,20 +142,16 @@ function PartnerLoginContent() {
         }),
       });
 
-      // Look up user's partnership to get dashboard slug
-      const response = await fetch('/api/partners/get-dashboard', {
-        headers: {
-          'x-user-id': data.user.id,
-        },
-      });
+      // Look up user's partnership to get dashboard redirect
+      const response = await fetch('/api/partners/me');
       const partnerData = await response.json();
 
-      if (partnerData.success && partnerData.slug) {
-        router.push(`/partners/${partnerData.slug}-dashboard`);
+      if (partnerData.redirect) {
+        router.push(partnerData.redirect);
       } else {
         // User doesn't have a partnership yet - this shouldn't happen normally
         setPageState('error');
-        setErrorMessage('No partnership found for this account. Please contact support.');
+        setErrorMessage(partnerData.error || 'No partnership found for this account. Please contact support.');
       }
     } catch (error) {
       console.error('Login error:', error);
