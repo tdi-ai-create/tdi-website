@@ -2,34 +2,34 @@
 // Extracted from Creator Studio for consistent styling across all admin sections
 
 export const ADMIN_COLORS = {
-  // Section accent colors
+  // Section accent colors - Approved color system v1.0
   hub: {
-    primary: '#0D9488',      // Teal (updated per spec)
-    light: '#F0FDFA',
-    dark: '#115E59',
-    bg15: 'rgba(13, 148, 136, 0.15)',
-    border30: 'rgba(13, 148, 136, 0.3)',
+    accent: '#00B5AD',       // Teal
+    accentLight: '#E0F7F6',
+    accentDark: '#007A75',
+    bg15: 'rgba(0, 181, 173, 0.15)',
+    border30: 'rgba(0, 181, 173, 0.3)',
   },
   creators: {
-    primary: '#6B5CE7',      // Purple (per spec)
-    light: '#F3EDF8',
-    dark: '#5145B5',
-    bg15: 'rgba(107, 92, 231, 0.15)',
-    border30: 'rgba(107, 92, 231, 0.3)',
+    accent: '#8B5CF6',       // Violet
+    accentLight: '#EDE9FE',
+    accentDark: '#5B21B6',
+    bg15: 'rgba(139, 92, 246, 0.15)',
+    border30: 'rgba(139, 92, 246, 0.3)',
   },
   leadership: {
-    primary: '#1E3A5F',      // Navy (per spec)
-    light: '#EEF2F6',
-    dark: '#152A45',
-    bg15: 'rgba(30, 58, 95, 0.15)',
-    border30: 'rgba(30, 58, 95, 0.3)',
+    accent: '#16A34A',       // Green
+    accentLight: '#DCFCE7',
+    accentDark: '#166534',
+    bg15: 'rgba(22, 163, 74, 0.15)',
+    border30: 'rgba(22, 163, 74, 0.3)',
   },
   team: {
-    primary: '#6B7280',      // Neutral grey
-    light: '#F9FAFB',
-    dark: '#4B5563',
-    bg15: 'rgba(107, 114, 128, 0.15)',
-    border30: 'rgba(107, 114, 128, 0.3)',
+    accent: '#F59E0B',       // Amber
+    accentLight: '#FEF3C7',
+    accentDark: '#B45309',
+    bg15: 'rgba(245, 158, 11, 0.15)',
+    border30: 'rgba(245, 158, 11, 0.3)',
   },
 } as const;
 

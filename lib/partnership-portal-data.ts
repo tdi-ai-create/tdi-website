@@ -21,6 +21,13 @@ export interface Partnership {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+  // Migration 014 fields
+  legacy_dashboard_url: string | null;
+  contract_url: string | null;
+  primary_contact_email: string | null;
+  primary_contact_name: string | null;
+  address: string | null;
+  website: string | null;
 }
 
 export interface Organization {

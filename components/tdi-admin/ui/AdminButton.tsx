@@ -3,6 +3,7 @@
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { ADMIN_TRANSITIONS } from './design-tokens';
+import { PortalTheme, PORTAL_THEMES } from '@/lib/tdi-admin/theme';
 
 interface AdminButtonProps {
   children: React.ReactNode;
@@ -14,12 +15,13 @@ interface AdminButtonProps {
   loading?: boolean;
   icon?: React.ReactNode;
   className?: string;
-  accentColor?: string;
+  theme?: PortalTheme;
   type?: 'button' | 'submit';
 }
 
 /**
  * Unified button component for admin sections
+ * Uses centralized theme system - pass theme from PORTAL_THEMES
  */
 export function AdminButton({
   children,
@@ -31,7 +33,7 @@ export function AdminButton({
   loading = false,
   icon,
   className = '',
-  accentColor = '#6B5CE7',
+  theme = PORTAL_THEMES.hub,
   type = 'button',
 }: AdminButtonProps) {
   const sizeClasses = {
@@ -44,15 +46,15 @@ export function AdminButton({
     switch (variant) {
       case 'primary':
         return {
-          backgroundColor: accentColor,
+          backgroundColor: theme.accent,
           color: 'white',
           border: 'none',
         };
       case 'secondary':
         return {
           backgroundColor: 'transparent',
-          color: accentColor,
-          border: `1.5px solid ${accentColor}`,
+          color: theme.accent,
+          border: `1.5px solid ${theme.accent}`,
         };
       case 'ghost':
         return {
@@ -159,19 +161,18 @@ interface AdminQuickActionProps {
   href: string;
   icon: React.ReactNode;
   children: React.ReactNode;
-  accentColor: string;
-  lightColor: string;
+  theme: PortalTheme;
 }
 
 /**
  * Quick action link button
+ * Uses centralized theme system - pass theme from PORTAL_THEMES
  */
 export function AdminQuickAction({
   href,
   icon,
   children,
-  accentColor,
-  lightColor,
+  theme,
 }: AdminQuickActionProps) {
   return (
     <Link
@@ -179,12 +180,12 @@ export function AdminQuickAction({
       className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ${ADMIN_TRANSITIONS.default}`}
       style={{
         fontFamily: "'DM Sans', sans-serif",
-        color: accentColor,
-        border: `1.5px solid ${accentColor}`,
+        color: theme.accent,
+        border: `1.5px solid ${theme.accent}`,
         backgroundColor: 'transparent',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = lightColor;
+        e.currentTarget.style.backgroundColor = theme.accentLight;
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.backgroundColor = 'transparent';

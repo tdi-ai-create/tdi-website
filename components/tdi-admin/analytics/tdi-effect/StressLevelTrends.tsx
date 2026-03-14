@@ -36,7 +36,7 @@ interface StressLevelTrendsProps {
   isLoading?: boolean;
 }
 
-const SCHOOL_COLORS = ['#0D9488', '#6366F1', '#F59E0B', '#EC4899', '#10B981', '#8B5CF6'];
+const SCHOOL_COLORS = ['#00B5AD', '#6366F1', '#F59E0B', '#EC4899', '#10B981', '#8B5CF6'];
 
 export function StressLevelTrends({
   overallData,

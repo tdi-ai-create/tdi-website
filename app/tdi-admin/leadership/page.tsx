@@ -58,6 +58,11 @@ interface Partnership {
   created_at: string;
   org_name?: string | null;
   staff_count?: number;
+  // Migration 014 fields
+  legacy_dashboard_url?: string | null;
+  primary_contact_name?: string | null;
+  address?: string | null;
+  website?: string | null;
 }
 
 interface Stats {
@@ -268,9 +273,9 @@ export default function LeadershipDashboardPage() {
     completed: partnerships.filter((p) => p.status === 'completed').length,
   };
 
-  // Get active partnerships for dashboards tab
+  // Get active partnerships for dashboards tab (with legacy_dashboard_url or slug)
   const activePartnerships = partnerships.filter(
-    (p) => p.status === 'active' && p.slug
+    (p) => p.status === 'active' && (p.legacy_dashboard_url || p.slug)
   );
 
   // Get pending action items (not completed)
@@ -789,9 +794,9 @@ export default function LeadershipDashboardPage() {
                                   )}
                                 </button>
                               )}
-                              {partnership.slug && partnership.status === 'active' && (
+                              {(partnership.legacy_dashboard_url || partnership.slug) && partnership.status === 'active' && (
                                 <Link
-                                  href={`/partners/${partnership.slug}-dashboard`}
+                                  href={partnership.legacy_dashboard_url || `/partners/${partnership.slug}-dashboard`}
                                   target="_blank"
                                   className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors"
                                 >
@@ -855,47 +860,52 @@ export default function LeadershipDashboardPage() {
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {activePartnerships.map((partnership) => (
-                  <Link
-                    key={partnership.id}
-                    href={`/partners/${partnership.slug}-dashboard`}
-                    target="_blank"
-                    className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-amber-400 hover:bg-amber-50 transition-all group"
-                  >
-                    <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        partnership.partnership_type === 'district'
-                          ? 'bg-purple-100 text-purple-600'
-                          : 'bg-blue-100 text-blue-600'
-                      }`}
+                {activePartnerships.map((partnership) => {
+                  // Use legacy_dashboard_url if available, otherwise fall back to slug-based URL
+                  const dashboardUrl = partnership.legacy_dashboard_url || `/partners/${partnership.slug}-dashboard`;
+
+                  return (
+                    <Link
+                      key={partnership.id}
+                      href={dashboardUrl}
+                      target="_blank"
+                      className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-amber-400 hover:bg-amber-50 transition-all group"
                     >
-                      {partnership.partnership_type === 'district' ? (
-                        <Building2 className="w-6 h-6" />
-                      ) : (
-                        <School className="w-6 h-6" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className="font-medium truncate"
-                        style={{ color: '#2B3A67' }}
+                      <div
+                        className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
+                          partnership.partnership_type === 'district'
+                            ? 'bg-purple-100 text-purple-600'
+                            : 'bg-blue-100 text-blue-600'
+                        }`}
                       >
-                        {partnership.org_name || partnership.contact_name}
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <span
-                          className={`px-1.5 py-0.5 rounded ${
-                            phaseColors[partnership.contract_phase]
-                          }`}
-                        >
-                          {partnership.contract_phase}
-                        </span>
-                        <span>{partnership.staff_count ?? 0} educators</span>
+                        {partnership.partnership_type === 'district' ? (
+                          <Building2 className="w-6 h-6" />
+                        ) : (
+                          <School className="w-6 h-6" />
+                        )}
                       </div>
-                    </div>
-                    <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-amber-600 transition-colors" />
-                  </Link>
-                ))}
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className="font-medium truncate"
+                          style={{ color: '#2B3A67' }}
+                        >
+                          {partnership.org_name || partnership.contact_name}
+                        </p>
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <span
+                            className={`px-1.5 py-0.5 rounded ${
+                              phaseColors[partnership.contract_phase]
+                            }`}
+                          >
+                            {partnership.contract_phase}
+                          </span>
+                          <span className="capitalize">{partnership.partnership_type}</span>
+                        </div>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-amber-600 transition-colors" />
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </div>

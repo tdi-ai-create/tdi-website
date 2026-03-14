@@ -1,9 +1,11 @@
 'use client';
 
+import { PortalTheme, PORTAL_THEMES } from '@/lib/tdi-admin/theme';
+
 interface AdminProgressBarProps {
   value: number;
   max?: number;
-  accentColor?: string;
+  theme?: PortalTheme;
   size?: 'sm' | 'md';
   showLabel?: boolean;
   className?: string;
@@ -11,11 +13,12 @@ interface AdminProgressBarProps {
 
 /**
  * Progress bar with rounded ends and consistent styling
+ * Uses centralized theme system - pass theme from PORTAL_THEMES
  */
 export function AdminProgressBar({
   value,
   max = 100,
-  accentColor = '#6B5CE7',
+  theme = PORTAL_THEMES.hub,
   size = 'md',
   showLabel = false,
   className = '',
@@ -36,7 +39,7 @@ export function AdminProgressBar({
           className="h-full rounded-full transition-all duration-500"
           style={{
             width: `${percentage}%`,
-            backgroundColor: accentColor,
+            backgroundColor: theme.accent,
           }}
         />
       </div>
@@ -55,17 +58,18 @@ export function AdminProgressBar({
 interface AdminUsageBarProps {
   used: number;
   total: number;
-  accentColor?: string;
+  theme?: PortalTheme;
   className?: string;
 }
 
 /**
  * Usage bar showing used/total
+ * Uses centralized theme system - pass theme from PORTAL_THEMES
  */
 export function AdminUsageBar({
   used,
   total,
-  accentColor = '#F59E0B',
+  theme = PORTAL_THEMES.team,
   className = '',
 }: AdminUsageBarProps) {
   const percentage = total > 0 ? (used / total) * 100 : 0;
@@ -77,7 +81,7 @@ export function AdminUsageBar({
           className="h-full rounded-full"
           style={{
             width: `${percentage}%`,
-            backgroundColor: accentColor,
+            backgroundColor: theme.accent,
           }}
         />
       </div>

@@ -1,34 +1,34 @@
 'use client';
 
 import { Loader2 } from 'lucide-react';
+import { PortalTheme, PORTAL_THEMES } from '@/lib/tdi-admin/theme';
 
 interface AdminEmptyStateProps {
   icon: React.ElementType;
   title: string;
   description: string;
   action?: React.ReactNode;
-  accentColor?: string;
-  lightColor?: string;
+  theme?: PortalTheme;
 }
 
 /**
  * Empty state component with icon, message, and optional action
+ * Uses centralized theme system - pass theme from PORTAL_THEMES
  */
 export function AdminEmptyState({
   icon: Icon,
   title,
   description,
   action,
-  accentColor = '#6B5CE7',
-  lightColor = '#F3EDF8',
+  theme = PORTAL_THEMES.hub,
 }: AdminEmptyStateProps) {
   return (
     <div className="text-center py-16">
       <div
         className="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center"
-        style={{ backgroundColor: lightColor }}
+        style={{ backgroundColor: theme.accentLight }}
       >
-        <Icon size={32} style={{ color: accentColor }} />
+        <Icon size={32} style={{ color: theme.accent }} />
       </div>
       <h3
         className="font-semibold text-lg mb-2"
@@ -52,21 +52,22 @@ export function AdminEmptyState({
 
 interface AdminLoadingStateProps {
   message?: string;
-  accentColor?: string;
+  theme?: PortalTheme;
 }
 
 /**
  * Loading state with spinner
+ * Uses centralized theme system - pass theme from PORTAL_THEMES
  */
 export function AdminLoadingState({
   message = 'Loading...',
-  accentColor = '#6B5CE7',
+  theme = PORTAL_THEMES.hub,
 }: AdminLoadingStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-16">
       <Loader2
         className="w-8 h-8 animate-spin mb-4"
-        style={{ color: accentColor }}
+        style={{ color: theme.accent }}
       />
       <p
         className="text-gray-500"
@@ -84,7 +85,6 @@ interface AdminAccessDeniedProps {
   message?: string;
   actionLabel?: string;
   actionHref?: string;
-  accentColor?: string;
 }
 
 /**
@@ -96,7 +96,6 @@ export function AdminAccessDenied({
   message = "You don't have permission to access this section. Contact your administrator to request access.",
   actionLabel = 'Go to Dashboard',
   actionHref = '/tdi-admin/hub',
-  accentColor = '#DC2626',
 }: AdminAccessDeniedProps) {
   return (
     <div className="p-4 md:p-8 max-w-4xl mx-auto">
@@ -105,7 +104,7 @@ export function AdminAccessDenied({
           className="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center"
           style={{ backgroundColor: '#FEE2E2' }}
         >
-          <Icon size={32} style={{ color: accentColor }} />
+          <Icon size={32} style={{ color: '#DC2626' }} />
         </div>
         <h1
           className="font-bold mb-3"

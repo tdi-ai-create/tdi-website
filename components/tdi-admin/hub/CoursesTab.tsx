@@ -90,7 +90,7 @@ function StatCard({
   color?: 'teal' | 'green' | 'amber';
 }) {
   const borderColors = {
-    teal: '#0D9488',
+    teal: '#00B5AD',
     green: '#22C55E',
     amber: '#F59E0B',
   };
@@ -188,7 +188,7 @@ function CreateCourseModal({
               type="text"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
               placeholder="What's this course called?"
             />
           </div>
@@ -201,7 +201,7 @@ function CreateCourseModal({
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50 resize-none"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50 resize-none"
               rows={3}
               placeholder="Brief description for teachers"
             />
@@ -215,7 +215,7 @@ function CreateCourseModal({
             <select
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
             >
               {CATEGORIES.map((cat) => (
                 <option key={cat} value={cat}>
@@ -239,7 +239,7 @@ function CreateCourseModal({
                     value={level}
                     checked={form.difficulty === level}
                     onChange={(e) => setForm({ ...form, difficulty: e.target.value })}
-                    className="w-4 h-4 text-[#0D9488]"
+                    className="w-4 h-4 text-[#00B5AD]"
                   />
                   <span className="text-sm capitalize">{level}</span>
                 </label>
@@ -259,7 +259,7 @@ function CreateCourseModal({
                 onChange={(e) =>
                   setForm({ ...form, estimated_minutes: parseInt(e.target.value) || 0 })
                 }
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
                 min={0}
               />
             </div>
@@ -274,7 +274,7 @@ function CreateCourseModal({
                 onChange={(e) =>
                   setForm({ ...form, pd_hours: parseFloat(e.target.value) || 0 })
                 }
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
                 min={0}
               />
             </div>
@@ -292,7 +292,7 @@ function CreateCourseModal({
                   name="pricing"
                   checked={form.is_free}
                   onChange={() => setForm({ ...form, is_free: true })}
-                  className="w-4 h-4 text-[#0D9488]"
+                  className="w-4 h-4 text-[#00B5AD]"
                 />
                 <span className="text-sm">Free</span>
               </label>
@@ -302,7 +302,7 @@ function CreateCourseModal({
                   name="pricing"
                   checked={!form.is_free}
                   onChange={() => setForm({ ...form, is_free: false })}
-                  className="w-4 h-4 text-[#0D9488]"
+                  className="w-4 h-4 text-[#00B5AD]"
                 />
                 <span className="text-sm">Paid</span>
               </label>
@@ -317,7 +317,7 @@ function CreateCourseModal({
                   step="0.01"
                   value={form.price}
                   onChange={(e) => setForm({ ...form, price: e.target.value })}
-                  className="w-full pl-7 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                  className="w-full pl-7 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
                   placeholder="0.00"
                 />
               </div>
@@ -604,7 +604,7 @@ export function CoursesTab() {
   if (isLoading) {
     return (
       <div className="py-12 text-center text-gray-500">
-        <div className="animate-spin w-8 h-8 border-2 border-gray-300 border-t-[#0D9488] rounded-full mx-auto mb-3" />
+        <div className="animate-spin w-8 h-8 border-2 border-gray-300 border-t-[#00B5AD] rounded-full mx-auto mb-3" />
         Loading courses...
       </div>
     );
@@ -633,7 +633,7 @@ export function CoursesTab() {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
           />
         </div>
 
