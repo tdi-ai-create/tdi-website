@@ -14,8 +14,20 @@ import { LoveNotesCallout } from '@/components/dashboard/shared/LoveNotesCallout
 import { LeadingIndicators } from '@/components/dashboard/shared/LeadingIndicators'
 import { ServiceTracker } from '@/components/dashboard/admin/ServiceTracker'
 import { InlineEditField } from '@/components/dashboard/admin/InlineEditField'
+import { FileUploadZone } from '@/components/dashboard/admin/FileUploadZone'
+import { AIExtractModal } from '@/components/dashboard/admin/AIExtractModal'
 import { STATIC_DEFAULTS } from '@/lib/dashboard/dashboardDefaults'
-import { ArrowLeft, Loader2, Building2 } from 'lucide-react'
+import { ArrowLeft, Loader2, Building2, Upload } from 'lucide-react'
+
+interface UploadedFile {
+  id: string
+  filename: string
+  content_type: string
+  file_size: number
+  uploaded_by?: string
+  extracted_at?: string
+  created_at: string
+}
 
 interface TimelineEvent {
   id: string
@@ -38,6 +50,14 @@ export default function AdminPartnershipDetailPage() {
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([])
   const [actionItems, setActionItems] = useState<any[]>([])
   const [defaults, setDefaults] = useState<Record<string, string>>(STATIC_DEFAULTS)
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
+
+  // AI Extract modal state
+  const [extractModal, setExtractModal] = useState<{
+    open: boolean
+    fileId: string
+    filename: string
+  }>({ open: false, fileId: '', filename: '' })
 
   // UI state
   const [loading, setLoading] = useState(true)
@@ -58,7 +78,7 @@ export default function AdminPartnershipDetailPage() {
 
     setLoading(true)
     try {
-      const [pRes, tRes, aRes, dRes] = await Promise.all([
+      const [pRes, tRes, aRes, dRes, fRes] = await Promise.all([
         fetch(`/api/tdi-admin/leadership/${partnershipId}`, {
           headers: { 'x-user-email': userEmail },
         }),
@@ -69,6 +89,9 @@ export default function AdminPartnershipDetailPage() {
           headers: { 'x-user-email': userEmail },
         }),
         fetch('/api/dashboard-defaults'),
+        fetch(`/api/tdi-admin/leadership/${partnershipId}/upload`, {
+          headers: { 'x-user-email': userEmail },
+        }),
       ])
 
       if (pRes.ok) {
@@ -93,6 +116,11 @@ export default function AdminPartnershipDetailPage() {
       if (dRes.ok) {
         const dData = await dRes.json()
         setDefaults(dData.defaults || STATIC_DEFAULTS)
+      }
+
+      if (fRes.ok) {
+        const fData = await fRes.json()
+        setUploadedFiles(fData.files || [])
       }
     } finally {
       setLoading(false)
@@ -181,6 +209,32 @@ export default function AdminPartnershipDetailPage() {
       setTimelineEvents((prev) =>
         prev.map((e) => (e.id === eventId ? { ...e, status: newStatus as any } : e))
       )
+    }
+  }
+
+  async function handleApplyExtracted(data: Record<string, any>) {
+    // Apply each extracted field
+    const updates: Promise<void>[] = []
+
+    for (const [field, value] of Object.entries(data)) {
+      if (value !== null && value !== undefined) {
+        updates.push(
+          handleFieldUpdate(field, value).then(() => {
+            setPartnership((p: any) => ({ ...p, [field]: value }))
+          })
+        )
+      }
+    }
+
+    await Promise.all(updates)
+    setExtractModal({ open: false, fileId: '', filename: '' })
+    // Refresh files to show extracted status
+    const fRes = await fetch(`/api/tdi-admin/leadership/${partnershipId}/upload`, {
+      headers: { 'x-user-email': userEmail },
+    })
+    if (fRes.ok) {
+      const fData = await fRes.json()
+      setUploadedFiles(fData.files || [])
     }
   }
 
@@ -532,7 +586,45 @@ export default function AdminPartnershipDetailPage() {
                 Changes save immediately and update what the client sees on their dashboard.
               </p>
             </div>
+
+            {/* File Upload Zone */}
+            <div className="mt-6 pt-6 border-t border-violet-200">
+              <div className="flex items-center gap-2 mb-4">
+                <Upload className="w-4 h-4 text-violet-600" />
+                <h3 className="text-sm font-semibold text-violet-900">Upload & Extract</h3>
+              </div>
+              <p className="text-xs text-violet-600 mb-4">
+                Upload reports, screenshots, or data exports. Use AI to automatically extract metrics.
+              </p>
+              <FileUploadZone
+                partnershipId={partnershipId}
+                userEmail={userEmail}
+                files={uploadedFiles}
+                onFilesChange={() => {
+                  fetch(`/api/tdi-admin/leadership/${partnershipId}/upload`, {
+                    headers: { 'x-user-email': userEmail },
+                  })
+                    .then((res) => res.json())
+                    .then((data) => setUploadedFiles(data.files || []))
+                }}
+                onExtract={(fileId, filename) =>
+                  setExtractModal({ open: true, fileId, filename })
+                }
+              />
+            </div>
           </div>
+        )}
+
+        {/* AI Extract Modal */}
+        {extractModal.open && (
+          <AIExtractModal
+            partnershipId={partnershipId}
+            fileId={extractModal.fileId}
+            filename={extractModal.filename}
+            userEmail={userEmail}
+            onClose={() => setExtractModal({ open: false, fileId: '', filename: '' })}
+            onApply={handleApplyExtracted}
+          />
         )}
 
         {/* Partnership Info */}
