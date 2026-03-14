@@ -209,66 +209,113 @@ function SidebarNavItem({ active, onClick, icon: Icon, children }: { active: boo
       onClick={onClick}
       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-left ${
         active
-          ? 'bg-indigo-50 text-indigo-700'
+          ? 'bg-purple-50 text-purple-700'
           : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
       }`}
     >
-      <Icon size={20} className={active ? 'text-indigo-600' : 'text-gray-400'} />
+      <Icon size={20} className={active ? 'text-purple-600' : 'text-gray-400'} />
       <span className={active ? 'font-semibold' : ''}>{children}</span>
     </button>
   );
 }
 
 // Modern Stat Card Component
+// Status indicator component - dots for most, checkmark for launched
+function StatusIndicator({ status }: { status: string }) {
+  if (status === 'launched') {
+    return (
+      <div className="flex items-center gap-1.5">
+        <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#16A34A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <span className="text-xs font-semibold tracking-wide" style={{ color: '#16A34A' }}>LIVE</span>
+      </div>
+    );
+  }
+
+  const dots: Record<string, string> = {
+    total:          '#8B5CF6',
+    stalled:        '#F59E0B',
+    followedUp:     '#10B981',
+    waitingOnCreator:'#06B6D4',
+    waitingOnTDI:   '#8B5CF6',
+  };
+
+  const labels: Record<string, string> = {
+    total:           'ALL PATHS',
+    stalled:         '14+ DAYS',
+    followedUp:      'BY TEAM',
+    waitingOnCreator:'ACTION NEEDED',
+    waitingOnTDI:    'NEEDS REVIEW',
+  };
+
+  const color = dots[status] || '#8B5CF6';
+  const label = labels[status] || status.toUpperCase();
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color }} />
+      <span className="text-xs font-semibold text-gray-400 tracking-wide">{label}</span>
+    </div>
+  );
+}
+
 function StatCard({
-  icon: Icon,
   label,
   value,
   isActive,
   onClick,
-  accentColor,
-  lightColor,
+  status,
 }: {
-  icon: React.ElementType;
   label: string;
   value: number;
   isActive: boolean;
   onClick: () => void;
-  accentColor?: string;
-  lightColor?: string;
+  status: string;
 }) {
-  const accent = accentColor || '#6366F1';
-  const light = lightColor || '#F8F9FA';
-
   return (
     <button
       onClick={onClick}
-      className="group bg-white rounded-xl p-5 text-left cursor-pointer transition-all duration-200"
+      className="group bg-white rounded-xl p-5 text-left cursor-pointer relative overflow-hidden border border-gray-100"
       style={{
-        backgroundColor: light,
-        borderLeft: `3px solid ${accent}`,
         boxShadow: isActive
-          ? `0 4px 12px ${accent}25, 0 1px 3px rgba(0,0,0,0.08)`
-          : '0 1px 3px rgba(0,0,0,0.08)',
+          ? '0 8px 28px rgba(139, 92, 246, 0.15), 0 2px 8px rgba(0,0,0,0.06)'
+          : '0 1px 4px rgba(0,0,0,0.04)',
+        borderColor: isActive ? 'rgba(139, 92, 246, 0.5)' : undefined,
+        transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
+      }}
+      onMouseEnter={e => {
+        if (!isActive) {
+          e.currentTarget.style.transform = 'translateY(-3px)';
+          e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.5)';
+          e.currentTarget.style.boxShadow = '0 8px 28px rgba(139, 92, 246, 0.1), 0 2px 8px rgba(0,0,0,0.06)';
+          const topBar = e.currentTarget.querySelector('.stat-top-bar') as HTMLElement;
+          if (topBar) topBar.style.background = '#8B5CF6';
+        }
+      }}
+      onMouseLeave={e => {
+        if (!isActive) {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.borderColor = '#F3F4F6';
+          e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.04)';
+          const topBar = e.currentTarget.querySelector('.stat-top-bar') as HTMLElement;
+          if (topBar) topBar.style.background = 'transparent';
+        }
       }}
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <p
-            className="text-3xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-            style={{ color: accent }}
-          >
-            {value}
-          </p>
-          <p className="text-sm text-gray-500 font-medium">{label}</p>
-        </div>
-        <div
-          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
-          style={{ backgroundColor: `${accent}15` }}
-        >
-          <Icon className="w-6 h-6" style={{ color: accent }} />
-        </div>
-      </div>
+      {/* Accent top bar - revealed on hover/active */}
+      <div
+        className="stat-top-bar absolute top-0 left-0 right-0 h-0.5"
+        style={{ background: isActive ? '#8B5CF6' : 'transparent', transition: 'background 0.25s' }}
+      />
+
+      <div className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-2">{label}</div>
+      <div className="text-3xl font-bold text-gray-900 tracking-tight leading-none mb-2">{value}</div>
+
+      {/* Status indicator */}
+      <StatusIndicator status={status} />
     </button>
   );
 }
@@ -649,20 +696,50 @@ export default function CreatorStudioPage() {
     }
   };
 
-  // Get waiting on badge
+  // Get waiting on badge - uses dot indicators with consistent colors
   const getWaitingOnBadge = (waitingOn: string, isStalled: boolean) => {
     if (isStalled) {
-      return { icon: <AlertTriangle className="w-3.5 h-3.5" />, label: 'Stalled', color: 'bg-red-100 text-red-700' };
+      return {
+        dotColor: '#DC2626',
+        label: 'Stalled',
+        isCheckmark: false,
+        bgColor: '#FEE2E2',
+        textColor: '#991B1B'
+      };
     }
     switch (waitingOn) {
       case 'tdi':
-        return { icon: <Bell className="w-3.5 h-3.5" />, label: 'TDI', color: 'bg-blue-100 text-blue-700' };
+        return {
+          dotColor: '#3B82F6',
+          label: 'TDI',
+          isCheckmark: false,
+          bgColor: '#DBEAFE',
+          textColor: '#1E40AF'
+        };
       case 'launched':
-        return { icon: <Rocket className="w-3.5 h-3.5" />, label: 'Launched', color: 'bg-green-100 text-green-700' };
+        return {
+          dotColor: '#16A34A',
+          label: 'Live',
+          isCheckmark: true,
+          bgColor: '#DCFCE7',
+          textColor: '#166534'
+        };
       case 'followed_up':
-        return { icon: <UserCheck className="w-3.5 h-3.5" />, label: 'Followed Up', color: 'bg-cyan-100 text-cyan-700' };
+        return {
+          dotColor: '#8B5CF6',
+          label: 'Followed Up',
+          isCheckmark: false,
+          bgColor: '#EDE9FE',
+          textColor: '#5B21B6'
+        };
       default:
-        return { icon: <Hourglass className="w-3.5 h-3.5" />, label: 'Creator', color: 'bg-amber-100 text-amber-700' };
+        return {
+          dotColor: '#F59E0B',
+          label: 'Creator',
+          isCheckmark: false,
+          bgColor: '#FEF3C7',
+          textColor: '#92400E'
+        };
     }
   };
 
@@ -831,7 +908,7 @@ export default function CreatorStudioPage() {
           {/* Sidebar Header */}
           <div className="flex items-center justify-between px-5 py-5 border-b border-gray-100">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#8B5CF6' }}>
                 <Rocket className="w-4 h-4 text-white" />
               </div>
               <span className="font-semibold text-gray-900">Creator Studio</span>
@@ -904,7 +981,8 @@ export default function CreatorStudioPage() {
             {canEdit && (
               <button
                 onClick={() => setShowAddModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm hover:shadow-md"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 text-white shadow-sm hover:shadow-md hover:opacity-90"
+                style={{ backgroundColor: '#8B5CF6' }}
               >
                 <Plus className="w-4 h-4" />
                 Add Creator
@@ -921,58 +999,48 @@ export default function CreatorStudioPage() {
       {activeTab === 'dashboard' && (
         <div>
           {/* Stat Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
             <StatCard
-              icon={Users}
               label="Total"
               value={stats.total}
               isActive={false}
               onClick={() => handleStatCardClick(null)}
+              status="total"
             />
             <StatCard
-              icon={AlertTriangle}
-              label="Stalled (14+ days)"
+              label="Stalled"
               value={stats.stalled}
               isActive={activeStatFilter === 'stalled'}
               onClick={() => handleStatCardClick('stalled')}
-              accentColor="#F97316"
-              lightColor="#FFF7ED"
+              status="stalled"
             />
             <StatCard
-              icon={UserCheck}
               label="Followed Up"
               value={stats.followedUp}
               isActive={activeStatFilter === 'followedUp'}
               onClick={() => handleStatCardClick('followedUp')}
-              accentColor="#06B6D4"
-              lightColor="#ECFEFF"
+              status="followedUp"
             />
             <StatCard
-              icon={Hourglass}
               label="Waiting on Creator"
               value={stats.waitingOnCreator}
               isActive={activeStatFilter === 'waitingOnCreator'}
               onClick={() => handleStatCardClick('waitingOnCreator')}
-              accentColor="#F59E0B"
-              lightColor="#FFFBEB"
+              status="waitingOnCreator"
             />
             <StatCard
-              icon={Bell}
               label="Waiting on TDI"
               value={stats.waitingOnTDI}
               isActive={activeStatFilter === 'waitingOnTDI'}
               onClick={() => handleStatCardClick('waitingOnTDI')}
-              accentColor="#3B82F6"
-              lightColor="#EFF6FF"
+              status="waitingOnTDI"
             />
             <StatCard
-              icon={Rocket}
               label="Launched"
               value={stats.launched}
               isActive={activeStatFilter === 'launched'}
               onClick={() => handleStatCardClick('launched')}
-              accentColor="#22C55E"
-              lightColor="#F0FDF4"
+              status="launched"
             />
           </div>
 
@@ -985,14 +1053,15 @@ export default function CreatorStudioPage() {
               </h2>
               <div className="space-y-3">
                 {[
-                  { key: 'onboarding', label: 'Onboarding', color: '#6366F1' },
-                  { key: 'agreement', label: 'Agreement', color: '#8B5CF6' },
+                  { key: 'onboarding', label: 'Onboarding', color: '#8B5CF6' },
+                  { key: 'agreement', label: 'Agreement', color: '#A78BFA' },
                   { key: 'course_design', label: 'Prep & Resources', color: '#A78BFA' },
-                  { key: 'test_prep', label: 'Production', color: '#F59E0B' },
-                  { key: 'launch', label: 'Launch', color: '#22C55E' },
+                  { key: 'test_prep', label: 'Production', color: '#C4B5FD' },
+                  { key: 'launch', label: 'Launch', color: '#16A34A' },
                 ].map((phase) => {
                   const count = phaseCounts[phase.key as keyof typeof phaseCounts];
                   const widthPercent = Math.max((count / maxPhaseCount) * 100, 5);
+                  const isLaunch = phase.key === 'launch';
                   return (
                     <button
                       key={phase.key}
@@ -1004,19 +1073,26 @@ export default function CreatorStudioPage() {
                       </div>
                       <div className="flex-1 flex items-center gap-2">
                         {/* Background track */}
-                        <div className="flex-1 h-8 bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full flex items-center justify-end px-3 transition-all duration-500 group-hover:brightness-110"
-                            style={{
-                              width: `${widthPercent}%`,
-                              minWidth: count > 0 ? '40px' : '0',
-                              background: `linear-gradient(135deg, ${phase.color}, ${phase.color}dd)`,
-                            }}
-                          >
-                            {count > 0 && (
+                        <div className="flex-1 h-8 bg-gray-100 rounded-md overflow-hidden">
+                          {count > 0 ? (
+                            <div
+                              className="h-full rounded-md flex items-center gap-1 pl-2 transition-all duration-500 group-hover:brightness-110"
+                              style={{
+                                width: `${widthPercent}%`,
+                                minWidth: '40px',
+                                background: phase.color,
+                              }}
+                            >
+                              {isLaunch && (
+                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="flex-shrink-0">
+                                  <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              )}
                               <span className="text-white text-xs font-semibold">{count}</span>
-                            )}
-                          </div>
+                            </div>
+                          ) : (
+                            <div className="h-full w-1 rounded-md" style={{ background: phase.color }} />
+                          )}
                         </div>
                         {count === 0 && (
                           <span className="text-gray-300 text-xs font-medium px-2">0</span>
@@ -1068,18 +1144,22 @@ export default function CreatorStudioPage() {
               ) : (
                 <div className="space-y-3">
                   {closestToLaunch.map((creator) => {
-                    const progressColor = creator.progressPercentage >= 80 ? '#22C55E' : creator.progressPercentage >= 50 ? '#F59E0B' : '#6366F1';
+                    const isNearLaunch = creator.progressPercentage >= 90;
+                    const progressColor = isNearLaunch ? '#16A34A' : '#8B5CF6';
                     return (
                       <Link
                         key={creator.id}
                         href={`/tdi-admin/creators/${creator.id}`}
                         className="flex items-center gap-3 group p-2 -mx-2 rounded-xl hover:bg-gray-50 transition-colors"
                       >
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-sm font-medium flex-shrink-0 ring-2 ring-white shadow-sm">
+                        <div
+                          className="w-9 h-9 rounded-full text-white flex items-center justify-center text-sm font-medium flex-shrink-0 ring-2 ring-white shadow-sm"
+                          style={{ background: '#8B5CF6' }}
+                        >
                           {creator.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate text-gray-900 group-hover:text-indigo-600 transition-colors">
+                          <p className="text-sm font-medium truncate text-gray-900 group-hover:text-violet-600 transition-colors">
                             {creator.name}
                           </p>
                         </div>
@@ -1090,7 +1170,18 @@ export default function CreatorStudioPage() {
                               style={{ width: `${creator.progressPercentage}%`, backgroundColor: progressColor }}
                             />
                           </div>
-                          <span className="text-xs font-semibold w-9 text-right" style={{ color: progressColor }}>{creator.progressPercentage}%</span>
+                          {isNearLaunch ? (
+                            <div className="flex items-center gap-1">
+                              <div className="w-3.5 h-3.5 rounded-full bg-green-100 flex items-center justify-center">
+                                <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                                  <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#16A34A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              </div>
+                              <span className="text-xs font-bold" style={{ color: '#16A34A' }}>{creator.progressPercentage}%</span>
+                            </div>
+                          ) : (
+                            <span className="text-xs font-semibold w-9 text-right" style={{ color: '#8B5CF6' }}>{creator.progressPercentage}%</span>
+                          )}
                         </div>
                       </Link>
                     );
@@ -1152,7 +1243,8 @@ export default function CreatorStudioPage() {
                               className="flex items-center gap-2 group"
                             >
                               <div
-                                className="w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0 bg-blue-500"
+                                className="w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0"
+                                style={{ backgroundColor: '#8B5CF6' }}
                               >
                                 {creator.name.charAt(0).toUpperCase()}
                               </div>
@@ -1261,7 +1353,10 @@ export default function CreatorStudioPage() {
             </div>
 
             {/* Needs Your Attention */}
-            <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+            <div
+              className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] border-l-4"
+              style={{ borderLeftColor: '#F59E0B' }}
+            >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
                   <AlertTriangle className="w-5 h-5 text-amber-500" />
@@ -1367,10 +1462,13 @@ export default function CreatorStudioPage() {
 
             {/* Followed Up by Team */}
             {followedUpCreators.length > 0 && (
-              <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+              <div
+                className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] border-l-4"
+                style={{ borderLeftColor: '#8B5CF6' }}
+              >
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
-                    <UserCheck className="w-5 h-5 text-cyan-500" />
+                    <UserCheck className="w-5 h-5" style={{ color: '#8B5CF6' }} />
                     Followed Up by Team
                     <span className="text-xs font-normal text-gray-500">({stats.followedUp})</span>
                   </h3>
@@ -1406,15 +1504,16 @@ export default function CreatorStudioPage() {
                       <Link
                         key={creator.id}
                         href={`/tdi-admin/creators/${creator.id}`}
-                        className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-cyan-50 transition-colors group"
+                        className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-purple-50 transition-colors group"
                       >
                         <div
-                          className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium flex-shrink-0 bg-cyan-500"
+                          className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium flex-shrink-0"
+                          style={{ backgroundColor: '#8B5CF6' }}
                         >
                           {creator.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate group-hover:text-cyan-700" style={{ color: '#2B3A67' }}>
+                          <p className="text-sm font-medium truncate group-hover:text-purple-700" style={{ color: '#2B3A67' }}>
                             {creator.name}
                           </p>
                           <p className="text-xs text-gray-500 truncate flex items-center gap-1">
@@ -1432,7 +1531,7 @@ export default function CreatorStudioPage() {
                             )}
                           </p>
                         </div>
-                        <p className="text-xs text-cyan-600 flex-shrink-0">
+                        <p className="text-xs flex-shrink-0" style={{ color: '#8B5CF6' }}>
                           {14 - daysSinceFollowUp > 0 ? `${14 - daysSinceFollowUp}d until re-stall` : 'Re-stalling soon'}
                         </p>
                       </Link>
@@ -1441,7 +1540,8 @@ export default function CreatorStudioPage() {
                   {stats.followedUp > 8 && (
                     <button
                       onClick={() => handleStatCardClick('followedUp')}
-                      className="w-full text-center text-xs pt-1 text-cyan-600"
+                      className="w-full text-center text-xs pt-1"
+                      style={{ color: '#8B5CF6' }}
                     >
                       View all {stats.followedUp} followed up creators →
                     </button>
@@ -1490,7 +1590,7 @@ export default function CreatorStudioPage() {
           {locationData && (
             <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] mb-5">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
-                <MapPin className="w-5 h-5 text-indigo-500" />
+                <MapPin className="w-5 h-5" style={{ color: '#8B5CF6' }} />
                 Geographic Distribution
               </h2>
 
@@ -1616,21 +1716,21 @@ export default function CreatorStudioPage() {
                   placeholder="Search by name, email, or course title..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-2.5 border border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                  className="w-full pl-12 pr-4 py-2.5 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all"
                 />
               </div>
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 font-medium ${
                   showFilters || activeFiltersCount > 0
-                    ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                    ? 'bg-purple-50 text-purple-700 border border-purple-200'
                     : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
                 }`}
               >
                 <Filter className="w-4 h-4" />
                 Filters
                 {activeFiltersCount > 0 && (
-                  <span className="text-white text-xs px-2 py-0.5 rounded-full bg-indigo-600">
+                  <span className="text-white text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#8B5CF6' }}>
                     {activeFiltersCount}
                   </span>
                 )}
@@ -1645,7 +1745,7 @@ export default function CreatorStudioPage() {
                   <select
                     value={filterPath}
                     onChange={(e) => setFilterPath(e.target.value)}
-                    className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all bg-white"
+                    className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all bg-white"
                   >
                     <option value="all">All Paths</option>
                     <option value="blog">Blog</option>
@@ -1659,7 +1759,7 @@ export default function CreatorStudioPage() {
                   <select
                     value={filterPhase}
                     onChange={(e) => setFilterPhase(e.target.value)}
-                    className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all bg-white"
+                    className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all bg-white"
                   >
                     <option value="all">All Phases</option>
                     <option value="onboarding">Onboarding</option>
@@ -1674,7 +1774,7 @@ export default function CreatorStudioPage() {
                   <select
                     value={filterWaitingOn}
                     onChange={(e) => setFilterWaitingOn(e.target.value)}
-                    className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all bg-white"
+                    className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all bg-white"
                   >
                     <option value="all">All</option>
                     <option value="creator">Creator</option>
@@ -1689,7 +1789,7 @@ export default function CreatorStudioPage() {
                   <select
                     value={filterPublishStatus}
                     onChange={(e) => setFilterPublishStatus(e.target.value)}
-                    className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all bg-white"
+                    className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all bg-white"
                   >
                     <option value="all">All</option>
                     <option value="in_progress">In Progress</option>
@@ -1706,7 +1806,7 @@ export default function CreatorStudioPage() {
                       setFilterPublishStatus('all');
                       setActiveStatFilter(null);
                     }}
-                    className="self-end px-3 py-2 text-sm text-gray-500 hover:text-indigo-600 transition-colors"
+                    className="self-end px-3 py-2 text-sm text-gray-500 hover:text-purple-600 transition-colors"
                   >
                     Clear all filters
                   </button>
@@ -1717,7 +1817,7 @@ export default function CreatorStudioPage() {
                     type="checkbox"
                     checked={showArchived}
                     onChange={(e) => setShowArchived(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                   />
                   <span className="text-sm text-gray-600">
                     Show Archived {dashboardData?.stats.archived ? `(${dashboardData.stats.archived})` : ''}
@@ -1729,9 +1829,9 @@ export default function CreatorStudioPage() {
 
           {/* Active stat filter indicator */}
           {activeStatFilter && (
-            <div className="px-5 py-3 border-b border-gray-100 flex items-center gap-2 bg-indigo-50">
+            <div className="px-5 py-3 border-b border-gray-100 flex items-center gap-2 bg-purple-50">
               <span className="text-sm text-gray-600">Showing:</span>
-              <span className="text-sm font-semibold capitalize text-indigo-700">
+              <span className="text-sm font-semibold capitalize text-purple-700">
                 {activeStatFilter === 'waitingOnCreator' ? 'Waiting on Creator' :
                  activeStatFilter === 'waitingOnTDI' ? 'Waiting on TDI' :
                  activeStatFilter === 'followedUp' ? 'Followed Up' :
@@ -1739,7 +1839,7 @@ export default function CreatorStudioPage() {
               </span>
               <button
                 onClick={() => setActiveStatFilter(null)}
-                className="text-gray-400 hover:text-indigo-600 transition-colors"
+                className="text-gray-400 hover:text-purple-600 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1912,8 +2012,25 @@ export default function CreatorStudioPage() {
 
                         {/* Waiting On */}
                         <td className="px-4 py-3 hidden md:table-cell">
-                          <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${waitingBadge.color}`}>
-                            {waitingBadge.icon}
+                          <span
+                            className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium"
+                            style={{
+                              backgroundColor: waitingBadge.bgColor,
+                              color: waitingBadge.textColor,
+                            }}
+                          >
+                            {waitingBadge.isCheckmark ? (
+                              <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#DCFCE7' }}>
+                                <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                                  <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#16A34A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              </div>
+                            ) : (
+                              <span
+                                className="w-2 h-2 rounded-full flex-shrink-0"
+                                style={{ backgroundColor: waitingBadge.dotColor }}
+                              />
+                            )}
                             {waitingBadge.label}
                           </span>
                         </td>
@@ -1949,7 +2066,8 @@ export default function CreatorStudioPage() {
             </span>
             <button
               onClick={handleBulkCopy}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm hover:shadow-md"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 text-white shadow-sm hover:shadow-md hover:opacity-90"
+              style={{ backgroundColor: '#8B5CF6' }}
             >
               {copiedSection === 'bulk' ? (
                 <>
@@ -1982,7 +2100,7 @@ export default function CreatorStudioPage() {
           {analyticsLoading && (
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
-                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-indigo-600" />
+                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#8B5CF6' }} />
                 <p className="text-gray-600">Loading analytics data...</p>
               </div>
             </div>
@@ -2370,7 +2488,7 @@ export default function CreatorStudioPage() {
                                         e.stopPropagation();
                                         openFollowUpModal({ id: creator.id, name: creator.name });
                                       }}
-                                      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-lg bg-cyan-100 text-cyan-700 hover:bg-cyan-200 transition-colors"
+                                      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-lg bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors"
                                     >
                                       <MessageCircle className="w-3.5 h-3.5" />
                                       Mark Followed Up
@@ -2447,8 +2565,8 @@ export default function CreatorStudioPage() {
                                 <span className="text-sm text-gray-700 w-24">{item.state}</span>
                                 <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
                                   <div
-                                    className="h-full rounded-full bg-indigo-500"
-                                    style={{ width: `${item.percent}%` }}
+                                    className="h-full rounded-full"
+                                    style={{ width: `${item.percent}%`, backgroundColor: '#8B5CF6' }}
                                   />
                                 </div>
                                 <span className="text-sm font-medium text-gray-600 w-8 text-right">{item.count}</span>
@@ -2458,8 +2576,8 @@ export default function CreatorStudioPage() {
                           </div>
                         </div>
                         <div className="space-y-3">
-                          <div className="bg-indigo-50 rounded-xl p-4 text-center">
-                            <p className="text-3xl font-bold text-indigo-600">{analyticsData.geographicDistribution.withState}</p>
+                          <div className="bg-purple-50 rounded-xl p-4 text-center">
+                            <p className="text-3xl font-bold" style={{ color: '#8B5CF6' }}>{analyticsData.geographicDistribution.withState}</p>
                             <p className="text-sm text-gray-600">With Location</p>
                           </div>
                           <div className="bg-gray-50 rounded-xl p-4 text-center">
@@ -2486,7 +2604,7 @@ export default function CreatorStudioPage() {
                     setAnalyticsData(null);
                     setAnalyticsLoading(false);
                   }}
-                  className="mt-3 text-sm text-indigo-600 hover:text-indigo-700"
+                  className="mt-3 text-sm text-purple-600 hover:text-purple-700"
                 >
                   Try again
                 </button>
@@ -2500,7 +2618,7 @@ export default function CreatorStudioPage() {
       {activeTab === 'payouts' && (
         <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
           <div className="text-center py-12">
-            <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg">
+            <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg" style={{ backgroundColor: '#8B5CF6' }}>
               <DollarSign className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-xl font-semibold mb-2 text-gray-900">
@@ -2540,7 +2658,7 @@ export default function CreatorStudioPage() {
                   required
                   value={newCreator.name}
                   onChange={(e) => setNewCreator({ ...newCreator, name: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all"
                 />
               </div>
 
@@ -2553,7 +2671,7 @@ export default function CreatorStudioPage() {
                   required
                   value={newCreator.email}
                   onChange={(e) => setNewCreator({ ...newCreator, email: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all"
                 />
               </div>
 
@@ -2565,7 +2683,7 @@ export default function CreatorStudioPage() {
                   type="text"
                   value={newCreator.course_title}
                   onChange={(e) => setNewCreator({ ...newCreator, course_title: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all"
                 />
               </div>
 
@@ -2578,7 +2696,7 @@ export default function CreatorStudioPage() {
                   value={newCreator.course_audience}
                   onChange={(e) => setNewCreator({ ...newCreator, course_audience: e.target.value })}
                   placeholder="e.g., Elementary teachers, K-12 paras"
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all placeholder:text-gray-400"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all placeholder:text-gray-400"
                 />
               </div>
 
@@ -2591,7 +2709,7 @@ export default function CreatorStudioPage() {
                   value={newCreator.target_launch_month}
                   onChange={(e) => setNewCreator({ ...newCreator, target_launch_month: e.target.value })}
                   placeholder="e.g., March 2026"
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all placeholder:text-gray-400"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all placeholder:text-gray-400"
                 />
               </div>
 
@@ -2606,7 +2724,8 @@ export default function CreatorStudioPage() {
                 <button
                   type="submit"
                   disabled={isAdding}
-                  className="flex-1 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2 bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm hover:shadow-md"
+                  className="flex-1 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2 text-white shadow-sm hover:shadow-md hover:opacity-90"
+                  style={{ backgroundColor: '#8B5CF6' }}
                 >
                   {isAdding ? (
                     <>
@@ -2629,8 +2748,8 @@ export default function CreatorStudioPage() {
           <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center">
-                  <MessageCircle className="w-5 h-5 text-cyan-600" />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#EDE9FE' }}>
+                  <MessageCircle className="w-5 h-5" style={{ color: '#8B5CF6' }} />
                 </div>
                 <h2 className="text-lg font-semibold text-gray-900">Mark as Followed Up</h2>
               </div>
@@ -2666,7 +2785,8 @@ export default function CreatorStudioPage() {
                 <button
                   onClick={handleMarkFollowedUp}
                   disabled={isMarkingFollowUp}
-                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:opacity-90"
+                  style={{ backgroundColor: '#8B5CF6' }}
                 >
                   {isMarkingFollowUp ? (
                     <>
