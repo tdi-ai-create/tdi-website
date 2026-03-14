@@ -100,13 +100,39 @@ export async function GET(request: NextRequest) {
       // Also consider publish_status - scheduled/published creators are "launched"
       const publishStatus = creator.publish_status || 'in_progress';
       const hasIncompleteCoreMillestones = coreCompleted < coreTotal;
-      const isStalled = hasIncompleteCoreMillestones && publishStatus === 'in_progress' && lastActivityDate < fourteenDaysAgo;
 
-      let waitingOn: 'creator' | 'tdi' | 'stalled' | 'launched' = 'creator';
+      // Check if creator was followed up
+      const lastFollowedUpAt = creator.last_followed_up_at ? new Date(creator.last_followed_up_at) : null;
+      const isInFollowedUpStatus = lastFollowedUpAt !== null;
+
+      // Calculate if creator is stalled (14+ days no activity, incomplete milestones, not in progress status)
+      // A followed-up creator returns to stalled if 14 days pass since follow-up with no new activity
+      let isStalled = false;
+      if (hasIncompleteCoreMillestones && publishStatus === 'in_progress') {
+        if (isInFollowedUpStatus) {
+          // For followed-up creators: stall again if 14 days since follow-up AND no activity after follow-up
+          const fourteenDaysAfterFollowUp = new Date(lastFollowedUpAt.getTime() + 14 * 24 * 60 * 60 * 1000);
+          const hasActivityAfterFollowUp = lastActivityDate > lastFollowedUpAt;
+          if (!hasActivityAfterFollowUp && now > fourteenDaysAfterFollowUp) {
+            isStalled = true;
+          }
+        } else {
+          // For non-followed-up creators: stall if 14+ days since last activity
+          isStalled = lastActivityDate < fourteenDaysAgo;
+        }
+      }
+
+      // If creator had activity after being followed up, they're back to active (clear followed_up status implicitly)
+      const isActiveAfterFollowUp = isInFollowedUpStatus && lastActivityDate > lastFollowedUpAt;
+
+      let waitingOn: 'creator' | 'tdi' | 'stalled' | 'launched' | 'followed_up' = 'creator';
       if (publishStatus === 'published' || publishStatus === 'scheduled' || corePercent === 100) {
         waitingOn = 'launched';
       } else if (isStalled) {
         waitingOn = 'stalled';
+      } else if (isInFollowedUpStatus && !isActiveAfterFollowUp) {
+        // Creator is in followed_up status (hasn't taken action since follow-up, not yet re-stalled)
+        waitingOn = 'followed_up';
       } else if (requiresTeamAction) {
         waitingOn = 'tdi';
       }
@@ -150,6 +176,7 @@ export async function GET(request: NextRequest) {
     const stats = {
       total: activeCreators.length,
       stalled: activeCreators.filter((c) => c.waitingOn === 'stalled').length,
+      followedUp: activeCreators.filter((c) => c.waitingOn === 'followed_up').length,
       waitingOnCreator: activeCreators.filter((c) => c.waitingOn === 'creator').length,
       waitingOnTDI: activeCreators.filter((c) => c.waitingOn === 'tdi').length,
       launched: activeCreators.filter((c) => c.waitingOn === 'launched').length,

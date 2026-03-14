@@ -271,6 +271,13 @@ export default function AdminCreatorDetailPage() {
     course_audience: string;
     target_launch_month: string;
     discount_code: string;
+    // Publication dates
+    blog_publish_date: string;
+    blog_publish_overview: string;
+    course_publish_date: string;
+    course_publish_overview: string;
+    download_publish_date: string;
+    download_publish_overview: string;
   }>({
     content_path: null,
     course_title: '',
@@ -279,6 +286,12 @@ export default function AdminCreatorDetailPage() {
     course_audience: '',
     target_launch_month: '',
     discount_code: '',
+    blog_publish_date: '',
+    blog_publish_overview: '',
+    course_publish_date: '',
+    course_publish_overview: '',
+    download_publish_date: '',
+    download_publish_overview: '',
   });
 
   // New note state
@@ -374,6 +387,12 @@ export default function AdminCreatorDetailPage() {
         course_audience: data.creator.course_audience || '',
         target_launch_month: data.creator.target_launch_month || '',
         discount_code: data.creator.discount_code || '',
+        blog_publish_date: data.creator.blog_publish_date || '',
+        blog_publish_overview: data.creator.blog_publish_overview || '',
+        course_publish_date: data.creator.course_publish_date || '',
+        course_publish_overview: data.creator.course_publish_overview || '',
+        download_publish_date: data.creator.download_publish_date || '',
+        download_publish_overview: data.creator.download_publish_overview || '',
       });
 
       // Find the phase containing the first available/in_progress milestone
@@ -490,11 +509,18 @@ export default function AdminCreatorDetailPage() {
     // No content path change, save normally
     setIsSaving(true);
     try {
-      await updateCreator(creatorId, editedDetails);
+      const result = await updateCreator(creatorId, editedDetails);
+      if (!result) {
+        alert('Failed to save course details. Please try again.');
+        return;
+      }
       await loadData();
       setIsEditingDetails(false);
+      setSuccessMessage('Course details saved successfully');
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (error) {
       console.error('Error saving details:', error);
+      alert('Error saving course details. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -529,6 +555,12 @@ export default function AdminCreatorDetailPage() {
           course_audience: editedDetails.course_audience,
           target_launch_month: editedDetails.target_launch_month,
           discount_code: editedDetails.discount_code,
+          blog_publish_date: editedDetails.blog_publish_date || null,
+          blog_publish_overview: editedDetails.blog_publish_overview || null,
+          course_publish_date: editedDetails.course_publish_date || null,
+          course_publish_overview: editedDetails.course_publish_overview || null,
+          download_publish_date: editedDetails.download_publish_date || null,
+          download_publish_overview: editedDetails.download_publish_overview || null,
         };
         await updateCreator(creatorId, otherDetails);
 
@@ -1401,6 +1433,115 @@ export default function AdminCreatorDetailPage() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent"
                     />
                   </div>
+
+                  {/* Publication Dates Section */}
+                  <div className="border-t border-gray-200 pt-4 mt-4">
+                    <h4 className="text-xs text-gray-500 uppercase font-semibold mb-3">Publication Dates</h4>
+
+                    {/* Course Publish Date - show for course path */}
+                    {(editedDetails.content_path === 'course') && (
+                      <div className="space-y-3 mb-4">
+                        <div>
+                          <label className="block text-xs text-gray-500 uppercase mb-1">
+                            Course Publish Date
+                          </label>
+                          <input
+                            type="date"
+                            value={editedDetails.course_publish_date}
+                            onChange={(e) =>
+                              setEditedDetails({ ...editedDetails, course_publish_date: e.target.value })
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 uppercase mb-1">
+                            Course Quick Overview
+                          </label>
+                          <textarea
+                            value={editedDetails.course_publish_overview}
+                            onChange={(e) =>
+                              setEditedDetails({ ...editedDetails, course_publish_overview: e.target.value })
+                            }
+                            rows={2}
+                            placeholder="Brief description of the course (1-2 sentences)..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent resize-none"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Download Publish Date - show for download path */}
+                    {(editedDetails.content_path === 'download') && (
+                      <div className="space-y-3 mb-4">
+                        <div>
+                          <label className="block text-xs text-gray-500 uppercase mb-1">
+                            Download Publish Date
+                          </label>
+                          <input
+                            type="date"
+                            value={editedDetails.download_publish_date}
+                            onChange={(e) =>
+                              setEditedDetails({ ...editedDetails, download_publish_date: e.target.value })
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 uppercase mb-1">
+                            Download Quick Overview
+                          </label>
+                          <textarea
+                            value={editedDetails.download_publish_overview}
+                            onChange={(e) =>
+                              setEditedDetails({ ...editedDetails, download_publish_overview: e.target.value })
+                            }
+                            rows={2}
+                            placeholder="Brief description of the download (1-2 sentences)..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent resize-none"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Blog Publish Date - show for course, download, or blog paths */}
+                    {(editedDetails.content_path === 'course' || editedDetails.content_path === 'download' || editedDetails.content_path === 'blog') && (
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-xs text-gray-500 uppercase mb-1">
+                            Blog Publish Date
+                          </label>
+                          <input
+                            type="date"
+                            value={editedDetails.blog_publish_date}
+                            onChange={(e) =>
+                              setEditedDetails({ ...editedDetails, blog_publish_date: e.target.value })
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 uppercase mb-1">
+                            Blog Quick Overview
+                          </label>
+                          <textarea
+                            value={editedDetails.blog_publish_overview}
+                            onChange={(e) =>
+                              setEditedDetails({ ...editedDetails, blog_publish_overview: e.target.value })
+                            }
+                            rows={2}
+                            placeholder="Brief description of the blog post (1-2 sentences)..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent resize-none"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Show message if no content path selected */}
+                    {!editedDetails.content_path && (
+                      <p className="text-gray-400 italic text-sm">Select a content path to see publication date fields</p>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-3 text-sm">
@@ -1454,8 +1595,152 @@ export default function AdminCreatorDetailPage() {
                       {creator.discount_code || 'Not set'}
                     </p>
                   </div>
+
+                  {/* Publication Dates Display */}
+                  {creator.content_path && (
+                    <div className="border-t border-gray-200 pt-4 mt-4">
+                      <h4 className="text-xs text-gray-500 uppercase font-semibold mb-3">Publication Dates</h4>
+
+                      {/* Course Publish Date - show for course path */}
+                      {creator.content_path === 'course' && (
+                        <div className="mb-3">
+                          <p className="text-xs text-gray-500 uppercase">Course Publish Date</p>
+                          <p className={creator.course_publish_date ? 'text-[#1e2749]' : 'text-gray-400 italic'}>
+                            {creator.course_publish_date
+                              ? new Date(creator.course_publish_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                              : 'Not set'}
+                          </p>
+                          {creator.course_publish_overview && (
+                            <p className="text-gray-600 text-sm mt-1">{creator.course_publish_overview}</p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Download Publish Date - show for download path */}
+                      {creator.content_path === 'download' && (
+                        <div className="mb-3">
+                          <p className="text-xs text-gray-500 uppercase">Download Publish Date</p>
+                          <p className={creator.download_publish_date ? 'text-[#1e2749]' : 'text-gray-400 italic'}>
+                            {creator.download_publish_date
+                              ? new Date(creator.download_publish_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                              : 'Not set'}
+                          </p>
+                          {creator.download_publish_overview && (
+                            <p className="text-gray-600 text-sm mt-1">{creator.download_publish_overview}</p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Blog Publish Date - show for all paths */}
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase">Blog Publish Date</p>
+                        <p className={creator.blog_publish_date ? 'text-[#1e2749]' : 'text-gray-400 italic'}>
+                          {creator.blog_publish_date
+                            ? new Date(creator.blog_publish_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                            : 'Not set'}
+                        </p>
+                        {creator.blog_publish_overview && (
+                          <p className="text-gray-600 text-sm mt-1">{creator.blog_publish_overview}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
+            </div>
+
+            {/* Target Timeline Section */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-[#80a4ed]" />
+                Target Timeline
+              </h3>
+
+              {/* Current Target Date */}
+              <div className="mb-4">
+                <p className="text-xs text-gray-500 uppercase mb-1">Target Completion Date</p>
+                {creator.target_completion_date ? (
+                  <div>
+                    <p className="text-[#1e2749] font-medium">
+                      {new Date(creator.target_completion_date).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </p>
+                    {(() => {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      const targetDate = new Date(creator.target_completion_date);
+                      targetDate.setHours(0, 0, 0, 0);
+                      const daysUntil = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+                      if (daysUntil < 0) {
+                        return <p className="text-amber-600 text-sm mt-1">{Math.abs(daysUntil)} days past target</p>;
+                      } else if (daysUntil === 0) {
+                        return <p className="text-green-600 text-sm mt-1">Target is today!</p>;
+                      } else {
+                        return <p className="text-gray-500 text-sm mt-1">{daysUntil} days remaining</p>;
+                      }
+                    })()}
+                    {creator.target_date_set_by && (
+                      <p className="text-gray-400 text-xs mt-2">
+                        Set by {creator.target_date_set_by.split('@')[0]}
+                        {creator.target_date_set_at && (
+                          <> on {new Date(creator.target_date_set_at).toLocaleDateString()}</>
+                        )}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-gray-400 italic">No target date set</p>
+                )}
+              </div>
+
+              {/* Admin can set/update target date */}
+              <div className="border-t border-gray-100 pt-4">
+                <p className="text-xs text-gray-500 uppercase mb-2">Set or Update Target Date</p>
+                <div className="flex gap-2">
+                  <input
+                    type="date"
+                    id="adminTargetDate"
+                    defaultValue={creator.target_completion_date || ''}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent"
+                  />
+                  <button
+                    onClick={async () => {
+                      const dateInput = document.getElementById('adminTargetDate') as HTMLInputElement;
+                      if (!dateInput.value) return;
+
+                      try {
+                        const response = await fetch('/api/creator-portal/set-target-date', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            creatorId: creator.id,
+                            targetDate: dateInput.value,
+                            setBy: 'admin',
+                            notes: 'Set by TDI admin',
+                          }),
+                        });
+
+                        if (response.ok) {
+                          setSuccessMessage('Target date updated');
+                          setTimeout(() => setSuccessMessage(null), 3000);
+                          await loadData();
+                        }
+                      } catch (err) {
+                        console.error('Error setting target date:', err);
+                      }
+                    }}
+                    className="px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm hover:bg-[#2a3459] transition-colors"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Add Note */}

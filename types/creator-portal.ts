@@ -45,8 +45,8 @@ export type ContentPath = 'blog' | 'download' | 'course';
 // Publish status types
 export type PublishStatus = 'in_progress' | 'scheduled' | 'published';
 
-// Creator status types
-export type CreatorStatus = 'active' | 'archived';
+// Creator status types (includes followed_up for stalled flow)
+export type CreatorStatus = 'active' | 'archived' | 'followed_up';
 
 // Project status types
 export type ProjectStatus = 'active' | 'completed' | 'archived';
@@ -112,6 +112,20 @@ export interface Creator {
   scheduled_publish_date: string | null;
   published_date: string | null;
   publish_notes: string | null;
+  // Publication dates (Enhancement 1)
+  blog_publish_date: string | null;
+  blog_publish_overview: string | null;
+  course_publish_date: string | null;
+  course_publish_overview: string | null;
+  download_publish_date: string | null;
+  download_publish_overview: string | null;
+  // Stalled flow tracking (Enhancement 3)
+  last_followed_up_at: string | null;
+  followed_up_by: string | null;
+  // Target timeline (Enhancement 4)
+  target_completion_date: string | null;
+  target_date_set_at: string | null;
+  target_date_set_by: string | null;
   // Archive and project tracking fields
   status: CreatorStatus;
   post_launch_notes: string | null;

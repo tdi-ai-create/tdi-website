@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { LogOut, AlertCircle, Mail, User, CheckCircle, X } from 'lucide-react';
+import { LogOut, AlertCircle, Mail, User, CheckCircle, X, Target, Calendar, RefreshCw } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CreatorDashboardHeader } from '@/components/creator-portal/CreatorDashboardHeader';
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
@@ -42,6 +42,10 @@ export default function CreatorDashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showLocationModal, setShowLocationModal] = useState(false);
+  // Target date state
+  const [showTargetDateModal, setShowTargetDateModal] = useState(false);
+  const [targetDateInput, setTargetDateInput] = useState('');
+  const [isSavingTargetDate, setIsSavingTargetDate] = useState(false);
 
   // NEW: Three independent gates — ALL must be true to show dashboard
   const [animationComplete, setAnimationComplete] = useState(false);
@@ -230,6 +234,109 @@ export default function CreatorDashboardPage() {
     }
   };
 
+  // Show target date modal when Agreement milestone is complete and no target date set
+  useEffect(() => {
+    const isDashboardVisible = animationComplete && dataLoaded && timerDone;
+    if (isDashboardVisible && dashboardData?.creator && !showLocationModal) {
+      const creator = dashboardData.creator;
+      // Find Agreement milestone
+      const agreementMilestone = dashboardData.phases
+        .flatMap(p => p.milestones)
+        .find((m: MilestoneWithStatus) => m.id === 'sign_agreement');
+      // Show modal if agreement is signed, no target date set, and hasn't been dismissed this session
+      if (
+        agreementMilestone?.status === 'completed' &&
+        !creator.target_completion_date
+      ) {
+        // Small delay to let the location modal close first if needed
+        setTimeout(() => setShowTargetDateModal(true), 500);
+      }
+    }
+  }, [animationComplete, dataLoaded, timerDone, dashboardData, showLocationModal]);
+
+  // Handle setting target date
+  const handleSetTargetDate = async () => {
+    if (!targetDateInput || !dashboardData || !userEmail) return;
+
+    setIsSavingTargetDate(true);
+    try {
+      const response = await fetch('/api/creator-portal/set-target-date', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId: dashboardData.creator.id,
+          targetDate: targetDateInput,
+          setBy: userEmail,
+        }),
+      });
+
+      if (response.ok) {
+        setShowTargetDateModal(false);
+        setSuccessMessage('Target date set! Check your dashboard for the countdown.');
+        setTimeout(() => setSuccessMessage(null), 5000);
+        // Update local state
+        setDashboardData({
+          ...dashboardData,
+          creator: {
+            ...dashboardData.creator,
+            target_completion_date: targetDateInput,
+          },
+        });
+      }
+    } catch (err) {
+      console.error('Error setting target date:', err);
+    } finally {
+      setIsSavingTargetDate(false);
+    }
+  };
+
+  // Handle updating target date
+  const handleUpdateTargetDate = async () => {
+    if (!targetDateInput || !dashboardData || !userEmail) return;
+
+    setIsSavingTargetDate(true);
+    try {
+      const response = await fetch('/api/creator-portal/set-target-date', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId: dashboardData.creator.id,
+          targetDate: targetDateInput,
+          setBy: userEmail,
+          notes: 'Updated by creator',
+        }),
+      });
+
+      if (response.ok) {
+        setShowTargetDateModal(false);
+        setSuccessMessage('Target date updated!');
+        setTimeout(() => setSuccessMessage(null), 3000);
+        // Update local state
+        setDashboardData({
+          ...dashboardData,
+          creator: {
+            ...dashboardData.creator,
+            target_completion_date: targetDateInput,
+          },
+        });
+      }
+    } catch (err) {
+      console.error('Error updating target date:', err);
+    } finally {
+      setIsSavingTargetDate(false);
+    }
+  };
+
+  // Helper to calculate days until target
+  const getDaysUntilTarget = () => {
+    if (!dashboardData?.creator.target_completion_date) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const targetDate = new Date(dashboardData.creator.target_completion_date);
+    targetDate.setHours(0, 0, 0, 0);
+    return Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  };
+
   const handleMarkComplete = async (milestoneId: string) => {
     if (!dashboardData || !userEmail) return;
 
@@ -278,6 +385,81 @@ export default function CreatorDashboardPage() {
         onSubmit={handleLocationSubmit}
         onSkip={handleLocationSkip}
       />
+
+      {/* Target Date Prompt Modal */}
+      {showTargetDateModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-[#1e2749] to-[#2a3459] p-6 text-white">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 bg-[#ffba06] rounded-full flex items-center justify-center">
+                  <Target className="w-5 h-5 text-[#1e2749]" />
+                </div>
+                <h2 className="text-xl font-semibold">
+                  {dashboardData?.creator.target_completion_date ? 'Update Your Goal' : 'Set Your Launch Goal'}
+                </h2>
+              </div>
+              <p className="text-white/80 text-sm">
+                {dashboardData?.creator.target_completion_date
+                  ? 'Adjust your target date as needed. Life happens!'
+                  : `You're officially in! Set a target date for when you'd like to have your ${
+                      dashboardData?.creator.content_path === 'course' ? 'course' :
+                      dashboardData?.creator.content_path === 'blog' ? 'blog' :
+                      dashboardData?.creator.content_path === 'download' ? 'download' : 'content'
+                    } ready to launch.`}
+              </p>
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              <p className="text-gray-600 text-sm mb-4">
+                This is your goal - it&apos;s okay to adjust it as life happens. We&apos;ll send friendly reminders as you get closer.
+              </p>
+
+              <label className="block text-sm font-medium text-[#1e2749] mb-2">
+                Target Launch Date
+              </label>
+              <input
+                type="date"
+                value={targetDateInput}
+                onChange={(e) => setTargetDateInput(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-[#1e2749] focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent"
+              />
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowTargetDateModal(false);
+                    setTargetDateInput('');
+                  }}
+                  className="flex-1 px-4 py-3 text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors font-medium"
+                >
+                  {dashboardData?.creator.target_completion_date ? 'Cancel' : 'Set Later'}
+                </button>
+                <button
+                  onClick={dashboardData?.creator.target_completion_date ? handleUpdateTargetDate : handleSetTargetDate}
+                  disabled={!targetDateInput || isSavingTargetDate}
+                  className="flex-1 px-4 py-3 text-white bg-[#1e2749] rounded-xl hover:bg-[#2a3459] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isSavingTargetDate ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Target className="w-4 h-4" />
+                      {dashboardData?.creator.target_completion_date ? 'Update Goal' : 'Set My Goal'}
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* LOADER: shows until animation calls onComplete */}
       {!animationComplete && (
@@ -430,6 +612,65 @@ export default function CreatorDashboardPage() {
                 totalMilestones={dashboardData.totalMilestones}
                 progressPercentage={dashboardData.progressPercentage}
               />
+
+              {/* Target Date Countdown Card */}
+              {dashboardData.creator.target_completion_date && (() => {
+                const daysUntil = getDaysUntilTarget();
+                const targetDate = new Date(dashboardData.creator.target_completion_date);
+                const isPast = daysUntil !== null && daysUntil < 0;
+
+                return (
+                  <div className={`mt-6 p-6 rounded-xl border ${isPast ? 'bg-amber-50 border-amber-200' : 'bg-gradient-to-r from-[#80a4ed]/10 to-[#ffba06]/10 border-[#80a4ed]/20'}`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isPast ? 'bg-amber-100' : 'bg-[#80a4ed]/20'}`}>
+                          <Target className={`w-6 h-6 ${isPast ? 'text-amber-600' : 'text-[#80a4ed]'}`} />
+                        </div>
+                        <div>
+                          {isPast ? (
+                            <>
+                              <p className="text-amber-800 font-medium">Your target date has passed</p>
+                              <p className="text-amber-700 text-sm">Want to set a new goal?</p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-[#1e2749] font-semibold text-2xl">
+                                {daysUntil} {daysUntil === 1 ? 'day' : 'days'}
+                              </p>
+                              <p className="text-gray-600 text-sm">
+                                until your launch goal - {targetDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                              </p>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setTargetDateInput(dashboardData.creator.target_completion_date || '');
+                          setShowTargetDateModal(true);
+                        }}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          isPast
+                            ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                            : 'bg-white/50 text-[#1e2749] hover:bg-white border border-gray-200'
+                        }`}
+                      >
+                        {isPast ? (
+                          <>
+                            <RefreshCw className="w-4 h-4" />
+                            Set New Goal
+                          </>
+                        ) : (
+                          <>
+                            <Calendar className="w-4 h-4" />
+                            Update Goal
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Content grid */}
               <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">

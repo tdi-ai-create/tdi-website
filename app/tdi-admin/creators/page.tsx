@@ -37,6 +37,8 @@ import {
   LogOut,
   Menu,
   ChevronLeft,
+  UserCheck,
+  MessageCircle,
 } from 'lucide-react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
@@ -101,8 +103,10 @@ interface EnrichedCreator {
   lastActivityDate: string;
   currentMilestoneName: string | null;
   requiresTeamAction: boolean;
-  waitingOn: 'creator' | 'tdi' | 'stalled' | 'launched';
+  waitingOn: 'creator' | 'tdi' | 'stalled' | 'launched' | 'followed_up';
   isStalled: boolean;
+  last_followed_up_at: string | null;
+  followed_up_by: string | null;
   // Publish workflow fields
   publish_status: 'in_progress' | 'scheduled' | 'published';
   scheduled_publish_date: string | null;
@@ -127,6 +131,7 @@ interface DashboardData {
   stats: {
     total: number;
     stalled: number;
+    followedUp: number;
     waitingOnCreator: number;
     waitingOnTDI: number;
     launched: number;
@@ -331,6 +336,12 @@ export default function CreatorStudioPage() {
   } | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
+  // Follow-up modal state
+  const [showFollowUpModal, setShowFollowUpModal] = useState(false);
+  const [selectedCreatorForFollowUp, setSelectedCreatorForFollowUp] = useState<{ id: string; name: string } | null>(null);
+  const [isMarkingFollowUp, setIsMarkingFollowUp] = useState(false);
+  const [adminEmail, setAdminEmail] = useState<string>('');
+
   const canEdit = isOwner || hasPermission(permissions, 'creator_studio', 'edit');
 
   const loadDashboardData = useCallback(async () => {
@@ -365,6 +376,14 @@ export default function CreatorStudioPage() {
           }
         })
         .catch(err => console.error('Failed to load location data:', err));
+      // Get admin email from session
+      import('@/lib/supabase').then(({ supabase }) => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (session?.user?.email) {
+            setAdminEmail(session.user.email);
+          }
+        });
+      });
     } else {
       setIsLoading(false);
     }
@@ -397,6 +416,9 @@ export default function CreatorStudioPage() {
       switch (activeStatFilter) {
         case 'stalled':
           filtered = filtered.filter((c) => c.waitingOn === 'stalled');
+          break;
+        case 'followedUp':
+          filtered = filtered.filter((c) => c.waitingOn === 'followed_up');
           break;
         case 'waitingOnCreator':
           filtered = filtered.filter((c) => c.waitingOn === 'creator');
@@ -568,6 +590,45 @@ export default function CreatorStudioPage() {
     setSelectedCreatorIds(new Set());
   };
 
+  // Handle marking a creator as followed up
+  const handleMarkFollowedUp = async () => {
+    if (!selectedCreatorForFollowUp || !adminEmail) return;
+
+    setIsMarkingFollowUp(true);
+    try {
+      const response = await fetch('/api/admin/mark-followed-up', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId: selectedCreatorForFollowUp.id,
+          adminEmail,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        showToast(`${selectedCreatorForFollowUp.name} marked as followed up`);
+        await loadDashboardData(); // Refresh data
+        setShowFollowUpModal(false);
+        setSelectedCreatorForFollowUp(null);
+      } else {
+        showToast(`Failed to mark as followed up: ${result.error}`, 'error');
+      }
+    } catch (error) {
+      console.error('Error marking as followed up:', error);
+      showToast('Error marking as followed up. Please try again.', 'error');
+    } finally {
+      setIsMarkingFollowUp(false);
+    }
+  };
+
+  // Open follow-up modal for a creator
+  const openFollowUpModal = (creator: { id: string; name: string }) => {
+    setSelectedCreatorForFollowUp(creator);
+    setShowFollowUpModal(true);
+  };
+
   const activeFiltersCount =
     (filterPath !== 'all' ? 1 : 0) +
     (filterPhase !== 'all' ? 1 : 0) +
@@ -598,6 +659,8 @@ export default function CreatorStudioPage() {
         return { icon: <Bell className="w-3.5 h-3.5" />, label: 'TDI', color: 'bg-blue-100 text-blue-700' };
       case 'launched':
         return { icon: <Rocket className="w-3.5 h-3.5" />, label: 'Launched', color: 'bg-green-100 text-green-700' };
+      case 'followed_up':
+        return { icon: <UserCheck className="w-3.5 h-3.5" />, label: 'Followed Up', color: 'bg-cyan-100 text-cyan-700' };
       default:
         return { icon: <Hourglass className="w-3.5 h-3.5" />, label: 'Creator', color: 'bg-amber-100 text-amber-700' };
     }
@@ -703,6 +766,17 @@ export default function CreatorStudioPage() {
   const needsAttentionCount = dashboardData.creators.filter(
     (c: EnrichedCreator) => c.waitingOn === 'tdi' || (c.post_launch_notes && c.post_launch_notes.trim() !== '')
   ).length;
+
+  // Compute creators that have been followed up
+  const followedUpCreators = dashboardData.creators
+    .filter((c: EnrichedCreator) => c.waitingOn === 'followed_up')
+    .sort((a: EnrichedCreator, b: EnrichedCreator) => {
+      // Sort by follow-up date, most recent first
+      const aDate = a.last_followed_up_at ? new Date(a.last_followed_up_at) : new Date(0);
+      const bDate = b.last_followed_up_at ? new Date(b.last_followed_up_at) : new Date(0);
+      return bDate.getTime() - aDate.getTime();
+    })
+    .slice(0, 8);
 
   // Prepare analytics data
   const phaseChartData = [
@@ -863,6 +937,15 @@ export default function CreatorStudioPage() {
               onClick={() => handleStatCardClick('stalled')}
               accentColor="#F97316"
               lightColor="#FFF7ED"
+            />
+            <StatCard
+              icon={UserCheck}
+              label="Followed Up"
+              value={stats.followedUp}
+              isActive={activeStatFilter === 'followedUp'}
+              onClick={() => handleStatCardClick('followedUp')}
+              accentColor="#06B6D4"
+              lightColor="#ECFEFF"
             />
             <StatCard
               icon={Hourglass}
@@ -1282,6 +1365,91 @@ export default function CreatorStudioPage() {
               )}
             </div>
 
+            {/* Followed Up by Team */}
+            {followedUpCreators.length > 0 && (
+              <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
+                    <UserCheck className="w-5 h-5 text-cyan-500" />
+                    Followed Up by Team
+                    <span className="text-xs font-normal text-gray-500">({stats.followedUp})</span>
+                  </h3>
+                  <button
+                    onClick={() => handleCopyEmails(followedUpCreators.map(c => c.email), 'followedUp')}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
+                      copiedSection === 'followedUp'
+                        ? 'bg-green-50 text-green-600 border border-green-200'
+                        : 'text-gray-500 hover:bg-gray-100 border border-transparent'
+                    }`}
+                  >
+                    {copiedSection === 'followedUp' ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        Copy Emails
+                      </>
+                    )}
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {followedUpCreators.map((creator: EnrichedCreator) => {
+                    const daysSinceFollowUp = creator.last_followed_up_at
+                      ? getDaysSince(creator.last_followed_up_at)
+                      : 0;
+                    const pathBadge = getPathBadge(creator.content_path);
+
+                    return (
+                      <Link
+                        key={creator.id}
+                        href={`/tdi-admin/creators/${creator.id}`}
+                        className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-cyan-50 transition-colors group"
+                      >
+                        <div
+                          className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium flex-shrink-0 bg-cyan-500"
+                        >
+                          {creator.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate group-hover:text-cyan-700" style={{ color: '#2B3A67' }}>
+                            {creator.name}
+                          </p>
+                          <p className="text-xs text-gray-500 truncate flex items-center gap-1">
+                            <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs ${pathBadge.color}`}>
+                              {pathBadge.icon}
+                              {pathBadge.label}
+                            </span>
+                            <span className="text-gray-400">·</span>
+                            <span>Followed up {daysSinceFollowUp === 0 ? 'today' : `${daysSinceFollowUp}d ago`}</span>
+                            {creator.followed_up_by && (
+                              <>
+                                <span className="text-gray-400">by</span>
+                                <span>{creator.followed_up_by.split('@')[0]}</span>
+                              </>
+                            )}
+                          </p>
+                        </div>
+                        <p className="text-xs text-cyan-600 flex-shrink-0">
+                          {14 - daysSinceFollowUp > 0 ? `${14 - daysSinceFollowUp}d until re-stall` : 'Re-stalling soon'}
+                        </p>
+                      </Link>
+                    );
+                  })}
+                  {stats.followedUp > 8 && (
+                    <button
+                      onClick={() => handleStatCardClick('followedUp')}
+                      className="w-full text-center text-xs pt-1 text-cyan-600"
+                    >
+                      View all {stats.followedUp} followed up creators →
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Content Paths */}
             <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
               <h3 className="text-lg font-semibold mb-4 text-gray-900">
@@ -1512,6 +1680,7 @@ export default function CreatorStudioPage() {
                     <option value="creator">Creator</option>
                     <option value="tdi">TDI</option>
                     <option value="stalled">Stalled</option>
+                    <option value="followed_up">Followed Up</option>
                     <option value="launched">Launched</option>
                   </select>
                 </div>
@@ -1565,6 +1734,7 @@ export default function CreatorStudioPage() {
               <span className="text-sm font-semibold capitalize text-indigo-700">
                 {activeStatFilter === 'waitingOnCreator' ? 'Waiting on Creator' :
                  activeStatFilter === 'waitingOnTDI' ? 'Waiting on TDI' :
+                 activeStatFilter === 'followedUp' ? 'Followed Up' :
                  activeStatFilter}
               </span>
               <button
@@ -2144,6 +2314,7 @@ export default function CreatorStudioPage() {
                               <th className="pb-2 font-medium">Current Step</th>
                               <th className="pb-2 font-medium text-right">Days Stalled</th>
                               <th className="pb-2 font-medium text-right">Last Activity</th>
+                              <th className="pb-2 font-medium text-center">Action</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-50">
@@ -2156,10 +2327,12 @@ export default function CreatorStudioPage() {
                               return (
                                 <tr
                                   key={creator.id}
-                                  className={`${bgColor[creator.severity]} hover:brightness-95 cursor-pointer transition-all`}
-                                  onClick={() => window.location.href = `/tdi-admin/creators/${creator.id}`}
+                                  className={`${bgColor[creator.severity]} hover:brightness-95 transition-all`}
                                 >
-                                  <td className="py-3 pr-2">
+                                  <td
+                                    className="py-3 pr-2 cursor-pointer"
+                                    onClick={() => window.location.href = `/tdi-admin/creators/${creator.id}`}
+                                  >
                                     <div className="flex items-center gap-2">
                                       <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600">
                                         {creator.name.charAt(0).toUpperCase()}
@@ -2167,17 +2340,41 @@ export default function CreatorStudioPage() {
                                       <span className="font-medium text-gray-900">{creator.name}</span>
                                     </div>
                                   </td>
-                                  <td className="py-3 pr-2 text-gray-500 capitalize">
+                                  <td
+                                    className="py-3 pr-2 text-gray-500 capitalize cursor-pointer"
+                                    onClick={() => window.location.href = `/tdi-admin/creators/${creator.id}`}
+                                  >
                                     {creator.contentPath || 'Not set'}
                                   </td>
-                                  <td className="py-3 pr-2 text-gray-600 truncate max-w-[200px]">
+                                  <td
+                                    className="py-3 pr-2 text-gray-600 truncate max-w-[200px] cursor-pointer"
+                                    onClick={() => window.location.href = `/tdi-admin/creators/${creator.id}`}
+                                  >
                                     {creator.currentStep || '-'}
                                   </td>
-                                  <td className="py-3 text-right font-semibold text-gray-700">
+                                  <td
+                                    className="py-3 text-right font-semibold text-gray-700 cursor-pointer"
+                                    onClick={() => window.location.href = `/tdi-admin/creators/${creator.id}`}
+                                  >
                                     {creator.daysSinceActivity}
                                   </td>
-                                  <td className="py-3 text-right text-gray-500">
+                                  <td
+                                    className="py-3 text-right text-gray-500 cursor-pointer"
+                                    onClick={() => window.location.href = `/tdi-admin/creators/${creator.id}`}
+                                  >
                                     {new Date(creator.lastActivityDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                  </td>
+                                  <td className="py-3 text-center">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        openFollowUpModal({ id: creator.id, name: creator.name });
+                                      }}
+                                      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-lg bg-cyan-100 text-cyan-700 hover:bg-cyan-200 transition-colors"
+                                    >
+                                      <MessageCircle className="w-3.5 h-3.5" />
+                                      Mark Followed Up
+                                    </button>
                                   </td>
                                 </tr>
                               );
@@ -2422,6 +2619,69 @@ export default function CreatorStudioPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Follow-up confirmation modal */}
+      {showFollowUpModal && selectedCreatorForFollowUp && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center">
+                  <MessageCircle className="w-5 h-5 text-cyan-600" />
+                </div>
+                <h2 className="text-lg font-semibold text-gray-900">Mark as Followed Up</h2>
+              </div>
+              <button
+                onClick={() => {
+                  setShowFollowUpModal(false);
+                  setSelectedCreatorForFollowUp(null);
+                }}
+                className="text-gray-400 hover:text-gray-600 p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6">
+              <p className="text-gray-600 mb-4">
+                Confirm you&apos;ve reached out to <strong>{selectedCreatorForFollowUp.name}</strong>?
+                This will move them to &quot;Followed Up&quot; status.
+              </p>
+              <p className="text-sm text-gray-500 mb-6">
+                They will return to &quot;Stalled&quot; if 14 days pass with no activity, or move back to
+                &quot;Active&quot; when they complete a milestone.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowFollowUpModal(false);
+                    setSelectedCreatorForFollowUp(null);
+                  }}
+                  className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleMarkFollowedUp}
+                  disabled={isMarkingFollowUp}
+                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isMarkingFollowUp ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Marking...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4" />
+                      Confirm Follow-up
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

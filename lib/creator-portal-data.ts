@@ -193,7 +193,7 @@ export async function createCreator(data: {
 
 export async function updateCreator(
   id: string,
-  data: Partial<Pick<Creator, 'content_path' | 'course_title' | 'course_description' | 'author_bio' | 'course_audience' | 'target_launch_month' | 'discount_code' | 'display_on_website' | 'website_display_name' | 'website_title' | 'website_bio' | 'headshot_url' | 'display_order'>>
+  data: Partial<Pick<Creator, 'content_path' | 'course_title' | 'course_description' | 'author_bio' | 'course_audience' | 'target_launch_month' | 'discount_code' | 'display_on_website' | 'website_display_name' | 'website_title' | 'website_bio' | 'headshot_url' | 'display_order' | 'blog_publish_date' | 'blog_publish_overview' | 'course_publish_date' | 'course_publish_overview' | 'download_publish_date' | 'download_publish_overview' | 'target_completion_date' | 'target_date_set_at' | 'target_date_set_by' | 'last_followed_up_at' | 'followed_up_by' | 'status'>>
 ): Promise<Creator | null> {
   const serviceSupabase = getServiceSupabase();
 
