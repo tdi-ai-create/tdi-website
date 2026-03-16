@@ -615,6 +615,76 @@ export default function WegoDashboard() {
       topBarrier: null,
       recommendedActions: [],
     },
+
+    // SECTION 12  - Leading Indicators (March 2026 PA Survey)
+    leadingIndicators: {
+      show: true,
+      surveyDate: 'March 16, 2026',
+      respondents: 10,
+      metrics: {
+        stress: { value: 3.0, scale: 5, industryAvg: '8–9/10', tdiPartners: '5–7/10' },
+        supported: { value: 3.7, scale: 5 },
+        retention: { value: 4.0, scale: 5, industryAvg: '2–4/10', tdiPartners: '5–7/10' },
+        hubValue: { value: 3.7, scale: 5 },
+      },
+      retentionBreakdown: {
+        likelyToStay: 5,  // score 4-5
+        uncertain: 5,      // score 3
+        atRisk: 0,         // score 1-2
+      },
+    },
+
+    // SECTION 13  - PA Voice Survey Snapshot (March 2026)
+    paVoice: {
+      show: true,
+      surveyDate: 'March 16, 2026',
+      respondents: 9,
+      totalPAs: 19,
+      challenges: [
+        { label: 'Emotional / mental exhaustion', count: 6 },
+        { label: 'Unclear role expectations', count: 5 },
+        { label: 'Managing student behavior', count: 2 },
+        { label: 'Lack of training', count: 2 },
+        { label: 'Feeling undervalued', count: 2 },
+        { label: 'Being spread too thin', count: 2 },
+      ],
+      stressPeaks: [
+        { label: 'After school / end of day', count: 6 },
+        { label: 'Lack of planning time', count: 3 },
+        { label: 'Transitions between classes', count: 3 },
+        { label: 'Managing student behavior', count: 3 },
+      ],
+      pdTopics: [
+        { label: 'Behavior support strategies', count: 7, highlight: true },
+        { label: 'Supporting students w/ disabilities', count: 4, highlight: true },
+        { label: 'Self-care & managing stress', count: 4, highlight: true },
+        { label: 'Understanding role & boundaries', count: 4, highlight: true },
+        { label: 'De-escalation techniques', count: 2, highlight: false },
+        { label: 'Career growth / becoming a teacher', count: 2, highlight: false },
+        { label: 'Communicating with teachers', count: 2, highlight: false },
+      ],
+      stayFactors: [
+        { label: 'Higher pay', count: 6 },
+        { label: 'More training & development', count: 3 },
+        { label: 'More respect / recognition', count: 3 },
+        { label: 'Consistent schedule', count: 3 },
+        { label: 'Clearer role expectations', count: 2 },
+        { label: 'Administrative support', count: 2 },
+      ],
+    },
+
+    // Survey Insight Card for What We're Learning
+    surveyInsight: {
+      show: true,
+      title: "What Your Team Told Us — March Survey",
+      content: `Two themes came through clearly from your PA team this month: role clarity and end-of-day exhaustion.
+
+6 of 10 PAs named emotional exhaustion as a top challenge and 5 named unclear role expectations — and these are connected. When the boundaries of a role aren't clear, every situation costs more energy to navigate.
+
+The bright spot: your team rated the Learning Hub 3.7/5 for value. PAs who are stretched thin are still choosing to engage — and that says something important about their investment in growth.
+
+End-of-day stress was the most common stress peak (7 of 10 PAs). This is worth a conversation with Juan and Meghan about what's happening in those final hours — dismissal, behavior escalations, or accumulated exhaustion may each need a different response.`,
+    },
   };
 
   // ObservationCard component for Our Partnership tab
@@ -1369,16 +1439,32 @@ export default function WegoDashboard() {
                 defaultOpen={true}
                 accent="indigo"
               >
-                <div className="space-y-3">
-                  {partnershipData.learning.topCourses.map((course, i) => (
-                    <div key={i} className="bg-gray-50 rounded-lg p-4 border border-gray-100">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-semibold text-gray-900">{course.title}</span>
-                        <span className="text-sm font-bold text-teal-700">{course.engagedStaff} engaged</span>
+                <div className="space-y-4">
+                  {/* Survey Insight Card */}
+                  {partnershipData.surveyInsight.show && (
+                    <div className="bg-teal-50 rounded-xl p-5 border-l-4 border-teal-500">
+                      <div className="flex items-center gap-2 mb-3">
+                        <MessageSquare className="w-4 h-4 text-teal-600" />
+                        <h4 className="text-sm font-bold text-gray-900">{partnershipData.surveyInsight.title}</h4>
                       </div>
-                      <p className="text-xs text-gray-600">{course.note}</p>
+                      <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                        {partnershipData.surveyInsight.content}
+                      </div>
                     </div>
-                  ))}
+                  )}
+
+                  {/* Existing course cards */}
+                  <div className="space-y-3">
+                    {partnershipData.learning.topCourses.map((course, i) => (
+                      <div key={i} className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-semibold text-gray-900">{course.title}</span>
+                          <span className="text-sm font-bold text-teal-700">{course.engagedStaff} engaged</span>
+                        </div>
+                        <p className="text-xs text-gray-600">{course.note}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </CollapsibleSection>
             )}
@@ -1413,7 +1499,180 @@ export default function WegoDashboard() {
               </CollapsibleSection>
             )}
 
-            {/* SECTION 10  - WHAT'S RESONATING */}
+            {/* SECTION 10  - LEADING INDICATORS (March 2026 Survey) */}
+            {partnershipData.leadingIndicators.show && (
+              <CollapsibleSection
+                title="Leading Indicators"
+                icon={<TrendingUp className="w-4 h-4 text-green-600" />}
+                defaultOpen={true}
+                accent="green"
+              >
+                {/* Metric Cards */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                  {/* PA Stress Level */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">PA Stress Level</p>
+                    <p className="text-2xl font-bold text-gray-900">{partnershipData.leadingIndicators.metrics.stress.value}/5</p>
+                    <p className="text-xs text-teal-600 font-medium mt-1">March 2026 Survey</p>
+                    <div className="mt-2 pt-2 border-t border-gray-200 space-y-1">
+                      <p className="text-xs text-gray-500">Industry avg: {partnershipData.leadingIndicators.metrics.stress.industryAvg}</p>
+                      <p className="text-xs text-gray-500">TDI Partners: {partnershipData.leadingIndicators.metrics.stress.tdiPartners}</p>
+                    </div>
+                  </div>
+
+                  {/* Feeling Supported */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Feeling Supported</p>
+                    <p className="text-2xl font-bold text-gray-900">{partnershipData.leadingIndicators.metrics.supported.value}/5</p>
+                    <p className="text-xs text-teal-600 font-medium mt-1">March 2026 Survey</p>
+                    <div className="mt-2 pt-2 border-t border-gray-200 space-y-1">
+                      <p className="text-xs text-gray-500">Industry avg: N/A</p>
+                      <p className="text-xs text-gray-500">TDI Partners: N/A</p>
+                    </div>
+                  </div>
+
+                  {/* Retention Intent */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Retention Intent</p>
+                    <p className="text-2xl font-bold text-gray-900">{partnershipData.leadingIndicators.metrics.retention.value}/5</p>
+                    <p className="text-xs text-teal-600 font-medium mt-1">March 2026 Survey</p>
+                    <div className="mt-2 pt-2 border-t border-gray-200 space-y-1">
+                      <p className="text-xs text-gray-500">Industry avg: {partnershipData.leadingIndicators.metrics.retention.industryAvg}</p>
+                      <p className="text-xs text-gray-500">TDI Partners: {partnershipData.leadingIndicators.metrics.retention.tdiPartners}</p>
+                    </div>
+                  </div>
+
+                  {/* Hub Value Rating */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Hub Value Rating</p>
+                    <p className="text-2xl font-bold text-gray-900">{partnershipData.leadingIndicators.metrics.hubValue.value}/5</p>
+                    <p className="text-xs text-teal-600 font-medium mt-1">March 2026 Survey</p>
+                  </div>
+                </div>
+
+                {/* Retention Breakdown Tiles */}
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div className="bg-green-50 rounded-xl p-4 border border-green-200 text-center">
+                    <p className="text-3xl font-bold text-green-700">{partnershipData.leadingIndicators.retentionBreakdown.likelyToStay}</p>
+                    <p className="text-sm font-medium text-green-800">Likely to stay</p>
+                    <p className="text-xs text-green-600">(score: 4–5/5)</p>
+                  </div>
+                  <div className="bg-amber-50 rounded-xl p-4 border border-amber-200 text-center">
+                    <p className="text-3xl font-bold text-amber-700">{partnershipData.leadingIndicators.retentionBreakdown.uncertain}</p>
+                    <p className="text-sm font-medium text-amber-800">Uncertain</p>
+                    <p className="text-xs text-amber-600">(score: 3/5)</p>
+                  </div>
+                  <div className="bg-gray-100 rounded-xl p-4 border border-gray-200 text-center">
+                    <p className="text-3xl font-bold text-gray-600">{partnershipData.leadingIndicators.retentionBreakdown.atRisk}</p>
+                    <p className="text-sm font-medium text-gray-700">At risk</p>
+                    <p className="text-xs text-gray-500">(score: 1–2/5)</p>
+                  </div>
+                </div>
+
+                <p className="text-xs text-gray-500 italic text-center">Based on {partnershipData.leadingIndicators.respondents} PA responses · {partnershipData.leadingIndicators.surveyDate}</p>
+              </CollapsibleSection>
+            )}
+
+            {/* SECTION 10b  - PA VOICE SURVEY SNAPSHOT */}
+            {partnershipData.paVoice.show && (
+              <CollapsibleSection
+                title="PA Voice — Survey Snapshot"
+                icon={<MessageCircle className="w-4 h-4 text-purple-600" />}
+                defaultOpen={true}
+                accent="purple"
+              >
+                <p className="text-sm text-gray-600 mb-4">What your team shared on {partnershipData.paVoice.surveyDate}</p>
+
+                {/* 2x2 Grid of Sub-cards */}
+                <div className="grid md:grid-cols-2 gap-4 mb-4">
+                  {/* Sub-card 1: Top Challenges */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                    <h4 className="text-sm font-bold text-gray-900 mb-3">What feels hardest right now</h4>
+                    <div className="space-y-2">
+                      {partnershipData.paVoice.challenges.map((item, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="h-2 bg-purple-400 rounded-full"
+                                style={{ width: `${(item.count / partnershipData.paVoice.respondents) * 100}%`, minWidth: '20px' }}
+                              />
+                              <span className="text-xs text-gray-500 whitespace-nowrap">{item.count} of {partnershipData.paVoice.respondents}</span>
+                            </div>
+                            <p className="text-xs text-gray-700 mt-0.5">{item.label}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Sub-card 2: Stress Peaks */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                    <h4 className="text-sm font-bold text-gray-900 mb-3">When stress peaks</h4>
+                    <div className="space-y-2">
+                      {partnershipData.paVoice.stressPeaks.map((item, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="h-2 bg-amber-400 rounded-full"
+                                style={{ width: `${(item.count / partnershipData.paVoice.respondents) * 100}%`, minWidth: '20px' }}
+                              />
+                              <span className="text-xs text-gray-500 whitespace-nowrap">{item.count} of {partnershipData.paVoice.respondents}</span>
+                            </div>
+                            <p className="text-xs text-gray-700 mt-0.5">{item.label}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Sub-card 3: PD Topics Requested */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                    <h4 className="text-sm font-bold text-gray-900 mb-3">What they want to learn</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {partnershipData.paVoice.pdTopics.map((item, i) => (
+                        <span
+                          key={i}
+                          className={`text-xs px-2.5 py-1 rounded-full ${
+                            item.highlight
+                              ? 'bg-teal-100 text-teal-700 border border-teal-200'
+                              : 'bg-gray-100 text-gray-600 border border-gray-200'
+                          }`}
+                        >
+                          {item.label} ({item.count} of {partnershipData.paVoice.respondents})
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Sub-card 4: Stay Factors */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                    <h4 className="text-sm font-bold text-gray-900 mb-3">Stay factors they named</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {partnershipData.paVoice.stayFactors.map((item, i) => (
+                        <span
+                          key={i}
+                          className="text-xs px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 border border-gray-200"
+                        >
+                          {item.label} ({item.count} of {partnershipData.paVoice.respondents})
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-500 italic mt-3">
+                      Higher pay is outside TDI&apos;s direct scope — but training, recognition, role clarity, and schedule consistency are all areas Year 2 directly addresses.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Footer note */}
+                <p className="text-xs text-gray-500 italic text-center">
+                  Survey completed by {partnershipData.paVoice.respondents} of {partnershipData.paVoice.totalPAs} PAs during Virtual Session 4 · {partnershipData.paVoice.surveyDate} · Responses are confidential — no individual names are associated with this data.
+                </p>
+              </CollapsibleSection>
+            )}
+
+            {/* SECTION 11  - WHAT'S RESONATING */}
             {partnershipData.resonating.show && (
               <CollapsibleSection
                 title="What's Resonating"
@@ -1877,6 +2136,105 @@ export default function WegoDashboard() {
               <p className="text-white/90">
                 Year 2 is the natural next step - bringing their teachers into the same room, the same conversation, and the same commitment. When teachers and paras speak the same language, students feel it every single day.
               </p>
+            </div>
+
+            {/* ===== Section 6b: What the Data Says ===== */}
+            <div className="bg-gradient-to-r from-[#1e2749]/5 to-teal-50 rounded-xl p-6 border border-teal-200">
+              <div className="flex items-center gap-2 mb-4">
+                <BarChart3 className="w-5 h-5 text-teal-600" />
+                <h3 className="font-bold text-[#1e2749]">What the data says</h3>
+              </div>
+              <p className="text-sm text-gray-700 mb-4">
+                Our March 2026 PA survey gives us a clear picture heading into Year 2:
+              </p>
+              <ul className="space-y-3 text-sm text-gray-700">
+                <li className="flex items-start gap-2">
+                  <span className="text-teal-600 font-bold">•</span>
+                  <span><strong>Hub value rated 3.7/5</strong> — your team finds the learning meaningful even when time is limited.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-teal-600 font-bold">•</span>
+                  <span><strong>Retention intent at 4.0/5</strong> — no one is leaving, but 5 of 10 PAs are genuinely undecided. Year 2 is the moment to close that gap.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-teal-600 font-bold">•</span>
+                  <span><strong>0 PAs in the &quot;at risk&quot; category</strong> — the foundation is solid. What&apos;s needed now is clarity, recognition, and continued support.</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* ===== Section 6c: Year 2 Priorities ===== */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h3 className="font-bold text-[#1e2749] mb-2">Year 2 Priorities — Informed by Your Team</h3>
+              <p className="text-sm text-gray-600 mb-6">These focus areas emerge directly from what PAs told us.</p>
+
+              <div className="space-y-4">
+                {/* Priority 1 */}
+                <div className="border-l-4 border-amber-400 bg-amber-50/50 rounded-r-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-0.5 rounded-full">1</span>
+                    <h4 className="font-semibold text-[#1e2749]">Role Clarity & Boundaries</h4>
+                  </div>
+                  <p className="text-sm text-gray-700">
+                    5 of 10 PAs named unclear role expectations as a top challenge. 4 of 10 specifically requested PD on understanding their role. Year 2 addresses this through continued coaching and structured role-definition work in sessions.
+                  </p>
+                </div>
+
+                {/* Priority 2 */}
+                <div className="border-l-4 border-orange-400 bg-orange-50/50 rounded-r-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="bg-orange-100 text-orange-700 text-xs font-bold px-2 py-0.5 rounded-full">2</span>
+                    <h4 className="font-semibold text-[#1e2749]">Behavior Support & De-escalation</h4>
+                  </div>
+                  <p className="text-sm text-gray-700">
+                    Behavior support was the #1 requested PD topic (7 of 10 PAs). End-of-day stress — often behavior-related — was flagged by 7 of 10. Year 2 sessions will include targeted behavior and de-escalation content aligned to what PAs are experiencing in real time.
+                  </p>
+                </div>
+
+                {/* Priority 3 */}
+                <div className="border-l-4 border-teal-400 bg-teal-50/50 rounded-r-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="bg-teal-100 text-teal-700 text-xs font-bold px-2 py-0.5 rounded-full">3</span>
+                    <h4 className="font-semibold text-[#1e2749]">Teacher–PA Partnership Strengthening</h4>
+                  </div>
+                  <p className="text-sm text-gray-700">
+                    6 of 10 PAs said their teacher relationship &quot;depends on the teacher&quot; — not broken, but inconsistent. The co-teaching expansion option in Year 2 directly addresses this by bringing teachers and PAs into shared professional development.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* ===== Section 6d: Retention Opportunity ===== */}
+            <div className="bg-green-50 rounded-xl p-6 border border-green-200">
+              <h3 className="font-bold text-[#1e2749] mb-4">Retention: An Opportunity, Not a Warning</h3>
+              <p className="text-sm text-gray-700 mb-4">
+                5 of 10 WEGO PAs are uncertain about staying in their role next year. 0 are actively planning to leave.
+              </p>
+              <p className="text-sm text-gray-700 mb-4">
+                The gap between &quot;uncertain&quot; and &quot;staying&quot; is closeable — and the factors your team named are within reach:
+              </p>
+              <ul className="space-y-2 text-sm text-gray-700 mb-4">
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-600" />
+                  <span><strong>More training & development</strong> → Year 2 Hub access + coaching</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-600" />
+                  <span><strong>More respect / recognition</strong> → Continued Love Notes + celebration</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-600" />
+                  <span><strong>Consistent schedule</strong> → District operations (flag for Juan/Meghan)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-600" />
+                  <span><strong>Clearer role expectations</strong> → Year 2 coaching focus</span>
+                </li>
+              </ul>
+              <p className="text-sm text-gray-700">
+                Renewing now keeps the momentum. Starting over with new PAs next year means rebuilding the trust and skills your current team has already developed.
+              </p>
+              <p className="text-xs text-gray-500 italic mt-4">Based on March 2026 PA survey · 10 respondents</p>
             </div>
 
             {/* ===== Section 7: TDI Does the Work ===== */}
