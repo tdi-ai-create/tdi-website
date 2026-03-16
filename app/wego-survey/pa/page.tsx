@@ -3,18 +3,20 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, ArrowRight, CheckCircle, Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import { LanguageToggle } from '@/components/LanguageToggle';
+import { paTranslations, Language } from '@/lib/wego-survey-translations';
 
 // Type definitions
 interface EmojiOption {
   value: number;
   emoji: string;
-  label: string;
+  labelKey: string;
 }
 
 interface BaseQuestion {
   id: string;
-  question: string;
-  subtitle?: string;
+  questionKey: string;
+  subtitleKey?: string;
   required: boolean;
 }
 
@@ -33,190 +35,138 @@ interface StarRatingQuestion extends BaseQuestion {
 
 interface SingleSelectQuestion extends BaseQuestion {
   type: 'single-select';
-  options: string[];
+  optionKeys: string[];
 }
 
 interface MultiSelectQuestion extends BaseQuestion {
   type: 'multi-select';
-  options: string[];
+  optionKeys: string[];
 }
 
 interface MultiSelectLimitQuestion extends BaseQuestion {
   type: 'multi-select-limit';
-  options: string[];
+  optionKeys: string[];
   limit: number;
 }
 
 interface TextareaQuestion extends BaseQuestion {
   type: 'textarea';
-  placeholder?: string;
+  placeholderKey?: string;
 }
 
 type Question = NameQuestion | EmojiScaleQuestion | StarRatingQuestion | SingleSelectQuestion | MultiSelectQuestion | MultiSelectLimitQuestion | TextareaQuestion;
 
-// Question definitions
+// Question definitions with translation keys
 const QUESTIONS: Question[] = [
   {
     id: 'name',
     type: 'name',
-    question: "Before we begin — what's your name?",
-    subtitle: 'First and last name',
+    questionKey: 'q0_question',
+    subtitleKey: 'q0_subtitle',
     required: true,
   },
   {
     id: 'stress',
     type: 'emoji-scale',
-    question: 'How would you rate your overall stress level at work?',
-    subtitle: 'Think about a typical week',
+    questionKey: 'q1_question',
+    subtitleKey: 'q1_subtitle',
     options: [
-      { value: 1, emoji: '😌', label: 'Very Low' },
-      { value: 2, emoji: '🙂', label: 'Low' },
-      { value: 3, emoji: '😐', label: 'Moderate' },
-      { value: 4, emoji: '😓', label: 'High' },
-      { value: 5, emoji: '🥵', label: 'Very High' },
+      { value: 1, emoji: '😌', labelKey: 'q1_opt1' },
+      { value: 2, emoji: '🙂', labelKey: 'q1_opt2' },
+      { value: 3, emoji: '😐', labelKey: 'q1_opt3' },
+      { value: 4, emoji: '😓', labelKey: 'q1_opt4' },
+      { value: 5, emoji: '🥵', labelKey: 'q1_opt5' },
     ],
     required: true,
   },
   {
     id: 'stress_time',
     type: 'multi-select',
-    question: 'When during the day do you feel most stressed?',
-    subtitle: 'Select all that apply',
-    options: [
-      'Morning arrival',
-      'Transitions between classes',
-      'Lunch/recess duty',
-      'Afternoon block',
-      'End of day',
-      'It varies day to day',
-    ],
+    questionKey: 'q2_question',
+    subtitleKey: 'q2_subtitle',
+    optionKeys: ['q2_opt1', 'q2_opt2', 'q2_opt3', 'q2_opt4', 'q2_opt5', 'q2_opt6'],
     required: true,
   },
   {
     id: 'challenges',
     type: 'multi-select-limit',
-    question: 'What are your biggest daily challenges?',
-    subtitle: 'Select your top 3',
+    questionKey: 'q3_question',
+    subtitleKey: 'q3_subtitle',
     limit: 3,
-    options: [
-      'Unclear expectations from teachers',
-      'Not enough planning/prep time',
-      'Managing student behavior',
-      'Feeling undervalued or overlooked',
-      'Lack of training for specific needs',
-      'Too many students to support at once',
-      'Communication gaps with teachers',
-      'Not knowing what to do during downtime',
-      'Inconsistent schedules',
-      'Emotional/mental exhaustion',
-    ],
+    optionKeys: ['q3_opt1', 'q3_opt2', 'q3_opt3', 'q3_opt4', 'q3_opt5', 'q3_opt6', 'q3_opt7', 'q3_opt8', 'q3_opt9', 'q3_opt10'],
     required: true,
   },
   {
     id: 'supported',
     type: 'emoji-scale',
-    question: 'How supported do you feel in your role?',
-    subtitle: 'By your school team overall',
+    questionKey: 'q4_question',
+    subtitleKey: 'q4_subtitle',
     options: [
-      { value: 1, emoji: '😔', label: 'Not at all' },
-      { value: 2, emoji: '😕', label: 'A little' },
-      { value: 3, emoji: '🤷', label: 'Somewhat' },
-      { value: 4, emoji: '😊', label: 'Well' },
-      { value: 5, emoji: '🤗', label: 'Very well' },
+      { value: 1, emoji: '😔', labelKey: 'q4_opt1' },
+      { value: 2, emoji: '😕', labelKey: 'q4_opt2' },
+      { value: 3, emoji: '🤷', labelKey: 'q4_opt3' },
+      { value: 4, emoji: '😊', labelKey: 'q4_opt4' },
+      { value: 5, emoji: '🤗', labelKey: 'q4_opt5' },
     ],
     required: true,
   },
   {
     id: 'teacher_relationship',
     type: 'single-select',
-    question: 'How would you describe your working relationship with your teacher(s)?',
-    options: [
-      "We're a great team",
-      'Good but could improve',
-      'It depends on the teacher',
-      "We don't communicate much",
-      "It's challenging",
-    ],
+    questionKey: 'q5_question',
+    optionKeys: ['q5_opt1', 'q5_opt2', 'q5_opt3', 'q5_opt4', 'q5_opt5'],
     required: true,
   },
   {
     id: 'hub_value',
     type: 'star-rating',
-    question: 'How valuable has the Learning Hub been for your growth?',
-    subtitle: 'Think about resources, tools, and courses',
+    questionKey: 'q6_question',
+    subtitleKey: 'q6_subtitle',
     required: true,
   },
   {
     id: 'pd_topics',
     type: 'multi-select',
-    question: 'What topics would help you most right now?',
-    subtitle: 'Select all that interest you',
-    options: [
-      'Behavior support strategies',
-      'Working with EL students',
-      'Supporting students with disabilities',
-      'Small group instruction',
-      'De-escalation techniques',
-      'Building relationships with students',
-      'Communicating with teachers',
-      'Self-care & managing stress',
-      'Understanding my role & boundaries',
-      'Career growth / becoming a teacher',
-    ],
+    questionKey: 'q7_question',
+    subtitleKey: 'q7_subtitle',
+    optionKeys: ['q7_opt1', 'q7_opt2', 'q7_opt3', 'q7_opt4', 'q7_opt5', 'q7_opt6', 'q7_opt7', 'q7_opt8', 'q7_opt9', 'q7_opt10'],
     required: true,
   },
   {
     id: 'best_part',
     type: 'multi-select',
-    question: "What's the best part of your job?",
-    subtitle: 'Select all that apply',
-    options: [
-      'Connecting with students',
-      'Seeing student growth',
-      'Working with my teacher(s)',
-      'Feeling like I make a difference',
-      'The school community',
-      'Learning new skills',
-      'The schedule/hours',
-    ],
+    questionKey: 'q8_question',
+    subtitleKey: 'q8_subtitle',
+    optionKeys: ['q8_opt1', 'q8_opt2', 'q8_opt3', 'q8_opt4', 'q8_opt5', 'q8_opt6', 'q8_opt7'],
     required: true,
   },
   {
     id: 'retention',
     type: 'emoji-scale',
-    question: 'How likely are you to continue in your role next year?',
+    questionKey: 'q9_question',
     options: [
-      { value: 1, emoji: '👋', label: 'Unlikely' },
-      { value: 2, emoji: '🤔', label: 'Unsure' },
-      { value: 3, emoji: '😊', label: 'Likely' },
-      { value: 4, emoji: '💪', label: 'Very likely' },
-      { value: 5, emoji: '❤️', label: 'Absolutely' },
+      { value: 1, emoji: '👋', labelKey: 'q9_opt1' },
+      { value: 2, emoji: '🤔', labelKey: 'q9_opt2' },
+      { value: 3, emoji: '😊', labelKey: 'q9_opt3' },
+      { value: 4, emoji: '💪', labelKey: 'q9_opt4' },
+      { value: 5, emoji: '❤️', labelKey: 'q9_opt5' },
     ],
     required: true,
   },
   {
     id: 'stay_factors',
     type: 'multi-select',
-    question: 'What would make you more likely to stay?',
-    subtitle: 'Select all that apply',
-    options: [
-      'Higher pay',
-      'More respect/recognition',
-      'Clearer role expectations',
-      'Better communication with teachers',
-      'More training & development',
-      'Consistent schedule',
-      'Feeling part of the team',
-      'Administrative support',
-    ],
+    questionKey: 'q10_question',
+    subtitleKey: 'q10_subtitle',
+    optionKeys: ['q10_opt1', 'q10_opt2', 'q10_opt3', 'q10_opt4', 'q10_opt5', 'q10_opt6', 'q10_opt7', 'q10_opt8'],
     required: true,
   },
   {
     id: 'comments',
     type: 'textarea',
-    question: 'Anything else you\'d like to share?',
-    subtitle: "This is your space — we're listening",
-    placeholder: 'Type here... (optional)',
+    questionKey: 'q11_question',
+    subtitleKey: 'q11_subtitle',
+    placeholderKey: 'q11_placeholder',
     required: false,
   },
 ];
@@ -228,6 +178,7 @@ interface FormData {
 }
 
 export default function WegoPASurvey() {
+  const [language, setLanguage] = useState<Language>('en');
   const [currentStep, setCurrentStep] = useState(-1); // -1 is landing page
   const [formData, setFormData] = useState<FormData>({
     first_name: '',
@@ -237,6 +188,9 @@ export default function WegoPASurvey() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Translation helper
+  const t = paTranslations[language];
 
   // Load saved progress
   useEffect(() => {
@@ -352,6 +306,7 @@ export default function WegoPASurvey() {
           survey_type: 'pa',
           first_name: formData.first_name,
           last_name: formData.last_name,
+          language: language,
           responses: {
             stress: formData.stress,
             stress_time: formData.stress_time,
@@ -375,7 +330,7 @@ export default function WegoPASurvey() {
       sessionStorage.removeItem('wego-pa-survey-draft');
       setIsSubmitted(true);
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      setError(t.errorMessage);
       console.error(err);
     } finally {
       setIsSubmitting(false);
@@ -386,19 +341,22 @@ export default function WegoPASurvey() {
   if (isSubmitted) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#faf9f7] to-white flex items-center justify-center px-4">
-        <div className="text-center max-w-md animate-fade-in">
-          <div className="mb-6">
+        <div className="text-center max-w-md animate-fade-in relative">
+          <div className="absolute top-0 right-0">
+            <LanguageToggle language={language} onToggle={setLanguage} />
+          </div>
+          <div className="mb-6 pt-12">
             <div className="w-20 h-20 mx-auto rounded-full bg-green-100 flex items-center justify-center">
               <CheckCircle className="w-10 h-10 text-green-600" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-[#1e2749] mb-4">Thank You!</h1>
+          <h1 className="text-3xl font-bold text-[#1e2749] mb-4">{t.thankYouTitle}</h1>
           <p className="text-gray-600 mb-6">
-            Your feedback helps us support you better. We appreciate you taking the time to share your thoughts.
+            {t.thankYouMessage}
           </p>
           <div className="bg-[#ffba06]/10 rounded-xl p-4 border border-[#ffba06]/30">
-            <p className="text-[#1e2749] font-medium">Your voice matters.</p>
-            <p className="text-sm text-gray-600 mt-1">The TDI team will review your responses to improve our support.</p>
+            <p className="text-[#1e2749] font-medium">{t.thankYouHighlight}</p>
+            <p className="text-sm text-gray-600 mt-1">{t.thankYouDetail}</p>
           </div>
         </div>
       </div>
@@ -411,6 +369,11 @@ export default function WegoPASurvey() {
       <div className="min-h-screen bg-gradient-to-b from-[#faf9f7] to-white flex flex-col">
         <div className="flex-1 flex items-center justify-center px-4 py-8">
           <div className={`text-center max-w-md transition-opacity duration-150 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+            {/* Language Toggle */}
+            <div className="flex justify-end mb-4">
+              <LanguageToggle language={language} onToggle={setLanguage} />
+            </div>
+
             {/* Logo */}
             <div className="mb-6">
               <Image
@@ -423,10 +386,10 @@ export default function WegoPASurvey() {
             </div>
 
             <h1 className="text-2xl md:text-3xl font-bold text-[#1e2749] mb-2">
-              WEGO PA Check-In
+              {t.landingTitle}
             </h1>
             <p className="text-gray-600 mb-6">
-              Help us understand how we can better support you
+              {t.landingSubtitle}
             </p>
 
             <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-6 text-left">
@@ -434,25 +397,25 @@ export default function WegoPASurvey() {
                 <div className="w-8 h-8 rounded-full bg-[#35A7FF]/10 flex items-center justify-center">
                   <span className="text-sm">⏱️</span>
                 </div>
-                <span className="text-gray-700">~3 minutes to complete</span>
+                <span className="text-gray-700">{t.timeBadge}</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-[#35A7FF]/10 flex items-center justify-center">
                   <span className="text-sm">🔒</span>
                 </div>
-                <span className="text-gray-700">Your responses are confidential</span>
+                <span className="text-gray-700">{t.lockBadge}</span>
               </div>
             </div>
 
             <div className="bg-[#1e2749]/5 rounded-xl p-4 mb-8 text-sm text-gray-600">
-              <strong className="text-[#1e2749]">Confidentiality Notice:</strong> Your responses are shared only with the Teachers Deserve It team to help improve support. They will not be shared with teachers or administration.
+              <strong className="text-[#1e2749]">{language === 'en' ? 'Confidentiality Notice:' : 'Aviso de Confidencialidad:'}</strong> {t.confidentialityNotice}
             </div>
 
             <button
               onClick={handleStart}
               className="w-full bg-[#38618C] hover:bg-[#2d4e70] text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
             >
-              Start Survey
+              {t.startButton}
             </button>
           </div>
         </div>
@@ -477,11 +440,14 @@ export default function WegoPASurvey() {
             className="flex items-center gap-1 text-gray-600 hover:text-[#1e2749] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm">Back</span>
+            <span className="text-sm">{t.back}</span>
           </button>
-          <span className="text-sm text-gray-500">
-            {currentStep + 1} of {totalQuestions}
-          </span>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-500">
+              {currentStep + 1} {t.questionOf} {totalQuestions}
+            </span>
+            <LanguageToggle language={language} onToggle={setLanguage} />
+          </div>
         </div>
       </div>
 
@@ -491,10 +457,10 @@ export default function WegoPASurvey() {
           {currentQuestion && (
             <>
               <h2 className="text-xl md:text-2xl font-bold text-[#1e2749] mb-2">
-                {currentQuestion.question}
+                {t[currentQuestion.questionKey as keyof typeof t]}
               </h2>
-              {currentQuestion.subtitle && (
-                <p className="text-gray-500 mb-6">{currentQuestion.subtitle}</p>
+              {currentQuestion.subtitleKey && (
+                <p className="text-gray-500 mb-6">{t[currentQuestion.subtitleKey as keyof typeof t]}</p>
               )}
 
               {/* Name input */}
@@ -502,7 +468,7 @@ export default function WegoPASurvey() {
                 <div className="space-y-4">
                   <input
                     type="text"
-                    placeholder="First name"
+                    placeholder={t.firstName}
                     value={formData.first_name || ''}
                     onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                     className="w-full p-4 rounded-xl border border-gray-200 focus:border-[#38618C] focus:ring-2 focus:ring-[#38618C]/20 outline-none text-lg"
@@ -510,7 +476,7 @@ export default function WegoPASurvey() {
                   />
                   <input
                     type="text"
-                    placeholder="Last name"
+                    placeholder={t.lastName}
                     value={formData.last_name || ''}
                     onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
                     className="w-full p-4 rounded-xl border border-gray-200 focus:border-[#38618C] focus:ring-2 focus:ring-[#38618C]/20 outline-none text-lg"
@@ -532,7 +498,7 @@ export default function WegoPASurvey() {
                       }`}
                     >
                       <span className="text-2xl md:text-3xl mb-1">{opt.emoji}</span>
-                      <span className="text-xs text-gray-600 text-center leading-tight">{opt.label}</span>
+                      <span className="text-xs text-gray-600 text-center leading-tight">{t[opt.labelKey as keyof typeof t]}</span>
                     </button>
                   ))}
                 </div>
@@ -560,19 +526,22 @@ export default function WegoPASurvey() {
               {/* Single select */}
               {currentQuestion.type === 'single-select' && (
                 <div className="space-y-2">
-                  {(currentQuestion as SingleSelectQuestion).options.map((opt) => (
-                    <button
-                      key={opt}
-                      onClick={() => handleSelectOption(currentQuestion.id, opt)}
-                      className={`w-full p-4 rounded-xl border-2 text-left transition-all duration-200 ${
-                        formData[currentQuestion.id] === opt
-                          ? 'border-[#38618C] bg-[#38618C]/10'
-                          : 'border-gray-200 hover:border-gray-300 bg-white'
-                      }`}
-                    >
-                      <span className="text-[#1e2749]">{opt}</span>
-                    </button>
-                  ))}
+                  {(currentQuestion as SingleSelectQuestion).optionKeys.map((optKey) => {
+                    const optText = t[optKey as keyof typeof t];
+                    return (
+                      <button
+                        key={optKey}
+                        onClick={() => handleSelectOption(currentQuestion.id, optKey)}
+                        className={`w-full p-4 rounded-xl border-2 text-left transition-all duration-200 ${
+                          formData[currentQuestion.id] === optKey
+                            ? 'border-[#38618C] bg-[#38618C]/10'
+                            : 'border-gray-200 hover:border-gray-300 bg-white'
+                        }`}
+                      >
+                        <span className="text-[#1e2749]">{optText}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
 
@@ -581,17 +550,18 @@ export default function WegoPASurvey() {
                 <div className="space-y-2">
                   {currentQuestion.type === 'multi-select-limit' && (
                     <p className="text-sm text-[#38618C] mb-3">
-                      Selected: {((formData[currentQuestion.id] as string[]) || []).length}/{(currentQuestion as MultiSelectLimitQuestion).limit}
+                      {t.selected}: {((formData[currentQuestion.id] as string[]) || []).length}/{(currentQuestion as MultiSelectLimitQuestion).limit}
                     </p>
                   )}
-                  {(currentQuestion as MultiSelectQuestion | MultiSelectLimitQuestion).options.map((opt) => {
-                    const isSelected = ((formData[currentQuestion.id] as string[]) || []).includes(opt);
+                  {(currentQuestion as MultiSelectQuestion | MultiSelectLimitQuestion).optionKeys.map((optKey) => {
+                    const optText = t[optKey as keyof typeof t];
+                    const isSelected = ((formData[currentQuestion.id] as string[]) || []).includes(optKey);
                     return (
                       <button
-                        key={opt}
+                        key={optKey}
                         onClick={() => handleSelectOption(
                           currentQuestion.id,
-                          opt,
+                          optKey,
                           true,
                           currentQuestion.type === 'multi-select-limit' ? (currentQuestion as MultiSelectLimitQuestion).limit : undefined
                         )}
@@ -610,7 +580,7 @@ export default function WegoPASurvey() {
                             </svg>
                           )}
                         </div>
-                        <span className="text-[#1e2749]">{opt}</span>
+                        <span className="text-[#1e2749]">{optText}</span>
                       </button>
                     );
                   })}
@@ -620,7 +590,7 @@ export default function WegoPASurvey() {
               {/* Textarea */}
               {currentQuestion.type === 'textarea' && (
                 <textarea
-                  placeholder={currentQuestion.placeholder || 'Type here...'}
+                  placeholder={currentQuestion.placeholderKey ? t[currentQuestion.placeholderKey as keyof typeof t] : ''}
                   value={(formData[currentQuestion.id] as string) || ''}
                   onChange={(e) => setFormData({ ...formData, [currentQuestion.id]: e.target.value })}
                   rows={5}
@@ -648,10 +618,10 @@ export default function WegoPASurvey() {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Submitting...
+                  {t.submitting}
                 </>
               ) : (
-                'Submit Survey'
+                t.submit
               )}
             </button>
           ) : (
@@ -660,7 +630,7 @@ export default function WegoPASurvey() {
               disabled={!canProceed()}
               className="w-full bg-[#38618C] hover:bg-[#2d4e70] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
             >
-              Next
+              {t.next}
               <ArrowRight className="w-5 h-5" />
             </button>
           )}
