@@ -1,6 +1,120 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
+
+// Component definitions moved outside to prevent re-creation on every render
+const ScaleSelector = memo(({
+  value,
+  onChange,
+  min,
+  max,
+  labels,
+}: {
+  value: number | null;
+  onChange: (v: number) => void;
+  min: number;
+  max: number;
+  labels: { [key: number]: string };
+}) => (
+  <div className="space-y-3">
+    <div className="flex flex-wrap gap-2">
+      {Array.from({ length: max - min + 1 }, (_, i) => min + i).map(n => (
+        <button
+          key={n}
+          type="button"
+          onClick={() => onChange(n)}
+          className={`w-10 h-10 rounded-lg font-medium transition-all ${
+            value === n
+              ? 'bg-teal-600 text-white shadow-md'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          {n}
+        </button>
+      ))}
+    </div>
+    <div className="flex justify-between text-xs text-slate-500">
+      {Object.entries(labels).map(([key, label]) => (
+        <span key={key}>{key} = {label}</span>
+      ))}
+    </div>
+  </div>
+));
+ScaleSelector.displayName = 'ScaleSelector';
+
+const RadioGroup = memo(({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+}) => (
+  <div className="flex flex-wrap gap-3">
+    {options.map(opt => (
+      <button
+        key={opt}
+        type="button"
+        onClick={() => onChange(opt)}
+        className={`px-4 py-2 rounded-lg font-medium transition-all ${
+          value === opt
+            ? 'bg-teal-600 text-white shadow-md'
+            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+        }`}
+      >
+        {opt}
+      </button>
+    ))}
+  </div>
+));
+RadioGroup.displayName = 'RadioGroup';
+
+const TextArea = memo(({
+  value,
+  onChange,
+  placeholder,
+  required = true,
+}: {
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  placeholder?: string;
+  required?: boolean;
+}) => (
+  <textarea
+    value={value}
+    onChange={onChange}
+    placeholder={placeholder}
+    rows={4}
+    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none transition-all ${
+      required && value.trim() === '' ? 'border-slate-200' : 'border-slate-200'
+    }`}
+  />
+));
+TextArea.displayName = 'TextArea';
+
+const QuestionBlock = memo(({
+  number,
+  question,
+  children,
+  optional = false,
+}: {
+  number: number;
+  question: string;
+  children: React.ReactNode;
+  optional?: boolean;
+}) => (
+  <div className="space-y-3">
+    <label className="block">
+      <span className="text-sm font-medium text-slate-700">
+        Q{number}. {question}
+        {optional && <span className="ml-2 text-slate-400 font-normal">(optional)</span>}
+      </span>
+    </label>
+    {children}
+  </div>
+));
+QuestionBlock.displayName = 'QuestionBlock';
 
 type FormData = {
   // Section 1
@@ -92,9 +206,14 @@ export default function RWSurveyPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const updateField = <K extends keyof FormData>(field: K, value: FormData[K]) => {
+  const updateField = useCallback(<K extends keyof FormData>(field: K, value: FormData[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  }, []);
+
+  // Stable handlers for text inputs to prevent cursor loss
+  const handleTextChange = useCallback((field: keyof FormData) => (e: React.ChangeEvent<HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData(prev => ({ ...prev, [field]: e.target.value }));
+  }, []);
 
   const validateCurrentSection = (): boolean => {
     switch (currentSection) {
@@ -213,115 +332,6 @@ export default function RWSurveyPage() {
       </div>
     );
   }
-
-  const ScaleSelector = ({
-    value,
-    onChange,
-    min,
-    max,
-    labels,
-  }: {
-    value: number | null;
-    onChange: (v: number) => void;
-    min: number;
-    max: number;
-    labels: { [key: number]: string };
-  }) => (
-    <div className="space-y-3">
-      <div className="flex flex-wrap gap-2">
-        {Array.from({ length: max - min + 1 }, (_, i) => min + i).map(n => (
-          <button
-            key={n}
-            type="button"
-            onClick={() => onChange(n)}
-            className={`w-10 h-10 rounded-lg font-medium transition-all ${
-              value === n
-                ? 'bg-teal-600 text-white shadow-md'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            {n}
-          </button>
-        ))}
-      </div>
-      <div className="flex justify-between text-xs text-slate-500">
-        {Object.entries(labels).map(([key, label]) => (
-          <span key={key}>{key} = {label}</span>
-        ))}
-      </div>
-    </div>
-  );
-
-  const RadioGroup = ({
-    value,
-    onChange,
-    options,
-  }: {
-    value: string;
-    onChange: (v: string) => void;
-    options: string[];
-  }) => (
-    <div className="flex flex-wrap gap-3">
-      {options.map(opt => (
-        <button
-          key={opt}
-          type="button"
-          onClick={() => onChange(opt)}
-          className={`px-4 py-2 rounded-lg font-medium transition-all ${
-            value === opt
-              ? 'bg-teal-600 text-white shadow-md'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          {opt}
-        </button>
-      ))}
-    </div>
-  );
-
-  const TextArea = ({
-    value,
-    onChange,
-    placeholder,
-    required = true,
-  }: {
-    value: string;
-    onChange: (v: string) => void;
-    placeholder?: string;
-    required?: boolean;
-  }) => (
-    <textarea
-      value={value}
-      onChange={e => onChange(e.target.value)}
-      placeholder={placeholder}
-      rows={4}
-      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none transition-all ${
-        required && value.trim() === '' ? 'border-slate-200' : 'border-slate-200'
-      }`}
-    />
-  );
-
-  const QuestionBlock = ({
-    number,
-    question,
-    children,
-    optional = false,
-  }: {
-    number: number;
-    question: string;
-    children: React.ReactNode;
-    optional?: boolean;
-  }) => (
-    <div className="space-y-3">
-      <label className="block">
-        <span className="text-sm font-medium text-slate-700">
-          Q{number}. {question}
-          {optional && <span className="ml-2 text-slate-400 font-normal">(optional)</span>}
-        </span>
-      </label>
-      {children}
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -446,7 +456,7 @@ export default function RWSurveyPage() {
               <QuestionBlock number={6} question="Approximately how many hours per week are you working?">
                 <select
                   value={formData.hours_worked_per_week}
-                  onChange={e => updateField('hours_worked_per_week', e.target.value)}
+                  onChange={handleTextChange('hours_worked_per_week')}
                   className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 >
                   <option value="">Select...</option>
@@ -469,7 +479,7 @@ export default function RWSurveyPage() {
               <QuestionBlock number={8} question="What is taking up the most time that feels like a drain?">
                 <TextArea
                   value={formData.time_biggest_drain}
-                  onChange={v => updateField('time_biggest_drain', v)}
+                  onChange={handleTextChange('time_biggest_drain')}
                 />
               </QuestionBlock>
             </>
@@ -491,28 +501,28 @@ export default function RWSurveyPage() {
               <QuestionBlock number={10} question="Reflecting on the last month — what do you wish had gone differently?">
                 <TextArea
                   value={formData.last_month_reflection}
-                  onChange={v => updateField('last_month_reflection', v)}
+                  onChange={handleTextChange('last_month_reflection')}
                 />
               </QuestionBlock>
 
               <QuestionBlock number={11} question="What is one win from the last month, big or small, worth naming?">
                 <TextArea
                   value={formData.biggest_win_last_month}
-                  onChange={v => updateField('biggest_win_last_month', v)}
+                  onChange={handleTextChange('biggest_win_last_month')}
                 />
               </QuestionBlock>
 
               <QuestionBlock number={12} question="What was the hardest moment or biggest challenge last month?">
                 <TextArea
                   value={formData.biggest_challenge_last_month}
-                  onChange={v => updateField('biggest_challenge_last_month', v)}
+                  onChange={handleTextChange('biggest_challenge_last_month')}
                 />
               </QuestionBlock>
 
               <QuestionBlock number={13} question="Is there a lead or deal that is still on your mind? What happened?">
                 <TextArea
                   value={formData.lead_or_deal_on_mind}
-                  onChange={v => updateField('lead_or_deal_on_mind', v)}
+                  onChange={handleTextChange('lead_or_deal_on_mind')}
                 />
               </QuestionBlock>
             </>
@@ -524,21 +534,21 @@ export default function RWSurveyPage() {
               <QuestionBlock number={14} question="What objection or pushback are you hearing most often from prospects?">
                 <TextArea
                   value={formData.most_common_objection}
-                  onChange={v => updateField('most_common_objection', v)}
+                  onChange={handleTextChange('most_common_objection')}
                 />
               </QuestionBlock>
 
               <QuestionBlock number={15} question="What part of the sales process feels hardest or most uncomfortable right now?">
                 <TextArea
                   value={formData.part_of_process_feels_hard}
-                  onChange={v => updateField('part_of_process_feels_hard', v)}
+                  onChange={handleTextChange('part_of_process_feels_hard')}
                 />
               </QuestionBlock>
 
               <QuestionBlock number={16} question="Is there something you have been avoiding? (A follow-up, a conversation, a type of outreach?) What is behind that?">
                 <TextArea
                   value={formData.something_being_avoided}
-                  onChange={v => updateField('something_being_avoided', v)}
+                  onChange={handleTextChange('something_being_avoided')}
                 />
               </QuestionBlock>
 
@@ -557,7 +567,7 @@ export default function RWSurveyPage() {
               >
                 <TextArea
                   value={formData.tools_missing}
-                  onChange={v => updateField('tools_missing', v)}
+                  onChange={handleTextChange('tools_missing')}
                   required={formData.tools_and_resources_adequate !== 'Yes'}
                 />
               </QuestionBlock>
@@ -570,14 +580,14 @@ export default function RWSurveyPage() {
               <QuestionBlock number={19} question="What part of this job energizes you most?">
                 <TextArea
                   value={formData.part_that_energizes}
-                  onChange={v => updateField('part_that_energizes', v)}
+                  onChange={handleTextChange('part_that_energizes')}
                 />
               </QuestionBlock>
 
               <QuestionBlock number={20} question="What part drains you most?">
                 <TextArea
                   value={formData.part_that_drains}
-                  onChange={v => updateField('part_that_drains', v)}
+                  onChange={handleTextChange('part_that_drains')}
                 />
               </QuestionBlock>
 
@@ -594,7 +604,7 @@ export default function RWSurveyPage() {
               <QuestionBlock number={22} question="What gaps in product knowledge would you like more support with?">
                 <TextArea
                   value={formData.product_knowledge_gaps}
-                  onChange={v => updateField('product_knowledge_gaps', v)}
+                  onChange={handleTextChange('product_knowledge_gaps')}
                 />
               </QuestionBlock>
             </>
@@ -606,28 +616,28 @@ export default function RWSurveyPage() {
               <QuestionBlock number={23} question="What is your top priority or focus for the next 4 weeks?">
                 <TextArea
                   value={formData.top_priority_next_4_weeks}
-                  onChange={v => updateField('top_priority_next_4_weeks', v)}
+                  onChange={handleTextChange('top_priority_next_4_weeks')}
                 />
               </QuestionBlock>
 
               <QuestionBlock number={24} question="What does a successful next 4 weeks look like for you, in your own words?">
                 <TextArea
                   value={formData.what_success_looks_like}
-                  onChange={v => updateField('what_success_looks_like', v)}
+                  onChange={handleTextChange('what_success_looks_like')}
                 />
               </QuestionBlock>
 
               <QuestionBlock number={25} question="What is one thing you want to do differently going into the next month?">
                 <TextArea
                   value={formData.one_thing_to_do_differently}
-                  onChange={v => updateField('one_thing_to_do_differently', v)}
+                  onChange={handleTextChange('one_thing_to_do_differently')}
                 />
               </QuestionBlock>
 
               <QuestionBlock number={26} question="What support would make the biggest difference for you right now?">
                 <TextArea
                   value={formData.support_needed}
-                  onChange={v => updateField('support_needed', v)}
+                  onChange={handleTextChange('support_needed')}
                 />
               </QuestionBlock>
             </>
@@ -639,28 +649,28 @@ export default function RWSurveyPage() {
               <QuestionBlock number={27} question="What could leadership do differently that would help you most?">
                 <TextArea
                   value={formData.leadership_feedback}
-                  onChange={v => updateField('leadership_feedback', v)}
+                  onChange={handleTextChange('leadership_feedback')}
                 />
               </QuestionBlock>
 
               <QuestionBlock number={28} question="Is there anything about how the team operates that you think could be better?">
                 <TextArea
                   value={formData.team_dynamic_feedback}
-                  onChange={v => updateField('team_dynamic_feedback', v)}
+                  onChange={handleTextChange('team_dynamic_feedback')}
                 />
               </QuestionBlock>
 
               <QuestionBlock number={29} question="This is your space. Is there something you have wanted to say but have not felt like there was room to say it?">
                 <TextArea
                   value={formData.safe_to_say}
-                  onChange={v => updateField('safe_to_say', v)}
+                  onChange={handleTextChange('safe_to_say')}
                 />
               </QuestionBlock>
 
               <QuestionBlock number={30} question="Anything else you want to share?" optional>
                 <TextArea
                   value={formData.anything_else}
-                  onChange={v => updateField('anything_else', v)}
+                  onChange={handleTextChange('anything_else')}
                   required={false}
                 />
               </QuestionBlock>
