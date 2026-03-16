@@ -193,6 +193,8 @@ export default function WegoDashboard() {
         { label: 'Virtual Session 1 complete', date: 'Jan 2026' },
         { label: 'Virtual Session 2 complete', date: 'Feb 2026' },
         { label: 'Observation Day 3  - 7 PAs observed, Love Notes delivered', date: 'Feb 25, 2026' },
+        { label: 'Virtual Session 3 complete', date: 'Mar 2026' },
+        { label: 'Virtual Session 4 complete + PA Survey collected (10 responses)', date: 'Mar 16, 2026' },
       ],
       inProgress: [
         { label: '19/19 PAs Hub activated  - 17 with tracked course activity', detail: '89% engagement and growing' },
@@ -201,7 +203,6 @@ export default function WegoDashboard() {
         { label: 'Year 2 teacher expansion in planning', detail: 'To be confirmed at Year 1 Celebration' },
       ],
       comingSoon: [
-        { label: 'Virtual Session 4', date: 'March 16, 2026' },
         { label: 'Virtual Session 5', date: 'April 13, 2026' },
         { label: 'Year 1 Celebration + Year 2 Planning', date: 'April 2026 (TBD)' },
         { label: 'Virtual Session 6 (Final)', date: 'May 11, 2026' },
@@ -240,8 +241,8 @@ export default function WegoDashboard() {
       ],
       tdiHandling: [
         {
-          label: 'Virtual Sessions 4-6  - TDI preparing content',
-          detail: 'March 16, April 13, May 11  - all confirmed',
+          label: 'Virtual Sessions 5-6  - TDI preparing content',
+          detail: 'April 13, May 11  - all confirmed',
         },
         {
           label: 'Year 2 teacher expansion proposal',
@@ -253,7 +254,7 @@ export default function WegoDashboard() {
         },
       ],
       alreadyInMotion: [
-        { label: 'Virtual Session 4', date: 'March 16, 2026', status: 'scheduled' },
+        { label: 'Virtual Session 4 + PA Survey', date: 'March 16, 2026', status: 'complete' },
         { label: 'Virtual Session 5', date: 'April 13, 2026', status: 'scheduled' },
         { label: 'Virtual Session 6 (Final)', date: 'May 11, 2026', status: 'scheduled' },
         { label: 'Weekly subgroups  - 4 groups every Monday', date: 'Ongoing through Jun 2026', status: 'scheduled' },
@@ -499,14 +500,15 @@ export default function WegoDashboard() {
           badge: 'Complete',
           note: 'See Observations section for full details',
         },
+        {
+          type: 'Virtual Session',
+          label: 'Virtual Session 4 + PA Survey',
+          date: 'March 16, 2026',
+          badge: 'Complete',
+          note: '10 PA responses collected',
+        },
       ],
       upcoming: [
-        {
-          type: 'In Person Check In',
-          label: 'In Person Check In 3',
-          date: 'March 16, 2026',
-          badge: 'Scheduled',
-        },
         {
           type: 'In Person Check In',
           label: 'In Person Check In 4',
