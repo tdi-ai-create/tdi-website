@@ -59,6 +59,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import { getMetricStatus, statusColors, statusShapes, statusLabels, formatMetricValue, getMetricDescription } from '@/lib/metric-thresholds';
 import TDIPortalLoader from '@/components/TDIPortalLoader';
+import PilotNextYearTab from '@/components/dashboard/pilot/PilotNextYearTab';
 
 // Types
 interface Partnership {
@@ -4282,7 +4283,16 @@ export default function PartnerDashboard() {
         {/* GROWTH PLAN TAB (formerly 2026-27 Preview) */}
         {activeTab === '2026-27' && (
           <div role="tabpanel" id="panel-2026-27" aria-labelledby="tab-2026-27" className="space-y-4 md:space-y-6">
-            {(() => {
+            {/* Roosevelt School Pilot gets custom PilotNextYearTab */}
+            {partnerSlug === 'roosevelt-school' && (
+              <PilotNextYearTab
+                partnership={partnership}
+                schoolName={organization?.name || 'Roosevelt School'}
+              />
+            )}
+
+            {/* Standard Growth Plan for all other schools */}
+            {partnerSlug !== 'roosevelt-school' && (() => {
               // Check if partnership is new (less than 3 months old OR no metric snapshots)
               const daysSinceStart = partnership?.contract_start
                 ? Math.floor((Date.now() - new Date(partnership.contract_start).getTime()) / (1000 * 60 * 60 * 24))
