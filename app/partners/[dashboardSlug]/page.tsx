@@ -54,6 +54,7 @@ import {
   Pencil,
   ThumbsUp,
   HelpCircle,
+  Handshake,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getMetricStatus, statusColors, statusShapes, statusLabels, formatMetricValue, getMetricDescription } from '@/lib/metric-thresholds';
@@ -988,11 +989,11 @@ export default function PartnerDashboard() {
   // Tabs configuration
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Eye },
-    { id: 'journey', label: 'Journey', icon: TrendingUp },
+    { id: 'our-partnership', label: 'Our Partnership', icon: Handshake },
     { id: 'progress', label: 'Progress', icon: Users },
     ...(partnership?.partnership_type === 'district' ? [{ id: 'schools', label: 'Schools', icon: School }] : []),
     { id: 'blueprint', label: 'Blueprint', icon: Star },
-    { id: 'preview', label: 'Growth Plan', icon: Sprout },
+    { id: '2026-27', label: '2026-27', icon: CalendarDays },
     { id: 'team', label: 'Team', icon: User },
   ];
 
@@ -1260,7 +1261,7 @@ export default function PartnerDashboard() {
 
               {/* Current Phase */}
               <div
-                onClick={() => navigateToTab('journey', 'phase-timeline')}
+                onClick={() => navigateToTab('our-partnership', 'phase-timeline')}
                 className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md hover:border-[#80a4ed] transition-all group"
               >
                 <div className="p-3 md:p-4">
@@ -3271,8 +3272,8 @@ export default function PartnerDashboard() {
         )}
 
         {/* JOURNEY TAB */}
-        {activeTab === 'journey' && (
-          <div role="tabpanel" id="panel-journey" aria-labelledby="tab-journey" className="space-y-4 md:space-y-6">
+        {activeTab === 'our-partnership' && (
+          <div role="tabpanel" id="panel-our-partnership" aria-labelledby="tab-our-partnership" className="space-y-4 md:space-y-6">
             {/* Partnership Goal Statement */}
             {organization?.partnership_goal ? (
               <div id="partnership-goal" className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
@@ -4279,8 +4280,8 @@ export default function PartnerDashboard() {
         )}
 
         {/* GROWTH PLAN TAB (formerly 2026-27 Preview) */}
-        {activeTab === 'preview' && (
-          <div role="tabpanel" id="panel-preview" aria-labelledby="tab-preview" className="space-y-4 md:space-y-6">
+        {activeTab === '2026-27' && (
+          <div role="tabpanel" id="panel-2026-27" aria-labelledby="tab-2026-27" className="space-y-4 md:space-y-6">
             {(() => {
               // Check if partnership is new (less than 3 months old OR no metric snapshots)
               const daysSinceStart = partnership?.contract_start
