@@ -356,6 +356,7 @@ export default function CreatorStudioPage() {
     course_title: '',
     course_audience: '',
     target_launch_month: '',
+    target_launch_year: new Date().getFullYear().toString(),
   });
 
   // Geographic distribution state
@@ -544,6 +545,11 @@ export default function CreatorStudioPage() {
     e.preventDefault();
     setIsAdding(true);
 
+    // Combine month and year into a single string
+    const targetLaunchMonth = newCreator.target_launch_month && newCreator.target_launch_year
+      ? `${newCreator.target_launch_month} ${newCreator.target_launch_year}`
+      : undefined;
+
     try {
       const response = await fetch('/api/admin/add-creator', {
         method: 'POST',
@@ -554,7 +560,7 @@ export default function CreatorStudioPage() {
           intakeResponses: {
             course_title: newCreator.course_title || undefined,
             course_audience: newCreator.course_audience || undefined,
-            target_launch_month: newCreator.target_launch_month || undefined,
+            target_launch_month: targetLaunchMonth,
           },
         }),
       });
@@ -569,6 +575,7 @@ export default function CreatorStudioPage() {
           course_title: '',
           course_audience: '',
           target_launch_month: '',
+          target_launch_year: new Date().getFullYear().toString(),
         });
         await loadDashboardData();
       } else {
@@ -1887,6 +1894,9 @@ export default function CreatorStudioPage() {
                   <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3 hidden lg:table-cell">
                     Phase
                   </th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3 hidden lg:table-cell">
+                    Target Launch
+                  </th>
                   <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3 hidden xl:table-cell">
                     Current Milestone
                   </th>
@@ -1934,7 +1944,7 @@ export default function CreatorStudioPage() {
               <tbody className="divide-y divide-gray-50">
                 {filteredCreators.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
+                    <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
                       {searchQuery || activeFiltersCount > 0 || activeStatFilter
                         ? 'No creators found matching your criteria.'
                         : 'No creators yet. Add your first creator to get started.'}
@@ -1998,6 +2008,13 @@ export default function CreatorStudioPage() {
                         <td className="px-4 py-3 hidden lg:table-cell">
                           <span className="text-sm text-gray-700">
                             {phaseDisplayNames[creator.current_phase] || creator.current_phase}
+                          </span>
+                        </td>
+
+                        {/* Target Launch */}
+                        <td className="px-4 py-3 hidden lg:table-cell">
+                          <span className="text-sm text-gray-600">
+                            {creator.target_launch_month || '-'}
                           </span>
                         </td>
 
@@ -2720,15 +2737,39 @@ export default function CreatorStudioPage() {
 
               <div>
                 <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                  Target Launch Month
+                  Target Launch Date
                 </label>
-                <input
-                  type="text"
-                  value={newCreator.target_launch_month}
-                  onChange={(e) => setNewCreator({ ...newCreator, target_launch_month: e.target.value })}
-                  placeholder="e.g., March 2026"
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all placeholder:text-gray-400"
-                />
+                <div className="flex gap-2">
+                  <select
+                    value={newCreator.target_launch_month}
+                    onChange={(e) => setNewCreator({ ...newCreator, target_launch_month: e.target.value })}
+                    className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all"
+                  >
+                    <option value="">Select Month</option>
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March">March</option>
+                    <option value="April">April</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
+                  </select>
+                  <select
+                    value={newCreator.target_launch_year}
+                    onChange={(e) => setNewCreator({ ...newCreator, target_launch_year: e.target.value })}
+                    className="w-28 px-4 py-2.5 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all"
+                  >
+                    {[0, 1, 2, 3].map(offset => {
+                      const year = new Date().getFullYear() + offset;
+                      return <option key={year} value={year}>{year}</option>;
+                    })}
+                  </select>
+                </div>
               </div>
 
               <div className="flex gap-3 pt-4">
