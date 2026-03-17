@@ -51,10 +51,11 @@ export async function POST(request: Request) {
 
     console.log('[add-creator] Creator created:', creator.id);
 
-    // 2. Get all milestones ordered by sort_order
+    // 2. Get all active milestones (excluding collapsed/retired ones)
     const { data: milestones, error: milestonesError } = await supabase
       .from('milestones')
       .select('*')
+      .is('is_collapsed_into', null)
       .order('sort_order');
 
     if (milestonesError || !milestones) {

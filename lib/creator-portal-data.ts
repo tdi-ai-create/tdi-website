@@ -159,10 +159,11 @@ export async function createCreator(data: {
     return null;
   }
 
-  // Get all milestones
+  // Get all active milestones (excluding collapsed/retired ones)
   const { data: milestones, error: milestonesError } = await serviceSupabase
     .from('milestones')
     .select('*')
+    .is('is_collapsed_into', null)
     .order('sort_order');
 
   if (milestonesError || !milestones) {

@@ -309,10 +309,11 @@ export async function POST(request: Request) {
             })
             .eq('id', creatorId);
 
-          // Get all milestones
+          // Get all active milestones (excluding collapsed/retired ones)
           const { data: milestones } = await supabase
             .from('milestones')
             .select('id, sort_order, phase_id')
+            .is('is_collapsed_into', null)
             .order('sort_order');
 
           if (milestones) {

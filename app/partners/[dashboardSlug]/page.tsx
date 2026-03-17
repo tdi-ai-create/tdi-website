@@ -55,6 +55,7 @@ import {
   ThumbsUp,
   HelpCircle,
   Handshake,
+  Receipt,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getMetricStatus, statusColors, statusShapes, statusLabels, formatMetricValue, getMetricDescription } from '@/lib/metric-thresholds';
@@ -991,11 +992,11 @@ export default function PartnerDashboard() {
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Eye },
     { id: 'our-partnership', label: 'Our Partnership', icon: Handshake },
-    { id: 'progress', label: 'Progress', icon: Users },
     ...(partnership?.partnership_type === 'district' ? [{ id: 'schools', label: 'Schools', icon: School }] : []),
     { id: 'blueprint', label: 'Blueprint', icon: Star },
     { id: '2026-27', label: '2026-27', icon: CalendarDays },
     { id: 'team', label: 'Team', icon: User },
+    { id: 'billing', label: 'Billing', icon: Receipt },
   ];
 
   return (

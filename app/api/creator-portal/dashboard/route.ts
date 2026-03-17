@@ -85,10 +85,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Phases query failed: ${phasesError?.message}` }, { status: 500 });
     }
 
-    // Get all milestones
+    // Get all active milestones (excluding collapsed/retired ones)
     const { data: milestones, error: milestonesError } = await supabase
       .from('milestones')
       .select('*')
+      .is('is_collapsed_into', null)
       .order('sort_order');
 
     console.log('[dashboard-api] Milestones:', { count: milestones?.length, error: milestonesError?.message });

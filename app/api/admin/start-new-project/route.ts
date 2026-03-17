@@ -117,10 +117,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Initialize milestones for the new creator (skip intake milestone)
-    // Get all milestones
+    // Get all active milestones (excluding collapsed/retired ones)
     const { data: milestones, error: milestonesError } = await supabase
       .from('milestones')
       .select('*')
+      .is('is_collapsed_into', null)
       .order('sort_order');
 
     if (milestonesError) {

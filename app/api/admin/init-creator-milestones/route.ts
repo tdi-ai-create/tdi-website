@@ -18,10 +18,11 @@ export async function POST(request: Request) {
 
     console.log('[init-milestones] Initializing for creator:', creatorId);
 
-    // 1. Get all milestones
+    // 1. Get all active milestones (excluding collapsed/retired ones)
     const { data: milestones, error: milestonesError } = await supabase
       .from('milestones')
       .select('id, sort_order, phase_id')
+      .is('is_collapsed_into', null)
       .order('phase_id')
       .order('sort_order');
 
