@@ -42,7 +42,6 @@ import {
 } from 'lucide-react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
-import { createCreator } from '@/lib/creator-portal-data';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
 import { copyToClipboard, formatEmailsForCopy } from '@/lib/tdi-admin/clipboard';
 import { Toast, useToast } from '@/components/tdi-admin/Toast';
@@ -546,8 +545,23 @@ export default function CreatorStudioPage() {
     setIsAdding(true);
 
     try {
-      const creator = await createCreator(newCreator);
-      if (creator) {
+      const response = await fetch('/api/admin/add-creator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newCreator.name,
+          email: newCreator.email,
+          intakeResponses: {
+            course_title: newCreator.course_title || undefined,
+            course_audience: newCreator.course_audience || undefined,
+            target_launch_month: newCreator.target_launch_month || undefined,
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
         setShowAddModal(false);
         setNewCreator({
           name: '',
@@ -557,9 +571,13 @@ export default function CreatorStudioPage() {
           target_launch_month: '',
         });
         await loadDashboardData();
+      } else {
+        console.error('Error adding creator:', data.error);
+        alert(data.error || 'Failed to add creator');
       }
     } catch (error) {
       console.error('Error adding creator:', error);
+      alert('Network error. Please try again.');
     } finally {
       setIsAdding(false);
     }

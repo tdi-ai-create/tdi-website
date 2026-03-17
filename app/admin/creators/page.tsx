@@ -27,7 +27,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { isAdmin, createCreator } from '@/lib/creator-portal-data';
+import { isAdmin } from '@/lib/creator-portal-data';
 import CreatorSwimlane from '@/components/admin/CreatorSwimlane';
 import { LayoutList, Kanban } from 'lucide-react';
 
@@ -292,8 +292,24 @@ export default function AdminCreatorsPage() {
     setIsAdding(true);
 
     try {
-      const creator = await createCreator(newCreator);
-      if (creator) {
+      const response = await fetch('/api/admin/add-creator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newCreator.name,
+          email: newCreator.email,
+          // Include optional fields in intakeResponses
+          intakeResponses: {
+            course_title: newCreator.course_title || undefined,
+            course_audience: newCreator.course_audience || undefined,
+            target_launch_month: newCreator.target_launch_month || undefined,
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
         setShowAddModal(false);
         setNewCreator({
           name: '',
@@ -303,9 +319,13 @@ export default function AdminCreatorsPage() {
           target_launch_month: '',
         });
         await loadDashboardData();
+      } else {
+        console.error('Error adding creator:', data.error);
+        alert(data.error || 'Failed to add creator');
       }
     } catch (error) {
       console.error('Error adding creator:', error);
+      alert('Network error. Please try again.');
     } finally {
       setIsAdding(false);
     }
