@@ -17,9 +17,13 @@ export function MainSiteWrapper({ children }: MainSiteWrapperProps) {
   const isTDIAdminRoute = pathname?.startsWith('/tdi-admin');
   const isLoginPage = pathname === '/login';
   const isDashboardRoute = pathname?.toLowerCase().includes('-dashboard');
+  // Partner portal dashboard routes (exclude login/reset-password which have their own layouts)
+  const isPartnerDashboard = pathname?.startsWith('/partners/') &&
+    !pathname?.startsWith('/partners/login') &&
+    !pathname?.startsWith('/partners/reset-password');
 
   // Don't render main site chrome on Hub, TDI Admin, Login, or Partner Dashboard routes
-  if (isHubRoute || isTDIAdminRoute || isLoginPage || isDashboardRoute) {
+  if (isHubRoute || isTDIAdminRoute || isLoginPage || isDashboardRoute || isPartnerDashboard) {
     return null;
   }
 

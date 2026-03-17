@@ -36,6 +36,13 @@ export async function GET(
 
     const supabase = getServiceSupabase();
 
+    // Get partnership (for staff_enrolled count)
+    const { data: partnership } = await supabase
+      .from('partnerships')
+      .select('staff_enrolled')
+      .eq('id', partnershipId)
+      .single();
+
     // Get organization
     const { data: organization } = await supabase
       .from('organizations')
@@ -50,14 +57,16 @@ export async function GET(
       .eq('partnership_id', partnershipId)
       .order('sort_order', { ascending: true });
 
-    // Get staff stats
+    // Get staff login stats (for hub_login tracking)
     const { data: staffMembers } = await supabase
       .from('staff_members')
       .select('id, hub_enrolled, hub_login_date')
       .eq('partnership_id', partnershipId);
 
+    // Use staff_enrolled from partnerships table for total count
+    // Use staff_members for hub login tracking
     const staffStats = {
-      total: staffMembers?.length || 0,
+      total: partnership?.staff_enrolled || 0,
       hubLoggedIn: staffMembers?.filter(s => s.hub_login_date).length || 0,
     };
 
