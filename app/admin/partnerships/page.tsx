@@ -438,7 +438,13 @@ export default function AdminPartnershipsPage() {
               href="/admin/creators"
               className="text-sm text-gray-600 hover:text-[#1e2749]"
             >
-              Creator Portal
+              Creators
+            </Link>
+            <Link
+              href="/admin/survey-responses"
+              className="text-sm text-gray-600 hover:text-[#1e2749]"
+            >
+              Survey Responses
             </Link>
           </div>
         </div>

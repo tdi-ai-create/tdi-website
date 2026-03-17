@@ -396,8 +396,34 @@ export default function AdminSurveyResponsesPage() {
 
   // List view
   return (
-    <div className="min-h-screen bg-slate-50 p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-slate-50">
+      {/* Header */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <span className="text-sm bg-[#1e2749] text-white px-3 py-1 rounded-full">
+              TDI Admin
+            </span>
+            <span className="text-sm text-slate-600">Survey Responses</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/admin/creators"
+              className="text-sm text-slate-600 hover:text-[#1e2749]"
+            >
+              Creators
+            </Link>
+            <Link
+              href="/admin/partnerships"
+              className="text-sm text-slate-600 hover:text-[#1e2749]"
+            >
+              Partnerships
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto p-8">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-slate-800">Creator Survey Responses</h1>

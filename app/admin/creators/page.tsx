@@ -410,12 +410,26 @@ export default function AdminCreatorsPage() {
             </span>
           </div>
 
-          <Link
-            href="/creator-portal/dashboard"
-            className="text-sm text-gray-600 hover:text-[#1e2749]"
-          >
-            Exit Admin View
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/admin/partnerships"
+              className="text-sm text-gray-600 hover:text-[#1e2749]"
+            >
+              Partnerships
+            </Link>
+            <Link
+              href="/admin/survey-responses"
+              className="text-sm text-gray-600 hover:text-[#1e2749]"
+            >
+              Survey Responses
+            </Link>
+            <Link
+              href="/creator-portal/dashboard"
+              className="text-sm text-gray-600 hover:text-[#1e2749]"
+            >
+              Exit Admin View
+            </Link>
+          </div>
         </div>
       </header>
 
