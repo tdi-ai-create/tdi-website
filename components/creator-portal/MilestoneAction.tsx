@@ -11,6 +11,10 @@ interface MilestoneActionProps {
     action_type?: string;
     action_config?: Record<string, unknown>;
     status: string;
+    // Combined card feature
+    awaiting_approval?: boolean;
+    submitted_value?: string | null;
+    team_status_message?: string | null;
   };
   creatorId: string;
   onComplete: () => void;
@@ -625,6 +629,36 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
       );
 
     case 'submit_link':
+      // Combined card: show awaiting approval state if submission is pending review
+      if (milestone.awaiting_approval) {
+        return (
+          <AdminPreviewWrapper actionLabel="Awaiting Approval">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-3">
+              <div className="flex items-center gap-2 text-amber-800">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="font-medium">Submitted - Awaiting Approval</span>
+              </div>
+              {milestone.submitted_value && (
+                <div className="text-sm text-amber-700">
+                  <span className="font-medium">Your submission:</span>{' '}
+                  <a
+                    href={milestone.submitted_value}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#80a4ed] hover:text-[#1e2749] inline-flex items-center gap-1"
+                  >
+                    View link <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              )}
+              <p className="text-sm text-amber-600">
+                The TDI team is reviewing your submission. You&apos;ll be notified when it&apos;s approved.
+              </p>
+            </div>
+          </AdminPreviewWrapper>
+        );
+      }
+
       return (
         <AdminPreviewWrapper actionLabel={config.label || 'Submit'}>
           <button
@@ -810,9 +844,16 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
     case 'team_action':
       return (
         <AdminPreviewWrapper actionLabel="Waiting on TDI Team">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-sm">
-            <span>⏳</span>
-            Waiting on TDI Team
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-sm">
+              <span>⏳</span>
+              Waiting on TDI Team
+            </div>
+            {milestone.team_status_message && (
+              <p className="text-sm text-slate-500 italic pl-1">
+                {milestone.team_status_message}
+              </p>
+            )}
           </div>
         </AdminPreviewWrapper>
       );

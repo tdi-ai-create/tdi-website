@@ -36,6 +36,10 @@ export interface Milestone {
   applies_to: string[] | null;
   action_type: string | null;
   action_config: Record<string, unknown> | null;
+  // Collapse feature: points to the milestone this was collapsed into
+  is_collapsed_into: string | null;
+  // Team status message for team_action milestones
+  team_status_message: string | null;
   created_at: string;
 }
 
@@ -145,6 +149,10 @@ export interface CreatorMilestone {
   completed_by: string | null;
   notes: string | null;
   metadata: Record<string, unknown> | null;
+  // Combined card feature: submission is awaiting team approval
+  awaiting_approval: boolean;
+  // Combined card feature: the value submitted (e.g., video URL)
+  submitted_value: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -218,6 +226,10 @@ export interface MilestoneWithStatus extends Milestone {
   metadata: Record<string, unknown> | null;
   submission_data: SubmissionData | null;
   isApplicable: boolean;
+  // Combined card feature: submission is awaiting team approval
+  awaiting_approval: boolean;
+  // Combined card feature: the value submitted (e.g., video URL)
+  submitted_value: string | null;
 }
 
 // Phase with milestones for display

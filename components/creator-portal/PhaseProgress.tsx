@@ -16,6 +16,7 @@ import {
   Hourglass,
   HelpCircle,
   Star,
+  PartyPopper,
 } from 'lucide-react';
 import type { PhaseWithMilestones, MilestoneWithStatus, MilestoneStatus, SubmissionData } from '@/types/creator-portal';
 import { MilestoneAction } from './MilestoneAction';
@@ -165,6 +166,9 @@ const waitingOnTdiConfig = {
   helper: 'Our team will complete this step and update your portal',
 };
 
+// Character limit for description before showing "Read more"
+const DESCRIPTION_CHAR_LIMIT = 120;
+
 function MilestoneItem({
   milestone,
   creatorId,
@@ -197,6 +201,9 @@ function MilestoneItem({
     content_path?: string | null;
   };
 }) {
+  // Area 2: Expandable notes state
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
   const isActionable =
     milestone.status === 'available' || milestone.status === 'in_progress';
   const hasCalendly = milestone.calendly_link && isActionable;
@@ -311,7 +318,28 @@ function MilestoneItem({
               )}
             </div>
             {milestone.description && (
-              <p className="text-sm text-gray-600 mt-1">{milestone.description}</p>
+              <div className="mt-1">
+                {milestone.description.length > DESCRIPTION_CHAR_LIMIT ? (
+                  <>
+                    <p className="text-sm text-gray-600">
+                      {isDescriptionExpanded
+                        ? milestone.description
+                        : `${milestone.description.slice(0, DESCRIPTION_CHAR_LIMIT)}...`}
+                    </p>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsDescriptionExpanded(!isDescriptionExpanded);
+                      }}
+                      className="text-xs text-[#80a4ed] hover:text-[#1e2749] font-medium mt-1"
+                    >
+                      {isDescriptionExpanded ? 'Read less' : 'Read more'}
+                    </button>
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-600">{milestone.description}</p>
+                )}
+              </div>
             )}
             {/* Show helper text for locked milestones */}
             {milestone.status === 'locked' && config.helper && (
@@ -343,6 +371,11 @@ function MilestoneItem({
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   action_config: (milestone as any).action_config,
                   status: milestone.status,
+                  // Combined card feature
+                  awaiting_approval: milestone.awaiting_approval,
+                  submitted_value: milestone.submitted_value,
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  team_status_message: (milestone as any).team_status_message,
                 }}
                 creatorId={creatorId}
                 onComplete={onRefresh || (() => window.location.reload())}
@@ -404,14 +437,36 @@ function MilestoneItem({
         {milestone.status === 'completed' && milestone.submission_data && (() => {
           const formattedData = formatSubmissionData(milestone.submission_data);
           if (!formattedData) return null;
+
+          // Area 3: Check if this is a team review with feedback
+          const isTeamReview = milestone.submission_data.type === 'team_review';
+          const hasFeedback = isTeamReview && milestone.submission_data.review_notes;
+
           return (
-            <div className="mt-3 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
-              <p className="text-sm text-gray-700">{formattedData.label}</p>
-              {formattedData.sublabel && (
+            <div className={`mt-3 rounded-lg px-3 py-2 ${
+              hasFeedback
+                ? 'bg-blue-50 border border-blue-200'
+                : 'bg-gray-50 border border-gray-200'
+            }`}>
+              <p className={`text-sm ${hasFeedback ? 'text-blue-800 font-medium' : 'text-gray-700'}`}>
+                {formattedData.label}
+              </p>
+              {/* Area 3: Team feedback display */}
+              {hasFeedback && (
+                <div className="mt-2 pt-2 border-t border-blue-200">
+                  <p className="text-xs text-blue-600 font-medium mb-1">Team Feedback:</p>
+                  <p className="text-sm text-blue-700 whitespace-pre-wrap">
+                    {milestone.submission_data.review_notes}
+                  </p>
+                </div>
+              )}
+              {formattedData.sublabel && !hasFeedback && (
                 <p className="text-xs text-gray-600 mt-0.5">{formattedData.sublabel}</p>
               )}
               {formattedData.timestamp && (
-                <p className="text-xs text-gray-500 mt-0.5">Submitted {formattedData.timestamp}</p>
+                <p className={`text-xs mt-0.5 ${hasFeedback ? 'text-blue-500' : 'text-gray-500'}`}>
+                  {isTeamReview ? 'Reviewed' : 'Submitted'} {formattedData.timestamp}
+                </p>
               )}
             </div>
           );
@@ -601,6 +656,22 @@ function PhaseCard({
 
       {isExpanded && (
         <div className={`p-4 space-y-3 ${isActionPhase ? 'bg-[#fef9eb]' : 'bg-white'}`}>
+          {/* Area 4: Phase Completion Celebration Banner */}
+          {phase.isComplete && (
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                <PartyPopper className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <p className="font-medium text-green-800">
+                  {phase.name} Complete!
+                </p>
+                <p className="text-sm text-green-600">
+                  Great work! You&apos;ve completed all steps in this phase.
+                </p>
+              </div>
+            </div>
+          )}
           {applicableMilestones.map((milestone) => (
             <MilestoneItem
               key={milestone.id}

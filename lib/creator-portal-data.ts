@@ -473,7 +473,10 @@ export async function getCreatorDashboardData(
 
   // Build phases with milestones
   const phasesWithMilestones: PhaseWithMilestones[] = phases.map((phase) => {
-    const phaseMilestones = milestones.filter((m) => m.phase_id === phase.id);
+    // Filter out collapsed milestones (ones that have is_collapsed_into set)
+    const phaseMilestones = milestones.filter(
+      (m) => m.phase_id === phase.id && !m.is_collapsed_into
+    );
 
     const milestonesWithStatus: MilestoneWithStatus[] = phaseMilestones.map(
       (milestone) => {
@@ -487,7 +490,10 @@ export async function getCreatorDashboardData(
           completed_at: progress?.completed_at || null,
           progress_id: progress?.id || null,
           metadata: progress?.metadata || null,
+          submission_data: null, // Will be populated by API if needed
           isApplicable,
+          awaiting_approval: progress?.awaiting_approval || false,
+          submitted_value: progress?.submitted_value || null,
         };
       }
     );
@@ -509,8 +515,8 @@ export async function getCreatorDashboardData(
     };
   });
 
-  // Calculate progress based only on applicable milestones
-  const applicableMilestones = milestones.filter(m => milestoneAppliesTo(m));
+  // Calculate progress based only on applicable milestones (excluding collapsed ones)
+  const applicableMilestones = milestones.filter(m => milestoneAppliesTo(m) && !m.is_collapsed_into);
   const applicableMilestoneIds = new Set(applicableMilestones.map(m => m.id));
 
   // Get applicable creator milestones
