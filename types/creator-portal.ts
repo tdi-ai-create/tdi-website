@@ -24,6 +24,15 @@ export interface Phase {
   created_at: string;
 }
 
+// Rich content structure for milestone accordion sections
+export interface MilestoneRichContent {
+  what_to_do?: string[];
+  why_it_matters?: string[];
+  examples?: string[];
+  watch_out_for?: string[];
+  whats_next?: string;
+}
+
 // Milestone from database
 export interface Milestone {
   id: string;
@@ -40,6 +49,11 @@ export interface Milestone {
   is_collapsed_into: string | null;
   // Team status message for team_action milestones
   team_status_message: string | null;
+  // Rich content for expandable accordion sections
+  rich_content: MilestoneRichContent | null;
+  // Milestone meeting feature
+  is_milestone_meeting: boolean;
+  milestone_meeting_note: string | null;
   created_at: string;
 }
 

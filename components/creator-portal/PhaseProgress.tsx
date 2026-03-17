@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import type { PhaseWithMilestones, MilestoneWithStatus, MilestoneStatus, SubmissionData } from '@/types/creator-portal';
 import { MilestoneAction } from './MilestoneAction';
+import { RichContentAccordion } from './RichContentAccordion';
+import { MilestoneMeetingBanner } from './MilestoneMeetingBanner';
 
 // Helper to format submission data for display
 function formatSubmissionData(data: SubmissionData): { label: string; timestamp: string | null; sublabel?: string } | null {
@@ -295,6 +297,16 @@ function MilestoneItem({
       </div>
 
       <div className="flex-grow min-w-0">
+        {/* Milestone Meeting Banner - shows above content for milestone meetings */}
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+        {(milestone as any).is_milestone_meeting && !milestone.requires_team_action && (
+          <MilestoneMeetingBanner
+            milestoneName={milestoneTitle}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            note={(milestone as any).milestone_meeting_note}
+          />
+        )}
+
         <div className="flex items-start justify-between gap-2">
           <div>
             <div className="flex items-center gap-2">
@@ -356,6 +368,12 @@ function MilestoneItem({
             {config.label}
           </span>
         </div>
+
+        {/* Rich Content Accordion - only for creator-action milestones, not team_action */}
+        {!milestone.requires_team_action && milestone.status !== 'locked' && (
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+          <RichContentAccordion richContent={(milestone as any).rich_content} />
+        )}
 
         {/* Action buttons - use MilestoneAction if creatorId available, otherwise fallback to legacy */}
         {isActionable && (
