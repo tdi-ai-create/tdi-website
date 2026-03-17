@@ -13,6 +13,7 @@ import { CompletionBanner } from '@/components/creator-portal/CompletionBanner';
 import { PastProjects } from '@/components/creator-portal/PastProjects';
 import TDIPortalLoader from '@/components/TDIPortalLoader';
 import LocationPromptModal from '@/components/creator-portal/LocationPromptModal';
+import { SurveyPopup } from '@/components/creator-portal/SurveyPopup';
 import type { CreatorDashboardData, MilestoneWithStatus } from '@/types/creator-portal';
 
 // Component to handle search params (must be wrapped in Suspense)
@@ -379,6 +380,9 @@ export default function CreatorDashboardPage() {
 
   return (
     <>
+      {/* Survey Popup - shows after dashboard is visible */}
+      {showDashboard && <SurveyPopup />}
+
       {/* Location Prompt Modal */}
       <LocationPromptModal
         isOpen={showLocationModal}
