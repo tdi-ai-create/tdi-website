@@ -37,6 +37,10 @@ import {
 import { Tooltip } from '@/components/ui/Tooltip';
 import { supabase } from '@/lib/supabase';
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
+import { getContentLabels } from '@/components/creator-portal/CourseDetailsPanel';
+import { RichTextEditor } from '@/components/creator-portal/RichTextEditor';
+import { NotePreview } from '@/components/creator-portal/NotePreview';
+import { NoteModal } from '@/components/creator-portal/NoteModal';
 import {
   isAdmin,
   getCreatorDashboardData,
@@ -52,6 +56,7 @@ import type {
   MilestoneStatus,
   MilestoneWithStatus,
   PhaseWithMilestones,
+  ContentPath,
 } from '@/types/creator-portal';
 
 const statusConfig: Record<
@@ -298,6 +303,7 @@ export default function AdminCreatorDetailPage() {
   const [newNote, setNewNote] = useState('');
   const [noteVisibleToCreator, setNoteVisibleToCreator] = useState(true);
   const [isAddingNote, setIsAddingNote] = useState(false);
+  const [expandedNote, setExpandedNote] = useState<CreatorNote | null>(null);
 
   // Expanded phases
   const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
@@ -1296,10 +1302,10 @@ export default function AdminCreatorDetailPage() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Course Details */}
+            {/* Details - context-aware based on content path */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-[#1e2749]">Course Details</h3>
+                <h3 className="font-semibold text-[#1e2749]">{getContentLabels(creator.content_path).panelTitle}</h3>
                 {!isEditingDetails ? (
                   <button
                     onClick={() => setIsEditingDetails(true)}
@@ -1355,7 +1361,7 @@ export default function AdminCreatorDetailPage() {
                   </div>
                   <div>
                     <label className="block text-xs text-gray-500 uppercase mb-1">
-                      Course Title
+                      {getContentLabels(editedDetails.content_path).titleLabel}
                     </label>
                     <input
                       type="text"
@@ -1368,7 +1374,7 @@ export default function AdminCreatorDetailPage() {
                   </div>
                   <div>
                     <label className="block text-xs text-gray-500 uppercase mb-1">
-                      Course Description
+                      Description
                     </label>
                     <textarea
                       value={editedDetails.course_description}
@@ -1409,7 +1415,7 @@ export default function AdminCreatorDetailPage() {
                   </div>
                   <div>
                     <label className="block text-xs text-gray-500 uppercase mb-1">
-                      Target Launch Month
+                      {getContentLabels(editedDetails.content_path).launchLabel}
                     </label>
                     <input
                       type="text"
@@ -1560,13 +1566,13 @@ export default function AdminCreatorDetailPage() {
                     )}
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 uppercase">Course Title</p>
+                    <p className="text-xs text-gray-500 uppercase">{getContentLabels(creator.content_path).titleLabel}</p>
                     <p className={creator.course_title ? 'text-[#1e2749] font-medium' : 'text-gray-400 italic'}>
                       {creator.course_title || 'Not set'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 uppercase">Course Description</p>
+                    <p className="text-xs text-gray-500 uppercase">Description</p>
                     <p className={creator.course_description ? 'text-[#1e2749] text-sm whitespace-pre-wrap' : 'text-gray-400 italic'}>
                       {creator.course_description || 'Not set'}
                     </p>
@@ -1584,7 +1590,7 @@ export default function AdminCreatorDetailPage() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 uppercase">Target Launch</p>
+                    <p className="text-xs text-gray-500 uppercase">{getContentLabels(creator.content_path).launchLabel}</p>
                     <p className={creator.target_launch_month ? 'text-[#1e2749]' : 'text-gray-400 italic'}>
                       {creator.target_launch_month || 'Not set'}
                     </p>
@@ -1747,12 +1753,10 @@ export default function AdminCreatorDetailPage() {
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <h3 className="font-semibold text-[#1e2749] mb-4">Add Note</h3>
               <form onSubmit={handleAddNote}>
-                <textarea
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
+                <RichTextEditor
+                  content={newNote}
+                  onChange={setNewNote}
                   placeholder="Add a note for this creator..."
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent resize-none"
                 />
                 <div className="flex items-center justify-between mt-3">
                   <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
@@ -1801,12 +1805,23 @@ export default function AdminCreatorDetailPage() {
                     <div
                       key={note.id}
                       className={`p-3 rounded-lg text-sm border-l-4 ${
-                        note.visible_to_creator
-                          ? 'bg-blue-50 border-[#80a4ed]'
-                          : 'bg-gray-50 border-gray-400'
+                        note.is_reply
+                          ? 'bg-green-50 border-green-400 ml-4'
+                          : note.visible_to_creator
+                            ? 'bg-blue-50 border-[#80a4ed]'
+                            : 'bg-gray-50 border-gray-400'
                       }`}
                     >
-                      <p className="text-gray-700 whitespace-pre-wrap">{note.content}</p>
+                      {note.is_reply && (
+                        <span className="inline-block text-xs text-green-700 bg-green-100 px-2 py-0.5 rounded mb-2">
+                          Creator Reply
+                        </span>
+                      )}
+                      <NotePreview
+                        content={note.content}
+                        maxLines={3}
+                        onReadMore={() => setExpandedNote(note)}
+                      />
                       <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
                         <span className="flex items-center gap-1">
                           {note.visible_to_creator ? (
@@ -1823,6 +1838,17 @@ export default function AdminCreatorDetailPage() {
                 </div>
               )}
             </div>
+
+            {/* Note Modal for expanded view */}
+            {expandedNote && (
+              <NoteModal
+                note={expandedNote}
+                creatorId={creatorId}
+                creatorName={creator?.name || ''}
+                onClose={() => setExpandedNote(null)}
+                showReplyButton={false}
+              />
+            )}
 
             {/* Past Projects */}
             {pastProjects && pastProjects.length > 0 && (
@@ -2710,11 +2736,17 @@ function MilestoneRow({
   isToggling: boolean;
 }) {
   const config = statusConfig[milestone.status];
+  // Show Approve/Request Changes buttons when:
+  // 1. Milestone requires team action and is in progress, or
+  // 2. Creator has submitted something for review (awaiting_approval is true), or
+  // 3. Status is waiting_approval (for any content path)
   const canApprove =
-    milestone.requires_team_action &&
-    (milestone.status === 'available' ||
-      milestone.status === 'in_progress' ||
-      milestone.status === 'waiting_approval');
+    (milestone.requires_team_action &&
+      (milestone.status === 'available' ||
+        milestone.status === 'in_progress' ||
+        milestone.status === 'waiting_approval')) ||
+    milestone.awaiting_approval === true ||
+    milestone.status === 'waiting_approval';
 
   // Handle different possible field names for milestone title and description
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -2914,7 +2946,7 @@ function MilestoneRow({
                   className="inline-flex items-center gap-1 bg-white border border-amber-500 text-amber-600 px-3 py-1.5 rounded-lg text-sm hover:bg-amber-50 transition-colors disabled:opacity-50"
                 >
                   <RotateCcw className="w-4 h-4" />
-                  Revise
+                  Request Changes
                 </button>
               </Tooltip>
             </>

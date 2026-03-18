@@ -1,17 +1,57 @@
 'use client';
 
-import { BookOpen, Users, Calendar, Tag, FileText, FolderOpen, ExternalLink, Video, Palette, CheckCircle } from 'lucide-react';
-import type { Creator } from '@/types/creator-portal';
+import { BookOpen, Users, Calendar, Tag, FileText, FolderOpen, ExternalLink, Video, Palette, CheckCircle, FileDown, PenLine } from 'lucide-react';
+import type { Creator, ContentPath } from '@/types/creator-portal';
 
 interface CourseDetailsPanelProps {
   creator: Creator;
 }
 
+// Get context-aware labels based on content path
+// Exported for use in admin views as well
+export function getContentLabels(contentPath: ContentPath | null) {
+  switch (contentPath) {
+    case 'blog':
+      return {
+        panelTitle: 'Blog Details',
+        titleLabel: 'Blog Title',
+        launchLabel: 'Target Publish Date',
+        outlineLabel: 'Blog Outline',
+        liveLabel: 'Your Blog (Live!)',
+        liveSubtext: 'TDI Blog',
+        icon: PenLine,
+      };
+    case 'download':
+      return {
+        panelTitle: 'Download Details',
+        titleLabel: 'Download Title',
+        launchLabel: 'Target Launch',
+        outlineLabel: 'Download Outline',
+        liveLabel: 'Your Download (Live!)',
+        liveSubtext: 'Learning Hub',
+        icon: FileDown,
+      };
+    case 'course':
+    default:
+      return {
+        panelTitle: 'Course Details',
+        titleLabel: 'Course Title',
+        launchLabel: 'Target Launch',
+        outlineLabel: 'Course Outline',
+        liveLabel: 'Your Course (Live!)',
+        liveSubtext: 'Learning Hub',
+        icon: BookOpen,
+      };
+  }
+}
+
 export function CourseDetailsPanel({ creator }: CourseDetailsPanelProps) {
+  const labels = getContentLabels(creator.content_path);
+
   const details = [
     {
-      icon: BookOpen,
-      label: 'Course Title',
+      icon: labels.icon,
+      label: labels.titleLabel,
       value: creator.course_title || 'Not set yet',
       isEmpty: !creator.course_title,
     },
@@ -23,7 +63,7 @@ export function CourseDetailsPanel({ creator }: CourseDetailsPanelProps) {
     },
     {
       icon: Calendar,
-      label: 'Target Launch',
+      label: labels.launchLabel,
       value: creator.target_launch_month || 'Not set yet',
       isEmpty: !creator.target_launch_month,
     },
@@ -44,9 +84,9 @@ export function CourseDetailsPanel({ creator }: CourseDetailsPanelProps) {
 
   return (
     <div className="space-y-6">
-      {/* Course Details Section */}
+      {/* Details Section - context-aware title based on content path */}
       <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h3 className="font-semibold text-[#1e2749] mb-4">Course Details</h3>
+        <h3 className="font-semibold text-[#1e2749] mb-4">{labels.panelTitle}</h3>
 
         <div className="space-y-4">
           {details.map((detail) => {
@@ -100,7 +140,7 @@ export function CourseDetailsPanel({ creator }: CourseDetailsPanelProps) {
                 </div>
                 <div className="flex-grow min-w-0">
                   <p className="text-sm font-medium text-[#1e2749] group-hover:text-[#80a4ed]">
-                    Course Outline
+                    {labels.outlineLabel}
                   </p>
                   <p className="text-xs text-gray-500 truncate">Google Doc</p>
                 </div>
@@ -156,13 +196,16 @@ export function CourseDetailsPanel({ creator }: CourseDetailsPanelProps) {
                 className="flex items-center gap-3 p-3 rounded-lg bg-green-50 hover:bg-green-100 transition-colors group"
               >
                 <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
-                  <BookOpen className="w-4 h-4 text-green-600" />
+                  {(() => {
+                    const LiveIcon = labels.icon;
+                    return <LiveIcon className="w-4 h-4 text-green-600" />;
+                  })()}
                 </div>
                 <div className="flex-grow min-w-0">
                   <p className="text-sm font-medium text-green-700 group-hover:text-green-800">
-                    Your Course (Live!)
+                    {labels.liveLabel}
                   </p>
-                  <p className="text-xs text-green-600 truncate">Learning Hub</p>
+                  <p className="text-xs text-green-600 truncate">{labels.liveSubtext}</p>
                 </div>
                 <ExternalLink className="w-4 h-4 text-green-500 group-hover:text-green-600" />
               </a>

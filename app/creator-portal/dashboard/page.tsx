@@ -708,7 +708,12 @@ export default function CreatorDashboardPage() {
                 {/* Sidebar */}
                 <div className="space-y-6">
                   <CourseDetailsPanel creator={dashboardData.creator} />
-                  <NotesPanel notes={dashboardData.notes} />
+                  <NotesPanel
+                    notes={dashboardData.notes}
+                    creatorId={dashboardData.creator.id}
+                    creatorName={dashboardData.creator.name}
+                    onNoteReply={refreshDashboard}
+                  />
 
                   {/* Past Projects (if any) */}
                   {dashboardData.pastProjects && dashboardData.pastProjects.length > 0 && (

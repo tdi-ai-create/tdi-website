@@ -60,12 +60,41 @@ export async function POST(request: NextRequest) {
 
     const milestoneTitle = milestone?.title || milestone?.name || 'Milestone';
 
-    // 3. Update this milestone back to 'available' (needs revision)
+    // 3. Get the current creator_milestone to preserve existing metadata
+    const { data: creatorMilestone } = await supabase
+      .from('creator_milestones')
+      .select('metadata')
+      .eq('creator_id', creatorId)
+      .eq('milestone_id', milestoneId)
+      .single();
+
+    // 4. Update this milestone back to 'available' (needs revision)
+    // Also store the revision feedback in metadata so it displays on the milestone
+    const adminName = adminEmail
+      ? adminEmail.split('@')[0].charAt(0).toUpperCase() + adminEmail.split('@')[0].slice(1)
+      : 'TDI Admin';
+    const revisionDate = new Date().toISOString();
+
+    // Merge existing metadata with new revision feedback
+    const existingMetadata = (creatorMilestone?.metadata as Record<string, unknown>) || {};
+    const updatedMetadata = {
+      ...existingMetadata,
+      revision_feedback: {
+        feedback: note,
+        requested_by: adminName,
+        requested_at: revisionDate,
+        admin_email: adminEmail,
+      }
+    };
+
     const { error: updateError } = await supabase
       .from('creator_milestones')
       .update({
         status: 'available',
-        updated_at: new Date().toISOString(),
+        awaiting_approval: false,
+        submitted_value: null,
+        updated_at: revisionDate,
+        metadata: updatedMetadata,
       })
       .eq('creator_id', creatorId)
       .eq('milestone_id', milestoneId);
@@ -78,7 +107,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. Get all milestones to find ones that come after this one
+    // 5. Get all milestones to find ones that come after this one
     const { data: allMilestones } = await supabase
       .from('milestones')
       .select('id, phase_id, sort_order')
@@ -106,7 +135,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 5. Update creator's current phase if needed
+    // 6. Update creator's current phase if needed
     if (milestone?.phase_id) {
       await supabase
         .from('creators')
@@ -117,10 +146,7 @@ export async function POST(request: NextRequest) {
         .eq('id', creatorId);
     }
 
-    // 6. Add a note explaining the revision request
-    const adminName = adminEmail
-      ? adminEmail.split('@')[0].charAt(0).toUpperCase() + adminEmail.split('@')[0].slice(1)
-      : 'TDI Admin';
+    // 7. Add a note explaining the revision request
     const dateStr = new Date().toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -135,7 +161,7 @@ export async function POST(request: NextRequest) {
       phase_id: milestone?.phase_id || null,
     });
 
-    // 7. Send email to creator
+    // 8. Send email to creator
     const resendApiKey = process.env.RESEND_API_KEY;
 
     if (resendApiKey && creator.email) {
@@ -150,7 +176,7 @@ export async function POST(request: NextRequest) {
             from: 'TDI Creator Studio <creators@teachersdeserveit.com>',
             to: [creator.email],
             cc: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
-            subject: `Action Needed: Revision requested for your course`,
+            subject: `Action Needed: Revision requested for ${milestoneTitle}`,
             html: `
               <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                 <img src="https://www.teachersdeserveit.com/images/logo.webp" alt="Teachers Deserve It" style="height: 40px; margin-bottom: 20px;" />
@@ -164,7 +190,7 @@ export async function POST(request: NextRequest) {
                   <p style="color: #78350f; margin: 0; white-space: pre-wrap;">${note}</p>
                 </div>
 
-                <p style="color: #374151; line-height: 1.6;">Don't worry -  this is a normal part of the process! We want to make sure your course is the best it can be.</p>
+                <p style="color: #374151; line-height: 1.6;">Don't worry — this is a normal part of the process! We want to make sure your content is the best it can be.</p>
 
                 <a href="https://www.teachersdeserveit.com/creator-portal/dashboard"
                    style="display: inline-block; background: #1e2749; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; margin-top: 16px; font-weight: 600;">

@@ -39,6 +39,8 @@ import {
   ChevronLeft,
   UserCheck,
   MessageCircle,
+  Settings,
+  RefreshCw,
 } from 'lucide-react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
@@ -349,6 +351,15 @@ export default function CreatorStudioPage() {
 
   // Selection state for bulk email
   const [selectedCreatorIds, setSelectedCreatorIds] = useState<Set<string>>(new Set());
+
+  // Milestone sync state
+  const [isSyncingMilestones, setIsSyncingMilestones] = useState(false);
+  const [syncResult, setSyncResult] = useState<{
+    success: boolean;
+    message: string;
+    creatorsProcessed?: number;
+    milestonesInserted?: number;
+  } | null>(null);
 
   const [newCreator, setNewCreator] = useState({
     name: '',
@@ -699,6 +710,47 @@ export default function CreatorStudioPage() {
   const openFollowUpModal = (creator: { id: string; name: string }) => {
     setSelectedCreatorForFollowUp(creator);
     setShowFollowUpModal(true);
+  };
+
+  // Handle syncing milestones for all creators
+  const handleSyncMilestones = async () => {
+    setIsSyncingMilestones(true);
+    setSyncResult(null);
+    try {
+      const response = await fetch('/api/admin/sync-all-milestones', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminEmail }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSyncResult({
+          success: true,
+          message: result.message || 'Milestones synced successfully',
+          creatorsProcessed: result.creators_processed,
+          milestonesInserted: result.milestones_inserted,
+        });
+        showToast(`Synced milestones: ${result.milestones_inserted || 0} added for ${result.creators_processed || 0} creators`);
+        await loadDashboardData(); // Refresh data to reflect any changes
+      } else {
+        setSyncResult({
+          success: false,
+          message: result.error || 'Failed to sync milestones',
+        });
+        showToast(`Milestone sync failed: ${result.error}`, 'error');
+      }
+    } catch (error) {
+      console.error('Error syncing milestones:', error);
+      setSyncResult({
+        success: false,
+        message: 'Network error. Please try again.',
+      });
+      showToast('Error syncing milestones. Please try again.', 'error');
+    } finally {
+      setIsSyncingMilestones(false);
+    }
   };
 
   const activeFiltersCount =
@@ -1723,6 +1775,65 @@ export default function CreatorStudioPage() {
               <span className="mx-2">·</span>
               <span className="inline-block w-2 h-2 rounded-full bg-blue-500 mr-1"></span> Team
             </p>
+          </div>
+
+          {/* Admin Tools */}
+          <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] mt-5">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
+              <Settings className="w-5 h-5 text-gray-500" />
+              Admin Tools
+            </h3>
+            <div className="space-y-4">
+              {/* Milestone Sync */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-gray-50 rounded-xl">
+                <div>
+                  <h4 className="font-medium text-gray-900">Sync Milestones for All Creators</h4>
+                  <p className="text-sm text-gray-500 mt-0.5">
+                    Add any missing milestone records for existing creators when new milestones are deployed.
+                  </p>
+                </div>
+                <button
+                  onClick={handleSyncMilestones}
+                  disabled={isSyncingMilestones}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all duration-200 ${
+                    isSyncingMilestones
+                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                      : 'bg-violet-600 text-white hover:bg-violet-700'
+                  }`}
+                >
+                  {isSyncingMilestones ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Syncing...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="w-4 h-4" />
+                      Sync Milestones
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Sync Result */}
+              {syncResult && (
+                <div
+                  className={`p-4 rounded-xl text-sm ${
+                    syncResult.success
+                      ? 'bg-green-50 border border-green-200 text-green-800'
+                      : 'bg-red-50 border border-red-200 text-red-800'
+                  }`}
+                >
+                  <p className="font-medium">{syncResult.success ? 'Sync Complete' : 'Sync Failed'}</p>
+                  <p className="mt-1">{syncResult.message}</p>
+                  {syncResult.success && syncResult.creatorsProcessed !== undefined && (
+                    <p className="mt-1 text-xs opacity-75">
+                      Processed {syncResult.creatorsProcessed} creators, inserted {syncResult.milestonesInserted} milestone records
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -50,7 +50,7 @@ import { copyToClipboard } from '@/lib/tdi-admin/clipboard';
 // Creators theme colors
 const theme = PORTAL_THEMES.creators;
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
-import { CourseDetailsPanel } from '@/components/creator-portal/CourseDetailsPanel';
+import { CourseDetailsPanel, getContentLabels } from '@/components/creator-portal/CourseDetailsPanel';
 import { NotesPanel } from '@/components/creator-portal/NotesPanel';
 import {
   getCreatorDashboardData,
@@ -63,6 +63,7 @@ import type {
   MilestoneStatus,
   MilestoneWithStatus,
   PhaseWithMilestones,
+  ContentPath,
 } from '@/types/creator-portal';
 
 const statusConfig: Record<
@@ -1006,7 +1007,11 @@ export default function TDIAdminCreatorDetailPage() {
             <>
               {/* Creator View Sidebar - mirrors what creators see */}
               <CourseDetailsPanel creator={creator} />
-              <NotesPanel notes={allNotes.filter(n => n.visible_to_creator)} />
+              <NotesPanel
+                notes={allNotes.filter(n => n.visible_to_creator)}
+                creatorId={creator.id}
+                creatorName={creator.name}
+              />
 
               {/* Admin Actions Panel - always accessible */}
               <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 p-5">
@@ -1029,7 +1034,7 @@ export default function TDIAdminCreatorDetailPage() {
                       style={{ color: '#2B3A67' }}
                     >
                       <PenLine className="w-4 h-4" />
-                      Edit Course Details
+                      Edit {getContentLabels(creator.content_path).panelTitle}
                     </button>
                   )}
 
@@ -1061,14 +1066,14 @@ export default function TDIAdminCreatorDetailPage() {
             </>
           ) : (
             <>
-          {/* Course Details Card */}
+          {/* Details Card - context-aware based on content path */}
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center justify-between mb-4">
               <h3
                 className="font-semibold"
                 style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
               >
-                Course Details
+                {getContentLabels(creator.content_path).panelTitle}
               </h3>
               {canEdit && !isEditingDetails && (
                 <button
@@ -1102,7 +1107,7 @@ export default function TDIAdminCreatorDetailPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Course Title</label>
+                  <label className="block text-sm text-gray-600 mb-1">{getContentLabels(editedDetails.content_path).titleLabel}</label>
                   <input
                     type="text"
                     value={editedDetails.course_title}
@@ -1120,7 +1125,7 @@ export default function TDIAdminCreatorDetailPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Target Launch</label>
+                  <label className="block text-sm text-gray-600 mb-1">{getContentLabels(editedDetails.content_path).launchLabel}</label>
                   <input
                     type="text"
                     value={editedDetails.target_launch_month}
@@ -1156,7 +1161,7 @@ export default function TDIAdminCreatorDetailPage() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Course Title</p>
+                  <p className="text-gray-500">{getContentLabels(creator.content_path).titleLabel}</p>
                   <p className="font-medium" style={{ color: '#2B3A67' }}>
                     {creator.course_title || 'Not set'}
                   </p>
@@ -1168,7 +1173,7 @@ export default function TDIAdminCreatorDetailPage() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Target Launch</p>
+                  <p className="text-gray-500">{getContentLabels(creator.content_path).launchLabel}</p>
                   <p className="font-medium" style={{ color: '#2B3A67' }}>
                     {creator.target_launch_month || 'Not set'}
                   </p>

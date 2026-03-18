@@ -153,6 +153,22 @@ export interface Creator {
   updated_at: string;
 }
 
+// Revision feedback from admin when requesting changes
+export interface RevisionFeedback {
+  feedback: string;
+  requested_by: string;
+  requested_at: string;
+  admin_email: string;
+}
+
+// Creator milestone metadata
+export interface CreatorMilestoneMetadata {
+  is_optional?: boolean;
+  out_of_order?: boolean;
+  revision_feedback?: RevisionFeedback;
+  [key: string]: unknown;
+}
+
 // Creator milestone progress
 export interface CreatorMilestone {
   id: string;
@@ -162,7 +178,7 @@ export interface CreatorMilestone {
   completed_at: string | null;
   completed_by: string | null;
   notes: string | null;
-  metadata: Record<string, unknown> | null;
+  metadata: CreatorMilestoneMetadata | null;
   // Combined card feature: submission is awaiting team approval
   awaiting_approval: boolean;
   // Combined card feature: the value submitted (e.g., video URL)
@@ -179,6 +195,9 @@ export interface CreatorNote {
   author: string;
   visible_to_creator: boolean;
   created_at: string;
+  // Reply tracking fields
+  is_reply?: boolean;
+  parent_note_id?: string | null;
 }
 
 // Admin user

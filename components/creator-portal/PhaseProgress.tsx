@@ -307,6 +307,33 @@ function MilestoneItem({
           />
         )}
 
+        {/* Revision Feedback Banner - shows when admin requested changes */}
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+        {(milestone as any).metadata?.revision_feedback && isActionable && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                <AlertCircle className="w-4 h-4 text-amber-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-amber-800 mb-1">Revision Requested</p>
+                <p className="text-sm text-amber-700 whitespace-pre-wrap">
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {(milestone as any).metadata.revision_feedback.feedback}
+                </p>
+                <p className="text-xs text-amber-600 mt-2">
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  — {(milestone as any).metadata.revision_feedback.requested_by},{' '}
+                  {new Date(
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    (milestone as any).metadata.revision_feedback.requested_at
+                  ).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-start justify-between gap-2">
           <div>
             <div className="flex items-center gap-2">

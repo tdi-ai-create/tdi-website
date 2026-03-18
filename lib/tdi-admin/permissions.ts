@@ -39,10 +39,17 @@ export interface TeamPermissions {
     financial_data?: boolean;
     export_reports?: boolean;
   };
+  intelligence?: {
+    view_districts?: boolean;
+    manage_districts?: boolean;
+    view_collections?: boolean;
+    manage_collections?: boolean;
+    financial_data?: boolean;
+  };
   team_access?: boolean;
 }
 
-export type PortalSection = 'learning_hub' | 'creator_studio' | 'leadership';
+export type PortalSection = 'learning_hub' | 'creator_studio' | 'leadership' | 'intelligence';
 
 // Permission definitions for UI
 export const LEARNING_HUB_PERMISSIONS = [
@@ -73,6 +80,14 @@ export const LEADERSHIP_PERMISSIONS = [
   { key: 'view_diagnostics', label: 'View diagnostics data' },
   { key: 'financial_data', label: 'Financial data' },
   { key: 'export_reports', label: 'Export reports' },
+];
+
+export const INTELLIGENCE_PERMISSIONS = [
+  { key: 'view_districts', label: 'View districts' },
+  { key: 'manage_districts', label: 'Manage district accounts' },
+  { key: 'view_collections', label: 'View collections queue' },
+  { key: 'manage_collections', label: 'Manage collections' },
+  { key: 'financial_data', label: 'Financial data' },
 ];
 
 /**
@@ -147,6 +162,9 @@ export function getAccessibleSections(permissions: TeamPermissions): PortalSecti
   if (hasAnySectionPermission(permissions, 'leadership')) {
     sections.push('leadership');
   }
+  if (hasAnySectionPermission(permissions, 'intelligence')) {
+    sections.push('intelligence');
+  }
 
   return sections;
 }
@@ -196,6 +214,13 @@ export function getDefaultPermissions(): TeamPermissions {
       view_diagnostics: false,
       financial_data: false,
       export_reports: false,
+    },
+    intelligence: {
+      view_districts: false,
+      manage_districts: false,
+      view_collections: false,
+      manage_collections: false,
+      financial_data: false,
     },
     team_access: false,
   };
