@@ -2325,115 +2325,152 @@ export default function StPeterChanelDashboard() {
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <h3 className="font-bold text-[#1e2749] mb-6">What&apos;s Included in Year 2</h3>
               <div className="grid md:grid-cols-2 gap-4">
-                {/* Card 1: Learning Hub */}
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+
+                {/* Learning Hub */}
+                <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
                   <div className="flex items-center gap-2 mb-2">
-                    <BookOpen className="w-5 h-5 text-[#38618C]" />
-                    <span className="font-semibold text-[#1e2749]">Learning Hub Membership</span>
+                    <BookOpen className="w-4 h-4 text-[#38618C]" />
+                    <span className="text-sm font-medium text-gray-500">Learning Hub Membership</span>
                   </div>
-                  <p className="text-2xl font-bold text-[#38618C] mb-2">25 Staff Members</p>
-                  <p className="text-sm text-gray-600 mb-3">Full access to TDI&apos;s research-backed resource library - targeted, actionable tools teachers can use immediately.</p>
-                  <p className="text-xs text-teal-600 font-medium flex items-center gap-1">
-                    <BarChart3 className="w-3 h-3" /> Includes Analytics Suite
+                  <p className="text-2xl font-bold text-[#1e2749] mb-1">25 Staff Members</p>
+                  <p className="text-sm text-gray-500 mb-3">
+                    Full access to TDI&apos;s research-backed resource library - targeted, actionable tools teachers can use immediately.
                   </p>
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <span className="text-xs text-gray-400 flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-[#38618C] inline-block"></span>
+                      Includes Analytics Suite
+                    </span>
+                    <span className="text-sm font-bold text-[#38618C]">$7,475 value</span>
+                  </div>
                 </div>
 
-                {/* Card 2: Observation Days */}
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                {/* In-Person Observation Days */}
+                <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
                   <div className="flex items-center gap-2 mb-2">
-                    <Eye className="w-5 h-5 text-[#38618C]" />
-                    <span className="font-semibold text-[#1e2749]">In-Person Observation Days</span>
+                    <Eye className="w-4 h-4 text-[#38618C]" />
+                    <span className="text-sm font-medium text-gray-500">In-Person Observation Days</span>
                   </div>
-                  <p className="text-2xl font-bold text-[#38618C] mb-2">3 Full Days</p>
-                  <p className="text-sm text-gray-600 mb-3">Full in-person visits with classroom observations, personalized teacher feedback (Love Notes), and leadership debrief. Travel included.</p>
-                  <p className="text-xs text-teal-600 font-medium flex items-center gap-1">
-                    <BarChart3 className="w-3 h-3" /> Includes Analytics Suite
+                  <p className="text-2xl font-bold text-[#1e2749] mb-1">3 Full Days</p>
+                  <p className="text-sm text-gray-500 mb-3">
+                    Full in-person visits with classroom observations, personalized teacher feedback (Love Notes), and leadership debrief. Travel included.
                   </p>
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <span className="text-xs text-gray-400 flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-[#38618C] inline-block"></span>
+                      Includes Analytics Suite
+                    </span>
+                    <span className="text-sm font-bold text-[#38618C]">$9,000 per day</span>
+                  </div>
                 </div>
 
-                {/* Card 3: Executive Sessions */}
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Star className="w-5 h-5 text-[#38618C]" />
-                    <span className="font-semibold text-[#1e2749]">Executive Impact Sessions</span>
+                {/* Executive Impact Sessions - COMPLIMENTARY */}
+                <div className="bg-gradient-to-br from-[#1e2749]/5 to-[#38618C]/10 border-2 border-[#38618C]/40 rounded-xl p-5 shadow-sm relative">
+                  <div className="absolute top-3 right-3">
+                    <span className="bg-[#38618C] text-white text-xs font-bold px-2.5 py-1 rounded-full tracking-wide">COMPLIMENTARY</span>
                   </div>
-                  <p className="text-2xl font-bold text-[#38618C] mb-2">2 Sessions</p>
-                  <p className="text-sm text-gray-600 mb-3">Strategic goal-setting for annual Key Performance Indicators (KPIs), improvement planning, and leadership alignment.</p>
-                  <p className="text-xs text-teal-600 font-medium flex items-center gap-1">
-                    <BarChart3 className="w-3 h-3" /> Includes Analytics Suite
+                  <div className="flex items-center gap-2 mb-2">
+                    <Star className="w-4 h-4 text-[#38618C]" />
+                    <span className="text-sm font-medium text-gray-500">Executive Impact Sessions</span>
+                  </div>
+                  <p className="text-2xl font-bold text-[#1e2749] mb-1">2 Sessions</p>
+                  <p className="text-sm text-gray-500 mb-3">
+                    Strategic goal-setting for annual Key Performance Indicators (KPIs), improvement planning, and leadership alignment.
                   </p>
+                  <div className="flex items-center justify-between pt-3 border-t border-[#38618C]/20">
+                    <span className="text-xs text-[#38618C] font-medium">Included at no charge</span>
+                    <div className="text-right">
+                      <span className="text-xs text-gray-400 line-through mr-1">$3,000 value</span>
+                      <span className="text-sm font-bold text-[#38618C]">$0</span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Card 4: Professional Books */}
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                {/* Professional Books */}
+                <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
                   <div className="flex items-center gap-2 mb-2">
-                    <BookOpen className="w-5 h-5 text-[#38618C]" />
-                    <span className="font-semibold text-[#1e2749]">Professional Books</span>
+                    <BookOpen className="w-4 h-4 text-[#38618C]" />
+                    <span className="text-sm font-medium text-gray-500">Professional Books</span>
                   </div>
-                  <p className="text-2xl font-bold text-[#38618C] mb-2">25 Copies - One for Every Staff Member</p>
-                  <p className="text-sm text-gray-600">Teachers Deserve It - the foundational text for building a school culture that puts educators first. Written by Rae Hughart &amp; Adam Welcome.</p>
+                  <p className="text-2xl font-bold text-[#1e2749] mb-1">25 Copies</p>
+                  <p className="text-sm text-gray-500 mb-3">
+                    Teachers Deserve It - the foundational text for building a school culture that puts educators first. Written by Rae Hughart &amp; Adam Welcome.
+                  </p>
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <span className="text-xs text-gray-400 italic">One for every staff member</span>
+                    <span className="text-sm font-bold text-[#38618C]">$600 value</span>
+                  </div>
                 </div>
+
               </div>
             </div>
 
             {/* Section 4: Full Service Table */}
-            <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
-              <h3 className="font-bold text-[#1e2749] mb-4">Included With Every Service</h3>
-              <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
+            <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-gray-100">
+                <h3 className="text-xl font-bold text-[#1e2749]">Included With Every Service</h3>
+              </div>
+              <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-gray-200 bg-gray-50">
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">SERVICE</th>
-                      <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">INCLUDED</th>
+                    <tr className="bg-gray-50">
+                      <th className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Service</th>
+                      <th className="text-right px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Quantity</th>
+                      <th className="text-right px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Value</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {/* Primary Services - Bold */}
-                    <tr className="border-b border-gray-100">
-                      <td className="py-3 px-4 font-medium text-[#1e2749]">Learning Hub Membership</td>
-                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">25 STAFF</td>
-                    </tr>
-                    <tr className="border-b border-gray-100">
-                      <td className="py-3 px-4 font-medium text-[#1e2749]">In-Person Observation Days</td>
-                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">3 DAYS</td>
-                    </tr>
-                    <tr className="border-b border-gray-100">
-                      <td className="py-3 px-4 font-medium text-[#1e2749]">Executive Impact Sessions</td>
-                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">2 SESSIONS</td>
-                    </tr>
-                    <tr className="border-b border-gray-200">
-                      <td className="py-3 px-4 font-medium text-[#1e2749]">Professional Books</td>
-                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">25 COPIES</td>
-                    </tr>
-                    {/* Included Services - Lighter */}
-                    <tr className="border-b border-gray-100 bg-gray-50/50">
-                      <td className="py-2.5 px-4 text-sm text-gray-600">Implementation &amp; Compliance Analytics</td>
-                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
-                    </tr>
-                    <tr className="border-b border-gray-100">
-                      <td className="py-2.5 px-4 text-sm text-gray-600">Access to On-Demand Request Pipeline</td>
-                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
-                    </tr>
-                    <tr className="border-b border-gray-100 bg-gray-50/50">
-                      <td className="py-2.5 px-4 text-sm text-gray-600">Access to Global Solution Tools</td>
-                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
-                    </tr>
-                    <tr className="border-b border-gray-100">
-                      <td className="py-2.5 px-4 text-sm text-gray-600">Network News &amp; Updates</td>
-                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
-                    </tr>
-                    <tr className="border-b border-gray-100 bg-gray-50/50">
-                      <td className="py-2.5 px-4 text-sm text-gray-600">Funding Pipeline</td>
-                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
-                    </tr>
-                    <tr className="border-b border-gray-100">
-                      <td className="py-2.5 px-4 text-sm text-gray-600">Expert Research &amp; Professional Network</td>
-                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                  <tbody className="divide-y divide-gray-100">
+                    <tr>
+                      <td className="px-6 py-4 text-[#1e2749] font-medium">Learning Hub Membership</td>
+                      <td className="px-6 py-4 text-right text-[#38618C] font-bold text-sm">25 STAFF</td>
+                      <td className="px-6 py-4 text-right text-[#38618C] font-bold text-sm">$7,475</td>
                     </tr>
                     <tr>
-                      <td className="py-2.5 px-4 text-sm text-gray-600">Certified Strategic Trainer</td>
-                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                      <td className="px-6 py-4 text-[#1e2749] font-medium">In-Person Observation Days</td>
+                      <td className="px-6 py-4 text-right text-[#38618C] font-bold text-sm">3 DAYS</td>
+                      <td className="px-6 py-4 text-right text-[#38618C] font-bold text-sm">$27,000</td>
                     </tr>
+                    <tr className="bg-[#38618C]/5">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[#1e2749] font-medium">Executive Impact Sessions</span>
+                          <span className="bg-[#38618C] text-white text-xs font-bold px-2 py-0.5 rounded-full">COMPLIMENTARY</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-right text-[#38618C] font-bold text-sm">2 SESSIONS</td>
+                      <td className="px-6 py-4 text-right">
+                        <span className="text-gray-400 line-through text-xs mr-1">$3,000</span>
+                        <span className="text-[#38618C] font-bold text-sm">$0</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-6 py-4 text-[#1e2749] font-medium">Professional Books</td>
+                      <td className="px-6 py-4 text-right text-[#38618C] font-bold text-sm">25 COPIES</td>
+                      <td className="px-6 py-4 text-right text-[#38618C] font-bold text-sm">$600</td>
+                    </tr>
+                  </tbody>
+                  <tbody className="divide-y divide-gray-50">
+                    <tr>
+                      <td colSpan={3} className="px-6 pt-5 pb-2">
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide border-t border-dashed border-gray-200 pt-3">
+                          Also Included With Every Partnership
+                        </p>
+                      </td>
+                    </tr>
+                    {[
+                      'Implementation & Compliance Analytics',
+                      'Access to On-Demand Request Pipeline',
+                      'Access to Global Solution Tools',
+                      'Network News & Updates',
+                      'Funding Pipeline',
+                      'Expert Research & Professional Network',
+                      'Certified Strategic Trainer',
+                    ].map((item) => (
+                      <tr key={item}>
+                        <td className="px-6 py-2.5 text-gray-500 text-sm" colSpan={2}>{item}</td>
+                        <td className="px-6 py-2.5 text-right text-[#38618C] font-semibold text-sm">INCLUDED</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -2583,22 +2620,95 @@ export default function StPeterChanelDashboard() {
               </div>
             </div>
 
-            {/* Section 9: We Help You Fund It (SIMPLIFIED - Private School) */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <h3 className="font-bold text-[#1e2749] mb-2">We Help You Fund It</h3>
-              <p className="text-sm text-gray-600 mb-6">
-                TDI doesn&apos;t just provide the partnership - we help you secure the funding to make it happen. Private schools have access to a variety of foundation and community funding sources that can offset or fully cover partnership costs.
-              </p>
-
-              <div className="text-center">
-                <a
-                  href="/funding"
-                  className="inline-flex items-center gap-2 bg-[#38618C] hover:bg-[#2d4e70] text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-                >
-                  Explore Funding Options
-                  <ArrowRight className="w-4 h-4" />
-                </a>
+            {/* Section 9: We Help You Fund It - Private School Version */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-2xl font-bold text-[#1e2749] mb-2">We Help You Fund It</h3>
+                <p className="text-gray-600">
+                  Private schools have access to a range of foundation, community, and private grant sources that can offset or fully cover partnership costs. TDI doesn&apos;t just provide the partnership - we help you secure the funding to make it happen.
+                </p>
               </div>
+
+              {/* Two columns: what TDI does vs what Paula does */}
+              <div className="grid md:grid-cols-2 gap-4">
+
+                <div className="bg-white border border-gray-200 rounded-xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-7 h-7 bg-[#38618C]/10 rounded-lg flex items-center justify-center">
+                      <Shield className="w-4 h-4 text-[#38618C]" />
+                    </div>
+                    <span className="font-semibold text-[#1e2749]">TDI Handles Everything</span>
+                  </div>
+                  <ul className="space-y-2">
+                    {[
+                      'Research every funding source',
+                      'Write all budget narratives',
+                      'Write all grant applications',
+                      'Prepare vendor compliance docs',
+                      'Draft all scopes of work',
+                      'Draft reference letters',
+                      'Handle all follow-up',
+                      'Manage invoicing across sources',
+                      'Track every deadline',
+                    ].map((item) => (
+                      <li key={item} className="flex items-center gap-2 text-sm text-gray-600">
+                        <CheckCircle className="w-3.5 h-3.5 text-[#38618C] flex-shrink-0" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="bg-[#fffbeb] border border-amber-200 rounded-xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-7 h-7 bg-amber-100 rounded-lg flex items-center justify-center">
+                      <User className="w-4 h-4 text-amber-600" />
+                    </div>
+                    <span className="font-semibold text-[#1e2749]">Paula Does This</span>
+                  </div>
+                  <ul className="space-y-2 mb-4">
+                    {[
+                      'Pick a path',
+                      'Route pre-written requests',
+                      'Sign the partnership agreement',
+                    ].map((item) => (
+                      <li key={item} className="flex items-center gap-2 text-sm text-gray-600">
+                        <ArrowRight className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="text-sm font-semibold text-amber-700">That&apos;s it. We&apos;ve prepared everything else.</p>
+                </div>
+
+              </div>
+
+              {/* Funding Conversation Invitation */}
+              <div className="bg-[#1e2749] rounded-xl p-6">
+                <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                  <div className="flex-1">
+                    <p className="text-white font-semibold text-lg mb-1">Want to explore funding for Year 2?</p>
+                    <p className="text-white/70 text-sm mb-3">
+                      Here&apos;s how it works: you tell us your minimum comfortable contribution and your dream investment level. We find the difference. Private schools like St. Peter Chanel have access to foundation grants, community partnerships, and diocesan funding sources that most principals never know exist.
+                    </p>
+                    <p className="text-white/50 text-xs">
+                      One conversation. No obligation. We&apos;ll show you exactly what&apos;s possible.
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <a
+                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-white text-[#1e2749] px-6 py-3 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors whitespace-nowrap"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Let&apos;s Talk Funding
+                    </a>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
             {/* Section 10: TDI Does the Work */}
