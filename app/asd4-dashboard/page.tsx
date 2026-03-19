@@ -710,14 +710,14 @@ export default function ASD4Dashboard() {
         { type: 'silver', label: 'Engaged Team' },
       ],
       observationDay2Notes: [
-        { para: 'Magnuson, Karen', note: 'Karen demonstrated exceptional proximity awareness - constantly scanning the room and positioning herself where students needed support before they even asked. Her quiet confidence sets the tone for the whole classroom.' },
-        { para: 'Zaborowski, Samantha', note: 'Samantha\'s small-group facilitation was a highlight. She broke down a complex math concept into three digestible steps and checked for understanding after each one. Students were visibly more confident by the end.' },
-        { para: 'Beahan, Linda', note: 'Linda showed strong co-teaching instincts - she anticipated the teacher\'s transitions and had materials ready before they were needed. The classroom ran like a well-oiled machine.' },
-        { para: 'Juarez, Alexia', note: 'Alexia used affirming language consistently throughout the observation. Every student she worked with heard something positive about their effort or thinking.' },
-        { para: 'Herrera, Elizabeth', note: 'Elizabeth demonstrated the "wait time" principle beautifully - giving students space to think before jumping in. Her patience is building student independence.' },
-        { para: 'Hodo, Mirela', note: 'Mirela\'s relationship-building was evident immediately. Students sought her out for help, and she greeted each one by name with genuine warmth.' },
-        { para: 'Cortez, Maria', note: 'Maria showed strong instructional awareness - she noticed when a student was struggling before the teacher did and provided just enough scaffolding to get them back on track.' },
-        { para: 'Zarate, Claudia', note: 'Claudia\'s energy is contagious. She turned a mundane worksheet review into an engaging mini-competition that had students actually excited to participate.' },
+        { para: 'Magnuson, Karen', location: 'Social Studies, S134', note: 'Strong student rapport on display — when a student came to ask about a vocabulary word, the exchange was easy and comfortable. In the moment: "That\'s good detail!" and "Wow, your psychic abilities are amazing — you predicted it again!" — specific, genuine affirmations that make students feel seen.' },
+        { para: 'Zaborowski, Samantha', location: 'Reading Group, W116', note: 'Led a small reading group with strong voice and real inflection — students were following along and engaged. Used "On a good / very nice" as a smooth mid-group redirect that didn\'t interrupt the lesson flow. A high-level move.' },
+        { para: 'Beahan, Linda', location: 'FACS, N119 (Sub present)', note: 'Arrived early, welcomed students, and when the sub was late — stepped in and gave initial directions to get class started. When the sub didn\'t have a class list, problem-solved immediately by pulling up Google Classroom. Calm, positive, and smiling throughout. A model of quiet leadership.' },
+        { para: 'Juarez, Alexia', location: 'N119 (Sub present)', note: 'Working the full room — circling, checking for understanding, carrying a completed example activity to show students the final product. Chunked directions clearly. Left one student to get started independently, then moved on. Nice, calm, nurturing voice. Great relationships with students.' },
+        { para: 'Herrera, Elizabeth', location: 'FACS, N119 (Sub present)', note: 'Working 1:1 using both Spanish and English cues naturally. Scanned the full room while her student worked. Prepared student\'s walking tool (rollator) for transition a minute early. Took initiative to offer questions and feedback to other students in the room, going beyond her 1:1 assignment.' },
+        { para: 'Hodo, Mirela', location: 'Social Studies, S134', note: 'Used a silent hand cue to redirect a distracted student without interrupting the lesson. Moved in to help two students troubleshoot a Chromebook assignment. Kind and warm voice throughout.' },
+        { para: 'Cortez, Maria', location: 'Social Studies, S236', note: 'Present with students during guided notes. Students were on task and engaged during whole-class instruction.' },
+        { para: 'Zarate, Claudia', location: '1:1 support', note: 'Seated alongside student, focused on redirects. Said "Good, you have it" as a quiet in-the-moment affirmation. Consistent presence with her student.' },
       ],
       paras: [
         { name: 'Gorostieta, Michele', email: 'mgorostieta@asd4.org', loggedIn: true },
@@ -892,8 +892,8 @@ export default function ASD4Dashboard() {
         { type: 'bronze', label: 'Growing Login Rate' },
       ],
       observationDay2Notes: [
-        { para: 'Hoppensteadt, Emilia', note: 'Emilia\'s calm presence transformed a potentially chaotic transition into a smooth routine. She used proximity and a quiet voice to redirect two students without disrupting the flow of the classroom. Her instincts are sharp.' },
-        { para: 'Zaragoza Aguilar, Ana', note: 'Ana showed remarkable patience during a one-on-one reading session. She celebrated every small win and gently corrected without deflating the student\'s confidence. The student was beaming by the end.' },
+        { para: 'Hoppensteadt, Emily', location: 'Literacy, Room 42 (Teacher: Velez)', note: 'An absolute standout. Working with two students at a table on letter formation — full of energy, invitational language, and specific feedback. "What letter is that? Like snake — ssss!" with a hand gesture. "Let\'s try making that line a little higher so it looks like an \'h\' not an \'x\'" — precise, actionable, delivered with warmth. "Great! I love how you wrote that!" Students were giggling and smiling throughout. Encouraging, loving, strong voice. A master class in early literacy support.' },
+        { para: 'Zaragoza, Ana', location: 'Spanish Bilingual Math, Room 57 (Teacher: Rodriguez)', note: 'Working 1:1 in Spanish. Warm, slow, expressive voice with lots of inflection. "Excellente!" "Muy bien! Me gusta! Sí!" Used hands and body movement to show understanding as she read problems aloud. "Show me one" with a physical prompt — meeting the student exactly where they are. Gave the student choices on multiple choice items, reading options aloud and letting the student select. A beautiful example of "Ask Don\'t Tell" in a bilingual context.' },
       ],
       paras: [
         { name: 'Zaragoza Aguilar, Ana', email: 'azaragoza@asd4.org', loggedIn: true },
@@ -1272,7 +1272,7 @@ Thank you for setting the example. It matters more than you know.`;
         classroomsVisited: 10,
         loveNotesDelivered: 10,
         repliesReceived: 0,
-        aiSummary: 'Observation & Support Day 2 visited Indian Trail Jr. High and Army Trail Elementary, observing 10 paras across both buildings. The focus was Instructional Support Strategies - how paras scaffold learning, check for understanding, and adapt in real-time. Every para observed received a personalized Love Note recognizing the specific strategies they demonstrated. Early standouts included strong proximity use, proactive student check-ins, and seamless co-teaching transitions.',
+        aiSummary: 'Observation Day 2 spanned two buildings — Indian Trail Jr. High and Army Trail Elementary — with 10 paraprofessionals observed across a range of settings including FACS, Social Studies, Reading Groups, and early elementary literacy. All 10 paras received personalized follow-up emails same-day. Standout themes included proactive room presence, bilingual instructional support, and strong student relationships built through consistent, warm interaction.',
         details: {
           narrative: 'During Observation Day 2, TDI visited two buildings: Indian Trail Jr. High (8 paras observed) and Army Trail Elementary (2 paras observed). The observation focus shifted to Instructional Support Strategies - looking at how paras scaffold learning, monitor understanding, and adjust their approach based on student needs. Across both buildings, we saw paras confidently stepping into instructional moments, using proximity intentionally, and building rapport with students through consistent check-ins. The momentum from Day 1 was visible - paras were more aware of being observed and more intentional in demonstrating the strategies they\'ve been learning.',
           quotes: [
@@ -2086,36 +2086,39 @@ Thank you for setting the example. It matters more than you know.`;
               <div className="flex items-center gap-2 mb-4">
                 <Eye className="w-5 h-5 text-[#1A6B6B]" />
                 <h3 className="text-base font-bold text-[#1B2A4A]">Observed in Action</h3>
-                <span className="ml-auto text-xs text-gray-400">March 19, 2026 - Observation Day 2</span>
+                <span className="ml-auto text-xs text-gray-400">March 19, 2026 — Observation Day 2</span>
               </div>
               <div className="space-y-4">
                 <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 border-l-4 border-emerald-400">
-                  <p className="text-sm italic text-gray-700 leading-relaxed">&quot;Emilia&apos;s calm presence transformed a potentially chaotic transition into a smooth routine. She used proximity and a quiet voice to redirect two students without disrupting the flow of the classroom.&quot;</p>
+                  <p className="text-sm italic text-gray-700 leading-relaxed">&quot;What letter is that? Like snake — ssss!&quot;</p>
                   <div className="flex items-center gap-2 mt-3">
                     <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-semibold text-sm">EH</div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">Emilia Hoppensteadt</p>
+                      <p className="text-sm font-medium text-gray-900">Emily Hoppensteadt</p>
                       <p className="text-xs text-gray-500">Army Trail Elementary</p>
+                      <p className="text-xs text-gray-400 mt-0.5">Observed in action during literacy instruction</p>
                     </div>
                   </div>
                 </div>
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-l-4 border-blue-400">
-                  <p className="text-sm italic text-gray-700 leading-relaxed">&quot;Ana showed remarkable patience during a one-on-one reading session. She celebrated every small win and gently corrected without deflating the student&apos;s confidence. The student was beaming by the end.&quot;</p>
+                  <p className="text-sm italic text-gray-700 leading-relaxed">&quot;Excellente! Muy bien! Me gusta!&quot;</p>
                   <div className="flex items-center gap-2 mt-3">
                     <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">AZ</div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">Ana Zaragoza Aguilar</p>
+                      <p className="text-sm font-medium text-gray-900">Ana Zaragoza</p>
                       <p className="text-xs text-gray-500">Army Trail Elementary</p>
+                      <p className="text-xs text-gray-400 mt-0.5">Observed during bilingual 1:1 math support</p>
                     </div>
                   </div>
                 </div>
                 <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 border-l-4 border-amber-400">
-                  <p className="text-sm italic text-gray-700 leading-relaxed">&quot;Karen demonstrated exceptional proximity awareness - constantly scanning the room and positioning herself where students needed support before they even asked. Her quiet confidence sets the tone for the whole classroom.&quot;</p>
+                  <p className="text-sm italic text-gray-700 leading-relaxed">&quot;Wow, your psychic abilities are amazing — you predicted it again!&quot;</p>
                   <div className="flex items-center gap-2 mt-3">
                     <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-semibold text-sm">KM</div>
                     <div>
                       <p className="text-sm font-medium text-gray-900">Karen Magnuson</p>
                       <p className="text-xs text-gray-500">Indian Trail Jr. High</p>
+                      <p className="text-xs text-gray-400 mt-0.5">Para affirming a student&apos;s prediction during class discussion</p>
                     </div>
                   </div>
                 </div>
@@ -3591,16 +3594,21 @@ Thank you for setting the example. It matters more than you know.`;
                               <summary className="cursor-pointer">
                                 <div className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
                                   <ClipboardList className="w-4 h-4 text-emerald-600" />
-                                  Observation & Support Day 2 - March 19, 2026
+                                  Observation & Support Day 2 — March 19, 2026
                                   <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
                                   <ChevronDown className="w-4 h-4 ml-auto transition-transform group-open:rotate-180" />
                                 </div>
-                                <p className="text-xs text-gray-500 mt-1 ml-6">{school.observationDay2Notes.length} para{school.observationDay2Notes.length !== 1 ? 's' : ''} observed · {school.observationDay2Notes.length} Love Notes delivered</p>
+                                <p className="text-xs text-gray-500 mt-1 ml-6">
+                                  {school.observationDay2Notes.length} para{school.observationDay2Notes.length !== 1 ? 's' : ''} observed · {school.observationDay2Notes.length} emails sent · Standout: {school.name === 'Indian Trail' ? '"Wow, your psychic abilities are amazing — you predicted it again!"' : '"What letter is that? Like snake — ssss!"'}
+                                </p>
                               </summary>
                               <div className="mt-4 space-y-3">
-                                {school.observationDay2Notes.map((note: { para: string; note: string }, i: number) => (
+                                {school.observationDay2Notes.map((note: { para: string; location?: string; note: string }, i: number) => (
                                   <div key={i} className="bg-white border border-gray-200 rounded-lg p-3">
-                                    <p className="font-semibold text-gray-900">{note.para}</p>
+                                    <p className="font-semibold text-gray-900">
+                                      {note.para}
+                                      {note.location && <span className="text-xs font-normal text-gray-500 ml-2">({note.location})</span>}
+                                    </p>
                                     <p className="text-sm text-gray-600 mt-1">{note.note}</p>
                                   </div>
                                 ))}
@@ -3982,12 +3990,16 @@ Thank you for setting the example. It matters more than you know.`;
                 </div>
 
                 {/* Card 4: Executive Sessions */}
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-5 border border-amber-200">
                   <div className="flex items-center gap-2 mb-2">
                     <Star className="w-5 h-5 text-[#38618C]" />
                     <span className="font-semibold text-[#1e2749]">Executive Impact Sessions</span>
                   </div>
-                  <p className="text-2xl font-bold text-[#38618C] mb-2">3 Sessions</p>
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-2xl font-bold text-[#38618C]">3 Sessions</p>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">All Complimentary</span>
+                  </div>
+                  <p className="text-xs text-amber-700 font-medium mb-2">All 3 sessions complimentary — included in recognition of ASD4&apos;s Year 2 renewal</p>
                   <p className="text-sm text-gray-600 mb-3">Strategic goal-setting for annual KPIs, improvement planning, and leadership alignment. Board-ready data built in.</p>
                   <p className="text-xs text-teal-600 font-medium flex items-center gap-1">
                     <BarChart3 className="w-3 h-3" /> Includes Analytics Suite
@@ -4021,9 +4033,12 @@ Thank you for setting the example. It matters more than you know.`;
                       <td className="py-3 px-4 font-medium text-[#1e2749]">Virtual Strategy Sessions</td>
                       <td className="py-3 px-4 text-right font-bold text-[#38618C]">4 SESSIONS</td>
                     </tr>
-                    <tr className="border-b border-gray-200">
+                    <tr className="border-b border-gray-200 bg-amber-50/50">
                       <td className="py-3 px-4 font-medium text-[#1e2749]">Executive Impact Sessions</td>
-                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">3 SESSIONS</td>
+                      <td className="py-3 px-4 text-right">
+                        <span className="font-bold text-[#38618C]">3 SESSIONS</span>
+                        <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">ALL COMPLIMENTARY</span>
+                      </td>
                     </tr>
                     {/* Included Services - Lighter */}
                     <tr className="border-b border-gray-100 bg-gray-50/50">
@@ -4158,8 +4173,11 @@ Thank you for setting the example. It matters more than you know.`;
                     </div>
                     <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
                       <p className="text-xs font-bold text-amber-700 uppercase mb-1">August 2026</p>
-                      <p className="font-semibold text-[#1e2749]">Executive Impact Session 1</p>
-                      <p className="text-sm text-gray-600">Set Year 2 goals. Review Year 1 data. Establish baselines for all 111 paras.</p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold text-[#1e2749]">Executive Impact Session 1</p>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">🎁 Complimentary</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Set Year 2 goals. Review Year 1 data. Establish baselines for all 111 paras.</p>
                     </div>
                   </div>
 
@@ -4308,12 +4326,12 @@ Thank you for setting the example. It matters more than you know.`;
               </div>
 
               {/* Complimentary Sessions Note */}
-              <div className="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+              <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
                 <div className="flex items-start gap-3">
                   <span className="text-lg">🎁</span>
                   <div>
-                    <p className="text-sm font-medium text-purple-900">Complimentary Executive Sessions</p>
-                    <p className="text-sm text-purple-700 mt-1">As a thank-you for your Year 1 partnership, Executive Impact Sessions 2 and 3 are included at no additional cost when you renew by April 30, 2026. These sessions provide mid-year data review and end-of-year celebration with board-ready reporting.</p>
+                    <p className="text-sm font-medium text-amber-900">All Executive Sessions Complimentary</p>
+                    <p className="text-sm text-amber-800 mt-1">All 3 Executive Impact Sessions are provided complimentary in recognition of ASD4&apos;s commitment to their team&apos;s growth and renewal into Year 2 of the partnership. We&apos;re honored to continue this work together.</p>
                   </div>
                 </div>
               </div>
