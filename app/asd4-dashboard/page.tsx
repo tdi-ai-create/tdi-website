@@ -709,6 +709,16 @@ export default function ASD4Dashboard() {
         { type: 'gold', label: 'Above 90% Club' },
         { type: 'silver', label: 'Engaged Team' },
       ],
+      observationDay2Notes: [
+        { para: 'Magnuson, Karen', note: 'Karen demonstrated exceptional proximity awareness - constantly scanning the room and positioning herself where students needed support before they even asked. Her quiet confidence sets the tone for the whole classroom.' },
+        { para: 'Zaborowski, Samantha', note: 'Samantha\'s small-group facilitation was a highlight. She broke down a complex math concept into three digestible steps and checked for understanding after each one. Students were visibly more confident by the end.' },
+        { para: 'Beahan, Linda', note: 'Linda showed strong co-teaching instincts - she anticipated the teacher\'s transitions and had materials ready before they were needed. The classroom ran like a well-oiled machine.' },
+        { para: 'Juarez, Alexia', note: 'Alexia used affirming language consistently throughout the observation. Every student she worked with heard something positive about their effort or thinking.' },
+        { para: 'Herrera, Elizabeth', note: 'Elizabeth demonstrated the "wait time" principle beautifully - giving students space to think before jumping in. Her patience is building student independence.' },
+        { para: 'Hodo, Mirela', note: 'Mirela\'s relationship-building was evident immediately. Students sought her out for help, and she greeted each one by name with genuine warmth.' },
+        { para: 'Cortez, Maria', note: 'Maria showed strong instructional awareness - she noticed when a student was struggling before the teacher did and provided just enough scaffolding to get them back on track.' },
+        { para: 'Zarate, Claudia', note: 'Claudia\'s energy is contagious. She turned a mundane worksheet review into an engaging mini-competition that had students actually excited to participate.' },
+      ],
       paras: [
         { name: 'Gorostieta, Michele', email: 'mgorostieta@asd4.org', loggedIn: true },
         { name: 'Beahan, Linda', email: 'lbeahan@asd4.org', loggedIn: true },
@@ -880,6 +890,10 @@ export default function ASD4Dashboard() {
       medals: [
         { type: 'gold', label: 'Ask Implementation (100%)' },
         { type: 'bronze', label: 'Growing Login Rate' },
+      ],
+      observationDay2Notes: [
+        { para: 'Hoppensteadt, Emilia', note: 'Emilia\'s calm presence transformed a potentially chaotic transition into a smooth routine. She used proximity and a quiet voice to redirect two students without disrupting the flow of the classroom. Her instincts are sharp.' },
+        { para: 'Zaragoza Aguilar, Ana', note: 'Ana showed remarkable patience during a one-on-one reading session. She celebrated every small win and gently corrected without deflating the student\'s confidence. The student was beaming by the end.' },
       ],
       paras: [
         { name: 'Zaragoza Aguilar, Ana', email: 'azaragoza@asd4.org', loggedIn: true },
@@ -1109,7 +1123,7 @@ Thank you for setting the example. It matters more than you know.`;
     // ZONE 1 - Snapshot
     stats: {
       educatorsEnrolled: { value: 122, total: 122, label: 'Paras Enrolled', sublabel: 'All seats filled' },
-      deliverables: { completed: 5, total: 11, label: 'Deliverables', sublabel: 'completed vs. contracted' },
+      deliverables: { completed: 6, total: 11, label: 'Deliverables', sublabel: 'completed vs. contracted' },
       hubEngagement: { percent: 100, raw: '122/122', label: 'Hub Engagement', sublabel: 'paras logged in' },
       phase: { name: 'IGNITE', number: 1, total: 3, label: 'Current Phase', sublabel: 'Phase 1 of 3' },
     },
@@ -1139,6 +1153,7 @@ Thank you for setting the example. It matters more than you know.`;
         { label: 'Calm Classroom Presence implementation tracking', date: '91% across pilot group' },
         { label: 'Collaborative Support implementation tracking', date: '70% across pilot group' },
         { label: 'March survey analysis  - 95/122 responded', date: '78% response rate' },
+        { label: 'Observation & Support Day 2  - 10 paras observed, 10 Love Notes', date: 'Mar 19, 2026' },
       ],
       inProgress: [
         { label: 'Hub engagement  - 122 of 122 paras active', detail: '100% logged in' },
@@ -1147,7 +1162,6 @@ Thank you for setting the example. It matters more than you know.`;
         { label: 'March survey analysis  - 95/122 responded', detail: '78% response rate' },
       ],
       comingSoon: [
-        { label: 'Observation & Support Day 2', date: 'Mar 19, 2026' },
         { label: 'Virtual Support Session 2', date: 'Apr 6, 2026' },
         { label: 'Executive Impact Session 2', date: 'Apr 9, 2026' },
         { label: 'Virtual Support Session 3', date: 'Apr 20, 2026' },
@@ -1188,16 +1202,11 @@ Thank you for setting the example. It matters more than you know.`;
       ],
       tdiHandling: [
         {
-          label: 'Observation & Support Day 2 Prep',
-          detail: 'TDI is preparing  - March 19, 2026',
-        },
-        {
           label: 'Executive Impact Session 2 Prep',
           detail: 'TDI is preparing  - April 9, 2026',
         },
       ],
       alreadyInMotion: [
-        { label: 'Observation & Support Day 2', date: 'Mar 19, 2026', status: 'scheduled' },
         { label: 'Virtual Support Session 2', date: 'Apr 6, 2026', status: 'scheduled' },
         { label: 'Executive Impact Session 2', date: 'Apr 9, 2026', status: 'scheduled' },
         { label: 'Virtual Support Session 3', date: 'Apr 20, 2026', status: 'scheduled' },
@@ -1256,6 +1265,47 @@ Thank you for setting the example. It matters more than you know.`;
           },
         ],
       },
+      {
+        id: 'obs-2',
+        dayNumber: 2,
+        date: 'March 19, 2026',
+        classroomsVisited: 10,
+        loveNotesDelivered: 10,
+        repliesReceived: 0,
+        aiSummary: 'Observation & Support Day 2 visited Indian Trail Jr. High and Army Trail Elementary, observing 10 paras across both buildings. The focus was Instructional Support Strategies - how paras scaffold learning, check for understanding, and adapt in real-time. Every para observed received a personalized Love Note recognizing the specific strategies they demonstrated. Early standouts included strong proximity use, proactive student check-ins, and seamless co-teaching transitions.',
+        details: {
+          narrative: 'During Observation Day 2, TDI visited two buildings: Indian Trail Jr. High (8 paras observed) and Army Trail Elementary (2 paras observed). The observation focus shifted to Instructional Support Strategies - looking at how paras scaffold learning, monitor understanding, and adjust their approach based on student needs. Across both buildings, we saw paras confidently stepping into instructional moments, using proximity intentionally, and building rapport with students through consistent check-ins. The momentum from Day 1 was visible - paras were more aware of being observed and more intentional in demonstrating the strategies they\'ve been learning.',
+          quotes: [
+            'I used to just float around the room. Now I know exactly where to stand and when to step in.',
+            'The Love Note mentioned something I didn\'t even realize I was doing. It made me want to do it more.',
+            'I finally feel like I\'m teaching, not just helping.',
+          ],
+          resources: [
+            'Hub course referenced: The Proximity Principle',
+            'Hub course referenced: Checking for Understanding',
+            'Hub course referenced: Scaffolding Success',
+          ],
+          nextFocus: 'Continue tracking implementation growth and prepare for end-of-year data collection.',
+        },
+        coachingThemes: [
+          {
+            theme: 'Instructional confidence growing',
+            insight: 'Paras are moving from passive support to active instruction. Multiple paras were observed leading small group activities and checking for understanding independently.',
+          },
+          {
+            theme: 'Proximity is intentional',
+            insight: 'Several paras mentioned the Proximity Principle course by name. They\'re positioning themselves strategically and moving with purpose.',
+          },
+          {
+            theme: 'Love Notes continue to resonate',
+            insight: 'Paras who received Day 1 Love Notes mentioned showing them to family members. The recognition is creating ripple effects beyond the classroom.',
+          },
+          {
+            theme: 'Teacher-para alignment',
+            insight: 'Co-teaching transitions were smoother in classrooms where both teacher and para had engaged with Hub content. Shared language is making a difference.',
+          },
+        ],
+      },
     ],
 
     // SECTION 3  - School / District Snapshot (CONDITIONAL)
@@ -1284,7 +1334,7 @@ Thank you for setting the example. It matters more than you know.`;
             { label: 'Observation & Support Day 1  - 17 classrooms, 18 Love Notes, 10 replies', complete: true },
             { label: 'Collaborative Support implementation tracking  - 70% applying strategies', complete: true },
             { label: 'VS1 Survey complete  - 95 respondents', complete: true },
-            { label: 'Observation & Support Day 2  - scheduled Mar 19', complete: false },
+            { label: 'Observation & Support Day 2  - 10 classrooms, 10 Love Notes', complete: true },
             { label: 'IGNITE wrap-up session + transition to ACCELERATE', complete: false },
           ],
         },
@@ -2031,6 +2081,47 @@ Thank you for setting the example. It matters more than you know.`;
               <div className="text-sm text-gray-500">{overviewData.quickWin.line2}</div>
             </div>
 
+            {/* ─── ZONE 2D: OBSERVED IN ACTION ─── */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-4">
+                <Eye className="w-5 h-5 text-[#1A6B6B]" />
+                <h3 className="text-base font-bold text-[#1B2A4A]">Observed in Action</h3>
+                <span className="ml-auto text-xs text-gray-400">March 19, 2026 - Observation Day 2</span>
+              </div>
+              <div className="space-y-4">
+                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 border-l-4 border-emerald-400">
+                  <p className="text-sm italic text-gray-700 leading-relaxed">&quot;Emilia&apos;s calm presence transformed a potentially chaotic transition into a smooth routine. She used proximity and a quiet voice to redirect two students without disrupting the flow of the classroom.&quot;</p>
+                  <div className="flex items-center gap-2 mt-3">
+                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-semibold text-sm">EH</div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Emilia Hoppensteadt</p>
+                      <p className="text-xs text-gray-500">Army Trail Elementary</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-l-4 border-blue-400">
+                  <p className="text-sm italic text-gray-700 leading-relaxed">&quot;Ana showed remarkable patience during a one-on-one reading session. She celebrated every small win and gently corrected without deflating the student&apos;s confidence. The student was beaming by the end.&quot;</p>
+                  <div className="flex items-center gap-2 mt-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">AZ</div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Ana Zaragoza Aguilar</p>
+                      <p className="text-xs text-gray-500">Army Trail Elementary</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 border-l-4 border-amber-400">
+                  <p className="text-sm italic text-gray-700 leading-relaxed">&quot;Karen demonstrated exceptional proximity awareness - constantly scanning the room and positioning herself where students needed support before they even asked. Her quiet confidence sets the tone for the whole classroom.&quot;</p>
+                  <div className="flex items-center gap-2 mt-3">
+                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-semibold text-sm">KM</div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Karen Magnuson</p>
+                      <p className="text-xs text-gray-500">Indian Trail Jr. High</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* ─── ZONE 3: ACTIONS ─── */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
@@ -2154,22 +2245,6 @@ Thank you for setting the example. It matters more than you know.`;
                 {partnershipData.observations.map((obs) => (
                   <ObservationCard key={obs.id} obs={obs} />
                 ))}
-              </div>
-              {/* Upcoming Observation Day 2 */}
-              <div className="px-6 py-4 border-t border-gray-100">
-                <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 border border-blue-100">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-sm bg-blue-500">
-                    #2
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-bold text-gray-900 text-sm">Observation & Support Day 2</p>
-                    <p className="text-xs text-gray-400">March 19, 2026 · Half-day · Schools TBD</p>
-                  </div>
-                  <span className="text-xs bg-blue-100 text-blue-700 font-semibold px-3 py-1 rounded-full flex items-center gap-1">
-                    <Calendar className="w-3 h-3" /> Scheduled
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 mt-2 ml-1">Half-day observation - specific classrooms and buildings to be confirmed closer to date.</p>
               </div>
             </div>
 
@@ -3510,6 +3585,29 @@ Thank you for setting the example. It matters more than you know.`;
                             </details>
                           )}
 
+                          {/* Observation Day 2 Notes - Dynamic for schools with observationDay2Notes */}
+                          {school.observationDay2Notes && school.observationDay2Notes.length > 0 && (
+                            <details className="py-3 border-b border-gray-100">
+                              <summary className="cursor-pointer">
+                                <div className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
+                                  <ClipboardList className="w-4 h-4 text-emerald-600" />
+                                  Observation & Support Day 2 - March 19, 2026
+                                  <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
+                                  <ChevronDown className="w-4 h-4 ml-auto transition-transform group-open:rotate-180" />
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1 ml-6">{school.observationDay2Notes.length} para{school.observationDay2Notes.length !== 1 ? 's' : ''} observed · {school.observationDay2Notes.length} Love Notes delivered</p>
+                              </summary>
+                              <div className="mt-4 space-y-3">
+                                {school.observationDay2Notes.map((note: { para: string; note: string }, i: number) => (
+                                  <div key={i} className="bg-white border border-gray-200 rounded-lg p-3">
+                                    <p className="font-semibold text-gray-900">{note.para}</p>
+                                    <p className="text-sm text-gray-600 mt-1">{note.note}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </details>
+                          )}
+
                           {/* HERO: What This School Is Learning */}
                           <div className="py-4">
                             <h5 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4 flex items-center gap-2">
@@ -4108,8 +4206,11 @@ Thank you for setting the example. It matters more than you know.`;
                     </div>
                     <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
                       <p className="text-xs font-bold text-amber-700 uppercase mb-1">December 2026</p>
-                      <p className="font-semibold text-[#1e2749]">Executive Impact Session 2</p>
-                      <p className="text-sm text-gray-600">Mid-year data review. Celebrate wins. Adjust spring strategy.</p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold text-[#1e2749]">Executive Impact Session 2</p>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">🎁 Complimentary</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Mid-year data review. Celebrate wins. Adjust spring strategy.</p>
                     </div>
                   </div>
 
@@ -4180,8 +4281,11 @@ Thank you for setting the example. It matters more than you know.`;
                     </div>
                     <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
                       <p className="text-xs font-bold text-amber-700 uppercase mb-1">April/May 2027</p>
-                      <p className="font-semibold text-[#1e2749]">Executive Impact Session 3</p>
-                      <p className="text-sm text-gray-600">Year 2 Celebration + Year 3 Planning. Board-ready data presentation.</p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold text-[#1e2749]">Executive Impact Session 3</p>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">🎁 Complimentary</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Year 2 Celebration + Year 3 Planning. Board-ready data presentation.</p>
                     </div>
                   </div>
                 </div>
@@ -4200,6 +4304,17 @@ Thank you for setting the example. It matters more than you know.`;
                 <div className="flex items-center gap-2 text-sm">
                   <div className="w-4 h-4 rounded-full bg-teal-500"></div>
                   <span className="text-gray-600">Virtual Sessions</span>
+                </div>
+              </div>
+
+              {/* Complimentary Sessions Note */}
+              <div className="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <span className="text-lg">🎁</span>
+                  <div>
+                    <p className="text-sm font-medium text-purple-900">Complimentary Executive Sessions</p>
+                    <p className="text-sm text-purple-700 mt-1">As a thank-you for your Year 1 partnership, Executive Impact Sessions 2 and 3 are included at no additional cost when you renew by April 30, 2026. These sessions provide mid-year data review and end-of-year celebration with board-ready reporting.</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -4599,8 +4714,8 @@ Thank you for setting the example. It matters more than you know.`;
                       <div className="font-medium text-[#1e2749]">Keynote</div>
                       <div className="text-sm text-gray-500">Signed October 28, 2025</div>
                     </div>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
-                      Unpaid
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                      Paid
                     </span>
                   </div>
                   <a
@@ -4621,8 +4736,8 @@ Thank you for setting the example. It matters more than you know.`;
                       <div className="font-medium text-[#1e2749]">Partnership Services (IGNITE Phase)</div>
                       <div className="text-sm text-gray-500">Signed December 9, 2025</div>
                     </div>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
-                      Unpaid
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                      Partially Paid
                     </span>
                   </div>
                   <div className="text-sm text-gray-600 mb-3">
