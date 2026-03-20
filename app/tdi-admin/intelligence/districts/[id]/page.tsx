@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { getSupabase } from '@/lib/supabase'
 import Link from 'next/link'
-import { ChevronRight, Pencil, Plus } from 'lucide-react'
+import { ChevronRight, Pencil, Plus, X, Check } from 'lucide-react'
 
 type Tab = 'overview' | 'contracts' | 'contacts'
 
@@ -75,6 +75,341 @@ type Task = {
   status: string
 }
 
+// ---- Modal: Add Contract ----
+function AddContractModal({ districtId, onClose, onSaved }: { districtId: string, onClose: () => void, onSaved: () => void }) {
+  const supabase = getSupabase()
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({
+    contract_name: '', start_date: '', end_date: '', total_value: '',
+    renewal_deadline_date: '', signed_doc_url: '', status: 'active', scope_notes: ''
+  })
+
+  const inputClass = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+  const labelClass = "block text-xs font-medium text-gray-600 mb-1"
+
+  async function handleSave() {
+    if (!form.contract_name.trim()) return
+    setSaving(true)
+    await supabase.from('intelligence_contracts').insert({
+      district_id: districtId,
+      contract_name: form.contract_name.trim(),
+      start_date: form.start_date || null,
+      end_date: form.end_date || null,
+      total_value: form.total_value ? parseFloat(form.total_value) : null,
+      renewal_deadline_date: form.renewal_deadline_date || null,
+      signed_doc_url: form.signed_doc_url.trim() || null,
+      status: form.status,
+      scope_json: form.scope_notes ? { notes: form.scope_notes } : {},
+    })
+    onSaved()
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-900">Add Contract</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div><label className={labelClass}>Contract Name *</label><input className={inputClass} value={form.contract_name} onChange={e => setForm(f => ({ ...f, contract_name: e.target.value }))} placeholder="e.g. ACCELERATE Year 2 - 2025-26" /></div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={labelClass}>Start Date</label><input type="date" className={inputClass} value={form.start_date} onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))} /></div>
+          <div><label className={labelClass}>End Date</label><input type="date" className={inputClass} value={form.end_date} onChange={e => setForm(f => ({ ...f, end_date: e.target.value }))} /></div>
+          <div><label className={labelClass}>Total Value ($)</label><input type="number" className={inputClass} value={form.total_value} onChange={e => setForm(f => ({ ...f, total_value: e.target.value }))} placeholder="0.00" /></div>
+          <div><label className={labelClass}>Renewal Deadline</label><input type="date" className={inputClass} value={form.renewal_deadline_date} onChange={e => setForm(f => ({ ...f, renewal_deadline_date: e.target.value }))} /></div>
+        </div>
+
+        <div>
+          <label className={labelClass}>Status</label>
+          <select className={inputClass} value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}>
+            <option value="draft">Draft</option>
+            <option value="active">Active</option>
+            <option value="expired">Expired</option>
+            <option value="renewed">Renewed</option>
+          </select>
+        </div>
+
+        <div><label className={labelClass}>Signed Doc URL</label><input className={inputClass} value={form.signed_doc_url} onChange={e => setForm(f => ({ ...f, signed_doc_url: e.target.value }))} placeholder="https://..." /></div>
+        <div><label className={labelClass}>Scope Notes</label><textarea className={inputClass} rows={2} value={form.scope_notes} onChange={e => setForm(f => ({ ...f, scope_notes: e.target.value }))} placeholder="Memberships, observation days, exec sessions..." /></div>
+
+        <div className="flex justify-end gap-3 pt-2">
+          <button onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700 px-4 py-2">Cancel</button>
+          <button onClick={handleSave} disabled={saving || !form.contract_name.trim()} className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-lg">
+            {saving ? 'Saving...' : 'Save Contract'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ---- Modal: Add Invoice ----
+function AddInvoiceModal({ districtId, contracts, onClose, onSaved }: { districtId: string, contracts: Contract[], onClose: () => void, onSaved: () => void }) {
+  const supabase = getSupabase()
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({
+    invoice_number: '', contract_id: '', invoice_date: '', amount: '',
+    service_start_date: '', service_end_date: '', service_date_exact: '',
+    status: 'draft', notes: '',
+    ap_po_required: false, ap_w9_required: false, ap_vendor_packet: false, ap_exact_service_date: false,
+  })
+
+  const inputClass = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+  const labelClass = "block text-xs font-medium text-gray-600 mb-1"
+
+  async function handleSave() {
+    if (!form.invoice_number.trim()) return
+    setSaving(true)
+
+    const { data: invoice } = await supabase.from('intelligence_invoices').insert({
+      district_id: districtId,
+      contract_id: form.contract_id || null,
+      invoice_number: form.invoice_number.trim(),
+      invoice_date: form.invoice_date || null,
+      amount: form.amount ? parseFloat(form.amount) : null,
+      service_start_date: form.service_start_date || null,
+      service_end_date: form.service_end_date || null,
+      service_date_exact: form.service_date_exact || null,
+      status: form.status,
+      notes: form.notes.trim() || null,
+      ap_requirements_json: {
+        po_required: form.ap_po_required,
+        w9_required: form.ap_w9_required,
+        vendor_packet: form.ap_vendor_packet,
+        exact_service_date_needed: form.ap_exact_service_date,
+      }
+    }).select().single()
+
+    // Auto-create collections_workflow entry
+    if (invoice) {
+      await supabase.from('collections_workflow').insert({
+        invoice_id: invoice.id,
+        current_stage: 'submitted',
+        risk_flag: 'none',
+      })
+    }
+
+    onSaved()
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-900">Add Invoice</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="col-span-2"><label className={labelClass}>Invoice Number *</label><input className={inputClass} value={form.invoice_number} onChange={e => setForm(f => ({ ...f, invoice_number: e.target.value }))} placeholder="e.g. TDI-2026-001" /></div>
+          <div className="col-span-2">
+            <label className={labelClass}>Contract (optional)</label>
+            <select className={inputClass} value={form.contract_id} onChange={e => setForm(f => ({ ...f, contract_id: e.target.value }))}>
+              <option value="">No contract linked</option>
+              {contracts.map((c) => <option key={c.id} value={c.id}>{c.contract_name}</option>)}
+            </select>
+          </div>
+          <div><label className={labelClass}>Invoice Date</label><input type="date" className={inputClass} value={form.invoice_date} onChange={e => setForm(f => ({ ...f, invoice_date: e.target.value }))} /></div>
+          <div><label className={labelClass}>Amount ($)</label><input type="number" className={inputClass} value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} placeholder="0.00" /></div>
+          <div><label className={labelClass}>Service Start</label><input type="date" className={inputClass} value={form.service_start_date} onChange={e => setForm(f => ({ ...f, service_start_date: e.target.value }))} /></div>
+          <div><label className={labelClass}>Service End</label><input type="date" className={inputClass} value={form.service_end_date} onChange={e => setForm(f => ({ ...f, service_end_date: e.target.value }))} /></div>
+          <div className="col-span-2"><label className={labelClass}>Exact Service Date (if required by AP)</label><input type="date" className={inputClass} value={form.service_date_exact} onChange={e => setForm(f => ({ ...f, service_date_exact: e.target.value }))} /></div>
+        </div>
+
+        <div>
+          <label className={labelClass}>Status</label>
+          <select className={inputClass} value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}>
+            <option value="draft">Draft</option>
+            <option value="sent">Sent</option>
+            <option value="approved">Approved</option>
+            <option value="paid">Paid</option>
+            <option value="overdue">Overdue</option>
+            <option value="void">Void</option>
+          </select>
+        </div>
+
+        <div>
+          <p className={labelClass}>AP Requirements</p>
+          <div className="space-y-2 mt-1">
+            {[
+              { key: 'ap_po_required', label: 'PO required' },
+              { key: 'ap_w9_required', label: 'W-9 required' },
+              { key: 'ap_vendor_packet', label: 'Vendor packet required' },
+              { key: 'ap_exact_service_date', label: 'Exact service date required' },
+            ].map(({ key, label }) => (
+              <label key={key} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                <input type="checkbox" checked={(form as Record<string, boolean | string>)[key] as boolean} onChange={e => setForm(f => ({ ...f, [key]: e.target.checked }))} className="rounded" />
+                {label}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div><label className={labelClass}>Notes</label><textarea className={inputClass} rows={2} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} /></div>
+
+        <div className="flex justify-end gap-3 pt-2">
+          <button onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700 px-4 py-2">Cancel</button>
+          <button onClick={handleSave} disabled={saving || !form.invoice_number.trim()} className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-lg">
+            {saving ? 'Saving...' : 'Save Invoice'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ---- Inline: Log Payment Event ----
+function LogEventPanel({ invoiceId, onSaved }: { invoiceId: string, onSaved: () => void }) {
+  const supabase = getSupabase()
+  const [open, setOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({ event_type: 'email_sent', event_date: new Date().toISOString().split('T')[0], summary: '' })
+
+  const inputClass = "border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+
+  async function handleSave() {
+    if (!form.summary.trim()) return
+    setSaving(true)
+    await supabase.from('payment_events').insert({
+      invoice_id: invoiceId,
+      event_type: form.event_type,
+      event_date: form.event_date,
+      summary: form.summary.trim(),
+    })
+    setForm({ event_type: 'email_sent', event_date: new Date().toISOString().split('T')[0], summary: '' })
+    setOpen(false)
+    onSaved()
+    setSaving(false)
+  }
+
+  if (!open) return (
+    <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1 text-xs text-amber-600 hover:underline mt-2">
+      <Plus className="w-3 h-3" />
+      Log Event
+    </button>
+  )
+
+  return (
+    <div className="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2">
+      <div className="flex gap-2 flex-wrap">
+        <select className={inputClass} value={form.event_type} onChange={e => setForm(f => ({ ...f, event_type: e.target.value }))}>
+          <option value="email_sent">Email Sent</option>
+          <option value="call_made">Call Made</option>
+          <option value="voicemail">Voicemail</option>
+          <option value="board_approval">Board Approval</option>
+          <option value="check_reissued">Check Reissued</option>
+          <option value="check_received">Check Received</option>
+          <option value="paid">Paid</option>
+          <option value="escalated">Escalated</option>
+          <option value="note">Note</option>
+        </select>
+        <input type="date" className={inputClass} value={form.event_date} onChange={e => setForm(f => ({ ...f, event_date: e.target.value }))} />
+      </div>
+      <input className={`${inputClass} w-full`} value={form.summary} onChange={e => setForm(f => ({ ...f, summary: e.target.value }))} placeholder="Brief summary of what happened..." />
+      <div className="flex gap-2">
+        <button onClick={handleSave} disabled={saving || !form.summary.trim()} className="text-xs bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg font-medium">
+          {saving ? 'Saving...' : 'Log Event'}
+        </button>
+        <button onClick={() => setOpen(false)} className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5">Cancel</button>
+      </div>
+    </div>
+  )
+}
+
+// ---- Inline: Edit Collections Workflow ----
+function EditCollectionsWorkflow({ workflow, onSaved }: { workflow: CollectionsWorkflow | undefined, onSaved: () => void }) {
+  const supabase = getSupabase()
+  const [open, setOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({
+    current_stage: workflow?.current_stage ?? 'submitted',
+    risk_flag: workflow?.risk_flag ?? 'none',
+    board_meeting_date: workflow?.board_meeting_date ?? '',
+    expected_payment_date: workflow?.expected_payment_date ?? '',
+    next_follow_up_at: workflow?.next_follow_up_at ? workflow.next_follow_up_at.split('T')[0] : '',
+  })
+
+  const inputClass = "border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+  const labelClass = "text-xs font-medium text-gray-600"
+
+  async function handleSave() {
+    setSaving(true)
+    if (workflow?.id) {
+      await supabase.from('collections_workflow').update({
+        current_stage: form.current_stage,
+        risk_flag: form.risk_flag,
+        board_meeting_date: form.board_meeting_date || null,
+        expected_payment_date: form.expected_payment_date || null,
+        next_follow_up_at: form.next_follow_up_at ? `${form.next_follow_up_at}T00:00:00Z` : null,
+        last_contacted_at: new Date().toISOString(),
+      }).eq('id', workflow.id)
+    }
+    setOpen(false)
+    onSaved()
+    setSaving(false)
+  }
+
+  if (!open) return (
+    <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-amber-600 mt-1">
+      <Pencil className="w-3 h-3" />
+      Edit collections status
+    </button>
+  )
+
+  return (
+    <div className="mt-2 bg-gray-50 border border-gray-200 rounded-lg p-3 space-y-3">
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <p className={labelClass}>Stage</p>
+          <select className={`${inputClass} w-full mt-1`} value={form.current_stage} onChange={e => setForm(f => ({ ...f, current_stage: e.target.value }))}>
+            <option value="submitted">Submitted</option>
+            <option value="ap_review">AP Review</option>
+            <option value="board_approval_pending">Board Approval Pending</option>
+            <option value="check_issued">Check Issued</option>
+            <option value="stop_payment">Stop Payment</option>
+            <option value="reissue">Reissue</option>
+            <option value="pickup_scheduled">Pickup Scheduled</option>
+            <option value="paid">Paid</option>
+          </select>
+        </div>
+        <div>
+          <p className={labelClass}>Risk Flag</p>
+          <select className={`${inputClass} w-full mt-1`} value={form.risk_flag} onChange={e => setForm(f => ({ ...f, risk_flag: e.target.value }))}>
+            <option value="none">Clear</option>
+            <option value="at_risk">At Risk</option>
+            <option value="critical">Critical</option>
+          </select>
+        </div>
+        <div>
+          <p className={labelClass}>Board Meeting Date</p>
+          <input type="date" className={`${inputClass} w-full mt-1`} value={form.board_meeting_date} onChange={e => setForm(f => ({ ...f, board_meeting_date: e.target.value }))} />
+        </div>
+        <div>
+          <p className={labelClass}>Expected Payment</p>
+          <input type="date" className={`${inputClass} w-full mt-1`} value={form.expected_payment_date} onChange={e => setForm(f => ({ ...f, expected_payment_date: e.target.value }))} />
+        </div>
+        <div className="col-span-2">
+          <p className={labelClass}>Next Follow-up Date</p>
+          <input type="date" className={`${inputClass} w-full mt-1`} value={form.next_follow_up_at} onChange={e => setForm(f => ({ ...f, next_follow_up_at: e.target.value }))} />
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <button onClick={handleSave} disabled={saving} className="text-xs bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg font-medium">
+          {saving ? 'Saving...' : 'Update'}
+        </button>
+        <button onClick={() => setOpen(false)} className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5">Cancel</button>
+      </div>
+    </div>
+  )
+}
+
+// ---- Main Page ----
 export default function DistrictDetailPage() {
   const params = useParams()
   const id = params.id as string
@@ -82,6 +417,10 @@ export default function DistrictDetailPage() {
   const [district, setDistrict] = useState<District | null>(null)
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<Tab>('overview')
+  const [showAddContract, setShowAddContract] = useState(false)
+  const [showAddInvoice, setShowAddInvoice] = useState(false)
+  const [newTaskTitle, setNewTaskTitle] = useState('')
+  const [addingTask, setAddingTask] = useState(false)
 
   useEffect(() => { if (id) loadDistrict() }, [id])
 
@@ -106,6 +445,27 @@ export default function DistrictDetailPage() {
     setLoading(false)
   }
 
+  async function addTask() {
+    if (!newTaskTitle.trim()) return
+    setAddingTask(true)
+    await supabase.from('intelligence_tasks').insert({
+      district_id: id,
+      title: newTaskTitle.trim(),
+      related_type: 'district',
+      related_id: id,
+      status: 'open',
+      priority: 'med',
+    })
+    setNewTaskTitle('')
+    setAddingTask(false)
+    loadDistrict()
+  }
+
+  async function markTaskDone(taskId: string) {
+    await supabase.from('intelligence_tasks').update({ status: 'done' }).eq('id', taskId)
+    loadDistrict()
+  }
+
   if (loading) return <div className="p-8 text-gray-400 text-sm animate-pulse">Loading district...</div>
   if (!district) return <div className="p-8 text-gray-500 text-sm">District not found.</div>
 
@@ -124,6 +484,23 @@ export default function DistrictDetailPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
+
+      {showAddContract && (
+        <AddContractModal
+          districtId={id}
+          onClose={() => setShowAddContract(false)}
+          onSaved={() => { setShowAddContract(false); loadDistrict() }}
+        />
+      )}
+
+      {showAddInvoice && (
+        <AddInvoiceModal
+          districtId={id}
+          contracts={contracts}
+          onClose={() => setShowAddInvoice(false)}
+          onSaved={() => { setShowAddInvoice(false); loadDistrict() }}
+        />
+      )}
 
       {/* Breadcrumb */}
       <div className="flex items-center gap-1 text-xs text-gray-400">
@@ -206,32 +583,56 @@ export default function DistrictDetailPage() {
 
           {/* Open Tasks */}
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
+            <div className="px-5 py-4 border-b border-gray-100">
               <h3 className="font-semibold text-gray-800">Open Tasks</h3>
-              <button className="inline-flex items-center gap-1 text-xs text-amber-600 hover:underline">
-                <Plus className="w-3 h-3" />
-                Add Task
-              </button>
             </div>
-            {openTasks.length === 0 ? (
-              <div className="p-5 text-sm text-gray-400">No open tasks.</div>
-            ) : (
-              <ul className="divide-y divide-gray-100">
-                {openTasks.map((t) => (
-                  <li key={t.id} className="px-5 py-3 flex items-center justify-between text-sm">
-                    <span className="text-gray-800">{t.title}</span>
-                    <div className="flex items-center gap-3 text-xs text-gray-400">
-                      {t.due_date && <span>{new Date(t.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>}
-                      <span className={`px-2 py-0.5 rounded-full font-medium ${
-                        t.priority === 'high' ? 'bg-red-50 text-red-600' :
-                        t.priority === 'med' ? 'bg-yellow-50 text-yellow-700' :
-                        'text-gray-400'
-                      }`}>{t.priority}</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <div className="p-5 space-y-3">
+              {openTasks.length === 0 ? (
+                <p className="text-sm text-gray-400">No open tasks.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {openTasks.map((t) => (
+                    <li key={t.id} className="flex items-center justify-between text-sm">
+                      <span className="text-gray-800">{t.title}</span>
+                      <div className="flex items-center gap-3">
+                        {t.due_date && (
+                          <span className={`text-xs ${new Date(t.due_date) < new Date() ? 'text-red-500 font-medium' : 'text-gray-400'}`}>
+                            {new Date(t.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </span>
+                        )}
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                          t.priority === 'high' ? 'bg-red-50 text-red-600' :
+                          t.priority === 'med' ? 'bg-yellow-50 text-yellow-700' :
+                          'text-gray-400'
+                        }`}>{t.priority}</span>
+                        <button onClick={() => markTaskDone(t.id)} className="inline-flex items-center gap-1 text-xs text-green-600 hover:underline">
+                          <Check className="w-3 h-3" />
+                          Done
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {/* Add task inline */}
+              <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
+                <input
+                  className="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  value={newTaskTitle}
+                  onChange={e => setNewTaskTitle(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && addTask()}
+                  placeholder="Add a task and press Enter..."
+                />
+                <button
+                  onClick={addTask}
+                  disabled={addingTask || !newTaskTitle.trim()}
+                  className="text-xs bg-amber-500 hover:bg-amber-600 disabled:opacity-40 text-white px-3 py-1.5 rounded-lg font-medium"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Collections snapshot - critical invoices */}
@@ -272,13 +673,13 @@ export default function DistrictDetailPage() {
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
               <h3 className="font-semibold text-gray-800">Contracts</h3>
-              <button className="inline-flex items-center gap-1 text-xs text-amber-600 hover:underline">
+              <button onClick={() => setShowAddContract(true)} className="inline-flex items-center gap-1 text-xs text-amber-600 hover:underline">
                 <Plus className="w-3 h-3" />
                 Add Contract
               </button>
             </div>
             {contracts.length === 0 ? (
-              <div className="p-5 text-sm text-gray-400">No contracts yet.</div>
+              <div className="p-5 text-sm text-gray-400">No contracts yet. <button onClick={() => setShowAddContract(true)} className="text-amber-600 hover:underline">Add one.</button></div>
             ) : (
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
@@ -317,13 +718,13 @@ export default function DistrictDetailPage() {
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
               <h3 className="font-semibold text-gray-800">Invoices + Collections</h3>
-              <button className="inline-flex items-center gap-1 text-xs text-amber-600 hover:underline">
+              <button onClick={() => setShowAddInvoice(true)} className="inline-flex items-center gap-1 text-xs text-amber-600 hover:underline">
                 <Plus className="w-3 h-3" />
                 Add Invoice
               </button>
             </div>
             {invoices.length === 0 ? (
-              <div className="p-5 text-sm text-gray-400">No invoices yet.</div>
+              <div className="p-5 text-sm text-gray-400">No invoices yet. <button onClick={() => setShowAddInvoice(true)} className="text-amber-600 hover:underline">Add one.</button></div>
             ) : (
               <div className="divide-y divide-gray-100">
                 {invoices.map((inv) => {
@@ -363,10 +764,13 @@ export default function DistrictDetailPage() {
                         </div>
                       )}
 
-                      {/* Payment events timeline (last 3) */}
+                      {/* Edit collections workflow */}
+                      {cw && <EditCollectionsWorkflow workflow={cw} onSaved={loadDistrict} />}
+
+                      {/* Payment events timeline (last 5) */}
                       {events.length > 0 && (
                         <div className="mt-3 space-y-1.5 border-l-2 border-amber-200 pl-3">
-                          {events.slice(0, 3).map((e) => (
+                          {events.slice(0, 5).map((e) => (
                             <div key={e.id} className="text-xs text-gray-500">
                               <span className="font-medium text-gray-700">{e.event_type.replace(/_/g, ' ')}</span>
                               {e.summary && ` - ${e.summary}`}
@@ -375,11 +779,14 @@ export default function DistrictDetailPage() {
                               </span>
                             </div>
                           ))}
-                          {events.length > 3 && (
-                            <p className="text-xs text-amber-600 hover:underline cursor-pointer">+ {events.length - 3} more events</p>
+                          {events.length > 5 && (
+                            <p className="text-xs text-gray-400">+ {events.length - 5} more events</p>
                           )}
                         </div>
                       )}
+
+                      {/* Log event */}
+                      <LogEventPanel invoiceId={inv.id} onSaved={loadDistrict} />
                     </div>
                   )
                 })}
@@ -394,13 +801,15 @@ export default function DistrictDetailPage() {
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
             <h3 className="font-semibold text-gray-800">Contacts</h3>
-            <button className="inline-flex items-center gap-1 text-xs text-amber-600 hover:underline">
-              <Plus className="w-3 h-3" />
-              Add Contact
-            </button>
+            <Link href={`/tdi-admin/intelligence/districts/${id}/edit`} className="inline-flex items-center gap-1 text-xs text-amber-600 hover:underline">
+              <Pencil className="w-3 h-3" />
+              Edit contacts
+            </Link>
           </div>
           {contacts.length === 0 ? (
-            <div className="p-8 text-center text-sm text-gray-400">No contacts yet.</div>
+            <div className="p-8 text-center text-sm text-gray-400">
+              No contacts yet. <Link href={`/tdi-admin/intelligence/districts/${id}/edit`} className="text-amber-600 hover:underline">Add contacts.</Link>
+            </div>
           ) : (
             <ul className="divide-y divide-gray-100">
               {contacts.map((c) => (

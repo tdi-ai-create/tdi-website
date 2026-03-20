@@ -2737,16 +2737,14 @@ function MilestoneRow({
 }) {
   const config = statusConfig[milestone.status];
   // Show Approve/Request Changes buttons when:
-  // 1. Milestone requires team action and is in progress, or
-  // 2. Creator has submitted something for review (awaiting_approval is true), or
-  // 3. Status is waiting_approval (for any content path)
-  const canApprove =
-    (milestone.requires_team_action &&
-      (milestone.status === 'available' ||
-        milestone.status === 'in_progress' ||
-        milestone.status === 'waiting_approval')) ||
+  // 1. Status is waiting_approval (ALWAYS show both buttons - universal rule)
+  // 2. Creator has submitted something for review (awaiting_approval is true)
+  // 3. Milestone requires team action and is in progress/available
+  const showApprovalButtons =
+    milestone.status === 'waiting_approval' ||
     milestone.awaiting_approval === true ||
-    milestone.status === 'waiting_approval';
+    (milestone.requires_team_action &&
+      (milestone.status === 'available' || milestone.status === 'in_progress'));
 
   // Handle different possible field names for milestone title and description
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -2923,7 +2921,7 @@ function MilestoneRow({
               {config.label}
             </span>
           </Tooltip>
-          {canApprove && (
+          {showApprovalButtons && (
             <>
               <Tooltip content="Mark this step as complete and unlock the next step. The creator will receive an email notification." position="left">
                 <button
