@@ -22,7 +22,7 @@ import type { PhaseWithMilestones, MilestoneWithStatus, MilestoneStatus, Submiss
 import { MilestoneAction } from './MilestoneAction';
 import { RichContentAccordion } from './RichContentAccordion';
 import { MilestoneMeetingBanner } from './MilestoneMeetingBanner';
-import { getContextAwareMilestoneDescription } from '@/lib/creator-portal-data';
+import { getContextAwareMilestoneDescription, getContextAwareMilestoneTitle } from '@/lib/creator-portal-data';
 
 // Helper to format submission data for display
 function formatSubmissionData(data: SubmissionData): { label: string; timestamp: string | null; sublabel?: string } | null {
@@ -213,7 +213,9 @@ function MilestoneItem({
 
   // Get milestone title (handle both 'title' and 'name' fields from database)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const milestoneTitle = (milestone as any).title || (milestone as any).name || '';
+  const rawMilestoneTitle = (milestone as any).title || (milestone as any).name || '';
+  // Use context-aware title if available (e.g., "Post Published!" instead of "Course Launched" for blog creators)
+  const milestoneTitle = getContextAwareMilestoneTitle(milestone.id, creator?.content_path) || rawMilestoneTitle;
 
   // Check if milestone is optional (bonus)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

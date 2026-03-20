@@ -26,8 +26,32 @@ const PHASE_ORDER: PhaseId[] = [
 ];
 
 // ============================================
-// Content-Path-Aware Milestone Descriptions
+// Content-Path-Aware Milestone Titles & Descriptions
 // ============================================
+
+/**
+ * Returns a content-path-aware title for specific milestones.
+ * If no custom title exists, returns null (use the default).
+ */
+export function getContextAwareMilestoneTitle(
+  milestoneId: string,
+  contentPath: string | null | undefined
+): string | null {
+  // Define milestone-specific titles by content path
+  const contextTitles: Record<string, Record<string, string>> = {
+    course_launched: {
+      blog: "Post Published!",
+      download: "Download Live!",
+      course: "Course Launched",
+    },
+  };
+
+  const milestoneTitles = contextTitles[milestoneId];
+  if (!milestoneTitles) return null;
+
+  const path = contentPath || 'course'; // Default to course if no path set
+  return milestoneTitles[path] || null;
+}
 
 /**
  * Returns a content-path-aware description for specific milestones.
@@ -41,7 +65,7 @@ export function getContextAwareMilestoneDescription(
   const contextDescriptions: Record<string, Record<string, string>> = {
     course_launched: {
       blog: "Your post is live on the TDI blog! Congratulations — teachers are reading your work!",
-      download: "Your download is live in the TDI store! Congratulations!",
+      download: "Your download is live! Congratulations!",
       course: "Your launch date is set and your course is LIVE in the TDI Learning Hub! Congratulations!",
     },
   };
