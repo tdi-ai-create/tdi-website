@@ -68,10 +68,10 @@ export default function GetStartedPage() {
       <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default text-center">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#ffffff' }}>
-            Where do you want to start?
+            Select Your Role to Get Started
           </h1>
           <p className="text-lg max-w-2xl mx-auto mb-8" style={{ color: '#ffffff', opacity: 0.9 }}>
-            Tell us who you are and we'll point you in the right direction.
+            Choose the option that best describes you — we'll send you exactly where you need to go.
           </p>
 
           {/* Trust Indicators */}
@@ -99,9 +99,12 @@ export default function GetStartedPage() {
               <div className="lg:col-span-2">
                 <div className="bg-white rounded-xl shadow-md p-6 md:p-8">
                   {/* Label */}
-                  <p className="text-sm font-semibold mb-6" style={{ color: '#1e2749' }}>
-                    I am a...
+                  <p className="text-sm font-semibold mb-4" style={{ color: '#1e2749' }}>
+                    Select one to continue:
                   </p>
+
+                  {/* Instruction line */}
+                  <p className="text-xs text-gray-400 mb-4">Tap a card to select your role</p>
 
                   {/* Role Cards Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
@@ -111,21 +114,37 @@ export default function GetStartedPage() {
                         <button
                           key={role}
                           onClick={() => handleRoleSelect(role)}
-                          className="p-6 rounded-xl text-center transition-all cursor-pointer"
+                          className={`relative p-6 rounded-xl text-center transition-all duration-150 cursor-pointer ${
+                            isSelected
+                              ? ''
+                              : 'hover:shadow-md hover:border-[#ffba06]'
+                          }`}
                           style={{
-                            backgroundColor: isSelected ? 'rgba(255,186,6,0.08)' : '#ffffff',
-                            border: isSelected ? '2px solid #ffba06' : '1.5px solid #1e2749',
-                            boxShadow: isSelected ? '0 4px 12px rgba(255,186,6,0.15)' : 'none',
+                            backgroundColor: isSelected ? 'rgba(255,186,6,0.06)' : '#ffffff',
+                            border: isSelected ? '2px solid #ffba06' : '2px solid #e5e5e5',
                           }}
                         >
+                          {/* Radio Circle */}
+                          <div
+                            className="absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center"
+                            style={{
+                              backgroundColor: isSelected ? '#ffba06' : '#ffffff',
+                              border: isSelected ? '2px solid #ffba06' : '2px solid #d1d5db',
+                            }}
+                          >
+                            {isSelected && (
+                              <div className="w-2 h-2 rounded-full bg-white" />
+                            )}
+                          </div>
+
                           <Icon
-                            className="w-10 h-10 mx-auto mb-3"
+                            className="w-10 h-10 mx-auto"
                             style={{ color: '#1e2749' }}
                           />
-                          <h3 className="text-lg font-bold mb-1" style={{ color: '#1e2749' }}>
+                          <h3 className="text-xl font-bold mt-3 text-center" style={{ color: '#1e2749' }}>
                             {role}
                           </h3>
-                          <p className="text-sm" style={{ color: '#666' }}>
+                          <p className="text-sm mt-1 text-center" style={{ color: '#6b7280' }}>
                             {description}
                           </p>
                         </button>
@@ -144,7 +163,7 @@ export default function GetStartedPage() {
                       cursor: selectedRole ? 'pointer' : 'not-allowed',
                     }}
                   >
-                    {isSubmitting ? 'Redirecting...' : 'Show Me Where to Start →'}
+                    {isSubmitting ? 'Redirecting...' : 'Continue →'}
                   </button>
                 </div>
 
