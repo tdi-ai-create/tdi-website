@@ -159,7 +159,7 @@ export default function GetStartedPage() {
     return (
       <div
         onClick={() => handleRoleSelect(role)}
-        className="relative rounded-2xl p-8 cursor-pointer transition-all duration-200 flex flex-col items-center text-center"
+        className="relative rounded-2xl p-5 md:p-6 cursor-pointer transition-all duration-200 flex flex-col items-center text-center"
         style={{
           backgroundColor: isSelected ? 'rgba(255,186,6,0.06)' : '#ffffff',
           border: isSelected ? '2px solid #ffba06' : '2px solid #e5e5e5',
@@ -178,27 +178,37 @@ export default function GetStartedPage() {
         </div>
 
         <div
-          className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+          className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3"
           style={{ backgroundColor: isSelected ? 'rgba(255,186,6,0.12)' : '#f5f5f5' }}
         >
-          <Icon className="w-8 h-8" style={{ color: '#1e2749' }} />
+          <Icon className="w-6 h-6" style={{ color: '#1e2749' }} />
         </div>
 
-        <p className="text-xl font-bold mb-1" style={{ color: '#1e2749' }}>{role}</p>
+        <p className="text-lg font-bold mb-1" style={{ color: '#1e2749' }}>{role}</p>
         <p className="text-sm mb-2" style={{ color: '#6b7280' }}>{description}</p>
         <p className="text-xs font-medium" style={{ color: isSelected ? '#2B8C96' : '#9ca3af' }}>{tagline}</p>
       </div>
     );
   };
 
+  const GroupLabel = ({ label }: { label: string }) => (
+    <div className="flex items-center gap-3 mb-3">
+      <div className="h-px flex-1" style={{ backgroundColor: '#e5e5e5' }} />
+      <p className="text-xs font-bold uppercase tracking-widest px-2" style={{ color: '#1e2749' }}>
+        {label}
+      </p>
+      <div className="h-px flex-1" style={{ backgroundColor: '#e5e5e5' }} />
+    </div>
+  );
+
   // STEP 3: Confirmation
   if (step === 3) {
     const isTeacherPath = selectedRole === 'Teacher' || selectedRole === 'Para';
     return (
       <main className="min-h-screen" style={{ backgroundColor: '#f5f5f5' }}>
-        <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
+        <section className="py-8 md:py-10" style={{ backgroundColor: '#1e2749' }}>
           <div className="container-default text-center">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#ffffff' }}>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: '#ffffff' }}>
               Select Your Role to Get Started
             </h1>
           </div>
@@ -265,21 +275,25 @@ export default function GetStartedPage() {
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
+      <section className="py-8 md:py-10" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default text-center">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#ffffff' }}>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: '#ffffff' }}>
             Select Your Role to Get Started
           </h1>
-          <p className="text-lg max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
+          <p className="text-sm md:text-base max-w-lg mx-auto mb-4" style={{ color: '#ffffff', opacity: 0.9 }}>
             Choose the option that best describes you — we'll send you exactly where you need to go.
           </p>
 
-          <div className="flex flex-wrap justify-center gap-3 mt-6">
+          <div className="flex flex-wrap justify-center gap-2 mt-4">
             {['87,000+ educators served', '21 states', 'Takes 10 seconds'].map((item) => (
               <span
                 key={item}
-                className="px-4 py-1.5 rounded-full text-sm font-medium"
-                style={{ border: '1px solid rgba(255,255,255,0.4)', color: '#ffffff', backgroundColor: 'rgba(255,255,255,0.1)' }}
+                className="px-3 py-1 rounded-full text-xs font-semibold"
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.15)',
+                  border: '1px solid rgba(255,255,255,0.5)',
+                  color: '#ffffff',
+                }}
               >
                 {item}
               </span>
@@ -290,32 +304,30 @@ export default function GetStartedPage() {
 
       {/* STEP 1: Role Selection */}
       {step === 1 && (
-        <section className="py-12 px-4" style={{ backgroundColor: '#f5f5f5' }}>
+        <section className="py-8 px-4" style={{ backgroundColor: '#f5f5f5' }}>
           <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-8">
-              <p className="text-sm font-semibold uppercase tracking-widest mb-2" style={{ color: '#2B8C96' }}>
+            <div className="text-center mb-6">
+              <p className="text-xs font-medium mb-2" style={{ color: '#2B8C96' }}>
                 Step 1 of 2
               </p>
-              <h2 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: '#1e2749' }}>
+              <h2 className="text-xl md:text-2xl font-bold mb-1" style={{ color: '#1e2749' }}>
                 Who are you?
               </h2>
-              <p className="text-sm" style={{ color: '#6b7280' }}>
-                Select the option that best describes your role. We'll send you exactly where you need to go.
+              <p className="text-xs" style={{ color: '#6b7280' }}>
+                Select the option that best describes your role.
               </p>
             </div>
 
-            <p className="text-xs font-semibold uppercase tracking-widest mb-3 ml-1" style={{ color: '#6b7280' }}>
-              I work in a classroom
-            </p>
+            <GroupLabel label="I work in a classroom" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {classroomRoles.map((roleConfig) => (
                 <RoleCard key={roleConfig.role} {...roleConfig} />
               ))}
             </div>
 
-            <p className="text-xs font-semibold uppercase tracking-widest mb-3 ml-1 mt-6" style={{ color: '#6b7280' }}>
-              I lead a school or district
-            </p>
+            <div className="mt-5">
+              <GroupLabel label="I lead a school or district" />
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {leaderRoles.map((roleConfig) => (
                 <RoleCard key={roleConfig.role} {...roleConfig} />
@@ -339,7 +351,7 @@ export default function GetStartedPage() {
                   ? 'Loading...'
                   : selectedRole
                   ? `I'm a ${selectedRole} — Continue →`
-                  : 'Select your role above to continue'}
+                  : 'Who are you? Pick a card above.'}
               </button>
 
               <p className="text-center text-xs mt-3" style={{ color: '#9ca3af' }}>
@@ -347,7 +359,7 @@ export default function GetStartedPage() {
               </p>
             </div>
 
-            <div className="flex items-center justify-center gap-2 mt-6">
+            <div className="flex items-center justify-center gap-2 mt-4">
               <div className="flex -space-x-1">
                 <div className="w-6 h-6 rounded-full bg-teal-200 border-2 border-white" />
                 <div className="w-6 h-6 rounded-full bg-blue-200 border-2 border-white" />
@@ -363,25 +375,25 @@ export default function GetStartedPage() {
 
       {/* STEP 2: Form */}
       {step === 2 && (
-        <section id="step-2" className="py-12 px-4" style={{ backgroundColor: '#f5f5f5' }}>
+        <section id="step-2" className="py-8 px-4" style={{ backgroundColor: '#f5f5f5' }}>
           <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-8">
-              <p className="text-sm font-semibold uppercase tracking-widest mb-2" style={{ color: '#2B8C96' }}>
+            <div className="text-center mb-6">
+              <p className="text-xs font-medium mb-2" style={{ color: '#2B8C96' }}>
                 Step 2 of 2
               </p>
-              <h2 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: '#1e2749' }}>
+              <h2 className="text-xl md:text-2xl font-bold mb-1" style={{ color: '#1e2749' }}>
                 {selectedRole === 'Teacher' || selectedRole === 'Para'
                   ? 'Tell us about the school'
                   : 'Tell us about your school'}
               </h2>
-              <p className="text-sm" style={{ color: '#6b7280' }}>
+              <p className="text-xs" style={{ color: '#6b7280' }}>
                 {selectedRole === 'Teacher' || selectedRole === 'Para'
                   ? "We'll reach out to their admin within 48 hours."
                   : "We'll send your custom PD plan within 24 hours."}
               </p>
             </div>
 
-            <div className="flex items-center justify-center gap-3 mb-8">
+            <div className="flex items-center justify-center gap-3 mb-6">
               <span
                 className="px-4 py-1.5 rounded-full text-sm font-semibold"
                 style={{ backgroundColor: 'rgba(255,186,6,0.1)', border: '1px solid #ffba06', color: '#1e2749' }}

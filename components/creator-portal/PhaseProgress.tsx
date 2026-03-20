@@ -781,9 +781,22 @@ export function PhaseProgress({
     );
   });
 
+  // Filter phases based on content path
+  // Blog: only onboarding, agreement, launch
+  // Download: onboarding, agreement, production, launch
+  // Course: all phases
+  const effectiveContentPath = contentPath || creator?.content_path || 'course';
+  const phasesForPath: Record<string, string[]> = {
+    blog: ['onboarding', 'agreement', 'launch'],
+    download: ['onboarding', 'agreement', 'production', 'launch'],
+    course: ['onboarding', 'agreement', 'course_design', 'test_prep', 'production', 'launch'],
+  };
+  const allowedPhases = phasesForPath[effectiveContentPath] || phasesForPath.course;
+  const filteredPhases = phases.filter((phase) => allowedPhases.includes(phase.id));
+
   return (
     <div className="space-y-4">
-      {phases.map((phase) => {
+      {filteredPhases.map((phase) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isSkipped = (phase as any).isSkipped;
         // Only expand the phase with the current step (not completed phases)

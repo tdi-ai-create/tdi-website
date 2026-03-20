@@ -912,8 +912,21 @@ export default function TDIAdminCreatorDetailPage() {
           )}
 
           {/* Milestones */}
-          {viewMode === 'admin' ? (
-            phases.map((phase) => {
+          {(() => {
+            // Filter phases based on content path
+            // Blog: only onboarding, agreement, launch
+            // Download: onboarding, agreement, production, launch
+            // Course: all phases
+            const phasesForPath: Record<string, string[]> = {
+              blog: ['onboarding', 'agreement', 'launch'],
+              download: ['onboarding', 'agreement', 'production', 'launch'],
+              course: ['onboarding', 'agreement', 'course_design', 'test_prep', 'production', 'launch'],
+            };
+            const allowedPhases = phasesForPath[creator.content_path || 'course'] || phasesForPath.course;
+            const filteredPhases = phases.filter((phase) => allowedPhases.includes(phase.id));
+
+            return viewMode === 'admin' ? (
+            filteredPhases.map((phase) => {
               const isExpanded = expandedPhases.has(phase.id);
               const applicableMilestones = phase.milestones.filter((m: MilestoneWithStatus) => m.isApplicable !== false);
               const completedCount = applicableMilestones.filter((m: MilestoneWithStatus) => m.status === 'completed').length;
@@ -1054,17 +1067,18 @@ export default function TDIAdminCreatorDetailPage() {
                 </div>
               );
             })
-          ) : (
-            // Creator View Preview
-            <div className="space-y-4">
-              <PhaseProgress
-                phases={phases}
-                creator={creator}
-                creatorId={creatorId}
-                isAdminPreview={true}
-              />
-            </div>
-          )}
+            ) : (
+              // Creator View Preview
+              <div className="space-y-4">
+                <PhaseProgress
+                  phases={filteredPhases}
+                  creator={creator}
+                  creatorId={creatorId}
+                  isAdminPreview={true}
+                />
+              </div>
+            );
+          })()}
         </div>
 
         {/* Sidebar */}

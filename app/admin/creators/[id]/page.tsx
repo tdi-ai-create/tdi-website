@@ -1258,11 +1258,23 @@ export default function AdminCreatorDetailPage() {
                   if (currentStepId) break;
                 }
 
-                return phases.map((phase) => (
+                // Filter phases based on content path
+                // Blog: only onboarding, agreement, launch
+                // Download: onboarding, agreement, production, launch
+                // Course: all phases
+                const phasesForPath: Record<string, string[]> = {
+                  blog: ['onboarding', 'agreement', 'launch'],
+                  download: ['onboarding', 'agreement', 'production', 'launch'],
+                  course: ['onboarding', 'agreement', 'course_design', 'test_prep', 'production', 'launch'],
+                };
+                const allowedPhases = phasesForPath[creator.content_path || 'course'] || phasesForPath.course;
+                const filteredPhases = phases.filter((phase) => allowedPhases.includes(phase.id));
+
+                return filteredPhases.map((phase) => (
                   <PhaseSection
                     key={phase.id}
                     phase={phase}
-                    allPhases={phases}
+                    allPhases={filteredPhases}
                     isExpanded={expandedPhases.has(phase.id)}
                     contentPath={creator.content_path}
                     onToggle={() => togglePhase(phase.id)}

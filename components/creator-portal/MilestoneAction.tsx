@@ -1088,18 +1088,48 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
       );
     }
 
-    case 'launch_celebration':
+    case 'launch_celebration': {
+      // Content-path-aware labels
+      const contentPath = creator?.content_path || 'course';
+      const launchLabels = {
+        blog: {
+          actionLabel: 'Blog Published!',
+          headline: 'Your Blog Post is Live!',
+          viewLabel: 'View Your Post:',
+          linkText: 'Read on TDI Blog',
+          shareText: 'Share your post with your network',
+          impactText: 'Track your impact as educators read your insights',
+        },
+        download: {
+          actionLabel: 'Download Live!',
+          headline: 'Your Download is Live!',
+          viewLabel: 'View Your Download:',
+          linkText: 'Open in TDI Store',
+          shareText: 'Share your download with your network',
+          impactText: 'Track your impact as educators use your resource',
+        },
+        course: {
+          actionLabel: 'Course Launched!',
+          headline: 'Your Course is Live!',
+          viewLabel: 'View Your Course:',
+          linkText: 'Open in Learning Hub',
+          shareText: 'Share your course with your network',
+          impactText: 'Track your impact as educators take your course',
+        },
+      };
+      const labels = launchLabels[contentPath as keyof typeof launchLabels] || launchLabels.course;
+
       return (
-        <AdminPreviewWrapper actionLabel="Course Launched!">
+        <AdminPreviewWrapper actionLabel={labels.actionLabel}>
           <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6 space-y-6">
             <div className="text-center">
               <PartyPopper className="w-12 h-12 text-green-600 mx-auto mb-3" />
-              <h3 className="text-xl font-bold text-green-800">Your Course is Live!</h3>
+              <h3 className="text-xl font-bold text-green-800">{labels.headline}</h3>
             </div>
 
             {creator?.course_url && (
               <div className="bg-white rounded-lg p-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">View Your Course:</p>
+                <p className="text-sm font-medium text-gray-700 mb-2">{labels.viewLabel}</p>
                 <a
                   href={creator.course_url}
                   target="_blank"
@@ -1107,7 +1137,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                   className="inline-flex items-center gap-2 text-[#80a4ed] hover:text-[#1e2749] font-medium"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  Open in Learning Hub
+                  {labels.linkText}
                 </a>
               </div>
             )}
@@ -1132,18 +1162,19 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
             <div className="border-t border-green-200 pt-4">
               <p className="font-medium text-green-800 mb-2">What&apos;s Next?</p>
               <ul className="text-sm text-green-700 space-y-1">
-                <li>• Share your course with your network</li>
-                <li>• Track your impact as educators take your course</li>
+                <li>• {labels.shareText}</li>
+                <li>• {labels.impactText}</li>
                 <li>• Have another idea? We&apos;d love to work with you again - reach out anytime!</li>
               </ul>
             </div>
 
             <p className="text-center text-green-700 font-medium">
-              Thank you for creating with TDI. You&apos;re officially part of the Learning Hub family!
+              Thank you for creating with TDI. You&apos;re officially part of the TDI family!
             </p>
           </div>
         </AdminPreviewWrapper>
       );
+    }
 
     case 'select':
       // Content path selection with visual cards and program overview
