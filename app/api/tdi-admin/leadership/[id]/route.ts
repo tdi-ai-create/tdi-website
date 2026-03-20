@@ -44,9 +44,15 @@ export async function GET(
       .eq('partnership_id', id)
       .order('sort_order')
 
+    // Enrich partnership with org_name like the list API does
+    const enrichedPartnership = {
+      ...partnership,
+      org_name: organization?.name || null,
+    }
+
     return NextResponse.json({
       success: true,
-      partnership,
+      partnership: enrichedPartnership,
       organization: organization || null,
       items: actionItems || [],
     })

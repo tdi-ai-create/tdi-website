@@ -304,7 +304,7 @@ export default function AdminPartnershipDetailPage() {
     )
   }
 
-  const schoolName = organization?.name || partnership.contact_name || 'School'
+  const schoolName = partnership.org_name || organization?.name || 'School'
   const phase = (partnership.contract_phase as 'IGNITE' | 'ACCELERATE' | 'SUSTAIN') || 'IGNITE'
   const observationsDone = timelineEvents.filter(
     (e) => e.event_type === 'observation' && e.status === 'completed'

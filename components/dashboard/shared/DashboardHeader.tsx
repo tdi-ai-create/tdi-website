@@ -31,34 +31,47 @@ export function DashboardHeader({
     >
       {/* Admin controls */}
       {isAdminView && (
-        <div className="flex items-center justify-between mb-4 relative z-10">
-          <span className="text-xs font-bold tracking-widest text-white/40 uppercase">
+        <div className="flex items-start justify-between mb-4 relative z-10">
+          <span className="text-xs font-bold tracking-widest text-white/40 uppercase pt-1">
             Admin View
           </span>
-          <div className="flex items-center gap-2">
-            {onEditToggle && (
-              <button
-                onClick={onEditToggle}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-                style={{
-                  background: editMode ? '#FFBA06' : 'rgba(255,255,255,0.1)',
-                  color: editMode ? '#1B2A4A' : '#fff',
-                }}
+          <div className="flex flex-col items-end gap-2">
+            {/* Row 1: Buttons */}
+            <div className="flex items-center gap-2">
+              {onEditToggle && (
+                <button
+                  onClick={onEditToggle}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                  style={{
+                    background: editMode ? '#FFBA06' : 'rgba(255,255,255,0.1)',
+                    color: editMode ? '#1B2A4A' : '#fff',
+                  }}
+                >
+                  {editMode ? '✓ Editing...' : '✎ Edit Data'}
+                </button>
+              )}
+              {legacyUrl && (
+                <a
+                  href={legacyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                  style={{ background: 'rgba(255,255,255,0.1)', color: '#fff' }}
+                >
+                  ↗ View Client Dashboard
+                </a>
+              )}
+            </div>
+            {/* Row 2: Phase badge */}
+            <div className="text-right">
+              <div className="text-xs text-white/40 mb-1">Status:</div>
+              <div
+                className="px-4 py-2 rounded-lg text-sm font-bold text-white"
+                style={{ background: phaseConfig.bg }}
               >
-                {editMode ? '✓ Editing...' : '✎ Edit Data'}
-              </button>
-            )}
-            {legacyUrl && (
-              <a
-                href={legacyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-                style={{ background: 'rgba(255,255,255,0.1)', color: '#fff' }}
-              >
-                ↗ View Client Dashboard
-              </a>
-            )}
+                {phaseConfig.label}
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -88,16 +101,18 @@ export function DashboardHeader({
         <p className="text-white/40 text-xs">Data updated {dataUpdatedAt}</p>
       )}
 
-      {/* Phase badge */}
-      <div className="absolute top-8 right-8 text-right z-0">
-        <div className="text-xs text-white/40 mb-1">Status:</div>
-        <div
-          className="px-4 py-2 rounded-lg text-sm font-bold text-white"
-          style={{ background: phaseConfig.bg }}
-        >
-          {phaseConfig.label}
+      {/* Phase badge - only show for non-admin view (admin view has inline badge) */}
+      {!isAdminView && (
+        <div className="absolute top-8 right-8 text-right z-0">
+          <div className="text-xs text-white/40 mb-1">Status:</div>
+          <div
+            className="px-4 py-2 rounded-lg text-sm font-bold text-white"
+            style={{ background: phaseConfig.bg }}
+          >
+            {phaseConfig.label}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

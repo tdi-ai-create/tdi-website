@@ -52,6 +52,8 @@ const theme = PORTAL_THEMES.creators;
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
 import { CourseDetailsPanel, getContentLabels } from '@/components/creator-portal/CourseDetailsPanel';
 import { NotesPanel } from '@/components/creator-portal/NotesPanel';
+import { NotePreview } from '@/components/creator-portal/NotePreview';
+import { NoteModal } from '@/components/creator-portal/NoteModal';
 import {
   getCreatorDashboardData,
   updateCreator,
@@ -193,6 +195,9 @@ export default function TDIAdminCreatorDetailPage() {
   const [revisionNote, setRevisionNote] = useState('');
   const [showRevisionModal, setShowRevisionModal] = useState(false);
   const [isRequestingRevision, setIsRequestingRevision] = useState(false);
+
+  // Expanded note modal state (for reading full notes)
+  const [expandedNote, setExpandedNote] = useState<CreatorNote | null>(null);
 
   // Previous projects state
   const [previousProjects, setPreviousProjects] = useState<Array<{
@@ -1719,7 +1724,7 @@ export default function TDIAdminCreatorDetailPage() {
               </form>
             )}
 
-            {/* Notes List */}
+            {/* Notes List - Truncated preview with "Read more" */}
             <div className="space-y-3 max-h-80 overflow-y-auto">
               {allNotes.length === 0 ? (
                 <p className="text-sm text-gray-500">No notes yet</p>
@@ -1727,11 +1732,15 @@ export default function TDIAdminCreatorDetailPage() {
                 allNotes.map((note) => (
                   <div
                     key={note.id}
-                    className={`p-3 rounded-lg text-sm ${
+                    className={`p-3 rounded-lg ${
                       note.visible_to_creator ? 'bg-gray-50' : 'bg-amber-50 border border-amber-200'
                     }`}
                   >
-                    <p className="text-gray-800">{note.content}</p>
+                    <NotePreview
+                      content={note.content}
+                      maxLines={3}
+                      onReadMore={() => setExpandedNote(note)}
+                    />
                     <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
                       <span>{note.author}</span>
                       <div className="flex items-center gap-2">
@@ -2214,6 +2223,17 @@ export default function TDIAdminCreatorDetailPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Note Read More Modal - Admin view (no reply button) */}
+      {expandedNote && (
+        <NoteModal
+          note={expandedNote}
+          creatorId={creatorId}
+          creatorName={creator?.name || ''}
+          onClose={() => setExpandedNote(null)}
+          showReplyButton={false}
+        />
       )}
     </div>
   );
