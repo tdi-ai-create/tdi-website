@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
 import Link from 'next/link'
-import { Plus, AlertTriangle, Clock, Calendar, FileCheck } from 'lucide-react'
+import { Plus, AlertTriangle, Clock, Calendar, FileCheck, TrendingDown } from 'lucide-react'
 
 // Types
 type AlertCard = {
@@ -24,6 +24,7 @@ type District = {
   notes: string | null
   intelligence_invoices?: Invoice[]
   intelligence_contracts?: Contract[]
+  service_sessions?: Session[]
 }
 
 type Invoice = {
@@ -37,7 +38,21 @@ type Invoice = {
 type Contract = {
   id: string
   renewal_deadline_date: string | null
+  end_date: string | null
   status: string
+  scope_json?: {
+    observation_days?: number
+    virtual_sessions?: number
+    executive_sessions?: number
+    love_notes?: number
+    keynotes?: number
+  }
+}
+
+type Session = {
+  id: string
+  session_type: string
+  session_date: string
 }
 
 type CollectionsWorkflow = {
@@ -72,7 +87,7 @@ export default function IntelligenceHubPage() {
   async function loadData() {
     setLoading(true)
 
-    // Fetch active districts with invoice + collections data
+    // Fetch active districts with invoice + collections + sessions data
     const { data: districtData } = await supabase
       .from('districts')
       .select(`
@@ -84,7 +99,10 @@ export default function IntelligenceHubPage() {
           )
         ),
         intelligence_contracts (
-          id, renewal_deadline_date, status
+          id, renewal_deadline_date, end_date, status, scope_json
+        ),
+        service_sessions (
+          id, session_type, session_date
         )
       `)
       .in('status', ['active', 'pilot'])
@@ -121,6 +139,30 @@ export default function IntelligenceHubPage() {
       c.current_stage === 'board_approval_pending'
     ).length
 
+    // Delivery at risk calculation
+    const deliveryAtRiskCount = (districtData ?? []).filter(d => {
+      const dContracts = d.intelligence_contracts ?? []
+      const dSessions = d.service_sessions ?? []
+      const activeContract = dContracts.find((c) => c.status === 'active')
+      if (!activeContract?.end_date) return false
+
+      const daysUntilEnd = (new Date(activeContract.end_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+      if (daysUntilEnd < 0 || daysUntilEnd > 90) return false // only flag if ending in 90 days
+
+      const scope = activeContract.scope_json ?? {}
+      const totalContracted =
+        (parseInt(String(scope.observation_days ?? 0))) +
+        (parseInt(String(scope.virtual_sessions ?? 0))) +
+        (parseInt(String(scope.executive_sessions ?? 0))) +
+        (parseInt(String(scope.love_notes ?? 0))) +
+        (parseInt(String(scope.keynotes ?? 0)))
+
+      if (totalContracted === 0) return false
+
+      const totalDelivered = dSessions.length
+      return (totalDelivered / totalContracted) < 0.5
+    }).length
+
     setAlerts([
       {
         label: 'Critical Collections',
@@ -154,6 +196,14 @@ export default function IntelligenceHubPage() {
         href: '/tdi-admin/intelligence/districts?filter=renewals',
         icon: <Calendar className="w-5 h-5 text-blue-500" />,
       },
+      {
+        label: 'Delivery at Risk',
+        value: deliveryAtRiskCount,
+        sub: 'contracts ending soon, <50% delivered',
+        color: 'bg-purple-50 border-purple-200',
+        href: '/tdi-admin/intelligence/districts?filter=active',
+        icon: <TrendingDown className="w-5 h-5 text-purple-500" />,
+      },
     ])
 
     setDistricts((districtData as unknown as District[]) ?? [])
@@ -174,7 +224,25 @@ export default function IntelligenceHubPage() {
       .filter((c) => c.renewal_deadline_date && c.status === 'active')
       .sort((a, b) => new Date(a.renewal_deadline_date!).getTime() - new Date(b.renewal_deadline_date!).getTime())[0]
       ?.renewal_deadline_date
-    return { topRisk, openInvoices, renewalDate }
+
+    // Delivery progress
+    const sessions = d.service_sessions ?? []
+    const activeContract = contracts.find((c) => c.status === 'active')
+    let deliveryPct: number | null = null
+    if (activeContract?.scope_json) {
+      const scope = activeContract.scope_json
+      const totalContracted =
+        (parseInt(String(scope.observation_days ?? 0))) +
+        (parseInt(String(scope.virtual_sessions ?? 0))) +
+        (parseInt(String(scope.executive_sessions ?? 0))) +
+        (parseInt(String(scope.love_notes ?? 0))) +
+        (parseInt(String(scope.keynotes ?? 0)))
+      if (totalContracted > 0) {
+        deliveryPct = Math.round((sessions.length / totalContracted) * 100)
+      }
+    }
+
+    return { topRisk, openInvoices, renewalDate, deliveryPct }
   }
 
   const riskBadge = (flag: string) => {
@@ -209,13 +277,13 @@ export default function IntelligenceHubPage() {
 
       {/* Alert Cards */}
       {loading ? (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          {[...Array(5)].map((_, i) => (
             <div key={i} className="h-28 bg-gray-100 rounded-xl animate-pulse" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {alerts.map((card) => (
             <Link
               key={card.label}
@@ -257,6 +325,7 @@ export default function IntelligenceHubPage() {
                   <th className="text-left px-5 py-3">District</th>
                   <th className="text-left px-3 py-3">Status</th>
                   <th className="text-left px-3 py-3">Collections</th>
+                  <th className="text-left px-3 py-3">Delivery</th>
                   <th className="text-left px-3 py-3">Renewal</th>
                 </tr>
               </thead>
@@ -287,6 +356,24 @@ export default function IntelligenceHubPage() {
                             <span className="text-xs text-gray-400">{meta.openInvoices} open</span>
                           )}
                         </div>
+                      </td>
+                      <td className="px-3 py-3">
+                        {meta.deliveryPct !== null ? (
+                          <div className="flex items-center gap-2">
+                            <div className="w-12 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full ${
+                                  meta.deliveryPct >= 100 ? 'bg-green-500' :
+                                  meta.deliveryPct >= 50 ? 'bg-amber-400' : 'bg-gray-300'
+                                }`}
+                                style={{ width: `${Math.min(100, meta.deliveryPct)}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-gray-500">{meta.deliveryPct}%</span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400">-</span>
+                        )}
                       </td>
                       <td className="px-3 py-3 text-xs text-gray-500">
                         {meta.renewalDate

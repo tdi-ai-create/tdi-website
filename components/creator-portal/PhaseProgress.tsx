@@ -22,6 +22,7 @@ import type { PhaseWithMilestones, MilestoneWithStatus, MilestoneStatus, Submiss
 import { MilestoneAction } from './MilestoneAction';
 import { RichContentAccordion } from './RichContentAccordion';
 import { MilestoneMeetingBanner } from './MilestoneMeetingBanner';
+import { getContextAwareMilestoneDescription } from '@/lib/creator-portal-data';
 
 // Helper to format submission data for display
 function formatSubmissionData(data: SubmissionData): { label: string; timestamp: string | null; sublabel?: string } | null {
@@ -261,7 +262,9 @@ function MilestoneItem({
               </span>
             </div>
             {milestone.description && (
-              <p className="text-sm text-gray-600 mt-1">{milestone.description}</p>
+              <p className="text-sm text-gray-600 mt-1">
+                {getContextAwareMilestoneDescription(milestone.id, creator?.content_path) || milestone.description}
+              </p>
             )}
             <p className="text-sm text-slate-600 mt-2">
               Our team is working on this -  we&apos;ll update your portal once complete.
@@ -356,30 +359,33 @@ function MilestoneItem({
                 </span>
               )}
             </div>
-            {milestone.description && (
-              <div className="mt-1">
-                {milestone.description.length > DESCRIPTION_CHAR_LIMIT ? (
-                  <>
-                    <p className="text-sm text-gray-600">
-                      {isDescriptionExpanded
-                        ? milestone.description
-                        : `${milestone.description.slice(0, DESCRIPTION_CHAR_LIMIT)}...`}
-                    </p>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsDescriptionExpanded(!isDescriptionExpanded);
-                      }}
-                      className="text-xs text-[#80a4ed] hover:text-[#1e2749] font-medium mt-1"
-                    >
-                      {isDescriptionExpanded ? 'Read less' : 'Read more'}
-                    </button>
-                  </>
-                ) : (
-                  <p className="text-sm text-gray-600">{milestone.description}</p>
-                )}
-              </div>
-            )}
+            {milestone.description && (() => {
+              const displayDescription = getContextAwareMilestoneDescription(milestone.id, creator?.content_path) || milestone.description;
+              return (
+                <div className="mt-1">
+                  {displayDescription.length > DESCRIPTION_CHAR_LIMIT ? (
+                    <>
+                      <p className="text-sm text-gray-600">
+                        {isDescriptionExpanded
+                          ? displayDescription
+                          : `${displayDescription.slice(0, DESCRIPTION_CHAR_LIMIT)}...`}
+                      </p>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsDescriptionExpanded(!isDescriptionExpanded);
+                        }}
+                        className="text-xs text-[#80a4ed] hover:text-[#1e2749] font-medium mt-1"
+                      >
+                        {isDescriptionExpanded ? 'Read less' : 'Read more'}
+                      </button>
+                    </>
+                  ) : (
+                    <p className="text-sm text-gray-600">{displayDescription}</p>
+                  )}
+                </div>
+              );
+            })()}
             {/* Show helper text for locked milestones */}
             {milestone.status === 'locked' && config.helper && (
               <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">

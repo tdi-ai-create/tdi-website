@@ -46,6 +46,7 @@ import {
   getCreatorDashboardData,
   updateCreator,
   getCreatorNotes,
+  getContextAwareMilestoneDescription,
 } from '@/lib/creator-portal-data';
 import { ProjectArchiveBanner } from '@/components/admin/ProjectArchiveBanner';
 import { AdminPastProjects } from '@/components/admin/AdminPastProjects';
@@ -1263,6 +1264,7 @@ export default function AdminCreatorDetailPage() {
                     phase={phase}
                     allPhases={phases}
                     isExpanded={expandedPhases.has(phase.id)}
+                    contentPath={creator.content_path}
                     onToggle={() => togglePhase(phase.id)}
                     onApprove={handleApprove}
                     onRequestRevision={handleRequestRevision}
@@ -2554,6 +2556,7 @@ function PhaseSection({
   phase,
   allPhases,
   isExpanded,
+  contentPath,
   onToggle,
   onApprove,
   onRequestRevision,
@@ -2569,6 +2572,7 @@ function PhaseSection({
   phase: PhaseWithMilestones;
   allPhases: PhaseWithMilestones[];
   isExpanded: boolean;
+  contentPath: string | null;
   onToggle: () => void;
   onApprove: (milestoneId: string, milestoneTitle: string) => void;
   onRequestRevision: (milestoneId: string, milestoneTitle: string) => void;
@@ -2689,6 +2693,7 @@ function PhaseSection({
                   milestone={milestone}
                   isOptional={isOptional}
                   isCurrentStep={currentStepId === milestone.id}
+                  contentPath={contentPath}
                   onApprove={() => onApprove(milestone.id, milestoneTitle)}
                   onRequestRevision={() => onRequestRevision(milestone.id, milestoneTitle)}
                   onReopen={() => onReopen(milestone.id, milestoneTitle)}
@@ -2712,6 +2717,7 @@ function MilestoneRow({
   milestone,
   isOptional,
   isCurrentStep,
+  contentPath,
   onApprove,
   onRequestRevision,
   onReopen,
@@ -2725,6 +2731,7 @@ function MilestoneRow({
   milestone: MilestoneWithStatus;
   isOptional: boolean;
   isCurrentStep: boolean;
+  contentPath: string | null;
   onApprove: () => void;
   onRequestRevision: () => void;
   onCompleteAction: () => void;
@@ -2750,8 +2757,11 @@ function MilestoneRow({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const m = milestone as any;
   const milestoneTitle = m.title || m.name || `Milestone ${milestone.id.slice(0, 8)}`;
-  const adminDescription = m.admin_description || m.description || null;
-  const creatorDescription = m.creator_description || null;
+  // Use context-aware description if available, fallback to default
+  const rawAdminDescription = m.admin_description || m.description || null;
+  const adminDescription = getContextAwareMilestoneDescription(milestone.id, contentPath) || rawAdminDescription;
+  const rawCreatorDescription = m.creator_description || null;
+  const creatorDescription = getContextAwareMilestoneDescription(milestone.id, contentPath) || rawCreatorDescription;
 
   const isLocked = milestone.status === 'locked';
   const isCompleted = milestone.status === 'completed';

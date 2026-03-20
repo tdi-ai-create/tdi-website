@@ -58,6 +58,7 @@ import {
   getCreatorDashboardData,
   updateCreator,
   getCreatorNotes,
+  getContextAwareMilestoneDescription,
 } from '@/lib/creator-portal-data';
 import type {
   CreatorDashboardData,
@@ -1012,7 +1013,9 @@ export default function TDIAdminCreatorDetailPage() {
                                 </span>
                               </div>
                               {milestone.description && (
-                                <p className="text-sm text-gray-500 mt-1">{milestone.description}</p>
+                                <p className="text-sm text-gray-500 mt-1">
+                                  {getContextAwareMilestoneDescription(milestone.id, creator.content_path) || milestone.description}
+                                </p>
                               )}
                             </div>
 

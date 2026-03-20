@@ -6,7 +6,7 @@ import { getSupabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { ChevronRight, Pencil, Plus, X, Check } from 'lucide-react'
 
-type Tab = 'overview' | 'contracts' | 'contacts'
+type Tab = 'overview' | 'contracts' | 'contacts' | 'delivery'
 
 type District = {
   id: string
@@ -19,6 +19,7 @@ type District = {
   intelligence_contracts?: Contract[]
   intelligence_invoices?: Invoice[]
   intelligence_tasks?: Task[]
+  service_sessions?: Session[]
 }
 
 type Contact = {
@@ -39,6 +40,14 @@ type Contract = {
   total_value: number | null
   renewal_deadline_date: string | null
   status: string
+  scope_json?: {
+    observation_days?: number
+    virtual_sessions?: number
+    executive_sessions?: number
+    love_notes?: number
+    keynotes?: number
+    notes?: string
+  }
 }
 
 type Invoice = {
@@ -75,13 +84,67 @@ type Task = {
   status: string
 }
 
+type Session = {
+  id: string
+  session_type: string
+  session_date: string
+  title: string | null
+  attendees_count: number | null
+  buildings_visited: string[] | null
+  notes: string | null
+}
+
+// ---- Delivery Helper Functions ----
+function getContractedTotals(contracts: Contract[]) {
+  const active = contracts.filter((c) => c.status === 'active')
+  let obs = 0, virtual = 0, exec = 0, loveNotes = 0, keynote = 0
+  active.forEach((c) => {
+    const s = c.scope_json ?? {}
+    obs += parseInt(String(s.observation_days ?? 0))
+    virtual += parseInt(String(s.virtual_sessions ?? 0))
+    exec += parseInt(String(s.executive_sessions ?? 0))
+    loveNotes += parseInt(String(s.love_notes ?? 0))
+    keynote += parseInt(String(s.keynotes ?? 0))
+  })
+  return { obs, virtual, exec, loveNotes, keynote }
+}
+
+function getDeliveredCounts(sessions: Session[]) {
+  const count = (type: string) => sessions.filter((s) => s.session_type === type).length
+  return {
+    obs: count('observation'),
+    virtual: count('virtual_session'),
+    exec: count('executive_impact'),
+    loveNotes: count('love_notes'),
+    keynote: count('keynote'),
+  }
+}
+
+function isDeliveryAtRisk(
+  contracted: ReturnType<typeof getContractedTotals>,
+  delivered: ReturnType<typeof getDeliveredCounts>,
+  contractEndDate?: string | null
+): boolean {
+  if (!contractEndDate) return false
+  const daysUntilEnd = (new Date(contractEndDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+  if (daysUntilEnd < 0) return false
+  const pctTimeLeft = daysUntilEnd / 365
+  const totalContracted = contracted.obs + contracted.virtual + contracted.exec + contracted.loveNotes + contracted.keynote
+  const totalDelivered = delivered.obs + delivered.virtual + delivered.exec + delivered.loveNotes + delivered.keynote
+  if (totalContracted === 0) return false
+  const deliveryPct = totalDelivered / totalContracted
+  return deliveryPct < 0.5 && pctTimeLeft < 0.3
+}
+
 // ---- Modal: Add Contract ----
 function AddContractModal({ districtId, onClose, onSaved }: { districtId: string, onClose: () => void, onSaved: () => void }) {
   const supabase = getSupabase()
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
     contract_name: '', start_date: '', end_date: '', total_value: '',
-    renewal_deadline_date: '', signed_doc_url: '', status: 'active', scope_notes: ''
+    renewal_deadline_date: '', signed_doc_url: '', status: 'active',
+    observation_days: '', virtual_sessions: '', executive_sessions: '',
+    love_notes: '', keynotes: '',
   })
 
   const inputClass = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
@@ -99,14 +162,20 @@ function AddContractModal({ districtId, onClose, onSaved }: { districtId: string
       renewal_deadline_date: form.renewal_deadline_date || null,
       signed_doc_url: form.signed_doc_url.trim() || null,
       status: form.status,
-      scope_json: form.scope_notes ? { notes: form.scope_notes } : {},
+      scope_json: {
+        observation_days: parseInt(form.observation_days) || 0,
+        virtual_sessions: parseInt(form.virtual_sessions) || 0,
+        executive_sessions: parseInt(form.executive_sessions) || 0,
+        love_notes: parseInt(form.love_notes) || 0,
+        keynotes: parseInt(form.keynotes) || 0,
+      },
     })
     onSaved()
   }
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900">Add Contract</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
@@ -134,7 +203,31 @@ function AddContractModal({ districtId, onClose, onSaved }: { districtId: string
         </div>
 
         <div><label className={labelClass}>Signed Doc URL</label><input className={inputClass} value={form.signed_doc_url} onChange={e => setForm(f => ({ ...f, signed_doc_url: e.target.value }))} placeholder="https://..." /></div>
-        <div><label className={labelClass}>Scope Notes</label><textarea className={inputClass} rows={2} value={form.scope_notes} onChange={e => setForm(f => ({ ...f, scope_notes: e.target.value }))} placeholder="Memberships, observation days, exec sessions..." /></div>
+
+        <div>
+          <p className={labelClass}>Contracted Deliverables</p>
+          <div className="grid grid-cols-2 gap-3 mt-1">
+            {[
+              { key: 'observation_days', label: 'Observation Days' },
+              { key: 'virtual_sessions', label: 'Virtual Sessions' },
+              { key: 'executive_sessions', label: 'Exec Impact Sessions' },
+              { key: 'love_notes', label: 'Love Notes' },
+              { key: 'keynotes', label: 'Keynotes' },
+            ].map(({ key, label }) => (
+              <div key={key}>
+                <label className={labelClass}>{label}</label>
+                <input
+                  type="number"
+                  className={inputClass}
+                  value={(form as Record<string, string>)[key] ?? ''}
+                  onChange={e => setForm((f) => ({ ...f, [key]: e.target.value }))}
+                  placeholder="0"
+                  min="0"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
 
         <div className="flex justify-end gap-3 pt-2">
           <button onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700 px-4 py-2">Cancel</button>
@@ -184,7 +277,6 @@ function AddInvoiceModal({ districtId, contracts, onClose, onSaved }: { district
       }
     }).select().single()
 
-    // Auto-create collections_workflow entry
     if (invoice) {
       await supabase.from('collections_workflow').insert({
         invoice_id: invoice.id,
@@ -257,6 +349,131 @@ function AddInvoiceModal({ districtId, contracts, onClose, onSaved }: { district
           <button onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700 px-4 py-2">Cancel</button>
           <button onClick={handleSave} disabled={saving || !form.invoice_number.trim()} className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-lg">
             {saving ? 'Saving...' : 'Save Invoice'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ---- Modal: Log Session ----
+function LogSessionModal({ districtId, contracts, onClose, onSaved }: {
+  districtId: string
+  contracts: Contract[]
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const supabase = getSupabase()
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({
+    session_type: 'observation',
+    session_date: new Date().toISOString().split('T')[0],
+    title: '',
+    contract_id: '',
+    attendees_count: '',
+    buildings_visited: '',
+    notes: '',
+  })
+
+  const inputClass = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+  const labelClass = "block text-xs font-medium text-gray-600 mb-1"
+
+  const sessionTypeLabels: Record<string, string> = {
+    observation: 'In-Person Observation Day',
+    virtual_session: 'Virtual Session',
+    executive_impact: 'Executive Impact Session',
+    love_notes: 'Love Notes',
+    keynote: 'Keynote',
+    custom: 'Custom',
+  }
+
+  async function handleSave() {
+    if (!form.session_date) return
+    setSaving(true)
+
+    const buildings = form.buildings_visited
+      .split(',')
+      .map(b => b.trim())
+      .filter(Boolean)
+
+    await supabase.from('service_sessions').insert({
+      district_id: districtId,
+      contract_id: form.contract_id || null,
+      session_type: form.session_type,
+      session_date: form.session_date,
+      title: form.title.trim() || sessionTypeLabels[form.session_type],
+      attendees_count: form.attendees_count ? parseInt(form.attendees_count) : null,
+      buildings_visited: buildings.length > 0 ? buildings : null,
+      notes: form.notes.trim() || null,
+    })
+
+    onSaved()
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-900">Log Service Session</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div>
+          <label className={labelClass}>Session Type</label>
+          <select className={inputClass} value={form.session_type} onChange={e => setForm(f => ({ ...f, session_type: e.target.value }))}>
+            <option value="observation">In-Person Observation Day</option>
+            <option value="virtual_session">Virtual Session</option>
+            <option value="executive_impact">Executive Impact Session</option>
+            <option value="love_notes">Love Notes</option>
+            <option value="keynote">Keynote</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className={labelClass}>Date</label>
+            <input type="date" className={inputClass} value={form.session_date} onChange={e => setForm(f => ({ ...f, session_date: e.target.value }))} />
+          </div>
+          <div>
+            <label className={labelClass}>Attendees</label>
+            <input type="number" className={inputClass} value={form.attendees_count} onChange={e => setForm(f => ({ ...f, attendees_count: e.target.value }))} placeholder="0" />
+          </div>
+        </div>
+
+        <div>
+          <label className={labelClass}>Title (optional - auto-fills if blank)</label>
+          <input className={inputClass} value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="e.g. Observation Day 1 - Building A" />
+        </div>
+
+        <div>
+          <label className={labelClass}>Contract (optional)</label>
+          <select className={inputClass} value={form.contract_id} onChange={e => setForm(f => ({ ...f, contract_id: e.target.value }))}>
+            <option value="">No contract linked</option>
+            {contracts.map((c) => <option key={c.id} value={c.id}>{c.contract_name}</option>)}
+          </select>
+        </div>
+
+        <div>
+          <label className={labelClass}>Buildings Visited (comma-separated)</label>
+          <input className={inputClass} value={form.buildings_visited} onChange={e => setForm(f => ({ ...f, buildings_visited: e.target.value }))} placeholder="e.g. Lincoln Elementary, Jefferson Middle" />
+        </div>
+
+        <div>
+          <label className={labelClass}>Notes</label>
+          <textarea className={inputClass} rows={3} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} placeholder="Key observations, highlights, follow-ups needed..." />
+        </div>
+
+        <div className="flex justify-end gap-3 pt-2">
+          <button onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700 px-4 py-2">Cancel</button>
+          <button
+            onClick={handleSave}
+            disabled={saving || !form.session_date}
+            className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-lg"
+          >
+            {saving ? 'Saving...' : 'Log Session'}
           </button>
         </div>
       </div>
@@ -419,6 +636,7 @@ export default function DistrictDetailPage() {
   const [tab, setTab] = useState<Tab>('overview')
   const [showAddContract, setShowAddContract] = useState(false)
   const [showAddInvoice, setShowAddInvoice] = useState(false)
+  const [showLogSession, setShowLogSession] = useState(false)
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [addingTask, setAddingTask] = useState(false)
 
@@ -437,7 +655,8 @@ export default function DistrictDetailPage() {
           collections_workflow(*),
           payment_events(*)
         ),
-        intelligence_tasks(*)
+        intelligence_tasks(*),
+        service_sessions(*)
       `)
       .eq('id', id)
       .single()
@@ -475,11 +694,20 @@ export default function DistrictDetailPage() {
   const contacts = district.district_contacts ?? []
   const tasks = district.intelligence_tasks ?? []
   const openTasks = tasks.filter((t) => t.status !== 'done')
+  const sessions = (district.service_sessions ?? []).sort((a, b) =>
+    new Date(b.session_date).getTime() - new Date(a.session_date).getTime()
+  )
+  const contracted = getContractedTotals(contracts)
+  const delivered = getDeliveredCounts(sessions)
+  const activeContract = contracts.find((c) => c.status === 'active')
+  const deliveryAtRisk = isDeliveryAtRisk(contracted, delivered, activeContract?.end_date)
+  const totalContracted = contracted.obs + contracted.virtual + contracted.exec + contracted.loveNotes + contracted.keynote
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'overview', label: 'Overview' },
     { key: 'contracts', label: `Contracts + Invoices (${invoices.length})` },
     { key: 'contacts', label: `Contacts (${contacts.length})` },
+    { key: 'delivery', label: `Delivery (${sessions.length})` },
   ]
 
   return (
@@ -499,6 +727,15 @@ export default function DistrictDetailPage() {
           contracts={contracts}
           onClose={() => setShowAddInvoice(false)}
           onSaved={() => { setShowAddInvoice(false); loadDistrict() }}
+        />
+      )}
+
+      {showLogSession && (
+        <LogSessionModal
+          districtId={id}
+          contracts={contracts}
+          onClose={() => setShowLogSession(false)}
+          onSaved={() => { setShowLogSession(false); loadDistrict() }}
         />
       )}
 
@@ -578,6 +815,60 @@ export default function DistrictDetailPage() {
             <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 text-sm text-gray-700">
               <p className="font-semibold text-amber-800 mb-1">Notes</p>
               <p>{district.notes}</p>
+            </div>
+          )}
+
+          {/* Delivery Summary */}
+          {totalContracted > 0 && (
+            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h3 className="font-semibold text-gray-800">Delivery Progress</h3>
+                <div className="flex items-center gap-3">
+                  {deliveryAtRisk && (
+                    <span className="text-xs font-semibold text-orange-700 bg-orange-100 px-2 py-0.5 rounded-full">At Risk</span>
+                  )}
+                  <button
+                    onClick={() => setShowLogSession(true)}
+                    className="inline-flex items-center gap-1 text-xs text-amber-600 hover:underline"
+                  >
+                    <Plus className="w-3 h-3" />
+                    Log Session
+                  </button>
+                </div>
+              </div>
+              <div className="px-5 py-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {[
+                    { label: 'Observation Days', delivered: delivered.obs, contracted: contracted.obs },
+                    { label: 'Virtual Sessions', delivered: delivered.virtual, contracted: contracted.virtual },
+                    { label: 'Exec Impact Sessions', delivered: delivered.exec, contracted: contracted.exec },
+                    { label: 'Love Notes', delivered: delivered.loveNotes, contracted: contracted.loveNotes },
+                    { label: 'Keynotes', delivered: delivered.keynote, contracted: contracted.keynote },
+                  ].filter(row => row.contracted > 0).map(row => (
+                    <div key={row.label} className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-xs text-gray-500 mb-1">{row.label}</p>
+                      <p className="text-lg font-bold text-gray-900">
+                        {row.delivered}
+                        <span className="text-sm font-normal text-gray-400"> / {row.contracted}</span>
+                      </p>
+                      <div className="mt-1.5 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${
+                            row.delivered >= row.contracted ? 'bg-green-500' :
+                            row.delivered / row.contracted >= 0.5 ? 'bg-amber-400' : 'bg-gray-300'
+                          }`}
+                          style={{ width: `${Math.min(100, (row.delivered / row.contracted) * 100)}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {sessions.length > 0 && (
+                  <p className="text-xs text-gray-400 mt-3">
+                    Last session: {new Date(sessions[0].session_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} - {sessions[0].title}
+                  </p>
+                )}
+              </div>
             </div>
           )}
 
@@ -754,7 +1045,6 @@ export default function DistrictDetailPage() {
                         </div>
                       </div>
 
-                      {/* Collections stage */}
                       {cw && (
                         <div className="mt-2 text-xs text-gray-500 flex flex-wrap gap-4">
                           <span>Stage: <span className="font-medium text-gray-700">{cw.current_stage?.replace(/_/g, ' ')}</span></span>
@@ -764,10 +1054,8 @@ export default function DistrictDetailPage() {
                         </div>
                       )}
 
-                      {/* Edit collections workflow */}
                       {cw && <EditCollectionsWorkflow workflow={cw} onSaved={loadDistrict} />}
 
-                      {/* Payment events timeline (last 5) */}
                       {events.length > 0 && (
                         <div className="mt-3 space-y-1.5 border-l-2 border-amber-200 pl-3">
                           {events.slice(0, 5).map((e) => (
@@ -785,7 +1073,6 @@ export default function DistrictDetailPage() {
                         </div>
                       )}
 
-                      {/* Log event */}
                       <LogEventPanel invoiceId={inv.id} onSaved={loadDistrict} />
                     </div>
                   )
@@ -830,6 +1117,126 @@ export default function DistrictDetailPage() {
               ))}
             </ul>
           )}
+        </div>
+      )}
+
+      {/* Tab: Delivery */}
+      {tab === 'delivery' && (
+        <div className="space-y-6">
+
+          {/* Contracted vs Delivered summary */}
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="font-semibold text-gray-800">Contracted vs. Delivered</h3>
+              <button
+                onClick={() => setShowLogSession(true)}
+                className="text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg"
+              >
+                + Log Session
+              </button>
+            </div>
+            <div className="px-5 py-4">
+              {totalContracted === 0 ? (
+                <p className="text-sm text-gray-400">No contracted sessions found. Add scope details to a contract to see delivery tracking.</p>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {[
+                    { label: 'Observation Days', delivered: delivered.obs, contracted: contracted.obs, key: 'observation' },
+                    { label: 'Virtual Sessions', delivered: delivered.virtual, contracted: contracted.virtual, key: 'virtual_session' },
+                    { label: 'Exec Impact Sessions', delivered: delivered.exec, contracted: contracted.exec, key: 'executive_impact' },
+                    { label: 'Love Notes', delivered: delivered.loveNotes, contracted: contracted.loveNotes, key: 'love_notes' },
+                    { label: 'Keynotes', delivered: delivered.keynote, contracted: contracted.keynote, key: 'keynote' },
+                  ].filter(row => row.contracted > 0).map(row => {
+                    const pct = row.contracted > 0 ? Math.min(100, (row.delivered / row.contracted) * 100) : 0
+                    const complete = row.delivered >= row.contracted
+                    return (
+                      <div key={row.label} className={`rounded-xl p-4 border ${complete ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200'}`}>
+                        <p className="text-xs font-medium text-gray-500 mb-2">{row.label}</p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          {row.delivered}
+                          <span className="text-base font-normal text-gray-400"> / {row.contracted}</span>
+                        </p>
+                        <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${complete ? 'bg-green-500' : pct >= 50 ? 'bg-amber-400' : 'bg-gray-300'}`}
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                        {complete && <p className="text-xs text-green-600 font-medium mt-1">Complete</p>}
+                        {!complete && row.contracted - row.delivered > 0 && (
+                          <p className="text-xs text-gray-400 mt-1">{row.contracted - row.delivered} remaining</p>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Session Log */}
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="font-semibold text-gray-800">Session Log</h3>
+              <span className="text-xs text-gray-400">{sessions.length} sessions</span>
+            </div>
+            {sessions.length === 0 ? (
+              <div className="p-8 text-center">
+                <p className="text-sm text-gray-400">No sessions logged yet.</p>
+                <button
+                  onClick={() => setShowLogSession(true)}
+                  className="text-sm text-amber-600 hover:underline mt-2 inline-block"
+                >
+                  Log your first session
+                </button>
+              </div>
+            ) : (
+              <ul className="divide-y divide-gray-100">
+                {sessions.map((s) => {
+                  const typeColors: Record<string, string> = {
+                    observation: 'bg-blue-100 text-blue-700',
+                    virtual_session: 'bg-purple-100 text-purple-700',
+                    executive_impact: 'bg-green-100 text-green-700',
+                    love_notes: 'bg-pink-100 text-pink-700',
+                    keynote: 'bg-orange-100 text-orange-700',
+                    custom: 'bg-gray-100 text-gray-600',
+                  }
+                  const typeLabels: Record<string, string> = {
+                    observation: 'Observation',
+                    virtual_session: 'Virtual',
+                    executive_impact: 'Exec Impact',
+                    love_notes: 'Love Notes',
+                    keynote: 'Keynote',
+                    custom: 'Custom',
+                  }
+                  return (
+                    <li key={s.id} className="px-5 py-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${typeColors[s.session_type] ?? 'bg-gray-100 text-gray-600'}`}>
+                              {typeLabels[s.session_type] ?? s.session_type}
+                            </span>
+                            <p className="text-sm font-medium text-gray-900">{s.title}</p>
+                          </div>
+                          {s.notes && <p className="text-xs text-gray-500 mt-1">{s.notes}</p>}
+                          {s.buildings_visited && s.buildings_visited.length > 0 && (
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              Buildings: {s.buildings_visited.join(', ')}
+                            </p>
+                          )}
+                        </div>
+                        <div className="text-right text-xs text-gray-500 shrink-0">
+                          <p className="font-medium">{new Date(s.session_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                          {s.attendees_count != null && <p className="text-gray-400">{s.attendees_count} attendees</p>}
+                        </div>
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+          </div>
         </div>
       )}
     </div>
