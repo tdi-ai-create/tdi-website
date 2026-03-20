@@ -226,6 +226,8 @@ export async function updateCreator(
 ): Promise<Creator | null> {
   const serviceSupabase = getServiceSupabase();
 
+  console.log('[updateCreator] Updating creator:', id, 'with data:', data);
+
   const { data: creator, error } = await serviceSupabase
     .from('creators')
     .update({
@@ -237,8 +239,8 @@ export async function updateCreator(
     .single();
 
   if (error) {
-    console.error('Error updating creator:', error);
-    return null;
+    console.error('[updateCreator] Supabase error:', error.message, error.details, error.hint);
+    throw new Error(`Database error: ${error.message}`);
   }
   return creator;
 }

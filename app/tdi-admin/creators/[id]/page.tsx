@@ -352,6 +352,7 @@ export default function TDIAdminCreatorDetailPage() {
     setIsSaving(true);
     setSaveDetailsError(null);
     try {
+      console.log('[handleSaveDetails] Saving:', editedDetails);
       const result = await updateCreator(creatorId, editedDetails);
       if (!result) {
         setSaveDetailsError('Failed to save details. Please try again.');
@@ -362,8 +363,9 @@ export default function TDIAdminCreatorDetailPage() {
       setSuccessMessage('Details saved successfully!');
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (error) {
-      console.error('Error saving details:', error);
-      setSaveDetailsError('An unexpected error occurred. Please try again.');
+      console.error('[handleSaveDetails] Error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      setSaveDetailsError(errorMessage);
     } finally {
       setIsSaving(false);
     }
@@ -1215,13 +1217,47 @@ export default function TDIAdminCreatorDetailPage() {
                 </div>
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">{getContentLabels(editedDetails.content_path).launchLabel}</label>
-                  <input
-                    type="text"
-                    value={editedDetails.target_launch_month}
-                    onChange={(e) => setEditedDetails({ ...editedDetails, target_launch_month: e.target.value })}
-                    placeholder="e.g., March 2026"
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                  />
+                  <div className="flex gap-2">
+                    <select
+                      value={editedDetails.target_launch_month?.split(' ')[0] || ''}
+                      onChange={(e) => {
+                        const currentYear = editedDetails.target_launch_month?.split(' ')[1] || new Date().getFullYear().toString();
+                        const newValue = e.target.value ? `${e.target.value} ${currentYear}` : '';
+                        setEditedDetails({ ...editedDetails, target_launch_month: newValue });
+                      }}
+                      className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
+                    >
+                      <option value="">Month</option>
+                      <option value="January">January</option>
+                      <option value="February">February</option>
+                      <option value="March">March</option>
+                      <option value="April">April</option>
+                      <option value="May">May</option>
+                      <option value="June">June</option>
+                      <option value="July">July</option>
+                      <option value="August">August</option>
+                      <option value="September">September</option>
+                      <option value="October">October</option>
+                      <option value="November">November</option>
+                      <option value="December">December</option>
+                    </select>
+                    <select
+                      value={editedDetails.target_launch_month?.split(' ')[1] || ''}
+                      onChange={(e) => {
+                        const currentMonth = editedDetails.target_launch_month?.split(' ')[0] || '';
+                        const newValue = e.target.value ? `${currentMonth || 'January'} ${e.target.value}` : '';
+                        setEditedDetails({ ...editedDetails, target_launch_month: newValue });
+                      }}
+                      className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
+                    >
+                      <option value="">Year</option>
+                      <option value="2025">2025</option>
+                      <option value="2026">2026</option>
+                      <option value="2027">2027</option>
+                      <option value="2028">2028</option>
+                      <option value="2029">2029</option>
+                    </select>
+                  </div>
                 </div>
                 {saveDetailsError && (
                   <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
