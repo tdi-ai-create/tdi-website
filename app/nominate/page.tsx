@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import {
   MapPin,
   Users,
@@ -184,10 +185,22 @@ interface FormErrors {
 }
 
 export default function NominatePage() {
+  // Query params for pre-selection
+  const searchParams = useSearchParams();
+
   const [openAccordion, setOpenAccordion] = useState<number | null>(null);
   const [isPartner, setIsPartner] = useState<boolean | null>(null);
   const [role, setRole] = useState<'leader' | 'teacher' | null>(null);
   const [track, setTrack] = useState<Track>(null);
+
+  // Handle track=non-partner query param from /get-started
+  useEffect(() => {
+    const trackParam = searchParams.get('track');
+    if (trackParam === 'non-partner') {
+      setIsPartner(false);
+    }
+  }, [searchParams]);
+
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
