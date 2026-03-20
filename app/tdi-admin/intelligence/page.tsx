@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { Plus, AlertTriangle, Clock, Calendar, FileCheck, TrendingDown } from 'lucide-react'
+import { calculateRenewalHealth, renewalHealthBadge } from '@/lib/tdi-admin/renewal-health'
 
 // Types
 type AlertCard = {
@@ -13,6 +14,12 @@ type AlertCard = {
   color: string
   href: string
   icon: React.ReactNode
+}
+
+type DistrictTask = {
+  id: string
+  status: string
+  due_date: string | null
 }
 
 type District = {
@@ -25,6 +32,7 @@ type District = {
   intelligence_invoices?: Invoice[]
   intelligence_contracts?: Contract[]
   service_sessions?: Session[]
+  intelligence_tasks?: DistrictTask[]
 }
 
 type Invoice = {
@@ -87,7 +95,7 @@ export default function IntelligenceHubPage() {
   async function loadData() {
     setLoading(true)
 
-    // Fetch active districts with invoice + collections + sessions data
+    // Fetch active districts with invoice + collections + sessions + tasks data
     const { data: districtData } = await supabase
       .from('districts')
       .select(`
@@ -102,7 +110,10 @@ export default function IntelligenceHubPage() {
           id, renewal_deadline_date, end_date, status, scope_json
         ),
         service_sessions (
-          id, session_type, session_date
+          id, session_type, session_date, title
+        ),
+        intelligence_tasks (
+          id, status, due_date
         )
       `)
       .in('status', ['active', 'pilot'])

@@ -1225,7 +1225,7 @@ export default function TDIAdminCreatorDetailPage() {
                         const newValue = e.target.value ? `${e.target.value} ${currentYear}` : '';
                         setEditedDetails({ ...editedDetails, target_launch_month: newValue });
                       }}
-                      className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
+                      className="flex-1 min-w-[120px] px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
                     >
                       <option value="">Month</option>
                       <option value="January">January</option>
@@ -1248,7 +1248,7 @@ export default function TDIAdminCreatorDetailPage() {
                         const newValue = e.target.value ? `${currentMonth || 'January'} ${e.target.value}` : '';
                         setEditedDetails({ ...editedDetails, target_launch_month: newValue });
                       }}
-                      className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
+                      className="flex-1 min-w-[120px] px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
                     >
                       <option value="">Year</option>
                       <option value="2025">2025</option>

@@ -80,6 +80,7 @@ interface Partnership {
   virtual_sessions_completed: number;
   executive_sessions_total: number;
   status: string;
+  org_name?: string | null;
 }
 
 interface Organization {
@@ -1110,7 +1111,7 @@ export default function PartnerDashboard() {
         <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
           <div>
             <h1 className="text-2xl md:text-4xl font-bold">
-              {organization?.name || partnership.contact_name}
+              {partnership?.org_name || organization?.name || 'Your School'}
             </h1>
             <p className="text-white/70 text-xs md:text-sm mt-1">
               {organization?.address_city}, {organization?.address_state} |{' '}
@@ -1197,27 +1198,27 @@ export default function PartnerDashboard() {
                 </div>
               </div>
 
-              {/* Observations */}
-              <div
-                onClick={() => navigateToTab('blueprint', 'contract-deliverables')}
-                className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md hover:border-[#80a4ed] transition-all group"
-              >
-                <div className="p-3 md:p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <Eye className="w-4 h-4 text-[#38618C]" />
-                        <span className="text-xs text-gray-500 uppercase">Observations</span>
+              {/* Observations - only show if partnership has observation days */}
+              {(partnership.observation_days_total ?? 0) > 0 && (
+                <div
+                  onClick={() => navigateToTab('blueprint', 'contract-deliverables')}
+                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md hover:border-[#80a4ed] transition-all group"
+                >
+                  <div className="p-3 md:p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <Eye className="w-4 h-4 text-[#38618C]" />
+                          <span className="text-xs text-gray-500 uppercase">Observations</span>
+                        </div>
+                        <div className="stat-number text-[#1e2749]">
+                          {partnership.observation_days_completed ?? 0}
+                          <span className="text-lg font-normal text-gray-400">
+                            /{partnership.observation_days_total ?? 0}
+                          </span>
+                        </div>
                       </div>
-                      <div className="stat-number text-[#1e2749]">
-                        {partnership.observation_days_completed ?? 0}
-                        <span className="text-lg font-normal text-gray-400">
-                          /{partnership.observation_days_total ?? 0}
-                        </span>
-                      </div>
-                    </div>
-                    {/* Mini progress bar */}
-                    {partnership.observation_days_total > 0 && (
+                      {/* Mini progress bar */}
                       <div className="w-16 hidden sm:block">
                         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div
@@ -1229,16 +1230,16 @@ export default function PartnerDashboard() {
                           {Math.round(((partnership.observation_days_completed ?? 0) / (partnership.observation_days_total || 1)) * 100)}%
                         </p>
                       </div>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between mt-1">
-                    <div className="text-xs font-medium" style={{ color: getObservationColor() }}>
-                      {getObservationText()}
                     </div>
-                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#80a4ed] transition-colors opacity-0 group-hover:opacity-100" />
+                    <div className="flex items-center justify-between mt-1">
+                      <div className="text-xs font-medium" style={{ color: getObservationColor() }}>
+                        {getObservationText()}
+                      </div>
+                      <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#80a4ed] transition-colors opacity-0 group-hover:opacity-100" />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Needs Attention */}
               <div
@@ -2610,7 +2611,7 @@ export default function PartnerDashboard() {
 
         {/* BILLING TAB */}
         {activeTab === 'billing' && (
-          <BillingTab partnership={partnership} schoolName={organization?.name || partnership?.contact_name || 'Your School'} />
+          <BillingTab partnership={partnership} schoolName={partnership?.org_name || organization?.name || 'Your School'} />
         )}
 
         {/* BLUEPRINT TAB */}
@@ -3984,7 +3985,7 @@ export default function PartnerDashboard() {
             {partnerSlug === 'roosevelt-school' && (
               <PilotNextYearTab
                 partnership={partnership}
-                schoolName={organization?.name || 'Roosevelt School'}
+                schoolName={partnership?.org_name || organization?.name || 'Roosevelt School'}
               />
             )}
 
@@ -4057,7 +4058,7 @@ export default function PartnerDashboard() {
                   {/* Headline */}
                   <div className="bg-white rounded-2xl p-4 md:p-8 shadow-sm border border-gray-100 text-center">
                     <h1 className="text-base md:text-lg font-bold text-gray-900 mb-2">
-                      Your Growth Plan: Building on {organization?.name || 'Your'}&apos;s Momentum
+                      Your Growth Plan: Building on {partnership?.org_name || organization?.name || 'Your'}&apos;s Momentum
                     </h1>
                     <p className="text-sm md:text-base text-gray-600">
                       {partnership?.partnership_type === 'district'
@@ -4284,7 +4285,7 @@ export default function PartnerDashboard() {
       {/* Dashboard Footer - Clean and minimal */}
       <footer className="text-center py-6 border-t border-gray-200 bg-white mt-8">
         <p className="text-sm text-gray-400">
-          Teachers Deserve It | Partner Dashboard for {organization?.name || partnership?.contact_name || 'Your School'}
+          Teachers Deserve It | Partner Dashboard for {partnership?.org_name || organization?.name || 'Your School'}
         </p>
         <a
           href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"

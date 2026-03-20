@@ -59,6 +59,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get organization name to enrich partnership
+    const { data: organization } = await supabase
+      .from('organizations')
+      .select('name')
+      .eq('partnership_id', partnership.id)
+      .maybeSingle();
+
+    // Enrich partnership with org_name
+    const enrichedPartnership = {
+      ...partnership,
+      org_name: organization?.name || null,
+    };
+
     // Check authorization
     const isAdmin = userEmail ? isTDIAdmin(userEmail) : false;
 
@@ -81,7 +94,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      partnership,
+      partnership: enrichedPartnership,
     });
   } catch (error) {
     console.error('Error in auth-check:', error);

@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { getSupabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { ChevronRight, Pencil, Plus, X, Check } from 'lucide-react'
+import { calculateRenewalHealth } from '@/lib/tdi-admin/renewal-health'
 
 type Tab = 'overview' | 'contracts' | 'contacts' | 'delivery'
 
@@ -703,6 +704,13 @@ export default function DistrictDetailPage() {
   const deliveryAtRisk = isDeliveryAtRisk(contracted, delivered, activeContract?.end_date)
   const totalContracted = contracted.obs + contracted.virtual + contracted.exec + contracted.loveNotes + contracted.keynote
 
+  const renewalHealth = calculateRenewalHealth({
+    contracts,
+    sessions,
+    invoices,
+    tasks,
+  })
+
   const tabs: { key: Tab; label: string }[] = [
     { key: 'overview', label: 'Overview' },
     { key: 'contracts', label: `Contracts + Invoices (${invoices.length})` },
@@ -817,6 +825,74 @@ export default function DistrictDetailPage() {
               <p>{district.notes}</p>
             </div>
           )}
+
+          {/* Renewal Health Score */}
+          <div className={`border rounded-xl overflow-hidden ${renewalHealth.border}`}>
+            <div className={`px-5 py-4 ${renewalHealth.bg} border-b ${renewalHealth.border}`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-gray-800">Renewal Health</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">Composite score across delivery, collections, timeline, and tasks</p>
+                </div>
+                <div className="text-right">
+                  <p className={`text-3xl font-bold ${renewalHealth.color}`}>{renewalHealth.score}</p>
+                  <p className={`text-sm font-semibold ${renewalHealth.color}`}>{renewalHealth.label}</p>
+                </div>
+              </div>
+
+              {/* Progress bar */}
+              <div className="mt-3 h-2 bg-white/60 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    renewalHealth.tier === 'strong' ? 'bg-green-500' :
+                    renewalHealth.tier === 'watch' ? 'bg-amber-400' :
+                    renewalHealth.tier === 'at_risk' ? 'bg-orange-500' : 'bg-red-500'
+                  }`}
+                  style={{ width: `${renewalHealth.score}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Signal breakdown */}
+            <div className="px-5 py-4 bg-white space-y-2">
+              {renewalHealth.signals.map(signal => (
+                <div key={signal.label} className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                      signal.status === 'good' ? 'bg-green-400' :
+                      signal.status === 'warn' ? 'bg-amber-400' :
+                      signal.status === 'bad' ? 'bg-red-400' : 'bg-gray-300'
+                    }`} />
+                    <span className="text-gray-600">{signal.label}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-400 hidden sm:block">{signal.detail}</span>
+                    <span className={`text-xs font-semibold ${
+                      signal.score === signal.max ? 'text-green-600' :
+                      signal.score > 0 ? 'text-amber-600' : 'text-red-500'
+                    }`}>
+                      {signal.score}/{signal.max}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Playbook */}
+            {renewalHealth.playbook.length > 0 && (
+              <div className="px-5 py-4 bg-gray-50 border-t border-gray-100">
+                <p className="text-xs font-semibold text-gray-600 mb-2">Recommended Next Steps</p>
+                <ul className="space-y-1">
+                  {renewalHealth.playbook.map((action, i) => (
+                    <li key={i} className="text-xs text-gray-600 flex items-start gap-2">
+                      <span className="text-amber-500 mt-0.5 flex-shrink-0">→</span>
+                      {action}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
 
           {/* Delivery Summary */}
           {totalContracted > 0 && (
