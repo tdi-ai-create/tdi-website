@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -184,7 +184,7 @@ interface FormErrors {
   relationship?: string;
 }
 
-export default function NominatePage() {
+function NominatePageInner() {
   // Query params for pre-selection
   const searchParams = useSearchParams();
 
@@ -929,5 +929,13 @@ export default function NominatePage() {
         <button onClick={scrollToForm} className="w-full py-3 rounded-full font-semibold shadow-lg transition-all hover:scale-[1.02]" style={{ backgroundColor: '#2B8C96', color: '#ffffff' }}>Nominate a School</button>
       </div>
     </main>
+  );
+}
+
+export default function NominatePage() {
+  return (
+    <Suspense>
+      <NominatePageInner />
+    </Suspense>
   );
 }
