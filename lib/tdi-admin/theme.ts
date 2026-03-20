@@ -3,7 +3,7 @@
  * Approved color system for portal section identities
  */
 
-export type PortalSection = 'hub' | 'creators' | 'leadership' | 'team';
+export type PortalSection = 'hub' | 'creators' | 'leadership' | 'team' | 'intelligence';
 
 export interface PortalTheme {
   accent:      string;  // primary color used for highlights, buttons, etc.
@@ -47,6 +47,14 @@ export const PORTAL_THEMES: Record<PortalSection, PortalTheme> = {
     name:        'Team Resources',
     section:     'team',
   },
+  intelligence: {
+    accent:      '#F59E0B',
+    accentLight: '#FEF3C7',
+    accentDark:  '#B45309',
+    label:       'INTEL',
+    name:        'Intelligence Hub',
+    section:     'intelligence',
+  },
 };
 
 /**
@@ -64,6 +72,9 @@ export function getPortalTheme(pathname: string): PortalTheme {
   }
   if (pathname.includes('/tdi-admin/team')) {
     return PORTAL_THEMES.team;
+  }
+  if (pathname.includes('/tdi-admin/intelligence')) {
+    return PORTAL_THEMES.intelligence;
   }
   // Default to hub theme
   return PORTAL_THEMES.hub;
