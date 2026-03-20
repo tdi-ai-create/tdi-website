@@ -31,7 +31,7 @@ export function DashboardHeader({
     >
       {/* Admin controls */}
       {isAdminView && (
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 relative z-10">
           <span className="text-xs font-bold tracking-widest text-white/40 uppercase">
             Admin View
           </span>
@@ -89,7 +89,7 @@ export function DashboardHeader({
       )}
 
       {/* Phase badge */}
-      <div className="absolute top-8 right-8 text-right">
+      <div className="absolute top-8 right-8 text-right z-0">
         <div className="text-xs text-white/40 mb-1">Status:</div>
         <div
           className="px-4 py-2 rounded-lg text-sm font-bold text-white"

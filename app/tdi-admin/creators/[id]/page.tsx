@@ -188,6 +188,12 @@ export default function TDIAdminCreatorDetailPage() {
   const [isSavingField, setIsSavingField] = useState(false);
   const [fieldError, setFieldError] = useState<string | null>(null);
 
+  // Revision request modal state
+  const [selectedMilestoneForRevision, setSelectedMilestoneForRevision] = useState<{ id: string; title: string } | null>(null);
+  const [revisionNote, setRevisionNote] = useState('');
+  const [showRevisionModal, setShowRevisionModal] = useState(false);
+  const [isRequestingRevision, setIsRequestingRevision] = useState(false);
+
   // Previous projects state
   const [previousProjects, setPreviousProjects] = useState<Array<{
     id: string;
@@ -288,6 +294,49 @@ export default function TDIAdminCreatorDetailPage() {
       alert('Error approving milestone.');
     } finally {
       setApprovingMilestoneId(null);
+    }
+  };
+
+  const handleRequestRevision = (milestoneId: string, milestoneTitle: string) => {
+    setSelectedMilestoneForRevision({ id: milestoneId, title: milestoneTitle });
+    setRevisionNote('');
+    setShowRevisionModal(true);
+  };
+
+  const submitRevisionRequest = async () => {
+    if (!selectedMilestoneForRevision || !revisionNote.trim()) return;
+
+    setIsRequestingRevision(true);
+
+    try {
+      const response = await fetch('/api/admin/request-revision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          milestoneId: selectedMilestoneForRevision.id,
+          creatorId,
+          adminEmail,
+          note: revisionNote.trim(),
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setShowRevisionModal(false);
+        setSelectedMilestoneForRevision(null);
+        setRevisionNote('');
+        await loadData();
+        setSuccessMessage(`Revision requested for: ${selectedMilestoneForRevision.title}`);
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        alert(`Failed to request revision: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error requesting revision:', error);
+      alert('Error requesting revision. Please try again.');
+    } finally {
+      setIsRequestingRevision(false);
     }
   };
 
@@ -962,23 +1011,32 @@ export default function TDIAdminCreatorDetailPage() {
                               )}
                             </div>
 
-                            {/* Actions */}
+                            {/* Actions - Both buttons always appear together for waiting_approval */}
                             {milestone.status === 'waiting_approval' && canEdit && (
-                              <button
-                                onClick={() => handleApprove(milestone.id, milestone.title)}
-                                disabled={isProcessing}
-                                className="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5"
-                                style={{ backgroundColor: theme.accent, color: '#2B3A67' }}
-                              >
-                                {isProcessing ? (
-                                  <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  <>
-                                    <Check className="w-4 h-4" />
-                                    Approve
-                                  </>
-                                )}
-                              </button>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => handleApprove(milestone.id, milestone.title)}
+                                  disabled={isProcessing}
+                                  className="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 bg-green-600 text-white hover:bg-green-700"
+                                >
+                                  {isProcessing ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    <>
+                                      <Check className="w-4 h-4" />
+                                      Approve
+                                    </>
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => handleRequestRevision(milestone.id, milestone.title)}
+                                  disabled={isProcessing}
+                                  className="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 bg-white border border-amber-500 text-amber-600 hover:bg-amber-50"
+                                >
+                                  <RotateCcw className="w-4 h-4" />
+                                  Request Changes
+                                </button>
+                              </div>
                             )}
                           </div>
                         );
@@ -2093,6 +2151,63 @@ export default function TDIAdminCreatorDetailPage() {
                   <>
                     <Sparkles className="w-4 h-4" />
                     Start New Project
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Revision Request Modal */}
+      {showRevisionModal && selectedMilestoneForRevision && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="p-6 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900">Request Changes</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Send &quot;{selectedMilestoneForRevision.title}&quot; back for revision
+              </p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Feedback for Creator
+                </label>
+                <textarea
+                  value={revisionNote}
+                  onChange={(e) => setRevisionNote(e.target.value)}
+                  placeholder="What changes are needed? Be specific so the creator knows what to fix..."
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
+                />
+              </div>
+              <p className="text-xs text-gray-500">
+                The creator will receive an email with your feedback and the milestone will be marked for revision.
+              </p>
+            </div>
+            <div className="p-6 border-t border-gray-100 flex gap-3">
+              <button
+                onClick={() => {
+                  setShowRevisionModal(false);
+                  setSelectedMilestoneForRevision(null);
+                  setRevisionNote('');
+                }}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitRevisionRequest}
+                disabled={!revisionNote.trim() || isRequestingRevision}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isRequestingRevision ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <RotateCcw className="w-4 h-4" />
+                    Request Changes
                   </>
                 )}
               </button>
