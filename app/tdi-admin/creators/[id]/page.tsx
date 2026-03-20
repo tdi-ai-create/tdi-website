@@ -131,6 +131,7 @@ export default function TDIAdminCreatorDetailPage() {
 
   // Course details editing
   const [isEditingDetails, setIsEditingDetails] = useState(false);
+  const [saveDetailsError, setSaveDetailsError] = useState<string | null>(null);
   const [editedDetails, setEditedDetails] = useState<{
     content_path: 'blog' | 'download' | 'course' | null;
     course_title: string;
@@ -349,12 +350,20 @@ export default function TDIAdminCreatorDetailPage() {
   const handleSaveDetails = async () => {
     if (!canEdit) return;
     setIsSaving(true);
+    setSaveDetailsError(null);
     try {
-      await updateCreator(creatorId, editedDetails);
+      const result = await updateCreator(creatorId, editedDetails);
+      if (!result) {
+        setSaveDetailsError('Failed to save details. Please try again.');
+        return;
+      }
       await loadData();
       setIsEditingDetails(false);
+      setSuccessMessage('Details saved successfully!');
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (error) {
       console.error('Error saving details:', error);
+      setSaveDetailsError('An unexpected error occurred. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -1214,9 +1223,17 @@ export default function TDIAdminCreatorDetailPage() {
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
                   />
                 </div>
+                {saveDetailsError && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                    {saveDetailsError}
+                  </div>
+                )}
                 <div className="flex gap-2 pt-2">
                   <button
-                    onClick={() => setIsEditingDetails(false)}
+                    onClick={() => {
+                      setIsEditingDetails(false);
+                      setSaveDetailsError(null);
+                    }}
                     className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50"
                   >
                     Cancel
