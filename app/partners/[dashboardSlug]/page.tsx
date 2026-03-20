@@ -1723,15 +1723,18 @@ export default function PartnerDashboard() {
                   <div className="flex flex-col">
                     <p className="text-sm font-semibold text-[#1e2749] mb-3">Support Delivered</p>
                     <div className="space-y-3">
-                      <div className="bg-pink-50 rounded-lg p-3 flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
-                          <Heart className="w-5 h-5 text-pink-500" />
+                      {/* Love Notes - only show if there are any */}
+                      {loveNotes > 0 && (
+                        <div className="bg-pink-50 rounded-lg p-3 flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
+                            <Heart className="w-5 h-5 text-pink-500" />
+                          </div>
+                          <div>
+                            <span className="text-base font-bold text-[#1e2749]">{loveNotes}</span>
+                            <p className="text-xs text-gray-500">Love Notes sent</p>
+                          </div>
                         </div>
-                        <div>
-                          <span className="text-base font-bold text-[#1e2749]">{loveNotes}</span>
-                          <p className="text-xs text-gray-500">Love Notes sent</p>
-                        </div>
-                      </div>
+                      )}
                       <div className="bg-purple-50 rounded-lg p-3 flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
                           <Calendar className="w-5 h-5 text-purple-600" />

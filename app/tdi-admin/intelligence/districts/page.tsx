@@ -4,6 +4,20 @@ import { useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
+import { calculateRenewalHealth, renewalHealthBadge } from '@/lib/tdi-admin/renewal-health'
+
+type Session = {
+  id: string
+  session_type: string
+  session_date: string
+  title: string | null
+}
+
+type Task = {
+  id: string
+  status: string
+  due_date: string | null
+}
 
 type District = {
   id: string
@@ -15,6 +29,8 @@ type District = {
   district_contacts?: Contact[]
   intelligence_contracts?: Contract[]
   intelligence_invoices?: Invoice[]
+  service_sessions?: Session[]
+  intelligence_tasks?: Task[]
 }
 
 type Contact = {
@@ -59,10 +75,12 @@ export default function DistrictsPage() {
       .from('districts')
       .select(`id, name, state, segment, status, notes,
         district_contacts(id, name, title, email, is_primary),
-        intelligence_contracts(id, renewal_deadline_date, status, total_value),
+        intelligence_contracts(id, renewal_deadline_date, status, total_value, scope_json),
         intelligence_invoices(id, status, amount,
           collections_workflow(risk_flag, current_stage, next_follow_up_at)
-        )
+        ),
+        service_sessions(id, session_type, session_date, title),
+        intelligence_tasks(id, status, due_date)
       `)
       .order('name')
 
@@ -130,6 +148,7 @@ export default function DistrictsPage() {
                 <th className="text-left px-4 py-3">Status</th>
                 <th className="text-left px-4 py-3">Primary Contact</th>
                 <th className="text-left px-4 py-3">Collections Risk</th>
+                <th className="text-left px-4 py-3">Renewal Health</th>
                 <th className="text-left px-4 py-3">Renewal Date</th>
                 <th className="px-4 py-3" />
               </tr>
@@ -171,6 +190,22 @@ export default function DistrictsPage() {
                       {topRisk === 'critical' && <span className="text-xs font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">Critical</span>}
                       {topRisk === 'at_risk' && <span className="text-xs font-semibold text-orange-700 bg-orange-100 px-2 py-0.5 rounded-full">At Risk</span>}
                       {topRisk === 'none' && <span className="text-xs text-gray-400">Clear</span>}
+                    </td>
+                    <td className="px-4 py-3">
+                      {(() => {
+                        const health = calculateRenewalHealth({
+                          contracts,
+                          sessions: d.service_sessions ?? [],
+                          invoices,
+                          tasks: d.intelligence_tasks ?? [],
+                        })
+                        const badge = renewalHealthBadge(health.tier)
+                        return (
+                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badge.bg} ${badge.text}`}>
+                            {badge.label} · {health.score}
+                          </span>
+                        )
+                      })()}
                     </td>
                     <td className="px-4 py-3 text-gray-500 text-xs">
                       {renewal?.renewal_deadline_date

@@ -253,7 +253,15 @@ export default function IntelligenceHubPage() {
       }
     }
 
-    return { topRisk, openInvoices, renewalDate, deliveryPct }
+    // Renewal health score
+    const health = calculateRenewalHealth({
+      contracts,
+      sessions,
+      invoices,
+      tasks: d.intelligence_tasks ?? [],
+    })
+
+    return { topRisk, openInvoices, renewalDate, deliveryPct, health }
   }
 
   const riskBadge = (flag: string) => {
@@ -319,9 +327,14 @@ export default function IntelligenceHubPage() {
         <div className="lg:col-span-3 bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
             <h2 className="font-semibold text-gray-800">Active Districts</h2>
-            <Link href="/tdi-admin/intelligence/districts" className="text-xs text-amber-600 hover:underline">
-              View all
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link href="/tdi-admin/intelligence/renewals" className="text-xs text-amber-600 hover:underline">
+                Renewals
+              </Link>
+              <Link href="/tdi-admin/intelligence/districts" className="text-xs text-amber-600 hover:underline">
+                View all
+              </Link>
+            </div>
           </div>
           {loading ? (
             <div className="p-5 space-y-3">
@@ -337,6 +350,7 @@ export default function IntelligenceHubPage() {
                   <th className="text-left px-3 py-3">Status</th>
                   <th className="text-left px-3 py-3">Collections</th>
                   <th className="text-left px-3 py-3">Delivery</th>
+                  <th className="text-left px-3 py-3">Health</th>
                   <th className="text-left px-3 py-3">Renewal</th>
                 </tr>
               </thead>
@@ -385,6 +399,16 @@ export default function IntelligenceHubPage() {
                         ) : (
                           <span className="text-xs text-gray-400">-</span>
                         )}
+                      </td>
+                      <td className="px-3 py-3">
+                        {(() => {
+                          const badge = renewalHealthBadge(meta.health.tier)
+                          return (
+                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badge.bg} ${badge.text}`}>
+                              {badge.label} · {meta.health.score}
+                            </span>
+                          )
+                        })()}
                       </td>
                       <td className="px-3 py-3 text-xs text-gray-500">
                         {meta.renewalDate

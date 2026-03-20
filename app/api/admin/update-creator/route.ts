@@ -5,11 +5,16 @@ const ALLOWED_FIELDS = [
   'email',
   'name',
   'content_path',
+  'course_title',
+  'course_audience',
+  'target_launch_month',
+  'discount_code',
   'status',
   'display_on_website',
   'website_display_name',
   'website_title',
   'website_bio',
+  'display_order',
 ];
 
 export async function POST(request: NextRequest) {
@@ -127,11 +132,16 @@ export async function POST(request: NextRequest) {
       email: 'Email',
       name: 'Name',
       content_path: 'Content Path',
+      course_title: 'Content Title',
+      course_audience: 'Target Audience',
+      target_launch_month: 'Target Launch Date',
+      discount_code: 'Discount Code',
       status: 'Status',
       display_on_website: 'Website Visibility',
       website_display_name: 'Website Display Name',
       website_title: 'Website Title',
       website_bio: 'Website Bio',
+      display_order: 'Display Order',
     };
 
     const formatValue = (val: unknown): string => {

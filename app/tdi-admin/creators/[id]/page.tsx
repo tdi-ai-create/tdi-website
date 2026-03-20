@@ -56,7 +56,6 @@ import { NotePreview } from '@/components/creator-portal/NotePreview';
 import { NoteModal } from '@/components/creator-portal/NoteModal';
 import {
   getCreatorDashboardData,
-  updateCreator,
   getCreatorNotes,
   getContextAwareMilestoneDescription,
 } from '@/lib/creator-portal-data';
@@ -353,11 +352,35 @@ export default function TDIAdminCreatorDetailPage() {
     setSaveDetailsError(null);
     try {
       console.log('[handleSaveDetails] Saving:', editedDetails);
-      const result = await updateCreator(creatorId, editedDetails);
-      if (!result) {
-        setSaveDetailsError('Failed to save details. Please try again.');
-        return;
+
+      // Save each field using the API route
+      const fieldsToSave = [
+        { field: 'content_path', value: editedDetails.content_path },
+        { field: 'course_title', value: editedDetails.course_title },
+        { field: 'course_audience', value: editedDetails.course_audience },
+        { field: 'target_launch_month', value: editedDetails.target_launch_month },
+        { field: 'discount_code', value: editedDetails.discount_code },
+      ];
+
+      for (const { field, value } of fieldsToSave) {
+        const response = await fetch('/api/admin/update-creator', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            creatorId,
+            field,
+            value: value || null,
+            adminEmail,
+          }),
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+          setSaveDetailsError(result.error || `Failed to save ${field}`);
+          return;
+        }
       }
+
       await loadData();
       setIsEditingDetails(false);
       setSuccessMessage('Details saved successfully!');
@@ -375,7 +398,34 @@ export default function TDIAdminCreatorDetailPage() {
     if (!canEdit) return;
     setIsSavingWebsite(true);
     try {
-      await updateCreator(creatorId, websiteSettings);
+      // Save each field using the API route
+      const fieldsToSave = [
+        { field: 'display_on_website', value: websiteSettings.display_on_website },
+        { field: 'website_display_name', value: websiteSettings.website_display_name },
+        { field: 'website_title', value: websiteSettings.website_title },
+        { field: 'website_bio', value: websiteSettings.website_bio },
+        { field: 'display_order', value: websiteSettings.display_order },
+      ];
+
+      for (const { field, value } of fieldsToSave) {
+        const response = await fetch('/api/admin/update-creator', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            creatorId,
+            field,
+            value: value ?? null,
+            adminEmail,
+          }),
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+          console.error(`Failed to save ${field}:`, result.error);
+          return;
+        }
+      }
+
       await loadData();
       setIsEditingWebsite(false);
       setSuccessMessage('Website visibility settings saved!');
@@ -1217,7 +1267,7 @@ export default function TDIAdminCreatorDetailPage() {
                 </div>
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">{getContentLabels(editedDetails.content_path).launchLabel}</label>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 w-full">
                     <select
                       value={editedDetails.target_launch_month?.split(' ')[0] || ''}
                       onChange={(e) => {
@@ -1225,7 +1275,7 @@ export default function TDIAdminCreatorDetailPage() {
                         const newValue = e.target.value ? `${e.target.value} ${currentYear}` : '';
                         setEditedDetails({ ...editedDetails, target_launch_month: newValue });
                       }}
-                      className="flex-1 min-w-[120px] px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
+                      className="flex-1 border border-gray-200 rounded-lg p-3 text-sm bg-white"
                     >
                       <option value="">Month</option>
                       <option value="January">January</option>
@@ -1248,7 +1298,7 @@ export default function TDIAdminCreatorDetailPage() {
                         const newValue = e.target.value ? `${currentMonth || 'January'} ${e.target.value}` : '';
                         setEditedDetails({ ...editedDetails, target_launch_month: newValue });
                       }}
-                      className="flex-1 min-w-[120px] px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
+                      className="flex-1 border border-gray-200 rounded-lg p-3 text-sm bg-white"
                     >
                       <option value="">Year</option>
                       <option value="2025">2025</option>
