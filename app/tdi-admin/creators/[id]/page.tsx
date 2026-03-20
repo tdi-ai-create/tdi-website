@@ -58,6 +58,7 @@ import {
   getCreatorDashboardData,
   getCreatorNotes,
   getContextAwareMilestoneDescription,
+  getContextAwareMilestoneTitle,
 } from '@/lib/creator-portal-data';
 import type {
   CreatorDashboardData,
@@ -1038,6 +1039,8 @@ export default function TDIAdminCreatorDetailPage() {
                         const config = statusConfig[milestone.status];
                         const Icon = config.icon;
                         const isProcessing = approvingMilestoneId === milestone.id;
+                        // Use context-aware title for content-path-specific milestones
+                        const displayTitle = getContextAwareMilestoneTitle(milestone.id, creator.content_path) || milestone.title;
 
                         return (
                           <div
@@ -1052,7 +1055,7 @@ export default function TDIAdminCreatorDetailPage() {
                           >
                             {/* Checkbox/Status */}
                             <button
-                              onClick={() => handleToggleMilestone(milestone.id, milestone.title, milestone.status)}
+                              onClick={() => handleToggleMilestone(milestone.id, displayTitle, milestone.status)}
                               disabled={isProcessing || milestone.status === 'locked' || !canEdit}
                               className={`w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 transition-all ${
                                 milestone.status === 'completed'
@@ -1080,7 +1083,7 @@ export default function TDIAdminCreatorDetailPage() {
                                   }`}
                                   style={{ color: milestone.status !== 'completed' ? '#2B3A67' : undefined }}
                                 >
-                                  {milestone.title}
+                                  {displayTitle}
                                 </p>
                                 <span className={`text-xs px-2 py-0.5 rounded-full ${config.bg} ${config.color}`}>
                                   {config.label}
@@ -1097,7 +1100,7 @@ export default function TDIAdminCreatorDetailPage() {
                             {milestone.status === 'waiting_approval' && canEdit && (
                               <div className="flex items-center gap-2">
                                 <button
-                                  onClick={() => handleApprove(milestone.id, milestone.title)}
+                                  onClick={() => handleApprove(milestone.id, displayTitle)}
                                   disabled={isProcessing}
                                   className="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 bg-green-600 text-white hover:bg-green-700"
                                 >
@@ -1111,7 +1114,7 @@ export default function TDIAdminCreatorDetailPage() {
                                   )}
                                 </button>
                                 <button
-                                  onClick={() => handleRequestRevision(milestone.id, milestone.title)}
+                                  onClick={() => handleRequestRevision(milestone.id, displayTitle)}
                                   disabled={isProcessing}
                                   className="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 bg-white border border-amber-500 text-amber-600 hover:bg-amber-50"
                                 >
