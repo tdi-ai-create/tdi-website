@@ -35,7 +35,7 @@ export type RenewalSignal = {
 
 export function calculateRenewalHealth(params: {
   contracts: any[]
-  sessions: any[]        // service_sessions
+  sessions: any[]        // service_sessions OR merged district_delivery_events
   invoices: any[]        // intelligence_invoices with collections_workflow
   tasks: any[]           // intelligence_tasks
 }): RenewalHealth {

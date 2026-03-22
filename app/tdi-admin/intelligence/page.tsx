@@ -29,6 +29,7 @@ type District = {
   segment: string
   status: string
   notes: string | null
+  partnership_id: string | null
   intelligence_invoices?: Invoice[]
   intelligence_contracts?: Contract[]
   service_sessions?: Session[]
@@ -99,7 +100,7 @@ export default function IntelligenceHubPage() {
     const { data: districtData } = await supabase
       .from('districts')
       .select(`
-        id, name, state, segment, status,
+        id, name, state, segment, status, partnership_id,
         intelligence_invoices (
           id, amount, status, invoice_date,
           collections_workflow (
@@ -151,6 +152,9 @@ export default function IntelligenceHubPage() {
     ).length
 
     // Delivery at risk calculation
+    // Note: Uses service_sessions (manual entries only) for performance.
+    // Full merged delivery data (including dashboard timeline_events) is on district detail page.
+    // Districts with partnership_id will show more accurate data on their detail page.
     const deliveryAtRiskCount = (districtData ?? []).filter(d => {
       const dContracts = d.intelligence_contracts ?? []
       const dSessions = d.service_sessions ?? []

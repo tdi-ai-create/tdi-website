@@ -640,6 +640,7 @@ export default function DistrictDetailPage() {
   const [showLogSession, setShowLogSession] = useState(false)
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [addingTask, setAddingTask] = useState(false)
+  const [mergedSessions, setMergedSessions] = useState<any[]>([])
 
   useEffect(() => { if (id) loadDistrict() }, [id])
 
@@ -662,6 +663,16 @@ export default function DistrictDetailPage() {
       .eq('id', id)
       .single()
     setDistrict(data as District)
+
+    // Fetch merged delivery events (combines legacy timeline_events + service_sessions)
+    const { data: deliveryData } = await supabase
+      .from('district_delivery_events' as any)
+      .select('*')
+      .eq('district_id', id)
+      .not('session_date', 'is', null)
+      .order('session_date', { ascending: false })
+
+    setMergedSessions(deliveryData ?? [])
     setLoading(false)
   }
 
@@ -699,14 +710,16 @@ export default function DistrictDetailPage() {
     new Date(b.session_date).getTime() - new Date(a.session_date).getTime()
   )
   const contracted = getContractedTotals(contracts)
-  const delivered = getDeliveredCounts(sessions)
+  // Use merged sessions (dashboard + manual) for delivery counts if available
+  const sessionsForCounts = mergedSessions.length > 0 ? mergedSessions : sessions
+  const delivered = getDeliveredCounts(sessionsForCounts as Session[])
   const activeContract = contracts.find((c) => c.status === 'active')
   const deliveryAtRisk = isDeliveryAtRisk(contracted, delivered, activeContract?.end_date)
   const totalContracted = contracted.obs + contracted.virtual + contracted.exec + contracted.loveNotes + contracted.keynote
 
   const renewalHealth = calculateRenewalHealth({
     contracts,
-    sessions,
+    sessions: mergedSessions.length > 0 ? mergedSessions : sessions,
     invoices,
     tasks,
   })
@@ -715,7 +728,7 @@ export default function DistrictDetailPage() {
     { key: 'overview', label: 'Overview' },
     { key: 'contracts', label: `Contracts + Invoices (${invoices.length})` },
     { key: 'contacts', label: `Contacts (${contacts.length})` },
-    { key: 'delivery', label: `Delivery (${sessions.length})` },
+    { key: 'delivery', label: `Delivery (${mergedSessions.length > 0 ? mergedSessions.length : sessions.length})` },
   ]
 
   return (
@@ -939,9 +952,10 @@ export default function DistrictDetailPage() {
                     </div>
                   ))}
                 </div>
-                {sessions.length > 0 && (
+                {mergedSessions.length > 0 && (
                   <p className="text-xs text-gray-400 mt-3">
-                    Last session: {new Date(sessions[0].session_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} - {sessions[0].title}
+                    Last session: {new Date(mergedSessions[0].session_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} - {mergedSessions[0].title}
+                    {mergedSessions[0].source === 'dashboard' && <span className="ml-1 text-gray-300">(dashboard)</span>}
                   </p>
                 )}
               </div>
@@ -1250,13 +1264,19 @@ export default function DistrictDetailPage() {
             </div>
           </div>
 
-          {/* Session Log */}
+          {/* Session Log - merged data from dashboard + manual entries */}
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="font-semibold text-gray-800">Session Log</h3>
-              <span className="text-xs text-gray-400">{sessions.length} sessions</span>
+              <div>
+                <h3 className="font-semibold text-gray-800">Session Log</h3>
+                {mergedSessions.length > 0 && mergedSessions.some((s: any) => s.source === 'dashboard') && (
+                  <p className="text-xs text-gray-400 mt-0.5">Includes sessions from partner dashboard</p>
+                )}
+              </div>
+              <span className="text-xs text-gray-400">{mergedSessions.length > 0 ? mergedSessions.length : sessions.length} sessions</span>
             </div>
-            {sessions.length === 0 ? (
+
+            {(mergedSessions.length > 0 ? mergedSessions.length : sessions.length) === 0 ? (
               <div className="p-8 text-center">
                 <p className="text-sm text-gray-400">No sessions logged yet.</p>
                 <button
@@ -1268,7 +1288,7 @@ export default function DistrictDetailPage() {
               </div>
             ) : (
               <ul className="divide-y divide-gray-100">
-                {sessions.map((s) => {
+                {(mergedSessions.length > 0 ? mergedSessions : sessions).map((s: any) => {
                   const typeColors: Record<string, string> = {
                     observation: 'bg-blue-100 text-blue-700',
                     virtual_session: 'bg-purple-100 text-purple-700',
@@ -1286,7 +1306,7 @@ export default function DistrictDetailPage() {
                     custom: 'Custom',
                   }
                   return (
-                    <li key={s.id} className="px-5 py-4">
+                    <li key={`${s.source ?? 'manual'}-${s.event_id ?? s.id}`} className="px-5 py-4">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
@@ -1294,6 +1314,11 @@ export default function DistrictDetailPage() {
                               {typeLabels[s.session_type] ?? s.session_type}
                             </span>
                             <p className="text-sm font-medium text-gray-900">{s.title}</p>
+                            {s.source === 'dashboard' && (
+                              <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                                From Dashboard
+                              </span>
+                            )}
                           </div>
                           {s.notes && <p className="text-xs text-gray-500 mt-1">{s.notes}</p>}
                           {s.buildings_visited && s.buildings_visited.length > 0 && (
