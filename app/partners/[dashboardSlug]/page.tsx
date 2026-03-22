@@ -62,6 +62,7 @@ import { getMetricStatus, statusColors, statusShapes, statusLabels, formatMetric
 import TDIPortalLoader from '@/components/TDIPortalLoader';
 import PilotNextYearTab from '@/components/dashboard/pilot/PilotNextYearTab';
 import BillingTab from '@/components/dashboard/shared/BillingTab';
+import { TeacherQuotes } from '@/components/dashboard/shared/TeacherQuotes';
 
 // Types
 interface Partnership {
@@ -350,6 +351,7 @@ export default function PartnerDashboard() {
   const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
   const [apiBuildings, setApiBuildings] = useState<Building[]>([]);
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
+  const [teacherQuotes, setTeacherQuotes] = useState<{ id: string; quote_text: string; teacher_role: string; session_type: string; created_at: string }[]>([]);
 
   // UI state
   const [activeTab, setActiveTab] = useState('overview');
@@ -514,6 +516,16 @@ export default function PartnerDashboard() {
           setTimelineEvents(data.timelineEvents || []);
         }
       }
+
+      // Fetch teacher quotes
+      const { data: quotesData } = await supabase
+        .from('teacher_quotes')
+        .select('id, quote_text, teacher_role, session_type, created_at')
+        .eq('partnership_id', partnershipId)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      setTeacherQuotes(quotesData || []);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     }
@@ -1586,70 +1598,29 @@ export default function PartnerDashboard() {
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                    {/* Donut Chart - Example Login Rate */}
-                    <div className="flex flex-col items-center">
-                      <div className="relative w-28 h-28 md:w-36 md:h-36">
-                        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
-                          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#4ecdc4" strokeWidth="3"
-                            strokeDasharray="87, 100" strokeLinecap="round" />
-                        </svg>
-                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                          <span className="text-2xl font-bold text-[#1e2749]">87%</span>
-                          <span className="text-xs text-gray-500">logged in</span>
-                        </div>
-                      </div>
-                      <div className="mt-3 text-center">
-                        <p className="text-sm font-semibold text-[#1e2749]">Hub Logins</p>
-                        <p className="text-xs text-gray-500">223 of 255 staff</p>
-                        <p className="text-xs text-[#4ecdc4] font-medium mt-1">Goal: 100% by Observation Day</p>
-                      </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    {/* Staff Enrolled Info */}
+                    <div className="flex flex-col items-center justify-center p-4 bg-[#4ecdc4]/10 rounded-xl">
+                      <span className="text-3xl font-bold text-[#1e2749]">{staffStats.total || '—'}</span>
+                      <span className="text-sm text-gray-600 mt-1">Staff with Hub Access</span>
+                      <p className="text-xs text-[#4ecdc4] font-medium mt-2">Logins will appear here once staff begin using the Hub</p>
                     </div>
 
-                    {/* Example Engagement Depth */}
+                    {/* What to Expect */}
                     <div className="flex flex-col">
-                      <p className="text-sm font-semibold text-[#1e2749] mb-3">Engagement Depth</p>
+                      <p className="text-sm font-semibold text-[#1e2749] mb-3">Coming Soon</p>
                       <div className="space-y-2 flex-1">
-                        <div className="flex justify-between text-xs py-1.5">
-                          <span className="text-gray-600">Completed 1+ course</span>
-                          <span className="text-[#4ecdc4] font-medium">68%</span>
+                        <div className="flex items-center gap-2 text-xs py-1.5 text-gray-600">
+                          <div className="w-2 h-2 rounded-full bg-[#4ecdc4]" />
+                          <span>Login rates by staff</span>
                         </div>
-                        <div className="flex justify-between text-xs py-1.5">
-                          <span className="text-gray-600">Downloaded resources</span>
-                          <span className="text-[#4ecdc4] font-medium">74%</span>
+                        <div className="flex items-center gap-2 text-xs py-1.5 text-gray-600">
+                          <div className="w-2 h-2 rounded-full bg-[#4ecdc4]" />
+                          <span>Course completion tracking</span>
                         </div>
-                        <div className="flex justify-between text-xs py-1.5">
-                          <span className="text-gray-600">Active this month</span>
-                          <span className="text-[#4ecdc4] font-medium">52%</span>
-                        </div>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-3 text-center bg-gray-50 rounded-lg py-2 px-3">
-                        By Building: Harmony 95%, Crescendo 91%, Rhythm 88%
-                      </p>
-                    </div>
-
-                    {/* Example Love Notes & Sessions */}
-                    <div className="flex flex-col">
-                      <p className="text-sm font-semibold text-[#1e2749] mb-3">Support Delivered</p>
-                      <div className="space-y-3">
-                        <div className="bg-pink-50 rounded-lg p-3 flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
-                            <Heart className="w-5 h-5 text-pink-500" />
-                          </div>
-                          <div>
-                            <span className="text-base font-bold text-[#1e2749]">127</span>
-                            <p className="text-xs text-gray-500">Love Notes sent</p>
-                          </div>
-                        </div>
-                        <div className="bg-purple-50 rounded-lg p-3 flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                            <Calendar className="w-5 h-5 text-purple-600" />
-                          </div>
-                          <div>
-                            <span className="text-base font-bold text-[#1e2749]">3 of 4</span>
-                            <p className="text-xs text-gray-500">Virtual sessions</p>
-                          </div>
+                        <div className="flex items-center gap-2 text-xs py-1.5 text-gray-600">
+                          <div className="w-2 h-2 rounded-full bg-[#4ecdc4]" />
+                          <span>Engagement depth metrics</span>
                         </div>
                       </div>
                     </div>
@@ -1754,6 +1725,9 @@ export default function PartnerDashboard() {
                 </a>
               </div>
             )}
+
+            {/* Teacher Quotes - Voices from your school */}
+            <TeacherQuotes quotes={teacherQuotes} />
 
             {/* Action Items */}
             <div id="action-items" className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">

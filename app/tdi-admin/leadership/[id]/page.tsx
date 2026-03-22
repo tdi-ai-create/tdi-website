@@ -570,52 +570,82 @@ export default function AdminPartnershipDetailPage() {
           />
         </SectionHighlight>
 
-        {/* ADMIN ONLY: Service Delivery Tracking */}
-        <SectionHighlight
-          sectionKey="service_delivery"
-          highlights={highlights}
-          isAdminView={editMode}
-          onEdit={(key) => setEditingHighlight(key)}
-        >
-          <div
-            className="bg-white rounded-xl border border-gray-100 p-6 mb-4"
-            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
+        {/* ADMIN ONLY: Service Delivery Tracking - hide if all totals are 0 */}
+        {((partnership.observation_days_total || 0) > 0 ||
+          (partnership.virtual_sessions_total || 0) > 0 ||
+          (partnership.executive_sessions_total || 0) > 0) && (
+          <SectionHighlight
+            sectionKey="service_delivery"
+            highlights={highlights}
+            isAdminView={editMode}
+            onEdit={(key) => setEditingHighlight(key)}
           >
-            <div className="flex items-center gap-2 mb-5">
-              <div className="w-2 h-2 rounded-full bg-violet-500" />
-              <h2 className="text-base font-semibold text-gray-900">Service Delivery Tracking</h2>
-              <span className="ml-auto text-xs bg-violet-50 text-violet-700 px-2 py-0.5 rounded-full font-semibold">
-                Admin Only
-              </span>
+            <div
+              className="bg-white rounded-xl border border-gray-100 p-6 mb-4"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
+            >
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-2 h-2 rounded-full bg-violet-500" />
+                <h2 className="text-base font-semibold text-gray-900">Service Delivery Tracking</h2>
+                <span className="ml-auto text-xs bg-violet-50 text-violet-700 px-2 py-0.5 rounded-full font-semibold">
+                  Admin Only
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <ServiceTracker
+                  partnershipId={partnershipId}
+                  label="Observation Days"
+                  used={partnership.observation_days_used || 0}
+                  total={partnership.observation_days_total || 0}
+                  sessionType="observation"
+                  color="#2D7D78"
+                  userEmail={userEmail}
+                  onCompleted={(result) => {
+                    setPartnership((p: any) => ({
+                      ...p,
+                      observation_days_used: (p.observation_days_used || 0) + 1,
+                      love_notes_count:
+                        (p.love_notes_count || 0) + (result.sessionRecord?.love_notes_count || 0),
+                    }))
+                    fetchData()
+                  }}
+                />
+                <ServiceTracker
+                  partnershipId={partnershipId}
+                  label="Virtual Sessions"
+                  used={partnership.virtual_sessions_used || 0}
+                  total={partnership.virtual_sessions_total || 0}
+                  sessionType="virtual_session"
+                  color="#8B5CF6"
+                  userEmail={userEmail}
+                  onCompleted={() => {
+                    setPartnership((p: any) => ({
+                      ...p,
+                      virtual_sessions_used: (p.virtual_sessions_used || 0) + 1,
+                    }))
+                    fetchData()
+                  }}
+                />
+                <ServiceTracker
+                  partnershipId={partnershipId}
+                  label="Executive Sessions"
+                  used={partnership.executive_sessions_used || 0}
+                  total={partnership.executive_sessions_total || 0}
+                  sessionType="executive_session"
+                  color="#D97706"
+                  userEmail={userEmail}
+                  onCompleted={() => {
+                    setPartnership((p: any) => ({
+                      ...p,
+                      executive_sessions_used: (p.executive_sessions_used || 0) + 1,
+                    }))
+                    fetchData()
+                  }}
+                />
+              </div>
             </div>
-            <div className="grid grid-cols-3 gap-4">
-              <ServiceTracker
-                partnershipId={partnershipId}
-                label="Observation Days"
-                used={partnership.observation_days_used || 0}
-                total={partnership.observation_days_total || 6}
-                field="observation_days_used"
-                color="#2D7D78"
-              />
-              <ServiceTracker
-                partnershipId={partnershipId}
-                label="Virtual Sessions"
-                used={partnership.virtual_sessions_used || 0}
-                total={partnership.virtual_sessions_total || 4}
-                field="virtual_sessions_used"
-                color="#8B5CF6"
-              />
-              <ServiceTracker
-                partnershipId={partnershipId}
-                label="Executive Sessions"
-                used={partnership.executive_sessions_used || 0}
-                total={partnership.executive_sessions_total || 2}
-                field="executive_sessions_used"
-                color="#D97706"
-              />
-            </div>
-          </div>
-        </SectionHighlight>
+          </SectionHighlight>
+        )}
 
         {/* ADMIN ONLY: Data Upload Panel - visible in edit mode */}
         {editMode && (
