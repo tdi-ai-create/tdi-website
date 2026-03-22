@@ -66,6 +66,7 @@ export default function DistrictsPage() {
   const [districts, setDistricts] = useState<District[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'active' | 'pilot' | 'prospect' | 'churned'>('all')
+  const [deliveryByDistrict, setDeliveryByDistrict] = useState<Record<string, any[]>>({})
 
   useEffect(() => { loadDistricts() }, [filter])
 
@@ -88,6 +89,22 @@ export default function DistrictsPage() {
 
     const { data } = await query
     setDistricts((data as District[]) ?? [])
+
+    // Fetch merged delivery data from district_delivery_events view
+    const { data: deliveryData } = await supabase
+      .from('district_delivery_events' as any)
+      .select('*')
+      .not('session_date', 'is', null)
+      .order('session_date', { ascending: false })
+
+    // Group delivery data by district_id
+    const deliveryMap: Record<string, any[]> = {}
+    ;(deliveryData ?? []).forEach((d: any) => {
+      if (!deliveryMap[d.district_id]) deliveryMap[d.district_id] = []
+      deliveryMap[d.district_id].push(d)
+    })
+    setDeliveryByDistrict(deliveryMap)
+
     setLoading(false)
   }
 
@@ -193,9 +210,12 @@ export default function DistrictsPage() {
                     </td>
                     <td className="px-4 py-3">
                       {(() => {
+                        // Use merged delivery data if available
+                        const mergedSessions = deliveryByDistrict[d.id] ?? []
+                        const sessions = mergedSessions.length > 0 ? mergedSessions : (d.service_sessions ?? [])
                         const health = calculateRenewalHealth({
                           contracts,
-                          sessions: d.service_sessions ?? [],
+                          sessions,
                           invoices,
                           tasks: d.intelligence_tasks ?? [],
                         })

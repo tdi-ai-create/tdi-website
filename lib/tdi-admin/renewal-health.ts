@@ -26,11 +26,12 @@ export type RenewalSignal = {
 }
 
 // ---- Scoring weights ----
-// Delivery completion:    30 pts
-// Collections health:     25 pts
+// Delivery completion:    25 pts
+// Collections health:     20 pts
 // Renewal proximity:      20 pts
 // Next session scheduled: 15 pts
 // Task backlog:           10 pts
+// Meeting recency:        10 pts
 // Total:                 100 pts
 
 export function calculateRenewalHealth(params: {
@@ -38,11 +39,12 @@ export function calculateRenewalHealth(params: {
   sessions: any[]        // service_sessions OR merged district_delivery_events
   invoices: any[]        // intelligence_invoices with collections_workflow
   tasks: any[]           // intelligence_tasks
+  meetings?: any[]       // district_meetings (optional for backwards compatibility)
 }): RenewalHealth {
-  const { contracts, sessions, invoices, tasks } = params
+  const { contracts, sessions, invoices, tasks, meetings = [] } = params
   const signals: RenewalSignal[] = []
 
-  // ---- 1. Delivery Completion (30 pts) ----
+  // ---- 1. Delivery Completion (25 pts) ----
   const activeContracts = contracts.filter(c => c.status === 'active')
   let totalContracted = 0
   const totalDelivered = sessions.length
@@ -63,7 +65,7 @@ export function calculateRenewalHealth(params: {
 
   if (totalContracted > 0) {
     const pct = Math.min(1, totalDelivered / totalContracted)
-    deliveryScore = Math.round(pct * 30)
+    deliveryScore = Math.round(pct * 25)
     deliveryDetail = `${totalDelivered} of ${totalContracted} contracted sessions delivered (${Math.round(pct * 100)}%)`
     deliveryStatus = pct >= 0.75 ? 'good' : pct >= 0.4 ? 'warn' : 'bad'
   }
@@ -71,19 +73,19 @@ export function calculateRenewalHealth(params: {
   signals.push({
     label: 'Delivery Completion',
     score: deliveryScore,
-    max: 30,
+    max: 25,
     detail: deliveryDetail,
     status: deliveryStatus,
   })
 
-  // ---- 2. Collections Health (25 pts) ----
+  // ---- 2. Collections Health (20 pts) ----
   const allCollections = invoices.flatMap((inv: any) => inv.collections_workflow ?? [])
   const hasCritical = allCollections.some((c: any) => c.risk_flag === 'critical')
   const hasAtRisk = allCollections.some((c: any) => c.risk_flag === 'at_risk')
   const hasOverdue = invoices.some((inv: any) => inv.status === 'overdue')
   const openInvoices = invoices.filter((inv: any) => !['paid', 'void'].includes(inv.status))
 
-  let collectionsScore = 25
+  let collectionsScore = 20
   let collectionsDetail = 'No collection issues'
   let collectionsStatus: RenewalSignal['status'] = 'good'
 
@@ -92,11 +94,11 @@ export function calculateRenewalHealth(params: {
     collectionsDetail = 'Critical collection issue - immediate attention needed'
     collectionsStatus = 'bad'
   } else if (hasAtRisk || hasOverdue) {
-    collectionsScore = 10
+    collectionsScore = 8
     collectionsDetail = 'At-risk invoice or overdue payment - follow up needed'
     collectionsStatus = 'warn'
   } else if (openInvoices.length > 0) {
-    collectionsScore = 20
+    collectionsScore = 15
     collectionsDetail = `${openInvoices.length} open invoice(s) - collections in progress`
     collectionsStatus = 'warn'
   }
@@ -104,7 +106,7 @@ export function calculateRenewalHealth(params: {
   signals.push({
     label: 'Collections Health',
     score: collectionsScore,
-    max: 25,
+    max: 20,
     detail: collectionsDetail,
     status: collectionsStatus,
   })
@@ -218,6 +220,48 @@ export function calculateRenewalHealth(params: {
     status: taskStatus,
   })
 
+  // ---- 6. Meeting Recency (10 pts) ----
+  // Tracks how recently TDI has had face time with district stakeholders
+  const sortedMeetings = [...meetings].sort(
+    (a: any, b: any) => new Date(b.meeting_date).getTime() - new Date(a.meeting_date).getTime()
+  )
+  const lastMeeting = sortedMeetings[0] ?? null
+  const daysSinceLastMeeting = lastMeeting
+    ? Math.round((today.getTime() - new Date(lastMeeting.meeting_date).getTime()) / (1000 * 60 * 60 * 24))
+    : null
+
+  let meetingScore = 0
+  let meetingDetail = 'No meetings logged'
+  let meetingStatus: RenewalSignal['status'] = 'bad'
+
+  if (daysSinceLastMeeting !== null) {
+    if (daysSinceLastMeeting <= 30) {
+      meetingScore = 10
+      meetingDetail = `Meeting ${daysSinceLastMeeting} days ago - strong engagement`
+      meetingStatus = 'good'
+    } else if (daysSinceLastMeeting <= 60) {
+      meetingScore = 7
+      meetingDetail = `Meeting ${daysSinceLastMeeting} days ago - consider scheduling check-in`
+      meetingStatus = 'good'
+    } else if (daysSinceLastMeeting <= 90) {
+      meetingScore = 4
+      meetingDetail = `Meeting ${daysSinceLastMeeting} days ago - reconnect soon`
+      meetingStatus = 'warn'
+    } else {
+      meetingScore = 1
+      meetingDetail = `Meeting ${daysSinceLastMeeting} days ago - relationship may be going cold`
+      meetingStatus = 'bad'
+    }
+  }
+
+  signals.push({
+    label: 'Meeting Recency',
+    score: meetingScore,
+    max: 10,
+    detail: meetingDetail,
+    status: meetingStatus,
+  })
+
   // ---- Final Score + Tier ----
   const score = signals.reduce((sum, s) => sum + s.score, 0)
 
@@ -256,10 +300,10 @@ export function calculateRenewalHealth(params: {
   // ---- Playbook: recommended next actions based on weak signals ----
   const playbook: string[] = []
 
-  if (deliveryScore < 15 && totalContracted > 0) {
+  if (deliveryScore < 12 && totalContracted > 0) {
     playbook.push('Schedule remaining contracted sessions before contract end date')
   }
-  if (collectionsScore < 20) {
+  if (collectionsScore < 15) {
     playbook.push('Resolve outstanding invoice or collections issue before renewal conversation')
   }
   if (daysUntilRenewal !== null && daysUntilRenewal <= 90) {
@@ -270,6 +314,9 @@ export function calculateRenewalHealth(params: {
   }
   if (overdueTasks.length > 0) {
     playbook.push(`Clear ${overdueTasks.length} overdue task(s) to show follow-through`)
+  }
+  if (meetingScore < 5) {
+    playbook.push('Schedule check-in or exec meeting to maintain relationship momentum')
   }
   if (playbook.length === 0) {
     playbook.push('Partnership is on track - maintain current momentum and begin renewal conversation')

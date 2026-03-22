@@ -34,24 +34,46 @@ export default function RenewalsPage() {
           collections_workflow (risk_flag, current_stage)
         ),
         service_sessions (id, session_type, session_date, title),
-        intelligence_tasks (id, status, due_date)
+        intelligence_tasks (id, status, due_date),
+        district_meetings (id, meeting_date, meeting_type)
       `)
       .in('status', ['active', 'pilot'])
       .order('name')
 
-    const withHealth: DistrictWithHealth[] = (data ?? []).map(d => ({
-      id: d.id,
-      name: d.name,
-      state: d.state,
-      status: d.status,
-      contracts: d.intelligence_contracts ?? [],
-      health: calculateRenewalHealth({
+    // Fetch merged delivery data for accurate session counts
+    const { data: deliveryData } = await supabase
+      .from('district_delivery_events' as any)
+      .select('*')
+      .not('session_date', 'is', null)
+      .order('session_date', { ascending: false })
+
+    // Group delivery data by district_id
+    const deliveryMap: Record<string, any[]> = {}
+    ;(deliveryData ?? []).forEach((d: any) => {
+      if (!deliveryMap[d.district_id]) deliveryMap[d.district_id] = []
+      deliveryMap[d.district_id].push(d)
+    })
+
+    const withHealth: DistrictWithHealth[] = (data ?? []).map(d => {
+      // Use merged delivery data if available
+      const mergedSessions = deliveryMap[d.id] ?? []
+      const sessions = mergedSessions.length > 0 ? mergedSessions : (d.service_sessions ?? [])
+
+      return {
+        id: d.id,
+        name: d.name,
+        state: d.state,
+        status: d.status,
         contracts: d.intelligence_contracts ?? [],
-        sessions: d.service_sessions ?? [],
-        invoices: d.intelligence_invoices ?? [],
-        tasks: d.intelligence_tasks ?? [],
-      }),
-    }))
+        health: calculateRenewalHealth({
+          contracts: d.intelligence_contracts ?? [],
+          sessions,
+          invoices: d.intelligence_invoices ?? [],
+          tasks: d.intelligence_tasks ?? [],
+          meetings: (d as any).district_meetings ?? [],
+        }),
+      }
+    })
 
     // Sort by score ascending (most at-risk first)
     withHealth.sort((a, b) => a.health.score - b.health.score)

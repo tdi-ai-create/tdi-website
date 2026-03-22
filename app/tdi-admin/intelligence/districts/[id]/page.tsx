@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { getSupabase } from '@/lib/supabase'
 import Link from 'next/link'
-import { ChevronRight, Pencil, Plus, X, Check } from 'lucide-react'
+import { ChevronRight, Pencil, Plus, X, Check, Calendar, Users } from 'lucide-react'
 import { calculateRenewalHealth } from '@/lib/tdi-admin/renewal-health'
 
-type Tab = 'overview' | 'contracts' | 'contacts' | 'delivery'
+type Tab = 'overview' | 'contracts' | 'contacts' | 'delivery' | 'meetings'
 
 type District = {
   id: string
@@ -95,6 +95,17 @@ type Session = {
   notes: string | null
 }
 
+type Meeting = {
+  id: string
+  meeting_type: string
+  meeting_date: string
+  attendees_json: { name: string; role?: string; email?: string }[]
+  summary: string | null
+  score: number | null
+  follow_up_notes: string | null
+  next_meeting_date: string | null
+}
+
 // ---- Delivery Helper Functions ----
 function getContractedTotals(contracts: Contract[]) {
   const active = contracts.filter((c) => c.status === 'active')
@@ -144,8 +155,9 @@ function AddContractModal({ districtId, onClose, onSaved }: { districtId: string
   const [form, setForm] = useState({
     contract_name: '', start_date: '', end_date: '', total_value: '',
     renewal_deadline_date: '', signed_doc_url: '', status: 'active',
+    payment_terms: '', payment_schedule: '', notes: '',
     observation_days: '', virtual_sessions: '', executive_sessions: '',
-    love_notes: '', keynotes: '',
+    hub_memberships: '', books: '',
   })
 
   const inputClass = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
@@ -163,12 +175,15 @@ function AddContractModal({ districtId, onClose, onSaved }: { districtId: string
       renewal_deadline_date: form.renewal_deadline_date || null,
       signed_doc_url: form.signed_doc_url.trim() || null,
       status: form.status,
+      payment_terms: form.payment_terms || null,
+      payment_schedule: form.payment_schedule || null,
+      notes: form.notes.trim() || null,
       scope_json: {
         observation_days: parseInt(form.observation_days) || 0,
         virtual_sessions: parseInt(form.virtual_sessions) || 0,
         executive_sessions: parseInt(form.executive_sessions) || 0,
-        love_notes: parseInt(form.love_notes) || 0,
-        keynotes: parseInt(form.keynotes) || 0,
+        hub_memberships: parseInt(form.hub_memberships) || 0,
+        books: parseInt(form.books) || 0,
       },
     })
     onSaved()
@@ -193,6 +208,31 @@ function AddContractModal({ districtId, onClose, onSaved }: { districtId: string
           <div><label className={labelClass}>Renewal Deadline</label><input type="date" className={inputClass} value={form.renewal_deadline_date} onChange={e => setForm(f => ({ ...f, renewal_deadline_date: e.target.value }))} /></div>
         </div>
 
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className={labelClass}>Payment Terms</label>
+            <select className={inputClass} value={form.payment_terms} onChange={e => setForm(f => ({ ...f, payment_terms: e.target.value }))}>
+              <option value="">Select...</option>
+              <option value="net_15">Net 15</option>
+              <option value="net_30">Net 30</option>
+              <option value="net_45">Net 45</option>
+              <option value="net_60">Net 60</option>
+              <option value="upfront">Upfront</option>
+              <option value="split">Split</option>
+            </select>
+          </div>
+          <div>
+            <label className={labelClass}>Payment Schedule</label>
+            <select className={inputClass} value={form.payment_schedule} onChange={e => setForm(f => ({ ...f, payment_schedule: e.target.value }))}>
+              <option value="">Select...</option>
+              <option value="annual">Annual</option>
+              <option value="semester">Semester</option>
+              <option value="monthly">Monthly</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+        </div>
+
         <div>
           <label className={labelClass}>Status</label>
           <select className={inputClass} value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}>
@@ -206,14 +246,14 @@ function AddContractModal({ districtId, onClose, onSaved }: { districtId: string
         <div><label className={labelClass}>Signed Doc URL</label><input className={inputClass} value={form.signed_doc_url} onChange={e => setForm(f => ({ ...f, signed_doc_url: e.target.value }))} placeholder="https://..." /></div>
 
         <div>
-          <p className={labelClass}>Contracted Deliverables</p>
+          <p className={labelClass}>Contracted Scope</p>
           <div className="grid grid-cols-2 gap-3 mt-1">
             {[
               { key: 'observation_days', label: 'Observation Days' },
               { key: 'virtual_sessions', label: 'Virtual Sessions' },
               { key: 'executive_sessions', label: 'Exec Impact Sessions' },
-              { key: 'love_notes', label: 'Love Notes' },
-              { key: 'keynotes', label: 'Keynotes' },
+              { key: 'hub_memberships', label: 'Hub Memberships' },
+              { key: 'books', label: 'Books' },
             ].map(({ key, label }) => (
               <div key={key}>
                 <label className={labelClass}>{label}</label>
@@ -230,6 +270,8 @@ function AddContractModal({ districtId, onClose, onSaved }: { districtId: string
           </div>
         </div>
 
+        <div><label className={labelClass}>Notes</label><textarea className={inputClass} rows={2} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} placeholder="Contract notes, special terms, etc..." /></div>
+
         <div className="flex justify-end gap-3 pt-2">
           <button onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700 px-4 py-2">Cancel</button>
           <button onClick={handleSave} disabled={saving || !form.contract_name.trim()} className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-lg">
@@ -245,15 +287,43 @@ function AddContractModal({ districtId, onClose, onSaved }: { districtId: string
 function AddInvoiceModal({ districtId, contracts, onClose, onSaved }: { districtId: string, contracts: Contract[], onClose: () => void, onSaved: () => void }) {
   const supabase = getSupabase()
   const [saving, setSaving] = useState(false)
+  const [loadingNumber, setLoadingNumber] = useState(true)
   const [form, setForm] = useState({
-    invoice_number: '', contract_id: '', invoice_date: '', amount: '',
-    service_start_date: '', service_end_date: '', service_date_exact: '',
-    status: 'draft', notes: '',
-    ap_po_required: false, ap_w9_required: false, ap_vendor_packet: false, ap_exact_service_date: false,
+    invoice_number: '', contract_id: '', invoice_date: new Date().toISOString().split('T')[0],
+    due_date: '', amount: '',
+    service_start_date: '', service_end_date: '',
+    status: 'draft', notes: '', ap_requirements: '',
+    ap_po_required: false, ap_board_approval: false,
   })
 
   const inputClass = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
   const labelClass = "block text-xs font-medium text-gray-600 mb-1"
+
+  // Auto-generate invoice number on mount
+  useEffect(() => {
+    async function generateInvoiceNumber() {
+      const year = new Date().getFullYear()
+      const { count } = await supabase
+        .from('intelligence_invoices')
+        .select('*', { count: 'exact', head: true })
+        .ilike('invoice_number', `TDI-${year}-%`)
+
+      const nextNum = String((count || 0) + 1).padStart(3, '0')
+      const suggestedNumber = `TDI-${year}-${nextNum}`
+      setForm(f => ({ ...f, invoice_number: suggestedNumber }))
+      setLoadingNumber(false)
+    }
+    generateInvoiceNumber()
+  }, [supabase])
+
+  // Auto-calculate due date from invoice date (default Net 30)
+  useEffect(() => {
+    if (form.invoice_date && !form.due_date) {
+      const invoiceDate = new Date(form.invoice_date)
+      invoiceDate.setDate(invoiceDate.getDate() + 30)
+      setForm(f => ({ ...f, due_date: invoiceDate.toISOString().split('T')[0] }))
+    }
+  }, [form.invoice_date])
 
   async function handleSave() {
     if (!form.invoice_number.trim()) return
@@ -264,17 +334,16 @@ function AddInvoiceModal({ districtId, contracts, onClose, onSaved }: { district
       contract_id: form.contract_id || null,
       invoice_number: form.invoice_number.trim(),
       invoice_date: form.invoice_date || null,
+      due_date: form.due_date || null,
       amount: form.amount ? parseFloat(form.amount) : null,
       service_start_date: form.service_start_date || null,
       service_end_date: form.service_end_date || null,
-      service_date_exact: form.service_date_exact || null,
       status: form.status,
       notes: form.notes.trim() || null,
       ap_requirements_json: {
         po_required: form.ap_po_required,
-        w9_required: form.ap_w9_required,
-        vendor_packet: form.ap_vendor_packet,
-        exact_service_date_needed: form.ap_exact_service_date,
+        board_approval_required: form.ap_board_approval,
+        requirements_text: form.ap_requirements.trim() || null,
       }
     }).select().single()
 
@@ -300,47 +369,65 @@ function AddInvoiceModal({ districtId, contracts, onClose, onSaved }: { district
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div className="col-span-2"><label className={labelClass}>Invoice Number *</label><input className={inputClass} value={form.invoice_number} onChange={e => setForm(f => ({ ...f, invoice_number: e.target.value }))} placeholder="e.g. TDI-2026-001" /></div>
+          <div className="col-span-2">
+            <label className={labelClass}>Invoice Number *</label>
+            <input
+              className={inputClass}
+              value={form.invoice_number}
+              onChange={e => setForm(f => ({ ...f, invoice_number: e.target.value }))}
+              placeholder={loadingNumber ? 'Generating...' : 'e.g. TDI-2026-001'}
+              disabled={loadingNumber}
+            />
+            <p className="text-xs text-gray-400 mt-1">Auto-generated, but editable</p>
+          </div>
           <div className="col-span-2">
             <label className={labelClass}>Contract (optional)</label>
             <select className={inputClass} value={form.contract_id} onChange={e => setForm(f => ({ ...f, contract_id: e.target.value }))}>
               <option value="">No contract linked</option>
-              {contracts.map((c) => <option key={c.id} value={c.id}>{c.contract_name}</option>)}
+              {contracts.filter(c => c.status === 'active').map((c) => <option key={c.id} value={c.id}>{c.contract_name}</option>)}
             </select>
           </div>
           <div><label className={labelClass}>Invoice Date</label><input type="date" className={inputClass} value={form.invoice_date} onChange={e => setForm(f => ({ ...f, invoice_date: e.target.value }))} /></div>
+          <div><label className={labelClass}>Due Date</label><input type="date" className={inputClass} value={form.due_date} onChange={e => setForm(f => ({ ...f, due_date: e.target.value }))} /></div>
           <div><label className={labelClass}>Amount ($)</label><input type="number" className={inputClass} value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} placeholder="0.00" /></div>
-          <div><label className={labelClass}>Service Start</label><input type="date" className={inputClass} value={form.service_start_date} onChange={e => setForm(f => ({ ...f, service_start_date: e.target.value }))} /></div>
-          <div><label className={labelClass}>Service End</label><input type="date" className={inputClass} value={form.service_end_date} onChange={e => setForm(f => ({ ...f, service_end_date: e.target.value }))} /></div>
-          <div className="col-span-2"><label className={labelClass}>Exact Service Date (if required by AP)</label><input type="date" className={inputClass} value={form.service_date_exact} onChange={e => setForm(f => ({ ...f, service_date_exact: e.target.value }))} /></div>
+          <div><label className={labelClass}>Status</label>
+            <select className={inputClass} value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}>
+              <option value="draft">Draft</option>
+              <option value="sent">Sent</option>
+              <option value="approved">Approved</option>
+              <option value="paid">Paid</option>
+              <option value="overdue">Overdue</option>
+              <option value="void">Void</option>
+            </select>
+          </div>
         </div>
 
         <div>
-          <label className={labelClass}>Status</label>
-          <select className={inputClass} value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}>
-            <option value="draft">Draft</option>
-            <option value="sent">Sent</option>
-            <option value="approved">Approved</option>
-            <option value="paid">Paid</option>
-            <option value="overdue">Overdue</option>
-            <option value="void">Void</option>
-          </select>
+          <p className={labelClass}>Service Period</p>
+          <div className="grid grid-cols-2 gap-3 mt-1">
+            <div><label className={labelClass}>Start</label><input type="date" className={inputClass} value={form.service_start_date} onChange={e => setForm(f => ({ ...f, service_start_date: e.target.value }))} /></div>
+            <div><label className={labelClass}>End</label><input type="date" className={inputClass} value={form.service_end_date} onChange={e => setForm(f => ({ ...f, service_end_date: e.target.value }))} /></div>
+          </div>
         </div>
 
         <div>
           <p className={labelClass}>AP Requirements</p>
           <div className="space-y-2 mt-1">
-            {[
-              { key: 'ap_po_required', label: 'PO required' },
-              { key: 'ap_w9_required', label: 'W-9 required' },
-              { key: 'ap_vendor_packet', label: 'Vendor packet required' },
-              { key: 'ap_exact_service_date', label: 'Exact service date required' },
-            ].map(({ key, label }) => (
-              <label key={key} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                <input type="checkbox" checked={(form as Record<string, boolean | string>)[key] as boolean} onChange={e => setForm(f => ({ ...f, [key]: e.target.checked }))} className="rounded" />
-                {label}
-              </label>
-            ))}
+            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+              <input type="checkbox" checked={form.ap_po_required} onChange={e => setForm(f => ({ ...f, ap_po_required: e.target.checked }))} className="rounded" />
+              PO required
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+              <input type="checkbox" checked={form.ap_board_approval} onChange={e => setForm(f => ({ ...f, ap_board_approval: e.target.checked }))} className="rounded" />
+              Board approval required
+            </label>
+            <textarea
+              className={inputClass}
+              rows={2}
+              value={form.ap_requirements}
+              onChange={e => setForm(f => ({ ...f, ap_requirements: e.target.value }))}
+              placeholder="Specific contact, special instructions, etc..."
+            />
           </div>
         </div>
 
@@ -348,7 +435,7 @@ function AddInvoiceModal({ districtId, contracts, onClose, onSaved }: { district
 
         <div className="flex justify-end gap-3 pt-2">
           <button onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700 px-4 py-2">Cancel</button>
-          <button onClick={handleSave} disabled={saving || !form.invoice_number.trim()} className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-lg">
+          <button onClick={handleSave} disabled={saving || !form.invoice_number.trim() || loadingNumber} className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-lg">
             {saving ? 'Saving...' : 'Save Invoice'}
           </button>
         </div>
@@ -475,6 +562,125 @@ function LogSessionModal({ districtId, contracts, onClose, onSaved }: {
             className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-lg"
           >
             {saving ? 'Saving...' : 'Log Session'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ---- Modal: Log Meeting ----
+function LogMeetingModal({ districtId, onClose, onSaved }: {
+  districtId: string
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const supabase = getSupabase()
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({
+    meeting_type: 'check_in',
+    meeting_date: new Date().toISOString().split('T')[0],
+    attendees: '',
+    summary: '',
+    score: '',
+    follow_up_notes: '',
+    next_meeting_date: '',
+  })
+
+  const inputClass = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+  const labelClass = "block text-xs font-medium text-gray-600 mb-1"
+
+  const meetingTypeLabels: Record<string, string> = {
+    exec_impact: 'Executive Impact Review',
+    renewal: 'Renewal Conversation',
+    check_in: 'Check-in',
+    board_presentation: 'Board Presentation',
+  }
+
+  async function handleSave() {
+    if (!form.meeting_date) return
+    setSaving(true)
+
+    // Parse attendees into JSON array
+    const attendeesJson = form.attendees
+      .split(',')
+      .map(a => a.trim())
+      .filter(Boolean)
+      .map(name => ({ name }))
+
+    await supabase.from('district_meetings').insert({
+      district_id: districtId,
+      meeting_type: form.meeting_type,
+      meeting_date: form.meeting_date,
+      attendees_json: attendeesJson,
+      summary: form.summary.trim() || null,
+      score: form.score ? parseInt(form.score) : null,
+      follow_up_notes: form.follow_up_notes.trim() || null,
+      next_meeting_date: form.next_meeting_date || null,
+    })
+
+    onSaved()
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-900">Log Meeting</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div>
+          <label className={labelClass}>Meeting Type</label>
+          <select className={inputClass} value={form.meeting_type} onChange={e => setForm(f => ({ ...f, meeting_type: e.target.value }))}>
+            <option value="check_in">Check-in</option>
+            <option value="exec_impact">Executive Impact Review</option>
+            <option value="renewal">Renewal Conversation</option>
+            <option value="board_presentation">Board Presentation</option>
+          </select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className={labelClass}>Date *</label>
+            <input type="date" className={inputClass} value={form.meeting_date} onChange={e => setForm(f => ({ ...f, meeting_date: e.target.value }))} />
+          </div>
+          <div>
+            <label className={labelClass}>Score (0-10)</label>
+            <input type="number" min="0" max="10" className={inputClass} value={form.score} onChange={e => setForm(f => ({ ...f, score: e.target.value }))} placeholder="0-10" />
+          </div>
+        </div>
+
+        <div>
+          <label className={labelClass}>Attendees (comma-separated)</label>
+          <input className={inputClass} value={form.attendees} onChange={e => setForm(f => ({ ...f, attendees: e.target.value }))} placeholder="e.g. Dr. Smith, Jane Doe, Principal Johnson" />
+        </div>
+
+        <div>
+          <label className={labelClass}>Summary</label>
+          <textarea className={inputClass} rows={3} value={form.summary} onChange={e => setForm(f => ({ ...f, summary: e.target.value }))} placeholder="Key discussion points, outcomes, stakeholder sentiment..." />
+        </div>
+
+        <div>
+          <label className={labelClass}>Follow-up Notes</label>
+          <textarea className={inputClass} rows={2} value={form.follow_up_notes} onChange={e => setForm(f => ({ ...f, follow_up_notes: e.target.value }))} placeholder="Action items, next steps..." />
+        </div>
+
+        <div>
+          <label className={labelClass}>Next Meeting Date (optional)</label>
+          <input type="date" className={inputClass} value={form.next_meeting_date} onChange={e => setForm(f => ({ ...f, next_meeting_date: e.target.value }))} />
+        </div>
+
+        <div className="flex justify-end gap-3 pt-2">
+          <button onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700 px-4 py-2">Cancel</button>
+          <button
+            onClick={handleSave}
+            disabled={saving || !form.meeting_date}
+            className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-lg"
+          >
+            {saving ? 'Saving...' : 'Log Meeting'}
           </button>
         </div>
       </div>
@@ -638,9 +844,11 @@ export default function DistrictDetailPage() {
   const [showAddContract, setShowAddContract] = useState(false)
   const [showAddInvoice, setShowAddInvoice] = useState(false)
   const [showLogSession, setShowLogSession] = useState(false)
+  const [showLogMeeting, setShowLogMeeting] = useState(false)
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [addingTask, setAddingTask] = useState(false)
   const [mergedSessions, setMergedSessions] = useState<any[]>([])
+  const [meetings, setMeetings] = useState<Meeting[]>([])
 
   useEffect(() => { if (id) loadDistrict() }, [id])
 
@@ -673,6 +881,15 @@ export default function DistrictDetailPage() {
       .order('session_date', { ascending: false })
 
     setMergedSessions(deliveryData ?? [])
+
+    // Fetch district meetings
+    const { data: meetingsData } = await supabase
+      .from('district_meetings')
+      .select('*')
+      .eq('district_id', id)
+      .order('meeting_date', { ascending: false })
+
+    setMeetings((meetingsData ?? []) as Meeting[])
     setLoading(false)
   }
 
@@ -722,6 +939,7 @@ export default function DistrictDetailPage() {
     sessions: mergedSessions.length > 0 ? mergedSessions : sessions,
     invoices,
     tasks,
+    meetings,
   })
 
   const tabs: { key: Tab; label: string }[] = [
@@ -729,6 +947,7 @@ export default function DistrictDetailPage() {
     { key: 'contracts', label: `Contracts + Invoices (${invoices.length})` },
     { key: 'contacts', label: `Contacts (${contacts.length})` },
     { key: 'delivery', label: `Delivery (${mergedSessions.length > 0 ? mergedSessions.length : sessions.length})` },
+    { key: 'meetings', label: `Meetings (${meetings.length})` },
   ]
 
   return (
@@ -757,6 +976,14 @@ export default function DistrictDetailPage() {
           contracts={contracts}
           onClose={() => setShowLogSession(false)}
           onSaved={() => { setShowLogSession(false); loadDistrict() }}
+        />
+      )}
+
+      {showLogMeeting && (
+        <LogMeetingModal
+          districtId={id}
+          onClose={() => setShowLogMeeting(false)}
+          onSaved={() => { setShowLogMeeting(false); loadDistrict() }}
         />
       )}
 
@@ -1338,6 +1565,132 @@ export default function DistrictDetailPage() {
               </ul>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Tab: Meetings */}
+      {tab === 'meetings' && (
+        <div className="space-y-6">
+
+          {/* Meeting Log */}
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-gray-800">Meeting Log</h3>
+                <p className="text-xs text-gray-400 mt-0.5">Track exec impact reviews, renewal conversations, check-ins</p>
+              </div>
+              <button
+                onClick={() => setShowLogMeeting(true)}
+                className="text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg"
+              >
+                + Log Meeting
+              </button>
+            </div>
+
+            {meetings.length === 0 ? (
+              <div className="p-8 text-center">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Calendar className="w-6 h-6 text-gray-400" />
+                </div>
+                <p className="text-sm text-gray-500">No meetings logged yet.</p>
+                <button
+                  onClick={() => setShowLogMeeting(true)}
+                  className="text-sm text-amber-600 hover:underline mt-2 inline-block"
+                >
+                  Log your first meeting
+                </button>
+              </div>
+            ) : (
+              <ul className="divide-y divide-gray-100">
+                {meetings.map((m) => {
+                  const typeColors: Record<string, string> = {
+                    exec_impact: 'bg-green-100 text-green-700',
+                    renewal: 'bg-purple-100 text-purple-700',
+                    check_in: 'bg-blue-100 text-blue-700',
+                    board_presentation: 'bg-orange-100 text-orange-700',
+                  }
+                  const typeLabels: Record<string, string> = {
+                    exec_impact: 'Exec Impact',
+                    renewal: 'Renewal',
+                    check_in: 'Check-in',
+                    board_presentation: 'Board',
+                  }
+                  const attendees = m.attendees_json ?? []
+                  return (
+                    <li key={m.id} className="px-5 py-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${typeColors[m.meeting_type] ?? 'bg-gray-100 text-gray-600'}`}>
+                              {typeLabels[m.meeting_type] ?? m.meeting_type}
+                            </span>
+                            <span className="text-sm font-medium text-gray-900">
+                              {new Date(m.meeting_date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                            </span>
+                            {m.score != null && (
+                              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                                m.score >= 8 ? 'bg-green-100 text-green-700' :
+                                m.score >= 5 ? 'bg-amber-100 text-amber-700' :
+                                'bg-red-100 text-red-700'
+                              }`}>
+                                {m.score}/10
+                              </span>
+                            )}
+                          </div>
+
+                          {m.summary && (
+                            <p className="text-sm text-gray-600 mt-2">{m.summary}</p>
+                          )}
+
+                          {attendees.length > 0 && (
+                            <div className="flex items-center gap-1.5 mt-2 text-xs text-gray-400">
+                              <Users className="w-3.5 h-3.5" />
+                              <span>{attendees.map((a: any) => a.name).join(', ')}</span>
+                            </div>
+                          )}
+
+                          {m.follow_up_notes && (
+                            <div className="mt-2 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+                              <p className="text-xs font-semibold text-amber-700 mb-0.5">Follow-up</p>
+                              <p className="text-xs text-gray-600">{m.follow_up_notes}</p>
+                            </div>
+                          )}
+
+                          {m.next_meeting_date && (
+                            <p className="text-xs text-gray-400 mt-2">
+                              Next meeting: {new Date(m.next_meeting_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+          </div>
+
+          {/* Meeting Stats */}
+          {meetings.length > 0 && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { label: 'Total Meetings', value: meetings.length, color: 'text-gray-700' },
+                { label: 'Exec Reviews', value: meetings.filter(m => m.meeting_type === 'exec_impact').length, color: 'text-green-700' },
+                { label: 'Renewal Convos', value: meetings.filter(m => m.meeting_type === 'renewal').length, color: 'text-purple-700' },
+                { label: 'Avg Score', value: (() => {
+                  const scored = meetings.filter(m => m.score != null)
+                  if (scored.length === 0) return '-'
+                  const avg = scored.reduce((sum, m) => sum + (m.score ?? 0), 0) / scored.length
+                  return avg.toFixed(1)
+                })(), color: 'text-amber-700' },
+              ].map(stat => (
+                <div key={stat.label} className="bg-white border border-gray-200 rounded-xl p-4">
+                  <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
