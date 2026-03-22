@@ -51,8 +51,8 @@ export function generateSuggestions(
 
   // ── ENGAGEMENT SUGGESTIONS ──────────────────────────────────
 
-  // Low Hub login
-  if (partnership.hub_login_pct !== null && partnership.hub_login_pct < 70) {
+  // Low Hub login - only trigger when we have actual percentage data
+  if (typeof partnership.hub_login_pct === 'number' && partnership.hub_login_pct < 70) {
     suggestions.push({
       id: 'low-hub-login',
       priority: partnership.hub_login_pct < 50 ? 'high' : 'medium',
@@ -66,7 +66,7 @@ export function generateSuggestions(
   }
 
   // High Hub login - celebrate
-  if (partnership.hub_login_pct !== null && partnership.hub_login_pct >= 95) {
+  if (typeof partnership.hub_login_pct === 'number' && partnership.hub_login_pct >= 95) {
     suggestions.push({
       id: 'high-hub-login',
       priority: 'low',

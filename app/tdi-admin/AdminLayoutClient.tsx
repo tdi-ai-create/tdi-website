@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getSupabase } from '@/lib/supabase';
 import { TDIAdminProvider, useTDIAdmin } from '@/lib/tdi-admin/context';
-import { BookOpen, Palette, Building2, Users, LogOut, ShieldAlert, BarChart2 } from 'lucide-react';
+import { BookOpen, Palette, Building2, Users, LogOut, ShieldAlert, BarChart2, TrendingUp } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 import { getPortalTheme } from '@/lib/tdi-admin/theme';
 
@@ -15,6 +15,7 @@ const PORTAL_COLORS = {
   creators: { accent: '#8B5CF6', light: '#EDE9FE', bg15: 'rgba(139, 92, 246, 0.15)', border30: 'rgba(139, 92, 246, 0.3)' },
   leadership: { accent: '#16A34A', light: '#DCFCE7', bg15: 'rgba(22, 163, 74, 0.15)', border30: 'rgba(22, 163, 74, 0.3)' },
   intelligence: { accent: '#F59E0B', light: '#FEF3C7', bg15: 'rgba(245, 158, 11, 0.15)', border30: 'rgba(245, 158, 11, 0.3)' },
+  sales: { accent: '#6366F1', light: '#EEF2FF', bg15: 'rgba(99, 102, 241, 0.15)', border30: 'rgba(99, 102, 241, 0.3)' },
   team: { accent: '#6B7280', light: '#F3F4F6', bg15: 'rgba(107, 114, 128, 0.15)', border30: 'rgba(107, 114, 128, 0.3)' },
 };
 
@@ -23,7 +24,8 @@ const PORTAL_TABS = [
   { id: 'hub', label: 'Learning Hub', icon: BookOpen, href: '/tdi-admin/hub', section: 'learning_hub', colors: PORTAL_COLORS.hub },
   { id: 'creators', label: 'Creator Studio', icon: Palette, href: '/tdi-admin/creators', section: 'creator_studio', colors: PORTAL_COLORS.creators },
   { id: 'leadership', label: 'Lead Dashboard', icon: Building2, href: '/tdi-admin/leadership', section: 'leadership', colors: PORTAL_COLORS.leadership },
-  { id: 'intelligence', label: 'Intelligence', icon: BarChart2, href: '/tdi-admin/intelligence', section: 'intelligence', colors: PORTAL_COLORS.intelligence },
+  { id: 'intelligence', label: 'Operations', icon: BarChart2, href: '/tdi-admin/intelligence', section: 'intelligence', colors: PORTAL_COLORS.intelligence },
+  { id: 'sales', label: 'Sales', icon: TrendingUp, href: '/tdi-admin/sales', section: 'sales', colors: PORTAL_COLORS.sales },
 ];
 
 function AdminNavbar({ user }: { user: User }) {
@@ -40,9 +42,11 @@ function AdminNavbar({ user }: { user: User }) {
         ? 'leadership'
         : pathname.startsWith('/tdi-admin/intelligence')
           ? 'intelligence'
-          : pathname.startsWith('/tdi-admin/team')
-            ? 'team'
-            : 'hub';
+          : pathname.startsWith('/tdi-admin/sales')
+            ? 'sales'
+            : pathname.startsWith('/tdi-admin/team')
+              ? 'team'
+              : 'hub';
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();

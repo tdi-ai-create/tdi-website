@@ -1165,7 +1165,11 @@ export default function PartnerDashboard() {
               {partnership?.org_name || organization?.name || 'Your School'}
             </h1>
             <p className="text-white/70 text-xs md:text-sm mt-1">
-              {organization?.address_city}, {organization?.address_state} |{' '}
+              {organization?.address_city || organization?.address_state ? (
+                <>
+                  {[organization?.address_city, organization?.address_state].filter(Boolean).join(', ')} |{' '}
+                </>
+              ) : null}
               {partnership.partnership_type === 'district' ? 'District' : 'School'} Partnership
             </p>
           </div>
@@ -2607,7 +2611,7 @@ export default function PartnerDashboard() {
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Location</p>
                     <p className="font-medium text-[#1e2749]">
-                      {organization?.address_city}, {organization?.address_state}
+                      {[organization?.address_city, organization?.address_state].filter(Boolean).join(', ') || 'Not set'}
                     </p>
                   </div>
                 </div>

@@ -1321,7 +1321,7 @@ export default function DistrictDetailPage() {
 
       {/* Breadcrumb */}
       <div className="flex items-center gap-1 text-xs text-gray-400">
-        <Link href="/tdi-admin/intelligence" className="hover:text-amber-600">Intelligence Hub</Link>
+        <Link href="/tdi-admin/intelligence" className="hover:text-amber-600">Operations</Link>
         <ChevronRight className="w-3 h-3" />
         <Link href="/tdi-admin/intelligence/districts" className="hover:text-amber-600">Districts</Link>
         <ChevronRight className="w-3 h-3" />

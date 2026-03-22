@@ -395,7 +395,7 @@ export default function IntelligenceHubPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Intelligence Hub</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Operations</h1>
           <p className="text-sm text-gray-500 mt-1">District Command Center - Collections, Contracts, Pipeline</p>
         </div>
         <Link

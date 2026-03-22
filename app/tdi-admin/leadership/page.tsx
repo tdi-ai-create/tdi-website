@@ -913,7 +913,7 @@ export default function LeadershipDashboardPage() {
                               )}
                               {(partnership.legacy_dashboard_url || partnership.slug) && partnership.status === 'active' && (
                                 <Link
-                                  href={partnership.legacy_dashboard_url || `/partners/${partnership.slug}-dashboard`}
+                                  href={partnership.slug ? `/partners/${partnership.slug}-dashboard` : (partnership.legacy_dashboard_url || '#')}
                                   target="_blank"
                                   className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors"
                                 >
@@ -978,8 +978,8 @@ export default function LeadershipDashboardPage() {
             ) : (
               <div className="grid md:grid-cols-2 gap-4">
                 {activePartnerships.map((partnership) => {
-                  // Use legacy_dashboard_url if available, otherwise fall back to slug-based URL
-                  const dashboardUrl = partnership.legacy_dashboard_url || `/partners/${partnership.slug}-dashboard`;
+                  // Prefer slug-based dynamic dashboard, fall back to legacy_dashboard_url
+                  const dashboardUrl = partnership.slug ? `/partners/${partnership.slug}-dashboard` : (partnership.legacy_dashboard_url || '#');
 
                   return (
                     <div
