@@ -41,6 +41,7 @@ import {
   MessageCircle,
   Settings,
   RefreshCw,
+  Trash2,
 } from 'lucide-react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
@@ -352,6 +353,10 @@ export default function CreatorStudioPage() {
   // Selection state for bulk email
   const [selectedCreatorIds, setSelectedCreatorIds] = useState<Set<string>>(new Set());
 
+  // Bulk delete state
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  const [isDeletingBulk, setIsDeletingBulk] = useState(false);
+
   // Milestone sync state
   const [isSyncingMilestones, setIsSyncingMilestones] = useState(false);
   const [syncResult, setSyncResult] = useState<{
@@ -644,6 +649,55 @@ export default function CreatorStudioPage() {
       .map(c => c.email);
     if (selectedEmails.length === 0) return;
     await handleCopyEmails(selectedEmails, 'bulk');
+  };
+
+  // Handle bulk delete for selected creators
+  const handleBulkDelete = async () => {
+    if (selectedCreatorIds.size === 0) return;
+    setIsDeletingBulk(true);
+
+    const selectedIds = Array.from(selectedCreatorIds);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const creatorId of selectedIds) {
+      try {
+        const response = await fetch('/api/admin/delete-creator', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ creatorId }),
+        });
+        const result = await response.json();
+        if (result.success) {
+          successCount++;
+        } else {
+          failCount++;
+          console.error(`Failed to delete creator ${creatorId}:`, result.error);
+        }
+      } catch (error) {
+        failCount++;
+        console.error(`Error deleting creator ${creatorId}:`, error);
+      }
+    }
+
+    setIsDeletingBulk(false);
+    setShowBulkDeleteModal(false);
+    setSelectedCreatorIds(new Set());
+
+    // Show result message
+    if (failCount === 0) {
+      showToast(`Successfully deleted ${successCount} creator${successCount > 1 ? 's' : ''}`);
+    } else {
+      showToast(`Deleted ${successCount}, failed ${failCount}`);
+    }
+
+    // Refresh the data
+    loadDashboardData();
+  };
+
+  // Get selected creators for modal display
+  const getSelectedCreators = () => {
+    return filteredCreators.filter(c => selectedCreatorIds.has(c.id));
   };
 
   // Toggle single creator selection
@@ -2204,7 +2258,7 @@ export default function CreatorStudioPage() {
           </div>
         </div>
 
-        {/* Floating Action Bar for Bulk Copy */}
+        {/* Floating Action Bar for Bulk Actions */}
         {selectedCreatorIds.size > 0 && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white px-6 py-4 rounded-2xl shadow-xl border border-gray-100 flex items-center gap-4 z-50 backdrop-blur-sm">
             <span className="text-sm font-medium text-gray-700">
@@ -2223,9 +2277,16 @@ export default function CreatorStudioPage() {
               ) : (
                 <>
                   <Copy className="w-4 h-4" />
-                  Copy Email Addresses
+                  Copy Emails
                 </>
               )}
+            </button>
+            <button
+              onClick={() => setShowBulkDeleteModal(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border border-red-200 text-red-600 hover:bg-red-50"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete
             </button>
             <button
               onClick={clearSelection}
@@ -2971,6 +3032,71 @@ export default function CreatorStudioPage() {
                   )}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Confirmation Modal */}
+      {showBulkDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Delete {selectedCreatorIds.size} Creator{selectedCreatorIds.size > 1 ? 's' : ''}</h2>
+                  <p className="text-sm text-gray-500">This action cannot be undone</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 overflow-y-auto flex-1">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-red-800">
+                  You are about to permanently delete {selectedCreatorIds.size} creator{selectedCreatorIds.size > 1 ? 's' : ''} and all their associated data.
+                </p>
+              </div>
+              <p className="text-sm font-medium text-gray-700 mb-2">Creators to be deleted:</p>
+              <ul className="space-y-2 max-h-40 overflow-y-auto">
+                {getSelectedCreators().map(creator => (
+                  <li key={creator.id} className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                    <X className="w-4 h-4 text-red-500 flex-shrink-0" />
+                    <span className="font-medium">{creator.name}</span>
+                    <span className="text-gray-400">({creator.email})</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-sm text-gray-500 mt-4">
+                This will delete all milestone progress, notes, projects, and submission data for these creators.
+              </p>
+            </div>
+            <div className="p-6 border-t border-gray-100 flex gap-3">
+              <button
+                onClick={() => setShowBulkDeleteModal(false)}
+                disabled={isDeletingBulk}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                disabled={isDeletingBulk}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isDeletingBulk ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    Delete Permanently
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>

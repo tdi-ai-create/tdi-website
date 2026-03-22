@@ -43,8 +43,8 @@ export async function PATCH(
       return NextResponse.json({ error: 'Field name required' }, { status: 400 });
     }
 
-    // Allowed fields for dashboard updates
-    const allowedFields = [
+    // Partnership table fields
+    const partnershipFields = [
       'staff_enrolled',
       'hub_login_pct',
       'momentum_status',
@@ -62,40 +62,63 @@ export async function PATCH(
       'contract_start',
       'contract_end',
       'status',
+      'primary_contact_name',
+      'primary_contact_email',
+      'phone',
     ];
 
-    if (!allowedFields.includes(field)) {
-      return NextResponse.json({ error: `Field '${field}' not allowed` }, { status: 400 });
-    }
+    // Organization table fields
+    const orgFields = [
+      'name',
+      'address',
+      'city',
+      'state',
+      'zip',
+      'website',
+    ];
 
     const supabase = getServiceSupabase();
 
-    // Update the field
-    const updateData: Record<string, unknown> = {
-      [field]: value,
-      updated_at: new Date().toISOString(),
-    };
+    // Route to correct table based on field
+    if (orgFields.includes(field)) {
+      // Update organizations table
+      const { error } = await supabase
+        .from('organizations')
+        .update({ [field]: value, updated_at: new Date().toISOString() })
+        .eq('partnership_id', id);
 
-    // If updating dashboard data, also update data_updated_at
-    const dashboardFields = [
-      'staff_enrolled', 'hub_login_pct', 'momentum_status', 'momentum_detail',
-      'cost_per_educator', 'love_notes_count', 'high_engagement_pct',
-      'observation_days_used', 'virtual_sessions_used', 'executive_sessions_used',
-    ];
-    if (dashboardFields.includes(field)) {
-      updateData.data_updated_at = new Date().toISOString();
-    }
+      if (error) {
+        console.error('Error updating organization:', error);
+        return NextResponse.json({ error: 'Failed to update organization' }, { status: 500 });
+      }
+    } else if (partnershipFields.includes(field)) {
+      // Update partnerships table
+      const updateData: Record<string, unknown> = {
+        [field]: value,
+        updated_at: new Date().toISOString(),
+      };
 
-    const { data: partnership, error } = await supabase
-      .from('partnerships')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single();
+      // If updating dashboard data, also update data_updated_at
+      const dashboardFields = [
+        'staff_enrolled', 'hub_login_pct', 'momentum_status', 'momentum_detail',
+        'cost_per_educator', 'love_notes_count', 'high_engagement_pct',
+        'observation_days_used', 'virtual_sessions_used', 'executive_sessions_used',
+      ];
+      if (dashboardFields.includes(field)) {
+        updateData.data_updated_at = new Date().toISOString();
+      }
 
-    if (error) {
-      console.error('Error updating partnership:', error);
-      return NextResponse.json({ error: 'Failed to update' }, { status: 500 });
+      const { error } = await supabase
+        .from('partnerships')
+        .update(updateData)
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error updating partnership:', error);
+        return NextResponse.json({ error: 'Failed to update' }, { status: 500 });
+      }
+    } else {
+      return NextResponse.json({ error: `Field '${field}' not allowed` }, { status: 400 });
     }
 
     // Log the activity
@@ -107,7 +130,8 @@ export async function PATCH(
 
     return NextResponse.json({
       success: true,
-      partnership,
+      field,
+      value,
     });
   } catch (error) {
     console.error('Error in update route:', error);

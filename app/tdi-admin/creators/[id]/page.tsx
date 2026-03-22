@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -41,8 +41,6 @@ import {
   User,
   Folder,
   Activity,
-  Trash2,
-  AlertTriangle,
 } from 'lucide-react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
@@ -118,7 +116,6 @@ const phaseDescriptions: Record<string, string> = {
 
 export default function TDIAdminCreatorDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const creatorId = params.id as string;
   const { teamMember, permissions, isOwner } = useTDIAdmin();
   const hasAccess = isOwner || hasAnySectionPermission(permissions, 'creator_studio');
@@ -187,10 +184,6 @@ export default function TDIAdminCreatorDetailPage() {
   const [isArchiving, setIsArchiving] = useState(false);
   const [showStartNewProjectModal, setShowStartNewProjectModal] = useState(false);
   const [isStartingNewProject, setIsStartingNewProject] = useState(false);
-
-  // Delete creator state
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   // Creator Settings state
   const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
@@ -627,32 +620,6 @@ export default function TDIAdminCreatorDetailPage() {
       alert('Error starting new project.');
     } finally {
       setIsStartingNewProject(false);
-    }
-  };
-
-  // Handle delete creator
-  const handleDeleteCreator = async () => {
-    if (!canEdit) return;
-    setIsDeleting(true);
-    try {
-      const response = await fetch('/api/admin/delete-creator', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ creatorId }),
-      });
-      const result = await response.json();
-      if (result.success) {
-        setShowDeleteModal(false);
-        // Redirect to creators list with success message
-        router.push('/tdi-admin/creators?deleted=true');
-      } else {
-        alert(`Failed to delete: ${result.error || 'Unknown error'}`);
-      }
-    } catch (error) {
-      console.error('Error deleting creator:', error);
-      alert('Error deleting creator.');
-    } finally {
-      setIsDeleting(false);
     }
   };
 
@@ -2073,30 +2040,6 @@ export default function TDIAdminCreatorDetailPage() {
             )}
           </div>
 
-          {/* Danger Zone - Delete Creator */}
-          {canEdit && (
-            <div className="bg-white rounded-xl border border-red-200 overflow-hidden">
-              <div className="p-5">
-                <h3
-                  className="font-semibold flex items-center gap-2 text-red-600 mb-3"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  <AlertTriangle className="w-4 h-4" />
-                  Danger Zone
-                </h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Permanently delete this creator and all associated data. This action cannot be undone.
-                </p>
-                <button
-                  onClick={() => setShowDeleteModal(true)}
-                  className="w-full px-4 py-2.5 text-sm font-medium rounded-lg border border-red-300 text-red-600 hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Delete Creator
-                </button>
-              </div>
-            </div>
-          )}
             </>
           )}
         </div>
@@ -2417,73 +2360,6 @@ export default function TDIAdminCreatorDetailPage() {
         />
       )}
 
-      {/* Delete Creator Confirmation Modal */}
-      {showDeleteModal && creator && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl">
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                  <AlertTriangle className="w-6 h-6 text-red-600" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">Delete Creator</h2>
-                  <p className="text-sm text-gray-500">This action cannot be undone</p>
-                </div>
-              </div>
-            </div>
-            <div className="p-6">
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                <p className="text-sm text-red-800">
-                  Are you sure you want to permanently delete <strong>{creator.name}</strong>?
-                </p>
-              </div>
-              <p className="text-sm text-gray-600 mb-2">This will delete:</p>
-              <ul className="space-y-1 text-sm text-gray-600 mb-4">
-                <li className="flex items-center gap-2">
-                  <X className="w-4 h-4 text-red-500" />
-                  Creator profile and all settings
-                </li>
-                <li className="flex items-center gap-2">
-                  <X className="w-4 h-4 text-red-500" />
-                  All milestone progress records
-                </li>
-                <li className="flex items-center gap-2">
-                  <X className="w-4 h-4 text-red-500" />
-                  All notes and communication history
-                </li>
-                <li className="flex items-center gap-2">
-                  <X className="w-4 h-4 text-red-500" />
-                  All project and submission data
-                </li>
-              </ul>
-            </div>
-            <div className="p-6 border-t border-gray-100 flex gap-3">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                disabled={isDeleting}
-                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteCreator}
-                disabled={isDeleting}
-                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {isDeleting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <>
-                    <Trash2 className="w-4 h-4" />
-                    Delete Permanently
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

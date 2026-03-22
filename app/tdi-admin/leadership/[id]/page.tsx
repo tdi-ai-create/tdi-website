@@ -753,6 +753,198 @@ export default function AdminPartnershipDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* School Information - always visible, editable in edit mode */}
+        <div
+          className="bg-white rounded-xl border border-gray-100 p-5 mb-4"
+          style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-2 h-2 rounded-full" style={{ background: '#16A34A' }} />
+            <h2 className="text-sm font-semibold text-gray-900">School Information</h2>
+            {editMode && (
+              <span className="ml-auto text-xs text-violet-500">Click any field to edit</span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+            {/* School Name */}
+            <div>
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                School / District Name
+              </label>
+              {editMode ? (
+                <InlineEditField
+                  partnershipId={partnershipId}
+                  field="name"
+                  value={organization?.name}
+                  type="text"
+                  onSaved={(v) => setOrganization((o: any) => ({ ...o, name: v }))}
+                />
+              ) : (
+                <p className="text-sm text-gray-700">{organization?.name || '—'}</p>
+              )}
+            </div>
+
+            {/* Primary Contact Name */}
+            <div>
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                Primary Contact
+              </label>
+              {editMode ? (
+                <InlineEditField
+                  partnershipId={partnershipId}
+                  field="primary_contact_name"
+                  value={partnership?.primary_contact_name}
+                  type="text"
+                  onSaved={(v) => setPartnership((p: any) => ({ ...p, primary_contact_name: v }))}
+                />
+              ) : (
+                <p className="text-sm text-gray-700">{partnership?.primary_contact_name || '—'}</p>
+              )}
+            </div>
+
+            {/* Contact Email */}
+            <div>
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                Contact Email
+              </label>
+              {editMode ? (
+                <InlineEditField
+                  partnershipId={partnershipId}
+                  field="primary_contact_email"
+                  value={partnership?.primary_contact_email}
+                  type="text"
+                  onSaved={(v) => setPartnership((p: any) => ({ ...p, primary_contact_email: v }))}
+                />
+              ) : (
+                <p className="text-sm text-gray-700">{partnership?.primary_contact_email || '—'}</p>
+              )}
+            </div>
+
+            {/* Phone */}
+            <div>
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                Phone
+              </label>
+              {editMode ? (
+                <InlineEditField
+                  partnershipId={partnershipId}
+                  field="phone"
+                  value={partnership?.phone}
+                  type="text"
+                  onSaved={(v) => setPartnership((p: any) => ({ ...p, phone: v }))}
+                />
+              ) : (
+                <p className="text-sm text-gray-700">{partnership?.phone || '—'}</p>
+              )}
+            </div>
+
+            {/* Address */}
+            <div>
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                Address
+              </label>
+              {editMode ? (
+                <InlineEditField
+                  partnershipId={partnershipId}
+                  field="address"
+                  value={organization?.address}
+                  type="text"
+                  onSaved={(v) => setOrganization((o: any) => ({ ...o, address: v }))}
+                />
+              ) : (
+                <p className="text-sm text-gray-700">{organization?.address || '—'}</p>
+              )}
+            </div>
+
+            {/* City / State / Zip */}
+            <div>
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                City / State / Zip
+              </label>
+              {editMode ? (
+                <div className="flex gap-2">
+                  <InlineEditField
+                    partnershipId={partnershipId}
+                    field="city"
+                    value={organization?.city}
+                    type="text"
+                    onSaved={(v) => setOrganization((o: any) => ({ ...o, city: v }))}
+                  />
+                  <InlineEditField
+                    partnershipId={partnershipId}
+                    field="state"
+                    value={organization?.state}
+                    type="text"
+                    onSaved={(v) => setOrganization((o: any) => ({ ...o, state: v }))}
+                  />
+                  <InlineEditField
+                    partnershipId={partnershipId}
+                    field="zip"
+                    value={organization?.zip}
+                    type="text"
+                    onSaved={(v) => setOrganization((o: any) => ({ ...o, zip: v }))}
+                  />
+                </div>
+              ) : (
+                <p className="text-sm text-gray-700">
+                  {[organization?.city, organization?.state, organization?.zip].filter(Boolean).join(', ') || '—'}
+                </p>
+              )}
+            </div>
+
+            {/* Website */}
+            <div>
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                Website
+              </label>
+              {editMode ? (
+                <InlineEditField
+                  partnershipId={partnershipId}
+                  field="website"
+                  value={organization?.website}
+                  type="text"
+                  onSaved={(v) => setOrganization((o: any) => ({ ...o, website: v }))}
+                />
+              ) : (
+                <p className="text-sm text-gray-700">
+                  {organization?.website ? (
+                    <a
+                      href={organization.website.startsWith('http') ? organization.website : `https://${organization.website}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-violet-600 hover:underline"
+                    >
+                      {organization.website}
+                    </a>
+                  ) : (
+                    '—'
+                  )}
+                </p>
+              )}
+            </div>
+
+            {/* Contract Phase */}
+            <div>
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                Contract Phase
+              </label>
+              {editMode ? (
+                <InlineEditField
+                  partnershipId={partnershipId}
+                  field="contract_phase"
+                  value={partnership?.contract_phase}
+                  type="select"
+                  options={['IGNITE', 'ACCELERATE', 'SUSTAIN']}
+                  onSaved={(v) => setPartnership((p: any) => ({ ...p, contract_phase: v }))}
+                />
+              ) : (
+                <p className="text-sm text-gray-700">{partnership?.contract_phase || '—'}</p>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
