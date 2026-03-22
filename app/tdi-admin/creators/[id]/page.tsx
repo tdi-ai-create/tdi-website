@@ -54,6 +54,7 @@ import { CourseDetailsPanel, getContentLabels } from '@/components/creator-porta
 import { NotesPanel } from '@/components/creator-portal/NotesPanel';
 import { NotePreview } from '@/components/creator-portal/NotePreview';
 import { NoteModal } from '@/components/creator-portal/NoteModal';
+import { RichTextEditor } from '@/components/creator-portal/RichTextEditor';
 import {
   getCreatorDashboardData,
   getCreatorNotes,
@@ -625,7 +626,9 @@ export default function TDIAdminCreatorDetailPage() {
 
   const handleAddNote = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newNote.trim() || !canEdit) return;
+    // Strip HTML tags to check if there's actual content
+    const textContent = newNote.replace(/<[^>]*>/g, '').trim();
+    if (!textContent || !canEdit) return;
 
     setIsAddingNote(true);
     try {
@@ -634,7 +637,7 @@ export default function TDIAdminCreatorDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           creatorId,
-          note: newNote.trim(),
+          note: newNote, // Save as HTML
           createdBy: adminEmail,
           visibleToCreator: noteVisibleToCreator,
         }),
@@ -1817,12 +1820,10 @@ export default function TDIAdminCreatorDetailPage() {
             {/* Add Note Form */}
             {canEdit && (
               <form onSubmit={handleAddNote} className="mb-4">
-                <textarea
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
+                <RichTextEditor
+                  content={newNote}
+                  onChange={setNewNote}
                   placeholder="Add a note..."
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
-                  rows={3}
                 />
                 <div className="flex items-center justify-between mt-2">
                   <label className="flex items-center gap-2 text-sm text-gray-600">
@@ -1836,7 +1837,7 @@ export default function TDIAdminCreatorDetailPage() {
                   </label>
                   <button
                     type="submit"
-                    disabled={!newNote.trim() || isAddingNote}
+                    disabled={!newNote.replace(/<[^>]*>/g, '').trim() || isAddingNote}
                     className="px-3 py-1.5 text-sm font-medium rounded-lg disabled:opacity-50 flex items-center gap-1"
                     style={{ backgroundColor: theme.accent, color: '#2B3A67' }}
                   >
