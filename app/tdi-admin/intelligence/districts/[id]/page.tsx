@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { ChevronRight, Pencil, Plus, X, Check, Calendar, Users } from 'lucide-react'
 import { calculateRenewalHealth } from '@/lib/tdi-admin/renewal-health'
 
-type Tab = 'overview' | 'contracts' | 'contacts' | 'delivery' | 'meetings'
+type Tab = 'overview' | 'contracts' | 'contacts' | 'delivery' | 'meetings' | 'proof'
 
 type District = {
   id: string
@@ -688,6 +688,315 @@ function LogMeetingModal({ districtId, onClose, onSaved }: {
   )
 }
 
+// ---- Modal: Add Proof Asset ----
+function AddProofAssetModal({ districtId, onClose, onSaved }: {
+  districtId: string
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const supabase = getSupabase()
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({
+    asset_type: 'testimonial',
+    title: '',
+    description: '',
+    url: '',
+    quote_text: '',
+    quote_attribution: '',
+    stat_before: '',
+    stat_after: '',
+    stat_label: '',
+    tags: '',
+    is_featured: false,
+  })
+
+  const inputClass = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+  const labelClass = "block text-xs font-medium text-gray-600 mb-1"
+
+  const assetTypeLabels: Record<string, string> = {
+    case_study: 'Case Study',
+    testimonial: 'Testimonial',
+    dashboard_screenshot: 'Dashboard Screenshot',
+    before_after: 'Before/After Data',
+    grant_letter: 'Grant Award Letter',
+    love_notes: 'Love Notes Example',
+    impact_quote: 'Impact Quote',
+    board_deck: 'Board Presentation Deck',
+    renewal_letter: 'Renewal Letter',
+    media_mention: 'Media Mention',
+    other: 'Other',
+  }
+
+  // Show quote fields for testimonials and impact quotes
+  const showQuoteFields = ['testimonial', 'impact_quote'].includes(form.asset_type)
+  // Show before/after fields for before_after type
+  const showBeforeAfter = form.asset_type === 'before_after'
+
+  async function handleSave() {
+    if (!form.title.trim()) return
+    setSaving(true)
+
+    const tags = form.tags.split(',').map(t => t.trim()).filter(Boolean)
+
+    await supabase.from('proof_assets').insert({
+      district_id: districtId,
+      asset_type: form.asset_type,
+      title: form.title.trim(),
+      description: form.description.trim() || null,
+      url: form.url.trim() || null,
+      quote_text: form.quote_text.trim() || null,
+      quote_attribution: form.quote_attribution.trim() || null,
+      stat_before: form.stat_before.trim() || null,
+      stat_after: form.stat_after.trim() || null,
+      stat_label: form.stat_label.trim() || null,
+      tags,
+      is_featured: form.is_featured,
+    })
+
+    onSaved()
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-900">Add Proof Asset</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div>
+          <label className={labelClass}>Asset Type</label>
+          <select className={inputClass} value={form.asset_type} onChange={e => setForm(f => ({ ...f, asset_type: e.target.value }))}>
+            {Object.entries(assetTypeLabels).map(([value, label]) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className={labelClass}>Title *</label>
+          <input className={inputClass} value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder={
+            form.asset_type === 'testimonial' ? 'e.g. Principal Poche on Year 1 Impact' :
+            form.asset_type === 'case_study' ? 'e.g. SPC Year 1 Case Study' :
+            form.asset_type === 'impact_quote' ? 'e.g. Hub engagement 12% to 87%' :
+            'Title'
+          } />
+        </div>
+
+        {/* Quote fields - testimonials and impact quotes */}
+        {showQuoteFields && (
+          <>
+            <div>
+              <label className={labelClass}>Quote Text</label>
+              <textarea className={inputClass} rows={3} value={form.quote_text} onChange={e => setForm(f => ({ ...f, quote_text: e.target.value }))} placeholder="The exact quote..." />
+            </div>
+            <div>
+              <label className={labelClass}>Attribution</label>
+              <input className={inputClass} value={form.quote_attribution} onChange={e => setForm(f => ({ ...f, quote_attribution: e.target.value }))} placeholder="e.g. Paula Poche, Principal - St. Peter Chanel School" />
+            </div>
+          </>
+        )}
+
+        {/* Before/After fields */}
+        {showBeforeAfter && (
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className={labelClass}>Metric</label>
+              <input className={inputClass} value={form.stat_label} onChange={e => setForm(f => ({ ...f, stat_label: e.target.value }))} placeholder="e.g. Stress Score" />
+            </div>
+            <div>
+              <label className={labelClass}>Before</label>
+              <input className={inputClass} value={form.stat_before} onChange={e => setForm(f => ({ ...f, stat_before: e.target.value }))} placeholder="e.g. 8.2/10" />
+            </div>
+            <div>
+              <label className={labelClass}>After</label>
+              <input className={inputClass} value={form.stat_after} onChange={e => setForm(f => ({ ...f, stat_after: e.target.value }))} placeholder="e.g. 5.1/10" />
+            </div>
+          </div>
+        )}
+
+        <div>
+          <label className={labelClass}>Description</label>
+          <textarea className={inputClass} rows={2} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Brief context or summary..." />
+        </div>
+
+        <div>
+          <label className={labelClass}>URL (Google Drive, Dropbox, etc.)</label>
+          <input className={inputClass} value={form.url} onChange={e => setForm(f => ({ ...f, url: e.target.value }))} placeholder="https://..." />
+        </div>
+
+        <div>
+          <label className={labelClass}>Tags (comma-separated)</label>
+          <input className={inputClass} value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} placeholder="e.g. renewal, stress, hub-engagement" />
+        </div>
+
+        <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={form.is_featured}
+            onChange={e => setForm(f => ({ ...f, is_featured: e.target.checked }))}
+            className="rounded"
+          />
+          Feature this asset (shows first in the list)
+        </label>
+
+        <div className="flex justify-end gap-3 pt-2">
+          <button onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700 px-4 py-2">Cancel</button>
+          <button
+            onClick={handleSave}
+            disabled={saving || !form.title.trim()}
+            className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-lg"
+          >
+            {saving ? 'Saving...' : 'Save Asset'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ---- Proof Pack Generator ----
+function ProofPackGenerator({ assets, districtName }: { assets: any[], districtName: string }) {
+  const [selected, setSelected] = useState<string[]>([])
+  const [generated, setGenerated] = useState('')
+  const [copied, setCopied] = useState(false)
+
+  const assetTypeLabels: Record<string, string> = {
+    case_study: 'Case Study',
+    testimonial: 'Testimonial',
+    dashboard_screenshot: 'Dashboard Screenshot',
+    before_after: 'Before/After Data',
+    grant_letter: 'Grant Award Letter',
+    love_notes: 'Love Notes',
+    impact_quote: 'Impact Quote',
+    board_deck: 'Board Deck',
+    renewal_letter: 'Renewal Letter',
+    media_mention: 'Media Mention',
+    other: 'Other',
+  }
+
+  function toggleAsset(id: string) {
+    setSelected(prev =>
+      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
+    )
+    setGenerated('')
+  }
+
+  function generatePack() {
+    const selectedAssets = assets.filter(a => selected.includes(a.id))
+    if (selectedAssets.length === 0) return
+
+    const lines: string[] = [
+      `TDI PROOF PACK - ${districtName}`,
+      `Generated ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`,
+      '─'.repeat(50),
+      '',
+    ]
+
+    selectedAssets.forEach((asset, i) => {
+      lines.push(`${i + 1}. ${assetTypeLabels[asset.asset_type] ?? asset.asset_type}: ${asset.title}`)
+
+      if (asset.quote_text) {
+        lines.push(`   "${asset.quote_text}"`)
+        if (asset.quote_attribution) lines.push(`   - ${asset.quote_attribution}`)
+      }
+
+      if (asset.stat_label && asset.stat_before && asset.stat_after) {
+        lines.push(`   ${asset.stat_label}: ${asset.stat_before} → ${asset.stat_after}`)
+      }
+
+      if (asset.description) {
+        lines.push(`   ${asset.description}`)
+      }
+
+      if (asset.url) {
+        lines.push(`   Link: ${asset.url}`)
+      }
+
+      lines.push('')
+    })
+
+    lines.push('─'.repeat(50))
+    lines.push('Teachers Deserve It | teachersdeserveit.com')
+
+    setGenerated(lines.join('\n'))
+  }
+
+  async function copyToClipboard() {
+    await navigator.clipboard.writeText(generated)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  if (assets.length === 0) return null
+
+  return (
+    <div className="bg-white border border-amber-200 rounded-xl overflow-hidden">
+      <div className="px-5 py-4 border-b border-amber-100 bg-amber-50">
+        <h3 className="font-semibold text-amber-900">Proof Pack Generator</h3>
+        <p className="text-xs text-amber-700 mt-0.5">Select assets below to generate a shareable summary</p>
+      </div>
+
+      <div className="p-5 space-y-4">
+        {/* Asset selector */}
+        <div className="space-y-2">
+          {assets.map(asset => (
+            <label key={asset.id} className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+              selected.includes(asset.id)
+                ? 'border-amber-300 bg-amber-50'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}>
+              <input
+                type="checkbox"
+                checked={selected.includes(asset.id)}
+                onChange={() => toggleAsset(asset.id)}
+                className="mt-0.5 rounded"
+              />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900">{asset.title}</p>
+                <p className="text-xs text-gray-500">{assetTypeLabels[asset.asset_type]}</p>
+              </div>
+            </label>
+          ))}
+        </div>
+
+        {/* Generate button */}
+        <button
+          onClick={generatePack}
+          disabled={selected.length === 0}
+          className="w-full bg-amber-500 hover:bg-amber-600 disabled:opacity-40 text-white text-sm font-medium py-2.5 rounded-lg transition-colors"
+        >
+          Generate Proof Pack ({selected.length} selected)
+        </button>
+
+        {/* Generated output */}
+        {generated && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold text-gray-600">Ready to copy</p>
+              <button
+                onClick={copyToClipboard}
+                className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
+                  copied
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                }`}
+              >
+                {copied ? 'Copied!' : 'Copy to Clipboard'}
+              </button>
+            </div>
+            <pre className="text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded-lg p-3 whitespace-pre-wrap font-mono">
+              {generated}
+            </pre>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ---- Inline: Log Payment Event ----
 function LogEventPanel({ invoiceId, onSaved }: { invoiceId: string, onSaved: () => void }) {
   const supabase = getSupabase()
@@ -849,6 +1158,9 @@ export default function DistrictDetailPage() {
   const [addingTask, setAddingTask] = useState(false)
   const [mergedSessions, setMergedSessions] = useState<any[]>([])
   const [meetings, setMeetings] = useState<Meeting[]>([])
+  const [proofAssets, setProofAssets] = useState<any[]>([])
+  const [showAddProofAsset, setShowAddProofAsset] = useState(false)
+  const [proofTypeFilter, setProofTypeFilter] = useState<string>('all')
 
   useEffect(() => { if (id) loadDistrict() }, [id])
 
@@ -890,6 +1202,16 @@ export default function DistrictDetailPage() {
       .order('meeting_date', { ascending: false })
 
     setMeetings((meetingsData ?? []) as Meeting[])
+
+    // Fetch proof assets
+    const { data: proofData } = await supabase
+      .from('proof_assets')
+      .select('*')
+      .eq('district_id', id)
+      .order('is_featured', { ascending: false })
+      .order('created_at', { ascending: false })
+
+    setProofAssets(proofData ?? [])
     setLoading(false)
   }
 
@@ -940,6 +1262,7 @@ export default function DistrictDetailPage() {
     invoices,
     tasks,
     meetings,
+    proofAssets,
   })
 
   const tabs: { key: Tab; label: string }[] = [
@@ -948,6 +1271,7 @@ export default function DistrictDetailPage() {
     { key: 'contacts', label: `Contacts (${contacts.length})` },
     { key: 'delivery', label: `Delivery (${mergedSessions.length > 0 ? mergedSessions.length : sessions.length})` },
     { key: 'meetings', label: `Meetings (${meetings.length})` },
+    { key: 'proof', label: `Proof (${proofAssets.length})` },
   ]
 
   return (
@@ -984,6 +1308,14 @@ export default function DistrictDetailPage() {
           districtId={id}
           onClose={() => setShowLogMeeting(false)}
           onSaved={() => { setShowLogMeeting(false); loadDistrict() }}
+        />
+      )}
+
+      {showAddProofAsset && (
+        <AddProofAssetModal
+          districtId={id}
+          onClose={() => setShowAddProofAsset(false)}
+          onSaved={() => { setShowAddProofAsset(false); loadDistrict() }}
         />
       )}
 
@@ -1689,6 +2021,172 @@ export default function DistrictDetailPage() {
                   <p className="text-xs text-gray-500 mt-0.5">{stat.label}</p>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Tab: Proof Assets */}
+      {tab === 'proof' && (
+        <div className="space-y-6">
+
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">{proofAssets.length} assets</p>
+            <button
+              onClick={() => setShowAddProofAsset(true)}
+              className="text-sm font-medium bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg"
+            >
+              + Add Asset
+            </button>
+          </div>
+
+          {/* Proof Pack Generator */}
+          <ProofPackGenerator assets={proofAssets} districtName={district.name} />
+
+          {/* Type filter */}
+          {proofAssets.length > 0 && (
+            <div className="flex gap-2 flex-wrap">
+              {['all', ...Array.from(new Set(proofAssets.map((a: any) => a.asset_type)))].map(type => (
+                <button
+                  key={type}
+                  onClick={() => setProofTypeFilter(type)}
+                  className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                    proofTypeFilter === type
+                      ? 'border-amber-400 bg-amber-50 text-amber-700 font-medium'
+                      : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                  }`}
+                >
+                  {type === 'all' ? 'All' : ({
+                    case_study: 'Case Study',
+                    testimonial: 'Testimonial',
+                    dashboard_screenshot: 'Screenshot',
+                    before_after: 'Before/After',
+                    grant_letter: 'Grant Letter',
+                    love_notes: 'Love Notes',
+                    impact_quote: 'Impact Quote',
+                    board_deck: 'Board Deck',
+                    renewal_letter: 'Renewal Letter',
+                    media_mention: 'Media',
+                    other: 'Other',
+                  } as Record<string, string>)[type] ?? type}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Asset grid */}
+          {proofAssets.length === 0 ? (
+            <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
+              <p className="text-sm text-gray-400">No proof assets yet.</p>
+              <p className="text-xs text-gray-400 mt-1">Add testimonials, case studies, before/after data, and more.</p>
+              <button
+                onClick={() => setShowAddProofAsset(true)}
+                className="text-sm text-amber-600 hover:underline mt-3 inline-block"
+              >
+                Add your first asset
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {proofAssets
+                .filter((a: any) => proofTypeFilter === 'all' || a.asset_type === proofTypeFilter)
+                .map((asset: any) => {
+                  const typeColors: Record<string, string> = {
+                    case_study: 'bg-blue-100 text-blue-700',
+                    testimonial: 'bg-purple-100 text-purple-700',
+                    dashboard_screenshot: 'bg-teal-100 text-teal-700',
+                    before_after: 'bg-green-100 text-green-700',
+                    grant_letter: 'bg-yellow-100 text-yellow-700',
+                    love_notes: 'bg-pink-100 text-pink-700',
+                    impact_quote: 'bg-orange-100 text-orange-700',
+                    board_deck: 'bg-indigo-100 text-indigo-700',
+                    renewal_letter: 'bg-emerald-100 text-emerald-700',
+                    media_mention: 'bg-gray-100 text-gray-700',
+                    other: 'bg-gray-100 text-gray-600',
+                  }
+                  const typeLabels: Record<string, string> = {
+                    case_study: 'Case Study',
+                    testimonial: 'Testimonial',
+                    dashboard_screenshot: 'Screenshot',
+                    before_after: 'Before/After',
+                    grant_letter: 'Grant Letter',
+                    love_notes: 'Love Notes',
+                    impact_quote: 'Impact Quote',
+                    board_deck: 'Board Deck',
+                    renewal_letter: 'Renewal Letter',
+                    media_mention: 'Media Mention',
+                    other: 'Other',
+                  }
+
+                  return (
+                    <div key={asset.id} className={`bg-white border rounded-xl p-5 ${asset.is_featured ? 'border-amber-300 ring-1 ring-amber-200' : 'border-gray-200'}`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${typeColors[asset.asset_type] ?? 'bg-gray-100 text-gray-600'}`}>
+                              {typeLabels[asset.asset_type] ?? asset.asset_type}
+                            </span>
+                            {asset.is_featured && (
+                              <span className="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                                Featured
+                              </span>
+                            )}
+                            <h4 className="text-sm font-semibold text-gray-900">{asset.title}</h4>
+                          </div>
+
+                          {/* Quote */}
+                          {asset.quote_text && (
+                            <blockquote className="mt-2 pl-3 border-l-2 border-amber-300">
+                              <p className="text-sm text-gray-700 italic">"{asset.quote_text}"</p>
+                              {asset.quote_attribution && (
+                                <p className="text-xs text-gray-500 mt-0.5">- {asset.quote_attribution}</p>
+                              )}
+                            </blockquote>
+                          )}
+
+                          {/* Before/After */}
+                          {asset.stat_before && asset.stat_after && (
+                            <div className="mt-2 flex items-center gap-3">
+                              {asset.stat_label && <span className="text-xs text-gray-500">{asset.stat_label}:</span>}
+                              <span className="text-sm font-medium text-red-600">{asset.stat_before}</span>
+                              <span className="text-gray-400">→</span>
+                              <span className="text-sm font-bold text-green-600">{asset.stat_after}</span>
+                            </div>
+                          )}
+
+                          {/* Description */}
+                          {asset.description && (
+                            <p className="text-xs text-gray-500 mt-2">{asset.description}</p>
+                          )}
+
+                          {/* Tags */}
+                          {asset.tags?.length > 0 && (
+                            <div className="flex gap-1 flex-wrap mt-2">
+                              {asset.tags.map((tag: string) => (
+                                <span key={tag} className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Link */}
+                        {asset.url && (
+                          <a
+                            href={asset.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-amber-600 hover:underline shrink-0"
+                          >
+                            Open →
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
             </div>
           )}
         </div>

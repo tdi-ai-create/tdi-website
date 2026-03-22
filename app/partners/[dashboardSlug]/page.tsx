@@ -63,6 +63,8 @@ import TDIPortalLoader from '@/components/TDIPortalLoader';
 import PilotNextYearTab from '@/components/dashboard/pilot/PilotNextYearTab';
 import BillingTab from '@/components/dashboard/shared/BillingTab';
 import { TeacherQuotes } from '@/components/dashboard/shared/TeacherQuotes';
+import { TDISuggestions } from '@/components/dashboard/shared/TDISuggestions';
+import { generateSuggestions, type TDISuggestion } from '@/lib/dashboard/generateSuggestions';
 
 // Types
 interface Partnership {

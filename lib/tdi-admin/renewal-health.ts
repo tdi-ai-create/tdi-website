@@ -29,9 +29,10 @@ export type RenewalSignal = {
 // Delivery completion:    25 pts
 // Collections health:     20 pts
 // Renewal proximity:      20 pts
-// Next session scheduled: 15 pts
+// Next session scheduled: 10 pts
 // Task backlog:           10 pts
 // Meeting recency:        10 pts
+// Proof strength:          5 pts
 // Total:                 100 pts
 
 export function calculateRenewalHealth(params: {
@@ -40,8 +41,9 @@ export function calculateRenewalHealth(params: {
   invoices: any[]        // intelligence_invoices with collections_workflow
   tasks: any[]           // intelligence_tasks
   meetings?: any[]       // district_meetings (optional for backwards compatibility)
+  proofAssets?: any[]    // proof_assets (optional for backwards compatibility)
 }): RenewalHealth {
-  const { contracts, sessions, invoices, tasks, meetings = [] } = params
+  const { contracts, sessions, invoices, tasks, meetings = [], proofAssets = [] } = params
   const signals: RenewalSignal[] = []
 
   // ---- 1. Delivery Completion (25 pts) ----
@@ -155,7 +157,7 @@ export function calculateRenewalHealth(params: {
     status: proximityStatus,
   })
 
-  // ---- 4. Next Session Scheduled (15 pts) ----
+  // ---- 4. Next Session Scheduled (10 pts) ----
   const futureSessions = sessions.filter(
     (s: any) => new Date(s.session_date) > today
   )
@@ -171,11 +173,11 @@ export function calculateRenewalHealth(params: {
     const daysUntilSession = Math.round(
       (new Date(nextSession.session_date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
     )
-    sessionScore = 15
+    sessionScore = 10
     sessionDetail = `Next session in ${daysUntilSession} days - ${nextSession.title ?? nextSession.session_type}`
     sessionStatus = 'good'
   } else if (totalContracted === 0) {
-    sessionScore = 15 // Hub-only or membership - no sessions expected
+    sessionScore = 10 // Hub-only or membership - no sessions expected
     sessionDetail = 'Hub-only partnership - no sessions required'
     sessionStatus = 'neutral'
   }
@@ -183,7 +185,7 @@ export function calculateRenewalHealth(params: {
   signals.push({
     label: 'Next Session Scheduled',
     score: sessionScore,
-    max: 15,
+    max: 10,
     detail: sessionDetail,
     status: sessionStatus,
   })
@@ -262,6 +264,36 @@ export function calculateRenewalHealth(params: {
     status: meetingStatus,
   })
 
+  // ---- 7. Proof Strength (5 pts) ----
+  // Rewards documented proof - signals partnership maturity
+  let proofScore = 0
+  let proofDetail = 'No proof assets logged'
+  let proofStatus: RenewalSignal['status'] = 'neutral'
+
+  const totalProof = proofAssets.length
+
+  if (totalProof >= 5) {
+    proofScore = 5
+    proofDetail = `${totalProof} proof assets logged - strong evidence library`
+    proofStatus = 'good'
+  } else if (totalProof >= 2) {
+    proofScore = 3
+    proofDetail = `${totalProof} proof assets logged - building evidence library`
+    proofStatus = 'warn'
+  } else if (totalProof === 1) {
+    proofScore = 1
+    proofDetail = '1 proof asset logged - keep adding evidence'
+    proofStatus = 'warn'
+  }
+
+  signals.push({
+    label: 'Proof Strength',
+    score: proofScore,
+    max: 5,
+    detail: proofDetail,
+    status: proofStatus,
+  })
+
   // ---- Final Score + Tier ----
   const score = signals.reduce((sum, s) => sum + s.score, 0)
 
@@ -317,6 +349,9 @@ export function calculateRenewalHealth(params: {
   }
   if (meetingScore < 5) {
     playbook.push('Schedule check-in or exec meeting to maintain relationship momentum')
+  }
+  if (proofScore < 3) {
+    playbook.push('Log proof assets (testimonials, before/after data) to strengthen the renewal conversation')
   }
   if (playbook.length === 0) {
     playbook.push('Partnership is on track - maintain current momentum and begin renewal conversation')
