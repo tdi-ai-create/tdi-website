@@ -126,9 +126,13 @@ export async function POST(request: Request) {
         completed_by: index === 0 ? 'system:returning-creator' : null
       }));
 
+      // Use upsert with ignoreDuplicates in case trigger already created records
       const { error: milestoneError } = await supabase
         .from('creator_milestones')
-        .insert(milestoneRecords);
+        .upsert(milestoneRecords, {
+          onConflict: 'creator_id,milestone_id',
+          ignoreDuplicates: true
+        });
 
       if (milestoneError) {
         console.error('[create-new-project] Error creating milestones:', milestoneError);

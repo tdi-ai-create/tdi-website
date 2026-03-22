@@ -116,9 +116,13 @@ export async function POST(request: NextRequest) {
         status: index === 0 ? 'available' : 'locked',
       }));
 
+      // Use upsert with ignoreDuplicates in case trigger already created records
       const { error: insertError } = await supabase
         .from('creator_milestones')
-        .insert(milestoneRecords);
+        .upsert(milestoneRecords, {
+          onConflict: 'creator_id,milestone_id',
+          ignoreDuplicates: true
+        });
 
       if (insertError) {
         console.error('[dashboard-api] Error creating milestones:', insertError);

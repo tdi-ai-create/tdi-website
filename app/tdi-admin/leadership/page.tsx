@@ -145,6 +145,110 @@ function getRelativeTime(dateStr: string): string {
   return `${Math.floor(diffInDays / 30)}mo ago`;
 }
 
+// Portal Access Cell Component
+function PortalAccessCell({
+  partnershipId,
+  contactEmail,
+  contactName,
+  userEmail,
+}: {
+  partnershipId: string;
+  contactEmail: string;
+  contactName: string;
+  userEmail: string;
+}) {
+  const [status, setStatus] = useState<'loading' | 'not_invited' | 'invited' | 'active'>('loading');
+  const [sending, setSending] = useState(false);
+  const [sentAt, setSentAt] = useState<string | null>(null);
+  const [lastLogin, setLastLogin] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(`/api/tdi-admin/leadership/${partnershipId}/invite-status`, {
+      headers: { 'x-user-email': userEmail },
+    })
+      .then(r => r.json())
+      .then(data => {
+        setStatus(data.status || 'not_invited');
+        setSentAt(data.inviteSentAt || null);
+        setLastLogin(data.lastLogin || null);
+      })
+      .catch(() => setStatus('not_invited'));
+  }, [partnershipId, userEmail]);
+
+  async function sendInvite() {
+    setSending(true);
+    const res = await fetch('/api/tdi-admin/leadership/invite', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-email': userEmail,
+      },
+      body: JSON.stringify({
+        partnershipId,
+        email: contactEmail,
+        name: contactName,
+      }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setStatus('invited');
+      setSentAt(new Date().toISOString());
+    }
+    setSending(false);
+  }
+
+  if (status === 'loading') {
+    return <div className="w-4 h-4 rounded-full border-2 border-gray-200 border-t-gray-400 animate-spin" />;
+  }
+
+  if (status === 'active') {
+    return (
+      <div className="flex items-center gap-1.5">
+        <div className="w-2 h-2 rounded-full bg-green-500" />
+        <span className="text-xs text-green-700 font-medium">Active</span>
+        {lastLogin && (
+          <span className="text-xs text-gray-400">
+            · {new Date(lastLogin).toLocaleDateString()}
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  if (status === 'invited') {
+    return (
+      <div className="flex items-center gap-1.5">
+        <div className="w-2 h-2 rounded-full bg-amber-400" />
+        <span className="text-xs text-amber-700 font-medium">Invited</span>
+        {sentAt && (
+          <span className="text-xs text-gray-400">
+            · {new Date(sentAt).toLocaleDateString()}
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  // not_invited - only show button if we have contact email
+  if (!contactEmail) {
+    return <span className="text-xs text-gray-400">No email</span>;
+  }
+
+  return (
+    <button
+      onClick={sendInvite}
+      disabled={sending}
+      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-50"
+      style={{
+        background: sending ? '#FEF3C7' : '#16A34A',
+        color: sending ? '#92400E' : '#fff',
+      }}
+    >
+      {sending ? 'Sending...' : '✉ Send Invite'}
+    </button>
+  );
+}
+
 export default function LeadershipDashboardPage() {
   const { permissions, isOwner, teamMember } = useTDIAdmin();
   const [activeTab, setActiveTab] = useState<TabId>('partnerships');
@@ -655,6 +759,9 @@ export default function LeadershipDashboardPage() {
                         Created
                       </th>
                       <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
+                        Portal Access
+                      </th>
+                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
                         Actions
                       </th>
                     </tr>
@@ -663,7 +770,7 @@ export default function LeadershipDashboardPage() {
                     {filteredPartnerships.length === 0 ? (
                       <tr>
                         <td
-                          colSpan={7}
+                          colSpan={8}
                           className="px-4 py-8 text-center text-gray-500"
                         >
                           {searchQuery || activeFiltersCount > 0
@@ -755,6 +862,16 @@ export default function LeadershipDashboardPage() {
                             <span className="text-sm text-gray-600">
                               {getRelativeTime(partnership.created_at)}
                             </span>
+                          </td>
+
+                          {/* Portal Access */}
+                          <td className="px-4 py-3">
+                            <PortalAccessCell
+                              partnershipId={partnership.id}
+                              contactEmail={partnership.contact_email}
+                              contactName={partnership.contact_name}
+                              userEmail={teamMember?.email || ''}
+                            />
                           </td>
 
                           {/* Actions */}

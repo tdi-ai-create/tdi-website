@@ -51,9 +51,13 @@ export async function POST(request: Request) {
       completed_at: index === 0 ? new Date().toISOString() : null,
     })) || [];
 
+    // Use upsert with ignoreDuplicates in case trigger already created records
     const { error: insertError } = await supabase
       .from('creator_milestones')
-      .insert(milestoneRecords);
+      .upsert(milestoneRecords, {
+        onConflict: 'creator_id,milestone_id',
+        ignoreDuplicates: true
+      });
 
     if (insertError) {
       console.error('[init-milestones] Insert error:', insertError);

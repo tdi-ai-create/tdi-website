@@ -233,9 +233,14 @@ export async function createCreator(data: {
     completed_at: index === 0 ? new Date().toISOString() : null,
   }));
 
+  // Use upsert with ignoreDuplicates to handle case where database trigger
+  // may have already created milestone records
   const { error: progressError } = await serviceSupabase
     .from('creator_milestones')
-    .insert(milestoneRecords);
+    .upsert(milestoneRecords, {
+      onConflict: 'creator_id,milestone_id',
+      ignoreDuplicates: true
+    });
 
   if (progressError) {
     console.error('Error creating milestone progress:', progressError);
