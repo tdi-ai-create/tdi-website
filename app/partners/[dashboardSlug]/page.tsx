@@ -354,6 +354,7 @@ export default function PartnerDashboard() {
   const [apiBuildings, setApiBuildings] = useState<Building[]>([]);
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
   const [teacherQuotes, setTeacherQuotes] = useState<{ id: string; quote_text: string; teacher_role: string; session_type: string; created_at: string }[]>([]);
+  const [suggestions, setSuggestions] = useState<TDISuggestion[]>([]);
 
   // UI state
   const [activeTab, setActiveTab] = useState('overview');
@@ -655,6 +656,42 @@ export default function PartnerDashboard() {
 
     checkAuthAndLoad();
   }, [partnerSlug, router, loadDashboardData]);
+
+  // Generate suggestions when data is ready
+  useEffect(() => {
+    if (!partnership || !staffStats) return;
+
+    // Build partnership data for suggestion engine
+    const partnershipData = {
+      slug: partnership.slug,
+      contract_phase: partnership.contract_phase,
+      momentum_status: partnership.status || 'Active',
+      staff_enrolled: staffStats.total,
+      hub_login_pct: staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : null,
+      love_notes_count: null, // Not available in principal view
+      observation_days_used: partnership.observation_days_completed || 0,
+      observation_days_total: partnership.observation_days_total || 0,
+      virtual_sessions_used: partnership.virtual_sessions_completed || 0,
+      virtual_sessions_total: partnership.virtual_sessions_total || 0,
+      executive_sessions_used: 0, // Not in Partnership interface
+      executive_sessions_total: partnership.executive_sessions_total || 0,
+      teacher_stress_score: null,
+      strategy_implementation_pct: null,
+      retention_intent_score: null,
+      contract_end: partnership.contract_end,
+      data_updated_at: null,
+    };
+
+    // Convert timeline events to expected format
+    const formattedEvents = timelineEvents.map(e => ({
+      status: e.details?.event_date && new Date(e.details.event_date) > new Date() ? 'upcoming' : 'completed',
+      event_type: e.action || 'event',
+      event_date: e.details?.event_date || e.created_at,
+    }));
+
+    const generated = generateSuggestions(partnershipData, formattedEvents, actionItems);
+    setSuggestions(generated);
+  }, [partnership, staffStats, timelineEvents, actionItems]);
 
   // Action item handlers
   const handleCompleteItem = async (itemId: string) => {
@@ -1730,6 +1767,9 @@ export default function PartnerDashboard() {
 
             {/* Teacher Quotes - Voices from your school */}
             <TeacherQuotes quotes={teacherQuotes} />
+
+            {/* TDI Suggestions */}
+            <TDISuggestions suggestions={suggestions} isAdminView={false} />
 
             {/* Action Items */}
             <div id="action-items" className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">

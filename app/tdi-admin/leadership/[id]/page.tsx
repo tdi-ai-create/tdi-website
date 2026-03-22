@@ -18,7 +18,9 @@ import { FileUploadZone } from '@/components/dashboard/admin/FileUploadZone'
 import { AIExtractModal } from '@/components/dashboard/admin/AIExtractModal'
 import { HighlightControls } from '@/components/dashboard/admin/HighlightControls'
 import { SectionHighlight } from '@/components/dashboard/shared/SectionHighlight'
+import { TDISuggestions } from '@/components/dashboard/shared/TDISuggestions'
 import { STATIC_DEFAULTS } from '@/lib/dashboard/dashboardDefaults'
+import { generateSuggestions, type TDISuggestion } from '@/lib/dashboard/generateSuggestions'
 import { ArrowLeft, Loader2, Building2, Upload } from 'lucide-react'
 
 interface UploadedFile {
@@ -54,6 +56,7 @@ export default function AdminPartnershipDetailPage() {
   const [defaults, setDefaults] = useState<Record<string, string>>(STATIC_DEFAULTS)
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
   const [highlights, setHighlights] = useState<any[]>([])
+  const [suggestions, setSuggestions] = useState<TDISuggestion[]>([])
 
   // Highlight controls modal state
   const [editingHighlight, setEditingHighlight] = useState<string | null>(null)
@@ -146,6 +149,42 @@ export default function AdminPartnershipDetailPage() {
       fetchData()
     }
   }, [hasAccess, userEmail, fetchData])
+
+  // Generate suggestions when partnership data is loaded
+  useEffect(() => {
+    if (!partnership) return
+
+    // Build partnership data for suggestion engine
+    const partnershipData = {
+      slug: partnership.slug || '',
+      contract_phase: partnership.contract_phase || '',
+      momentum_status: partnership.momentum_status || 'Active',
+      staff_enrolled: partnership.staff_enrolled || 0,
+      hub_login_pct: partnership.hub_login_pct,
+      love_notes_count: partnership.love_notes_count,
+      observation_days_used: partnership.observation_days_used || 0,
+      observation_days_total: partnership.observation_days_total || 0,
+      virtual_sessions_used: partnership.virtual_sessions_used || 0,
+      virtual_sessions_total: partnership.virtual_sessions_total || 0,
+      executive_sessions_used: partnership.executive_sessions_used || 0,
+      executive_sessions_total: partnership.executive_sessions_total || 0,
+      teacher_stress_score: partnership.teacher_stress_score,
+      strategy_implementation_pct: partnership.strategy_implementation_pct,
+      retention_intent_score: partnership.retention_intent_score,
+      contract_end: partnership.contract_end,
+      data_updated_at: partnership.data_updated_at,
+    }
+
+    // Convert timeline events to expected format
+    const formattedEvents = timelineEvents.map(e => ({
+      status: e.status,
+      event_type: e.event_type,
+      event_date: e.event_date || null,
+    }))
+
+    const generated = generateSuggestions(partnershipData, formattedEvents, actionItems)
+    setSuggestions(generated)
+  }, [partnership, timelineEvents, actionItems])
 
   async function handleFieldUpdate(field: string, value: any) {
     if (!userEmail) return
@@ -428,6 +467,9 @@ export default function AdminPartnershipDetailPage() {
             </div>
           </div>
         )}
+
+        {/* TDI Suggestions */}
+        <TDISuggestions suggestions={suggestions} isAdminView={true} />
 
         {/* Partnership Timeline */}
         <SectionHighlight
