@@ -896,10 +896,10 @@ function InvoiceDetailPanel({ invoice, onClose, onMarkPaid, onGenerateEmail, onR
             <div>
               <p className="text-xs text-gray-500 mb-1">AP Requirements</p>
               <div className="text-sm text-gray-700 space-y-1">
-                {invoice.ap_requirements_json.po_required && <p>PO required</p>}
-                {invoice.ap_requirements_json.board_approval_required && <p>Board approval required</p>}
-                {invoice.ap_requirements_json.requirements_text && (
-                  <p className="text-gray-600">{String(invoice.ap_requirements_json.requirements_text)}</p>
+                {Boolean(invoice.ap_requirements_json?.po_required) && <p>PO required</p>}
+                {Boolean(invoice.ap_requirements_json?.board_approval_required) && <p>Board approval required</p>}
+                {Boolean(invoice.ap_requirements_json?.requirements_text) && (
+                  <p className="text-gray-600">{String(invoice.ap_requirements_json?.requirements_text)}</p>
                 )}
               </div>
             </div>
@@ -1165,7 +1165,7 @@ function EmailGeneratorModal({ invoice, onClose }: {
     ? `${new Date(invoice.service_start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} - ${new Date(invoice.service_end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
     : ''
 
-  const apReqs = invoice.ap_requirements_json
+  const apReqs = invoice.ap_requirements_json as { po_required?: boolean; board_approval_required?: boolean } | null
   const poLine = apReqs?.po_required ? '\n\nPlease reference PO #_______ when processing payment.' : ''
   const boardLine = apReqs?.board_approval_required ? '\n\nPlease confirm board approval date so we can track expected payment.' : ''
 
