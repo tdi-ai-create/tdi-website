@@ -64,8 +64,8 @@ export function CourseDetailsPanel({ creator }: CourseDetailsPanelProps) {
     {
       icon: Calendar,
       label: labels.launchLabel,
-      value: creator.target_launch_month || 'Not set yet',
-      isEmpty: !creator.target_launch_month,
+      value: creator.target_publish_month || 'Not set yet',
+      isEmpty: !creator.target_publish_month,
     },
     {
       icon: Tag,

@@ -96,7 +96,7 @@ interface EnrichedCreator {
   course_audience: string | null;
   content_path: string | null;
   current_phase: string;
-  target_launch_month: string | null;
+  target_publish_month: string | null;
   created_at: string;
   totalMilestones: number;
   completedMilestones: number;
@@ -366,7 +366,7 @@ export default function CreatorStudioPage() {
     email: '',
     course_title: '',
     course_audience: '',
-    target_launch_month: '',
+    target_publish_month: '',
     target_launch_year: new Date().getFullYear().toString(),
   });
 
@@ -557,8 +557,8 @@ export default function CreatorStudioPage() {
     setIsAdding(true);
 
     // Combine month and year into a single string
-    const targetLaunchMonth = newCreator.target_launch_month && newCreator.target_launch_year
-      ? `${newCreator.target_launch_month} ${newCreator.target_launch_year}`
+    const targetLaunchMonth = newCreator.target_publish_month && newCreator.target_launch_year
+      ? `${newCreator.target_publish_month} ${newCreator.target_launch_year}`
       : undefined;
 
     try {
@@ -571,7 +571,7 @@ export default function CreatorStudioPage() {
           intakeResponses: {
             course_title: newCreator.course_title || undefined,
             course_audience: newCreator.course_audience || undefined,
-            target_launch_month: targetLaunchMonth,
+            target_publish_month: targetLaunchMonth,
           },
         }),
       });
@@ -585,7 +585,7 @@ export default function CreatorStudioPage() {
           email: '',
           course_title: '',
           course_audience: '',
-          target_launch_month: '',
+          target_publish_month: '',
           target_launch_year: new Date().getFullYear().toString(),
         });
         await loadDashboardData();
@@ -2125,7 +2125,7 @@ export default function CreatorStudioPage() {
                         {/* Target Launch */}
                         <td className="px-4 py-3 hidden lg:table-cell">
                           <span className="text-sm text-gray-600">
-                            {creator.target_launch_month || '-'}
+                            {creator.target_publish_month || '-'}
                           </span>
                         </td>
 
@@ -2852,8 +2852,8 @@ export default function CreatorStudioPage() {
                 </label>
                 <div className="flex gap-2">
                   <select
-                    value={newCreator.target_launch_month}
-                    onChange={(e) => setNewCreator({ ...newCreator, target_launch_month: e.target.value })}
+                    value={newCreator.target_publish_month}
+                    onChange={(e) => setNewCreator({ ...newCreator, target_publish_month: e.target.value })}
                     className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all"
                   >
                     <option value="">Select Month</option>

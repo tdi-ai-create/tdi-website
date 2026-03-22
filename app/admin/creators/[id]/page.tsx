@@ -275,7 +275,7 @@ export default function AdminCreatorDetailPage() {
     course_description: string;
     author_bio: string;
     course_audience: string;
-    target_launch_month: string;
+    target_publish_month: string;
     discount_code: string;
     // Publication dates
     blog_publish_date: string;
@@ -290,7 +290,7 @@ export default function AdminCreatorDetailPage() {
     course_description: '',
     author_bio: '',
     course_audience: '',
-    target_launch_month: '',
+    target_publish_month: '',
     discount_code: '',
     blog_publish_date: '',
     blog_publish_overview: '',
@@ -392,7 +392,7 @@ export default function AdminCreatorDetailPage() {
         course_description: data.creator.course_description || '',
         author_bio: data.creator.author_bio || '',
         course_audience: data.creator.course_audience || '',
-        target_launch_month: data.creator.target_launch_month || '',
+        target_publish_month: data.creator.target_publish_month || '',
         discount_code: data.creator.discount_code || '',
         blog_publish_date: data.creator.blog_publish_date || '',
         blog_publish_overview: data.creator.blog_publish_overview || '',
@@ -560,7 +560,7 @@ export default function AdminCreatorDetailPage() {
           course_description: editedDetails.course_description,
           author_bio: editedDetails.author_bio,
           course_audience: editedDetails.course_audience,
-          target_launch_month: editedDetails.target_launch_month,
+          target_publish_month: editedDetails.target_publish_month,
           discount_code: editedDetails.discount_code,
           blog_publish_date: editedDetails.blog_publish_date || null,
           blog_publish_overview: editedDetails.blog_publish_overview || null,
@@ -1433,9 +1433,9 @@ export default function AdminCreatorDetailPage() {
                     </label>
                     <input
                       type="text"
-                      value={editedDetails.target_launch_month}
+                      value={editedDetails.target_publish_month}
                       onChange={(e) =>
-                        setEditedDetails({ ...editedDetails, target_launch_month: e.target.value })
+                        setEditedDetails({ ...editedDetails, target_publish_month: e.target.value })
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent"
                     />
@@ -1605,8 +1605,8 @@ export default function AdminCreatorDetailPage() {
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 uppercase">{getContentLabels(creator.content_path).launchLabel}</p>
-                    <p className={creator.target_launch_month ? 'text-[#1e2749]' : 'text-gray-400 italic'}>
-                      {creator.target_launch_month || 'Not set'}
+                    <p className={creator.target_publish_month ? 'text-[#1e2749]' : 'text-gray-400 italic'}>
+                      {creator.target_publish_month || 'Not set'}
                     </p>
                   </div>
                   <div>

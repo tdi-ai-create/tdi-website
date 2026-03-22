@@ -136,13 +136,13 @@ export default function TDIAdminCreatorDetailPage() {
     content_path: 'blog' | 'download' | 'course' | null;
     course_title: string;
     course_audience: string;
-    target_launch_month: string;
+    target_publish_month: string;
     discount_code: string;
   }>({
     content_path: null,
     course_title: '',
     course_audience: '',
-    target_launch_month: '',
+    target_publish_month: '',
     discount_code: '',
   });
 
@@ -219,7 +219,7 @@ export default function TDIAdminCreatorDetailPage() {
         content_path: data.creator.content_path || null,
         course_title: data.creator.course_title || '',
         course_audience: data.creator.course_audience || '',
-        target_launch_month: data.creator.target_launch_month || '',
+        target_publish_month: data.creator.target_publish_month || '',
         discount_code: data.creator.discount_code || '',
       });
 
@@ -359,7 +359,7 @@ export default function TDIAdminCreatorDetailPage() {
         { field: 'content_path', value: editedDetails.content_path },
         { field: 'course_title', value: editedDetails.course_title },
         { field: 'course_audience', value: editedDetails.course_audience },
-        { field: 'target_launch_month', value: editedDetails.target_launch_month },
+        { field: 'target_publish_month', value: editedDetails.target_publish_month },
         { field: 'discount_code', value: editedDetails.discount_code },
       ];
 
@@ -1272,11 +1272,11 @@ export default function TDIAdminCreatorDetailPage() {
                   <label className="block text-sm text-gray-600 mb-1">{getContentLabels(editedDetails.content_path).launchLabel}</label>
                   <div className="flex gap-2 w-full">
                     <select
-                      value={editedDetails.target_launch_month?.split(' ')[0] || ''}
+                      value={editedDetails.target_publish_month?.split(' ')[0] || ''}
                       onChange={(e) => {
-                        const currentYear = editedDetails.target_launch_month?.split(' ')[1] || new Date().getFullYear().toString();
+                        const currentYear = editedDetails.target_publish_month?.split(' ')[1] || new Date().getFullYear().toString();
                         const newValue = e.target.value ? `${e.target.value} ${currentYear}` : '';
-                        setEditedDetails({ ...editedDetails, target_launch_month: newValue });
+                        setEditedDetails({ ...editedDetails, target_publish_month: newValue });
                       }}
                       className="flex-1 border border-gray-200 rounded-lg p-3 text-sm bg-white"
                     >
@@ -1295,11 +1295,11 @@ export default function TDIAdminCreatorDetailPage() {
                       <option value="December">December</option>
                     </select>
                     <select
-                      value={editedDetails.target_launch_month?.split(' ')[1] || ''}
+                      value={editedDetails.target_publish_month?.split(' ')[1] || ''}
                       onChange={(e) => {
-                        const currentMonth = editedDetails.target_launch_month?.split(' ')[0] || '';
+                        const currentMonth = editedDetails.target_publish_month?.split(' ')[0] || '';
                         const newValue = e.target.value ? `${currentMonth || 'January'} ${e.target.value}` : '';
-                        setEditedDetails({ ...editedDetails, target_launch_month: newValue });
+                        setEditedDetails({ ...editedDetails, target_publish_month: newValue });
                       }}
                       className="flex-1 border border-gray-200 rounded-lg p-3 text-sm bg-white"
                     >
@@ -1361,7 +1361,7 @@ export default function TDIAdminCreatorDetailPage() {
                 <div>
                   <p className="text-gray-500">{getContentLabels(creator.content_path).launchLabel}</p>
                   <p className="font-medium" style={{ color: '#2B3A67' }}>
-                    {creator.target_launch_month || 'Not set'}
+                    {creator.target_publish_month || 'Not set'}
                   </p>
                 </div>
               </div>

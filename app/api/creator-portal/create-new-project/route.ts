@@ -70,7 +70,7 @@ export async function POST(request: Request) {
         content_path: null,
         course_title: null,
         course_audience: null,
-        target_launch_month: null,
+        target_publish_month: null,
         discount_code: null,
         google_doc_link: null,
         drive_folder_link: null,

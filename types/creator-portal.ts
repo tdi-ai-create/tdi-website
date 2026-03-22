@@ -92,7 +92,7 @@ export interface Creator {
   course_description: string | null;
   author_bio: string | null;
   course_audience: string | null;
-  target_launch_month: string | null;
+  target_publish_month: string | null;
   discount_code: string | null;
   current_phase: PhaseId;
   content_path: ContentPath | null;

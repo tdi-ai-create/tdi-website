@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       course_title: null,
       course_audience: null,
       content_path: null,
-      target_launch_month: null,
+      target_publish_month: null,
       // Keep some metadata
       discount_code: currentCreator.discount_code,
       // Start at onboarding but will skip intake

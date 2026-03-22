@@ -61,7 +61,7 @@ const mockCreator = {
   name: 'Sarah Johnson',
   course_title: 'Classroom Management Strategies That Actually Work',
   course_audience: 'K-5 Elementary Teachers',
-  target_launch_month: 'March 2025',
+  target_publish_month: 'March 2025',
   discount_code: 'SARAH20',
 };
 
@@ -1089,7 +1089,7 @@ export default function CreatorPortalDemoPage() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wide">Target Launch</p>
-                  <p className="font-medium text-[#1e2749] mt-1">{mockCreator.target_launch_month}</p>
+                  <p className="font-medium text-[#1e2749] mt-1">{mockCreator.target_publish_month}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wide">Your Discount Code</p>
