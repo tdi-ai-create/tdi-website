@@ -65,6 +65,8 @@ export async function PATCH(
       'primary_contact_name',
       'primary_contact_email',
       'phone',
+      'partnership_goal',
+      'year2_planning_notes',
     ];
 
     // Organization table fields

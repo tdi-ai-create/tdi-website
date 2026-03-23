@@ -21,7 +21,18 @@ import { SectionHighlight } from '@/components/dashboard/shared/SectionHighlight
 import { TDISuggestions } from '@/components/dashboard/shared/TDISuggestions'
 import { STATIC_DEFAULTS } from '@/lib/dashboard/dashboardDefaults'
 import { generateSuggestions, type TDISuggestion } from '@/lib/dashboard/generateSuggestions'
-import { ArrowLeft, Loader2, Building2, Upload } from 'lucide-react'
+import { ArrowLeft, Loader2, Building2, Upload, ExternalLink, Calendar, Mail, Phone, MessageCircle } from 'lucide-react'
+import Image from 'next/image'
+
+// Tab configuration - mirrors principal dashboard
+const ADMIN_TABS = [
+  { key: 'overview', label: 'Overview' },
+  { key: 'our-partnership', label: 'Our Partnership' },
+  { key: 'blueprint', label: 'Blueprint' },
+  { key: 'next-year', label: 'Next Year' },
+  { key: 'team', label: 'Team' },
+  { key: 'billing', label: 'Billing' },
+]
 
 interface UploadedFile {
   id: string
@@ -71,6 +82,7 @@ export default function AdminPartnershipDetailPage() {
   // UI state
   const [loading, setLoading] = useState(true)
   const [editMode, setEditMode] = useState(false)
+  const [activeTab, setActiveTab] = useState('overview')
   const [addEventOpen, setAddEventOpen] = useState(false)
   const [newEvent, setNewEvent] = useState({
     event_title: '',
@@ -78,6 +90,14 @@ export default function AdminPartnershipDetailPage() {
     status: 'upcoming',
     event_date: '',
   })
+
+  // Inline editing state for partnership goal
+  const [editingField, setEditingField] = useState<string | null>(null)
+  const [localGoal, setLocalGoal] = useState('')
+  const [localYear2Notes, setLocalYear2Notes] = useState('')
+
+  // Session records state (for Our Partnership tab)
+  const [sessionRecords, setSessionRecords] = useState<any[]>([])
 
   const hasAccess = isOwner || hasAnySectionPermission(permissions, 'leadership')
   const userEmail = teamMember?.email || ''
@@ -149,6 +169,16 @@ export default function AdminPartnershipDetailPage() {
       fetchData()
     }
   }, [hasAccess, userEmail, fetchData])
+
+  // Sync local state when partnership loads
+  useEffect(() => {
+    if (partnership?.partnership_goal) {
+      setLocalGoal(partnership.partnership_goal)
+    }
+    if (partnership?.year2_planning_notes) {
+      setLocalYear2Notes(partnership.year2_planning_notes)
+    }
+  }, [partnership])
 
   // Generate suggestions when partnership data is loaded
   useEffect(() => {
@@ -349,6 +379,8 @@ export default function AdminPartnershipDetailPage() {
     (e) => e.event_type === 'observation' && e.status === 'completed'
   ).length
 
+  const contactName = partnership.primary_contact_name || partnership.contact_name || 'the principal'
+
   return (
     <div className="min-h-screen" style={{ background: '#F4F4F2' }}>
       <div className="max-w-5xl mx-auto px-6 py-8">
@@ -361,7 +393,47 @@ export default function AdminPartnershipDetailPage() {
           Back to Leadership Dashboard
         </Link>
 
-        {/* Header with edit toggle */}
+        {/* Admin Header Bar */}
+        <div className="flex items-center justify-between mb-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-bold text-violet-700 bg-violet-100 px-2.5 py-1 rounded-full">
+              Admin View
+            </span>
+            <span className="text-sm font-semibold text-gray-900">{schoolName}</span>
+            {partnership.data_updated_at && (
+              <span className="text-xs text-gray-400">
+                Last updated: {new Date(partnership.data_updated_at).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setEditMode(!editMode)}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                editMode
+                  ? 'bg-violet-600 text-white'
+                  : 'bg-violet-100 text-violet-700 hover:bg-violet-200'
+              }`}
+            >
+              {editMode ? '✎ Editing' : '✎ Edit Data'}
+            </button>
+            <a
+              href={`/partners/${partnership.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+            >
+              View Client Dashboard
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+        </div>
+
+        {/* Header with school info */}
         <DashboardHeader
           schoolName={schoolName}
           location={
@@ -370,30 +442,61 @@ export default function AdminPartnershipDetailPage() {
               : partnership.address
           }
           phase={phase}
-          dataUpdatedAt={
-            partnership.data_updated_at
-              ? new Date(partnership.data_updated_at).toLocaleDateString('en-US', {
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
-                })
-              : undefined
-          }
-          isAdminView={true}
-          legacyUrl={partnership.legacy_dashboard_url}
-          editMode={editMode}
-          onEditToggle={() => setEditMode(!editMode)}
+          dataUpdatedAt={undefined}
+          isAdminView={false}
         />
+
+        {/* Tab Bar - mirrors principal dashboard */}
+        <div className="mb-6">
+          <div className="flex gap-1 p-1 bg-gray-100 rounded-xl">
+            {ADMIN_TABS.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                  activeTab === tab.key
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Edit Mode Banner */}
         {editMode && (
           <div className="flex items-center gap-2 mb-4 p-3 bg-violet-50 rounded-xl border border-violet-200">
-            <span className="text-xs text-violet-700 font-semibold">* Edit Mode:</span>
-            <span className="text-xs text-violet-600">Click the * button on any section to add highlights, callouts, or NEW badges</span>
+            <span className="text-xs text-violet-700 font-semibold">✎ Edit Mode:</span>
+            <span className="text-xs text-violet-600">Click edit buttons to modify fields. Changes save immediately and update what the client sees.</span>
           </div>
         )}
 
-        {/* Stat Cards */}
+        {/* ═══════════════════════════════════════════════════════════════════
+            OVERVIEW TAB
+            ═══════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'overview' && (
+          <>
+            {/* AI Guidance for Overview */}
+            {editMode && (
+              <div className="mb-4 p-4 rounded-xl border border-violet-200 bg-violet-50">
+                <div className="flex items-start gap-2">
+                  <span className="text-violet-500 text-lg flex-shrink-0">✦</span>
+                  <div>
+                    <p className="text-sm font-semibold text-violet-800 mb-1">AI Tip: Overview Tab</p>
+                    <p className="text-sm text-violet-700 leading-relaxed">
+                      The Overview is the first thing {contactName} sees when they log in.
+                      Keep momentum status current and make sure the TDI Suggestions
+                      reflect where this partnership actually is. If hub login % is low,
+                      update it so the suggestion fires correctly.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Stat Cards */}
         <SectionHighlight
           sectionKey="stat_cards"
           highlights={highlights}
@@ -487,85 +590,7 @@ export default function AdminPartnershipDetailPage() {
           />
         </SectionHighlight>
 
-        {/* Add Event Modal */}
-        {addEventOpen && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
-              <h3 className="font-semibold text-gray-900 mb-4">Add Timeline Event</h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 mb-1 block">
-                    Event Title
-                  </label>
-                  <input
-                    type="text"
-                    value={newEvent.event_title}
-                    onChange={(e) => setNewEvent((n) => ({ ...n, event_title: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-                    placeholder="e.g. Virtual Session 4 complete"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-semibold text-gray-500 mb-1 block">Type</label>
-                    <select
-                      value={newEvent.event_type}
-                      onChange={(e) => setNewEvent((n) => ({ ...n, event_type: e.target.value }))}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-                    >
-                      <option value="custom">Custom</option>
-                      <option value="observation">Observation</option>
-                      <option value="virtual_session">Virtual Session</option>
-                      <option value="executive_session">Executive Session</option>
-                      <option value="love_notes">Love Notes</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-gray-500 mb-1 block">Status</label>
-                    <select
-                      value={newEvent.status}
-                      onChange={(e) => setNewEvent((n) => ({ ...n, status: e.target.value }))}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-                    >
-                      <option value="completed">Done</option>
-                      <option value="in_progress">In Progress</option>
-                      <option value="upcoming">Coming Soon</option>
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 mb-1 block">
-                    Date (optional)
-                  </label>
-                  <input
-                    type="date"
-                    value={newEvent.event_date}
-                    onChange={(e) => setNewEvent((n) => ({ ...n, event_date: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-3 mt-5">
-                <button
-                  onClick={handleAddEvent}
-                  disabled={!newEvent.event_title}
-                  className="flex-1 py-2 rounded-lg text-sm font-semibold text-white transition-all disabled:opacity-50"
-                  style={{ background: '#8B5CF6' }}
-                >
-                  Add Event
-                </button>
-                <button
-                  onClick={() => setAddEventOpen(false)}
-                  className="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Investment Numbers */}
+            {/* Investment Numbers */}
         <SectionHighlight
           sectionKey="investment"
           highlights={highlights}
@@ -597,165 +622,574 @@ export default function AdminPartnershipDetailPage() {
           />
         </SectionHighlight>
 
-        {/* Leading Indicators */}
-        <SectionHighlight
-          sectionKey="leading_indicators"
-          highlights={highlights}
-          isAdminView={editMode}
-          onEdit={(key) => setEditingHighlight(key)}
-        >
-          <LeadingIndicators
-            teacherStress={partnership.teacher_stress_score}
-            strategyImplementation={partnership.strategy_implementation_pct}
-            retentionIntent={partnership.retention_intent_score}
-            defaults={defaults}
-          />
-        </SectionHighlight>
-
-        {/* ADMIN ONLY: Service Delivery Tracking - hide if all totals are 0 */}
-        {((partnership.observation_days_total || 0) > 0 ||
-          (partnership.virtual_sessions_total || 0) > 0 ||
-          (partnership.executive_sessions_total || 0) > 0) && (
-          <SectionHighlight
-            sectionKey="service_delivery"
-            highlights={highlights}
-            isAdminView={editMode}
-            onEdit={(key) => setEditingHighlight(key)}
-          >
-            <div
-              className="bg-white rounded-xl border border-gray-100 p-6 mb-4"
-              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
+            {/* Leading Indicators */}
+            <SectionHighlight
+              sectionKey="leading_indicators"
+              highlights={highlights}
+              isAdminView={editMode}
+              onEdit={(key) => setEditingHighlight(key)}
             >
-              <div className="flex items-center gap-2 mb-5">
-                <div className="w-2 h-2 rounded-full bg-violet-500" />
-                <h2 className="text-base font-semibold text-gray-900">Service Delivery Tracking</h2>
-                <span className="ml-auto text-xs bg-violet-50 text-violet-700 px-2 py-0.5 rounded-full font-semibold">
-                  Admin Only
-                </span>
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <ServiceTracker
-                  partnershipId={partnershipId}
-                  label="Observation Days"
-                  used={partnership.observation_days_used || 0}
-                  total={partnership.observation_days_total || 0}
-                  sessionType="observation"
-                  color="#2D7D78"
-                  userEmail={userEmail}
-                  onCompleted={(result) => {
-                    setPartnership((p: any) => ({
-                      ...p,
-                      observation_days_used: (p.observation_days_used || 0) + 1,
-                      love_notes_count:
-                        (p.love_notes_count || 0) + (result.sessionRecord?.love_notes_count || 0),
-                    }))
-                    fetchData()
-                  }}
-                />
-                <ServiceTracker
-                  partnershipId={partnershipId}
-                  label="Virtual Sessions"
-                  used={partnership.virtual_sessions_used || 0}
-                  total={partnership.virtual_sessions_total || 0}
-                  sessionType="virtual_session"
-                  color="#8B5CF6"
-                  userEmail={userEmail}
-                  onCompleted={() => {
-                    setPartnership((p: any) => ({
-                      ...p,
-                      virtual_sessions_used: (p.virtual_sessions_used || 0) + 1,
-                    }))
-                    fetchData()
-                  }}
-                />
-                <ServiceTracker
-                  partnershipId={partnershipId}
-                  label="Executive Sessions"
-                  used={partnership.executive_sessions_used || 0}
-                  total={partnership.executive_sessions_total || 0}
-                  sessionType="executive_session"
-                  color="#D97706"
-                  userEmail={userEmail}
-                  onCompleted={() => {
-                    setPartnership((p: any) => ({
-                      ...p,
-                      executive_sessions_used: (p.executive_sessions_used || 0) + 1,
-                    }))
-                    fetchData()
-                  }}
-                />
-              </div>
-            </div>
-          </SectionHighlight>
+              <LeadingIndicators
+                teacherStress={partnership.teacher_stress_score}
+                strategyImplementation={partnership.strategy_implementation_pct}
+                retentionIntent={partnership.retention_intent_score}
+                defaults={defaults}
+              />
+            </SectionHighlight>
+          </>
         )}
 
-        {/* ADMIN ONLY: Data Upload Panel - visible in edit mode */}
-        {editMode && (
-          <div className="bg-violet-50 rounded-xl border border-violet-200 p-6 mb-4">
-            <div className="flex items-center gap-2 mb-5">
-              <span className="text-violet-600">↑</span>
-              <h2 className="text-base font-semibold text-violet-900">Update Dashboard Data</h2>
-              <span className="ml-auto text-xs text-violet-500">Changes save immediately</span>
-            </div>
-            <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-              {[
-                { label: 'Hub Login %', field: 'hub_login_pct', type: 'number', suffix: '%' },
-                { label: 'Staff Enrolled', field: 'staff_enrolled', type: 'number' },
-                { label: 'Love Notes Delivered', field: 'love_notes_count', type: 'number' },
-                { label: 'High Engagement %', field: 'high_engagement_pct', type: 'number', suffix: '%' },
-                { label: 'Cost Per Educator', field: 'cost_per_educator', type: 'number', prefix: '$' },
-                { label: 'Teacher Stress Score', field: 'teacher_stress_score', type: 'number', suffix: '/10' },
-                { label: 'Strategy Implementation %', field: 'strategy_implementation_pct', type: 'number', suffix: '%' },
-                { label: 'Retention Intent Score', field: 'retention_intent_score', type: 'number', suffix: '/10' },
-              ].map(({ label, field, type, prefix, suffix }) => (
-                <div key={field}>
-                  <label className="text-xs font-semibold text-violet-700 uppercase tracking-wide mb-1 block">
-                    {label}
-                  </label>
-                  <InlineEditField
-                    partnershipId={partnershipId}
-                    field={field}
-                    value={partnership[field]}
-                    type={type as any}
-                    prefix={prefix}
-                    suffix={suffix}
-                    onSaved={(v) => setPartnership((p: any) => ({ ...p, [field]: v }))}
-                  />
+        {/* ═══════════════════════════════════════════════════════════════════
+            OUR PARTNERSHIP TAB
+            ═══════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'our-partnership' && (
+          <>
+            {/* AI Guidance for Our Partnership */}
+            {editMode && (
+              <div className="mb-4 p-4 rounded-xl border border-violet-200 bg-violet-50">
+                <div className="flex items-start gap-2">
+                  <span className="text-violet-500 text-lg flex-shrink-0">✦</span>
+                  <div>
+                    <p className="text-sm font-semibold text-violet-800 mb-1">AI Tip: Our Partnership Tab</p>
+                    <p className="text-sm text-violet-700 leading-relaxed">
+                      This tab shows the full partnership story. Make sure the Partnership Goal
+                      is specific and measurable. Timeline events should be celebratory - instead of
+                      &quot;Virtual Session 1&quot; try &quot;Virtual Session 1 - Hub onboarding + goals set.&quot;
+                    </p>
+                  </div>
                 </div>
-              ))}
-            </div>
-            <div className="mt-4 pt-4 border-t border-violet-200">
-              <p className="text-xs text-violet-600">
-                Changes save immediately and update what the client sees on their dashboard.
-              </p>
+              </div>
+            )}
+
+            {/* Partnership Goal - Editable */}
+            <div
+              className="bg-white rounded-xl border p-6 mb-4"
+              style={{ borderColor: editMode ? '#8B5CF6' : '#F3F4F6' }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full" style={{ background: '#2D7D78' }} />
+                  <h2 className="text-base font-semibold text-gray-900">Our Partnership Goal</h2>
+                </div>
+                {editMode && editingField !== 'partnership_goal' && (
+                  <button
+                    onClick={() => setEditingField('partnership_goal')}
+                    className="text-xs font-semibold text-violet-600 hover:text-violet-800"
+                  >
+                    ✎ Edit
+                  </button>
+                )}
+              </div>
+
+              {editMode && editingField === 'partnership_goal' ? (
+                <div>
+                  <textarea
+                    value={localGoal}
+                    onChange={(e) => setLocalGoal(e.target.value)}
+                    rows={3}
+                    className="w-full border border-violet-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 mb-2"
+                    placeholder="e.g. Support 19 educators with Hub access, building classroom strategies and reducing teacher stress during a 3-month pilot."
+                  />
+                  <div className="flex items-center gap-2 mb-3">
+                    <button
+                      onClick={async () => {
+                        await handleFieldUpdate('partnership_goal', localGoal)
+                        setEditingField(null)
+                      }}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white"
+                      style={{ background: '#8B5CF6' }}
+                    >
+                      Save Goal
+                    </button>
+                    <button
+                      onClick={() => {
+                        setLocalGoal(partnership?.partnership_goal || '')
+                        setEditingField(null)
+                      }}
+                      className="text-xs text-gray-400 hover:text-gray-600"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  {/* AI Guidance */}
+                  <div className="p-3 rounded-lg bg-violet-50 border border-violet-100">
+                    <p className="text-xs font-semibold text-violet-700 mb-1">✦ AI Guidance</p>
+                    <p className="text-xs text-violet-600 leading-relaxed">
+                      A strong partnership goal includes: (1) who is being served (staff count + role),
+                      (2) the main outcome (what changes for them), and (3) the timeframe.
+                      Keep it to 1-2 sentences. The principal will see this at the top of their Our Partnership tab.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-base text-gray-700 leading-relaxed font-medium">
+                  {partnership.partnership_goal || (
+                    <span className="text-gray-400 italic text-sm">No goal set yet. Click Edit to add one.</span>
+                  )}
+                </p>
+              )}
             </div>
 
-            {/* File Upload Zone */}
-            <div className="mt-6 pt-6 border-t border-violet-200">
-              <div className="flex items-center gap-2 mb-4">
-                <Upload className="w-4 h-4 text-violet-600" />
-                <h3 className="text-sm font-semibold text-violet-900">Upload & Extract</h3>
+            {/* Service Delivery Tracking - Admin Only, moved to Our Partnership tab */}
+            {editMode && ((partnership.observation_days_total || 0) > 0 ||
+              (partnership.virtual_sessions_total || 0) > 0 ||
+              (partnership.executive_sessions_total || 0) > 0) && (
+              <SectionHighlight
+                sectionKey="service_delivery"
+                highlights={highlights}
+                isAdminView={editMode}
+                onEdit={(key) => setEditingHighlight(key)}
+              >
+                <div
+                  className="bg-white rounded-xl border border-violet-200 p-6 mb-4"
+                  style={{ boxShadow: '0 1px 4px rgba(139,92,246,0.08)' }}
+                >
+                  <div className="flex items-center gap-2 mb-5">
+                    <div className="w-2 h-2 rounded-full bg-violet-500" />
+                    <h2 className="text-base font-semibold text-gray-900">Mark Session Complete</h2>
+                    <span className="ml-auto text-xs bg-violet-50 text-violet-700 px-2 py-0.5 rounded-full font-semibold">
+                      Admin Only
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <ServiceTracker
+                      partnershipId={partnershipId}
+                      label="Observation Days"
+                      used={partnership.observation_days_used || 0}
+                      total={partnership.observation_days_total || 0}
+                      sessionType="observation"
+                      color="#2D7D78"
+                      userEmail={userEmail}
+                      onCompleted={(result) => {
+                        setPartnership((p: any) => ({
+                          ...p,
+                          observation_days_used: (p.observation_days_used || 0) + 1,
+                          love_notes_count:
+                            (p.love_notes_count || 0) + (result.sessionRecord?.love_notes_count || 0),
+                        }))
+                        fetchData()
+                      }}
+                    />
+                    <ServiceTracker
+                      partnershipId={partnershipId}
+                      label="Virtual Sessions"
+                      used={partnership.virtual_sessions_used || 0}
+                      total={partnership.virtual_sessions_total || 0}
+                      sessionType="virtual_session"
+                      color="#8B5CF6"
+                      userEmail={userEmail}
+                      onCompleted={() => {
+                        setPartnership((p: any) => ({
+                          ...p,
+                          virtual_sessions_used: (p.virtual_sessions_used || 0) + 1,
+                        }))
+                        fetchData()
+                      }}
+                    />
+                    <ServiceTracker
+                      partnershipId={partnershipId}
+                      label="Executive Sessions"
+                      used={partnership.executive_sessions_used || 0}
+                      total={partnership.executive_sessions_total || 0}
+                      sessionType="executive_session"
+                      color="#D97706"
+                      userEmail={userEmail}
+                      onCompleted={() => {
+                        setPartnership((p: any) => ({
+                          ...p,
+                          executive_sessions_used: (p.executive_sessions_used || 0) + 1,
+                        }))
+                        fetchData()
+                      }}
+                    />
+                  </div>
+                </div>
+              </SectionHighlight>
+            )}
+
+            {/* Partnership Timeline with AI tip */}
+            {editMode && (
+              <div className="p-3 rounded-lg bg-violet-50 border border-violet-100 mb-3">
+                <p className="text-xs font-semibold text-violet-700 mb-1">✦ AI Guidance</p>
+                <p className="text-xs text-violet-600 leading-relaxed">
+                  Great timeline events are specific and celebratory. Instead of &quot;Virtual Session 1&quot;
+                  try &quot;Virtual Session 1 - Hub onboarding + partnership goals set.&quot;
+                  The Done column builds momentum for the principal. Keep Coming Soon honest -
+                  only add dates you&apos;re confident about.
+                </p>
               </div>
-              <p className="text-xs text-violet-600 mb-4">
-                Upload reports, screenshots, or data exports. Use AI to automatically extract metrics.
-              </p>
-              <FileUploadZone
-                partnershipId={partnershipId}
-                userEmail={userEmail}
-                files={uploadedFiles}
-                onFilesChange={() => {
-                  fetch(`/api/tdi-admin/leadership/${partnershipId}/upload`, {
-                    headers: { 'x-user-email': userEmail },
-                  })
-                    .then((res) => res.json())
-                    .then((data) => setUploadedFiles(data.files || []))
-                }}
-                onExtract={(fileId, filename) =>
-                  setExtractModal({ open: true, fileId, filename })
-                }
+            )}
+
+            <SectionHighlight
+              sectionKey="timeline"
+              highlights={highlights}
+              isAdminView={editMode}
+              onEdit={(key) => setEditingHighlight(key)}
+            >
+              <PartnershipTimeline
+                events={timelineEvents}
+                isAdminView={editMode}
+                onAddEvent={() => setAddEventOpen(true)}
+                onDeleteEvent={handleDeleteEvent}
+                onMoveEvent={handleMoveEvent}
               />
+            </SectionHighlight>
+          </>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════
+            BLUEPRINT TAB
+            ═══════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'blueprint' && (
+          <>
+            {editMode && (
+              <div className="p-4 rounded-xl bg-violet-50 border border-violet-200 mb-4">
+                <p className="text-xs text-violet-700">
+                  ✦ Blueprint tab content is standard across all partnerships.
+                  The &quot;You Are Here&quot; phase updates automatically when you change the contract phase
+                  in School Information on the Team tab.
+                </p>
+              </div>
+            )}
+
+            {/* Blueprint content - simplified for admin view */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6 mb-4">
+              <h2 className="text-lg font-bold text-gray-900 mb-4">The TDI Blueprint</h2>
+              <p className="text-gray-600 mb-6">
+                Our partnership follows a proven three-phase framework designed to create lasting change.
+              </p>
+
+              {/* Phase Cards */}
+              <div className="grid md:grid-cols-3 gap-4">
+                {[
+                  { phase: 'IGNITE', title: 'Build the Foundation', desc: 'Hub onboarding, first observations, baseline data collection' },
+                  { phase: 'ACCELERATE', title: 'Scale to Full Staff', desc: 'Growth groups, expanded observations, mid-year review' },
+                  { phase: 'SUSTAIN', title: 'Embed for Lasting Change', desc: 'Internal coaching capacity, full implementation, annual impact' },
+                ].map((p) => (
+                  <div
+                    key={p.phase}
+                    className={`p-5 rounded-xl border-2 ${
+                      partnership.contract_phase === p.phase
+                        ? 'border-[#4ecdc4] bg-[#4ecdc4]/10'
+                        : 'border-gray-200 bg-gray-50'
+                    }`}
+                  >
+                    {partnership.contract_phase === p.phase && (
+                      <span className="text-xs font-bold text-[#4ecdc4] mb-2 block">YOU ARE HERE</span>
+                    )}
+                    <h3 className="font-bold text-gray-900 mb-1">{p.phase}</h3>
+                    <p className="text-sm font-medium text-gray-700 mb-2">{p.title}</p>
+                    <p className="text-xs text-gray-500">{p.desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          </>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════
+            NEXT YEAR TAB
+            ═══════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'next-year' && (
+          <>
+            {/* Admin-only Year 2 Planning Notes */}
+            {editMode && (
+              <div className="bg-white rounded-xl border border-violet-200 p-5 mb-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-violet-500">✦</span>
+                  <h3 className="text-sm font-semibold text-violet-900">Year 2 Planning Notes</h3>
+                  <span className="text-xs text-violet-500 ml-auto">Admin only</span>
+                </div>
+                <InlineEditField
+                  partnershipId={partnershipId}
+                  field="year2_planning_notes"
+                  value={partnership.year2_planning_notes}
+                  type="textarea"
+                  onSaved={(v) => setPartnership((p: any) => ({ ...p, year2_planning_notes: v }))}
+                />
+                <div className="mt-3 p-3 rounded-lg bg-violet-50">
+                  <p className="text-xs text-violet-600 leading-relaxed">
+                    ✦ AI Guidance: Note the renewal conversation status, any pricing discussions,
+                    what phase they&apos;d move to, and any concerns. This is internal only -
+                    the principal sees the standard Next Year content.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Standard Next Year content */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6 mb-4">
+              <h2 className="text-lg font-bold text-gray-900 mb-2">Your Growth Plan</h2>
+              <p className="text-gray-600 mb-6">
+                Building on this year&apos;s momentum, here&apos;s what Year 2 can look like for {schoolName}.
+              </p>
+
+              {/* Proposed Timeline */}
+              <div className="bg-gray-50 rounded-xl p-5">
+                <h3 className="font-semibold text-gray-900 mb-4">Proposed 2026-27 Timeline</h3>
+                <div className="space-y-3">
+                  {[
+                    { month: 'Aug', event: 'Leadership Planning Session' },
+                    { month: 'Sep', event: 'On-Site Kickoff (full team)' },
+                    { month: 'Oct', event: 'Virtual Session: Advanced strategies' },
+                    { month: 'Nov', event: 'Observation Day: Expanded groups' },
+                    { month: 'Jan', event: 'Mid-Year Check-in + Growth Group refresh' },
+                    { month: 'Mar', event: 'Observation Day: Full implementation' },
+                    { month: 'May', event: 'Executive Impact Session: Annual results + Year 3' },
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-3 text-sm">
+                      <span className="font-semibold text-gray-900 w-10">{item.month}</span>
+                      <span className="text-gray-600">{item.event}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════
+            TEAM TAB
+            ═══════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'team' && (
+          <>
+            {/* AI Guidance for Team */}
+            {editMode && (
+              <div className="p-3 rounded-lg bg-violet-50 border border-violet-100 mb-4">
+                <p className="text-xs font-semibold text-violet-700 mb-1">✦ AI Guidance</p>
+                <p className="text-xs text-violet-600 leading-relaxed">
+                  Make sure the primary contact name and email are correct -
+                  these show on the principal&apos;s Team tab. The phone number is helpful
+                  for your records but isn&apos;t shown to the principal.
+                </p>
+              </div>
+            )}
+
+            {/* TDI Team */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-4">
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Your TDI Team</h2>
+              <div className="flex flex-col sm:flex-row items-start gap-6">
+                <div className="w-28 h-28 bg-gray-200 rounded-full overflow-hidden flex-shrink-0 shadow-md">
+                  <Image
+                    src="/images/rae-headshot.webp"
+                    alt="Rae Hughart"
+                    width={112}
+                    height={112}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-1">
+                  <p className="text-base font-semibold text-[#1e2749]">Rae Hughart</p>
+                  <p className="text-gray-500">Founder & CEO</p>
+                  <div className="mt-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-gray-400" />
+                      <a href="mailto:Rae@TeachersDeserveIt.com" className="text-blue-600 hover:underline">
+                        Rae@TeachersDeserveIt.com
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-4 h-4 text-gray-400" />
+                      <a href="tel:+18477215503" className="text-blue-600 hover:underline">847-721-5503</a>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MessageCircle className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm text-gray-600">Also available by text!</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-3 mt-5">
+                    <a
+                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FFBA06] text-[#1e2749] rounded-lg font-medium hover:bg-[#e5a805] transition-colors"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Schedule a Call
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* School Information - editable in edit mode */}
+            <div
+              className="bg-white rounded-xl border border-gray-100 p-5 mb-4"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-2 h-2 rounded-full" style={{ background: '#16A34A' }} />
+                <h2 className="text-sm font-semibold text-gray-900">School Information</h2>
+                {editMode && (
+                  <span className="ml-auto text-xs text-violet-500">Click any field to edit</span>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                {/* School Name */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                    School / District Name
+                  </label>
+                  {editMode ? (
+                    <InlineEditField
+                      partnershipId={partnershipId}
+                      field="name"
+                      value={organization?.name}
+                      type="text"
+                      onSaved={(v) => setOrganization((o: any) => ({ ...o, name: v }))}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700">{organization?.name || '—'}</p>
+                  )}
+                </div>
+
+                {/* Primary Contact Name */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                    Primary Contact
+                  </label>
+                  {editMode ? (
+                    <InlineEditField
+                      partnershipId={partnershipId}
+                      field="primary_contact_name"
+                      value={partnership?.primary_contact_name}
+                      type="text"
+                      onSaved={(v) => setPartnership((p: any) => ({ ...p, primary_contact_name: v }))}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700">{partnership?.primary_contact_name || '—'}</p>
+                  )}
+                </div>
+
+                {/* Contact Email */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                    Contact Email
+                  </label>
+                  {editMode ? (
+                    <InlineEditField
+                      partnershipId={partnershipId}
+                      field="primary_contact_email"
+                      value={partnership?.primary_contact_email}
+                      type="text"
+                      onSaved={(v) => setPartnership((p: any) => ({ ...p, primary_contact_email: v }))}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700">{partnership?.primary_contact_email || '—'}</p>
+                  )}
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                    Phone
+                  </label>
+                  {editMode ? (
+                    <InlineEditField
+                      partnershipId={partnershipId}
+                      field="phone"
+                      value={partnership?.phone}
+                      type="text"
+                      onSaved={(v) => setPartnership((p: any) => ({ ...p, phone: v }))}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700">{partnership?.phone || '—'}</p>
+                  )}
+                </div>
+
+                {/* Contract Phase */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                    Contract Phase
+                  </label>
+                  {editMode ? (
+                    <InlineEditField
+                      partnershipId={partnershipId}
+                      field="contract_phase"
+                      value={partnership?.contract_phase}
+                      type="select"
+                      options={['IGNITE', 'ACCELERATE', 'SUSTAIN']}
+                      onSaved={(v) => setPartnership((p: any) => ({ ...p, contract_phase: v }))}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700">{partnership?.contract_phase || '—'}</p>
+                  )}
+                </div>
+
+                {/* Contract Dates */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                    Contract Period
+                  </label>
+                  <p className="text-sm text-gray-700">
+                    {partnership?.contract_start || 'Not set'} — {partnership?.contract_end || 'Not set'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════
+            BILLING TAB
+            ═══════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'billing' && (
+          <>
+            <div className="bg-white rounded-xl border border-gray-100 p-6 mb-4">
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Billing & Contract</h2>
+              <p className="text-gray-600 mb-6">
+                Contract and billing details for this partnership.
+              </p>
+
+              <div className="grid sm:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Partnership Type</p>
+                    <p className="font-medium text-[#1e2749] capitalize">{partnership.partnership_type || 'School'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Contract Period</p>
+                    <p className="font-medium text-[#1e2749]">
+                      {partnership.contract_start
+                        ? new Date(partnership.contract_start).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                        : 'Not set'}{' '}
+                      —{' '}
+                      {partnership.contract_end
+                        ? new Date(partnership.contract_end).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                        : 'Not set'}
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Current Phase</p>
+                    <span
+                      className="inline-block px-3 py-1 rounded-full text-sm font-medium"
+                      style={{ backgroundColor: '#4ecdc420', color: '#2D7D78' }}
+                    >
+                      {partnership.contract_phase || 'IGNITE'}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Staff Enrolled</p>
+                    <p className="font-medium text-[#1e2749]">{partnership.staff_enrolled || 0} educators</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact for billing questions */}
+              <div className="mt-6 pt-4 border-t border-gray-100">
+                <p className="text-sm text-gray-500">
+                  Questions about billing? Contact{' '}
+                  <a href="mailto:Rae@TeachersDeserveIt.com" className="text-violet-600 hover:underline">
+                    Rae@TeachersDeserveIt.com
+                  </a>
+                </p>
+              </div>
+            </div>
+          </>
         )}
 
         {/* AI Extract Modal */}
@@ -783,240 +1217,79 @@ export default function AdminPartnershipDetailPage() {
           />
         )}
 
-        {/* Partnership Info */}
-        <div
-          className="bg-white rounded-xl border border-gray-100 p-5 mb-4"
-          style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-2 h-2 rounded-full bg-violet-500" />
-            <h2 className="text-sm font-semibold text-gray-900">Partnership Info</h2>
-          </div>
-          <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-400">Contact</span>
-              <span className="font-medium text-gray-700">
-                {partnership.primary_contact_name || partnership.contact_name || '-'}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">Email</span>
-              <span className="font-medium text-gray-700">
-                {partnership.primary_contact_email || partnership.contact_email || '-'}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">Type</span>
-              <span className="font-medium text-gray-700 capitalize">
-                {partnership.partnership_type || '-'}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">Phase</span>
-              <span className="font-medium text-gray-700">{partnership.contract_phase || '-'}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">Contract Start</span>
-              <span className="font-medium text-gray-700">{partnership.contract_start || '-'}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">Contract End</span>
-              <span className="font-medium text-gray-700">{partnership.contract_end || '-'}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* School Information - always visible, editable in edit mode */}
-        <div
-          className="bg-white rounded-xl border border-gray-100 p-5 mb-4"
-          style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-2 h-2 rounded-full" style={{ background: '#16A34A' }} />
-            <h2 className="text-sm font-semibold text-gray-900">School Information</h2>
-            {editMode && (
-              <span className="ml-auto text-xs text-violet-500">Click any field to edit</span>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-            {/* School Name */}
-            <div>
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                School / District Name
-              </label>
-              {editMode ? (
-                <InlineEditField
-                  partnershipId={partnershipId}
-                  field="name"
-                  value={organization?.name}
-                  type="text"
-                  onSaved={(v) => setOrganization((o: any) => ({ ...o, name: v }))}
-                />
-              ) : (
-                <p className="text-sm text-gray-700">{organization?.name || '—'}</p>
-              )}
-            </div>
-
-            {/* Primary Contact Name */}
-            <div>
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                Primary Contact
-              </label>
-              {editMode ? (
-                <InlineEditField
-                  partnershipId={partnershipId}
-                  field="primary_contact_name"
-                  value={partnership?.primary_contact_name}
-                  type="text"
-                  onSaved={(v) => setPartnership((p: any) => ({ ...p, primary_contact_name: v }))}
-                />
-              ) : (
-                <p className="text-sm text-gray-700">{partnership?.primary_contact_name || '—'}</p>
-              )}
-            </div>
-
-            {/* Contact Email */}
-            <div>
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                Contact Email
-              </label>
-              {editMode ? (
-                <InlineEditField
-                  partnershipId={partnershipId}
-                  field="primary_contact_email"
-                  value={partnership?.primary_contact_email}
-                  type="text"
-                  onSaved={(v) => setPartnership((p: any) => ({ ...p, primary_contact_email: v }))}
-                />
-              ) : (
-                <p className="text-sm text-gray-700">{partnership?.primary_contact_email || '—'}</p>
-              )}
-            </div>
-
-            {/* Phone */}
-            <div>
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                Phone
-              </label>
-              {editMode ? (
-                <InlineEditField
-                  partnershipId={partnershipId}
-                  field="phone"
-                  value={partnership?.phone}
-                  type="text"
-                  onSaved={(v) => setPartnership((p: any) => ({ ...p, phone: v }))}
-                />
-              ) : (
-                <p className="text-sm text-gray-700">{partnership?.phone || '—'}</p>
-              )}
-            </div>
-
-            {/* Address */}
-            <div>
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                Address
-              </label>
-              {editMode ? (
-                <InlineEditField
-                  partnershipId={partnershipId}
-                  field="address"
-                  value={organization?.address}
-                  type="text"
-                  onSaved={(v) => setOrganization((o: any) => ({ ...o, address: v }))}
-                />
-              ) : (
-                <p className="text-sm text-gray-700">{organization?.address || '—'}</p>
-              )}
-            </div>
-
-            {/* City / State / Zip */}
-            <div>
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                City / State / Zip
-              </label>
-              {editMode ? (
-                <div className="flex gap-2">
-                  <InlineEditField
-                    partnershipId={partnershipId}
-                    field="city"
-                    value={organization?.city}
+        {/* Add Event Modal */}
+        {addEventOpen && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+              <h3 className="font-semibold text-gray-900 mb-4">Add Timeline Event</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 mb-1 block">Event Title</label>
+                  <input
                     type="text"
-                    onSaved={(v) => setOrganization((o: any) => ({ ...o, city: v }))}
-                  />
-                  <InlineEditField
-                    partnershipId={partnershipId}
-                    field="state"
-                    value={organization?.state}
-                    type="text"
-                    onSaved={(v) => setOrganization((o: any) => ({ ...o, state: v }))}
-                  />
-                  <InlineEditField
-                    partnershipId={partnershipId}
-                    field="zip"
-                    value={organization?.zip}
-                    type="text"
-                    onSaved={(v) => setOrganization((o: any) => ({ ...o, zip: v }))}
+                    value={newEvent.event_title}
+                    onChange={(e) => setNewEvent((n) => ({ ...n, event_title: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    placeholder="e.g. Virtual Session 4 - Growth Group strategies"
                   />
                 </div>
-              ) : (
-                <p className="text-sm text-gray-700">
-                  {[organization?.city, organization?.state, organization?.zip].filter(Boolean).join(', ') || '—'}
-                </p>
-              )}
-            </div>
-
-            {/* Website */}
-            <div>
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                Website
-              </label>
-              {editMode ? (
-                <InlineEditField
-                  partnershipId={partnershipId}
-                  field="website"
-                  value={organization?.website}
-                  type="text"
-                  onSaved={(v) => setOrganization((o: any) => ({ ...o, website: v }))}
-                />
-              ) : (
-                <p className="text-sm text-gray-700">
-                  {organization?.website ? (
-                    <a
-                      href={organization.website.startsWith('http') ? organization.website : `https://${organization.website}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-violet-600 hover:underline"
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-semibold text-gray-500 mb-1 block">Type</label>
+                    <select
+                      value={newEvent.event_type}
+                      onChange={(e) => setNewEvent((n) => ({ ...n, event_type: e.target.value }))}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
                     >
-                      {organization.website}
-                    </a>
-                  ) : (
-                    '—'
-                  )}
-                </p>
-              )}
-            </div>
-
-            {/* Contract Phase */}
-            <div>
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                Contract Phase
-              </label>
-              {editMode ? (
-                <InlineEditField
-                  partnershipId={partnershipId}
-                  field="contract_phase"
-                  value={partnership?.contract_phase}
-                  type="select"
-                  options={['IGNITE', 'ACCELERATE', 'SUSTAIN']}
-                  onSaved={(v) => setPartnership((p: any) => ({ ...p, contract_phase: v }))}
-                />
-              ) : (
-                <p className="text-sm text-gray-700">{partnership?.contract_phase || '—'}</p>
-              )}
+                      <option value="custom">Custom</option>
+                      <option value="observation">Observation</option>
+                      <option value="virtual_session">Virtual Session</option>
+                      <option value="executive_session">Executive Session</option>
+                      <option value="love_notes">Love Notes</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-500 mb-1 block">Status</label>
+                    <select
+                      value={newEvent.status}
+                      onChange={(e) => setNewEvent((n) => ({ ...n, status: e.target.value }))}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    >
+                      <option value="completed">Done</option>
+                      <option value="in_progress">In Progress</option>
+                      <option value="upcoming">Coming Soon</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 mb-1 block">Date (optional)</label>
+                  <input
+                    type="date"
+                    value={newEvent.event_date}
+                    onChange={(e) => setNewEvent((n) => ({ ...n, event_date: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3 mt-5">
+                <button
+                  onClick={handleAddEvent}
+                  disabled={!newEvent.event_title}
+                  className="flex-1 py-2 rounded-lg text-sm font-semibold text-white transition-all disabled:opacity-50"
+                  style={{ background: '#8B5CF6' }}
+                >
+                  Add Event
+                </button>
+                <button
+                  onClick={() => setAddEventOpen(false)}
+                  className="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
