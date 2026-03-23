@@ -227,6 +227,28 @@ function ThankYouContent() {
           >
             Share on LinkedIn
           </a>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(shareText);
+              const btn = document.getElementById('ig-copy-btn');
+              if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.textContent = 'Copy for Instagram'; }, 2000); }
+            }}
+            id="ig-copy-btn"
+            style={shareButtonStyle('#E1306C')}
+          >
+            Copy for Instagram
+          </button>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(shareText);
+              const btn = document.getElementById('tt-copy-btn');
+              if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.textContent = 'Copy for TikTok'; }, 2000); }
+            }}
+            id="tt-copy-btn"
+            style={shareButtonStyle('#010101')}
+          >
+            Copy for TikTok
+          </button>
         </div>
 
         <p style={{
@@ -344,6 +366,8 @@ const shareButtonStyle = (bg: string): React.CSSProperties => ({
   fontSize: '14px',
   fontWeight: '600',
   fontFamily: 'sans-serif',
+  border: 'none',
+  cursor: 'pointer',
 });
 
 export default function ThankYouPage() {

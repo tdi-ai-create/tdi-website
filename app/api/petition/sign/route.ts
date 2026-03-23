@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
           </p>
 
           <p style="font-size: 15px; line-height: 1.7; margin-bottom: 24px;">
-            As a thank you, here's a free month inside the TDI Learning Hub - 33 courses, practical strategies, and a community of educators who get it.
+            As a thank you, here's a free month inside the TDI Learning Hub - over 100+ educator created tools, practical strategies, and a community of educators who get it.
           </p>
 
           <div style="background: #E1F5EE; border-left: 4px solid #1D9E75; padding: 20px 24px; border-radius: 4px; margin-bottom: 32px;">
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
             <p style="font-size: 28px; font-weight: bold; color: #0F6E56; margin: 0; letter-spacing: 2px; font-family: monospace;">Free Month</p>
           </div>
 
-          <a href="https://teachersdeserveit.com/hub" style="display: inline-block; background: #1D9E75; color: white; padding: 14px 32px; border-radius: 4px; text-decoration: none; font-family: sans-serif; font-weight: bold; font-size: 15px; margin-bottom: 32px;">
+          <a href="https://tdi.thinkific.com/bundles/AllAccess" style="display: inline-block; background: #1D9E75; color: white; padding: 14px 32px; border-radius: 4px; text-decoration: none; font-family: sans-serif; font-weight: bold; font-size: 15px; margin-bottom: 32px;">
             Redeem Your Free Month
           </a>
 
