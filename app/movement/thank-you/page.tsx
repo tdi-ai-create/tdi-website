@@ -121,6 +121,8 @@ function ThankYouContent() {
 
         <a
           href="https://tdi.thinkific.com/bundles/AllAccess"
+          target="_blank"
+          rel="noopener noreferrer"
           style={{
             display: 'inline-block',
             backgroundColor: '#1D9E75',
