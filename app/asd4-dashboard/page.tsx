@@ -719,6 +719,12 @@ export default function ASD4Dashboard() {
         { para: 'Cortez, Maria', location: 'Social Studies, S236', note: 'Present with students during guided notes. Students were on task and engaged during whole-class instruction.' },
         { para: 'Zarate, Claudia', location: '1:1 support', note: 'Seated alongside student, focused on redirects. Said "Good, you have it" as a quiet in-the-moment affirmation. Consistent presence with her student.' },
       ],
+      voicesFromTheField: [
+        { text: 'I love that Paras now have a person who can help us find information, give us feedback and listen to what we are saying.', author: 'Karen Magnuson', role: 'Paraprofessional' },
+        { text: 'I will implement the waiting on the question part. It makes me feel really good working with the students.', author: 'Samantha Zaborowski', role: 'Paraprofessional' },
+        { text: 'I will definitely look into the paraprofessional foundations, as I believe it will help me grow in my role and better support students.', author: 'Maria Cortez', role: 'Paraprofessional' },
+        { text: 'I found your observations helpful and relevant to my practice. This is an area I would like to continue developing.', author: 'Mirela Hodo', role: 'Paraprofessional' },
+      ],
       paras: [
         { name: 'Gorostieta, Michele', email: 'mgorostieta@asd4.org', loggedIn: true },
         { name: 'Beahan, Linda', email: 'lbeahan@asd4.org', loggedIn: true },
@@ -894,6 +900,10 @@ export default function ASD4Dashboard() {
       observationDay2Notes: [
         { para: 'Hoppensteadt, Emily', location: 'Literacy, Room 42 (Teacher: Velez)', note: 'An absolute standout. Working with two students at a table on letter formation — full of energy, invitational language, and specific feedback. "What letter is that? Like snake — ssss!" with a hand gesture. "Let\'s try making that line a little higher so it looks like an \'h\' not an \'x\'" — precise, actionable, delivered with warmth. "Great! I love how you wrote that!" Students were giggling and smiling throughout. Encouraging, loving, strong voice. A master class in early literacy support.' },
         { para: 'Zaragoza, Ana', location: 'Spanish Bilingual Math, Room 57 (Teacher: Rodriguez)', note: 'Working 1:1 in Spanish. Warm, slow, expressive voice with lots of inflection. "Excellente!" "Muy bien! Me gusta! Sí!" Used hands and body movement to show understanding as she read problems aloud. "Show me one" with a physical prompt — meeting the student exactly where they are. Gave the student choices on multiple choice items, reading options aloud and letting the student select. A beautiful example of "Ask Don\'t Tell" in a bilingual context.' },
+      ],
+      voicesFromTheField: [
+        { text: 'I could see their confidence boost right in front of my eyes. Their big smiles filled my heart. I believe this strategy supports engagement and play to develop a deeper understanding.', author: 'Emily Hoppensteadt', role: 'Paraprofessional', note: 'Replied March 23, 2026' },
+        { text: 'I\'ll be sure to try your recommendation of using basic sign language cues. I appreciate your kind observations and am happy to hear back from you!', author: 'Ana Zaragoza', role: 'Paraprofessional', note: 'Replied same day as observation' },
       ],
       paras: [
         { name: 'Zaragoza Aguilar, Ana', email: 'azaragoza@asd4.org', loggedIn: true },
@@ -1271,14 +1281,16 @@ Thank you for setting the example. It matters more than you know.`;
         date: 'March 19, 2026',
         classroomsVisited: 10,
         loveNotesDelivered: 10,
-        repliesReceived: 0,
-        aiSummary: 'Observation Day 2 spanned two buildings — Indian Trail Jr. High and Army Trail Elementary — with 10 paraprofessionals observed across a range of settings including FACS, Social Studies, Reading Groups, and early elementary literacy. All 10 paras received personalized follow-up emails same-day. Standout themes included proactive room presence, bilingual instructional support, and strong student relationships built through consistent, warm interaction.',
+        repliesReceived: 7,
+        aiSummary: 'Observation Day 2 spanned two buildings — Indian Trail Jr. High and Army Trail Elementary — with 10 paraprofessionals observed across a range of settings including FACS, Social Studies, Reading Groups, and early elementary literacy. All 10 paras received personalized follow-up emails same-day, with 7 of 7 contacted paras replying same day or within 4 days. Standout themes included proactive room presence, bilingual instructional support, and strong student relationships built through consistent, warm interaction.',
         details: {
           narrative: 'During Observation Day 2, TDI visited two buildings: Indian Trail Jr. High (8 paras observed) and Army Trail Elementary (2 paras observed). The observation focus shifted to Instructional Support Strategies - looking at how paras scaffold learning, monitor understanding, and adjust their approach based on student needs. Across both buildings, we saw paras confidently stepping into instructional moments, using proximity intentionally, and building rapport with students through consistent check-ins. The momentum from Day 1 was visible - paras were more aware of being observed and more intentional in demonstrating the strategies they\'ve been learning.',
           quotes: [
-            'I used to just float around the room. Now I know exactly where to stand and when to step in.',
-            'The Love Note mentioned something I didn\'t even realize I was doing. It made me want to do it more.',
-            'I finally feel like I\'m teaching, not just helping.',
+            { text: 'I love that Paras now have a person who can help us find information, give us feedback and listen to what we are saying.', author: 'Karen Magnuson', school: 'Indian Trail Junior High', note: 'Replied same day' },
+            { text: 'I will implement the waiting on the question part. It makes me feel really good working with the students.', author: 'Samantha Zaborowski', school: 'Indian Trail Junior High', note: 'Replied same day' },
+            { text: 'I will definitely look into the paraprofessional foundations, as I believe it will help me grow in my role and better support students.', author: 'Maria Cortez', school: 'Indian Trail Junior High', note: 'Replied same day' },
+            { text: 'I found your observations helpful and relevant to my practice. This is an area I would like to continue developing.', author: 'Mirela Hodo', school: 'Indian Trail Junior High', note: 'Replied same day' },
+            { text: 'I\'ll be sure to try your recommendation of using basic sign language cues. I appreciate your kind observations and am happy to hear back from you!', author: 'Ana Zaragoza', school: 'Army Trail Elementary', note: 'Replied same day' },
           ],
           resources: [
             'Hub course referenced: The Proximity Principle',
@@ -1303,6 +1315,10 @@ Thank you for setting the example. It matters more than you know.`;
           {
             theme: 'Teacher-para alignment',
             insight: 'Co-teaching transitions were smoother in classrooms where both teacher and para had engaged with Hub content. Shared language is making a difference.',
+          },
+          {
+            theme: 'Para engagement exceeding expectations',
+            insight: '7 of 7 Observation Day 2 paras replied to their follow-up emails same day or within 4 days. Several paras have asked follow-up coaching questions, indicating active engagement beyond the observation visit.',
           },
         ],
       },
@@ -1705,13 +1721,22 @@ Thank you for setting the example. It matters more than you know.`;
             {obs.details.quotes.length > 0 && (
               <div>
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Voices from the Field</p>
-                <div className="space-y-2">
-                  {obs.details.quotes.slice(0, 4).map((q, i) => (
-                    <div key={i} className="flex gap-3 bg-teal-50 rounded-xl p-3 border border-teal-100">
-                      <div className="w-1 bg-teal-400 rounded-full shrink-0 self-stretch" />
-                      <p className="text-sm text-gray-700 italic leading-relaxed">&ldquo;{q}&rdquo;</p>
-                    </div>
-                  ))}
+                <div className="space-y-3">
+                  {obs.details.quotes.slice(0, 5).map((q: string | { text: string; author: string; school: string; note: string }, i: number) => {
+                    const isObject = typeof q === 'object';
+                    const quoteText = isObject ? q.text : q;
+                    return (
+                      <blockquote key={i} className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
+                        <p className="text-sm italic text-gray-700">&ldquo;{quoteText}&rdquo;</p>
+                        {isObject && (
+                          <>
+                            <p className="text-xs text-gray-500 mt-2">— {q.author}, Paraprofessional, {q.school}</p>
+                            <p className="text-xs text-emerald-600 mt-1">{q.note}</p>
+                          </>
+                        )}
+                      </blockquote>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -2070,6 +2095,28 @@ Thank you for setting the example. It matters more than you know.`;
                       <div className="text-xs text-gray-400 leading-snug">{stat.sub}</div>
                     </div>
                   ))}
+                </div>
+              </div>
+            </div>
+
+            {/* ─── ZONE 2B+: FEATURED PARA VOICE ─── */}
+            <div className="bg-gradient-to-r from-[#1e2749] to-[#2d3a6b] rounded-2xl p-6 shadow-lg">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <MessageCircle className="w-6 h-6 text-teal-300" />
+                </div>
+                <div>
+                  <p className="text-white text-lg font-medium italic leading-relaxed mb-3">
+                    &ldquo;I love that Paras now have a person who can help us find information, give us feedback and listen to what we are saying.&rdquo;
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-8 bg-teal-400 rounded-full" />
+                    <div>
+                      <p className="text-white font-semibold">Karen Magnuson</p>
+                      <p className="text-white/70 text-sm">Paraprofessional, Indian Trail Junior High</p>
+                      <p className="text-teal-300 text-xs mt-0.5">Observation Day 2 · Replied same day</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -3602,16 +3649,38 @@ Thank you for setting the example. It matters more than you know.`;
                                   {school.observationDay2Notes.length} para{school.observationDay2Notes.length !== 1 ? 's' : ''} observed · {school.observationDay2Notes.length} emails sent · Standout: {school.name === 'Indian Trail' ? '"Wow, your psychic abilities are amazing — you predicted it again!"' : '"What letter is that? Like snake — ssss!"'}
                                 </p>
                               </summary>
-                              <div className="mt-4 space-y-3">
-                                {school.observationDay2Notes.map((note: { para: string; location?: string; note: string }, i: number) => (
-                                  <div key={i} className="bg-white border border-gray-200 rounded-lg p-3">
-                                    <p className="font-semibold text-gray-900">
-                                      {note.para}
-                                      {note.location && <span className="text-xs font-normal text-gray-500 ml-2">({note.location})</span>}
-                                    </p>
-                                    <p className="text-sm text-gray-600 mt-1">{note.note}</p>
+                              <div className="mt-4 space-y-4">
+                                {/* Standout Moments */}
+                                <div>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Standout Moments</p>
+                                  <div className="space-y-3">
+                                    {school.observationDay2Notes.map((note: { para: string; location?: string; note: string }, i: number) => (
+                                      <div key={i} className="bg-white border border-gray-200 rounded-lg p-3">
+                                        <p className="font-semibold text-gray-900">
+                                          {note.para}
+                                          {note.location && <span className="text-xs font-normal text-gray-500 ml-2">({note.location})</span>}
+                                        </p>
+                                        <p className="text-sm text-gray-600 mt-1">{note.note}</p>
+                                      </div>
+                                    ))}
                                   </div>
-                                ))}
+                                </div>
+
+                                {/* Voices from the Field */}
+                                {school.voicesFromTheField && school.voicesFromTheField.length > 0 && (
+                                  <div>
+                                    <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Voices from the Field</p>
+                                    <div className="space-y-3">
+                                      {school.voicesFromTheField.map((quote: { text: string; author: string; role: string; note?: string }, i: number) => (
+                                        <blockquote key={i} className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
+                                          <p className="text-sm italic text-gray-700">&quot;{quote.text}&quot;</p>
+                                          <p className="text-xs text-gray-500 mt-2">— {quote.author}, {quote.role}</p>
+                                          {quote.note && <p className="text-xs text-emerald-600 mt-1">{quote.note}</p>}
+                                        </blockquote>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             </details>
                           )}
