@@ -526,27 +526,10 @@ export default function PartnerDashboard() {
           setMetricSnapshots(data.metricSnapshots || []);
           setApiBuildings(data.buildings || []);
           setTimelineEvents(data.timelineEvents || []);
+          setTeacherQuotes(data.teacherQuotes || []);
+          setSessionRecords(data.sessionRecords || []);
         }
       }
-
-      // Fetch teacher quotes
-      const { data: quotesData } = await supabase
-        .from('teacher_quotes')
-        .select('id, quote_text, teacher_role, session_type, created_at')
-        .eq('partnership_id', partnershipId)
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      setTeacherQuotes(quotesData || []);
-
-      // Fetch session records for Our Partnership tab
-      const { data: sessionsData } = await supabase
-        .from('session_records')
-        .select('*')
-        .eq('partnership_id', partnershipId)
-        .order('session_date', { ascending: false });
-
-      setSessionRecords(sessionsData || []);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     }

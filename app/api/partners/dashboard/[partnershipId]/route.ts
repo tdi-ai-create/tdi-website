@@ -102,22 +102,27 @@ export async function GET(
       .order('created_at', { ascending: false })
       .limit(10);
 
-    // Get timeline events (activity_log entries marked as timeline events)
-    const timelineEventTypes = [
-      'observation_day_completed',
-      'virtual_session_completed',
-      'executive_session_completed',
-      'survey_completed',
-      'milestone_reached',
-      'pd_hours_awarded',
-      'custom_event',
-    ];
+    // Get timeline events from dedicated table
     const { data: timelineEvents } = await supabase
-      .from('activity_log')
+      .from('timeline_events')
       .select('*')
       .eq('partnership_id', partnershipId)
-      .in('action', timelineEventTypes)
-      .order('created_at', { ascending: false });
+      .order('sort_order', { ascending: true });
+
+    // Get teacher quotes for Our Partnership tab
+    const { data: teacherQuotes } = await supabase
+      .from('teacher_quotes')
+      .select('id, quote_text, teacher_role, session_type, created_at')
+      .eq('partnership_id', partnershipId)
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    // Get session records for Our Partnership tab
+    const { data: sessionRecords } = await supabase
+      .from('session_records')
+      .select('*')
+      .eq('partnership_id', partnershipId)
+      .order('session_date', { ascending: false });
 
     return NextResponse.json({
       success: true,
@@ -128,6 +133,8 @@ export async function GET(
       buildings: buildings || [],
       activityLog: activityLog || [],
       timelineEvents: timelineEvents || [],
+      teacherQuotes: teacherQuotes || [],
+      sessionRecords: sessionRecords || [],
     });
   } catch (error) {
     console.error('Error getting dashboard data:', error);
