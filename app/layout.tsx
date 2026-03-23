@@ -10,6 +10,7 @@ import { EmailPopup } from "@/components/EmailPopup";
 import { SocialProofPopup } from "@/components/SocialProofPopup";
 import { MainSiteWrapper } from "@/components/layout/MainSiteWrapper";
 import { MomentModeProvider } from "@/components/hub/MomentModeContext";
+import MovementBanner from "@/components/MovementBanner";
 
 export const metadata: Metadata = {
   title: {
@@ -77,6 +78,7 @@ export default function RootLayout({
           <GoogleAnalytics />
           <MicrosoftClarity />
           <ScrollToTop />
+          <MovementBanner />
           <MainSiteWrapper>
             <AnnouncementBar />
             <Header />

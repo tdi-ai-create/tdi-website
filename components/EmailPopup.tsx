@@ -7,7 +7,7 @@ interface EmailPopupProps {
   delay?: number; // milliseconds for time trigger
 }
 
-export function EmailPopup({ delay = 30000 }: EmailPopupProps) {
+export function EmailPopup({ delay = 60000 }: EmailPopupProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
