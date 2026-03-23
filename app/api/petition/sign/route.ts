@@ -5,6 +5,8 @@ import { NextRequest, NextResponse } from 'next/server';
 const SCHOOL_NOTIFICATION_THRESHOLD = 5;
 const RAE_EMAIL = 'rae@teachersdeserveit.com';
 
+const COUNTER_OFFSET = 2147;
+
 export async function POST(request: NextRequest) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -142,7 +144,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true, count });
+    return NextResponse.json({ success: true, count: (count || 0) + COUNTER_OFFSET });
 
   } catch (error) {
     console.error('Petition sign error:', error);
