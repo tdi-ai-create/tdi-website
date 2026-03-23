@@ -100,7 +100,7 @@ function ThankYouContent() {
           marginBottom: '24px',
           lineHeight: '1.6',
         }}>
-          Check your inbox - we sent your coupon code to get started in the TDI Learning Hub. 33 courses, practical strategies, and a community of educators who get it.
+          Check your inbox - we sent your coupon code to get started in the TDI Learning Hub. Over 100+ educator created tools, practical strategies, and a community of educators who get it.
         </p>
 
         <div style={{
@@ -120,7 +120,7 @@ function ThankYouContent() {
         </div>
 
         <a
-          href="https://teachersdeserveit.com/hub"
+          href="https://tdi.thinkific.com/bundles/AllAccess"
           style={{
             display: 'inline-block',
             backgroundColor: '#1D9E75',
