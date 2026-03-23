@@ -155,6 +155,18 @@ interface Building {
   staff_count: number;
 }
 
+interface SessionRecord {
+  id: string;
+  partnership_id: string;
+  session_type: string;
+  session_number: number;
+  session_date: string;
+  love_notes_count: number;
+  internal_notes: string | null;
+  completed_by: string;
+  created_at: string;
+}
+
 // Design colors
 const colors = {
   navy: '#1B2A4A',
@@ -355,6 +367,7 @@ export default function PartnerDashboard() {
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
   const [teacherQuotes, setTeacherQuotes] = useState<{ id: string; quote_text: string; teacher_role: string; session_type: string; created_at: string }[]>([]);
   const [suggestions, setSuggestions] = useState<TDISuggestion[]>([]);
+  const [sessionRecords, setSessionRecords] = useState<SessionRecord[]>([]);
 
   // UI state
   const [activeTab, setActiveTab] = useState('overview');
@@ -529,6 +542,15 @@ export default function PartnerDashboard() {
         .limit(5);
 
       setTeacherQuotes(quotesData || []);
+
+      // Fetch session records for Our Partnership tab
+      const { data: sessionsData } = await supabase
+        .from('session_records')
+        .select('*')
+        .eq('partnership_id', partnershipId)
+        .order('session_date', { ascending: false });
+
+      setSessionRecords(sessionsData || []);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     }
@@ -1041,15 +1063,14 @@ export default function PartnerDashboard() {
     return `${completed}/${total} complete`;
   };
 
-  // Tabs configuration
-  const tabs = [
-    { id: 'overview', label: 'Overview', icon: Eye },
-    { id: 'our-partnership', label: 'Our Partnership', icon: Handshake },
-    ...(partnership?.partnership_type === 'district' ? [{ id: 'schools', label: 'Schools', icon: School }] : []),
-    { id: 'blueprint', label: 'Blueprint', icon: Star },
-    { id: '2026-27', label: '2026-27', icon: CalendarDays },
-    { id: 'team', label: 'Team', icon: User },
-    { id: 'billing', label: 'Billing', icon: Receipt },
+  // Tabs configuration - matches CCP approved structure
+  const TABS = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'our-partnership', label: 'Our Partnership' },
+    { id: 'blueprint', label: 'Blueprint' },
+    { id: 'next-year', label: 'Next Year', badge: true },
+    { id: 'team', label: 'Team' },
+    { id: 'billing', label: 'Billing' },
   ];
 
   return (
@@ -1188,29 +1209,37 @@ export default function PartnerDashboard() {
         </div>
       </section>
 
-      {/* Tab Navigation */}
+      {/* Tab Navigation - CCP approved sticky tab bar */}
       <div
-        className="bg-white border-b border-gray-200 sticky top-14 z-40"
+        className="sticky top-0 z-30 bg-white border-b border-gray-100"
+        style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
         role="tablist"
         aria-label="Dashboard sections"
       >
-        <div className="max-w-5xl mx-auto px-4 py-2 md:py-3">
-          <div className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory gap-1.5 md:gap-2 md:flex-wrap md:justify-center pb-1 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
-            {tabs.map((tab) => (
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+            {TABS.map((tab) => (
               <button
                 key={tab.id}
                 role="tab"
                 aria-selected={activeTab === tab.id}
                 aria-controls={`panel-${tab.id}`}
                 onClick={() => handleTabChange(tab.id)}
-                className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 text-sm font-medium rounded-lg transition-all whitespace-nowrap snap-start flex-shrink-0 ${
-                  activeTab === tab.id
-                    ? 'bg-[#1e2749] text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
-                }`}
+                className="flex items-center gap-1.5 px-4 py-4 text-sm font-semibold whitespace-nowrap border-b-2 transition-all flex-shrink-0"
+                style={{
+                  borderBottomColor: activeTab === tab.id ? '#1B2A4A' : 'transparent',
+                  color: activeTab === tab.id ? '#1B2A4A' : '#9CA3AF',
+                }}
               >
-                <tab.icon className="w-4 h-4" />
-                <span className="hidden md:inline">{tab.label}</span>
+                {tab.label}
+                {tab.badge && (
+                  <span
+                    className="text-xs px-1.5 py-0.5 rounded-full font-bold"
+                    style={{ background: '#DBEAFE', color: '#1D4ED8' }}
+                  >
+                    New
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -4002,8 +4031,8 @@ export default function PartnerDashboard() {
         )}
 
         {/* GROWTH PLAN TAB (formerly 2026-27 Preview) */}
-        {activeTab === '2026-27' && (
-          <div role="tabpanel" id="panel-2026-27" aria-labelledby="tab-2026-27" className="space-y-4 md:space-y-6">
+        {activeTab === 'next-year' && (
+          <div role="tabpanel" id="panel-next-year" aria-labelledby="tab-next-year" className="space-y-4 md:space-y-6">
             {/* Roosevelt School Pilot gets custom PilotNextYearTab */}
             {partnerSlug === 'roosevelt-school' && (
               <PilotNextYearTab
