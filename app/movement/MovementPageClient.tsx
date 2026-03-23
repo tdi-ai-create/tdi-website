@@ -22,9 +22,9 @@ export default function MovementPageClient() {
     email: '',
     school_name: '',
     state: '',
-    share_consent: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSigned, setIsSigned] = useState(false);
   const [error, setError] = useState('');
   const formRef = useRef<HTMLDivElement>(null);
 
@@ -54,8 +54,10 @@ export default function MovementPageClient() {
         return;
       }
 
-      // Redirect to thank you page with count
-      router.push(`/movement/thank-you?count=${data.count}&name=${encodeURIComponent(formData.name)}`);
+      setIsSigned(true);
+      setTimeout(() => {
+        router.push(`/movement/thank-you?count=${data.count}&name=${encodeURIComponent(formData.name)}`);
+      }, 1000);
     } catch {
       setError('Something went wrong. Please try again.');
       setIsSubmitting(false);
@@ -223,7 +225,7 @@ export default function MovementPageClient() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div>
-                <label style={labelStyle}>School name</label>
+                <label style={labelStyle}>Nominate your school</label>
                 <input
                   type="text"
                   placeholder="Optional"
@@ -231,6 +233,9 @@ export default function MovementPageClient() {
                   onChange={e => setFormData(p => ({ ...p, school_name: e.target.value }))}
                   style={inputStyle}
                 />
+                <p style={{ fontSize: '12px', color: '#6B7280', fontFamily: 'sans-serif', margin: '4px 0 0', lineHeight: '1.4' }}>
+                  Add your school so we can track how many educators from your building have signed.
+                </p>
               </div>
               <div>
                 <label style={labelStyle}>State</label>
@@ -244,25 +249,6 @@ export default function MovementPageClient() {
                 </select>
               </div>
             </div>
-
-            <label style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '10px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              color: '#555',
-              fontFamily: 'sans-serif',
-              lineHeight: '1.5',
-            }}>
-              <input
-                type="checkbox"
-                checked={formData.share_consent}
-                onChange={e => setFormData(p => ({ ...p, share_consent: e.target.checked }))}
-                style={{ marginTop: '2px', accentColor: '#1D9E75', flexShrink: 0 }}
-              />
-              I&apos;m okay with TDI sharing my name publicly as a petition signer
-            </label>
 
             {error && (
               <p style={{
@@ -280,9 +266,9 @@ export default function MovementPageClient() {
 
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isSigned}
               style={{
-                backgroundColor: isSubmitting ? '#9FE1CB' : '#1D9E75',
+                backgroundColor: isSigned ? '#085041' : isSubmitting ? '#9FE1CB' : '#1D9E75',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
@@ -290,12 +276,12 @@ export default function MovementPageClient() {
                 fontSize: '17px',
                 fontWeight: '700',
                 fontFamily: 'sans-serif',
-                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                cursor: (isSubmitting || isSigned) ? 'not-allowed' : 'pointer',
                 transition: 'background-color 0.2s',
                 marginTop: '8px',
               }}
             >
-              {isSubmitting ? 'Signing...' : 'Sign the Petition'}
+              {isSigned ? '✓ Signed!' : isSubmitting ? 'Signing...' : 'Sign the Petition'}
             </button>
 
             <p style={{

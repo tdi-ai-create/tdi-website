@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { name, email, school_name, state, share_consent } = body;
+    const { name, email, school_name, state } = body;
 
     if (!name || !email) {
       return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     // Insert signature
     const { error: insertError } = await supabase
       .from('petition_signatures')
-      .insert({ name, email, school_name: school_name || null, state: state || null, share_consent: share_consent || false });
+      .insert({ name, email, school_name: school_name || null, state: state || null });
 
     if (insertError) {
       console.error('Insert error:', insertError);

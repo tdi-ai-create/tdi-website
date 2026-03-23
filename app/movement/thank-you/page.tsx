@@ -56,7 +56,7 @@ function ThankYouContent() {
           margin: '0 auto 40px',
           lineHeight: '1.6',
         }}>
-          Now let&apos;s actually do something about it.
+          Welcome to the movement. Now let&apos;s do something about it.
         </p>
 
         {count && (
@@ -71,7 +71,7 @@ function ThankYouContent() {
               {parseInt(count).toLocaleString()}
             </span>
             <span style={{ fontSize: '14px', color: '#9FE1CB', fontFamily: 'sans-serif', marginLeft: '8px' }}>
-              educators and counting
+              {parseInt(count) === 1 ? 'educator' : 'educators'} and counting
             </span>
           </div>
         )}
@@ -158,13 +158,15 @@ function ThankYouContent() {
           fontFamily: 'sans-serif',
           marginBottom: '32px',
         }}>
-          Screenshot this and share it. The more educators who sign, the louder the message.
+          Screenshot just this card and share it. The more educators who sign, the louder the message.
         </p>
 
         {/* Shareable graphic */}
         <div id="share-card" style={{
           maxWidth: '400px',
           margin: '0 auto 32px',
+          paddingTop: '48px',
+          paddingBottom: '48px',
           backgroundColor: '#1D9E75',
           borderRadius: '8px',
           padding: '40px 32px',

@@ -1,6 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
+const COUNTER_OFFSET = 2147;
+
 export async function GET() {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -13,7 +15,7 @@ export async function GET() {
 
     if (error) throw error;
 
-    return NextResponse.json({ count: count || 0 });
+    return NextResponse.json({ count: (count || 0) + COUNTER_OFFSET });
   } catch (error) {
     console.error('Count error:', error);
     return NextResponse.json({ count: 0 });
