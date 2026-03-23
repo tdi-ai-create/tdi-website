@@ -64,6 +64,9 @@ export default function SalesPage() {
   const [newNextAction, setNewNextAction] = useState('')
   const [savingNote, setSavingNote] = useState(false)
   const [lastSynced, setLastSynced] = useState<Date | null>(null)
+  const [hideUnassigned, setHideUnassigned] = useState(true) // default ON
+  const [hideZeroValue, setHideZeroValue] = useState(false)
+  const [activePreset, setActivePreset] = useState<string | null>(null)
 
   useEffect(() => {
     loadAll()
@@ -173,13 +176,50 @@ export default function SalesPage() {
     return key ? STAGE_COLORS[key] : 'bg-gray-100 border-gray-200 text-gray-600'
   }
 
-  // Filter opportunities
-  const filtered = opportunities.filter(opp => {
-    const matchesSearch = !search ||
-      opp.name?.toLowerCase().includes(search.toLowerCase()) ||
-      opp.contact?.company?.toLowerCase().includes(search.toLowerCase())
-    const matchesStage = selectedStage === 'all' || opp.pipelineStageId === selectedStage
-    return matchesSearch && matchesStage
+  // Deduplicate by contact name - keep only the first occurrence (latest if sorted by date)
+  const deduped = opportunities.filter((opp, index, self) => {
+    if (!opp.name) return true
+    return index === self.findIndex(o => o.name === opp.name)
+  })
+
+  // Preset filter functions
+  const presetFilters: Record<string, (o: GHLOpportunity) => boolean> = {
+    renewals: (o) => o.name?.toLowerCase().includes('renewal') ?? false,
+    active: (o) => {
+      const stage = getStageName(o.pipelineStageId)?.toLowerCase() ?? ''
+      return ['qualified', 'likely yes', 'proposal sent', 'signed'].some(s => stage.includes(s))
+    },
+    attention: (o) => isNeedsAttention(o.id),
+    recent: (o) => {
+      const oppNotes = getOppNotes(o.id)
+      if (oppNotes.length === 0) return false
+      const hours = (Date.now() - new Date(oppNotes[0].created_at).getTime()) / (1000 * 60 * 60)
+      return hours <= 24
+    },
+  }
+
+  // Apply all filters
+  const filtered = deduped.filter(opp => {
+    // Stage filter dropdown
+    if (selectedStage !== 'all' && opp.pipelineStageId !== selectedStage) return false
+
+    // Search
+    if (search && !opp.name?.toLowerCase().includes(search.toLowerCase()) &&
+        !opp.contact?.company?.toLowerCase().includes(search.toLowerCase())) return false
+
+    // Hide unassigned
+    if (hideUnassigned) {
+      const stageName = getStageName(opp.pipelineStageId)?.toLowerCase() ?? ''
+      if (stageName.includes('unassigned')) return false
+    }
+
+    // Hide $0 value
+    if (hideZeroValue && (!opp.monetaryValue || opp.monetaryValue === 0)) return false
+
+    // Active preset
+    if (activePreset && presetFilters[activePreset] && !presetFilters[activePreset](opp)) return false
+
+    return true
   })
 
   // Group by stage for kanban
@@ -364,26 +404,71 @@ export default function SalesPage() {
         </div>
       )}
 
-      {/* Search + Stage filter */}
+      {/* Smart filter presets + Search */}
       {!loading && !error && (
-        <div className="flex gap-3 flex-wrap">
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search opportunities..."
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 w-64"
-          />
-          <select
-            value={selectedStage}
-            onChange={e => setSelectedStage(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          >
-            <option value="all">All Stages</option>
-            {stages.map(s => (
-              <option key={s.id} value={s.id}>{s.name}</option>
+        <div className="space-y-3">
+          {/* Preset filter buttons */}
+          <div className="flex gap-2 flex-wrap items-center">
+            {[
+              { key: 'renewals', label: 'Renewals' },
+              { key: 'active', label: 'Active Deals' },
+              { key: 'attention', label: 'Needs Attention' },
+              { key: 'recent', label: 'Recent Contact' },
+            ].map(preset => (
+              <button
+                key={preset.key}
+                onClick={() => setActivePreset(activePreset === preset.key ? null : preset.key)}
+                className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${
+                  activePreset === preset.key
+                    ? 'bg-indigo-500 text-white border-indigo-500'
+                    : 'border-gray-300 text-gray-600 hover:border-indigo-300'
+                }`}
+              >
+                {preset.label}
+              </button>
             ))}
-          </select>
+
+            {/* Toggle switches */}
+            <label className="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer ml-2">
+              <input
+                type="checkbox"
+                checked={hideUnassigned}
+                onChange={e => setHideUnassigned(e.target.checked)}
+                className="rounded"
+              />
+              Hide Unassigned
+            </label>
+            <label className="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={hideZeroValue}
+                onChange={e => setHideZeroValue(e.target.checked)}
+                className="rounded"
+              />
+              Hide $0 Value
+            </label>
+          </div>
+
+          {/* Search + Stage filter */}
+          <div className="flex gap-3 flex-wrap">
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search opportunities..."
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 w-64"
+            />
+            <select
+              value={selectedStage}
+              onChange={e => setSelectedStage(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            >
+              <option value="all">All Stages</option>
+              {stages.map(s => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+          </div>
         </div>
       )}
 

@@ -5,6 +5,7 @@ import { getSupabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { Plus, AlertTriangle, Clock, Calendar, FileCheck, TrendingDown, X, Mail, DollarSign, CheckCircle, Phone, Copy } from 'lucide-react'
 import { calculateRenewalHealth, renewalHealthBadge } from '@/lib/tdi-admin/renewal-health'
+import { calculateAlerts } from '@/lib/tdi-admin/alert-rules'
 
 type Tab = 'districts' | 'invoices'
 
@@ -134,6 +135,7 @@ export default function IntelligenceHubPage() {
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceWithDetails | null>(null)
   const [showMarkPaidModal, setShowMarkPaidModal] = useState(false)
   const [showEmailModal, setShowEmailModal] = useState(false)
+  const [totalAlertCount, setTotalAlertCount] = useState(0)
 
   useEffect(() => {
     loadData()
@@ -148,19 +150,22 @@ export default function IntelligenceHubPage() {
       .select(`
         id, name, state, segment, status, partnership_id,
         intelligence_invoices (
-          id, amount, status, invoice_date,
+          id, invoice_number, amount, status, invoice_date,
           collections_workflow (
             risk_flag, current_stage, next_follow_up_at, board_meeting_date, expected_payment_date
           )
         ),
         intelligence_contracts (
-          id, renewal_deadline_date, end_date, status, scope_json
+          id, contract_name, renewal_deadline_date, end_date, status, scope_json
         ),
         service_sessions (
           id, session_type, session_date, title
         ),
         intelligence_tasks (
           id, status, due_date
+        ),
+        district_meetings (
+          id, meeting_date
         )
       `)
       .in('status', ['active', 'pilot'])
@@ -189,6 +194,13 @@ export default function IntelligenceHubPage() {
       deliveryMap[d.district_id].push(d)
     })
     setDeliveryByDistrict(deliveryMap)
+
+    // Calculate alert count for Alert Center badge
+    const alertsPreview = calculateAlerts({
+      districts: districtData ?? [],
+      sessionsByDistrict: deliveryMap,
+    })
+    setTotalAlertCount(alertsPreview.filter(a => a.severity === 'critical').length)
 
     // Build alert cards
     const allInvoices = districtData?.flatMap(d => d.intelligence_invoices ?? []) ?? []
@@ -398,13 +410,21 @@ export default function IntelligenceHubPage() {
           <h1 className="text-2xl font-bold text-gray-900">Operations</h1>
           <p className="text-sm text-gray-500 mt-1">District Command Center - Collections, Contracts, Pipeline</p>
         </div>
-        <Link
-          href="/tdi-admin/intelligence/districts/new"
-          className="inline-flex items-center gap-2 text-sm font-medium bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Add District
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/tdi-admin/intelligence/alerts"
+            className="text-sm font-medium border border-amber-300 text-amber-600 hover:bg-amber-50 px-4 py-2 rounded-lg transition-colors"
+          >
+            Alert Center {totalAlertCount > 0 && <span className="ml-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">{totalAlertCount}</span>}
+          </Link>
+          <Link
+            href="/tdi-admin/intelligence/districts/new"
+            className="inline-flex items-center gap-2 text-sm font-medium bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Add District
+          </Link>
+        </div>
       </div>
 
       {/* Alert Cards */}
