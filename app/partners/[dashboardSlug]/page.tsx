@@ -130,15 +130,11 @@ interface MetricSnapshot {
 
 interface TimelineEvent {
   id: string;
-  action: string;
-  details: {
-    title?: string;
-    description?: string;
-    event_date?: string;
-    building_id?: string;
-    [key: string]: unknown;
-  };
-  created_at: string;
+  event_title: string;
+  event_date?: string;
+  event_type: string;
+  status: 'completed' | 'in_progress' | 'upcoming';
+  notes?: string;
 }
 
 interface StaffStats {
@@ -704,11 +700,11 @@ export default function PartnerDashboard() {
       data_updated_at: null,
     };
 
-    // Convert timeline events to expected format
+    // Convert timeline events to expected format for suggestions
     const formattedEvents = timelineEvents.map(e => ({
-      status: e.details?.event_date && new Date(e.details.event_date) > new Date() ? 'upcoming' : 'completed',
-      event_type: e.action || 'event',
-      event_date: e.details?.event_date || e.created_at,
+      status: e.status || 'upcoming',
+      event_type: e.event_type || 'event',
+      event_date: e.event_date || null,
     }));
 
     const generated = generateSuggestions(partnershipData, formattedEvents, actionItems);
@@ -2355,141 +2351,6 @@ export default function PartnerDashboard() {
                 )}
               </div>
             </div>
-
-            {/* Recommendation Card - Matching Example Dashboard */}
-            <div className="rounded-xl p-4 bg-blue-50 border border-blue-100">
-              <div className="flex items-start gap-3">
-                <Zap className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-blue-700 mb-1">Recommendation: Dedicated Hub Time</p>
-                  <p className="text-sm text-gray-600">
-                    Districts that build in 15-30 minutes of protected Hub time during PLCs or
-                    staff meetings see <span className="font-bold text-[#1e2749]">3x higher implementation rates</span>.
-                    We&apos;d suggest each building designate a TDI Champion.
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {getActionItemStatus('hub time') === 'completed' ? (
-                      <span className="text-xs px-3 py-1.5 bg-green-100 text-green-700 rounded-lg border border-green-200 flex items-center gap-1">
-                        <Check className="w-3 h-3" /> Completed
-                      </span>
-                    ) : getActionItemStatus('hub time') === 'in_progress' ? (
-                      <span className="text-xs px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg border border-blue-200 flex items-center gap-1">
-                        <Check className="w-3 h-3" /> Already on your list
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => navigateToActionItem('hub time')}
-                        className="text-xs px-3 py-1.5 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors"
-                      >
-                        Add Hub time to PLC agenda
-                      </button>
-                    )}
-                    {getActionItemStatus('champion') === 'completed' ? (
-                      <span className="text-xs px-3 py-1.5 bg-green-100 text-green-700 rounded-lg border border-green-200 flex items-center gap-1">
-                        <Check className="w-3 h-3" /> Completed
-                      </span>
-                    ) : getActionItemStatus('champion') === 'in_progress' ? (
-                      <span className="text-xs px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg border border-blue-200 flex items-center gap-1">
-                        <Check className="w-3 h-3" /> Already on your list
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => navigateToActionItem('champion')}
-                        className="text-xs px-3 py-1.5 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors"
-                      >
-                        Designate building TDI Champions
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* District-wide Movement */}
-            <div id="district-movement" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-[#4ecdc4]" />
-                  <h3 className="text-base md:text-lg font-bold text-gray-900">District-wide Movement</h3>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
-                {[
-                  { icon: Mail, label: 'Newsletter', stat: '32% higher adoption', link: 'https://raehughart.substack.com' },
-                  { icon: BookOpen, label: 'Blog', stat: '2.5x more strategies', link: 'https://raehughart.substack.com' },
-                  { icon: Headphones, label: 'Podcast', stat: '28% higher rates', link: 'https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274' },
-                  { icon: Users, label: 'Community', stat: '45% less isolated', link: 'https://www.facebook.com/groups/tdimovement' },
-                  { icon: FileText, label: 'Resources', stat: '3x more tools used', link: 'https://tdi.thinkific.com' },
-                  { icon: GraduationCap, label: 'Courses', stat: '65% vs 10% avg', link: 'https://tdi.thinkific.com' },
-                ].map((channel) => (
-                  <a
-                    key={channel.label}
-                    href={channel.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex flex-col p-2 md:p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#4ecdc4]/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 border border-transparent hover:border-[#4ecdc4]/30"
-                  >
-                    <div className="flex items-center gap-1.5 md:gap-2 mb-1 md:mb-2">
-                      <channel.icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#4ecdc4] flex-shrink-0" />
-                      <p className="text-xs md:text-sm font-medium text-[#1e2749]">{channel.label}</p>
-                      <ArrowUpRight className="w-3 h-3 text-gray-400 ml-auto hidden md:block" />
-                    </div>
-                    <p className="text-[10px] md:text-xs text-[#4ecdc4] font-medium">
-                      ↗ {channel.stat}
-                    </p>
-                  </a>
-                ))}
-              </div>
-              <p className="text-xs text-gray-400 mt-4 text-center">
-                Your staff engagement with TDI content helps drive implementation
-              </p>
-            </div>
-
-            {/* Partnership Planning Card */}
-            <div
-              className="relative bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-6 text-white overflow-hidden group cursor-pointer hover:shadow-xl transition-shadow"
-              onClick={() => setActiveTab('preview')}
-            >
-              {/* Decorative elements */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-              <div className="absolute bottom-0 left-1/2 w-24 h-24 bg-white/5 rounded-full translate-y-1/2" />
-
-              <div className="relative z-10 flex justify-between items-center">
-                <div className="max-w-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs bg-[#4ecdc4] text-[#1e2749] px-3 py-1 rounded-full font-bold uppercase tracking-wide">
-                      Planning Ahead
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-bold">
-                    2026-27 Partnership Planning
-                  </h3>
-                  <p className="text-sm opacity-90 mt-2">
-                    Whether you&apos;re deepening your current phase or ready to take the next step, your TDI partner will build a custom plan based on your school&apos;s progress and goals. Every partnership moves at its own pace.
-                  </p>
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveTab('preview');
-                  }}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
-                >
-                  Explore 2026-27 Options
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* FERPA / Data Privacy Note */}
-            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-              <p className="text-xs text-gray-500">
-                🔒 <span className="font-medium text-gray-600">Data Privacy:</span> In your partnership dashboard,
-                access is role-based. Superintendents see district-wide data. Principals see only their building.
-                Teacher-level data is never displayed. All data handling follows FERPA guidelines.
-              </p>
-            </div>
           </div>
         )}
 
@@ -3332,371 +3193,193 @@ export default function PartnerDashboard() {
           </div>
         )}
 
-        {/* JOURNEY TAB */}
+        {/* OUR PARTNERSHIP TAB */}
         {activeTab === 'our-partnership' && (
-          <div role="tabpanel" id="panel-our-partnership" aria-labelledby="tab-our-partnership" className="space-y-4 md:space-y-6">
-            {/* Partnership Goal Statement */}
-            {organization?.partnership_goal ? (
-              <div id="partnership-goal" className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
-                <div className="flex">
-                  <div className="w-1 bg-[#1B2A4A] flex-shrink-0" />
-                  <div className="p-4 md:p-8">
-                    <p className="text-base md:text-lg text-[#1e2749] leading-relaxed font-medium">
-                      &ldquo;{organization.partnership_goal}&rdquo;
-                    </p>
-                    <p className="text-sm text-gray-500 mt-4">- Your Partnership Goal</p>
-                  </div>
-                </div>
+          <div className="py-6 space-y-4">
+
+            {/* Partnership Goal */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-2 h-2 rounded-full" style={{ background: '#2D7D78' }} />
+                <h2 className="text-base font-semibold text-gray-900">Our Partnership Goal</h2>
               </div>
-            ) : (
-              <div id="partnership-goal" className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="p-4 md:p-8">
-                  <h3 className="text-lg font-bold text-[#1e2749] mb-2">Your Partnership Goal</h3>
-                  <p className="text-gray-600">
-                    This will be personalized after your first planning session with TDI. Together, we&apos;ll define what success looks like for your team.
-                  </p>
-                  <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-3">Example goals from other partnerships:</p>
-                    <ul className="space-y-2">
-                      <li className="text-sm text-gray-500 italic">&ldquo;Equip educators with practical strategies to confidently support students and each other.&rdquo;</li>
-                      <li className="text-sm text-gray-500 italic">&ldquo;Reduce teacher burnout through sustainable, classroom-tested approaches.&rdquo;</li>
-                      <li className="text-sm text-gray-500 italic">&ldquo;Build internal coaching capacity that outlasts the partnership.&rdquo;</li>
-                    </ul>
-                    <p className="text-xs text-gray-400 mt-4">Your TDI partner will customize this based on your {partnership?.partnership_type === 'district' ? 'district' : 'school'}&apos;s unique needs and priorities.</p>
-                  </div>
-                </div>
-              </div>
-            )}
+              <p className="text-base text-gray-700 leading-relaxed font-medium">
+                {organization?.partnership_goal ||
+                  'Your partnership goal will be set during your onboarding call with Rae.'}
+              </p>
+            </div>
 
-            {/* The TDI Approach */}
-            <div className="bg-gray-50 rounded-2xl p-6 md:p-8">
-              <h2 style={{ color: '#1B2A4A' }} className="text-lg font-bold mb-4">Our Process</h2>
-              <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
-
-                {/* Step 1 */}
-                <div className="flex-1 text-center md:text-left">
-                  <div className="flex items-center gap-3 justify-center md:justify-start mb-1">
-                    <div className="w-8 h-8 rounded-full bg-[#1B2A4A] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
-                    <h3 style={{ color: '#1B2A4A' }} className="text-sm font-semibold">Strong Teachers</h3>
-                  </div>
-                  <p style={{ color: '#6b7280' }} className="text-xs ml-11 md:ml-11">Practical strategies from the Learning Hub, tailored to your classrooms and tested by real educators.</p>
-                </div>
-
-                {/* Arrow */}
-                <div className="hidden md:block text-[#FFBA06] text-lg font-bold">→</div>
-                <div className="md:hidden text-[#FFBA06] text-lg font-bold">↓</div>
-
-                {/* Step 2 */}
-                <div className="flex-1 text-center md:text-left">
-                  <div className="flex items-center gap-3 justify-center md:justify-start mb-1">
-                    <div className="w-8 h-8 rounded-full bg-[#1B2A4A] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
-                    <h3 style={{ color: '#1B2A4A' }} className="text-sm font-semibold">Strong Support</h3>
-                  </div>
-                  <p style={{ color: '#6b7280' }} className="text-xs ml-11 md:ml-11">Ongoing coaching, Love Notes, observation feedback, and a community of 87,000+ educators.</p>
-                </div>
-
-                {/* Arrow */}
-                <div className="hidden md:block text-[#FFBA06] text-lg font-bold">→</div>
-                <div className="md:hidden text-[#FFBA06] text-lg font-bold">↓</div>
-
-                {/* Step 3 */}
-                <div className="flex-1 text-center md:text-left">
-                  <div className="flex items-center gap-3 justify-center md:justify-start mb-1">
-                    <div className="w-8 h-8 rounded-full bg-[#1B2A4A] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
-                    <h3 style={{ color: '#1B2A4A' }} className="text-sm font-semibold">Student Success</h3>
-                  </div>
-                  <p style={{ color: '#6b7280' }} className="text-xs ml-11 md:ml-11">When teachers thrive, students thrive. Better engagement, stronger relationships, measurable growth.</p>
-                </div>
-
+            {/* Phase Timeline */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <h2 className="text-base font-semibold text-gray-900 mb-5">Your TDI Journey</h2>
+              <div className="flex items-start">
+                {(['IGNITE', 'ACCELERATE', 'SUSTAIN'] as const).map((p, i) => {
+                  const phases = ['IGNITE', 'ACCELERATE', 'SUSTAIN']
+                  const currentIndex = phases.indexOf(partnership?.contract_phase || 'IGNITE')
+                  const thisIndex = phases.indexOf(p)
+                  const isCurrent = p === (partnership?.contract_phase || 'IGNITE')
+                  const isComplete = thisIndex < currentIndex
+                  const phaseColors = ['#D97706', '#2D7D78', '#16A34A']
+                  const color = phaseColors[i]
+                  return (
+                    <div key={p} className="flex items-start flex-1">
+                      <div className="flex-1 text-center">
+                        <div className="flex justify-center mb-2">
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
+                            style={{
+                              background: isCurrent ? color : isComplete ? '#E5E7EB' : '#F3F4F6',
+                              color: isCurrent ? '#fff' : isComplete ? '#6B7280' : '#9CA3AF',
+                              border: isCurrent ? `2px solid ${color}` : '2px solid #E5E7EB',
+                            }}>
+                            {isComplete ? '✓' : i + 1}
+                          </div>
+                        </div>
+                        <p className="text-xs font-bold mb-0.5"
+                          style={{ color: isCurrent ? color : isComplete ? '#6B7280' : '#9CA3AF' }}>
+                          Phase {i + 1}
+                        </p>
+                        <p className="text-xs font-semibold"
+                          style={{ color: isCurrent ? '#1B2A4A' : '#9CA3AF' }}>
+                          {p}
+                        </p>
+                        {isCurrent && (
+                          <div className="mt-1 text-xs font-bold px-2 py-0.5 rounded-full inline-block"
+                            style={{ background: `${color}15`, color }}>
+                            You Are Here
+                          </div>
+                        )}
+                      </div>
+                      {i < 2 && (
+                        <div className="flex-shrink-0 w-8 h-0.5 mt-5"
+                          style={{ background: isComplete ? '#2D7D78' : '#E5E7EB' }} />
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
 
-            {/* Phase Timeline with Milestones */}
-            <div
-              id="phase-timeline"
-              className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition-shadow rounded-2xl"
-              onClick={() => navigateToTab('Blueprint')}
-            >
-              <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4 md:mb-8">Your Partnership Journey</h2>
-              <div className="relative">
-                {/* Timeline connector line - desktop only */}
-                <div className="absolute top-6 left-[16.67%] right-[16.67%] h-0.5 bg-gray-200 hidden md:block" />
-
-                {/* Milestone dots on the line - between IGNITE and ACCELERATE */}
-                {(() => {
-                  const phase = partnership?.contract_phase;
-                  const isPhase2OrLater = phase === 'ACCELERATE' || phase === 'SUSTAIN';
-                  const isPhase3 = phase === 'SUSTAIN';
-
-                  // Milestones between IGNITE and ACCELERATE
-                  const phase1Milestones = [
-                    { id: 'hub', label: 'Hub onboarding', position: 28 },
-                    { id: 'obs1', label: 'First observation day', position: 38 },
-                    { id: 'survey', label: 'Baseline survey collected', position: 48 },
-                  ];
-
-                  // Milestones between ACCELERATE and SUSTAIN
-                  const phase2Milestones = [
-                    { id: 'growth', label: 'Growth Groups formed', position: 61 },
-                    { id: 'midyear', label: 'Mid-year progress review', position: 72 },
-                    { id: 'coaching', label: 'Internal coaching capacity', position: 83 },
-                  ];
-
-                  return (
-                    <>
-                      {/* Phase 1 milestones */}
-                      {phase1Milestones.map((m) => (
-                        <div
-                          key={m.id}
-                          className="absolute top-[22px] hidden md:block z-10"
-                          style={{ left: `${m.position}%` }}
-                        >
-                          <div
-                            className="relative cursor-pointer"
-                            onClick={() => setActiveMilestoneTooltip(activeMilestoneTooltip === m.id ? null : m.id)}
-                          >
-                            <div className={`w-3 h-3 rounded-full border-2 ${
-                              isPhase2OrLater
-                                ? 'bg-[#4ecdc4] border-[#4ecdc4]'
-                                : 'bg-white border-gray-300'
-                            }`} />
-                            {activeMilestoneTooltip === m.id && (
-                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-[#1B2A4A] text-white text-xs rounded-lg whitespace-nowrap shadow-lg">
-                                {isPhase2OrLater ? '✓ ' : ''}{m.label}
-                                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1B2A4A]" />
+            {/* Partnership Timeline */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <h2 className="text-base font-semibold text-gray-900 mb-5">Partnership Timeline</h2>
+              {timelineEvents.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-4">
+                  Your timeline will fill in as we deliver sessions and reach milestones together.
+                </p>
+              ) : (
+                <div className="grid grid-cols-3 gap-6">
+                  {(['completed', 'in_progress', 'upcoming'] as const).map(status => {
+                    const config = {
+                      completed: { label: 'Done', color: '#16A34A', bg: '#DCFCE7' },
+                      in_progress: { label: 'In Progress', color: '#D97706', bg: '#FEF3C7' },
+                      upcoming: { label: 'Coming Soon', color: '#2563EB', bg: '#EFF6FF' },
+                    }[status]
+                    const events = timelineEvents.filter(e => e.status === status)
+                    return (
+                      <div key={status}>
+                        <div className="flex items-center gap-1.5 mb-3">
+                          <div className="w-2 h-2 rounded-full" style={{ background: config.color }} />
+                          <span className="text-xs font-bold uppercase tracking-wide"
+                            style={{ color: config.color }}>
+                            {config.label}
+                          </span>
+                          <span className="text-xs text-gray-400 ml-auto">{events.length}</span>
+                        </div>
+                        {events.length === 0 ? (
+                          <p className="text-xs text-gray-300 italic">Nothing here yet</p>
+                        ) : (
+                          events.map(event => (
+                            <div key={event.id} className="flex items-start gap-2 mb-3">
+                              <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5"
+                                style={{ background: config.color }} />
+                              <div>
+                                <p className="text-sm text-gray-700 leading-snug">{event.event_title}</p>
+                                {event.event_date && (
+                                  <p className="text-xs text-gray-400 mt-0.5">
+                                    {new Date(event.event_date).toLocaleDateString('en-US', {
+                                      month: 'short', day: 'numeric', year: 'numeric'
+                                    })}
+                                  </p>
+                                )}
                               </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-
-                      {/* Phase 2 milestones */}
-                      {phase2Milestones.map((m) => (
-                        <div
-                          key={m.id}
-                          className="absolute top-[22px] hidden md:block z-10"
-                          style={{ left: `${m.position}%` }}
-                        >
-                          <div
-                            className="relative cursor-pointer"
-                            onClick={() => setActiveMilestoneTooltip(activeMilestoneTooltip === m.id ? null : m.id)}
-                          >
-                            <div className={`w-3 h-3 rounded-full border-2 ${
-                              isPhase3
-                                ? 'bg-[#4ecdc4] border-[#4ecdc4]'
-                                : 'bg-white border-gray-300'
-                            }`} />
-                            {activeMilestoneTooltip === m.id && (
-                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-[#1B2A4A] text-white text-xs rounded-lg whitespace-nowrap shadow-lg">
-                                {isPhase3 ? '✓ ' : '○ '}{m.label}
-                                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1B2A4A]" />
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </>
-                  );
-                })()}
-
-                <div className="grid md:grid-cols-3 gap-6">
-                  {/* IGNITE Phase */}
-                  {(() => {
-                    const isActive = partnership?.contract_phase === 'IGNITE';
-                    const isPast = partnership?.contract_phase === 'ACCELERATE' || partnership?.contract_phase === 'SUSTAIN';
-                    return (
-                      <div className="relative flex flex-col items-center group">
-                        {isActive && (
-                          <span className="absolute -top-4 px-2.5 py-1 bg-[#4ecdc4] text-white text-[10px] font-bold rounded-full whitespace-nowrap z-20 shadow-sm">
-                            YOU ARE HERE
-                          </span>
+                            </div>
+                          ))
                         )}
-                        <div
-                          className={`w-14 h-14 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-md transition-all duration-300 group-hover:scale-110 ${
-                            isPast ? 'bg-[#4ecdc4]' : isActive ? 'bg-[#1B2A4A] ring-4 ring-[#4ecdc4]/40 animate-[pulse_3s_ease-in-out_infinite]' : 'bg-gray-200'
-                          }`}
-                        >
-                          {isPast ? (
-                            <Check className="w-7 h-7 text-white" />
-                          ) : (
-                            <span className={`text-xl font-bold ${isActive ? 'text-white' : 'text-gray-400'}`}>1</span>
-                          )}
-                        </div>
-                        <h3 className={`font-bold mt-3 text-sm ${isPast || isActive ? 'text-[#1e2749]' : 'text-gray-400'}`}>IGNITE</h3>
-                        <p className={`text-xs text-center mt-1 ${isPast || isActive ? 'text-gray-600' : 'text-gray-400'}`}>
-                          Build the foundation
-                        </p>
                       </div>
-                    );
-                  })()}
-
-                  {/* ACCELERATE Phase */}
-                  {(() => {
-                    const isActive = partnership?.contract_phase === 'ACCELERATE';
-                    const isPast = partnership?.contract_phase === 'SUSTAIN';
-                    const isFuture = partnership?.contract_phase === 'IGNITE';
-                    return (
-                      <div className="relative flex flex-col items-center group">
-                        {isActive && (
-                          <span className="absolute -top-4 px-2.5 py-1 bg-[#4ecdc4] text-white text-[10px] font-bold rounded-full whitespace-nowrap z-20 shadow-sm">
-                            YOU ARE HERE
-                          </span>
-                        )}
-                        <div
-                          className={`w-14 h-14 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-md transition-all duration-300 group-hover:scale-110 ${
-                            isPast ? 'bg-[#4ecdc4]' : isActive ? 'bg-[#38618C] ring-4 ring-[#4ecdc4]/40 animate-[pulse_3s_ease-in-out_infinite]' : 'bg-gray-200'
-                          }`}
-                        >
-                          {isPast ? (
-                            <Check className="w-7 h-7 text-white" />
-                          ) : (
-                            <span className={`text-xl font-bold ${isActive || isPast ? 'text-white' : 'text-gray-400'}`}>2</span>
-                          )}
-                        </div>
-                        <h3 className={`font-bold mt-3 text-sm ${isFuture ? 'text-gray-400' : 'text-[#1e2749]'}`}>ACCELERATE</h3>
-                        <p className={`text-xs text-center mt-1 ${isFuture ? 'text-gray-400' : 'text-gray-600'}`}>
-                          Scale to full staff
-                        </p>
-                      </div>
-                    );
-                  })()}
-
-                  {/* SUSTAIN Phase */}
-                  {(() => {
-                    const isActive = partnership?.contract_phase === 'SUSTAIN';
-                    const isFuture = partnership?.contract_phase === 'IGNITE' || partnership?.contract_phase === 'ACCELERATE';
-                    return (
-                      <div className="relative flex flex-col items-center group">
-                        {isActive && (
-                          <span className="absolute -top-4 px-2.5 py-1 bg-[#4ecdc4] text-white text-[10px] font-bold rounded-full whitespace-nowrap z-20 shadow-sm">
-                            YOU ARE HERE
-                          </span>
-                        )}
-                        <div
-                          className={`w-14 h-14 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-md transition-all duration-300 group-hover:scale-110 ${
-                            isActive ? 'bg-[#4ecdc4] ring-4 ring-[#4ecdc4]/40 animate-[pulse_3s_ease-in-out_infinite]' : 'bg-gray-200'
-                          }`}
-                        >
-                          <span className={`text-xl font-bold ${isActive ? 'text-white' : 'text-gray-400'}`}>3</span>
-                        </div>
-                        <h3 className={`font-bold mt-3 text-sm ${isFuture ? 'text-gray-400' : 'text-[#1e2749]'}`}>SUSTAIN</h3>
-                        <p className={`text-xs text-center mt-1 ${isFuture ? 'text-gray-400' : 'text-gray-600'}`}>
-                          Embed for lasting change
-                        </p>
-                      </div>
-                    );
-                  })()}
+                    )
+                  })}
                 </div>
-                <p className="text-xs text-[#FFBA06] text-center mt-4 font-medium">Learn more about each phase →</p>
-              </div>
+              )}
+            </div>
 
-              {/* Mobile milestone list */}
-              <div className="md:hidden mt-6 pt-4 border-t border-gray-100">
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Milestones</p>
-                <div className="space-y-1.5">
-                  {[
-                    { done: (partnership?.contract_phase === 'ACCELERATE' || partnership?.contract_phase === 'SUSTAIN'), label: 'Hub onboarding' },
-                    { done: (partnership?.contract_phase === 'ACCELERATE' || partnership?.contract_phase === 'SUSTAIN'), label: 'First observation day' },
-                    { done: (partnership?.contract_phase === 'ACCELERATE' || partnership?.contract_phase === 'SUSTAIN'), label: 'Baseline survey collected' },
-                    { done: partnership?.contract_phase === 'SUSTAIN', label: 'Growth Groups formed' },
-                    { done: partnership?.contract_phase === 'SUSTAIN', label: 'Mid-year progress review' },
-                    { done: false, label: 'Internal coaching capacity' },
-                  ].map((m, i) => (
-                    <div key={i} className="flex items-center gap-2 text-xs">
-                      <span className={m.done ? 'text-[#4ecdc4]' : 'text-gray-300'}>
-                        {m.done ? '✓' : '○'}
-                      </span>
-                      <span className={m.done ? 'text-gray-700' : 'text-gray-400'}>{m.label}</span>
+            {/* Session Records */}
+            {sessionRecords && sessionRecords.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-100 p-6"
+                style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                <h2 className="text-base font-semibold text-gray-900 mb-4">Sessions Completed</h2>
+                <div className="space-y-3">
+                  {sessionRecords.map((record) => (
+                    <div key={record.id}
+                      className="flex items-start justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0 mt-1" />
+                        <div>
+                          <p className="text-sm font-semibold text-gray-800">
+                            {record.session_type === 'observation' ? 'Observation Day' :
+                             record.session_type === 'virtual_session' ? 'Virtual Session' :
+                             record.session_type === 'executive_session' ? 'Executive Session' :
+                             'Session'} {record.session_number}
+                          </p>
+                          {record.session_date && (
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              {new Date(record.session_date).toLocaleDateString('en-US', {
+                                month: 'long', day: 'numeric', year: 'numeric'
+                              })}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      {record.love_notes_count > 0 && (
+                        <span className="text-xs font-semibold px-2 py-1 rounded-full flex-shrink-0"
+                          style={{ background: '#FEF3C7', color: '#92400E' }}>
+                          {record.love_notes_count} Love Notes
+                        </span>
+                      )}
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* Your TDI Impact So Far */}
-            <div className="dark-card bg-gradient-to-br from-[#1B2A4A] via-[#2a3f6e] to-[#38618C] rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
-              <h2 className="text-lg font-bold text-white mb-4">Your TDI Impact So Far</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
-                  <div className="text-2xl font-bold">{staffStats.total || 1}</div>
-                  <div className="text-xs text-gray-300 mt-1">Staff enrolled</div>
-                </div>
-                <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
-                  <div className="text-2xl font-bold">{partnership?.observation_days_completed || 0}</div>
-                  <div className="text-xs text-gray-300 mt-1">Observation days</div>
-                </div>
-                <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
-                  <div className="text-2xl font-bold">0</div>
-                  <div className="text-xs text-gray-300 mt-1">Love Notes sent</div>
-                </div>
-                <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
-                  <div className="text-2xl font-bold">0</div>
-                  <div className="text-xs text-gray-300 mt-1">Courses started</div>
-                </div>
-              </div>
-              <p className="text-xs text-gray-300 text-center mt-4">
-                These numbers grow as your partnership progresses. Check the Progress tab for details.
-              </p>
-            </div>
-
-            {/* What Success Looks Like - with Progress Tracking */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">What Success Looks Like</h2>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {(() => {
-                  // Default success targets with icons
-                  const defaultTargets = [
-                    { icon: TrendingUp, text: 'Staff report increased confidence in classroom strategies' },
-                    { icon: ThumbsUp, text: 'Measurable improvement in feeling valued and supported' },
-                    { icon: TrendingDown, text: 'Reduced stress levels compared to baseline' },
-                    { icon: CheckCircle, text: 'Clear implementation of Hub strategies observed in classrooms' },
-                  ];
-
-                  // Use custom targets if available, with cycling icons
-                  const cycleIcons = [TrendingUp, ThumbsUp, TrendingDown, CheckCircle, Target, Zap];
-                  const targets = organization?.success_targets && organization.success_targets.length > 0
-                    ? organization.success_targets.map((text, idx) => ({
-                        icon: cycleIcons[idx % cycleIcons.length],
-                        text,
-                      }))
-                    : defaultTargets;
-
-                  return targets.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="relative flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-[#4ecdc4] hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group"
-                    >
-                      {/* Status indicator */}
-                      <div className="absolute top-3 right-3 flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-gray-300" />
-                        <span className="text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">Baseline pending</span>
-                      </div>
-                      <div className="flex-shrink-0">
-                        <item.icon className="w-5 h-5 text-[#38618C]" />
-                      </div>
-                      <p className="text-sm text-gray-700 pr-16">{item.text}</p>
+            {/* Teacher Quotes */}
+            {teacherQuotes && teacherQuotes.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-100 p-6"
+                style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                <h2 className="text-base font-semibold text-gray-900 mb-4">
+                  Voices From Your School
+                </h2>
+                <div className="space-y-3">
+                  {teacherQuotes.map((quote) => (
+                    <div key={quote.id}
+                      className="p-4 rounded-xl border-l-4"
+                      style={{ background: '#F9FAFB', borderLeftColor: '#2D7D78' }}>
+                      <p className="text-sm text-gray-700 italic leading-relaxed">
+                        &ldquo;{quote.quote_text}&rdquo;
+                      </p>
+                      {quote.teacher_role && (
+                        <p className="text-xs text-gray-400 mt-2 font-medium">
+                          - {quote.teacher_role}
+                        </p>
+                      )}
                     </div>
-                  ));
-                })()}
+                  ))}
+                </div>
               </div>
-              <p className="text-xs text-gray-500 text-center mt-4">
-                Your TDI partner updates these as data comes in. No action needed from you.
-              </p>
+            )}
 
-              {/* CTA Card */}
-              <div className="mt-6 bg-gradient-to-r from-[#1B2A4A] to-[#2a3f6e] rounded-xl p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p className="text-sm text-center sm:text-left">Want to set custom goals? Let&apos;s talk about it in your next session.</p>
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white text-[#1B2A4A] text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap"
-                >
-                  Schedule Session
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-              </div>
-            </div>
           </div>
         )}
 
