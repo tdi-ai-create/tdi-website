@@ -1,17 +1,46 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
+import html2canvas from 'html2canvas';
 
 function ThankYouContent() {
   const params = useSearchParams();
   const count = params.get('count');
   const name = params.get('name') || 'Educator';
   const firstName = name.split(' ')[0];
+  const [igState, setIgState] = useState<'idle' | 'downloading' | 'saved'>('idle');
 
   const shareText = `I just signed the Teachers Deserve Voice and Choice petition. ${count ? `${parseInt(count).toLocaleString()} educators` : 'Thousands of educators'} and counting. Join us. teachersdeserveit.com/movement`;
 
   const shareUrl = 'https://teachersdeserveit.com/movement';
+
+  const handleInstagramShare = async () => {
+    setIgState('downloading');
+    try {
+      const card = document.getElementById('share-card');
+      if (!card) return;
+
+      const canvas = await html2canvas(card, {
+        backgroundColor: '#1D9E75',
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      const link = document.createElement('a');
+      link.download = 'teachers-deserve-voice-and-choice.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+
+      setIgState('saved');
+    } catch (err) {
+      console.error('Image download failed:', err);
+      // Fallback to clipboard copy if html2canvas fails
+      navigator.clipboard.writeText(shareText);
+      setIgState('saved');
+    }
+  };
 
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#fff' }}>
@@ -229,17 +258,32 @@ function ThankYouContent() {
           >
             Share on LinkedIn
           </a>
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText(shareText);
-              const btn = document.getElementById('ig-copy-btn');
-              if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.textContent = 'Copy for Instagram'; }, 2000); }
-            }}
-            id="ig-copy-btn"
-            style={shareButtonStyle('#E1306C')}
-          >
-            Copy for Instagram
-          </button>
+          {igState === 'saved' ? (
+            <a
+              href="instagram://"
+              onClick={(e) => {
+                // On desktop, fall back to instagram.com
+                setTimeout(() => {
+                  window.open('https://www.instagram.com', '_blank');
+                }, 500);
+              }}
+              style={shareButtonStyle('#C13584')}
+            >
+              Image saved - open Instagram →
+            </a>
+          ) : (
+            <button
+              onClick={handleInstagramShare}
+              disabled={igState === 'downloading'}
+              style={{
+                ...shareButtonStyle('#E1306C'),
+                opacity: igState === 'downloading' ? 0.7 : 1,
+                cursor: igState === 'downloading' ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {igState === 'downloading' ? 'Saving image...' : 'Share to Instagram'}
+            </button>
+          )}
           <button
             onClick={() => {
               navigator.clipboard.writeText(shareText);
@@ -260,6 +304,14 @@ function ThankYouContent() {
           marginTop: '24px',
         }}>
           Or copy the link: <span style={{ color: '#1D9E75', fontWeight: '600' }}>teachersdeserveit.com/movement</span>
+        </p>
+        <p style={{
+          fontSize: '12px',
+          color: '#bbb',
+          fontFamily: 'sans-serif',
+          marginTop: '8px',
+        }}>
+          Instagram: tap "Share to Instagram" to save the image, then post from your camera roll.
         </p>
       </section>
 
