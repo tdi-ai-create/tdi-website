@@ -97,7 +97,7 @@ export default function SalesPage() {
       }
 
       // Fetch opportunities
-      const oppsRes = await fetch('/api/ghl/pipeline?limit=200')
+      const oppsRes = await fetch('/api/ghl/pipeline?limit=100')
       const oppsData = await oppsRes.json()
 
       if (oppsData.error) {
