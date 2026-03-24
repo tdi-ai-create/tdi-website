@@ -84,6 +84,7 @@ interface Partnership {
   executive_sessions_total: number;
   status: string;
   org_name?: string | null;
+  partnership_goal?: string | null;
 }
 
 interface Organization {
@@ -1165,12 +1166,9 @@ export default function PartnerDashboard() {
               {partnership?.org_name || organization?.name || 'Your School'}
             </h1>
             <p className="text-white/70 text-xs md:text-sm mt-1">
-              {organization?.address_city || organization?.address_state ? (
-                <>
-                  {[organization?.address_city, organization?.address_state].filter(Boolean).join(', ')} |{' '}
-                </>
-              ) : null}
-              {partnership.partnership_type === 'district' ? 'District' : 'School'} Partnership
+              {organization?.address_city || organization?.address_state
+                ? [organization?.address_city, organization?.address_state].filter(Boolean).join(', ')
+                : `${partnership.partnership_type === 'district' ? 'District' : 'School'} Partnership`}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -3188,7 +3186,7 @@ export default function PartnerDashboard() {
                 <h2 className="text-base font-semibold text-gray-900">Our Partnership Goal</h2>
               </div>
               <p className="text-base text-gray-700 leading-relaxed font-medium">
-                {organization?.partnership_goal ||
+                {partnership?.partnership_goal ||
                   'Your partnership goal will be set during your onboarding call with Rae.'}
               </p>
             </div>
