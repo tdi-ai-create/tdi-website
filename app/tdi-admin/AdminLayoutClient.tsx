@@ -219,7 +219,7 @@ function AdminSidebar({ user }: { user: User }) {
         {/* Collapse toggle */}
         <button
           onClick={toggleCollapsed}
-          className="hidden lg:flex items-center justify-center py-3 border-t border-white/10 text-gray-500 hover:text-white transition-colors"
+          className="flex items-center justify-center py-3 border-t border-white/10 text-gray-500 hover:text-white transition-colors w-full"
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           <svg
