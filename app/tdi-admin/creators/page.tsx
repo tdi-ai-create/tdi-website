@@ -34,9 +34,6 @@ import {
   Check,
   Copy,
   LayoutGrid,
-  LogOut,
-  Menu,
-  ChevronLeft,
   UserCheck,
   MessageCircle,
   Settings,
@@ -204,22 +201,6 @@ function getDaysSince(dateStr: string): number {
   return Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-// Sidebar Navigation Item Component
-function SidebarNavItem({ active, onClick, icon: Icon, children }: { active: boolean; onClick: () => void; icon: React.ElementType; children: React.ReactNode }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-left ${
-        active
-          ? 'bg-purple-50 text-purple-700'
-          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-      }`}
-    >
-      <Icon size={20} className={active ? 'text-purple-600' : 'text-gray-400'} />
-      <span className={active ? 'font-semibold' : ''}>{children}</span>
-    </button>
-  );
-}
 
 // Modern Stat Card Component
 // Status indicator component - dots for most, checkmark for launched
@@ -328,7 +309,6 @@ export default function CreatorStudioPage() {
 
   // Tab state
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [filteredCreators, setFilteredCreators] = useState<EnrichedCreator[]>([]);
@@ -1019,112 +999,51 @@ export default function CreatorStudioPage() {
   const mostActiveCreator = Object.entries(recentActivityCounts).sort((a, b) => b[1] - a[1])[0];
 
   return (
-    <div className="flex min-h-screen bg-[#FAFBFC]">
-      {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 transform transition-transform duration-200 ease-in-out lg:transform-none ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
-        style={{ boxShadow: '1px 0 3px rgba(0,0,0,0.03)' }}
-      >
-        <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
-          <div className="flex items-center justify-between px-5 py-5 border-b border-gray-100">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#8B5CF6' }}>
-                <Rocket className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-semibold text-gray-900">Creator Studio</span>
-            </div>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <ChevronLeft className="w-5 h-5 text-gray-500" />
-            </button>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 px-3 py-4 space-y-1">
-            {TABS.map((tab) => (
-              <SidebarNavItem
-                key={tab.id}
-                active={activeTab === tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  setSidebarOpen(false);
-                }}
-                icon={tab.icon}
-              >
-                {tab.label}
-              </SidebarNavItem>
-            ))}
-          </nav>
-
-          {/* Sidebar Footer - User */}
-          <div className="px-3 py-4 border-t border-gray-100">
-            <div className="flex items-center gap-3 px-3 py-2">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-medium text-sm">
-                RH
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">Rae Hughart</p>
-                <p className="text-xs text-gray-500 truncate">Admin</p>
-              </div>
-              <button className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-600">
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
+    <div className="min-h-screen bg-[#FAFBFC]">
+      {/* Sticky Tab Bar */}
+      <div className="sticky top-0 z-30 bg-white border-b border-gray-200">
+        <div className="px-6">
+          <div className="flex items-center gap-1 -mb-px">
+            {TABS.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                    isActive
+                      ? 'border-violet-600 text-violet-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
         </div>
-      </aside>
+      </div>
 
-      {/* Main Content Area */}
-      <main className="flex-1 min-w-0">
-        {/* Top Header Bar */}
-        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-sm border-b border-gray-100">
-          <div className="flex items-center justify-between px-6 py-4">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <Menu className="w-5 h-5 text-gray-600" />
-              </button>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-                  Creator Command Center
-                </h1>
-                <p className="text-sm text-gray-500 mt-0.5">
-                  Pipeline overview and creator management
-                </p>
-              </div>
-            </div>
+      {/* Page Content */}
+      <div className="px-6 py-6">
+        {/* Page Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-semibold text-gray-900">Creator Studio</h1>
+          {canEdit && (
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 text-white shadow-sm hover:shadow-md hover:opacity-90"
+              style={{ backgroundColor: '#8B5CF6' }}
+            >
+              <Plus className="w-4 h-4" />
+              Add Creator
+            </button>
+          )}
+        </div>
 
-            {canEdit && (
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 text-white shadow-sm hover:shadow-md hover:opacity-90"
-                style={{ backgroundColor: '#8B5CF6' }}
-              >
-                <Plus className="w-4 h-4" />
-                Add Creator
-              </button>
-            )}
-          </div>
-        </header>
-
-        {/* Page Content */}
-        <div className="px-6 py-6">
-          {/* TAB CONTENT */}
+        {/* TAB CONTENT */}
 
       {/* DASHBOARD TAB */}
       {activeTab === 'dashboard' && (
@@ -3110,8 +3029,7 @@ export default function CreatorStudioPage() {
           onClose={hideToast}
         />
       )}
-        </div>
-      </main>
+      </div>
     </div>
   );
 }
