@@ -204,7 +204,39 @@ export default function FundingPage() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-[#FAFBFC]">
+      {/* Sticky Tab Bar */}
+      <div
+        className="sticky top-0 z-10 bg-white border-b border-gray-200"
+        style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+      >
+        <div className="flex items-center gap-0 px-6">
+          {[
+            { key: 'all', label: 'All' },
+            { key: 'researching', label: 'Researching' },
+            { key: 'writing', label: 'Writing' },
+            { key: 'submitted', label: 'Submitted' },
+            { key: 'awarded', label: 'Awarded' },
+            { key: 'denied', label: 'Denied' },
+            { key: 'on_hold', label: 'On Hold' },
+          ].map(f => (
+            <button
+              key={f.key}
+              onClick={() => setStatusFilter(f.key)}
+              className="px-4 py-3 text-sm font-medium transition-colors relative"
+              style={{
+                color: statusFilter === f.key ? '#111827' : '#6B7280',
+                borderBottom: statusFilter === f.key ? '2px solid #10B981' : '2px solid transparent',
+              }}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Page Content */}
+      <div className="px-6 py-6 max-w-7xl mx-auto space-y-6">
 
       {showAdd && (
         <AddFundingModal
@@ -252,29 +284,6 @@ export default function FundingPage() {
           </div>
         </div>
       )}
-
-      {/* Status filter tabs */}
-      <div className="flex gap-2 border-b border-gray-200">
-        {[
-          { key: 'all', label: 'All' },
-          { key: 'researching', label: 'Researching' },
-          { key: 'writing', label: 'Writing' },
-          { key: 'submitted', label: 'Submitted' },
-          { key: 'awarded', label: 'Awarded' },
-          { key: 'denied', label: 'Denied' },
-          { key: 'on_hold', label: 'On Hold' },
-        ].map(f => (
-          <button
-            key={f.key}
-            onClick={() => setStatusFilter(f.key)}
-            className={`pb-3 px-3 text-sm font-medium border-b-2 transition-colors ${
-              statusFilter === f.key ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
 
       {/* Records table */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
@@ -359,6 +368,7 @@ export default function FundingPage() {
         <p className="text-xs text-emerald-700">
           Title II-A &middot; Title I &middot; ESSER/ARP &middot; State Grants &middot; Foundation Grants &middot; General PD Budgets &middot; Private & Public Funding &middot; Diocesan Sources &middot; Corporate Partnerships &middot; Community Foundations
         </p>
+      </div>
       </div>
     </div>
   )

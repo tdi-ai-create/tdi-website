@@ -402,7 +402,38 @@ export default function IntelligenceHubPage() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[#FAFBFC]">
+      {/* Sticky Tab Bar */}
+      <div
+        className="sticky top-0 z-10 bg-white border-b border-gray-200"
+        style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+      >
+        <div className="flex items-center gap-0 px-6">
+          <button
+            onClick={() => setTab('districts')}
+            className="px-4 py-3 text-sm font-medium transition-colors relative"
+            style={{
+              color: tab === 'districts' ? '#111827' : '#6B7280',
+              borderBottom: tab === 'districts' ? '2px solid #F59E0B' : '2px solid transparent',
+            }}
+          >
+            Districts
+          </button>
+          <button
+            onClick={() => setTab('invoices')}
+            className="px-4 py-3 text-sm font-medium transition-colors relative"
+            style={{
+              color: tab === 'invoices' ? '#111827' : '#6B7280',
+              borderBottom: tab === 'invoices' ? '2px solid #F59E0B' : '2px solid transparent',
+            }}
+          >
+            Invoices ({invoices.length})
+          </button>
+        </div>
+      </div>
+
+      {/* Page Content */}
+      <div className="px-6 py-6 max-w-7xl mx-auto space-y-8">
 
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -453,28 +484,6 @@ export default function IntelligenceHubPage() {
           ))}
         </div>
       )}
-
-      {/* Tabs */}
-      <div className="border-b border-gray-200">
-        <div className="flex gap-1">
-          <button
-            onClick={() => setTab('districts')}
-            className={`pb-3 px-4 text-sm font-medium border-b-2 transition-colors ${
-              tab === 'districts' ? 'border-amber-500 text-amber-600' : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            Districts
-          </button>
-          <button
-            onClick={() => setTab('invoices')}
-            className={`pb-3 px-4 text-sm font-medium border-b-2 transition-colors ${
-              tab === 'invoices' ? 'border-amber-500 text-amber-600' : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            Invoices ({invoices.length})
-          </button>
-        </div>
-      </div>
 
       {/* Tab: Districts */}
       {tab === 'districts' && (
@@ -797,6 +806,7 @@ export default function IntelligenceHubPage() {
           onClose={() => { setShowEmailModal(false) }}
         />
       )}
+      </div>
     </div>
   )
 }

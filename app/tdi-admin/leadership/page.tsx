@@ -433,14 +433,48 @@ export default function LeadershipDashboardPage() {
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-8">
-      {/* Page Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Lead Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Manage school partnerships, reports, action items, and billing.
-        </p>
+    <div className="min-h-screen bg-[#FAFBFC]">
+      {/* Sticky Tab Bar */}
+      <div
+        className="sticky top-0 z-10 bg-white border-b border-gray-200"
+        style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+      >
+        <div className="flex items-center gap-0 px-6">
+          {TABS.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className="px-4 py-3 text-sm font-medium transition-colors relative"
+                style={{
+                  color: isActive ? '#111827' : '#6B7280',
+                  borderBottom: isActive
+                    ? `2px solid ${theme.accent}`
+                    : '2px solid transparent',
+                }}
+              >
+                {tab.label}
+                {tab.id === 'actions' && pendingActionItems.length > 0 && (
+                  <span className="ml-1 text-xs text-gray-900 font-medium">
+                    ({pendingActionItems.length})
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
+
+      {/* Page Content */}
+      <div className="px-6 py-6">
+        {/* Page Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-gray-900">Lead Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Manage school partnerships, reports, action items, and billing.
+          </p>
+        </div>
 
       {/* Stats Cards - White bg with accent top bar */}
       {stats && (
@@ -550,33 +584,6 @@ export default function LeadershipDashboardPage() {
           </div>
         </div>
       )}
-
-      {/* Tab Navigation */}
-      <div className="flex flex-wrap gap-0 mb-6 border-b border-gray-200">
-        {TABS.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className="px-4 py-3 text-sm font-medium transition-colors relative"
-              style={{
-                color: isActive ? '#111827' : '#6B7280',
-                borderBottom: isActive
-                  ? `2px solid ${theme.accent}`
-                  : '2px solid transparent',
-              }}
-            >
-              {tab.label}
-              {tab.id === 'actions' && pendingActionItems.length > 0 && (
-                <span className="ml-1 text-xs text-gray-900 font-medium">
-                  ({pendingActionItems.length})
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
 
       {/* Tab Content */}
       <div
@@ -1643,6 +1650,7 @@ export default function LeadershipDashboardPage() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

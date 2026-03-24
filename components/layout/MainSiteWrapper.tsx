@@ -21,9 +21,11 @@ export function MainSiteWrapper({ children }: MainSiteWrapperProps) {
   const isPartnerDashboard = pathname?.startsWith('/partners/') &&
     !pathname?.startsWith('/partners/login') &&
     !pathname?.startsWith('/partners/reset-password');
+  // Client-facing quote signing pages
+  const isInvoiceRoute = pathname?.startsWith('/invoice');
 
-  // Don't render main site chrome on Hub, TDI Admin, Login, or Partner Dashboard routes
-  if (isHubRoute || isTDIAdminRoute || isLoginPage || isDashboardRoute || isPartnerDashboard) {
+  // Don't render main site chrome on Hub, TDI Admin, Login, Partner Dashboard, or Invoice routes
+  if (isHubRoute || isTDIAdminRoute || isLoginPage || isDashboardRoute || isPartnerDashboard || isInvoiceRoute) {
     return null;
   }
 

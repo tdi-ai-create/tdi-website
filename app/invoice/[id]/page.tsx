@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { getSupabase } from '@/lib/supabase'
 
 type Quote = {
   id: string
@@ -59,7 +58,6 @@ function getYouTubeEmbedUrl(url: string): string | null {
 }
 
 export default function InvoicePage({ params }: { params: { id: string } }) {
-  const supabase = getSupabase()
   const [quote, setQuote] = useState<Quote | null>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
@@ -83,34 +81,29 @@ export default function InvoicePage({ params }: { params: { id: string } }) {
   }, [params.id])
 
   async function loadQuote() {
-    const { data, error } = await supabase
-      .from('quotes')
-      .select(`*, quote_packages(*)`)
-      .eq('id', params.id)
-      .single()
+    try {
+      const response = await fetch(`/api/quotes/${params.id}`)
+      if (!response.ok) {
+        setNotFound(true)
+        setLoading(false)
+        return
+      }
+      const data = await response.json()
+      setQuote(data)
+      setLoading(false)
 
-    if (error || !data) {
+      // Track view
+      if (!viewTracked.current && ['sent', 'viewed'].includes(data.status)) {
+        viewTracked.current = true
+        fetch(`/api/quotes/${params.id}/view`, { method: 'POST' })
+      }
+
+      // If already signed, jump to confirmation
+      if (data.status === 'signed') setSigned(true)
+    } catch {
       setNotFound(true)
       setLoading(false)
-      return
     }
-
-    // Sort packages by index
-    data.quote_packages = (data.quote_packages ?? []).sort(
-      (a: Package, b: Package) => a.package_index - b.package_index
-    )
-
-    setQuote(data)
-    setLoading(false)
-
-    // Track view
-    if (!viewTracked.current && ['sent', 'viewed'].includes(data.status)) {
-      viewTracked.current = true
-      fetch(`/api/quotes/${params.id}/view`, { method: 'POST' })
-    }
-
-    // If already signed, jump to confirmation
-    if (data.status === 'signed') setSigned(true)
   }
 
   // Get active steps (skip video if no URL)
