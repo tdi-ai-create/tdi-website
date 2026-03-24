@@ -2457,6 +2457,22 @@ export default function DistrictDetailPage() {
                                 Reset Timer
                               </button>
                             )}
+                            <a href={quoteUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-gray-500 hover:text-gray-700 hover:underline">
+                              Preview
+                            </a>
+                            {q.status === 'draft' && (
+                              <button
+                                onClick={async () => {
+                                  if (!confirm('Delete this quote? This cannot be undone.')) return
+                                  await supabase.from('quote_packages').delete().eq('quote_id', q.id)
+                                  await supabase.from('quotes').delete().eq('id', q.id)
+                                  loadDistrict()
+                                }}
+                                className="text-xs text-red-400 hover:text-red-600"
+                              >
+                                Delete
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
