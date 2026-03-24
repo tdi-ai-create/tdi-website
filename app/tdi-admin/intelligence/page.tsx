@@ -255,7 +255,7 @@ export default function IntelligenceHubPage() {
         label: 'Critical Collections',
         value: criticalCount,
         sub: 'invoices flagged critical risk',
-        color: 'bg-red-50 border-red-200',
+        color: 'bg-white border-gray-100 border-l-[3px] border-l-red-500',
         href: '/tdi-admin/intelligence/collections?filter=critical',
         icon: <AlertTriangle className="w-5 h-5 text-red-500" />,
       },
@@ -263,33 +263,33 @@ export default function IntelligenceHubPage() {
         label: 'At-Risk Invoices',
         value: atRiskCount,
         sub: 'need follow-up soon',
-        color: 'bg-orange-50 border-orange-200',
+        color: 'bg-white border-gray-100 border-l-[3px] border-l-amber-500',
         href: '/tdi-admin/intelligence/collections?filter=at_risk',
-        icon: <Clock className="w-5 h-5 text-orange-500" />,
+        icon: <Clock className="w-5 h-5 text-amber-500" />,
       },
       {
         label: 'Board Approvals',
         value: boardPending,
         sub: 'pending in next 30 days',
-        color: 'bg-yellow-50 border-yellow-200',
+        color: 'bg-white border-gray-100 border-l-[3px] border-l-amber-500',
         href: '/tdi-admin/intelligence/collections?filter=board',
-        icon: <FileCheck className="w-5 h-5 text-yellow-600" />,
+        icon: <FileCheck className="w-5 h-5 text-amber-500" />,
       },
       {
         label: 'Renewals Soon',
         value: renewalsSoon,
         sub: 'contracts renewing within 90 days',
-        color: 'bg-blue-50 border-blue-200',
+        color: 'bg-white border-gray-100 border-l-[3px] border-l-amber-500',
         href: '/tdi-admin/intelligence/districts?filter=renewals',
-        icon: <Calendar className="w-5 h-5 text-blue-500" />,
+        icon: <Calendar className="w-5 h-5 text-amber-500" />,
       },
       {
         label: 'Delivery at Risk',
         value: deliveryAtRiskCount,
         sub: 'contracts ending soon, <50% delivered',
-        color: 'bg-purple-50 border-purple-200',
+        color: 'bg-white border-gray-100 border-l-[3px] border-l-amber-500',
         href: '/tdi-admin/intelligence/districts?filter=active',
-        icon: <TrendingDown className="w-5 h-5 text-purple-500" />,
+        icon: <TrendingDown className="w-5 h-5 text-amber-500" />,
       },
     ])
 
@@ -440,7 +440,8 @@ export default function IntelligenceHubPage() {
             <Link
               key={card.label}
               href={card.href}
-              className={`border rounded-xl p-4 hover:shadow-md transition-shadow ${card.color}`}
+              className={`rounded-xl p-4 transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] ${card.color}`}
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
             >
               <div className="flex items-start justify-between">
                 <p className="text-3xl font-bold text-gray-900">{card.value}</p>

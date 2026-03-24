@@ -1178,7 +1178,7 @@ export default function CreatorStudioPage() {
           {/* Grid Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
             {/* Pipeline Funnel */}
-            <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+            <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
               <h2 className="text-lg font-semibold mb-4 text-gray-900">
                 Creator Pipeline
               </h2>
@@ -1236,7 +1236,7 @@ export default function CreatorStudioPage() {
             </div>
 
             {/* Closest to Launch */}
-            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
                   <Trophy className="w-5 h-5 text-amber-500" />
@@ -1322,7 +1322,7 @@ export default function CreatorStudioPage() {
             </div>
 
             {/* Scheduled for Launch */}
-            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
               {(() => {
                 const scheduled = dashboardData.creators
                   .filter(c => c.publish_status === 'scheduled' && c.scheduled_publish_date)
@@ -1401,7 +1401,7 @@ export default function CreatorStudioPage() {
             </div>
 
             {/* Recently Published */}
-            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
               {(() => {
                 // Include creators who are either:
                 // 1. Explicitly marked as published (publish_status === 'published')
@@ -1485,7 +1485,7 @@ export default function CreatorStudioPage() {
 
             {/* Needs Your Attention */}
             <div
-              className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] border-l-4"
+              className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] border-l-4"
               style={{ borderLeftColor: '#F59E0B' }}
             >
               <div className="flex items-center justify-between mb-4">
@@ -1594,7 +1594,7 @@ export default function CreatorStudioPage() {
             {/* Followed Up by Team */}
             {followedUpCreators.length > 0 && (
               <div
-                className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] border-l-4"
+                className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] border-l-4"
                 style={{ borderLeftColor: '#8B5CF6' }}
               >
                 <div className="flex items-center justify-between mb-4">
@@ -1682,7 +1682,7 @@ export default function CreatorStudioPage() {
             )}
 
             {/* Content Paths */}
-            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
               <h3 className="text-lg font-semibold mb-4 text-gray-900">
                 Content Paths
               </h3>
@@ -1719,7 +1719,7 @@ export default function CreatorStudioPage() {
 
           {/* Geographic Distribution */}
           {locationData && (
-            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] mb-5">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] mb-5">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
                 <MapPin className="w-5 h-5" style={{ color: '#8B5CF6' }} />
                 Geographic Distribution
@@ -1793,7 +1793,7 @@ export default function CreatorStudioPage() {
           )}
 
           {/* Recent Activity */}
-          <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+          <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
             <h3 className="text-lg font-semibold mb-4 text-gray-900">
               Recent Activity
             </h3>
@@ -1832,7 +1832,7 @@ export default function CreatorStudioPage() {
           </div>
 
           {/* Admin Tools */}
-          <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] mt-5">
+          <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] mt-5">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
               <Settings className="w-5 h-5 text-gray-500" />
               Admin Tools
@@ -1895,7 +1895,7 @@ export default function CreatorStudioPage() {
       {/* CREATORS TAB */}
       {activeTab === 'creators' && (
         <>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
           {/* Search and Filters Bar */}
           <div className="p-5 border-b border-gray-100">
             <div className="flex flex-col md:flex-row gap-3">
@@ -2326,7 +2326,7 @@ export default function CreatorStudioPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                   {/* A. Creator Velocity — Average Time Per Phase */}
-                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
                     <h3 className="text-lg font-semibold mb-4 text-gray-900">
                       Creator Velocity
                     </h3>
@@ -2355,7 +2355,7 @@ export default function CreatorStudioPage() {
                   </div>
 
                   {/* B. Bottleneck Report */}
-                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
                     <h3 className="text-lg font-semibold mb-4 text-gray-900">
                       Bottleneck Report
                     </h3>
@@ -2402,7 +2402,7 @@ export default function CreatorStudioPage() {
                   </div>
 
                   {/* C. Content Path Breakdown */}
-                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
                     <h3 className="text-lg font-semibold mb-4 text-gray-900">
                       Content Path Breakdown
                     </h3>
@@ -2444,7 +2444,7 @@ export default function CreatorStudioPage() {
                   </div>
 
                   {/* Content Path Trends */}
-                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
                     <h3 className="text-lg font-semibold mb-4 text-gray-900">
                       New Creators Over Time
                     </h3>
@@ -2465,7 +2465,7 @@ export default function CreatorStudioPage() {
                   </div>
 
                   {/* D. Creator Activity Heatmap */}
-                  <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                  <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
                     <h3 className="text-lg font-semibold mb-2 text-gray-900">
                       Creator Activity Heatmap
                     </h3>
@@ -2522,7 +2522,7 @@ export default function CreatorStudioPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                   {/* E. Time from Intake to Launch */}
-                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
                     <h3 className="text-lg font-semibold mb-4 text-gray-900">
                       Time to Launch
                     </h3>
@@ -2559,7 +2559,7 @@ export default function CreatorStudioPage() {
                   </div>
 
                   {/* F. Completion Funnel */}
-                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
                     <h3 className="text-lg font-semibold mb-4 text-gray-900">
                       Completion Funnel
                     </h3>
@@ -2594,7 +2594,7 @@ export default function CreatorStudioPage() {
                   </div>
 
                   {/* G. Stalled Creator Alerts */}
-                  <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                  <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -2722,7 +2722,7 @@ export default function CreatorStudioPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                   {/* H. Content Published Per Month */}
-                  <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                  <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
                     <h3 className="text-lg font-semibold mb-4 text-gray-900">
                       Content Published Per Month
                     </h3>
@@ -2748,7 +2748,7 @@ export default function CreatorStudioPage() {
                   </div>
 
                   {/* I. Geographic Distribution */}
-                  <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                  <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
                     <h3 className="text-lg font-semibold mb-4 text-gray-900">
                       Geographic Distribution
                     </h3>
@@ -2823,7 +2823,7 @@ export default function CreatorStudioPage() {
 
       {/* PAYOUTS TAB */}
       {activeTab === 'payouts' && (
-        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
           <div className="text-center py-12">
             <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg" style={{ backgroundColor: '#8B5CF6' }}>
               <DollarSign className="w-8 h-8 text-white" />

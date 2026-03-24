@@ -109,17 +109,15 @@ function StatCard({
 }) {
   return (
     <div
-      className="group bg-white rounded-xl p-5 text-left transition-all duration-200"
-      style={{
-        backgroundColor: theme.accentLight,
-        borderLeft: `3px solid ${theme.accent}`,
-        boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-      }}
+      className="group bg-white rounded-xl text-left transition-all duration-200 border border-gray-100 relative overflow-hidden"
+      style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
     >
-      <div className="flex items-center justify-between">
+      {/* Accent top bar */}
+      <div className="h-0.5 w-full" style={{ background: theme.accent }} />
+      <div className="p-5 flex items-center justify-between">
         <div>
           <p
-            className="text-3xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+            className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
             style={{ color: theme.accent }}
           >
             {typeof value === 'number' ? value.toLocaleString() : value}
@@ -155,10 +153,8 @@ function SectionCard({
   return (
     <Link
       href={href}
-      className="block bg-white rounded-xl p-6 border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all duration-200 group"
-      style={{
-        boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-      }}
+      className="block bg-white rounded-xl p-6 border border-gray-100 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:border-gray-200 transition-all duration-200 group"
+      style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
     >
       <div className="flex items-start justify-between mb-4">
         <div
@@ -338,7 +334,7 @@ export default function HubAdminPage() {
                   <div
                     key={i}
                     className="bg-white rounded-xl p-5 animate-pulse"
-                    style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}
+                    style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
                   >
                     <div className="flex items-center justify-between">
                       <div>

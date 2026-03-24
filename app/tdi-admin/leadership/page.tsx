@@ -458,21 +458,18 @@ export default function LeadershipDashboardPage() {
         </p>
       </div>
 
-      {/* Stats Cards - Updated to match Creator Studio design */}
+      {/* Stats Cards - White bg with accent top bar */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div
-            className="bg-white rounded-xl p-5 transition-all duration-200 group"
-            style={{
-              backgroundColor: theme.accentLight,
-              borderLeft: `3px solid ${theme.accent}`,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
-            }}
+            className="bg-white rounded-xl border border-gray-100 transition-all duration-200 group relative overflow-hidden"
+            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
           >
-            <div className="flex items-center justify-between">
+            <div className="h-0.5 w-full" style={{ background: theme.accent }} />
+            <div className="p-5 flex items-center justify-between">
               <div>
                 <p
-                  className="text-[28px] font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
                   style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.activeCount}
@@ -491,17 +488,14 @@ export default function LeadershipDashboardPage() {
           </div>
 
           <div
-            className="bg-white rounded-xl p-5 transition-all duration-200 group"
-            style={{
-              backgroundColor: theme.accentLight,
-              borderLeft: `3px solid ${theme.accent}`,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
-            }}
+            className="bg-white rounded-xl border border-gray-100 transition-all duration-200 group relative overflow-hidden"
+            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
           >
-            <div className="flex items-center justify-between">
+            <div className="h-0.5 w-full" style={{ background: theme.accent }} />
+            <div className="p-5 flex items-center justify-between">
               <div>
                 <p
-                  className="text-[28px] font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
                   style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.totalEducators}
@@ -520,17 +514,14 @@ export default function LeadershipDashboardPage() {
           </div>
 
           <div
-            className="bg-white rounded-xl p-5 transition-all duration-200 group"
-            style={{
-              backgroundColor: theme.accentLight,
-              borderLeft: `3px solid ${theme.accent}`,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
-            }}
+            className="bg-white rounded-xl border border-gray-100 transition-all duration-200 group relative overflow-hidden"
+            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
           >
-            <div className="flex items-center justify-between">
+            <div className="h-0.5 w-full" style={{ background: theme.accent }} />
+            <div className="p-5 flex items-center justify-between">
               <div>
                 <p
-                  className="text-[28px] font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
                   style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.pendingSetup}
@@ -549,17 +540,14 @@ export default function LeadershipDashboardPage() {
           </div>
 
           <div
-            className="bg-white rounded-xl p-5 transition-all duration-200 group"
-            style={{
-              backgroundColor: theme.accentLight,
-              borderLeft: `3px solid ${theme.accent}`,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
-            }}
+            className="bg-white rounded-xl border border-gray-100 transition-all duration-200 group relative overflow-hidden"
+            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
           >
-            <div className="flex items-center justify-between">
+            <div className="h-0.5 w-full" style={{ background: theme.accent }} />
+            <div className="p-5 flex items-center justify-between">
               <div>
                 <p
-                  className="text-[28px] font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
                   style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.awaitingAccept}
@@ -614,7 +602,7 @@ export default function LeadershipDashboardPage() {
       {/* Tab Content */}
       <div
         className="bg-white rounded-xl border border-gray-100"
-        style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)' }}
+        style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
       >
         {/* =========== PARTNERSHIPS TAB =========== */}
         {activeTab === 'partnerships' && (
@@ -986,7 +974,7 @@ export default function LeadershipDashboardPage() {
                       key={partnership.id}
                       className="p-5 rounded-xl border border-gray-200 bg-white transition-all hover:shadow-md"
                       style={{
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                        boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
                       }}
                     >
                       {/* Badges Row */}
@@ -1430,9 +1418,9 @@ export default function LeadershipDashboardPage() {
               </div>
 
               {/* Setup In Progress */}
-              <div className="bg-amber-50 rounded-xl p-4">
-                <h3 className="font-semibold text-amber-700 mb-3 flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
+              <div className="bg-white rounded-xl p-4 border border-gray-100" style={{ borderLeft: '3px solid #F59E0B', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full" style={{ background: '#F59E0B' }} />
                   Setup ({pipelineCounts.setup})
                 </h3>
                 <div className="space-y-2">
@@ -1443,7 +1431,7 @@ export default function LeadershipDashboardPage() {
                       <Link
                         key={p.id}
                         href={`/tdi-admin/leadership/${p.id}`}
-                        className="block p-3 bg-white rounded-lg border border-amber-200 hover:border-amber-300 transition-colors"
+                        className="block p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
                       >
                         <p className="font-medium text-sm" style={{ color: '#2B3A67' }}>
                           {p.org_name || p.contact_name}
@@ -1454,7 +1442,7 @@ export default function LeadershipDashboardPage() {
                       </Link>
                     ))}
                   {pipelineCounts.setup === 0 && (
-                    <p className="text-sm text-amber-400 text-center py-4">
+                    <p className="text-sm text-gray-400 text-center py-4">
                       No partnerships in setup
                     </p>
                   )}
@@ -1462,9 +1450,9 @@ export default function LeadershipDashboardPage() {
               </div>
 
               {/* Active */}
-              <div className="bg-green-50 rounded-xl p-4">
-                <h3 className="font-semibold text-green-700 mb-3 flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4" />
+              <div className="bg-white rounded-xl p-4 border border-gray-100" style={{ borderLeft: '3px solid #16A34A', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full" style={{ background: '#16A34A' }} />
                   Active ({pipelineCounts.active})
                 </h3>
                 <div className="space-y-2">
@@ -1475,7 +1463,7 @@ export default function LeadershipDashboardPage() {
                       <Link
                         key={p.id}
                         href={`/tdi-admin/leadership/${p.id}`}
-                        className="block p-3 bg-white rounded-lg border border-green-200 hover:border-green-300 transition-colors"
+                        className="block p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
                       >
                         <p className="font-medium text-sm" style={{ color: '#2B3A67' }}>
                           {p.org_name || p.contact_name}

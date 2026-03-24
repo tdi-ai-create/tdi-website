@@ -1,5 +1,5 @@
 // Admin Design System Tokens
-// Extracted from Creator Studio for consistent styling across all admin sections
+// Portal-wide design consistency system v1.0
 
 export const ADMIN_COLORS = {
   // Section accent colors - Approved color system v1.0
@@ -24,6 +24,21 @@ export const ADMIN_COLORS = {
     bg15: 'rgba(22, 163, 74, 0.15)',
     border30: 'rgba(22, 163, 74, 0.3)',
   },
+  intelligence: {
+    accent: '#F59E0B',       // Amber (Operations)
+    accentLight: '#FEF3C7',
+    accentDark: '#B45309',
+    bg15: 'rgba(245, 158, 11, 0.15)',
+    border30: 'rgba(245, 158, 11, 0.3)',
+  },
+  sales: {
+    accent: '#6366F1',       // Indigo
+    accentLight: '#E0E7FF',
+    accentDark: '#4338CA',
+    bg15: 'rgba(99, 102, 241, 0.15)',
+    border30: 'rgba(99, 102, 241, 0.3)',
+  },
+  // Legacy alias for team (maps to intelligence/amber)
   team: {
     accent: '#F59E0B',       // Amber
     accentLight: '#FEF3C7',
@@ -31,6 +46,33 @@ export const ADMIN_COLORS = {
     bg15: 'rgba(245, 158, 11, 0.15)',
     border30: 'rgba(245, 158, 11, 0.3)',
   },
+} as const;
+
+// Global portal design tokens - Use these everywhere
+export const PORTAL_TOKENS = {
+  // Card surface - ALL cards must be white
+  cardBg: '#FFFFFF',
+  cardBorder: '#F3F4F6',        // gray-100
+  cardBorderHover: '#E5E7EB',   // gray-200
+  cardShadow: '0 1px 4px rgba(0,0,0,0.04)',
+  cardShadowHover: '0 8px 24px rgba(0,0,0,0.08)',
+  cardRadius: '12px',           // rounded-xl
+
+  // Row surface (inside cards)
+  rowBg: '#FFFFFF',
+  rowBgHover: '#F9FAFB',        // gray-50
+  rowBorder: '#F9FAFB',
+
+  // Typography
+  textPrimary: '#111827',       // gray-900
+  textSecondary: '#6B7280',     // gray-500
+  textTertiary: '#9CA3AF',      // gray-400
+
+  // Page background
+  pageBg: '#F4F4F2',
+
+  // Section header (top of each portal page)
+  sectionHeaderBg: '#1B2A4A',   // navy - same everywhere
 } as const;
 
 export const ADMIN_TYPOGRAPHY = {
@@ -71,8 +113,8 @@ export const ADMIN_SPACING = {
 } as const;
 
 export const ADMIN_SHADOWS = {
-  card: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
-  cardHover: '0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06)',
+  card: '0 1px 4px rgba(0,0,0,0.04)',
+  cardHover: '0 8px 24px rgba(0,0,0,0.08)',
   statActive: (accentColor: string) => `0 4px 12px ${accentColor}25, 0 1px 3px rgba(0,0,0,0.08)`,
 } as const;
 

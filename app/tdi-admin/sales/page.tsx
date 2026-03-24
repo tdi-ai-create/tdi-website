@@ -245,7 +245,7 @@ export default function SalesPage() {
     const isRenewal = opp.name?.toLowerCase().includes('renewal')
 
     return (
-      <div className={`bg-white border rounded-xl p-4 space-y-2 ${attention ? 'border-red-300' : 'border-gray-200'}`}>
+      <div className={`bg-white border rounded-xl p-4 space-y-2 ${attention ? 'border-red-300' : 'border-gray-100'}`} style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-gray-900 truncate">{opp.name}</p>
@@ -380,26 +380,38 @@ export default function SalesPage() {
         </div>
       )}
 
-      {/* Summary cards */}
+      {/* Summary cards - indigo accent top bar */}
       {!loading && !error && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-2xl font-bold text-gray-900">{opportunities.length}</p>
-            <p className="text-sm text-gray-500 mt-0.5">Total Opportunities</p>
+          <div className="bg-white border border-gray-100 rounded-xl relative overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+            <div className="h-0.5 w-full bg-indigo-500" />
+            <div className="p-4">
+              <p className="text-2xl font-bold text-indigo-600">{opportunities.length}</p>
+              <p className="text-sm text-gray-500 mt-0.5">Total Opportunities</p>
+            </div>
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-2xl font-bold text-amber-600">{renewalCount}</p>
-            <p className="text-sm text-gray-500 mt-0.5">Renewal Opportunities</p>
+          <div className="bg-white border border-gray-100 rounded-xl relative overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+            <div className="h-0.5 w-full bg-indigo-500" />
+            <div className="p-4">
+              <p className="text-2xl font-bold text-amber-600">{renewalCount}</p>
+              <p className="text-sm text-gray-500 mt-0.5">Renewal Opportunities</p>
+            </div>
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-2xl font-bold text-red-500">{needsAttentionCount}</p>
-            <p className="text-sm text-gray-500 mt-0.5">Needs Attention</p>
+          <div className="bg-white border border-gray-100 rounded-xl relative overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+            <div className="h-0.5 w-full bg-indigo-500" />
+            <div className="p-4">
+              <p className="text-2xl font-bold text-red-500">{needsAttentionCount}</p>
+              <p className="text-sm text-gray-500 mt-0.5">Needs Attention</p>
+            </div>
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-2xl font-bold text-green-600">
-              ${totalValue.toLocaleString()}
-            </p>
-            <p className="text-sm text-gray-500 mt-0.5">Total Pipeline Value</p>
+          <div className="bg-white border border-gray-100 rounded-xl relative overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+            <div className="h-0.5 w-full bg-indigo-500" />
+            <div className="p-4">
+              <p className="text-2xl font-bold text-green-600">
+                ${totalValue.toLocaleString()}
+              </p>
+              <p className="text-sm text-gray-500 mt-0.5">Total Pipeline Value</p>
+            </div>
           </div>
         </div>
       )}
