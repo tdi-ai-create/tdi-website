@@ -88,6 +88,22 @@ function AdminSidebar({ user }: { user: User }) {
   const supabase = getSupabase();
   const { teamMember, canManageTeam, accessibleSections, isOwner } = useTDIAdmin();
 
+  // Collapsed state with localStorage persistence
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('tdi-sidebar-collapsed') === 'true';
+    }
+    return false;
+  });
+
+  function toggleCollapsed() {
+    const next = !collapsed;
+    setCollapsed(next);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('tdi-sidebar-collapsed', String(next));
+    }
+  }
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     router.push('/tdi-admin/login');
@@ -108,17 +124,19 @@ function AdminSidebar({ user }: { user: User }) {
   return (
     <>
       {/* LEFT SIDEBAR */}
-      <aside className="w-16 lg:w-56 flex-shrink-0 bg-[#0f172a] flex flex-col h-full">
+      <aside className={`${collapsed ? 'w-16' : 'w-16 lg:w-56'} flex-shrink-0 bg-[#0f172a] flex flex-col h-full transition-all duration-200 ease-in-out`}>
         {/* Logo / Wordmark */}
-        <div className="px-3 lg:px-4 py-5 border-b border-white/10">
+        <div className={`px-3 ${collapsed ? '' : 'lg:px-4'} py-5 border-b border-white/10`}>
           <Link href="/tdi-admin" className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center flex-shrink-0">
               <span className="text-white font-bold text-sm">T</span>
             </div>
-            <div className="hidden lg:block">
-              <p className="text-white font-bold text-sm leading-tight">Admin Portal</p>
-              <p className="text-gray-400 text-xs">Teachers Deserve It</p>
-            </div>
+            {!collapsed && (
+              <div className="hidden lg:block">
+                <p className="text-white font-bold text-sm leading-tight">Admin Portal</p>
+                <p className="text-gray-400 text-xs">Teachers Deserve It</p>
+              </div>
+            )}
           </Link>
         </div>
 
@@ -135,7 +153,7 @@ function AdminSidebar({ user }: { user: User }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-2 lg:px-3 py-2.5 rounded-lg transition-all group ${
+                className={`flex items-center gap-3 px-2 ${collapsed ? '' : 'lg:px-3'} py-2.5 rounded-lg transition-all group ${
                   active
                     ? 'bg-white/10 text-white'
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -149,7 +167,7 @@ function AdminSidebar({ user }: { user: User }) {
                 >
                   {item.icon(active)}
                 </span>
-                <span className="hidden lg:block text-sm font-medium truncate">{item.label}</span>
+                {!collapsed && <span className="hidden lg:block text-sm font-medium truncate">{item.label}</span>}
               </Link>
             );
           })}
@@ -161,7 +179,7 @@ function AdminSidebar({ user }: { user: User }) {
           {canManageTeam && (
             <Link
               href="/tdi-admin/team"
-              className={`flex items-center gap-3 px-2 lg:px-3 py-2.5 rounded-lg transition-all group ${
+              className={`flex items-center gap-3 px-2 ${collapsed ? '' : 'lg:px-3'} py-2.5 rounded-lg transition-all group ${
                 isTeamActive
                   ? 'bg-white/10 text-white'
                   : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -169,32 +187,51 @@ function AdminSidebar({ user }: { user: User }) {
               title="Settings & Team Access"
             >
               <Settings className="w-5 h-5 flex-shrink-0" />
-              <span className="hidden lg:block text-sm font-medium">Settings</span>
+              {!collapsed && <span className="hidden lg:block text-sm font-medium">Settings</span>}
             </Link>
           )}
 
           {/* User + logout */}
-          <div className="flex items-center gap-3 px-2 lg:px-3 py-2.5">
+          <div className={`flex items-center gap-3 px-2 ${collapsed ? '' : 'lg:px-3'} py-2.5`}>
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm"
               style={{ backgroundColor: activeAccent }}
             >
               {teamMember?.display_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
             </div>
-            <div className="hidden lg:flex flex-1 items-center justify-between min-w-0">
-              <p className="text-gray-300 text-xs truncate">
-                {teamMember?.display_name || user?.email?.split('@')[0]}
-              </p>
-              <button
-                onClick={handleSignOut}
-                className="text-gray-500 hover:text-white transition-colors ml-2 flex-shrink-0"
-                title="Sign out"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
+            {!collapsed && (
+              <div className="hidden lg:flex flex-1 items-center justify-between min-w-0">
+                <p className="text-gray-300 text-xs truncate">
+                  {teamMember?.display_name || user?.email?.split('@')[0]}
+                </p>
+                <button
+                  onClick={handleSignOut}
+                  className="text-gray-500 hover:text-white transition-colors ml-2 flex-shrink-0"
+                  title="Sign out"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Collapse toggle */}
+        <button
+          onClick={toggleCollapsed}
+          className="hidden lg:flex items-center justify-center py-3 border-t border-white/10 text-gray-500 hover:text-white transition-colors"
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          <svg
+            className={`w-4 h-4 transition-transform duration-200 ${collapsed ? 'rotate-180' : ''}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+        </button>
       </aside>
 
       {/* Accent bar storage for main content */}
