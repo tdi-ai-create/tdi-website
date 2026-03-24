@@ -374,19 +374,36 @@ export default function InvoiceClient({ quote: initialQuote }: { quote: Quote })
 
             {/* Package selector if multiple */}
             {quote.quote_packages.length > 1 && (
-              <div className="flex gap-3 flex-wrap">
+              <div className="space-y-3">
                 {quote.quote_packages.map((pkg, i) => (
                   <button
                     key={pkg.id}
                     onClick={() => setSelectedPackage(i)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all ${
+                    className={`w-full text-left p-5 rounded-xl border-2 transition-all ${
                       selectedPackage === i
-                        ? 'border-amber-500 bg-amber-50 text-amber-700'
-                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                        ? 'border-amber-500 bg-amber-50'
+                        : 'border-gray-200 hover:border-gray-300 bg-white'
                     }`}
                   >
-                    {pkg.package_name}
-                    {pkg.is_recommended && <span className="ml-2 text-xs bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full">Recommended</span>}
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="font-bold text-gray-900 text-lg">{pkg.package_name}</p>
+                          {pkg.is_recommended && (
+                            <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-semibold">Recommended</span>
+                          )}
+                        </div>
+                        {pkg.description && <p className="text-sm text-gray-500 mt-0.5">{pkg.description}</p>}
+                      </div>
+                      <div className="text-right ml-4">
+                        <p className="text-2xl font-bold text-gray-900">${Number(pkg.total_amount).toLocaleString()}</p>
+                      </div>
+                    </div>
+                    {selectedPackage === i && (
+                      <div className="mt-3 pt-3 border-t border-amber-200">
+                        <p className="text-xs text-amber-700 font-semibold">✓ Selected</p>
+                      </div>
+                    )}
                   </button>
                 ))}
               </div>

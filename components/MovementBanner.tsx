@@ -26,8 +26,8 @@ export default function MovementBanner() {
     sessionStorage.setItem('movement-banner-dismissed', 'true');
   };
 
-  // Hide on admin portal
-  if (pathname.startsWith('/tdi-admin')) return null;
+  // Hide on admin portal and invoice pages
+  if (pathname.startsWith('/tdi-admin') || pathname.startsWith('/invoice')) return null;
 
   if (dismissed) return null;
 
