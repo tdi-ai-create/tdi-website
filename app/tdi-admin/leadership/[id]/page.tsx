@@ -443,7 +443,8 @@ export default function AdminPartnershipDetailPage() {
           }
           phase={phase}
           dataUpdatedAt={undefined}
-          isAdminView={false}
+          isAdminView={true}
+          showAdminControls={false}
         />
 
         {/* Tab Bar - mirrors principal dashboard */}

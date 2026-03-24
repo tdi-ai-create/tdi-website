@@ -7,6 +7,7 @@ interface DashboardHeaderProps {
   phase:          'IGNITE' | 'ACCELERATE' | 'SUSTAIN'
   dataUpdatedAt?: string
   isAdminView?:   boolean
+  showAdminControls?: boolean
   legacyUrl?:     string
   onEditToggle?:  () => void
   editMode?:      boolean
@@ -20,7 +21,7 @@ const PHASE_COLORS = {
 
 export function DashboardHeader({
   schoolName, location, phase, dataUpdatedAt,
-  isAdminView = false, legacyUrl, onEditToggle, editMode = false,
+  isAdminView = false, showAdminControls = true, legacyUrl, onEditToggle, editMode = false,
 }: DashboardHeaderProps) {
   const phaseConfig = PHASE_COLORS[phase] || PHASE_COLORS.IGNITE
 
@@ -30,7 +31,7 @@ export function DashboardHeader({
       style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2D4A7A 100%)' }}
     >
       {/* Admin controls */}
-      {isAdminView && (
+      {isAdminView && showAdminControls && (
         <div className="flex items-start justify-between mb-4 relative z-10">
           <span className="text-xs font-bold tracking-widest text-white/40 uppercase pt-1">
             Admin View
