@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { getSupabase } from '@/lib/supabase'
 import Link from 'next/link'
-import { ChevronRight, Pencil, Plus, X, Check, Calendar, Users } from 'lucide-react'
+import { ChevronRight, Pencil, Plus, X, Check, Calendar, Users, Brain, FileText, Loader2 } from 'lucide-react'
 import { calculateRenewalHealth } from '@/lib/tdi-admin/renewal-health'
 
 type Tab = 'overview' | 'contracts' | 'contacts' | 'delivery' | 'meetings' | 'proof'
@@ -104,6 +104,41 @@ type Meeting = {
   score: number | null
   follow_up_notes: string | null
   next_meeting_date: string | null
+}
+
+type MeetingEvaluation = {
+  id: string
+  meeting_id: string | null
+  district_id: string
+  evaluated_at: string
+  overall_score: number
+  renewal_likelihood: 'high' | 'medium' | 'low' | 'at_risk'
+  executive_summary: string
+  relationship_score: number
+  relationship_feedback: string
+  relationship_quotes: string[]
+  value_demonstration_score: number
+  value_demonstration_feedback: string
+  value_demonstration_quotes: string[]
+  next_steps_score: number
+  next_steps_feedback: string
+  next_steps_quotes: string[]
+  stakeholder_engagement_score: number
+  stakeholder_engagement_feedback: string
+  stakeholder_engagement_quotes: string[]
+  objection_handling_score: number
+  objection_handling_feedback: string
+  objection_handling_quotes: string[]
+  expansion_signals_score: number
+  expansion_signals_feedback: string
+  expansion_signals_quotes: string[]
+  risk_indicators_score: number
+  risk_indicators_feedback: string
+  risk_indicators_quotes: string[]
+  key_wins: string[]
+  areas_for_improvement: string[]
+  action_items: { task: string; owner: string; deadline?: string }[]
+  transcript_word_count: number
 }
 
 // ---- Delivery Helper Functions ----
@@ -688,6 +723,329 @@ function LogMeetingModal({ districtId, onClose, onSaved }: {
   )
 }
 
+// ---- Modal: Meeting AI Evaluator ----
+function MeetingEvaluatorModal({
+  districtId,
+  meetingId,
+  onClose,
+  onSaved,
+}: {
+  districtId: string
+  meetingId?: string
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const [transcript, setTranscript] = useState('')
+  const [evaluating, setEvaluating] = useState(false)
+  const [evaluation, setEvaluation] = useState<MeetingEvaluation | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const inputClass = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+
+  async function handleEvaluate() {
+    if (!transcript.trim() || transcript.trim().split(/\s+/).length < 50) {
+      setError('Please provide a transcript with at least 50 words')
+      return
+    }
+
+    setEvaluating(true)
+    setError(null)
+
+    try {
+      const res = await fetch('/api/tdi-admin/evaluate-meeting', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          districtId,
+          meetingId: meetingId || null,
+          transcript: transcript.trim(),
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || 'Failed to evaluate transcript')
+        setEvaluating(false)
+        return
+      }
+
+      setEvaluation(data.evaluation)
+      setEvaluating(false)
+    } catch {
+      setError('Failed to connect to evaluation service')
+      setEvaluating(false)
+    }
+  }
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      const text = await file.text()
+      setTranscript(text)
+      setError(null)
+    } catch {
+      setError('Failed to read file')
+    }
+  }
+
+  const dimensionLabels: Record<string, { label: string; icon: string }> = {
+    relationship: { label: 'Relationship Strength', icon: '🤝' },
+    value_demonstration: { label: 'Value Demonstration', icon: '💎' },
+    next_steps: { label: 'Next Steps Clarity', icon: '📋' },
+    stakeholder_engagement: { label: 'Stakeholder Engagement', icon: '👥' },
+    objection_handling: { label: 'Objection Handling', icon: '🛡️' },
+    expansion_signals: { label: 'Expansion Signals', icon: '📈' },
+    risk_indicators: { label: 'Risk Level', icon: '⚠️' },
+  }
+
+  const renewalColors: Record<string, string> = {
+    high: 'bg-green-100 text-green-700',
+    medium: 'bg-amber-100 text-amber-700',
+    low: 'bg-orange-100 text-orange-700',
+    at_risk: 'bg-red-100 text-red-700',
+  }
+
+  const scoreColor = (score: number) => {
+    if (score >= 8) return 'text-green-600'
+    if (score >= 6) return 'text-amber-600'
+    if (score >= 4) return 'text-orange-600'
+    return 'text-red-600'
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="sticky top-0 bg-white px-6 py-4 border-b border-gray-100 flex items-center justify-between z-10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+              <Brain className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">AI Meeting Evaluator</h3>
+              <p className="text-xs text-gray-500">Analyze meeting transcripts with Claude</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-6">
+          {/* Input Section */}
+          {!evaluation && (
+            <>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Meeting Transcript
+                  </label>
+                  <label className="cursor-pointer text-xs text-purple-600 hover:underline flex items-center gap-1">
+                    <FileText className="w-3.5 h-3.5" />
+                    Upload .txt file
+                    <input
+                      type="file"
+                      accept=".txt,.md"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <textarea
+                  className={inputClass}
+                  rows={12}
+                  value={transcript}
+                  onChange={(e) => setTranscript(e.target.value)}
+                  placeholder="Paste your meeting transcript here...
+
+Include dialogue from both TDI representatives and district stakeholders for best results.
+
+Example format:
+Rae: Hi everyone, thanks for joining us today to review the ACCELERATE program results...
+Dr. Smith: Thank you for the update. The teachers have been really positive about the Hub...
+Principal Johnson: I wanted to share that our stress survey scores improved significantly..."
+                />
+                <p className="text-xs text-gray-400 mt-2">
+                  {transcript.trim().split(/\s+/).filter(Boolean).length} words
+                  {transcript.trim().split(/\s+/).filter(Boolean).length < 50 && ' (minimum 50 words)'}
+                </p>
+              </div>
+
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700">
+                  {error}
+                </div>
+              )}
+
+              <div className="flex justify-end gap-3">
+                <button onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700 px-4 py-2">
+                  Cancel
+                </button>
+                <button
+                  onClick={handleEvaluate}
+                  disabled={evaluating || transcript.trim().split(/\s+/).filter(Boolean).length < 50}
+                  className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-lg flex items-center gap-2"
+                >
+                  {evaluating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <Brain className="w-4 h-4" />
+                      Evaluate Meeting
+                    </>
+                  )}
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* Results Section */}
+          {evaluation && (
+            <div className="space-y-6">
+              {/* Overview Cards */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-center">
+                  <p className={`text-4xl font-bold ${scoreColor(evaluation.overall_score)}`}>
+                    {evaluation.overall_score}
+                  </p>
+                  <p className="text-sm text-purple-700 font-medium mt-1">Overall Score</p>
+                </div>
+                <div className="bg-white border border-gray-200 rounded-xl p-4 text-center">
+                  <span className={`inline-block text-sm font-semibold px-3 py-1 rounded-full ${renewalColors[evaluation.renewal_likelihood] ?? 'bg-gray-100 text-gray-600'}`}>
+                    {evaluation.renewal_likelihood?.replace('_', ' ').toUpperCase()}
+                  </span>
+                  <p className="text-sm text-gray-500 mt-2">Renewal Likelihood</p>
+                </div>
+                <div className="bg-white border border-gray-200 rounded-xl p-4 text-center">
+                  <p className="text-2xl font-bold text-gray-700">{evaluation.transcript_word_count}</p>
+                  <p className="text-sm text-gray-500 mt-1">Words Analyzed</p>
+                </div>
+              </div>
+
+              {/* Executive Summary */}
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <p className="text-sm font-semibold text-amber-800 mb-2">Executive Summary</p>
+                <p className="text-sm text-gray-700">{evaluation.executive_summary}</p>
+              </div>
+
+              {/* Dimension Scores */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-800 mb-3">Dimension Scores</h4>
+                <div className="grid gap-3">
+                  {(['relationship', 'value_demonstration', 'next_steps', 'stakeholder_engagement', 'objection_handling', 'expansion_signals', 'risk_indicators'] as const).map((dim) => {
+                    const scoreKey = `${dim}_score` as keyof MeetingEvaluation
+                    const feedbackKey = `${dim}_feedback` as keyof MeetingEvaluation
+                    const quotesKey = `${dim}_quotes` as keyof MeetingEvaluation
+                    const score = evaluation[scoreKey] as number
+                    const feedback = evaluation[feedbackKey] as string
+                    const quotes = evaluation[quotesKey] as string[]
+                    const info = dimensionLabels[dim]
+
+                    return (
+                      <div key={dim} className="bg-white border border-gray-200 rounded-xl p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span>{info.icon}</span>
+                            <span className="font-medium text-gray-800">{info.label}</span>
+                          </div>
+                          <span className={`text-xl font-bold ${scoreColor(score)}`}>{score}/10</span>
+                        </div>
+                        <p className="text-sm text-gray-600">{feedback}</p>
+                        {quotes && quotes.length > 0 && (
+                          <div className="mt-2 space-y-1">
+                            {quotes.map((q, i) => (
+                              <p key={i} className="text-xs text-gray-500 italic border-l-2 border-gray-200 pl-2">
+                                &ldquo;{q}&rdquo;
+                              </p>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Key Wins & Improvements */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                  <p className="text-sm font-semibold text-green-800 mb-2">Key Wins</p>
+                  <ul className="space-y-1">
+                    {(evaluation.key_wins ?? []).map((win, i) => (
+                      <li key={i} className="text-sm text-gray-700 flex items-start gap-2">
+                        <span className="text-green-500">✓</span>
+                        {win}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+                  <p className="text-sm font-semibold text-orange-800 mb-2">Areas for Improvement</p>
+                  <ul className="space-y-1">
+                    {(evaluation.areas_for_improvement ?? []).map((area, i) => (
+                      <li key={i} className="text-sm text-gray-700 flex items-start gap-2">
+                        <span className="text-orange-500">→</span>
+                        {area}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Action Items */}
+              {evaluation.action_items && evaluation.action_items.length > 0 && (
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  <p className="text-sm font-semibold text-blue-800 mb-2">Action Items</p>
+                  <ul className="space-y-2">
+                    {evaluation.action_items.map((item, i) => (
+                      <li key={i} className="text-sm text-gray-700 bg-white rounded-lg px-3 py-2 border border-blue-100">
+                        <p className="font-medium">{item.task}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          {item.owner && `Owner: ${item.owner}`}
+                          {item.owner && item.deadline && ' · '}
+                          {item.deadline && `Due: ${item.deadline}`}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                <button
+                  onClick={() => {
+                    setEvaluation(null)
+                    setTranscript('')
+                  }}
+                  className="text-sm text-gray-500 hover:text-gray-700 px-4 py-2"
+                >
+                  ← Evaluate Another
+                </button>
+                <button
+                  onClick={() => {
+                    onSaved()
+                    onClose()
+                  }}
+                  className="bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium px-5 py-2 rounded-lg"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ---- Modal: Add Proof Asset ----
 function AddProofAssetModal({ districtId, onClose, onSaved }: {
   districtId: string
@@ -1161,6 +1519,8 @@ export default function DistrictDetailPage() {
   const [proofAssets, setProofAssets] = useState<any[]>([])
   const [showAddProofAsset, setShowAddProofAsset] = useState(false)
   const [proofTypeFilter, setProofTypeFilter] = useState<string>('all')
+  const [showMeetingEvaluator, setShowMeetingEvaluator] = useState(false)
+  const [meetingEvaluations, setMeetingEvaluations] = useState<MeetingEvaluation[]>([])
 
   useEffect(() => { if (id) loadDistrict() }, [id])
 
@@ -1212,6 +1572,15 @@ export default function DistrictDetailPage() {
       .order('created_at', { ascending: false })
 
     setProofAssets(proofData ?? [])
+
+    // Fetch meeting evaluations
+    const { data: evaluationsData } = await supabase
+      .from('meeting_evaluations')
+      .select('*')
+      .eq('district_id', id)
+      .order('evaluated_at', { ascending: false })
+
+    setMeetingEvaluations((evaluationsData ?? []) as MeetingEvaluation[])
     setLoading(false)
   }
 
@@ -1316,6 +1685,14 @@ export default function DistrictDetailPage() {
           districtId={id}
           onClose={() => setShowAddProofAsset(false)}
           onSaved={() => { setShowAddProofAsset(false); loadDistrict() }}
+        />
+      )}
+
+      {showMeetingEvaluator && (
+        <MeetingEvaluatorModal
+          districtId={id}
+          onClose={() => setShowMeetingEvaluator(false)}
+          onSaved={() => { setShowMeetingEvaluator(false); loadDistrict() }}
         />
       )}
 
@@ -1911,12 +2288,21 @@ export default function DistrictDetailPage() {
                 <h3 className="font-semibold text-gray-800">Meeting Log</h3>
                 <p className="text-xs text-gray-400 mt-0.5">Track exec impact reviews, renewal conversations, check-ins</p>
               </div>
-              <button
-                onClick={() => setShowLogMeeting(true)}
-                className="text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg"
-              >
-                + Log Meeting
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowMeetingEvaluator(true)}
+                  className="text-xs font-medium bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-1.5 rounded-lg flex items-center gap-1.5"
+                >
+                  <Brain className="w-3.5 h-3.5" />
+                  AI Evaluator
+                </button>
+                <button
+                  onClick={() => setShowLogMeeting(true)}
+                  className="text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg"
+                >
+                  + Log Meeting
+                </button>
+              </div>
             </div>
 
             {meetings.length === 0 ? (
@@ -2021,6 +2407,57 @@ export default function DistrictDetailPage() {
                   <p className="text-xs text-gray-500 mt-0.5">{stat.label}</p>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* AI Evaluations */}
+          {meetingEvaluations.length > 0 && (
+            <div className="bg-white border border-purple-200 rounded-xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-purple-100 bg-purple-50 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Brain className="w-4 h-4 text-purple-600" />
+                  <h3 className="font-semibold text-purple-800">AI Meeting Evaluations</h3>
+                </div>
+                <span className="text-xs text-purple-600">{meetingEvaluations.length} evaluation{meetingEvaluations.length !== 1 ? 's' : ''}</span>
+              </div>
+              <ul className="divide-y divide-gray-100">
+                {meetingEvaluations.map((ev) => {
+                  const renewalColors: Record<string, string> = {
+                    high: 'bg-green-100 text-green-700',
+                    medium: 'bg-amber-100 text-amber-700',
+                    low: 'bg-orange-100 text-orange-700',
+                    at_risk: 'bg-red-100 text-red-700',
+                  }
+                  const scoreColor = ev.overall_score >= 8 ? 'text-green-600' :
+                    ev.overall_score >= 6 ? 'text-amber-600' :
+                    ev.overall_score >= 4 ? 'text-orange-600' : 'text-red-600'
+
+                  return (
+                    <li key={ev.id} className="px-5 py-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className={`text-xl font-bold ${scoreColor}`}>{ev.overall_score}/10</span>
+                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${renewalColors[ev.renewal_likelihood] ?? 'bg-gray-100 text-gray-600'}`}>
+                              {ev.renewal_likelihood?.replace('_', ' ').toUpperCase()}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              {new Date(ev.evaluated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 mt-2">{ev.executive_summary}</p>
+                          <div className="flex gap-4 mt-3 text-xs text-gray-500">
+                            <span>Relationship: <strong className={ev.relationship_score >= 7 ? 'text-green-600' : ev.relationship_score >= 5 ? 'text-amber-600' : 'text-red-600'}>{ev.relationship_score}</strong></span>
+                            <span>Value: <strong className={ev.value_demonstration_score >= 7 ? 'text-green-600' : ev.value_demonstration_score >= 5 ? 'text-amber-600' : 'text-red-600'}>{ev.value_demonstration_score}</strong></span>
+                            <span>Next Steps: <strong className={ev.next_steps_score >= 7 ? 'text-green-600' : ev.next_steps_score >= 5 ? 'text-amber-600' : 'text-red-600'}>{ev.next_steps_score}</strong></span>
+                            <span>Risk: <strong className={ev.risk_indicators_score >= 7 ? 'text-green-600' : ev.risk_indicators_score >= 5 ? 'text-amber-600' : 'text-red-600'}>{ev.risk_indicators_score}</strong></span>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
             </div>
           )}
         </div>
