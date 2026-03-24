@@ -6,23 +6,12 @@ import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { getAdminStats } from '@/lib/hub/admin';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
 import {
-  Users,
-  BookOpen,
-  Award,
-  Clock,
-  TrendingUp,
   ChevronRight,
   BarChart3,
   FileText,
   Zap,
   Mail,
   Download,
-  GraduationCap,
-  Clapperboard,
-  LayoutGrid,
-  Menu,
-  ChevronLeft,
-  Settings,
   Info,
   X,
 } from 'lucide-react';
@@ -30,13 +19,11 @@ import {
 // Hub theme colors
 const theme = PORTAL_THEMES.hub;
 
-// Tab configuration for sidebar
-type TabId = 'overview' | 'operations' | 'production';
-
-const TABS: { id: TabId; label: string; icon: React.ElementType; href?: string }[] = [
-  { id: 'overview', label: 'Overview', icon: LayoutGrid },
-  { id: 'operations', label: 'Operations', icon: BarChart3, href: '/tdi-admin/hub/operations' },
-  { id: 'production', label: 'Production', icon: Clapperboard, href: '/tdi-admin/hub/production' },
+// Tab configuration for top nav
+const HUB_TABS = [
+  { id: 'overview', label: 'Overview', href: '/tdi-admin/hub' },
+  { id: 'operations', label: 'Operations', href: '/tdi-admin/hub/operations' },
+  { id: 'production', label: 'Production', href: '/tdi-admin/hub/production' },
 ];
 
 interface HubStats {
@@ -48,107 +35,48 @@ interface HubStats {
   avgStressScore: number | null;
 }
 
-// Sidebar Navigation Item Component (matching Creator Studio)
-function SidebarNavItem({
-  active,
-  onClick,
-  href,
-  icon: Icon,
-  children,
-}: {
-  active: boolean;
-  onClick?: () => void;
-  href?: string;
-  icon: React.ElementType;
-  children: React.ReactNode;
-}) {
-  const content = (
-    <>
-      <Icon size={20} className={active ? '' : 'text-gray-400'} style={active ? { color: theme.accent } : undefined} />
-      <span className={active ? 'font-semibold' : ''}>{children}</span>
-    </>
-  );
-
-  const className = `w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-left ${
-    active ? '' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-  }`;
-
-  const activeStyles = active
-    ? {
-        backgroundColor: `${theme.accent}10`,
-        color: theme.accent,
-      }
-    : undefined;
-
-  if (href && !active) {
-    return (
-      <Link href={href} className={className} style={activeStyles}>
-        {content}
-      </Link>
-    );
-  }
-
-  return (
-    <button onClick={onClick} className={className} style={activeStyles}>
-      {content}
-    </button>
-  );
-}
-
-// Modern Stat Card Component (matching Creator Studio exactly)
+// Modern Stat Card Component - simplified without icon circles
 function StatCard({
-  icon: Icon,
   label,
   value,
   subtitle,
 }: {
-  icon: React.ElementType;
   label: string;
   value: number | string;
   subtitle?: string;
 }) {
   return (
     <div
-      className="group bg-white rounded-xl text-left transition-all duration-200 border border-gray-100 relative overflow-hidden"
+      className="bg-white rounded-xl border border-gray-100 relative overflow-hidden"
       style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
     >
       {/* Accent top bar */}
       <div className="h-0.5 w-full" style={{ background: theme.accent }} />
-      <div className="p-5 flex items-center justify-between">
-        <div>
-          <p
-            className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-            style={{ color: theme.accent }}
-          >
-            {typeof value === 'number' ? value.toLocaleString() : value}
-          </p>
-          <p className="text-sm text-gray-500 font-medium">{label}</p>
-          {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
-        </div>
-        <div
-          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
-          style={{ backgroundColor: `${theme.accent}15` }}
+      <div className="p-5">
+        <p
+          className="text-2xl font-bold mb-1"
+          style={{ color: theme.accent }}
         >
-          <Icon className="w-6 h-6" style={{ color: theme.accent }} />
-        </div>
+          {typeof value === 'number' ? value.toLocaleString() : value}
+        </p>
+        <p className="text-sm text-gray-500">{label}</p>
+        {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
       </div>
     </div>
   );
 }
 
-// Section Card Component (clean style without left border)
+// Section Card Component - with small dot accent instead of large icon
 function SectionCard({
   title,
   description,
   features,
   href,
-  icon: Icon,
 }: {
   title: string;
   description: string;
   features: string[];
   href: string;
-  icon: React.ElementType;
 }) {
   return (
     <Link
@@ -156,19 +84,14 @@ function SectionCard({
       className="block bg-white rounded-xl p-6 border border-gray-100 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:border-gray-200 transition-all duration-200 group"
       style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
     >
-      <div className="flex items-start justify-between mb-4">
-        <div
-          className="w-12 h-12 rounded-xl flex items-center justify-center"
-          style={{ backgroundColor: theme.accentLight }}
-        >
-          <Icon size={24} style={{ color: theme.accent }} />
-        </div>
+      <div className="flex items-start justify-between mb-3">
+        <div className="w-2 h-2 rounded-full" style={{ background: theme.accent }} />
         <ChevronRight
           size={20}
           className="text-gray-300 group-hover:text-gray-500 group-hover:translate-x-1 transition-all duration-200"
         />
       </div>
-      <h3 className="font-semibold text-lg mb-2 text-gray-900">{title}</h3>
+      <h3 className="text-base font-semibold text-gray-900 mb-1">{title}</h3>
       <p className="text-sm text-gray-500 mb-4">{description}</p>
       <ul className="space-y-2">
         {features.map((feature, i) => (
@@ -211,7 +134,6 @@ export default function HubAdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasExampleData, setHasExampleData] = useState(false);
   const [showExampleNotice, setShowExampleNotice] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     async function loadStats() {
@@ -230,254 +152,188 @@ export default function HubAdminPage() {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-[#FAFBFC]">
-      {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 transform transition-transform duration-200 ease-in-out lg:transform-none ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
-        style={{ boxShadow: '1px 0 3px rgba(0,0,0,0.03)' }}
+    <div className="min-h-screen bg-[#FAFBFC]">
+      {/* Sticky Tab Bar */}
+      <div
+        className="sticky top-0 z-10 bg-white border-b border-gray-100"
+        style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
       >
-        <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
-          <div className="flex items-center justify-between px-5 py-5 border-b border-gray-100">
-            <div className="flex items-center gap-2">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: theme.accent }}
-              >
-                <BookOpen className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-semibold text-gray-900">Learning Hub</span>
-            </div>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <ChevronLeft className="w-5 h-5 text-gray-500" />
-            </button>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 px-3 py-4 space-y-1">
-            {TABS.map((tab) => (
-              <SidebarNavItem
-                key={tab.id}
-                active={tab.id === 'overview'}
-                onClick={tab.id === 'overview' ? () => setSidebarOpen(false) : undefined}
-                href={tab.href}
-                icon={tab.icon}
-              >
-                {tab.label}
-              </SidebarNavItem>
-            ))}
-          </nav>
-
-          {/* Sidebar Footer */}
-          <div className="px-3 py-4 border-t border-gray-100">
+        <div className="flex items-center gap-0 px-6">
+          {HUB_TABS.map(tab => (
             <Link
-              href="/hub/admin"
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              key={tab.id}
+              href={tab.href}
+              className="px-4 py-3 text-sm font-medium transition-colors relative"
+              style={{
+                color: tab.id === 'overview' ? '#111827' : '#6B7280',
+                borderBottom: tab.id === 'overview'
+                  ? '2px solid #00B5AD'
+                  : '2px solid transparent',
+              }}
             >
-              <Settings size={16} />
-              Legacy Admin
+              {tab.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Page Content */}
+      <div className="px-6 py-6">
+        {/* Page Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Learning Hub</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage enrollments, content, and analytics</p>
+        </div>
+
+        {/* Example Data Notice (subtle) */}
+        {hasExampleData && showExampleNotice && (
+          <ExampleDataNotice onDismiss={() => setShowExampleNotice(false)} />
+        )}
+
+        {/* Stats Overview */}
+        <div className="mb-8">
+          <h2 className="text-sm font-semibold text-gray-900 mb-4">Quick Stats</h2>
+          {isLoading ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-xl p-5 animate-pulse border border-gray-100"
+                  style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+                >
+                  <div className="h-8 bg-gray-200 rounded w-16 mb-2" />
+                  <div className="h-4 bg-gray-100 rounded w-20" />
+                </div>
+              ))}
+            </div>
+          ) : stats ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              <StatCard label="Total Users" value={stats.totalUsers || 0} />
+              <StatCard label="Enrollments" value={stats.totalEnrollments || 0} />
+              <StatCard label="Completions" value={stats.totalCompletions || 0} />
+              <StatCard label="Certificates" value={stats.totalCertificates || 0} />
+              <StatCard label="PD Hours" value={stats.totalPdHours || 0} />
+              <StatCard
+                label="Avg Stress"
+                value={stats.avgStressScore || '-'}
+                subtitle="1=great, 5=rough"
+              />
+            </div>
+          ) : (
+            <p className="text-gray-500">Unable to load stats.</p>
+          )}
+        </div>
+
+        {/* Section Cards */}
+        <div className="mb-8">
+          <h2 className="text-sm font-semibold text-gray-900 mb-4">Manage</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <SectionCard
+              title="Operations"
+              description="Accounts, enrollments, reports, analytics"
+              features={[
+                'View and manage enrollments',
+                'Export reports and data',
+                'View analytics dashboards',
+                'Manage user accounts',
+                'Send bulk emails',
+                'Certificate management',
+              ]}
+              href="/tdi-admin/hub/operations"
+            />
+            <SectionCard
+              title="Production"
+              description="Courses, content, Quick Wins, media"
+              features={[
+                'Create and edit courses',
+                'Manage lessons and modules',
+                'Publish/unpublish content',
+                'Manage Quick Wins',
+                'Upload videos and resources',
+                'Content calendar',
+              ]}
+              href="/tdi-admin/hub/production"
+            />
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div>
+          <h2 className="text-sm font-semibold text-gray-900 mb-4">Quick Actions</h2>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/tdi-admin/hub/operations"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
+              style={{
+                color: theme.accent,
+                borderColor: theme.accent,
+                backgroundColor: 'transparent',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+            >
+              <BarChart3 size={16} />
+              View Analytics
+            </Link>
+            <Link
+              href="/tdi-admin/hub/production"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
+              style={{
+                color: theme.accent,
+                borderColor: theme.accent,
+                backgroundColor: 'transparent',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+            >
+              <FileText size={16} />
+              Manage Courses
+            </Link>
+            <Link
+              href="/tdi-admin/hub/production"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
+              style={{
+                color: theme.accent,
+                borderColor: theme.accent,
+                backgroundColor: 'transparent',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+            >
+              <Zap size={16} />
+              Quick Wins
+            </Link>
+            <Link
+              href="/tdi-admin/hub/operations"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
+              style={{
+                color: theme.accent,
+                borderColor: theme.accent,
+                backgroundColor: 'transparent',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+            >
+              <Download size={16} />
+              Export Reports
+            </Link>
+            <Link
+              href="/tdi-admin/hub/operations"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
+              style={{
+                color: theme.accent,
+                borderColor: theme.accent,
+                backgroundColor: 'transparent',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+            >
+              <Mail size={16} />
+              Email Management
             </Link>
           </div>
         </div>
-      </aside>
-
-      {/* Main Content Area */}
-      <main className="flex-1 min-w-0">
-        {/* Top Header Bar */}
-        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-sm border-b border-gray-100">
-          <div className="flex items-center justify-between px-6 py-4">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <Menu className="w-5 h-5 text-gray-600" />
-              </button>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-                  Learning Hub Overview
-                </h1>
-                <p className="text-sm text-gray-500 mt-0.5">
-                  Manage enrollments, content, and analytics
-                </p>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Page Content */}
-        <div className="px-6 py-6">
-          {/* Example Data Notice (subtle) */}
-          {hasExampleData && showExampleNotice && (
-            <ExampleDataNotice onDismiss={() => setShowExampleNotice(false)} />
-          )}
-
-          {/* Stats Overview */}
-          <div className="mb-8">
-            <h2 className="text-base font-semibold text-gray-900 mb-4">Quick Stats</h2>
-            {isLoading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div
-                    key={i}
-                    className="bg-white rounded-xl p-5 animate-pulse"
-                    style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="h-8 bg-gray-200 rounded w-16 mb-2" />
-                        <div className="h-4 bg-gray-100 rounded w-20" />
-                      </div>
-                      <div className="w-12 h-12 bg-gray-100 rounded-xl" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : stats ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                <StatCard icon={Users} label="Total Users" value={stats.totalUsers || 0} />
-                <StatCard icon={BookOpen} label="Enrollments" value={stats.totalEnrollments || 0} />
-                <StatCard icon={Award} label="Completions" value={stats.totalCompletions || 0} />
-                <StatCard icon={GraduationCap} label="Certificates" value={stats.totalCertificates || 0} />
-                <StatCard icon={Clock} label="PD Hours" value={stats.totalPdHours || 0} />
-                <StatCard
-                  icon={TrendingUp}
-                  label="Avg Stress"
-                  value={stats.avgStressScore || '-'}
-                  subtitle="1=great, 5=rough"
-                />
-              </div>
-            ) : (
-              <p className="text-gray-500">Unable to load stats.</p>
-            )}
-          </div>
-
-          {/* Section Cards */}
-          <div className="mb-8">
-            <h2 className="text-base font-semibold text-gray-900 mb-4">Manage</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              <SectionCard
-                title="Operations"
-                description="Accounts, enrollments, reports, analytics"
-                features={[
-                  'View and manage enrollments',
-                  'Export reports and data',
-                  'View analytics dashboards',
-                  'Manage user accounts',
-                  'Send bulk emails',
-                  'Certificate management',
-                ]}
-                href="/tdi-admin/hub/operations"
-                icon={BarChart3}
-              />
-              <SectionCard
-                title="Production"
-                description="Courses, content, Quick Wins, media"
-                features={[
-                  'Create and edit courses',
-                  'Manage lessons and modules',
-                  'Publish/unpublish content',
-                  'Manage Quick Wins',
-                  'Upload videos and resources',
-                  'Content calendar',
-                ]}
-                href="/tdi-admin/hub/production"
-                icon={Clapperboard}
-              />
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div>
-            <h2 className="text-base font-semibold text-gray-900 mb-4">Quick Actions</h2>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/tdi-admin/hub/operations"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
-                style={{
-                  color: theme.accent,
-                  borderColor: theme.accent,
-                  backgroundColor: 'transparent',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-              >
-                <BarChart3 size={16} />
-                View Analytics
-              </Link>
-              <Link
-                href="/tdi-admin/hub/production"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
-                style={{
-                  color: theme.accent,
-                  borderColor: theme.accent,
-                  backgroundColor: 'transparent',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-              >
-                <FileText size={16} />
-                Manage Courses
-              </Link>
-              <Link
-                href="/tdi-admin/hub/production"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
-                style={{
-                  color: theme.accent,
-                  borderColor: theme.accent,
-                  backgroundColor: 'transparent',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-              >
-                <Zap size={16} />
-                Quick Wins
-              </Link>
-              <Link
-                href="/tdi-admin/hub/operations"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
-                style={{
-                  color: theme.accent,
-                  borderColor: theme.accent,
-                  backgroundColor: 'transparent',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-              >
-                <Download size={16} />
-                Export Reports
-              </Link>
-              <Link
-                href="/tdi-admin/hub/operations"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
-                style={{
-                  color: theme.accent,
-                  borderColor: theme.accent,
-                  backgroundColor: 'transparent',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-              >
-                <Mail size={16} />
-                Email Management
-              </Link>
-            </div>
-          </div>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }

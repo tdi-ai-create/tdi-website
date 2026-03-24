@@ -76,65 +76,15 @@ import {
   RefreshCw,
   GraduationCap,
   Heart,
-  Menu,
-  ChevronLeft,
-  LayoutGrid,
-  Clapperboard,
-  Settings,
   Info,
 } from 'lucide-react';
 
-// Tab configuration for sidebar
-const SIDEBAR_TABS = [
-  { id: 'overview', label: 'Overview', icon: LayoutGrid, href: '/tdi-admin/hub' },
-  { id: 'operations', label: 'Operations', icon: BarChart3 },
-  { id: 'production', label: 'Production', icon: Clapperboard, href: '/tdi-admin/hub/production' },
+// Tab configuration for top nav
+const HUB_TABS = [
+  { id: 'overview', label: 'Overview', href: '/tdi-admin/hub' },
+  { id: 'operations', label: 'Operations', href: '/tdi-admin/hub/operations' },
+  { id: 'production', label: 'Production', href: '/tdi-admin/hub/production' },
 ];
-
-// Sidebar Navigation Item Component
-function SidebarNavItem({
-  active,
-  href,
-  icon: Icon,
-  children,
-}: {
-  active: boolean;
-  href?: string;
-  icon: React.ElementType;
-  children: React.ReactNode;
-}) {
-  const content = (
-    <>
-      <Icon size={20} className={active ? '' : 'text-gray-400'} style={active ? { color: theme.accent } : undefined} />
-      <span className={active ? 'font-semibold' : ''}>{children}</span>
-    </>
-  );
-
-  const className = `w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-left ${
-    active ? '' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-  }`;
-
-  const activeStyles = active
-    ? {
-        backgroundColor: `${theme.accent}10`,
-        color: theme.accent,
-      }
-    : undefined;
-
-  if (href) {
-    return (
-      <Link href={href} className={className} style={activeStyles}>
-        {content}
-      </Link>
-    );
-  }
-
-  return (
-    <div className={className} style={activeStyles}>
-      {content}
-    </div>
-  );
-}
 
 type Tab = 'accounts' | 'enrollments' | 'certificates' | 'analytics-reports' | 'tips' | 'emails';
 
@@ -2704,7 +2654,6 @@ function EmailsTab() {
 export default function HubOperationsPage() {
   const { permissions } = useTDIAdmin();
   const [activeTab, setActiveTab] = useState<Tab>('accounts');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showExampleNotice, setShowExampleNotice] = useState(true);
 
   const canViewEnrollments = hasPermission(permissions, 'learning_hub', 'view_enrollments');
@@ -2724,95 +2673,38 @@ export default function HubOperationsPage() {
   }, [canViewEnrollments, canExportReports, canViewAnalytics, canManageTips, canManageEmails, activeTab]);
 
   return (
-    <div className="flex min-h-screen bg-[#FAFBFC]">
-      {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 transform transition-transform duration-200 ease-in-out lg:transform-none ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
-        style={{ boxShadow: '1px 0 3px rgba(0,0,0,0.03)' }}
+    <div className="min-h-screen bg-[#FAFBFC]">
+      {/* Sticky Tab Bar */}
+      <div
+        className="sticky top-0 z-10 bg-white border-b border-gray-100"
+        style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
       >
-        <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
-          <div className="flex items-center justify-between px-5 py-5 border-b border-gray-100">
-            <div className="flex items-center gap-2">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: theme.accent }}
-              >
-                <BookOpen className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-semibold text-gray-900">Learning Hub</span>
-            </div>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <ChevronLeft className="w-5 h-5 text-gray-500" />
-            </button>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 px-3 py-4 space-y-1">
-            {SIDEBAR_TABS.map((tab) => (
-              <SidebarNavItem
-                key={tab.id}
-                active={tab.id === 'operations'}
-                href={tab.href}
-                icon={tab.icon}
-              >
-                {tab.label}
-              </SidebarNavItem>
-            ))}
-          </nav>
-
-          {/* Sidebar Footer */}
-          <div className="px-3 py-4 border-t border-gray-100">
+        <div className="flex items-center gap-0 px-6">
+          {HUB_TABS.map(tab => (
             <Link
-              href="/hub/admin"
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              key={tab.id}
+              href={tab.href}
+              className="px-4 py-3 text-sm font-medium transition-colors relative"
+              style={{
+                color: tab.id === 'operations' ? '#111827' : '#6B7280',
+                borderBottom: tab.id === 'operations'
+                  ? '2px solid #00B5AD'
+                  : '2px solid transparent',
+              }}
             >
-              <Settings size={16} />
-              Legacy Admin
+              {tab.label}
             </Link>
-          </div>
+          ))}
         </div>
-      </aside>
+      </div>
 
-      {/* Main Content Area */}
-      <main className="flex-1 min-w-0">
-        {/* Top Header Bar */}
-        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-sm border-b border-gray-100">
-          <div className="flex items-center justify-between px-6 py-4">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <Menu className="w-5 h-5 text-gray-600" />
-              </button>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-                  Operations
-                </h1>
-                <p className="text-sm text-gray-500 mt-0.5">
-                  Manage accounts, enrollments, reports, and analytics
-                </p>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Page Content */}
-        <div className="px-6 py-6">
+      {/* Page Content */}
+      <div className="px-6 py-6">
+        {/* Page Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Operations</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage accounts, enrollments, reports, and analytics</p>
+        </div>
           {/* Example Data Notice (subtle) */}
           {showExampleNotice && (
             <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-amber-50 border border-amber-200 mb-6">
@@ -2830,80 +2722,73 @@ export default function HubOperationsPage() {
             </div>
           )}
 
-          {/* Tab Bar */}
-          <div className="border-b border-gray-200 mb-6 overflow-x-auto">
-            <div className="flex gap-1 min-w-max">
-              <TabButton
-                active={activeTab === 'accounts'}
-                onClick={() => setActiveTab('accounts')}
-                disabled={!canViewEnrollments}
-              >
-                <Users size={16} className="mr-2 inline" />
-                Accounts
-              </TabButton>
-              <TabButton
-                active={activeTab === 'enrollments'}
-                onClick={() => setActiveTab('enrollments')}
-                disabled={!canViewEnrollments}
-              >
-                <BookOpen size={16} className="mr-2 inline" />
-                Enrollments
-              </TabButton>
-              <TabButton
-                active={activeTab === 'certificates'}
-                onClick={() => setActiveTab('certificates')}
-                disabled={!canManageCertificates}
-              >
-                <Award size={16} className="mr-2 inline" />
-                Certificates
-              </TabButton>
-              <TabButton
-                active={activeTab === 'analytics-reports'}
-                onClick={() => setActiveTab('analytics-reports')}
-                disabled={!canExportReports && !canViewAnalytics}
-              >
-                <BarChart3 size={16} className="mr-2 inline" />
-                Analytics & Reports
-              </TabButton>
-              <TabButton
-                active={activeTab === 'tips'}
-                onClick={() => setActiveTab('tips')}
-                disabled={!canManageTips}
-              >
-                <Lightbulb size={16} className="mr-2 inline" />
-                Tips & Requests
-              </TabButton>
-              <TabButton
-                active={activeTab === 'emails'}
-                onClick={() => setActiveTab('emails')}
-                disabled={!canManageEmails}
-              >
-                <Mail size={16} className="mr-2 inline" />
-                Emails
-              </TabButton>
-            </div>
-          </div>
-
-          {/* Tab Content */}
-          <div>
-            {activeTab === 'accounts' && canViewEnrollments && <AccountsTab />}
-            {activeTab === 'enrollments' && canViewEnrollments && <EnrollmentsTab />}
-            {activeTab === 'certificates' && canManageCertificates && <CertificatesTab />}
-            {activeTab === 'analytics-reports' && (canExportReports || canViewAnalytics) && <AnalyticsReportsTab />}
-            {activeTab === 'tips' && canManageTips && <TipsTab />}
-            {activeTab === 'emails' && canManageEmails && <EmailsTab />}
-
-            {/* No Permission State */}
-            {!canViewEnrollments && !canExportReports && !canViewAnalytics && !canManageTips && !canManageEmails && (
-              <EmptyState
-                icon={AlertCircle}
-                title="No Access"
-                description="You don't have permission to view any operations data. Contact your admin for access."
-              />
-            )}
+        {/* Tab Bar */}
+        <div className="border-b border-gray-200 mb-6 overflow-x-auto">
+          <div className="flex gap-1 min-w-max">
+            <TabButton
+              active={activeTab === 'accounts'}
+              onClick={() => setActiveTab('accounts')}
+              disabled={!canViewEnrollments}
+            >
+              Accounts
+            </TabButton>
+            <TabButton
+              active={activeTab === 'enrollments'}
+              onClick={() => setActiveTab('enrollments')}
+              disabled={!canViewEnrollments}
+            >
+              Enrollments
+            </TabButton>
+            <TabButton
+              active={activeTab === 'certificates'}
+              onClick={() => setActiveTab('certificates')}
+              disabled={!canManageCertificates}
+            >
+              Certificates
+            </TabButton>
+            <TabButton
+              active={activeTab === 'analytics-reports'}
+              onClick={() => setActiveTab('analytics-reports')}
+              disabled={!canExportReports && !canViewAnalytics}
+            >
+              Analytics & Reports
+            </TabButton>
+            <TabButton
+              active={activeTab === 'tips'}
+              onClick={() => setActiveTab('tips')}
+              disabled={!canManageTips}
+            >
+              Tips & Requests
+            </TabButton>
+            <TabButton
+              active={activeTab === 'emails'}
+              onClick={() => setActiveTab('emails')}
+              disabled={!canManageEmails}
+            >
+              Emails
+            </TabButton>
           </div>
         </div>
-      </main>
+
+        {/* Tab Content */}
+        <div>
+          {activeTab === 'accounts' && canViewEnrollments && <AccountsTab />}
+          {activeTab === 'enrollments' && canViewEnrollments && <EnrollmentsTab />}
+          {activeTab === 'certificates' && canManageCertificates && <CertificatesTab />}
+          {activeTab === 'analytics-reports' && (canExportReports || canViewAnalytics) && <AnalyticsReportsTab />}
+          {activeTab === 'tips' && canManageTips && <TipsTab />}
+          {activeTab === 'emails' && canManageEmails && <EmailsTab />}
+
+          {/* No Permission State */}
+          {!canViewEnrollments && !canExportReports && !canViewAnalytics && !canManageTips && !canManageEmails && (
+            <EmptyState
+              icon={AlertCircle}
+              title="No Access"
+              description="You don't have permission to view any operations data. Contact your admin for access."
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 }

@@ -10,7 +10,6 @@ import {
   School,
   ClipboardList,
   DollarSign,
-  ExternalLink,
   Search,
   Filter,
   Users,
@@ -23,12 +22,11 @@ import {
   Plus,
   Copy,
   BarChart3,
-  ListTodo,
-  GitBranch,
-  FileSpreadsheet,
   TrendingUp,
   Calendar,
   RefreshCw,
+  ExternalLink,
+  ListTodo,
 } from 'lucide-react';
 
 // Leadership theme colors
@@ -90,12 +88,12 @@ interface ActionItem {
 
 // Tab configuration
 const TABS = [
-  { id: 'partnerships', label: 'Partnerships', icon: School },
-  { id: 'dashboards', label: 'School Dashboards', icon: ExternalLink },
-  { id: 'reports', label: 'School Reports', icon: FileSpreadsheet },
-  { id: 'actions', label: 'Action Items', icon: ListTodo },
-  { id: 'pipeline', label: 'Onboarding Pipeline', icon: GitBranch },
-  { id: 'billing', label: 'Billing', icon: DollarSign },
+  { id: 'partnerships', label: 'Partnerships' },
+  { id: 'dashboards', label: 'School Dashboards' },
+  { id: 'reports', label: 'School Reports' },
+  { id: 'actions', label: 'Action Items' },
+  { id: 'pipeline', label: 'Onboarding Pipeline' },
+  { id: 'billing', label: 'Billing' },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -438,22 +436,8 @@ export default function LeadershipDashboardPage() {
     <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-8">
       {/* Page Header */}
       <div className="mb-6">
-        <h1
-          className="font-bold mb-2"
-          style={{
-            fontFamily: "'Source Serif 4', Georgia, serif",
-            fontSize: '28px',
-            color: '#1a1a2e',
-            borderLeft: `4px solid ${theme.accent}`,
-            paddingLeft: '16px',
-          }}
-        >
-          Lead Dashboard
-        </h1>
-        <p
-          className="text-gray-500 pl-5"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
-        >
+        <h1 className="text-2xl font-bold text-gray-900">Lead Dashboard</h1>
+        <p className="text-sm text-gray-500 mt-1">
           Manage school partnerships, reports, action items, and billing.
         </p>
       </div>
@@ -568,30 +552,25 @@ export default function LeadershipDashboardPage() {
       )}
 
       {/* Tab Navigation */}
-      <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200 pb-1">
+      <div className="flex flex-wrap gap-0 mb-6 border-b border-gray-200">
         {TABS.map((tab) => {
-          const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className="flex items-center gap-2 px-4 py-2 rounded-t-lg font-medium transition-all relative"
+              className="px-4 py-3 text-sm font-medium transition-colors relative"
               style={{
-                backgroundColor: isActive ? 'white' : 'transparent',
-                color: isActive ? theme.accent : '#6B7280',
-                fontFamily: "'DM Sans', sans-serif",
+                color: isActive ? '#111827' : '#6B7280',
                 borderBottom: isActive
                   ? `2px solid ${theme.accent}`
                   : '2px solid transparent',
-                marginBottom: '-2px',
               }}
             >
-              <Icon size={18} />
               {tab.label}
               {tab.id === 'actions' && pendingActionItems.length > 0 && (
-                <span className="ml-1 text-xs bg-red-500 text-white px-1.5 py-0.5 rounded-full">
-                  {pendingActionItems.length}
+                <span className="ml-1 text-xs text-gray-900 font-medium">
+                  ({pendingActionItems.length})
                 </span>
               )}
             </button>
