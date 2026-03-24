@@ -1500,6 +1500,338 @@ function EditCollectionsWorkflow({ workflow, onSaved }: { workflow: CollectionsW
   )
 }
 
+// ---- Modal: Create Quote ----
+function CreateQuoteModal({ districtId, districtName, contracts, contacts, onClose, onSaved }: {
+  districtId: string
+  districtName: string
+  contracts: Contract[]
+  contacts: Contact[]
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const supabase = getSupabase()
+  const [saving, setSaving] = useState(false)
+  const [step, setStep] = useState<'details' | 'packages'>('details')
+
+  const primaryContact = contacts.find((c) => c.is_primary) ?? contacts[0]
+
+  const TDI_TOS = `Teachers Deserve It (TDI) agrees to provide the professional development services outlined in this agreement. Payment is due within 30 days of invoice date. Services are delivered per the agreed schedule. Either party may request amendments in writing. TDI is committed to the success of your school and team.`
+
+  const [form, setForm] = useState({
+    title: `${districtName} - Partnership Proposal ${new Date().getFullYear()}-${new Date().getFullYear() + 1}`,
+    contract_id: contracts.find((c) => c.status === 'active')?.id ?? '',
+    intro_message: `Hi ${primaryContact?.name?.split(' ')[0] ?? 'there'},\n\nAs discussed, your TDI partnership proposal is ready for your review and approval.\n\nWe're excited about what we can build together for your teachers and school community. Please review the services below and reach out with any questions.`,
+    video_url: '',
+    service_start_date: '',
+    service_end_date: '',
+    payment_instructions: 'Payment is due within 30 days of invoice date. Please make checks payable to Teachers Deserve It. ACH and credit card also accepted.\n\nFor billing questions: Billing@Teachersdeserveit.com',
+    terms_of_service: TDI_TOS,
+    po_required: false,
+    contact_name: primaryContact?.name ?? '',
+    contact_email: primaryContact?.email ?? '',
+    contact_organization: districtName,
+  })
+
+  type LineItem = { label: string; quantity: number; unit_price: number; total: number; is_complimentary: boolean }
+  type Package = { package_name: string; description: string; line_items: LineItem[]; is_recommended: boolean }
+
+  const buildFromContract = (contractId: string): LineItem[] => {
+    const contract = contracts.find((c) => c.id === contractId)
+    if (!contract?.scope_json) return []
+    const s = contract.scope_json
+    const items: LineItem[] = []
+    if (parseInt(String(s.observation_days ?? 0)) > 0) {
+      const qty = parseInt(String(s.observation_days))
+      items.push({ label: 'In-Person Observation Day (includes travel)', quantity: qty, unit_price: 9000, total: qty * 9000, is_complimentary: false })
+    }
+    if (parseInt(String(s.virtual_sessions ?? 0)) > 0) {
+      const qty = parseInt(String(s.virtual_sessions))
+      items.push({ label: 'Virtual Support Session', quantity: qty, unit_price: 1500, total: qty * 1500, is_complimentary: false })
+    }
+    if (parseInt(String(s.executive_sessions ?? 0)) > 0) {
+      const qty = parseInt(String(s.executive_sessions))
+      items.push({ label: 'Executive Impact Session', quantity: qty, unit_price: 3000, total: qty * 3000, is_complimentary: true })
+    }
+    return items
+  }
+
+  const [packages, setPackages] = useState<Package[]>([{
+    package_name: 'Proposed Partnership',
+    description: '',
+    line_items: form.contract_id ? buildFromContract(form.contract_id) : [],
+    is_recommended: true,
+  }])
+
+  function addPackage() {
+    if (packages.length >= 3) return
+    setPackages(p => [...p, { package_name: `Option ${p.length + 1}`, description: '', line_items: [], is_recommended: false }])
+  }
+
+  function removePackage(i: number) {
+    setPackages(p => p.filter((_, j) => j !== i))
+  }
+
+  function updatePackage(i: number, field: string, value: string | boolean) {
+    setPackages(p => p.map((pkg, j) => j === i ? { ...pkg, [field]: value } : pkg))
+  }
+
+  function addLineItem(pkgIdx: number) {
+    setPackages(p => p.map((pkg, j) => j === pkgIdx ? {
+      ...pkg, line_items: [...pkg.line_items, { label: '', quantity: 1, unit_price: 0, total: 0, is_complimentary: false }]
+    } : pkg))
+  }
+
+  function updateLineItem(pkgIdx: number, itemIdx: number, field: string, value: string | number | boolean) {
+    setPackages(p => p.map((pkg, j) => {
+      if (j !== pkgIdx) return pkg
+      const items = pkg.line_items.map((item, k) => {
+        if (k !== itemIdx) return item
+        const updated = { ...item, [field]: value }
+        if (field === 'quantity' || field === 'unit_price') updated.total = Number(updated.quantity) * Number(updated.unit_price)
+        if (field === 'is_complimentary' && value) { updated.total = 0 }
+        return updated
+      })
+      return { ...pkg, line_items: items }
+    }))
+  }
+
+  function removeLineItem(pkgIdx: number, itemIdx: number) {
+    setPackages(p => p.map((pkg, j) => j === pkgIdx ? { ...pkg, line_items: pkg.line_items.filter((_, k) => k !== itemIdx) } : pkg))
+  }
+
+  function getTotal(pkg: Package) {
+    return pkg.line_items.filter(i => !i.is_complimentary).reduce((sum, i) => sum + (i.total ?? 0), 0)
+  }
+
+  async function handleSave() {
+    setSaving(true)
+    const { count } = await supabase.from('quotes').select('*', { count: 'exact', head: true }).eq('district_id', districtId)
+    const quoteNumber = `TDI-Q-${new Date().getFullYear()}-${String((count ?? 0) + 1).padStart(3, '0')}`
+
+    const { data: quote, error } = await supabase.from('quotes').insert({
+      district_id: districtId,
+      contract_id: form.contract_id || null,
+      quote_number: quoteNumber,
+      title: form.title.trim(),
+      intro_message: form.intro_message.trim(),
+      video_url: form.video_url.trim() || null,
+      service_start_date: form.service_start_date || null,
+      service_end_date: form.service_end_date || null,
+      payment_instructions: form.payment_instructions.trim(),
+      terms_of_service: form.terms_of_service.trim(),
+      po_required: form.po_required,
+      contact_name: form.contact_name.trim() || null,
+      contact_email: form.contact_email.trim() || null,
+      contact_organization: form.contact_organization.trim() || null,
+      status: 'draft',
+    }).select().single()
+
+    if (error || !quote) { setSaving(false); return }
+
+    await supabase.from('quote_packages').insert(
+      packages.map((pkg, index) => ({
+        quote_id: quote.id,
+        package_index: index,
+        package_name: pkg.package_name,
+        description: pkg.description || null,
+        line_items: pkg.line_items,
+        total_amount: getTotal(pkg),
+        is_recommended: pkg.is_recommended,
+      }))
+    )
+
+    onSaved()
+  }
+
+  const inputClass = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+  const labelClass = "block text-xs font-medium text-gray-600 mb-1"
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Create Quote</h3>
+            <p className="text-xs text-gray-400 mt-0.5">Client signs at teachersdeserveit.com/invoice/[id] · Expires 30 days after sending</p>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+        </div>
+
+        <div className="flex border-b border-gray-100">
+          {(['details', 'packages'] as const).map((s, i) => (
+            <button key={s} onClick={() => setStep(s)} className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${step === s ? 'border-amber-500 text-amber-600' : 'border-transparent text-gray-500'}`}>
+              {i + 1}. {s.charAt(0).toUpperCase() + s.slice(1)} {s === 'packages' && `(${packages.length})`}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+
+          {step === 'details' && (
+            <>
+              <div>
+                <label className={labelClass}>Quote Title</label>
+                <input className={inputClass} value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={labelClass}>Contact Name</label>
+                  <input className={inputClass} value={form.contact_name} onChange={e => setForm(f => ({ ...f, contact_name: e.target.value }))} placeholder="Paula Poche" />
+                </div>
+                <div>
+                  <label className={labelClass}>Contact Email</label>
+                  <input type="email" className={inputClass} value={form.contact_email} onChange={e => setForm(f => ({ ...f, contact_email: e.target.value }))} placeholder="ppoche@stpeterchanel.org" />
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClass}>Intro Message (shown on first page)</label>
+                <textarea className={inputClass} rows={4} value={form.intro_message} onChange={e => setForm(f => ({ ...f, intro_message: e.target.value }))} />
+              </div>
+
+              <div>
+                <label className={labelClass}>Welcome Video URL (YouTube - optional)</label>
+                <input className={inputClass} value={form.video_url} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} placeholder="https://youtube.com/watch?v=..." />
+              </div>
+
+              <div>
+                <label className={labelClass}>Linked Contract (auto-fills line items)</label>
+                <select className={inputClass} value={form.contract_id} onChange={e => {
+                  const cid = e.target.value
+                  setForm(f => ({ ...f, contract_id: cid }))
+                  if (cid) setPackages(p => p.map((pkg, i) => i === 0 ? { ...pkg, line_items: buildFromContract(cid) } : pkg))
+                }}>
+                  <option value="">No contract linked</option>
+                  {contracts.map((c) => <option key={c.id} value={c.id}>{c.contract_name}</option>)}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={labelClass}>Service Start Date</label>
+                  <input type="date" className={inputClass} value={form.service_start_date} onChange={e => setForm(f => ({ ...f, service_start_date: e.target.value }))} />
+                </div>
+                <div>
+                  <label className={labelClass}>Service End Date</label>
+                  <input type="date" className={inputClass} value={form.service_end_date} onChange={e => setForm(f => ({ ...f, service_end_date: e.target.value }))} />
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClass}>Payment Instructions</label>
+                <textarea className={inputClass} rows={3} value={form.payment_instructions} onChange={e => setForm(f => ({ ...f, payment_instructions: e.target.value }))} />
+              </div>
+
+              <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                <input type="checkbox" checked={form.po_required} onChange={e => setForm(f => ({ ...f, po_required: e.target.checked }))} className="rounded" />
+                PO number required from district
+              </label>
+
+              <div className="flex justify-end pt-2">
+                <button onClick={() => setStep('packages')} className="bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium px-5 py-2 rounded-lg">
+                  Next: Packages &rarr;
+                </button>
+              </div>
+            </>
+          )}
+
+          {step === 'packages' && (
+            <>
+              {packages.map((pkg, pkgIdx) => (
+                <div key={pkgIdx} className={`border rounded-xl p-4 space-y-3 ${pkg.is_recommended ? 'border-amber-300 bg-amber-50/30' : 'border-gray-200'}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-gray-500">Package {pkgIdx + 1}</span>
+                      {pkg.is_recommended && <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Recommended</span>}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <label className="flex items-center gap-1 text-xs text-gray-600 cursor-pointer">
+                        <input type="checkbox" checked={pkg.is_recommended} onChange={e => updatePackage(pkgIdx, 'is_recommended', e.target.checked)} className="rounded" />
+                        Recommended
+                      </label>
+                      {packages.length > 1 && (
+                        <button onClick={() => removePackage(pkgIdx)} className="text-xs text-red-400 hover:text-red-600">Remove</button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className={labelClass}>Package Name</label>
+                      <input className={inputClass} value={pkg.package_name} onChange={e => updatePackage(pkgIdx, 'package_name', e.target.value)} placeholder="IGNITE, ACCELERATE..." />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Tagline (optional)</label>
+                      <input className={inputClass} value={pkg.description} onChange={e => updatePackage(pkgIdx, 'description', e.target.value)} placeholder="Foundation year" />
+                    </div>
+                  </div>
+
+                  {/* Line items */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className={labelClass}>Line Items</label>
+                      <button onClick={() => addLineItem(pkgIdx)} className="text-xs text-amber-600 hover:underline">+ Add Item</button>
+                    </div>
+                    {pkg.line_items.length === 0 ? (
+                      <p className="text-xs text-gray-400">No line items. Add items or link a contract above.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        <div className="grid grid-cols-12 gap-2 text-xs text-gray-400 font-medium px-1">
+                          <span className="col-span-5">Service</span>
+                          <span className="col-span-2 text-center">Qty</span>
+                          <span className="col-span-2 text-center">Price</span>
+                          <span className="col-span-2 text-right">Total</span>
+                          <span className="col-span-1" />
+                        </div>
+                        {pkg.line_items.map((item, itemIdx) => (
+                          <div key={itemIdx} className={`grid grid-cols-12 gap-2 items-center ${item.is_complimentary ? 'opacity-70' : ''}`}>
+                            <input className={`${inputClass} col-span-5 text-xs`} value={item.label} onChange={e => updateLineItem(pkgIdx, itemIdx, 'label', e.target.value)} placeholder="Service name" />
+                            <input type="number" className={`${inputClass} col-span-2 text-xs text-center`} value={item.quantity} onChange={e => updateLineItem(pkgIdx, itemIdx, 'quantity', Number(e.target.value))} min="0" />
+                            <input type="number" className={`${inputClass} col-span-2 text-xs text-center`} value={item.unit_price} onChange={e => updateLineItem(pkgIdx, itemIdx, 'unit_price', Number(e.target.value))} min="0" />
+                            <div className="col-span-2 text-sm font-medium text-right">
+                              {item.is_complimentary ? (
+                                <span className="text-xs text-green-600 font-semibold">Complimentary</span>
+                              ) : (
+                                <span>${(item.total ?? 0).toLocaleString()}</span>
+                              )}
+                            </div>
+                            <div className="col-span-1 flex flex-col items-center gap-0.5">
+                              <button onClick={() => updateLineItem(pkgIdx, itemIdx, 'is_complimentary', !item.is_complimentary)} title="Toggle complimentary" className={`text-xs ${item.is_complimentary ? 'text-green-600' : 'text-gray-300 hover:text-green-500'}`}>&#9733;</button>
+                              <button onClick={() => removeLineItem(pkgIdx, itemIdx)} className="text-red-400 hover:text-red-600 text-xs">&#10005;</button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end pt-2 border-t border-gray-100">
+                    <p className="text-sm font-bold text-gray-900">Total: ${getTotal(pkg).toLocaleString()}</p>
+                  </div>
+                </div>
+              ))}
+
+              {packages.length < 3 && (
+                <button onClick={addPackage} className="w-full border-2 border-dashed border-gray-300 hover:border-amber-300 hover:text-amber-600 text-gray-500 rounded-xl py-3 text-sm font-medium transition-colors">
+                  + Add Package Option ({packages.length}/3)
+                </button>
+              )}
+
+              <div className="flex items-center justify-between pt-2">
+                <button onClick={() => setStep('details')} className="text-sm text-gray-500 hover:text-gray-700">&larr; Back</button>
+                <button onClick={handleSave} disabled={saving || !form.title.trim()} className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium px-6 py-2.5 rounded-lg">
+                  {saving ? 'Creating...' : 'Save as Draft'}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ---- Main Page ----
 export default function DistrictDetailPage() {
   const params = useParams()
@@ -1521,6 +1853,8 @@ export default function DistrictDetailPage() {
   const [proofTypeFilter, setProofTypeFilter] = useState<string>('all')
   const [showMeetingEvaluator, setShowMeetingEvaluator] = useState(false)
   const [meetingEvaluations, setMeetingEvaluations] = useState<MeetingEvaluation[]>([])
+  const [showCreateQuote, setShowCreateQuote] = useState(false)
+  const [quotes, setQuotes] = useState<any[]>([])
 
   useEffect(() => { if (id) loadDistrict() }, [id])
 
@@ -1538,11 +1872,21 @@ export default function DistrictDetailPage() {
           payment_events(*)
         ),
         intelligence_tasks(*),
-        service_sessions(*)
+        service_sessions(*),
+        quotes(
+          *,
+          quote_packages(*)
+        )
       `)
       .eq('id', id)
       .single()
     setDistrict(data as District)
+
+    // Fetch and sort quotes
+    const quotesData = (data as any)?.quotes ?? []
+    setQuotes(quotesData.sort((a: any, b: any) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    ))
 
     // Fetch merged delivery events (combines legacy timeline_events + service_sessions)
     const { data: deliveryData } = await supabase
@@ -1693,6 +2037,17 @@ export default function DistrictDetailPage() {
           districtId={id}
           onClose={() => setShowMeetingEvaluator(false)}
           onSaved={() => { setShowMeetingEvaluator(false); loadDistrict() }}
+        />
+      )}
+
+      {showCreateQuote && (
+        <CreateQuoteModal
+          districtId={id}
+          districtName={district.name}
+          contracts={contracts}
+          contacts={contacts}
+          onClose={() => setShowCreateQuote(false)}
+          onSaved={() => { setShowCreateQuote(false); loadDistrict() }}
         />
       )}
 
@@ -1986,6 +2341,132 @@ export default function DistrictDetailPage() {
       {/* Tab: Contracts + Invoices */}
       {tab === 'contracts' && (
         <div className="space-y-6">
+          {/* Quotes */}
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-gray-800">Quotes</h3>
+                <p className="text-xs text-gray-400 mt-0.5">Client-facing signing links · Expire 30 days after sending</p>
+              </div>
+              <button onClick={() => setShowCreateQuote(true)} className="text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg">
+                + Create Quote
+              </button>
+            </div>
+
+            {quotes.length === 0 ? (
+              <div className="p-5 text-sm text-gray-400">
+                No quotes yet. <button onClick={() => setShowCreateQuote(true)} className="text-amber-600 hover:underline">Create one.</button>
+              </div>
+            ) : (
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+                  <tr>
+                    <th className="text-left px-5 py-2">Quote</th>
+                    <th className="text-left px-4 py-2">Packages</th>
+                    <th className="text-left px-4 py-2">Status</th>
+                    <th className="text-left px-4 py-2">Expires</th>
+                    <th className="px-4 py-2" />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {quotes.map((q) => {
+                    const quoteUrl = `${typeof window !== 'undefined' ? window.location.origin : 'https://www.teachersdeserveit.com'}/invoice/${q.id}`
+                    const daysOld = q.sent_at ? Math.floor((Date.now() - new Date(q.sent_at).getTime()) / (1000 * 60 * 60 * 24)) : null
+                    const daysLeft = q.expires_at ? Math.ceil((new Date(q.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null
+                    const isAtRisk = daysOld !== null && daysOld >= 14 && q.status === 'sent'
+                    const isExpired = q.status === 'expired'
+
+                    const statusStyles: Record<string, string> = {
+                      draft: 'bg-gray-100 text-gray-600',
+                      sent: isAtRisk ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700',
+                      viewed: 'bg-purple-100 text-purple-700',
+                      signed: 'bg-green-100 text-green-700',
+                      declined: 'bg-red-100 text-red-700',
+                      expired: 'bg-red-100 text-red-600',
+                    }
+
+                    const statusLabel: Record<string, string> = {
+                      draft: 'Draft',
+                      sent: isAtRisk ? `At Risk (${daysOld}d)` : 'Sent',
+                      viewed: 'Viewed',
+                      signed: 'Signed',
+                      declined: 'Declined',
+                      expired: 'Expired',
+                    }
+
+                    return (
+                      <tr key={q.id} className={`hover:bg-gray-50 ${isAtRisk ? 'bg-orange-50/20' : ''} ${isExpired ? 'opacity-60' : ''}`}>
+                        <td className="px-5 py-3">
+                          <p className="font-medium text-gray-900">{q.title}</p>
+                          <p className="text-xs text-gray-400">{q.quote_number}</p>
+                          {q.signed_by_name && <p className="text-xs text-green-600 mt-0.5">Signed by {q.signed_by_name}</p>}
+                        </td>
+                        <td className="px-4 py-3 text-gray-600">
+                          {(q.quote_packages ?? []).length} package{(q.quote_packages ?? []).length !== 1 ? 's' : ''}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusStyles[q.status] ?? 'bg-gray-100 text-gray-600'}`}>
+                            {statusLabel[q.status] ?? q.status}
+                          </span>
+                          {q.view_count > 0 && <p className="text-xs text-gray-400 mt-0.5">{q.view_count} view{q.view_count !== 1 ? 's' : ''}</p>}
+                        </td>
+                        <td className="px-4 py-3 text-xs">
+                          {q.status === 'draft' ? (
+                            <span className="text-gray-400">Not sent yet</span>
+                          ) : daysLeft !== null ? (
+                            <span className={daysLeft <= 7 ? 'text-red-500 font-medium' : daysLeft <= 14 ? 'text-orange-500' : 'text-gray-500'}>
+                              {isExpired ? 'Expired' : `${daysLeft}d left`}
+                            </span>
+                          ) : '-'}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            {q.status === 'draft' && (
+                              <button
+                                onClick={async () => {
+                                  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+                                  await supabase.from('quotes').update({ status: 'sent', sent_at: new Date().toISOString(), expires_at: expiresAt }).eq('id', q.id)
+                                  await navigator.clipboard.writeText(quoteUrl)
+                                  loadDistrict()
+                                  alert(`Marked as sent. Link copied:\n${quoteUrl}`)
+                                }}
+                                className="text-xs bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded-lg font-medium"
+                              >
+                                Send + Copy Link
+                              </button>
+                            )}
+                            {q.status !== 'draft' && (
+                              <button onClick={() => navigator.clipboard.writeText(quoteUrl)} className="text-xs text-amber-600 hover:underline">
+                                Copy Link
+                              </button>
+                            )}
+                            {isAtRisk && !isExpired && (
+                              <button
+                                onClick={async () => {
+                                  const newExpiry = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
+                                  await supabase.from('quotes').update({
+                                    expires_at: newExpiry,
+                                    expiry_reset_at: new Date().toISOString(),
+                                    at_risk_flagged_at: null,
+                                    reminder_14_sent_at: null,
+                                  }).eq('id', q.id)
+                                  loadDistrict()
+                                }}
+                                className="text-xs text-orange-600 hover:underline"
+                              >
+                                Reset Timer
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
+
           {/* Contracts */}
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
