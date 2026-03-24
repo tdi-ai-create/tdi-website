@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 export default function MovementBanner() {
+  const pathname = usePathname();
   const [count, setCount] = useState<number | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
@@ -23,6 +25,9 @@ export default function MovementBanner() {
     setDismissed(true);
     sessionStorage.setItem('movement-banner-dismissed', 'true');
   };
+
+  // Hide on admin portal
+  if (pathname.startsWith('/tdi-admin')) return null;
 
   if (dismissed) return null;
 

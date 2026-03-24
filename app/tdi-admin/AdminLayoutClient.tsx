@@ -126,7 +126,7 @@ function AdminSidebar({ user }: { user: User }) {
       {/* LEFT SIDEBAR */}
       <aside className={`${collapsed ? 'w-16' : 'w-16 lg:w-56'} flex-shrink-0 bg-[#0f172a] flex flex-col h-full transition-all duration-200 ease-in-out`}>
         {/* Logo / Wordmark */}
-        <div className={`px-3 ${collapsed ? '' : 'lg:px-4'} py-5 border-b border-white/10`}>
+        <div className={`px-3 ${collapsed ? '' : 'lg:px-4'} py-5 border-b border-white/10 flex items-center`}>
           <Link href="/tdi-admin" className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center flex-shrink-0">
               <span className="text-white font-bold text-sm">T</span>
@@ -138,6 +138,15 @@ function AdminSidebar({ user }: { user: User }) {
               </div>
             )}
           </Link>
+          <button
+            onClick={toggleCollapsed}
+            className="ml-auto text-gray-500 hover:text-white transition-colors p-1 rounded"
+            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            <svg className={`w-4 h-4 transition-transform duration-200 ${collapsed ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </button>
         </div>
 
         {/* Nav items */}
@@ -216,22 +225,6 @@ function AdminSidebar({ user }: { user: User }) {
           </div>
         </div>
 
-        {/* Collapse toggle */}
-        <button
-          onClick={toggleCollapsed}
-          className="flex items-center justify-center py-3 border-t border-white/10 text-gray-500 hover:text-white transition-colors w-full"
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          <svg
-            className={`w-4 h-4 transition-transform duration-200 ${collapsed ? 'rotate-180' : ''}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-          </svg>
-        </button>
       </aside>
 
       {/* Accent bar storage for main content */}
