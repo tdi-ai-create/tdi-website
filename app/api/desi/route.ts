@@ -86,6 +86,8 @@ When you cannot answer confidently OR the user needs personalized help (custom p
 This automatically displays a contact form. You do not need to explain it or tell the user about it.`
 
 export async function POST(request: NextRequest) {
+  console.log('Desi API called, key exists:', !!process.env.ANTHROPIC_API_KEY)
+
   try {
     const { messages } = await request.json()
 
@@ -117,10 +119,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ content: content.text })
   } catch (error) {
-    console.error('Desi API error:', error)
-    return NextResponse.json(
-      { error: 'Failed to get response' },
-      { status: 500 }
-    )
+    console.error('Desi error details:', JSON.stringify(error, null, 2))
+    return NextResponse.json({
+      error: 'Something went wrong',
+      detail: process.env.NODE_ENV === 'development' ? String(error) : undefined
+    }, { status: 500 })
   }
 }
