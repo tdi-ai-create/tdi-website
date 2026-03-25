@@ -1158,36 +1158,114 @@ export default function PartnerDashboard() {
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="dashboard-hero relative text-white py-4 md:py-8 px-4 overflow-hidden">
+      {/* Hero - Full-width dark navy gradient (legacy design) */}
+      <section className="relative text-white overflow-hidden">
+        {/* Full-width gradient background */}
         <div
           className="absolute inset-0"
-          style={{ background: 'linear-gradient(135deg, #1B2A4A, #38618C)' }}
+          style={{
+            background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 50%, #38618C 100%)',
+          }}
+        />
+        {/* Subtle pattern overlay */}
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 25% 25%, white 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+          }}
         />
 
-        <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
-          <div>
-            <h1 className="text-2xl md:text-4xl font-bold">
-              {partnership?.org_name || organization?.name || 'Your School'}
-            </h1>
-            <p className="text-white/70 text-xs md:text-sm mt-1">
-              {organization?.address_city || organization?.address_state
-                ? [organization?.address_city, organization?.address_state].filter(Boolean).join(', ')
-                : `${partnership.partnership_type === 'district' ? 'District' : 'School'} Partnership`}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div
-              className="px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium"
-              style={{
-                backgroundColor: 'rgba(78, 205, 196, 0.2)',
-                borderColor: colors.teal,
-                borderWidth: 1,
-              }}
-            >
-              Phase {partnership.contract_phase === 'IGNITE' ? '1' : partnership.contract_phase === 'ACCELERATE' ? '2' : '3'} - {partnership.contract_phase}
+        <div className="relative max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-12">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+                  {partnership?.org_name || organization?.name || 'Your School'}
+                </h1>
+                {/* Partnership year badge */}
+                {partnership?.contract_start && (
+                  <span
+                    className="hidden md:inline-flex px-3 py-1 rounded-full text-xs font-semibold"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(255,186,6,0.2), rgba(255,186,6,0.1))',
+                      border: '1px solid rgba(255,186,6,0.4)',
+                      color: '#FFBA06',
+                    }}
+                  >
+                    {new Date(partnership.contract_start).getFullYear()}-{partnership.contract_end ? new Date(partnership.contract_end).getFullYear() : 'Present'}
+                  </span>
+                )}
+              </div>
+              <p className="text-white/60 text-sm md:text-base">
+                {organization?.address_city || organization?.address_state
+                  ? [organization?.address_city, organization?.address_state].filter(Boolean).join(', ')
+                  : `${partnership.partnership_type === 'district' ? 'District' : 'School'} Partnership`}
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              {/* Phase badge with glow */}
+              <div
+                className="px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2"
+                style={{
+                  background: partnership.contract_phase === 'IGNITE'
+                    ? 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(251,191,36,0.1))'
+                    : partnership.contract_phase === 'ACCELERATE'
+                    ? 'linear-gradient(135deg, rgba(78,205,196,0.2), rgba(78,205,196,0.1))'
+                    : 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(139,92,246,0.1))',
+                  border: partnership.contract_phase === 'IGNITE'
+                    ? '1px solid rgba(251,191,36,0.4)'
+                    : partnership.contract_phase === 'ACCELERATE'
+                    ? '1px solid rgba(78,205,196,0.4)'
+                    : '1px solid rgba(139,92,246,0.4)',
+                  boxShadow: partnership.contract_phase === 'IGNITE'
+                    ? '0 0 20px rgba(251,191,36,0.2)'
+                    : partnership.contract_phase === 'ACCELERATE'
+                    ? '0 0 20px rgba(78,205,196,0.2)'
+                    : '0 0 20px rgba(139,92,246,0.2)',
+                }}
+              >
+                <span
+                  className="w-2 h-2 rounded-full"
+                  style={{
+                    background: partnership.contract_phase === 'IGNITE'
+                      ? '#FBBF24'
+                      : partnership.contract_phase === 'ACCELERATE'
+                      ? '#4ecdc4'
+                      : '#8B5CF6',
+                    boxShadow: partnership.contract_phase === 'IGNITE'
+                      ? '0 0 8px rgba(251,191,36,0.6)'
+                      : partnership.contract_phase === 'ACCELERATE'
+                      ? '0 0 8px rgba(78,205,196,0.6)'
+                      : '0 0 8px rgba(139,92,246,0.6)',
+                  }}
+                />
+                <span style={{
+                  color: partnership.contract_phase === 'IGNITE'
+                    ? '#FBBF24'
+                    : partnership.contract_phase === 'ACCELERATE'
+                    ? '#4ecdc4'
+                    : '#A78BFA',
+                }}>
+                  Phase {partnership.contract_phase === 'IGNITE' ? '1' : partnership.contract_phase === 'ACCELERATE' ? '2' : '3'} · {partnership.contract_phase}
+                </span>
+              </div>
             </div>
           </div>
+
+          {/* Partnership goal - if available */}
+          {partnership?.partnership_goal && (
+            <div
+              className="mt-6 p-4 rounded-xl"
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+              }}
+            >
+              <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Partnership Goal</p>
+              <p className="text-white/90 text-sm md:text-base leading-relaxed">{partnership.partnership_goal}</p>
+            </div>
+          )}
         </div>
       </section>
 
