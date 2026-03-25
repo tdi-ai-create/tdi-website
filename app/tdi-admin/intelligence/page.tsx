@@ -538,42 +538,6 @@ export default function IntelligenceHubPage() {
         </div>
       </div>
 
-      {/* Renewal Season banner - shows when any renewal within 60 days */}
-      {renewalPipeline.some((r: any) => r.daysUntilRenewal !== null && r.daysUntilRenewal <= 60) && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-amber-500 text-lg">📋</span>
-            <div>
-              <p className="text-sm font-semibold text-amber-800">Renewal Season Active</p>
-              <p className="text-xs text-amber-600">
-                {renewalPipeline.filter((r: any) => r.daysUntilRenewal !== null && r.daysUntilRenewal <= 60).length} schools renewing within 60 days - April/May window
-              </p>
-            </div>
-          </div>
-          <Link href="/tdi-admin/intelligence/alerts" className="text-xs text-amber-700 hover:underline font-medium">View alerts →</Link>
-        </div>
-      )}
-
-      {/* Alert cards - compact single row */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        {[
-          { label: 'Critical Collections', value: criticalCollections, icon: '⚠️', color: 'border-red-200 bg-red-50', text: 'text-red-600', sub: 'invoices flagged critical risk' },
-          { label: 'At-Risk Invoices', value: atRiskInvoices, icon: '🕐', color: 'border-amber-200 bg-amber-50', text: 'text-amber-600', sub: 'need follow-up soon' },
-          { label: 'Board Approvals', value: boardApprovals, icon: '📄', color: 'border-blue-200 bg-blue-50', text: 'text-blue-600', sub: 'pending in next 30 days' },
-          { label: 'Renewals Soon', value: renewalsSoon, icon: '📅', color: 'border-purple-200 bg-purple-50', text: 'text-purple-600', sub: 'within 90 days' },
-          { label: 'Delivery at Risk', value: deliveryAtRisk, icon: '📉', color: 'border-orange-200 bg-orange-50', text: 'text-orange-600', sub: 'ending soon, <50% done' },
-        ].map(card => (
-          <div key={card.label} className={`border rounded-xl p-3 ${card.color}`}>
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-base">{card.icon}</span>
-              <span className={`text-xl font-bold ${card.text}`}>{card.value}</span>
-            </div>
-            <p className="text-xs font-semibold text-gray-700 leading-tight">{card.label}</p>
-            <p className="text-xs text-gray-400 mt-0.5">{card.sub}</p>
-          </div>
-        ))}
-      </div>
-
       {/* Tabs */}
       <div className="border-b border-gray-200">
         <div className="flex gap-0">
@@ -596,6 +560,42 @@ export default function IntelligenceHubPage() {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Renewal Season banner - shows when any renewal within 60 days */}
+      {renewalPipeline.some((r: any) => r.daysUntilRenewal !== null && r.daysUntilRenewal <= 60) && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-amber-500 text-lg">📋</span>
+            <div>
+              <p className="text-sm font-semibold text-amber-800">Renewal Season Active</p>
+              <p className="text-xs text-amber-600">
+                {renewalPipeline.filter((r: any) => r.daysUntilRenewal !== null && r.daysUntilRenewal <= 60).length} schools renewing within 60 days - April/May window
+              </p>
+            </div>
+          </div>
+          <Link href="/tdi-admin/intelligence/alerts" className="text-xs text-amber-700 hover:underline font-medium">View alerts →</Link>
+        </div>
+      )}
+
+      {/* Alert cards - compact single row */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        {[
+          { label: 'Critical Collections', value: criticalCollections, icon: '⚠️', color: 'border-red-200 bg-red-50', text: 'text-red-600', sub: 'invoices flagged critical risk' },
+          { label: 'At-Risk Invoices', value: atRiskInvoices, icon: '🕐', color: 'border-amber-200 bg-amber-50', text: 'text-amber-600', sub: 'need follow-up soon' },
+          { label: 'Board Approvals', value: boardApprovals, icon: '📄', color: 'border-gray-200 bg-gray-50', text: 'text-gray-600', sub: 'pending in next 30 days' },
+          { label: 'Renewals Soon', value: renewalsSoon, icon: '📅', color: 'border-amber-200 bg-amber-50', text: 'text-amber-600', sub: 'within 90 days' },
+          { label: 'Delivery at Risk', value: deliveryAtRisk, icon: '📉', color: 'border-red-200 bg-red-50', text: 'text-red-600', sub: 'ending soon, <50% done' },
+        ].map(card => (
+          <div key={card.label} className={`border rounded-xl p-3 ${card.color}`}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-base">{card.icon}</span>
+              <span className={`text-xl font-bold ${card.text}`}>{card.value}</span>
+            </div>
+            <p className="text-xs font-semibold text-gray-700 leading-tight">{card.label}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{card.sub}</p>
+          </div>
+        ))}
       </div>
 
       {/* TAB: ANALYTICS */}
