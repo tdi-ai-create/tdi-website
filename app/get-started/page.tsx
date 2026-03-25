@@ -58,7 +58,7 @@ export default function GetStartedPage() {
     }
 
     // Fire GHL webhook (non-blocking, silent fail)
-    fetch('https://services.leadconnectorhq.com/hooks/3V0PYKAGmdo86GbTC1GC/webhook-trigger/bb1a8bb9-586b-4245-aab4-9c7662641fb9', {
+    fetch('https://services.leadconnectorhq.com/hooks/3V0PYKAGmdo86GbTC1GC/webhook-trigger/afb49642-3913-454a-97e5-9823b40cf6c6', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -120,7 +120,7 @@ export default function GetStartedPage() {
         body: JSON.stringify(submitData),
       });
 
-      fetch('https://services.leadconnectorhq.com/hooks/3V0PYKAGmdo86GbTC1GC/webhook-trigger/bb1a8bb9-586b-4245-aab4-9c7662641fb9', {
+      fetch('https://services.leadconnectorhq.com/hooks/3V0PYKAGmdo86GbTC1GC/webhook-trigger/afb49642-3913-454a-97e5-9823b40cf6c6', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

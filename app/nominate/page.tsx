@@ -418,7 +418,7 @@ function NominatePageInner() {
 
     try {
       // Fire to GHL webhook (non-blocking — won't affect form submission if GHL is down)
-      fetch('https://services.leadconnectorhq.com/hooks/3V0PYKAGmdo86GbTC1GC/webhook-trigger/bb1a8bb9-586b-4245-aab4-9c7662641fb9', {
+      fetch('https://services.leadconnectorhq.com/hooks/3V0PYKAGmdo86GbTC1GC/webhook-trigger/afb49642-3913-454a-97e5-9823b40cf6c6', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
