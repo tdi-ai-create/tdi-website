@@ -1832,6 +1832,130 @@ function CreateQuoteModal({ districtId, districtName, contracts, contacts, onClo
   )
 }
 
+function CreateInvoiceFromQuoteModal({ quote, districtId, onClose, onSaved }: {
+  quote: any
+  districtId: string
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const supabase = getSupabase()
+  const [saving, setSaving] = useState(false)
+  const [invoiceTitle, setInvoiceTitle] = useState('')
+  const [dueDate, setDueDate] = useState('')
+  const [selectedItems, setSelectedItems] = useState<number[]>([])
+
+  const pkg = (quote.quote_packages ?? []).find(
+    (p: any) => p.package_index === (quote.selected_package_index ?? 0)
+  ) ?? quote.quote_packages?.[0]
+
+  const lineItems: any[] = pkg?.line_items ?? []
+
+  function toggleItem(idx: number) {
+    setSelectedItems(prev =>
+      prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
+    )
+  }
+
+  const selectedTotal = selectedItems.reduce((sum, idx) => {
+    const item = lineItems[idx]
+    return sum + (item?.is_complimentary ? 0 : (item?.total ?? 0))
+  }, 0)
+
+  async function handleSave() {
+    if (selectedItems.length === 0 || !invoiceTitle.trim()) return
+    setSaving(true)
+
+    const { count } = await supabase
+      .from('quote_invoices')
+      .select('*', { count: 'exact', head: true })
+      .eq('district_id', districtId)
+
+    const invoiceNumber = `TDI-INV-${new Date().getFullYear()}-${String((count ?? 0) + 1).padStart(3, '0')}`
+
+    await supabase.from('quote_invoices').insert({
+      quote_id: quote.id,
+      district_id: districtId,
+      invoice_number: invoiceNumber,
+      title: invoiceTitle.trim(),
+      line_items: selectedItems.map(idx => lineItems[idx]),
+      amount: selectedTotal,
+      status: 'draft',
+      due_date: dueDate || null,
+    })
+
+    onSaved()
+  }
+
+  const inputClass = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+  const labelClass = "block text-xs font-medium text-gray-600 mb-1"
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-900">Create Invoice</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+        </div>
+
+        <p className="text-xs text-gray-500">From: {quote.quote_number} - {quote.title}</p>
+
+        <div>
+          <label className={labelClass}>Invoice Title</label>
+          <input className={inputClass} value={invoiceTitle} onChange={e => setInvoiceTitle(e.target.value)} placeholder="e.g. Observation Day 1 - September 2026" />
+        </div>
+
+        <div>
+          <label className={labelClass}>Due Date</label>
+          <input type="date" className={inputClass} value={dueDate} onChange={e => setDueDate(e.target.value)} />
+        </div>
+
+        <div>
+          <label className={labelClass}>Select Line Items to Invoice</label>
+          <div className="space-y-2 mt-1">
+            {lineItems.map((item, idx) => (
+              <label key={idx} className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${selectedItems.includes(idx) ? 'border-amber-300 bg-amber-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.includes(idx)}
+                    onChange={() => toggleItem(idx)}
+                    className="rounded"
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{item.label}</p>
+                    <p className="text-xs text-gray-400">{item.quantity} x ${Number(item.unit_price).toLocaleString()}</p>
+                  </div>
+                </div>
+                <span className={`text-sm font-semibold ${item.is_complimentary ? 'text-green-600' : 'text-gray-700'}`}>
+                  {item.is_complimentary ? 'Complimentary' : `$${Number(item.total).toLocaleString()}`}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {selectedItems.length > 0 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 flex justify-between items-center">
+            <span className="text-sm text-amber-800 font-medium">Invoice Total</span>
+            <span className="text-lg font-bold text-amber-600">${selectedTotal.toLocaleString()}</span>
+          </div>
+        )}
+
+        <div className="flex justify-end gap-3 pt-2">
+          <button onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700 px-4 py-2">Cancel</button>
+          <button
+            onClick={handleSave}
+            disabled={saving || selectedItems.length === 0 || !invoiceTitle.trim()}
+            className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-lg"
+          >
+            {saving ? 'Creating...' : 'Create Invoice'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ---- Main Page ----
 export default function DistrictDetailPage() {
   const params = useParams()
@@ -1855,6 +1979,7 @@ export default function DistrictDetailPage() {
   const [meetingEvaluations, setMeetingEvaluations] = useState<MeetingEvaluation[]>([])
   const [showCreateQuote, setShowCreateQuote] = useState(false)
   const [quotes, setQuotes] = useState<any[]>([])
+  const [activeInvoiceQuote, setActiveInvoiceQuote] = useState<any>(null)
 
   useEffect(() => { if (id) loadDistrict() }, [id])
 
@@ -1875,7 +2000,8 @@ export default function DistrictDetailPage() {
         service_sessions(*),
         quotes(
           *,
-          quote_packages(*)
+          quote_packages(*),
+          quote_invoices(*)
         )
       `)
       .eq('id', id)
@@ -2048,6 +2174,15 @@ export default function DistrictDetailPage() {
           contacts={contacts}
           onClose={() => setShowCreateQuote(false)}
           onSaved={() => { setShowCreateQuote(false); loadDistrict() }}
+        />
+      )}
+
+      {activeInvoiceQuote && (
+        <CreateInvoiceFromQuoteModal
+          quote={activeInvoiceQuote}
+          districtId={id}
+          onClose={() => setActiveInvoiceQuote(null)}
+          onSaved={() => { setActiveInvoiceQuote(null); loadDistrict() }}
         />
       )}
 
@@ -2440,6 +2575,14 @@ export default function DistrictDetailPage() {
                                 Copy Link
                               </button>
                             )}
+                            {q.status === 'signed' && (
+                              <button
+                                onClick={() => setActiveInvoiceQuote(q)}
+                                className="text-xs bg-green-500 hover:bg-green-600 text-white px-2.5 py-1 rounded-lg font-medium"
+                              >
+                                + Invoice
+                              </button>
+                            )}
                             {isAtRisk && !isExpired && (
                               <button
                                 onClick={async () => {
@@ -2482,6 +2625,72 @@ export default function DistrictDetailPage() {
               </table>
             )}
           </div>
+
+          {/* Quote Invoices */}
+          {quotes.some((q: any) => (q.quote_invoices ?? []).length > 0) && (
+            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-100">
+                <h3 className="font-semibold text-gray-800">Quote Invoices</h3>
+                <p className="text-xs text-gray-400 mt-0.5">Created from signed quotes</p>
+              </div>
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+                  <tr>
+                    <th className="text-left px-5 py-2">Invoice</th>
+                    <th className="text-left px-4 py-2">Amount</th>
+                    <th className="text-left px-4 py-2">Status</th>
+                    <th className="text-left px-4 py-2">Due Date</th>
+                    <th className="px-4 py-2" />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {quotes.flatMap((q: any) =>
+                    (q.quote_invoices ?? []).map((inv: any) => {
+                      const invStatusStyles: Record<string, string> = {
+                        draft: 'bg-gray-100 text-gray-600',
+                        sent: 'bg-blue-100 text-blue-700',
+                        viewed: 'bg-purple-100 text-purple-700',
+                        paid: 'bg-green-100 text-green-700',
+                        overdue: 'bg-red-100 text-red-700',
+                        void: 'bg-gray-100 text-gray-400',
+                      }
+                      return (
+                        <tr key={inv.id} className="hover:bg-gray-50">
+                          <td className="px-5 py-3">
+                            <p className="font-medium text-gray-900">{inv.title}</p>
+                            <p className="text-xs text-gray-400">{inv.invoice_number}</p>
+                          </td>
+                          <td className="px-4 py-3 font-medium text-gray-700">
+                            {inv.amount ? `$${Number(inv.amount).toLocaleString()}` : '-'}
+                          </td>
+                          <td className="px-4 py-3">
+                            <select
+                              value={inv.status}
+                              onChange={async e => {
+                                await supabase.from('quote_invoices').update({ status: e.target.value }).eq('id', inv.id)
+                                loadDistrict()
+                              }}
+                              className={`text-xs font-semibold px-2 py-0.5 rounded-full border-0 cursor-pointer ${invStatusStyles[inv.status] ?? 'bg-gray-100 text-gray-600'}`}
+                            >
+                              {['draft','sent','viewed','paid','overdue','void'].map(s => (
+                                <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+                              ))}
+                            </select>
+                          </td>
+                          <td className="px-4 py-3 text-xs text-gray-500">
+                            {inv.due_date ? new Date(inv.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-'}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="text-xs text-gray-400">From {q.quote_number}</span>
+                          </td>
+                        </tr>
+                      )
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           {/* Contracts */}
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
