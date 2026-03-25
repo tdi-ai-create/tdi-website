@@ -52,6 +52,7 @@ const STAGE_COLORS: Record<string, string> = {
 export default function SalesPage() {
   const supabase = getSupabase()
   const [view, setView] = useState<ViewMode>('list')
+  const [pipelineId, setPipelineId] = useState<string>('')
   const [stages, setStages] = useState<GHLStage[]>([])
   const [opportunities, setOpportunities] = useState<GHLOpportunity[]>([])
   const [notes, setNotes] = useState<LocalNote[]>([])
@@ -94,11 +95,14 @@ export default function SalesPage() {
         (p: any) => p.name?.toLowerCase().includes('sales')
       ) ?? pipelinesData.pipelines?.[0]
 
-      if (salesPipeline?.stages) {
-        const sortedStages = [...salesPipeline.stages].sort(
-          (a: any, b: any) => (a.position ?? 0) - (b.position ?? 0)
-        )
-        setStages(sortedStages)
+      if (salesPipeline) {
+        setPipelineId(salesPipeline.id)
+        if (salesPipeline.stages) {
+          const sortedStages = [...salesPipeline.stages].sort(
+            (a: any, b: any) => (a.position ?? 0) - (b.position ?? 0)
+          )
+          setStages(sortedStages)
+        }
       }
 
       // Fetch opportunities
@@ -177,7 +181,7 @@ export default function SalesPage() {
       const res = await fetch(`/api/ghl/opportunity/${opportunityId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stageId: newStageId }),
+        body: JSON.stringify({ pipelineStageId: newStageId, pipelineId }),
       })
 
       if (!res.ok) throw new Error('Update failed')

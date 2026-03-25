@@ -90,6 +90,8 @@ export default function AdminPartnershipDetailPage() {
     status: 'upcoming',
     event_date: '',
   })
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null)
 
   // Inline editing state for partnership goal
   const [editingField, setEditingField] = useState<string | null>(null)
@@ -101,6 +103,18 @@ export default function AdminPartnershipDetailPage() {
 
   const hasAccess = isOwner || hasAnySectionPermission(permissions, 'leadership')
   const userEmail = teamMember?.email || ''
+
+  function showToast(message: string, type: 'success' | 'error') {
+    if (type === 'success') {
+      setSubmitSuccess(message)
+      setSubmitError(null)
+      setTimeout(() => setSubmitSuccess(null), 3000)
+    } else {
+      setSubmitError(message)
+      setSubmitSuccess(null)
+      setTimeout(() => setSubmitError(null), 4000)
+    }
+  }
 
   const fetchData = useCallback(async () => {
     if (!userEmail) return
@@ -257,6 +271,10 @@ export default function AdminPartnershipDetailPage() {
       }
       setAddEventOpen(false)
       setNewEvent({ event_title: '', event_type: 'custom', status: 'upcoming', event_date: '' })
+      showToast('Event added to timeline', 'success')
+    } else {
+      const err = await res.json().catch(() => ({}))
+      showToast(err.message || 'Failed to add event - please try again', 'error')
     }
   }
 
@@ -273,11 +291,20 @@ export default function AdminPartnershipDetailPage() {
 
     if (res.ok) {
       setTimelineEvents((prev) => prev.filter((e) => e.id !== eventId))
+      showToast('Event removed', 'success')
+    } else {
+      showToast('Failed to delete event - please try again', 'error')
     }
   }
 
   async function handleMoveEvent(eventId: string, newStatus: string) {
     if (!userEmail) return
+
+    // Optimistic update - move immediately in UI
+    const originalEvent = timelineEvents.find(e => e.id === eventId)
+    setTimelineEvents((prev) =>
+      prev.map((e) => (e.id === eventId ? { ...e, status: newStatus as any } : e))
+    )
 
     const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/timeline`, {
       method: 'PATCH',
@@ -288,10 +315,14 @@ export default function AdminPartnershipDetailPage() {
       body: JSON.stringify({ event_id: eventId, status: newStatus }),
     })
 
-    if (res.ok) {
-      setTimelineEvents((prev) =>
-        prev.map((e) => (e.id === eventId ? { ...e, status: newStatus as any } : e))
-      )
+    if (!res.ok) {
+      // Revert the optimistic update on failure
+      if (originalEvent) {
+        setTimelineEvents((prev) =>
+          prev.map((e) => (e.id === eventId ? originalEvent : e))
+        )
+      }
+      showToast('Failed to move event - please try again', 'error')
     }
   }
 

@@ -15,11 +15,20 @@ export async function PUT(
   }
 
   const body = await request.json()
-  // body can contain: { stageId, status, monetaryValue, name }
-  // We only send what's being updated
+  const { pipelineStageId, pipelineId } = body
 
-  const updatePayload: Record<string, unknown> = {}
-  if (body.stageId !== undefined) updatePayload.stageId = body.stageId
+  if (!pipelineStageId || !pipelineId) {
+    return NextResponse.json(
+      { error: 'pipelineStageId and pipelineId are required' },
+      { status: 400 }
+    )
+  }
+
+  const updatePayload: Record<string, unknown> = {
+    pipelineStageId,
+    pipelineId,
+  }
+  // Optional fields
   if (body.status !== undefined) updatePayload.status = body.status
   if (body.monetaryValue !== undefined) updatePayload.monetaryValue = body.monetaryValue
   if (body.name !== undefined) updatePayload.name = body.name
