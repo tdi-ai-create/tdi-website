@@ -61,7 +61,7 @@ import { supabase } from '@/lib/supabase';
 import { getMetricStatus, statusColors, statusShapes, statusLabels, formatMetricValue, getMetricDescription } from '@/lib/metric-thresholds';
 import TDIPortalLoader from '@/components/TDIPortalLoader';
 import PilotNextYearTab from '@/components/dashboard/pilot/PilotNextYearTab';
-import BillingTab from '@/components/dashboard/shared/BillingTab';
+// BillingTab moved inline per CCP spec
 import { TeacherQuotes } from '@/components/dashboard/shared/TeacherQuotes';
 import { TDISuggestions } from '@/components/dashboard/shared/TDISuggestions';
 import { generateSuggestions, type TDISuggestion } from '@/lib/dashboard/generateSuggestions';
@@ -73,6 +73,7 @@ interface Partnership {
   slug: string;
   contact_name: string;
   contact_email: string;
+  phone?: string | null;
   contract_phase: 'IGNITE' | 'ACCELERATE' | 'SUSTAIN';
   contract_start: string | null;
   contract_end: string | null;
@@ -82,6 +83,8 @@ interface Partnership {
   virtual_sessions_total: number;
   virtual_sessions_completed: number;
   executive_sessions_total: number;
+  executive_sessions_completed?: number;
+  staff_enrolled?: number;
   status: string;
   org_name?: string | null;
   partnership_goal?: string | null;
@@ -91,8 +94,10 @@ interface Organization {
   id: string;
   name: string;
   org_type: string;
+  address?: string;
   address_city: string;
   address_state: string;
+  address_zip?: string;
   website?: string;
   partnership_goal?: string | null;
   success_targets?: string[] | null;
@@ -2341,171 +2346,203 @@ export default function PartnerDashboard() {
             role="tabpanel"
             id="panel-team"
             aria-labelledby="tab-team"
-            className="space-y-6"
+            className="py-6 space-y-4"
           >
-            {/* TDI Team */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Your TDI Team</h2>
-              <div className="flex flex-col sm:flex-row items-start gap-6">
-                <div className="w-28 h-28 bg-gray-200 rounded-full overflow-hidden flex-shrink-0 shadow-md">
-                  <Image
+            {/* Rae contact card */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <h2 className="text-base font-semibold text-gray-900 mb-4">Your TDI Team</h2>
+              <div className="flex items-center gap-5">
+                <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 bg-gray-200">
+                  <img
                     src="/images/rae-headshot.webp"
                     alt="Rae Hughart"
-                    width={112}
-                    height={112}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                 </div>
                 <div className="flex-1">
-                  <p className="text-base font-semibold text-[#1e2749]">Rae Hughart</p>
-                  <p className="text-gray-500">Founder & CEO</p>
-                  <div className="mt-4 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-gray-400" />
-                      <a
-                        href="mailto:Rae@TeachersDeserveIt.com"
-                        className="text-blue-600 hover:underline"
-                      >
-                        Rae@TeachersDeserveIt.com
-                      </a>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-gray-400" />
-                      <a
-                        href="tel:+18477215503"
-                        className="text-blue-600 hover:underline"
-                      >
-                        847-721-5503
-                      </a>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MessageCircle className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">Also available by text!</span>
-                    </div>
-                  </div>
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap gap-3 mt-5">
-                    <a
-                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FFBA06] text-[#1e2749] rounded-lg font-medium hover:bg-[#e5a805] transition-colors"
-                    >
-                      <Calendar className="w-4 h-4" />
+                  <p className="font-bold text-gray-900 text-lg">Rae Hughart</p>
+                  <p className="text-sm text-gray-500 mb-3">Co-Founder, Teachers Deserve It</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <a href="mailto:rae@teachersdeserveit.com"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-white"
+                      style={{ background: '#1B2A4A' }}>
+                      Email Rae
+                    </a>
+                    <a href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                      target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold border border-gray-200 text-gray-700">
                       Schedule a Call
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
-                    <a
-                      href="mailto:Rae@TeachersDeserveIt.com"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-[#1e2749] text-[#1e2749] rounded-lg font-medium hover:bg-[#1e2749]/5 transition-colors"
-                    >
-                      <Mail className="w-4 h-4" />
-                      Send an Email
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-6 p-4 bg-[#1e2749]/5 rounded-lg">
-                <p className="text-sm text-gray-600">
-                  <strong className="text-[#1e2749]">Your TDI partner is with you every step of the way.</strong>{' '}
-                  Reach out anytime - call, text, or email. We mean it.
-                </p>
-              </div>
-            </div>
-
-            {/* Your Team (Partnership Contact) */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Your Team</h2>
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-[#1e2749] to-[#38618C] rounded-full flex items-center justify-center text-white font-bold text-xl">
-                  {partnership.contact_name.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <p className="font-medium text-[#1e2749]">{partnership.contact_name}</p>
-                  <p className="text-sm text-gray-500">Partnership Administrator</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <Mail className="w-4 h-4 text-gray-400" />
-                    <a
-                      href={`mailto:${partnership.contact_email}`}
-                      className="text-sm text-blue-600 hover:underline"
-                    >
-                      {partnership.contact_email}
                     </a>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Partnership Details */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Partnership Details</h2>
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Partnership Type</p>
-                    <p className="font-medium text-[#1e2749] capitalize">{partnership.partnership_type}</p>
+            {/* School info card */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <h2 className="text-base font-semibold text-gray-900 mb-4">Your School</h2>
+              <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                {[
+                  { label: 'School', value: organization?.name || partnership?.org_name },
+                  { label: 'Primary Contact', value: partnership?.contact_name },
+                  { label: 'Email', value: partnership?.contact_email },
+                  { label: 'Phone', value: partnership?.phone },
+                  {
+                    label: 'Address',
+                    value: [organization?.address, organization?.address_city, organization?.address_state, organization?.address_zip]
+                      .filter(Boolean).join(', ') || null
+                  },
+                  { label: 'Current Phase', value: partnership?.contract_phase },
+                  {
+                    label: 'Contract Period',
+                    value: partnership?.contract_start && partnership?.contract_end
+                      ? `${new Date(partnership.contract_start).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} - ${new Date(partnership.contract_end).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`
+                      : null
+                  },
+                ].map(({ label, value }) => (
+                  <div key={label}>
+                    <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-0.5">{label}</p>
+                    <p className="text-sm font-medium text-gray-800">{value || '—'}</p>
                   </div>
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Current Phase</p>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="px-3 py-1 rounded-full text-sm font-medium"
-                        style={{ backgroundColor: colors.teal + '20', color: colors.teal }}
-                      >
-                        {partnership.contract_phase}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Contract Period</p>
-                    <p className="font-medium text-[#1e2749]">
-                      {partnership.contract_start
-                        ? new Date(partnership.contract_start).toLocaleDateString('en-US', {
-                            month: 'long',
-                            year: 'numeric',
-                          })
-                        : 'Not set'}{' '}
-                      -{' '}
-                      {partnership.contract_end
-                        ? new Date(partnership.contract_end).toLocaleDateString('en-US', {
-                            month: 'long',
-                            year: 'numeric',
-                          })
-                        : 'Not set'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Location</p>
-                    <p className="font-medium text-[#1e2749]">
-                      {[organization?.address_city, organization?.address_state].filter(Boolean).join(', ') || 'Not set'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-6 pt-4 border-t border-gray-100">
-                <p className="text-sm text-gray-500">
-                  <strong>Dashboard Active Since:</strong>{' '}
-                  {partnership.contract_start
-                    ? new Date(partnership.contract_start).toLocaleDateString('en-US', {
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })
-                    : 'Recently'}
-                </p>
+                ))}
               </div>
             </div>
+
+            {/* Partnership Includes card */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <h2 className="text-base font-semibold text-gray-900 mb-4">Your Partnership Includes</h2>
+              <div className="divide-y divide-gray-50">
+                {(partnership?.observation_days_total ?? 0) > 0 && (
+                  <div className="flex items-center justify-between py-2.5">
+                    <span className="text-sm text-gray-600">Observation Days</span>
+                    <span className="text-sm font-semibold text-gray-900">{partnership.observation_days_total}</span>
+                  </div>
+                )}
+                {(partnership?.virtual_sessions_total ?? 0) > 0 && (
+                  <div className="flex items-center justify-between py-2.5">
+                    <span className="text-sm text-gray-600">Virtual Sessions</span>
+                    <span className="text-sm font-semibold text-gray-900">{partnership.virtual_sessions_total}</span>
+                  </div>
+                )}
+                {(partnership?.executive_sessions_total ?? 0) > 0 && (
+                  <div className="flex items-center justify-between py-2.5">
+                    <span className="text-sm text-gray-600">Executive Sessions</span>
+                    <span className="text-sm font-semibold text-gray-900">{partnership.executive_sessions_total}</span>
+                  </div>
+                )}
+                {(partnership?.staff_enrolled ?? 0) > 0 && (
+                  <div className="flex items-center justify-between py-2.5">
+                    <span className="text-sm text-gray-600">Hub Memberships</span>
+                    <span className="text-sm font-semibold text-gray-900">{partnership.staff_enrolled}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between py-2.5">
+                  <span className="text-sm text-gray-600">The TDI Book</span>
+                  <span className="text-sm font-semibold text-gray-900">1 per educator</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Data privacy note */}
+            <p className="text-xs text-gray-400 text-center px-4 leading-relaxed">
+              Data Privacy: In your partnership dashboard, access is role-based.
+              All data handling follows FERPA guidelines.
+            </p>
           </div>
         )}
 
         {/* BILLING TAB */}
         {activeTab === 'billing' && (
-          <BillingTab partnership={partnership} schoolName={partnership?.org_name || organization?.name || 'Your School'} />
+          <div className="py-6 space-y-4">
+
+            {/* Header card */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <h2 className="text-base font-semibold text-gray-900 mb-1">Billing and Invoices</h2>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                For questions about your contract, invoices, or payment - reach the TDI billing team directly.
+                A real person responds within one business day.
+              </p>
+            </div>
+
+            {/* Contact billing CTA */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6 text-center"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <rect x="2" y="4" width="20" height="16" rx="3" stroke="#6B7280" strokeWidth="1.5"/>
+                  <path d="M2 9h20" stroke="#6B7280" strokeWidth="1.5"/>
+                  <path d="M6 14h4M6 17h2" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </div>
+              <h3 className="font-semibold text-gray-900 text-base mb-2">Questions about your invoice?</h3>
+              <p className="text-sm text-gray-500 mb-5 max-w-xs mx-auto leading-relaxed">
+                Our billing team handles all contract, invoice, and payment questions.
+                They&apos;ll get back to you within one business day.
+              </p>
+              <a
+                href="mailto:Billing@Teachersdeserveit.com"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
+                style={{ background: '#1B2A4A' }}>
+                Contact Billing Team
+              </a>
+              <p className="text-xs text-gray-400 mt-3">Billing@Teachersdeserveit.com</p>
+            </div>
+
+            {/* Payment policy */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">Payment Information</h3>
+              <div className="space-y-3">
+                {[
+                  {
+                    label: 'Payment methods',
+                    value: 'Check, ACH transfer, or credit card. Details provided on your invoice.'
+                  },
+                  {
+                    label: 'Invoice timing',
+                    value: 'Invoices are sent at the start of each service period or as outlined in your contract.'
+                  },
+                  {
+                    label: 'Net terms',
+                    value: 'Payment is due within 30 days of invoice unless otherwise agreed in your contract.'
+                  },
+                  {
+                    label: 'Questions or disputes',
+                    value: 'Contact Billing@Teachersdeserveit.com. We respond within one business day.'
+                  },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50">
+                    <div className="w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0 mt-1.5" />
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-0.5">{label}</p>
+                      <p className="text-sm text-gray-700 leading-relaxed">{value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Contract access */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Your Contract</h3>
+              <p className="text-sm text-gray-500 mb-4 leading-relaxed">
+                Your signed partnership agreement is on file with TDI.
+                Need a copy? Contact the billing team and we&apos;ll send it over.
+              </p>
+              <a
+                href="mailto:Billing@Teachersdeserveit.com?subject=Contract Copy Request"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all">
+                Request Contract Copy
+              </a>
+            </div>
+
+          </div>
         )}
 
         {/* BLUEPRINT TAB */}
