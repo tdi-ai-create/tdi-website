@@ -316,7 +316,7 @@ export default function AllenwoodDashboard() {
     // ZONE 1 - Snapshot
     stats: {
       educatorsEnrolled: { value: 13, total: 13, label: 'Teachers Enrolled', sublabel: 'All seats filled' },
-      deliverables: { completed: 8, total: 11, label: 'Deliverables', sublabel: 'completed vs. contracted' },
+      deliverables: { completed: 9, total: 11, label: 'Deliverables', sublabel: 'completed vs. contracted' },
       hubEngagement: { percent: 100, raw: '13/13', label: 'Hub Engagement', sublabel: '100% logged in' },
       phase: { name: 'IGNITE', number: 1, total: 3, label: 'Current Phase', sublabel: 'Phase 1 of 3' },
     },
@@ -343,6 +343,7 @@ export default function AllenwoodDashboard() {
         { label: 'Virtual Session 2  - Hub update, tools discussion, data collection', date: 'Feb 25, 2026' },
         { label: 'Observation Day 2  - 10 classrooms, Love Notes delivered', date: 'Feb 18, 2026' },
         { label: 'Leadership Meeting  - mid-year wins, Year 2 expansion planning', date: 'Mar 2, 2026' },
+        { label: 'Virtual Session 3  - Hub progress check-in + strategy session', date: 'Mar 11, 2026' },
         { label: 'Virtual Session 4  - Survey debrief + autism and transitions session', date: 'Mar 25, 2026' },
       ],
       inProgress: [
@@ -352,8 +353,6 @@ export default function AllenwoodDashboard() {
         { label: 'Year 2 expansion conversations underway', detail: 'Discussed at March 2 leadership meeting' },
       ],
       comingSoon: [
-        { label: 'Funding Meeting with Dr. Porter', date: 'March 10, 2026  - 9AM ET (Tomorrow)' },
-        { label: 'Virtual Session 3', date: 'March 11, 2026  - 7:30PM ET' },
         { label: 'Virtual Session 5', date: 'April 8, 2026  - 7:30PM ET' },
         { label: 'Virtual Session 6', date: 'April 15, 2026  - 7:30PM ET' },
         { label: 'Spring Leadership Celebration', date: 'Available through May 2026' },
@@ -408,7 +407,6 @@ export default function AllenwoodDashboard() {
         },
       ],
       alreadyInMotion: [
-        { label: 'Virtual Session 3', date: 'March 11, 2026  - 7:30PM ET', status: 'scheduled' },
         { label: 'Virtual Session 5', date: 'April 8, 2026  - 7:30PM ET', status: 'scheduled' },
         { label: 'Virtual Session 6', date: 'April 15, 2026  - 7:30PM ET', status: 'scheduled' },
       ],
