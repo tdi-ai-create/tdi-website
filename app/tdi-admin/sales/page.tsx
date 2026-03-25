@@ -67,6 +67,8 @@ export default function SalesPage() {
   const [hideUnassigned, setHideUnassigned] = useState(true) // default ON
   const [hideZeroValue, setHideZeroValue] = useState(false)
   const [activePreset, setActivePreset] = useState<string | null>(null)
+  const [updatingOpportunity, setUpdatingOpportunity] = useState<string | null>(null)
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
   useEffect(() => {
     loadAll()
@@ -149,6 +151,49 @@ export default function SalesPage() {
     setNewNextAction('')
     setActiveNoteOpp(null)
     setSavingNote(false)
+  }
+
+  function showToast(message: string, type: 'success' | 'error') {
+    setToast({ message, type })
+    setTimeout(() => setToast(null), 3000)
+  }
+
+  async function updateStage(opportunityId: string, newStageId: string, newStageName: string) {
+    setUpdatingOpportunity(opportunityId)
+
+    // Store original values for potential revert
+    const originalOpp = opportunities.find(o => o.id === opportunityId)
+    const originalStageId = originalOpp?.pipelineStageId
+    const originalStageName = originalOpp?.pipelineStageName
+
+    // Optimistic update - change stage in local state immediately
+    setOpportunities(prev => prev.map(opp =>
+      opp.id === opportunityId
+        ? { ...opp, pipelineStageId: newStageId, pipelineStageName: newStageName }
+        : opp
+    ))
+
+    try {
+      const res = await fetch(`/api/ghl/opportunity/${opportunityId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stageId: newStageId }),
+      })
+
+      if (!res.ok) throw new Error('Update failed')
+
+      showToast(`Stage updated to "${newStageName}"`, 'success')
+    } catch {
+      // Revert optimistic update on error
+      setOpportunities(prev => prev.map(opp =>
+        opp.id === opportunityId
+          ? { ...opp, pipelineStageId: originalStageId ?? '', pipelineStageName: originalStageName }
+          : opp
+      ))
+      showToast('Failed to update stage - try again', 'error')
+    } finally {
+      setUpdatingOpportunity(null)
+    }
   }
 
   function getOppNotes(oppId: string) {
@@ -283,6 +328,30 @@ export default function SalesPage() {
             )}
           </div>
         )}
+
+        {/* Move to stage dropdown */}
+        <div className="flex items-center gap-2">
+          <select
+            value={opp.pipelineStageId}
+            disabled={updatingOpportunity === opp.id}
+            onChange={e => {
+              const selectedStage = stages.find(s => s.id === e.target.value)
+              if (selectedStage) updateStage(opp.id, selectedStage.id, selectedStage.name)
+            }}
+            className={`text-xs border border-gray-200 rounded-lg px-2 py-1 bg-white text-gray-600 cursor-pointer hover:border-indigo-300 focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-colors ${
+              updatingOpportunity === opp.id ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+          >
+            {stages.map(stage => (
+              <option key={stage.id} value={stage.id}>
+                {stage.name}
+              </option>
+            ))}
+          </select>
+          {updatingOpportunity === opp.id && (
+            <span className="text-xs text-indigo-500 animate-pulse">Syncing...</span>
+          )}
+        </div>
 
         {/* Log note toggle */}
         {activeNoteOpp === opp.id ? (
@@ -543,9 +612,28 @@ export default function SalesPage() {
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${stageColor}`}>
-                          {stageName}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <select
+                            value={opp.pipelineStageId}
+                            disabled={updatingOpportunity === opp.id}
+                            onChange={e => {
+                              const selectedStage = stages.find(s => s.id === e.target.value)
+                              if (selectedStage) updateStage(opp.id, selectedStage.id, selectedStage.name)
+                            }}
+                            className={`text-xs font-medium px-2 py-1 rounded-lg border cursor-pointer focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-colors ${stageColor} ${
+                              updatingOpportunity === opp.id ? 'opacity-50 cursor-not-allowed' : 'hover:border-indigo-300'
+                            }`}
+                          >
+                            {stages.map(stage => (
+                              <option key={stage.id} value={stage.id}>
+                                {stage.name}
+                              </option>
+                            ))}
+                          </select>
+                          {updatingOpportunity === opp.id && (
+                            <span className="text-xs text-indigo-500 animate-pulse">Syncing...</span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-4 py-3 font-medium text-gray-700">
                         {opp.monetaryValue ? `$${opp.monetaryValue.toLocaleString()}` : '-'}
@@ -647,6 +735,17 @@ export default function SalesPage() {
               )
             })}
           </div>
+        </div>
+      )}
+
+      {/* Toast notification */}
+      {toast && (
+        <div className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${
+          toast.type === 'success'
+            ? 'bg-green-500 text-white'
+            : 'bg-red-500 text-white'
+        }`}>
+          {toast.message}
         </div>
       )}
     </div>
