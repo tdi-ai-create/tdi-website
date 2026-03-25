@@ -90,24 +90,23 @@ export default function Desi() {
       if (!response.ok) throw new Error('API error')
 
       const data = await response.json()
-      const assistantContent = data.content || ''
-      const showContactForm = assistantContent.includes('[SHOW_CONTACT_FORM]')
-      const cleanContent = assistantContent.replace('[SHOW_CONTACT_FORM]', '').trim()
+      const assistantContent = data.message || ''
+      const showForm = data.showContactForm || false
 
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: cleanContent,
-        showContactForm,
+        content: assistantContent,
+        showContactForm: showForm,
       }])
 
       // Pre-fill contact form with user's question
-      if (showContactForm) {
+      if (showForm) {
         setContactForm(prev => ({ ...prev, message: userMessage }))
       }
     } catch {
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: "I'm having a little trouble connecting. You can reach us at hello@teachersdeserveit.com and we'll reply within 24 hours.",
+        content: "I'm having a little trouble connecting. You can find more info at teachersdeserveit.com/contact - our team replies within 24 hours.",
       }])
     } finally {
       setIsLoading(false)
@@ -119,31 +118,53 @@ export default function Desi() {
 
     setContactLoading(true)
 
+    // Build transcript from message history
+    const transcript = messages
+      .map(m => `${m.role === 'user' ? 'Visitor' : 'Desi'}: ${m.content}`)
+      .join('\n')
+
     try {
-      const response = await fetch('https://api.web3forms.com/submit', {
+      const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           access_key: process.env.NEXT_PUBLIC_WEB3FORMS_KEY,
-          subject: 'Website Chat - Desi Contact Form',
+          subject: `Website Chat Ticket - ${contactForm.name}`,
           from_name: contactForm.name,
           email: contactForm.email,
-          message: contactForm.message,
+          message: `
+NAME: ${contactForm.name}
+EMAIL: ${contactForm.email}
+
+THEIR QUESTION:
+${contactForm.message}
+
+--- FULL CHAT TRANSCRIPT ---
+${transcript}
+          `.trim(),
           to: 'info@teachersdeserveit.com',
         }),
       })
 
-      if (response.ok) {
-        const firstName = contactForm.name.split(' ')[0]
-        setMessages(prev => [...prev, {
-          role: 'assistant',
-          content: `Got it, ${firstName}! Your message is on its way. We reply within 24 hours. Anything else I can help with?`,
-        }])
-        setContactForm({ name: '', email: '', message: '' })
+      if (res.ok) {
         setContactSent(true)
+        setMessages(prev => [
+          ...prev,
+          {
+            role: 'assistant' as const,
+            content: `Got it, ${contactForm.name.split(' ')[0]}! Your message and our full conversation have been sent to our team. A real person will reply within 24 hours. Is there anything else I can help with in the meantime?`,
+          },
+        ])
+        setContactForm({ name: '', email: '', message: '' })
       }
     } catch {
-      // Silent fail - form submission error
+      setMessages(prev => [
+        ...prev,
+        {
+          role: 'assistant' as const,
+          content: `Something went wrong on my end. Our team can be reached at teachersdeserveit.com/contact and will get back to you within 24 hours.`,
+        },
+      ])
     } finally {
       setContactLoading(false)
     }
@@ -311,8 +332,11 @@ export default function Desi() {
                     padding: '14px',
                     margin: '8px 0 0 36px',
                   }}>
-                    <p style={{ fontSize: '12px', fontWeight: 600, color: '#166534', marginBottom: '10px' }}>
-                      Send us a message - we reply within 24 hours
+                    <p style={{ fontSize: '12px', fontWeight: 600, color: '#166534', marginBottom: '4px' }}>
+                      Send a message to our team
+                    </p>
+                    <p style={{ fontSize: '11px', color: '#4B7C59', marginBottom: '10px', lineHeight: 1.5 }}>
+                      Fill this out and we will send your question to our team. A real person will reply within 24 hours.
                     </p>
                     <input
                       type="text"
