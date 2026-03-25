@@ -7,7 +7,7 @@ import { Plus, AlertTriangle, Clock, Calendar, FileCheck, TrendingDown, X, Mail,
 import { calculateRenewalHealth, renewalHealthBadge } from '@/lib/tdi-admin/renewal-health'
 import { calculateAlerts } from '@/lib/tdi-admin/alert-rules'
 
-type Tab = 'districts' | 'invoices'
+type Tab = 'analytics' | 'districts' | 'renewals' | 'invoices'
 
 // Types
 type AlertCard = {
@@ -37,6 +37,7 @@ type District = {
   intelligence_contracts?: Contract[]
   service_sessions?: Session[]
   intelligence_tasks?: DistrictTask[]
+  quotes?: { id: string; status: string }[]
 }
 
 type Invoice = {
@@ -52,6 +53,7 @@ type Contract = {
   renewal_deadline_date: string | null
   end_date: string | null
   status: string
+  total_value?: number | null
   scope_json?: {
     observation_days?: number
     virtual_sessions?: number
@@ -123,7 +125,7 @@ type InvoiceSummary = {
 export default function IntelligenceHubPage() {
   const supabase = getSupabase()
   const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState<Tab>('districts')
+  const [tab, setTab] = useState<Tab>('analytics')
   const [alerts, setAlerts] = useState<AlertCard[]>([])
   const [districts, setDistricts] = useState<District[]>([])
   const [openTasks, setOpenTasks] = useState<Task[]>([])
@@ -158,7 +160,7 @@ export default function IntelligenceHubPage() {
     const { data: districtData } = await supabase
       .from('districts')
       .select(`
-        id, name, state, segment, status, partnership_id,
+        id, name, state, segment, status, partnership_id, notes,
         intelligence_invoices (
           id, invoice_number, amount, status, invoice_date,
           collections_workflow (
@@ -166,7 +168,7 @@ export default function IntelligenceHubPage() {
           )
         ),
         intelligence_contracts (
-          id, contract_name, renewal_deadline_date, end_date, status, scope_json
+          id, contract_name, renewal_deadline_date, end_date, status, scope_json, total_value
         ),
         service_sessions (
           id, session_type, session_date, title
@@ -176,6 +178,9 @@ export default function IntelligenceHubPage() {
         ),
         district_meetings (
           id, meeting_date
+        ),
+        quotes (
+          id, status
         )
       `)
       .in('status', ['active', 'pilot'])
@@ -491,37 +496,8 @@ export default function IntelligenceHubPage() {
 
   return (
     <div className="min-h-screen bg-[#FAFBFC]">
-      {/* Sticky Tab Bar */}
-      <div
-        className="sticky top-0 z-10 bg-white border-b border-gray-200"
-        style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
-      >
-        <div className="flex items-center gap-0 px-6">
-          <button
-            onClick={() => setTab('districts')}
-            className="px-4 py-3 text-sm font-medium transition-colors relative"
-            style={{
-              color: tab === 'districts' ? '#111827' : '#6B7280',
-              borderBottom: tab === 'districts' ? '2px solid #F59E0B' : '2px solid transparent',
-            }}
-          >
-            Districts
-          </button>
-          <button
-            onClick={() => setTab('invoices')}
-            className="px-4 py-3 text-sm font-medium transition-colors relative"
-            style={{
-              color: tab === 'invoices' ? '#111827' : '#6B7280',
-              borderBottom: tab === 'invoices' ? '2px solid #F59E0B' : '2px solid transparent',
-            }}
-          >
-            Invoices ({invoices.length})
-          </button>
-        </div>
-      </div>
-
       {/* Page Content */}
-      <div className="px-6 py-6 max-w-7xl mx-auto space-y-8">
+      <div className="px-6 py-6 max-w-7xl mx-auto space-y-5">
 
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
@@ -531,31 +507,26 @@ export default function IntelligenceHubPage() {
         </div>
         <div className="flex items-center gap-3">
           {/* Tasks badge */}
-          <Link
-            href="/tdi-admin/intelligence/districts"
-            className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors ${
+          <span
+            className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border ${
               totalOpenTasks > 0
-                ? 'bg-amber-50 border-amber-300 text-amber-700 hover:bg-amber-100'
-                : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'
+                ? 'bg-amber-50 border-amber-300 text-amber-700'
+                : 'bg-gray-50 border-gray-200 text-gray-500'
             }`}
-            title="Open tasks across all districts"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
             </svg>
-            {totalOpenTasks > 0 ? `${totalOpenTasks} open task${totalOpenTasks !== 1 ? 's' : ''}` : 'No open tasks'}
-          </Link>
+            {totalOpenTasks > 0 ? `${totalOpenTasks} open tasks` : 'No open tasks'}
+          </span>
 
-          <Link
-            href="/tdi-admin/intelligence/alerts"
-            className="text-xs font-medium border border-amber-300 text-amber-600 hover:bg-amber-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
-          >
-            Alert Center
-            {totalAlertCount > 0 && (
-              <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full leading-none">
-                {totalAlertCount}
-              </span>
-            )}
+          <Link href="/tdi-admin/intelligence/alerts">
+            <button className="text-xs font-medium border border-amber-300 text-amber-600 hover:bg-amber-50 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+              Alert Center
+              {totalAlertCount > 0 && (
+                <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">{totalAlertCount}</span>
+              )}
+            </button>
           </Link>
 
           <Link
@@ -568,20 +539,18 @@ export default function IntelligenceHubPage() {
       </div>
 
       {/* Renewal Season banner - shows when any renewal within 60 days */}
-      {renewalPipeline.some(r => r.daysUntilRenewal !== null && r.daysUntilRenewal <= 60) && (
+      {renewalPipeline.some((r: any) => r.daysUntilRenewal !== null && r.daysUntilRenewal <= 60) && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-amber-500 text-lg">📋</span>
             <div>
               <p className="text-sm font-semibold text-amber-800">Renewal Season Active</p>
               <p className="text-xs text-amber-600">
-                {renewalPipeline.filter(r => r.daysUntilRenewal !== null && r.daysUntilRenewal <= 60).length} schools renewing within 60 days - April/May window
+                {renewalPipeline.filter((r: any) => r.daysUntilRenewal !== null && r.daysUntilRenewal <= 60).length} schools renewing within 60 days - April/May window
               </p>
             </div>
           </div>
-          <Link href="/tdi-admin/intelligence/alerts" className="text-xs text-amber-700 hover:underline font-medium">
-            View alerts →
-          </Link>
+          <Link href="/tdi-admin/intelligence/alerts" className="text-xs text-amber-700 hover:underline font-medium">View alerts →</Link>
         </div>
       )}
 
@@ -605,203 +574,451 @@ export default function IntelligenceHubPage() {
         ))}
       </div>
 
-      {/* Tab: Districts - Main content: Districts table + Renewals Pipeline */}
-      {tab === 'districts' && (
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+      {/* Tabs */}
+      <div className="border-b border-gray-200">
+        <div className="flex gap-0">
+          {[
+            { key: 'analytics', label: 'Analytics' },
+            { key: 'districts', label: `Districts (${districts.length})` },
+            { key: 'renewals', label: `Renewal Pipeline (${renewalPipeline.length})` },
+            { key: 'invoices', label: `Invoices (${invoices.length})` },
+          ].map(t => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key as Tab)}
+              className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
+                tab === t.key
+                  ? 'border-amber-500 text-amber-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-        {/* Districts table - takes 2/3 */}
-        <div className="xl:col-span-2">
-          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-900">Active Districts</h2>
-              <div className="flex items-center gap-3">
-                <Link href="/tdi-admin/intelligence/districts" className="text-xs text-amber-600 hover:underline">
-                  Renewals
-                </Link>
-                <Link href="/tdi-admin/intelligence/districts" className="text-xs text-gray-500 hover:underline">
-                  View all
-                </Link>
+      {/* TAB: ANALYTICS */}
+      {tab === 'analytics' && (
+        <div className="space-y-5">
+
+          {/* Row 1: Portfolio Health + Revenue Pipeline */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+            {/* Portfolio Health */}
+            <div className="bg-white border border-gray-200 rounded-xl p-5">
+              <h3 className="font-semibold text-gray-900 mb-4">Portfolio Health</h3>
+              {(() => {
+                const strong = renewalPipeline.filter((r: any) => r.healthScore >= 75).length
+                const watch = renewalPipeline.filter((r: any) => r.healthScore >= 50 && r.healthScore < 75).length
+                const atRiskHealth = renewalPipeline.filter((r: any) => r.healthScore < 50).length
+                const avg = renewalPipeline.length > 0
+                  ? Math.round(renewalPipeline.reduce((sum: number, r: any) => sum + r.healthScore, 0) / renewalPipeline.length)
+                  : 0
+                const total = renewalPipeline.length
+
+                return (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500">Average health score</span>
+                      <span className={`text-2xl font-bold ${avg >= 75 ? 'text-green-600' : avg >= 50 ? 'text-amber-600' : 'text-red-600'}`}>{avg}</span>
+                    </div>
+                    <div className="space-y-2">
+                      {[
+                        { label: 'Strong', count: strong, color: 'bg-green-500', textColor: 'text-green-700' },
+                        { label: 'Watch', count: watch, color: 'bg-amber-400', textColor: 'text-amber-700' },
+                        { label: 'At Risk', count: atRiskHealth, color: 'bg-red-400', textColor: 'text-red-700' },
+                      ].map(tier => (
+                        <div key={tier.label} className="flex items-center gap-3">
+                          <span className="text-xs text-gray-500 w-16">{tier.label}</span>
+                          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${tier.color}`}
+                              style={{ width: total > 0 ? `${(tier.count / total) * 100}%` : '0%' }}
+                            />
+                          </div>
+                          <span className={`text-xs font-bold w-4 text-right ${tier.textColor}`}>{tier.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {renewalPipeline.filter((r: any) => r.healthScore < 50).length > 0 && (
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-3 mt-2">
+                        <p className="text-xs font-semibold text-red-700 mb-1">Needs Immediate Attention</p>
+                        {renewalPipeline.filter((r: any) => r.healthScore < 50).map((r: any) => (
+                          <Link key={r.id} href={`/tdi-admin/intelligence/districts/${r.id}`} className="text-xs text-red-600 hover:underline block">
+                            {r.name} - {r.healthScore}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })()}
+            </div>
+
+            {/* Revenue Pipeline */}
+            <div className="bg-white border border-gray-200 rounded-xl p-5">
+              <h3 className="font-semibold text-gray-900 mb-4">Revenue Pipeline</h3>
+              {(() => {
+                const currentYearValue = districts.reduce((sum: number, d: any) => {
+                  const active = (d.intelligence_contracts ?? []).find((c: any) => c.status === 'active')
+                  return sum + (active?.total_value ? Number(active.total_value) : 0)
+                }, 0)
+
+                const proposedValue = districts.reduce((sum: number, d: any) => {
+                  const draft = (d.intelligence_contracts ?? []).find((c: any) => c.status === 'draft')
+                  return sum + (draft?.total_value ? Number(draft.total_value) : 0)
+                }, 0)
+
+                return (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <p className="text-xs text-gray-500 mb-1">Current Year (25-26)</p>
+                        <p className="text-xl font-bold text-gray-900">
+                          {currentYearValue > 0 ? `$${currentYearValue.toLocaleString()}` : 'Entering data'}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-0.5">contracted value</p>
+                      </div>
+                      <div className="bg-amber-50 rounded-lg p-3">
+                        <p className="text-xs text-gray-500 mb-1">Proposed (26-27)</p>
+                        <p className="text-xl font-bold text-amber-600">
+                          {proposedValue > 0 ? `$${proposedValue.toLocaleString()}` : 'Building proposals'}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-0.5">renewal pipeline</p>
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-xs text-gray-500 mb-1">Renewal Window</p>
+                      <p className="text-sm font-semibold text-gray-800">
+                        {renewalPipeline.filter((r: any) => r.daysUntilRenewal !== null && r.daysUntilRenewal <= 30).length} schools need action in 30 days
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {renewalPipeline.filter((r: any) => r.daysUntilRenewal !== null && r.daysUntilRenewal <= 60).length} total within 60 days
+                      </p>
+                    </div>
+                  </div>
+                )
+              })()}
+            </div>
+          </div>
+
+          {/* Row 2: Delivery Performance + Relationship Signals */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+            {/* Delivery Performance */}
+            <div className="bg-white border border-gray-200 rounded-xl p-5">
+              <h3 className="font-semibold text-gray-900 mb-4">Delivery Performance</h3>
+              <div className="space-y-3">
+                {renewalPipeline
+                  .filter((r: any) => r.deliveryPct !== null)
+                  .sort((a: any, b: any) => (b.deliveryPct ?? 0) - (a.deliveryPct ?? 0))
+                  .map((r: any) => (
+                    <div key={r.id}>
+                      <div className="flex items-center justify-between mb-1">
+                        <Link href={`/tdi-admin/intelligence/districts/${r.id}`} className="text-xs font-medium text-gray-700 hover:text-amber-600 truncate max-w-40">
+                          {r.name}
+                        </Link>
+                        <span className={`text-xs font-bold ${r.deliveryPct >= 100 ? 'text-green-600' : r.deliveryPct >= 75 ? 'text-amber-600' : 'text-red-500'}`}>
+                          {r.deliveryPct}%
+                        </span>
+                      </div>
+                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${r.deliveryPct >= 100 ? 'bg-green-500' : r.deliveryPct >= 75 ? 'bg-amber-400' : r.deliveryPct >= 50 ? 'bg-orange-400' : 'bg-red-400'}`}
+                          style={{ width: `${Math.min(r.deliveryPct, 100)}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                {renewalPipeline.filter((r: any) => r.deliveryPct === null).length > 0 && (
+                  <p className="text-xs text-gray-400 pt-1">
+                    {renewalPipeline.filter((r: any) => r.deliveryPct === null).length} schools with hub-only contracts (no session delivery tracked)
+                  </p>
+                )}
               </div>
             </div>
-            {loading ? (
-              <div className="p-5 space-y-3">
-                {[...Array(4)].map((_, i) => <div key={i} className="h-8 bg-gray-100 rounded animate-pulse" />)}
-              </div>
-            ) : districts.length === 0 ? (
-              <div className="p-8 text-center text-gray-400 text-sm">No active districts yet.</div>
-            ) : (
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
-                  <tr>
-                    <th className="text-left px-5 py-2">District</th>
-                    <th className="text-left px-3 py-2">Status</th>
-                    <th className="text-left px-3 py-2">Collections</th>
-                    <th className="text-left px-3 py-2">Delivery</th>
-                    <th className="text-left px-3 py-2">Health</th>
-                    <th className="text-left px-3 py-2">Renewal</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {districts.map((d) => {
-                    const meta = getDistrictMeta(d)
-                    return (
-                      <tr key={d.id} className="hover:bg-gray-50 cursor-pointer">
-                        <td className="px-5 py-3">
-                          <Link href={`/tdi-admin/intelligence/districts/${d.id}`} className="font-medium text-gray-900 hover:text-amber-600">
-                            {d.name}
+
+            {/* Relationship Signals */}
+            <div className="bg-white border border-gray-200 rounded-xl p-5">
+              <h3 className="font-semibold text-gray-900 mb-4">Relationship Signals</h3>
+              <div className="space-y-4">
+
+                {/* No meeting in 60+ days */}
+                <div>
+                  <p className="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">No Meeting in 60+ Days</p>
+                  {renewalPipeline.filter((r: any) => !r.lastMeeting).length === 0 ? (
+                    <p className="text-xs text-green-600">All schools have recent meetings ✓</p>
+                  ) : (
+                    <div className="space-y-1">
+                      {renewalPipeline.filter((r: any) => !r.lastMeeting).map((r: any) => (
+                        <Link key={r.id} href={`/tdi-admin/intelligence/districts/${r.id}?tab=meetings`} className="flex items-center justify-between text-xs hover:bg-gray-50 rounded py-1 px-2 -mx-2">
+                          <span className="text-gray-700">{r.name}</span>
+                          <span className="text-amber-600 font-medium">Log meeting →</span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Upcoming renewals needing quotes */}
+                <div>
+                  <p className="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Renewals Needing Quotes</p>
+                  {(() => {
+                    const needsQuote = renewalPipeline.filter((r: any) => {
+                      const districtMatch = districts.find((d: any) => d.id === r.id)
+                      const quotes = (districtMatch as any)?.quotes ?? []
+                      const hasActiveQuote = quotes.some((q: any) => ['sent', 'viewed', 'signed'].includes(q.status))
+                      return !hasActiveQuote && r.daysUntilRenewal !== null && r.daysUntilRenewal <= 60
+                    })
+                    return needsQuote.length === 0 ? (
+                      <p className="text-xs text-green-600">All renewing schools have quotes ✓</p>
+                    ) : (
+                      <div className="space-y-1">
+                        {needsQuote.map((r: any) => (
+                          <Link key={r.id} href={`/tdi-admin/intelligence/districts/${r.id}?tab=contracts`} className="flex items-center justify-between text-xs hover:bg-gray-50 rounded py-1 px-2 -mx-2">
+                            <span className="text-gray-700">{r.name}</span>
+                            <span className="text-amber-600 font-medium">{r.daysUntilRenewal}d · Create quote →</span>
                           </Link>
-                          <span className="ml-2 text-xs text-gray-400">{d.state}</span>
-                        </td>
-                        <td className="px-3 py-3">
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                            d.status === 'active' ? 'bg-green-100 text-green-700' :
-                            d.status === 'pilot' ? 'bg-blue-100 text-blue-700' :
-                            'bg-gray-100 text-gray-600'
-                          }`}>
-                            {d.status.charAt(0).toUpperCase() + d.status.slice(1)}
-                          </span>
-                        </td>
-                        <td className="px-3 py-3">
-                          <div className="flex items-center gap-2">
-                            {riskBadge(meta.topRisk)}
-                            {meta.openInvoices > 0 && (
-                              <span className="text-xs text-gray-400">{meta.openInvoices} open</span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-3 py-3">
-                          {meta.deliveryPct !== null ? (
-                            <div className="flex items-center gap-2">
-                              <div className="w-12 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                <div
-                                  className={`h-full rounded-full ${
-                                    meta.deliveryPct >= 100 ? 'bg-green-500' :
-                                    meta.deliveryPct >= 50 ? 'bg-amber-400' : 'bg-gray-300'
-                                  }`}
-                                  style={{ width: `${Math.min(100, meta.deliveryPct)}%` }}
-                                />
-                              </div>
-                              <span className="text-xs text-gray-500">{meta.deliveryPct}%</span>
-                            </div>
-                          ) : (
-                            <span className="text-xs text-gray-400">-</span>
-                          )}
-                        </td>
-                        <td className="px-3 py-3">
-                          {(() => {
-                            const badge = renewalHealthBadge(meta.health.tier)
-                            return (
-                              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badge.bg} ${badge.text}`}>
-                                {badge.label} · {meta.health.score}
-                              </span>
-                            )
-                          })()}
-                        </td>
-                        <td className="px-3 py-3 text-xs text-gray-500">
-                          {meta.renewalDate
-                            ? new Date(meta.renewalDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })
-                            : '-'}
-                        </td>
-                      </tr>
+                        ))}
+                      </div>
                     )
-                  })}
-                </tbody>
-              </table>
+                  })()}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Row 3: Upcoming This Week */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <h3 className="font-semibold text-gray-900 mb-4">Upcoming This Week</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+              {/* Renewal deadlines in next 14 days */}
+              <div>
+                <p className="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Renewal Deadlines - Next 14 Days</p>
+                {renewalPipeline.filter((r: any) => r.daysUntilRenewal !== null && r.daysUntilRenewal <= 14).length === 0 ? (
+                  <p className="text-xs text-gray-400">No deadlines in next 14 days</p>
+                ) : (
+                  renewalPipeline
+                    .filter((r: any) => r.daysUntilRenewal !== null && r.daysUntilRenewal <= 14)
+                    .map((r: any) => (
+                      <Link key={r.id} href={`/tdi-admin/intelligence/districts/${r.id}`} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0 hover:bg-gray-50 rounded px-2 -mx-2">
+                        <span className="text-sm text-gray-800">{r.name}</span>
+                        <span className="text-xs font-bold text-red-600">{r.daysUntilRenewal}d left</span>
+                      </Link>
+                    ))
+                )}
+              </div>
+
+              {/* Schools with open tasks */}
+              <div>
+                <p className="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Open Tasks</p>
+                {renewalPipeline.filter((r: any) => r.openTasks > 0).length === 0 ? (
+                  <p className="text-xs text-gray-400">No open tasks across any district</p>
+                ) : (
+                  renewalPipeline
+                    .filter((r: any) => r.openTasks > 0)
+                    .map((r: any) => (
+                      <Link key={r.id} href={`/tdi-admin/intelligence/districts/${r.id}`} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0 hover:bg-gray-50 rounded px-2 -mx-2">
+                        <span className="text-sm text-gray-800">{r.name}</span>
+                        <span className="text-xs font-bold text-amber-600">{r.openTasks} task{r.openTasks !== 1 ? 's' : ''}</span>
+                      </Link>
+                    ))
+                )}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* TAB: DISTRICTS */}
+      {tab === 'districts' && (
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-gray-900">Active Districts</h2>
+            <Link href="/tdi-admin/intelligence/districts" className="text-xs text-gray-500 hover:underline">
+              View all
+            </Link>
+          </div>
+          {loading ? (
+            <div className="p-5 space-y-3">
+              {[...Array(4)].map((_, i) => <div key={i} className="h-8 bg-gray-100 rounded animate-pulse" />)}
+            </div>
+          ) : districts.length === 0 ? (
+            <div className="p-8 text-center text-gray-400 text-sm">No active districts yet.</div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+                <tr>
+                  <th className="text-left px-5 py-2">District</th>
+                  <th className="text-left px-3 py-2">Status</th>
+                  <th className="text-left px-3 py-2">Collections</th>
+                  <th className="text-left px-3 py-2">Delivery</th>
+                  <th className="text-left px-3 py-2">Health</th>
+                  <th className="text-left px-3 py-2">Renewal</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {districts.map((d) => {
+                  const meta = getDistrictMeta(d)
+                  return (
+                    <tr key={d.id} className="hover:bg-gray-50 cursor-pointer">
+                      <td className="px-5 py-3">
+                        <Link href={`/tdi-admin/intelligence/districts/${d.id}`} className="font-medium text-gray-900 hover:text-amber-600">
+                          {d.name}
+                        </Link>
+                        <span className="ml-2 text-xs text-gray-400">{d.state}</span>
+                      </td>
+                      <td className="px-3 py-3">
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                          d.status === 'active' ? 'bg-green-100 text-green-700' :
+                          d.status === 'pilot' ? 'bg-blue-100 text-blue-700' :
+                          'bg-gray-100 text-gray-600'
+                        }`}>
+                          {d.status.charAt(0).toUpperCase() + d.status.slice(1)}
+                        </span>
+                      </td>
+                      <td className="px-3 py-3">
+                        <div className="flex items-center gap-2">
+                          {riskBadge(meta.topRisk)}
+                          {meta.openInvoices > 0 && (
+                            <span className="text-xs text-gray-400">{meta.openInvoices} open</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-3 py-3">
+                        {meta.deliveryPct !== null ? (
+                          <div className="flex items-center gap-2">
+                            <div className="w-12 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full ${
+                                  meta.deliveryPct >= 100 ? 'bg-green-500' :
+                                  meta.deliveryPct >= 50 ? 'bg-amber-400' : 'bg-gray-300'
+                                }`}
+                                style={{ width: `${Math.min(100, meta.deliveryPct)}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-gray-500">{meta.deliveryPct}%</span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400">-</span>
+                        )}
+                      </td>
+                      <td className="px-3 py-3">
+                        {(() => {
+                          const badge = renewalHealthBadge(meta.health.tier)
+                          return (
+                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badge.bg} ${badge.text}`}>
+                              {badge.label} · {meta.health.score}
+                            </span>
+                          )
+                        })()}
+                      </td>
+                      <td className="px-3 py-3 text-xs text-gray-500">
+                        {meta.renewalDate
+                          ? new Date(meta.renewalDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })
+                          : '-'}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
+
+      {/* TAB: RENEWAL PIPELINE */}
+      {tab === 'renewals' && (
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100">
+            <h3 className="font-semibold text-gray-800">Renewal Pipeline</h3>
+            <p className="text-xs text-gray-400 mt-0.5">Sorted by deadline - closest first</p>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {renewalPipeline.length === 0 ? (
+              <p className="text-xs text-gray-400 p-5">No upcoming renewals.</p>
+            ) : (
+              renewalPipeline.map((school: any) => {
+                const isUrgent = school.daysUntilRenewal !== null && school.daysUntilRenewal <= 30
+                const isWarning = school.daysUntilRenewal !== null && school.daysUntilRenewal <= 60 && school.daysUntilRenewal > 30
+                const dayColor = isUrgent ? 'text-red-600' : isWarning ? 'text-amber-600' : 'text-gray-500'
+                const healthColor = school.healthScore >= 75 ? 'text-green-600' : school.healthScore >= 50 ? 'text-amber-600' : 'text-red-600'
+
+                return (
+                  <Link
+                    key={school.id}
+                    href={`/tdi-admin/intelligence/districts/${school.id}`}
+                    className="block px-5 py-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 truncate">{school.name}</p>
+                        {school.notes && (
+                          <p className="text-xs text-gray-400 truncate mt-0.5">{school.notes}</p>
+                        )}
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className={`text-xs font-bold ${dayColor}`}>
+                          {school.daysUntilRenewal !== null
+                            ? school.daysUntilRenewal <= 0
+                              ? 'Overdue'
+                              : `${school.daysUntilRenewal}d`
+                            : '-'}
+                        </p>
+                        {school.renewalDate && (
+                          <p className="text-xs text-gray-400">
+                            {new Date(school.renewalDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Health score */}
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-gray-500">Health</span>
+                      <span className={`text-xs font-bold ${healthColor}`}>
+                        {school.healthScore} - {school.healthLabel}
+                      </span>
+                    </div>
+
+                    {/* Delivery progress bar */}
+                    {school.deliveryPct !== null && (
+                      <div className="mb-2">
+                        <div className="flex items-center justify-between mb-0.5">
+                          <span className="text-xs text-gray-500">Delivery</span>
+                          <span className="text-xs font-medium text-gray-700">{school.deliveryPct}%</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${school.deliveryPct >= 100 ? 'bg-green-500' : school.deliveryPct >= 50 ? 'bg-amber-400' : 'bg-red-400'}`}
+                            style={{ width: `${Math.min(school.deliveryPct, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Last meeting */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-400">
+                        {school.lastMeeting
+                          ? `Last meeting: ${new Date(school.lastMeeting.meeting_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+                          : 'No meetings logged'}
+                      </span>
+                      {school.openTasks > 0 && (
+                        <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">
+                          {school.openTasks} task{school.openTasks !== 1 ? 's' : ''}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                )
+              })
             )}
           </div>
         </div>
-
-        {/* Renewals Pipeline - takes 1/3 */}
-        <div className="xl:col-span-1">
-          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden h-fit">
-            <div className="px-5 py-4 border-b border-gray-100">
-              <h2 className="text-base font-bold text-gray-900">Renewal Pipeline</h2>
-              <p className="text-xs text-gray-400 mt-0.5">Sorted by deadline - closest first</p>
-            </div>
-            <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
-              {renewalPipeline.length === 0 ? (
-                <p className="text-xs text-gray-400 p-5">No upcoming renewals.</p>
-              ) : (
-                renewalPipeline.map(school => {
-                  const isUrgent = school.daysUntilRenewal !== null && school.daysUntilRenewal <= 30
-                  const isWarning = school.daysUntilRenewal !== null && school.daysUntilRenewal <= 60 && school.daysUntilRenewal > 30
-                  const dayColor = isUrgent ? 'text-red-600' : isWarning ? 'text-amber-600' : 'text-gray-500'
-                  const healthColor = school.healthScore >= 75 ? 'text-green-600' : school.healthScore >= 50 ? 'text-amber-600' : 'text-red-600'
-
-                  return (
-                    <Link
-                      key={school.id}
-                      href={`/tdi-admin/intelligence/districts/${school.id}`}
-                      className="block px-5 py-4 hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-gray-900 truncate">{school.name}</p>
-                          {school.notes && (
-                            <p className="text-xs text-gray-400 truncate mt-0.5">{school.notes}</p>
-                          )}
-                        </div>
-                        <div className="text-right shrink-0">
-                          <p className={`text-xs font-bold ${dayColor}`}>
-                            {school.daysUntilRenewal !== null
-                              ? school.daysUntilRenewal <= 0
-                                ? 'Overdue'
-                                : `${school.daysUntilRenewal}d`
-                              : '-'}
-                          </p>
-                          {school.renewalDate && (
-                            <p className="text-xs text-gray-400">
-                              {new Date(school.renewalDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Health score */}
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs text-gray-500">Health</span>
-                        <span className={`text-xs font-bold ${healthColor}`}>
-                          {school.healthScore} - {school.healthLabel}
-                        </span>
-                      </div>
-
-                      {/* Delivery progress bar */}
-                      {school.deliveryPct !== null && (
-                        <div className="mb-2">
-                          <div className="flex items-center justify-between mb-0.5">
-                            <span className="text-xs text-gray-500">Delivery</span>
-                            <span className="text-xs font-medium text-gray-700">{school.deliveryPct}%</span>
-                          </div>
-                          <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${school.deliveryPct >= 100 ? 'bg-green-500' : school.deliveryPct >= 50 ? 'bg-amber-400' : 'bg-red-400'}`}
-                              style={{ width: `${Math.min(school.deliveryPct, 100)}%` }}
-                            />
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Last meeting */}
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-400">
-                          {school.lastMeeting
-                            ? `Last meeting: ${new Date(school.lastMeeting.meeting_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
-                            : 'No meetings logged'}
-                        </span>
-                        {school.openTasks > 0 && (
-                          <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">
-                            {school.openTasks} task{school.openTasks !== 1 ? 's' : ''}
-                          </span>
-                        )}
-                      </div>
-                    </Link>
-                  )
-                })
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
       )}
 
       {/* Tab: Invoices */}
