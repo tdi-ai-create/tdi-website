@@ -25,7 +25,7 @@ IGNITE - Phase 1 (Leadership + Pilot Group):
 - What's included: 2 on-campus observation days, 4 virtual strategy sessions, 2 executive impact sessions, Learning Hub access for pilot group, Leadership Dashboard
 - Typical timeline: One semester to one year
 - Outcomes: 95% of teachers report saving planning time. Schools build buy-in and see early wins.
-- Pricing: Starts at $6,600 depending on school size and scope. Most partner schools use Title II-A, ESSER, or state PD grant funding.
+- Pricing: Customized based on staff size and scope. Generally starts around $30,000 with a-la-carte options available. Most partner schools use Title II-A, ESSER, or state PD grant funding.
 
 ACCELERATE - Phase 2 (Full Staff):
 - Expands everything from IGNITE to full staff
@@ -88,9 +88,12 @@ FUNDING:
 - Full funding guide: teachersdeserveit.com/funding
 
 PRICING:
-- Partnerships start at $6,600 depending on school size and scope
-- IGNITE is the entry point - typically one semester to one year
-- Cost should never be the reason a school cannot support its teachers
+- Partnerships are fully customized based on staff size, goals, and scope
+- Packages start around $30,000 with options to build up or scale down
+- A-la-carte options are available for schools that want specific services
+- Desi should NEVER quote a specific final price - always direct toward a personalized conversation
+- When asked about cost say something like: "Partnerships are customized to your school - staff size, goals, and what you need. They generally start around $30,000 with a-la-carte and personalized options available. The best way to get real numbers is a quick conversation with our team - want me to connect you?"
+- 80% of partner schools fund TDI through grants - Title II-A, ESSER, state PD funds
 
 FOR INDIVIDUAL TEACHERS:
 - Free resources: blog at raehughart.substack.com and podcast "Sustainable Teaching with Rae Hughart" on Apple Podcasts
@@ -121,7 +124,7 @@ Q: What is TDI / What do you do?
 A: We are a professional development organization built by teachers who got tired of ineffective PD. We partner with schools across 21+ states to deliver action-focused support that actually changes what happens in classrooms - not just what gets checked off a form.
 
 Q: How much does it cost?
-A: School partnerships start at $6,600 depending on size and scope. The great news is 80% of our partner schools fund TDI through grants - Title II-A, ESSER, or state PD funds. We can help you find and apply for the right funding source. Want to explore what it might look like for your school?
+A: Partnerships are customized to your school - staff size, goals, and what you need. They generally start around $30,000 with a-la-carte and personalized options available. The great news is 80% of our partner schools fund TDI through grants - Title II-A, ESSER, or state PD funds. The best way to get real numbers is a quick conversation with our team - want me to connect you?
 
 Q: What is IGNITE?
 A: IGNITE is our starting phase - designed for leadership teams and a pilot group of 10 to 25 educators. It includes 2 on-campus observation days, virtual strategy sessions, executive impact sessions, Learning Hub access, and your Leadership Dashboard. Most schools run IGNITE for one semester to one year before expanding.

@@ -24,6 +24,7 @@ export default function Desi() {
   const [contactForm, setContactForm] = useState<ContactForm>({ name: '', email: '', message: '' })
   const [contactLoading, setContactLoading] = useState(false)
   const [contactSent, setContactSent] = useState(false)
+  const [showContactForm, setShowContactForm] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const greeting = "Hi! I'm Desi, your TDI guide. Whether you're a teacher looking for better PD or a school leader exploring partnerships - I'm here to help. What can I answer for you?"
@@ -148,6 +149,7 @@ ${transcript}
 
       if (res.ok) {
         setContactSent(true)
+        setShowContactForm(false)
         setMessages(prev => [
           ...prev,
           {
@@ -410,6 +412,104 @@ ${transcript}
                   ))}
                 </div>
               </div>
+            )}
+
+            {/* Standalone Contact Form (triggered by button) */}
+            {showContactForm && !contactSent && (
+              <div style={{
+                background: '#F0FDF4',
+                border: '1px solid #86EFAC',
+                borderRadius: '12px',
+                padding: '14px',
+                margin: '8px 0',
+              }}>
+                <p style={{ fontSize: '12px', fontWeight: 600, color: '#166534', marginBottom: '4px' }}>
+                  Send a message to our team
+                </p>
+                <p style={{ fontSize: '11px', color: '#4B7C59', marginBottom: '10px', lineHeight: 1.5 }}>
+                  Fill this out and we will send your question to our team. A real person will reply within 24 hours.
+                </p>
+                <input
+                  type="text"
+                  placeholder="Your name"
+                  value={contactForm.name}
+                  onChange={e => setContactForm(p => ({ ...p, name: e.target.value }))}
+                  style={{ width: '100%', fontSize: '12px', padding: '8px 10px', borderRadius: '8px', border: '1px solid #BBF7D0', marginBottom: '6px', boxSizing: 'border-box' }}
+                />
+                <input
+                  type="email"
+                  placeholder="Your email"
+                  value={contactForm.email}
+                  onChange={e => setContactForm(p => ({ ...p, email: e.target.value }))}
+                  style={{ width: '100%', fontSize: '12px', padding: '8px 10px', borderRadius: '8px', border: '1px solid #BBF7D0', marginBottom: '6px', boxSizing: 'border-box' }}
+                />
+                <textarea
+                  placeholder="Your question or message"
+                  value={contactForm.message}
+                  rows={2}
+                  onChange={e => setContactForm(p => ({ ...p, message: e.target.value }))}
+                  style={{ width: '100%', fontSize: '12px', padding: '8px 10px', borderRadius: '8px', border: '1px solid #BBF7D0', marginBottom: '8px', resize: 'none', boxSizing: 'border-box' }}
+                />
+                <button
+                  onClick={sendContactForm}
+                  disabled={contactLoading || !contactForm.name || !contactForm.email || !contactForm.message}
+                  style={{
+                    width: '100%',
+                    padding: '9px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    background: '#16A34A',
+                    color: 'white',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    opacity: contactLoading ? 0.6 : 1,
+                  }}
+                >
+                  {contactLoading ? 'Sending...' : 'Send Message'}
+                </button>
+              </div>
+            )}
+
+            {/* Talk to our team button - always visible unless form is open */}
+            {!showContactForm && !contactSent && !messages.some(m => m.showContactForm) && (
+              <button
+                onClick={() => {
+                  setShowContactForm(true)
+                  setContactForm(prev => ({ ...prev, message: '' }))
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  width: '100%',
+                  padding: '8px',
+                  margin: '8px 0 4px',
+                  background: 'transparent',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '10px',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  color: '#6B7280',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = '#80a4ed'
+                  e.currentTarget.style.color = '#1B2A4A'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = '#E5E7EB'
+                  e.currentTarget.style.color = '#6B7280'
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                Talk to our team
+              </button>
             )}
 
             <div ref={messagesEndRef} />
