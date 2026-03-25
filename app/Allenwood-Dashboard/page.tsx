@@ -316,7 +316,7 @@ export default function AllenwoodDashboard() {
     // ZONE 1 - Snapshot
     stats: {
       educatorsEnrolled: { value: 13, total: 13, label: 'Teachers Enrolled', sublabel: 'All seats filled' },
-      deliverables: { completed: 7, total: 11, label: 'Deliverables', sublabel: 'completed vs. contracted' },
+      deliverables: { completed: 8, total: 11, label: 'Deliverables', sublabel: 'completed vs. contracted' },
       hubEngagement: { percent: 100, raw: '13/13', label: 'Hub Engagement', sublabel: '100% logged in' },
       phase: { name: 'IGNITE', number: 1, total: 3, label: 'Current Phase', sublabel: 'Phase 1 of 3' },
     },
@@ -343,6 +343,7 @@ export default function AllenwoodDashboard() {
         { label: 'Virtual Session 2  - Hub update, tools discussion, data collection', date: 'Feb 25, 2026' },
         { label: 'Observation Day 2  - 10 classrooms, Love Notes delivered', date: 'Feb 18, 2026' },
         { label: 'Leadership Meeting  - mid-year wins, Year 2 expansion planning', date: 'Mar 2, 2026' },
+        { label: 'Virtual Session 4  - Survey debrief + autism and transitions session', date: 'Mar 25, 2026' },
       ],
       inProgress: [
         { label: 'Hub engagement  - 13/13 teachers active', detail: '14 courses being explored, up from 4 last month' },
@@ -353,7 +354,6 @@ export default function AllenwoodDashboard() {
       comingSoon: [
         { label: 'Funding Meeting with Dr. Porter', date: 'March 10, 2026  - 9AM ET (Tomorrow)' },
         { label: 'Virtual Session 3', date: 'March 11, 2026  - 7:30PM ET' },
-        { label: 'Virtual Session 4', date: 'March 25, 2026  - 7:30PM ET' },
         { label: 'Virtual Session 5', date: 'April 8, 2026  - 7:30PM ET' },
         { label: 'Virtual Session 6', date: 'April 15, 2026  - 7:30PM ET' },
         { label: 'Spring Leadership Celebration', date: 'Available through May 2026' },
@@ -409,7 +409,6 @@ export default function AllenwoodDashboard() {
       ],
       alreadyInMotion: [
         { label: 'Virtual Session 3', date: 'March 11, 2026  - 7:30PM ET', status: 'scheduled' },
-        { label: 'Virtual Session 4', date: 'March 25, 2026  - 7:30PM ET', status: 'scheduled' },
         { label: 'Virtual Session 5', date: 'April 8, 2026  - 7:30PM ET', status: 'scheduled' },
         { label: 'Virtual Session 6', date: 'April 15, 2026  - 7:30PM ET', status: 'scheduled' },
       ],
@@ -448,7 +447,7 @@ export default function AllenwoodDashboard() {
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">Allenwood Elementary School</h1>
             <p className="text-white/80 text-sm">Camp Springs, Maryland | Partner Dashboard</p>
-            <p className="text-xs text-gray-400 mt-1">Data updated March 2, 2026</p>
+            <p className="text-xs text-gray-400 mt-1">Data updated March 25, 2026</p>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <div className="bg-white/10 px-3 py-2 rounded-lg text-center">
