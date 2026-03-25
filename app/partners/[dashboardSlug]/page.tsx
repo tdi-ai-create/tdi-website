@@ -64,6 +64,8 @@ import PilotNextYearTab from '@/components/dashboard/pilot/PilotNextYearTab';
 // BillingTab moved inline per CCP spec
 import { TeacherQuotes } from '@/components/dashboard/shared/TeacherQuotes';
 import { TDISuggestions } from '@/components/dashboard/shared/TDISuggestions';
+import { DashboardHeader } from '@/components/dashboard/shared/DashboardHeader';
+import { StatCards } from '@/components/dashboard/shared/StatCards';
 import { generateSuggestions, type TDISuggestion } from '@/lib/dashboard/generateSuggestions';
 
 // Types
@@ -1158,116 +1160,20 @@ export default function PartnerDashboard() {
         </div>
       </nav>
 
-      {/* Hero - Full-width dark navy gradient (legacy design) */}
-      <section className="relative text-white overflow-hidden">
-        {/* Full-width gradient background */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 50%, #38618C 100%)',
-          }}
-        />
-        {/* Subtle pattern overlay */}
-        <div
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: 'radial-gradient(circle at 25% 25%, white 1px, transparent 1px)',
-            backgroundSize: '40px 40px',
-          }}
-        />
-
-        <div className="relative max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-12">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-                  {partnership?.org_name || organization?.name || 'Your School'}
-                </h1>
-                {/* Partnership year badge */}
-                {partnership?.contract_start && (
-                  <span
-                    className="hidden md:inline-flex px-3 py-1 rounded-full text-xs font-semibold"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(255,186,6,0.2), rgba(255,186,6,0.1))',
-                      border: '1px solid rgba(255,186,6,0.4)',
-                      color: '#FFBA06',
-                    }}
-                  >
-                    {new Date(partnership.contract_start).getFullYear()}-{partnership.contract_end ? new Date(partnership.contract_end).getFullYear() : 'Present'}
-                  </span>
-                )}
-              </div>
-              <p className="text-white/60 text-sm md:text-base">
-                {organization?.address_city || organization?.address_state
-                  ? [organization?.address_city, organization?.address_state].filter(Boolean).join(', ')
-                  : `${partnership.partnership_type === 'district' ? 'District' : 'School'} Partnership`}
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              {/* Phase badge with glow */}
-              <div
-                className="px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2"
-                style={{
-                  background: partnership.contract_phase === 'IGNITE'
-                    ? 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(251,191,36,0.1))'
-                    : partnership.contract_phase === 'ACCELERATE'
-                    ? 'linear-gradient(135deg, rgba(78,205,196,0.2), rgba(78,205,196,0.1))'
-                    : 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(139,92,246,0.1))',
-                  border: partnership.contract_phase === 'IGNITE'
-                    ? '1px solid rgba(251,191,36,0.4)'
-                    : partnership.contract_phase === 'ACCELERATE'
-                    ? '1px solid rgba(78,205,196,0.4)'
-                    : '1px solid rgba(139,92,246,0.4)',
-                  boxShadow: partnership.contract_phase === 'IGNITE'
-                    ? '0 0 20px rgba(251,191,36,0.2)'
-                    : partnership.contract_phase === 'ACCELERATE'
-                    ? '0 0 20px rgba(78,205,196,0.2)'
-                    : '0 0 20px rgba(139,92,246,0.2)',
-                }}
-              >
-                <span
-                  className="w-2 h-2 rounded-full"
-                  style={{
-                    background: partnership.contract_phase === 'IGNITE'
-                      ? '#FBBF24'
-                      : partnership.contract_phase === 'ACCELERATE'
-                      ? '#4ecdc4'
-                      : '#8B5CF6',
-                    boxShadow: partnership.contract_phase === 'IGNITE'
-                      ? '0 0 8px rgba(251,191,36,0.6)'
-                      : partnership.contract_phase === 'ACCELERATE'
-                      ? '0 0 8px rgba(78,205,196,0.6)'
-                      : '0 0 8px rgba(139,92,246,0.6)',
-                  }}
-                />
-                <span style={{
-                  color: partnership.contract_phase === 'IGNITE'
-                    ? '#FBBF24'
-                    : partnership.contract_phase === 'ACCELERATE'
-                    ? '#4ecdc4'
-                    : '#A78BFA',
-                }}>
-                  Phase {partnership.contract_phase === 'IGNITE' ? '1' : partnership.contract_phase === 'ACCELERATE' ? '2' : '3'} · {partnership.contract_phase}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Partnership goal - if available */}
-          {partnership?.partnership_goal && (
-            <div
-              className="mt-6 p-4 rounded-xl"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-              }}
-            >
-              <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Partnership Goal</p>
-              <p className="text-white/90 text-sm md:text-base leading-relaxed">{partnership.partnership_goal}</p>
-            </div>
-          )}
-        </div>
-      </section>
+      {/* Hero - Elevated DashboardHeader component */}
+      <DashboardHeader
+        schoolName={partnership?.org_name || organization?.name || 'Your School'}
+        location={
+          organization?.address_city || organization?.address_state
+            ? [organization?.address_city, organization?.address_state].filter(Boolean).join(', ')
+            : undefined
+        }
+        phase={partnership.contract_phase}
+        contractStart={partnership.contract_start}
+        contractEnd={partnership.contract_end}
+        partnershipGoal={partnership.partnership_goal}
+        partnershipType={partnership.partnership_type}
+      />
 
       {/* Tab Navigation - CCP approved sticky tab bar */}
       <div
@@ -1317,249 +1223,22 @@ export default function PartnerDashboard() {
             className="space-y-6"
           >
             {/* Rich Stat Cards - Elevated Design */}
-            <div id="stat-cards" className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Staff Enrolled Card */}
-              <div
-                onClick={() => partnership.partnership_type === 'district' ? navigateToTab('schools', 'buildings-list') : undefined}
-                className={`bg-white rounded-2xl overflow-hidden group relative ${partnership.partnership_type === 'district' ? 'cursor-pointer' : ''}`}
-                style={{
-                  boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
-                  border: '1px solid rgba(0,0,0,0.04)',
-                }}
-              >
-                {/* Top accent bar */}
-                <div className="h-1" style={{ background: 'linear-gradient(90deg, #4ecdc4, #38618C)' }} />
-                <div className="p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center"
-                      style={{ background: 'linear-gradient(135deg, rgba(78,205,196,0.15), rgba(56,97,140,0.1))' }}
-                    >
-                      <Users className="w-5 h-5" style={{ color: '#4ecdc4' }} />
-                    </div>
-                    {partnership.partnership_type === 'district' && (
-                      <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#4ecdc4] transition-colors" />
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Staff Enrolled</p>
-                  <p className="text-3xl font-bold" style={{ color: '#1B2A4A' }}>{staffStats.total}</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {partnership.partnership_type === 'district' && apiBuildings.length > 0
-                      ? `across ${apiBuildings.length} school${apiBuildings.length > 1 ? 's' : ''}`
-                      : 'staff members'}
-                  </p>
-                  {/* Hub login progress */}
-                  {staffStats.total > 0 && (
-                    <div className="mt-3 pt-3 border-t border-gray-100">
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-400">Hub Access</span>
-                        <span className="font-medium" style={{ color: '#4ecdc4' }}>
-                          {staffStats.hubLoggedIn}/{staffStats.total}
-                        </span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-500"
-                          style={{
-                            width: `${(staffStats.hubLoggedIn / staffStats.total) * 100}%`,
-                            background: 'linear-gradient(90deg, #4ecdc4, #38618C)',
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Observations Card - only show if partnership has observation days */}
-              {(partnership.observation_days_total ?? 0) > 0 && (
-                <div
-                  onClick={() => navigateToTab('blueprint', 'contract-deliverables')}
-                  className="bg-white rounded-2xl overflow-hidden cursor-pointer group relative"
-                  style={{
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
-                    border: '1px solid rgba(0,0,0,0.04)',
-                  }}
-                >
-                  {/* Top accent bar */}
-                  <div className="h-1" style={{ background: 'linear-gradient(90deg, #FBBF24, #F59E0B)' }} />
-                  <div className="p-5">
-                    <div className="flex items-center justify-between mb-3">
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center"
-                        style={{ background: 'linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.1))' }}
-                      >
-                        <Eye className="w-5 h-5" style={{ color: '#F59E0B' }} />
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#F59E0B] transition-colors" />
-                    </div>
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Observations</p>
-                    <div className="flex items-baseline gap-1">
-                      <p className="text-3xl font-bold" style={{ color: '#1B2A4A' }}>
-                        {partnership.observation_days_completed ?? 0}
-                      </p>
-                      <span className="text-lg text-gray-400">/{partnership.observation_days_total ?? 0}</span>
-                    </div>
-                    <p className="text-xs mt-1 font-medium" style={{ color: getObservationColor() }}>
-                      {getObservationText()}
-                    </p>
-                    {/* Progress bar */}
-                    <div className="mt-3 pt-3 border-t border-gray-100">
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-400">Progress</span>
-                        <span className="font-medium" style={{ color: '#F59E0B' }}>
-                          {Math.round(((partnership.observation_days_completed ?? 0) / (partnership.observation_days_total || 1)) * 100)}%
-                        </span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-500"
-                          style={{
-                            width: `${((partnership.observation_days_completed ?? 0) / (partnership.observation_days_total || 1)) * 100}%`,
-                            background: 'linear-gradient(90deg, #FBBF24, #F59E0B)',
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Needs Attention Card */}
-              <div
-                onClick={() => scrollToSection('action-items')}
-                className="bg-white rounded-2xl overflow-hidden cursor-pointer group relative"
-                style={{
-                  boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
-                  border: '1px solid rgba(0,0,0,0.04)',
-                }}
-              >
-                {/* Top accent bar */}
-                <div
-                  className="h-1"
-                  style={{
-                    background: pendingItems.length === 0
-                      ? 'linear-gradient(90deg, #10B981, #059669)'
-                      : 'linear-gradient(90deg, #F59E0B, #D97706)',
-                  }}
-                />
-                <div className="p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center"
-                      style={{
-                        background: pendingItems.length === 0
-                          ? 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(5,150,105,0.1))'
-                          : 'linear-gradient(135deg, rgba(245,158,11,0.15), rgba(217,119,6,0.1))',
-                      }}
-                    >
-                      {pendingItems.length === 0 ? (
-                        <CheckCircle className="w-5 h-5" style={{ color: '#10B981' }} />
-                      ) : (
-                        <AlertCircle className="w-5 h-5" style={{ color: '#F59E0B' }} />
-                      )}
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#F59E0B] transition-colors" />
-                  </div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">
-                    {pendingItems.length === 0 ? 'Status' : 'Needs Attention'}
-                  </p>
-                  <p
-                    className="text-3xl font-bold"
-                    style={{ color: pendingItems.length === 0 ? '#10B981' : '#F59E0B' }}
-                  >
-                    {pendingItems.length === 0 ? '✓' : pendingItems.length}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {pendingItems.length === 0 ? 'All caught up!' : `${pendingItems.length} item${pendingItems.length !== 1 ? 's' : ''} pending`}
-                  </p>
-                </div>
-              </div>
-
-              {/* Current Phase Card */}
-              <div
-                onClick={() => navigateToTab('our-partnership', 'phase-timeline')}
-                className="bg-white rounded-2xl overflow-hidden cursor-pointer group relative"
-                style={{
-                  boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
-                  border: '1px solid rgba(0,0,0,0.04)',
-                }}
-              >
-                {/* Top accent bar */}
-                <div
-                  className="h-1"
-                  style={{
-                    background: partnership.contract_phase === 'IGNITE'
-                      ? 'linear-gradient(90deg, #FBBF24, #F59E0B)'
-                      : partnership.contract_phase === 'ACCELERATE'
-                      ? 'linear-gradient(90deg, #4ecdc4, #38618C)'
-                      : 'linear-gradient(90deg, #8B5CF6, #7C3AED)',
-                  }}
-                />
-                <div className="p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center"
-                      style={{
-                        background: partnership.contract_phase === 'IGNITE'
-                          ? 'linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.1))'
-                          : partnership.contract_phase === 'ACCELERATE'
-                          ? 'linear-gradient(135deg, rgba(78,205,196,0.15), rgba(56,97,140,0.1))'
-                          : 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(124,58,237,0.1))',
-                      }}
-                    >
-                      {partnership.contract_phase === 'IGNITE' ? (
-                        <Zap className="w-5 h-5" style={{ color: '#FBBF24' }} />
-                      ) : partnership.contract_phase === 'ACCELERATE' ? (
-                        <Rocket className="w-5 h-5" style={{ color: '#4ecdc4' }} />
-                      ) : (
-                        <Target className="w-5 h-5" style={{ color: '#8B5CF6' }} />
-                      )}
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#38618C] transition-colors" />
-                  </div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Current Phase</p>
-                  <p className="text-3xl font-bold" style={{ color: '#1B2A4A' }}>
-                    Phase {partnership.contract_phase === 'IGNITE' ? '1' : partnership.contract_phase === 'ACCELERATE' ? '2' : '3'}
-                  </p>
-                  <p
-                    className="text-xs mt-1 font-semibold"
-                    style={{
-                      color: partnership.contract_phase === 'IGNITE'
-                        ? '#FBBF24'
-                        : partnership.contract_phase === 'ACCELERATE'
-                        ? '#4ecdc4'
-                        : '#8B5CF6',
-                    }}
-                  >
-                    {partnership.contract_phase}
-                  </p>
-                  {/* Phase progress */}
-                  <div className="mt-3 pt-3 border-t border-gray-100">
-                    <div className="flex gap-2">
-                      {['IGNITE', 'ACCELERATE', 'SUSTAIN'].map((phase, idx) => (
-                        <div
-                          key={phase}
-                          className="flex-1 h-1.5 rounded-full transition-all duration-300"
-                          style={{
-                            background: idx <= ['IGNITE', 'ACCELERATE', 'SUSTAIN'].indexOf(partnership.contract_phase)
-                              ? partnership.contract_phase === 'IGNITE'
-                                ? '#FBBF24'
-                                : partnership.contract_phase === 'ACCELERATE'
-                                ? '#4ecdc4'
-                                : '#8B5CF6'
-                              : '#E5E7EB',
-                          }}
-                        />
-                      ))}
-                    </div>
-                    <p className="text-xs text-gray-400 mt-1 text-center">
-                      Phase {partnership.contract_phase === 'IGNITE' ? '1' : partnership.contract_phase === 'ACCELERATE' ? '2' : '3'} of 3
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <StatCards
+              staffTotal={staffStats.total}
+              staffHubLoggedIn={staffStats.hubLoggedIn}
+              partnershipType={partnership.partnership_type}
+              buildingCount={apiBuildings.length}
+              observationsUsed={partnership.observation_days_completed ?? 0}
+              observationsTotal={partnership.observation_days_total ?? 0}
+              phase={partnership.contract_phase}
+              pendingItemsCount={pendingItems.length}
+              onStaffClick={partnership.partnership_type === 'district' ? () => navigateToTab('schools', 'buildings-list') : undefined}
+              onObservationClick={() => navigateToTab('blueprint', 'contract-deliverables')}
+              onAttentionClick={() => scrollToSection('action-items')}
+              onPhaseClick={() => navigateToTab('our-partnership', 'phase-timeline')}
+              observationStatusText={getObservationText()}
+              observationStatusColor={getObservationColor()}
+            />
 
             {/* Partnership Momentum Bar */}
             <div
