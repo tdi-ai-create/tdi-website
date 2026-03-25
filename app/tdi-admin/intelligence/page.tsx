@@ -496,6 +496,30 @@ export default function IntelligenceHubPage() {
 
   return (
     <div className="min-h-screen bg-[#FAFBFC]">
+      {/* Sticky Tab Bar at top */}
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-200" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        <div className="flex gap-0 px-6">
+          {[
+            { key: 'analytics', label: 'Analytics' },
+            { key: 'districts', label: `Districts (${districts.length})` },
+            { key: 'renewals', label: `Renewal Pipeline (${renewalPipeline.length})` },
+            { key: 'invoices', label: `Invoices (${invoices.length})` },
+          ].map(t => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key as Tab)}
+              className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
+                tab === t.key
+                  ? 'border-amber-500 text-amber-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Page Content */}
       <div className="px-6 py-6 max-w-7xl mx-auto space-y-5">
 
@@ -535,30 +559,6 @@ export default function IntelligenceHubPage() {
           >
             + Add District
           </Link>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="border-b border-gray-200">
-        <div className="flex gap-0">
-          {[
-            { key: 'analytics', label: 'Analytics' },
-            { key: 'districts', label: `Districts (${districts.length})` },
-            { key: 'renewals', label: `Renewal Pipeline (${renewalPipeline.length})` },
-            { key: 'invoices', label: `Invoices (${invoices.length})` },
-          ].map(t => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key as Tab)}
-              className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
-                tab === t.key
-                  ? 'border-amber-500 text-amber-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
         </div>
       </div>
 
