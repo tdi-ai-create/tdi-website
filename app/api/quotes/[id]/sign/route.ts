@@ -40,5 +40,10 @@ export async function POST(
 
   if (error) return NextResponse.json({ error: 'Failed to save signature' }, { status: 500 })
 
+  // Trigger receipt email + PDF in background
+  fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.teachersdeserveit.com'}/api/quotes/${id}/send-receipt`, {
+    method: 'POST',
+  }).catch(err => console.error('Receipt send failed:', err))
+
   return NextResponse.json({ success: true })
 }

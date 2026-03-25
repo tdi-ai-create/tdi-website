@@ -29,7 +29,7 @@ export default function Desi() {
 
   const greeting = "Hi! I'm Desi, your TDI guide. Whether you're a teacher looking for better PD or a school leader exploring partnerships - I'm here to help. What can I answer for you?"
 
-  // Auto-open behavior
+  // Pulse behavior (no auto-open)
   useEffect(() => {
     if (hasInteracted) return
 
@@ -37,16 +37,8 @@ export default function Desi() {
       setIsPulsing(true)
     }, 8000)
 
-    const openTimer = setTimeout(() => {
-      setIsPulsing(false)
-      setIsOpen(true)
-      setMessages([{ role: 'assistant', content: greeting }])
-      setHasInteracted(true)
-    }, 10000)
-
     return () => {
       clearTimeout(pulseTimer)
-      clearTimeout(openTimer)
     }
   }, [hasInteracted])
 
@@ -183,7 +175,31 @@ ${transcript}
           0%, 60%, 100% { transform: translateY(0); }
           30% { transform: translateY(-6px); }
         }
+        @keyframes desi-bubble-in {
+          0% { opacity: 0; transform: translateY(8px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
       `}</style>
+
+      {/* Need anything? bubble */}
+      {isPulsing && !isOpen && (
+        <div style={{
+          position: 'fixed',
+          bottom: '88px',
+          right: '24px',
+          background: 'white',
+          borderRadius: '12px',
+          padding: '8px 14px',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+          fontSize: '13px',
+          fontWeight: 500,
+          color: '#1B2A4A',
+          zIndex: 9999,
+          animation: 'desi-bubble-in 0.3s ease-out',
+        }}>
+          Need anything?
+        </div>
+      )}
 
       {/* Chat Button */}
       <button
