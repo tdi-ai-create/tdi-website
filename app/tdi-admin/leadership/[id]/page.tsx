@@ -414,6 +414,16 @@ export default function AdminPartnershipDetailPage() {
 
   return (
     <div className="min-h-screen" style={{ background: '#F4F4F2' }}>
+      {/* Toast notifications */}
+      {(submitSuccess || submitError) && (
+        <div
+          className="fixed bottom-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold text-white shadow-lg transition-all"
+          style={{ background: submitSuccess ? '#16A34A' : '#DC2626' }}
+        >
+          {submitSuccess || submitError}
+        </div>
+      )}
+
       <div className="max-w-5xl mx-auto px-6 py-8">
         {/* Back link */}
         <Link
@@ -1307,7 +1317,7 @@ export default function AdminPartnershipDetailPage() {
                 <button
                   onClick={handleAddEvent}
                   disabled={!newEvent.event_title}
-                  className="flex-1 py-2 rounded-lg text-sm font-semibold text-white transition-all disabled:opacity-50"
+                  className="flex-1 py-2 rounded-lg text-sm font-semibold text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
                   style={{ background: '#8B5CF6' }}
                 >
                   Add Event
