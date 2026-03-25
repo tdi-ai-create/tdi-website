@@ -88,8 +88,8 @@ export function TDISuggestions({ suggestions, isAdminView = false }: TDISuggesti
                       href={suggestion.ctaUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 mt-2 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-90 text-white"
-                      style={{ background: '#1B2A4A' }}
+                      className="inline-flex items-center gap-1 mt-2 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-90"
+                      style={{ background: '#1B2A4A', color: '#FFFFFF' }}
                     >
                       {suggestion.cta} →
                     </a>

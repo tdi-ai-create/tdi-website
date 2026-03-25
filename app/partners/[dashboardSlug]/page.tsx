@@ -2366,8 +2366,8 @@ export default function PartnerDashboard() {
                   <p className="text-sm text-gray-500 mb-3">Co-Founder, Teachers Deserve It</p>
                   <div className="flex items-center gap-2 flex-wrap">
                     <a href="mailto:rae@teachersdeserveit.com"
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-white"
-                      style={{ background: '#1B2A4A' }}>
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold"
+                      style={{ background: '#1B2A4A', color: '#FFFFFF' }}>
                       Email Rae
                     </a>
                     <a href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
@@ -2486,8 +2486,8 @@ export default function PartnerDashboard() {
               </p>
               <a
                 href="mailto:Billing@Teachersdeserveit.com"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
-                style={{ background: '#1B2A4A' }}>
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all hover:opacity-90"
+                style={{ background: '#1B2A4A', color: '#FFFFFF' }}>
                 Contact Billing Team
               </a>
               <p className="text-xs text-gray-400 mt-3">Billing@Teachersdeserveit.com</p>
@@ -4044,8 +4044,8 @@ export default function PartnerDashboard() {
           href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 mt-3 px-5 py-2 rounded-lg text-sm font-semibold text-white transition-all hover:opacity-90"
-          style={{ background: '#1B2A4A' }}
+          className="inline-flex items-center gap-2 mt-3 px-5 py-2 rounded-lg text-sm font-semibold transition-all hover:opacity-90"
+          style={{ background: '#1B2A4A', color: '#FFFFFF' }}
         >
           <Phone className="w-4 h-4" />
           Schedule a Call
