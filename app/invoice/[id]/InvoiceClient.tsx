@@ -224,7 +224,7 @@ export default function InvoiceClient({ quote: initialQuote }: { quote: Quote })
               <p className="text-lg font-bold text-amber-600 mt-1">${Number(pkg.total_amount).toLocaleString()}</p>
             </div>
           )}
-          <p className="text-sm text-gray-500">A copy of this agreement has been recorded. Our team will be in touch shortly to coordinate next steps.</p>
+          <p className="text-sm text-gray-500">A signed copy has been sent to your email. Our team will be in touch shortly to coordinate next steps.</p>
           <p className="text-xs text-gray-400 mt-4">Questions? <a href="mailto:Billing@Teachersdeserveit.com" className="text-amber-600 hover:underline">Billing@Teachersdeserveit.com</a></p>
         </div>
       </div>
@@ -295,15 +295,7 @@ export default function InvoiceClient({ quote: initialQuote }: { quote: Quote })
         {/* STEP 1: INTRODUCTION */}
         {currentStepKey === 'intro' && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold text-gray-900">Introduction</h1>
-              <button className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1.5 border border-gray-300 px-3 py-1.5 rounded-lg">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Download as PDF
-              </button>
-            </div>
+            <h1 className="text-3xl font-bold text-gray-900">Introduction</h1>
 
             <div className="border-b border-gray-200 pb-6">
               <p className="text-sm text-gray-500 mb-4">Agreement between</p>
