@@ -693,7 +693,7 @@ export default function PartnerDashboard() {
     const formattedEvents = timelineEvents.map(e => ({
       status: e.status || 'upcoming',
       event_type: e.event_type || 'event',
-      event_date: e.event_date || null,
+      event_date: e.date || null,
     }));
 
     const generated = generateSuggestions(partnershipData, formattedEvents, actionItems);
@@ -3903,10 +3903,10 @@ export default function PartnerDashboard() {
                               <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5"
                                 style={{ background: config.color }} />
                               <div>
-                                <p className="text-sm text-gray-700 leading-snug">{event.event_title}</p>
-                                {event.event_date && (
+                                <p className="text-sm text-gray-700 leading-snug">{event.title}</p>
+                                {event.date && (
                                   <p className="text-xs text-gray-400 mt-0.5">
-                                    {new Date(event.event_date).toLocaleDateString('en-US', {
+                                    {new Date(event.date).toLocaleDateString('en-US', {
                                       month: 'short', day: 'numeric', year: 'numeric'
                                     })}
                                   </p>
