@@ -136,6 +136,16 @@ export default function IntelligenceHubPage() {
   const [showMarkPaidModal, setShowMarkPaidModal] = useState(false)
   const [showEmailModal, setShowEmailModal] = useState(false)
   const [totalAlertCount, setTotalAlertCount] = useState(0)
+  const [renewalPipeline, setRenewalPipeline] = useState<any[]>([])
+  const [totalOpenTasks, setTotalOpenTasks] = useState(0)
+  const [showAddDistrict, setShowAddDistrict] = useState(false)
+
+  // Alert card counts
+  const [criticalCollections, setCriticalCollections] = useState(0)
+  const [atRiskInvoices, setAtRiskInvoices] = useState(0)
+  const [boardApprovals, setBoardApprovals] = useState(0)
+  const [renewalsSoon, setRenewalsSoon] = useState(0)
+  const [deliveryAtRisk, setDeliveryAtRisk] = useState(0)
 
   useEffect(() => {
     loadData()
@@ -213,7 +223,7 @@ export default function IntelligenceHubPage() {
     const today = new Date()
     const in90 = new Date(today)
     in90.setDate(today.getDate() + 90)
-    const renewalsSoon = districtData?.flatMap(d => d.intelligence_contracts ?? [])
+    const renewalsSoonCount = districtData?.flatMap(d => d.intelligence_contracts ?? [])
       .filter(c => c.renewal_deadline_date && new Date(c.renewal_deadline_date) <= in90 && c.status === 'active')
       .length ?? 0
 
@@ -250,6 +260,13 @@ export default function IntelligenceHubPage() {
       return (totalDelivered / totalContracted) < 0.5
     }).length
 
+    // Set alert card counts
+    setCriticalCollections(criticalCount)
+    setAtRiskInvoices(atRiskCount)
+    setBoardApprovals(boardPending)
+    setRenewalsSoon(renewalsSoonCount)
+    setDeliveryAtRisk(deliveryAtRiskCount)
+
     setAlerts([
       {
         label: 'Critical Collections',
@@ -277,7 +294,7 @@ export default function IntelligenceHubPage() {
       },
       {
         label: 'Renewals Soon',
-        value: renewalsSoon,
+        value: renewalsSoonCount,
         sub: 'contracts renewing within 90 days',
         color: 'bg-white border-gray-100 border-l-[3px] border-l-amber-500',
         href: '/tdi-admin/intelligence/districts?filter=renewals',
@@ -292,6 +309,77 @@ export default function IntelligenceHubPage() {
         icon: <TrendingDown className="w-5 h-5 text-amber-500" />,
       },
     ])
+
+    // Compute total open tasks across all districts
+    const totalTaskCount = (districtData ?? []).reduce((sum: number, d: any) => {
+      return sum + (d.intelligence_tasks ?? []).filter((t: any) => t.status !== 'done').length
+    }, 0)
+    setTotalOpenTasks(totalTaskCount)
+
+    // Compute renewal pipeline data
+    const pipeline = (districtData ?? [])
+      .filter((d: any) => {
+        const activeContract = (d.intelligence_contracts ?? []).find(
+          (c: any) => c.status === 'active' && c.renewal_deadline_date
+        )
+        return !!activeContract
+      })
+      .map((d: any) => {
+        const activeContract = (d.intelligence_contracts ?? []).find(
+          (c: any) => c.status === 'active' && c.renewal_deadline_date
+        )
+        const scope = activeContract?.scope_json ?? {}
+        const totalContracted =
+          (parseInt(String(scope.observation_days ?? 0))) +
+          (parseInt(String(scope.virtual_sessions ?? 0))) +
+          (parseInt(String(scope.executive_sessions ?? 0)))
+
+        const sessions = deliveryMap[d.id] ?? []
+        const deliveryPct = totalContracted > 0
+          ? Math.round((sessions.length / totalContracted) * 100)
+          : null
+
+        const daysUntilRenewal = activeContract?.renewal_deadline_date
+          ? Math.ceil((new Date(activeContract.renewal_deadline_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+          : null
+
+        const meetings = (d.district_meetings ?? []).sort((a: any, b: any) =>
+          new Date(b.meeting_date).getTime() - new Date(a.meeting_date).getTime()
+        )
+        const lastMeeting = meetings[0] ?? null
+
+        const openTaskCount = (d.intelligence_tasks ?? []).filter(
+          (t: any) => t.status !== 'done'
+        ).length
+
+        // Calculate health score
+        const health = calculateRenewalHealth({
+          contracts: d.intelligence_contracts ?? [],
+          sessions,
+          invoices: d.intelligence_invoices ?? [],
+          tasks: d.intelligence_tasks ?? [],
+        })
+
+        return {
+          id: d.id,
+          name: d.name,
+          state: d.state,
+          status: d.status,
+          notes: d.notes,
+          healthScore: health.score,
+          healthLabel: health.label,
+          healthColor: health.color,
+          deliveryPct,
+          daysUntilRenewal,
+          renewalDate: activeContract?.renewal_deadline_date,
+          lastMeeting,
+          openTasks: openTaskCount,
+          contractName: activeContract?.contract_name,
+        }
+      })
+      .sort((a: any, b: any) => (a.daysUntilRenewal ?? 999) - (b.daysUntilRenewal ?? 999))
+
+    setRenewalPipeline(pipeline)
 
     setDistricts((districtData as unknown as District[]) ?? [])
     setOpenTasks((taskData as unknown as Task[]) ?? [])
@@ -436,191 +524,282 @@ export default function IntelligenceHubPage() {
       <div className="px-6 py-6 max-w-7xl mx-auto space-y-8">
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Operations</h1>
-          <p className="text-sm text-gray-500 mt-1">District Command Center - Collections, Contracts, Pipeline</p>
+          <p className="text-sm text-gray-500 mt-0.5">District Command Center - Collections, Contracts, Pipeline</p>
         </div>
         <div className="flex items-center gap-3">
+          {/* Tasks badge */}
+          <Link
+            href="/tdi-admin/intelligence/districts"
+            className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors ${
+              totalOpenTasks > 0
+                ? 'bg-amber-50 border-amber-300 text-amber-700 hover:bg-amber-100'
+                : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'
+            }`}
+            title="Open tasks across all districts"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+            {totalOpenTasks > 0 ? `${totalOpenTasks} open task${totalOpenTasks !== 1 ? 's' : ''}` : 'No open tasks'}
+          </Link>
+
           <Link
             href="/tdi-admin/intelligence/alerts"
-            className="text-sm font-medium border border-amber-300 text-amber-600 hover:bg-amber-50 px-4 py-2 rounded-lg transition-colors"
+            className="text-xs font-medium border border-amber-300 text-amber-600 hover:bg-amber-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
           >
-            Alert Center {totalAlertCount > 0 && <span className="ml-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">{totalAlertCount}</span>}
+            Alert Center
+            {totalAlertCount > 0 && (
+              <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full leading-none">
+                {totalAlertCount}
+              </span>
+            )}
           </Link>
+
           <Link
             href="/tdi-admin/intelligence/districts/new"
-            className="inline-flex items-center gap-2 text-sm font-medium bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg transition-colors"
+            className="text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg"
           >
-            <Plus className="w-4 h-4" />
-            Add District
+            + Add District
           </Link>
         </div>
       </div>
 
-      {/* Alert Cards */}
-      {loading ? (
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-28 bg-gray-100 rounded-xl animate-pulse" />
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-          {alerts.map((card) => (
-            <Link
-              key={card.label}
-              href={card.href}
-              className={`rounded-xl p-4 transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] ${card.color}`}
-              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
-            >
-              <div className="flex items-start justify-between">
-                <p className="text-3xl font-bold text-gray-900">{card.value}</p>
-                {card.icon}
-              </div>
-              <p className="text-sm font-semibold text-gray-700 mt-1">{card.label}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{card.sub}</p>
-            </Link>
-          ))}
+      {/* Renewal Season banner - shows when any renewal within 60 days */}
+      {renewalPipeline.some(r => r.daysUntilRenewal !== null && r.daysUntilRenewal <= 60) && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-amber-500 text-lg">📋</span>
+            <div>
+              <p className="text-sm font-semibold text-amber-800">Renewal Season Active</p>
+              <p className="text-xs text-amber-600">
+                {renewalPipeline.filter(r => r.daysUntilRenewal !== null && r.daysUntilRenewal <= 60).length} schools renewing within 60 days - April/May window
+              </p>
+            </div>
+          </div>
+          <Link href="/tdi-admin/intelligence/alerts" className="text-xs text-amber-700 hover:underline font-medium">
+            View alerts →
+          </Link>
         </div>
       )}
 
-      {/* Tab: Districts */}
-      {tab === 'districts' && (
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-
-        {/* District Table - 3/5 */}
-        <div className="lg:col-span-3 bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-            <h2 className="font-semibold text-gray-800">Active Districts</h2>
-            <div className="flex items-center gap-4">
-              <Link href="/tdi-admin/intelligence/renewals" className="text-xs text-amber-600 hover:underline">
-                Renewals
-              </Link>
-              <Link href="/tdi-admin/intelligence/districts" className="text-xs text-amber-600 hover:underline">
-                View all
-              </Link>
+      {/* Alert cards - compact single row */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        {[
+          { label: 'Critical Collections', value: criticalCollections, icon: '⚠️', color: 'border-red-200 bg-red-50', text: 'text-red-600', sub: 'invoices flagged critical risk' },
+          { label: 'At-Risk Invoices', value: atRiskInvoices, icon: '🕐', color: 'border-amber-200 bg-amber-50', text: 'text-amber-600', sub: 'need follow-up soon' },
+          { label: 'Board Approvals', value: boardApprovals, icon: '📄', color: 'border-blue-200 bg-blue-50', text: 'text-blue-600', sub: 'pending in next 30 days' },
+          { label: 'Renewals Soon', value: renewalsSoon, icon: '📅', color: 'border-purple-200 bg-purple-50', text: 'text-purple-600', sub: 'within 90 days' },
+          { label: 'Delivery at Risk', value: deliveryAtRisk, icon: '📉', color: 'border-orange-200 bg-orange-50', text: 'text-orange-600', sub: 'ending soon, <50% done' },
+        ].map(card => (
+          <div key={card.label} className={`border rounded-xl p-3 ${card.color}`}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-base">{card.icon}</span>
+              <span className={`text-xl font-bold ${card.text}`}>{card.value}</span>
             </div>
+            <p className="text-xs font-semibold text-gray-700 leading-tight">{card.label}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{card.sub}</p>
           </div>
-          {loading ? (
-            <div className="p-5 space-y-3">
-              {[...Array(4)].map((_, i) => <div key={i} className="h-8 bg-gray-100 rounded animate-pulse" />)}
+        ))}
+      </div>
+
+      {/* Tab: Districts - Main content: Districts table + Renewals Pipeline */}
+      {tab === 'districts' && (
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+
+        {/* Districts table - takes 2/3 */}
+        <div className="xl:col-span-2">
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-gray-900">Active Districts</h2>
+              <div className="flex items-center gap-3">
+                <Link href="/tdi-admin/intelligence/districts" className="text-xs text-amber-600 hover:underline">
+                  Renewals
+                </Link>
+                <Link href="/tdi-admin/intelligence/districts" className="text-xs text-gray-500 hover:underline">
+                  View all
+                </Link>
+              </div>
             </div>
-          ) : districts.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 text-sm">No active districts yet.</div>
-          ) : (
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
-                <tr>
-                  <th className="text-left px-5 py-3">District</th>
-                  <th className="text-left px-3 py-3">Status</th>
-                  <th className="text-left px-3 py-3">Collections</th>
-                  <th className="text-left px-3 py-3">Delivery</th>
-                  <th className="text-left px-3 py-3">Health</th>
-                  <th className="text-left px-3 py-3">Renewal</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {districts.map((d) => {
-                  const meta = getDistrictMeta(d)
-                  return (
-                    <tr key={d.id} className="hover:bg-gray-50 cursor-pointer">
-                      <td className="px-5 py-3">
-                        <Link href={`/tdi-admin/intelligence/districts/${d.id}`} className="font-medium text-gray-900 hover:text-amber-600">
-                          {d.name}
-                        </Link>
-                        <span className="ml-2 text-xs text-gray-400">{d.state}</span>
-                      </td>
-                      <td className="px-3 py-3">
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                          d.status === 'active' ? 'bg-green-100 text-green-700' :
-                          d.status === 'pilot' ? 'bg-blue-100 text-blue-700' :
-                          'bg-gray-100 text-gray-600'
-                        }`}>
-                          {d.status.charAt(0).toUpperCase() + d.status.slice(1)}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3">
-                        <div className="flex items-center gap-2">
-                          {riskBadge(meta.topRisk)}
-                          {meta.openInvoices > 0 && (
-                            <span className="text-xs text-gray-400">{meta.openInvoices} open</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-3 py-3">
-                        {meta.deliveryPct !== null ? (
+            {loading ? (
+              <div className="p-5 space-y-3">
+                {[...Array(4)].map((_, i) => <div key={i} className="h-8 bg-gray-100 rounded animate-pulse" />)}
+              </div>
+            ) : districts.length === 0 ? (
+              <div className="p-8 text-center text-gray-400 text-sm">No active districts yet.</div>
+            ) : (
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+                  <tr>
+                    <th className="text-left px-5 py-2">District</th>
+                    <th className="text-left px-3 py-2">Status</th>
+                    <th className="text-left px-3 py-2">Collections</th>
+                    <th className="text-left px-3 py-2">Delivery</th>
+                    <th className="text-left px-3 py-2">Health</th>
+                    <th className="text-left px-3 py-2">Renewal</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {districts.map((d) => {
+                    const meta = getDistrictMeta(d)
+                    return (
+                      <tr key={d.id} className="hover:bg-gray-50 cursor-pointer">
+                        <td className="px-5 py-3">
+                          <Link href={`/tdi-admin/intelligence/districts/${d.id}`} className="font-medium text-gray-900 hover:text-amber-600">
+                            {d.name}
+                          </Link>
+                          <span className="ml-2 text-xs text-gray-400">{d.state}</span>
+                        </td>
+                        <td className="px-3 py-3">
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                            d.status === 'active' ? 'bg-green-100 text-green-700' :
+                            d.status === 'pilot' ? 'bg-blue-100 text-blue-700' :
+                            'bg-gray-100 text-gray-600'
+                          }`}>
+                            {d.status.charAt(0).toUpperCase() + d.status.slice(1)}
+                          </span>
+                        </td>
+                        <td className="px-3 py-3">
                           <div className="flex items-center gap-2">
-                            <div className="w-12 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full rounded-full ${
-                                  meta.deliveryPct >= 100 ? 'bg-green-500' :
-                                  meta.deliveryPct >= 50 ? 'bg-amber-400' : 'bg-gray-300'
-                                }`}
-                                style={{ width: `${Math.min(100, meta.deliveryPct)}%` }}
-                              />
-                            </div>
-                            <span className="text-xs text-gray-500">{meta.deliveryPct}%</span>
+                            {riskBadge(meta.topRisk)}
+                            {meta.openInvoices > 0 && (
+                              <span className="text-xs text-gray-400">{meta.openInvoices} open</span>
+                            )}
                           </div>
-                        ) : (
-                          <span className="text-xs text-gray-400">-</span>
-                        )}
-                      </td>
-                      <td className="px-3 py-3">
-                        {(() => {
-                          const badge = renewalHealthBadge(meta.health.tier)
-                          return (
-                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badge.bg} ${badge.text}`}>
-                              {badge.label} · {meta.health.score}
-                            </span>
-                          )
-                        })()}
-                      </td>
-                      <td className="px-3 py-3 text-xs text-gray-500">
-                        {meta.renewalDate
-                          ? new Date(meta.renewalDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })
-                          : '-'}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          )}
+                        </td>
+                        <td className="px-3 py-3">
+                          {meta.deliveryPct !== null ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-12 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full ${
+                                    meta.deliveryPct >= 100 ? 'bg-green-500' :
+                                    meta.deliveryPct >= 50 ? 'bg-amber-400' : 'bg-gray-300'
+                                  }`}
+                                  style={{ width: `${Math.min(100, meta.deliveryPct)}%` }}
+                                />
+                              </div>
+                              <span className="text-xs text-gray-500">{meta.deliveryPct}%</span>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-gray-400">-</span>
+                          )}
+                        </td>
+                        <td className="px-3 py-3">
+                          {(() => {
+                            const badge = renewalHealthBadge(meta.health.tier)
+                            return (
+                              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badge.bg} ${badge.text}`}>
+                                {badge.label} · {meta.health.score}
+                              </span>
+                            )
+                          })()}
+                        </td>
+                        <td className="px-3 py-3 text-xs text-gray-500">
+                          {meta.renewalDate
+                            ? new Date(meta.renewalDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })
+                            : '-'}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
 
-        {/* Open Tasks - 2/5 */}
-        <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-            <h2 className="font-semibold text-gray-800">Open Tasks</h2>
-            <span className="text-xs text-gray-400">{openTasks.length} open</span>
-          </div>
-          {loading ? (
-            <div className="p-5 space-y-3">
-              {[...Array(5)].map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded animate-pulse" />)}
+        {/* Renewals Pipeline - takes 1/3 */}
+        <div className="xl:col-span-1">
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden h-fit">
+            <div className="px-5 py-4 border-b border-gray-100">
+              <h2 className="text-base font-bold text-gray-900">Renewal Pipeline</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Sorted by deadline - closest first</p>
             </div>
-          ) : openTasks.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 text-sm">No open tasks.</div>
-          ) : (
-            <ul className="divide-y divide-gray-100">
-              {openTasks.map((t) => (
-                <li key={t.id} className="px-5 py-3 flex flex-col gap-0.5">
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-sm text-gray-800 font-medium leading-snug">{t.title}</span>
-                    {priorityBadge(t.priority)}
-                  </div>
-                  <div className="flex items-center gap-3 text-xs text-gray-400">
-                    {t.districts?.name && <span>{t.districts.name}</span>}
-                    {t.due_date && (
-                      <span className={new Date(t.due_date) < new Date() ? 'text-red-500 font-medium' : ''}>
-                        Due {new Date(t.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                      </span>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+            <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
+              {renewalPipeline.length === 0 ? (
+                <p className="text-xs text-gray-400 p-5">No upcoming renewals.</p>
+              ) : (
+                renewalPipeline.map(school => {
+                  const isUrgent = school.daysUntilRenewal !== null && school.daysUntilRenewal <= 30
+                  const isWarning = school.daysUntilRenewal !== null && school.daysUntilRenewal <= 60 && school.daysUntilRenewal > 30
+                  const dayColor = isUrgent ? 'text-red-600' : isWarning ? 'text-amber-600' : 'text-gray-500'
+                  const healthColor = school.healthScore >= 75 ? 'text-green-600' : school.healthScore >= 50 ? 'text-amber-600' : 'text-red-600'
+
+                  return (
+                    <Link
+                      key={school.id}
+                      href={`/tdi-admin/intelligence/districts/${school.id}`}
+                      className="block px-5 py-4 hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 truncate">{school.name}</p>
+                          {school.notes && (
+                            <p className="text-xs text-gray-400 truncate mt-0.5">{school.notes}</p>
+                          )}
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className={`text-xs font-bold ${dayColor}`}>
+                            {school.daysUntilRenewal !== null
+                              ? school.daysUntilRenewal <= 0
+                                ? 'Overdue'
+                                : `${school.daysUntilRenewal}d`
+                              : '-'}
+                          </p>
+                          {school.renewalDate && (
+                            <p className="text-xs text-gray-400">
+                              {new Date(school.renewalDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Health score */}
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs text-gray-500">Health</span>
+                        <span className={`text-xs font-bold ${healthColor}`}>
+                          {school.healthScore} - {school.healthLabel}
+                        </span>
+                      </div>
+
+                      {/* Delivery progress bar */}
+                      {school.deliveryPct !== null && (
+                        <div className="mb-2">
+                          <div className="flex items-center justify-between mb-0.5">
+                            <span className="text-xs text-gray-500">Delivery</span>
+                            <span className="text-xs font-medium text-gray-700">{school.deliveryPct}%</span>
+                          </div>
+                          <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${school.deliveryPct >= 100 ? 'bg-green-500' : school.deliveryPct >= 50 ? 'bg-amber-400' : 'bg-red-400'}`}
+                              style={{ width: `${Math.min(school.deliveryPct, 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Last meeting */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-gray-400">
+                          {school.lastMeeting
+                            ? `Last meeting: ${new Date(school.lastMeeting.meeting_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+                            : 'No meetings logged'}
+                        </span>
+                        {school.openTasks > 0 && (
+                          <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">
+                            {school.openTasks} task{school.openTasks !== 1 ? 's' : ''}
+                          </span>
+                        )}
+                      </div>
+                    </Link>
+                  )
+                })
+              )}
+            </div>
+          </div>
         </div>
       </div>
       )}

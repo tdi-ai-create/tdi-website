@@ -136,8 +136,8 @@ interface MetricSnapshot {
 
 interface TimelineEvent {
   id: string;
-  event_title: string;
-  event_date?: string;
+  title: string;
+  date?: string;
   event_type: string;
   status: 'completed' | 'in_progress' | 'upcoming';
   notes?: string;
@@ -1316,138 +1316,469 @@ export default function PartnerDashboard() {
             aria-labelledby="tab-overview"
             className="space-y-6"
           >
-            {/* Stat Cards */}
-            <div id="stat-cards" className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-              {/* Staff Enrolled */}
+            {/* Rich Stat Cards - Elevated Design */}
+            <div id="stat-cards" className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Staff Enrolled Card */}
               <div
                 onClick={() => partnership.partnership_type === 'district' ? navigateToTab('schools', 'buildings-list') : undefined}
-                className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group ${partnership.partnership_type === 'district' ? 'cursor-pointer hover:shadow-md hover:border-[#80a4ed] transition-all' : ''}`}
+                className={`bg-white rounded-2xl overflow-hidden group relative ${partnership.partnership_type === 'district' ? 'cursor-pointer' : ''}`}
+                style={{
+                  boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+                  border: '1px solid rgba(0,0,0,0.04)',
+                }}
               >
-                <div className="p-3 md:p-4">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-[#38618C]" />
-                      <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
+                {/* Top accent bar */}
+                <div className="h-1" style={{ background: 'linear-gradient(90deg, #4ecdc4, #38618C)' }} />
+                <div className="p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ background: 'linear-gradient(135deg, rgba(78,205,196,0.15), rgba(56,97,140,0.1))' }}
+                    >
+                      <Users className="w-5 h-5" style={{ color: '#4ecdc4' }} />
                     </div>
                     {partnership.partnership_type === 'district' && (
-                      <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#80a4ed] transition-colors opacity-0 group-hover:opacity-100" />
+                      <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#4ecdc4] transition-colors" />
                     )}
                   </div>
-                  <div className="stat-number text-[#1e2749]">{staffStats.total}</div>
-                  <div className="text-xs text-[#38618C] font-medium">
+                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Staff Enrolled</p>
+                  <p className="text-3xl font-bold" style={{ color: '#1B2A4A' }}>{staffStats.total}</p>
+                  <p className="text-xs text-gray-500 mt-1">
                     {partnership.partnership_type === 'district' && apiBuildings.length > 0
                       ? `across ${apiBuildings.length} school${apiBuildings.length > 1 ? 's' : ''}`
                       : 'staff members'}
-                  </div>
+                  </p>
+                  {/* Hub login progress */}
+                  {staffStats.total > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-100">
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-400">Hub Access</span>
+                        <span className="font-medium" style={{ color: '#4ecdc4' }}>
+                          {staffStats.hubLoggedIn}/{staffStats.total}
+                        </span>
+                      </div>
+                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: `${(staffStats.hubLoggedIn / staffStats.total) * 100}%`,
+                            background: 'linear-gradient(90deg, #4ecdc4, #38618C)',
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Observations - only show if partnership has observation days */}
+              {/* Observations Card - only show if partnership has observation days */}
               {(partnership.observation_days_total ?? 0) > 0 && (
                 <div
                   onClick={() => navigateToTab('blueprint', 'contract-deliverables')}
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md hover:border-[#80a4ed] transition-all group"
+                  className="bg-white rounded-2xl overflow-hidden cursor-pointer group relative"
+                  style={{
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+                    border: '1px solid rgba(0,0,0,0.04)',
+                  }}
                 >
-                  <div className="p-3 md:p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <Eye className="w-4 h-4 text-[#38618C]" />
-                          <span className="text-xs text-gray-500 uppercase">Observations</span>
-                        </div>
-                        <div className="stat-number text-[#1e2749]">
-                          {partnership.observation_days_completed ?? 0}
-                          <span className="text-lg font-normal text-gray-400">
-                            /{partnership.observation_days_total ?? 0}
-                          </span>
-                        </div>
+                  {/* Top accent bar */}
+                  <div className="h-1" style={{ background: 'linear-gradient(90deg, #FBBF24, #F59E0B)' }} />
+                  <div className="p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center"
+                        style={{ background: 'linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.1))' }}
+                      >
+                        <Eye className="w-5 h-5" style={{ color: '#F59E0B' }} />
                       </div>
-                      {/* Mini progress bar */}
-                      <div className="w-16 hidden sm:block">
-                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-[#4ecdc4] rounded-full"
-                            style={{ width: `${((partnership.observation_days_completed ?? 0) / (partnership.observation_days_total || 1)) * 100}%` }}
-                          />
-                        </div>
-                        <p className="text-xs text-gray-400 text-right mt-0.5">
-                          {Math.round(((partnership.observation_days_completed ?? 0) / (partnership.observation_days_total || 1)) * 100)}%
-                        </p>
-                      </div>
+                      <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#F59E0B] transition-colors" />
                     </div>
-                    <div className="flex items-center justify-between mt-1">
-                      <div className="text-xs font-medium" style={{ color: getObservationColor() }}>
-                        {getObservationText()}
+                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Observations</p>
+                    <div className="flex items-baseline gap-1">
+                      <p className="text-3xl font-bold" style={{ color: '#1B2A4A' }}>
+                        {partnership.observation_days_completed ?? 0}
+                      </p>
+                      <span className="text-lg text-gray-400">/{partnership.observation_days_total ?? 0}</span>
+                    </div>
+                    <p className="text-xs mt-1 font-medium" style={{ color: getObservationColor() }}>
+                      {getObservationText()}
+                    </p>
+                    {/* Progress bar */}
+                    <div className="mt-3 pt-3 border-t border-gray-100">
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-400">Progress</span>
+                        <span className="font-medium" style={{ color: '#F59E0B' }}>
+                          {Math.round(((partnership.observation_days_completed ?? 0) / (partnership.observation_days_total || 1)) * 100)}%
+                        </span>
                       </div>
-                      <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#80a4ed] transition-colors opacity-0 group-hover:opacity-100" />
+                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: `${((partnership.observation_days_completed ?? 0) / (partnership.observation_days_total || 1)) * 100}%`,
+                            background: 'linear-gradient(90deg, #FBBF24, #F59E0B)',
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Needs Attention */}
+              {/* Needs Attention Card */}
               <div
                 onClick={() => scrollToSection('action-items')}
-                className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md hover:border-[#80a4ed] transition-all group"
+                className="bg-white rounded-2xl overflow-hidden cursor-pointer group relative"
+                style={{
+                  boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+                  border: '1px solid rgba(0,0,0,0.04)',
+                }}
               >
-                <div className="p-3 md:p-4">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 text-amber-500" />
-                      <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
+                {/* Top accent bar */}
+                <div
+                  className="h-1"
+                  style={{
+                    background: pendingItems.length === 0
+                      ? 'linear-gradient(90deg, #10B981, #059669)'
+                      : 'linear-gradient(90deg, #F59E0B, #D97706)',
+                  }}
+                />
+                <div className="p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{
+                        background: pendingItems.length === 0
+                          ? 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(5,150,105,0.1))'
+                          : 'linear-gradient(135deg, rgba(245,158,11,0.15), rgba(217,119,6,0.1))',
+                      }}
+                    >
+                      {pendingItems.length === 0 ? (
+                        <CheckCircle className="w-5 h-5" style={{ color: '#10B981' }} />
+                      ) : (
+                        <AlertCircle className="w-5 h-5" style={{ color: '#F59E0B' }} />
+                      )}
                     </div>
-                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#80a4ed] transition-colors opacity-0 group-hover:opacity-100" />
+                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#F59E0B] transition-colors" />
                   </div>
-                  <div className="stat-number text-amber-500">
-                    {pendingItems.length}
-                  </div>
-                  <div className="text-xs text-amber-600 font-medium">
+                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">
+                    {pendingItems.length === 0 ? 'Status' : 'Needs Attention'}
+                  </p>
+                  <p
+                    className="text-3xl font-bold"
+                    style={{ color: pendingItems.length === 0 ? '#10B981' : '#F59E0B' }}
+                  >
+                    {pendingItems.length === 0 ? '✓' : pendingItems.length}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
                     {pendingItems.length === 0 ? 'All caught up!' : `${pendingItems.length} item${pendingItems.length !== 1 ? 's' : ''} pending`}
-                  </div>
+                  </p>
                 </div>
               </div>
 
-              {/* Current Phase */}
+              {/* Current Phase Card */}
               <div
                 onClick={() => navigateToTab('our-partnership', 'phase-timeline')}
-                className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md hover:border-[#80a4ed] transition-all group"
+                className="bg-white rounded-2xl overflow-hidden cursor-pointer group relative"
+                style={{
+                  boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+                  border: '1px solid rgba(0,0,0,0.04)',
+                }}
               >
-                <div className="p-3 md:p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <TrendingUp className="w-4 h-4 text-[#38618C]" />
-                        <span className="text-xs text-gray-500 uppercase">Current Phase</span>
-                      </div>
-                      <div className="stat-number text-[#1e2749]">
-                        Phase {partnership.contract_phase === 'IGNITE' ? '1' : partnership.contract_phase === 'ACCELERATE' ? '2' : '3'}
-                      </div>
-                      <div className="text-xs text-[#38618C] font-medium">
-                        {partnership.contract_phase}
-                      </div>
-                    </div>
-                    {/* Phase indicator dots */}
-                    <div className="flex gap-1">
-                      <div className={`w-3 h-3 rounded-full ${partnership.contract_phase === 'IGNITE' ? 'bg-[#38618C]' : 'bg-gray-300'}`} />
-                      <div className={`w-3 h-3 rounded-full ${partnership.contract_phase === 'ACCELERATE' ? 'bg-[#38618C]' : 'bg-gray-200'}`} />
-                      <div className={`w-3 h-3 rounded-full ${partnership.contract_phase === 'SUSTAIN' ? 'bg-[#38618C]' : 'bg-gray-200'}`} />
-                    </div>
-                  </div>
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mt-3">
+                {/* Top accent bar */}
+                <div
+                  className="h-1"
+                  style={{
+                    background: partnership.contract_phase === 'IGNITE'
+                      ? 'linear-gradient(90deg, #FBBF24, #F59E0B)'
+                      : partnership.contract_phase === 'ACCELERATE'
+                      ? 'linear-gradient(90deg, #4ecdc4, #38618C)'
+                      : 'linear-gradient(90deg, #8B5CF6, #7C3AED)',
+                  }}
+                />
+                <div className="p-5">
+                  <div className="flex items-center justify-between mb-3">
                     <div
-                      className="h-full bg-[#38618C] rounded-full"
-                      style={{ width: `${partnership.contract_phase === 'IGNITE' ? 33 : partnership.contract_phase === 'ACCELERATE' ? 66 : 100}%` }}
-                    />
+                      className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{
+                        background: partnership.contract_phase === 'IGNITE'
+                          ? 'linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.1))'
+                          : partnership.contract_phase === 'ACCELERATE'
+                          ? 'linear-gradient(135deg, rgba(78,205,196,0.15), rgba(56,97,140,0.1))'
+                          : 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(124,58,237,0.1))',
+                      }}
+                    >
+                      {partnership.contract_phase === 'IGNITE' ? (
+                        <Zap className="w-5 h-5" style={{ color: '#FBBF24' }} />
+                      ) : partnership.contract_phase === 'ACCELERATE' ? (
+                        <Rocket className="w-5 h-5" style={{ color: '#4ecdc4' }} />
+                      ) : (
+                        <Target className="w-5 h-5" style={{ color: '#8B5CF6' }} />
+                      )}
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#38618C] transition-colors" />
                   </div>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Current Phase</p>
+                  <p className="text-3xl font-bold" style={{ color: '#1B2A4A' }}>
+                    Phase {partnership.contract_phase === 'IGNITE' ? '1' : partnership.contract_phase === 'ACCELERATE' ? '2' : '3'}
+                  </p>
+                  <p
+                    className="text-xs mt-1 font-semibold"
+                    style={{
+                      color: partnership.contract_phase === 'IGNITE'
+                        ? '#FBBF24'
+                        : partnership.contract_phase === 'ACCELERATE'
+                        ? '#4ecdc4'
+                        : '#8B5CF6',
+                    }}
+                  >
+                    {partnership.contract_phase}
+                  </p>
+                  {/* Phase progress */}
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <div className="flex gap-2">
+                      {['IGNITE', 'ACCELERATE', 'SUSTAIN'].map((phase, idx) => (
+                        <div
+                          key={phase}
+                          className="flex-1 h-1.5 rounded-full transition-all duration-300"
+                          style={{
+                            background: idx <= ['IGNITE', 'ACCELERATE', 'SUSTAIN'].indexOf(partnership.contract_phase)
+                              ? partnership.contract_phase === 'IGNITE'
+                                ? '#FBBF24'
+                                : partnership.contract_phase === 'ACCELERATE'
+                                ? '#4ecdc4'
+                                : '#8B5CF6'
+                              : '#E5E7EB',
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1 text-center">
                       Phase {partnership.contract_phase === 'IGNITE' ? '1' : partnership.contract_phase === 'ACCELERATE' ? '2' : '3'} of 3
-                    </span>
-                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#80a4ed] transition-colors opacity-0 group-hover:opacity-100" />
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
+
+            {/* Partnership Momentum Bar */}
+            <div
+              className="rounded-2xl p-5 md:p-6"
+              style={{
+                background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 50%, #38618C 100%)',
+                boxShadow: '0 4px 24px rgba(27,42,74,0.2)',
+              }}
+            >
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                    style={{ background: 'rgba(255,255,255,0.1)' }}
+                  >
+                    <Sparkles className="w-7 h-7 text-[#FFBA06]" />
+                  </div>
+                  <div>
+                    <p className="text-white/60 text-xs uppercase tracking-wider mb-1">Partnership Momentum</p>
+                    <p className="text-white text-xl md:text-2xl font-bold">
+                      {(() => {
+                        // Calculate momentum score based on completed items
+                        const totalDeliverables = (partnership.observation_days_total || 0) + (partnership.virtual_sessions_total || 0);
+                        const completedDeliverables = (partnership.observation_days_completed || 0) + (partnership.virtual_sessions_completed || 0);
+                        const deliverableScore = totalDeliverables > 0 ? (completedDeliverables / totalDeliverables) * 100 : 0;
+                        const hubScore = staffStats.total > 0 ? (staffStats.hubLoggedIn / staffStats.total) * 100 : 0;
+                        const actionScore = pendingItems.length === 0 ? 100 : Math.max(0, 100 - (pendingItems.length * 10));
+                        const momentum = Math.round((deliverableScore + hubScore + actionScore) / 3);
+                        return `${momentum}%`;
+                      })()}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex-1 max-w-md">
+                  <div className="flex justify-between text-xs text-white/60 mb-2">
+                    <span>Starting Out</span>
+                    <span>Building</span>
+                    <span>Thriving</span>
+                  </div>
+                  <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{
+                        width: (() => {
+                          const totalDeliverables = (partnership.observation_days_total || 0) + (partnership.virtual_sessions_total || 0);
+                          const completedDeliverables = (partnership.observation_days_completed || 0) + (partnership.virtual_sessions_completed || 0);
+                          const deliverableScore = totalDeliverables > 0 ? (completedDeliverables / totalDeliverables) * 100 : 0;
+                          const hubScore = staffStats.total > 0 ? (staffStats.hubLoggedIn / staffStats.total) * 100 : 0;
+                          const actionScore = pendingItems.length === 0 ? 100 : Math.max(0, 100 - (pendingItems.length * 10));
+                          return `${Math.round((deliverableScore + hubScore + actionScore) / 3)}%`;
+                        })(),
+                        background: 'linear-gradient(90deg, #4ecdc4, #FFBA06, #F59E0B)',
+                      }}
+                    />
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigateToTab('blueprint', 'contract-deliverables')}
+                  className="px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all hover:scale-105"
+                  style={{
+                    background: 'rgba(255,255,255,0.1)',
+                    color: '#FFFFFF',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                  }}
+                >
+                  View Blueprint
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Three-Column Timeline - Done / In Progress / Coming Soon */}
+            {timelineEvents.length > 0 && (
+              <div
+                className="bg-white rounded-2xl p-5 md:p-6"
+                style={{
+                  boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+                  border: '1px solid rgba(0,0,0,0.04)',
+                }}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ background: 'linear-gradient(135deg, rgba(78,205,196,0.15), rgba(56,97,140,0.1))' }}
+                    >
+                      <CalendarDays className="w-5 h-5" style={{ color: '#4ecdc4' }} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900">Your Partnership Journey</h3>
+                      <p className="text-xs text-gray-400">Key milestones and upcoming activities</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => navigateToTab('blueprint', 'contract-deliverables')}
+                    className="text-xs font-medium flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors"
+                    style={{ color: '#4ecdc4', background: 'rgba(78,205,196,0.1)' }}
+                  >
+                    View All <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Done Column */}
+                  <div className="rounded-xl p-4" style={{ background: 'rgba(16,185,129,0.05)', border: '1px solid rgba(16,185,129,0.1)' }}>
+                    <div className="flex items-center gap-2 mb-4">
+                      <CheckCircle className="w-4 h-4" style={{ color: '#10B981' }} />
+                      <span className="text-sm font-semibold" style={{ color: '#10B981' }}>Completed</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.1)', color: '#10B981' }}>
+                        {timelineEvents.filter(e => e.status === 'completed').length}
+                      </span>
+                    </div>
+                    <div className="space-y-3">
+                      {timelineEvents.filter(e => e.status === 'completed').slice(0, 4).map((event, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-start gap-3 p-3 rounded-lg bg-white"
+                          style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                        >
+                          <div
+                            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                            style={{ background: 'rgba(16,185,129,0.1)' }}
+                          >
+                            <Check className="w-4 h-4" style={{ color: '#10B981' }} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">{event.title}</p>
+                            {event.date && (
+                              <p className="text-xs text-gray-400">
+                                {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                      {timelineEvents.filter(e => e.status === 'completed').length === 0 && (
+                        <p className="text-xs text-gray-400 text-center py-4">Milestones will appear here</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* In Progress Column */}
+                  <div className="rounded-xl p-4" style={{ background: 'rgba(251,191,36,0.05)', border: '1px solid rgba(251,191,36,0.1)' }}>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Loader2 className="w-4 h-4 animate-spin" style={{ color: '#FBBF24' }} />
+                      <span className="text-sm font-semibold" style={{ color: '#F59E0B' }}>In Progress</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(251,191,36,0.1)', color: '#F59E0B' }}>
+                        {timelineEvents.filter(e => e.status === 'in_progress').length}
+                      </span>
+                    </div>
+                    <div className="space-y-3">
+                      {timelineEvents.filter(e => e.status === 'in_progress').slice(0, 4).map((event, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-start gap-3 p-3 rounded-lg bg-white"
+                          style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid rgba(251,191,36,0.2)' }}
+                        >
+                          <div
+                            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                            style={{ background: 'rgba(251,191,36,0.1)' }}
+                          >
+                            <Play className="w-4 h-4" style={{ color: '#F59E0B' }} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">{event.title}</p>
+                            {event.date && (
+                              <p className="text-xs text-gray-400">
+                                {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                      {timelineEvents.filter(e => e.status === 'in_progress').length === 0 && (
+                        <p className="text-xs text-gray-400 text-center py-4">Active items will appear here</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Coming Soon Column */}
+                  <div className="rounded-xl p-4" style={{ background: 'rgba(56,97,140,0.05)', border: '1px solid rgba(56,97,140,0.1)' }}>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Clock className="w-4 h-4" style={{ color: '#38618C' }} />
+                      <span className="text-sm font-semibold" style={{ color: '#38618C' }}>Coming Soon</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(56,97,140,0.1)', color: '#38618C' }}>
+                        {timelineEvents.filter(e => e.status === 'upcoming').length}
+                      </span>
+                    </div>
+                    <div className="space-y-3">
+                      {timelineEvents.filter(e => e.status === 'upcoming').slice(0, 4).map((event, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-start gap-3 p-3 rounded-lg bg-white"
+                          style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                        >
+                          <div
+                            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                            style={{ background: 'rgba(56,97,140,0.1)' }}
+                          >
+                            <Calendar className="w-4 h-4" style={{ color: '#38618C' }} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">{event.title}</p>
+                            {event.date && (
+                              <p className="text-xs text-gray-400">
+                                {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                      {timelineEvents.filter(e => e.status === 'upcoming').length === 0 && (
+                        <p className="text-xs text-gray-400 text-center py-4">Upcoming items will appear here</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Leading Indicators */}
             {(() => {
@@ -1857,6 +2188,90 @@ export default function PartnerDashboard() {
                 </a>
               </div>
             )}
+
+            {/* Investment By The Numbers - Dark Card */}
+            <div
+              className="rounded-2xl p-6 md:p-8 overflow-hidden relative"
+              style={{
+                background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 50%, #38618C 100%)',
+                boxShadow: '0 8px 32px rgba(27,42,74,0.25)',
+              }}
+            >
+              {/* Background pattern */}
+              <div
+                className="absolute inset-0 opacity-5"
+                style={{
+                  backgroundImage: 'radial-gradient(circle at 25% 25%, white 1px, transparent 1px)',
+                  backgroundSize: '32px 32px',
+                }}
+              />
+
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-6">
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center"
+                    style={{ background: 'rgba(255,186,6,0.15)' }}
+                  >
+                    <BarChart3 className="w-6 h-6 text-[#FFBA06]" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white">Investment By The Numbers</h3>
+                    <p className="text-white/50 text-sm">Your partnership impact at a glance</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                  {/* Total Sessions */}
+                  <div className="text-center p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                    <p className="text-3xl md:text-4xl font-bold text-white mb-1">
+                      {(partnership.observation_days_completed || 0) + (partnership.virtual_sessions_completed || 0)}
+                    </p>
+                    <p className="text-xs text-white/50 uppercase tracking-wider">Sessions Delivered</p>
+                  </div>
+
+                  {/* Staff Reached */}
+                  <div className="text-center p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                    <p className="text-3xl md:text-4xl font-bold text-[#4ecdc4] mb-1">
+                      {staffStats.total}
+                    </p>
+                    <p className="text-xs text-white/50 uppercase tracking-wider">Staff Reached</p>
+                  </div>
+
+                  {/* Hours Invested */}
+                  <div className="text-center p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                    <p className="text-3xl md:text-4xl font-bold text-[#FFBA06] mb-1">
+                      {((partnership.observation_days_completed || 0) * 6) + ((partnership.virtual_sessions_completed || 0) * 1)}+
+                    </p>
+                    <p className="text-xs text-white/50 uppercase tracking-wider">PD Hours</p>
+                  </div>
+
+                  {/* Love Notes - if any */}
+                  <div className="text-center p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                    <p className="text-3xl md:text-4xl font-bold text-pink-400 mb-1">
+                      {loveNotes || 0}
+                    </p>
+                    <p className="text-xs text-white/50 uppercase tracking-wider">Love Notes Sent</p>
+                  </div>
+                </div>
+
+                {/* View Full Report Link */}
+                <div className="mt-6 flex justify-center">
+                  <button
+                    onClick={() => navigateToTab('preview', 'roi-summary')}
+                    className="px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all hover:scale-105"
+                    style={{
+                      background: 'rgba(255,186,6,0.15)',
+                      color: '#FFBA06',
+                      border: '1px solid rgba(255,186,6,0.3)',
+                    }}
+                  >
+                    <ChartLine className="w-4 h-4" />
+                    View Impact Report
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
 
             {/* Teacher Quotes - Voices from your school */}
             <TeacherQuotes quotes={teacherQuotes} />
@@ -2413,6 +2828,102 @@ export default function PartnerDashboard() {
                     <p className="text-gray-600">All caught up! You&apos;ve completed all action items.</p>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Overview Footer - Dark Navy */}
+            <div
+              className="rounded-2xl p-6 md:p-8 mt-4"
+              style={{
+                background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 100%)',
+                boxShadow: '0 4px 24px rgba(27,42,74,0.15)',
+              }}
+            >
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 bg-white/10 flex items-center justify-center">
+                    <Image
+                      src="/images/logo.webp"
+                      alt="Teachers Deserve It"
+                      width={40}
+                      height={40}
+                      className="object-contain"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-white font-semibold">Teachers Deserve It</p>
+                    <p className="text-white/50 text-sm">We&apos;re here for you every step of the way</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href="mailto:rae@teachersdeserveit.com"
+                    className="px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all hover:scale-105"
+                    style={{
+                      background: 'rgba(255,255,255,0.1)',
+                      color: '#FFFFFF',
+                      border: '1px solid rgba(255,255,255,0.2)',
+                    }}
+                  >
+                    <Mail className="w-4 h-4" />
+                    Email Rae
+                  </a>
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all hover:scale-105"
+                    style={{
+                      background: '#FFBA06',
+                      color: '#1B2A4A',
+                    }}
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Schedule a Call
+                  </a>
+                </div>
+              </div>
+
+              {/* Quick Links */}
+              <div className="mt-6 pt-6 border-t border-white/10">
+                <div className="flex flex-wrap justify-center gap-4 text-sm">
+                  <a
+                    href="https://tdi.thinkific.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white/60 hover:text-white transition-colors flex items-center gap-1"
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    Learning Hub
+                  </a>
+                  <span className="text-white/20">•</span>
+                  <button
+                    onClick={() => navigateToTab('blueprint', 'contract-deliverables')}
+                    className="text-white/60 hover:text-white transition-colors flex items-center gap-1"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    Your Blueprint
+                  </button>
+                  <span className="text-white/20">•</span>
+                  <button
+                    onClick={() => navigateToTab('team')}
+                    className="text-white/60 hover:text-white transition-colors flex items-center gap-1"
+                  >
+                    <Users className="w-3.5 h-3.5" />
+                    Your Team
+                  </button>
+                  <span className="text-white/20">•</span>
+                  <a
+                    href="https://www.teachersdeserveit.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white/60 hover:text-white transition-colors flex items-center gap-1"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    TDI Website
+                  </a>
+                </div>
               </div>
             </div>
           </div>
