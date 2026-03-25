@@ -15,7 +15,7 @@ const PORTAL_COLORS = {
   leadership: { accent: '#16A34A', light: '#DCFCE7', bg15: 'rgba(22, 163, 74, 0.15)', border30: 'rgba(22, 163, 74, 0.3)' },
   intelligence: { accent: '#F59E0B', light: '#FEF3C7', bg15: 'rgba(245, 158, 11, 0.15)', border30: 'rgba(245, 158, 11, 0.3)' },
   sales: { accent: '#6366F1', light: '#EEF2FF', bg15: 'rgba(99, 102, 241, 0.15)', border30: 'rgba(99, 102, 241, 0.3)' },
-  funding: { accent: '#10B981', light: '#D1FAE5', bg15: 'rgba(16, 185, 129, 0.15)', border30: 'rgba(16, 185, 129, 0.3)' },
+  funding: { accent: '#EC4899', light: '#FCE7F3', bg15: 'rgba(236, 72, 153, 0.15)', border30: 'rgba(236, 72, 153, 0.3)' },
   team: { accent: '#6B7280', light: '#F3F4F6', bg15: 'rgba(107, 114, 128, 0.15)', border30: 'rgba(107, 114, 128, 0.3)' },
 };
 
