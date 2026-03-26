@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Check, Lock, Sparkles } from 'lucide-react';
+import { Check, Lock, Sparkles, Heart } from 'lucide-react';
 import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
 
 // Category colors - elevated design
@@ -33,6 +33,11 @@ interface CourseCardProps {
   } | null;
   onEnroll?: (courseId: string) => void;
   isEnrolling?: boolean;
+  isFavorited?: boolean;
+  onToggleFavorite?: (id: string, type: 'course' | 'quick_win') => void;
+  displayTitle?: string;
+  displayDescription?: string;
+  showTranslationBadge?: boolean;
 }
 
 export default function CourseCard({
@@ -40,7 +45,15 @@ export default function CourseCard({
   enrollment,
   onEnroll,
   isEnrolling = false,
+  isFavorited = false,
+  onToggleFavorite,
+  displayTitle,
+  displayDescription,
+  showTranslationBadge = false,
 }: CourseCardProps) {
+  // Use display props if provided, otherwise fall back to course data
+  const title = displayTitle || course.title;
+  const description = displayDescription || course.description;
   const colors = CATEGORY_COLORS[course.category] || {
     bar: '#E8B84B',
     bg: '#FEF3C7',
@@ -61,7 +74,7 @@ export default function CourseCard({
 
   return (
     <div
-      className="flex flex-col overflow-hidden"
+      className="flex flex-col overflow-hidden relative"
       style={{
         backgroundColor: 'white',
         borderRadius: '16px',
@@ -112,6 +125,29 @@ export default function CourseCard({
         ) : null}
       </div>
 
+      {/* Favorite button */}
+      {onToggleFavorite && (
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavorite(course.id, 'course') }}
+          className="absolute top-3 right-3 p-1.5 rounded-full transition-all z-10"
+          style={{
+            background: isFavorited ? '#FEE2E2' : 'rgba(0,0,0,0.04)',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+          aria-label={isFavorited ? 'Remove from saved' : 'Save course'}
+        >
+          <Heart
+            size={14}
+            style={{
+              color: isFavorited ? '#E53935' : '#9CA3AF',
+              fill: isFavorited ? '#E53935' : 'none',
+              transition: 'all 0.15s',
+            }}
+          />
+        </button>
+      )}
+
       {/* Body */}
       <div className="p-4 flex-1 flex flex-col">
         {/* Category tag */}
@@ -128,6 +164,19 @@ export default function CourseCard({
           {course.category}
         </span>
 
+        {/* Translation badge */}
+        {showTranslationBadge && (
+          <div
+            className="inline-flex items-center gap-1 text-[9px] font-medium px-2 py-0.5 rounded-full mb-2"
+            style={{ background: '#FEF3C7', color: '#92400E', border: '1px solid #FDE68A' }}
+          >
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+            </svg>
+            Traducción próximamente
+          </div>
+        )}
+
         {/* Title */}
         <h3
           className="font-semibold mb-2 line-clamp-2"
@@ -138,7 +187,7 @@ export default function CourseCard({
             lineHeight: '1.3',
           }}
         >
-          {course.title}
+          {title}
         </h3>
 
         {/* Description */}
@@ -149,7 +198,7 @@ export default function CourseCard({
             color: '#6B7280',
           }}
         >
-          {course.description}
+          {description}
         </p>
 
         {/* Meta row */}

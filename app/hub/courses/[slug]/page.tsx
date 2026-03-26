@@ -7,6 +7,7 @@ import { useHub } from '@/components/hub/HubContext';
 import { getSupabase } from '@/lib/supabase';
 import { useEnrollment } from '@/lib/hooks/useEnrollment';
 import { useProgressTracking } from '@/lib/hooks/useProgressTracking';
+import { useLanguage } from '@/lib/hub/useLanguage';
 import {
   ArrowLeft,
   BookOpen,
@@ -60,6 +61,8 @@ interface Course {
   author_name: string | null;
   author_bio: string | null;
   author_avatar_url: string | null;
+  title_es?: string | null;
+  description_es?: string | null;
 }
 
 interface RelatedCourse {
@@ -93,6 +96,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
   const { enrollment, isEnrolled, isEnrolling, enroll } = useEnrollment(course?.id || null, user?.id || null);
   const { progress, toggleLessonComplete } = useProgressTracking(course?.id || null, user?.id || null);
+  const { language, t, hasSpanish } = useLanguage();
 
   // Fetch course data
   useEffect(() => {
@@ -393,7 +397,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             </Link>
           </li>
           <li className="text-gray-400">/</li>
-          <li className="text-gray-700 truncate max-w-[200px]">{course.title}</li>
+          <li className="text-gray-700 truncate max-w-[200px]">{t(course.title, course.title_es)}</li>
         </ol>
       </nav>
 
@@ -412,6 +416,19 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             />
 
             <div className="relative z-10 px-9 py-8">
+              {/* Translation badge */}
+              {language === 'es' && !hasSpanish(course.title_es) && (
+                <div
+                  className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full mb-3"
+                  style={{ background: '#FEF3C7', color: '#92400E', border: '1px solid #FDE68A' }}
+                >
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+                  </svg>
+                  Traducción próximamente
+                </div>
+              )}
+
               {/* Category tag */}
               {course.category && (
                 <div
@@ -430,13 +447,13 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
               {/* Title */}
               <h1 className="text-2xl font-bold text-white mb-2 leading-snug" style={{ maxWidth: '560px' }}>
-                {course.title}
+                {t(course.title, course.title_es)}
               </h1>
 
               {/* Description */}
               {course.description && (
                 <p className="text-sm mb-6 leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)', maxWidth: '560px' }}>
-                  {course.description}
+                  {t(course.description, course.description_es)}
                 </p>
               )}
 

@@ -1,10 +1,15 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import HubAuthGuard from '@/components/hub/HubAuthGuard';
 import HubNavBar from '@/components/hub/HubNavBar';
 import HubFooter from '@/components/hub/HubFooter';
 import { useHub } from '@/components/hub/HubContext';
+import { getSupabase } from '@/lib/supabase';
+
+const CheckInSlideUp = dynamic(() => import('@/components/hub/CheckInSlideUp'), { ssr: false });
 
 // Routes that should NOT show the Hub nav bar
 const NO_NAV_ROUTES = ['/hub/login', '/hub/verify', '/hub/onboarding'];
@@ -12,8 +17,46 @@ const NO_NAV_ROUTES = ['/hub/login', '/hub/verify', '/hub/onboarding'];
 function HubLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { profile, user } = useHub();
+  const [showCheckIn, setShowCheckIn] = useState(false);
 
   const showNav = !NO_NAV_ROUTES.some((route) => pathname.startsWith(route));
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    // Only show on hub pages (not login, onboarding, admin)
+    const path = window.location.pathname;
+    const isHubPage = path.startsWith('/hub') &&
+      !path.includes('/login') &&
+      !path.includes('/onboarding') &&
+      !path.includes('/admin') &&
+      !path.includes('/verify');
+
+    if (!isHubPage) return;
+
+    // Check if teacher already answered today
+    const checkTodayCheckIn = async () => {
+      const supabase = getSupabase();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const { data } = await supabase
+        .from('hub_assessments')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('type', 'daily_check_in')
+        .gte('created_at', today.toISOString())
+        .limit(1);
+
+      // Show slide-up if no check-in today
+      // Small delay so the page loads first
+      if (!data || data.length === 0) {
+        setTimeout(() => setShowCheckIn(true), 1200);
+      }
+    };
+
+    checkTodayCheckIn();
+  }, [user?.id]);
 
   return (
     <div
@@ -27,6 +70,9 @@ function HubLayoutInner({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       {showNav && <HubFooter />}
+      {showCheckIn && (
+        <CheckInSlideUp onDismiss={() => setShowCheckIn(false)} />
+      )}
     </div>
   );
 }

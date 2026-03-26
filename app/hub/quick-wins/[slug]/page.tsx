@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
 import { getSupabase } from '@/lib/supabase';
+import { useLanguage } from '@/lib/hub/useLanguage';
 import {
   ArrowLeft,
   Clock,
@@ -139,6 +140,9 @@ interface QuickWin {
   content_type: string;
   video_url: string | null;
   download_url: string | null;
+  title_es?: string | null;
+  description_es?: string | null;
+  content_es?: string | null;
 }
 
 interface QuickWinPageProps {
@@ -155,6 +159,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isCompleted, setIsCompleted] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
+  const { language, t, hasSpanish } = useLanguage();
 
   // For "do" type - action step checkboxes
   const [checkedSteps, setCheckedSteps] = useState<Set<number>>(new Set());
@@ -174,7 +179,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         console.log('[QuickWinDetail] Fetching quick win with slug:', slug);
         const { data, error } = await supabase
           .from('hub_quick_wins')
-          .select('id, slug, title, description, content, category, quick_win_type, duration_minutes, download_url')
+          .select('id, slug, title, description, content, category, quick_win_type, duration_minutes, download_url, title_es, description_es, content_es')
           .eq('slug', slug)
           .eq('is_published', true)
           .single();
@@ -199,6 +204,9 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           content_type: data.quick_win_type || 'activity',
           video_url: null, // hub_quick_wins doesn't have video_url
           download_url: data.download_url,
+          title_es: data.title_es,
+          description_es: data.description_es,
+          content_es: data.content_es,
         };
 
         setQuickWin(quickWinData);
@@ -328,6 +336,19 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
         {/* Header */}
         <div className="mb-5">
+          {/* Translation badge */}
+          {language === 'es' && !hasSpanish(quickWin.title_es) && (
+            <div
+              className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full mb-3"
+              style={{ background: '#FEF3C7', color: '#92400E', border: '1px solid #FDE68A' }}
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+              </svg>
+              Traducción próximamente
+            </div>
+          )}
+
           {quickWin.category && (
             <div
               className="inline-block text-xs font-bold px-2.5 py-1 rounded-lg mb-3"
@@ -342,7 +363,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               {quickWin.category}
             </div>
           )}
-          <h1 className="text-2xl font-bold mb-2" style={{ color: '#1B2A4A' }}>{quickWin.title}</h1>
+          <h1 className="text-2xl font-bold mb-2" style={{ color: '#1B2A4A' }}>{t(quickWin.title, quickWin.title_es)}</h1>
           <div
             className="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full"
             style={{ background: '#F3F4F6', color: '#6B7280' }}
@@ -359,7 +380,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
             className="rounded-xl p-4 mb-4 text-sm leading-relaxed"
             style={{ background: '#F0F6FF', border: '0.5px solid #C8DEFF', color: '#1E3A8A' }}
           >
-            {quickWin.description}
+            {t(quickWin.description, quickWin.description_es)}
           </div>
         )}
 

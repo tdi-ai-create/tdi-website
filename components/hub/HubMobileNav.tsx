@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { X, Heart, Shield, Building } from 'lucide-react';
 import AvatarDisplay from './AvatarDisplay';
 import type { HubProfile } from '@/lib/hub-auth';
+import type { Language } from '@/lib/hub/useLanguage';
 
 interface NavItem {
   href: string;
@@ -20,6 +21,8 @@ interface HubMobileNavProps {
   userEmail?: string;
   navItems: NavItem[];
   onMomentMode: () => void;
+  language?: Language;
+  onSetLanguage?: (lang: Language) => void;
 }
 
 export default function HubMobileNav({
@@ -29,6 +32,8 @@ export default function HubMobileNav({
   userEmail,
   navItems,
   onMomentMode,
+  language = 'en',
+  onSetLanguage,
 }: HubMobileNavProps) {
   const pathname = usePathname();
 
@@ -129,8 +134,44 @@ export default function HubMobileNav({
         })}
       </nav>
 
-      {/* Moment Mode Button - Bottom */}
+      {/* Language Toggle + Moment Mode Button - Bottom */}
       <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10">
+        {/* Language toggle */}
+        {onSetLanguage && (
+          <div className="flex justify-center mb-4">
+            <div
+              className="flex items-center rounded-lg overflow-hidden"
+              style={{ border: '1px solid rgba(255,255,255,0.2)' }}
+            >
+              <button
+                onClick={() => onSetLanguage('en')}
+                className="px-4 py-2 text-sm font-bold transition-all"
+                style={{
+                  background: language === 'en' ? '#FFBA06' : 'transparent',
+                  color: language === 'en' ? '#1B2A4A' : 'rgba(255,255,255,0.5)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => onSetLanguage('es')}
+                className="px-4 py-2 text-sm font-bold transition-all"
+                style={{
+                  background: language === 'es' ? '#FFBA06' : 'transparent',
+                  color: language === 'es' ? '#1B2A4A' : 'rgba(255,255,255,0.5)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                ES
+              </button>
+            </div>
+          </div>
+        )}
         <button
           onClick={onMomentMode}
           className="w-full flex items-center justify-center gap-3 py-4 rounded-lg border border-white/30 text-white hover:bg-white/10 transition-colors"

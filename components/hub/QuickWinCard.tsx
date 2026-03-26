@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Lock, Sparkles } from 'lucide-react';
+import { Lock, Sparkles, Heart } from 'lucide-react';
 import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
 
 // Category colors - elevated design
@@ -29,10 +29,24 @@ interface QuickWinCardProps {
     access_tier?: string;
     is_free_rotating?: boolean;
   };
+  isFavorited?: boolean;
+  onToggleFavorite?: (id: string, type: 'course' | 'quick_win') => void;
+  displayTitle?: string;
+  displayDescription?: string;
+  showTranslationBadge?: boolean;
 }
 
-export default function QuickWinCard({ quickWin }: QuickWinCardProps) {
+export default function QuickWinCard({
+  quickWin,
+  isFavorited = false,
+  onToggleFavorite,
+  displayTitle,
+  displayDescription,
+  showTranslationBadge = false,
+}: QuickWinCardProps) {
   const colors = CATEGORY_COLORS[quickWin.category] || { bg: '#F3F4F6', text: '#374151' };
+  // Use display props if provided, otherwise fall back to quickWin data
+  const title = displayTitle || quickWin.title;
 
   // Check access using membership hook
   const { canAccess } = useMembership();
@@ -64,14 +78,37 @@ export default function QuickWinCard({ quickWin }: QuickWinCardProps) {
         opacity: !hasAccess && !isFreeRotating ? 0.82 : 1,
       }}
     >
-      {/* Tier badge */}
+      {/* Favorite button */}
+      {onToggleFavorite && (
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavorite(quickWin.id, 'quick_win') }}
+          className="absolute top-3 right-3 p-1.5 rounded-full transition-all z-10"
+          style={{
+            background: isFavorited ? '#FEE2E2' : 'rgba(0,0,0,0.04)',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+          aria-label={isFavorited ? 'Remove from saved' : 'Save quick win'}
+        >
+          <Heart
+            size={14}
+            style={{
+              color: isFavorited ? '#E53935' : '#9CA3AF',
+              fill: isFavorited ? '#E53935' : 'none',
+              transition: 'all 0.15s',
+            }}
+          />
+        </button>
+      )}
+
+      {/* Tier badge - repositioned when favorite button present */}
       {isFreeRotating ? (
-        <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-500 text-white">
+        <span className={`absolute ${onToggleFavorite ? 'top-3 right-12' : 'top-3 right-3'} inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-500 text-white`}>
           <Sparkles size={10} />
           Free
         </span>
       ) : !hasAccess && quickWin.access_tier && quickWin.access_tier !== 'free_rotating' ? (
-        <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-600 text-white">
+        <span className={`absolute ${onToggleFavorite ? 'top-3 right-12' : 'top-3 right-3'} inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-600 text-white`}>
           <Lock size={10} />
           {quickWin.access_tier === 'essentials' ? 'Essentials' : quickWin.access_tier === 'professional' ? 'Pro' : 'All-Access'}
         </span>
@@ -91,6 +128,19 @@ export default function QuickWinCard({ quickWin }: QuickWinCardProps) {
         {quickWin.category}
       </div>
 
+      {/* Translation badge */}
+      {showTranslationBadge && (
+        <div
+          className="inline-flex items-center gap-1 text-[9px] font-medium px-2 py-0.5 rounded-full mb-2 ml-2"
+          style={{ background: '#FEF3C7', color: '#92400E', border: '1px solid #FDE68A' }}
+        >
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+          </svg>
+          Traducción próximamente
+        </div>
+      )}
+
       {/* Title */}
       <div
         className="text-sm font-semibold mb-1 leading-snug"
@@ -99,7 +149,7 @@ export default function QuickWinCard({ quickWin }: QuickWinCardProps) {
           fontFamily: "'DM Sans', sans-serif",
         }}
       >
-        {quickWin.title}
+        {title}
       </div>
 
       {/* Meta */}

@@ -7,11 +7,15 @@ import CourseCard from '@/components/hub/CourseCard';
 import EmptyState from '@/components/hub/EmptyState';
 import { getSupabase } from '@/lib/supabase';
 import { enrollInCourse } from '@/lib/hooks/useEnrollment';
-import { BookOpen, CheckCircle, AlertCircle } from 'lucide-react';
+import { useFavorites } from '@/lib/hub/useFavorites';
+import { useLanguage } from '@/lib/hub/useLanguage';
+import { BookOpen, CheckCircle, AlertCircle, Heart } from 'lucide-react';
 
 // Filter categories
 const FILTER_CATEGORIES = [
   'All',
+  'Saved',
+  'In Progress',
   'Stress & Wellness',
   'Classroom Management',
   'Time Savers',
@@ -32,6 +36,8 @@ interface Course {
   is_published: boolean;
   access_tier?: string;
   is_free_rotating?: boolean;
+  title_es?: string | null;
+  description_es?: string | null;
 }
 
 interface Enrollment {
@@ -49,6 +55,8 @@ export default function CourseCatalogPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isEnrolling, setIsEnrolling] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const { language, t, hasSpanish } = useLanguage();
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
@@ -64,7 +72,7 @@ export default function CourseCatalogPage() {
         // Fetch all published courses
         const { data: courseData } = await supabase
           .from('hub_courses')
-          .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url, is_published, access_tier, is_free_rotating')
+          .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url, is_published, access_tier, is_free_rotating, title_es, description_es')
           .eq('is_published', true)
           .order('created_at', { ascending: false });
 
@@ -152,7 +160,10 @@ export default function CourseCatalogPage() {
 
   // Filter courses based on category
   const filteredCourses = courses.filter((course) => {
-    return activeFilter === 'All' || course.category === activeFilter;
+    if (activeFilter === 'All') return true;
+    if (activeFilter === 'Saved') return isFavorite(course.id);
+    if (activeFilter === 'In Progress') return !!enrollments[course.id];
+    return course.category === activeFilter;
   });
 
   // Get in-progress courses (enrolled but not completed)
@@ -246,24 +257,29 @@ export default function CourseCatalogPage() {
 
         {/* Filter Pills */}
         <div className="flex gap-2 mb-8 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
-          {FILTER_CATEGORIES.map((category) => (
-            <button
-              key={category}
-              onClick={() => setActiveFilter(category)}
-              className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0"
-              style={{
-                backgroundColor: activeFilter === category ? '#1B2A4A' : 'white',
-                color: activeFilter === category ? 'white' : '#6B7280',
-                border: activeFilter === category ? 'none' : '1px solid rgba(0,0,0,0.08)',
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
-              {category}
-            </button>
-          ))}
+          {FILTER_CATEGORIES.map((category) => {
+            const isSaved = category === 'Saved';
+            const isActive = activeFilter === category;
+            return (
+              <button
+                key={category}
+                onClick={() => setActiveFilter(category)}
+                className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5"
+                style={{
+                  backgroundColor: isActive ? (isSaved ? '#E53935' : '#1B2A4A') : 'white',
+                  color: isActive ? 'white' : '#6B7280',
+                  border: isActive ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                {isSaved && <Heart size={14} style={{ fill: isActive ? 'white' : 'none' }} />}
+                {category}
+              </button>
+            );
+          })}
         </div>
 
-        {/* In Progress Section */}
+        {/* In Progress Section - only show when filter is All */}
         {inProgressCourses.length > 0 && activeFilter === 'All' && (
           <div className="mb-10">
             <h2
@@ -285,6 +301,11 @@ export default function CourseCatalogPage() {
                   enrollment={enrollments[course.id] || null}
                   onEnroll={handleEnroll}
                   isEnrolling={isEnrolling === course.id}
+                  isFavorited={isFavorite(course.id)}
+                  onToggleFavorite={toggleFavorite}
+                  displayTitle={t(course.title, course.title_es)}
+                  displayDescription={t(course.description, course.description_es)}
+                  showTranslationBadge={language === 'es' && !hasSpanish(course.title_es)}
                 />
               ))}
             </div>
@@ -315,6 +336,11 @@ export default function CourseCatalogPage() {
                   enrollment={enrollments[course.id] || null}
                   onEnroll={handleEnroll}
                   isEnrolling={isEnrolling === course.id}
+                  isFavorited={isFavorite(course.id)}
+                  onToggleFavorite={toggleFavorite}
+                  displayTitle={t(course.title, course.title_es)}
+                  displayDescription={t(course.description, course.description_es)}
+                  showTranslationBadge={language === 'es' && !hasSpanish(course.title_es)}
                 />
               ))}
             </div>

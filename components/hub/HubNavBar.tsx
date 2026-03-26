@@ -11,6 +11,7 @@ import MomentMode from './MomentMode';
 import { checkTrackerEligibility } from '@/lib/hub/transformation';
 import { isAdmin } from '@/lib/hub/admin';
 import { isChampion } from '@/lib/hub/champion';
+import { useLanguage } from '@/lib/hub/useLanguage';
 import type { HubProfile } from '@/lib/hub-auth';
 
 interface HubNavBarProps {
@@ -40,6 +41,7 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
   const [trackerEligible, setTrackerEligible] = useState(false);
   const [isUserAdmin, setIsUserAdmin] = useState(false);
   const [isUserChampion, setIsUserChampion] = useState(false);
+  const { language, setLanguage } = useLanguage();
 
   // Check tracker eligibility, admin status, and champion status
   useEffect(() => {
@@ -171,6 +173,39 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
 
         {/* Right Side - Desktop */}
         <div className="hidden md:flex items-center gap-4">
+          {/* Language toggle */}
+          <div
+            className="flex items-center rounded-lg overflow-hidden"
+            style={{ border: '1px solid rgba(255,255,255,0.15)' }}
+          >
+            <button
+              onClick={() => setLanguage('en')}
+              className="px-2.5 py-1 text-xs font-bold transition-all"
+              style={{
+                background: language === 'en' ? '#FFBA06' : 'transparent',
+                color: language === 'en' ? '#1B2A4A' : 'rgba(255,255,255,0.45)',
+                border: 'none',
+                cursor: 'pointer',
+                letterSpacing: '0.04em',
+              }}
+            >
+              EN
+            </button>
+            <button
+              onClick={() => setLanguage('es')}
+              className="px-2.5 py-1 text-xs font-bold transition-all"
+              style={{
+                background: language === 'es' ? '#FFBA06' : 'transparent',
+                color: language === 'es' ? '#1B2A4A' : 'rgba(255,255,255,0.45)',
+                border: 'none',
+                cursor: 'pointer',
+                letterSpacing: '0.04em',
+              }}
+            >
+              ES
+            </button>
+          </div>
+
           {/* I need a moment button */}
           <button
             onClick={() => setMomentModeOpen(true)}
@@ -238,6 +273,8 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
           setMobileNavOpen(false);
           setMomentModeOpen(true);
         }}
+        language={language}
+        onSetLanguage={setLanguage}
       />
 
       {/* Moment Mode Overlay */}

@@ -4,11 +4,14 @@ import { useState, useEffect } from 'react';
 import QuickWinCard from '@/components/hub/QuickWinCard';
 import EmptyState from '@/components/hub/EmptyState';
 import { getSupabase } from '@/lib/supabase';
-import { Zap } from 'lucide-react';
+import { useFavorites } from '@/lib/hub/useFavorites';
+import { useLanguage } from '@/lib/hub/useLanguage';
+import { Zap, Heart } from 'lucide-react';
 
 // Filter categories for Quick Wins
 const FILTER_CATEGORIES = [
   'All',
+  'Saved',
   'Stress Relief',
   'Time Savers',
   'Classroom Tools',
@@ -27,12 +30,16 @@ interface QuickWin {
   course_slug?: string;
   access_tier?: string;
   is_free_rotating?: boolean;
+  title_es?: string | null;
+  description_es?: string | null;
 }
 
 export default function QuickWinsPage() {
   const [quickWins, setQuickWins] = useState<QuickWin[]>([]);
   const [activeFilter, setActiveFilter] = useState('All');
   const [isLoading, setIsLoading] = useState(true);
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const { language, t, hasSpanish } = useLanguage();
 
   useEffect(() => {
     async function loadQuickWins() {
@@ -65,6 +72,8 @@ export default function QuickWinsPage() {
             content_type: qw.quick_win_type || 'activity',
             access_tier: qw.access_tier,
             is_free_rotating: qw.is_free_rotating,
+            title_es: qw.title_es,
+            description_es: qw.description_es,
           }));
           setQuickWins(formattedQuickWins);
         }
@@ -80,7 +89,9 @@ export default function QuickWinsPage() {
 
   // Filter quick wins
   const filteredQuickWins = quickWins.filter((qw) => {
-    return activeFilter === 'All' || qw.category === activeFilter;
+    if (activeFilter === 'All') return true;
+    if (activeFilter === 'Saved') return isFavorite(qw.id);
+    return qw.category === activeFilter;
   });
 
   // Loading skeleton
@@ -153,28 +164,41 @@ export default function QuickWinsPage() {
 
         {/* Filter Pills */}
         <div className="flex gap-2 mb-8 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
-          {FILTER_CATEGORIES.map((category) => (
-            <button
-              key={category}
-              onClick={() => setActiveFilter(category)}
-              className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0"
-              style={{
-                backgroundColor: activeFilter === category ? '#1B2A4A' : 'white',
-                color: activeFilter === category ? 'white' : '#6B7280',
-                border: activeFilter === category ? 'none' : '1px solid rgba(0,0,0,0.08)',
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
-              {category}
-            </button>
-          ))}
+          {FILTER_CATEGORIES.map((category) => {
+            const isSaved = category === 'Saved';
+            const isActive = activeFilter === category;
+            return (
+              <button
+                key={category}
+                onClick={() => setActiveFilter(category)}
+                className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5"
+                style={{
+                  backgroundColor: isActive ? (isSaved ? '#E53935' : '#1B2A4A') : 'white',
+                  color: isActive ? 'white' : '#6B7280',
+                  border: isActive ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                {isSaved && <Heart size={14} style={{ fill: isActive ? 'white' : 'none' }} />}
+                {category}
+              </button>
+            );
+          })}
         </div>
 
         {/* Quick Wins Grid or Empty State */}
         {filteredQuickWins.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredQuickWins.map((qw) => (
-              <QuickWinCard key={qw.id} quickWin={qw} />
+              <QuickWinCard
+                key={qw.id}
+                quickWin={qw}
+                isFavorited={isFavorite(qw.id)}
+                onToggleFavorite={toggleFavorite}
+                displayTitle={t(qw.title, qw.title_es)}
+                displayDescription={t(qw.description, qw.description_es)}
+                showTranslationBadge={language === 'es' && !hasSpanish(qw.title_es)}
+              />
             ))}
           </div>
         ) : quickWins.length === 0 ? (

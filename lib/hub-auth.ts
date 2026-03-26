@@ -14,6 +14,7 @@ export interface HubProfile {
   onboarding_completed: boolean;
   onboarding_data: Record<string, unknown>;
   preferences: Record<string, unknown>;
+  preferred_language?: string | null;
   created_at: string;
   updated_at: string;
 }

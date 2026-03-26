@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
+import { useFavorites } from '@/lib/hub/useFavorites';
 import AvatarDisplay from '@/components/hub/AvatarDisplay';
 import EmptyState from '@/components/hub/EmptyState';
 import { getSupabase } from '@/lib/supabase';
@@ -17,6 +19,7 @@ import {
   Sparkles,
   Lock,
   TrendingUp,
+  Heart,
 } from 'lucide-react';
 import ShareMenu from '@/components/hub/ShareMenu';
 
@@ -42,15 +45,6 @@ const FALLBACK_TIPS = [
   'Five minutes of silence can change your entire afternoon.',
 ];
 
-// Check-in response messages
-const CHECKIN_RESPONSES: Record<number, string> = {
-  1: 'Glad you are having a good day.',
-  2: 'Glad you are having a good day.',
-  3: 'Hang in there. You have got this.',
-  4: 'Sending you a deep breath. Remember, "I need a moment" is always here.',
-  5: 'Sending you a deep breath. Remember, "I need a moment" is always here.',
-};
-
 interface Enrollment {
   id: string;
   course_id: string;
@@ -75,18 +69,26 @@ interface QuickWin {
   course_slug?: string;
 }
 
+interface SavedCourse {
+  id: string;
+  slug: string;
+  title: string;
+  category: string;
+}
+
 export default function HubDashboard() {
+  const router = useRouter();
   const { profile, user } = useHub();
+  const { favorites } = useFavorites();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [quickWin, setQuickWin] = useState<QuickWin | null>(null);
   const [tip, setTip] = useState<string>(FALLBACK_TIPS[0]);
   const [certificateCount, setCertificateCount] = useState<number>(0);
-  const [todayCheckIn, setTodayCheckIn] = useState<number | null>(null);
-  const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [trackerEligibility, setTrackerEligibility] = useState<TrackerEligibility | null>(null);
   const [recommendations, setRecommendations] = useState<RecommendedCourse[]>([]);
   const [showRecommendations, setShowRecommendations] = useState(false);
+  const [savedCourses, setSavedCourses] = useState<SavedCourse[]>([]);
 
   const firstName = profile?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Teacher';
   const dailyMessage = DAILY_MESSAGES[new Date().getDay()];
@@ -227,22 +229,6 @@ export default function HubDashboard() {
           .eq('user_id', user.id);
 
         setCertificateCount(certCount || 0);
-
-        // Check if user already checked in today
-        const today = new Date().toISOString().split('T')[0];
-        const { data: checkInData } = await supabase
-          .from('hub_assessments')
-          .select('score')
-          .eq('user_id', user.id)
-          .eq('type', 'daily_check_in')
-          .gte('created_at', `${today}T00:00:00`)
-          .lte('created_at', `${today}T23:59:59`)
-          .order('created_at', { ascending: false })
-          .limit(1);
-
-        if (checkInData && checkInData.length > 0) {
-          setTodayCheckIn(checkInData[0].score);
-        }
       } catch (error) {
         console.error('Error loading dashboard data:', error);
       } finally {
@@ -253,29 +239,30 @@ export default function HubDashboard() {
     loadDashboardData();
   }, [user?.id]);
 
-  const handleCheckIn = async (score: number) => {
-    if (!user?.id || isCheckingIn) return;
-
-    setIsCheckingIn(true);
-    const supabase = getSupabase();
-
-    try {
-      const { error } = await supabase.from('hub_assessments').insert({
-        user_id: user.id,
-        type: 'daily_check_in',
-        score: score,
-        data: { source: 'dashboard_widget' },
-      });
-
-      if (!error) {
-        setTodayCheckIn(score);
+  // Load saved courses when favorites change
+  useEffect(() => {
+    async function loadSavedCourses() {
+      if (favorites.size === 0) {
+        setSavedCourses([]);
+        return;
       }
-    } catch (error) {
-      console.error('Error saving check-in:', error);
-    } finally {
-      setIsCheckingIn(false);
+
+      const supabase = getSupabase();
+      const favoriteIds = Array.from(favorites);
+
+      const { data } = await supabase
+        .from('hub_courses')
+        .select('id, slug, title, category')
+        .in('id', favoriteIds)
+        .eq('is_published', true);
+
+      if (data) {
+        setSavedCourses(data);
+      }
     }
-  };
+
+    loadSavedCourses();
+  }, [favorites]);
 
   // Loading skeleton
   if (isLoading) {
@@ -440,6 +427,34 @@ export default function HubDashboard() {
             )}
           </div>
 
+          {/* Saved - only show if teacher has bookmarked anything */}
+          {savedCourses.length > 0 && (
+            <div>
+              <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
+                Saved
+              </div>
+              <div className="grid grid-cols-1 gap-2 mb-4">
+                {savedCourses.slice(0, 3).map(course => (
+                  <div
+                    key={course.id}
+                    className="bg-white rounded-xl flex items-center gap-3 px-4 py-3 cursor-pointer hover:shadow-sm transition-shadow"
+                    style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+                    onClick={() => router.push(`/hub/courses/${course.slug}`)}
+                  >
+                    <Heart size={14} style={{ color: '#E53935', fill: '#E53935', flexShrink: 0 }} />
+                    <span className="text-sm font-medium flex-1" style={{ color: '#1B2A4A' }}>{course.title}</span>
+                    <span className="text-xs" style={{ color: '#9CA3AF' }}>{course.category}</span>
+                  </div>
+                ))}
+              </div>
+              {savedCourses.length > 3 && (
+                <Link href="/hub/courses?filter=Saved" className="text-xs font-semibold" style={{ color: '#38618C' }}>
+                  View all {savedCourses.length} saved →
+                </Link>
+              )}
+            </div>
+          )}
+
           {/* Recommended for You Section */}
           {showRecommendations && recommendations.length > 0 && (
             <div>
@@ -561,49 +576,6 @@ export default function HubDashboard() {
             <Link href="/hub/certificates" className="ml-auto text-xs font-semibold" style={{ color: '#38618C' }}>
               View all →
             </Link>
-          </div>
-
-          {/* Check-In Widget */}
-          <div
-            className="bg-white rounded-2xl p-5 mb-4"
-            style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
-          >
-            <div className="text-sm font-semibold mb-3.5" style={{ color: '#1B2A4A' }}>
-              How are you feeling today?
-            </div>
-
-            {todayCheckIn !== null ? (
-              <div
-                className="p-4 rounded-lg"
-                style={{ backgroundColor: '#FFF8E7' }}
-              >
-                <p className="text-sm text-gray-700">
-                  Thanks for checking in. {CHECKIN_RESPONSES[todayCheckIn]}
-                </p>
-              </div>
-            ) : (
-              <div className="flex gap-1.5">
-                {[
-                  { label: 'Thriving', score: 5, bg: '#4CAF50', textColor: 'rgba(255,255,255,0.95)' },
-                  { label: 'Good',     score: 4, bg: '#8BC34A', textColor: 'rgba(255,255,255,0.95)' },
-                  { label: 'Okay',     score: 3, bg: '#FFC107', textColor: 'rgba(0,0,0,0.6)'        },
-                  { label: 'Tough',    score: 2, bg: '#FF7043', textColor: 'rgba(255,255,255,0.95)' },
-                  { label: 'Rough',    score: 1, bg: '#E53935', textColor: 'rgba(255,255,255,0.95)' },
-                ].map(({ label, score, bg, textColor }) => (
-                  <button
-                    key={score}
-                    onClick={() => handleCheckIn(score)}
-                    disabled={isCheckingIn}
-                    className="flex-1 rounded-lg border-none cursor-pointer flex items-center justify-center transition-transform hover:-translate-y-0.5 disabled:opacity-50"
-                    style={{ background: bg, height: '44px' }}
-                  >
-                    <span style={{ fontSize: '11px', fontWeight: '500', color: textColor }}>
-                      {label}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Transformation Tracker - shown when not eligible */}
