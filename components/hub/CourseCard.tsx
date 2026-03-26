@@ -37,7 +37,6 @@ interface CourseCardProps {
   onToggleFavorite?: (id: string, type: 'course' | 'quick_win') => void;
   displayTitle?: string;
   displayDescription?: string;
-  showTranslationBadge?: boolean;
 }
 
 export default function CourseCard({
@@ -49,7 +48,6 @@ export default function CourseCard({
   onToggleFavorite,
   displayTitle,
   displayDescription,
-  showTranslationBadge = false,
 }: CourseCardProps) {
   // Use display props if provided, otherwise fall back to course data
   const title = displayTitle || course.title;
@@ -163,19 +161,6 @@ export default function CourseCard({
         >
           {course.category}
         </span>
-
-        {/* Translation badge */}
-        {showTranslationBadge && (
-          <div
-            className="inline-flex items-center gap-1 text-[9px] font-medium px-2 py-0.5 rounded-full mb-2"
-            style={{ background: '#FEF3C7', color: '#92400E', border: '1px solid #FDE68A' }}
-          >
-            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
-            </svg>
-            Traducción próximamente
-          </div>
-        )}
 
         {/* Title */}
         <h3

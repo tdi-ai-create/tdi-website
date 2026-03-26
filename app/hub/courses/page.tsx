@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
 import CourseCard from '@/components/hub/CourseCard';
@@ -56,54 +56,84 @@ export default function CourseCatalogPage() {
   const [isEnrolling, setIsEnrolling] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const { isFavorite, toggleFavorite } = useFavorites();
-  const { language, t, hasSpanish } = useLanguage();
+  const { language, t } = useLanguage();
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
 
-  useEffect(() => {
-    async function loadCourses() {
-      const supabase = getSupabase();
-      setIsLoading(true);
+  const loadCourses = useCallback(async () => {
+    const supabase = getSupabase();
+    setIsLoading(true);
 
-      try {
-        // Fetch all published courses
-        const { data: courseData } = await supabase
-          .from('hub_courses')
-          .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url, is_published, access_tier, is_free_rotating, title_es, description_es')
-          .eq('is_published', true)
-          .order('created_at', { ascending: false });
+    try {
+      // Fetch all published courses
+      const { data: courseData } = await supabase
+        .from('hub_courses')
+        .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url, is_published, access_tier, is_free_rotating, title_es, description_es')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false });
 
-        if (courseData) {
-          setCourses(courseData);
-        }
-
-        // Fetch user's enrollments if logged in
-        if (user?.id) {
-          const { data: enrollmentData } = await supabase
-            .from('hub_enrollments')
-            .select('course_id, status, progress_percentage')
-            .eq('user_id', user.id);
-
-          if (enrollmentData) {
-            const enrollmentMap: Record<string, Enrollment> = {};
-            enrollmentData.forEach((e) => {
-              enrollmentMap[e.course_id] = e;
-            });
-            setEnrollments(enrollmentMap);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading courses:', error);
-      } finally {
-        setIsLoading(false);
+      if (courseData) {
+        setCourses(courseData);
       }
-    }
 
-    loadCourses();
+      // Fetch user's enrollments if logged in
+      if (user?.id) {
+        const { data: enrollmentData } = await supabase
+          .from('hub_enrollments')
+          .select('course_id, status, progress_percentage')
+          .eq('user_id', user.id);
+
+        if (enrollmentData) {
+          const enrollmentMap: Record<string, Enrollment> = {};
+          enrollmentData.forEach((e) => {
+            enrollmentMap[e.course_id] = e;
+          });
+          setEnrollments(enrollmentMap);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading courses:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }, [user?.id]);
+
+  useEffect(() => {
+    loadCourses();
+  }, [loadCourses]);
+
+  // Auto-translate courses when Spanish is selected
+  useEffect(() => {
+    if (language !== 'es' || courses.length === 0 || isLoading) return;
+
+    // Find courses that need translation
+    const coursesNeedingTranslation = courses.filter(course => !course.title_es);
+    if (coursesNeedingTranslation.length === 0) return;
+
+    // Trigger translation for courses missing Spanish content
+    // Translations cache to database - subsequent loads are instant
+    let translationTriggered = false;
+    coursesNeedingTranslation.forEach(course => {
+      fetch('/api/hub/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contentType: 'course',
+          contentId: course.id,
+          lang: 'es',
+        }),
+      }).then(res => {
+        if (res.ok && !translationTriggered) {
+          translationTriggered = true;
+          // Refresh courses to get translated content after first successful translation
+          setTimeout(() => loadCourses(), 500);
+        }
+      }).catch(() => {}); // Silent fail - English fallback is fine
+    });
+  }, [language, courses.length, isLoading, loadCourses]);
 
   const handleEnroll = async (courseId: string) => {
     console.log('[CourseCatalogPage] handleEnroll called', { courseId, userId: user?.id });
@@ -305,7 +335,6 @@ export default function CourseCatalogPage() {
                   onToggleFavorite={toggleFavorite}
                   displayTitle={t(course.title, course.title_es)}
                   displayDescription={t(course.description, course.description_es)}
-                  showTranslationBadge={language === 'es' && !hasSpanish(course.title_es)}
                 />
               ))}
             </div>
@@ -340,7 +369,6 @@ export default function CourseCatalogPage() {
                   onToggleFavorite={toggleFavorite}
                   displayTitle={t(course.title, course.title_es)}
                   displayDescription={t(course.description, course.description_es)}
-                  showTranslationBadge={language === 'es' && !hasSpanish(course.title_es)}
                 />
               ))}
             </div>

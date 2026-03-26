@@ -96,7 +96,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
   const { enrollment, isEnrolled, isEnrolling, enroll } = useEnrollment(course?.id || null, user?.id || null);
   const { progress, toggleLessonComplete } = useProgressTracking(course?.id || null, user?.id || null);
-  const { language, t, hasSpanish } = useLanguage();
+  const { language, t } = useLanguage();
 
   // Fetch course data
   useEffect(() => {
@@ -237,6 +237,33 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
     loadCourse();
   }, [slug]);
+
+  // Auto-translate course when Spanish is selected and content is missing
+  useEffect(() => {
+    if (language !== 'es' || !course) return;
+    if (course.title_es && course.description_es) return; // Already translated
+
+    fetch('/api/hub/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contentType: 'course',
+        contentId: course.id,
+        lang: 'es',
+      }),
+    }).then(res => {
+      if (res.ok) return res.json();
+    }).then(data => {
+      if (data) {
+        // Update local state with translated content
+        setCourse(prev => prev ? {
+          ...prev,
+          title_es: data.title_es || prev.title_es,
+          description_es: data.description_es || prev.description_es,
+        } : prev);
+      }
+    }).catch(() => {});
+  }, [language, course?.id]);
 
   const handleEnroll = async () => {
     console.log('[CourseDetailPage] handleEnroll called');
@@ -416,19 +443,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             />
 
             <div className="relative z-10 px-9 py-8">
-              {/* Translation badge */}
-              {language === 'es' && !hasSpanish(course.title_es) && (
-                <div
-                  className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full mb-3"
-                  style={{ background: '#FEF3C7', color: '#92400E', border: '1px solid #FDE68A' }}
-                >
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
-                  </svg>
-                  Traducción próximamente
-                </div>
-              )}
-
               {/* Category tag */}
               {course.category && (
                 <div

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import QuickWinCard from '@/components/hub/QuickWinCard';
 import EmptyState from '@/components/hub/EmptyState';
 import { getSupabase } from '@/lib/supabase';
@@ -39,53 +39,82 @@ export default function QuickWinsPage() {
   const [activeFilter, setActiveFilter] = useState('All');
   const [isLoading, setIsLoading] = useState(true);
   const { isFavorite, toggleFavorite } = useFavorites();
-  const { language, t, hasSpanish } = useLanguage();
+  const { language, t } = useLanguage();
+
+  const loadQuickWins = useCallback(async () => {
+    const supabase = getSupabase();
+    setIsLoading(true);
+
+    try {
+      // Fetch all published quick wins from hub_quick_wins table
+      console.log('[QuickWins] Fetching from hub_quick_wins...');
+      const { data, error } = await supabase
+        .from('hub_quick_wins')
+        .select('*')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false });
+
+      console.log('[QuickWins] Result:', { data, error, count: data?.length });
+
+      if (error) {
+        console.error('[QuickWins] Query error:', error);
+      }
+
+      if (data) {
+        const formattedQuickWins: QuickWin[] = data.map((qw) => ({
+          id: qw.id,
+          slug: qw.slug,
+          title: qw.title,
+          description: qw.description || '',
+          category: qw.category || 'Classroom Tools',
+          estimated_minutes: qw.duration_minutes || 5,
+          content_type: qw.quick_win_type || 'activity',
+          access_tier: qw.access_tier,
+          is_free_rotating: qw.is_free_rotating,
+          title_es: qw.title_es,
+          description_es: qw.description_es,
+        }));
+        setQuickWins(formattedQuickWins);
+      }
+    } catch (error) {
+      console.error('Error loading quick wins:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    async function loadQuickWins() {
-      const supabase = getSupabase();
-      setIsLoading(true);
-
-      try {
-        // Fetch all published quick wins from hub_quick_wins table
-        console.log('[QuickWins] Fetching from hub_quick_wins...');
-        const { data, error } = await supabase
-          .from('hub_quick_wins')
-          .select('*')
-          .eq('is_published', true)
-          .order('created_at', { ascending: false });
-
-        console.log('[QuickWins] Result:', { data, error, count: data?.length });
-
-        if (error) {
-          console.error('[QuickWins] Query error:', error);
-        }
-
-        if (data) {
-          const formattedQuickWins: QuickWin[] = data.map((qw) => ({
-            id: qw.id,
-            slug: qw.slug,
-            title: qw.title,
-            description: qw.description || '',
-            category: qw.category || 'Classroom Tools',
-            estimated_minutes: qw.duration_minutes || 5,
-            content_type: qw.quick_win_type || 'activity',
-            access_tier: qw.access_tier,
-            is_free_rotating: qw.is_free_rotating,
-            title_es: qw.title_es,
-            description_es: qw.description_es,
-          }));
-          setQuickWins(formattedQuickWins);
-        }
-      } catch (error) {
-        console.error('Error loading quick wins:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     loadQuickWins();
-  }, []);
+  }, [loadQuickWins]);
+
+  // Auto-translate quick wins when Spanish is selected
+  useEffect(() => {
+    if (language !== 'es' || quickWins.length === 0 || isLoading) return;
+
+    // Find quick wins that need translation
+    const qwNeedingTranslation = quickWins.filter(qw => !qw.title_es);
+    if (qwNeedingTranslation.length === 0) return;
+
+    // Trigger translation for quick wins missing Spanish content
+    let translationTriggered = false;
+    qwNeedingTranslation.forEach(qw => {
+      fetch('/api/hub/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contentType: 'quick_win',
+          contentId: qw.id,
+          lang: 'es',
+        }),
+      }).then(res => {
+        if (res.ok && !translationTriggered) {
+          translationTriggered = true;
+          // Refresh quick wins to get translated content
+          setTimeout(() => loadQuickWins(), 500);
+        }
+      }).catch(() => {}); // Silent fail - English fallback is fine
+    });
+  }, [language, quickWins.length, isLoading, loadQuickWins]);
 
   // Filter quick wins
   const filteredQuickWins = quickWins.filter((qw) => {
@@ -197,7 +226,6 @@ export default function QuickWinsPage() {
                 onToggleFavorite={toggleFavorite}
                 displayTitle={t(qw.title, qw.title_es)}
                 displayDescription={t(qw.description, qw.description_es)}
-                showTranslationBadge={language === 'es' && !hasSpanish(qw.title_es)}
               />
             ))}
           </div>
