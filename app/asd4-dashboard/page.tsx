@@ -4349,14 +4349,14 @@ Thank you for setting the example. It matters more than you know.`;
                     </div>
                   </div>
 
-                  {/* April Virtual */}
+                  {/* May Virtual */}
                   <div className="relative">
                     <div className="absolute left-[-26px] w-6 h-6 rounded-full bg-teal-500 border-2 border-white flex items-center justify-center">
                       <MessageCircle className="w-3 h-3 text-white" />
                     </div>
                     <div className="bg-teal-50 rounded-lg p-4 border border-teal-200">
-                      <p className="text-xs font-bold text-teal-700 uppercase mb-1">April 2027</p>
-                      <p className="font-semibold text-[#1e2749]">Virtual Session 4</p>
+                      <p className="text-xs font-bold text-teal-700 uppercase mb-1">May 2026</p>
+                      <p className="font-semibold text-[#1e2749]">Virtual Session 4 · May 4, 2026 · 7:30 – 8:15 AM · Virtual</p>
                       <p className="text-sm text-gray-600">Leadership pathway conversations - growing paras into district leaders.</p>
                     </div>
                   </div>
