@@ -5,67 +5,99 @@ import { getSupabase } from '@/lib/supabase'
 
 type ViewMode = 'kanban' | 'list'
 
-type GHLStage = {
+// Supabase sales_opportunities row shape
+interface SalesOpportunity {
   id: string
+  ghl_opportunity_id: string | null
   name: string
-  position?: number
+  type: 'new_business' | 'renewal' | 'upsell' | 'reactivation'
+  stage: string
+  value: number | null
+  probability: number | null
+  assigned_to_email: string | null
+  source: string | null
+  notes: string | null
+  last_activity_at: string | null
+  created_at: string
+  updated_at: string
 }
 
-type GHLOpportunity = {
+// UI Opportunity shape - keeps rendering code unchanged
+interface Opportunity {
   id: string
+  supabase_id: string
+  ghl_id: string | null
   name: string
-  monetaryValue?: number
-  status: string
-  pipelineStageId: string
-  pipelineStageName?: string
-  assignedTo?: string
-  contact?: {
-    name?: string
-    email?: string
-    company?: string
-  }
-  createdAt?: string
-  updatedAt?: string
+  stage: string
+  stageName: string
+  value: number | null
+  type: string
+  assignedTo: string | null
+  isRenewal: boolean
+  lastActivityAt: string | null
 }
 
-type LocalNote = {
+interface ActivityNote {
   id: string
-  ghl_opportunity_id: string
-  note: string
-  next_action_date: string | null
-  needs_attention: boolean
+  opportunity_id: string
+  activity_type: string
+  body: string
+  activity_date: string
   created_at: string
 }
 
+// Stage display name map
+const STAGE_DISPLAY: Record<string, string> = {
+  unassigned: 'Unassigned',
+  targeting: 'Targeting (5%)',
+  engaged: 'Engaged (10%)',
+  qualified: 'Qualified (30%)',
+  likely_yes: 'Likely Yes (50%)',
+  proposal_sent: 'Proposal Sent (70%)',
+  signed: 'Signed (90%)',
+  paid: 'Paid (100%)',
+  lost: 'Lost',
+}
+
+// Stage order for kanban columns and dropdown
+const STAGE_OPTIONS = [
+  { id: 'unassigned', name: 'Unassigned' },
+  { id: 'targeting', name: 'Targeting (5%)' },
+  { id: 'engaged', name: 'Engaged (10%)' },
+  { id: 'qualified', name: 'Qualified (30%)' },
+  { id: 'likely_yes', name: 'Likely Yes (50%)' },
+  { id: 'proposal_sent', name: 'Proposal Sent (70%)' },
+  { id: 'signed', name: 'Signed (90%)' },
+  { id: 'paid', name: 'Paid (100%)' },
+  { id: 'lost', name: 'Lost' },
+]
+
 const STAGE_COLORS: Record<string, string> = {
-  'Unassigned': 'bg-gray-100 border-gray-200 text-gray-600',
-  'New': 'bg-slate-100 border-slate-200 text-slate-700',
-  'Targeting': 'bg-blue-100 border-blue-200 text-blue-700',
-  'Engaged': 'bg-indigo-100 border-indigo-200 text-indigo-700',
-  'Qualified': 'bg-violet-100 border-violet-200 text-violet-700',
-  'Likely Yes': 'bg-purple-100 border-purple-200 text-purple-700',
-  'Proposal Sent': 'bg-amber-100 border-amber-200 text-amber-700',
-  'Signed': 'bg-orange-100 border-orange-200 text-orange-700',
-  'Paid': 'bg-green-100 border-green-200 text-green-700',
+  'unassigned': 'bg-gray-100 border-gray-200 text-gray-600',
+  'targeting': 'bg-blue-100 border-blue-200 text-blue-700',
+  'engaged': 'bg-indigo-100 border-indigo-200 text-indigo-700',
+  'qualified': 'bg-violet-100 border-violet-200 text-violet-700',
+  'likely_yes': 'bg-purple-100 border-purple-200 text-purple-700',
+  'proposal_sent': 'bg-amber-100 border-amber-200 text-amber-700',
+  'signed': 'bg-orange-100 border-orange-200 text-orange-700',
+  'paid': 'bg-green-100 border-green-200 text-green-700',
+  'lost': 'bg-red-100 border-red-200 text-red-700',
 }
 
 export default function SalesPage() {
   const supabase = getSupabase()
   const [view, setView] = useState<ViewMode>('list')
-  const [pipelineId, setPipelineId] = useState<string>('')
-  const [stages, setStages] = useState<GHLStage[]>([])
-  const [opportunities, setOpportunities] = useState<GHLOpportunity[]>([])
-  const [notes, setNotes] = useState<LocalNote[]>([])
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([])
+  const [notes, setNotes] = useState<ActivityNote[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [selectedStage, setSelectedStage] = useState<string>('all')
   const [activeNoteOpp, setActiveNoteOpp] = useState<string | null>(null)
   const [newNote, setNewNote] = useState('')
-  const [newNextAction, setNewNextAction] = useState('')
   const [savingNote, setSavingNote] = useState(false)
   const [lastSynced, setLastSynced] = useState<Date | null>(null)
-  const [hideUnassigned, setHideUnassigned] = useState(true) // default ON
+  const [hideUnassigned, setHideUnassigned] = useState(true)
   const [hideZeroValue, setHideZeroValue] = useState(false)
   const [activePreset, setActivePreset] = useState<string | null>(null)
   const [updatingOpportunity, setUpdatingOpportunity] = useState<string | null>(null)
@@ -80,79 +112,86 @@ export default function SalesPage() {
     setError('')
 
     try {
-      // Fetch pipeline stages
-      const pipelinesRes = await fetch('/api/ghl/pipelines')
-      const pipelinesData = await pipelinesRes.json()
+      // Fetch opportunities from Supabase
+      const { data, error: fetchError } = await supabase
+        .from('sales_opportunities')
+        .select('*')
+        .not('stage', 'eq', 'lost')
+        .order('value', { ascending: false, nullsFirst: false })
 
-      if (pipelinesData.error) {
-        setError(pipelinesData.error)
-        setLoading(false)
-        return
-      }
+      if (fetchError) throw fetchError
 
-      // Find the Sales Pipeline
-      const salesPipeline = pipelinesData.pipelines?.find(
-        (p: any) => p.name?.toLowerCase().includes('sales')
-      ) ?? pipelinesData.pipelines?.[0]
+      // Map Supabase rows to UI Opportunity shape
+      const mapped: Opportunity[] = (data || []).map((row: SalesOpportunity) => ({
+        id: row.ghl_opportunity_id || row.id,
+        supabase_id: row.id,
+        ghl_id: row.ghl_opportunity_id,
+        name: row.name,
+        stage: row.stage,
+        stageName: STAGE_DISPLAY[row.stage] || row.stage,
+        value: row.value,
+        type: row.type,
+        assignedTo: row.assigned_to_email,
+        isRenewal: row.type === 'renewal' || row.name.toLowerCase().includes('renewal'),
+        lastActivityAt: row.last_activity_at,
+      }))
 
-      if (salesPipeline) {
-        setPipelineId(salesPipeline.id)
-        if (salesPipeline.stages) {
-          const sortedStages = [...salesPipeline.stages].sort(
-            (a: any, b: any) => (a.position ?? 0) - (b.position ?? 0)
-          )
-          setStages(sortedStages)
-        }
-      }
-
-      // Fetch opportunities
-      const oppsRes = await fetch('/api/ghl/pipeline?limit=100')
-      const oppsData = await oppsRes.json()
-
-      if (oppsData.error) {
-        setError(oppsData.error)
-        setLoading(false)
-        return
-      }
-
-      const opps: GHLOpportunity[] = oppsData.opportunities ?? oppsData.data ?? []
-      setOpportunities(opps)
+      setOpportunities(mapped)
       setLastSynced(new Date())
 
-      // Fetch local notes
+      // Fetch activity notes
       const { data: notesData } = await supabase
-        .from('opportunity_notes')
+        .from('activity_log')
         .select('*')
-        .order('created_at', { ascending: false })
+        .eq('activity_type', 'note')
+        .order('activity_date', { ascending: false })
 
       setNotes(notesData ?? [])
-    } catch (err) {
-      setError('Failed to connect to GHL. Check your API credentials.')
+    } catch (err: any) {
+      setError(err.message || 'Failed to load opportunities')
     }
 
     setLoading(false)
   }
 
-  async function saveNote(oppId: string, oppName: string) {
+  async function saveNote(supabaseId: string) {
     if (!newNote.trim()) return
     setSavingNote(true)
 
-    await supabase.from('opportunity_notes').insert({
-      ghl_opportunity_id: oppId,
-      ghl_opportunity_name: oppName,
-      note: newNote.trim(),
-      next_action_date: newNextAction || null,
-      needs_attention: !!newNextAction && new Date(newNextAction) < new Date(),
+    const { error: insertError } = await supabase.from('activity_log').insert({
+      opportunity_id: supabaseId,
+      activity_type: 'note',
+      subject: 'Note',
+      body: newNote.trim(),
+      logged_by_email: 'admin@teachersdeserveit.com',
+      activity_date: new Date().toISOString(),
     })
 
-    const { data } = await supabase
-      .from('opportunity_notes')
-      .select('*')
-      .order('created_at', { ascending: false })
+    if (!insertError) {
+      // Refresh notes
+      const { data: notesData } = await supabase
+        .from('activity_log')
+        .select('*')
+        .eq('activity_type', 'note')
+        .order('activity_date', { ascending: false })
 
-    setNotes(data ?? [])
+      setNotes(notesData ?? [])
+
+      // Update last_activity_at on the opportunity
+      await supabase
+        .from('sales_opportunities')
+        .update({ last_activity_at: new Date().toISOString() })
+        .eq('id', supabaseId)
+
+      // Update local state
+      setOpportunities(prev => prev.map(opp =>
+        opp.supabase_id === supabaseId
+          ? { ...opp, lastActivityAt: new Date().toISOString() }
+          : opp
+      ))
+    }
+
     setNewNote('')
-    setNewNextAction('')
     setActiveNoteOpp(null)
     setSavingNote(false)
   }
@@ -162,108 +201,100 @@ export default function SalesPage() {
     setTimeout(() => setToast(null), 3000)
   }
 
-  async function updateStage(opportunityId: string, newStageId: string, newStageName: string) {
-    setUpdatingOpportunity(opportunityId)
+  async function updateStage(supabaseId: string, ghlId: string | null, newStageId: string, newStageName: string) {
+    const originalOpp = opportunities.find(o => o.supabase_id === supabaseId)
+    const originalStage = originalOpp?.stage
+    const originalStageName = originalOpp?.stageName
 
-    // Store original values for potential revert
-    const originalOpp = opportunities.find(o => o.id === opportunityId)
-    const originalStageId = originalOpp?.pipelineStageId
-    const originalStageName = originalOpp?.pipelineStageName
-
-    // Optimistic update - change stage in local state immediately
+    // Optimistic UI update
     setOpportunities(prev => prev.map(opp =>
-      opp.id === opportunityId
-        ? { ...opp, pipelineStageId: newStageId, pipelineStageName: newStageName }
+      opp.supabase_id === supabaseId
+        ? { ...opp, stage: newStageId, stageName: newStageName }
         : opp
     ))
 
-    try {
-      const res = await fetch(`/api/ghl/opportunity/${opportunityId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pipelineStageId: newStageId, pipelineId }),
-      })
+    setUpdatingOpportunity(supabaseId)
 
-      if (!res.ok) throw new Error('Update failed')
+    try {
+      // 1. Update Supabase (primary - source of truth)
+      const { error: supabaseError } = await supabase
+        .from('sales_opportunities')
+        .update({ stage: newStageId, updated_at: new Date().toISOString() })
+        .eq('id', supabaseId)
+
+      if (supabaseError) throw new Error('Supabase update failed: ' + supabaseError.message)
+
+      // 2. Write back to GHL if we have a GHL ID (secondary - keeps GHL in sync)
+      if (ghlId) {
+        try {
+          await fetch(`/api/ghl/opportunity/${ghlId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              pipelineStageId: newStageId,
+              pipelineId: 'tdi-crm', // placeholder for GHL compatibility
+            }),
+          })
+          // GHL failure is non-blocking - Supabase is source of truth
+        } catch {
+          console.warn('GHL write-back failed - Supabase updated successfully')
+        }
+      }
 
       showToast(`Stage updated to "${newStageName}"`, 'success')
-    } catch {
-      // Revert optimistic update on error
+    } catch (err: any) {
+      // Revert optimistic update on Supabase failure
       setOpportunities(prev => prev.map(opp =>
-        opp.id === opportunityId
-          ? { ...opp, pipelineStageId: originalStageId ?? '', pipelineStageName: originalStageName }
+        opp.supabase_id === supabaseId
+          ? { ...opp, stage: originalStage ?? '', stageName: originalStageName ?? '' }
           : opp
       ))
-      showToast('Failed to update stage - try again', 'error')
+      showToast('Failed to update stage - please try again', 'error')
     } finally {
       setUpdatingOpportunity(null)
     }
   }
 
-  function getOppNotes(oppId: string) {
-    return notes.filter(n => n.ghl_opportunity_id === oppId)
+  function getOppNotes(supabaseId: string) {
+    return notes.filter(n => n.opportunity_id === supabaseId)
   }
 
-  function getLatestNote(oppId: string) {
-    return getOppNotes(oppId)[0] ?? null
+  function getLatestNote(supabaseId: string) {
+    return getOppNotes(supabaseId)[0] ?? null
   }
 
-  function isNeedsAttention(oppId: string) {
-    const latest = getLatestNote(oppId)
-    if (!latest?.next_action_date) return false
-    return new Date(latest.next_action_date) < new Date()
+  function isNeedsAttention(opp: Opportunity) {
+    // Needs attention if no activity in 14 days
+    if (!opp.lastActivityAt) return true
+    const daysSinceActivity = (Date.now() - new Date(opp.lastActivityAt).getTime()) / (1000 * 60 * 60 * 24)
+    return daysSinceActivity > 14
   }
 
-  function getStageName(stageId: string) {
-    return stages.find(s => s.id === stageId)?.name ?? stageId
+  function getStageColor(stage: string) {
+    return STAGE_COLORS[stage] || 'bg-gray-100 border-gray-200 text-gray-600'
   }
-
-  function getStageColor(stageName: string) {
-    const key = Object.keys(STAGE_COLORS).find(k =>
-      stageName?.toLowerCase().includes(k.toLowerCase())
-    )
-    return key ? STAGE_COLORS[key] : 'bg-gray-100 border-gray-200 text-gray-600'
-  }
-
-  // Deduplicate by contact name - keep only the first occurrence (latest if sorted by date)
-  const deduped = opportunities.filter((opp, index, self) => {
-    if (!opp.name) return true
-    return index === self.findIndex(o => o.name === opp.name)
-  })
 
   // Preset filter functions
-  const presetFilters: Record<string, (o: GHLOpportunity) => boolean> = {
-    renewals: (o) => o.name?.toLowerCase().includes('renewal') ?? false,
-    active: (o) => {
-      const stage = getStageName(o.pipelineStageId)?.toLowerCase() ?? ''
-      return ['qualified', 'likely yes', 'proposal sent', 'signed'].some(s => stage.includes(s))
-    },
-    attention: (o) => isNeedsAttention(o.id),
-    recent: (o) => {
-      const oppNotes = getOppNotes(o.id)
-      if (oppNotes.length === 0) return false
-      const hours = (Date.now() - new Date(oppNotes[0].created_at).getTime()) / (1000 * 60 * 60)
-      return hours <= 24
-    },
+  const presetFilters: Record<string, (o: Opportunity) => boolean> = {
+    renewals: (o) => o.isRenewal,
+    active: (o) => ['qualified', 'likely_yes', 'proposal_sent', 'signed'].includes(o.stage),
+    attention: (o) => isNeedsAttention(o),
+    hot: (o) => ['likely_yes', 'proposal_sent', 'signed'].includes(o.stage),
   }
 
   // Apply all filters
-  const filtered = deduped.filter(opp => {
+  const filtered = opportunities.filter(opp => {
     // Stage filter dropdown
-    if (selectedStage !== 'all' && opp.pipelineStageId !== selectedStage) return false
+    if (selectedStage !== 'all' && opp.stage !== selectedStage) return false
 
     // Search
-    if (search && !opp.name?.toLowerCase().includes(search.toLowerCase()) &&
-        !opp.contact?.company?.toLowerCase().includes(search.toLowerCase())) return false
+    if (search && !opp.name?.toLowerCase().includes(search.toLowerCase())) return false
 
     // Hide unassigned
-    if (hideUnassigned) {
-      const stageName = getStageName(opp.pipelineStageId)?.toLowerCase() ?? ''
-      if (stageName.includes('unassigned')) return false
-    }
+    if (hideUnassigned && opp.stage === 'unassigned') return false
 
     // Hide $0 value
-    if (hideZeroValue && (!opp.monetaryValue || opp.monetaryValue === 0)) return false
+    if (hideZeroValue && (!opp.value || opp.value === 0)) return false
 
     // Active preset
     if (activePreset && presetFilters[activePreset] && !presetFilters[activePreset](opp)) return false
@@ -271,39 +302,33 @@ export default function SalesPage() {
     return true
   })
 
-  // Group by stage for kanban
-  const byStage: Record<string, GHLOpportunity[]> = {}
-  stages.forEach(s => { byStage[s.id] = [] })
+  // Group by stage for kanban (exclude lost)
+  const kanbanStages = STAGE_OPTIONS.filter(s => s.id !== 'lost')
+  const byStage: Record<string, Opportunity[]> = {}
+  kanbanStages.forEach(s => { byStage[s.id] = [] })
   filtered.forEach(opp => {
-    if (!byStage[opp.pipelineStageId]) byStage[opp.pipelineStageId] = []
-    byStage[opp.pipelineStageId].push(opp)
+    if (byStage[opp.stage]) byStage[opp.stage].push(opp)
   })
 
   // Summary stats
   const totalValue = opportunities
-    .filter(o => o.status !== 'lost')
-    .reduce((sum, o) => sum + (o.monetaryValue ?? 0), 0)
-  const renewalCount = opportunities.filter(o =>
-    o.name?.toLowerCase().includes('renewal')
-  ).length
-  const needsAttentionCount = opportunities.filter(o => isNeedsAttention(o.id)).length
+    .filter(o => o.stage !== 'lost' && o.stage !== 'paid')
+    .reduce((sum, o) => sum + (o.value ?? 0), 0)
+  const renewalCount = opportunities.filter(o => o.isRenewal && o.stage !== 'paid').length
+  const needsAttentionCount = opportunities.filter(o => isNeedsAttention(o) && o.stage !== 'paid').length
 
-  const OppCard = ({ opp }: { opp: GHLOpportunity }) => {
-    const latestNote = getLatestNote(opp.id)
-    const attention = isNeedsAttention(opp.id)
-    const isRenewal = opp.name?.toLowerCase().includes('renewal')
+  const OppCard = ({ opp }: { opp: Opportunity }) => {
+    const latestNote = getLatestNote(opp.supabase_id)
+    const attention = isNeedsAttention(opp)
 
     return (
       <div className={`bg-white border rounded-xl p-4 space-y-2 ${attention ? 'border-red-300' : 'border-gray-100'}`} style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-gray-900 truncate">{opp.name}</p>
-            {opp.contact?.company && (
-              <p className="text-xs text-gray-400 truncate">{opp.contact.company}</p>
-            )}
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            {isRenewal && (
+            {opp.isRenewal && (
               <span className="text-xs font-medium bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">
                 Renewal
               </span>
@@ -316,49 +341,44 @@ export default function SalesPage() {
           </div>
         </div>
 
-        {opp.monetaryValue ? (
+        {opp.value ? (
           <p className="text-sm font-bold text-gray-700">
-            ${opp.monetaryValue.toLocaleString()}
+            ${opp.value.toLocaleString()}
           </p>
         ) : null}
 
         {latestNote && (
           <div className="text-xs text-gray-500 bg-gray-50 rounded px-2 py-1.5">
-            <p className="truncate">{latestNote.note}</p>
-            {latestNote.next_action_date && (
-              <p className={`mt-0.5 font-medium ${attention ? 'text-red-500' : 'text-gray-400'}`}>
-                Action: {new Date(latestNote.next_action_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-              </p>
-            )}
+            <p className="truncate">{latestNote.body}</p>
           </div>
         )}
 
         {/* Move to stage dropdown */}
         <div className="flex items-center gap-2">
           <select
-            value={opp.pipelineStageId}
-            disabled={updatingOpportunity === opp.id}
+            value={opp.stage}
+            disabled={updatingOpportunity === opp.supabase_id}
             onChange={e => {
-              const selectedStage = stages.find(s => s.id === e.target.value)
-              if (selectedStage) updateStage(opp.id, selectedStage.id, selectedStage.name)
+              const selected = STAGE_OPTIONS.find(s => s.id === e.target.value)
+              if (selected) updateStage(opp.supabase_id, opp.ghl_id, selected.id, selected.name)
             }}
             className={`text-xs border border-gray-200 rounded-lg px-2 py-1 bg-white text-gray-600 cursor-pointer hover:border-indigo-300 focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-colors ${
-              updatingOpportunity === opp.id ? 'opacity-50 cursor-not-allowed' : ''
+              updatingOpportunity === opp.supabase_id ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
-            {stages.map(stage => (
+            {STAGE_OPTIONS.map(stage => (
               <option key={stage.id} value={stage.id}>
                 {stage.name}
               </option>
             ))}
           </select>
-          {updatingOpportunity === opp.id && (
+          {updatingOpportunity === opp.supabase_id && (
             <span className="text-xs text-indigo-500 animate-pulse">Syncing...</span>
           )}
         </div>
 
         {/* Log note toggle */}
-        {activeNoteOpp === opp.id ? (
+        {activeNoteOpp === opp.supabase_id ? (
           <div className="space-y-2 pt-1 border-t border-gray-100">
             <textarea
               className="w-full border border-gray-300 rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400"
@@ -369,21 +389,15 @@ export default function SalesPage() {
               autoFocus
             />
             <div className="flex items-center gap-2">
-              <input
-                type="date"
-                className="flex-1 border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400"
-                value={newNextAction}
-                onChange={e => setNewNextAction(e.target.value)}
-              />
               <button
-                onClick={() => saveNote(opp.id, opp.name)}
+                onClick={() => saveNote(opp.supabase_id)}
                 disabled={savingNote || !newNote.trim()}
                 className="text-xs bg-indigo-500 hover:bg-indigo-600 disabled:opacity-40 text-white px-2.5 py-1 rounded font-medium"
               >
                 Save
               </button>
               <button
-                onClick={() => { setActiveNoteOpp(null); setNewNote(''); setNewNextAction('') }}
+                onClick={() => { setActiveNoteOpp(null); setNewNote('') }}
                 className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1"
               >
                 Cancel
@@ -392,7 +406,7 @@ export default function SalesPage() {
           </div>
         ) : (
           <button
-            onClick={() => setActiveNoteOpp(opp.id)}
+            onClick={() => setActiveNoteOpp(opp.supabase_id)}
             className="text-xs text-indigo-500 hover:text-indigo-700 hover:underline"
           >
             + Log note
@@ -410,10 +424,10 @@ export default function SalesPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Sales</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            Go High Level pipeline - live sync
+            TDI CRM Pipeline
             {lastSynced && (
               <span className="ml-2 text-gray-400">
-                Last synced {lastSynced.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                Last loaded {lastSynced.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
               </span>
             )}
           </p>
@@ -453,7 +467,7 @@ export default function SalesPage() {
         </div>
       )}
 
-      {/* Summary cards - indigo accent top bar */}
+      {/* Summary cards */}
       {!loading && !error && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white border border-gray-100 rounded-xl relative overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
@@ -483,7 +497,7 @@ export default function SalesPage() {
               <p className="text-2xl font-bold text-green-600">
                 ${totalValue.toLocaleString()}
               </p>
-              <p className="text-sm text-gray-500 mt-0.5">Total Pipeline Value</p>
+              <p className="text-sm text-gray-500 mt-0.5">Pipeline Value</p>
             </div>
           </div>
         </div>
@@ -498,7 +512,7 @@ export default function SalesPage() {
               { key: 'renewals', label: 'Renewals' },
               { key: 'active', label: 'Active Deals' },
               { key: 'attention', label: 'Needs Attention' },
-              { key: 'recent', label: 'Recent Contact' },
+              { key: 'hot', label: 'Hot Deals' },
             ].map(preset => (
               <button
                 key={preset.key}
@@ -549,7 +563,7 @@ export default function SalesPage() {
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
             >
               <option value="all">All Stages</option>
-              {stages.map(s => (
+              {STAGE_OPTIONS.map(s => (
                 <option key={s.id} value={s.id}>{s.name}</option>
               ))}
             </select>
@@ -576,7 +590,7 @@ export default function SalesPage() {
                 <th className="text-left px-4 py-3">Stage</th>
                 <th className="text-left px-4 py-3">Value</th>
                 <th className="text-left px-4 py-3">Latest Note</th>
-                <th className="text-left px-4 py-3">Next Action</th>
+                <th className="text-left px-4 py-3">Last Activity</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -589,18 +603,16 @@ export default function SalesPage() {
                 </tr>
               ) : (
                 filtered.map(opp => {
-                  const stageName = getStageName(opp.pipelineStageId)
-                  const stageColor = getStageColor(stageName)
-                  const latestNote = getLatestNote(opp.id)
-                  const attention = isNeedsAttention(opp.id)
-                  const isRenewal = opp.name?.toLowerCase().includes('renewal')
+                  const stageColor = getStageColor(opp.stage)
+                  const latestNote = getLatestNote(opp.supabase_id)
+                  const attention = isNeedsAttention(opp)
 
                   return (
-                    <tr key={opp.id} className={`hover:bg-gray-50 ${attention ? 'bg-red-50/30' : ''}`}>
+                    <tr key={opp.supabase_id} className={`hover:bg-gray-50 ${attention ? 'bg-red-50/30' : ''}`}>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2">
                           <p className="font-medium text-gray-900">{opp.name}</p>
-                          {isRenewal && (
+                          {opp.isRenewal && (
                             <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">
                               Renewal
                             </span>
@@ -611,51 +623,48 @@ export default function SalesPage() {
                             </span>
                           )}
                         </div>
-                        {opp.contact?.company && (
-                          <p className="text-xs text-gray-400 mt-0.5">{opp.contact.company}</p>
-                        )}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <select
-                            value={opp.pipelineStageId}
-                            disabled={updatingOpportunity === opp.id}
+                            value={opp.stage}
+                            disabled={updatingOpportunity === opp.supabase_id}
                             onChange={e => {
-                              const selectedStage = stages.find(s => s.id === e.target.value)
-                              if (selectedStage) updateStage(opp.id, selectedStage.id, selectedStage.name)
+                              const selected = STAGE_OPTIONS.find(s => s.id === e.target.value)
+                              if (selected) updateStage(opp.supabase_id, opp.ghl_id, selected.id, selected.name)
                             }}
                             className={`text-xs font-medium px-2 py-1 rounded-lg border cursor-pointer focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-colors ${stageColor} ${
-                              updatingOpportunity === opp.id ? 'opacity-50 cursor-not-allowed' : 'hover:border-indigo-300'
+                              updatingOpportunity === opp.supabase_id ? 'opacity-50 cursor-not-allowed' : 'hover:border-indigo-300'
                             }`}
                           >
-                            {stages.map(stage => (
+                            {STAGE_OPTIONS.map(stage => (
                               <option key={stage.id} value={stage.id}>
                                 {stage.name}
                               </option>
                             ))}
                           </select>
-                          {updatingOpportunity === opp.id && (
+                          {updatingOpportunity === opp.supabase_id && (
                             <span className="text-xs text-indigo-500 animate-pulse">Syncing...</span>
                           )}
                         </div>
                       </td>
                       <td className="px-4 py-3 font-medium text-gray-700">
-                        {opp.monetaryValue ? `$${opp.monetaryValue.toLocaleString()}` : '-'}
+                        {opp.value ? `$${opp.value.toLocaleString()}` : '-'}
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-500 max-w-48">
                         {latestNote ? (
-                          <p className="truncate">{latestNote.note}</p>
+                          <p className="truncate">{latestNote.body}</p>
                         ) : (
                           <span className="text-gray-300">No notes</span>
                         )}
                       </td>
                       <td className={`px-4 py-3 text-xs font-medium ${attention ? 'text-red-500' : 'text-gray-500'}`}>
-                        {latestNote?.next_action_date
-                          ? new Date(latestNote.next_action_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                        {opp.lastActivityAt
+                          ? new Date(opp.lastActivityAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
                           : '-'}
                       </td>
                       <td className="px-4 py-3">
-                        {activeNoteOpp === opp.id ? (
+                        {activeNoteOpp === opp.supabase_id ? (
                           <div className="space-y-1 min-w-48">
                             <textarea
                               className="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400"
@@ -666,21 +675,15 @@ export default function SalesPage() {
                               autoFocus
                             />
                             <div className="flex items-center gap-1">
-                              <input
-                                type="date"
-                                className="flex-1 border border-gray-300 rounded px-1.5 py-1 text-xs focus:outline-none"
-                                value={newNextAction}
-                                onChange={e => setNewNextAction(e.target.value)}
-                              />
                               <button
-                                onClick={() => saveNote(opp.id, opp.name)}
+                                onClick={() => saveNote(opp.supabase_id)}
                                 disabled={savingNote || !newNote.trim()}
                                 className="text-xs bg-indigo-500 hover:bg-indigo-600 disabled:opacity-40 text-white px-2 py-1 rounded"
                               >
                                 Save
                               </button>
                               <button
-                                onClick={() => { setActiveNoteOpp(null); setNewNote(''); setNewNextAction('') }}
+                                onClick={() => { setActiveNoteOpp(null); setNewNote('') }}
                                 className="text-xs text-gray-400 px-1 py-1"
                               >
                                 ✕
@@ -689,7 +692,7 @@ export default function SalesPage() {
                           </div>
                         ) : (
                           <button
-                            onClick={() => setActiveNoteOpp(opp.id)}
+                            onClick={() => setActiveNoteOpp(opp.supabase_id)}
                             className="text-xs text-indigo-500 hover:underline whitespace-nowrap"
                           >
                             + Note
@@ -709,10 +712,10 @@ export default function SalesPage() {
       {!loading && !error && view === 'kanban' && (
         <div className="overflow-x-auto pb-4">
           <div className="flex gap-4 min-w-max">
-            {stages.map(stage => {
+            {kanbanStages.map(stage => {
               const stageOpps = byStage[stage.id] ?? []
-              const stageColor = getStageColor(stage.name)
-              const stageValue = stageOpps.reduce((sum, o) => sum + (o.monetaryValue ?? 0), 0)
+              const stageColor = getStageColor(stage.id)
+              const stageValue = stageOpps.reduce((sum, o) => sum + (o.value ?? 0), 0)
 
               return (
                 <div key={stage.id} className="w-72 flex-shrink-0">
@@ -732,7 +735,7 @@ export default function SalesPage() {
                     {stageOpps.length === 0 ? (
                       <p className="text-xs text-gray-300 text-center py-4">No opportunities</p>
                     ) : (
-                      stageOpps.map(opp => <OppCard key={opp.id} opp={opp} />)
+                      stageOpps.map(opp => <OppCard key={opp.supabase_id} opp={opp} />)
                     )}
                   </div>
                 </div>
