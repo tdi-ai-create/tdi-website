@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
 import { useFavorites } from '@/lib/hub/useFavorites';
+import { useTranslation } from '@/lib/hub/useTranslation';
 import AvatarDisplay from '@/components/hub/AvatarDisplay';
 import EmptyState from '@/components/hub/EmptyState';
 import { getSupabase } from '@/lib/supabase';
@@ -80,6 +81,7 @@ export default function HubDashboard() {
   const router = useRouter();
   const { profile, user } = useHub();
   const { favorites } = useFavorites();
+  const { tUI } = useTranslation();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [quickWin, setQuickWin] = useState<QuickWin | null>(null);
   const [tip, setTip] = useState<string>(FALLBACK_TIPS[0]);
@@ -352,7 +354,7 @@ export default function HubDashboard() {
           {/* Continue Learning Section */}
           <div>
             <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-              Continue Learning
+              {tUI('Continue Learning')}
             </div>
             <div
               className="bg-white rounded-2xl mb-4"
@@ -393,7 +395,7 @@ export default function HubDashboard() {
                           className="ml-auto flex-shrink-0 text-xs font-semibold text-white rounded-lg px-4 py-1.5 whitespace-nowrap"
                           style={{ background: '#1B2A4A' }}
                         >
-                          Resume
+                          {tUI('Resume')}
                         </Link>
                       </div>
                     );
@@ -421,7 +423,7 @@ export default function HubDashboard() {
                   fontFamily: "'DM Sans', sans-serif",
                 }}
               >
-                View all courses
+                {tUI('View all courses')}
                 <ArrowRight size={14} />
               </Link>
             )}
@@ -431,7 +433,7 @@ export default function HubDashboard() {
           {savedCourses.length > 0 && (
             <div>
               <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-                Saved
+                {tUI('Saved')}
               </div>
               <div className="grid grid-cols-1 gap-2 mb-4">
                 {savedCourses.slice(0, 3).map(course => (
@@ -459,7 +461,7 @@ export default function HubDashboard() {
           {showRecommendations && recommendations.length > 0 && (
             <div>
               <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-                Recommended for You
+                {tUI('Recommended for You')}
               </div>
               <div className="space-y-2.5 mb-4">
                 {recommendations.map((course) => (
@@ -474,10 +476,10 @@ export default function HubDashboard() {
                         className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-2"
                         style={{ background: '#1B2A4A', color: '#FFBA06', fontSize: '10px' }}
                       >
-                        {course.pd_hours} PD Hours
+                        {course.pd_hours} {tUI('PD Hours')}
                       </div>
                       <div className="text-sm font-semibold mb-0.5" style={{ color: '#1B2A4A' }}>{course.title}</div>
-                      <div className="text-xs" style={{ color: '#6B7280' }}>{course.reason || 'Popular with educators'}</div>
+                      <div className="text-xs" style={{ color: '#6B7280' }}>{course.reason || tUI('Popular with educators')}</div>
                     </div>
                     <div className="text-base font-semibold flex-shrink-0 mt-1" style={{ color: '#38618C' }}>→</div>
                   </Link>
@@ -489,7 +491,7 @@ export default function HubDashboard() {
           {/* Quick Wins Section */}
           <div>
             <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-              Quick Wins
+              {tUI('Quick Wins')}
             </div>
             {quickWin ? (
               <div
@@ -500,7 +502,7 @@ export default function HubDashboard() {
                   className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-2"
                   style={{ background: '#FEF3C7', color: '#854F0B', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '10px' }}
                 >
-                  Quick Win
+                  {tUI('Quick Win')}
                 </div>
                 <div className="text-sm font-semibold mb-1 leading-snug" style={{ color: '#1B2A4A' }}>
                   {quickWin.title}
@@ -513,7 +515,7 @@ export default function HubDashboard() {
                   className="text-xs font-semibold text-white rounded-lg px-4 py-1.5 inline-block"
                   style={{ background: '#1B2A4A' }}
                 >
-                  Try it now
+                  {tUI('Try it now')}
                 </Link>
               </div>
             ) : (
@@ -522,7 +524,7 @@ export default function HubDashboard() {
                 style={{ background: '#FAFAF8', border: '0.5px solid #E9E7E2' }}
               >
                 <p className="text-sm" style={{ color: '#9CA3AF' }}>
-                  Quick Wins are coming soon. Short, practical tools you can use in 3-5 minutes.
+                  {tUI('Quick Wins are coming soon. Short, practical tools you can use in 3-5 minutes.')}
                 </p>
               </div>
             )}
@@ -531,7 +533,7 @@ export default function HubDashboard() {
               className="inline-flex items-center gap-2 text-sm font-medium hover:underline"
               style={{ color: '#1B2A4A' }}
             >
-              View all Quick Wins
+              {tUI('View all Quick Wins')}
               <ArrowRight size={14} />
             </Link>
           </div>
@@ -545,7 +547,7 @@ export default function HubDashboard() {
               className="text-xs font-bold tracking-widest uppercase mb-2"
               style={{ color: '#FFBA06', letterSpacing: '0.1em' }}
             >
-              TDI Tip
+              {tUI('TDI Tip')}
             </div>
             <div className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.8)' }}>
               {tip}
@@ -571,10 +573,10 @@ export default function HubDashboard() {
             </div>
             <div>
               <div className="text-xl font-bold" style={{ color: '#1B2A4A' }}>{certificateCount}</div>
-              <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>Certificates earned</div>
+              <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{tUI('Certificates earned')}</div>
             </div>
             <Link href="/hub/certificates" className="ml-auto text-xs font-semibold" style={{ color: '#38618C' }}>
-              View all →
+              {tUI('View all')} →
             </Link>
           </div>
 
@@ -585,20 +587,20 @@ export default function HubDashboard() {
               style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
             >
               <div className="flex items-center justify-between mb-3.5">
-                <div className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>Your Transformation Tracker</div>
+                <div className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>{tUI('Your Transformation Tracker')}</div>
                 <div
                   className="text-xs font-bold px-2 py-0.5 rounded"
                   style={{ background: '#F3F4F6', color: '#6B7280', fontSize: '10px' }}
                 >
-                  Locked
+                  {tUI('Locked')}
                 </div>
               </div>
               <p className="text-xs mb-4" style={{ color: '#9CA3AF' }}>
-                Complete 1 course and 2 check-ins to unlock your growth dashboard.
+                {tUI('Complete 1 course and 2 check-ins to unlock your growth dashboard.')}
               </p>
               <div className="space-y-2.5">
                 <div className="flex items-center gap-2.5">
-                  <div className="text-xs w-16 flex-shrink-0" style={{ color: '#6B7280' }}>Courses</div>
+                  <div className="text-xs w-16 flex-shrink-0" style={{ color: '#6B7280' }}>{tUI('Courses')}</div>
                   <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
                     <div
                       className="h-full rounded-full transition-all duration-500"
@@ -610,7 +612,7 @@ export default function HubDashboard() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <div className="text-xs w-16 flex-shrink-0" style={{ color: '#6B7280' }}>Check-ins</div>
+                  <div className="text-xs w-16 flex-shrink-0" style={{ color: '#6B7280' }}>{tUI('Check-ins')}</div>
                   <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
                     <div
                       className="h-full rounded-full transition-all duration-500"
@@ -633,12 +635,12 @@ export default function HubDashboard() {
               style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
             >
               <div className="flex items-center justify-between mb-3.5">
-                <div className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>Your Transformation Tracker</div>
+                <div className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>{tUI('Your Transformation Tracker')}</div>
                 <div
                   className="text-xs font-bold px-2 py-0.5 rounded"
                   style={{ background: '#FEF3C7', color: '#854F0B', fontSize: '10px' }}
                 >
-                  Building
+                  {tUI('Building')}
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -650,7 +652,7 @@ export default function HubDashboard() {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium" style={{ color: '#1B2A4A' }}>
-                    View your progress and milestones
+                    {tUI('View your progress and milestones')}
                   </p>
                 </div>
                 <ArrowRight size={16} style={{ color: '#38618C' }} />

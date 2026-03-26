@@ -9,6 +9,7 @@ import { getSupabase } from '@/lib/supabase';
 import { enrollInCourse } from '@/lib/hooks/useEnrollment';
 import { useFavorites } from '@/lib/hub/useFavorites';
 import { useLanguage } from '@/lib/hub/useLanguage';
+import { useTranslation } from '@/lib/hub/useTranslation';
 import { BookOpen, CheckCircle, AlertCircle, Heart } from 'lucide-react';
 
 // Filter categories
@@ -57,6 +58,7 @@ export default function CourseCatalogPage() {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const { isFavorite, toggleFavorite } = useFavorites();
   const { language, t } = useLanguage();
+  const { tUI } = useTranslation();
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
@@ -272,7 +274,7 @@ export default function CourseCatalogPage() {
               color: '#1B2A4A',
             }}
           >
-            Courses
+            {tUI('Courses')}
           </h1>
           <p
             className="text-[15px]"
@@ -281,7 +283,7 @@ export default function CourseCatalogPage() {
               color: '#6B7280',
             }}
           >
-            {courses.length} courses · Practical PD built by teachers, for teachers
+            {courses.length} {tUI('courses')} · {tUI('Practical PD built by teachers, for teachers')}
           </p>
         </div>
 
@@ -303,7 +305,7 @@ export default function CourseCatalogPage() {
                 }}
               >
                 {isSaved && <Heart size={14} style={{ fill: isActive ? 'white' : 'none' }} />}
-                {category}
+                {tUI(category)}
               </button>
             );
           })}
@@ -321,7 +323,7 @@ export default function CourseCatalogPage() {
                 fontFamily: "'DM Sans', sans-serif",
               }}
             >
-              IN PROGRESS
+              {tUI('IN PROGRESS')}
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
               {inProgressCourses.map((course) => (
@@ -354,7 +356,7 @@ export default function CourseCatalogPage() {
                   fontFamily: "'DM Sans', sans-serif",
                 }}
               >
-                ALL COURSES
+                {tUI('ALL COURSES')}
               </h2>
             )}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -384,8 +386,8 @@ export default function CourseCatalogPage() {
             <EmptyState
               icon={BookOpen}
               iconBgColor="#E0E7FF"
-              title="Courses are coming soon."
-              description="We are building practical, teacher-tested courses that earn PD hours. Check back soon."
+              title={tUI('Courses are coming soon.')}
+              description={tUI('We are building practical, teacher-tested courses that earn PD hours. Check back soon.')}
             />
             <p
               className="text-center text-sm mt-4"
@@ -394,7 +396,7 @@ export default function CourseCatalogPage() {
                 color: '#6B7280',
               }}
             >
-              Want to be notified? We will email you when courses launch.
+              {tUI('Want to be notified? We will email you when courses launch.')}
             </p>
           </div>
         ) : filteredCourses.length === 0 ? (
@@ -408,7 +410,7 @@ export default function CourseCatalogPage() {
                 color: '#6B7280',
               }}
             >
-              No courses match this filter. Try selecting a different category.
+              {tUI('No courses match this filter. Try selecting a different category.')}
             </p>
           </div>
         ) : null}

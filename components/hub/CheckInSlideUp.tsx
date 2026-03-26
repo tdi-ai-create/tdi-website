@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { getSupabase } from '@/lib/supabase'
 import { getNextQuestion, scoreResponse, type CheckInQuestion } from '@/lib/hub/checkInQuestions'
 import { useHub } from '@/components/hub/HubContext'
+import { useTranslation } from '@/lib/hub/useTranslation'
 
 interface CheckInSlideUpProps {
   onDismiss: () => void
@@ -10,6 +11,7 @@ interface CheckInSlideUpProps {
 
 export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
   const { user } = useHub()
+  const { tUI } = useTranslation()
   const [question, setQuestion] = useState<CheckInQuestion | null>(null)
   const [selectedValues, setSelectedValues] = useState<(string | number)[]>([])
   const [blankValue, setBlankValue] = useState<string | null>(null)
@@ -156,7 +158,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
             className="absolute top-5 right-6 text-xs font-medium"
             style={{ color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px' }}
           >
-            Skip for today
+            {tUI('Skip for today')}
           </button>
 
           {isDone ? (
@@ -171,9 +173,9 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
                 </svg>
               </div>
               <div className="text-lg font-bold mb-1" style={{ color: '#1B2A4A' }}>
-                Thanks for checking in.
+                {tUI('Thanks for checking in.')}
               </div>
-              <div className="text-sm" style={{ color: '#9CA3AF' }}>Have a great session.</div>
+              <div className="text-sm" style={{ color: '#9CA3AF' }}>{tUI('Have a great session.')}</div>
             </div>
           ) : (
             <>
@@ -182,7 +184,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
                 className="text-xs font-bold tracking-widest uppercase mb-2"
                 style={{ color: '#9CA3AF', letterSpacing: '0.1em' }}
               >
-                Daily check-in
+                {tUI('Daily check-in')}
               </div>
 
               {/* Question text */}
@@ -274,7 +276,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
                       letterSpacing: '0.02em',
                     }}
                   >
-                    Done
+                    {tUI('Done')}
                   </button>
                 </>
               )}
@@ -323,7 +325,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
                       opacity: canSubmit ? 1 : 0.4,
                     }}
                   >
-                    Done
+                    {tUI('Done')}
                   </button>
                 </>
               )}
@@ -391,7 +393,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
                       opacity: canSubmit ? 1 : 0.4,
                     }}
                   >
-                    Done
+                    {tUI('Done')}
                   </button>
                 </>
               )}
@@ -454,7 +456,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
                       opacity: canSubmit ? 1 : 0.4,
                     }}
                   >
-                    Done
+                    {tUI('Done')}
                   </button>
                 </>
               )}

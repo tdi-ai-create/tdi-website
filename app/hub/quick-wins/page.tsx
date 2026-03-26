@@ -6,6 +6,7 @@ import EmptyState from '@/components/hub/EmptyState';
 import { getSupabase } from '@/lib/supabase';
 import { useFavorites } from '@/lib/hub/useFavorites';
 import { useLanguage } from '@/lib/hub/useLanguage';
+import { useTranslation } from '@/lib/hub/useTranslation';
 import { Zap, Heart } from 'lucide-react';
 
 // Filter categories for Quick Wins
@@ -40,6 +41,7 @@ export default function QuickWinsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const { isFavorite, toggleFavorite } = useFavorites();
   const { language, t } = useLanguage();
+  const { tUI } = useTranslation();
 
   const loadQuickWins = useCallback(async () => {
     const supabase = getSupabase();
@@ -178,7 +180,7 @@ export default function QuickWinsPage() {
               color: '#1B2A4A',
             }}
           >
-            Quick Wins
+            {tUI('Quick Wins')}
           </h1>
           <p
             className="text-[15px]"
@@ -187,7 +189,7 @@ export default function QuickWinsPage() {
               color: '#6B7280',
             }}
           >
-            {quickWins.length} quick wins · Short, practical tools you can use right now
+            {quickWins.length} {tUI('quick wins')} · {tUI('Short, practical tools you can use right now')}
           </p>
         </div>
 
@@ -209,7 +211,7 @@ export default function QuickWinsPage() {
                 }}
               >
                 {isSaved && <Heart size={14} style={{ fill: isActive ? 'white' : 'none' }} />}
-                {category}
+                {tUI(category)}
               </button>
             );
           })}
@@ -237,8 +239,8 @@ export default function QuickWinsPage() {
             <EmptyState
               icon={Zap}
               iconBgColor="#FEF3C7"
-              title="Quick Wins are on the way."
-              description="3-5 minute tools for busy teachers. No prep required."
+              title={tUI('Quick Wins are on the way.')}
+              description={tUI('3-5 minute tools for busy teachers. No prep required.')}
             />
           </div>
         ) : (
@@ -252,7 +254,7 @@ export default function QuickWinsPage() {
                 color: '#6B7280',
               }}
             >
-              No Quick Wins match this filter. Try selecting a different category.
+              {tUI('No Quick Wins match this filter. Try selecting a different category.')}
             </p>
           </div>
         )}

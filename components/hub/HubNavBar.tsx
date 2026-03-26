@@ -12,6 +12,7 @@ import { checkTrackerEligibility } from '@/lib/hub/transformation';
 import { isAdmin } from '@/lib/hub/admin';
 import { isChampion } from '@/lib/hub/champion';
 import { useLanguage } from '@/lib/hub/useLanguage';
+import { useTranslation } from '@/lib/hub/useTranslation';
 import type { HubProfile } from '@/lib/hub-auth';
 
 interface HubNavBarProps {
@@ -42,6 +43,7 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
   const [isUserAdmin, setIsUserAdmin] = useState(false);
   const [isUserChampion, setIsUserChampion] = useState(false);
   const { language, setLanguage } = useLanguage();
+  const { tUI } = useTranslation();
 
   // Check tracker eligibility, admin status, and champion status
   useEffect(() => {
@@ -132,7 +134,7 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
               letterSpacing: '0.1em',
             }}
           >
-            LEARNING HUB
+            {tUI('LEARNING HUB')}
           </span>
         </Link>
 
@@ -165,7 +167,7 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
               >
                 {isSchoolLink && <Building size={14} />}
                 {isAdminLink && <Shield size={14} />}
-                {item.label}
+                {tUI(item.label)}
               </Link>
             );
           })}
@@ -220,7 +222,7 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
               borderRadius: '20px',
             }}
           >
-            I need a moment
+            {tUI('I need a moment')}
           </button>
 
           {/* User Avatar and Name */}

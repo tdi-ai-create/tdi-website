@@ -6,6 +6,7 @@ import { incrementHardDayCount } from '@/lib/hub-auth';
 import { useMomentMode } from './MomentModeContext';
 import { useHub } from './HubContext';
 import { getSupabase } from '@/lib/supabase';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 type MomentState = 'entry' | 'pause' | 'affirmation' | 'gentle' | 'journal';
 type JournalTab = 'private' | 'anonymous';
@@ -79,6 +80,7 @@ const TOTAL_CYCLES = 6; // 6 cycles of box breathing
 
 export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   const { user } = useHub();
+  const { tUI } = useTranslation();
   const [state, setState] = useState<MomentState>('entry');
   const [journalTab, setJournalTab] = useState<JournalTab>('private');
   const [privateJournal, setPrivateJournal] = useState('');
@@ -388,7 +390,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
           }}
         >
           <Clock size={14} />
-          {formatTime(globalTimer)} remaining
+          {formatTime(globalTimer)} {tUI('remaining')}
         </div>
       )}
 
@@ -406,7 +408,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
               color: '#2B3A67',
             }}
           >
-            Your 3 minutes are up. Feeling better?
+            {tUI('Your 3 minutes are up. Feeling better?')}
           </p>
           <div className="flex gap-2 justify-center">
             <button
@@ -419,7 +421,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                 fontFamily: "'DM Sans', sans-serif",
               }}
             >
-              I need more time
+              {tUI('I need more time')}
             </button>
             <button
               onClick={handleClose}
@@ -430,7 +432,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                 fontFamily: "'DM Sans', sans-serif",
               }}
             >
-              Back to the Hub
+              {tUI('Back to the Hub')}
             </button>
           </div>
         </div>
@@ -462,7 +464,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                 color: 'white',
               }}
             >
-              Moment Mode.
+              {tUI('Moment Mode.')}
             </h2>
             <p
               className="mb-4 leading-relaxed"
@@ -499,7 +501,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                 }}
               >
                 <Wind size={20} />
-                <span>Breathing exercise</span>
+                <span>{tUI('Breathing exercise')}</span>
               </button>
 
               <button
@@ -513,7 +515,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                 }}
               >
                 <Heart size={20} />
-                <span>Show me an affirmation</span>
+                <span>{tUI('Show me an affirmation')}</span>
               </button>
 
               <button
@@ -527,7 +529,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                 }}
               >
                 <Sparkles size={20} />
-                <span>Gentle tools</span>
+                <span>{tUI('Gentle tools')}</span>
               </button>
 
               <button
@@ -541,7 +543,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                 }}
               >
                 <BookOpen size={20} />
-                <span>Write it out</span>
+                <span>{tUI('Write it out')}</span>
               </button>
             </div>
           </div>
@@ -561,7 +563,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                 color: 'rgba(255, 255, 255, 0.6)',
               }}
             >
-              ← Back
+              ← {tUI('Back')}
             </button>
 
             {breathPhase !== 'complete' ? (
@@ -631,7 +633,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                       color: 'white',
                     }}
                   >
-                    Well done.
+                    {tUI('Well done.')}
                   </p>
                   <p
                     className="mb-8"
@@ -641,7 +643,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                       color: 'rgba(255, 255, 255, 0.8)',
                     }}
                   >
-                    Take one more breath on your own.
+                    {tUI('Take one more breath on your own.')}
                   </p>
 
                   <button
@@ -657,7 +659,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                       color: 'white',
                     }}
                   >
-                    Done
+                    {tUI('Done')}
                   </button>
                 </div>
               </>
@@ -723,7 +725,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                 color: 'white',
               }}
             >
-              Next affirmation
+              {tUI('Next affirmation')}
             </button>
 
             {/* Note to Team Section */}
@@ -832,7 +834,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                 color: 'white',
               }}
             >
-              Gentle tools for right now
+              {tUI('Gentle tools for right now')}
             </h3>
 
             <div>
@@ -918,7 +920,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                 color: 'white',
               }}
             >
-              Write it out
+              {tUI('Write it out')}
             </h3>
 
             {/* Tabs */}
@@ -935,7 +937,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                   borderBottom: journalTab === 'private' ? '2px solid #E8B84B' : '2px solid transparent',
                 }}
               >
-                Private journal
+                {tUI('Private journal')}
               </button>
               <button
                 onClick={() => setJournalTab('anonymous')}
@@ -946,7 +948,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                   borderBottom: journalTab === 'anonymous' ? '2px solid #E8B84B' : '2px solid transparent',
                 }}
               >
-                Anonymous vent
+                {tUI('Anonymous vent')}
               </button>
             </div>
 
@@ -1009,7 +1011,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                     color: '#2B3A67',
                   }}
                 >
-                  Send anonymously
+                  {tUI('Send anonymously')}
                 </button>
               </div>
             )}
