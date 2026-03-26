@@ -349,7 +349,36 @@ ${transcript}
                     borderRadius: '12px',
                     padding: '14px',
                     margin: '8px 0 0 36px',
+                    position: 'relative',
                   }}>
+                    <button
+                      onClick={() => {
+                        // Remove showContactForm from this message
+                        setMessages(prev => prev.map((m, i) =>
+                          i === index ? { ...m, showContactForm: false } : m
+                        ))
+                        setContactForm({ name: '', email: '', message: '' })
+                      }}
+                      style={{
+                        position: 'absolute',
+                        top: '8px',
+                        right: '8px',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: '#6B7280',
+                        padding: '4px',
+                        display: 'flex',
+                        borderRadius: '4px',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.color = '#374151'}
+                      onMouseLeave={e => e.currentTarget.style.color = '#6B7280'}
+                      aria-label="Close contact form"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                      </svg>
+                    </button>
                     <p style={{ fontSize: '12px', fontWeight: 600, color: '#166534', marginBottom: '4px' }}>
                       Send a message to our team
                     </p>
@@ -438,7 +467,33 @@ ${transcript}
                 borderRadius: '12px',
                 padding: '14px',
                 margin: '8px 0',
+                position: 'relative',
               }}>
+                <button
+                  onClick={() => {
+                    setShowContactForm(false)
+                    setContactForm({ name: '', email: '', message: '' })
+                  }}
+                  style={{
+                    position: 'absolute',
+                    top: '8px',
+                    right: '8px',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: '#6B7280',
+                    padding: '4px',
+                    display: 'flex',
+                    borderRadius: '4px',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#374151'}
+                  onMouseLeave={e => e.currentTarget.style.color = '#6B7280'}
+                  aria-label="Close contact form"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </button>
                 <p style={{ fontSize: '12px', fontWeight: 600, color: '#166534', marginBottom: '4px' }}>
                   Send a message to our team
                 </p>
