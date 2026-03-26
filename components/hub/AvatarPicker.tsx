@@ -43,28 +43,28 @@ const AVATAR_ICON_MAP: Record<string, LucideIcon> = {
   'spiral': RotateCcw,
 };
 
-// Avatar definitions with LIGHT BRIGHT colors and personality names
+// Avatar definitions with LIGHT BRIGHT colors and community characteristic names
 export const AVATARS = [
   // Animals (1-8)
-  { id: 'owl', name: 'Owl', personality: 'Old soul energy', color: '#E8D5F2', iconColor: '#6B21A8' },
-  { id: 'golden-retriever', name: 'Golden Retriever', personality: 'Dog lover, obviously', color: '#FFF3C4', iconColor: '#B45309' },
-  { id: 'cat', name: 'Cat', personality: 'Cat lover, no apologies', color: '#E2E8F0', iconColor: '#475569' },
-  { id: 'squirrel', name: 'Squirrel', personality: 'Quietly running the show', color: '#FFDDC1', iconColor: '#C2410C' },
-  { id: 'hummingbird', name: 'Hummingbird', personality: 'High achiever', color: '#C6F6D5', iconColor: '#15803D' },
-  { id: 'turtle', name: 'Turtle', personality: 'Patience is my superpower', color: '#B2F5EA', iconColor: '#0D9488' },
-  { id: 'bear', name: 'Bear', personality: 'Tough love specialist', color: '#FEEBC8', iconColor: '#92400E' },
-  { id: 'butterfly', name: 'Butterfly', personality: 'Still becoming', color: '#E9D8FD', iconColor: '#7C3AED' },
+  { id: 'owl', name: 'Wise', personality: 'Old soul energy', color: '#E8D5F2', iconColor: '#6B21A8' },
+  { id: 'golden-retriever', name: 'Loyal', personality: 'Dog lover, obviously', color: '#FFF3C4', iconColor: '#B45309' },
+  { id: 'cat', name: 'Curious', personality: 'Cat lover, no apologies', color: '#E2E8F0', iconColor: '#475569' },
+  { id: 'squirrel', name: 'Resourceful', personality: 'Quietly running the show', color: '#FFDDC1', iconColor: '#C2410C' },
+  { id: 'hummingbird', name: 'Joyful', personality: 'High achiever', color: '#C6F6D5', iconColor: '#15803D' },
+  { id: 'turtle', name: 'Steady', personality: 'Patience is my superpower', color: '#B2F5EA', iconColor: '#0D9488' },
+  { id: 'bear', name: 'Nurturing', personality: 'Tough love specialist', color: '#FEEBC8', iconColor: '#92400E' },
+  { id: 'butterfly', name: 'Dreamer', personality: 'Still becoming', color: '#E9D8FD', iconColor: '#7C3AED' },
   // Objects (9-12)
-  { id: 'coffee-mug', name: 'Coffee Mug', personality: 'But first, coffee', color: '#FED7AA', iconColor: '#9A3412' },
-  { id: 'books', name: 'Books', personality: 'Total bookworm', color: '#FECACA', iconColor: '#B91C1C' },
-  { id: 'plant', name: 'Plant', personality: 'Kids first, always', color: '#C6F6D5', iconColor: '#166534' },
-  { id: 'headphones', name: 'Headphones', personality: 'Main character energy', color: '#BFDBFE', iconColor: '#1D4ED8' },
+  { id: 'coffee-mug', name: 'Grounded', personality: 'But first, coffee', color: '#FED7AA', iconColor: '#9A3412' },
+  { id: 'books', name: 'Learner', personality: 'Total bookworm', color: '#FECACA', iconColor: '#B91C1C' },
+  { id: 'plant', name: 'Grower', personality: 'Kids first, always', color: '#C6F6D5', iconColor: '#166534' },
+  { id: 'headphones', name: 'Focused', personality: 'Main character energy', color: '#BFDBFE', iconColor: '#1D4ED8' },
   // Nature (13-14)
-  { id: 'sunrise', name: 'Sunrise', personality: 'Fresh start kind of person', color: '#FEF3C7', iconColor: '#D97706' },
-  { id: 'mountain', name: 'Mountain', personality: 'Built for the climb', color: '#D1FAE5', iconColor: '#047857' },
+  { id: 'sunrise', name: 'Hopeful', personality: 'Fresh start kind of person', color: '#FEF3C7', iconColor: '#D97706' },
+  { id: 'mountain', name: 'Resilient', personality: 'Built for the climb', color: '#D1FAE5', iconColor: '#047857' },
   // Abstract (15-16)
-  { id: 'starburst', name: 'Starburst', personality: 'Rule breaker', color: '#FDE68A', iconColor: '#CA8A04' },
-  { id: 'spiral', name: 'Spiral', personality: 'Go with the flow type', color: '#DDD6FE', iconColor: '#7C3AED' },
+  { id: 'starburst', name: 'Effervescent', personality: 'Rule breaker', color: '#FDE68A', iconColor: '#CA8A04' },
+  { id: 'spiral', name: 'Reflective', personality: 'Go with the flow type', color: '#DDD6FE', iconColor: '#7C3AED' },
 ];
 
 // Get the icon component for an avatar
