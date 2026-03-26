@@ -91,8 +91,8 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
   return (
     <>
       <nav
-        className="fixed top-0 left-0 right-0 z-40 h-[60px] flex items-center px-4 md:px-6"
-        style={{ backgroundColor: '#2B3A67' }}
+        className="fixed top-0 left-0 right-0 z-40 h-[54px] flex items-center px-4 md:px-6"
+        style={{ backgroundColor: '#1B2A4A' }}
       >
         {/* Logo + Learning Hub Label */}
         <Link
@@ -144,19 +144,21 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
               <Link
                 key={item.href}
                 href={item.href}
-                className="hub-nav-link"
+                className="flex items-center transition-colors"
                 style={{
-                  color: active ? '#FFFFFF' : 'rgba(255, 255, 255, 0.8)',
-                  borderBottomColor: active ? '#E8B84B' : 'transparent',
-                  display: 'flex',
-                  alignItems: 'center',
+                  color: active ? '#FFFFFF' : 'rgba(255, 255, 255, 0.45)',
+                  background: active ? 'rgba(255,255,255,0.12)' : 'transparent',
+                  borderRadius: '8px',
+                  padding: '6px 14px',
+                  fontSize: '14px',
+                  fontWeight: 500,
                   gap: '4px',
                 }}
                 onMouseEnter={(e) => {
                   if (!active) e.currentTarget.style.color = '#FFFFFF';
                 }}
                 onMouseLeave={(e) => {
-                  if (!active) e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)';
+                  if (!active) e.currentTarget.style.color = 'rgba(255, 255, 255, 0.45)';
                 }}
               >
                 {isSchoolLink && <Building size={14} />}
@@ -172,7 +174,16 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
           {/* I need a moment button */}
           <button
             onClick={() => setMomentModeOpen(true)}
-            className="hub-btn-ghost text-sm"
+            className="transition-opacity hover:opacity-80"
+            style={{
+              background: 'rgba(255,186,6,0.12)',
+              border: '1px solid rgba(255,186,6,0.35)',
+              color: '#FFBA06',
+              fontSize: '12px',
+              fontWeight: 600,
+              padding: '6px 16px',
+              borderRadius: '20px',
+            }}
           >
             I need a moment
           </button>

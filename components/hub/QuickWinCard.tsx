@@ -1,16 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-import { Clock, Download, Play, FileText, Lock, Sparkles } from 'lucide-react';
+import { Lock, Sparkles } from 'lucide-react';
 import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
 
-// Category colors
-const CATEGORY_COLORS: Record<string, string> = {
-  'Stress Relief': '#7C9CBF',
-  'Time Savers': '#6BA368',
-  'Classroom Tools': '#E8B84B',
-  'Communication': '#E8927C',
-  'Self-Care': '#9B7CB8',
+// Category colors - elevated design
+const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
+  'Stress Relief':  { bg: '#FEF3C7', text: '#854F0B' },
+  'Communication':  { bg: '#E8F5E9', text: '#27500A' },
+  'Time Savers':    { bg: '#EEEDFE', text: '#3C3489' },
+  'Para Support':   { bg: '#E1F5EE', text: '#085041' },
+  'Classroom Mgmt': { bg: '#FEE2E2', text: '#991B1B' },
+  'Classroom Tools': { bg: '#FEF3C7', text: '#854F0B' },
+  'Wellbeing':      { bg: '#EDE9FE', text: '#4C1D95' },
+  'Self-Care':      { bg: '#EDE9FE', text: '#4C1D95' },
 };
 
 interface QuickWinCardProps {
@@ -29,7 +32,7 @@ interface QuickWinCardProps {
 }
 
 export default function QuickWinCard({ quickWin }: QuickWinCardProps) {
-  const categoryColor = CATEGORY_COLORS[quickWin.category] || '#E8B84B';
+  const colors = CATEGORY_COLORS[quickWin.category] || { bg: '#F3F4F6', text: '#374151' };
 
   // Check access using membership hook
   const { canAccess } = useMembership();
@@ -39,17 +42,6 @@ export default function QuickWinCard({ quickWin }: QuickWinCardProps) {
   };
   const hasAccess = canAccess(contentAccess);
   const isFreeRotating = quickWin.is_free_rotating;
-
-  const getTypeIcon = () => {
-    switch (quickWin.content_type) {
-      case 'download':
-        return <Download size={12} />;
-      case 'video':
-        return <Play size={12} />;
-      default:
-        return <FileText size={12} />;
-    }
-  };
 
   const getTypeLabel = () => {
     switch (quickWin.content_type) {
@@ -62,120 +54,64 @@ export default function QuickWinCard({ quickWin }: QuickWinCardProps) {
     }
   };
 
-  const getActionLabel = () => {
-    return quickWin.content_type === 'download' ? 'Download' : 'Try it';
-  };
-
   return (
     <div
-      className="hub-card p-4 relative"
-      style={{ borderLeft: '4px solid #E8B84B' }}
+      className="rounded-xl p-3.5 cursor-pointer relative"
+      style={{ background: '#FAFAF8', border: '0.5px solid #E9E7E2' }}
     >
       {/* Tier badge */}
       {isFreeRotating ? (
-        <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-500 text-white">
+        <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-500 text-white">
           <Sparkles size={10} />
           Free
         </span>
       ) : !hasAccess && quickWin.access_tier && quickWin.access_tier !== 'free_rotating' ? (
-        <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-600 text-white">
+        <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-600 text-white">
           <Lock size={10} />
           {quickWin.access_tier === 'essentials' ? 'Essentials' : quickWin.access_tier === 'professional' ? 'Pro' : 'All-Access'}
         </span>
       ) : null}
 
       {/* Category tag */}
-      <span
-        className="inline-block text-[11px] font-medium px-2 py-0.5 rounded mb-3"
-        style={{
-          backgroundColor: `${categoryColor}20`,
-          color: categoryColor,
-          fontFamily: "'DM Sans', sans-serif",
-        }}
+      <div
+        className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-2"
+        style={{ background: colors.bg, color: colors.text, letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '10px' }}
       >
         {quickWin.category}
-      </span>
+      </div>
 
       {/* Title */}
-      <h3
-        className="font-bold mb-2"
-        style={{
-          fontFamily: "'DM Sans', sans-serif",
-          fontSize: '16px',
-          color: '#2B3A67',
-        }}
-      >
+      <div className="text-sm font-semibold mb-1 leading-snug" style={{ color: '#1B2A4A' }}>
         {quickWin.title}
-      </h3>
-
-      {/* Description */}
-      <p
-        className="text-[13px] text-gray-500 mb-4 line-clamp-2"
-        style={{ fontFamily: "'DM Sans', sans-serif" }}
-      >
-        {quickWin.description}
-      </p>
-
-      {/* Bottom row */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {/* Time badge */}
-          <span
-            className="inline-flex items-center gap-1.5 text-[12px] px-2 py-1 rounded"
-            style={{
-              backgroundColor: '#F5F5F5',
-              color: '#6B7280',
-              fontFamily: "'DM Sans', sans-serif",
-            }}
-          >
-            <Clock size={12} />
-            Takes {quickWin.estimated_minutes} min
-          </span>
-
-          {/* Type badge */}
-          <span
-            className="inline-flex items-center gap-1.5 text-[12px] px-2 py-1 rounded border"
-            style={{
-              borderColor: '#E5E5E5',
-              color: '#6B7280',
-              fontFamily: "'DM Sans', sans-serif",
-            }}
-          >
-            {getTypeIcon()}
-            {getTypeLabel()}
-          </span>
-        </div>
-
-        {/* Action button */}
-        {hasAccess ? (
-          <Link
-            href={quickWin.course_slug
-              ? `/hub/courses/${quickWin.course_slug}/${quickWin.slug}`
-              : `/hub/quick-wins/${quickWin.slug}`}
-            className="text-[13px] font-medium px-3 py-1.5 rounded-lg border-2 transition-colors hover:bg-[#FFF8E7]"
-            style={{
-              borderColor: '#E8B84B',
-              color: '#2B3A67',
-              fontFamily: "'DM Sans', sans-serif",
-            }}
-          >
-            {getActionLabel()}
-          </Link>
-        ) : (
-          <Link
-            href="/hub/membership"
-            className="text-[13px] font-medium px-3 py-1.5 rounded-lg border-2 transition-colors hover:bg-gray-50 inline-flex items-center gap-1"
-            style={{
-              borderColor: '#9CA3AF',
-              color: '#6B7280',
-              fontFamily: "'DM Sans', sans-serif",
-            }}
-          >
-            <Lock size={12} />
-            Upgrade
-          </Link>
-        )}
       </div>
+
+      {/* Meta */}
+      <div className="text-xs" style={{ color: '#9CA3AF' }}>
+        {quickWin.estimated_minutes} min
+        {quickWin.content_type && ` · ${getTypeLabel()}`}
+      </div>
+
+      {/* Action */}
+      {hasAccess ? (
+        <Link
+          href={quickWin.course_slug
+            ? `/hub/courses/${quickWin.course_slug}/${quickWin.slug}`
+            : `/hub/quick-wins/${quickWin.slug}`}
+          className="mt-3 text-xs font-semibold text-white rounded-lg px-3 py-1.5 inline-block transition-opacity hover:opacity-90"
+          style={{ background: '#1B2A4A' }}
+        >
+          Try it
+        </Link>
+      ) : (
+        <Link
+          href="/hub/membership"
+          className="mt-3 text-xs font-medium px-3 py-1.5 rounded-lg border inline-flex items-center gap-1 transition-colors hover:bg-gray-50"
+          style={{ borderColor: '#9CA3AF', color: '#6B7280' }}
+        >
+          <Lock size={10} />
+          Upgrade
+        </Link>
+      )}
     </div>
   );
 }

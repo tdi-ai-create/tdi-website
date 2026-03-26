@@ -320,334 +320,221 @@ export default function HubDashboard() {
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-6xl mx-auto">
-      {/* Welcome Banner */}
-      <div
-        className="rounded-xl p-6 mb-8"
-        style={{ backgroundColor: '#2B3A67' }}
+    <div className="p-4 md:p-8 max-w-6xl mx-auto" style={{ background: '#F0EEE9', minHeight: '100vh' }}>
+      {/* Welcome Hero */}
+      <section
+        className="relative text-white overflow-hidden rounded-2xl mb-6"
+        style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)' }}
       >
-        <div className="flex items-center justify-between">
-          <div>
-            <h1
-              className="font-semibold text-white mb-2"
-              style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontSize: '28px' }}
-            >
-              Welcome back, {firstName}
-            </h1>
-            <p
-              className="text-white/70 text-base md:text-lg"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
-              {dailyMessage}
-            </p>
-          </div>
-          <div className="hidden md:flex flex-col items-center">
-            <AvatarDisplay
-              size={48}
-              avatarId={profile?.avatar_id}
-              avatarUrl={profile?.avatar_url}
-              displayName={profile?.display_name}
-            />
-            <span
-              className="text-xs mt-2"
+        {/* Decorative circles - purely visual */}
+        <div className="absolute rounded-full pointer-events-none"
+          style={{ right: '-50px', top: '-70px', width: '260px', height: '260px', background: 'rgba(255,186,6,0.07)' }} />
+        <div className="absolute rounded-full pointer-events-none"
+          style={{ right: '50px', bottom: '-90px', width: '180px', height: '180px', background: 'rgba(56,97,140,0.5)' }} />
+
+        <div className="relative z-10 px-8 py-8">
+          {/* Role tag */}
+          {profile?.role && (
+            <div
+              className="inline-flex items-center mb-3 px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase"
               style={{
-                fontFamily: "'DM Sans', sans-serif",
-                color: '#E8B84B',
+                background: 'rgba(255,186,6,0.15)',
+                border: '1px solid rgba(255,186,6,0.3)',
+                color: '#FFBA06',
+                letterSpacing: '0.06em',
               }}
             >
               {roleLabel}
-            </span>
-          </div>
+            </div>
+          )}
+
+          {/* Name */}
+          <h1 className="text-3xl font-bold text-white mb-1" style={{ letterSpacing: '-0.3px' }}>
+            Welcome back, {firstName}
+          </h1>
+
+          {/* Daily message */}
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>{dailyMessage}</p>
         </div>
-      </div>
+      </section>
 
       {/* Main Grid - Left column (main) + Right column (sidebar) */}
       <div className="grid lg:grid-cols-[1fr_340px] gap-6">
         {/* Left Column - Main Content */}
         <div className="space-y-6">
           {/* Continue Learning Section */}
-          <div className="hub-card">
-            <div className="flex items-center gap-3 mb-4">
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: '#FFF8E7' }}
-              >
-                <BookOpen size={20} style={{ color: '#E8B84B' }} />
-              </div>
-              <h2
-                className="font-semibold"
+          <div>
+            <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
+              Continue Learning
+            </div>
+            <div
+              className="bg-white rounded-2xl mb-4"
+              style={{ border: '0.5px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
+            >
+              {enrollments.length > 0 ? (
+                <div className="divide-y" style={{ borderColor: '#F3F4F6' }}>
+                  {enrollments.map((enrollment, index) => {
+                    const iconColors = ['#E0F4FF', '#E8F5E9', '#FEF3C7'];
+                    const iconBg = iconColors[index % iconColors.length];
+                    return (
+                      <div
+                        key={enrollment.id}
+                        className="p-4 flex items-center gap-4"
+                      >
+                        <div
+                          className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                          style={{ background: iconBg }}
+                        >
+                          <BookOpen size={20} style={{ color: '#1B2A4A' }} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
+                            {enrollment.course?.title}
+                          </div>
+                          <div className="text-xs" style={{ color: '#9CA3AF' }}>
+                            {enrollment.lessons_completed} of {enrollment.total_lessons} lessons
+                          </div>
+                          {/* Progress bar */}
+                          <div className="h-1.5 rounded-full mt-2" style={{ background: '#F3F4F6' }}>
+                            <div
+                              style={{ background: '#FFBA06', height: '100%', borderRadius: '3px', width: `${enrollment.progress_percentage}%` }}
+                            />
+                          </div>
+                        </div>
+                        <Link
+                          href={`/hub/courses/${enrollment.course?.slug}`}
+                          className="ml-auto flex-shrink-0 text-xs font-semibold text-white rounded-lg px-4 py-1.5 whitespace-nowrap"
+                          style={{ background: '#1B2A4A' }}
+                        >
+                          Resume
+                        </Link>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="p-6">
+                  <EmptyState
+                    icon={BookOpen}
+                    iconBgColor="#BFDBFE"
+                    title="You have not enrolled in any courses yet."
+                    description="Browse the catalog to find your first course."
+                    buttonText="Browse Courses"
+                    buttonLink="/hub/courses"
+                  />
+                </div>
+              )}
+            </div>
+            {enrollments.length > 0 && (
+              <Link
+                href="/hub/courses"
+                className="inline-flex items-center gap-2 text-sm font-medium hover:underline"
                 style={{
-                  fontFamily: "'Source Serif 4', Georgia, serif",
-                  fontSize: '18px',
-                  color: '#2B3A67',
+                  color: '#1B2A4A',
+                  fontFamily: "'DM Sans', sans-serif",
                 }}
               >
-                Continue Learning
-              </h2>
-            </div>
-
-            {enrollments.length > 0 ? (
-              <div className="space-y-4">
-                {enrollments.map((enrollment) => (
-                  <div
-                    key={enrollment.id}
-                    className="p-4 rounded-lg border border-gray-100 bg-white"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <span
-                          className="inline-block text-[11px] font-medium px-2 py-0.5 rounded mb-2"
-                          style={{
-                            backgroundColor: '#E8B84B20',
-                            color: '#B45309',
-                            fontFamily: "'DM Sans', sans-serif",
-                          }}
-                        >
-                          {enrollment.course?.category || 'Course'}
-                        </span>
-                        <h3
-                          className="font-bold"
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            fontSize: '16px',
-                            color: '#2B3A67',
-                          }}
-                        >
-                          {enrollment.course?.title}
-                        </h3>
-                      </div>
-                    </div>
-
-                    {/* Progress bar */}
-                    <div className="mb-3">
-                      <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-300"
-                          style={{
-                            width: `${enrollment.progress_percentage}%`,
-                            backgroundColor: '#E8B84B',
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <span
-                        className="text-[13px] text-gray-500"
-                        style={{ fontFamily: "'DM Sans', sans-serif" }}
-                      >
-                        {enrollment.lessons_completed} of {enrollment.total_lessons} lessons complete
-                      </span>
-                      <Link
-                        href={`/hub/courses/${enrollment.course?.slug}`}
-                        className="text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-                        style={{
-                          backgroundColor: '#E8B84B',
-                          color: '#2B3A67',
-                          fontFamily: "'DM Sans', sans-serif",
-                        }}
-                      >
-                        Continue
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-
-                <Link
-                  href="/hub/courses"
-                  className="inline-flex items-center gap-2 text-sm font-medium hover:underline"
-                  style={{
-                    color: '#2B3A67',
-                    fontFamily: "'DM Sans', sans-serif",
-                  }}
-                >
-                  View all courses
-                  <ArrowRight size={14} />
-                </Link>
-              </div>
-            ) : (
-              <EmptyState
-                icon={BookOpen}
-                iconBgColor="#BFDBFE"
-                title="You have not enrolled in any courses yet."
-                description="Browse the catalog to find your first course."
-                buttonText="Browse Courses"
-                buttonLink="/hub/courses"
-              />
+                View all courses
+                <ArrowRight size={14} />
+              </Link>
             )}
           </div>
 
           {/* Recommended for You Section */}
           {showRecommendations && recommendations.length > 0 && (
-            <div className="hub-card">
-              <div className="flex items-center gap-3 mb-4">
-                <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center"
-                  style={{ backgroundColor: '#FFF8E7' }}
-                >
-                  <Sparkles size={20} style={{ color: '#E8B84B' }} />
-                </div>
-                <h2
-                  className="font-semibold"
-                  style={{
-                    fontFamily: "'Source Serif 4', Georgia, serif",
-                    fontSize: '18px',
-                    color: '#2B3A67',
-                  }}
-                >
-                  Recommended for You
-                </h2>
+            <div>
+              <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
+                Recommended for You
               </div>
-
-              <div className="space-y-3">
+              <div className="space-y-2.5 mb-4">
                 {recommendations.map((course) => (
                   <Link
                     key={course.id}
                     href={`/hub/courses/${course.slug}`}
-                    className="block p-4 rounded-lg border border-gray-100 bg-white hover:shadow-md transition-shadow"
+                    className="rounded-xl p-4 cursor-pointer flex justify-between items-start gap-3 hover:shadow-md transition-shadow"
+                    style={{ background: '#F0F6FF', border: '0.5px solid #C8DEFF' }}
                   >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <span
-                          className="inline-block text-[11px] font-medium px-2 py-0.5 rounded mb-2"
-                          style={{
-                            backgroundColor: '#E8B84B20',
-                            color: '#B45309',
-                            fontFamily: "'DM Sans', sans-serif",
-                          }}
-                        >
-                          {course.category}
-                        </span>
-                        <h3
-                          className="font-bold line-clamp-1"
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            fontSize: '15px',
-                            color: '#2B3A67',
-                          }}
-                        >
-                          {course.title}
-                        </h3>
-                        <p
-                          className="text-xs text-gray-500 mt-1"
-                          style={{ fontFamily: "'DM Sans', sans-serif" }}
-                        >
-                          {course.reason}
-                        </p>
-                      </div>
-                      <span
-                        className="text-[11px] font-medium px-2 py-1 rounded flex-shrink-0"
-                        style={{
-                          backgroundColor: '#E8B84B',
-                          color: '#2B3A67',
-                          fontFamily: "'DM Sans', sans-serif",
-                        }}
+                    <div>
+                      <div
+                        className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-2"
+                        style={{ background: '#1B2A4A', color: '#FFBA06', fontSize: '10px' }}
                       >
-                        {course.pd_hours} PD
-                      </span>
+                        {course.pd_hours} PD Hours
+                      </div>
+                      <div className="text-sm font-semibold mb-0.5" style={{ color: '#1B2A4A' }}>{course.title}</div>
+                      <div className="text-xs" style={{ color: '#6B7280' }}>{course.reason || 'Popular with educators'}</div>
                     </div>
+                    <div className="text-base font-semibold flex-shrink-0 mt-1" style={{ color: '#38618C' }}>→</div>
                   </Link>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Got 5 Minutes Section */}
-          <div className="hub-card">
-            <div className="flex items-center gap-3 mb-4">
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: '#FFF8E7' }}
-              >
-                <Zap size={20} style={{ color: '#E8B84B' }} />
-              </div>
-              <h2
-                className="font-semibold"
-                style={{
-                  fontFamily: "'Source Serif 4', Georgia, serif",
-                  fontSize: '18px',
-                  color: '#2B3A67',
-                }}
-              >
-                Got 5 Minutes?
-              </h2>
+          {/* Quick Wins Section */}
+          <div>
+            <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
+              Quick Wins
             </div>
-
             {quickWin ? (
               <div
-                className="p-4 rounded-lg"
-                style={{ borderLeft: '4px solid #E8B84B', backgroundColor: '#FAFAF8' }}
+                className="rounded-xl p-3.5 cursor-pointer mb-4"
+                style={{ background: '#FAFAF8', border: '0.5px solid #E9E7E2' }}
               >
-                <h3
-                  className="font-bold mb-2"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '16px',
-                    color: '#2B3A67',
-                  }}
+                <div
+                  className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-2"
+                  style={{ background: '#FEF3C7', color: '#854F0B', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '10px' }}
                 >
-                  {quickWin.title}
-                </h3>
-                <div className="flex items-center justify-between">
-                  <span
-                    className="inline-flex items-center gap-1.5 text-[12px] px-2 py-1 rounded"
-                    style={{
-                      backgroundColor: '#F5F5F5',
-                      color: '#6B7280',
-                      fontFamily: "'DM Sans', sans-serif",
-                    }}
-                  >
-                    <Clock size={12} />
-                    Takes about {quickWin.estimated_minutes} minutes
-                  </span>
-                  <Link
-                    href={`/hub/courses/${quickWin.course_slug}/${quickWin.slug}`}
-                    className="text-sm font-medium px-4 py-2 rounded-lg border-2 transition-colors hover:bg-[#FFF8E7]"
-                    style={{
-                      borderColor: '#E8B84B',
-                      color: '#2B3A67',
-                      fontFamily: "'DM Sans', sans-serif",
-                    }}
-                  >
-                    Try it now
-                  </Link>
+                  Quick Win
                 </div>
+                <div className="text-sm font-semibold mb-1 leading-snug" style={{ color: '#1B2A4A' }}>
+                  {quickWin.title}
+                </div>
+                <div className="text-xs mb-3" style={{ color: '#9CA3AF' }}>
+                  {quickWin.estimated_minutes} min
+                </div>
+                <Link
+                  href={`/hub/courses/${quickWin.course_slug}/${quickWin.slug}`}
+                  className="text-xs font-semibold text-white rounded-lg px-4 py-1.5 inline-block"
+                  style={{ background: '#1B2A4A' }}
+                >
+                  Try it now
+                </Link>
               </div>
             ) : (
               <div
-                className="p-6 rounded-lg text-center"
-                style={{ backgroundColor: '#FAFAF8' }}
+                className="rounded-xl p-6 text-center mb-4"
+                style={{ background: '#FAFAF8', border: '0.5px solid #E9E7E2' }}
               >
-                <p
-                  className="text-gray-500"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
-                >
+                <p className="text-sm" style={{ color: '#9CA3AF' }}>
                   Quick Wins are coming soon. Short, practical tools you can use in 3-5 minutes.
                 </p>
               </div>
             )}
+            <Link
+              href="/hub/quick-wins"
+              className="inline-flex items-center gap-2 text-sm font-medium hover:underline"
+              style={{ color: '#1B2A4A' }}
+            >
+              View all Quick Wins
+              <ArrowRight size={14} />
+            </Link>
           </div>
         </div>
 
         {/* Right Column - Sidebar */}
         <div className="space-y-4">
-          {/* Today's TDI Tip */}
-          <div className="hub-card">
-            <span
-              className="inline-block text-[11px] font-semibold tracking-wide uppercase mb-3"
-              style={{
-                color: '#E8B84B',
-                fontFamily: "'DM Sans', sans-serif",
-              }}
+          {/* TDI Tip */}
+          <div className="rounded-2xl p-5 mb-4" style={{ background: '#1B2A4A' }}>
+            <div
+              className="text-xs font-bold tracking-widest uppercase mb-2"
+              style={{ color: '#FFBA06', letterSpacing: '0.1em' }}
             >
               TDI Tip
-            </span>
-            <p
-              className="text-[15px] text-gray-700 leading-relaxed mb-4"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
+            </div>
+            <div className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.8)' }}>
               {tip}
-            </p>
+            </div>
             <ShareMenu
               type="tip"
               text={tip}
@@ -657,60 +544,32 @@ export default function HubDashboard() {
           </div>
 
           {/* Certificates Widget */}
-          <div className="hub-card">
-            <div className="flex items-center gap-3 mb-2">
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: '#FFF8E7' }}
-              >
-                <Award size={20} style={{ color: '#E8B84B' }} />
-              </div>
-              <div>
-                <p
-                  className="text-2xl font-bold"
-                  style={{
-                    fontFamily: "'Source Serif 4', Georgia, serif",
-                    color: '#2B3A67',
-                  }}
-                >
-                  {certificateCount}
-                </p>
-              </div>
+          <div
+            className="bg-white rounded-2xl p-5 flex items-center gap-3.5 mb-4"
+            style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+          >
+            <div
+              className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: '#FEF3C7' }}
+            >
+              <Award size={20} style={{ color: '#D97706' }} />
             </div>
-            <p
-              className="text-sm text-gray-600 mb-3"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
-              {certificateCount === 0
-                ? '0 certificates earned yet. Complete a course to earn PD hours.'
-                : `certificate${certificateCount !== 1 ? 's' : ''} earned`}
-            </p>
-            <Link
-              href="/hub/certificates"
-              className="text-sm font-medium hover:underline"
-              style={{
-                color: '#2B3A67',
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
-              View certificates
+            <div>
+              <div className="text-xl font-bold" style={{ color: '#1B2A4A' }}>{certificateCount}</div>
+              <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>Certificates earned</div>
+            </div>
+            <Link href="/hub/certificates" className="ml-auto text-xs font-semibold" style={{ color: '#38618C' }}>
+              View all →
             </Link>
           </div>
 
-          {/* Stress Check-In Widget */}
-          <div className="hub-card">
-            <div className="flex items-center gap-2 mb-4">
-              <Sparkles size={18} style={{ color: '#E8B84B' }} />
-              <h3
-                className="font-bold"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '15px',
-                  color: '#2B3A67',
-                }}
-              >
-                How are you feeling today?
-              </h3>
+          {/* Check-In Widget */}
+          <div
+            className="bg-white rounded-2xl p-5 mb-4"
+            style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+          >
+            <div className="text-sm font-semibold mb-3.5" style={{ color: '#1B2A4A' }}>
+              How are you feeling today?
             </div>
 
             {todayCheckIn !== null ? (
@@ -718,135 +577,76 @@ export default function HubDashboard() {
                 className="p-4 rounded-lg"
                 style={{ backgroundColor: '#FFF8E7' }}
               >
-                <p
-                  className="text-sm text-gray-700"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
-                >
+                <p className="text-sm text-gray-700">
                   Thanks for checking in. {CHECKIN_RESPONSES[todayCheckIn]}
                 </p>
               </div>
             ) : (
-              <>
-                <div className="flex justify-between mb-2">
-                  {[1, 2, 3, 4, 5].map((num) => (
-                    <button
-                      key={num}
-                      onClick={() => handleCheckIn(num)}
-                      disabled={isCheckingIn}
-                      className="w-12 h-12 rounded-lg font-bold text-lg transition-all hover:scale-105 disabled:opacity-50"
-                      style={{
-                        backgroundColor: '#F5F5F5',
-                        color: '#2B3A67',
-                        fontFamily: "'DM Sans', sans-serif",
-                      }}
-                    >
-                      {num}
-                    </button>
-                  ))}
-                </div>
-                <div className="flex justify-between">
-                  <span
-                    className="text-[11px] text-gray-400"
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
+              <div className="flex gap-1.5">
+                {[
+                  { label: 'Thriving', score: 5, bg: '#4CAF50', textColor: 'rgba(255,255,255,0.95)' },
+                  { label: 'Good',     score: 4, bg: '#8BC34A', textColor: 'rgba(255,255,255,0.95)' },
+                  { label: 'Okay',     score: 3, bg: '#FFC107', textColor: 'rgba(0,0,0,0.6)'        },
+                  { label: 'Tough',    score: 2, bg: '#FF7043', textColor: 'rgba(255,255,255,0.95)' },
+                  { label: 'Rough',    score: 1, bg: '#E53935', textColor: 'rgba(255,255,255,0.95)' },
+                ].map(({ label, score, bg, textColor }) => (
+                  <button
+                    key={score}
+                    onClick={() => handleCheckIn(score)}
+                    disabled={isCheckingIn}
+                    className="flex-1 rounded-lg border-none cursor-pointer flex items-center justify-center transition-transform hover:-translate-y-0.5 disabled:opacity-50"
+                    style={{ background: bg, height: '44px' }}
                   >
-                    Great
-                  </span>
-                  <span
-                    className="text-[11px] text-gray-400"
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
-                  >
-                    Rough
-                  </span>
-                </div>
-              </>
+                    <span style={{ fontSize: '11px', fontWeight: '500', color: textColor }}>
+                      {label}
+                    </span>
+                  </button>
+                ))}
+              </div>
             )}
           </div>
 
-          {/* Transformation Tracker Teaser - shown when not eligible */}
+          {/* Transformation Tracker - shown when not eligible */}
           {trackerEligibility && !trackerEligibility.isEligible && (
             <div
-              className="hub-card"
-              style={{ backgroundColor: '#FAFAF8', border: '1px dashed #E5E5E5' }}
+              className="bg-white rounded-2xl p-5 mb-4"
+              style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
             >
-              <div className="flex items-center gap-3 mb-3">
+              <div className="flex items-center justify-between mb-3.5">
+                <div className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>Your Transformation Tracker</div>
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: '#E5E5E5' }}
+                  className="text-xs font-bold px-2 py-0.5 rounded"
+                  style={{ background: '#F3F4F6', color: '#6B7280', fontSize: '10px' }}
                 >
-                  <Lock size={18} style={{ color: '#9CA3AF' }} />
+                  Locked
                 </div>
-                <h3
-                  className="font-bold"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '15px',
-                    color: '#6B7280',
-                  }}
-                >
-                  Your Transformation Tracker
-                </h3>
               </div>
-              <p
-                className="text-sm text-gray-500 mb-4"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
-              >
+              <p className="text-xs mb-4" style={{ color: '#9CA3AF' }}>
                 Complete 1 course and 2 check-ins to unlock your growth dashboard.
               </p>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span
-                    className="text-xs text-gray-500"
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
-                  >
-                    Courses
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full"
-                        style={{
-                          width: `${Math.min(100, (trackerEligibility.completedCourses / trackerEligibility.requiredCourses) * 100)}%`,
-                          backgroundColor: trackerEligibility.completedCourses >= trackerEligibility.requiredCourses ? '#10B981' : '#E8B84B',
-                        }}
-                      />
-                    </div>
-                    <span
-                      className="text-xs font-medium"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        color: trackerEligibility.completedCourses >= trackerEligibility.requiredCourses ? '#10B981' : '#6B7280',
-                      }}
-                    >
-                      {trackerEligibility.completedCourses}/{trackerEligibility.requiredCourses}
-                    </span>
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="text-xs w-16 flex-shrink-0" style={{ color: '#6B7280' }}>Courses</div>
+                  <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min(100, (trackerEligibility.completedCourses / trackerEligibility.requiredCourses) * 100)}%`, background: '#FFBA06' }}
+                    />
+                  </div>
+                  <div className="text-xs font-semibold w-7 text-right" style={{ color: '#1B2A4A' }}>
+                    {trackerEligibility.completedCourses}/{trackerEligibility.requiredCourses}
                   </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span
-                    className="text-xs text-gray-500"
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
-                  >
-                    Check-ins
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full"
-                        style={{
-                          width: `${Math.min(100, (trackerEligibility.totalAssessments / trackerEligibility.requiredAssessments) * 100)}%`,
-                          backgroundColor: trackerEligibility.totalAssessments >= trackerEligibility.requiredAssessments ? '#10B981' : '#E8B84B',
-                        }}
-                      />
-                    </div>
-                    <span
-                      className="text-xs font-medium"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        color: trackerEligibility.totalAssessments >= trackerEligibility.requiredAssessments ? '#10B981' : '#6B7280',
-                      }}
-                    >
-                      {trackerEligibility.totalAssessments}/{trackerEligibility.requiredAssessments}
-                    </span>
+                <div className="flex items-center gap-2.5">
+                  <div className="text-xs w-16 flex-shrink-0" style={{ color: '#6B7280' }}>Check-ins</div>
+                  <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min(100, (trackerEligibility.totalAssessments / trackerEligibility.requiredAssessments) * 100)}%`, background: '#4ecdc4' }}
+                    />
+                  </div>
+                  <div className="text-xs font-semibold w-7 text-right" style={{ color: '#1B2A4A' }}>
+                    {trackerEligibility.totalAssessments}/{trackerEligibility.requiredAssessments}
                   </div>
                 </div>
               </div>
@@ -857,35 +657,31 @@ export default function HubDashboard() {
           {trackerEligibility && trackerEligibility.isEligible && (
             <Link
               href="/hub/transformation"
-              className="hub-card block hover:shadow-md transition-shadow"
-              style={{ borderLeft: '4px solid #E8B84B' }}
+              className="bg-white rounded-2xl p-5 block hover:shadow-md transition-shadow mb-4"
+              style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
             >
+              <div className="flex items-center justify-between mb-3.5">
+                <div className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>Your Transformation Tracker</div>
+                <div
+                  className="text-xs font-bold px-2 py-0.5 rounded"
+                  style={{ background: '#FEF3C7', color: '#854F0B', fontSize: '10px' }}
+                >
+                  Building
+                </div>
+              </div>
               <div className="flex items-center gap-3">
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center"
                   style={{ backgroundColor: '#FFF8E7' }}
                 >
-                  <TrendingUp size={18} style={{ color: '#E8B84B' }} />
+                  <TrendingUp size={18} style={{ color: '#FFBA06' }} />
                 </div>
-                <div>
-                  <h3
-                    className="font-bold"
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: '15px',
-                      color: '#2B3A67',
-                    }}
-                  >
-                    Your Growth Journey
-                  </h3>
-                  <p
-                    className="text-sm text-gray-500"
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
-                  >
+                <div className="flex-1">
+                  <p className="text-sm font-medium" style={{ color: '#1B2A4A' }}>
                     View your progress and milestones
                   </p>
                 </div>
-                <ArrowRight size={16} className="ml-auto text-gray-400" />
+                <ArrowRight size={16} style={{ color: '#38618C' }} />
               </div>
             </Link>
           )}
