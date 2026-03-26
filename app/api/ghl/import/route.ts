@@ -42,14 +42,14 @@ export async function POST() {
     // Map GHL stage names to TDI stage values
     const stageNameToTDI: Record<string, string> = {
       'unassigned': 'unassigned',
-      'new': 'unassigned',
-      'targeting': 'targeting',
-      'engaged': 'engaged',
-      'qualified': 'qualified',
-      'likely yes': 'likely_yes',
-      'proposal sent': 'proposal_sent',
-      'signed': 'signed',
-      'paid': 'paid',
+      'new (0%)': 'unassigned',
+      'targeting (5%)': 'targeting',
+      'engaged (10%)': 'engaged',
+      'qualified (30%)': 'qualified',
+      'likely yes (50%)': 'likely_yes',
+      'proposal sent (70%)': 'proposal_sent',
+      'signed (90%)': 'signed',
+      'paid (100%)': 'paid',
       'lost': 'lost',
     }
 
