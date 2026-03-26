@@ -16,6 +16,105 @@ import {
   Share2,
 } from 'lucide-react';
 
+// Breathing Exercise Component
+function BreathingExercise() {
+  const [phase, setPhase] = useState(0);
+  const [count, setCount] = useState(4);
+  const [round, setRound] = useState(1);
+  const [isRunning, setIsRunning] = useState(false);
+
+  const phases = [
+    { label: 'Breathe in',  sub: 'Slowly fill your lungs',    size: 160, innerSize: 100, color: '#4ecdc4' },
+    { label: 'Hold',        sub: 'Stay still, let it settle',  size: 160, innerSize: 100, color: '#FFBA06' },
+    { label: 'Breathe out', sub: 'Release slowly and fully',   size: 120, innerSize: 76,  color: '#4ecdc4' },
+    { label: 'Hold',        sub: 'Empty and at ease',          size: 120, innerSize: 76,  color: '#38618C' },
+  ];
+
+  useEffect(() => {
+    if (!isRunning) return;
+    const timer = setInterval(() => {
+      setCount(prev => {
+        if (prev <= 1) {
+          setPhase(p => {
+            const next = (p + 1) % 4;
+            if (next === 0) setRound(r => r < 3 ? r + 1 : 1);
+            return next;
+          });
+          return 4;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [isRunning]);
+
+  const current = phases[phase];
+
+  return (
+    <div className="text-center py-6">
+      {!isRunning ? (
+        <div className="flex flex-col items-center gap-4">
+          <div
+            className="w-32 h-32 rounded-full flex items-center justify-center"
+            style={{ background: 'rgba(78,205,196,0.12)', border: '2px solid rgba(78,205,196,0.3)' }}
+          >
+            <div style={{ fontSize: '32px', color: '#4ecdc4', fontWeight: 700 }}>4</div>
+          </div>
+          <button
+            onClick={() => setIsRunning(true)}
+            className="px-8 py-2.5 rounded-full text-sm font-semibold text-white"
+            style={{ background: '#1B2A4A' }}
+          >
+            Start breathing exercise
+          </button>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center gap-3">
+          <div
+            className="rounded-full flex items-center justify-center transition-all duration-1000"
+            style={{
+              width: current.size,
+              height: current.size,
+              background: `${current.color}20`,
+              border: `2px solid ${current.color}50`,
+            }}
+          >
+            <div
+              className="rounded-full flex items-center justify-center transition-all duration-1000"
+              style={{
+                width: current.innerSize,
+                height: current.innerSize,
+                background: `${current.color}30`,
+              }}
+            >
+              <span style={{ fontSize: '28px', fontWeight: 700, color: '#1B2A4A' }}>{count}</span>
+            </div>
+          </div>
+          <div className="text-base font-semibold" style={{ color: '#1B2A4A' }}>{current.label}</div>
+          <div className="text-sm" style={{ color: '#9CA3AF' }}>{current.sub}</div>
+          <div className="flex gap-2 mt-1">
+            {phases.map((_, i) => (
+              <div
+                key={i}
+                className="w-2 h-2 rounded-full transition-all"
+                style={{ background: i === phase ? current.color : '#E5E7EB' }}
+              />
+            ))}
+          </div>
+          <div className="text-xs mt-1" style={{ color: '#9CA3AF' }}>Round {round} of 3</div>
+          <button
+            onClick={() => { setIsRunning(false); setPhase(0); setCount(4); setRound(1); }}
+            className="text-xs mt-1"
+            style={{ color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer' }}
+          >
+            Reset
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Category colors
 const CATEGORY_COLORS: Record<string, string> = {
   'Stress Relief': '#7C9CBF',
@@ -182,7 +281,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: '#FAFAF8' }}>
+      <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: '#F0EEE9' }}>
         <div className="max-w-[600px] mx-auto">
           <div className="h-4 bg-gray-200 rounded w-32 mb-8 animate-pulse" />
           <div className="h-6 bg-gray-100 rounded w-24 mb-4 animate-pulse" />
@@ -195,7 +294,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
   if (!quickWin) {
     return (
-      <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: '#FAFAF8' }}>
+      <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: '#F0EEE9' }}>
         <div className="max-w-[600px] mx-auto text-center py-16">
           <p className="text-gray-500">Quick Win not found.</p>
           <Link href="/hub/quick-wins" className="text-[#E8B84B] hover:underline mt-4 inline-block">
@@ -209,70 +308,70 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const actionSteps = quickWin.content_type === 'activity' ? parseActionSteps(quickWin.content) : [];
   const allStepsChecked = actionSteps.length > 0 && checkedSteps.size === actionSteps.length;
 
+  // Category colors for elevated design
+  const categoryColors = {
+    bg: `${categoryColor}20`,
+    text: categoryColor,
+  };
+
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FAFAF8' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F0EEE9' }}>
       <div className="max-w-[600px] mx-auto p-4 md:p-8 md:py-12">
         {/* Back link */}
         <Link
           href="/hub/quick-wins"
           className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-8 text-sm"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
           <ArrowLeft size={16} />
           Back to Quick Wins
         </Link>
 
         {/* Header */}
-        <div className="mb-8">
-          {/* Category pill */}
+        <div className="mb-5">
           {quickWin.category && (
-            <span
-              className="inline-block text-[11px] font-medium px-3 py-1 rounded-full mb-4"
+            <div
+              className="inline-block text-xs font-bold px-2.5 py-1 rounded-lg mb-3"
               style={{
-                backgroundColor: `${categoryColor}20`,
-                color: categoryColor,
-                fontFamily: "'DM Sans', sans-serif",
+                background: categoryColors.bg,
+                color: categoryColors.text,
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                fontSize: '10px',
               }}
             >
               {quickWin.category}
-            </span>
+            </div>
           )}
-
-          {/* Title with Zap icon */}
-          <div className="flex items-start gap-3 mb-4">
-            <Zap
-              size={28}
-              className="flex-shrink-0 mt-1"
-              style={{ color: '#E8B84B' }}
-            />
-            <h1
-              className="font-bold"
-              style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                fontSize: '24px',
-                color: '#2B3A67',
-              }}
-            >
-              {quickWin.title}
-            </h1>
-          </div>
-
-          {/* Duration badge */}
+          <h1 className="text-2xl font-bold mb-2" style={{ color: '#1B2A4A' }}>{quickWin.title}</h1>
           <div
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm"
-            style={{
-              backgroundColor: '#F5F5F5',
-              fontFamily: "'DM Sans', sans-serif",
-              color: '#6B7280',
-            }}
+            className="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full"
+            style={{ background: '#F3F4F6', color: '#6B7280' }}
           >
-            <Clock size={14} />
+            <Clock size={11} />
             {quickWin.estimated_minutes} min
+            {quickWin.content_type && ` · ${quickWin.content_type}`}
           </div>
         </div>
 
+        {/* Context card - show description if exists */}
+        {quickWin.description && (
+          <div
+            className="rounded-xl p-4 mb-4 text-sm leading-relaxed"
+            style={{ background: '#F0F6FF', border: '0.5px solid #C8DEFF', color: '#1E3A8A' }}
+          >
+            {quickWin.description}
+          </div>
+        )}
+
         {/* Content area - varies by type */}
-        <div className="bg-white rounded-xl p-6 md:p-8 mb-8 shadow-sm">
+        <div
+          className="bg-white rounded-2xl p-6 mb-4"
+          style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+        >
+          {/* Breathing Visual - render when content involves breathing exercise */}
+          {(quickWin.title?.toLowerCase().includes('breath') || quickWin.category === 'Stress Relief') && (
+            <BreathingExercise />
+          )}
           {/* Read type */}
           {(quickWin.content_type === 'read' || (!quickWin.video_url && !quickWin.download_url && actionSteps.length === 0)) && (
             <div>
@@ -666,15 +765,10 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           <button
             onClick={handleMarkDone}
             disabled={!user}
-            className="flex items-center justify-center gap-2 w-full py-4 rounded-lg font-medium text-lg transition-colors disabled:opacity-50"
-            style={{
-              backgroundColor: '#E8B84B',
-              color: '#2B3A67',
-              fontFamily: "'DM Sans', sans-serif",
-            }}
+            className="w-full py-3.5 rounded-xl text-sm font-semibold text-white mb-3 transition-all disabled:opacity-60"
+            style={{ background: 'linear-gradient(135deg, #1B2A4A, #38618C)' }}
           >
-            <Check size={20} />
-            Mark as Done
+            I did it - mark complete
           </button>
         )}
 

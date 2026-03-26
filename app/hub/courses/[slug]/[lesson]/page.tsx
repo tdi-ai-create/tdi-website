@@ -250,7 +250,7 @@ export default function LessonPage({ params }: LessonPageProps) {
 
   if (isLoading || !course || !currentLesson) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: '#FAFAF8' }}>
+      <div className="min-h-screen" style={{ backgroundColor: '#F0EEE9' }}>
         <div className="h-1 bg-gray-200" />
         <div className="p-4 md:p-8 max-w-[1200px] mx-auto">
           <div className="h-5 bg-gray-200 rounded w-64 mb-4 animate-pulse" />
@@ -264,20 +264,24 @@ export default function LessonPage({ params }: LessonPageProps) {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FAFAF8' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F0EEE9' }}>
       {/* Progress bar at top */}
-      <div className="h-1 bg-gray-200">
+      <div className="h-1 w-full" style={{ background: '#E5E7EB' }}>
         <div
           className="h-full transition-all duration-500"
           style={{
             width: `${progress.progressPct}%`,
-            backgroundColor: progress.isComplete ? '#10B981' : '#E8B84B',
+            background: 'linear-gradient(90deg, #FFBA06, #4ecdc4)',
           }}
         />
       </div>
 
-      <div className="max-w-[1200px] mx-auto">
-        <div className="lg:grid lg:grid-cols-[1fr_300px] lg:gap-8">
+      <div className="max-w-[1200px] mx-auto p-4 md:p-8">
+        <div
+          className="bg-white rounded-2xl overflow-hidden"
+          style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+        >
+        <div className="lg:grid lg:grid-cols-[1fr_300px] lg:gap-0">
           {/* Main Content */}
           <div className="p-4 md:p-8">
             {/* Breadcrumb */}
@@ -347,27 +351,19 @@ export default function LessonPage({ params }: LessonPageProps) {
             )}
 
             {/* Lesson Title */}
-            <h1
-              className="font-bold mb-4"
-              style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                fontSize: '24px',
-                color: '#2B3A67',
-              }}
-            >
+            <h1 className="text-lg font-bold mb-1.5" style={{ color: '#1B2A4A' }}>
               {currentLesson.title}
             </h1>
+            <div className="flex items-center gap-3 text-xs mb-5" style={{ color: '#9CA3AF' }}>
+              <span>{currentLesson.estimated_minutes} min</span>
+              {currentLesson.content_type && <><span>·</span><span>{currentLesson.content_type}</span></>}
+            </div>
 
             {/* Lesson description/content */}
             {currentLesson.description && (
               <p
-                className="mb-6"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '15px',
-                  color: '#374151',
-                  lineHeight: '1.7',
-                }}
+                className="mb-6 text-sm leading-relaxed"
+                style={{ color: '#374151' }}
               >
                 {currentLesson.description}
               </p>
@@ -502,95 +498,52 @@ export default function LessonPage({ params }: LessonPageProps) {
           </div>
 
           {/* Sidebar - Desktop */}
-          <div className="hidden lg:block p-4 lg:p-8 lg:pl-0">
-            <div
-              className="sticky top-4 bg-white rounded-xl border overflow-hidden"
-              style={{ borderColor: '#E5E5E5', maxHeight: 'calc(100vh - 2rem)' }}
-            >
-              <div
-                className="p-4 border-b"
-                style={{ borderColor: '#E5E5E5', backgroundColor: '#FAFAF8' }}
-              >
-                <h3
-                  className="font-semibold"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '14px',
-                    color: '#2B3A67',
-                  }}
-                >
-                  Course Outline
-                </h3>
-              </div>
-              <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 8rem)' }}>
+          <div className="hidden lg:block p-6" style={{ borderLeft: '0.5px solid #F3F4F6' }}>
+            <div className="sticky top-4">
+              <h3 className="text-sm font-semibold mb-4" style={{ color: '#1B2A4A' }}>
+                Course Outline
+              </h3>
+              <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 10rem)' }}>
                 {modules.map((module) => (
-                  <div key={module.id}>
-                    {/* Module header */}
-                    <button
-                      onClick={() => toggleModule(module.id)}
-                      className="w-full flex items-center gap-2 p-3 text-left hover:bg-gray-50 transition-colors"
+                  <div key={module.id} className="mb-4">
+                    <div
+                      className="text-xs font-semibold mb-2 pb-1.5"
+                      style={{ color: '#6B7280', borderBottom: '0.5px solid #F3F4F6' }}
                     >
-                      {expandedModules.has(module.id) ? (
-                        <ChevronDown size={16} className="text-gray-400 flex-shrink-0" />
-                      ) : (
-                        <ChevronRight size={16} className="text-gray-400 flex-shrink-0" />
-                      )}
-                      <span
-                        className="text-sm font-medium truncate"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          color: '#2B3A67',
-                        }}
-                      >
-                        {module.title}
-                      </span>
-                    </button>
-
-                    {/* Module lessons */}
-                    {expandedModules.has(module.id) && (
-                      <div>
-                        {module.lessons.map((lesson) => {
-                          const isCurrentLesson = lesson.id === currentLesson.id;
-                          const lessonComplete = progress.lessonProgress.get(lesson.id)?.status === 'completed';
-
-                          return (
-                            <Link
-                              key={lesson.id}
-                              href={`/hub/courses/${slug}/${lesson.slug}`}
-                              className={`flex items-center gap-2 px-4 py-2 pl-8 text-sm transition-colors ${
-                                isCurrentLesson ? 'bg-[#FFF8E7]' : 'hover:bg-gray-50'
-                              }`}
-                              style={{
-                                borderLeft: isCurrentLesson ? '3px solid #E8B84B' : '3px solid transparent',
-                                fontFamily: "'DM Sans', sans-serif",
-                              }}
-                            >
-                              {lessonComplete ? (
-                                <div
-                                  className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                                  style={{ backgroundColor: '#10B981' }}
-                                >
-                                  <Check size={12} className="text-white" />
-                                </div>
-                              ) : (
-                                <div
-                                  className="w-5 h-5 rounded-full border-2 flex-shrink-0"
-                                  style={{
-                                    borderColor: isCurrentLesson ? '#E8B84B' : '#D1D5DB',
-                                  }}
-                                />
-                              )}
-                              <span
-                                className={`truncate ${isCurrentLesson ? 'font-medium' : ''}`}
-                                style={{ color: isCurrentLesson ? '#2B3A67' : '#6B7280' }}
-                              >
-                                {lesson.title}
-                              </span>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    )}
+                      {module.title}
+                    </div>
+                    {module.lessons.map((l) => {
+                      const isActive = l.slug === lessonSlug;
+                      const isDone = progress.lessonProgress.get(l.id)?.status === 'completed';
+                      return (
+                        <div
+                          key={l.id}
+                          className="flex items-center gap-2 py-1.5 cursor-pointer"
+                          style={{ borderBottom: '0.5px solid #F9FAFB' }}
+                          onClick={() => router.push(`/hub/courses/${slug}/${l.slug}`)}
+                        >
+                          <div
+                            className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
+                            style={{
+                              border: isDone ? 'none' : isActive ? '1.5px solid #FFBA06' : '1.5px solid #E5E7EB',
+                              background: isDone ? '#16A34A' : 'transparent',
+                            }}
+                          >
+                            {isDone && (
+                              <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3">
+                                <path d="M20 6L9 17l-5-5"/>
+                              </svg>
+                            )}
+                          </div>
+                          <span
+                            className="text-xs flex-1 leading-snug"
+                            style={{ color: isActive ? '#1B2A4A' : '#9CA3AF', fontWeight: isActive ? 600 : 400 }}
+                          >
+                            {l.title}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 ))}
               </div>
@@ -699,6 +652,7 @@ export default function LessonPage({ params }: LessonPageProps) {
               </div>
             </div>
           )}
+        </div>
         </div>
       </div>
 

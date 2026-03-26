@@ -18,6 +18,7 @@ interface SalesOpportunity {
   source: string | null
   notes: string | null
   last_activity_at: string | null
+  is_contact_only: boolean
   created_at: string
   updated_at: string
 }
@@ -34,6 +35,7 @@ interface Opportunity {
   type: string
   assignedTo: string | null
   isRenewal: boolean
+  isContactOnly: boolean
   lastActivityAt: string | null
 }
 
@@ -98,7 +100,8 @@ export default function SalesPage() {
   const [savingNote, setSavingNote] = useState(false)
   const [lastSynced, setLastSynced] = useState<Date | null>(null)
   const [hideUnassigned, setHideUnassigned] = useState(true)
-  const [hideZeroValue, setHideZeroValue] = useState(false)
+  const [hideZeroValue, setHideZeroValue] = useState(true)
+  const [hideContactOnly, setHideContactOnly] = useState(true)
   const [activePreset, setActivePreset] = useState<string | null>(null)
   const [updatingOpportunity, setUpdatingOpportunity] = useState<string | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
@@ -133,6 +136,7 @@ export default function SalesPage() {
         type: row.type,
         assignedTo: row.assigned_to_email,
         isRenewal: row.type === 'renewal' || row.name.toLowerCase().includes('renewal'),
+        isContactOnly: row.is_contact_only || false,
         lastActivityAt: row.last_activity_at,
       }))
 
@@ -274,33 +278,92 @@ export default function SalesPage() {
     return STAGE_COLORS[stage] || 'bg-gray-100 border-gray-200 text-gray-600'
   }
 
-  // Preset filter functions
-  const presetFilters: Record<string, (o: Opportunity) => boolean> = {
-    renewals: (o) => o.isRenewal,
-    active: (o) => ['qualified', 'likely_yes', 'proposal_sent', 'signed'].includes(o.stage),
-    attention: (o) => isNeedsAttention(o),
-    hot: (o) => ['likely_yes', 'proposal_sent', 'signed'].includes(o.stage),
-  }
+  // ─── FILTER PRESETS ───────────────────────────────────────────────────────
+  const PRESETS = [
+    {
+      id: 'renewals',
+      label: 'Renewals',
+      description: 'All active renewal opportunities',
+      filter: (o: Opportunity) =>
+        o.isRenewal && o.stage !== 'paid' && o.stage !== 'lost',
+    },
+    {
+      id: 'hot',
+      label: 'Hot Deals',
+      description: 'Likely Yes + Proposal Sent + Signed',
+      filter: (o: Opportunity) =>
+        ['likely_yes', 'proposal_sent', 'signed'].includes(o.stage),
+    },
+    {
+      id: 'new_prospects',
+      label: 'New Prospects',
+      description: 'Targeting + Engaged - active outreach',
+      filter: (o: Opportunity) =>
+        ['targeting', 'engaged'].includes(o.stage),
+    },
+    {
+      id: 'needs_attention',
+      label: 'Needs Attention',
+      description: 'No activity in 14+ days',
+      filter: (o: Opportunity) => isNeedsAttention(o),
+    },
+    {
+      id: 'closing_soon',
+      label: 'Closing Soon',
+      description: 'Signed + Likely Yes - revenue to close',
+      filter: (o: Opportunity) =>
+        ['signed', 'likely_yes'].includes(o.stage),
+    },
+    {
+      id: 'full_pipeline',
+      label: 'Full Pipeline',
+      description: 'Everything active (no paid/lost)',
+      filter: (o: Opportunity) =>
+        o.stage !== 'paid' && o.stage !== 'lost' && !o.isContactOnly,
+    },
+    {
+      id: 'won',
+      label: 'Won',
+      description: 'Paid - closed deals',
+      filter: (o: Opportunity) => o.stage === 'paid',
+    },
+    {
+      id: 'stale',
+      label: 'Stale',
+      description: 'No activity in 21+ days',
+      filter: (o: Opportunity) => {
+        if (!o.lastActivityAt) return true
+        const days = (Date.now() - new Date(o.lastActivityAt).getTime()) / (1000 * 60 * 60 * 24)
+        return days > 21 && o.stage !== 'paid' && o.stage !== 'lost'
+      },
+    },
+  ]
 
-  // Apply all filters
+  // Active preset filter function
+  const presetFilter = activePreset
+    ? PRESETS.find(p => p.id === activePreset)?.filter
+    : null
+
+  // Apply all filters to get the visible opportunities list
   const filtered = opportunities.filter(opp => {
-    // Stage filter dropdown
-    if (selectedStage !== 'all' && opp.stage !== selectedStage) return false
-
-    // Search
-    if (search && !opp.name?.toLowerCase().includes(search.toLowerCase())) return false
-
-    // Hide unassigned
+    if (hideContactOnly && opp.isContactOnly) return false
     if (hideUnassigned && opp.stage === 'unassigned') return false
-
-    // Hide $0 value
-    if (hideZeroValue && (!opp.value || opp.value === 0)) return false
-
-    // Active preset
-    if (activePreset && presetFilters[activePreset] && !presetFilters[activePreset](opp)) return false
-
+    if (hideZeroValue && !opp.value) return false
+    if (presetFilter && !presetFilter(opp)) return false
+    if (search && !opp.name.toLowerCase().includes(search.toLowerCase())) return false
+    if (selectedStage !== 'all' && opp.stage !== selectedStage) return false
     return true
   })
+
+  // Count per preset (applied against base-filtered list, ignoring active preset)
+  const baseFiltered = opportunities.filter(opp => {
+    if (hideContactOnly && opp.isContactOnly) return false
+    return true
+  })
+
+  const presetCounts = Object.fromEntries(
+    PRESETS.map(p => [p.id, baseFiltered.filter(p.filter).length])
+  )
 
   // Group by stage for kanban (exclude lost)
   const kanbanStages = STAGE_OPTIONS.filter(s => s.id !== 'lost')
@@ -310,12 +373,21 @@ export default function SalesPage() {
     if (byStage[opp.stage]) byStage[opp.stage].push(opp)
   })
 
-  // Summary stats
-  const totalValue = opportunities
-    .filter(o => o.stage !== 'lost' && o.stage !== 'paid')
-    .reduce((sum, o) => sum + (o.value ?? 0), 0)
-  const renewalCount = opportunities.filter(o => o.isRenewal && o.stage !== 'paid').length
-  const needsAttentionCount = opportunities.filter(o => isNeedsAttention(o) && o.stage !== 'paid').length
+  // Probability map for weighted value
+  const STAGE_PROBABILITY: Record<string, number> = {
+    unassigned: 0, targeting: 5, engaged: 10, qualified: 30,
+    likely_yes: 50, proposal_sent: 70, signed: 90, paid: 100, lost: 0,
+  }
+
+  // Summary stats - pipeline-wide (excluding contact-only)
+  const pipelineOpps = opportunities.filter(o => !o.isContactOnly && o.stage !== 'paid' && o.stage !== 'lost')
+  const totalValue = pipelineOpps.reduce((sum, o) => sum + (o.value ?? 0), 0)
+  const weightedValue = pipelineOpps.reduce((sum, o) => {
+    const prob = STAGE_PROBABILITY[o.stage] || 0
+    return sum + ((o.value || 0) * prob / 100)
+  }, 0)
+  const renewalCount = opportunities.filter(o => o.isRenewal && !o.isContactOnly && o.stage !== 'paid' && o.stage !== 'lost').length
+  const needsAttentionCount = pipelineOpps.filter(o => isNeedsAttention(o)).length
 
   const OppCard = ({ opp }: { opp: Opportunity }) => {
     const latestNote = getLatestNote(opp.supabase_id)
@@ -498,6 +570,9 @@ export default function SalesPage() {
                 ${totalValue.toLocaleString()}
               </p>
               <p className="text-sm text-gray-500 mt-0.5">Pipeline Value</p>
+              <p className="text-xs text-gray-400 mt-1">
+                ${Math.round(weightedValue).toLocaleString()} weighted
+              </p>
             </div>
           </div>
         </div>
@@ -506,45 +581,84 @@ export default function SalesPage() {
       {/* Smart filter presets + Search */}
       {!loading && !error && (
         <div className="space-y-3">
-          {/* Preset filter buttons */}
-          <div className="flex gap-2 flex-wrap items-center">
-            {[
-              { key: 'renewals', label: 'Renewals' },
-              { key: 'active', label: 'Active Deals' },
-              { key: 'attention', label: 'Needs Attention' },
-              { key: 'hot', label: 'Hot Deals' },
-            ].map(preset => (
+          {/* Filter preset bar */}
+          <div className="flex flex-wrap gap-2">
+            {PRESETS.map(preset => (
               <button
-                key={preset.key}
-                onClick={() => setActivePreset(activePreset === preset.key ? null : preset.key)}
-                className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${
-                  activePreset === preset.key
-                    ? 'bg-indigo-500 text-white border-indigo-500'
-                    : 'border-gray-300 text-gray-600 hover:border-indigo-300'
+                key={preset.id}
+                onClick={() => setActivePreset(activePreset === preset.id ? null : preset.id)}
+                title={preset.description}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  activePreset === preset.id
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
                 {preset.label}
+                {presetCounts[preset.id] > 0 && (
+                  <span className={`rounded-full px-1.5 py-0.5 text-xs font-bold ${
+                    activePreset === preset.id
+                      ? 'bg-indigo-500 text-white'
+                      : 'bg-slate-300 text-slate-600'
+                  }`}>
+                    {presetCounts[preset.id]}
+                  </span>
+                )}
               </button>
             ))}
+            {activePreset && (
+              <button
+                onClick={() => setActivePreset(null)}
+                className="px-3 py-1.5 rounded-full text-xs font-medium text-red-500 hover:bg-red-50 transition-colors"
+              >
+                Clear filter
+              </button>
+            )}
+          </div>
 
-            {/* Toggle switches */}
-            <label className="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer ml-2">
+          {/* Active filter summary */}
+          <div className="flex items-center gap-3 text-xs text-slate-500">
+            <span>
+              Showing <span className="font-semibold text-slate-700">{filtered.length}</span> of {opportunities.filter(o => !o.isContactOnly).length} opportunities
+            </span>
+            {hideUnassigned && <span className="bg-slate-100 px-2 py-0.5 rounded">Hiding unassigned</span>}
+            {hideZeroValue && <span className="bg-slate-100 px-2 py-0.5 rounded">Hiding $0</span>}
+            {hideContactOnly && <span className="bg-slate-100 px-2 py-0.5 rounded">Hiding contact-only</span>}
+            {activePreset && (
+              <span className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded">
+                {PRESETS.find(p => p.id === activePreset)?.label} filter active
+              </span>
+            )}
+          </div>
+
+          {/* Toggle switches */}
+          <div className="flex items-center gap-4 text-sm">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={hideContactOnly}
+                onChange={e => setHideContactOnly(e.target.checked)}
+                className="rounded"
+              />
+              <span className="text-slate-600">Hide contact-only rows</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={hideUnassigned}
                 onChange={e => setHideUnassigned(e.target.checked)}
                 className="rounded"
               />
-              Hide Unassigned
+              <span className="text-slate-600">Hide Unassigned</span>
             </label>
-            <label className="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer">
+            <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={hideZeroValue}
                 onChange={e => setHideZeroValue(e.target.checked)}
                 className="rounded"
               />
-              Hide $0 Value
+              <span className="text-slate-600">Hide $0 Value</span>
             </label>
           </div>
 

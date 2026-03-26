@@ -6,29 +6,13 @@ import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
 import { getSupabase } from '@/lib/supabase';
 import { useEnrollment } from '@/lib/hooks/useEnrollment';
-import { useProgressTracking, LessonStatus } from '@/lib/hooks/useProgressTracking';
+import { useProgressTracking } from '@/lib/hooks/useProgressTracking';
 import {
   ArrowLeft,
-  Clock,
   BookOpen,
-  BarChart2,
-  ChevronDown,
-  ChevronRight,
-  Play,
-  FileText,
-  Headphones,
-  Zap,
-  Check,
-  CheckCircle,
   Award,
-  Infinity,
-  HelpCircle,
-  PenLine,
-  CheckSquare,
-  Flag,
   User,
-  ExternalLink,
-  Mail,
+  CheckCircle,
 } from 'lucide-react';
 import CourseCard from '@/components/hub/CourseCard';
 
@@ -291,61 +275,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
     setExpandedModules(newExpanded);
   };
 
-  const getLessonIcon = (contentType: string) => {
-    switch (contentType) {
-      case 'video':
-        return <Play size={14} />;
-      case 'audio':
-        return <Headphones size={14} />;
-      case 'read':
-      case 'download':
-        return <FileText size={14} />;
-      case 'quiz':
-        return <HelpCircle size={14} />;
-      case 'reflection':
-        return <PenLine size={14} />;
-      case 'action_step':
-        return <CheckSquare size={14} />;
-      case 'checkpoint':
-        return <Flag size={14} />;
-      default:
-        return <BookOpen size={14} />;
-    }
-  };
-
-  const getLessonStatusIcon = (lessonId: string) => {
-    const status = progress.lessonProgress.get(lessonId)?.status || 'not_started';
-
-    if (status === 'completed') {
-      return (
-        <div
-          className="w-6 h-6 rounded-full flex items-center justify-center"
-          style={{ backgroundColor: '#10B981' }}
-        >
-          <Check size={14} className="text-white" />
-        </div>
-      );
-    }
-
-    if (status === 'in_progress') {
-      return (
-        <div
-          className="w-6 h-6 rounded-full flex items-center justify-center border-2"
-          style={{ borderColor: '#E8B84B' }}
-        >
-          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#E8B84B' }} />
-        </div>
-      );
-    }
-
-    return (
-      <div
-        className="w-6 h-6 rounded-full border-2"
-        style={{ borderColor: '#D1D5DB' }}
-      />
-    );
-  };
-
   const getTotalLessons = () => {
     return modules.reduce((acc, mod) => acc + mod.lessons.length, 0);
   };
@@ -433,7 +362,12 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
     );
   }
 
+  const totalLessons = getTotalLessons();
+  const completedLessons = progress.completedLessons || 0;
+  const progressPct = progress.progressPct || 0;
+
   return (
+    <div style={{ background: '#F0EEE9', minHeight: '100vh' }}>
     <div className="p-4 md:p-8 max-w-[1100px] mx-auto">
       {/* Toast notification */}
       {toast && (
@@ -466,264 +400,219 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
       <div className="grid lg:grid-cols-[1fr_320px] gap-8">
         {/* Main Content */}
         <div>
-          {/* Course Header Card */}
-          <div className="hub-card">
-            {/* Category pill */}
-            <span
-              className="inline-block text-[12px] font-medium px-3 py-1 rounded-full mb-4"
-              style={{
-                backgroundColor: `${categoryColor}20`,
-                color: categoryColor,
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
-              {course.category}
-            </span>
+          {/* Course Hero */}
+          <section
+            className="relative text-white overflow-hidden rounded-2xl mb-5"
+            style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)' }}
+          >
+            {/* Decorative circle */}
+            <div
+              className="absolute rounded-full pointer-events-none"
+              style={{ right: '-40px', top: '-60px', width: '240px', height: '240px', background: 'rgba(255,186,6,0.06)' }}
+            />
 
-            {/* Title */}
-            <h1
-              className="font-bold mb-4"
-              style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                fontSize: '28px',
-                color: '#2B3A67',
-              }}
-            >
-              {course.title}
-            </h1>
-
-            {/* Description */}
-            <p
-              className="text-[15px] mb-6 line-clamp-3"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                color: '#4B5563',
-              }}
-            >
-              {course.description}
-            </p>
-
-            {/* Stats row */}
-            <div className="flex flex-wrap items-center gap-4 mb-6">
-              <div className="flex items-center gap-2 text-gray-500">
-                <Clock size={18} />
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '14px' }}>
-                  {course.pd_hours} hours PD credit
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-500">
-                <BookOpen size={18} />
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '14px' }}>
-                  {getTotalLessons()} lessons
-                </span>
-              </div>
-              {course.difficulty && (
-                <div className="flex items-center gap-2 text-gray-500">
-                  <BarChart2 size={18} />
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '14px' }}>
-                    {course.difficulty}
-                  </span>
+            <div className="relative z-10 px-9 py-8">
+              {/* Category tag */}
+              {course.category && (
+                <div
+                  className="inline-block text-xs font-bold px-3 py-1 rounded-full mb-3"
+                  style={{
+                    background: 'rgba(254,243,199,0.15)',
+                    border: '1px solid rgba(255,186,6,0.3)',
+                    color: '#FFBA06',
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {course.category}
                 </div>
               )}
-            </div>
 
-            {/* Enroll button or Progress */}
-            {isEnrolled ? (
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span
-                    className="text-sm font-medium"
-                    style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-                  >
-                    Your progress
-                  </span>
-                  <span
-                    className="text-sm font-bold"
-                    style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-                  >
-                    {progress.progressPct}%
-                  </span>
-                </div>
-                <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${progress.progressPct}%`,
-                      backgroundColor: progress.isComplete ? '#10B981' : '#E8B84B',
-                    }}
-                  />
-                </div>
-                {progress.isComplete && (
-                  <p
-                    className="mt-3 text-sm text-green-600 flex items-center gap-2"
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
-                  >
-                    <CheckCircle size={16} />
-                    Course completed! View your certificate.
-                  </p>
+              {/* Title */}
+              <h1 className="text-2xl font-bold text-white mb-2 leading-snug" style={{ maxWidth: '560px' }}>
+                {course.title}
+              </h1>
+
+              {/* Description */}
+              {course.description && (
+                <p className="text-sm mb-6 leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)', maxWidth: '560px' }}>
+                  {course.description}
+                </p>
+              )}
+
+              {/* Stats row - PD Hours and Lessons only, NO difficulty/level */}
+              <div
+                className="flex gap-0 pt-5"
+                style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}
+              >
+                {course.pd_hours && (
+                  <div className="pr-6" style={{ borderRight: '1px solid rgba(255,255,255,0.08)' }}>
+                    <div className="text-xl font-bold" style={{ color: '#FFBA06' }}>{course.pd_hours}</div>
+                    <div className="text-xs font-bold tracking-widest uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>PD Hours</div>
+                  </div>
+                )}
+                {totalLessons > 0 && (
+                  <div className="px-6">
+                    <div className="text-xl font-bold text-white">{totalLessons}</div>
+                    <div className="text-xs font-bold tracking-widest uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>Lessons</div>
+                  </div>
                 )}
               </div>
-            ) : (
-              <button
-                onClick={handleEnroll}
-                disabled={isEnrolling || !user}
-                className="px-8 py-3 rounded-lg font-medium transition-colors disabled:opacity-50"
-                style={{
-                  backgroundColor: '#E8B84B',
-                  color: '#2B3A67',
-                  fontFamily: "'DM Sans', sans-serif",
-                }}
+            </div>
+
+            {/* Progress strip - only show if enrolled */}
+            {enrollment && (
+              <div
+                className="px-9 py-4 flex items-center gap-4"
+                style={{ background: 'rgba(255,255,255,0.05)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
               >
-                {isEnrolling ? 'Enrolling...' : !user ? 'Sign in to enroll' : 'Enroll in Course'}
-              </button>
+                <span className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.4)', whiteSpace: 'nowrap' }}>
+                  Your progress
+                </span>
+                <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{ width: `${progressPct}%`, background: 'linear-gradient(90deg, #FFBA06, #F59E0B)' }}
+                  />
+                </div>
+                <span className="text-sm font-bold" style={{ color: '#FFBA06', whiteSpace: 'nowrap' }}>
+                  {progressPct}%
+                </span>
+              </div>
             )}
-          </div>
+          </section>
 
           {/* Course Content / Lesson List */}
-          <div className="hub-card mt-6">
+          <div className="mb-6">
             <h2
-              className="font-semibold mb-4"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '18px',
-                color: '#2B3A67',
-              }}
+              className="text-xs font-bold tracking-widest uppercase mb-3"
+              style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}
             >
               Course Content
             </h2>
 
             {modules.length === 0 ? (
-              <p
-                className="text-gray-500 text-center py-8"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
+              <div
+                className="bg-white rounded-2xl p-8 text-center"
+                style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
               >
-                No lessons available yet. Check console for debug info.
-              </p>
+                <p className="text-gray-500 text-sm">No lessons available yet.</p>
+              </div>
             ) : (
-              <div className="space-y-4">
-                {modules.map((module) => (
-                  <div key={module.id} className="border border-gray-100 rounded-lg overflow-hidden">
-                    {/* Module header */}
-                    <button
-                      onClick={() => toggleModule(module.id)}
-                      className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+              <div>
+                {modules.map((module, moduleIndex) => {
+                  const moduleIsComplete = module.lessons.every(
+                    (l) => progress.lessonProgress.get(l.id)?.status === 'completed'
+                  );
+
+                  // Find next lesson
+                  const findNextLessonId = () => {
+                    for (const mod of modules) {
+                      for (const l of mod.lessons) {
+                        if (progress.lessonProgress.get(l.id)?.status !== 'completed') {
+                          return l.id;
+                        }
+                      }
+                    }
+                    return null;
+                  };
+                  const nextLessonId = findNextLessonId();
+
+                  return (
+                    <div
+                      key={module.id}
+                      className="bg-white rounded-2xl overflow-hidden mb-3"
+                      style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
                     >
-                      <div className="flex items-center gap-3">
-                        {expandedModules.has(module.id) ? (
-                          <ChevronDown size={20} className="text-gray-400" />
-                        ) : (
-                          <ChevronRight size={20} className="text-gray-400" />
-                        )}
-                        <span
-                          className="font-semibold text-left"
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            fontSize: '16px',
-                            color: '#2B3A67',
-                          }}
-                        >
-                          {module.title}
+                      {/* Module header */}
+                      <div className="flex items-center justify-between px-5 py-3.5">
+                        <div className="flex items-center gap-3">
+                          {/* Module number badge */}
+                          <div
+                            className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0"
+                            style={{
+                              background: moduleIsComplete ? '#DCFCE7' : '#F3F4F6',
+                              color: moduleIsComplete ? '#16A34A' : '#6B7280',
+                            }}
+                          >
+                            {moduleIndex + 1}
+                          </div>
+                          <span className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>{module.title}</span>
+                        </div>
+                        <span className="text-xs" style={{ color: '#9CA3AF' }}>
+                          {module.lessons.length} lessons
                         </span>
                       </div>
-                      <span
-                        className="text-sm text-gray-500"
-                        style={{ fontFamily: "'DM Sans', sans-serif" }}
-                      >
-                        {module.lessons.length} lesson{module.lessons.length !== 1 ? 's' : ''}
-                      </span>
-                    </button>
 
-                    {/* Lessons */}
-                    {expandedModules.has(module.id) && (
-                      <div className="divide-y divide-gray-100">
-                        {module.lessons.map((lesson, index) => {
-                          const canAccess = isEnrolled || lesson.is_free_preview;
-                          const lessonStatus = progress.lessonProgress.get(lesson.id)?.status || 'not_started';
+                      {/* Lesson rows */}
+                      {module.lessons.map((lesson) => {
+                        const isDone = progress.lessonProgress.get(lesson.id)?.status === 'completed';
+                        const isNext = lesson.id === nextLessonId;
+                        const canAccess = isEnrolled || lesson.is_free_preview;
 
-                          return (
+                        return (
+                          <div
+                            key={lesson.id}
+                            className={`flex items-center gap-3 px-5 py-3 ${canAccess ? 'cursor-pointer hover:bg-gray-50' : 'opacity-60'}`}
+                            style={{
+                              borderTop: '0.5px solid #F9FAFB',
+                              background: isNext ? '#FFFBF0' : 'transparent',
+                            }}
+                            onClick={() => canAccess && router.push(`/hub/courses/${course.slug}/${lesson.slug}`)}
+                          >
+                            {/* Status dot */}
                             <div
-                              key={lesson.id}
-                              className={`flex items-center gap-4 p-4 ${!canAccess ? 'opacity-60' : ''}`}
+                              className="w-[18px] h-[18px] rounded-full flex items-center justify-center flex-shrink-0"
+                              style={{
+                                border: isDone ? 'none' : isNext ? '1.5px solid #FFBA06' : '1.5px solid #E5E7EB',
+                                background: isDone ? '#16A34A' : isNext ? 'rgba(255,186,6,0.1)' : 'transparent',
+                              }}
                             >
-                              {/* Status circle - clickable if enrolled */}
-                              {isEnrolled ? (
-                                <button
-                                  onClick={() => handleLessonToggle(lesson.id)}
-                                  className="flex-shrink-0 hover:scale-110 transition-transform"
-                                  title={
-                                    lessonStatus === 'completed'
-                                      ? 'Mark as incomplete'
-                                      : 'Mark as complete'
-                                  }
-                                >
-                                  {getLessonStatusIcon(lesson.id)}
-                                </button>
-                              ) : (
-                                <div className="flex-shrink-0">{getLessonStatusIcon(lesson.id)}</div>
+                              {isDone && (
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3">
+                                  <path d="M20 6L9 17l-5-5"/>
+                                </svg>
                               )}
-
-                              {/* Lesson info */}
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  {canAccess ? (
-                                    <Link
-                                      href={`/hub/courses/${course.slug}/${lesson.slug}`}
-                                      className="font-medium hover:text-[#E8B84B] transition-colors truncate"
-                                      style={{
-                                        fontFamily: "'DM Sans', sans-serif",
-                                        fontSize: '14px',
-                                        color: '#2B3A67',
-                                      }}
-                                    >
-                                      {lesson.title}
-                                    </Link>
-                                  ) : (
-                                    <span
-                                      className="font-medium truncate"
-                                      style={{
-                                        fontFamily: "'DM Sans', sans-serif",
-                                        fontSize: '14px',
-                                        color: '#6B7280',
-                                      }}
-                                    >
-                                      {lesson.title}
-                                    </span>
-                                  )}
-                                  {lesson.is_free_preview && (
-                                    <span
-                                      className="text-[10px] font-medium px-2 py-0.5 rounded-full"
-                                      style={{
-                                        backgroundColor: '#D1FAE5',
-                                        color: '#059669',
-                                        fontFamily: "'DM Sans', sans-serif",
-                                      }}
-                                    >
-                                      Free Preview
-                                    </span>
-                                  )}
-                                  {lesson.is_quick_win && (
-                                    <Zap size={14} style={{ color: '#E8B84B' }} />
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Duration and type */}
-                              <div className="flex items-center gap-3 flex-shrink-0">
-                                <span
-                                  className="text-[12px] text-gray-400"
-                                  style={{ fontFamily: "'DM Sans', sans-serif" }}
-                                >
-                                  {lesson.estimated_minutes} min
-                                </span>
-                                <div className="text-gray-400">{getLessonIcon(lesson.content_type)}</div>
-                              </div>
+                              {isNext && !isDone && (
+                                <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#FFBA06' }} />
+                              )}
                             </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                ))}
+
+                            {/* Title */}
+                            <div
+                              className="flex-1 text-sm"
+                              style={{ color: isDone ? '#9CA3AF' : '#374151', fontWeight: isNext ? 600 : 400 }}
+                            >
+                              {lesson.title}
+                              {lesson.is_free_preview && (
+                                <span
+                                  className="ml-2 text-[10px] font-medium px-2 py-0.5 rounded-full"
+                                  style={{ backgroundColor: '#D1FAE5', color: '#059669' }}
+                                >
+                                  Free Preview
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Up next badge or time */}
+                            {isNext && !isDone ? (
+                              <span
+                                className="text-xs font-semibold px-2 py-0.5 rounded"
+                                style={{ background: '#FFFBF0', color: '#D97706' }}
+                              >
+                                Up next
+                              </span>
+                            ) : (
+                              <span className="text-xs" style={{ color: '#9CA3AF' }}>
+                                {lesson.estimated_minutes} min
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -780,215 +669,118 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-4">
-          {/* What you'll learn */}
-          <div className="hub-card">
-            <h3
-              className="font-semibold mb-4"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '16px',
-                color: '#2B3A67',
+        <div className="space-y-3">
+          {/* Resume / Start button + progress */}
+          <div
+            className="bg-white rounded-2xl p-5"
+            style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+          >
+            <button
+              onClick={() => {
+                if (isEnrolled) {
+                  // Find next incomplete lesson
+                  for (const mod of modules) {
+                    for (const l of mod.lessons) {
+                      if (progress.lessonProgress.get(l.id)?.status !== 'completed') {
+                        router.push(`/hub/courses/${course.slug}/${l.slug}`);
+                        return;
+                      }
+                    }
+                  }
+                  // All complete, go to first lesson
+                  if (modules[0]?.lessons[0]) {
+                    router.push(`/hub/courses/${course.slug}/${modules[0].lessons[0].slug}`);
+                  }
+                } else {
+                  handleEnroll();
+                }
               }}
+              disabled={isEnrolling || !user}
+              className="w-full py-3 rounded-xl text-sm font-semibold text-white mb-4 disabled:opacity-50"
+              style={{ background: '#1B2A4A' }}
             >
-              What you'll learn
-            </h3>
-            <ul className="space-y-3">
-              {['Key concepts and strategies', 'Practical techniques you can use immediately', 'Real classroom examples'].map(
-                (item, i) => (
-                  <li
-                    key={i}
-                    className="flex items-start gap-3 text-sm text-gray-600"
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
-                  >
-                    <Check size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    {item}
-                  </li>
-                )
-              )}
-            </ul>
+              {isEnrolled ? 'Resume Course →' : isEnrolling ? 'Enrolling...' : !user ? 'Sign in to enroll' : 'Start Course →'}
+            </button>
+
+            {enrollment && (
+              <>
+                <div className="h-1.5 rounded-full overflow-hidden mb-1.5" style={{ background: '#F3F4F6' }}>
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{ width: `${progressPct}%`, background: 'linear-gradient(90deg, #FFBA06, #F59E0B)' }}
+                  />
+                </div>
+                <div className="text-xs mb-3" style={{ color: '#9CA3AF' }}>
+                  Lesson {completedLessons} of {totalLessons}
+                </div>
+                <div className="text-xs font-medium" style={{ color: '#16A34A' }}>
+                  {progressPct === 100 ? 'Course complete!' : "You're doing great - keep going!"}
+                </div>
+              </>
+            )}
           </div>
 
-          {/* This course includes */}
-          <div className="hub-card">
-            <h3
-              className="font-semibold mb-4"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '16px',
-                color: '#2B3A67',
-              }}
+          {/* PD Hours badge */}
+          {course.pd_hours && (
+            <div
+              className="rounded-xl p-4 flex items-center gap-3"
+              style={{ background: '#FEF3C7' }}
             >
-              This course includes
-            </h3>
-            <ul className="space-y-3">
-              <li className="flex items-center gap-3 text-sm text-gray-600" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                <Play size={16} className="text-gray-400" />
-                {getTotalLessons()} lessons
-              </li>
-              <li className="flex items-center gap-3 text-sm text-gray-600" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                <Clock size={16} className="text-gray-400" />
-                {course.pd_hours} PD hours
-              </li>
-              <li className="flex items-center gap-3 text-sm text-gray-600" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                <Award size={16} className="text-gray-400" />
-                Certificate on completion
-              </li>
-              <li className="flex items-center gap-3 text-sm text-gray-600" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                <Infinity size={16} className="text-gray-400" />
-                Lifetime access
-              </li>
-            </ul>
-          </div>
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ background: '#FDE68A' }}
+              >
+                <Award size={16} style={{ color: '#D97706' }} />
+              </div>
+              <div>
+                <div className="text-base font-bold" style={{ color: '#1B2A4A' }}>{course.pd_hours} PD Hours</div>
+                <div className="text-xs" style={{ color: '#9CA3AF' }}>Earned on completion</div>
+              </div>
+            </div>
+          )}
 
-          {/* Meet Your Instructor - Sidebar version */}
-          <div className="hub-card">
-            <h3
-              className="font-semibold mb-4"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '16px',
-                color: '#2B3A67',
-              }}
-            >
+          {/* Meet Your Instructor */}
+          <div
+            className="bg-white rounded-2xl p-5"
+            style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+          >
+            <h3 className="text-sm font-semibold mb-4" style={{ color: '#1B2A4A' }}>
               Meet Your Instructor
             </h3>
 
             <div className="flex gap-3">
-              {/* Author Avatar - 60px for sidebar */}
               <div className="flex-shrink-0">
                 {course.author_avatar_url ? (
                   <img
                     src={course.author_avatar_url}
                     alt={course.author_name || 'Instructor'}
-                    className="w-[60px] h-[60px] rounded-full object-cover"
+                    className="w-[50px] h-[50px] rounded-full object-cover"
                   />
                 ) : (
                   <div
-                    className="w-[60px] h-[60px] rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: '#E5E7EB' }}
+                    className="w-[50px] h-[50px] rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: '#F3F4F6' }}
                   >
-                    <User size={24} style={{ color: '#9CA3AF' }} />
+                    <User size={20} style={{ color: '#9CA3AF' }} />
                   </div>
                 )}
               </div>
 
-              {/* Author Info - Compact for sidebar */}
               <div className="flex-1 min-w-0">
-                <h4
-                  className="font-semibold mb-0.5"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '15px',
-                    color: '#2B3A67',
-                  }}
-                >
+                <h4 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
                   {course.author_name || 'Teachers Deserve It Team'}
                 </h4>
-                <p
-                  className="mb-2"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '12px',
-                    color: '#6B7280',
-                  }}
-                >
-                  {course.author_name
-                    ? 'Educator & Course Creator'
-                    : 'Educators supporting teachers'}
+                <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                  {course.author_name ? 'Educator & Course Creator' : 'Educators supporting teachers'}
                 </p>
               </div>
             </div>
 
-            {/* Bio - Compact */}
-            <p
-              className="mt-3 mb-3 line-clamp-3"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '13px',
-                color: '#4B5563',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
+            <p className="mt-3 text-xs line-clamp-3" style={{ color: '#6B7280' }}>
               {course.author_bio ||
                 'Built by educators who believe every teacher deserves support, growth, and a community that gets it.'}
             </p>
-
-            {/* Links row - Compact, wrapping */}
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-              <a
-                href="https://teachersdeserveit.com/blog"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 transition-colors hover:opacity-80"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '12px',
-                  color: '#2B3A67',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#E8B84B')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#2B3A67')}
-              >
-                <ExternalLink size={12} />
-                Blog
-              </a>
-              <a
-                href="https://teachersdeserveit.com/podcast"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 transition-colors hover:opacity-80"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '12px',
-                  color: '#2B3A67',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#E8B84B')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#2B3A67')}
-              >
-                <Headphones size={12} />
-                Podcast
-              </a>
-              <a
-                href="mailto:hello@teachersdeserveit.com"
-                className="inline-flex items-center gap-1 transition-colors hover:opacity-80"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '12px',
-                  color: '#2B3A67',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#E8B84B')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#2B3A67')}
-              >
-                <Mail size={12} />
-                Email
-              </a>
-            </div>
           </div>
-
-          {/* Enroll CTA (sidebar on desktop) */}
-          {!isEnrolled && (
-            <div className="hidden lg:block hub-card" style={{ backgroundColor: '#FFF8E7', border: 'none' }}>
-              <p
-                className="text-sm text-gray-600 mb-4"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
-              >
-                Get full access to all lessons and earn your PD certificate.
-              </p>
-              <button
-                onClick={handleEnroll}
-                disabled={isEnrolling || !user}
-                className="w-full py-3 rounded-lg font-medium transition-colors disabled:opacity-50"
-                style={{
-                  backgroundColor: '#E8B84B',
-                  color: '#2B3A67',
-                  fontFamily: "'DM Sans', sans-serif",
-                }}
-              >
-                {isEnrolling ? 'Enrolling...' : 'Enroll Now'}
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
@@ -1014,6 +806,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           </button>
         </div>
       )}
+    </div>
     </div>
   );
 }
