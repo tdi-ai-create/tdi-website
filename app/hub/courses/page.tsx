@@ -7,7 +7,7 @@ import CourseCard from '@/components/hub/CourseCard';
 import EmptyState from '@/components/hub/EmptyState';
 import { getSupabase } from '@/lib/supabase';
 import { enrollInCourse } from '@/lib/hooks/useEnrollment';
-import { Search, BookOpen, CheckCircle, AlertCircle } from 'lucide-react';
+import { BookOpen, CheckCircle, AlertCircle } from 'lucide-react';
 
 // Filter categories
 const FILTER_CATEGORIES = [
@@ -18,7 +18,6 @@ const FILTER_CATEGORIES = [
   'Leadership',
   'Communication',
   'New Teacher',
-  'Quick Wins Only',
 ];
 
 interface Course {
@@ -46,7 +45,6 @@ export default function CourseCatalogPage() {
   const { user } = useHub();
   const [courses, setCourses] = useState<Course[]>([]);
   const [enrollments, setEnrollments] = useState<Record<string, Enrollment>>({});
-  const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
   const [isLoading, setIsLoading] = useState(true);
   const [isEnrolling, setIsEnrolling] = useState<string | null>(null);
@@ -132,7 +130,7 @@ export default function CourseCatalogPage() {
           },
         }));
 
-        showToast('You are enrolled! 🎉', 'success');
+        showToast('You are enrolled!', 'success');
 
         // Find the course slug and redirect to course detail page
         const course = courses.find((c) => c.id === courseId);
@@ -152,69 +150,65 @@ export default function CourseCatalogPage() {
     }
   };
 
-  // Filter courses based on search and category
+  // Filter courses based on category
   const filteredCourses = courses.filter((course) => {
-    const matchesSearch =
-      searchQuery === '' ||
-      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return activeFilter === 'All' || course.category === activeFilter;
+  });
 
-    const matchesFilter =
-      activeFilter === 'All' ||
-      (activeFilter === 'Quick Wins Only' && false) || // This would filter for quick win courses
-      course.category === activeFilter;
-
-    return matchesSearch && matchesFilter;
+  // Get in-progress courses (enrolled but not completed)
+  const inProgressCourses = courses.filter((course) => {
+    const enrollment = enrollments[course.id];
+    return enrollment && enrollment.status === 'active' && enrollment.progress_percentage > 0;
   });
 
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="p-4 md:p-8 max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="h-8 bg-gray-200 rounded w-48 mb-2 animate-pulse" />
-          <div className="h-5 bg-gray-100 rounded w-96 animate-pulse" />
-        </div>
+      <div
+        className="p-4 md:p-8"
+        style={{ backgroundColor: '#F0EEE9', minHeight: 'calc(100vh - 54px)' }}
+      >
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="h-8 bg-white/50 rounded w-48 mb-2 animate-pulse" />
+            <div className="h-5 bg-white/30 rounded w-96 animate-pulse" />
+          </div>
 
-        {/* Search skeleton */}
-        <div className="mb-6">
-          <div className="h-12 bg-gray-100 rounded-lg w-full max-w-md animate-pulse" />
-        </div>
+          {/* Filter pills skeleton */}
+          <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="h-9 bg-white/50 rounded-full w-28 flex-shrink-0 animate-pulse"
+              />
+            ))}
+          </div>
 
-        {/* Filter pills skeleton */}
-        <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div
-              key={i}
-              className="h-9 bg-gray-100 rounded-full w-28 flex-shrink-0 animate-pulse"
-            />
-          ))}
-        </div>
-
-        {/* Grid skeleton */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="hub-card h-80 animate-pulse">
-              <div className="h-36 bg-gray-100 rounded-t-lg" />
-              <div className="p-4 space-y-3">
-                <div className="h-4 bg-gray-100 rounded w-20" />
-                <div className="h-5 bg-gray-200 rounded w-full" />
-                <div className="h-4 bg-gray-100 rounded w-3/4" />
-              </div>
-            </div>
-          ))}
+          {/* Grid skeleton */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div
+                key={i}
+                className="h-80 bg-white rounded-2xl animate-pulse"
+                style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+              />
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-6xl mx-auto">
+    <div
+      className="p-4 md:p-8"
+      style={{ backgroundColor: '#F0EEE9', minHeight: 'calc(100vh - 54px)' }}
+    >
       {/* Toast notification */}
       {toast && (
         <div
-          className="fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2"
+          className="fixed top-16 right-4 z-50 px-4 py-3 rounded-xl shadow-lg flex items-center gap-2"
           style={{
             backgroundColor: toast.type === 'success' ? '#10B981' : '#EF4444',
             color: 'white',
@@ -226,107 +220,145 @@ export default function CourseCatalogPage() {
         </div>
       )}
 
-      {/* Header */}
-      <div className="mb-8">
-        <h1
-          className="font-bold mb-2"
-          style={{
-            fontFamily: "'Source Serif 4', Georgia, serif",
-            fontSize: '28px',
-            color: '#2B3A67',
-          }}
-        >
-          Course Catalog
-        </h1>
-        <p
-          className="text-gray-500 text-[15px] max-w-[560px]"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
-        >
-          Practical PD built by teachers, for teachers. Every course earns PD hours.
-        </p>
-      </div>
-
-      {/* Search */}
-      <div className="mb-6">
-        <div className="relative max-w-md">
-          <Search
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-            size={20}
-          />
-          <input
-            type="text"
-            placeholder="Search courses..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#E8B84B] transition-colors"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
-          />
-        </div>
-      </div>
-
-      {/* Filter Pills */}
-      <div className="flex gap-2 mb-8 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
-        {FILTER_CATEGORIES.map((category) => (
-          <button
-            key={category}
-            onClick={() => setActiveFilter(category)}
-            className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0"
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1
+            className="font-bold mb-2"
             style={{
-              backgroundColor: activeFilter === category ? '#E8B84B' : 'white',
-              color: activeFilter === category ? 'white' : '#6B7280',
-              border: activeFilter === category ? 'none' : '1px solid #E5E5E5',
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontSize: '28px',
+              color: '#1B2A4A',
             }}
           >
-            {category}
-          </button>
-        ))}
-      </div>
+            Courses
+          </h1>
+          <p
+            className="text-[15px]"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              color: '#6B7280',
+            }}
+          >
+            {courses.length} courses · Practical PD built by teachers, for teachers
+          </p>
+        </div>
 
-      {/* Course Grid or Empty State */}
-      {filteredCourses.length > 0 ? (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredCourses.map((course) => (
-            <CourseCard
-              key={course.id}
-              course={course}
-              enrollment={enrollments[course.id] || null}
-              onEnroll={handleEnroll}
-              isEnrolling={isEnrolling === course.id}
-            />
+        {/* Filter Pills */}
+        <div className="flex gap-2 mb-8 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+          {FILTER_CATEGORIES.map((category) => (
+            <button
+              key={category}
+              onClick={() => setActiveFilter(category)}
+              className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0"
+              style={{
+                backgroundColor: activeFilter === category ? '#1B2A4A' : 'white',
+                color: activeFilter === category ? 'white' : '#6B7280',
+                border: activeFilter === category ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {category}
+            </button>
           ))}
         </div>
-      ) : courses.length === 0 ? (
-        <div
-          className="hub-card py-16"
-          style={{ backgroundColor: '#FFF8E7', border: 'none' }}
-        >
-          <EmptyState
-            icon={BookOpen}
-            iconBgColor="#BFDBFE"
-            title="Courses are coming soon."
-            description="We are building practical, teacher-tested courses that earn PD hours. Check back soon."
-          />
-          <p
-            className="text-center text-sm text-gray-500 mt-4"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
+
+        {/* In Progress Section */}
+        {inProgressCourses.length > 0 && activeFilter === 'All' && (
+          <div className="mb-10">
+            <h2
+              className="text-[11px] font-bold tracking-wider mb-4"
+              style={{
+                color: '#1B2A4A',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              IN PROGRESS
+            </h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {inProgressCourses.map((course) => (
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  enrollment={enrollments[course.id] || null}
+                  onEnroll={handleEnroll}
+                  isEnrolling={isEnrolling === course.id}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* All Courses Section */}
+        {filteredCourses.length > 0 && (
+          <div>
+            {inProgressCourses.length > 0 && activeFilter === 'All' && (
+              <h2
+                className="text-[11px] font-bold tracking-wider mb-4"
+                style={{
+                  color: '#1B2A4A',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                ALL COURSES
+              </h2>
+            )}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filteredCourses.map((course) => (
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  enrollment={enrollments[course.id] || null}
+                  onEnroll={handleEnroll}
+                  isEnrolling={isEnrolling === course.id}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Empty States */}
+        {courses.length === 0 ? (
+          <div
+            className="rounded-2xl py-16"
+            style={{ backgroundColor: 'white', border: '0.5px solid rgba(0,0,0,0.06)' }}
           >
-            Want to be notified? We will email you when courses launch.
-          </p>
-        </div>
-      ) : (
-        <div
-          className="hub-card py-12 text-center"
-          style={{ backgroundColor: '#FAFAF8' }}
-        >
-          <p
-            className="text-gray-500"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
+            <EmptyState
+              icon={BookOpen}
+              iconBgColor="#E0E7FF"
+              title="Courses are coming soon."
+              description="We are building practical, teacher-tested courses that earn PD hours. Check back soon."
+            />
+            <p
+              className="text-center text-sm mt-4"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: '#6B7280',
+              }}
+            >
+              Want to be notified? We will email you when courses launch.
+            </p>
+          </div>
+        ) : filteredCourses.length === 0 ? (
+          <div
+            className="rounded-2xl py-12 text-center"
+            style={{ backgroundColor: 'white', border: '0.5px solid rgba(0,0,0,0.06)' }}
           >
-            No courses match your search. Try a different filter or search term.
-          </p>
-        </div>
-      )}
+            <p
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: '#6B7280',
+              }}
+            >
+              No courses match this filter. Try selecting a different category.
+            </p>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

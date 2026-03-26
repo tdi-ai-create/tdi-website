@@ -4,14 +4,14 @@ import Link from 'next/link';
 import { Check, Lock, Sparkles } from 'lucide-react';
 import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
 
-// Category colors
-const CATEGORY_COLORS: Record<string, string> = {
-  'Stress & Wellness': '#7C9CBF',
-  'Classroom Management': '#E8B84B',
-  'Time Savers': '#6BA368',
-  'Leadership': '#9B7CB8',
-  'Communication': '#E8927C',
-  'New Teacher': '#5BBEC4',
+// Category colors - elevated design
+const CATEGORY_COLORS: Record<string, { bar: string; bg: string; text: string }> = {
+  'Stress & Wellness': { bar: '#7C9CBF', bg: '#E8F0F8', text: '#3D5A80' },
+  'Classroom Management': { bar: '#E8B84B', bg: '#FEF3C7', text: '#854F0B' },
+  'Time Savers': { bar: '#6BA368', bg: '#E8F5E9', text: '#27500A' },
+  'Leadership': { bar: '#9B7CB8', bg: '#EDE9FE', text: '#4C1D95' },
+  'Communication': { bar: '#E8927C', bg: '#FEE2E2', text: '#991B1B' },
+  'New Teacher': { bar: '#5BBEC4', bg: '#E1F5EE', text: '#085041' },
 };
 
 interface CourseCardProps {
@@ -41,7 +41,11 @@ export default function CourseCard({
   onEnroll,
   isEnrolling = false,
 }: CourseCardProps) {
-  const categoryColor = CATEGORY_COLORS[course.category] || '#E8B84B';
+  const colors = CATEGORY_COLORS[course.category] || {
+    bar: '#E8B84B',
+    bg: '#FEF3C7',
+    text: '#854F0B',
+  };
   const isCompleted = enrollment?.status === 'completed';
   const isEnrolled = !!enrollment;
   const progress = enrollment?.progress_percentage || 0;
@@ -56,10 +60,26 @@ export default function CourseCard({
   const isFreeRotating = course.is_free_rotating;
 
   return (
-    <div className="hub-card p-0 overflow-hidden flex flex-col">
+    <div
+      className="flex flex-col overflow-hidden"
+      style={{
+        backgroundColor: 'white',
+        borderRadius: '16px',
+        border: '0.5px solid rgba(0,0,0,0.06)',
+        opacity: !hasAccess && !isFreeRotating ? 0.82 : 1,
+      }}
+    >
+      {/* Category color bar at top */}
+      <div
+        style={{
+          height: '5px',
+          backgroundColor: colors.bar,
+        }}
+      />
+
       {/* Thumbnail */}
       <div
-        className="h-[140px] relative"
+        className="h-[130px] relative"
         style={{ backgroundColor: '#F5F5F5' }}
       >
         {course.thumbnail_url ? (
@@ -78,11 +98,6 @@ export default function CourseCard({
             </span>
           </div>
         )}
-        {/* Category color band at bottom */}
-        <div
-          className="absolute bottom-0 left-0 right-0 h-1"
-          style={{ backgroundColor: categoryColor }}
-        />
         {/* Tier badge */}
         {isFreeRotating ? (
           <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-500 text-white shadow-sm">
@@ -90,9 +105,9 @@ export default function CourseCard({
             Free This Week
           </span>
         ) : !hasAccess && course.access_tier && course.access_tier !== 'free_rotating' ? (
-          <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-800/80 text-white shadow-sm">
+          <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-700 text-white shadow-sm">
             <Lock size={12} />
-            {course.access_tier === 'essentials' ? 'Essentials' : course.access_tier === 'professional' ? 'Professional' : 'All-Access'}
+            {course.access_tier === 'essentials' ? 'Essentials' : course.access_tier === 'professional' ? 'Pro' : 'All-Access'}
           </span>
         ) : null}
       </div>
@@ -101,10 +116,12 @@ export default function CourseCard({
       <div className="p-4 flex-1 flex flex-col">
         {/* Category tag */}
         <span
-          className="inline-block text-[11px] font-medium px-2 py-0.5 rounded mb-2 self-start"
+          className="inline-block text-[10px] font-bold px-2 py-0.5 rounded mb-2 self-start"
           style={{
-            backgroundColor: `${categoryColor}20`,
-            color: categoryColor,
+            backgroundColor: colors.bg,
+            color: colors.text,
+            letterSpacing: '0.05em',
+            textTransform: 'uppercase',
             fontFamily: "'DM Sans', sans-serif",
           }}
         >
@@ -113,11 +130,12 @@ export default function CourseCard({
 
         {/* Title */}
         <h3
-          className="font-bold mb-2 line-clamp-2"
+          className="font-semibold mb-2 line-clamp-2"
           style={{
             fontFamily: "'DM Sans', sans-serif",
-            fontSize: '16px',
-            color: '#2B3A67',
+            fontSize: '15px',
+            color: '#1B2A4A',
+            lineHeight: '1.3',
           }}
         >
           {course.title}
@@ -125,27 +143,33 @@ export default function CourseCard({
 
         {/* Description */}
         <p
-          className="text-[13px] text-gray-500 mb-4 line-clamp-2 flex-1"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
+          className="text-[13px] mb-4 line-clamp-2 flex-1"
+          style={{
+            fontFamily: "'DM Sans', sans-serif",
+            color: '#6B7280',
+          }}
         >
           {course.description}
         </p>
 
-        {/* Bottom row */}
+        {/* Meta row */}
         <div className="flex items-center gap-3 mb-4">
           <span
-            className="text-[12px] font-medium px-2 py-1 rounded"
+            className="text-[11px] font-semibold px-2 py-1 rounded"
             style={{
-              backgroundColor: '#E8B84B',
-              color: '#2B3A67',
+              backgroundColor: '#FEF3C7',
+              color: '#854F0B',
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
             {course.pd_hours} PD Hours
           </span>
           <span
-            className="text-[12px] text-gray-500"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
+            className="text-[12px]"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              color: '#9CA3AF',
+            }}
           >
             ~{course.estimated_minutes} min
           </span>
@@ -154,36 +178,43 @@ export default function CourseCard({
 
       {/* Footer */}
       <div
-        className="px-4 py-3 border-t border-gray-100"
-        style={{ backgroundColor: '#FAFAF8' }}
+        className="px-4 py-3"
+        style={{ backgroundColor: '#FAFAF8', borderTop: '1px solid rgba(0,0,0,0.04)' }}
       >
         {isCompleted ? (
           <div
-            className="flex items-center justify-center gap-2 text-green-600"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
+            className="flex items-center justify-center gap-2"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              color: '#10B981',
+            }}
           >
             <Check size={18} />
             <span className="font-medium">Completed</span>
           </div>
         ) : isEnrolled ? (
           <div className="space-y-2">
-            {/* Progress bar */}
-            <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+            {/* Gradient progress bar */}
+            <div
+              className="h-1.5 rounded-full overflow-hidden"
+              style={{ backgroundColor: 'rgba(0,0,0,0.06)' }}
+            >
               <div
                 className="h-full rounded-full transition-all duration-300"
                 style={{
                   width: `${progress}%`,
-                  backgroundColor: '#E8B84B',
+                  background: 'linear-gradient(90deg, #FFBA06, #4ecdc4)',
                 }}
               />
             </div>
             <Link
               href={`/hub/courses/${course.slug}`}
-              className="block w-full text-center py-2 rounded-lg border-2 font-medium transition-colors"
+              className="block w-full text-center py-2 rounded-lg font-medium transition-colors"
               style={{
-                borderColor: '#E8B84B',
-                color: '#2B3A67',
+                backgroundColor: '#1B2A4A',
+                color: 'white',
                 fontFamily: "'DM Sans', sans-serif",
+                fontSize: '14px',
               }}
             >
               Continue ({progress}%)
@@ -192,14 +223,16 @@ export default function CourseCard({
         ) : !hasAccess ? (
           <Link
             href="/hub/membership"
-            className="block w-full text-center py-2 rounded-lg font-medium transition-colors border-2"
+            className="flex items-center justify-center gap-1.5 w-full py-2 rounded-lg font-medium transition-colors"
             style={{
-              borderColor: '#6B7280',
+              backgroundColor: 'transparent',
+              border: '1px solid #9CA3AF',
               color: '#6B7280',
               fontFamily: "'DM Sans', sans-serif",
+              fontSize: '14px',
             }}
           >
-            <Lock size={14} className="inline mr-1.5 -mt-0.5" />
+            <Lock size={14} />
             Upgrade to Access
           </Link>
         ) : (
@@ -208,9 +241,10 @@ export default function CourseCard({
             disabled={isEnrolling}
             className="w-full py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
             style={{
-              backgroundColor: '#E8B84B',
-              color: '#2B3A67',
+              backgroundColor: '#1B2A4A',
+              color: 'white',
               fontFamily: "'DM Sans', sans-serif",
+              fontSize: '14px',
             }}
           >
             {isEnrolling ? 'Enrolling...' : 'Enroll'}

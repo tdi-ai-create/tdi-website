@@ -6,14 +6,14 @@ import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
 
 // Category colors - elevated design
 const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
-  'Stress Relief':  { bg: '#FEF3C7', text: '#854F0B' },
-  'Communication':  { bg: '#E8F5E9', text: '#27500A' },
-  'Time Savers':    { bg: '#EEEDFE', text: '#3C3489' },
-  'Para Support':   { bg: '#E1F5EE', text: '#085041' },
-  'Classroom Mgmt': { bg: '#FEE2E2', text: '#991B1B' },
-  'Classroom Tools': { bg: '#FEF3C7', text: '#854F0B' },
-  'Wellbeing':      { bg: '#EDE9FE', text: '#4C1D95' },
-  'Self-Care':      { bg: '#EDE9FE', text: '#4C1D95' },
+  'Stress Relief':    { bg: '#FEF3C7', text: '#854F0B' },
+  'Communication':    { bg: '#E8F5E9', text: '#27500A' },
+  'Time Savers':      { bg: '#EEEDFE', text: '#3C3489' },
+  'Para Support':     { bg: '#E1F5EE', text: '#085041' },
+  'Classroom Mgmt':   { bg: '#FEE2E2', text: '#991B1B' },
+  'Classroom Tools':  { bg: '#FEF3C7', text: '#854F0B' },
+  'Wellbeing':        { bg: '#EDE9FE', text: '#4C1D95' },
+  'Self-Care':        { bg: '#EDE9FE', text: '#4C1D95' },
 };
 
 interface QuickWinCardProps {
@@ -56,17 +56,22 @@ export default function QuickWinCard({ quickWin }: QuickWinCardProps) {
 
   return (
     <div
-      className="rounded-xl p-3.5 cursor-pointer relative"
-      style={{ background: '#FAFAF8', border: '0.5px solid #E9E7E2' }}
+      className="p-4 relative"
+      style={{
+        backgroundColor: 'white',
+        borderRadius: '16px',
+        border: '0.5px solid rgba(0,0,0,0.06)',
+        opacity: !hasAccess && !isFreeRotating ? 0.82 : 1,
+      }}
     >
       {/* Tier badge */}
       {isFreeRotating ? (
-        <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-500 text-white">
+        <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-500 text-white">
           <Sparkles size={10} />
           Free
         </span>
       ) : !hasAccess && quickWin.access_tier && quickWin.access_tier !== 'free_rotating' ? (
-        <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-600 text-white">
+        <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-600 text-white">
           <Lock size={10} />
           {quickWin.access_tier === 'essentials' ? 'Essentials' : quickWin.access_tier === 'professional' ? 'Pro' : 'All-Access'}
         </span>
@@ -74,19 +79,37 @@ export default function QuickWinCard({ quickWin }: QuickWinCardProps) {
 
       {/* Category tag */}
       <div
-        className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-2"
-        style={{ background: colors.bg, color: colors.text, letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '10px' }}
+        className="inline-block text-[10px] font-bold px-2 py-0.5 rounded mb-2"
+        style={{
+          backgroundColor: colors.bg,
+          color: colors.text,
+          letterSpacing: '0.05em',
+          textTransform: 'uppercase',
+          fontFamily: "'DM Sans', sans-serif",
+        }}
       >
         {quickWin.category}
       </div>
 
       {/* Title */}
-      <div className="text-sm font-semibold mb-1 leading-snug" style={{ color: '#1B2A4A' }}>
+      <div
+        className="text-sm font-semibold mb-1 leading-snug"
+        style={{
+          color: '#1B2A4A',
+          fontFamily: "'DM Sans', sans-serif",
+        }}
+      >
         {quickWin.title}
       </div>
 
       {/* Meta */}
-      <div className="text-xs" style={{ color: '#9CA3AF' }}>
+      <div
+        className="text-xs mb-3"
+        style={{
+          color: '#9CA3AF',
+          fontFamily: "'DM Sans', sans-serif",
+        }}
+      >
         {quickWin.estimated_minutes} min
         {quickWin.content_type && ` · ${getTypeLabel()}`}
       </div>
@@ -97,16 +120,24 @@ export default function QuickWinCard({ quickWin }: QuickWinCardProps) {
           href={quickWin.course_slug
             ? `/hub/courses/${quickWin.course_slug}/${quickWin.slug}`
             : `/hub/quick-wins/${quickWin.slug}`}
-          className="mt-3 text-xs font-semibold text-white rounded-lg px-3 py-1.5 inline-block transition-opacity hover:opacity-90"
-          style={{ background: '#1B2A4A' }}
+          className="text-xs font-semibold rounded-lg px-3 py-1.5 inline-block transition-opacity hover:opacity-90"
+          style={{
+            backgroundColor: '#1B2A4A',
+            color: 'white',
+            fontFamily: "'DM Sans', sans-serif",
+          }}
         >
           Try it
         </Link>
       ) : (
         <Link
           href="/hub/membership"
-          className="mt-3 text-xs font-medium px-3 py-1.5 rounded-lg border inline-flex items-center gap-1 transition-colors hover:bg-gray-50"
-          style={{ borderColor: '#9CA3AF', color: '#6B7280' }}
+          className="text-xs font-medium px-3 py-1.5 rounded-lg inline-flex items-center gap-1 transition-colors hover:bg-gray-50"
+          style={{
+            border: '1px solid #9CA3AF',
+            color: '#6B7280',
+            fontFamily: "'DM Sans', sans-serif",
+          }}
         >
           <Lock size={10} />
           Upgrade

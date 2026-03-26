@@ -280,39 +280,37 @@ export default function HubDashboard() {
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="p-4 md:p-8 max-w-6xl mx-auto">
-        {/* Welcome Banner Skeleton */}
+      <div style={{ background: '#F0EEE9', minHeight: '100vh' }}>
+        {/* Welcome Banner Skeleton - Full width */}
         <div
-          className="rounded-xl p-6 mb-8 animate-pulse"
-          style={{ backgroundColor: '#2B3A67' }}
+          className="animate-pulse"
+          style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)' }}
         >
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <div className="h-8 bg-white/20 rounded w-64 mb-3" />
-              <div className="h-5 bg-white/10 rounded w-48" />
-            </div>
-            <div className="hidden md:block">
-              <div className="w-16 h-16 rounded-full bg-white/20" />
-            </div>
+          <div className="max-w-5xl mx-auto px-4 md:px-6 py-8">
+            <div className="h-6 bg-white/20 rounded w-24 mb-3" />
+            <div className="h-8 bg-white/20 rounded w-64 mb-2" />
+            <div className="h-5 bg-white/10 rounded w-48" />
           </div>
         </div>
 
         {/* Content Skeleton */}
-        <div className="grid lg:grid-cols-[1fr_340px] gap-6">
-          <div className="space-y-6">
-            <div className="hub-card h-48 animate-pulse">
-              <div className="h-6 bg-gray-200 rounded w-40 mb-4" />
-              <div className="h-32 bg-gray-100 rounded" />
+        <div className="max-w-5xl mx-auto px-4 md:px-6 py-6">
+          <div className="grid lg:grid-cols-[1fr_340px] gap-6">
+            <div className="space-y-6">
+              <div className="bg-white rounded-2xl p-6 animate-pulse" style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}>
+                <div className="h-4 bg-gray-200 rounded w-32 mb-4" />
+                <div className="h-20 bg-gray-100 rounded" />
+              </div>
+              <div className="bg-white rounded-2xl p-6 animate-pulse" style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}>
+                <div className="h-4 bg-gray-200 rounded w-24 mb-4" />
+                <div className="h-16 bg-gray-100 rounded" />
+              </div>
             </div>
-            <div className="hub-card h-32 animate-pulse">
-              <div className="h-6 bg-gray-200 rounded w-32 mb-4" />
-              <div className="h-16 bg-gray-100 rounded" />
+            <div className="space-y-4">
+              <div className="rounded-2xl h-32 animate-pulse" style={{ background: '#1B2A4A' }} />
+              <div className="bg-white rounded-2xl h-24 animate-pulse" style={{ border: '0.5px solid rgba(0,0,0,0.06)' }} />
+              <div className="bg-white rounded-2xl h-36 animate-pulse" style={{ border: '0.5px solid rgba(0,0,0,0.06)' }} />
             </div>
-          </div>
-          <div className="space-y-4">
-            <div className="hub-card h-32 animate-pulse" />
-            <div className="hub-card h-24 animate-pulse" />
-            <div className="hub-card h-36 animate-pulse" />
           </div>
         </div>
       </div>
@@ -320,10 +318,10 @@ export default function HubDashboard() {
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-6xl mx-auto" style={{ background: '#F0EEE9', minHeight: '100vh' }}>
-      {/* Welcome Hero */}
+    <div style={{ background: '#F0EEE9', minHeight: '100vh' }}>
+      {/* Welcome Hero - Full width */}
       <section
-        className="relative text-white overflow-hidden rounded-2xl mb-6"
+        className="relative text-white overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)' }}
       >
         {/* Decorative circles - purely visual */}
@@ -332,7 +330,7 @@ export default function HubDashboard() {
         <div className="absolute rounded-full pointer-events-none"
           style={{ right: '50px', bottom: '-90px', width: '180px', height: '180px', background: 'rgba(56,97,140,0.5)' }} />
 
-        <div className="relative z-10 px-8 py-8">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-6 py-8">
           {/* Role tag */}
           {profile?.role && (
             <div
@@ -358,8 +356,10 @@ export default function HubDashboard() {
         </div>
       </section>
 
-      {/* Main Grid - Left column (main) + Right column (sidebar) */}
-      <div className="grid lg:grid-cols-[1fr_340px] gap-6">
+      {/* Main Content - Constrained width */}
+      <div className="max-w-5xl mx-auto px-4 md:px-6 py-6">
+        {/* Main Grid - Left column (main) + Right column (sidebar) */}
+        <div className="grid lg:grid-cols-[1fr_340px] gap-6">
         {/* Left Column - Main Content */}
         <div className="space-y-6">
           {/* Continue Learning Section */}
@@ -687,6 +687,7 @@ export default function HubDashboard() {
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 }

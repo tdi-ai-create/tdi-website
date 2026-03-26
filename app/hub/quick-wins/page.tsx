@@ -86,116 +86,125 @@ export default function QuickWinsPage() {
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="p-4 md:p-8 max-w-6xl mx-auto">
-        {/* Header skeleton */}
-        <div className="mb-8">
-          <div className="h-8 bg-gray-200 rounded w-40 mb-2 animate-pulse" />
-          <div className="h-5 bg-gray-100 rounded w-80 animate-pulse" />
-        </div>
+      <div
+        className="p-4 md:p-8"
+        style={{ backgroundColor: '#F0EEE9', minHeight: 'calc(100vh - 54px)' }}
+      >
+        <div className="max-w-6xl mx-auto">
+          {/* Header skeleton */}
+          <div className="mb-8">
+            <div className="h-8 bg-white/50 rounded w-40 mb-2 animate-pulse" />
+            <div className="h-5 bg-white/30 rounded w-80 animate-pulse" />
+          </div>
 
-        {/* Filter pills skeleton */}
-        <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div
-              key={i}
-              className="h-9 bg-gray-100 rounded-full w-24 flex-shrink-0 animate-pulse"
-            />
-          ))}
-        </div>
+          {/* Filter pills skeleton */}
+          <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="h-9 bg-white/50 rounded-full w-24 flex-shrink-0 animate-pulse"
+              />
+            ))}
+          </div>
 
-        {/* Grid skeleton */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="hub-card h-40 animate-pulse">
-              <div className="space-y-3">
-                <div className="h-4 bg-gray-100 rounded w-20" />
-                <div className="h-5 bg-gray-200 rounded w-3/4" />
-                <div className="h-4 bg-gray-100 rounded w-full" />
-                <div className="flex gap-2">
-                  <div className="h-6 bg-gray-100 rounded w-24" />
-                  <div className="h-6 bg-gray-100 rounded w-20" />
-                </div>
-              </div>
-            </div>
-          ))}
+          {/* Grid skeleton */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div
+                key={i}
+                className="h-40 bg-white rounded-2xl animate-pulse"
+                style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+              />
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1
-          className="font-bold mb-2"
-          style={{
-            fontFamily: "'Source Serif 4', Georgia, serif",
-            fontSize: '28px',
-            color: '#2B3A67',
-          }}
-        >
-          Quick Wins
-        </h1>
-        <p
-          className="text-gray-500 text-[15px] max-w-[560px]"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
-        >
-          Short, practical tools you can use right now. No prep. No commitment.
-        </p>
-      </div>
-
-      {/* Filter Pills */}
-      <div className="flex gap-2 mb-8 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
-        {FILTER_CATEGORIES.map((category) => (
-          <button
-            key={category}
-            onClick={() => setActiveFilter(category)}
-            className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0"
+    <div
+      className="p-4 md:p-8"
+      style={{ backgroundColor: '#F0EEE9', minHeight: 'calc(100vh - 54px)' }}
+    >
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1
+            className="font-bold mb-2"
             style={{
-              backgroundColor: activeFilter === category ? '#E8B84B' : 'white',
-              color: activeFilter === category ? 'white' : '#6B7280',
-              border: activeFilter === category ? 'none' : '1px solid #E5E5E5',
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontSize: '28px',
+              color: '#1B2A4A',
             }}
           >
-            {category}
-          </button>
-        ))}
-      </div>
-
-      {/* Quick Wins Grid or Empty State */}
-      {filteredQuickWins.length > 0 ? (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredQuickWins.map((qw) => (
-            <QuickWinCard key={qw.id} quickWin={qw} />
-          ))}
-        </div>
-      ) : quickWins.length === 0 ? (
-        <div
-          className="hub-card py-16"
-          style={{ backgroundColor: '#FFF8E7', border: 'none' }}
-        >
-          <EmptyState
-            icon={Zap}
-            iconBgColor="#FFF8E7"
-            title="Quick Wins are on the way."
-            description="3-5 minute tools for busy teachers. No prep required."
-          />
-        </div>
-      ) : (
-        <div
-          className="hub-card py-12 text-center"
-          style={{ backgroundColor: '#FAFAF8' }}
-        >
+            Quick Wins
+          </h1>
           <p
-            className="text-gray-500"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
+            className="text-[15px]"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              color: '#6B7280',
+            }}
           >
-            No Quick Wins match this filter. Try selecting a different category.
+            {quickWins.length} quick wins · Short, practical tools you can use right now
           </p>
         </div>
-      )}
+
+        {/* Filter Pills */}
+        <div className="flex gap-2 mb-8 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+          {FILTER_CATEGORIES.map((category) => (
+            <button
+              key={category}
+              onClick={() => setActiveFilter(category)}
+              className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0"
+              style={{
+                backgroundColor: activeFilter === category ? '#1B2A4A' : 'white',
+                color: activeFilter === category ? 'white' : '#6B7280',
+                border: activeFilter === category ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
+        {/* Quick Wins Grid or Empty State */}
+        {filteredQuickWins.length > 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredQuickWins.map((qw) => (
+              <QuickWinCard key={qw.id} quickWin={qw} />
+            ))}
+          </div>
+        ) : quickWins.length === 0 ? (
+          <div
+            className="rounded-2xl py-16"
+            style={{ backgroundColor: 'white', border: '0.5px solid rgba(0,0,0,0.06)' }}
+          >
+            <EmptyState
+              icon={Zap}
+              iconBgColor="#FEF3C7"
+              title="Quick Wins are on the way."
+              description="3-5 minute tools for busy teachers. No prep required."
+            />
+          </div>
+        ) : (
+          <div
+            className="rounded-2xl py-12 text-center"
+            style={{ backgroundColor: 'white', border: '0.5px solid rgba(0,0,0,0.06)' }}
+          >
+            <p
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: '#6B7280',
+              }}
+            >
+              No Quick Wins match this filter. Try selecting a different category.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
