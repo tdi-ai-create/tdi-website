@@ -179,7 +179,7 @@ export default function CourseCard({
       {/* Footer */}
       <div
         className="px-4 py-3"
-        style={{ backgroundColor: '#FAFAF8', borderTop: '1px solid rgba(0,0,0,0.04)' }}
+        style={{ backgroundColor: '#FFFFFF', borderTop: '1px solid rgba(0,0,0,0.04)' }}
       >
         {isCompleted ? (
           <div

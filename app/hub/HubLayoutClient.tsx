@@ -18,7 +18,7 @@ function HubLayoutInner({ children }: { children: React.ReactNode }) {
   return (
     <div
       className="min-h-screen flex flex-col"
-      style={{ backgroundColor: '#FAFAF8' }}
+      style={{ backgroundColor: '#F0EEE9' }}
     >
       {showNav && (
         <HubNavBar profile={profile} userEmail={user?.email} userId={user?.id} />
@@ -41,7 +41,7 @@ export default function HubLayoutClient({
   // For login page, render without auth guard
   if (pathname === '/hub/login' || pathname.startsWith('/hub/auth')) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: '#FAFAF8' }}>
+      <div className="min-h-screen" style={{ backgroundColor: '#F0EEE9' }}>
         {children}
       </div>
     );
@@ -50,7 +50,7 @@ export default function HubLayoutClient({
   // For verify page (public), render without auth guard but check in HubAuthGuard
   if (pathname.startsWith('/hub/verify')) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: '#FAFAF8' }}>
+      <div className="min-h-screen" style={{ backgroundColor: '#F0EEE9' }}>
         {children}
       </div>
     );
