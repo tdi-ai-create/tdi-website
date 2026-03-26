@@ -1,12 +1,23 @@
 export interface TDISuggestion {
   id: string
   priority: 'high' | 'medium' | 'low'
-  category: 'engagement' | 'scheduling' | 'celebration' | 'renewal' | 'action'
+  category: 'engagement' | 'scheduling' | 'celebration' | 'renewal' | 'action' | 'wellbeing'
   title: string
   body: string
-  cta?: string
-  ctaUrl?: string
+  cta?: string | null
+  ctaUrl?: string | null
   icon: string
+}
+
+interface MoodData {
+  has_data: boolean
+  alert: { severity: string; message: string; recommendation: string } | null
+  celebration: { message: string } | null
+  trend: string | null
+  avg_mood_7d: number | null
+  avg_mood_14d: number | null
+  check_in_count_7d: number
+  week_change: number | null
 }
 
 interface PartnershipData {
@@ -44,7 +55,8 @@ interface ActionItem {
 export function generateSuggestions(
   partnership: PartnershipData,
   timelineEvents: TimelineEvent[],
-  _actionItems: ActionItem[]
+  _actionItems: ActionItem[],
+  moodData?: MoodData | null
 ): TDISuggestion[] {
   const suggestions: TDISuggestion[] = []
   const now = new Date()
@@ -223,6 +235,38 @@ export function generateSuggestions(
         ctaUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
       })
     }
+  }
+
+  // ── MOOD TREND SUGGESTIONS (from real Hub check-in data) ────
+
+  // Mood alert - based on school-wide weekly average (sparse data friendly)
+  if (moodData?.has_data && moodData.alert) {
+    suggestions.push({
+      id: 'mood-alert',
+      priority: moodData.alert.severity === 'high' ? 'high' : 'medium',
+      category: 'wellbeing',
+      icon: '💜',
+      title: moodData.alert.severity === 'high'
+        ? 'Teachers are struggling this week'
+        : 'Mood dip detected this week',
+      body: moodData.alert.message + '. ' + moodData.alert.recommendation + '.',
+      cta: 'Schedule a check-in',
+      ctaUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+    })
+  }
+
+  // Mood celebration - school averaging 4+ and improving
+  if (moodData?.has_data && moodData.celebration) {
+    suggestions.push({
+      id: 'mood-positive',
+      priority: 'low',
+      category: 'celebration',
+      icon: '📈',
+      title: 'Teachers are thriving',
+      body: moodData.celebration.message + '.',
+      cta: null,
+      ctaUrl: null,
+    })
   }
 
   // ── ALL CAUGHT UP ──────────────────────────────────────────

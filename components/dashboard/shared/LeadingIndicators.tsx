@@ -2,11 +2,25 @@
 import { useExampleMode } from '@/lib/dashboard/useExampleMode'
 import { ExampleBanner } from './ExampleBanner'
 
+interface HubStats {
+  has_real_data: boolean
+  member_count: number
+  logins_this_month: number | null
+  active_users_7d: number | null
+  hub_login_pct: number | null
+  course_completions: number | null
+  quick_wins_completed: number | null
+  mood_avg_7d: number | null
+  mood_avg_30d: number | null
+  moment_mode_uses_7d: number | null
+}
+
 interface LeadingIndicatorsProps {
   teacherStress?:         number | null
   strategyImplementation?: number | null
   retentionIntent?:       number | null
   defaults:               Record<string, string>
+  hubStats?:              HubStats | null  // Reserved for future Hub-driven indicators
 }
 
 function IndicatorBar({ label, value, direction, industryLow, industryHigh, tdiAvgLow, tdiAvgHigh, isExample }: {
@@ -53,7 +67,7 @@ function IndicatorBar({ label, value, direction, industryLow, industryHigh, tdiA
 }
 
 export function LeadingIndicators({
-  teacherStress, strategyImplementation, retentionIntent, defaults,
+  teacherStress, strategyImplementation, retentionIntent, defaults, hubStats: _hubStats,
 }: LeadingIndicatorsProps) {
   const stress   = useExampleMode(teacherStress,           'teacher_stress',           defaults)
   const strategy = useExampleMode(strategyImplementation,  'strategy_implementation',  defaults)

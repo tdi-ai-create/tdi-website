@@ -68,6 +68,48 @@ export default function AdminPartnershipDetailPage() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
   const [highlights, setHighlights] = useState<any[]>([])
   const [suggestions, setSuggestions] = useState<TDISuggestion[]>([])
+  const [hubStats, setHubStats] = useState<{
+    has_real_data: boolean
+    member_count: number
+    logins_this_month: number | null
+    active_users_7d: number | null
+    hub_login_pct: number | null
+    course_completions: number | null
+    quick_wins_completed: number | null
+    mood_avg_7d: number | null
+    mood_avg_30d: number | null
+    moment_mode_uses_7d: number | null
+  } | null>(null)
+  const [moodData, setMoodData] = useState<{
+    has_data: boolean
+    alert: { severity: string; message: string; recommendation: string } | null
+    celebration: { message: string } | null
+    trend: string | null
+    avg_mood_7d: number | null
+    avg_mood_14d: number | null
+    check_in_count_7d: number
+    week_change: number | null
+  } | null>(null)
+  const [reflections, setReflections] = useState<{
+    has_data: boolean
+    reflections: { text: string; quick_win_title: string; created_at: string }[]
+  }>({ has_data: false, reflections: [] })
+  const [observationImpact, setObservationImpact] = useState<{
+    has_data: boolean
+    observations: {
+      observation_id: string
+      observation_title: string
+      observation_date: string
+      active_users_before: number
+      active_users_after: number
+      engagement_change_pct: number | null
+      mood_before: number | null
+      mood_after: number | null
+      mood_change: number | null
+      quick_wins_before: number
+      quick_wins_after: number
+    }[]
+  }>({ has_data: false, observations: [] })
 
   // Highlight controls modal state
   const [editingHighlight, setEditingHighlight] = useState<string | null>(null)
@@ -173,6 +215,29 @@ export default function AdminPartnershipDetailPage() {
         const hData = await hRes.json()
         setHighlights(hData.highlights || [])
       }
+
+      // Fetch Hub stats (separate from main data for real-time Hub analytics)
+      try {
+        const hubResponse = await fetch(`/api/partnerships/${partnershipId}/hub-stats`)
+        if (hubResponse.ok) {
+          const hubData = await hubResponse.json()
+          setHubStats(hubData)
+        }
+      } catch (hubError) {
+        console.error('Error fetching hub stats:', hubError)
+        // Non-fatal - dashboard works without real-time Hub data
+      }
+
+      // Fetch mood trend, reflections, and observation impact in parallel - non-blocking
+      Promise.all([
+        fetch(`/api/partnerships/${partnershipId}/hub-mood`).then(r => r.ok ? r.json() : null),
+        fetch(`/api/partnerships/${partnershipId}/hub-reflections`).then(r => r.ok ? r.json() : null),
+        fetch(`/api/partnerships/${partnershipId}/hub-observation-impact`).then(r => r.ok ? r.json() : null),
+      ]).then(([mood, refs, obsImpact]) => {
+        if (mood) setMoodData(mood)
+        if (refs) setReflections(refs)
+        if (obsImpact) setObservationImpact(obsImpact)
+      }).catch(err => console.error('Hub signal fetch error:', err))
     } finally {
       setLoading(false)
     }
@@ -226,9 +291,9 @@ export default function AdminPartnershipDetailPage() {
       event_date: e.event_date || null,
     }))
 
-    const generated = generateSuggestions(partnershipData, formattedEvents, actionItems)
+    const generated = generateSuggestions(partnershipData, formattedEvents, actionItems, moodData)
     setSuggestions(generated)
-  }, [partnership, timelineEvents, actionItems])
+  }, [partnership, timelineEvents, actionItems, moodData])
 
   async function handleFieldUpdate(field: string, value: any) {
     if (!userEmail) return
@@ -556,6 +621,7 @@ export default function AdminPartnershipDetailPage() {
             executiveTotal={partnership.executive_sessions_total || 2}
             phase={phase}
             defaults={defaults}
+            hubStats={hubStats}
           />
         </SectionHighlight>
 
@@ -616,6 +682,164 @@ export default function AdminPartnershipDetailPage() {
         {/* TDI Suggestions */}
         <TDISuggestions suggestions={suggestions} isAdminView={true} />
 
+        {/* Teacher Voice - reflections from Quick Wins */}
+        {reflections.has_data && reflections.reflections.length > 0 && (
+          <div
+            className="bg-white rounded-xl border border-gray-100 p-5 mb-4"
+            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">Teacher Voice</h3>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  What teachers wrote after Quick Wins - unfiltered and unprompted
+                </p>
+              </div>
+              <span
+                className="text-xs font-semibold px-2 py-1 rounded-full"
+                style={{ background: '#F0FDF4', color: '#16A34A' }}
+              >
+                {reflections.reflections.length} reflections
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {reflections.reflections.slice(0, 5).map((r, i) => (
+                <div
+                  key={i}
+                  className="rounded-lg p-3"
+                  style={{ background: '#FAFAF8', border: '0.5px solid #E9E7E2' }}
+                >
+                  <p className="text-sm text-gray-700 leading-relaxed italic">
+                    &quot;{r.text}&quot;
+                  </p>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-xs text-gray-400">{r.quick_win_title}</span>
+                    <span className="text-xs text-gray-400">
+                      {new Date(r.created_at).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-xs text-gray-400 mt-3 text-center">
+              Use these as talking points before your next observation day
+            </p>
+          </div>
+        )}
+
+        {/* Observation Impact - before/after Hub data around observation days */}
+        {observationImpact.has_data && observationImpact.observations.length > 0 && (
+          <div
+            className="bg-white rounded-xl border border-gray-100 p-5 mb-4"
+            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">Observation Impact</h3>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Hub activity 7 days before vs 7 days after each observation
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {observationImpact.observations.map((obs) => (
+                <div
+                  key={obs.observation_id}
+                  className="rounded-lg p-4"
+                  style={{ background: '#FAFAF8', border: '0.5px solid #E9E7E2' }}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
+                      {obs.observation_title}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      {new Date(obs.observation_date).toLocaleDateString('en-US', {
+                        month: 'short', day: 'numeric', year: 'numeric'
+                      })}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    {/* Engagement change */}
+                    <div className="text-center">
+                      <div
+                        className="text-lg font-bold"
+                        style={{
+                          color: obs.engagement_change_pct === null ? '#9CA3AF'
+                            : obs.engagement_change_pct > 0 ? '#16A34A'
+                            : obs.engagement_change_pct < 0 ? '#DC2626'
+                            : '#6B7280'
+                        }}
+                      >
+                        {obs.engagement_change_pct === null ? '-'
+                          : obs.engagement_change_pct > 0 ? `+${obs.engagement_change_pct}%`
+                          : `${obs.engagement_change_pct}%`}
+                      </div>
+                      <div className="text-xs text-gray-400 mt-0.5">Hub engagement</div>
+                      <div className="text-xs text-gray-300 mt-0.5">
+                        {obs.active_users_before} → {obs.active_users_after} active users
+                      </div>
+                    </div>
+
+                    {/* Mood change */}
+                    <div className="text-center">
+                      <div
+                        className="text-lg font-bold"
+                        style={{
+                          color: obs.mood_change === null ? '#9CA3AF'
+                            : obs.mood_change > 0 ? '#16A34A'
+                            : obs.mood_change < 0 ? '#DC2626'
+                            : '#6B7280'
+                        }}
+                      >
+                        {obs.mood_change === null ? '-'
+                          : obs.mood_change > 0 ? `+${obs.mood_change}`
+                          : `${obs.mood_change}`}
+                      </div>
+                      <div className="text-xs text-gray-400 mt-0.5">Avg mood score</div>
+                      {obs.mood_before !== null && obs.mood_after !== null && (
+                        <div className="text-xs text-gray-300 mt-0.5">
+                          {obs.mood_before} → {obs.mood_after} /5
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Quick wins */}
+                    <div className="text-center">
+                      <div
+                        className="text-lg font-bold"
+                        style={{
+                          color: obs.quick_wins_after > obs.quick_wins_before ? '#16A34A'
+                            : obs.quick_wins_after < obs.quick_wins_before ? '#DC2626'
+                            : '#6B7280'
+                        }}
+                      >
+                        {obs.quick_wins_after > obs.quick_wins_before
+                          ? `+${obs.quick_wins_after - obs.quick_wins_before}`
+                          : obs.quick_wins_after - obs.quick_wins_before}
+                      </div>
+                      <div className="text-xs text-gray-400 mt-0.5">Quick wins</div>
+                      <div className="text-xs text-gray-300 mt-0.5">
+                        {obs.quick_wins_before} → {obs.quick_wins_after} completed
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-xs text-gray-400 mt-3 text-center">
+              Use this data in renewal conversations to show the impact of in-person visits
+            </p>
+          </div>
+        )}
+
         {/* Partnership Timeline */}
         <SectionHighlight
           sectionKey="timeline"
@@ -646,6 +870,7 @@ export default function AdminPartnershipDetailPage() {
             highEngagementPct={partnership.high_engagement_pct}
             perEducatorNote={partnership.per_educator_value_note}
             defaults={defaults}
+            hubStats={hubStats}
           />
         </SectionHighlight>
 
@@ -676,6 +901,7 @@ export default function AdminPartnershipDetailPage() {
                 strategyImplementation={partnership.strategy_implementation_pct}
                 retentionIntent={partnership.retention_intent_score}
                 defaults={defaults}
+                hubStats={hubStats}
               />
             </SectionHighlight>
           </>

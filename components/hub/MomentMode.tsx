@@ -90,6 +90,10 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   const [showTimerNudge, setShowTimerNudge] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Session tracking for analytics
+  const sessionStartRef = useRef<Date | null>(null);
+  const hasLoggedOpenRef = useRef(false);
+
   // Box breathing state
   const [breathPhase, setBreathPhase] = useState<BreathPhase>('inhale');
   const [breathCycle, setBreathCycle] = useState(1);
@@ -169,6 +173,22 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
         incrementHardDayCount();
         setHasIncremented(true);
       }
+
+      // Log moment mode opened - once per session
+      if (!hasLoggedOpenRef.current && user?.id) {
+        hasLoggedOpenRef.current = true;
+        sessionStartRef.current = new Date();
+
+        const supabase = getSupabase();
+        // Fire and forget, non-blocking
+        void supabase.from('hub_activity_log').insert({
+          user_id: user.id,
+          action: 'moment_mode_opened',
+          metadata: {
+            opened_at: new Date().toISOString(),
+          },
+        });
+      }
     } else {
       setMomentModeActive(false);
       if (timerRef.current) clearInterval(timerRef.current);
@@ -221,6 +241,30 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   }, [state, breathPhase, breathCycle]);
 
   const handleClose = () => {
+    // Log moment mode completed when closing after meaningful use (30+ seconds)
+    if (sessionStartRef.current && user?.id) {
+      const durationSeconds = Math.round(
+        (new Date().getTime() - sessionStartRef.current.getTime()) / 1000
+      );
+
+      if (durationSeconds >= 30) {
+        const supabase = getSupabase();
+        // Fire and forget, non-blocking
+        void supabase.from('hub_activity_log').insert({
+          user_id: user.id,
+          action: 'moment_mode_completed',
+          metadata: {
+            duration_seconds: durationSeconds,
+            completed_at: new Date().toISOString(),
+          },
+        });
+      }
+
+      // Reset for next session
+      sessionStartRef.current = null;
+      hasLoggedOpenRef.current = false;
+    }
+
     setState('entry');
     resetBreathing();
     setHasIncremented(false);

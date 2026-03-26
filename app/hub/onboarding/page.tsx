@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import {
   Check,
@@ -81,6 +81,7 @@ const ALL_INDIVIDUAL_GOALS: GoalType[] = GRID_GOALS.map(g => g.value);
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState<OnboardingStep>(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -196,6 +197,32 @@ export default function OnboardingPage() {
 
       if (profileError) {
         console.error('Profile update error:', profileError);
+      }
+
+      // 1b. Check if user should be linked to a partnership
+      // This handles users who joined via a school invite link
+      const partnershipId = searchParams.get('partnership_id') ||
+        (typeof window !== 'undefined' ? sessionStorage.getItem('tdi_partnership_id') : null) ||
+        null;
+
+      if (partnershipId && userId) {
+        const { error: orgError } = await supabase
+          .from('hub_org_members')
+          .upsert({
+            user_id: userId,
+            partnership_id: partnershipId,
+            org_id: partnershipId, // use partnership_id as org_id for now
+            role: 'member',
+            joined_at: new Date().toISOString(),
+          }, {
+            onConflict: 'user_id,org_id',
+            ignoreDuplicates: true,
+          });
+
+        if (orgError) {
+          console.error('Failed to create org membership:', orgError);
+          // Non-blocking - don't fail onboarding if this fails
+        }
       }
 
       // 2. Insert hub_user_goals

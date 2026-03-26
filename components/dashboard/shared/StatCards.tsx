@@ -1,6 +1,19 @@
 'use client'
 import { Users, Eye, CheckCircle, AlertCircle, Zap, Rocket, Target, ArrowRight } from 'lucide-react'
 
+interface HubStats {
+  has_real_data: boolean
+  member_count: number
+  logins_this_month: number | null
+  active_users_7d: number | null
+  hub_login_pct: number | null
+  course_completions: number | null
+  quick_wins_completed: number | null
+  mood_avg_7d: number | null
+  mood_avg_30d: number | null
+  moment_mode_uses_7d: number | null
+}
+
 interface StatCardsProps {
   // New props
   staffTotal?: number
@@ -21,6 +34,8 @@ interface StatCardsProps {
   onPhaseClick?: () => void
   observationStatusText?: string
   observationStatusColor?: string
+  // Hub analytics - when present with has_real_data, use real Hub data
+  hubStats?: HubStats | null
   // Legacy props for backward compatibility
   staffEnrolled?: number | null
   hubLoginPct?: number | null
@@ -94,6 +109,7 @@ export function StatCards({
   onPhaseClick,
   observationStatusText,
   observationStatusColor,
+  hubStats,
   // Legacy props
   staffEnrolled,
   hubLoginPct,
@@ -101,7 +117,11 @@ export function StatCards({
 }: StatCardsProps) {
   // Support legacy props for backward compatibility
   const staff = staffTotal ?? staffEnrolled ?? 0
-  const hubLogins = staffHubLoggedIn ?? (hubLoginPct && staffEnrolled ? Math.round((hubLoginPct / 100) * staffEnrolled) : 0)
+
+  // Use real Hub data when available, otherwise fall back to manual/legacy values
+  const hubLogins = hubStats?.has_real_data
+    ? (hubStats.logins_this_month ?? 0)
+    : (staffHubLoggedIn ?? (hubLoginPct && staffEnrolled ? Math.round((hubLoginPct / 100) * staffEnrolled) : 0))
   const obsUsed = observationsUsed ?? 0
   const obsTotal = observationsTotal ?? 0
 

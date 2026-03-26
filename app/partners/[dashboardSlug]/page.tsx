@@ -372,6 +372,18 @@ export default function PartnerDashboard() {
   const [teacherQuotes, setTeacherQuotes] = useState<{ id: string; quote_text: string; teacher_role: string; session_type: string; created_at: string }[]>([]);
   const [suggestions, setSuggestions] = useState<TDISuggestion[]>([]);
   const [sessionRecords, setSessionRecords] = useState<SessionRecord[]>([]);
+  const [hubStats, setHubStats] = useState<{
+    has_real_data: boolean
+    member_count: number
+    logins_this_month: number | null
+    active_users_7d: number | null
+    hub_login_pct: number | null
+    course_completions: number | null
+    quick_wins_completed: number | null
+    mood_avg_7d: number | null
+    mood_avg_30d: number | null
+    moment_mode_uses_7d: number | null
+  } | null>(null)
 
   // UI state
   const [activeTab, setActiveTab] = useState('overview');
@@ -537,6 +549,18 @@ export default function PartnerDashboard() {
           setTeacherQuotes(data.teacherQuotes || []);
           setSessionRecords(data.sessionRecords || []);
         }
+      }
+
+      // Fetch Hub stats (separate endpoint for real-time Hub data)
+      try {
+        const hubResponse = await fetch(`/api/partnerships/${partnershipId}/hub-stats`);
+        if (hubResponse.ok) {
+          const hubData = await hubResponse.json();
+          setHubStats(hubData);
+        }
+      } catch (hubError) {
+        console.error('Error fetching hub stats:', hubError);
+        // Non-fatal - dashboard works without real-time Hub data
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -1238,6 +1262,7 @@ export default function PartnerDashboard() {
               onPhaseClick={() => navigateToTab('our-partnership', 'phase-timeline')}
               observationStatusText={getObservationText()}
               observationStatusColor={getObservationColor()}
+              hubStats={hubStats}
             />
 
             {/* Partnership Momentum Bar */}

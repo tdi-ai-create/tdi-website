@@ -2,6 +2,19 @@
 import { useExampleMode } from '@/lib/dashboard/useExampleMode'
 import { ExampleBanner } from './ExampleBanner'
 
+interface HubStats {
+  has_real_data: boolean
+  member_count: number
+  logins_this_month: number | null
+  active_users_7d: number | null
+  hub_login_pct: number | null
+  course_completions: number | null
+  quick_wins_completed: number | null
+  mood_avg_7d: number | null
+  mood_avg_30d: number | null
+  moment_mode_uses_7d: number | null
+}
+
 interface InvestmentNumbersProps {
   costPerEducator?:    number | null
   hubLoginPct?:        number | null
@@ -9,6 +22,7 @@ interface InvestmentNumbersProps {
   highEngagementPct?:  number | null
   perEducatorNote?:    string | null
   defaults:            Record<string, string>
+  hubStats?:           HubStats | null
 }
 
 function InvestmentStat({ value, label, sublabel, isExample }: {
@@ -31,10 +45,13 @@ function InvestmentStat({ value, label, sublabel, isExample }: {
 
 export function InvestmentNumbers({
   costPerEducator, hubLoginPct, loveNotesCount,
-  highEngagementPct, perEducatorNote, defaults,
+  highEngagementPct, perEducatorNote, defaults, hubStats,
 }: InvestmentNumbersProps) {
-  const cost     = useExampleMode(costPerEducator,   'cost_per_educator',    defaults)
-  const hubLogin = useExampleMode(hubLoginPct,       'hub_login_pct',        defaults)
+  const cost = useExampleMode(costPerEducator, 'cost_per_educator', defaults)
+
+  // Use real Hub data when available, otherwise fall back to manual value
+  const effectiveHubLoginPct = hubStats?.has_real_data ? hubStats.hub_login_pct : hubLoginPct
+  const hubLogin = useExampleMode(effectiveHubLoginPct, 'hub_login_pct', defaults)
   const notes    = useExampleMode(loveNotesCount,    'love_notes_count',     defaults)
   const highEng  = useExampleMode(highEngagementPct, 'high_engagement_pct',  defaults)
   const noteText = perEducatorNote || defaults.per_educator_value_note || 'per educator'
