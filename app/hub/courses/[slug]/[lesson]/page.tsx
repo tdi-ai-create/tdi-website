@@ -31,6 +31,8 @@ interface Lesson {
   content_type: string;
   sort_order: number;
   module_id: string | null;
+  transcript_text: string | null;
+  transcript_text_es: string | null;
 }
 
 interface Module {
@@ -64,6 +66,8 @@ export default function LessonPage({ params }: LessonPageProps) {
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [hasTranscript, setHasTranscript] = useState(false);
+  const [hasTranscriptEs, setHasTranscriptEs] = useState(false);
 
   // Quiz state
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
@@ -125,7 +129,7 @@ export default function LessonPage({ params }: LessonPageProps) {
         // Fetch all lessons
         const { data: lessonsData } = await supabase
           .from('hub_lessons')
-          .select('id, slug, title, description, content, video_url, estimated_minutes, content_type, sort_order, module_id')
+          .select('id, slug, title, description, content, video_url, estimated_minutes, content_type, sort_order, module_id, transcript_text, transcript_text_es')
           .eq('course_id', courseData.id)
           .order('sort_order', { ascending: true });
 
@@ -187,6 +191,10 @@ export default function LessonPage({ params }: LessonPageProps) {
           return;
         }
         setCurrentLesson(current);
+
+        // Check if transcripts are available
+        setHasTranscript(!!current.transcript_text);
+        setHasTranscriptEs(!!current.transcript_text_es);
 
         // Load quiz questions for this lesson
         const lessonQuestions = await getLessonQuestions(current.id);
@@ -495,6 +503,44 @@ export default function LessonPage({ params }: LessonPageProps) {
                 </Link>
               )}
             </div>
+
+            {/* Transcript downloads - only show when transcripts exist */}
+            {(hasTranscript || hasTranscriptEs) && (
+              <div
+                className="mt-4 pt-4 flex items-center gap-3 flex-wrap"
+                style={{ borderTop: '0.5px solid #F3F4F6' }}
+              >
+                <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
+                  Download Transcript
+                </span>
+                {hasTranscript && (
+                  <a
+                    href={`/api/hub/transcripts/${currentLesson?.id}?lang=en`}
+                    download
+                    className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
+                    style={{ background: '#EFF6FF', color: '#1E40AF', border: '0.5px solid #BFDBFE' }}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                    </svg>
+                    English
+                  </a>
+                )}
+                {hasTranscriptEs && (
+                  <a
+                    href={`/api/hub/transcripts/${currentLesson?.id}?lang=es`}
+                    download
+                    className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
+                    style={{ background: '#F0FDF4', color: '#166534', border: '0.5px solid #BBF7D0' }}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                    </svg>
+                    Español
+                  </a>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Sidebar - Desktop */}
