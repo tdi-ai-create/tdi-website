@@ -63,7 +63,7 @@ export default function GetStartedPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         source: 'get-started page',
-        role: selectedRole,
+        role: selectedRole?.toLowerCase(),
         tags: ['get-started', selectedRole.toLowerCase().replace(' ', '-')],
       }),
     }).catch(() => {});
@@ -126,7 +126,7 @@ export default function GetStartedPage() {
         body: JSON.stringify({
           email: formData.email,
           name: formData.name,
-          role: selectedRole,
+          role: selectedRole?.toLowerCase(),
           school_name: formData.schoolName,
           school_city: formData.schoolCity,
           school_state: formData.schoolState,
@@ -137,7 +137,7 @@ export default function GetStartedPage() {
       }).catch(() => {});
 
       if (typeof window !== 'undefined' && window.gtag) {
-        window.gtag('event', 'get_started_form_submit', { role: selectedRole, path: isTeacherPath ? 'nomination' : 'pd-plan' });
+        window.gtag('event', 'get_started_form_submit', { role: selectedRole?.toLowerCase(), path: isTeacherPath ? 'nomination' : 'pd-plan' });
       }
 
       setStep(3);
