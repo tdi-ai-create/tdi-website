@@ -3,7 +3,7 @@ import RooseveltDashboard from "@/components/dashboard/roosevelt/RooseveltDashbo
 
 // TODO: replace with actual Better Auth session utility
 async function getSession() {
-  // Placeholder — wire to Learning Hub's Better Auth session
+  // Placeholder - wire to Learning Hub's Better Auth session
   // Should return: { userId, role: "tdi" | "admin", schoolId?: string }
   return { userId: "demo", role: "tdi" as const, schoolId: undefined };
 }
@@ -20,10 +20,5 @@ export default async function RooseveltDashboardPage() {
     redirect("/unauthorized");
   }
 
-  return (
-    <RooseveltDashboard
-      role={session.role}
-      schoolId={session.schoolId}
-    />
-  );
+  return <RooseveltDashboard />;
 }
