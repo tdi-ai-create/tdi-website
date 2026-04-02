@@ -27,6 +27,9 @@ interface FormData {
   title: string;
   schoolName: string;
   schoolAddress: string;
+  pdPlanAudience: string[];
+  pdPlanScope: string;
+  pdPainPoint: string;
   howConnected: string;
   anythingElse: string;
 }
@@ -53,6 +56,9 @@ export default function FreePDPlanPage() {
     title: '',
     schoolName: '',
     schoolAddress: '',
+    pdPlanAudience: [],
+    pdPlanScope: '',
+    pdPainPoint: '',
     howConnected: '',
     anythingElse: '',
   });
@@ -159,6 +165,9 @@ export default function FreePDPlanPage() {
           'Title': formData.title,
           'School Name': formData.schoolName,
           'School Address': formData.schoolAddress,
+          'PD Plan Audience': formData.pdPlanAudience.join(', '),
+          'PD Plan Scope': formData.pdPlanScope,
+          'PD Pain Point': formData.pdPainPoint,
           'How Connected': formData.howConnected,
           'Anything Else': formData.anythingElse,
         }),
@@ -177,7 +186,7 @@ export default function FreePDPlanPage() {
   const canProceed = () => {
     switch (currentStep) {
       case 5:
-        return formData.email && formData.name && formData.schoolName;
+        return formData.email && formData.name && formData.schoolName && formData.pdPlanAudience.length > 0 && formData.pdPlanScope && formData.pdPainPoint;
       default:
         return true;
     }
@@ -665,7 +674,90 @@ export default function FreePDPlanPage() {
               />
             </div>
 
-            {/* Q18 - How Connected */}
+            {/* Q18 - PD Plan Audience (Checkboxes) */}
+            <div>
+              <label className="block text-sm font-semibold mb-1" style={{ color: '#1e2749' }}>
+                Who is this PD plan for? <span style={{ color: '#f96767' }}>*</span>
+              </label>
+              <p className="text-sm mb-3" style={{ color: '#666' }}>
+                Select everyone you&apos;re thinking about — you can always start with just one group.
+              </p>
+              <div className="space-y-3">
+                {[
+                  'Classroom teachers',
+                  'Paraprofessionals',
+                  'Special education staff',
+                  'Building leadership team',
+                  'New teacher onboarding',
+                  'Full school or district — everyone'
+                ].map((option) => (
+                  <CheckboxOption
+                    key={option}
+                    value={option}
+                    label={option}
+                    checked={formData.pdPlanAudience.includes(option)}
+                    onChange={() => {
+                      const current = formData.pdPlanAudience;
+                      if (current.includes(option)) {
+                        updateFormData('pdPlanAudience', current.filter((v: string) => v !== option));
+                      } else {
+                        updateFormData('pdPlanAudience', [...current, option]);
+                      }
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Q19 - PD Plan Scope (Radio) */}
+            <div>
+              <label className="block text-sm font-semibold mb-1" style={{ color: '#1e2749' }}>
+                How do you want to roll this out? <span style={{ color: '#f96767' }}>*</span>
+              </label>
+              <p className="text-sm mb-3" style={{ color: '#666' }}>
+                No wrong answer — most schools start small and expand from there.
+              </p>
+              <div className="space-y-3">
+                {[
+                  'Small pilot — a select group of teachers or one department',
+                  'One full building',
+                  'Multiple buildings or full district',
+                  'Not sure yet — I\'d like guidance'
+                ].map((option) => (
+                  <RadioOption
+                    key={option}
+                    name="pd_plan_scope"
+                    value={option}
+                    label={option}
+                    checked={formData.pdPlanScope === option}
+                    onChange={() => updateFormData('pdPlanScope', option)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Q20 - PD Pain Point (Text Area) */}
+            <div>
+              <label className="block text-sm font-semibold mb-1" style={{ color: '#1e2749' }}>
+                What&apos;s your biggest frustration with PD at your school right now? <span style={{ color: '#f96767' }}>*</span>
+              </label>
+              <p className="text-sm mb-3" style={{ color: '#666' }}>
+                There are no wrong answers — the more specific you are, the more useful your plan will be.
+              </p>
+              <textarea
+                value={formData.pdPainPoint}
+                onChange={(e) => updateFormData('pdPainPoint', e.target.value)}
+                placeholder='e.g. "Teachers sit through PD days but nothing changes in classrooms" or "I have no way to know if strategies are actually being used"'
+                rows={4}
+                required
+                className="w-full px-4 py-3 rounded-lg border-2 text-base transition-all focus:outline-none resize-none"
+                style={{ borderColor: '#e5e5e5' }}
+                onFocus={(e) => e.target.style.borderColor = '#ffba06'}
+                onBlur={(e) => e.target.style.borderColor = '#e5e5e5'}
+              />
+            </div>
+
+            {/* Q21 - How Connected */}
             <div>
               <label className="block text-sm font-semibold mb-3" style={{ color: '#1e2749' }}>
                 How did you connect to Teachers Deserve It?
