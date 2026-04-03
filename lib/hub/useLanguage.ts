@@ -5,19 +5,47 @@ import { useHub } from '@/components/hub/HubContext'
 
 export type Language = 'en' | 'es'
 
+// Module-level shared state ensures all hook instances stay in sync when language changes.
+// Without this, each component that calls useLanguage() gets its own independent React state,
+// so switching language in LanguageToggle would not propagate to MomentMode, CheckInSlideUp, etc.
+let sharedLanguage: Language = 'en'
+const languageListeners: Set<() => void> = new Set()
+
+function notifyLanguageListeners() {
+  languageListeners.forEach(listener => listener())
+}
+
 export function useLanguage() {
   const { user, profile } = useHub()
-  const [language, setLanguageState] = useState<Language>('en')
+  const [language, setLanguageLocal] = useState<Language>(sharedLanguage)
   const [pendingTranslations, setPendingTranslations] = useState<Set<string>>(new Set())
 
+  // Register listener so this instance updates when any other instance changes language
+  useEffect(() => {
+    const listener = () => setLanguageLocal(sharedLanguage)
+    languageListeners.add(listener)
+    return () => {
+      languageListeners.delete(listener)
+    }
+  }, [])
+
+  // Sync language from user profile preference on mount / profile load
   useEffect(() => {
     if (profile?.preferred_language) {
-      setLanguageState(profile.preferred_language as Language)
+      const lang = profile.preferred_language as Language
+      if (lang !== sharedLanguage) {
+        sharedLanguage = lang
+        setLanguageLocal(lang)
+        notifyLanguageListeners()
+      }
     }
   }, [profile?.preferred_language])
 
   const setLanguage = useCallback(async (lang: Language) => {
-    setLanguageState(lang) // Optimistic update
+    // Update shared state and notify all component instances immediately
+    sharedLanguage = lang
+    setLanguageLocal(lang)
+    notifyLanguageListeners()
 
     if (!user?.id) return
 
