@@ -10,11 +10,9 @@ interface HubContextValue {
   isLoading: boolean;
 }
 
-const HubContext = createContext<HubContextValue>({
-  user: null,
-  profile: null,
-  isLoading: true,
-});
+// Use undefined as default so the if (!context) guard in useHub() actually fires
+// when a component calls useHub() outside a HubProvider tree.
+const HubContext = createContext<HubContextValue | undefined>(undefined);
 
 export function useHub() {
   const context = useContext(HubContext);
