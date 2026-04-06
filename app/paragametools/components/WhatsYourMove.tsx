@@ -411,12 +411,41 @@ function Survey({ language, score }: { language: 'en' | 'es'; score: number }) {
 
     console.log('=== TDI SURVEY RESPONSE ===', JSON.stringify(response, null, 2));
 
+    // Persist to localStorage as fallback
     try {
       const existing = JSON.parse(localStorage.getItem('tdi_quiz_surveys') || '[]');
       existing.push(response);
       localStorage.setItem('tdi_quiz_surveys', JSON.stringify(existing));
     } catch {
       // localStorage may be unavailable
+    }
+
+    // Insert into Supabase
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (supabaseUrl && supabaseKey) {
+      fetch(`${supabaseUrl}/rest/v1/quiz_surveys`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: supabaseKey,
+          Authorization: `Bearer ${supabaseKey}`,
+        },
+        body: JSON.stringify({
+          timestamp: response.timestamp,
+          language: response.language,
+          quiz_score: response.quizScore,
+          confidence: response.confidence,
+          implementation: response.implementation,
+          valued: response.valued,
+          impact: response.impact,
+          retention: response.retention,
+          continue_pd: response.continuePD,
+          open_text: response.openText,
+        }),
+      }).catch(() => {
+        // Supabase insert failed silently — localStorage has the backup
+      });
     }
 
     setSubmitted(true);
