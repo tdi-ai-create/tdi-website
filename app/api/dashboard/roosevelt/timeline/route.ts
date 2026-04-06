@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 
+interface TimelineEventRow {
+  id: string;
+  event_title: string;
+  status: string;
+  event_type: string;
+  sort_order: number;
+}
+
 /**
  * GET /api/dashboard/roosevelt/timeline
  *
@@ -36,12 +44,12 @@ export async function GET() {
       return NextResponse.json({ error: "Failed to load timeline events." }, { status: 500 });
     }
 
-    const events = (eventRows ?? []).map((row: Record<string, unknown>) => ({
-      id: row.id as string,
-      title: row.event_title as string,
+    const events = ((eventRows ?? []) as TimelineEventRow[]).map((row) => ({
+      id: row.id,
+      title: row.event_title,
       status: row.status as "completed" | "in_progress" | "upcoming",
       eventType: row.event_type as "milestone" | "observation" | "virtual_session",
-      sortOrder: row.sort_order as number,
+      sortOrder: row.sort_order,
     }));
 
     return NextResponse.json({ events });

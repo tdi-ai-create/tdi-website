@@ -1,6 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 
+// Typed row shapes for partnership_staff query results
+interface StaffRow {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  role_group: string;
+  hub_enrolled: boolean;
+}
+
+interface StaffRowWithDate extends StaffRow {
+  created_at: string;
+}
+
 function deriveStatus(hubEnrolled: boolean): "active" | "inactive" | "pending" {
   return hubEnrolled ? "active" : "inactive";
 }
@@ -9,15 +23,19 @@ function deriveStatus(hubEnrolled: boolean): "active" | "inactive" | "pending" {
  * GET /api/dashboard/roosevelt/educators
  * GET /api/dashboard/roosevelt/educators?scope=admin
  *
- * Returns the full educator roster for the Roosevelt pilot.
- * The ?scope=admin param is reserved for future role-scoped field expansion.
+ * Returns the full educator roster for the Roosevelt pilot partnership.
+ * The optional ?scope=admin param includes created_at for admin views.
+ *
+ * Response shape:
+ *   { educators: Educator[], total: number, enrolled: number }
  */
 export async function GET(request: NextRequest) {
   try {
     const supabase = getSupabase();
     const { searchParams } = new URL(request.url);
-    const scope = searchParams.get("scope");
+    const isAdmin = searchParams.get("scope") === "admin";
 
+    // Resolve partnership
     const { data: partnership, error: partnershipError } = await supabase
       .from("partnerships")
       .select("id, staff_enrolled")
@@ -32,34 +50,59 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Roosevelt partnership not found." }, { status: 404 });
     }
 
-    const columns = scope === "admin"
-      ? "id, first_name, last_name, email, role_group, hub_enrolled, created_at"
-      : "id, first_name, last_name, email, role_group, hub_enrolled";
+    if (isAdmin) {
+      // Admin: include created_at
+      const { data: staffRows, error: staffError } = await supabase
+        .from("partnership_staff")
+        .select("id, first_name, last_name, email, role_group, hub_enrolled, created_at")
+        .eq("partnership_id", partnership.id)
+        .order("last_name", { ascending: true })
+        .order("first_name", { ascending: true });
 
+      if (staffError) {
+        console.error("[educators] staff query error:", staffError);
+        return NextResponse.json({ error: "Failed to load educator roster." }, { status: 500 });
+      }
+
+      const rows = (staffRows ?? []) as StaffRowWithDate[];
+      const educators = rows.map((row) => ({
+        id: row.id,
+        name: `${row.first_name} ${row.last_name}`.trim(),
+        email: row.email,
+        roleGroup: row.role_group,
+        hubEnrolled: row.hub_enrolled,
+        status: deriveStatus(row.hub_enrolled),
+        createdAt: row.created_at,
+      }));
+
+      const enrolled = educators.filter((e) => e.hubEnrolled).length;
+      return NextResponse.json({ educators, total: partnership.staff_enrolled as number, enrolled });
+    }
+
+    // Standard view (no created_at)
     const { data: staffRows, error: staffError } = await supabase
       .from("partnership_staff")
-      .select(columns)
+      .select("id, first_name, last_name, email, role_group, hub_enrolled")
       .eq("partnership_id", partnership.id)
       .order("last_name", { ascending: true })
       .order("first_name", { ascending: true });
 
     if (staffError) {
-      console.error("[educators] partnership_staff query error:", staffError);
+      console.error("[educators] staff query error:", staffError);
       return NextResponse.json({ error: "Failed to load educator roster." }, { status: 500 });
     }
 
-    const rows = staffRows ?? [];
-    const educators = rows.map((row: Record<string, unknown>) => ({
-      id: row.id as string,
+    const rows = (staffRows ?? []) as StaffRow[];
+    const educators = rows.map((row) => ({
+      id: row.id,
       name: `${row.first_name} ${row.last_name}`.trim(),
-      email: row.email as string,
-      roleGroup: row.role_group as string,
-      hubEnrolled: row.hub_enrolled as boolean,
-      status: deriveStatus(row.hub_enrolled as boolean),
+      email: row.email,
+      roleGroup: row.role_group,
+      hubEnrolled: row.hub_enrolled,
+      status: deriveStatus(row.hub_enrolled),
     }));
 
     const enrolled = educators.filter((e) => e.hubEnrolled).length;
-
     return NextResponse.json({
       educators,
       total: partnership.staff_enrolled as number,
