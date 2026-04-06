@@ -1,6 +1,6 @@
 // Game configuration and shared utilities
 
-export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover';
+export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove';
 
 export interface GameConfig {
   id: GameId;
@@ -91,6 +91,12 @@ export const COLORS = {
     bg: 'rgba(147, 51, 234, 0.1)',
     bgHover: 'rgba(147, 51, 234, 0.15)',
     border: 'rgba(147, 51, 234, 0.4)',
+  },
+  teal: {
+    accent: '#22b8bd',
+    bg: 'rgba(34, 184, 189, 0.1)',
+    bgHover: 'rgba(34, 184, 189, 0.15)',
+    border: 'rgba(34, 184, 189, 0.4)',
   },
   blue: {
     accent: '#3498DB',

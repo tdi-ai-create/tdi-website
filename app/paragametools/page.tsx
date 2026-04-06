@@ -12,6 +12,7 @@ import { TellOrAsk } from './components/TellOrAsk';
 import { FeedbackLevelUp } from './components/FeedbackLevelUp';
 import { FeedbackMadlibs } from './components/FeedbackMadlibs';
 import { FeedbackMakeover } from './components/FeedbackMakeover';
+import { WhatsYourMove } from './components/WhatsYourMove';
 import type { GameId } from './data/gameConfig';
 
 type ViewState =
@@ -93,6 +94,8 @@ function ParaGameToolsContent() {
           return <FeedbackMadlibs onBack={handleBackToPlayerHome} />;
         case 'makeover':
           return <FeedbackMakeover onBack={handleBackToPlayerHome} />;
+        case 'whatsyourmove':
+          return <WhatsYourMove onBack={handleBackToPlayerHome} />;
       }
       break;
 

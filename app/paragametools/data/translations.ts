@@ -69,6 +69,14 @@ export const UI_TRANSLATIONS = {
       },
       format: { en: 'Advanced Practice', es: 'Práctica Avanzada' },
     },
+    whatsyourmove: {
+      title: { en: "What's Your Move?", es: '¿Cuál Es Tu Movimiento?' },
+      description: {
+        en: 'Six real classroom scenarios. Three strategies. Can you spot the right move?',
+        es: 'Seis escenarios reales del salón. Tres estrategias. ¿Puedes identificar el movimiento correcto?',
+      },
+      format: { en: 'Solo Quiz', es: 'Quiz Individual' },
+    },
   },
 
   // Common Game UI

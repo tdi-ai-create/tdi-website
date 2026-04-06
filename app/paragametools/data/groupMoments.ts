@@ -41,4 +41,5 @@ export const GROUP_MOMENTS_BY_GAME = {
   levelup: LEVEL_UP_GROUP_MOMENTS,
   madlibs: MADLIBS_GROUP_MOMENTS,
   makeover: MAKEOVER_GROUP_MOMENTS,
+  whatsyourmove: [] as string[],
 } as const;

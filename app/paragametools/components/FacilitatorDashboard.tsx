@@ -15,6 +15,7 @@ import {
   TrendingUp,
   Smile,
   Wrench,
+  Crosshair,
   ChevronRight,
 } from 'lucide-react';
 import { GAMES, COLORS, type GameId } from '../data/gameConfig';
@@ -27,6 +28,7 @@ const GAME_ICONS = {
   levelup: TrendingUp,
   madlibs: Smile,
   makeover: Wrench,
+  whatsyourmove: Crosshair,
 } as const;
 
 interface FacilitatorDashboardProps {

@@ -9,13 +9,14 @@ import { UI_TRANSLATIONS } from '../data/translations';
 const GAME_CARDS: {
   id: GameId;
   icon: string;
-  color: 'orange' | 'yellow' | 'green' | 'purple' | 'red';
+  color: keyof typeof COLORS;
 }[] = [
   { id: 'knockout', icon: '🎯', color: 'orange' },
   { id: 'tellorask', icon: '⚡', color: 'yellow' },
   { id: 'levelup', icon: '📈', color: 'green' },
   { id: 'madlibs', icon: '😂', color: 'purple' },
   { id: 'makeover', icon: '🔧', color: 'red' },
+  { id: 'whatsyourmove', icon: '🎯', color: 'teal' },
 ];
 
 const TIMES: Record<GameId, string> = {
@@ -24,6 +25,7 @@ const TIMES: Record<GameId, string> = {
   levelup: '12 min',
   madlibs: '10 min',
   makeover: '15 min',
+  whatsyourmove: '~8 min',
 };
 
 interface HomeScreenProps {

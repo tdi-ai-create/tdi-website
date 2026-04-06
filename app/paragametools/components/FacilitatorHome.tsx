@@ -1,6 +1,6 @@
 'use client';
 
-import { Target, Zap, TrendingUp, Smile, Wrench, ArrowLeft, Monitor, Coffee } from 'lucide-react';
+import { Target, Zap, TrendingUp, Smile, Wrench, Crosshair, ArrowLeft, Monitor, Coffee } from 'lucide-react';
 import { GAMES, COLORS, type GameId } from '../data/gameConfig';
 
 // Icon map for home screen
@@ -10,6 +10,7 @@ const GAME_ICONS = {
   levelup: TrendingUp,
   madlibs: Smile,
   makeover: Wrench,
+  whatsyourmove: Crosshair,
 } as const;
 
 interface FacilitatorHomeProps {

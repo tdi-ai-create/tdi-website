@@ -51,4 +51,5 @@ export const TIPS_BY_GAME = {
   levelup: LEVEL_UP_TIPS,
   madlibs: MADLIBS_TIPS,
   makeover: MAKEOVER_TIPS,
+  whatsyourmove: [] as string[],
 } as const;

@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Target, Zap, TrendingUp, Smile, Wrench, Award, Check, X } from 'lucide-react';
+import { ArrowLeft, Target, Zap, TrendingUp, Smile, Wrench, Crosshair, Award, Check, X } from 'lucide-react';
 import { COLORS, type GameId } from '../data/gameConfig';
 import { ConfettiBurst } from './ConfettiBurst';
 import { useLanguage } from '../context/LanguageContext';
@@ -13,6 +13,7 @@ export const GAME_ICONS = {
   levelup: TrendingUp,
   madlibs: Smile,
   makeover: Wrench,
+  whatsyourmove: Crosshair,
 } as const;
 
 interface GameWrapperProps {
