@@ -19,21 +19,36 @@ const COLORS = {
   yellow: "#ffba06",
 };
 
-// === ROOSEVLT PILOT DATA (seed - replace with Supabase queries at Phase 2) ===
-const PILOT = {
-  school: "Roosevelt Middle School",
-  location: "Pilot District, IL",
+// === ROOSEVELT PILOT DATA ===
+// Static fields: school identity info (does not change)
+// Dynamic fields: fetched from /api/dashboard/roosevelt/scorecard via page.tsx server component
+// and passed in as liveData prop, merged over defaults below.
+interface RooseveltLiveData {
+  staffCount?: number;
+  contractedSeats?: number;
+  hubLoggedIn?: number;
+  phase?: string;
+  phaseNum?: number;
+  virtualSessionsDone?: number;
+  virtualSessionsTotal?: number;
+  daysRemaining?: number;
+}
+
+const PILOT_DEFAULTS = {
+  school: "Roosevelt School",
+  location: "Lodi, NJ",
   phase: "IGNITE",
   phaseNum: 1,
-  pilotPeriod: "April - June 2026",
-  staffCount: 24,
-  contractedSeats: 24,
-  hubLoggedIn: 18,
-  deliverablesDone: 2,
+  pilotPeriod: "April – June 2026",
+  staffCount: 18,
+  contractedSeats: 18,
+  hubLoggedIn: 0,
+  deliverablesDone: 0,
   deliverablesTotal: 6,
   loveNotesSent: 0,
   virtualSessionsDone: 0,
-  virtualSessionsTotal: 2,
+  virtualSessionsTotal: 4,
+  daysRemaining: 0,
   calendlyUrl: "https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone",
   tdiContact: {
     name: "Rae Hughart",
@@ -42,6 +57,11 @@ const PILOT = {
     calendly: "https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone",
   },
 };
+
+// Module-level mutable reference — updated by RooseveltDashboard on mount
+// so sub-component functions (computeHealth, OverviewTab, etc.) get live values
+// without requiring full prop-drilling through all function definitions.
+let PILOT = { ...PILOT_DEFAULTS };
 
 // === HEALTH INDICATOR (4-signal spec) ===
 function computeHealth() {
@@ -783,7 +803,14 @@ const TABS = [
 
 type TabId = typeof TABS[number]["id"];
 
-export default function RooseveltDashboard() {
+export default function RooseveltDashboard({ liveData }: { liveData?: RooseveltLiveData }) {
+  // Merge live data from server-side fetch over defaults.
+  // Updates the module-level PILOT reference so computeHealth() and tab
+  // sub-components pick up real DB values without prop-drilling.
+  if (liveData) {
+    PILOT = { ...PILOT_DEFAULTS, ...liveData };
+  }
+
   const [activeTab, setActiveTab] = useState<TabId>("overview");
 
   const changeTab = (tab: string) => {
