@@ -1,155 +1,125 @@
 "use client";
 
-interface Milestone {
-  date: string;
-  label: string;
-  description: string;
-  status: "done" | "upcoming" | "overdue";
+import { useEffect, useState } from "react";
+
+interface TimelineEvent {
+  id: string;
+  title: string;
+  status: "completed" | "in_progress" | "upcoming";
+  eventType: "milestone" | "observation" | "virtual_session";
+  sortOrder: number;
 }
 
-const MILESTONES: Milestone[] = [
-  {
-    date: "2026-04-07",
-    label: "All educators onboarded",
-    description: "All Roosevelt educators logged in for the first time",
-    status: "upcoming",
-  },
-  {
-    date: "2026-04-21",
-    label: "Ignite completion target",
-    description: "80%+ of cohort completes Ignite module",
-    status: "upcoming",
-  },
-  {
-    date: "2026-05-12",
-    label: "Mid-pilot survey",
-    description: "Mid-pilot survey sent and collected from all educators",
-    status: "upcoming",
-  },
-  {
-    date: "2026-05-26",
-    label: "Accelerate completion target",
-    description: "75%+ of cohort completes Accelerate module",
-    status: "upcoming",
-  },
-  {
-    date: "2026-06-09",
-    label: "Final survey deployment",
-    description: "End-of-pilot survey sent to all educators",
-    status: "upcoming",
-  },
-  {
-    date: "2026-06-23",
-    label: "Outcome report ready",
-    description: "Summary report prepared for Roosevelt admin",
-    status: "upcoming",
-  },
-  {
-    date: "2026-06-30",
-    label: "Pilot close",
-    description: "Full outcome report delivered to TDI leadership and Roosevelt admin",
-    status: "upcoming",
-  },
-];
+function EventIcon({ eventType }: { eventType: TimelineEvent["eventType"] }) {
+  const classes = "w-5 h-5";
+  if (eventType === "observation") return <span className={classes} title="Observation Day">👁</span>;
+  if (eventType === "virtual_session") return <span className={classes} title="Virtual Session">💻</span>;
+  return <span className={classes} title="Milestone">🎯</span>;
+}
 
-function resolveStatus(dateStr: string): Milestone["status"] {
-  const now = new Date();
-  const d = new Date(dateStr);
-  if (d < now) return "overdue";
-  return "upcoming";
+function StatusBadge({ status }: { status: TimelineEvent["status"] }) {
+  const map = {
+    completed: "bg-green-100 text-green-700",
+    in_progress: "bg-blue-100 text-blue-700",
+    upcoming: "bg-gray-100 text-gray-500",
+  };
+  const labels = {
+    completed: "Done",
+    in_progress: "In Progress",
+    upcoming: "Upcoming",
+  };
+  return (
+    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${map[status]}`}>
+      {labels[status]}
+    </span>
+  );
 }
 
 export default function MilestonesChecklist() {
-  const milestones = MILESTONES.map((m) => ({
-    ...m,
-    status: resolveStatus(m.date),
-  }));
+  const [events, setEvents] = useState<TimelineEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const today = new Date();
-  const pilotEnd = new Date("2026-06-30");
-  const pilotStart = new Date("2026-04-01");
-  const totalDays =
-    (pilotEnd.getTime() - pilotStart.getTime()) / 86400000;
-  const elapsed = Math.max(
-    0,
-    (today.getTime() - pilotStart.getTime()) / 86400000
-  );
-  const progressPct = Math.min(100, (elapsed / totalDays) * 100);
+  useEffect(() => {
+    fetch("/api/dashboard/roosevelt/timeline")
+      .then((r) => r.json())
+      .then((data) => {
+        setEvents(data.events ?? []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("[MilestonesChecklist] fetch error:", err);
+        setError("Could not load timeline data.");
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12 text-gray-400">
+        <span className="text-sm">Loading milestones…</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700 text-sm">
+        {error}
+      </div>
+    );
+  }
+
+  const completed = events.filter((e) => e.status === "completed").length;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Pilot Milestones
-        </h2>
-        <span className="text-sm text-gray-500">
-          April 1 – June 30, 2026
+    <div className="space-y-4">
+      {/* Progress summary */}
+      <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border">
+        <span className="text-sm text-gray-600">
+          <strong className="text-gray-900">{completed}</strong> of{" "}
+          <strong className="text-gray-900">{events.length}</strong> milestones completed
         </span>
-      </div>
-
-      {/* Timeline progress bar */}
-      <div className="bg-white border border-gray-200 rounded-lg p-5">
-        <div className="flex justify-between text-sm text-gray-600 mb-2">
-          <span>Pilot start (Apr 1)</span>
-          <span className="font-medium">{Math.round(progressPct)}% through pilot</span>
-          <span>Pilot end (Jun 30)</span>
-        </div>
-        <div className="w-full bg-gray-100 rounded-full h-3">
+        <div className="flex-1 bg-gray-200 rounded-full h-2">
           <div
-            className="bg-blue-500 h-3 rounded-full transition-all"
-            style={{ width: `${progressPct}%` }}
+            className="bg-green-500 h-2 rounded-full transition-all"
+            style={{ width: events.length ? `${(completed / events.length) * 100}%` : "0%" }}
           />
         </div>
       </div>
 
-      {/* Milestones list */}
-      <div className="space-y-3">
-        {milestones.map((m, i) => {
-          const isPast = m.status === "done" || m.status === "overdue";
-          return (
+      {/* Event list */}
+      <div className="space-y-2">
+        {events.length === 0 ? (
+          <p className="text-sm text-gray-400 text-center py-6">No timeline events yet.</p>
+        ) : (
+          events.map((event) => (
             <div
-              key={i}
-              className={`flex gap-4 bg-white border rounded-lg p-4 ${
-                m.status === "overdue"
-                  ? "border-red-200 bg-red-50/30"
-                  : m.status === "done"
-                  ? "border-green-200 bg-green-50/30"
-                  : "border-gray-200"
+              key={event.id}
+              className={`flex items-start gap-3 p-3 rounded-lg border ${
+                event.status === "completed"
+                  ? "bg-green-50 border-green-200"
+                  : event.status === "in_progress"
+                  ? "bg-blue-50 border-blue-200"
+                  : "bg-white border-gray-200"
               }`}
             >
-              {/* Icon */}
-              <div className="flex-shrink-0 mt-0.5">
-                {m.status === "done" ? (
-                  <span className="text-green-500 text-lg">✓</span>
-                ) : m.status === "overdue" ? (
-                  <span className="text-red-500 text-lg">!</span>
-                ) : (
-                  <span className="text-gray-300 text-lg">○</span>
-                )}
+              <div className="mt-0.5 flex-shrink-0">
+                <EventIcon eventType={event.eventType} />
               </div>
-
-              {/* Content */}
-              <div className="flex-1">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="font-medium text-gray-900">{m.label}</div>
-                  <div
-                    className={`text-xs flex-shrink-0 ${
-                      m.status === "overdue" ? "text-red-500 font-medium" : "text-gray-400"
-                    }`}
-                  >
-                    {new Date(m.date).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </div>
-                </div>
-                <div className="text-sm text-gray-500 mt-0.5">{m.description}</div>
+              <div className="flex-1 min-w-0">
+                <p className={`text-sm font-medium ${
+                  event.status === "completed" ? "text-green-800" : "text-gray-900"
+                }`}>
+                  {event.title}
+                </p>
+                <p className="text-xs text-gray-400 capitalize">{event.eventType.replace("_", " ")}</p>
               </div>
+              <StatusBadge status={event.status} />
             </div>
-          );
-        })}
+          ))
+        )}
       </div>
     </div>
   );
 }
-

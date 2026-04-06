@@ -1,34 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Educator {
   id: string;
   name: string;
+  email: string;
+  roleGroup: string;
+  hubEnrolled: boolean;
+  status: "active" | "inactive" | "pending";
+  // Phase tracking — populated from module_completions once users log in
   lastLogin: string | null;
   igniteComplete: boolean;
   accelerateComplete: boolean;
   sustainComplete: boolean;
   totalHours: number;
   surveyResponded: boolean;
-  status: "active" | "at_risk" | "inactive";
 }
 
 function statusBadge(status: Educator["status"]) {
   const map = {
     active: "bg-green-100 text-green-700",
-    at_risk: "bg-yellow-100 text-yellow-700",
     inactive: "bg-red-100 text-red-700",
+    pending: "bg-yellow-100 text-yellow-700",
   };
   const labels = {
     active: "Active",
-    at_risk: "At Risk",
-    inactive: "Inactive",
+    inactive: "Not Enrolled",
+    pending: "Pending",
   };
   return (
-    <span
-      className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${map[status]}`}
-    >
+    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${map[status]}`}>
       {labels[status]}
     </span>
   );
@@ -37,7 +39,7 @@ function statusBadge(status: Educator["status"]) {
 function moduleProgress(educator: Educator) {
   const phases = [
     { label: "Ignite", done: educator.igniteComplete },
-    { label: "Accelerate", done: educator.accelerateComplete },
+    { label: "Accel", done: educator.accelerateComplete },
     { label: "Sustain", done: educator.sustainComplete },
   ];
   return (
@@ -47,9 +49,7 @@ function moduleProgress(educator: Educator) {
           key={p.label}
           title={p.label}
           className={`text-xs px-1.5 py-0.5 rounded ${
-            p.done
-              ? "bg-green-100 text-green-700"
-              : "bg-gray-100 text-gray-400"
+            p.done ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-400"
           }`}
         >
           {p.label[0]}
@@ -59,113 +59,90 @@ function moduleProgress(educator: Educator) {
   );
 }
 
-// Seed data
-const SEED_EDUCATORS: Educator[] = [
-  {
-    id: "1",
-    name: "Jamie Rivera",
-    lastLogin: "2026-03-30",
-    igniteComplete: true,
-    accelerateComplete: false,
-    sustainComplete: false,
-    totalHours: 8.5,
-    surveyResponded: false,
-    status: "active",
-  },
-  {
-    id: "2",
-    name: "Marcus Lee",
-    lastLogin: "2026-03-28",
-    igniteComplete: true,
-    accelerateComplete: true,
-    sustainComplete: false,
-    totalHours: 14.2,
-    surveyResponded: true,
-    status: "active",
-  },
-  {
-    id: "3",
-    name: "Priya Nair",
-    lastLogin: "2026-03-14",
-    igniteComplete: false,
-    accelerateComplete: false,
-    sustainComplete: false,
-    totalHours: 1.0,
-    surveyResponded: false,
-    status: "at_risk",
-  },
-  {
-    id: "4",
-    name: "Derek Thomas",
-    lastLogin: null,
-    igniteComplete: false,
-    accelerateComplete: false,
-    sustainComplete: false,
-    totalHours: 0,
-    surveyResponded: false,
-    status: "inactive",
-  },
-  {
-    id: "5",
-    name: "Sofia Chen",
-    lastLogin: "2026-03-29",
-    igniteComplete: true,
-    accelerateComplete: false,
-    sustainComplete: false,
-    totalHours: 6.0,
-    surveyResponded: true,
-    status: "active",
-  },
-];
-
-type SortKey = "name" | "lastLogin" | "totalHours" | "status";
+type SortKey = "name" | "roleGroup" | "status" | "totalHours";
 
 export default function EducatorEngagementTable({
   schoolId,
 }: {
   schoolId?: string;
 }) {
-  const [educators] = useState<Educator[]>(SEED_EDUCATORS);
+  const [educators, setEducators] = useState<Educator[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [total, setTotal] = useState(0);
+  const [enrolledCount, setEnrolledCount] = useState(0);
+
   const [sortKey, setSortKey] = useState<SortKey>("status");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [search, setSearch] = useState("");
 
+  useEffect(() => {
+    const url = schoolId === "admin"
+      ? "/api/dashboard/roosevelt/educators?scope=admin"
+      : "/api/dashboard/roosevelt/educators";
+    
+    fetch(url)
+      .then((r) => r.json())
+      .then((data) => {
+        // Map API response to component Educator interface
+        // Module completion fields default to false — populated once
+        // Learning Hub tracks user_events and module_completions.
+        const mapped: Educator[] = (data.educators ?? []).map((e: {
+          id: string;
+          name: string;
+          email: string;
+          roleGroup: string;
+          hubEnrolled: boolean;
+          status: "active" | "inactive" | "pending";
+        }) => ({
+          id: e.id,
+          name: e.name,
+          email: e.email,
+          roleGroup: e.roleGroup,
+          hubEnrolled: e.hubEnrolled,
+          status: e.status,
+          lastLogin: null,
+          igniteComplete: false,
+          accelerateComplete: false,
+          sustainComplete: false,
+          totalHours: 0,
+          surveyResponded: false,
+        }));
+        setEducators(mapped);
+        setTotal(data.total ?? mapped.length);
+        setEnrolledCount(data.enrolled ?? 0);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("[EducatorEngagementTable] fetch error:", err);
+        setError("Could not load educator data.");
+        setLoading(false);
+      });
+  }, [schoolId]);
+
   const filtered = educators
     .filter((e) => filterStatus === "all" || e.status === filterStatus)
-    .filter(
-      (e) => !search || e.name.toLowerCase().includes(search.toLowerCase())
-    )
+    .filter((e) => !search || e.name.toLowerCase().includes(search.toLowerCase()) || e.roleGroup.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
       if (sortKey === "name") return a.name.localeCompare(b.name);
-      if (sortKey === "lastLogin") {
-        return (b.lastLogin || "").localeCompare(a.lastLogin || "");
-      }
+      if (sortKey === "roleGroup") return a.roleGroup.localeCompare(b.roleGroup);
       if (sortKey === "totalHours") return b.totalHours - a.totalHours;
-      // status: at_risk first, then inactive, then active
-      const rank = { at_risk: 0, inactive: 1, active: 2 };
-      return rank[a.status] - rank[b.status];
+      // status: inactive first to highlight who needs onboarding
+      const rank = { inactive: 0, pending: 1, active: 2 };
+      return (rank[a.status] ?? 1) - (rank[b.status] ?? 1);
     });
 
   const handleExportCSV = () => {
-    const headers = [
-      "Name",
-      "Last Login",
-      "Ignite",
-      "Accelerate",
-      "Sustain",
-      "Hours",
-      "Survey",
-      "Status",
-    ];
+    const headers = ["Name", "Email", "Role Group", "Hub Enrolled", "Status", "Ignite", "Accelerate", "Sustain"];
     const rows = filtered.map((e) => [
       e.name,
-      e.lastLogin || "Never",
+      e.email,
+      e.roleGroup,
+      e.hubEnrolled ? "Yes" : "No",
+      e.status,
       e.igniteComplete ? "Yes" : "No",
       e.accelerateComplete ? "Yes" : "No",
       e.sustainComplete ? "Yes" : "No",
-      e.totalHours.toFixed(1),
-      e.surveyResponded ? "Yes" : "No",
-      e.status,
     ]);
     const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
@@ -177,115 +154,104 @@ export default function EducatorEngagementTable({
     URL.revokeObjectURL(url);
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12 text-gray-400">
+        <span className="text-sm">Loading educators…</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700 text-sm">
+        {error}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Educator Engagement
-        </h2>
+      {/* Summary bar */}
+      <div className="flex gap-4 text-sm text-gray-600">
+        <span><strong>{total}</strong> total educators</span>
+        <span className="text-gray-300">|</span>
+        <span><strong className="text-green-600">{enrolledCount}</strong> Hub-enrolled</span>
+        <span className="text-gray-300">|</span>
+        <span><strong className="text-red-500">{total - enrolledCount}</strong> not yet enrolled</span>
+      </div>
+
+      {/* Controls */}
+      <div className="flex flex-wrap gap-3 items-center">
+        <input
+          type="text"
+          placeholder="Search by name or role…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border rounded-lg px-3 py-1.5 text-sm w-56"
+        />
+        <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+          className="border rounded-lg px-3 py-1.5 text-sm"
+        >
+          <option value="all">All statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Not Enrolled</option>
+        </select>
+        <select
+          value={sortKey}
+          onChange={(e) => setSortKey(e.target.value as SortKey)}
+          className="border rounded-lg px-3 py-1.5 text-sm"
+        >
+          <option value="status">Sort: Status</option>
+          <option value="name">Sort: Name</option>
+          <option value="roleGroup">Sort: Role Group</option>
+        </select>
         <button
           onClick={handleExportCSV}
-          className="text-sm px-3 py-1.5 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-gray-600"
+          className="ml-auto text-xs px-3 py-1.5 border rounded-lg hover:bg-gray-50"
         >
           Export CSV
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-3">
-        <input
-          type="text"
-          placeholder="Search educators..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="px-3 py-1.5 border border-gray-300 rounded-md text-sm w-48 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none"
-        >
-          <option value="all">All statuses</option>
-          <option value="active">Active</option>
-          <option value="at_risk">At Risk</option>
-          <option value="inactive">Inactive</option>
-        </select>
-        <select
-          value={sortKey}
-          onChange={(e) => setSortKey(e.target.value as SortKey)}
-          className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none"
-        >
-          <option value="status">Sort: Status</option>
-          <option value="name">Sort: Name</option>
-          <option value="lastLogin">Sort: Last Login</option>
-          <option value="totalHours">Sort: Hours</option>
-        </select>
-      </div>
-
       {/* Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-x-auto">
+      <div className="overflow-x-auto rounded-xl border border-gray-200">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">
-                Name
-              </th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">
-                Last Login
-              </th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">
-                Modules
-              </th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">
-                Hours
-              </th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">
-                Survey
-              </th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">
-                Status
-              </th>
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200">
+              <th className="text-left px-4 py-3 font-medium text-gray-500">Name</th>
+              <th className="text-left px-4 py-3 font-medium text-gray-500">Role Group</th>
+              <th className="text-left px-4 py-3 font-medium text-gray-500">Email</th>
+              <th className="text-left px-4 py-3 font-medium text-gray-500">Hub Status</th>
+              <th className="text-left px-4 py-3 font-medium text-gray-500">Modules</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map((educator, i) => (
-              <tr
-                key={educator.id}
-                className={`border-b border-gray-100 ${
-                  i % 2 === 0 ? "" : "bg-gray-50/30"
-                }`}
-              >
-                <td className="px-4 py-3 font-medium text-gray-900">
-                  {educator.name}
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="text-center text-gray-400 py-8 text-sm">
+                  No educators match the current filters.
                 </td>
-                <td className="px-4 py-3 text-gray-600">
-                  {educator.lastLogin
-                    ? new Date(educator.lastLogin).toLocaleDateString()
-                    : <span className="text-gray-400 italic">Never</span>}
-                </td>
-                <td className="px-4 py-3">{moduleProgress(educator)}</td>
-                <td className="px-4 py-3 text-gray-600">
-                  {educator.totalHours.toFixed(1)}h
-                </td>
-                <td className="px-4 py-3">
-                  {educator.surveyResponded ? (
-                    <span className="text-green-600 text-xs">Responded</span>
-                  ) : (
-                    <span className="text-gray-400 text-xs">Pending</span>
-                  )}
-                </td>
-                <td className="px-4 py-3">{statusBadge(educator.status)}</td>
               </tr>
-            ))}
+            ) : (
+              filtered.map((e) => (
+                <tr key={e.id} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="px-4 py-3 font-medium text-gray-900">{e.name}</td>
+                  <td className="px-4 py-3 text-gray-600">{e.roleGroup}</td>
+                  <td className="px-4 py-3 text-gray-500 text-xs">{e.email}</td>
+                  <td className="px-4 py-3">{statusBadge(e.status)}</td>
+                  <td className="px-4 py-3">{moduleProgress(e)}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
-
       <p className="text-xs text-gray-400">
-        At Risk = no login in 14+ days OR &lt;25% module completion at phase
-        midpoint
+        Module progress will populate once educators log in to the Learning Hub.
       </p>
     </div>
   );
 }
-
