@@ -429,7 +429,7 @@ function OurPartnershipTab() {
                 style={{
                   background: p.active ? COLORS.coral : "#e5e7eb",
                   color: p.active ? "#fff" : "#6b7280",
-                  ringColor: COLORS.coral,
+
                 }}
               >
                 {p.phase}
