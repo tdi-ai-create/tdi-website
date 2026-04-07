@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
         destination: '/paragametools',
         permanent: true,
       },
+      {
+        source: '/blog',
+        destination: 'https://raehughart.substack.com',
+        permanent: true,
+      },
     ];
   },
 };
