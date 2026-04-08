@@ -580,7 +580,7 @@ export default function SauneminDashboard() {
       alreadyInMotion: [
         { label: 'Observation Day 2', date: 'April 8, 2026', status: 'complete' },
         { label: 'Executive Leadership Session', date: 'April 8, 2026', status: 'complete' },
-        { label: 'Hub access active  - 9 staff learning', date: 'Ongoing', status: 'scheduled' },
+        { label: 'Hub access active  - 12 staff learning', date: 'Ongoing', status: 'complete' },
         { label: '17 Love Notes delivered', date: 'Nov 19, 2025 + April 8, 2026', status: 'complete' },
       ],
     },
