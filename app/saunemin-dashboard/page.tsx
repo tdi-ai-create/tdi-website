@@ -1041,105 +1041,6 @@ export default function SauneminDashboard() {
               })}
             </CollapsibleSection>
 
-            {/* Recommendation: Bridge the Implementation Gap - Expanded */}
-            <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-6 mb-6">
-              <div className="flex items-start gap-3 mb-4">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Lightbulb className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-[#1e2749] text-lg">Day 2 Confirmed: Hub Strategies Are in the Classroom</h4>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Research shows only 30% of professional development translates to classroom practice. Day 2 confirmed Saunemin is well above that benchmark - Hub content showing up in real instructional moves across every room visited.
-                  </p>
-                </div>
-              </div>
-
-              {/* What Day 2 Accomplished */}
-              <div className="bg-white rounded-lg p-4 mb-4">
-                <h5 className="font-semibold text-[#1e2749] mb-3 flex items-center gap-2">
-                  <Target className="w-4 h-4 text-[#38618C]" />
-                  What Day 2 Accomplished
-                </h5>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-3 h-3 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-[#1e2749]">Hub Strategies Confirmed in Practice</p>
-                      <p className="text-xs text-gray-500">Sam referenced &quot;Building Strong Teacher-Para Partnerships&quot; content directly visible in how she showed up as a true co-teacher. Grace&apos;s small group questioning techniques mirrored Hub instruction frameworks.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <TrendingUp className="w-3 h-3 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-[#1e2749]">Measurable Growth Since November</p>
-                      <p className="text-xs text-gray-500">Peyton showed clear role ownership growth - grading, knowing systems, engaging without prompting. Cindy personally invited the visit, signaling confidence and openness.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-[#35A7FF]/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Star className="w-3 h-3 text-[#35A7FF]" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-[#1e2749]">PreK Team Shining</p>
-                      <p className="text-xs text-gray-500">Both Chris and Lisa&apos;s preschool rooms demonstrated calm, structured, student-centered environments. Lisa logged in to the Hub for the first time after today&apos;s visit.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-[#35A7FF]/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Users className="w-3 h-3 text-[#35A7FF]" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-[#1e2749]">8 Love Notes Delivered</p>
-                      <p className="text-xs text-gray-500">Every observed educator received personalized feedback with specific Hub resource recommendations tied to what was seen in their classroom today.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Day 2 Confirmed Results */}
-              <div className="bg-[#1e2749] rounded-lg p-4 text-white">
-                <h5 className="font-semibold mb-3 flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4" />
-                  Day 2 Results: All Confirmed
-                </h5>
-                <div className="grid md:grid-cols-3 gap-3">
-                  <div className="bg-white/10 rounded-lg p-3">
-                    <p className="text-sm font-medium">Para Foundations</p>
-                    <p className="text-xs opacity-70">Role clarity visible - Sam operating as true co-teacher, Peyton showing ownership growth</p>
-                  </div>
-                  <div className="bg-white/10 rounded-lg p-3">
-                    <p className="text-sm font-medium">Small Group Strategies</p>
-                    <p className="text-xs opacity-70">Grace running number generator, visual anchors, guided review - Hub techniques in action</p>
-                  </div>
-                  <div className="bg-white/10 rounded-lg p-3">
-                    <p className="text-sm font-medium">De-Escalation &amp; Transitions</p>
-                    <p className="text-xs opacity-70">Chris and Lisa both demonstrating warm redirects, calm consistent guidance</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Items */}
-              <div className="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-green-200">
-                <div className="flex items-center gap-2 text-sm text-green-700 bg-green-100 px-3 py-1.5 rounded-full">
-                  <Check className="w-4 h-4" />
-                  8/8 observed staff received Love Notes
-                </div>
-                <div className="flex items-center gap-2 text-sm text-green-700 bg-green-100 px-3 py-1.5 rounded-full">
-                  <Check className="w-4 h-4" />
-                  Hub resources tied to each observation
-                </div>
-                <div className="flex items-center gap-2 text-sm text-green-700 bg-green-100 px-3 py-1.5 rounded-full">
-                  <Check className="w-4 h-4" />
-                  Day 2 complete  - April 8, 2026
-                </div>
-              </div>
-            </div>
-
             {/* IMPLEMENTATION PROGRESS SECTION (merged from Progress tab) */}
             <div className="border-t border-gray-200 pt-6 mt-6">
               <div className="flex justify-between items-center mb-4">
@@ -1290,6 +1191,105 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
+            {/* Day 2 Confirmed: Hub Strategies Are in the Classroom */}
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-6 mb-6">
+              <div className="flex items-start gap-3 mb-4">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Lightbulb className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-[#1e2749] text-lg">Day 2 Confirmed: Hub Strategies Are in the Classroom</h4>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Research shows only 30% of professional development translates to classroom practice. Day 2 confirmed Saunemin is well above that benchmark - Hub content showing up in real instructional moves across every room visited.
+                  </p>
+                </div>
+              </div>
+
+              {/* What Day 2 Accomplished */}
+              <div className="bg-white rounded-lg p-4 mb-4">
+                <h5 className="font-semibold text-[#1e2749] mb-3 flex items-center gap-2">
+                  <Target className="w-4 h-4 text-[#38618C]" />
+                  What Day 2 Accomplished
+                </h5>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3 h-3 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749]">Hub Strategies Confirmed in Practice</p>
+                      <p className="text-xs text-gray-500">Sam referenced &quot;Building Strong Teacher-Para Partnerships&quot; content directly visible in how she showed up as a true co-teacher. Grace&apos;s small group questioning techniques mirrored Hub instruction frameworks.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <TrendingUp className="w-3 h-3 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749]">Measurable Growth Since November</p>
+                      <p className="text-xs text-gray-500">Peyton showed clear role ownership growth - grading, knowing systems, engaging without prompting. Cindy personally invited the visit, signaling confidence and openness.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-[#35A7FF]/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Star className="w-3 h-3 text-[#35A7FF]" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749]">PreK Team Shining</p>
+                      <p className="text-xs text-gray-500">Both Chris and Lisa&apos;s preschool rooms demonstrated calm, structured, student-centered environments. Lisa logged in to the Hub for the first time after today&apos;s visit.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-[#35A7FF]/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Users className="w-3 h-3 text-[#35A7FF]" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749]">8 Love Notes Delivered</p>
+                      <p className="text-xs text-gray-500">Every observed educator received personalized feedback with specific Hub resource recommendations tied to what was seen in their classroom today.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Day 2 Confirmed Results */}
+              <div className="bg-[#1e2749] rounded-lg p-4 text-white">
+                <h5 className="font-semibold mb-3 flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4" />
+                  Day 2 Results: All Confirmed
+                </h5>
+                <div className="grid md:grid-cols-3 gap-3">
+                  <div className="bg-white/10 rounded-lg p-3">
+                    <p className="text-sm font-medium">Para Foundations</p>
+                    <p className="text-xs opacity-70">Role clarity visible - Sam operating as true co-teacher, Peyton showing ownership growth</p>
+                  </div>
+                  <div className="bg-white/10 rounded-lg p-3">
+                    <p className="text-sm font-medium">Small Group Strategies</p>
+                    <p className="text-xs opacity-70">Grace running number generator, visual anchors, guided review - Hub techniques in action</p>
+                  </div>
+                  <div className="bg-white/10 rounded-lg p-3">
+                    <p className="text-sm font-medium">De-Escalation &amp; Transitions</p>
+                    <p className="text-xs opacity-70">Chris and Lisa both demonstrating warm redirects, calm consistent guidance</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Items */}
+              <div className="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-green-200">
+                <div className="flex items-center gap-2 text-sm text-green-700 bg-green-100 px-3 py-1.5 rounded-full">
+                  <Check className="w-4 h-4" />
+                  8/8 observed staff received Love Notes
+                </div>
+                <div className="flex items-center gap-2 text-sm text-green-700 bg-green-100 px-3 py-1.5 rounded-full">
+                  <Check className="w-4 h-4" />
+                  Hub resources tied to each observation
+                </div>
+                <div className="flex items-center gap-2 text-sm text-green-700 bg-green-100 px-3 py-1.5 rounded-full">
+                  <Check className="w-4 h-4" />
+                  Day 2 complete  - April 8, 2026
+                </div>
+              </div>
+            </div>
+
             {/* From Hub to Classroom */}
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
               <div className="flex items-center gap-2 mb-4">
@@ -1335,19 +1335,6 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
-            {/* Where We're Growing */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <h4 className="font-medium text-blue-800 mb-2 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" />
-                Where We&apos;re Growing
-              </h4>
-              <ul className="space-y-2 text-sm text-blue-700">
-                <li>• Hub access currently limited to paras only (teachers don&apos;t have accounts yet)</li>
-                <li>• Amber and Dan have not yet logged into the Hub - pairing with Sam or Haylie recommended</li>
-                <li>• Dedicated PD time for paras to explore resources together would accelerate impact</li>
-              </ul>
-            </div>
-
             {/* Learning Hub Data Context Note */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
@@ -1367,61 +1354,49 @@ export default function SauneminDashboard() {
               title="Hub Engagement"
               subtitle="Learning Hub activity across 12 staff members"
               icon={<Laptop className="w-5 h-5" />}
-              badge="75% Active"
+              badge="100% Active"
               badgeColor="bg-green-100 text-green-700"
             >
               <div className="pt-4 space-y-4">
-                {/* Power Users */}
+                {/* Most Active */}
                 <div>
-                  <p className="text-xs font-medium text-green-600 uppercase mb-2">Power Users (3+ logins)</p>
+                  <p className="text-xs font-medium text-green-600 uppercase mb-2">Most Active</p>
                   <div className="grid sm:grid-cols-2 gap-2">
                     {hubUsers.filter(u => u.signIns >= 3).map((user, i) => (
-                      <div key={i} className="flex items-center justify-between bg-green-50 rounded-lg p-3">
+                      <div key={i} className="flex items-center bg-green-50 rounded-lg p-3">
                         <div>
                           <p className="font-medium text-[#1e2749] text-sm">{user.name}</p>
                           <p className="text-xs text-gray-500">{user.role}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold text-green-600">{user.signIns}</p>
-                          <p className="text-xs text-gray-500">sign-ins</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Getting Started */}
+                {/* Exploring */}
                 <div>
-                  <p className="text-xs font-medium text-[#35A7FF] uppercase mb-2">Getting Started (1-2 logins)</p>
+                  <p className="text-xs font-medium text-[#35A7FF] uppercase mb-2">Exploring</p>
                   <div className="grid sm:grid-cols-2 gap-2">
                     {hubUsers.filter(u => u.signIns >= 1 && u.signIns < 3).map((user, i) => (
-                      <div key={i} className="flex items-center justify-between bg-blue-50 rounded-lg p-3">
+                      <div key={i} className="flex items-center bg-blue-50 rounded-lg p-3">
                         <div>
                           <p className="font-medium text-[#1e2749] text-sm">{user.name}</p>
                           <p className="text-xs text-gray-500">{user.role}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold text-[#35A7FF]">{user.signIns}</p>
-                          <p className="text-xs text-gray-500">sign-ins</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Need Support */}
+                {/* Less Active */}
                 <div>
-                  <p className="text-xs font-medium text-[#E07A5F] uppercase mb-2">Need Support (0 logins)</p>
+                  <p className="text-xs font-medium text-[#E07A5F] uppercase mb-2">Less Active</p>
                   <div className="grid sm:grid-cols-2 gap-2">
                     {hubUsers.filter(u => u.signIns === 0).map((user, i) => (
-                      <div key={i} className="flex items-center justify-between bg-orange-50 rounded-lg p-3">
+                      <div key={i} className="flex items-center bg-orange-50 rounded-lg p-3">
                         <div>
                           <p className="font-medium text-[#1e2749] text-sm">{user.name}</p>
                           <p className="text-xs text-gray-500">{user.role}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold text-[#E07A5F]">0</p>
-                          <p className="text-xs text-gray-500">sign-ins</p>
                         </div>
                       </div>
                     ))}
