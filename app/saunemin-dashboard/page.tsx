@@ -1412,25 +1412,6 @@ export default function SauneminDashboard() {
               </div>
             </Accordion>
 
-            {/* Recommendation: Support Non-Active Users */}
-            <div className="bg-white border-l-4 border-[#E07A5F] rounded-r-xl p-5 shadow-sm mb-6">
-              <div className="flex items-center gap-2 mb-2">
-                <Lightbulb className="w-5 h-5 text-[#E07A5F]" />
-                <h3 className="font-semibold text-[#1e2749]">Recommendation: Support Non-Active Users</h3>
-              </div>
-              <p className="text-sm text-gray-600 mb-3">
-                <strong>Amber and Dan</strong> haven&apos;t logged into the Hub yet. Consider pairing them with power users like Sam or Haylie, or scheduling a dedicated Hub exploration session during PD time. Lisa logged in for the first time after today&apos;s visit - momentum is building.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1 text-xs bg-[#E07A5F]/10 text-[#E07A5F] px-2 py-1 rounded-full">
-                  <Users className="w-3 h-3" /> Pair with power users
-                </span>
-                <span className="inline-flex items-center gap-1 text-xs bg-[#E07A5F]/10 text-[#E07A5F] px-2 py-1 rounded-full">
-                  <Clock className="w-3 h-3" /> Schedule PD Hub time
-                </span>
-              </div>
-            </div>
-
             {/* Recommended Resources Section */}
             <div className="bg-gradient-to-r from-[#38618C] to-[#35A7FF] rounded-xl p-5 text-white mb-6">
               <div className="flex items-center gap-2 mb-3">
@@ -1460,24 +1441,6 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
-            {/* SECTION C: Sample Love Note */}
-            <Accordion
-              id="love-notes"
-              title="Sample Love Note"
-              subtitle="Personalized feedback from April 8, 2026 observations"
-              icon={<Heart className="w-5 h-5" />}
-              badge="8 Sent Today"
-              badgeColor="bg-pink-100 text-pink-700"
-            >
-              <div className="pt-4">
-                <div className="border-l-4 border-[#E07A5F] bg-[#E07A5F]/5 rounded-r-lg p-4">
-                  <p className="text-gray-700 italic">
-                    &quot;When you found out a student had missed the lesson on conjunctions, you didn&apos;t skip over it - you sat down and taught it. &apos;How would we know if... / What could you use if... / Yesterday we learned...&apos; - those question stems are what great instruction looks like.&quot;
-                  </p>
-                  <p className="text-sm text-gray-500 mt-3"> - From Haylie&apos;s April 8 Love Note</p>
-                </div>
-              </div>
-            </Accordion>
             </div>
 
             {/* Blog & Weekly Resources Promotion */}
