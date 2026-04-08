@@ -462,10 +462,16 @@ export default function SauneminDashboard() {
     { name: 'Dan Irish', role: 'PA/Perm. Sub', signIns: 0, lastSignIn: 'Never' },
   ];
 
-  // Observed staff
+  // Observed staff - Day 1
   const observedStaff = [
     'Haylie Moss', 'Brenda Reynolds', 'Sam Woodcock', 'Chris Logan', 'Peyton Cheek',
     'Cindy Palen', 'Lisa Heiser', 'Grace McEathron', 'Karissa Gray'
+  ];
+
+  // Observed staff - Day 2
+  const observedStaffDay2 = [
+    'Karissa Gray', 'Haylie Moss', 'Sam Woodcock', 'Peyton Cheek',
+    'Grace McEathron', 'Chris Logan', 'Lisa Heiser', 'Cindy Palen'
   ];
 
   // Tab configuration (removed 2025-26 tab - redundant with other content)
@@ -497,7 +503,7 @@ export default function SauneminDashboard() {
       statusColor: 'green',
       details: [
         'All 2025-26 contract deliverables fulfilled as of April 8, 2026',
-        'Both observation days complete  - 9 Love Notes delivered',
+        'Both observation days complete  - 17 total Love Notes delivered',
         'Executive Leadership Session complete  - April 8, 2026',
         'Hub engagement directly linked to stronger classroom practice',
       ],
@@ -510,7 +516,7 @@ export default function SauneminDashboard() {
         { label: 'Hub access activated  - staff onboarded', date: 'Fall 2025' },
         { label: 'Observation Day 1  - 9 staff observed, 9 Love Notes delivered', date: 'Nov 19, 2025' },
         { label: 'Hub-to-classroom connection confirmed  - top Hub users showed strongest practice', date: 'Nov 2025' },
-        { label: 'Observation Day 2  - Implementation focus, Hub strategies in classroom practice', date: 'April 8, 2026' },
+        { label: 'Observation Day 2  - 8 staff observed, 8 Love Notes delivered. Hub strategies visible in practice.', date: 'April 8, 2026' },
         { label: 'Executive Leadership Session  - completed with Gary & Michael', date: 'April 8, 2026' },
       ],
       inProgress: [
@@ -528,16 +534,16 @@ export default function SauneminDashboard() {
       perEducatorSublabel: 'per staff member  - Hub access + full-day PD visit + observations',
       implementationRate: '75%',
       implementationSublabel: 'Hub activation  - 9 of 12 staff logged in',
-      coursesCompleted: 9,
-      coursesCompletedSublabel: 'personalized Love Notes delivered  - every observed staff member',
+      coursesCompleted: 17,
+      coursesCompletedSublabel: 'total Love Notes delivered across both observation days',
       retentionStat: '16',
       retentionSublabel: 'different courses being explored by your team',
     },
 
     // ZONE 2C - Quick win counter
     quickWin: {
-      count: 9,
-      line1: '9 Saunemin staff members received personalized Love Notes after Observation Day 1.',
+      count: 17,
+      line1: '17 total Love Notes delivered across both Saunemin observation days.',
       line2: 'Every observed educator  - seen, celebrated, and connected to targeted Hub resources.',
     },
 
@@ -545,8 +551,8 @@ export default function SauneminDashboard() {
     actions: {
       nextToUnlock: [
         {
-          label: 'Support 3 staff members not yet in the Hub',
-          detail: 'Amber, Lisa, and Dan haven\'t logged in yet  - consider pairing with Sam or Haylie',
+          label: 'Support 2 staff members not yet in the Hub',
+          detail: 'Amber and Dan haven\'t logged in yet  - consider pairing with Sam or Haylie (Lisa logged in after today\'s visit)',
           owner: 'partner',
           cta: 'Contact TDI for support',
           ctaHref: 'mailto:rae@teachersdeserveit.com?subject=Saunemin%20Hub%20Support',
@@ -562,18 +568,18 @@ export default function SauneminDashboard() {
       tdiHandling: [
         {
           label: 'Observation Day 2 complete  - April 8, 2026',
-          detail: 'Implementation focus observation completed successfully',
+          detail: '8 staff observed, 8 Love Notes delivered. Hub strategies confirmed in classroom practice.',
         },
         {
           label: 'Love Notes ready for all observed staff',
-          detail: 'Personalized feedback delivered after every observation visit',
+          detail: 'Personalized feedback delivered after every observation visit  - 17 total across both days',
         },
       ],
       alreadyInMotion: [
         { label: 'Observation Day 2', date: 'April 8, 2026', status: 'complete' },
         { label: 'Executive Leadership Session', date: 'April 8, 2026', status: 'complete' },
         { label: 'Hub access active  - 9 staff learning', date: 'Ongoing', status: 'scheduled' },
-        { label: '9 Love Notes delivered', date: 'Nov 19, 2025', status: 'complete' },
+        { label: '17 Love Notes delivered', date: 'Nov 19, 2025 + April 8, 2026', status: 'complete' },
       ],
     },
   };
@@ -621,7 +627,7 @@ export default function SauneminDashboard() {
             </div>
             <div className="h-8 w-px bg-white/30" />
             <div className="text-center">
-              <div className="text-2xl font-bold">9</div>
+              <div className="text-2xl font-bold">17</div>
               <div className="text-white/70 text-xs">Love Notes</div>
             </div>
             <div className="h-8 w-px bg-white/30" />
@@ -1149,7 +1155,7 @@ export default function SauneminDashboard() {
                       <span className="text-xs font-bold text-green-600 w-20 text-right">Strong ✓</span>
                     </div>
                   </div>
-                  <p className="text-xs text-green-700 mt-2 ml-31">Excellent collaboration observed Nov 2025 -  seamless teamwork across classrooms</p>
+                  <p className="text-xs text-green-700 mt-2 ml-31">Confirmed both visits - Sam operating as true co-teacher, Grace and Haylie running seamless small group partnerships</p>
                 </div>
 
                 {/* Retention Intent (higher is better) */}
@@ -1209,9 +1215,9 @@ export default function SauneminDashboard() {
                   <Lightbulb className="w-5 h-5 text-green-600" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-[#1e2749] text-lg">Recommendation: Bridge the Implementation Gap</h4>
+                  <h4 className="font-bold text-[#1e2749] text-lg">Day 2 Confirmed: Hub Strategies Are in the Classroom</h4>
                   <p className="text-sm text-gray-600 mt-1">
-                    Research shows only 30% of professional development translates to classroom practice. Saunemin&apos;s November observations showed <strong>100% of observed staff</strong> implementing at least one strategy -  that&apos;s exceptional! Day 2 confirmed sustained momentum and deepened implementation.
+                    Research shows only 30% of professional development translates to classroom practice. Day 2 confirmed Saunemin is well above that benchmark - Hub content showing up in real instructional moves across every room visited.
                   </p>
                 </div>
               </div>
@@ -1224,62 +1230,62 @@ export default function SauneminDashboard() {
                 </h5>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-[#35A7FF]/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <TrendingUp className="w-3 h-3 text-[#35A7FF]" />
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3 h-3 text-green-600" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-[#1e2749]">Measure Progress After Feedback</p>
-                      <p className="text-xs text-gray-500">See how educators have grown since receiving their personalized Love Notes and Hub resources</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-[#35A7FF]/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Eye className="w-3 h-3 text-[#35A7FF]" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-[#1e2749]">Observe Strategy Implementation</p>
-                      <p className="text-xs text-gray-500">Look for specific Hub strategies showing up in daily practice -  not just logins, but real change</p>
+                      <p className="text-sm font-medium text-[#1e2749]">Hub Strategies Confirmed in Practice</p>
+                      <p className="text-xs text-gray-500">Sam referenced &quot;Building Strong Teacher-Para Partnerships&quot; content directly visible in how she showed up as a true co-teacher. Grace&apos;s small group questioning techniques mirrored Hub instruction frameworks.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Star className="w-3 h-3 text-green-600" />
+                      <TrendingUp className="w-3 h-3 text-green-600" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-[#1e2749]">Build on Current Strengths</p>
-                      <p className="text-xs text-gray-500">Celebrate wins like Sam&apos;s student rapport, Lisa&apos;s PreK systems, and Cindy&apos;s phonics instruction</p>
+                      <p className="text-sm font-medium text-[#1e2749]">Measurable Growth Since November</p>
+                      <p className="text-xs text-gray-500">Peyton showed clear role ownership growth - grading, knowing systems, engaging without prompting. Cindy personally invited the visit, signaling confidence and openness.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Users className="w-3 h-3 text-green-600" />
+                    <div className="w-6 h-6 bg-[#35A7FF]/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Star className="w-3 h-3 text-[#35A7FF]" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-[#1e2749]">Strengthen Para-Teacher Collaboration</p>
-                      <p className="text-xs text-gray-500">Deepen the already-strong teamwork we observed between Haylie, Grace, and their teachers</p>
+                      <p className="text-sm font-medium text-[#1e2749]">PreK Team Shining</p>
+                      <p className="text-xs text-gray-500">Both Chris and Lisa&apos;s preschool rooms demonstrated calm, structured, student-centered environments. Lisa logged in to the Hub for the first time after today&apos;s visit.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-[#35A7FF]/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Users className="w-3 h-3 text-[#35A7FF]" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749]">8 Love Notes Delivered</p>
+                      <p className="text-xs text-gray-500">Every observed educator received personalized feedback with specific Hub resource recommendations tied to what was seen in their classroom today.</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Day 2 Focus Areas */}
+              {/* Day 2 Confirmed Results */}
               <div className="bg-[#1e2749] rounded-lg p-4 text-white">
                 <h5 className="font-semibold mb-3 flex items-center gap-2">
-                  <ClipboardList className="w-4 h-4" />
-                  Day 2 Observation Focus Areas
+                  <CheckCircle className="w-4 h-4" />
+                  Day 2 Results: All Confirmed
                 </h5>
                 <div className="grid md:grid-cols-3 gap-3">
                   <div className="bg-white/10 rounded-lg p-3">
                     <p className="text-sm font-medium">Para Foundations</p>
-                    <p className="text-xs opacity-70">Are role clarity & boundaries clearer?</p>
+                    <p className="text-xs opacity-70">Role clarity visible - Sam operating as true co-teacher, Peyton showing ownership growth</p>
                   </div>
                   <div className="bg-white/10 rounded-lg p-3">
                     <p className="text-sm font-medium">Small Group Strategies</p>
-                    <p className="text-xs opacity-70">New techniques from Hub courses?</p>
+                    <p className="text-xs opacity-70">Grace running number generator, visual anchors, guided review - Hub techniques in action</p>
                   </div>
                   <div className="bg-white/10 rounded-lg p-3">
-                    <p className="text-sm font-medium">De-Escalation Tools</p>
-                    <p className="text-xs opacity-70">Calmer transitions & redirections?</p>
+                    <p className="text-sm font-medium">De-Escalation &amp; Transitions</p>
+                    <p className="text-xs opacity-70">Chris and Lisa both demonstrating warm redirects, calm consistent guidance</p>
                   </div>
                 </div>
               </div>
@@ -1288,11 +1294,11 @@ export default function SauneminDashboard() {
               <div className="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-green-200">
                 <div className="flex items-center gap-2 text-sm text-green-700 bg-green-100 px-3 py-1.5 rounded-full">
                   <Check className="w-4 h-4" />
-                  9/9 staff received personalized feedback
+                  8/8 observed staff received Love Notes
                 </div>
                 <div className="flex items-center gap-2 text-sm text-green-700 bg-green-100 px-3 py-1.5 rounded-full">
                   <Check className="w-4 h-4" />
-                  Hub resources shared with each educator
+                  Hub resources tied to each observation
                 </div>
                 <div className="flex items-center gap-2 text-sm text-green-700 bg-green-100 px-3 py-1.5 rounded-full">
                   <Check className="w-4 h-4" />
@@ -1370,29 +1376,80 @@ export default function SauneminDashboard() {
                   </div>
                 </Accordion>
 
-                {/* Day 2 - April 8, 2026 */}
+                {/* Day 2 - April 8, 2026 - REAL DATA */}
                 <Accordion
                   id="observation-day2"
-                  title="Day 2 - April 8, 2026"
-                  subtitle="On-Site Day 2 - Implementation Focus"
+                  title="April 8, 2026 - Day 2"
+                  subtitle="On-Site Implementation Observation"
                   icon={<Calendar className="w-5 h-5" />}
                   badge="Complete"
                   badgeColor="bg-green-100 text-green-700"
                 >
                   <div className="pt-4 space-y-4">
                     <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                      <p className="text-sm font-medium text-green-800 mb-1">Completed April 8, 2026</p>
+                      <p className="text-sm font-medium text-green-800 mb-1">8 staff observed &bull; 8 Love Notes delivered</p>
                       <p className="text-sm text-green-700">
-                        Second on-site observation day focused on implementation  - Hub strategies showing up in classroom practice.
+                        Hub strategies confirmed in classroom practice. Growth since November visible across every room. Cindy personally invited the visit - a sign of real educator confidence.
                       </p>
                     </div>
 
                     <div>
-                      <p className="text-sm font-medium text-gray-700 mb-2">Focus Areas:</p>
-                      <ul className="space-y-1 text-sm text-gray-600">
-                        <li className="flex items-center gap-2"><Target className="w-4 h-4 text-[#38618C]" /> Re-observe for implementation evidence</li>
-                        <li className="flex items-center gap-2"><Target className="w-4 h-4 text-[#38618C]" /> Include teachers if Hub access expanded</li>
-                        <li className="flex items-center gap-2"><Target className="w-4 h-4 text-[#38618C]" /> Hands-on Hub exploration session</li>
+                      <p className="text-sm font-medium text-gray-700 mb-2">Staff Observed:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {observedStaffDay2.map((name, i) => (
+                          <span key={i} className="bg-[#38618C]/10 text-[#38618C] px-3 py-1 rounded-full text-sm">
+                            {name.split(' ')[0]} {name.split(' ')[1]?.[0]}.
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-3">What We Saw:</p>
+                      <div className="space-y-3">
+                        <div className="bg-white border border-gray-100 rounded-lg p-3 shadow-sm">
+                          <p className="text-sm font-semibold text-[#1e2749] mb-1">Karissa Gray</p>
+                          <p className="text-xs text-gray-600">Scanning the room and jumping into action immediately - pencil sharpened to ease a transition before it became a problem. Walking the room throughout, bending to eye level, coaching capitalization with guided questioning rather than giving answers.</p>
+                        </div>
+                        <div className="bg-white border border-gray-100 rounded-lg p-3 shadow-sm">
+                          <p className="text-sm font-semibold text-[#1e2749] mb-1">Haylie Moss</p>
+                          <p className="text-xs text-gray-600">Supporting students writing self-affirmations (&quot;I love myself,&quot; &quot;I am strong&quot;) - right there co-creating. Sounding out words side-by-side at the small curved table. Gradual release in action: reading directions, handing a highlighter, letting students try on their own. Closing question: &quot;What&apos;s one more thing you&apos;d like to be stronger at?&quot; - growth mindset built right in.</p>
+                        </div>
+                        <div className="bg-white border border-gray-100 rounded-lg p-3 shadow-sm">
+                          <p className="text-sm font-semibold text-[#1e2749] mb-1">Sam Woodcock</p>
+                          <p className="text-xs text-gray-600">Co-teacher energy - loud, energetic, full of initiative. Has her own desk and space in the room (true partner, not aide). Hub data showed engagement with &quot;Building Strong Teacher-Para Partnerships&quot; - and it showed. Organizing answer keys, prepping for the teacher, offering to staple for a student. Student relationships incredibly strong.</p>
+                        </div>
+                        <div className="bg-white border border-gray-100 rounded-lg p-3 shadow-sm">
+                          <p className="text-sm font-semibold text-[#1e2749] mb-1">Peyton Cheek</p>
+                          <p className="text-xs text-gray-600">Real growth since November - got right to work grading papers without being asked. Knows the systems: the grading bin, where answer keys are, how things run. Greeted a student warmly on arrival. Asking the teacher about point values - engaged with the instruction, not just the task.</p>
+                        </div>
+                        <div className="bg-white border border-gray-100 rounded-lg p-3 shadow-sm">
+                          <p className="text-sm font-semibold text-[#1e2749] mb-1">Grace McEathron</p>
+                          <p className="text-xs text-gray-600">Small group done right. Random number generator to call on students - every student stays on their toes. Holding up hands to show the 5 elements of a sentence (visual anchor). Checking elements out loud: &quot;Did he answer the who, what, where, when, and why?&quot; The Ms. Woodcock handstand joke? The room giggled. She knows exactly how to make learning feel safe and fun.</p>
+                        </div>
+                        <div className="bg-white border border-gray-100 rounded-lg p-3 shadow-sm">
+                          <p className="text-sm font-semibold text-[#1e2749] mb-1">Chris Logan</p>
+                          <p className="text-xs text-gray-600">Prepping supplies during coloring - transitions smooth, learning keeps moving. Warm redirect: &quot;Great! Let&apos;s put your sticker away and find your center!&quot; Monitoring the whole room while leading 1:1 art work simultaneously. Sitting right at the table with students - physical presence at their level. Reminders were encouraging, not corrective.</p>
+                        </div>
+                        <div className="bg-white border border-gray-100 rounded-lg p-3 shadow-sm">
+                          <p className="text-sm font-semibold text-[#1e2749] mb-1">Lisa Heiser</p>
+                          <p className="text-xs text-gray-600">Calm, consistent redirects: &quot;Let&apos;s keep our elbows in,&quot; &quot;Keep going!&quot; Celebrating students by name - &quot;Love the hair Isaiah!&quot; Students managing their own name cards at centers (self-directed transitions). Patient with a struggling student through multiple gentle reminders - no frustration, just steady support. High five that made a student light up.</p>
+                        </div>
+                        <div className="bg-white border border-gray-100 rounded-lg p-3 shadow-sm">
+                          <p className="text-sm font-semibold text-[#1e2749] mb-1">Cindy Palen</p>
+                          <p className="text-xs text-gray-600">Personally invited this visit - that confidence speaks volumes. Guided telling time with intentional questioning: &quot;Is the minute hand on the right side or left side?&quot; Caught a misconception calmly: &quot;Oops! This is the hour hand.&quot; Checked in on a student who said he was &quot;doing terrible&quot; - stopped, saw him, made sure he was okay before anything else. Retaught quietly during the lesson rather than waiting.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <p className="text-sm font-medium text-blue-800 mb-2">Hub Strategies Visible in Practice:</p>
+                      <ul className="text-sm text-blue-700 space-y-1">
+                        <li>&bull; Sam: &quot;Building Strong Teacher-Para Partnerships&quot; content directly observable in co-teacher role</li>
+                        <li>&bull; Grace: Small group questioning strategies aligned with &quot;Effective Small-Group Instruction&quot; course</li>
+                        <li>&bull; Haylie: Gradual release and sentence starters from Hub resources in active use</li>
+                        <li>&bull; Chris &amp; Lisa: PreK classroom systems reflecting &quot;Calm Classrooms&quot; and PreK toolkit approaches</li>
+                        <li>&bull; Cindy: Push-in support moves consistent with SpEd Para Toolkit framework</li>
                       </ul>
                     </div>
                   </div>
@@ -1405,11 +1462,11 @@ export default function SauneminDashboard() {
               <div className="flex items-center gap-2 mb-4">
                 <TrendingUp className="w-5 h-5 text-[#38618C]" />
                 <h3 className="font-semibold text-[#1e2749]">From Hub to Classroom</h3>
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full ml-auto">Evidence</span>
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full ml-auto">Confirmed - Both Days</span>
               </div>
 
               <p className="text-sm text-gray-600 mb-4">
-                We&apos;re already seeing connections between Learning Hub engagement and classroom practice:
+                Day 2 confirmed what Day 1 hinted at - Hub engagement is showing up in real classroom practice:
               </p>
 
               <div className="space-y-3">
@@ -1418,8 +1475,8 @@ export default function SauneminDashboard() {
                     <Check className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-[#1e2749]">Most Active Hub Users = Strongest Practice</p>
-                    <p className="text-xs text-gray-600">Sam (4 logins), Cindy (4 logins), and Haylie (3 logins) demonstrated the strongest instructional strategies during observations.</p>
+                    <p className="text-sm font-medium text-[#1e2749]">Most Active Hub Users = Strongest Practice (Confirmed Day 2)</p>
+                    <p className="text-xs text-gray-600">Sam (4 logins) and Cindy (4 logins) demonstrated the most sophisticated instructional moves. Sam&apos;s Hub engagement with &quot;Building Strong Teacher-Para Partnerships&quot; was directly visible in how she functions as a true co-teacher.</p>
                   </div>
                 </div>
 
@@ -1428,8 +1485,8 @@ export default function SauneminDashboard() {
                     <Eye className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-[#1e2749]">Para-Teacher Collaboration Shining</p>
-                    <p className="text-xs text-gray-600">The &quot;Building Strong Teacher-Para Partnerships&quot; course content was visible in how Haylie and Grace work seamlessly with their classroom teachers.</p>
+                    <p className="text-sm font-medium text-[#1e2749]">Growth Since November Documented</p>
+                    <p className="text-xs text-gray-600">Peyton showed clear ownership growth - from uncertain to systems-aware and initiative-driven. Cindy&apos;s confidence leap: she personally invited this visit. Real evidence of educator growth, not just PD attendance.</p>
                   </div>
                 </div>
 
@@ -1438,8 +1495,8 @@ export default function SauneminDashboard() {
                     <Target className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-[#1e2749]">Day 2 Focus: Implementation Confirmed</p>
-                    <p className="text-xs text-gray-600">We looked for specific strategies from Para Foundations, De-Escalation, and Small Group Instruction showing up in practice.</p>
+                    <p className="text-sm font-medium text-[#1e2749]">PreK Team: Calm, Structured, Student-Centered</p>
+                    <p className="text-xs text-gray-600">Both Chris and Lisa demonstrated classroom environments that reflect Hub content on early childhood practice - smooth transitions, positive redirection, student ownership systems, warm relationships.</p>
                   </div>
                 </div>
               </div>
@@ -1453,8 +1510,8 @@ export default function SauneminDashboard() {
               </h4>
               <ul className="space-y-2 text-sm text-blue-700">
                 <li>• Hub access currently limited to paras only (teachers don&apos;t have accounts yet)</li>
-                <li>• Dedicated PD time for paras to explore resources</li>
-                <li>• Moving from completion to implementation evidence</li>
+                <li>• Amber and Dan have not yet logged into the Hub - pairing with Sam or Haylie recommended</li>
+                <li>• Dedicated PD time for paras to explore resources together would accelerate impact</li>
               </ul>
             </div>
 
@@ -1541,7 +1598,7 @@ export default function SauneminDashboard() {
                 {/* Recommendation */}
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
                   <p className="text-sm text-amber-800">
-                    <strong>Recommendation:</strong> 3 staff members haven&apos;t logged in yet. Consider scheduling the next observation day to include a hands-on Hub exploration session.
+                    <strong>Recommendation:</strong> Amber and Dan haven&apos;t logged in yet. Lisa logged in for the first time after today&apos;s visit - momentum is building. Consider pairing Amber and Dan with Sam or Haylie during PD time.
                   </p>
                 </div>
               </div>
@@ -1554,7 +1611,7 @@ export default function SauneminDashboard() {
                 <h3 className="font-semibold text-[#1e2749]">Recommendation: Support Non-Active Users</h3>
               </div>
               <p className="text-sm text-gray-600 mb-3">
-                <strong>Amber, Lisa, and Dan</strong> haven&apos;t logged into the Hub yet. Consider pairing them with power users like Sam or Haylie, or scheduling a dedicated Hub exploration session during PD time.
+                <strong>Amber and Dan</strong> haven&apos;t logged into the Hub yet. Consider pairing them with power users like Sam or Haylie, or scheduling a dedicated Hub exploration session during PD time. Lisa logged in for the first time after today&apos;s visit - momentum is building.
               </p>
               <div className="flex flex-wrap gap-2">
                 <span className="inline-flex items-center gap-1 text-xs bg-[#E07A5F]/10 text-[#E07A5F] px-2 py-1 rounded-full">
@@ -1576,41 +1633,21 @@ export default function SauneminDashboard() {
                 Based on November observations, here are Hub resources specifically relevant for Saunemin&apos;s para team:
               </p>
               <div className="grid sm:grid-cols-2 gap-3">
-                <a
-                  href="https://tdi.thinkific.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors"
-                >
-                  <div className="font-semibold text-sm">Para Strategies Collection</div>
-                  <div className="text-xs text-white/70 mt-1">Behavior support & classroom management</div>
+                <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors">
+                  <div className="font-semibold text-sm">SpEd Para Toolkit</div>
+                  <div className="text-xs text-white/70 mt-1">Push-in support, misconception catches, real-time reteaching (Cindy)</div>
                 </a>
-                <a
-                  href="https://tdi.thinkific.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors"
-                >
-                  <div className="font-semibold text-sm">Building Student Relationships</div>
-                  <div className="text-xs text-white/70 mt-1">Connection-first approaches</div>
+                <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors">
+                  <div className="font-semibold text-sm">Effective Small-Group Instruction</div>
+                  <div className="text-xs text-white/70 mt-1">Questioning strategies and structure (Grace, Haylie)</div>
                 </a>
-                <a
-                  href="https://tdi.thinkific.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors"
-                >
-                  <div className="font-semibold text-sm">Quick Wins for Paras</div>
-                  <div className="text-xs text-white/70 mt-1">5-minute strategies that work</div>
+                <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors">
+                  <div className="font-semibold text-sm">Pre-K Para Toolkit</div>
+                  <div className="text-xs text-white/70 mt-1">Early childhood strategies and transitions (Chris, Lisa)</div>
                 </a>
-                <a
-                  href="https://tdi.thinkific.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors"
-                >
-                  <div className="font-semibold text-sm">Teacher-Para Collaboration</div>
-                  <div className="text-xs text-white/70 mt-1">Communication & teamwork tools</div>
+                <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors">
+                  <div className="font-semibold text-sm">PA Quick Wins Menu</div>
+                  <div className="text-xs text-white/70 mt-1">High-impact moves across any classroom (Peyton, Karissa)</div>
                 </a>
               </div>
             </div>
@@ -1619,17 +1656,17 @@ export default function SauneminDashboard() {
             <Accordion
               id="love-notes"
               title="Sample Love Note"
-              subtitle="Personalized feedback from November observations"
+              subtitle="Personalized feedback from April 8, 2026 observations"
               icon={<Heart className="w-5 h-5" />}
-              badge="9 Sent"
+              badge="8 Sent Today"
               badgeColor="bg-pink-100 text-pink-700"
             >
               <div className="pt-4">
                 <div className="border-l-4 border-[#E07A5F] bg-[#E07A5F]/5 rounded-r-lg p-4">
                   <p className="text-gray-700 italic">
-                    &quot;Your classroom had such a great vibe today -  [Sam&apos;s] rapport with students is incredible. The jokes, the trust, the genuine connection you&apos;ve built... that&apos;s the foundation everything else is built on.&quot;
+                    &quot;When you found out a student had missed the lesson on conjunctions, you didn&apos;t skip over it - you sat down and taught it. &apos;How would we know if... / What could you use if... / Yesterday we learned...&apos; - those question stems are what great instruction looks like.&quot;
                   </p>
-                  <p className="text-sm text-gray-500 mt-3"> -  From November 19 observations</p>
+                  <p className="text-sm text-gray-500 mt-3"> - From Haylie&apos;s April 8 Love Note</p>
                 </div>
               </div>
             </Accordion>
@@ -2015,7 +2052,7 @@ export default function SauneminDashboard() {
             <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
               <h3 className="text-xl font-bold mb-3">Why ACCELERATE?</h3>
               <p className="text-white/90">
-                Saunemin&apos;s paras completed a full partnership year - 9 Love Notes delivered, 75% Hub activation, and real strategies making it into classrooms. Gary set out to give paras positive feedback AND growth areas. Year 2 delivers exactly that - with observation cycles, baseline data, and KPI tracking that Gary can bring to the board. The foundation is built. Now let&apos;s scale it.
+                Saunemin&apos;s paras completed a full partnership year - 17 Love Notes delivered across both observation days, 75% Hub activation, and Hub strategies confirmed in classroom practice on Day 2. Gary set out to give paras positive feedback AND growth areas. That&apos;s exactly what happened. Year 2 delivers the same for the full building - with observation cycles, baseline data, and KPI tracking that Gary can bring to the board.
               </p>
             </div>
 
