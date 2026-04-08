@@ -534,8 +534,8 @@ export default function SauneminDashboard() {
     investment: {
       perEducator: '$550',
       perEducatorSublabel: 'per staff member  - Hub access + full-day PD visit + observations',
-      implementationRate: '75%',
-      implementationSublabel: 'Hub activation  - 9 of 12 staff logged in',
+      implementationRate: '100%',
+      implementationSublabel: 'Hub activation  - 12 of 12 staff logged in',
       coursesCompleted: 17,
       coursesCompletedSublabel: 'total Love Notes delivered across both observation days',
       retentionStat: '16',
