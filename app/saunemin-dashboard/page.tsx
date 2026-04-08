@@ -491,9 +491,9 @@ export default function SauneminDashboard() {
   const overviewData = {
     // ZONE 1 - Snapshot
     stats: {
-      educatorsEnrolled: { value: 9, total: 12, label: 'Staff Active', sublabel: '75% Hub login rate' },
+      educatorsEnrolled: { value: 12, total: 12, label: 'Staff Active', sublabel: '100% Hub login rate' },
       deliverables: { completed: 6, total: 6, label: 'Deliverables', sublabel: 'all contracted deliverables complete' },
-      hubEngagement: { percent: 75, raw: '9/12', label: 'Hub Engagement', sublabel: '9 of 12 staff logged in' },
+      hubEngagement: { percent: 100, raw: '12/12', label: 'Hub Engagement', sublabel: '12 of 12 staff logged in' },
       phase: { name: 'IGNITE', number: 1, total: 3, label: 'Phase Complete', sublabel: 'All deliverables fulfilled' },
     },
 
