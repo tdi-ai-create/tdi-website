@@ -190,11 +190,11 @@ export default function SauneminDashboard() {
 
     // Journey
     'obs-nov-2025': true,
-    'obs-day2': false,
+    'obs-day2': true,
 
     // Progress (implementation tab)
     'observation-nov': true,
-    'observation-day2': false,
+    'observation-day2': true,
     'hub-engagement': true,
     'phase-1-details': true,
     'phase-2-details': false,
@@ -210,8 +210,8 @@ export default function SauneminDashboard() {
     'timeline-may': true,
     'timeline-sept': false,
     'timeline-nov': true,
-    'timeline-day2': false,
-    'timeline-spring': false,
+    'timeline-day2': true,
+    'timeline-spring': true,
 
     // Team
     'contact-options': true,
@@ -341,9 +341,9 @@ export default function SauneminDashboard() {
     {
       id: 1,
       name: 'IGNITE',
-      status: 'Current Phase',
-      isComplete: false,
-      isCurrent: true,
+      status: 'Completed',
+      isComplete: true,
+      isCurrent: false,
       isLocked: false,
       description: 'Building baseline understanding and relationships',
       includes: [
@@ -355,12 +355,11 @@ export default function SauneminDashboard() {
       completed: [
         'Hub access activated for 12 staff members',
         'First on-site observation day (Nov 19)',
-        '9 personalized Love Notes sent'
+        '9 personalized Love Notes sent',
+        'Second on-site observation day (April 8, 2026)',
+        'Executive Leadership Session (April 8, 2026)'
       ],
-      pending: [
-        'Second observation day (April 8, 2026)',
-        'Spring leadership meeting'
-      ],
+      pending: [],
       outcomes: [
         { label: 'Observations', value: '9', sublabel: 'Completed' },
         { label: 'Love Notes Sent', value: '9', sublabel: 'Personalized feedback' }
@@ -411,13 +410,13 @@ export default function SauneminDashboard() {
       {
         name: 'IGNITE',
         number: 1,
-        status: 'current' as 'complete' | 'current' | 'upcoming',
+        status: 'complete' as 'complete' | 'current' | 'upcoming',
         deliverables: [
           { label: 'Hub access activated for 12 staff members', complete: true },
           { label: 'First on-site observation day (Nov 19)', complete: true },
           { label: '9 personalized Love Notes delivered', complete: true },
           { label: 'Second observation day (April 8, 2026)', complete: true },
-          { label: 'Spring leadership meeting', complete: false },
+          { label: 'Executive Leadership Session (April 8, 2026)', complete: true },
         ],
       },
       {
@@ -487,20 +486,20 @@ export default function SauneminDashboard() {
     // ZONE 1 - Snapshot
     stats: {
       educatorsEnrolled: { value: 9, total: 12, label: 'Staff Active', sublabel: '75% Hub login rate' },
-      deliverables: { completed: 3, total: 6, label: 'Deliverables', sublabel: 'completed vs. contracted' },
+      deliverables: { completed: 6, total: 6, label: 'Deliverables', sublabel: 'all contracted deliverables complete' },
       hubEngagement: { percent: 75, raw: '9/12', label: 'Hub Engagement', sublabel: '9 of 12 staff logged in' },
-      phase: { name: 'IGNITE', number: 1, total: 3, label: 'Current Phase', sublabel: 'Phase 1 of 3' },
+      phase: { name: 'IGNITE', number: 1, total: 3, label: 'Phase Complete', sublabel: 'All deliverables fulfilled' },
     },
 
     // Partnership Health
     health: {
-      status: 'On Track',
-      statusColor: 'blue',
+      status: 'Completed',
+      statusColor: 'green',
       details: [
-        '9 of 12 staff Hub activated  - 75% and growing',
-        'Observation Day 1 complete  - 9 Love Notes delivered',
+        'All 2025-26 contract deliverables fulfilled as of April 8, 2026',
+        'Both observation days complete  - 9 Love Notes delivered',
+        'Executive Leadership Session complete  - April 8, 2026',
         'Hub engagement directly linked to stronger classroom practice',
-        'Observation Day 2 scheduled April 8',
       ],
     },
 
@@ -511,14 +510,13 @@ export default function SauneminDashboard() {
         { label: 'Hub access activated  - staff onboarded', date: 'Fall 2025' },
         { label: 'Observation Day 1  - 9 staff observed, 9 Love Notes delivered', date: 'Nov 19, 2025' },
         { label: 'Hub-to-classroom connection confirmed  - top Hub users showed strongest practice', date: 'Nov 2025' },
+        { label: 'Observation Day 2  - Implementation focus, Hub strategies in classroom practice', date: 'April 8, 2026' },
+        { label: 'Executive Leadership Session  - completed with Gary & Michael', date: 'April 8, 2026' },
       ],
       inProgress: [
-        { label: '9/12 staff Hub activated  - 5 with tracked course activity', detail: '3 staff to support before Obs Day 2' },
-        { label: 'Obs Day 2 prep  - TDI looking for Hub strategies in classroom practice', detail: 'Scheduled April 8, 2026' },
-        { label: 'Virtual session planning underway', detail: 'Coordinating with Gary Doughan' },
+        { label: '9/12 staff Hub activated  - 5 with tracked course activity', detail: 'Ongoing engagement' },
       ],
       comingSoon: [
-        { label: 'Observation Day 2', date: 'April 8, 2026' },
         { label: 'Virtual Session  - full team', date: 'To be scheduled' },
         { label: 'Spring wrap-up + next steps', date: 'Spring 2026' },
       ],
@@ -548,7 +546,7 @@ export default function SauneminDashboard() {
       nextToUnlock: [
         {
           label: 'Support 3 staff members not yet in the Hub',
-          detail: 'Amber, Lisa, and Dan haven\'t logged in yet  - consider pairing with Sam or Haylie before Obs Day 2',
+          detail: 'Amber, Lisa, and Dan haven\'t logged in yet  - consider pairing with Sam or Haylie',
           owner: 'partner',
           cta: 'Contact TDI for support',
           ctaHref: 'mailto:rae@teachersdeserveit.com?subject=Saunemin%20Hub%20Support',
@@ -563,8 +561,8 @@ export default function SauneminDashboard() {
       ],
       tdiHandling: [
         {
-          label: 'Observation Day 2 prep  - April 8',
-          detail: 'TDI preparing observation focus: Hub strategies showing up in classroom practice',
+          label: 'Observation Day 2 complete  - April 8, 2026',
+          detail: 'Implementation focus observation completed successfully',
         },
         {
           label: 'Love Notes ready for all observed staff',
@@ -572,7 +570,8 @@ export default function SauneminDashboard() {
         },
       ],
       alreadyInMotion: [
-        { label: 'Observation Day 2', date: 'April 8, 2026', status: 'scheduled' },
+        { label: 'Observation Day 2', date: 'April 8, 2026', status: 'complete' },
+        { label: 'Executive Leadership Session', date: 'April 8, 2026', status: 'complete' },
         { label: 'Hub access active  - 9 staff learning', date: 'Ongoing', status: 'scheduled' },
         { label: '9 Love Notes delivered', date: 'Nov 19, 2025', status: 'complete' },
       ],
@@ -608,8 +607,8 @@ export default function SauneminDashboard() {
         <div className="relative max-w-4xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="bg-[#35A7FF] text-white text-xs px-3 py-1 rounded-full font-medium">
-                Phase 1 • IGNITE
+              <span className="bg-green-500 text-white text-xs px-3 py-1 rounded-full font-medium">
+                IGNITE • Complete
               </span>
             </div>
             <h1 className="text-xl md:text-2xl font-bold">Saunemin CCSD #438</h1>
@@ -696,10 +695,10 @@ export default function SauneminDashboard() {
                   className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <CheckCircle className="w-5 h-5 text-[#F5C542]" />
+                    <CheckCircle className="w-5 h-5 text-green-500" />
                     <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#1A6B6B] transition-colors" />
                   </div>
-                  <div className="text-3xl font-bold text-[#B8860B] mb-1">
+                  <div className="text-3xl font-bold text-green-600 mb-1">
                     {overviewData.stats.deliverables.completed}/{overviewData.stats.deliverables.total}
                   </div>
                   <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{overviewData.stats.deliverables.label}</div>
@@ -707,7 +706,7 @@ export default function SauneminDashboard() {
                   {/* Mini progress bar */}
                   <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-[#F5C542] rounded-full transition-all"
+                      className="h-full bg-green-500 rounded-full transition-all"
                       style={{ width: `${(overviewData.stats.deliverables.completed / overviewData.stats.deliverables.total) * 100}%` }}
                     />
                   </div>
@@ -761,9 +760,9 @@ export default function SauneminDashboard() {
               {/* Partnership Health Indicator */}
               <div className="bg-white rounded-2xl px-6 py-4 shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center gap-3">
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-sm shadow-blue-200" />
-                  <span className="text-sm font-bold text-[#1B2A4A]">Partnership Momentum:</span>
-                  <span className="text-sm font-bold text-blue-600">{overviewData.health.status}</span>
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-sm shadow-green-200" />
+                  <span className="text-sm font-bold text-[#1B2A4A]">Partnership Status:</span>
+                  <span className="text-sm font-bold text-green-600">{overviewData.health.status}</span>
                 </div>
                 <div className="hidden md:block w-px h-4 bg-gray-200" />
                 <div className="flex flex-wrap gap-x-4 gap-y-1">
@@ -1212,16 +1211,16 @@ export default function SauneminDashboard() {
                 <div>
                   <h4 className="font-bold text-[#1e2749] text-lg">Recommendation: Bridge the Implementation Gap</h4>
                   <p className="text-sm text-gray-600 mt-1">
-                    Research shows only 30% of professional development translates to classroom practice. Saunemin&apos;s November observations showed <strong>100% of observed staff</strong> implementing at least one strategy -  that&apos;s exceptional! Day 2 will help sustain this momentum and deepen implementation.
+                    Research shows only 30% of professional development translates to classroom practice. Saunemin&apos;s November observations showed <strong>100% of observed staff</strong> implementing at least one strategy -  that&apos;s exceptional! Day 2 confirmed sustained momentum and deepened implementation.
                   </p>
                 </div>
               </div>
 
-              {/* What Day 2 Will Accomplish */}
+              {/* What Day 2 Accomplished */}
               <div className="bg-white rounded-lg p-4 mb-4">
                 <h5 className="font-semibold text-[#1e2749] mb-3 flex items-center gap-2">
                   <Target className="w-4 h-4 text-[#38618C]" />
-                  What Day 2 Will Accomplish
+                  What Day 2 Accomplished
                 </h5>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="flex items-start gap-3">
@@ -1295,15 +1294,10 @@ export default function SauneminDashboard() {
                   <Check className="w-4 h-4" />
                   Hub resources shared with each educator
                 </div>
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm text-white bg-[#35A7FF] hover:bg-[#2589db] px-4 py-1.5 rounded-full font-medium transition-colors"
-                >
-                  <Calendar className="w-4 h-4" />
-                  Schedule Day 2 to See Progress
-                </a>
+                <div className="flex items-center gap-2 text-sm text-green-700 bg-green-100 px-3 py-1.5 rounded-full">
+                  <Check className="w-4 h-4" />
+                  Day 2 complete  - April 8, 2026
+                </div>
               </div>
             </div>
 
@@ -1355,7 +1349,7 @@ export default function SauneminDashboard() {
                     </div>
 
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                      <p className="text-sm font-medium text-blue-800 mb-2">Areas of Focus for Day 2:</p>
+                      <p className="text-sm font-medium text-blue-800 mb-2">Areas of Focus from Day 2:</p>
                       <ul className="text-sm text-blue-700 space-y-1">
                         <li>• Look for evidence of Hub strategies in practice</li>
                         <li>• Expand observations to teachers (currently Hub access is para-only)</li>
@@ -1380,16 +1374,16 @@ export default function SauneminDashboard() {
                 <Accordion
                   id="observation-day2"
                   title="Day 2 - April 8, 2026"
-                  subtitle="Second on-site observation day"
+                  subtitle="On-Site Day 2 - Implementation Focus"
                   icon={<Calendar className="w-5 h-5" />}
-                  badge="Scheduled"
+                  badge="Complete"
                   badgeColor="bg-green-100 text-green-700"
                 >
                   <div className="pt-4 space-y-4">
-                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                      <p className="text-sm font-medium text-amber-800 mb-1">Gary&apos;s Request:</p>
-                      <p className="text-sm text-amber-700 italic">
-                        &quot;Schedule on a normal Wednesday so staff can meet with Rae after dismissal during PD time&quot;
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                      <p className="text-sm font-medium text-green-800 mb-1">Completed April 8, 2026</p>
+                      <p className="text-sm text-green-700">
+                        Second on-site observation day focused on implementation  - Hub strategies showing up in classroom practice.
                       </p>
                     </div>
 
@@ -1401,16 +1395,6 @@ export default function SauneminDashboard() {
                         <li className="flex items-center gap-2"><Target className="w-4 h-4 text-[#38618C]" /> Hands-on Hub exploration session</li>
                       </ul>
                     </div>
-
-                    <a
-                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block w-full bg-[#35A7FF] hover:bg-[#2589db] text-white text-center py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      Schedule Day 2
-                    </a>
                   </div>
                 </Accordion>
               </div>
@@ -1454,8 +1438,8 @@ export default function SauneminDashboard() {
                     <Target className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-[#1e2749]">Day 2 Focus: Deeper Implementation</p>
-                    <p className="text-xs text-gray-600">We&apos;ll look for specific strategies from Para Foundations, De-Escalation, and Small Group Instruction showing up in practice.</p>
+                    <p className="text-sm font-medium text-[#1e2749]">Day 2 Focus: Implementation Confirmed</p>
+                    <p className="text-xs text-gray-600">We looked for specific strategies from Para Foundations, De-Escalation, and Small Group Instruction showing up in practice.</p>
                   </div>
                 </div>
               </div>

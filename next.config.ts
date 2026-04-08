@@ -15,7 +15,12 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/blog',
-        destination: 'https://raehughart.substack.com',
+        destination: 'https://raehughart.substack.com/',
+        permanent: true,
+      },
+      {
+        source: '/blog/:path*',
+        destination: 'https://raehughart.substack.com/',
         permanent: true,
       },
     ];
