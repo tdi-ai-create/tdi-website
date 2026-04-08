@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
         destination: 'https://raehughart.substack.com/',
         permanent: true,
       },
+      {
+        source: '/guest-promo-toolkit',
+        destination: 'https://docs.google.com/document/d/1yAcAKpz03pWdQ0A9ZvEFxcdgiUtEfwtn/view',
+        permanent: false,
+      },
     ];
   },
 };
