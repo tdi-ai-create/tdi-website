@@ -183,6 +183,51 @@ export default function ASD4Dashboard() {
       status: "complete" as const
     },
     {
+      title: "Virtual Support Session 2",
+      date: "April 6, 2026",
+      format: "Virtual",
+      duration: "45-Minute Session",
+      focusAreas: [
+        "Mid-partnership progress review",
+        "Growth Group updates and wins",
+        "Implementation support"
+      ],
+      status: "complete" as const
+    },
+    {
+      title: "Virtual Support Session 3",
+      date: "April 6, 2026",
+      format: "Virtual",
+      duration: "45-Minute Session",
+      focusAreas: [
+        "Para-specific strategy exploration",
+        "Interactive classroom move identification",
+        "Resource sharing and implementation planning"
+      ],
+      status: "complete" as const,
+      summary: {
+        focus: "What's Your Move?",
+        description: "Staff explored para-specific strategies and identified their go-to classroom moves. The session centered on three key resources shared with the team.",
+        resources: [
+          {
+            title: "Para Game Tools",
+            url: "https://www.teachersdeserveit.com/paragametools",
+            description: "Staff began with 'What's Your Move?' - an interactive strategy tool for paras"
+          },
+          {
+            title: "Learning Hub Course Guide",
+            url: "https://tdi.thinkific.com/products/digital_downloads/CourseGuide",
+            description: "All current content available in the Learning Hub"
+          },
+          {
+            title: "Back from Break Toolbox: 3 High-Leverage Moves",
+            url: "https://tdi.thinkific.com/products/digital_downloads/new-digital-download-84",
+            description: "Practical re-entry strategies for paras returning from break"
+          }
+        ]
+      }
+    },
+    {
       title: "Observation & Support Day",
       date: "March 3, 2026",
       format: "In-Person",
@@ -228,18 +273,6 @@ export default function ASD4Dashboard() {
       status: "scheduled" as const
     },
     {
-      title: "Virtual Support Session 2",
-      date: "April 6, 2026",
-      time: "7:30 - 8:15 AM",
-      format: "Virtual",
-      focusAreas: [
-        "Mid-partnership progress review",
-        "Growth Group updates and wins",
-        "Implementation support"
-      ],
-      status: "scheduled" as const
-    },
-    {
       title: "Executive Impact Session 2",
       date: "April 9, 2026",
       time: "8:00 - 9:00 AM",
@@ -248,18 +281,6 @@ export default function ASD4Dashboard() {
         "Current outcomes review",
         "End-of-year metrics discussion",
         "Partnership continuation conversation"
-      ],
-      status: "scheduled" as const
-    },
-    {
-      title: "Virtual Support Session 3 (Late Start Days)",
-      date: "April 20, 2026",
-      time: "7:30 - 8:15 AM",
-      format: "Virtual",
-      focusAreas: [
-        "Strategy refinement",
-        "Success metrics check-in",
-        "Preparation for end-of-year review"
       ],
       status: "scheduled" as const
     }
@@ -1133,7 +1154,7 @@ Thank you for setting the example. It matters more than you know.`;
     // ZONE 1 - Snapshot
     stats: {
       educatorsEnrolled: { value: 122, total: 122, label: 'Paras Enrolled', sublabel: 'All seats filled' },
-      deliverables: { completed: 6, total: 11, label: 'Deliverables', sublabel: 'completed vs. contracted' },
+      deliverables: { completed: 8, total: 11, label: 'Deliverables', sublabel: 'completed vs. contracted' },
       hubEngagement: { percent: 100, raw: '122/122', label: 'Hub Engagement', sublabel: 'paras logged in' },
       phase: { name: 'IGNITE', number: 1, total: 3, label: 'Current Phase', sublabel: 'Phase 1 of 3' },
     },
@@ -1164,6 +1185,8 @@ Thank you for setting the example. It matters more than you know.`;
         { label: 'Collaborative Support implementation tracking', date: '70% across pilot group' },
         { label: 'March survey analysis  - 95/122 responded', date: '78% response rate' },
         { label: 'Observation & Support Day 2  - 10 paras observed, 10 Love Notes', date: 'Mar 19, 2026' },
+        { label: 'Virtual Support Session 2', date: 'Apr 6, 2026' },
+        { label: 'Virtual Support Session 3  - What\'s Your Move?', date: 'Apr 6, 2026' },
       ],
       inProgress: [
         { label: 'Hub engagement  - 122 of 122 paras active', detail: '100% logged in' },
@@ -1172,10 +1195,8 @@ Thank you for setting the example. It matters more than you know.`;
         { label: 'March survey analysis  - 95/122 responded', detail: '78% response rate' },
       ],
       comingSoon: [
-        { label: 'Virtual Support Session 2', date: 'Apr 6, 2026' },
         { label: 'Executive Impact Session 2', date: 'Apr 9, 2026' },
-        { label: 'Virtual Support Session 3', date: 'Apr 20, 2026' },
-        { label: 'Virtual Support Session 4', date: 'After Apr 20  - scheduling in progress' },
+        { label: 'Virtual Support Session 4', date: 'TBD  - scheduling in progress' },
         { label: 'End-of-year impact report', date: 'May 2026' },
       ],
     },
@@ -1217,9 +1238,7 @@ Thank you for setting the example. It matters more than you know.`;
         },
       ],
       alreadyInMotion: [
-        { label: 'Virtual Support Session 2', date: 'Apr 6, 2026', status: 'scheduled' },
         { label: 'Executive Impact Session 2', date: 'Apr 9, 2026', status: 'scheduled' },
-        { label: 'Virtual Support Session 3', date: 'Apr 20, 2026', status: 'scheduled' },
       ],
     },
   };
@@ -1416,18 +1435,30 @@ Thank you for setting the example. It matters more than you know.`;
           badge: 'Complete',
           note: 'See Team Pulse section for highlights',
         },
+        {
+          type: 'Virtual Support Session',
+          label: 'Virtual Support Session 2',
+          date: 'April 6, 2026',
+          badge: 'Complete',
+        },
+        {
+          type: 'Virtual Support Session',
+          label: 'Virtual Support Session 3  - What\'s Your Move?',
+          date: 'April 6, 2026',
+          badge: 'Complete',
+          note: 'Staff explored para-specific strategies and identified their go-to classroom moves.',
+          resources: [
+            { title: 'Para Game Tools', url: 'https://www.teachersdeserveit.com/paragametools' },
+            { title: 'Learning Hub Course Guide', url: 'https://tdi.thinkific.com/products/digital_downloads/CourseGuide' },
+            { title: 'Back from Break Toolbox: 3 High-Leverage Moves', url: 'https://tdi.thinkific.com/products/digital_downloads/new-digital-download-84' },
+          ],
+        },
       ],
       upcoming: [
         {
           type: 'Observation',
           label: 'Observation & Support Day 2',
           date: 'Mar 19, 2026',
-          status: 'scheduled' as const,
-        },
-        {
-          type: 'Virtual Support Session',
-          label: 'Virtual Support Session 2',
-          date: 'Apr 6, 2026',
           status: 'scheduled' as const,
         },
         {
@@ -1438,14 +1469,8 @@ Thank you for setting the example. It matters more than you know.`;
         },
         {
           type: 'Virtual Support Session',
-          label: 'Virtual Support Session 3',
-          date: 'Apr 20, 2026',
-          status: 'scheduled' as const,
-        },
-        {
-          type: 'Virtual Support Session',
           label: 'Virtual Support Session 4',
-          date: 'After Apr 20',
+          date: 'TBD',
           status: 'scheduling' as const,
         },
         {
@@ -2519,6 +2544,21 @@ Thank you for setting the example. It matters more than you know.`;
                           <p className="text-sm font-medium text-gray-900">{s.label}</p>
                           <p className="text-xs text-gray-500">{s.date} · {s.type}</p>
                           {s.note && <p className="text-xs text-gray-400 italic mt-0.5">{s.note}</p>}
+                          {'resources' in s && s.resources && (
+                            <div className="mt-2 space-y-1">
+                              {(s.resources as { title: string; url: string }[]).map((r, ri) => (
+                                <a
+                                  key={ri}
+                                  href={r.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="block text-xs text-[#38618C] hover:underline font-medium"
+                                >
+                                  {r.title} →
+                                </a>
+                              ))}
+                            </div>
+                          )}
                         </div>
                         <span className="ml-auto text-xs bg-green-100 text-green-700 font-medium px-2 py-0.5 rounded-full">{s.badge}</span>
                       </div>
