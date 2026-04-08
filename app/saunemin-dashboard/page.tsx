@@ -518,13 +518,15 @@ export default function SauneminDashboard() {
         { label: 'Hub-to-classroom connection confirmed  - top Hub users showed strongest practice', date: 'Nov 2025' },
         { label: 'Observation Day 2  - 8 staff observed, 8 Love Notes delivered. Hub strategies visible in practice.', date: 'April 8, 2026' },
         { label: 'Executive Leadership Session  - completed with Gary & Michael', date: 'April 8, 2026' },
+        { label: '12/12 staff Hub activated  - 100% login rate', date: 'April 2026' },
+        { label: 'Virtual Session  - full team', date: 'Spring 2026' },
+        { label: 'Spring wrap-up + next steps', date: 'Spring 2026' },
       ],
       inProgress: [
-        { label: '9/12 staff Hub activated  - 5 with tracked course activity', detail: 'Ongoing engagement' },
+        { label: 'All Access Learning Hub Memberships', detail: 'Active through May 2026' },
       ],
       comingSoon: [
-        { label: 'Virtual Session  - full team', date: 'To be scheduled' },
-        { label: 'Spring wrap-up + next steps', date: 'Spring 2026' },
+        { label: 'Plans for Year 2', date: 'TBD' },
       ],
     },
 
