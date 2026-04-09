@@ -7,6 +7,7 @@ import { getSupabase } from '@/lib/supabase';
 import { getCurrentUser } from '@/lib/hub-auth';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
 import TDIPortalLoader from '@/components/TDIPortalLoader';
+import { attributePartnership } from '@/lib/hub/partnerships';
 
 type AuthView = 'main' | 'signup' | 'forgot';
 type LoginMethod = 'email' | 'magic';
@@ -143,7 +144,7 @@ export default function HubLoginPage() {
 
     try {
       const supabase = getSupabase();
-      const { error: authError } = await supabase.auth.signUp({
+      const { data: signUpData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -158,6 +159,11 @@ export default function HubLoginPage() {
           setError(authError.message);
         }
         return;
+      }
+
+      // Attribute partnership if user arrived via a partner invite link
+      if (signUpData?.user) {
+        await attributePartnership(signUpData.user.id);
       }
 
       setSuccessMessage('Check your email to confirm your account.');
