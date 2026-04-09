@@ -4072,6 +4072,58 @@ Thank you for setting the example. It matters more than you know.`;
         {/* ==================== 2026-27 TAB ==================== */}
         {activeTab === 'year2' && (
           <div className="space-y-4">
+            {/* Voices from the Field  - Featured para quotes */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center gap-2 mb-5">
+                <MessageCircle className="w-5 h-5 text-teal-600" />
+                <h3 className="text-base font-bold text-[#1B2A4A]">Voices from the Field</h3>
+                <span className="ml-auto text-xs text-gray-400">What ASD4 paras are saying</span>
+              </div>
+              <div className="space-y-4">
+                {/* Quote 1: Karen Magnuson  - lead/renewal argument */}
+                <div className="bg-gradient-to-r from-[#1e2749] to-[#2d3a6b] rounded-2xl p-6 shadow-lg">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+                      <MessageCircle className="w-6 h-6 text-teal-300" />
+                    </div>
+                    <div>
+                      <p className="text-white text-lg font-medium italic leading-relaxed mb-3">
+                        &ldquo;I love that Paras now have a person who can help us find information, give us feedback and listen to what we are saying.&rdquo;
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <div className="w-1 h-8 bg-teal-400 rounded-full" />
+                        <div>
+                          <p className="text-white font-semibold">Karen Magnuson</p>
+                          <p className="text-white/70 text-sm">Paraprofessional, Indian Trail Junior High</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quote 2: Emily Hoppensteadt  - student impact */}
+                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-6 border-l-4 border-emerald-400">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                      <MessageCircle className="w-6 h-6 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-gray-800 text-lg font-medium italic leading-relaxed mb-3">
+                        &ldquo;I could see their confidence boost right in front of my eyes. Their big smiles filled my heart. I believe this strategy supports engagement and play to develop a deeper understanding.&rdquo;
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <div className="w-1 h-8 bg-emerald-500 rounded-full" />
+                        <div>
+                          <p className="text-[#1e2749] font-semibold">Emily Hoppensteadt</p>
+                          <p className="text-gray-600 text-sm">Paraprofessional, Army Trail Elementary</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Section 1: Phase Hero */}
             <div className="text-center mb-8">
               <p className="text-sm text-[#38618C] font-medium mb-2">Phase 2</p>
