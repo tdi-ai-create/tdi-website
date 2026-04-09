@@ -1498,6 +1498,21 @@ Thank you for setting the example. It matters more than you know.`;
       hubAccess: { active: 122, total: 122, percent: 100 },
       selfDirected: 79,
       coursesCompleted: 91,
+      // April 2026 Thinkific export
+      hubStats: {
+        activeUsers: 122,
+        activeEnrollments: 4148,
+        engagedParas: 101,
+        peakMonth: 'March 2026',
+        peakMonthCount: 78,
+      },
+      enrollmentGrowth: {
+        from: 2976,
+        fromLabel: 'Dec 2025',
+        to: 4148,
+        toLabel: 'Apr 2026',
+        percent: 39,
+      },
     },
 
     // SECTION 7  - Team Pulse (CONDITIONAL)
@@ -1565,13 +1580,11 @@ Thank you for setting the example. It matters more than you know.`;
       show: true,
       hubLink: 'https://teachersdeserveit.com/hub',
       topCourses: [
-        { title: 'Calm Classrooms, Not Chaos', engagedStaff: 22 },
-        { title: 'The Proximity Principle', engagedStaff: 18 },
-        { title: 'Communication That Clicks', engagedStaff: 15 },
-        { title: 'Behavior Is Communication', engagedStaff: 12 },
-        { title: 'The Differentiation Fix', engagedStaff: 9 },
+        { title: 'Paraprofessional Foundations  - Understanding Your Role & Impact', engagedStaff: 48 },
+        { title: 'Executive Functioning Made Simple: Tools for K-5 Classrooms', engagedStaff: 35 },
+        { title: 'RINSE Method  - Mindset Reset for Educators', engagedStaff: 32 },
       ],
-      totalCoursesStarted: 28,
+      totalCoursesStarted: 4148,
     },
 
     // SECTION 11  - Your Team's Top Ask (CONDITIONAL)
@@ -2721,6 +2734,50 @@ Thank you for setting the example. It matters more than you know.`;
                   </div>
                 </div>
 
+                {/* Learning Hub Engagement  - April 2026 Thinkific data */}
+                <div className="bg-gradient-to-br from-teal-50 to-blue-50 rounded-2xl p-5 border border-teal-100 mb-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-teal-600" />
+                      <p className="text-sm font-bold text-gray-900">Learning Hub Engagement</p>
+                    </div>
+                    <span className="text-xs bg-teal-100 text-teal-700 font-medium px-2 py-0.5 rounded-full">April 2026 Thinkific data</span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="bg-white rounded-xl p-3 border border-teal-100">
+                      <p className="text-2xl font-black text-teal-700">{partnershipData.progress.hubStats.activeUsers}</p>
+                      <p className="text-xs text-teal-700 font-medium mt-1">Active Users</p>
+                    </div>
+                    <div className="bg-white rounded-xl p-3 border border-teal-100">
+                      <p className="text-2xl font-black text-teal-700">{partnershipData.progress.hubStats.activeEnrollments.toLocaleString()}</p>
+                      <p className="text-xs text-teal-700 font-medium mt-1">Active Enrollments</p>
+                    </div>
+                    <div className="bg-white rounded-xl p-3 border border-teal-100">
+                      <p className="text-2xl font-black text-teal-700">{partnershipData.progress.hubStats.engagedParas}</p>
+                      <p className="text-xs text-teal-700 font-medium mt-1">Engaged Paras</p>
+                      <p className="text-xs text-gray-400 mt-0.5">Unique individuals with logged activity</p>
+                    </div>
+                    <div className="bg-white rounded-xl p-3 border border-teal-100">
+                      <p className="text-2xl font-black text-teal-700">{partnershipData.progress.hubStats.peakMonthCount}</p>
+                      <p className="text-xs text-teal-700 font-medium mt-1">Peak Month</p>
+                      <p className="text-xs text-gray-400 mt-0.5">{partnershipData.progress.hubStats.peakMonth}  - active students</p>
+                    </div>
+                  </div>
+
+                  {/* Enrollment Growth callout */}
+                  <div className="mt-4 bg-white rounded-xl p-4 border border-teal-100 flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                      <TrendingUp className="w-4 h-4 text-emerald-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-bold text-gray-900">
+                        Enrollments grew from {partnershipData.progress.enrollmentGrowth.from.toLocaleString()} ({partnershipData.progress.enrollmentGrowth.fromLabel}) → {partnershipData.progress.enrollmentGrowth.to.toLocaleString()} ({partnershipData.progress.enrollmentGrowth.toLabel})
+                      </p>
+                      <p className="text-xs text-emerald-700 font-medium">A {partnershipData.progress.enrollmentGrowth.percent}% increase since program launch</p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Survey data note */}
                 <p className="text-xs text-gray-400 text-center italic">
                   Implementation: 81 survey respondents · Feb 13, 2026 · VS1 survey: 95 of 114 respondents · Mar 2, 2026
@@ -2942,7 +2999,7 @@ Thank you for setting the example. It matters more than you know.`;
                 defaultOpen={false}
                 accent="orange"
               >
-                <p className="text-xs text-gray-500 mb-4">{partnershipData.resonating.totalCoursesStarted} courses being actively explored across your team.{' '}
+                <p className="text-xs text-gray-500 mb-4">{partnershipData.resonating.totalCoursesStarted.toLocaleString()} active enrollments across your team&apos;s Hub library.{' '}
                   <a href={partnershipData.resonating.hubLink} target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">View in Hub →</a>
                 </p>
                 <div className="space-y-2">
