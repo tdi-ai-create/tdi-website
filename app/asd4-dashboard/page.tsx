@@ -4190,8 +4190,8 @@ Thank you for setting the example. It matters more than you know.`;
                     <Eye className="w-5 h-5 text-[#38618C]" />
                     <span className="font-semibold text-[#1e2749]">In-Person Observation Days</span>
                   </div>
-                  <p className="text-2xl font-bold text-[#38618C] mb-2">4 Full Days</p>
-                  <p className="text-sm text-gray-600 mb-3">Four full observation cycles across the district. Up to 15-20 paras observed per visit with personalized Love Notes and leadership debrief. Travel included.</p>
+                  <p className="text-2xl font-bold text-[#38618C] mb-2">3 Full Days</p>
+                  <p className="text-sm text-gray-600 mb-3">Three full observation cycles across the district. Up to 15-20 paras observed per visit with personalized Love Notes and leadership debrief. Travel included.</p>
                   <p className="text-xs text-teal-600 font-medium flex items-center gap-1">
                     <BarChart3 className="w-3 h-3" /> Includes Analytics Suite
                   </p>
@@ -4203,7 +4203,7 @@ Thank you for setting the example. It matters more than you know.`;
                     <MessageCircle className="w-5 h-5 text-[#38618C]" />
                     <span className="font-semibold text-[#1e2749]">Virtual Strategy Sessions</span>
                   </div>
-                  <p className="text-2xl font-bold text-[#38618C] mb-2">4 Sessions</p>
+                  <p className="text-2xl font-bold text-[#38618C] mb-2">2 Sessions</p>
                   <p className="text-sm text-gray-600 mb-3">45-minute sessions tailored to where your team is - coaching, problem-solving, planning support, and momentum between observation days.</p>
                 </div>
 
