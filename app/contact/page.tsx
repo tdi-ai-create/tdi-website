@@ -321,7 +321,7 @@ export default function ContactPage() {
 
             {/* Card 3: Get a Free PD Eval */}
             <a
-              href="/free-pd-plan"
+              href="/get-started"
               className="bg-white rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow border border-gray-100"
               style={{ textDecoration: 'none' }}
             >

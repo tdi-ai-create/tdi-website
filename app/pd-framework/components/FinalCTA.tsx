@@ -31,7 +31,7 @@ export default function FinalCTA({ onCtaClick }: FinalCTAProps) {
 
             {/* Secondary CTA */}
             <Link
-              href="/free-pd-plan?utm_source=framework&utm_medium=page&utm_campaign=pdplan"
+              href="/get-started?utm_source=framework&utm_medium=page&utm_campaign=pdplan"
               onClick={() => onCtaClick?.('pdplan_cta', 'final_cta')}
               className="inline-block px-8 py-4 rounded-full font-semibold text-lg transition-all hover:shadow-lg hover:-translate-y-0.5 border-2"
               style={{ backgroundColor: 'transparent', color: '#1e2749', borderColor: '#1e2749' }}

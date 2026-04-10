@@ -153,7 +153,7 @@ FOR INDIVIDUAL TEACHERS:
 - Free resources: blog at raehughart.substack.com and podcast "Sustainable Teaching with Rae Hughart" on Apple Podcasts
 - Affordable courses in the Learning Hub at tdi.thinkific.com
 - Free PD Diagnostic: teachersdeserveit.com/pd-diagnostic
-- Free PD Plan: teachersdeserveit.com/free-pd-plan
+- Free PD Plan: teachersdeserveit.com/get-started
 - Free Facebook community: facebook.com/groups/tdimovement
 
 KEY LINKS:
@@ -163,7 +163,7 @@ KEY LINKS:
 - How We Partner: teachersdeserveit.com/how-we-partner
 - Learning Hub: tdi.thinkific.com
 - Free PD Diagnostic: teachersdeserveit.com/pd-diagnostic
-- Free PD Plan: teachersdeserveit.com/free-pd-plan
+- Free PD Plan: teachersdeserveit.com/get-started
 - Funding options: teachersdeserveit.com/funding
 - Impact Calculator: teachersdeserveit.com/calculator
 - FAQ: teachersdeserveit.com/faq

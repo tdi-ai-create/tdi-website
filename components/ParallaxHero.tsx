@@ -106,7 +106,7 @@ export function ParallaxHero() {
 
             <div className="flex flex-col sm:flex-row gap-3">
               <a
-                href="/free-pd-plan"
+                href="/get-started"
                 className="inline-block px-6 py-3 rounded-lg font-bold text-base transition-all hover-glow"
                 style={{
                   backgroundColor: '#ffba06',

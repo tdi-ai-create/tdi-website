@@ -123,7 +123,7 @@ export function BudgetImpactCalculator() {
         {/* CTAs */}
         <div className="grid grid-cols-2 gap-3 mt-6">
           <a
-            href="/free-pd-plan"
+            href="/get-started"
             className="flex items-center justify-center text-center px-4 py-3 rounded-lg font-bold transition-all hover-glow"
             style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
           >

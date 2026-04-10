@@ -1,168 +1,96 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 
 interface EmailPopupProps {
-  delay?: number; // milliseconds for time trigger
+  delay?: number;
 }
 
-export function EmailPopup({ delay = 60000 }: EmailPopupProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
+export function EmailPopup({ delay = 90000 }: EmailPopupProps) {
+  const [isVisible, setIsVisible] = useState(false);
   const pathname = usePathname();
 
-  // Don't show on dashboard pages, internal team pages, creator portal, admin pages, partner pages, hub, or paragametools
-  const isDashboardPage = pathname?.includes('-dashboard') ||
-    pathname?.includes('dashboard-creation') ||
-    pathname?.startsWith('/creator-portal') ||
-    pathname?.startsWith('/admin') ||
-    pathname?.startsWith('/partner-setup') ||
-    pathname?.startsWith('/partners') ||
-    pathname?.startsWith('/hub') ||
-    pathname?.startsWith('/paragametools');
+  // Don't show on conversion pages, admin, hub, or partner pages
+  const excludedPaths = ['/get-started', '/tdi-admin', '/hub', '/creator-portal', '/partners'];
+  const isExcluded = excludedPaths.some(path => pathname?.startsWith(path));
+
+  const showNudge = useCallback(() => {
+    if ((window as any).__tdiPopupActive) return;
+    setIsVisible(true);
+  }, []);
+
+  const handleDismiss = useCallback(() => {
+    setIsVisible(false);
+    // Don't show again for 14 days
+    localStorage.setItem('tdi-email-nudge-dismissed', new Date().toISOString());
+  }, []);
 
   useEffect(() => {
-    // Skip on dashboard pages
-    if (isDashboardPage) return;
+    if (isExcluded) return;
 
-    // Check if already dismissed this session
-    const wasDismissed = sessionStorage.getItem('tdi-popup-dismissed');
-    if (wasDismissed) {
-      setDismissed(true);
-      return;
+    // Check if dismissed within last 14 days
+    const dismissedAt = localStorage.getItem('tdi-email-nudge-dismissed');
+    if (dismissedAt) {
+      const daysSince = (Date.now() - new Date(dismissedAt).getTime()) / (1000 * 60 * 60 * 24);
+      if (daysSince < 14) return;
     }
 
-    let triggered = false;
+    // Check if already shown this session
+    if (sessionStorage.getItem('tdi-email-nudge-shown')) return;
 
-    const showPopup = () => {
-      if (!triggered) {
-        triggered = true;
-        setIsOpen(true);
-        window.removeEventListener('scroll', handleScroll);
-        clearTimeout(timer);
-      }
-    };
+    // Only trigger: 90 seconds on site (no scroll trigger - keep it rare)
+    const timer = setTimeout(() => {
+      showNudge();
+      sessionStorage.setItem('tdi-email-nudge-shown', 'true');
+    }, delay);
 
-    // Time trigger - 30 seconds
-    const timer = setTimeout(showPopup, delay);
+    return () => clearTimeout(timer);
+  }, [isExcluded, delay, showNudge]);
 
-    // Scroll trigger - 50% scroll
-    const handleScroll = () => {
-      const scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-      if (scrollPercent > 50) {
-        showPopup();
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [delay, isDashboardPage]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Connect to email service (Substack, ConvertKit, etc.)
-    console.log('Email submitted:', email);
-    setSubmitted(true);
-
-    // GA4 tracking
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'form_submission', {
-        form_name: 'email_popup',
-        form_location: window.location.pathname
-      });
-    }
-
-    setTimeout(() => {
-      setIsOpen(false);
-      sessionStorage.setItem('tdi-popup-dismissed', 'true');
-    }, 2000);
-  };
-
-  const handleDismiss = () => {
-    setIsOpen(false);
-    setDismissed(true);
-    sessionStorage.setItem('tdi-popup-dismissed', 'true');
-  };
-
-  if (isDashboardPage || dismissed || !isOpen) return null;
+  if (!isVisible || isExcluded) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/50"
-        onClick={handleDismiss}
-      />
-      
-      {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+    <div
+      className="fixed bottom-20 right-4 z-40 max-w-xs w-full animate-slideUp"
+      role="complementary"
+      aria-label="Join the email list"
+    >
+      <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 relative">
         {/* Close button */}
-        <button 
+        <button
           onClick={handleDismiss}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-600"
           aria-label="Close"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="1" y1="1" x2="9" y2="9" />
+            <line x1="9" y1="1" x2="1" y2="9" />
           </svg>
         </button>
 
-        {submitted ? (
-          <div className="text-center py-4">
-            <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--tdi-navy)' }}>
-              You're in!
-            </h3>
-            <p style={{ opacity: 0.7 }}>
-              Welcome to the movement.
-            </p>
-          </div>
-        ) : (
-          <>
-            <h3 className="text-2xl font-bold mb-4 text-center">
-              Join the movement of educators no longer accepting the status quo
-            </h3>
-            
-            <p className="text-center mb-6" style={{ opacity: 0.7 }}>
-              Get practical strategies delivered to your inbox 3x/week. Join 87,000+ educators.
-            </p>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="email"
-                required
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
-              />
-              <button 
-                type="submit" 
-                className="w-full py-3 rounded-lg font-bold transition-all"
-                style={{ backgroundColor: 'var(--tdi-navy)', color: 'white' }}
-              >
-                Join 87,000+ Educators
-              </button>
-            </form>
-
-            <p className="text-xs text-center mt-4" style={{ opacity: 0.5 }}>
-              No spam. Unsubscribe anytime.
-            </p>
-          </>
-        )}
+        <p className="text-sm font-semibold mb-1" style={{ color: '#1e2749' }}>
+          Want strategies that actually work?
+        </p>
+        <p className="text-xs text-gray-500 mb-3">
+          Join 87,000+ educators. Weekly, no spam.
+        </p>
+        <a
+          href="https://teachersdeserveit.substack.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={handleDismiss}
+          className="block w-full text-center text-sm font-semibold py-2 px-4 rounded-lg transition-colors"
+          style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#e5a805')}
+          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#ffba06')}
+        >
+          Join the list
+        </a>
       </div>
     </div>
   );
 }
 
-// Export a trigger function for calculator engagement
-export function triggerEmailPopup() {
-  // This can be called from calculator when user engages with results
-  const event = new CustomEvent('trigger-email-popup');
-  window.dispatchEvent(event);
-}
+// Keep the export for backwards compatibility but it's no longer used
+export function triggerEmailPopup() {}

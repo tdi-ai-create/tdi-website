@@ -219,7 +219,7 @@ export function GuiltFreeCalculator() {
 
         {/* Bottom CTA */}
         <a
-          href="/free-pd-plan"
+          href="/get-started"
           className="block w-full py-4 rounded-lg font-bold text-lg text-center transition-all hover:opacity-90 mt-4"
           style={{ backgroundColor: '#8b5cf6', color: '#ffffff' }}
         >

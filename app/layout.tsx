@@ -3,14 +3,13 @@ import "./globals.css";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { MicrosoftClarity } from "@/components/MicrosoftClarity";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { EmailPopup } from "@/components/EmailPopup";
+import { SubstackPopup } from "@/components/SubstackPopup";
 import { SocialProofPopup } from "@/components/SocialProofPopup";
 import { MainSiteWrapper } from "@/components/layout/MainSiteWrapper";
 import { MomentModeProvider } from "@/components/hub/MomentModeContext";
-import MovementBanner from "@/components/MovementBanner";
 import DesiWrapper from "@/components/DesiWrapper";
 
 export const metadata: Metadata = {
@@ -79,9 +78,7 @@ export default function RootLayout({
           <GoogleAnalytics />
           <MicrosoftClarity />
           <ScrollToTop />
-          <MovementBanner />
           <MainSiteWrapper>
-            <AnnouncementBar />
             <Header />
           </MainSiteWrapper>
           <main className="min-h-screen">
@@ -90,6 +87,7 @@ export default function RootLayout({
           <MainSiteWrapper>
             <Footer />
             <EmailPopup />
+            <SubstackPopup />
             <SocialProofPopup />
           </MainSiteWrapper>
           <DesiWrapper />

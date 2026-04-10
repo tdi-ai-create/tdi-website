@@ -271,7 +271,7 @@ function OurApproachPanel() {
       {/* Dual CTA */}
       <div className="text-center space-y-3">
         <Link
-          href="/free-pd-plan"
+          href="/get-started"
           className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
           style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
         >
@@ -367,7 +367,7 @@ function InPersonPanel() {
       {/* Dual CTA */}
       <div className="text-center space-y-3">
         <Link
-          href="/free-pd-plan"
+          href="/get-started"
           className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
           style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
         >
@@ -476,7 +476,7 @@ function LearningHubPanel() {
       {/* Dual CTA */}
       <div className="text-center space-y-3">
         <Link
-          href="/free-pd-plan"
+          href="/get-started"
           className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
           style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
         >
@@ -638,7 +638,7 @@ function DashboardPanel() {
       {/* Dual CTA */}
       <div className="text-center space-y-3">
         <Link
-          href="/free-pd-plan"
+          href="/get-started"
           className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
           style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
         >
@@ -747,7 +747,7 @@ function BookPanel() {
       {/* Dual CTA */}
       <div className="text-center space-y-3">
         <Link
-          href="/free-pd-plan"
+          href="/get-started"
           className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
           style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
         >
@@ -934,7 +934,7 @@ function ResultsPanel() {
       {/* Dual CTA */}
       <div className="text-center space-y-3">
         <Link
-          href="/free-pd-plan"
+          href="/get-started"
           className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
           style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
         >
@@ -972,7 +972,7 @@ function CalculatorPanel() {
       {/* Dual CTA */}
       <div className="text-center space-y-3">
         <Link
-          href="/free-pd-plan"
+          href="/get-started"
           className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
           style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
         >
@@ -1189,7 +1189,7 @@ export default function HowWePartnerPage() {
             </Link>
 
             <Link
-              href="/free-pd-plan"
+              href="/get-started"
               className="block p-6 rounded-xl bg-white transition-all hover:shadow-lg hover:scale-[1.02]"
             >
               <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#ffba06' }}>
