@@ -112,7 +112,7 @@ export default function TDIPhases({ onCtaClick, onFundingClick }: TDIPhasesProps
                     <li>• Leadership Dashboard</li>
                   </ul>
                   <Link
-                    href="/free-pd-plan?utm_source=framework&utm_medium=page&utm_campaign=pdplan"
+                    href="/get-started?utm_source=framework&utm_medium=page&utm_campaign=pdplan"
                     onClick={() => onCtaClick?.('pdplan_cta', 'ignite_card')}
                     className="block text-center py-3 rounded-lg font-bold transition-all hover:scale-105"
                     style={{ backgroundColor: '#ffba06', color: '#1e2749' }}

@@ -233,7 +233,7 @@ export default function ForSchoolsPage() {
               It is not your teachers. It is the model.
             </p>
             <Link
-              href="/free-pd-plan"
+              href="/get-started"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
               style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
             >
@@ -551,7 +551,7 @@ export default function ForSchoolsPage() {
 
             <div className="text-center">
               <Link
-                href="/free-pd-plan"
+                href="/get-started"
                 className="inline-flex items-center gap-2 font-semibold transition-all hover:gap-3"
                 style={{ color: '#35A7FF' }}
               >
@@ -584,7 +584,7 @@ export default function ForSchoolsPage() {
             Ready to see the numbers for your school?
           </h2>
           <Link
-            href="/free-pd-plan"
+            href="/get-started"
             className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105 hover:shadow-lg"
             style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
           >
@@ -787,7 +787,7 @@ export default function ForSchoolsPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
-              href="/free-pd-plan"
+              href="/get-started"
               className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105 hover:shadow-lg"
               style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
             >

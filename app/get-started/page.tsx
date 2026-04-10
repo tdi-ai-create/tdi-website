@@ -32,6 +32,9 @@ export default function GetStartedPage() {
     schoolName: '',
     schoolCity: '',
     schoolState: '',
+    pd_plan_audience: [] as string[],
+    pd_plan_scope: '',
+    pd_pain_point: '',
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -75,6 +78,15 @@ export default function GetStartedPage() {
     }, 100);
   };
 
+  const handleAudienceChange = (option: string) => {
+    setFormData(prev => ({
+      ...prev,
+      pd_plan_audience: prev.pd_plan_audience.includes(option)
+        ? prev.pd_plan_audience.filter((item: string) => item !== option)
+        : [...prev.pd_plan_audience, option]
+    }));
+  };
+
   const validateForm = () => {
     const errors: Record<string, string> = {};
     if (!formData.name.trim()) errors.name = 'Please enter your name';
@@ -93,9 +105,24 @@ export default function GetStartedPage() {
       setFormErrors(errors);
       return;
     }
-    setIsSubmitting(true);
-
     const isTeacherPath = selectedRole === 'Teacher' || selectedRole === 'Para';
+
+    if (!isTeacherPath) {
+      if (formData.pd_plan_audience.length === 0) {
+        alert('Please select at least one audience for your PD plan.');
+        return;
+      }
+      if (!formData.pd_plan_scope) {
+        alert('Please select how you want to roll this out.');
+        return;
+      }
+      if (!formData.pd_pain_point.trim()) {
+        alert('Please describe your biggest frustration with PD.');
+        return;
+      }
+    }
+
+    setIsSubmitting(true);
 
     const submitData = {
       access_key: '6533e850-3216-4ba6-bdd3-3d1273ce353b',
@@ -111,6 +138,11 @@ export default function GetStartedPage() {
       'City': formData.schoolCity,
       'State': formData.schoolState,
       'Path': isTeacherPath ? 'Teacher/Para - Nomination' : 'Leader - PD Plan Request',
+      ...(!isTeacherPath && {
+        'PD Plan Audience': formData.pd_plan_audience.join(', '),
+        'PD Plan Scope': formData.pd_plan_scope,
+        'PD Pain Point': formData.pd_pain_point,
+      }),
     };
 
     try {
@@ -133,6 +165,11 @@ export default function GetStartedPage() {
           path: isTeacherPath ? 'nomination' : 'pd-plan',
           source: 'get-started page',
           tags: ['get-started', selectedRole?.toLowerCase().replace(' ', '-')],
+          ...(!isTeacherPath && {
+            pd_plan_audience: formData.pd_plan_audience.join(', '),
+            pd_plan_scope: formData.pd_plan_scope,
+            pd_pain_point: formData.pd_pain_point,
+          }),
         }),
       }).catch(() => {});
 
@@ -259,7 +296,7 @@ export default function GetStartedPage() {
             onClick={() => {
               setStep(1);
               setSelectedRole(null);
-              setFormData({ name: '', email: '', schoolName: '', schoolCity: '', schoolState: '' });
+              setFormData({ name: '', email: '', schoolName: '', schoolCity: '', schoolState: '', pd_plan_audience: [], pd_plan_scope: '', pd_pain_point: '' });
               setFormErrors({});
             }}
             className="text-sm underline"
@@ -491,6 +528,96 @@ export default function GetStartedPage() {
                   {formErrors.schoolState && <p className="text-red-500 text-xs mt-1">{formErrors.schoolState}</p>}
                 </div>
               </div>
+
+              {/* PD Plan Fields - Leader Path Only */}
+              {(selectedRole === 'Building Leader' || selectedRole === 'District Leader') && (
+                <>
+                  {/* PD Plan Audience - Checkboxes */}
+                  <div className="mb-5">
+                    <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                      Who is this PD plan for? <span className="text-red-500">*</span>
+                    </label>
+                    <p className="text-xs mb-3" style={{ color: '#6b7280' }}>
+                      Select everyone you&#39;re thinking about - you can always start with just one group.
+                    </p>
+                    <div className="space-y-3">
+                      {[
+                        'Classroom teachers',
+                        'Paraprofessionals',
+                        'Special education staff',
+                        'Building leadership team',
+                        'New teacher onboarding',
+                        'Full school or district - everyone'
+                      ].map((option) => (
+                        <label key={option} className="flex items-center gap-3 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            name="pd_plan_audience"
+                            checked={formData.pd_plan_audience.includes(option)}
+                            onChange={() => handleAudienceChange(option)}
+                            className="w-5 h-5 rounded border-gray-300 text-teal-500 focus:ring-teal-500 cursor-pointer"
+                          />
+                          <span className="text-sm" style={{ color: '#374151' }}>
+                            {option}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* PD Plan Scope - Radio Buttons */}
+                  <div className="mb-5">
+                    <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                      How do you want to roll this out? <span className="text-red-500">*</span>
+                    </label>
+                    <p className="text-xs mb-3" style={{ color: '#6b7280' }}>
+                      No wrong answer - most schools start small and expand from there.
+                    </p>
+                    <div className="space-y-3">
+                      {[
+                        'Small pilot - a select group of teachers or one department',
+                        'One full building',
+                        'Multiple buildings or full district',
+                        'Not sure yet - I\'d like guidance'
+                      ].map((option) => (
+                        <label key={option} className="flex items-center gap-3 cursor-pointer group">
+                          <input
+                            type="radio"
+                            name="pd_plan_scope"
+                            value={option}
+                            checked={formData.pd_plan_scope === option}
+                            onChange={(e) => setFormData(prev => ({ ...prev, pd_plan_scope: e.target.value }))}
+                            className="w-5 h-5 border-gray-300 text-teal-500 focus:ring-teal-500 cursor-pointer"
+                          />
+                          <span className="text-sm" style={{ color: '#374151' }}>
+                            {option}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* PD Pain Point - Text Area */}
+                  <div className="mb-5">
+                    <label htmlFor="pd_pain_point" className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                      What&#39;s your biggest frustration with PD at your school right now? <span className="text-red-500">*</span>
+                    </label>
+                    <p className="text-xs mb-3" style={{ color: '#6b7280' }}>
+                      There are no wrong answers - the more specific you are, the more useful your plan will be.
+                    </p>
+                    <textarea
+                      id="pd_pain_point"
+                      name="pd_pain_point"
+                      rows={4}
+                      value={formData.pd_pain_point}
+                      onChange={(e) => setFormData(prev => ({ ...prev, pd_pain_point: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:border-gray-500 resize-none"
+                      style={{ borderColor: '#d1d5db' }}
+                      placeholder='e.g. "Teachers sit through PD days but nothing changes in classrooms" or "I have no way to know if strategies are actually being used"'
+                    />
+                  </div>
+                </>
+              )}
 
               <button
                 type="submit"

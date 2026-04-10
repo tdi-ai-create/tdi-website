@@ -239,7 +239,7 @@ export function TDICalculator() {
 
             <div className="grid grid-cols-2 gap-3">
               <Link
-                href="/free-pd-plan"
+                href="/get-started"
                 className="flex items-center justify-center text-center py-3 rounded-lg font-bold transition-all"
                 style={{ backgroundColor: 'var(--tdi-yellow)', color: 'var(--tdi-charcoal)' }}
               >

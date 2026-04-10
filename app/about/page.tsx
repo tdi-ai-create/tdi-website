@@ -605,7 +605,7 @@ export default function AboutPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="/free-pd-plan"
+              href="/get-started"
               className="inline-flex items-center justify-center px-8 py-4 rounded-lg font-bold text-lg transition-all hover-glow"
               style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
             >

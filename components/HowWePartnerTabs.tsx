@@ -592,7 +592,7 @@ export function HowWePartnerTabs({ excludeTabs = [], showCTAs = true }: HowWePar
         {showCTAs && (
           <div className="text-center space-y-3 mt-8 pt-6 border-t" style={{ borderColor: '#e5e7eb' }}>
             <Link
-              href="/free-pd-plan"
+              href="/get-started"
               className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
               style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
             >
