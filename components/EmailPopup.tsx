@@ -52,7 +52,7 @@ export function EmailPopup({ delay = 90000 }: EmailPopupProps) {
 
   return (
     <div
-      className="fixed bottom-20 right-4 z-40 max-w-xs w-full animate-slideUp"
+      className="fixed bottom-20 left-4 z-[45] max-w-xs w-full animate-slideUp"
       role="complementary"
       aria-label="Join the email list"
     >
