@@ -126,15 +126,33 @@ export function SubstackPopup() {
             Join 87,000+ educators getting strategies that actually work - delivered weekly.
           </p>
 
-          {/* Substack embed */}
-          <iframe
-            src="https://teachersdeserveit.substack.com/embed"
-            width="100%"
-            height="150"
-            style={{ border: 'none', background: 'transparent' }}
-            frameBorder="0"
-            scrolling="no"
-          />
+          {/* Substack form */}
+          <form
+            action="https://teachersdeserveit.substack.com/api/v1/free?nojs=true"
+            method="post"
+            target="_blank"
+            className="flex flex-col gap-3"
+            onSubmit={() => {
+              setTimeout(() => handleDismiss(), 1000);
+            }}
+          >
+            <input
+              type="email"
+              name="email"
+              placeholder="Your email address"
+              required
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 text-sm"
+            />
+            <button
+              type="submit"
+              className="w-full py-3 rounded-lg font-semibold text-sm transition-colors"
+              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#e5a805')}
+              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#ffba06')}
+            >
+              Subscribe
+            </button>
+          </form>
 
           {/* Dismiss link */}
           <button
