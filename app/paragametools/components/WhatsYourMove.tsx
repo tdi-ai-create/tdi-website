@@ -430,6 +430,7 @@ function Survey({ language, score }: { language: 'en' | 'es'; score: number }) {
           'Content-Type': 'application/json',
           apikey: supabaseKey,
           Authorization: `Bearer ${supabaseKey}`,
+          Prefer: 'return=minimal',
         },
         body: JSON.stringify({
           timestamp: response.timestamp,
@@ -443,9 +444,18 @@ function Survey({ language, score }: { language: 'en' | 'es'; score: number }) {
           continue_pd: response.continuePD,
           open_text: response.openText,
         }),
-      }).catch(() => {
-        // Supabase insert failed silently — localStorage has the backup
-      });
+      })
+        .then((res) => {
+          if (!res.ok) {
+            return res.text().then((body) => {
+              console.error('Supabase quiz_surveys insert failed:', res.status, body);
+            });
+          }
+          console.log('Supabase quiz_surveys insert succeeded');
+        })
+        .catch((err) => {
+          console.error('Supabase quiz_surveys network error:', err);
+        });
     }
 
     setSubmitted(true);
@@ -593,6 +603,7 @@ function Survey({ language, score }: { language: 'en' | 'es'; score: number }) {
               backgroundColor: 'rgba(255,255,255,0.06)',
               border: '1px solid rgba(255,255,255,0.15)',
               minHeight: '80px',
+              color: '#ffffff',
             }}
           />
         </div>
