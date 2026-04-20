@@ -196,9 +196,10 @@ export default function ASD4Dashboard() {
     },
     {
       title: "Virtual Support Session 3",
-      date: "April 6, 2026",
+      date: "April 20, 2026",
       format: "Virtual",
-      duration: "45-Minute Session",
+      duration: "45-Minute Session (3 blocks)",
+      attendance: 76,
       focusAreas: [
         "Para-specific strategy exploration",
         "Interactive classroom move identification",
@@ -1205,12 +1206,12 @@ Thank you for setting the example. It matters more than you know.`;
     investment: {
       perEducator: '$299',
       perEducatorSublabel: 'per para  - less than a one-day sub',
-      implementationRate: '91%',
-      implementationSublabel: 'Calm Classroom Presence implementation  - vs. 10% industry avg',
+      implementationRate: '85%',
+      implementationSublabel: 'actively using or trying TDI strategies with students',
       coursesCompleted: 91,
       coursesCompletedSublabel: 'course completions this partnership',
-      retentionStat: '71%',
-      retentionSublabel: 'of paras plan to return next year',
+      retentionStat: '74%',
+      retentionSublabel: 'of paras intend to stay in role next year (4-5/5)',
     },
 
     // ZONE 2C - Quick win counter
@@ -1405,7 +1406,8 @@ Thank you for setting the example. It matters more than you know.`;
         { date: 'Jan 2026', label: 'The Moves Training', status: 'complete' as const },
         { date: 'Mar 2026', label: 'Obs & Support Day 1', status: 'complete' as const },
         { date: 'Mar 2026', label: 'VS1 Survey', status: 'complete' as const },
-        { date: 'Mar 2026', label: 'You Are Here', status: 'current' as const },
+        { date: 'Apr 2026', label: 'VS3 Survey (n=76)', status: 'complete' as const },
+        { date: 'Apr 2026', label: 'You Are Here', status: 'current' as const },
         { date: 'May 2026', label: 'IGNITE Complete', status: 'upcoming' as const },
       ],
       completed: [
@@ -1443,10 +1445,10 @@ Thank you for setting the example. It matters more than you know.`;
         },
         {
           type: 'Virtual Support Session',
-          label: 'Virtual Support Session 3  - What\'s Your Move?',
-          date: 'April 6, 2026',
+          label: 'Virtual Support Session 3  - What\'s Your Move? (76 paras)',
+          date: 'April 20, 2026',
           badge: 'Complete',
-          note: 'Staff explored para-specific strategies and identified their go-to classroom moves.',
+          note: '76 paraprofessionals across three session blocks explored para-specific strategies and identified their go-to classroom moves.',
           resources: [
             { title: 'Para Game Tools', url: 'https://www.teachersdeserveit.com/paragametools' },
             { title: 'Learning Hub Course Guide', url: 'https://tdi.thinkific.com/products/digital_downloads/CourseGuide' },
@@ -1492,9 +1494,9 @@ Thank you for setting the example. It matters more than you know.`;
     // SECTION 6  - Progress Snapshot (CONDITIONAL)
     progress: {
       show: true,
-      implementationRate: 91,
-      implementationLabel: '91% of paras applying Calm Classroom Presence strategies',
-      implementationComparison: 'More than 9x the 10% industry average for PD implementation',
+      implementationRate: 85,
+      implementationLabel: '85% of ASD4 paras are actively using or trying TDI strategies with students',
+      implementationComparison: '29% use strategies regularly, 56% have tried them a few times',
       hubAccess: { active: 122, total: 122, percent: 100 },
       selfDirected: 79,
       coursesCompleted: 91,
@@ -1538,6 +1540,28 @@ Thank you for setting the example. It matters more than you know.`;
             'I finally feel like someone sees what I do every day.',
             'The Hub courses are actually useful  - not just another training to sit through.',
             'My teacher and I are actually talking now. Like, really talking about students.',
+          ],
+        },
+        {
+          id: 'vs3',
+          name: 'VS3  - Post-Session Survey',
+          date: 'April 2026',
+          respondents: 76,
+          responseRate: 69,
+          confidenceScore: 4.23,
+          confidenceMax: 5,
+          confidenceIncrease: 0,
+          highlights: [
+            '85% of paras are actively using or trying TDI strategies with students',
+            '4.23/5 average confidence rating  - up from 3.86 February baseline',
+            '93% average score on classroom scenario assessment (74% scored 6/6)',
+            '87% report TDI strategies are positively impacting their students',
+            '62% rate feeling valued at 4-5/5 · 74% rate intent to stay at 4-5/5',
+          ],
+          openResponses: [
+            'The small strategies, the little tactics that help the students without shining a spotlight on them.',
+            'This has been valuable because I am the newest Para, and I\'ve been able to keep up with the rest due to these trainings.',
+            'Seeing my students reach their IEP goals.',
           ],
         },
       ],
@@ -2123,7 +2147,7 @@ Thank you for setting the example. It matters more than you know.`;
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#1A6B6B]/10 rounded-xl overflow-hidden">
                   {[
                     { value: overviewData.investment.perEducator, label: 'per para', sub: overviewData.investment.perEducatorSublabel },
-                    { value: overviewData.investment.implementationRate, label: 'Calm Presence implemented', sub: overviewData.investment.implementationSublabel },
+                    { value: overviewData.investment.implementationRate, label: 'using TDI strategies', sub: overviewData.investment.implementationSublabel },
                     { value: overviewData.investment.coursesCompleted, label: 'course completions', sub: overviewData.investment.coursesCompletedSublabel },
                     { value: overviewData.investment.retentionStat, label: 'plan to return', sub: overviewData.investment.retentionSublabel },
                   ].map((stat, i) => (
@@ -2668,12 +2692,12 @@ Thank you for setting the example. It matters more than you know.`;
               >
                 {/* HERO STAT  - implementation rate with industry comparison */}
                 <div className="bg-gradient-to-br from-[#1e2749] to-[#2d3a6b] rounded-2xl p-6 mb-5 text-white">
-                  <p className="text-xs font-bold uppercase tracking-widest text-blue-300 mb-1">Calm Classroom Presence Implementation Rate</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-blue-300 mb-1">Strategy Implementation Rate</p>
                   <div className="flex items-end gap-4 mb-4">
                     <span className="text-6xl font-black text-white">{partnershipData.progress.implementationRate}%</span>
                     <div className="pb-2">
-                      <p className="text-blue-200 text-sm font-medium">of ASD4 paras applying</p>
-                      <p className="text-blue-300 text-xs">Ask Don&apos;t Tell strategies daily</p>
+                      <p className="text-blue-200 text-sm font-medium">of ASD4 paras actively using or trying</p>
+                      <p className="text-blue-300 text-xs">TDI strategies with students</p>
                     </div>
                   </div>
 
@@ -2707,30 +2731,44 @@ Thank you for setting the example. It matters more than you know.`;
                       </div>
                     </div>
                   </div>
-                  <p className="text-xs text-blue-300 mt-3 italic">ASD4 is 9× the industry average  - after just 2 sessions.</p>
+                  <p className="text-xs text-blue-300 mt-3 italic">29% use strategies regularly · 56% have tried them a few times · Based on April 20 post-session survey (n=76)</p>
                 </div>
 
                 {/* 4-stat grid */}
                 <div className="grid grid-cols-2 gap-3 mb-5">
+                  <div className="bg-green-50 rounded-xl p-4 border border-green-100">
+                    <p className="text-3xl font-black text-green-700">4.23<span className="text-lg">/5</span></p>
+                    <p className="text-xs text-green-600 font-medium mt-1">Avg Confidence Rating</p>
+                    <p className="text-xs text-gray-400 mt-0.5">Up from 3.86 Feb baseline</p>
+                  </div>
+                  <div className="bg-teal-50 rounded-xl p-4 border border-teal-100">
+                    <p className="text-3xl font-black text-teal-700">93%</p>
+                    <p className="text-xs text-teal-600 font-medium mt-1">Strategy Knowledge Score</p>
+                    <p className="text-xs text-gray-400 mt-0.5">74% scored perfect 6/6</p>
+                  </div>
+                  <div className="bg-purple-50 rounded-xl p-4 border border-purple-100">
+                    <p className="text-3xl font-black text-purple-700">87%</p>
+                    <p className="text-xs text-purple-600 font-medium mt-1">Positive Student Impact</p>
+                    <p className="text-xs text-gray-400 mt-0.5">26% describe impact as significant</p>
+                  </div>
+                  <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
+                    <p className="text-3xl font-black text-amber-700">74%</p>
+                    <p className="text-xs text-amber-600 font-medium mt-1">Intent to Stay Next Year</p>
+                    <p className="text-xs text-gray-400 mt-0.5">Rate 4 or 5 out of 5</p>
+                  </div>
+                </div>
+
+                {/* Feeling Valued + Retention detail */}
+                <div className="grid grid-cols-2 gap-3 mb-5">
+                  <div className="bg-rose-50 rounded-xl p-4 border border-rose-100">
+                    <p className="text-3xl font-black text-rose-700">62%</p>
+                    <p className="text-xs text-rose-600 font-medium mt-1">Feeling Valued in Role</p>
+                    <p className="text-xs text-gray-400 mt-0.5">Rate 4 or 5 out of 5</p>
+                  </div>
                   <div className="bg-teal-50 rounded-xl p-4 border border-teal-100">
                     <p className="text-3xl font-black text-teal-700">{partnershipData.progress.hubAccess.percent}%</p>
                     <p className="text-xs text-teal-600 font-medium mt-1">Hub Login Rate</p>
                     <p className="text-xs text-gray-400 mt-0.5">{partnershipData.progress.hubAccess.active}/{partnershipData.progress.hubAccess.total} paras active</p>
-                  </div>
-                  <div className="bg-green-50 rounded-xl p-4 border border-green-100">
-                    <p className="text-3xl font-black text-green-700">87%</p>
-                    <p className="text-xs text-green-600 font-medium mt-1">Confidence Increase</p>
-                    <p className="text-xs text-gray-400 mt-0.5">After Virtual Support Session 1</p>
-                  </div>
-                  <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
-                    <p className="text-3xl font-black text-orange-700">70%</p>
-                    <p className="text-xs text-orange-600 font-medium mt-1">Collaborative Support Implementation</p>
-                    <p className="text-xs text-gray-400 mt-0.5">Feedback formula after 2 sessions</p>
-                  </div>
-                  <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
-                    <p className="text-3xl font-black text-amber-700">76%</p>
-                    <p className="text-xs text-amber-600 font-medium mt-1">Retention Outlook</p>
-                    <p className="text-xs text-gray-400 mt-0.5">Paras likely returning next year</p>
                   </div>
                 </div>
 
@@ -2780,7 +2818,7 @@ Thank you for setting the example. It matters more than you know.`;
 
                 {/* Survey data note */}
                 <p className="text-xs text-gray-400 text-center italic">
-                  Implementation: 81 survey respondents · Feb 13, 2026 · VS1 survey: 95 of 114 respondents · Mar 2, 2026
+                  VS1 survey: 95 respondents · Mar 2, 2026 · VS3 post-session survey: 76 respondents · Apr 20, 2026
                 </p>
               </CollapsibleSection>
             )}
@@ -4116,6 +4154,48 @@ Thank you for setting the example. It matters more than you know.`;
                         <div>
                           <p className="text-[#1e2749] font-semibold">Emily Hoppensteadt</p>
                           <p className="text-gray-600 text-sm">Paraprofessional, Army Trail Elementary</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quote 3: Anonymous para  - April 2026 survey */}
+                <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-6 border-l-4 border-purple-400">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                      <MessageCircle className="w-6 h-6 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="text-gray-800 text-lg font-medium italic leading-relaxed mb-3">
+                        &ldquo;The small strategies, the little tactics that help the students without shining a spotlight on them.&rdquo;
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <div className="w-1 h-8 bg-purple-500 rounded-full" />
+                        <div>
+                          <p className="text-[#1e2749] font-semibold">ASD4 Paraprofessional</p>
+                          <p className="text-gray-600 text-sm">April 2026 Post-Session Survey</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quote 4: Anonymous para  - newest para */}
+                <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-2xl p-6 border-l-4 border-teal-400">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+                      <MessageCircle className="w-6 h-6 text-teal-600" />
+                    </div>
+                    <div>
+                      <p className="text-gray-800 text-lg font-medium italic leading-relaxed mb-3">
+                        &ldquo;This has been valuable because I am the newest Para, and I&apos;ve been able to keep up with the rest due to these trainings.&rdquo;
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <div className="w-1 h-8 bg-teal-500 rounded-full" />
+                        <div>
+                          <p className="text-[#1e2749] font-semibold">ASD4 Paraprofessional</p>
+                          <p className="text-gray-600 text-sm">April 2026 Post-Session Survey</p>
                         </div>
                       </div>
                     </div>
