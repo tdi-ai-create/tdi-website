@@ -4,6 +4,8 @@ User-agent: *
 Allow: /
 
 # Hidden pages - do not index
+Disallow: /seed
+Disallow: /seed/
 Disallow: /paragametools
 Disallow: /api/
 Disallow: /admin/
