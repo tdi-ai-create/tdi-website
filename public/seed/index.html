@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teachers Deserve It — Investor Brief</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy: #1B365D;
+  --teal: #2A9D8F;
+  --coral: #E76F51;
+  --gold: #F4C430;
+  --purple: #534AB7;
+  --green: #3B6D11;
+  --navy-lt: #EBF0F7;
+  --teal-lt: #E1F5EE;
+  --coral-lt: #FAECE7;
+  --gold-lt: #FAEEDA;
+  --purple-lt: #EEEDFE;
+  --green-lt: #EAF3DE;
+  --text: #1a1a1a;
+  --muted: #6b7280;
+  --border: rgba(0,0,0,0.08);
+  --bg: #f7f5f0;
+  --white: #ffffff;
+  --r: 12px;
+  --rs: 8px;
+}
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; font-size: 15px; }
+.page { max-width: 920px; margin: 0 auto; padding: 2.5rem 2rem 5rem; }
+
+/* HERO */
+.hero { background: var(--navy); border-radius: 16px; padding: 2.5rem 2.5rem 2.25rem; margin-bottom: 1.75rem; position: relative; overflow: hidden; }
+.hero::before { content:''; position:absolute; top:-60px; right:-60px; width:220px; height:220px; border-radius:50%; background:rgba(42,157,143,0.13); }
+.hero::after { content:''; position:absolute; bottom:-30px; left:90px; width:110px; height:110px; border-radius:50%; background:rgba(244,196,48,0.09); }
+.hero-eye { font-size:11px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:var(--teal); margin-bottom:.5rem; }
+.hero h1 { font-family:'Playfair Display',serif; font-size:30px; font-weight:600; color:#fff; line-height:1.25; margin-bottom:.75rem; }
+.hero-sub { font-size:14px; color:rgba(255,255,255,.65); max-width:500px; line-height:1.7; }
+.hero-date { margin-top:1.25rem; font-size:12px; color:rgba(255,255,255,.35); }
+
+/* TABS */
+.tab-bar { display:flex; gap:4px; background:var(--white); border:1px solid var(--border); border-radius:var(--r); padding:5px; margin-bottom:1.75rem; }
+.tab-btn { flex:1; padding:9px 10px; border:none; border-radius:var(--rs); background:transparent; color:var(--muted); font-size:13px; font-weight:500; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all .18s; white-space:nowrap; }
+.tab-btn.active { background:var(--navy); color:#fff; }
+.tab-btn:hover:not(.active) { background:var(--bg); color:var(--text); }
+#involve-tab-btn:not(.active) { color:var(--teal); border:1px solid rgba(42,157,143,.25); }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+/* SHARED */
+.section { margin-bottom:2.25rem; }
+.section-label { font-size:11px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.875rem; padding-bottom:.5rem; border-bottom:1px solid var(--border); }
+.card { background:var(--white); border:1px solid var(--border); border-radius:var(--r); }
+
+/* SVG ICON HELPER */
+.ico { display:inline-block; vertical-align:middle; }
+
+/* ===================== TAB 1: OVERVIEW ===================== */
+.stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.stat-card { background:var(--white); border:1px solid var(--border); border-radius:var(--r); padding:1.25rem; text-align:center; }
+.stat-num { font-family:'Playfair Display',serif; font-size:26px; font-weight:600; color:var(--navy); display:block; }
+.stat-label { font-size:12px; color:var(--muted); margin-top:4px; }
+
+/* Blueprint */
+.blueprint { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:1rem; }
+.phase-card { background:var(--white); border:1px solid var(--border); border-radius:var(--r); padding:1.25rem 1.25rem 1rem; }
+.phase-card.ignite { border-top:3px solid var(--teal); }
+.phase-card.accelerate { border-top:3px solid var(--navy); }
+.phase-card.sustain { border-top:3px solid var(--gold); }
+.phase-tag { font-size:10px; font-weight:500; letter-spacing:.09em; text-transform:uppercase; margin-bottom:.3rem; }
+.phase-card.ignite .phase-tag { color:var(--teal); }
+.phase-card.accelerate .phase-tag { color:var(--navy); }
+.phase-card.sustain .phase-tag { color:#B8960A; }
+.phase-name { font-size:17px; font-weight:600; margin-bottom:.35rem; font-family:'Playfair Display',serif; }
+.phase-tagline { font-size:11px; font-weight:500; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:.6rem; }
+.phase-desc { font-size:13px; color:var(--muted); line-height:1.55; margin-bottom:.875rem; }
+.phase-price { font-size:14px; font-weight:500; color:var(--navy); border-top:1px solid var(--border); padding-top:.75rem; }
+.phase-stat { font-size:11px; color:var(--teal); margin-top:3px; }
+
+/* Phase features */
+.phase-features { margin-top:.75rem; }
+.phase-feat-row { display:flex; align-items:baseline; gap:7px; padding:4px 0; border-bottom:1px solid rgba(0,0,0,.05); }
+.phase-feat-row:last-child { border-bottom:none; }
+.feat-name { font-size:12px; color:var(--text); flex:1; }
+.feat-val { font-size:12px; font-weight:500; color:var(--navy); white-space:nowrap; }
+.feat-inc { font-size:11px; font-style:italic; color:var(--muted); }
+.feat-check { width:14px; height:14px; flex-shrink:0; }
+
+/* Services grid */
+.services-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.svc-card { background:var(--white); border:1px solid var(--border); border-radius:var(--r); padding:1rem 1.1rem; }
+.svc-name { font-size:14px; font-weight:500; margin-bottom:3px; }
+.svc-price { font-size:11px; font-style:italic; color:var(--muted); margin-bottom:.4rem; }
+.svc-desc { font-size:13px; color:var(--muted); line-height:1.5; }
+.analytics-badge { display:inline-flex; align-items:center; gap:5px; margin-top:.6rem; background:var(--navy-lt); color:var(--navy); font-size:10px; font-weight:500; padding:3px 8px; border-radius:20px; }
+
+/* Partners */
+.partners-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.partner-card { padding:.75rem 1rem; background:var(--bg); border-radius:var(--rs); }
+.partner-name { font-size:13px; font-weight:500; }
+.partner-status { font-size:12px; color:var(--muted); margin-top:2px; }
+
+/* ===================== TAB 2: ORG CHART ===================== */
+.org-wrap { background:var(--white); border:1px solid var(--border); border-radius:var(--r); padding:2rem 1rem 1.5rem; overflow-x:auto; }
+.org-legend-row { display:flex; gap:1.25rem; justify-content:center; margin-bottom:1.75rem; flex-wrap:wrap; }
+.leg-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); }
+.leg-sw { width:14px; height:14px; border-radius:3px; }
+.sw-ceo { background:var(--navy); }
+.sw-h { background:var(--green-lt); border:1.5px solid var(--green); }
+.sw-ai { background:var(--purple-lt); border:1.5px dashed var(--purple); }
+
+/* nodes */
+.nd { display:inline-flex; flex-direction:column; align-items:center; border-radius:9px; padding:.5rem .7rem; text-align:center; min-width:100px; max-width:118px; }
+.nd.ceo-nd { background:var(--navy); border:2px solid var(--navy); min-width:120px; }
+.nd.human { background:var(--white); border:1.5px solid var(--green); }
+.nd.ai { background:var(--white); border:1.5px dashed var(--purple); }
+.nd.sm { min-width:82px; max-width:98px; padding:.4rem .55rem; }
+.nd.xs { min-width:70px; max-width:84px; padding:.35rem .5rem; }
+
+.nd-av { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:500; margin-bottom:.28rem; flex-shrink:0; }
+.nd.sm .nd-av, .nd.xs .nd-av { width:22px; height:22px; font-size:8px; }
+.av-w { background:rgba(255,255,255,.2); color:#fff; }
+.av-g { background:var(--green-lt); color:var(--green); }
+.av-p { background:var(--purple-lt); color:var(--purple); }
+.av-n { background:var(--navy-lt); color:var(--navy); }
+.av-t { background:var(--teal-lt); color:#0F6E56; }
+.av-c { background:var(--coral-lt); color:#993C1D; }
+.av-o { background:var(--gold-lt); color:#854F0B; }
+
+.nd-name { font-size:10px; font-weight:500; line-height:1.2; color:var(--text); }
+.nd.ceo-nd .nd-name { color:#fff; font-size:11px; }
+.nd-role { font-size:8px; color:var(--muted); margin-top:1px; line-height:1.3; }
+.nd.ceo-nd .nd-role { color:rgba(255,255,255,.6); font-size:9px; }
+.nd-badge { font-size:7px; padding:1px 5px; border-radius:10px; margin-top:3px; font-weight:500; }
+.nd.sm .nd-name { font-size:9px; }
+.nd.sm .nd-role { font-size:7px; }
+.nd.xs .nd-name { font-size:8.5px; }
+.nd.xs .nd-role { font-size:7px; }
+.badge-h { background:var(--green-lt); color:var(--green); }
+.badge-ai { background:var(--purple-lt); color:var(--purple); }
+
+/* tree connectors */
+.tree { display:flex; flex-direction:column; align-items:center; min-width:860px; }
+.v { width:2px; height:18px; background:var(--border); margin:0 auto; }
+.vs { width:2px; height:12px; background:var(--border); margin:0 auto; }
+.h-bar { height:2px; background:var(--border); width:100%; }
+.csuite { display:flex; gap:6px; justify-content:center; width:100%; }
+.branch { display:flex; flex-direction:column; align-items:center; }
+.reports { display:flex; gap:4px; flex-wrap:wrap; justify-content:center; }
+.rep { display:flex; flex-direction:column; align-items:center; }
+
+/* ===================== TAB 3: PORTAL ===================== */
+.portal-card { background:var(--white); border:1px solid var(--border); border-radius:var(--r); margin-bottom:1.25rem; overflow:hidden; }
+.portal-head { display:flex; align-items:center; gap:14px; padding:1.1rem 1.4rem; border-bottom:1px solid var(--border); }
+.p-icon { width:38px; height:38px; border-radius:var(--rs); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.pi-hub { background:var(--teal-lt); }
+.pi-cr { background:var(--purple-lt); }
+.pi-ops { background:var(--navy-lt); }
+.pi-sales { background:var(--coral-lt); }
+.pi-ld { background:var(--gold-lt); }
+.p-title-wrap { flex:1; }
+.p-title { font-size:15px; font-weight:500; margin-bottom:2px; }
+.p-sub { font-size:12px; color:var(--muted); }
+.p-status { font-size:11px; font-weight:500; padding:3px 10px; border-radius:20px; white-space:nowrap; }
+.s-live { background:var(--green-lt); color:var(--green); }
+.s-bld { background:var(--gold-lt); color:#854F0B; }
+.s-june { background:var(--coral-lt); color:#993C1D; }
+.portal-body { padding:1.1rem 1.4rem; }
+.p-purpose { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:.875rem; }
+.pills { display:flex; flex-wrap:wrap; gap:5px; }
+.pill { font-size:11px; padding:3px 9px; border-radius:20px; border:1px solid var(--border); color:var(--muted); background:var(--bg); }
+
+/* mockup */
+.mock-wrap { margin-top:1.1rem; background:#f0ede8; border-radius:var(--rs); overflow:hidden; border:1px solid var(--border); }
+.mock-bar { background:#e0ddd8; padding:5px 9px; display:flex; align-items:center; gap:4px; }
+.dot { width:7px; height:7px; border-radius:50%; }
+.dr { background:#ff6b6b; } .dy { background:#ffd43b; } .dg { background:#69db7c; }
+.mock-url { flex:1; background:var(--white); border-radius:3px; padding:2px 6px; font-size:10px; color:var(--muted); font-family:monospace; margin-left:3px; }
+.mock-body { padding:9px; }
+
+/* hub mock */
+.hub-nav { background:var(--navy); border-radius:4px 4px 0 0; padding:6px 9px; display:flex; align-items:center; gap:12px; }
+.hub-logo { font-size:9px; font-weight:500; color:#fff; }
+.hub-tabs { display:flex; gap:6px; }
+.h-tab { font-size:8px; color:rgba(255,255,255,.5); padding:2px 6px; border-radius:3px; }
+.h-tab.on { background:rgba(255,255,255,.12); color:#fff; }
+.hub-body { background:#f8f7f4; padding:9px; border-radius:0 0 4px 4px; }
+.hub-search { background:var(--white); border:1px solid var(--border); border-radius:4px; padding:4px 8px; font-size:9px; color:var(--muted); margin-bottom:7px; display:flex; }
+.hub-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+.hc { background:var(--white); border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+.hct { height:28px; display:flex; align-items:center; justify-content:center; font-size:11px; }
+.hct-t { background:var(--teal-lt); } .hct-n { background:var(--navy-lt); } .hct-c { background:var(--coral-lt); }
+.hci { padding:4px 6px; }
+.hcn { font-size:7.5px; font-weight:500; line-height:1.3; }
+.hcm { font-size:7px; color:var(--muted); margin-top:1px; }
+.hcb { height:2px; background:#eee; border-radius:1px; margin-top:3px; }
+.hcp { height:2px; background:var(--teal); border-radius:1px; }
+
+/* creator mock */
+.cr-pipeline { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; }
+.cr-col-h { font-size:7.5px; font-weight:500; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:4px; padding-bottom:3px; border-bottom:1px solid var(--border); }
+.cr-card { background:var(--white); border:1px solid var(--border); border-radius:4px; padding:4px 5px; margin-bottom:3px; }
+.cc-name { font-size:7.5px; font-weight:500; }
+.cc-topic { font-size:6.5px; color:var(--muted); margin-top:1px; }
+.cc-b { display:inline-block; font-size:6px; padding:1px 4px; border-radius:6px; margin-top:2px; }
+.ccb-c { background:var(--purple-lt); color:var(--purple); }
+.ccb-b { background:var(--navy-lt); color:var(--navy); }
+.ccb-d { background:var(--green-lt); color:var(--green); }
+.cc-flag { font-size:6.5px; color:#E76F51; margin-top:1px; }
+
+/* ops mock */
+.ops-tabs { display:flex; gap:3px; margin-bottom:6px; flex-wrap:wrap; }
+.ot { font-size:7.5px; padding:2px 6px; border-radius:3px; border:1px solid var(--border); color:var(--muted); background:var(--white); }
+.ot.on { background:var(--navy); color:#fff; border-color:var(--navy); }
+.ops-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; margin-bottom:6px; }
+.os-m { background:var(--white); border:1px solid var(--border); border-radius:4px; padding:4px 6px; text-align:center; }
+.os-n { font-size:12px; font-weight:500; color:var(--navy); }
+.os-l { font-size:7px; color:var(--muted); margin-top:1px; }
+.ops-t { width:100%; border-collapse:collapse; }
+.ops-t th { font-size:7px; text-align:left; color:var(--muted); font-weight:500; padding:2px 4px; border-bottom:1px solid var(--border); }
+.ops-t td { font-size:7.5px; padding:3px 4px; border-bottom:1px solid rgba(0,0,0,.04); }
+.chip { display:inline-block; font-size:6px; padding:1px 4px; border-radius:6px; }
+.ch-g { background:var(--green-lt); color:var(--green); }
+.ch-o { background:var(--gold-lt); color:#854F0B; }
+.ch-n { background:var(--navy-lt); color:var(--navy); }
+
+/* sales mock */
+.s-bars { display:flex; flex-direction:column; gap:4px; margin-bottom:8px; }
+.s-stage { display:flex; align-items:center; gap:6px; }
+.s-lbl { font-size:7.5px; color:var(--muted); width:72px; flex-shrink:0; }
+.s-bg { flex:1; height:12px; background:#eee; border-radius:3px; overflow:hidden; }
+.s-fill { height:100%; border-radius:3px; display:flex; align-items:center; padding-left:5px; }
+.s-fill span { font-size:7px; font-weight:500; color:#fff; }
+.s-cnt { font-size:7.5px; color:var(--muted); width:18px; text-align:right; flex-shrink:0; }
+.s-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
+.s-opp { background:var(--white); border:1px solid var(--border); border-radius:4px; padding:5px 6px; }
+.so-n { font-size:7.5px; font-weight:500; }
+.so-v { font-size:6.5px; color:var(--teal); margin-top:1px; }
+.so-s { font-size:6px; padding:1px 4px; border-radius:6px; margin-top:2px; display:inline-block; }
+.ss-h { background:var(--coral-lt); color:#993C1D; }
+.ss-w { background:var(--gold-lt); color:#854F0B; }
+.ss-c { background:var(--navy-lt); color:var(--navy); }
+
+/* ld mock */
+.ld-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:5px; }
+.ld-c { background:var(--white); border:1px solid var(--border); border-radius:4px; padding:6px 8px; }
+.ld-sch { font-size:7.5px; font-weight:500; }
+.ld-p { display:inline-block; font-size:6px; padding:1px 5px; border-radius:6px; margin:2px 0; }
+.ldp-i { background:var(--teal-lt); color:#0F6E56; }
+.ldp-a { background:var(--navy-lt); color:var(--navy); }
+.ldp-h { background:var(--gold-lt); color:#854F0B; }
+.ld-bb { height:2px; background:#eee; border-radius:1px; margin-top:3px; }
+.ld-bf { height:2px; background:var(--teal); border-radius:1px; }
+.ld-bl { font-size:6.5px; color:var(--muted); margin-top:1px; }
+
+/* timeline */
+.tl { background:var(--white); border:1px solid var(--border); border-radius:var(--r); padding:1.5rem; }
+.tl-item { display:flex; gap:12px; margin-bottom:1.1rem; }
+.tl-item:last-child { margin-bottom:0; }
+.tl-l { display:flex; flex-direction:column; align-items:center; flex-shrink:0; width:22px; }
+.tl-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:4px; }
+.td-done { background:var(--teal); }
+.td-now { background:var(--gold); border:2px solid #B8960A; }
+.td-fut { background:#ddd; }
+.tl-line { width:2px; flex:1; background:var(--border); margin-top:4px; }
+.tl-c { flex:1; }
+.tl-dt { font-size:11px; color:var(--muted); margin-bottom:1px; }
+.tl-ti { font-size:14px; font-weight:500; margin-bottom:2px; }
+.tl-de { font-size:13px; color:var(--muted); line-height:1.5; }
+
+/* stack */
+.stack-g { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.sk { background:var(--white); border:1px solid var(--border); border-radius:var(--rs); padding:.875rem 1rem; }
+.sk-nm { font-size:13px; font-weight:500; margin-bottom:2px; }
+.sk-de { font-size:11px; color:var(--muted); }
+
+/* ===================== TAB 4: EXPLORE ===================== */
+.links-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:1.5rem; }
+.link-card { background:var(--white); border:1px solid var(--border); border-radius:var(--r); padding:1.1rem 1.25rem; text-decoration:none; color:var(--text); display:block; transition:border-color .15s; }
+.link-card:hover { border-color:var(--teal); }
+.link-card.feat { border-left:3px solid var(--navy); }
+.link-card.sub { border-left:3px solid var(--coral); }
+.link-card.dash { border-left:3px solid var(--teal); }
+.lk-title { font-size:14px; font-weight:500; margin-bottom:3px; }
+.lk-desc { font-size:12px; color:var(--muted); line-height:1.5; }
+.lk-cta { display:inline-block; margin-top:8px; font-size:11px; font-weight:500; color:var(--teal); }
+.cta-block { background:var(--navy-lt); border:1px solid rgba(27,54,93,.12); border-radius:var(--r); padding:1.5rem 1.75rem; display:flex; align-items:center; gap:1.25rem; }
+.cta-ic { flex-shrink:0; }
+.cta-tx h3 { font-size:16px; font-weight:500; margin-bottom:.3rem; }
+.cta-tx p { font-size:13px; color:var(--muted); line-height:1.5; }
+.cta-btn { margin-top:.75rem; display:inline-block; background:var(--navy); color:#fff; font-size:13px; font-weight:500; padding:.5rem 1.25rem; border-radius:var(--rs); text-decoration:none; }
+
+/* footer */
+.footer { text-align:center; margin-top:3rem; padding-top:1.5rem; border-top:1px solid var(--border); }
+.footer-logo { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); font-weight:600; margin-bottom:.35rem; }
+.footer-sub { font-size:12px; color:var(--muted); line-height:1.6; }
+.teal { color:var(--teal); }
+.confid { display:inline-block; margin-top:.75rem; font-size:11px; background:var(--coral-lt); color:#993C1D; padding:3px 10px; border-radius:20px; }
+
+/* icon svg inline */
+svg.tab-ico { width:14px; height:14px; display:inline-block; vertical-align:-2px; margin-right:4px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eye">Teachers Deserve It &mdash; Investor Brief &mdash; April 2026</div>
+    <h1>Professional development<br>that actually works.</h1>
+    <div class="hero-sub">TDI is building the infrastructure layer for K-12 educator retention - AI-powered, grant-funded, and demand-proven. 100K+ educators. 8 district partners. Zero churn.</div>
+    <div style="display:flex;gap:10px;margin-top:1.25rem;flex-wrap:wrap;">
+      <div style="background:rgba(42,157,143,.18);border:1px solid rgba(42,157,143,.3);border-radius:20px;padding:4px 12px;font-size:11px;color:#9FE1CB;font-weight:500;">$1.2M Raise &middot; $10M Pre-Money</div>
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:4px 12px;font-size:11px;color:rgba(255,255,255,.7);font-weight:500;">42:1 LTV:CAC</div>
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:4px 12px;font-size:11px;color:rgba(255,255,255,.7);font-weight:500;">98% Renewal Rate</div>
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:4px 12px;font-size:11px;color:rgba(255,255,255,.7);font-weight:500;">$34B Market</div>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('opportunity',this)">
+      <svg class="tab-ico" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 4.5H14l-3.8 2.8 1.5 4.5L8 11.1l-3.7 2.7 1.5-4.5L2 6.5h4.5z" fill="currentColor" opacity=".8"/></svg>
+      The Opportunity
+    </button>
+    <button class="tab-btn" onclick="switchTab('overview',this)">
+      <svg class="tab-ico" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".6"/></svg>
+      TDI at a Glance
+    </button>
+    <button class="tab-btn" onclick="switchTab('org',this)">
+      <svg class="tab-ico" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="3" r="2" fill="currentColor" opacity=".7"/><circle cx="3" cy="13" r="2" fill="currentColor" opacity=".7"/><circle cx="13" cy="13" r="2" fill="currentColor" opacity=".7"/><path d="M8 5v3M8 8H3v3M8 8h5v3" stroke="currentColor" stroke-width="1.2" opacity=".5"/></svg>
+      The Team
+    </button>
+    <button class="tab-btn" onclick="switchTab('portal',this)">
+      <svg class="tab-ico" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.3" opacity=".6"/><path d="M1 5h14" stroke="currentColor" stroke-width="1.2" opacity=".5"/><circle cx="3.5" cy="3.5" r=".8" fill="currentColor" opacity=".5"/><circle cx="6" cy="3.5" r=".8" fill="currentColor" opacity=".5"/></svg>
+      The Platform
+    </button>
+    <button class="tab-btn" onclick="switchTab('explore',this)">
+      <svg class="tab-ico" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3" opacity=".6"/><path d="M8 1.5C8 1.5 5.5 4 5.5 8s2.5 6.5 2.5 6.5M8 1.5C8 1.5 10.5 4 10.5 8S8 14.5 8 14.5M1.5 8h13" stroke="currentColor" stroke-width="1.1" opacity=".5"/></svg>
+      Explore TDI
+    </button>
+  </div>
+
+  <!-- ===================== TAB 1: THE OPPORTUNITY ===================== -->
+  <div id="tab-opportunity" class="tab-panel active">
+
+    <!-- FOUNDER STORY -->
+    <div class="section">
+      <div class="section-label">The founder</div>
+      <div class="card" style="padding:1.5rem;border-left:3px solid var(--teal);">
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:1.25rem;align-items:start;">
+          <div style="width:52px;height:52px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <span style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:#fff;">RH</span>
+          </div>
+          <div>
+            <div style="font-size:16px;font-weight:500;margin-bottom:2px;">Rae Hughart &mdash; CEO and Founder</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:.875rem;">Former classroom teacher &middot; TEDx speaker &middot; Author &middot; EdTech builder</div>
+            <p style="font-size:14px;color:var(--muted);line-height:1.8;">Rae was a special education student told she wouldn't make it to college. At school she was invisible. Everywhere else - on the dance floor, at her father's work events, in any room she chose - she lit up. Same kid. Different system. That contrast never left her.</p>
+            <p style="font-size:14px;color:var(--muted);line-height:1.8;margin-top:.75rem;">She became a teacher, then a director of training, then an author and TEDx speaker. She completed every goal she'd set for herself before 30 - and felt empty, because the ceiling the system had put on her had become her own. She looked around and saw the same pattern in the teachers she worked with: brilliant, capable people being quietly broken by a profession that was supposed to support them.</p>
+            <p style="font-size:14px;color:var(--muted);line-height:1.8;margin-top:.75rem;">She didn't set out to build a company. She started helping teachers with what they were actually struggling with. It worked. It spread. Administrators asked for it at scale. <strong style="color:var(--text);">TDI was pulled into existence by demand, not designed from a boardroom.</strong> That origin is the product's most important feature.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);">
+          <span style="font-size:11px;background:var(--navy-lt);color:var(--navy);padding:3px 10px;border-radius:20px;font-weight:500;">TEDx Speaker</span>
+          <span style="font-size:11px;background:var(--teal-lt);color:#0F6E56;padding:3px 10px;border-radius:20px;font-weight:500;">Published Author</span>
+          <span style="font-size:11px;background:var(--coral-lt);color:#993C1D;padding:3px 10px;border-radius:20px;font-weight:500;">Former Classroom Teacher</span>
+          <span style="font-size:11px;background:var(--gold-lt);color:#854F0B;padding:3px 10px;border-radius:20px;font-weight:500;">National PD Trainer</span>
+          <span style="font-size:11px;background:var(--purple-lt);color:var(--purple);padding:3px 10px;border-radius:20px;font-weight:500;">EdTech Founder</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHY NOW -->
+    <div class="section">
+      <div class="section-label">Why now</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        <div class="card" style="padding:1.1rem;">
+          <div style="font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--coral);margin-bottom:.5rem;">The Crisis</div>
+          <div style="font-size:14px;font-weight:500;margin-bottom:.4rem;">44% of teachers leave within 5 years</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6;">The pandemic broke something in the teaching profession that has not been fixed. Burnout, attrition, and morale are at decade lows. Districts are desperate for solutions that actually work &mdash; not more one-day workshops.</div>
+        </div>
+        <div class="card" style="padding:1.1rem;">
+          <div style="font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:.5rem;">The Technology</div>
+          <div style="font-size:14px;font-weight:500;margin-bottom:.4rem;">AI enables what was impossible 3 years ago</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6;">Personalized PD tracking at scale, AI coaching agents available to every educator, and real-time implementation data that traditional PD companies cannot generate. TDI has built this stack. Competitors have not.</div>
+        </div>
+        <div class="card" style="padding:1.1rem;">
+          <div style="font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;">The Policy</div>
+          <div style="font-size:14px;font-weight:500;margin-bottom:.4rem;">Federal funding specifically for educator retention</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6;">Title II-A, ESSA workforce development provisions, and state-level educator retention grants have created a funding window that removes the primary purchase barrier for school districts. TDI's grant engine was built for exactly this landscape.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MARKET SIZE -->
+    <div class="section">
+      <div class="section-label">Market size</div>
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:center;">
+        <svg viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px;display:block;margin:0 auto;">
+          <!-- TAM outer -->
+          <ellipse cx="170" cy="130" rx="162" ry="118" fill="#EBF0F7" stroke="#1B365D" stroke-width="1.5"/>
+          <text x="170" y="30" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9.5" fill="#1B365D" font-weight="600" letter-spacing="0.06em">TOTAL ADDRESSABLE MARKET</text>
+          <text x="170" y="52" text-anchor="middle" font-family="Playfair Display,serif" font-size="26" fill="#1B365D" font-weight="600">$34B</text>
+          <text x="170" y="68" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#6b7280">US K-12 PD spend annually</text>
+          <!-- SAM middle -->
+          <ellipse cx="170" cy="155" rx="114" ry="82" fill="#E1F5EE" stroke="#2A9D8F" stroke-width="1.5"/>
+          <text x="170" y="116" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9.5" fill="#0F6E56" font-weight="600" letter-spacing="0.05em">SERVICEABLE MARKET</text>
+          <text x="170" y="138" text-anchor="middle" font-family="Playfair Display,serif" font-size="24" fill="#2A9D8F" font-weight="600">$8B</text>
+          <text x="170" y="154" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#6b7280">Title I + high-turnover districts</text>
+          <!-- SOM inner -->
+          <ellipse cx="170" cy="195" rx="64" ry="44" fill="#FAECE7" stroke="#E76F51" stroke-width="1.5"/>
+          <text x="170" y="183" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8.5" fill="#993C1D" font-weight="600">INITIAL TARGET</text>
+          <text x="170" y="200" text-anchor="middle" font-family="Playfair Display,serif" font-size="18" fill="#E76F51" font-weight="600">$1.25M</text>
+          <text x="170" y="214" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="#993C1D">50 districts · 24 months</text>
+        </svg>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="padding:.875rem 1rem;background:var(--navy-lt);border-radius:var(--rs);border-left:3px solid var(--navy);">
+            <div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--navy);margin-bottom:3px;">TAM &mdash; $34B</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5;">Total US K-12 professional development spend. $6B of this is estimated waste on one-time workshops with no measurable outcome.</div>
+          </div>
+          <div style="padding:.875rem 1rem;background:var(--teal-lt);border-radius:var(--rs);border-left:3px solid var(--teal);">
+            <div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#0F6E56;margin-bottom:3px;">SAM &mdash; $8B</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5;">Title I and high-turnover districts actively seeking retention solutions. TDI's grant engine makes these districts accessible regardless of discretionary budget.</div>
+          </div>
+          <div style="padding:.875rem 1rem;background:var(--coral-lt);border-radius:var(--rs);border-left:3px solid var(--coral);">
+            <div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#993C1D;margin-bottom:3px;">SOM &mdash; $1.25M ARR (24 months)</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5;">50 district partners at $15K&ndash;$36K each depending on Blueprint phase. Conservative path requiring just 0.02% SAM penetration.</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:10px;padding:.875rem 1.1rem;background:var(--white);border:1px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--muted);line-height:1.6;">
+        <strong style="color:var(--text);">The grant engine expands the TAM.</strong> Because TDI helps districts fund their partnership through existing federal and state grants, the addressable market is not limited to discretionary PD budgets. 80% of partner schools have funded TDI entirely through grants. This fundamentally changes the sales motion and the size of the opportunity.
+      </div>
+    </div>
+
+    <!-- TRACTION -->
+    <div class="section">
+      <div class="section-label">Traction</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;">
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:var(--navy);">8</div>
+          <div style="font-size:11px;font-weight:500;color:var(--navy);margin-top:3px;">District partners</div>
+          <div style="font-size:10px;color:var(--teal);margin-top:2px;">98% renewed</div>
+        </div>
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:var(--navy);">$105K</div>
+          <div style="font-size:11px;font-weight:500;color:var(--navy);margin-top:3px;">Confirmed ARR</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">$435K active pipeline</div>
+        </div>
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:var(--navy);">0</div>
+          <div style="font-size:11px;font-weight:500;color:var(--navy);margin-top:3px;">Partner churn</div>
+          <div style="font-size:10px;color:var(--teal);margin-top:2px;">All 8 renewed or active</div>
+        </div>
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:var(--navy);">100K+</div>
+          <div style="font-size:11px;font-weight:500;color:var(--navy);margin-top:3px;">Community</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">50 states, 100+ countries</div>
+        </div>
+      </div>
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem 1.4rem;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem;">Demand signal: TDI was pulled forward, not pushed</div>
+        <div style="display:flex;align-items:stretch;gap:0;overflow:hidden;border-radius:var(--rs);border:1px solid var(--border);">
+          <div style="flex:1;padding:.75rem .875rem;background:var(--bg);border-right:1px solid var(--border);">
+            <div style="font-size:10px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;">Origin</div>
+            <div style="font-size:12px;color:var(--text);">Rae helps teachers informally with what actually works</div>
+          </div>
+          <div style="flex:1;padding:.75rem .875rem;background:var(--bg);border-right:1px solid var(--border);">
+            <div style="font-size:10px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;">Spread</div>
+            <div style="font-size:12px;color:var(--text);">Teachers share it. Principals notice. Districts ask for it.</div>
+          </div>
+          <div style="flex:1;padding:.75rem .875rem;background:var(--bg);border-right:1px solid var(--border);">
+            <div style="font-size:10px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;">Scale</div>
+            <div style="font-size:12px;color:var(--text);">Blueprint model built to meet district-level demand</div>
+          </div>
+          <div style="flex:1;padding:.75rem .875rem;background:var(--teal-lt);">
+            <div style="font-size:10px;font-weight:500;color:#0F6E56;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;">Now</div>
+            <div style="font-size:12px;color:#0F6E56;font-weight:500;">8 partners · $105K ARR · zero churn</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UNIT ECONOMICS -->
+    <div class="section">
+      <div class="section-label">Unit economics</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:10px;">
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:var(--teal);">42:1</div>
+          <div style="font-size:11px;font-weight:500;color:var(--text);margin-top:3px;">LTV:CAC ratio</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Benchmark: 3:1 min</div>
+        </div>
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:var(--teal);">98%</div>
+          <div style="font-size:11px;font-weight:500;color:var(--text);margin-top:3px;">Renewal rate</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">LTV compounds yearly</div>
+        </div>
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:var(--teal);">85-94%</div>
+          <div style="font-size:11px;font-weight:500;color:var(--text);margin-top:3px;">Gross margin</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">SaaS-tier</div>
+        </div>
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:var(--teal);">$15&ndash;36K</div>
+          <div style="font-size:11px;font-weight:500;color:var(--text);margin-top:3px;">Contract range (ACV)</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">$15K&ndash;$36K depending on phase</div>
+        </div>
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:var(--teal);">$3.6M</div>
+          <div style="font-size:11px;font-weight:500;color:var(--text);margin-top:3px;">Year 4 ARR target</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Funded path</div>
+        </div>
+      </div>
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem 1.5rem;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;">ARR growth trajectory (funded path)</div>
+        <svg viewBox="0 0 660 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
+          <!-- y axis -->
+          <line x1="82" y1="18" x2="82" y2="160" stroke="#e0ddd8" stroke-width="1"/>
+          <!-- grid lines -->
+          <line x1="82" y1="30" x2="620" y2="30" stroke="#f0ede8" stroke-width="1"/>
+          <line x1="82" y1="65" x2="620" y2="65" stroke="#f0ede8" stroke-width="1"/>
+          <line x1="82" y1="100" x2="620" y2="100" stroke="#f0ede8" stroke-width="1"/>
+          <line x1="82" y1="135" x2="620" y2="135" stroke="#f0ede8" stroke-width="1"/>
+          <line x1="82" y1="160" x2="620" y2="160" stroke="#e0ddd8" stroke-width="1"/>
+          <!-- y axis labels -->
+          <text x="76" y="34" text-anchor="end" font-family="DM Sans,sans-serif" font-size="9.5" fill="#6b7280">$3.6M</text>
+          <text x="76" y="69" text-anchor="end" font-family="DM Sans,sans-serif" font-size="9.5" fill="#6b7280">$2.1M</text>
+          <text x="76" y="104" text-anchor="end" font-family="DM Sans,sans-serif" font-size="9.5" fill="#6b7280">$690K</text>
+          <text x="76" y="139" text-anchor="end" font-family="DM Sans,sans-serif" font-size="9.5" fill="#6b7280">$63K</text>
+          <!-- bars - wider and spaced better, all end at y=160 baseline -->
+          <!-- Year 1 (current): $105K confirmed ARR -->
+          <rect x="108" y="154" width="72" height="6" rx="2" fill="#1B365D" opacity=".4"/>
+          <text x="144" y="178" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6b7280">Year 1 (now)</text>
+          <text x="144" y="191" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#aaa">today</text>
+          <text x="144" y="147" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#1B365D" font-weight="500">$105K</text>
+          <!-- Year 2: $690K -->
+          <rect x="218" y="100" width="72" height="60" rx="2" fill="#1B365D" opacity=".55"/>
+          <text x="254" y="178" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6b7280">Year 2</text>
+          <text x="254" y="93" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#1B365D" font-weight="500">$690K</text>
+          <!-- Year 3: $2.1M -->
+          <rect x="328" y="65" width="72" height="95" rx="2" fill="#2A9D8F" opacity=".65"/>
+          <text x="364" y="178" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6b7280">Year 3</text>
+          <text x="364" y="58" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#2A9D8F" font-weight="500">$2.1M</text>
+          <!-- Year 4: $3.6M -->
+          <rect x="438" y="30" width="72" height="130" rx="2" fill="#2A9D8F"/>
+          <text x="474" y="178" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6b7280">Year 4</text>
+          <text x="474" y="23" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="#2A9D8F" font-weight="600">$3.6M</text>
+          <!-- seed annotation -->
+          <line x1="144" y1="118" x2="364" y2="118" stroke="#E76F51" stroke-width="1.2" stroke-dasharray="4,3"/>
+          <rect x="186" y="108" width="138" height="18" rx="4" fill="#FAECE7"/>
+          <text x="255" y="121" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#993C1D" font-weight="500">$1.2M seed enables Year 2&ndash;4 growth</text>
+          <!-- Series A label -->
+          <rect x="528" y="56" width="88" height="30" rx="4" fill="#EEEDFE"/>
+          <text x="572" y="69" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#534AB7" font-weight="600">Series A</text>
+          <text x="572" y="81" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8.5" fill="#534AB7">threshold</text>
+          <line x1="528" y1="65" x2="513" y2="52" stroke="#534AB7" stroke-width="1" stroke-dasharray="3,2"/>
+        </svg>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border);">
+          <div style="padding:.75rem;background:var(--bg);border-radius:var(--rs);">
+            <div style="font-size:13px;font-weight:500;margin-bottom:.3rem;">B2B &mdash; District contracts</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6;">$15K&ndash;$36K per district per year depending on Blueprint phase (Ignite starts at $33K, Accelerate $34K, Sustain $54K). Multi-year relationships. 98% renewal. 80% grant-funded. Primary revenue engine.</div>
+          </div>
+          <div style="padding:.75rem;background:var(--bg);border-radius:var(--rs);">
+            <div style="font-size:13px;font-weight:500;margin-bottom:.3rem;">B2C &mdash; Individual subscriptions</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6;">$5/$10/$25/month for educators. 100K+ community flywheel. Teachers bring TDI to their principals. ARR projections above are B2B only &mdash; B2C is additional upside.</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:10px;padding:.875rem 1rem;background:var(--white);border:1px solid var(--border);border-left:3px solid var(--purple);border-radius:var(--rs);font-size:13px;color:var(--muted);line-height:1.6;">
+        <strong style="color:var(--text);">Valuation context:</strong> CFO Victor Nash benchmarked TDI against Carta Q3 2025 EdTech seed data and recommends a <strong style="color:var(--purple);">$8&ndash;12M pre-money range (midpoint $10M)</strong>. Inputs: $105K confirmed ARR, 6 active contracts, 85&ndash;94% gross margins. The $1.2M raise at $10M pre-money implies 10.7% dilution &mdash; within standard seed parameters of 10&ndash;20%. Pipeline, community size, and zero churn support the higher end of the range.
+      </div>
+    </div>
+
+    <!-- COMPETITIVE MOAT -->
+    <div class="section">
+      <div class="section-label">Competitive landscape</div>
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="background:var(--bg);">
+              <th style="text-align:left;font-size:11px;font-weight:500;color:var(--muted);padding:.65rem 1rem;border-bottom:1px solid var(--border);">Capability</th>
+              <th style="text-align:center;font-size:11px;font-weight:500;color:var(--muted);padding:.65rem .75rem;border-bottom:1px solid var(--border);">Generic LMS<br><span style="font-weight:400;font-size:10px;">Thinkific, etc.</span></th>
+              <th style="text-align:center;font-size:11px;font-weight:500;color:var(--muted);padding:.65rem .75rem;border-bottom:1px solid var(--border);">PD Vendors<br><span style="font-weight:400;font-size:10px;">BetterLesson, TNTP</span></th>
+              <th style="text-align:center;font-size:11px;font-weight:500;color:var(--navy);padding:.65rem .75rem;border-bottom:2px solid var(--teal);background:var(--teal-lt);">Teachers Deserve It</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-size:12px;padding:.6rem 1rem;color:var(--text);">School content filter compliance</td>
+              <td style="text-align:center;font-size:14px;padding:.6rem;">&#10007;</td>
+              <td style="text-align:center;font-size:14px;padding:.6rem;">&#10007;</td>
+              <td style="text-align:center;font-size:15px;padding:.6rem;color:var(--teal);font-weight:600;background:rgba(42,157,143,.05);">&#10003;</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-size:12px;padding:.6rem 1rem;color:var(--text);">Grant engine removes budget barrier</td>
+              <td style="text-align:center;font-size:14px;padding:.6rem;">&#10007;</td>
+              <td style="text-align:center;font-size:14px;padding:.6rem;">&#10007;</td>
+              <td style="text-align:center;font-size:15px;padding:.6rem;color:var(--teal);font-weight:600;background:rgba(42,157,143,.05);">&#10003;</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-size:12px;padding:.6rem 1rem;color:var(--text);">Real-time implementation tracking dashboard</td>
+              <td style="text-align:center;font-size:14px;padding:.6rem;">&#10007;</td>
+              <td style="text-align:center;font-size:14px;padding:.6rem;">&#10007;</td>
+              <td style="text-align:center;font-size:15px;padding:.6rem;color:var(--teal);font-weight:600;background:rgba(42,157,143,.05);">&#10003;</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-size:12px;padding:.6rem 1rem;color:var(--text);">Paraprofessional-specific content</td>
+              <td style="text-align:center;font-size:14px;padding:.6rem;">&#10007;</td>
+              <td style="text-align:center;font-size:14px;padding:.6rem;">&#10007;</td>
+              <td style="text-align:center;font-size:15px;padding:.6rem;color:var(--teal);font-weight:600;background:rgba(42,157,143,.05);">&#10003;</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-size:12px;padding:.6rem 1rem;color:var(--text);">Proprietary platform (no third-party LMS dependency)</td>
+              <td style="text-align:center;font-size:14px;padding:.6rem;">&#10007;</td>
+              <td style="text-align:center;font-size:14px;padding:.6rem;">&#10007;</td>
+              <td style="text-align:center;font-size:15px;padding:.6rem;color:var(--teal);font-weight:600;background:rgba(42,157,143,.05);">&#10003;</td>
+            </tr>
+            <tr>
+              <td style="font-size:12px;padding:.6rem 1rem;color:var(--text);">100K+ educator community flywheel</td>
+              <td style="text-align:center;font-size:14px;padding:.6rem;">&#10007;</td>
+              <td style="text-align:center;font-size:14px;padding:.6rem;">&#10007;</td>
+              <td style="text-align:center;font-size:15px;padding:.6rem;color:var(--teal);font-weight:600;background:rgba(42,157,143,.05);">&#10003;</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="padding:.75rem 1rem;background:var(--bg);border-top:1px solid var(--border);font-size:12px;color:var(--muted);">
+          <strong style="color:var(--text);">The positioning:</strong> TDI is not a professional development tool. It is a teacher retention infrastructure platform. BetterLesson sells coaching. Instructure sells LMS. Teachstone sells rubrics. None measure classroom-level implementation. None help schools fund the purchase. None were built from inside a school building.
+        </div>
+      </div>
+      <!-- 2x2 positioning map -->
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;margin-top:10px;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;">Competitive positioning map</div>
+        <svg viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:520px;display:block;margin:0 auto;">
+          <!-- quadrant fills -->
+          <rect x="60" y="24" width="190" height="148" rx="5" fill="#f8f7f4"/>
+          <rect x="268" y="24" width="190" height="148" rx="5" fill="#f8f7f4"/>
+          <rect x="60" y="188" width="190" height="148" rx="5" fill="#f8f7f4"/>
+          <rect x="268" y="188" width="190" height="148" rx="5" fill="rgba(42,157,143,.07)" stroke="#2A9D8F" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <!-- axes -->
+          <line x1="60" y1="170" x2="460" y2="170" stroke="#ccc" stroke-width="1.5"/>
+          <line x1="264" y1="20" x2="264" y2="342" stroke="#ccc" stroke-width="1.5"/>
+          <!-- x axis labels -->
+          <text x="152" y="356" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="#6b7280">Narrow solution</text>
+          <text x="362" y="356" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="#6b7280">Broad solution</text>
+          <!-- y axis labels (rotated) -->
+          <text x="14" y="100" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="#6b7280" transform="rotate(-90,14,100)">High budget barrier</text>
+          <text x="14" y="262" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="#6b7280" transform="rotate(-90,14,262)">Low budget barrier</text>
+          <!-- arrow tips -->
+          <polygon points="460,167 468,170 460,173" fill="#ccc"/>
+          <polygon points="264,20 261,14 267,14" fill="#ccc"/>
+          <!-- Quadrant labels -->
+          <text x="152" y="42" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#bbb" letter-spacing="0.05em">NARROW + HIGH BARRIER</text>
+          <text x="362" y="42" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#bbb" letter-spacing="0.05em">BROAD + HIGH BARRIER</text>
+          <text x="152" y="206" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#bbb" letter-spacing="0.05em">NARROW + LOW BARRIER</text>
+          <text x="362" y="206" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#2A9D8F" letter-spacing="0.05em" font-weight="600">BROAD + LOW BARRIER</text>
+          <!-- Generic LMS -->
+          <circle cx="152" cy="88" r="24" fill="#EBF0F7" stroke="#1B365D" stroke-width="1.5"/>
+          <text x="152" y="85" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#1B365D" font-weight="500">Generic</text>
+          <text x="152" y="98" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#1B365D" font-weight="500">LMS</text>
+          <!-- PD Vendors -->
+          <circle cx="362" cy="100" r="26" fill="#EBF0F7" stroke="#1B365D" stroke-width="1.5"/>
+          <text x="362" y="97" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#1B365D" font-weight="500">PD Vendors</text>
+          <text x="362" y="110" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#6b7280">BetterLesson</text>
+          <!-- Teachstone -->
+          <circle cx="170" cy="130" r="18" fill="#f0ede8" stroke="#aaa" stroke-width="1"/>
+          <text x="170" y="133" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9.5" fill="#888">Teachstone</text>
+          <!-- District DIY -->
+          <circle cx="130" cy="255" r="20" fill="#f0ede8" stroke="#aaa" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="130" y="252" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9.5" fill="#888">District</text>
+          <text x="130" y="264" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9.5" fill="#888">DIY PD</text>
+          <!-- TDI -->
+          <circle cx="370" cy="270" r="36" fill="#2A9D8F"/>
+          <text x="370" y="262" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="13" fill="#fff" font-weight="700">TDI</text>
+          <text x="370" y="276" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9.5" fill="rgba(255,255,255,.9)">Grant-funded</text>
+          <text x="370" y="289" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9.5" fill="rgba(255,255,255,.9)">full solution</text>
+          <!-- "only player" callout -->
+          <rect x="296" y="316" width="148" height="22" rx="5" fill="#E1F5EE" stroke="#2A9D8F" stroke-width="1"/>
+          <text x="370" y="331" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#0F6E56" font-weight="600">Only player in this quadrant</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- THE ASK -->
+    <div class="section">
+      <div class="section-label">The ask</div>
+      <div style="background:var(--navy);border-radius:var(--r);padding:1.75rem 2rem;">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:#fff;margin-bottom:.35rem;">$1.2M Seed Round</div>
+        <div style="font-size:14px;color:rgba(255,255,255,.65);line-height:1.7;max-width:560px;margin-bottom:1.25rem;">This raise is not to figure out if TDI works. It works. This raise answers one question: how fast can we grow? Eight district partners with zero churn, $435K in active pipeline, and 131 opportunities in our CRM. We have proof. We need scale.</div>
+
+        <!-- Valuation table -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem;">
+          <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:var(--rs);padding:.875rem;text-align:center;">
+            <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:#fff;">$10M</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;line-height:1.4;">Target pre-money<br>valuation</div>
+          </div>
+          <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:var(--rs);padding:.875rem;text-align:center;">
+            <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:#9FE1CB;">$1.2M</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;line-height:1.4;">Raise amount<br>(seed round)</div>
+          </div>
+          <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:var(--rs);padding:.875rem;text-align:center;">
+            <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:#fff;">$11.2M</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;line-height:1.4;">Post-money<br>implied value</div>
+          </div>
+          <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:var(--rs);padding:.875rem;text-align:center;">
+            <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:#F5C4B3;">~10.7%</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;line-height:1.4;">Investor dilution<br>(within normal 10-20%)</div>
+          </div>
+        </div>
+
+        <!-- Valuation basis note -->
+        <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:var(--rs);padding:.75rem 1rem;margin-bottom:1.25rem;display:flex;align-items:flex-start;gap:.75rem;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="8" cy="8" r="7" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/><path d="M8 5v4M8 11v.5" stroke="rgba(255,255,255,0.6)" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <div style="font-size:12px;color:rgba(255,255,255,.6);line-height:1.6;"><strong style="color:rgba(255,255,255,.85);">Valuation basis:</strong> $8&ndash;12M range (midpoint $10M) recommended by CFO Victor Nash, benchmarked against Carta Q3 2025 EdTech seed data. Inputs: $105K confirmed ARR, 6 active district contracts, 85&ndash;94% gross margins (SaaS-tier). TDI's pipeline, community, and zero-churn profile support the higher end of this range.</div>
+        </div>
+
+        <!-- Allocation bar -->
+        <div style="margin-bottom:1.1rem;">
+          <div style="font-size:11px;font-weight:500;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;">Use of funds &mdash; $1.2M</div>
+          <div style="display:flex;height:28px;border-radius:6px;overflow:hidden;gap:2px;">
+            <div style="flex:50;background:#2A9D8F;display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:10px;font-weight:600;color:#fff;">50% Sales</span>
+            </div>
+            <div style="flex:30;background:#534AB7;display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:10px;font-weight:600;color:#fff;">30% Platform</span>
+            </div>
+            <div style="flex:20;background:#E76F51;display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:10px;font-weight:600;color:#fff;">20% Ops</span>
+            </div>
+          </div>
+          <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:4px;">Allocation percentages are directional &mdash; final breakdown pending CFO confirmation</div>
+        </div>
+
+        <!-- Use of funds buckets -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem;">
+          <div style="background:rgba(42,157,143,.2);border:1px solid rgba(42,157,143,.3);border-radius:var(--rs);padding:.875rem;">
+            <div style="font-size:12px;font-weight:500;color:#9FE1CB;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem;">~$600K &mdash; Sales expansion</div>
+            <div style="font-size:13px;color:#fff;line-height:1.5;">8 partners to 25. Conference pipeline, sales hire, and relationship conversion. Average contract $15K&ndash;$36K depending on entry phase. All compound with 98% renewal.</div>
+          </div>
+          <div style="background:rgba(83,74,183,.2);border:1px solid rgba(83,74,183,.3);border-radius:var(--rs);padding:.875rem;">
+            <div style="font-size:12px;font-weight:500;color:#CECBF6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem;">~$360K &mdash; Platform</div>
+            <div style="font-size:13px;color:#fff;line-height:1.5;">Learning Hub live, CRM independent June 1. Own the full stack. Zero third-party LMS dependency.</div>
+          </div>
+          <div style="background:rgba(231,111,81,.2);border:1px solid rgba(231,111,81,.3);border-radius:var(--rs);padding:.875rem;">
+            <div style="font-size:12px;font-weight:500;color:#F5C4B3;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem;">~$240K &mdash; Operations</div>
+            <div style="font-size:13px;color:#fff;line-height:1.5;">25 districts at $20K ARR = $500K. That threshold positions TDI for a $5&ndash;8M Series A in 2027.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <a href="mailto:rae@teachersdeserveit.com?subject=TDI Investor Interest" style="display:inline-block;background:#fff;color:var(--navy);font-size:13px;font-weight:500;padding:.6rem 1.4rem;border-radius:var(--rs);text-decoration:none;white-space:nowrap;">Email Rae directly</a>
+          <a href="https://calendar.app.google/rpF9q94JZhi3f9qN9" target="_blank" style="display:inline-block;background:var(--teal);color:#fff;font-size:13px;font-weight:500;padding:.6rem 1.4rem;border-radius:var(--rs);text-decoration:none;white-space:nowrap;">Schedule a conversation &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== TAB 2: TDI AT A GLANCE ===================== -->
+  <div id="tab-overview" class="tab-panel">
+
+    <div class="section">
+      <div class="section-label">Impact at a glance</div>
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card"><span class="stat-num">100K+</span><div class="stat-label">educators served</div></div>
+        <div class="stat-card"><span class="stat-num">50</span><div class="stat-label">states in our community</div></div>
+        <div class="stat-card"><span class="stat-num">100+</span><div class="stat-label">countries represented</div></div>
+        <div class="stat-card"><span class="stat-num">94%</span><div class="stat-label">would recommend TDI</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Mission and vision</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div class="card" style="padding:1.4rem 1.5rem;border-left:3px solid var(--teal);">
+          <div style="font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:.5rem;">Our Mission</div>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;line-height:1.55;color:var(--text);">Teachers Deserve It exists to build a system that actually supports the educators inside it - not by adding more to their plate, but by helping them work smarter, feel better, and remember why they chose this work in the first place.</div>
+        </div>
+        <div class="card" style="padding:1.4rem 1.5rem;border-left:3px solid var(--navy);">
+          <div style="font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--navy);margin-bottom:.5rem;">Our Vision</div>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;line-height:1.55;color:var(--text);">A world where no great teacher leaves the classroom because of burnout. Where professional development is something educators look forward to - not dread. Where every school has the data, the support, and the systems to keep their best people.</div>
+        </div>
+      </div>
+      <div class="card" style="padding:1.25rem 1.5rem;">
+        <div style="font-size:13px;color:var(--muted);line-height:1.75;">TDI was born from the belief that teachers deserve better - not nicer words or a pizza party at the end of a hard week, but real, practical support that changes how they spend their time and energy. We put boots on the ground in your building and work with <strong style="color:var(--text);">your whole staff</strong> - not just core teachers. Art teachers, coaches, paraprofessionals, everyone. Personalized support that reduces stress, improves retention, and actually gets used. <strong style="color:var(--text);">83% of teachers want additional support after a single PD session.</strong> TDI bridges the gap between inspiration and implementation - and because every plan is built new for every educator, every season, it never gets stale.</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">What the data shows in partner schools</div>
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem 1.5rem;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;">Before and after a TDI partnership</div>
+        <svg viewBox="0 0 760 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
+          <!-- column headers -->
+          <text x="90" y="14" font-family="DM Sans,sans-serif" font-size="10" fill="#6b7280" font-weight="500">METRIC</text>
+          <text x="298" y="14" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#E76F51" font-weight="600">BEFORE TDI</text>
+          <text x="514" y="14" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#2A9D8F" font-weight="600">AFTER TDI</text>
+          <text x="680" y="14" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6b7280">INDUSTRY AVG</text>
+          <!-- divider -->
+          <line x1="86" y1="20" x2="748" y2="20" stroke="#e0ddd8" stroke-width="1"/>
+
+          <!-- ROW 1: Stress (lower = better, so before=bad=wide red, after=good=narrow teal) -->
+          <text x="86" y="48" font-family="DM Sans,sans-serif" font-size="11" fill="#1a1a1a" font-weight="500">Teacher stress</text>
+          <text x="86" y="62" font-family="DM Sans,sans-serif" font-size="9" fill="#aaa">(10-point scale, lower = better)</text>
+          <!-- before: 9/10 -->
+          <rect x="190" y="38" width="200" height="22" rx="4" fill="#FAECE7"/>
+          <rect x="190" y="38" width="180" height="22" rx="4" fill="#E76F51" opacity=".75"/>
+          <text x="376" y="53" text-anchor="end" font-family="DM Sans,sans-serif" font-size="10" fill="#fff" font-weight="600">9 / 10</text>
+          <!-- arrow -->
+          <text x="404" y="53" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="14" fill="#2A9D8F">&#8594;</text>
+          <!-- after: 5/10 -->
+          <rect x="420" y="38" width="200" height="22" rx="4" fill="#E1F5EE"/>
+          <rect x="420" y="38" width="100" height="22" rx="4" fill="#2A9D8F"/>
+          <text x="526" y="53" text-anchor="end" font-family="DM Sans,sans-serif" font-size="10" fill="#fff" font-weight="600">5 / 10</text>
+          <!-- industry -->
+          <text x="680" y="53" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6b7280">7.3 avg</text>
+          <line x1="86" y1="74" x2="748" y2="74" stroke="#f0ede8" stroke-width="1"/>
+
+          <!-- ROW 2: Retention intent (higher = better) -->
+          <text x="86" y="100" font-family="DM Sans,sans-serif" font-size="11" fill="#1a1a1a" font-weight="500">Retention intent</text>
+          <text x="86" y="114" font-family="DM Sans,sans-serif" font-size="9" fill="#aaa">(10-point scale, higher = better)</text>
+          <!-- before: 3/10 -->
+          <rect x="190" y="90" width="200" height="22" rx="4" fill="#FAECE7"/>
+          <rect x="190" y="90" width="60" height="22" rx="4" fill="#E76F51" opacity=".75"/>
+          <text x="258" y="105" text-anchor="end" font-family="DM Sans,sans-serif" font-size="10" fill="#fff" font-weight="600">3 / 10</text>
+          <text x="404" y="105" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="14" fill="#2A9D8F">&#8594;</text>
+          <!-- after: 6/10 -->
+          <rect x="420" y="90" width="200" height="22" rx="4" fill="#E1F5EE"/>
+          <rect x="420" y="90" width="120" height="22" rx="4" fill="#2A9D8F"/>
+          <text x="548" y="105" text-anchor="end" font-family="DM Sans,sans-serif" font-size="10" fill="#fff" font-weight="600">6 / 10</text>
+          <text x="680" y="105" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6b7280">4.1 avg</text>
+          <line x1="86" y1="126" x2="748" y2="126" stroke="#f0ede8" stroke-width="1"/>
+
+          <!-- ROW 3: Implementation -->
+          <text x="86" y="152" font-family="DM Sans,sans-serif" font-size="11" fill="#1a1a1a" font-weight="500">Strategy implementation rate</text>
+          <text x="86" y="166" font-family="DM Sans,sans-serif" font-size="9" fill="#aaa">(% of educators applying strategies in class)</text>
+          <!-- before: 10% -->
+          <rect x="190" y="142" width="200" height="22" rx="4" fill="#f0ede8"/>
+          <rect x="190" y="142" width="20" height="22" rx="4" fill="#ccc"/>
+          <text x="220" y="157" font-family="DM Sans,sans-serif" font-size="10" fill="#888" font-weight="500">10%</text>
+          <text x="404" y="157" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="14" fill="#2A9D8F">&#8594;</text>
+          <!-- after: 65% -->
+          <rect x="420" y="142" width="200" height="22" rx="4" fill="#E1F5EE"/>
+          <rect x="420" y="142" width="130" height="22" rx="4" fill="#2A9D8F"/>
+          <text x="556" y="157" text-anchor="end" font-family="DM Sans,sans-serif" font-size="10" fill="#fff" font-weight="600">65%</text>
+          <text x="680" y="157" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6b7280">10% avg</text>
+          <line x1="86" y1="178" x2="748" y2="178" stroke="#f0ede8" stroke-width="1"/>
+
+          <!-- ROW 4: Time saved -->
+          <text x="86" y="204" font-family="DM Sans,sans-serif" font-size="11" fill="#1a1a1a" font-weight="500">Planning time</text>
+          <text x="86" y="218" font-family="DM Sans,sans-serif" font-size="9" fill="#aaa">(hours per week)</text>
+          <!-- before -->
+          <rect x="190" y="194" width="200" height="22" rx="4" fill="#f0ede8"/>
+          <text x="290" y="209" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#888">No baseline tracked</text>
+          <text x="404" y="209" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="14" fill="#2A9D8F">&#8594;</text>
+          <!-- after -->
+          <rect x="420" y="194" width="200" height="22" rx="4" fill="#E1F5EE"/>
+          <text x="520" y="209" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#0F6E56" font-weight="600">~6 hrs/week recovered</text>
+          <text x="680" y="209" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6b7280">Per educator</text>
+        </svg>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        <div style="background:var(--purple-lt);border-radius:var(--r);padding:1.1rem;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:var(--purple);">93%</div>
+          <div style="font-size:12px;font-weight:500;color:var(--purple);margin-top:3px;">grant funding approved</div>
+          <div style="font-size:11px;color:#7a70d0;margin-top:2px;">for partner schools</div>
+        </div>
+        <div style="background:var(--green-lt);border-radius:var(--r);padding:1.1rem;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:var(--green);">80%</div>
+          <div style="font-size:12px;font-weight:500;color:var(--green);margin-top:3px;">secure $35K+ in funding</div>
+          <div style="font-size:11px;color:#5a9a28;margin-top:2px;">through existing grant pipelines</div>
+        </div>
+        <div style="background:var(--teal-lt);border-radius:var(--r);padding:1.1rem;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:#0F6E56;">98%</div>
+          <div style="font-size:12px;font-weight:500;color:#0F6E56;margin-top:3px;">partner renewal rate</div>
+          <div style="font-size:11px;color:#2A9D8F;margin-top:2px;">zero churn to date</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;padding:.75rem 1rem;background:var(--white);border:1px solid var(--border);border-radius:var(--rs);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+        <div style="font-size:13px;color:var(--muted);">Most partnerships pay for themselves. Title II-A, ESSA, and other existing grant pipelines cover TDI partnerships at 80%+ of partner schools.</div>
+        <a href="https://www.teachersdeserveit.com/funding" target="_blank" style="font-size:12px;font-weight:500;color:var(--teal);white-space:nowrap;text-decoration:none;flex-shrink:0;">Explore funding options &rarr;</a>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">The TDI Blueprint - a partnership, not a transaction</div>
+      <div class="blueprint">
+
+        <!-- IGNITE -->
+        <div class="phase-card ignite">
+          <div class="phase-tag">Phase 1</div>
+          <div class="phase-name">Ignite</div>
+          <div class="phase-tagline">Pilot Phase</div>
+          <div class="phase-desc">Targeted pilot with select teachers. Establish baselines, build trust, and prove impact with measurable data. Includes Implementation and Compliance Analytics with every service.</div>
+          <div class="phase-features">
+            <div class="phase-feat-row"><div class="feat-name">Learning Hub Membership</div><div class="feat-val"># of staff</div></div>
+            <div class="phase-feat-row"><div class="feat-name">In-Person Observation Days</div><div class="feat-val">3 days</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Virtual Coaching</div><div class="feat-val">2 sessions</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Executive Session</div><div class="feat-val">2 sessions</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Implementation &amp; Compliance Analytics</div><div class="feat-inc">Included</div></div>
+            <div class="phase-feat-row"><div class="feat-name">On-Demand Request Pipeline</div><div class="feat-inc">Included</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Global Solution Tools</div><div class="feat-inc">Included</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Funding Pipeline</div><div class="feat-inc">Included</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Certified Strategic Trainer</div><div class="feat-inc">Included</div></div>
+          </div>
+          <div class="phase-price">Starting at $33,000</div>
+          <div class="phase-stat">65% implementation rate vs 10% industry average</div>
+        </div>
+
+        <!-- ACCELERATE -->
+        <div class="phase-card accelerate">
+          <div class="phase-tag">Phase 2</div>
+          <div class="phase-name">Accelerate</div>
+          <div class="phase-tagline">Full Staff</div>
+          <div class="phase-desc">Expand to full staff with embedded coaching, observations, and sustained implementation support. Includes the TDI book for every educator on staff.</div>
+          <div class="phase-features">
+            <div class="phase-feat-row"><div class="feat-name">Learning Hub Membership</div><div class="feat-val"># of staff</div></div>
+            <div class="phase-feat-row"><div class="feat-name">In-Person Observation Days</div><div class="feat-val">2 days</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Virtual Coaching</div><div class="feat-val">2 sessions</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Executive Session</div><div class="feat-val">2 sessions</div></div>
+            <div class="phase-feat-row"><div class="feat-name">TDI Soft Cover Book</div><div class="feat-val"># of staff</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Implementation &amp; Compliance Analytics</div><div class="feat-inc">Included</div></div>
+            <div class="phase-feat-row"><div class="feat-name">On-Demand Request Pipeline</div><div class="feat-inc">Included</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Global Solution Tools</div><div class="feat-inc">Included</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Funding Pipeline</div><div class="feat-inc">Included</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Certified Strategic Trainer</div><div class="feat-inc">Included</div></div>
+          </div>
+          <div class="phase-price">Starting at $34,000</div>
+          <div class="phase-stat">94% would recommend to a colleague</div>
+        </div>
+
+        <!-- SUSTAIN -->
+        <div class="phase-card sustain">
+          <div class="phase-tag">Phase 3</div>
+          <div class="phase-name">Sustain</div>
+          <div class="phase-tagline">Built-In Capacity</div>
+          <div class="phase-desc">Build internal capacity with leadership coaching, Desi AI tools, and self-sustaining systems. Desi provides always-on AI-powered coaching and resource support for every teacher in the building.</div>
+          <div class="phase-features">
+            <div class="phase-feat-row"><div class="feat-name">Learning Hub Membership</div><div class="feat-val"># of staff</div></div>
+            <div class="phase-feat-row"><div class="feat-name">In-Person Observation Days</div><div class="feat-val">2 days</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Virtual Coaching</div><div class="feat-val">2 sessions</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Executive Session</div><div class="feat-val">2 sessions</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Desi AI Support</div><div class="feat-val">Building access</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Implementation &amp; Compliance Analytics</div><div class="feat-inc">Included</div></div>
+            <div class="phase-feat-row"><div class="feat-name">On-Demand Request Pipeline</div><div class="feat-inc">Included</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Global Solution Tools</div><div class="feat-inc">Included</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Funding Pipeline</div><div class="feat-inc">Included</div></div>
+            <div class="phase-feat-row"><div class="feat-name">Certified Strategic Trainer</div><div class="feat-inc">Included</div></div>
+          </div>
+          <div class="phase-price">Starting at $54,000</div>
+          <div class="phase-stat">21 states with partnership schools</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Individual services (a la carte)</div>
+      <div class="services-grid">
+        <div class="svc-card">
+          <div class="svc-name">Learning Hub Membership</div>
+          <div class="svc-price">Priced per teacher, annually</div>
+          <div class="svc-desc">Full access to TDI's research-backed resource library - targeted, actionable tools teachers can use immediately.</div>
+          <div class="analytics-badge"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1" y="5" width="2" height="4" rx=".5" fill="currentColor"/><rect x="4" y="3" width="2" height="6" rx=".5" fill="currentColor"/><rect x="7" y="1" width="2" height="8" rx=".5" fill="currentColor"/></svg> Includes Analytics Suite</div>
+        </div>
+        <div class="svc-card">
+          <div class="svc-name">In-Person Observation</div>
+          <div class="svc-price">Priced per visit, travel included</div>
+          <div class="svc-desc">Full in-person visit with classroom observations, teacher feedback, and leadership debrief.</div>
+          <div class="analytics-badge"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1" y="5" width="2" height="4" rx=".5" fill="currentColor"/><rect x="4" y="3" width="2" height="6" rx=".5" fill="currentColor"/><rect x="7" y="1" width="2" height="8" rx=".5" fill="currentColor"/></svg> Includes Analytics Suite</div>
+        </div>
+        <div class="svc-card">
+          <div class="svc-name">Virtual Coaching</div>
+          <div class="svc-price">Priced per session</div>
+          <div class="svc-desc">45-minute targeted coaching sessions for teacher support, leadership strategy, or implementation check-ins.</div>
+          <div class="analytics-badge"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1" y="5" width="2" height="4" rx=".5" fill="currentColor"/><rect x="4" y="3" width="2" height="6" rx=".5" fill="currentColor"/><rect x="7" y="1" width="2" height="8" rx=".5" fill="currentColor"/></svg> Includes Analytics Suite</div>
+        </div>
+        <div class="svc-card">
+          <div class="svc-name">Executive Session</div>
+          <div class="svc-price">Priced per session</div>
+          <div class="svc-desc">Strategic goal-setting for annual KPIs, school improvement planning, and leadership alignment.</div>
+          <div class="analytics-badge"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1" y="5" width="2" height="4" rx=".5" fill="currentColor"/><rect x="4" y="3" width="2" height="6" rx=".5" fill="currentColor"/><rect x="7" y="1" width="2" height="8" rx=".5" fill="currentColor"/></svg> Includes Analytics Suite</div>
+        </div>
+        <div class="svc-card">
+          <div class="svc-name">Keynote</div>
+          <div class="svc-price">Priced as full-day booking</div>
+          <div class="svc-desc">A full-day keynote experience that energizes staff and sets the vision for sustained instructional growth.</div>
+        </div>
+        <div class="svc-card">
+          <div class="svc-name">TDI Book</div>
+          <div class="svc-price">Priced per copy</div>
+          <div class="svc-desc">Teachers Deserve It - the foundational text for building a school culture that puts educators first. Written by Rae Hughart and Adam Welcome.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Community flywheel &amp; content engine</div>
+      <div class="card" style="padding:1.25rem 1.5rem;">
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:1rem;">Every piece of content TDI publishes is community-requested &mdash; which means it solves real problems, drives real engagement, and keeps the flywheel turning. This is the organic GTM that makes CAC near zero.</p>
+        <svg viewBox="0 0 680 170" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;margin-bottom:1rem;">
+          <defs>
+            <marker id="arrf" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7 Z" fill="#2A9D8F"/>
+            </marker>
+          </defs>
+          <!-- node 1: Community -->
+          <rect x="8" y="48" width="138" height="66" rx="8" fill="#EBF0F7" stroke="#1B365D" stroke-width="1.5"/>
+          <text x="77" y="72" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="#1B365D" font-weight="600">Community</text>
+          <text x="77" y="87" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#1B365D">requests a topic</text>
+          <text x="77" y="104" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#6b7280">100K+ educators</text>
+          <!-- arrow 1 -->
+          <path d="M 148 82 L 170 82" stroke="#2A9D8F" stroke-width="2" marker-end="url(#arrf)"/>
+          <!-- node 2: TDI publishes -->
+          <rect x="172" y="48" width="138" height="66" rx="8" fill="#E1F5EE" stroke="#2A9D8F" stroke-width="1.5"/>
+          <text x="241" y="72" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="#0F6E56" font-weight="600">TDI publishes</text>
+          <text x="241" y="87" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6b7280">3 blogs · 2 podcasts</text>
+          <text x="241" y="101" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6b7280">3-4 tools / week</text>
+          <!-- arrow 2 -->
+          <path d="M 312 82 L 334 82" stroke="#2A9D8F" stroke-width="2" marker-end="url(#arrf)"/>
+          <!-- node 3: Educators share -->
+          <rect x="336" y="48" width="138" height="66" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="1.5"/>
+          <text x="405" y="72" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="#534AB7" font-weight="600">Educators use it</text>
+          <text x="405" y="87" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6b7280">share with colleagues</text>
+          <text x="405" y="101" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6b7280">community grows</text>
+          <!-- arrow 3 -->
+          <path d="M 476 82 L 498 82" stroke="#2A9D8F" stroke-width="2" marker-end="url(#arrf)"/>
+          <!-- node 4: Districts -->
+          <rect x="500" y="48" width="172" height="66" rx="8" fill="#FAECE7" stroke="#E76F51" stroke-width="1.5"/>
+          <text x="586" y="69" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="#993C1D" font-weight="600">Districts notice</text>
+          <text x="586" y="84" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6b7280">partnerships open</text>
+          <text x="586" y="98" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6b7280">referrals multiply</text>
+          <!-- loop-back arrow under -->
+          <path d="M 586 115 Q 586 148 405 148 Q 77 148 77 115" stroke="#2A9D8F" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrf)"/>
+          <rect x="240" y="151" width="200" height="18" rx="4" fill="none"/>
+          <text x="340" y="164" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9.5" fill="#2A9D8F" font-weight="500">Every cycle grows community and lowers CAC</text>
+        </svg>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:1rem;">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+          <div style="background:var(--teal-lt);border-radius:var(--rs);padding:1rem;text-align:center;">
+            <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:#0F6E56;line-height:1;">3</div>
+            <div style="font-size:11px;font-weight:500;color:#0F6E56;margin-top:3px;">Blog posts</div>
+            <div style="font-size:10px;color:#2A9D8F;margin-top:2px;">per week</div>
+          </div>
+          <div style="background:var(--navy-lt);border-radius:var(--rs);padding:1rem;text-align:center;">
+            <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:var(--navy);line-height:1;">2</div>
+            <div style="font-size:11px;font-weight:500;color:var(--navy);margin-top:3px;">Podcast episodes</div>
+            <div style="font-size:10px;color:#4a6fa5;margin-top:2px;">per week</div>
+          </div>
+          <div style="background:var(--coral-lt);border-radius:var(--rs);padding:1rem;text-align:center;">
+            <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:#993C1D;line-height:1;">3-4</div>
+            <div style="font-size:11px;font-weight:500;color:#993C1D;margin-top:3px;">Download tools</div>
+            <div style="font-size:10px;color:#c45a36;margin-top:2px;">per week</div>
+          </div>
+          <div style="background:var(--gold-lt);border-radius:var(--rs);padding:1rem;text-align:center;">
+            <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:#854F0B;line-height:1;">1-3</div>
+            <div style="font-size:11px;font-weight:500;color:#854F0B;margin-top:3px;">New courses</div>
+            <div style="font-size:10px;color:#a0680e;margin-top:2px;">per month</div>
+          </div>
+        </div>
+        <div style="margin-top:.875rem;padding:.75rem 1rem;background:var(--bg);border-radius:var(--rs);font-size:12px;color:var(--muted);line-height:1.6;">
+          <strong style="color:var(--text);">All topics are community-requested.</strong> Educators submit what they need, TDI builds it. That feedback loop is what keeps engagement high and content directly useful in real classrooms.
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+  </div>
+
+  <!-- ===================== TAB 2: ORG CHART ===================== -->
+  <div id="tab-org" class="tab-panel">
+    <div class="section">
+      <div class="section-label">TDI team structure</div>
+      <div class="org-wrap">
+
+        <div class="org-legend-row">
+          <div class="leg-item"><div class="leg-sw sw-ceo"></div>Founder</div>
+          <div class="leg-item"><div class="leg-sw sw-h"></div>Human team member</div>
+          <div class="leg-item"><div class="leg-sw sw-ai"></div>AI agent (Paperclip-managed)</div>
+        </div>
+
+        <div class="tree">
+
+          <!-- CEO -->
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div class="nd ceo-nd">
+              <div class="nd-av av-w">RH</div>
+              <div class="nd-name">Rae Hughart</div>
+              <div class="nd-role">CEO and Founder</div>
+              <div class="nd-badge badge-h">Human</div>
+            </div>
+            <div class="v"></div>
+          </div>
+
+          <!-- Erin Pope - Operating CEO -->
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div class="nd ai" style="min-width:120px;">
+              <div class="nd-av av-p">EP</div>
+              <div class="nd-name">Erin Pope</div>
+              <div class="nd-role">Operating CEO Agent</div>
+              <div class="nd-badge badge-ai">AI Agent</div>
+            </div>
+            <div class="v"></div>
+          </div>
+
+          <!-- Quinn - Health Monitor (staff of Erin) -->
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div class="nd ai sm">
+              <div class="nd-av av-p">QN</div>
+              <div class="nd-name">Quinn Nakamura</div>
+              <div class="nd-role">Agent Health Monitor</div>
+              <div class="nd-badge badge-ai">AI Agent</div>
+            </div>
+            <div class="v"></div>
+          </div>
+
+          <!-- H-bar -->
+          <div class="h-bar" style="min-width:860px;"></div>
+
+          <!-- C-Suite -->
+          <div class="csuite">
+
+            <!-- KRISTIN / Marketing -->
+            <div class="branch">
+              <div class="vs"></div>
+              <div class="nd human">
+                <div class="nd-av av-g">KW</div>
+                <div class="nd-name">Kristin Williams</div>
+                <div class="nd-role">CMO</div>
+                <div class="nd-badge badge-h">Human</div>
+              </div>
+              <div class="vs"></div>
+              <div class="reports">
+                <div class="rep"><div class="nd ai sm"><div class="nd-av av-p">IR</div><div class="nd-name">Izzy Reeves</div><div class="nd-role">CMO Prep Agent</div><div class="nd-badge badge-ai">AI</div></div></div>
+                <div class="rep"><div class="nd ai sm"><div class="nd-av av-p">AM</div><div class="nd-name">Alexis Martinez</div><div class="nd-role">Brand and Content</div><div class="nd-badge badge-ai">AI</div></div></div>
+                <div class="rep"><div class="nd ai sm"><div class="nd-av av-p">ZO</div><div class="nd-name">Zara Okonkwo</div><div class="nd-role">Social Director</div><div class="nd-badge badge-ai">AI</div></div></div>
+                <div class="rep"><div class="nd ai sm"><div class="nd-av av-p">MB</div><div class="nd-name">Morgan Bell</div><div class="nd-role">Marketing</div><div class="nd-badge badge-ai">AI</div></div></div>
+              </div>
+            </div>
+
+            <!-- OMAR / Finance -->
+            <div class="branch">
+              <div class="vs"></div>
+              <div class="nd human">
+                <div class="nd-av av-o">OG</div>
+                <div class="nd-name">Omar Garcia</div>
+                <div class="nd-role">CFO</div>
+                <div class="nd-badge badge-h">Human</div>
+              </div>
+              <div class="vs"></div>
+              <div class="reports">
+                <div class="rep"><div class="nd human sm"><div class="nd-av av-o">MG</div><div class="nd-name">Mel Garcia</div><div class="nd-role">EA / Travel</div><div class="nd-badge badge-h">Human</div></div></div>
+                <div class="rep"><div class="nd ai sm"><div class="nd-av av-p">VN</div><div class="nd-name">Victor Nash</div><div class="nd-role">CFO Prep Agent</div><div class="nd-badge badge-ai">AI</div></div></div>
+                <div class="rep"><div class="nd ai sm"><div class="nd-av av-p">SR</div><div class="nd-name">Sandra Reyes</div><div class="nd-role">AR / Invoicing</div><div class="nd-badge badge-ai">AI</div></div></div>
+              </div>
+            </div>
+
+            <!-- JAMES / Operations COO -->
+            <div class="branch">
+              <div class="vs"></div>
+              <div class="nd ai">
+                <div class="nd-av av-n">JW</div>
+                <div class="nd-name">James Washington</div>
+                <div class="nd-role">COO</div>
+                <div class="nd-badge badge-ai">AI Agent</div>
+              </div>
+              <div class="vs"></div>
+              <div class="reports">
+                <div class="rep">
+                  <div class="nd human sm"><div class="nd-av av-c">RP</div><div class="nd-name">Rachel Patragas</div><div class="nd-role">Dir. Creative Solutions</div><div class="nd-badge badge-h">Human</div></div>
+                  <div class="vs"></div>
+                  <div class="nd ai sm"><div class="nd-av av-p">AMS</div><div class="nd-name">Anne Marie Schmitt</div><div class="nd-role">Rachel Prep Agent</div><div class="nd-badge badge-ai">AI</div></div>
+                </div>
+                <div class="rep"><div class="nd ai sm"><div class="nd-av av-p">OS</div><div class="nd-name">Olivia Smith</div><div class="nd-role">Exec Comms</div><div class="nd-badge badge-ai">AI</div></div></div>
+                <div class="rep"><div class="nd ai sm"><div class="nd-av av-p">PN</div><div class="nd-name">Priya Nair</div><div class="nd-role">Customer Success</div><div class="nd-badge badge-ai">AI</div></div></div>
+              </div>
+            </div>
+
+            <!-- ELENA / Revenue -->
+            <div class="branch">
+              <div class="vs"></div>
+              <div class="nd ai">
+                <div class="nd-av av-t">EV</div>
+                <div class="nd-name">Elena Vasquez</div>
+                <div class="nd-role">CRO</div>
+                <div class="nd-badge badge-ai">AI Agent</div>
+              </div>
+              <div class="vs"></div>
+              <div class="reports">
+                <div class="rep">
+                  <div class="nd human sm"><div class="nd-av av-o">JF</div><div class="nd-name">Jim Ford</div><div class="nd-role">Business Dev / SDR</div><div class="nd-badge badge-h">Human</div></div>
+                  <div class="vs"></div>
+                  <div class="nd ai sm"><div class="nd-av av-p">SC</div><div class="nd-name">Sophia Castillo</div><div class="nd-role">Jim Prep Agent</div><div class="nd-badge badge-ai">AI</div></div>
+                </div>
+                <div class="rep">
+                  <div class="nd ai sm"><div class="nd-av av-p">VT</div><div class="nd-name">Vanessa Thornton</div><div class="nd-role">Grants Lead</div><div class="nd-badge badge-ai">AI</div></div>
+                  <div class="vs"></div>
+                  <div style="display:flex;gap:3px;">
+                    <div class="nd ai xs"><div class="nd-av av-p">ML</div><div class="nd-name">Marcus Lee</div><div class="nd-role">Grants</div><div class="nd-badge badge-ai">AI</div></div>
+                    <div class="nd ai xs"><div class="nd-av av-p">AO</div><div class="nd-name">Amara Obi</div><div class="nd-role">Grants</div><div class="nd-badge badge-ai">AI</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- MARCUS / Product -->
+            <div class="branch">
+              <div class="vs"></div>
+              <div class="nd ai">
+                <div class="nd-av av-t">MT</div>
+                <div class="nd-name">Marcus Thompson</div>
+                <div class="nd-role">CPO</div>
+                <div class="nd-badge badge-ai">AI Agent</div>
+              </div>
+              <div class="vs"></div>
+              <div class="reports">
+                <div class="rep">
+                  <div class="nd ai sm"><div class="nd-av av-n">DC</div><div class="nd-name">Dr. David Chen</div><div class="nd-role">CTO / Architect</div><div class="nd-badge badge-ai">AI</div></div>
+                  <div class="vs"></div>
+                  <div class="nd ai sm"><div class="nd-av av-t">CC</div><div class="nd-name">Chris Copypaste</div><div class="nd-role">Dir. Engineering</div><div class="nd-badge badge-ai">AI</div></div>
+                </div>
+                <div class="rep"><div class="nd ai sm"><div class="nd-av av-p">MJ</div><div class="nd-name">Dr. Maya Johnson</div><div class="nd-role">VP UX</div><div class="nd-badge badge-ai">AI</div></div></div>
+                <div class="rep"><div class="nd ai sm"><div class="nd-av av-p">DJ</div><div class="nd-name">Dr. Jasmine Cole</div><div class="nd-role">Curriculum</div><div class="nd-badge badge-ai">AI</div></div></div>
+                <div class="rep"><div class="nd ai sm"><div class="nd-av av-p">RV</div><div class="nd-name">Rodrigo Vega</div><div class="nd-role">Product</div><div class="nd-badge badge-ai">AI</div></div></div>
+              </div>
+            </div>
+
+            <!-- DOMINIC / Creative + Sebastian + Ravi -->
+            <div class="branch">
+              <div class="vs"></div>
+              <div class="nd ai">
+                <div class="nd-av av-t">DO</div>
+                <div class="nd-name">Dominic Osei</div>
+                <div class="nd-role">CDCO</div>
+                <div class="nd-badge badge-ai">AI Agent</div>
+              </div>
+              <div class="vs"></div>
+              <div class="reports">
+                <div class="rep"><div class="nd ai sm"><div class="nd-av av-p">LC</div><div class="nd-name">Lily Chen</div><div class="nd-role">Design</div><div class="nd-badge badge-ai">AI</div></div></div>
+                <div class="rep"><div class="nd ai sm"><div class="nd-av av-p">RP</div><div class="nd-name">Ravi Patel</div><div class="nd-role">CSO</div><div class="nd-badge badge-ai">AI</div></div></div>
+                <div class="rep"><div class="nd ai sm"><div class="nd-av av-n">SC2</div><div class="nd-name">Sebastian Cole</div><div class="nd-role">General Counsel</div><div class="nd-badge badge-ai">AI</div></div></div>
+              </div>
+            </div>
+
+          </div><!-- end csuite -->
+
+          <!-- Chris 5 live note -->
+          <div style="margin-top:1.75rem;background:var(--navy-lt);border:1px solid rgba(27,54,93,.12);border-radius:var(--rs);padding:.75rem 1.25rem;max-width:580px;text-align:center;">
+            <div style="font-size:12px;color:var(--navy);font-weight:500;margin-bottom:2px;">Platform note</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6;">TDI's AI agents run on Paperclip, TDI's proprietary agent management platform. Erin Pope manages 2 live agents; Chris Copypaste manages 5 live agents across the engineering stack. Agent health is monitored in real time by Quinn Nakamura.</div>
+          </div>
+
+        </div><!-- end tree -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== TAB 3: PORTAL ===================== -->
+  <div id="tab-portal" class="tab-panel">
+
+    <div style="background:var(--white);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:var(--r);padding:1.1rem 1.4rem;margin-bottom:1.5rem;font-size:14px;color:var(--muted);line-height:1.7;">
+      <strong style="color:var(--text);">A note on this overview:</strong> TDI is building a unified internal platform to run every aspect of the business - content, partnerships, sales, and operations. Five sections, one portal. We're also exploring external fundraising to accelerate this work, but the real story here is that TDI has been building this entirely from the ground up, and it's nearly operational.
+    </div>
+
+    <!-- HUB -->
+    <div class="portal-card">
+      <div class="portal-head">
+        <div class="p-icon pi-hub">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="3" stroke="#2A9D8F" stroke-width="1.5"/><path d="M6 7h8M6 10h8M6 13h5" stroke="#2A9D8F" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="p-title-wrap"><div class="p-title">Learning Hub Management</div><div class="p-sub">Educator PD platform - replacing Thinkific entirely</div></div>
+        <div class="p-status s-bld">In Development</div>
+      </div>
+      <div class="portal-body">
+        <div class="p-purpose">TDI's professional development platform for educators. 33 courses, 250+ videos, 364 users currently on Thinkific - which has had reliability issues, content filter blocks in schools, and a 95% disengagement rate. We're building the whole platform from scratch so TDI owns the experience completely. Spanish translation, favorites, and downloadable transcripts are built into the design from day one.</div>
+        <div class="pills">
+          <span class="pill">Account and enrollment management</span><span class="pill">33 courses / 250+ videos</span><span class="pill">Completion certificates</span><span class="pill">Engagement analytics</span><span class="pill">Spanish translation</span><span class="pill">Membership tiers</span><span class="pill">Mood alerts and check-ins</span><span class="pill">Downloadable transcripts</span>
+        </div>
+        <div class="mock-wrap" style="margin-top:1.1rem;">
+          <div class="mock-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div><div class="mock-url">teachersdeserveit.com/hub</div></div>
+          <div style="background:#1B365D;padding:0;">
+            <!-- Hub nav -->
+            <div style="background:#1B365D;padding:9px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.1);">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="font-size:10px;font-weight:600;color:#fff;letter-spacing:.03em;">TDI Learning Hub</div>
+                <div style="display:flex;gap:2px;">
+                  <div style="font-size:8px;color:rgba(255,255,255,.5);padding:3px 7px;border-radius:3px;">My Courses</div>
+                  <div style="font-size:8px;color:#fff;background:rgba(255,255,255,.12);padding:3px 7px;border-radius:3px;">Quick Wins</div>
+                  <div style="font-size:8px;color:rgba(255,255,255,.5);padding:3px 7px;border-radius:3px;">Downloads</div>
+                  <div style="font-size:8px;color:rgba(255,255,255,.5);padding:3px 7px;border-radius:3px;">Community</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="font-size:8px;color:rgba(255,255,255,.5);">EN</div>
+                <div style="font-size:8px;color:rgba(255,255,255,.3);">|</div>
+                <div style="font-size:8px;color:#2A9D8F;">ES</div>
+              </div>
+            </div>
+            <!-- Hub body -->
+            <div style="background:#f8f7f4;padding:12px 14px;">
+              <!-- Welcome + check-in -->
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <div>
+                  <div style="font-size:11px;font-weight:500;color:#1B365D;">Good morning, Sarah.</div>
+                  <div style="font-size:9px;color:#6b7280;margin-top:1px;">You've completed 12 courses this year. Keep going.</div>
+                </div>
+                <div style="background:#2A9D8F;color:#fff;font-size:8px;font-weight:500;padding:4px 9px;border-radius:4px;">Check In</div>
+              </div>
+              <!-- Course grid -->
+              <div style="font-size:8px;font-weight:500;color:#1B365D;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Continue learning</div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px;">
+                <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:6px;overflow:hidden;">
+                  <div style="height:32px;background:#E1F5EE;display:flex;align-items:center;justify-content:center;">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5l1.2 3.6H12L9 7.3l1.2 3.6L7 9.1l-3.2 1.8L5 7.3 2 5.1h3.8z" fill="#2A9D8F" opacity=".8"/></svg>
+                  </div>
+                  <div style="padding:5px 6px;">
+                    <div style="font-size:7.5px;font-weight:500;line-height:1.3;">Burnout to Fired Up</div>
+                    <div style="height:2px;background:#eee;border-radius:1px;margin-top:4px;"><div style="height:2px;width:65%;background:#2A9D8F;border-radius:1px;"></div></div>
+                    <div style="font-size:6.5px;color:#6b7280;margin-top:2px;">65% complete</div>
+                  </div>
+                </div>
+                <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:6px;overflow:hidden;">
+                  <div style="height:32px;background:#EBF0F7;display:flex;align-items:center;justify-content:center;">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="1" width="10" height="12" rx="1.5" stroke="#1B365D" stroke-width="1.2"/><path d="M4.5 5h5M4.5 7.5h5M4.5 10h3" stroke="#1B365D" stroke-width=".9" stroke-linecap="round"/></svg>
+                  </div>
+                  <div style="padding:5px 6px;">
+                    <div style="font-size:7.5px;font-weight:500;line-height:1.3;">Grant Writing 101</div>
+                    <div style="height:2px;background:#eee;border-radius:1px;margin-top:4px;"><div style="height:2px;width:100%;background:#2A9D8F;border-radius:1px;"></div></div>
+                    <div style="font-size:6.5px;color:#2A9D8F;margin-top:2px;">Complete</div>
+                  </div>
+                </div>
+                <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:6px;overflow:hidden;">
+                  <div style="height:32px;background:#FAEEDA;display:flex;align-items:center;justify-content:center;">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="#854F0B" stroke-width="1.2"/><path d="M7 4.5v2.5l1.5 1.5" stroke="#854F0B" stroke-width="1" stroke-linecap="round"/></svg>
+                  </div>
+                  <div style="padding:5px 6px;">
+                    <div style="font-size:7.5px;font-weight:500;line-height:1.3;">Time Back System</div>
+                    <div style="height:2px;background:#eee;border-radius:1px;margin-top:4px;"><div style="height:2px;width:20%;background:#F4C430;border-radius:1px;"></div></div>
+                    <div style="font-size:6.5px;color:#6b7280;margin-top:2px;">Just started</div>
+                  </div>
+                </div>
+                <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:6px;overflow:hidden;">
+                  <div style="height:32px;background:#FAECE7;display:flex;align-items:center;justify-content:center;">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2l1 3h3l-2.5 1.8.9 3L7 8.2l-2.4 1.6.9-3L3 5h3z" stroke="#993C1D" stroke-width="1" stroke-linejoin="round"/></svg>
+                  </div>
+                  <div style="padding:5px 6px;">
+                    <div style="font-size:7.5px;font-weight:500;line-height:1.3;">Joy Restoration</div>
+                    <div style="height:2px;background:#eee;border-radius:1px;margin-top:4px;"></div>
+                    <div style="font-size:6.5px;color:#6b7280;margin-top:2px;">Not started</div>
+                  </div>
+                </div>
+              </div>
+              <!-- Quick wins + mood -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+                <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:5px;padding:8px;">
+                  <div style="font-size:8px;font-weight:500;color:#1B365D;margin-bottom:5px;">This Week's Quick Win</div>
+                  <div style="font-size:8px;color:#6b7280;line-height:1.5;">"Set a hard stop time today and write it on a sticky note on your desk. That's it."</div>
+                  <div style="font-size:7px;color:#2A9D8F;margin-top:4px;">Community requested - 247 educators this week</div>
+                </div>
+                <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:5px;padding:8px;">
+                  <div style="font-size:8px;font-weight:500;color:#1B365D;margin-bottom:5px;">Available in English and Spanish</div>
+                  <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                    <div style="font-size:7px;background:#EBF0F7;color:#1B365D;padding:2px 6px;border-radius:3px;">33 courses</div>
+                    <div style="font-size:7px;background:#EBF0F7;color:#1B365D;padding:2px 6px;border-radius:3px;">250+ videos</div>
+                    <div style="font-size:7px;background:#EBF0F7;color:#1B365D;padding:2px 6px;border-radius:3px;">74 downloads</div>
+                    <div style="font-size:7px;background:#E1F5EE;color:#0F6E56;padding:2px 6px;border-radius:3px;">Transcripts EN/ES</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CREATOR -->
+    <div class="portal-card">
+      <div class="portal-head">
+        <div class="p-icon pi-cr">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2l2 6h6l-5 3.5 2 6L10 14l-5 3.5 2-6L2 8h6z" stroke="#534AB7" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="p-title-wrap"><div class="p-title">Creator Studio</div><div class="p-sub">Internal pipeline for educator-creators building Hub content</div></div>
+        <div class="p-status s-live">82% Complete</div>
+      </div>
+      <div class="portal-body">
+        <div class="p-purpose">TDI works with educator-creators who develop courses and content for the Learning Hub. The Creator Studio is the internal tool that manages every creator's journey from onboarding through launch - a Kanban pipeline where Rachel Patragas can see where every creator stands, approve milestones, flag bottlenecks, and track publish dates. Creators have their own separate portal to submit work and track their own progress.</div>
+        <div class="pills">
+          <span class="pill">Kanban pipeline view</span><span class="pill">Milestone approval workflow</span><span class="pill">NDA and agreement signing</span><span class="pill">Course / blog / download tracking</span><span class="pill">Publish date scheduling</span><span class="pill">Creator payout tracking</span><span class="pill">Stalled flow alerts</span><span class="pill">Creator notifications</span>
+        </div>
+        <div class="mock-wrap">
+          <div class="mock-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div><div class="mock-url">teachersdeserveit.com/tdi-admin/creator-studio</div></div>
+          <div class="mock-body">
+            <div style="font-size:7.5px;font-weight:500;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Creator Pipeline</div>
+            <div class="cr-pipeline">
+              <div><div class="cr-col-h">Onboarding</div><div class="cr-card"><div class="cc-name">Amy S.</div><div class="cc-topic">Burnout Recovery</div><div class="cc-b ccb-c">Course</div></div><div class="cr-card"><div class="cc-name">Jordan T.</div><div class="cc-topic">Grant Writing</div><div class="cc-b ccb-b">Blog</div></div></div>
+              <div><div class="cr-col-h">In Progress</div><div class="cr-card" style="border-left:2px solid #E76F51;"><div class="cc-name">Sarah M.</div><div class="cc-topic">Para Systems</div><div class="cc-b ccb-c">Course</div><div class="cc-flag">Waiting on TDI</div></div><div class="cr-card"><div class="cc-name">Devon R.</div><div class="cc-topic">Grading Clarity</div><div class="cc-b ccb-d">Download</div></div></div>
+              <div><div class="cr-col-h">Review</div><div class="cr-card"><div class="cc-name">Marcus L.</div><div class="cc-topic">Classroom Systems</div><div class="cc-b ccb-c">Course</div></div></div>
+              <div><div class="cr-col-h">Published</div><div class="cr-card"><div class="cc-name">Tanya B.</div><div class="cc-topic">Fired Up Mindset</div><div class="cc-b ccb-c">Course</div></div><div class="cr-card"><div class="cc-name">Jen K.</div><div class="cc-topic">Guilt Reset</div><div class="cc-b ccb-b">Blog</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPERATIONS -->
+    <div class="portal-card">
+      <div class="portal-head">
+        <div class="p-icon pi-ops">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="3" stroke="#1B365D" stroke-width="1.4"/><path d="M10 3v2M10 15v2M3 10h2M15 10h2M5.05 5.05l1.41 1.41M13.54 13.54l1.41 1.41M14.95 5.05l-1.41 1.41M6.46 13.54l-1.41 1.41" stroke="#1B365D" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="p-title-wrap"><div class="p-title">Operations Command Center</div><div class="p-sub">Back-office for active school partnerships</div></div>
+        <div class="p-status s-bld">65% Complete</div>
+      </div>
+      <div class="portal-body">
+        <div class="p-purpose">TDI's internal back-office for everything on the delivery and fulfillment side of school partnerships - session tracking, invoices, renewal timelines, and contract health. Before this existed, all of this lived across emails, spreadsheets, and people's heads. The goal is full operational visibility for the whole team at a glance.</div>
+        <div class="pills">
+          <span class="pill">Session and milestone tracking</span><span class="pill">Invoice and collections workflow</span><span class="pill">Renewal alerts (90/60/30 day)</span><span class="pill">Partner contract management</span><span class="pill">Delivery evidence packs</span><span class="pill">Financial analytics</span><span class="pill">Sales-to-Operations auto-sync</span>
+        </div>
+        <div class="mock-wrap">
+          <div class="mock-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div><div class="mock-url">teachersdeserveit.com/tdi-admin/operations</div></div>
+          <div class="mock-body">
+            <div class="ops-tabs"><div class="ot on">Analytics</div><div class="ot">Partners</div><div class="ot">Invoices</div><div class="ot">Sessions</div><div class="ot">Renewals</div></div>
+            <div class="ops-stats"><div class="os-m"><div class="os-n">8</div><div class="os-l">Active partners</div></div><div class="os-m"><div class="os-n">$317K</div><div class="os-l">Contracted</div></div><div class="os-m"><div class="os-n">3</div><div class="os-l">Renewals 60d</div></div><div class="os-m"><div class="os-n">2</div><div class="os-l">Invoices out</div></div></div>
+            <table class="ops-t"><thead><tr><th>Partner</th><th>Phase</th><th>Sessions</th><th>Renewal</th><th>Status</th></tr></thead><tbody>
+              <tr><td>Allenwood Elementary</td><td>ACCELERATE</td><td>6/6</td><td>Jul 2026</td><td><span class="chip ch-g">Signed</span></td></tr>
+              <tr><td>ASD4</td><td>ACCELERATE</td><td>3/6</td><td>Jun 2026</td><td><span class="chip ch-o">In progress</span></td></tr>
+              <tr><td>Saunemin CCSD</td><td>IGNITE</td><td>6/6</td><td>Apr 2026</td><td><span class="chip ch-n">Renewal conv.</span></td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SALES -->
+    <div class="portal-card">
+      <div class="portal-head">
+        <div class="p-icon pi-sales">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="12" width="3" height="6" rx="1" fill="#E76F51" opacity=".7"/><rect x="7" y="8" width="3" height="10" rx="1" fill="#E76F51" opacity=".7"/><rect x="12" y="4" width="3" height="14" rx="1" fill="#E76F51" opacity=".7"/><path d="M3.5 10L7 7l4 2 4.5-5" stroke="#E76F51" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="p-title-wrap"><div class="p-title">Sales CRM</div><div class="p-sub">Replacing GoHighLevel entirely on June 1, 2026</div></div>
+        <div class="p-status s-june">June 1 Launch</div>
+      </div>
+      <div class="portal-body">
+        <div class="p-purpose">TDI has been running its sales pipeline through GoHighLevel, a third-party CRM that doesn't connect to any internal data. We're building a fully custom CRM designed around TDI's actual sales motion. 131 opportunities are already imported. June 1 is the hard cutover date - GHL gets retired as the system of record and retained only for email drip sequences.</div>
+        <div class="pills">
+          <span class="pill">131 opportunities imported</span><span class="pill">Pipeline stage management</span><span class="pill">Today's Work daily digest</span><span class="pill">Activity logging</span><span class="pill">Email composer</span><span class="pill">Opportunity scoring</span><span class="pill">Renewal intelligence</span><span class="pill">Contact profiles</span><span class="pill">GHL cutover June 1</span>
+        </div>
+        <div class="mock-wrap">
+          <div class="mock-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div><div class="mock-url">teachersdeserveit.com/tdi-admin/sales</div></div>
+          <div class="mock-body">
+            <div style="font-size:7.5px;font-weight:500;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">TDI CRM Pipeline - 131 opportunities</div>
+            <div class="s-bars">
+              <div class="s-stage"><div class="s-lbl">Qualified</div><div class="s-bg"><div class="s-fill" style="width:85%;background:var(--navy);"><span>42</span></div></div><div class="s-cnt">42</div></div>
+              <div class="s-stage"><div class="s-lbl">Likely Yes</div><div class="s-bg"><div class="s-fill" style="width:55%;background:var(--teal);"><span>27</span></div></div><div class="s-cnt">27</div></div>
+              <div class="s-stage"><div class="s-lbl">Proposal Sent</div><div class="s-bg"><div class="s-fill" style="width:30%;background:#E76F51;"><span>15</span></div></div><div class="s-cnt">15</div></div>
+              <div class="s-stage"><div class="s-lbl">Signed</div><div class="s-bg"><div class="s-fill" style="width:18%;background:var(--purple);"><span>9</span></div></div><div class="s-cnt">9</div></div>
+            </div>
+            <div class="s-cards">
+              <div class="s-opp"><div class="so-n">Roosevelt School</div><div class="so-v">Hub pilot - 19 staff</div><div class="so-s ss-h">Active partner</div></div>
+              <div class="s-opp"><div class="so-n">WEGO District 94</div><div class="so-v">$42K opportunity</div><div class="so-s ss-w">Likely Yes</div></div>
+              <div class="s-opp"><div class="so-n">Oak Glen USD</div><div class="so-v">$34K opportunity</div><div class="so-s ss-c">Qualified</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARTNER DASHBOARDS -->
+    <div class="portal-card">
+      <div class="portal-head">
+        <div class="p-icon pi-ld">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" stroke="#B8960A" stroke-width="1.4"/><rect x="11" y="2" width="7" height="7" rx="1.5" stroke="#B8960A" stroke-width="1.4"/><rect x="2" y="11" width="7" height="7" rx="1.5" stroke="#B8960A" stroke-width="1.4"/><rect x="11" y="11" width="7" height="7" rx="1.5" stroke="#B8960A" stroke-width="1.4"/></svg>
+        </div>
+        <div class="p-title-wrap"><div class="p-title">Partner Dashboards</div><div class="p-sub">Live dashboards for every active school partnership</div></div>
+        <div class="p-status s-live">8 Schools Live</div>
+      </div>
+      <div class="portal-body">
+        <div class="p-purpose">Every TDI partner school gets a private, custom dashboard tracking their partnership in real time - sessions completed, staff observed, survey results, renewal timelines, and what's next. Not static PDFs - live web pages that update as work happens. A full Leadership Portal giving the executive team an aggregate view across all schools is planned for Q3/Q4 2026.</div>
+        <div class="pills">
+          <span class="pill">8 live school dashboards</span><span class="pill">Session completion tracking</span><span class="pill">Staff observation data</span><span class="pill">Survey results</span><span class="pill">Renewal timeline and next steps</span><span class="pill">Billing and contract view</span><span class="pill">Leadership Portal Q3 2026</span>
+        </div>
+        <!-- RICH DASHBOARD MOCKUP -->
+        <div class="mock-wrap" style="margin-top:1.1rem;">
+          <div class="mock-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div><div class="mock-url">teachersdeserveit.com/dashboard/allenwood</div></div>
+          <div style="background:#0f1f3d;padding:0;">
+            <!-- Dashboard nav -->
+            <div style="background:#1B365D;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.1);">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="font-size:9px;font-weight:500;color:#fff;letter-spacing:.05em;">TDI</div>
+                <div style="width:1px;height:12px;background:rgba(255,255,255,.2);"></div>
+                <div style="font-size:9px;color:rgba(255,255,255,.7);">Partner Dashboard</div>
+              </div>
+              <div style="background:#2A9D8F;color:#fff;font-size:8px;font-weight:500;padding:3px 8px;border-radius:4px;">Schedule Session</div>
+            </div>
+            <!-- Hero -->
+            <div style="padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.08);">
+              <div style="font-size:20px;font-weight:700;color:#fff;font-family:'Playfair Display',serif;letter-spacing:-.01em;">Allenwood Elementary</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+                <div style="font-size:9px;color:rgba(255,255,255,.5);">Glenview, Illinois</div>
+                <div style="background:#2A9D8F;color:#fff;font-size:8px;font-weight:500;padding:2px 7px;border-radius:10px;">Phase 2 - ACCELERATE</div>
+              </div>
+              <!-- Tabs -->
+              <div style="display:flex;gap:0;margin-top:10px;border-bottom:1px solid rgba(255,255,255,.1);">
+                <div style="font-size:8px;color:#fff;padding:5px 10px;border-bottom:2px solid #2A9D8F;font-weight:500;">Overview</div>
+                <div style="font-size:8px;color:rgba(255,255,255,.45);padding:5px 10px;">Our Partnership</div>
+                <div style="font-size:8px;color:rgba(255,255,255,.45);padding:5px 10px;">Blueprint</div>
+                <div style="font-size:8px;color:rgba(255,255,255,.45);padding:5px 10px;">2026-27</div>
+                <div style="font-size:8px;color:rgba(255,255,255,.45);padding:5px 10px;">Team</div>
+                <div style="font-size:8px;color:rgba(255,255,255,.45);padding:5px 10px;">Billing</div>
+              </div>
+            </div>
+            <!-- Dashboard content -->
+            <div style="padding:12px 14px;background:#f8f7f4;">
+              <!-- Top stats -->
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;">
+                <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:6px;padding:8px;text-align:center;">
+                  <div style="font-size:16px;font-weight:600;color:#1B365D;font-family:'Playfair Display',serif;">187</div>
+                  <div style="font-size:7px;color:#6b7280;margin-top:1px;">Teachers</div>
+                  <div style="font-size:7px;color:#2A9D8F;">89% logged in</div>
+                </div>
+                <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:6px;padding:8px;text-align:center;">
+                  <div style="font-size:16px;font-weight:600;color:#1B365D;font-family:'Playfair Display',serif;">68</div>
+                  <div style="font-size:7px;color:#6b7280;margin-top:1px;">Paras</div>
+                  <div style="font-size:7px;color:#2A9D8F;">75% logged in</div>
+                </div>
+                <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:6px;padding:8px;text-align:center;">
+                  <div style="font-size:16px;font-weight:600;color:#2A9D8F;font-family:'Playfair Display',serif;">6/6</div>
+                  <div style="font-size:7px;color:#6b7280;margin-top:1px;">Deliverables</div>
+                  <div style="font-size:7px;color:#2A9D8F;">Complete</div>
+                </div>
+                <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:6px;padding:8px;text-align:center;">
+                  <div style="font-size:16px;font-weight:600;color:#534AB7;font-family:'Playfair Display',serif;">94%</div>
+                  <div style="font-size:7px;color:#6b7280;margin-top:1px;">Recommend</div>
+                  <div style="font-size:7px;color:#534AB7;">Survey result</div>
+                </div>
+              </div>
+              <!-- Two column -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <!-- Leading indicators -->
+                <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:6px;padding:10px;">
+                  <div style="font-size:8px;font-weight:500;color:#1B365D;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">Leading Indicators</div>
+                  <div style="margin-bottom:6px;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="font-size:8px;color:#6b7280;">Teacher Stress</span><span style="font-size:8px;font-weight:500;color:#2A9D8F;">5.2/10</span></div>
+                    <div style="height:4px;background:#eee;border-radius:2px;"><div style="height:4px;width:52%;background:#2A9D8F;border-radius:2px;"></div></div>
+                    <div style="font-size:7px;color:#6b7280;margin-top:1px;">Industry avg: 7.3 - TDI partners: 5-7</div>
+                  </div>
+                  <div style="margin-bottom:6px;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="font-size:8px;color:#6b7280;">Retention Intent</span><span style="font-size:8px;font-weight:500;color:#534AB7;">6.8/10</span></div>
+                    <div style="height:4px;background:#eee;border-radius:2px;"><div style="height:4px;width:68%;background:#534AB7;border-radius:2px;"></div></div>
+                    <div style="font-size:7px;color:#6b7280;margin-top:1px;">Industry avg: 4.1 - TDI partners: 5-7</div>
+                  </div>
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="font-size:8px;color:#6b7280;">Implementation Rate</span><span style="font-size:8px;font-weight:500;color:#E76F51;">65%</span></div>
+                    <div style="height:4px;background:#eee;border-radius:2px;"><div style="height:4px;width:65%;background:#E76F51;border-radius:2px;"></div></div>
+                    <div style="font-size:7px;color:#6b7280;margin-top:1px;">Industry avg: 10%</div>
+                  </div>
+                </div>
+                <!-- Observation timeline -->
+                <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:6px;padding:10px;">
+                  <div style="font-size:8px;font-weight:500;color:#1B365D;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">Observation Timeline</div>
+                  <div style="display:flex;flex-direction:column;gap:5px;">
+                    <div style="display:flex;align-items:center;gap:6px;">
+                      <div style="width:7px;height:7px;border-radius:50%;background:#2A9D8F;flex-shrink:0;"></div>
+                      <div style="flex:1;"><div style="font-size:8px;font-weight:500;">Day 1 - Para Pilot</div><div style="font-size:7px;color:#6b7280;">Feb 13 - Complete</div></div>
+                      <div style="font-size:7px;background:#E1F5EE;color:#0F6E56;padding:1px 5px;border-radius:4px;">Done</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                      <div style="width:7px;height:7px;border-radius:50%;background:#2A9D8F;flex-shrink:0;"></div>
+                      <div style="flex:1;"><div style="font-size:8px;font-weight:500;">Day 2 - Teacher Pilot</div><div style="font-size:7px;color:#6b7280;">Feb 26 - Complete</div></div>
+                      <div style="font-size:7px;background:#E1F5EE;color:#0F6E56;padding:1px 5px;border-radius:4px;">Done</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                      <div style="width:7px;height:7px;border-radius:50%;background:#F4C430;flex-shrink:0;"></div>
+                      <div style="flex:1;"><div style="font-size:8px;font-weight:500;">Virtual Session 3</div><div style="font-size:7px;color:#6b7280;">March 2026</div></div>
+                      <div style="font-size:7px;background:#FAEEDA;color:#854F0B;padding:1px 5px;border-radius:4px;">Scheduled</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                      <div style="width:7px;height:7px;border-radius:50%;background:#ddd;flex-shrink:0;"></div>
+                      <div style="flex:1;"><div style="font-size:8px;font-weight:500;">Session 4</div><div style="font-size:7px;color:#6b7280;">April 2026 - TBD</div></div>
+                      <div style="font-size:7px;background:#f0ede8;color:#6b7280;padding:1px 5px;border-radius:4px;">Upcoming</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="section" style="margin-top:1.5rem;">
+      <div class="section-label">Build timeline</div>
+      <div class="tl">
+        <div class="tl-item"><div class="tl-l"><div class="tl-dot td-done"></div><div class="tl-line"></div></div><div class="tl-c"><div class="tl-dt">Late 2025</div><div class="tl-ti">Portal foundation and Creator Studio</div><div class="tl-de">Unified admin shell, Creator Studio pipeline, milestone approvals, and 8 partner dashboards deployed and active.</div></div></div>
+        <div class="tl-item"><div class="tl-l"><div class="tl-dot td-done"></div><div class="tl-line"></div></div><div class="tl-c"><div class="tl-dt">February - March 2026</div><div class="tl-ti">Operations Command Center and Sales CRM foundation</div><div class="tl-de">Operations hub built. Sales CRM schema designed. 131 opportunities imported. Supabase becomes the source of truth for all pipeline data.</div></div></div>
+        <div class="tl-item"><div class="tl-l"><div class="tl-dot td-now"></div><div class="tl-line"></div></div><div class="tl-c"><div class="tl-dt">April - May 2026 (Now)</div><div class="tl-ti">Sales CRM features and Learning Hub development</div><div class="tl-de">Sales CRM adding daily work digest, activity logging, email composer, and opportunity scoring. Learning Hub platform being built to replace Thinkific.</div></div></div>
+        <div class="tl-item"><div class="tl-l"><div class="tl-dot td-fut"></div><div class="tl-line"></div></div><div class="tl-c"><div class="tl-dt">June 1, 2026</div><div class="tl-ti">GHL cutover - TDI fully off third-party CRM</div><div class="tl-de">GoHighLevel retired as the sales system of record. TDI's own CRM becomes the single source of truth.</div></div></div>
+        <div class="tl-item"><div class="tl-l"><div class="tl-dot td-fut"></div></div><div class="tl-c"><div class="tl-dt">Q3 - Q4 2026</div><div class="tl-ti">Leadership Portal and full Learning Hub launch</div><div class="tl-de">Executive Leadership Portal live across all school partnerships. Full Learning Hub migration from Thinkific complete with Spanish translation and transcripts.</div></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">What it's built on</div>
+      <div class="stack-g">
+        <div class="sk"><div class="sk-nm">Next.js and Vercel</div><div class="sk-de">Framework and hosting - same stack as the public site</div></div>
+        <div class="sk"><div class="sk-nm">Supabase</div><div class="sk-de">Database, auth, and real-time data layer</div></div>
+        <div class="sk"><div class="sk-nm">Cloudflare Stream</div><div class="sk-de">Video hosting for the Learning Hub</div></div>
+        <div class="sk"><div class="sk-nm">Stripe</div><div class="sk-de">Hub memberships and payment processing</div></div>
+        <div class="sk"><div class="sk-nm">Resend</div><div class="sk-de">Transactional email - confirmations, CRM emails</div></div>
+        <div class="sk"><div class="sk-nm">Google Translate API</div><div class="sk-de">Full Spanish translation layer for the Hub</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== TAB 4: EXPLORE ===================== -->
+  <div id="tab-explore" class="tab-panel">
+    <div class="section">
+      <div class="section-label">Explore our work</div>
+      <div class="links-grid">
+        <a class="link-card feat" href="https://www.teachersdeserveit.com" target="_blank">
+          <div class="lk-title">TDI Website</div>
+          <div class="lk-desc">The full picture. Programs, the Blueprint model, mission, and how we partner with schools. Start here.</div>
+          <div class="lk-cta">Visit teachersdeserveit.com &rarr;</div>
+        </a>
+        <a class="link-card dash" href="https://www.teachersdeserveit.com/dashboard/allenwood" target="_blank">
+          <div class="lk-title">Example School Dashboard</div>
+          <div class="lk-desc">A live look at what partner schools see. This is Allenwood Elementary's real-time partnership dashboard - the analytics and tracking that comes with every TDI partnership.</div>
+          <div class="lk-cta">View example dashboard &rarr;</div>
+        </a>
+        <a class="link-card sub" href="https://teachersdeserveit.substack.com" target="_blank">
+          <div class="lk-title">Join the Blog on Substack</div>
+          <div class="lk-desc">Three new blog posts every week, plus 3-4 downloadable tools. Every topic is requested by the community - this is educator-led content, not content marketing.</div>
+          <div class="lk-cta">Subscribe on Substack &rarr;</div>
+        </a>
+        <a class="link-card" href="https://hub.teachersdeserveit.com" target="_blank">
+          <div class="lk-title">Learning Hub</div>
+          <div class="lk-desc">TDI's professional development platform. 33 courses and 250+ videos for educators. Individual memberships available for teachers who want access outside of a school partnership.</div>
+          <div class="lk-cta">Explore the Hub &rarr;</div>
+        </a>
+        <a class="link-card" href="https://www.teachersdeserveit.com/podcast" target="_blank">
+          <div class="lk-title">TDI Podcast</div>
+          <div class="lk-desc">Two new episodes every week - conversations with educators and school leaders on what's actually working in classrooms right now. Topics are requested directly by the community.</div>
+          <div class="lk-cta">Listen now &rarr;</div>
+        </a>
+        <a class="link-card" href="https://www.teachersdeserveit.com/book" target="_blank">
+          <div class="lk-title">The Book</div>
+          <div class="lk-desc">Teachers Deserve It - the foundational text for building a school culture that puts educators first. Written by Rae Hughart and Adam Welcome. Distributed to every educator in an Accelerate or Sustain partnership.</div>
+          <div class="lk-cta">Learn more &rarr;</div>
+        </a>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-label">Get in touch</div>
+      <div class="cta-block">
+        <div class="cta-ic">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="4" y="8" width="32" height="24" rx="4" stroke="#1B365D" stroke-width="2"/><path d="M4 12l16 11 16-11" stroke="#1B365D" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cta-tx">
+          <h3>Questions? Let's connect.</h3>
+          <p>This overview is just the starting point. Rae is happy to walk through any part of TDI's model, team structure, or current work in more depth.</p>
+          <a class="cta-btn" href="mailto:rae@teachersdeserveit.com">Reach out to Rae &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== TAB 5: CONNECT ===================== -->
+  <div id="tab-involve" class="tab-panel">
+    <div class="section">
+      <div class="section-label">Request the full deck</div>
+      <div class="card" style="padding:1.5rem;border-left:3px solid var(--teal);">
+        <p style="font-size:15px;line-height:1.8;color:var(--muted);">This brief is a starting point. The full investor deck covers the detailed financial model (Year 1&ndash;4, conservative and funded scenarios), use of funds breakdown, go-to-market sequencing, and the complete competitive analysis. To request it or schedule a conversation with Rae, reach out directly.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:1.25rem;">
+          <a href="mailto:rae@teachersdeserveit.com?subject=TDI Investor Deck Request" style="display:inline-block;background:var(--navy);color:#fff;font-size:13px;font-weight:500;padding:.6rem 1.4rem;border-radius:var(--rs);text-decoration:none;">Request the full deck</a>
+          <a href="https://calendar.app.google/rpF9q94JZhi3f9qN9" target="_blank" style="display:inline-block;background:transparent;color:var(--navy);border:1px solid var(--navy);font-size:13px;font-weight:500;padding:.6rem 1.4rem;border-radius:var(--rs);text-decoration:none;">Schedule a call &rarr;</a>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-label">Key links</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+        <a class="link-card feat" href="https://www.teachersdeserveit.com" target="_blank"><div class="lk-title">TDI Website</div><div class="lk-desc">The public face of TDI. Programs, mission, and partnership model.</div><div class="lk-cta">Visit teachersdeserveit.com &rarr;</div></a>
+        <a class="link-card dash" href="https://www.teachersdeserveit.com/dashboard/allenwood" target="_blank"><div class="lk-title">Live Partner Dashboard</div><div class="lk-desc">A real partner school dashboard &mdash; this is the analytics product every district receives.</div><div class="lk-cta">View example &rarr;</div></a>
+        <a class="link-card" href="https://www.teachersdeserveit.com/funding" target="_blank"><div class="lk-title">The Grant Engine</div><div class="lk-desc">How TDI helps districts find and access funding. 80% of partners use this.</div><div class="lk-cta">Explore funding pipeline &rarr;</div></a>
+        <a class="link-card sub" href="https://teachersdeserveit.substack.com" target="_blank"><div class="lk-title">Community &amp; Content</div><div class="lk-desc">3 blogs, 2 podcast episodes, and 3&ndash;4 free tools every week. All community-requested. This is the flywheel.</div><div class="lk-cta">See Substack &rarr;</div></a>
+      </div>
+    </div>
+  </div>
+
+    <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-logo">Teachers Deserve It</div>
+    <div class="footer-sub">Serving <span class="teal">100,000+ educators</span> across 21 states.<br>teachersdeserveit.com &mdash; April 2026</div>
+    <div class="confid">Investor Brief &mdash; Teachers Deserve It &mdash; April 2026</div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
