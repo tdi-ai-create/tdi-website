@@ -39,7 +39,7 @@ function shiftWeek(weekStart: string, delta: number): string {
 
 export default function CMODashboard() {
   const router = useRouter();
-  const [pageState, setPageState] = useState<'loading' | 'ready' | 'unauthorized'>('loading');
+  const [pageState, setPageState] = useState<'loading' | 'ready' | 'unauthorized' | 'db_pending'>('loading');
   const [weekStart, setWeekStart] = useState(() => getWeekStart(new Date()));
 
   // Data state
@@ -53,15 +53,21 @@ export default function CMODashboard() {
   const [arrData, setArrData] = useState<PaidARR[]>([]);
   const [dataLoading, setDataLoading] = useState(false);
 
-  // Auth check
+  // Auth check + DB migration probe
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')) {
-        setPageState('ready');
-      } else {
+      if (!session?.user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')) {
         setPageState('unauthorized');
         router.push('/admin/login');
+        return;
+      }
+      // Verify migration 040 has been applied
+      const { error } = await supabase.from('cmo_weekly_metrics').select('id').limit(1);
+      if (error?.code === '42P01' || error?.message?.includes('does not exist')) {
+        setPageState('db_pending');
+      } else {
+        setPageState('ready');
       }
     };
     checkAuth();
@@ -116,6 +122,30 @@ export default function CMODashboard() {
   }
 
   if (pageState === 'unauthorized') return null;
+
+  if (pageState === 'db_pending') {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: PORTAL_TOKENS.pageBg }}>
+        <div className="max-w-md text-center p-8 bg-white rounded-2xl shadow-sm border border-gray-100">
+          <BarChart3 size={40} className="text-teal-400 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: ADMIN_TYPOGRAPHY.fontFamily.heading }}>
+            CMO Dashboard — Provisioning
+          </h2>
+          <p className="text-gray-500 text-sm mb-4" style={{ fontFamily: ADMIN_TYPOGRAPHY.fontFamily.body }}>
+            Database migration 040 has not been applied yet. Run{' '}
+            <code className="bg-gray-100 px-1 rounded text-xs font-mono">supabase/migrations/040_cmo_dashboard.sql</code>{' '}
+            in the Supabase SQL editor, then refresh this page.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-teal-500 text-white text-sm font-medium rounded-lg hover:bg-teal-600 transition-colors"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const weekLabel = new Date(weekStart + 'T00:00').toLocaleDateString('en-US', {
     month: 'long',
