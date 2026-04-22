@@ -56,7 +56,9 @@ import {
   DollarSign,
   Shield,
   Sprout,
-  Puzzle
+  Puzzle,
+  BookMarked,
+  Video
 } from 'lucide-react';
 
 // CollapsibleSection component
@@ -1976,29 +1978,31 @@ export default function AllenwoodDashboard() {
         {/* BLUEPRINT TAB */}
         {activeTab === 'blueprint' && (
           <div className="space-y-4">
-            {/* What&apos;s Included */}
+            {/* 2025-26 Partnership - Complete */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-[#38618C]" />
-                Your Partnership Includes
+                <BookOpen className="w-5 h-5 text-green-600" />
+                2025-26 Partnership - Complete ✓
               </h3>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-[#F5F5F5] rounded-xl">
-                  <div className="text-3xl font-bold text-[#38618C]">10</div>
-                  <div className="text-xs text-gray-600 mt-1">Teacher Hub Memberships</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-green-50 rounded-xl border border-green-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-semibold text-gray-900 text-sm">Learning Hub Membership (13 Teachers)</span>
+                    <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">
+                      <CheckCircle className="w-3 h-3" /> Complete
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500">All 13 teachers activated</p>
                 </div>
-                <div className="text-center p-4 bg-[#F5F5F5] rounded-xl">
-                  <div className="text-3xl font-bold text-[#38618C]">2</div>
-                  <div className="text-xs text-gray-600 mt-1">Observation Days</div>
-                </div>
-                <div className="text-center p-4 bg-[#F5F5F5] rounded-xl">
-                  <div className="text-3xl font-bold text-[#38618C]">6</div>
-                  <div className="text-xs text-gray-600 mt-1">Virtual Sessions</div>
-                </div>
-                <div className="text-center p-4 bg-[#F5F5F5] rounded-xl">
-                  <div className="text-3xl font-bold text-[#38618C]">1</div>
-                  <div className="text-xs text-gray-600 mt-1">Spring Celebration</div>
+                <div className="p-4 bg-green-50 rounded-xl border border-green-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-semibold text-gray-900 text-sm">On-Campus Observations &amp; Feedback (1 Visit)</span>
+                    <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">
+                      <CheckCircle className="w-3 h-3" /> Complete
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500">Visit completed - feedback delivered</p>
                 </div>
               </div>
             </div>
@@ -2050,70 +2054,106 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* ===== What's Included - Service Cards ===== */}
+            {/* ===== 2026-27 ACCELERATE Plan - Service Cards ===== */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <h3 className="font-bold text-[#1e2749] mb-6">What&apos;s Included in Year 2</h3>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Card 1: Learning Hub */}
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <BookOpen className="w-5 h-5 text-[#38618C]" />
-                    <span className="font-semibold text-[#1e2749]">Learning Hub Membership</span>
+              <h3 className="text-lg font-bold text-gray-900">2026-27 ACCELERATE Plan</h3>
+              <p className="text-sm text-gray-500 mt-1">Full-school partnership - all 75 staff members. Pending funding confirmation.</p>
+
+              {/* 2026-27 Service Cards - No pricing shown */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+
+                {/* Learning Hub */}
+                <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <BookOpen className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 text-sm">Learning Hub Membership</h4>
+                      <p className="text-xs text-blue-600 font-semibold mt-0.5">All 75 Staff Members</p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Full access to TDI&apos;s implementation-focused resource library. Every module includes clear objectives and classroom-ready tools. This is strategy to use - not content to consume.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-2xl font-bold text-[#38618C] mb-2">75 Staff Members</p>
-                  <p className="text-sm text-gray-600 mb-3">Full access to TDI&apos;s research-backed resource library - targeted, actionable tools teachers and paras can use immediately.</p>
-                  <p className="text-xs text-teal-600 font-medium flex items-center gap-1">
-                    <BarChart3 className="w-3 h-3" /> Includes Analytics Suite
-                  </p>
                 </div>
 
-                {/* Card 2: Observation Days */}
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Eye className="w-5 h-5 text-[#38618C]" />
-                    <span className="font-semibold text-[#1e2749]">In-Person Observation Days</span>
+                {/* Teachers Deserve It Book */}
+                <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <BookMarked className="w-5 h-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 text-sm">Teachers Deserve It Book</h4>
+                      <p className="text-xs text-amber-600 font-semibold mt-0.5">75 Copies - One Per Staff Member</p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        The book that started the movement. Every staff member receives a physical copy to ground the team in a shared vision and the why behind the work.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-2xl font-bold text-[#38618C] mb-2">3 Full Days</p>
-                  <p className="text-sm text-gray-600 mb-3">Full in-person visits with classroom observations, personalized teacher feedback (Love Notes), and leadership debrief. Travel included.</p>
-                  <p className="text-xs text-teal-600 font-medium flex items-center gap-1">
-                    <BarChart3 className="w-3 h-3" /> Includes Analytics Suite
-                  </p>
                 </div>
 
-                {/* Card 3: Virtual Coaching */}
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <MessageCircle className="w-5 h-5 text-[#38618C]" />
-                    <span className="font-semibold text-[#1e2749]">Virtual Coaching Sessions</span>
+                {/* Executive Impact Sessions */}
+                <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Target className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 text-sm">Executive Impact Sessions</h4>
+                      <p className="text-xs text-orange-600 font-semibold mt-0.5">Strategic Leadership Sessions</p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Strategic sessions with your leadership team and campus committees to align vision, review progress, and adjust the path forward. This is where we think big together.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-2xl font-bold text-[#38618C] mb-2">4 Sessions</p>
-                  <p className="text-sm text-gray-600 mb-3">45-minute targeted coaching sessions - use for teacher support, leadership strategy, or implementation check-ins.</p>
-                  <p className="text-xs text-teal-600 font-medium flex items-center gap-1">
-                    <BarChart3 className="w-3 h-3" /> Includes Analytics Suite
-                  </p>
                 </div>
 
-                {/* Card 4: Executive Sessions */}
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Star className="w-5 h-5 text-[#38618C]" />
-                    <span className="font-semibold text-[#1e2749]">Executive Impact Sessions</span>
+                {/* Virtual Strategy Sessions */}
+                <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Video className="w-5 h-5 text-teal-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 text-sm">Virtual Strategy Sessions</h4>
+                      <p className="text-xs text-teal-600 font-semibold mt-0.5">45-Minute Targeted Coaching</p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Coaching conversations, problem-solving, planning support, and check-ins to keep momentum going between on-campus visits. Flexible, focused, and always aligned to where your team is right now.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-2xl font-bold text-[#38618C] mb-2">3 Sessions</p>
-                  <p className="text-sm text-gray-600 mb-3">Strategic goal-setting for annual Key Performance Indicators (KPIs), improvement planning, and leadership alignment.</p>
-                  <p className="text-xs text-teal-600 font-medium flex items-center gap-1">
-                    <BarChart3 className="w-3 h-3" /> Includes Analytics Suite
-                  </p>
                 </div>
 
-                {/* Card 5: Professional Books */}
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200 md:col-span-2 lg:col-span-2">
-                  <div className="flex items-center gap-2 mb-2">
-                    <BookOpen className="w-5 h-5 text-[#38618C]" />
-                    <span className="font-semibold text-[#1e2749]">Professional Books</span>
+                {/* On-Campus Observations - full width */}
+                <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm md:col-span-2">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Eye className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 text-sm">On-Campus Observations &amp; Feedback</h4>
+                      <p className="text-xs text-purple-600 font-semibold mt-0.5">Up to 15 Teachers Per Visit</p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Our team comes to you. Each visit includes personalized classroom observations with actionable feedback designed to support growth - not evaluate. This is hands-on partnership: real classrooms, real strategies, real progress.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-2xl font-bold text-[#38618C] mb-2">75 Copies - One for Every Staff Member</p>
-                  <p className="text-sm text-gray-600">Teachers Deserve It - the foundational text for building a school culture that puts educators first. Written by Rae Hughart &amp; Adam Welcome.</p>
+                </div>
+
+              </div>
+
+              {/* Funding Note */}
+              <div className="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <Info className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-amber-800">How This Plan Gets Funded</p>
+                    <p className="text-xs text-amber-700 mt-1">
+                      This is our full 2026-27 vision for Allenwood. Nothing here is invoiced until funding is confirmed and services are delivered. Our team is actively pursuing grant and Title II-A funding to make this plan possible. All services begin August 2026.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
