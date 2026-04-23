@@ -285,7 +285,10 @@ export default function AllenwoodDashboard() {
           { label: 'Observation Day 2 - 11 classrooms, 11 Love Notes', complete: true },
           { label: 'Virtual Support Session 1', complete: true },
           { label: 'Virtual Support Session 2', complete: true },
-          { label: 'Virtual Support Session 3', complete: false },
+          { label: 'Virtual Support Session 3', complete: true },
+          { label: 'Virtual Support Session 4', complete: true },
+          { label: 'Virtual Support Session 5', complete: true },
+          { label: 'Virtual Support Session 6', complete: true },
           { label: 'Year-end leadership recap', complete: false },
         ],
       },
@@ -329,8 +332,8 @@ export default function AllenwoodDashboard() {
       statusColor: 'green',
       details: [
         'Hub engagement at 100%  - all 13 teachers active',
-        '2 observations + 2 virtual sessions complete',
-        '4 virtual sessions already scheduled through April',
+        '2 observations + 6 virtual sessions complete',
+        'All virtual sessions delivered',
         'Leadership meeting held March 2  - Year 2 discussions underway',
       ],
     },
@@ -347,16 +350,15 @@ export default function AllenwoodDashboard() {
         { label: 'Leadership Meeting  - mid-year wins, Year 2 expansion planning', date: 'Mar 2, 2026' },
         { label: 'Virtual Session 3  - Hub progress check-in + strategy session', date: 'Mar 11, 2026' },
         { label: 'Virtual Session 4  - Survey debrief + autism and transitions session', date: 'Mar 25, 2026' },
+        { label: 'Virtual Session 5', date: 'Apr 8, 2026' },
+        { label: 'Virtual Session 6', date: 'Apr 15, 2026' },
       ],
       inProgress: [
         { label: 'Hub engagement  - 13/13 teachers active', detail: '14 courses being explored, up from 4 last month' },
         { label: 'Funding strategy discussion with Dr. Porter', detail: 'Meeting March 10  - 9AM ET' },
-        { label: 'Virtual Sessions 3-6  - TDI preparing content', detail: 'All 4 sessions confirmed through April 15' },
         { label: 'Year 2 expansion conversations underway', detail: 'Discussed at March 2 leadership meeting' },
       ],
       comingSoon: [
-        { label: 'Virtual Session 5', date: 'April 8, 2026  - 7:30PM ET' },
-        { label: 'Virtual Session 6', date: 'April 15, 2026  - 7:30PM ET' },
         { label: 'Spring Leadership Celebration', date: 'Available through May 2026' },
       ],
     },
@@ -400,18 +402,11 @@ export default function AllenwoodDashboard() {
       ],
       tdiHandling: [
         {
-          label: 'Virtual Sessions 3-6  - TDI preparing content',
-          detail: 'All 4 sessions confirmed through April 15',
-        },
-        {
           label: 'Year 2 proposal in progress',
           detail: 'Following March 10 funding conversation',
         },
       ],
-      alreadyInMotion: [
-        { label: 'Virtual Session 5', date: 'April 8, 2026  - 7:30PM ET', status: 'scheduled' },
-        { label: 'Virtual Session 6', date: 'April 15, 2026  - 7:30PM ET', status: 'scheduled' },
-      ],
+      alreadyInMotion: [],
     },
   };
 
@@ -1490,7 +1485,7 @@ export default function AllenwoodDashboard() {
                 {/* Warm context note */}
                 <div className="bg-blue-50 rounded-xl p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#3B82F6', borderLeftStyle: 'solid' }}>
                   <p className="text-gray-700 text-sm">
-                    Hub engagement typically accelerates after virtual sessions when teachers get guided, protected time together. Your first session on February 25 is complete, with 4 more scheduled - as your team experiences more guided Hub time, this section will grow.
+                    All 6 virtual sessions are now complete. Hub engagement accelerated as teachers got guided, protected time together - and this section reflects that growth.
                   </p>
                 </div>
               </div>
@@ -1764,7 +1759,7 @@ export default function AllenwoodDashboard() {
                 </div>
               </div>
 
-              {/* Virtual Sessions - Completed */}
+              {/* Virtual Sessions - All Complete */}
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -1772,7 +1767,7 @@ export default function AllenwoodDashboard() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-semibold text-[#1e2749]">2 Virtual Sessions Completed</h4>
+                      <h4 className="font-semibold text-[#1e2749]">6 Virtual Sessions Completed</h4>
                       <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
                         <Check className="w-3 h-3" />
                         Complete
@@ -1781,62 +1776,51 @@ export default function AllenwoodDashboard() {
                     <div className="space-y-3">
                       <div className="border-b border-gray-100 pb-3">
                         <p className="text-sm text-gray-600 mb-1">
-                          <span className="font-medium">September 17, 2025</span>
+                          <span className="font-medium">September 17, 2025</span> — Session 1
                         </p>
                         <p className="text-sm text-gray-500">
                           Welcome &amp; onboarding session for new teachers - introduced the TDI Learning Hub and partnership goals.
                         </p>
                       </div>
-                      <div>
+                      <div className="border-b border-gray-100 pb-3">
                         <p className="text-sm text-gray-600 mb-1">
-                          <span className="font-medium">February 25, 2026</span>
+                          <span className="font-medium">February 25, 2026</span> — Session 2
                         </p>
                         <p className="text-sm text-gray-500">
                           Updated what&apos;s new in the hub, fostered discussion around tools, and collected data to support teacher growth.
                         </p>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Virtual Sessions - Confirmed Dates */}
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-[#38618C] rounded-lg flex items-center justify-center flex-shrink-0">
-                    <MessageCircle className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-semibold text-[#1e2749]">4 Virtual Sessions Scheduled</h4>
-                      <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
-                        <Check className="w-3 h-3" />
-                        Confirmed
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-2">
-                      All sessions at <span className="font-medium">6:30 PM CT / 7:30 PM ET</span>
-                    </p>
-                    <p className="text-sm text-gray-500 mb-4">
-                      Each session: Update what&apos;s new in the hub, foster discussion around tools, and collect data to support teacher growth.
-                    </p>
-
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-3 text-sm">
-                        <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">1</div>
-                        <span className="text-gray-700 font-medium">March 11, 2026</span>
+                      <div className="border-b border-gray-100 pb-3">
+                        <p className="text-sm text-gray-600 mb-1">
+                          <span className="font-medium">March 11, 2026</span> — Session 3
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Hub progress check-in + strategy session.
+                        </p>
                       </div>
-                      <div className="flex items-center gap-3 text-sm">
-                        <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">2</div>
-                        <span className="text-gray-700 font-medium">March 25, 2026</span>
+                      <div className="border-b border-gray-100 pb-3">
+                        <p className="text-sm text-gray-600 mb-1">
+                          <span className="font-medium">March 25, 2026</span> — Session 4
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Survey debrief + autism and transitions session.
+                        </p>
                       </div>
-                      <div className="flex items-center gap-3 text-sm">
-                        <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">3</div>
-                        <span className="text-gray-700 font-medium">April 8, 2026</span>
+                      <div className="border-b border-gray-100 pb-3">
+                        <p className="text-sm text-gray-600 mb-1">
+                          <span className="font-medium">April 8, 2026</span> — Session 5
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Continued hub engagement and implementation support.
+                        </p>
                       </div>
-                      <div className="flex items-center gap-3 text-sm">
-                        <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">4</div>
-                        <span className="text-gray-700 font-medium">April 15, 2026</span>
+                      <div>
+                        <p className="text-sm text-gray-600 mb-1">
+                          <span className="font-medium">April 15, 2026</span> — Session 6
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Continued hub engagement and implementation support.
+                        </p>
                       </div>
                     </div>
                   </div>
