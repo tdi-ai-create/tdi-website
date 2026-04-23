@@ -406,7 +406,7 @@ export default function AllenwoodDashboard() {
           detail: 'Following March 10 funding conversation',
         },
       ],
-      alreadyInMotion: [],
+      alreadyInMotion: [] as { label: string; date: string; status: string }[],
     },
   };
 
