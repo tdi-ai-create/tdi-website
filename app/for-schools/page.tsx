@@ -748,6 +748,51 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
+      {/* SECTION 7b: District Summary Download */}
+      <section
+        className="py-16 md:py-20"
+        style={{ background: 'linear-gradient(135deg, #1B365D 0%, #2d4a7a 100%)' }}
+      >
+        <div className="container-default">
+          <div className="max-w-3xl mx-auto text-center">
+            <p className="text-sm font-bold tracking-widest uppercase mb-4" style={{ color: '#F4C430' }}>
+              District Leadership Resource
+            </p>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#ffffff' }}>
+              Download the TDI District Summary
+            </h2>
+            <p className="text-lg mb-8 max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,0.8)' }}>
+              One page. Everything your leadership team needs to start the conversation — 100,000+ educators, 21 states, 94% would recommend.
+            </p>
+            <a
+              href="/district-summary.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                if (typeof window !== 'undefined' && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
+                  (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', 'file_download', {
+                    file_name: 'district-summary.pdf',
+                    file_extension: 'pdf',
+                    link_text: 'Download District Summary PDF',
+                    page_location: window.location.href,
+                  });
+                }
+              }}
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105 hover:shadow-lg"
+              style={{ backgroundColor: '#F4C430', color: '#1B365D' }}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Download District Summary PDF
+            </a>
+            <p className="mt-4 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              No email required — free and instant.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* SECTION 8: Objections FAQ */}
       <section
         id="section-faq"
