@@ -70,6 +70,10 @@ function PartnerLoginContent() {
   // Listen for auth state changes (handles Google OAuth callback)
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        router.push('/partners/reset-password');
+        return;
+      }
       if (event === 'SIGNED_IN' && session?.user) {
         // Log activity
         await fetch('/api/partners/log-activity', {
@@ -167,7 +171,7 @@ function PartnerLoginContent() {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/partners/reset-password`,
+        redirectTo: 'https://www.teachersdeserveit.com/partners/reset-password',
       });
 
       if (error) throw error;
