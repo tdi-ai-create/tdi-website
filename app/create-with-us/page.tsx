@@ -1,8 +1,17 @@
 'use client';
 
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (el: HTMLElement, opts: Record<string, unknown>) => string;
+      reset: (widgetId?: string) => void;
+    };
+  }
+}
+
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 // Creator interface with content path
 interface Creator {
@@ -127,6 +136,9 @@ export default function CreateWithUsPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileReady, setTurnstileReady] = useState(false);
+  const turnstileRef = useRef<HTMLDivElement>(null);
   const [creators, setCreators] = useState<Creator[]>(fallbackCreators);
   const [activeSection, setActiveSection] = useState<string>('');
 
@@ -200,48 +212,78 @@ export default function CreateWithUsPage() {
     }));
   };
 
+  const handleTurnstileCallback = useCallback((token: string) => {
+    setTurnstileToken(token);
+  }, []);
+
+  const handleTurnstileExpiry = useCallback(() => {
+    setTurnstileToken(null);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    if (!siteKey || !turnstileRef.current) return;
+
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    script.async = true;
+    script.onload = () => {
+      if (window.turnstile && turnstileRef.current) {
+        window.turnstile.render(turnstileRef.current, {
+          sitekey: siteKey,
+          callback: handleTurnstileCallback,
+          'expired-callback': handleTurnstileExpiry,
+        });
+        setTurnstileReady(true);
+      }
+    };
+    document.head.appendChild(script);
+    return () => { document.head.removeChild(script); };
+  }, [handleTurnstileCallback, handleTurnstileExpiry]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!turnstileToken) return;
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
-    const formData = new FormData(e.currentTarget);
-
-    // Add the content types as a formatted string
     const selectedTypes = contentTypes
       .filter(t => formState.contentTypes.includes(t.id))
       .map(t => t.label)
       .join(', ');
-    formData.set('content_types', selectedTypes || 'None selected');
 
-    // Add referral source
     const referralValue = formState.referral === 'Other'
       ? `Other: ${formState.otherReferral}`
       : formState.referral;
-    formData.set('referral_source', referralValue);
-
 
     try {
-      const response = await fetch('https://api.web3forms.com/submit', {
+      const response = await fetch('/api/creators/intake', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formState.name,
+          email: formState.email,
+          strategy: formState.strategy,
+          content_types: selectedTypes || 'None selected',
+          referral_dropdown: referralValue,
+          other_referral: formState.referral === 'Other' ? formState.otherReferral : undefined,
+          'cf-turnstile-response': turnstileToken,
+        }),
       });
 
       const result = await response.json();
 
-      if (result.success) {
+      if (response.ok && result.success) {
         setSubmitStatus('success');
-        setFormState({
-          name: '',
-          email: '',
-          strategy: '',
-          contentTypes: [],
-          referral: '',
-          otherReferral: '',
-        });
+        setFormState({ name: '', email: '', strategy: '', contentTypes: [], referral: '', otherReferral: '' });
+        setTurnstileToken(null);
+        if (window.turnstile) window.turnstile.reset();
       } else {
-        console.error('Web3Forms error:', result);
+        console.error('Intake error:', result);
         setSubmitStatus('error');
+        if (window.turnstile) window.turnstile.reset();
+        setTurnstileToken(null);
       }
     } catch (err) {
       console.error('Form submission error:', err);
@@ -525,11 +567,7 @@ export default function CreateWithUsPage() {
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-6" encType="multipart/form-data">
-                {/* Web3Forms Access Key */}
-                <input type="hidden" name="access_key" value="2ac6e03c-f09d-436f-bb54-a96ec7f00c34" />
-                <input type="hidden" name="subject" value="New Content Creator Application - TDI" />
-                <input type="hidden" name="from_name" value="TDI Content Creator Form" />
+              <form onSubmit={handleSubmit} className="space-y-6">
 
                 {/* Name */}
                 <div>
@@ -650,10 +688,13 @@ export default function CreateWithUsPage() {
                   </div>
                 )}
 
+                {/* Cloudflare Turnstile */}
+                <div ref={turnstileRef} className="flex justify-center" />
+
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  disabled={isSubmitting || formState.contentTypes.length === 0}
+                  disabled={isSubmitting || formState.contentTypes.length === 0 || !turnstileToken}
                   className="w-full bg-[#ffba06] text-[#1e2749] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-[#e5a800] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-md hover:shadow-lg"
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Application'}
