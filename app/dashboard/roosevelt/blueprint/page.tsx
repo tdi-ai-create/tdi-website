@@ -1,14 +1,11 @@
 import { redirect } from "next/navigation";
 import BlueprintPhaseTracker from "@/components/dashboard/roosevelt/BlueprintPhaseTracker";
-
-async function getSession() {
-  return { userId: "demo", role: "tdi" as const, schoolId: undefined };
-}
+import { getDashboardSession } from "@/lib/supabase-server";
 
 export default async function BlueprintPage() {
-  const session = await getSession();
-  if (!session) redirect("/login");
-  if (!["tdi"].includes(session.role)) redirect("/unauthorized");
+  const session = await getDashboardSession();
+  if (!session) redirect("/partners/login");
+  if (!["tdi"].includes(session.role)) redirect("/partners/login");
 
   return (
     <div className="min-h-screen bg-gray-50">

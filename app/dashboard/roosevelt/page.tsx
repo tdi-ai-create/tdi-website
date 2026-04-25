@@ -1,11 +1,6 @@
 import { redirect } from "next/navigation";
 import RooseveltDashboard from "@/components/dashboard/roosevelt/RooseveltDashboard";
-
-// TODO: replace with actual Better Auth session utility
-async function getSession() {
-  // Placeholder - wire to Learning Hub's Better Auth session
-  return { userId: "demo", role: "tdi" as const, schoolId: undefined };
-}
+import { getDashboardSession } from "@/lib/supabase-server";
 
 async function fetchScorecardData() {
   try {
@@ -26,15 +21,15 @@ async function fetchScorecardData() {
 }
 
 export default async function RooseveltDashboardPage() {
-  const session = await getSession();
+  const session = await getDashboardSession();
 
   if (!session) {
-    redirect("/login");
+    redirect("/partners/login");
   }
 
   const allowedRoles = ["tdi", "admin"];
   if (!allowedRoles.includes(session.role)) {
-    redirect("/unauthorized");
+    redirect("/partners/login");
   }
 
   // Fetch live scorecard data server-side so the page renders with real numbers
