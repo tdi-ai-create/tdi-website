@@ -14,6 +14,9 @@ function getSupabaseAdmin() {
 async function verifyTurnstile(token: string): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) {
+    // Dev-only shortcut: when TURNSTILE_SECRET_KEY is absent, verification is skipped.
+    // TURNSTILE_SECRET_KEY is set across all Vercel environments so this branch is
+    // unreachable in any deployed context.
     console.warn('[intake] TURNSTILE_SECRET_KEY not set — skipping verification');
     return true;
   }
@@ -25,6 +28,8 @@ async function verifyTurnstile(token: string): Promise<boolean> {
   const data = await resp.json() as { success: boolean };
   return data.success === true;
 }
+
+const MAX_FIELD_LEN = 5000;
 
 // POST /api/creators/intake
 // Accepts a creator intake form submission, verifies Turnstile, writes to
@@ -50,6 +55,17 @@ export async function POST(request: NextRequest) {
 
     if (!turnstileToken) {
       return NextResponse.json({ error: 'Missing Turnstile token' }, { status: 400 });
+    }
+
+    if (
+      name.length > MAX_FIELD_LEN ||
+      email.length > MAX_FIELD_LEN ||
+      strategy.length > MAX_FIELD_LEN ||
+      content_types.length > MAX_FIELD_LEN ||
+      referral_dropdown.length > MAX_FIELD_LEN ||
+      (other_referral && other_referral.length > MAX_FIELD_LEN)
+    ) {
+      return NextResponse.json({ error: 'Input exceeds maximum allowed length' }, { status: 400 });
     }
 
     const turnstileOk = await verifyTurnstile(turnstileToken);
@@ -83,10 +99,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[intake] Error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    console.error('[intake] Unhandled error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
