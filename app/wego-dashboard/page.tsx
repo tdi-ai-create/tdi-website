@@ -142,16 +142,7 @@ export default function WegoDashboard() {
   const isComplete = (itemId: string) => completedItems.includes(itemId);
 
   // Needs Attention items
-  const needsAttentionItems = [
-    {
-      id: 'year1-celebration',
-      title: 'Year 1 Celebration + Year 2 Planning',
-      description: 'Review wins, insights, and plan your next chapter',
-      deadline: 'APRIL 2026',
-      actionLabel: 'Schedule Your Session',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone',
-    },
-  ];
+  const needsAttentionItems: { id: string; title: string; description: string; deadline: string; actionLabel: string; actionUrl: string }[] = [];
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
@@ -162,7 +153,7 @@ export default function WegoDashboard() {
     // ZONE 1 - Snapshot
     stats: {
       educatorsEnrolled: { value: 19, total: 19, label: 'Paras Enrolled', sublabel: '100% Hub login rate' },
-      deliverables: { completed: 11, total: 13, label: 'Deliverables', sublabel: 'completed vs. contracted' },
+      deliverables: { completed: 13, total: 13, label: 'Deliverables', sublabel: 'all contracted deliverables complete' },
       hubEngagement: { percent: 89, raw: '17/19', label: 'Hub Engagement', sublabel: '17 PAs with tracked activity' },
       phase: { name: 'IGNITE', number: 1, total: 3, label: 'Current Phase', sublabel: 'Phase 1 of 3' },
     },
@@ -175,7 +166,8 @@ export default function WegoDashboard() {
         '100% Hub login rate  - all 19 PAs activated',
         '3 observation days + 3 on-site coachings complete',
         '21 personalized Love Notes delivered',
-        'Year 1 Celebration + Year 2 Planning to schedule',
+        'All 6 virtual sessions delivered',
+        'Spring Leadership Recap + Year 1 Celebration complete',
       ],
     },
 
@@ -195,18 +187,13 @@ export default function WegoDashboard() {
         { label: 'Observation Day 3  - 7 PAs observed, Love Notes delivered', date: 'Feb 25, 2026' },
         { label: 'Virtual Session 3 complete', date: 'Mar 2026' },
         { label: 'Virtual Session 4 complete + PA Survey collected (10 responses)', date: 'Mar 16, 2026' },
+        { label: 'Virtual Session 5 complete', date: 'Apr 13, 2026' },
+        { label: 'Virtual Session 6 (Final) complete', date: 'Apr 2026' },
+        { label: 'Spring Leadership Recap with Juan & Megan', date: 'Apr 2026' },
+        { label: 'Year 1 Celebration + Year 2 Planning', date: 'Apr 27, 2026' },
       ],
-      inProgress: [
-        { label: '19/19 PAs Hub activated  - 17 with tracked course activity', detail: '89% engagement and growing' },
-        { label: 'Weekly subgroups running  - every Monday 7:45-9AM', detail: 'EL, Self Contained, DLP, Transition (Step)' },
-        { label: 'Monthly full-group session with Rae  - ongoing', detail: 'Themed discussion + implementation support' },
-        { label: 'Year 2 teacher expansion in planning', detail: 'To be confirmed at Year 1 Celebration' },
-      ],
-      comingSoon: [
-        { label: 'Virtual Session 5', date: 'April 13, 2026' },
-        { label: 'Year 1 Celebration + Year 2 Planning', date: 'April 2026 (TBD)' },
-        { label: 'Virtual Session 6 (Final)', date: 'May 11, 2026' },
-      ],
+      inProgress: [] as { label: string; detail: string }[],
+      comingSoon: [] as { label: string; date: string }[],
     },
 
     // ZONE 2B - Investment value mirror
@@ -230,34 +217,14 @@ export default function WegoDashboard() {
 
     // ZONE 3 - Actions
     actions: {
-      nextToUnlock: [
-        {
-          label: 'Schedule Year 1 Celebration + Year 2 Planning',
-          detail: 'Review full-year wins + plan 2026-27 teacher expansion  - schedule by April 2026',
-          owner: 'partner',
-          cta: 'Schedule via Calendly',
-          ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
-        },
-      ],
-      tdiHandling: [
-        {
-          label: 'Virtual Sessions 5-6  - TDI preparing content',
-          detail: 'April 13, May 11  - all confirmed',
-        },
-        {
-          label: 'Year 2 teacher expansion proposal',
-          detail: 'TDI preparing  - to be presented at Year 1 Celebration',
-        },
-        {
-          label: 'Weekly subgroup facilitation  - ongoing',
-          detail: 'Every Monday 7:45-9AM through end of year',
-        },
-      ],
+      nextToUnlock: [] as { label: string; detail: string; owner: string; cta: string; ctaHref: string }[],
+      tdiHandling: [] as { label: string; detail: string }[],
       alreadyInMotion: [
         { label: 'Virtual Session 4 + PA Survey', date: 'March 16, 2026', status: 'complete' },
-        { label: 'Virtual Session 5', date: 'April 13, 2026', status: 'scheduled' },
-        { label: 'Virtual Session 6 (Final)', date: 'May 11, 2026', status: 'scheduled' },
-        { label: 'Weekly subgroups  - 4 groups every Monday', date: 'Ongoing through Jun 2026', status: 'scheduled' },
+        { label: 'Virtual Session 5', date: 'April 13, 2026', status: 'complete' },
+        { label: 'Virtual Session 6 (Final)', date: 'April 2026', status: 'complete' },
+        { label: 'Spring Leadership Recap', date: 'April 2026', status: 'complete' },
+        { label: 'Year 1 Celebration + Year 2 Planning', date: 'April 27, 2026', status: 'complete' },
       ],
     },
   };
@@ -440,7 +407,11 @@ export default function WegoDashboard() {
           name: 'ACCELERATE',
           number: 2,
           status: 'current',
-          deliverables: [],
+          deliverables: [
+            { label: 'Virtual Sessions 1-6  - all delivered on-site', complete: true },
+            { label: 'Spring Leadership Recap with Juan & Megan', complete: true },
+            { label: 'Year 1 Celebration + Year 2 Planning', complete: true },
+          ],
         },
         {
           name: 'SUSTAIN',
@@ -463,8 +434,8 @@ export default function WegoDashboard() {
         { date: 'Nov 2025', label: 'Obs Day 1', status: 'complete' },
         { date: 'Dec 2025', label: 'Obs Day 2', status: 'complete' },
         { date: 'Feb 2026', label: 'Obs Day 3', status: 'complete' },
-        { date: 'Mar 2026', label: 'You Are Here', status: 'current' },
-        { date: 'May 2026', label: 'Year 1 Celebration + Year 2 Planning', status: 'upcoming' },
+        { date: 'Mar 2026', label: 'Virtual Sessions 4-6', status: 'complete' },
+        { date: 'Apr 2026', label: 'Year 1 Celebration + Year 2 Planning', status: 'complete' },
       ],
       completed: [
         {
@@ -507,28 +478,32 @@ export default function WegoDashboard() {
           badge: 'Complete',
           note: '10 PA responses collected',
         },
-      ],
-      upcoming: [
         {
-          type: 'In Person Check In',
-          label: 'In Person Check In 4',
+          type: 'Virtual Session',
+          label: 'Virtual Session 5',
           date: 'April 13, 2026',
-          badge: 'Scheduled',
+          badge: 'Complete',
         },
         {
-          type: 'In Person Check In',
-          label: 'In Person Check In 5',
-          date: 'May 11, 2026',
-          badge: 'Scheduled',
+          type: 'Virtual Session',
+          label: 'Virtual Session 6 (Final)',
+          date: 'April 2026',
+          badge: 'Complete',
         },
         {
           type: 'Leadership Meeting',
-          label: 'Mid-Year Check-In + Year 2 Planning',
-          date: 'To be scheduled',
-          badge: 'Pending',
-          calendlyLink: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+          label: 'Spring Leadership Recap with Juan Suarez & Megan Payleitner',
+          date: 'April 2026',
+          badge: 'Complete',
+        },
+        {
+          type: 'Leadership Meeting',
+          label: 'Year 1 Celebration + Year 2 Planning',
+          date: 'April 27, 2026',
+          badge: 'Complete',
         },
       ],
+      upcoming: [] as { type: string; label: string; date: string; badge: string; calendlyLink?: string }[],
       leadershipMeetings: [
         {
           label: 'Partnership Kickoff  - Contract 1 (Juan Suarez)',
@@ -806,12 +781,17 @@ End-of-day stress was the most common stress peak (7 of 10 PAs). This is worth a
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">WEGO High School<br />District 94</h1>
             <p className="text-white/80 text-sm">West Chicago, Illinois | Partner Dashboard</p>
-            <p className="text-white/60 text-xs mt-1">Data updated February 25, 2026</p>
+            <p className="text-white/60 text-xs mt-1">Data updated April 27, 2026</p>
           </div>
           <div className="flex items-center gap-3 text-sm">
-            <div className="bg-white/10 px-3 py-2 rounded-lg text-center">
-              <div className="text-white/60">Status:</div>
-              <div className="font-semibold text-[#38618C] bg-white px-2 py-0.5 rounded mt-1">Phase 2 - ACCELERATE</div>
+            <div className="flex flex-col items-center gap-2">
+              <div className="bg-white/10 px-3 py-2 rounded-lg text-center">
+                <div className="text-white/60">Status:</div>
+                <div className="font-semibold text-[#38618C] bg-white px-2 py-0.5 rounded mt-1">Phase 2 - ACCELERATE</div>
+              </div>
+              <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full">
+                <CheckCircle className="w-3 h-3" /> Year 1 Complete
+              </span>
             </div>
           </div>
         </div>
@@ -946,6 +926,24 @@ End-of-day stress was the most common stress peak (7 of 10 PAs). This is worth a
                     ))}
                   </div>
                 </button>
+              </div>
+
+              {/* Year 1 Complete Celebration */}
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-7 h-7 text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-gray-900 text-lg">Year 1 Complete</h3>
+                    <p className="text-sm text-gray-700 mt-1">
+                      Every contract deliverable for the 2025-26 partnership is wrapped. 19 paraprofessionals, 3 observation days, 6 on-site sessions, and the spring leadership recap - all delivered. Thank you Juan, Megan, and the entire WEGO team.
+                    </p>
+                    <p className="text-xs text-green-700 font-semibold mt-3">
+                      Next chapter loading - see the 2026-27 tab for Year 2.
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Partnership Health Indicator */}
@@ -1123,20 +1121,20 @@ End-of-day stress was the most common stress peak (7 of 10 PAs). This is worth a
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
                 <h3 className="text-sm font-bold text-[#1B2A4A] mb-4 flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-green-500" />
-                  Already In Motion
+                  Delivered
                 </h3>
                 <div className="space-y-3">
                   {overviewData.actions.alreadyInMotion.map((item, i) => (
                     <div key={i} className="flex items-center gap-3 bg-green-50 rounded-xl p-4 border border-green-100">
                       <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                        <Calendar className="w-3.5 h-3.5 text-green-600" />
+                        <CheckCircle className="w-3.5 h-3.5 text-green-600" />
                       </div>
                       <div>
                         <div className="text-sm font-semibold text-[#1B2A4A]">{item.label}</div>
                         <div className="text-xs text-gray-500">{item.date}</div>
                       </div>
-                      <span className="ml-auto text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full flex-shrink-0">
-                        Scheduled
+                      <span className="ml-auto inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full flex-shrink-0">
+                        <CheckCircle className="w-3 h-3" /> Complete
                       </span>
                     </div>
                   ))}
@@ -1721,13 +1719,14 @@ End-of-day stress was the most common stress peak (7 of 10 PAs). This is worth a
 
             {/* ===== Full Service Table ===== */}
             <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
-              <h3 className="font-bold text-[#1e2749] mb-4">Included With Every Service</h3>
+              <h3 className="font-bold text-[#1e2749] mb-4">2025-26 Partnership - Complete <span className="text-green-600">&#10003;</span></h3>
               <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-200 bg-gray-50">
                       <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">SERVICE</th>
                       <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">INCLUDED</th>
+                      <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">STATUS</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1735,47 +1734,68 @@ End-of-day stress was the most common stress peak (7 of 10 PAs). This is worth a
                     <tr className="border-b border-gray-100">
                       <td className="py-3 px-4 font-medium text-[#1e2749]">Learning Hub Membership</td>
                       <td className="py-3 px-4 text-right font-bold text-[#38618C]">19 PAs</td>
+                      <td className="py-3 px-4 text-right"><span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full"><CheckCircle className="w-3 h-3" /> Complete</span></td>
                     </tr>
                     <tr className="border-b border-gray-100">
                       <td className="py-3 px-4 font-medium text-[#1e2749]">In-Person Observation Days</td>
                       <td className="py-3 px-4 text-right font-bold text-[#38618C]">3 DAYS</td>
+                      <td className="py-3 px-4 text-right"><span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full"><CheckCircle className="w-3 h-3" /> Complete</span></td>
                     </tr>
                     <tr className="border-b border-gray-100">
                       <td className="py-3 px-4 font-medium text-[#1e2749]">Virtual Coaching Sessions</td>
                       <td className="py-3 px-4 text-right font-bold text-[#38618C]">6 SESSIONS</td>
+                      <td className="py-3 px-4 text-right"><span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full"><CheckCircle className="w-3 h-3" /> Complete</span></td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 font-medium text-[#1e2749]">Spring Leadership Recap</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">1 SESSION</td>
+                      <td className="py-3 px-4 text-right"><span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full"><CheckCircle className="w-3 h-3" /> Complete</span></td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 font-medium text-[#1e2749]">Year 1 Celebration + Year 2 Planning</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">1 SESSION</td>
+                      <td className="py-3 px-4 text-right"><span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full"><CheckCircle className="w-3 h-3" /> Complete</span></td>
                     </tr>
                     <tr className="border-b border-gray-200">
                       <td className="py-3 px-4 font-medium text-[#1e2749]">Professional Books</td>
                       <td className="py-3 px-4 text-right font-bold text-[#38618C]">19 COPIES</td>
+                      <td className="py-3 px-4 text-right"><span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full"><CheckCircle className="w-3 h-3" /> Complete</span></td>
                     </tr>
                     {/* Included Services - Lighter */}
                     <tr className="border-b border-gray-100 bg-gray-50/50">
                       <td className="py-2.5 px-4 text-sm text-gray-600">Implementation &amp; Compliance Analytics</td>
                       <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                      <td className="py-2.5 px-4"></td>
                     </tr>
                     <tr className="border-b border-gray-100">
                       <td className="py-2.5 px-4 text-sm text-gray-600">Access to On-Demand Request Pipeline</td>
                       <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                      <td className="py-2.5 px-4"></td>
                     </tr>
                     <tr className="border-b border-gray-100 bg-gray-50/50">
                       <td className="py-2.5 px-4 text-sm text-gray-600">Access to Global Solution Tools</td>
                       <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                      <td className="py-2.5 px-4"></td>
                     </tr>
                     <tr className="border-b border-gray-100">
                       <td className="py-2.5 px-4 text-sm text-gray-600">Network News &amp; Updates</td>
                       <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                      <td className="py-2.5 px-4"></td>
                     </tr>
                     <tr className="border-b border-gray-100 bg-gray-50/50">
                       <td className="py-2.5 px-4 text-sm text-gray-600">Funding Pipeline</td>
                       <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                      <td className="py-2.5 px-4"></td>
                     </tr>
                     <tr className="border-b border-gray-100">
                       <td className="py-2.5 px-4 text-sm text-gray-600">Expert Research &amp; Professional Network</td>
                       <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                      <td className="py-2.5 px-4"></td>
                     </tr>
                     <tr>
                       <td className="py-2.5 px-4 text-sm text-gray-600">Certified Strategic Trainer</td>
                       <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                      <td className="py-2.5 px-4"></td>
                     </tr>
                   </tbody>
                 </table>
