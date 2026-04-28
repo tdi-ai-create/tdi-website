@@ -91,12 +91,14 @@ export async function PATCH(
       description,
       category,
       difficulty,
+      capacity,
       estimated_minutes,
       pd_hours,
       is_free,
       price,
       thumbnail_url,
       is_published,
+      origin_type,
     } = body;
 
     // Build update object with only provided fields
@@ -134,6 +136,7 @@ export async function PATCH(
     if (description !== undefined) updates.description = description;
     if (category !== undefined) updates.category = category;
     if (difficulty !== undefined) updates.difficulty = difficulty;
+    if (capacity !== undefined) updates.capacity = capacity;
     if (estimated_minutes !== undefined) updates.estimated_minutes = estimated_minutes;
     if (pd_hours !== undefined) updates.pd_hours = pd_hours;
     if (is_free !== undefined) {
@@ -145,6 +148,12 @@ export async function PATCH(
     if (price !== undefined && !is_free) updates.price = price;
     if (thumbnail_url !== undefined) updates.thumbnail_url = thumbnail_url;
     if (is_published !== undefined) updates.is_published = is_published;
+    if (origin_type !== undefined) {
+      if (origin_type !== null && !['internal', 'external_creator', 'mixed'].includes(origin_type)) {
+        return NextResponse.json({ error: 'origin_type must be internal, external_creator, or mixed' }, { status: 400 });
+      }
+      updates.origin_type = origin_type;
+    }
 
     const { data: course, error } = await supabase
       .from('hub_courses')

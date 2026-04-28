@@ -4,6 +4,12 @@ import Link from 'next/link';
 import { Lock, Sparkles, Heart } from 'lucide-react';
 import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
 
+const CAPACITY_STYLES: Record<string, { color: string; label: string }> = {
+  low:    { color: '#6BA368', label: 'Low' },
+  medium: { color: '#E8B84B', label: 'Medium' },
+  high:   { color: '#E8927C', label: 'High' },
+};
+
 // Category colors - elevated design
 const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
   'Stress Relief':    { bg: '#FEF3C7', text: '#854F0B' },
@@ -28,6 +34,7 @@ interface QuickWinCardProps {
     course_slug?: string;
     access_tier?: string;
     is_free_rotating?: boolean;
+    capacity?: 'low' | 'medium' | 'high' | null;
   };
   isFavorited?: boolean;
   onToggleFavorite?: (id: string, type: 'course' | 'quick_win') => void;
@@ -139,14 +146,27 @@ export default function QuickWinCard({
 
       {/* Meta */}
       <div
-        className="text-xs mb-3"
+        className="text-xs mb-3 flex items-center gap-2 flex-wrap"
         style={{
           color: '#9CA3AF',
           fontFamily: "'DM Sans', sans-serif",
         }}
       >
-        {quickWin.estimated_minutes} min
-        {quickWin.content_type && ` · ${getTypeLabel()}`}
+        <span>
+          {quickWin.estimated_minutes} min
+          {quickWin.content_type && ` · ${getTypeLabel()}`}
+        </span>
+        {quickWin.capacity && CAPACITY_STYLES[quickWin.capacity] && (
+          <span
+            className="text-[10px] font-semibold px-1.5 py-0.5 rounded"
+            style={{
+              backgroundColor: CAPACITY_STYLES[quickWin.capacity].color + '22',
+              color: CAPACITY_STYLES[quickWin.capacity].color,
+            }}
+          >
+            {CAPACITY_STYLES[quickWin.capacity].label}
+          </span>
+        )}
       </div>
 
       {/* Action */}

@@ -14,6 +14,12 @@ const CATEGORY_COLORS: Record<string, { bar: string; bg: string; text: string }>
   'New Teacher': { bar: '#5BBEC4', bg: '#E1F5EE', text: '#085041' },
 };
 
+const CAPACITY_STYLES: Record<string, { color: string; label: string }> = {
+  low:    { color: '#6BA368', label: 'Low Capacity' },
+  medium: { color: '#E8B84B', label: 'Medium Capacity' },
+  high:   { color: '#E8927C', label: 'High Capacity' },
+};
+
 interface CourseCardProps {
   course: {
     id: string;
@@ -26,6 +32,7 @@ interface CourseCardProps {
     thumbnail_url?: string;
     access_tier?: string;
     is_free_rotating?: boolean;
+    capacity?: 'low' | 'medium' | 'high' | null;
   };
   enrollment?: {
     status: 'active' | 'completed';
@@ -187,7 +194,7 @@ export default function CourseCard({
         </p>
 
         {/* Meta row */}
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-4 flex-wrap">
           <span
             className="text-[11px] font-semibold px-2 py-1 rounded"
             style={{
@@ -207,6 +214,18 @@ export default function CourseCard({
           >
             ~{course.estimated_minutes} min
           </span>
+          {course.capacity && CAPACITY_STYLES[course.capacity] && (
+            <span
+              className="text-[11px] font-semibold px-2 py-1 rounded"
+              style={{
+                backgroundColor: CAPACITY_STYLES[course.capacity].color + '22',
+                color: CAPACITY_STYLES[course.capacity].color,
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {CAPACITY_STYLES[course.capacity].label}
+            </span>
+          )}
         </div>
       </div>
 

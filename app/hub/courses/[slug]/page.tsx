@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, useRef, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
@@ -16,6 +16,8 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import CourseCard from '@/components/hub/CourseCard';
+import CommunityPracticeSpace from '@/components/hub/CommunityPracticeSpace';
+import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
 
 // Category colors
 const CATEGORY_COLORS: Record<string, string> = {
@@ -56,6 +58,7 @@ interface Course {
   pd_hours: number;
   estimated_minutes: number;
   difficulty: string;
+  capacity?: 'low' | 'medium' | 'high' | null;
   thumbnail_url: string | null;
   is_published: boolean;
   author_name: string | null;
@@ -93,6 +96,8 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const [authorCourses, setAuthorCourses] = useState<RelatedCourse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [showCapacityFeedback, setShowCapacityFeedback] = useState(false);
+  const capacityFeedbackShownRef = useRef(false);
 
   const { enrollment, isEnrolled, isEnrolling, enroll } = useEnrollment(course?.id || null, user?.id || null);
   const { progress, toggleLessonComplete } = useProgressTracking(course?.id || null, user?.id || null);
@@ -237,6 +242,19 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
     loadCourse();
   }, [slug]);
+
+  // Show capacity feedback prompt once the educator has completed at least one lesson
+  useEffect(() => {
+    if (!course?.capacity || !user?.id || !progress.completedLessons) return;
+    if (capacityFeedbackShownRef.current) return;
+    if (!shouldShowCapacityFeedback('course', course.id)) return;
+
+    const timer = setTimeout(() => {
+      capacityFeedbackShownRef.current = true;
+      setShowCapacityFeedback(true);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [course?.id, course?.capacity, user?.id, progress.completedLessons]);
 
   // Auto-translate course when Spanish is selected and content is missing
   useEffect(() => {
@@ -471,7 +489,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                 </p>
               )}
 
-              {/* Stats row - PD Hours and Lessons only, NO difficulty/level */}
+              {/* Stats row - PD Hours, Lessons, and Capacity */}
               <div
                 className="flex gap-0 pt-5"
                 style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}
@@ -483,9 +501,28 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                   </div>
                 )}
                 {totalLessons > 0 && (
-                  <div className="px-6">
+                  <div className="px-6" style={course.capacity ? { borderRight: '1px solid rgba(255,255,255,0.08)' } : {}}>
                     <div className="text-xl font-bold text-white">{totalLessons}</div>
                     <div className="text-xs font-bold tracking-widest uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>Lessons</div>
+                  </div>
+                )}
+                {course.capacity && (
+                  <div className="px-6">
+                    <div
+                      className="text-xl font-bold capitalize"
+                      style={{
+                        color: course.capacity === 'low' ? '#6BA368' : course.capacity === 'medium' ? '#E8B84B' : '#E8927C',
+                      }}
+                    >
+                      {course.capacity.charAt(0).toUpperCase() + course.capacity.slice(1)}
+                    </div>
+                    <div
+                      className="text-xs font-bold tracking-widest uppercase mt-0.5"
+                      style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}
+                      title="How much effort is needed to implement this in your practice"
+                    >
+                      Capacity
+                    </div>
                   </div>
                 )}
               </div>
@@ -815,6 +852,23 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         </div>
       </div>
 
+      {/* Section Divider */}
+      <hr
+        className="my-10 border-none border-t-2 border-dashed relative"
+        style={{ borderColor: 'rgba(255,186,6,0.3)' }}
+      />
+
+      {/* Community Practice Space */}
+      {process.env.NEXT_PUBLIC_PRACTICE_SPACE_ENABLED === 'true' && (
+        <CommunityPracticeSpace
+          courseId={course.id}
+          modules={modules}
+          lessons={modules.flatMap(m => m.lessons)}
+          isEnrolled={isEnrolled}
+          onEnroll={handleEnroll}
+        />
+      )}
+
       {/* Mobile Sticky Enroll Button */}
       {!isEnrolled && (
         <div
@@ -836,6 +890,15 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             {isEnrolling ? 'Enrolling...' : !user ? 'Sign in to Enroll' : 'Enroll in Course'}
           </button>
         </div>
+      )}
+
+      {showCapacityFeedback && course.capacity && (
+        <CapacityFeedbackPrompt
+          contentType="course"
+          contentId={course.id}
+          officialCapacity={course.capacity}
+          onDismiss={() => setShowCapacityFeedback(false)}
+        />
       )}
     </div>
     </div>

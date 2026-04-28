@@ -376,6 +376,11 @@ export default function CreatorStudioPage() {
     stalledCreators: { id: string; name: string; email: string; contentPath: string | null; currentStep: string | null; daysSinceActivity: number; lastActivityDate: string; severity: 'yellow' | 'orange' | 'red' }[];
     publishedPerMonth: { month: string; monthLabel: string; courses: number; blogs: number; cumulativeCourses: number; cumulativeBlogs: number; total: number }[];
     geographicDistribution: { hasData: boolean; total: number; withState: number; withoutState: number; states: { state: string; count: number; percent: number }[] };
+    // Event-driven overlay (optional — absent when milestone_events table is empty)
+    realtimeActivityFeed?: { id: string; creatorId: string; creatorName: string; eventType: string; eventLabel: string; triggerType: string; triggerLabel: string; milestoneName: string; phase: string; contentPath: string; createdAt: string }[];
+    selfCompleteRatio?: { contentPath: string; selfComplete: number; adminAdvance: number; other: number; total: number; selfCompletePercent: number; adminAdvancePercent: number }[];
+    eventEngagementHeatmap?: { id: string; name: string; initials: string; contentPath: string | null; engagementLevel: 'hot' | 'warm' | 'cool' | 'cold'; eventsLast30Days: number; eventsLast7Days: number; lastEventAt: string | null }[];
+    eventFunnelAnalysis?: { phase: string; name: string; count: number; percent: number; avgDaysToPhase: number | null; sampleSize: number }[];
   } | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
@@ -2716,6 +2721,170 @@ export default function CreatorStudioPage() {
                   </div>
                 </div>
               </div>
+
+              {/* ==========================================
+                  SECTION 4: EVENT-DRIVEN INSIGHTS (overlay)
+                  ========================================== */}
+              {(analyticsData.realtimeActivityFeed?.length ?? 0) > 0 && (
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-1 pb-2 border-b border-gray-100">
+                    Event-Driven Insights
+                  </h2>
+                  <p className="text-sm text-gray-500 mb-4">Live data from milestone_events — self-complete vs admin-advance signals, frequency-based engagement, and event-sourced funnel.</p>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    {/* K. Real-time Activity Feed */}
+                    <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+                      <h3 className="text-lg font-semibold mb-1 text-gray-900">Recent Activity</h3>
+                      <p className="text-sm text-gray-500 mb-4">Latest milestone completions from the event log</p>
+                      <div className="space-y-2 max-h-[320px] overflow-y-auto">
+                        {analyticsData.realtimeActivityFeed?.slice(0, 20).map((event) => (
+                          <div key={event.id} className="flex items-start gap-3 py-2 border-b border-gray-50 last:border-0">
+                            <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
+                              event.triggerType === 'self_complete' ? 'bg-green-400' :
+                              event.triggerType === 'admin_advance' ? 'bg-purple-400' : 'bg-gray-300'
+                            }`} />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium text-gray-900 truncate">{event.creatorName}</p>
+                              <p className="text-xs text-gray-500 truncate">{event.milestoneName}</p>
+                            </div>
+                            <div className="flex-shrink-0 text-right">
+                              <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                                event.triggerType === 'self_complete' ? 'bg-green-50 text-green-700' :
+                                event.triggerType === 'admin_advance' ? 'bg-purple-50 text-purple-700' : 'bg-gray-50 text-gray-500'
+                              }`}>
+                                {event.triggerLabel}
+                              </span>
+                              <p className="text-xs text-gray-400 mt-0.5">
+                                {new Date(event.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* L. Self-Complete vs Admin-Advance Ratio */}
+                    <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+                      <h3 className="text-lg font-semibold mb-1 text-gray-900">Self-Complete Ratio</h3>
+                      <p className="text-sm text-gray-500 mb-4">Creator-driven vs admin-driven completions per content path</p>
+                      <div className="space-y-4">
+                        {analyticsData.selfCompleteRatio?.filter(r => r.total > 0).map((row) => (
+                          <div key={row.contentPath}>
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="text-sm font-medium text-gray-700">{row.contentPath}</span>
+                              <span className="text-xs text-gray-400">{row.total} completions</span>
+                            </div>
+                            <div className="h-5 bg-gray-100 rounded-full overflow-hidden flex">
+                              <div
+                                className="h-full bg-green-400 transition-all"
+                                style={{ width: `${row.selfCompletePercent}%` }}
+                                title={`Self-complete: ${row.selfCompletePercent}%`}
+                              />
+                              <div
+                                className="h-full bg-purple-400 transition-all"
+                                style={{ width: `${row.adminAdvancePercent}%` }}
+                                title={`Admin advance: ${row.adminAdvancePercent}%`}
+                              />
+                            </div>
+                            <div className="flex gap-4 mt-1">
+                              <span className="text-xs text-green-600">{row.selfCompletePercent}% self</span>
+                              <span className="text-xs text-purple-600">{row.adminAdvancePercent}% admin</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex gap-4 mt-4 pt-3 border-t border-gray-50">
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-3 h-3 rounded-full bg-green-400" />
+                          <span className="text-xs text-gray-500">Self-Complete</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-3 h-3 rounded-full bg-purple-400" />
+                          <span className="text-xs text-gray-500">Admin Advance</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* M. Event Engagement Heatmap */}
+                    <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+                      <h3 className="text-lg font-semibold mb-1 text-gray-900">Engagement Frequency</h3>
+                      <p className="text-sm text-gray-500 mb-4">Based on event count (last 30 days), not just last-touch date</p>
+                      <div className="flex gap-3 mb-3 flex-wrap">
+                        {[
+                          { level: 'hot', label: '3+ this week', color: 'bg-red-400' },
+                          { level: 'warm', label: '3+ this month', color: 'bg-orange-400' },
+                          { level: 'cool', label: '1–2 this month', color: 'bg-yellow-400' },
+                          { level: 'cold', label: 'No events', color: 'bg-gray-300' },
+                        ].map(({ level, label, color }) => (
+                          <div key={level} className="flex items-center gap-1.5">
+                            <div className={`w-2.5 h-2.5 rounded-full ${color}`} />
+                            <span className="text-xs text-gray-500">{label}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex flex-wrap gap-2 max-h-[220px] overflow-y-auto">
+                        {analyticsData.eventEngagementHeatmap?.slice(0, 40).map((creator) => {
+                          const colorMap: Record<string, string> = {
+                            hot: 'bg-red-100 border-red-200 text-red-700',
+                            warm: 'bg-orange-100 border-orange-200 text-orange-700',
+                            cool: 'bg-yellow-100 border-yellow-200 text-yellow-700',
+                            cold: 'bg-gray-100 border-gray-200 text-gray-500',
+                          };
+                          return (
+                            <div
+                              key={creator.id}
+                              className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-xs ${colorMap[creator.engagementLevel]}`}
+                              title={`${creator.name} — ${creator.eventsLast30Days} events/30d, ${creator.eventsLast7Days} events/7d`}
+                            >
+                              <span className="font-medium">{creator.initials}</span>
+                              <span className="opacity-70">{creator.eventsLast30Days}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* N. Event Funnel Analysis */}
+                    <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+                      <h3 className="text-lg font-semibold mb-1 text-gray-900">Event Funnel</h3>
+                      <p className="text-sm text-gray-500 mb-4">Phase-by-phase reach based on event timestamps</p>
+                      <div className="space-y-3">
+                        {analyticsData.eventFunnelAnalysis?.map((stage, index, arr) => {
+                          const prevPercent = index === 0 ? 100 : arr[index - 1].percent;
+                          const dropOff = index === 0 ? 0 : prevPercent - stage.percent;
+                          return (
+                            <div key={stage.phase}>
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-sm font-medium text-gray-700">{stage.name}</span>
+                                <div className="flex items-center gap-2">
+                                  {dropOff > 5 && (
+                                    <span className="text-xs text-red-500">-{dropOff}%</span>
+                                  )}
+                                  <span className="text-xs text-gray-500">{stage.count} creators</span>
+                                  {stage.avgDaysToPhase !== null && (
+                                    <span className="text-xs text-gray-400">~{stage.avgDaysToPhase}d</span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full rounded-full transition-all"
+                                  style={{
+                                    width: `${stage.percent}%`,
+                                    backgroundColor: index === 0 ? '#6366F1' : index < 3 ? '#8B5CF6' : index < 5 ? '#F59E0B' : '#22C55E',
+                                  }}
+                                />
+                              </div>
+                              <p className="text-xs text-gray-400 mt-0.5">{stage.percent}% of all creators</p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </>
           )}
 

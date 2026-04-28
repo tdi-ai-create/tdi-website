@@ -16,6 +16,7 @@ import {
   CheckCircle,
   Share2,
 } from 'lucide-react';
+import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
 
 // Breathing Exercise Component
 function BreathingExercise() {
@@ -140,6 +141,7 @@ interface QuickWin {
   content_type: string;
   video_url: string | null;
   download_url: string | null;
+  capacity?: 'low' | 'medium' | 'high' | null;
   title_es?: string | null;
   description_es?: string | null;
   content_es?: string | null;
@@ -158,6 +160,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const [quickWin, setQuickWin] = useState<QuickWin | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [showCapacityFeedback, setShowCapacityFeedback] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const { language, t } = useLanguage();
 
@@ -179,7 +182,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         console.log('[QuickWinDetail] Fetching quick win with slug:', slug);
         const { data, error } = await supabase
           .from('hub_quick_wins')
-          .select('id, slug, title, description, content, category, quick_win_type, duration_minutes, download_url, title_es, description_es, content_es')
+          .select('id, slug, title, description, content, category, quick_win_type, duration_minutes, download_url, capacity, title_es, description_es, content_es')
           .eq('slug', slug)
           .eq('is_published', true)
           .single();
@@ -204,6 +207,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           content_type: data.quick_win_type || 'activity',
           video_url: null, // hub_quick_wins doesn't have video_url
           download_url: data.download_url,
+          capacity: data.capacity || null,
           title_es: data.title_es,
           description_es: data.description_es,
           content_es: data.content_es,
@@ -272,6 +276,10 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
     });
 
     setIsCompleted(true);
+
+    if (quickWin.capacity && user && shouldShowCapacityFeedback('quick_win', quickWin.id)) {
+      setShowCapacityFeedback(true);
+    }
   };
 
   const handleSaveReflection = async () => {
@@ -821,6 +829,15 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           </div>
         )}
       </div>
+
+      {showCapacityFeedback && quickWin.capacity && (
+        <CapacityFeedbackPrompt
+          contentType="quick_win"
+          contentId={quickWin.id}
+          officialCapacity={quickWin.capacity}
+          onDismiss={() => setShowCapacityFeedback(false)}
+        />
+      )}
     </div>
   );
 }

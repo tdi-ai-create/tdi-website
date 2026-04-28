@@ -85,6 +85,7 @@ interface Course {
   description: string;
   category: string;
   difficulty: string;
+  capacity?: 'low' | 'medium' | 'high' | null;
   estimated_minutes: number;
   pd_hours: number;
   is_published: boolean;
@@ -436,6 +437,7 @@ function CourseSettingsPanel({
     description: course.description,
     category: course.category,
     difficulty: course.difficulty,
+    capacity: course.capacity || '',
     estimated_minutes: course.estimated_minutes,
     pd_hours: course.pd_hours,
     is_free: course.is_free,
@@ -446,6 +448,7 @@ function CourseSettingsPanel({
   const handleSave = () => {
     onUpdate({
       ...form,
+      capacity: (form.capacity || null) as 'low' | 'medium' | 'high' | null,
       price: form.is_free ? null : parseFloat(form.price) || null,
       thumbnail_url: form.thumbnail_url || null,
     });
@@ -505,6 +508,20 @@ function CourseSettingsPanel({
             </label>
           ))}
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Capacity</label>
+        <select
+          value={form.capacity}
+          onChange={(e) => setForm({ ...form, capacity: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+        >
+          <option value="">Not set</option>
+          <option value="low">Low — Grab-and-go, minimal prep</option>
+          <option value="medium">Medium — Some prep, 1-2 sessions</option>
+          <option value="high">High — Significant investment, multi-session</option>
+        </select>
       </div>
 
       <div className="grid grid-cols-2 gap-4">

@@ -1,6 +1,20 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+interface MilestoneEventRecord {
+  id: string;
+  creator_id: string;
+  content_path: string;
+  milestone_order: number;
+  milestone_name: string;
+  phase: string;
+  event_type: string; // completed | unlocked | reopened
+  trigger_type: string; // self_complete | admin_advance | system_init
+  triggered_by: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
 interface MilestoneRecord {
   id: string;
   creator_id: string;
@@ -85,8 +99,15 @@ export async function GET() {
       return NextResponse.json({ success: false, error: milestonesError.message }, { status: 500 });
     }
 
+    // Get all milestone_events for event-driven analytics overlay
+    const { data: allMilestoneEvents } = await supabase
+      .from('milestone_events')
+      .select('*')
+      .order('created_at', { ascending: false });
+
     const typedMilestones = (allCreatorMilestones || []) as MilestoneRecord[];
     const typedCreators = (creators || []) as CreatorRecord[];
+    const typedEvents = (allMilestoneEvents || []) as MilestoneEventRecord[];
 
     // ==========================================
     // SECTION 1: PIPELINE HEALTH
@@ -130,6 +151,22 @@ export async function GET() {
     // J. Geographic Distribution
     const geographicDistribution = calculateGeographicDistribution(typedCreators);
 
+    // ==========================================
+    // SECTION 4: EVENT-DRIVEN INSIGHTS (overlay)
+    // ==========================================
+
+    // K. Real-time activity feed from milestone_events
+    const realtimeActivityFeed = calculateRealtimeActivityFeed(typedEvents, typedCreators);
+
+    // L. Self-complete vs admin-advance ratio per content path
+    const selfCompleteRatio = calculateSelfCompleteRatio(typedEvents);
+
+    // M. Engagement heatmap based on event frequency (not just staleness)
+    const eventEngagementHeatmap = calculateEventEngagementHeatmap(typedEvents, typedCreators);
+
+    // N. Funnel analysis with precise drop-off using event timestamps
+    const eventFunnelAnalysis = calculateEventFunnelAnalysis(typedEvents, typedCreators);
+
     return NextResponse.json({
       success: true,
       // Section 1
@@ -145,6 +182,11 @@ export async function GET() {
       // Section 3
       publishedPerMonth,
       geographicDistribution,
+      // Section 4: Event-driven overlay
+      realtimeActivityFeed,
+      selfCompleteRatio,
+      eventEngagementHeatmap,
+      eventFunnelAnalysis,
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -624,6 +666,198 @@ function calculatePublishedPerMonth(creators: CreatorRecord[], creatorMilestones
         total: data.courses + data.blogs,
       };
     });
+}
+
+function calculateRealtimeActivityFeed(
+  events: MilestoneEventRecord[],
+  creators: CreatorRecord[]
+) {
+  const creatorMap = new Map(creators.map(c => [c.id, c.name]));
+  const triggerLabels: Record<string, string> = {
+    self_complete: 'Self-Complete',
+    admin_advance: 'Admin Advance',
+    system_init: 'System Init',
+  };
+  const eventLabels: Record<string, string> = {
+    completed: 'Completed',
+    unlocked: 'Unlocked',
+    reopened: 'Reopened',
+  };
+
+  return events
+    .filter(e => e.event_type !== 'unlocked') // feed shows completions/reopens, not auto-unlocks
+    .slice(0, 50)
+    .map(e => ({
+      id: e.id,
+      creatorId: e.creator_id,
+      creatorName: creatorMap.get(e.creator_id) || 'Unknown Creator',
+      eventType: e.event_type,
+      eventLabel: eventLabels[e.event_type] || e.event_type,
+      triggerType: e.trigger_type,
+      triggerLabel: triggerLabels[e.trigger_type] || e.trigger_type,
+      milestoneName: e.milestone_name,
+      phase: e.phase,
+      contentPath: e.content_path,
+      createdAt: e.created_at,
+    }));
+}
+
+function calculateSelfCompleteRatio(events: MilestoneEventRecord[]) {
+  const completedEvents = events.filter(e => e.event_type === 'completed' && e.trigger_type !== 'system_init');
+
+  const pathStats: Record<string, { selfComplete: number; adminAdvance: number; other: number }> = {
+    blog: { selfComplete: 0, adminAdvance: 0, other: 0 },
+    download: { selfComplete: 0, adminAdvance: 0, other: 0 },
+    course: { selfComplete: 0, adminAdvance: 0, other: 0 },
+    overall: { selfComplete: 0, adminAdvance: 0, other: 0 },
+  };
+
+  completedEvents.forEach(e => {
+    const path = e.content_path in pathStats ? e.content_path : 'other';
+    const bucket = e.trigger_type === 'self_complete' ? 'selfComplete'
+      : e.trigger_type === 'admin_advance' ? 'adminAdvance'
+      : 'other';
+
+    if (pathStats[path]) pathStats[path][bucket]++;
+    pathStats.overall[bucket]++;
+  });
+
+  return Object.entries(pathStats).map(([contentPath, stats]) => {
+    const total = stats.selfComplete + stats.adminAdvance + stats.other;
+    return {
+      contentPath: contentPath === 'overall' ? 'Overall' : contentPath.charAt(0).toUpperCase() + contentPath.slice(1),
+      selfComplete: stats.selfComplete,
+      adminAdvance: stats.adminAdvance,
+      other: stats.other,
+      total,
+      selfCompletePercent: total > 0 ? Math.round((stats.selfComplete / total) * 100) : 0,
+      adminAdvancePercent: total > 0 ? Math.round((stats.adminAdvance / total) * 100) : 0,
+    };
+  });
+}
+
+function calculateEventEngagementHeatmap(
+  events: MilestoneEventRecord[],
+  creators: CreatorRecord[]
+) {
+  const now = new Date();
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+  const creatorEventStats = new Map<string, { recentCount: number; weekCount: number; lastEventAt: string | null }>();
+
+  events.forEach(e => {
+    if (!creatorEventStats.has(e.creator_id)) {
+      creatorEventStats.set(e.creator_id, { recentCount: 0, weekCount: 0, lastEventAt: null });
+    }
+    const stats = creatorEventStats.get(e.creator_id)!;
+    const eventDate = new Date(e.created_at);
+
+    if (!stats.lastEventAt || eventDate > new Date(stats.lastEventAt)) {
+      stats.lastEventAt = e.created_at;
+    }
+    if (eventDate >= thirtyDaysAgo) stats.recentCount++;
+    if (eventDate >= sevenDaysAgo) stats.weekCount++;
+  });
+
+  return creators.map(creator => {
+    const stats = creatorEventStats.get(creator.id) || { recentCount: 0, weekCount: 0, lastEventAt: null };
+
+    let engagementLevel: 'hot' | 'warm' | 'cool' | 'cold';
+    if (stats.weekCount >= 3) engagementLevel = 'hot';
+    else if (stats.recentCount >= 3) engagementLevel = 'warm';
+    else if (stats.recentCount >= 1) engagementLevel = 'cool';
+    else engagementLevel = 'cold';
+
+    return {
+      id: creator.id,
+      name: creator.name,
+      initials: creator.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2),
+      contentPath: creator.content_path,
+      engagementLevel,
+      eventsLast30Days: stats.recentCount,
+      eventsLast7Days: stats.weekCount,
+      lastEventAt: stats.lastEventAt,
+    };
+  }).sort((a, b) => {
+    const levelOrder: Record<string, number> = { hot: 0, warm: 1, cool: 2, cold: 3 };
+    const diff = levelOrder[a.engagementLevel] - levelOrder[b.engagementLevel];
+    return diff !== 0 ? diff : b.eventsLast30Days - a.eventsLast30Days;
+  });
+}
+
+function calculateEventFunnelAnalysis(
+  events: MilestoneEventRecord[],
+  creators: CreatorRecord[]
+) {
+  const phaseOrder = ['onboarding', 'agreement', 'course_design', 'test_prep', 'production', 'launch'];
+  const phaseNames: Record<string, string> = {
+    onboarding: 'Onboarding',
+    agreement: 'Agreement',
+    course_design: 'Prep & Resources',
+    test_prep: 'Test & Prep',
+    production: 'Production',
+    launch: 'Launch',
+  };
+
+  // Map of creator_id -> set of phases they have completed events in
+  const creatorPhases = new Map<string, Set<string>>();
+  events
+    .filter(e => e.event_type === 'completed')
+    .forEach(e => {
+      if (!creatorPhases.has(e.creator_id)) creatorPhases.set(e.creator_id, new Set());
+      creatorPhases.get(e.creator_id)!.add(e.phase);
+    });
+
+  const totalCreators = creators.length;
+
+  // For each phase, count creators who have at least one completed event in that phase
+  // (or any earlier phase - cumulative funnel)
+  const funnelData = phaseOrder.map((phase, index) => {
+    const phasesToCheck = phaseOrder.slice(0, index + 1);
+    let count = 0;
+    creators.forEach(creator => {
+      const phases = creatorPhases.get(creator.id) || new Set();
+      if (phasesToCheck.some(p => phases.has(p))) count++;
+    });
+
+    // Also get avg time to first event in this phase
+    const firstEventTimes: number[] = [];
+    creators.forEach(creator => {
+      const phaseEvents = events.filter(e =>
+        e.creator_id === creator.id &&
+        e.phase === phase &&
+        e.event_type === 'completed'
+      );
+      if (phaseEvents.length > 0) {
+        // Time from creator join to first completion in this phase
+        const creatorRecord = creators.find(c => c.id === creator.id);
+        if (creatorRecord) {
+          const joinDate = new Date(creatorRecord.created_at);
+          const firstEvent = phaseEvents.reduce((earliest, e) =>
+            new Date(e.created_at) < new Date(earliest.created_at) ? e : earliest
+          );
+          const days = Math.round((new Date(firstEvent.created_at).getTime() - joinDate.getTime()) / (1000 * 60 * 60 * 24));
+          if (days >= 0) firstEventTimes.push(days);
+        }
+      }
+    });
+
+    const avgDaysToPhase = firstEventTimes.length > 0
+      ? Math.round(firstEventTimes.reduce((a, b) => a + b, 0) / firstEventTimes.length)
+      : null;
+
+    return {
+      phase,
+      name: phaseNames[phase] || phase,
+      count,
+      percent: totalCreators > 0 ? Math.round((count / totalCreators) * 100) : 0,
+      avgDaysToPhase,
+      sampleSize: firstEventTimes.length,
+    };
+  });
+
+  return funnelData;
 }
 
 function calculateGeographicDistribution(creators: CreatorRecord[]) {

@@ -97,8 +97,8 @@ export async function getAdminEnrollments(filters?: {
       status,
       progress_pct,
       created_at,
-      user:hub_profiles!hub_enrollments_user_id_fkey(id, display_name, email),
-      course:hub_courses!hub_enrollments_course_id_fkey(title)
+      user:hub_profiles!user_id(id, display_name, email),
+      course:hub_courses!course_id(title)
     `)
     .order('created_at', { ascending: false });
 

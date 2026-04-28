@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
+import { getDashboardSession } from "@/lib/supabase-server";
 
 // Typed row shapes for partnership_staff query results
 interface StaffRow {
@@ -9,6 +10,8 @@ interface StaffRow {
   email: string;
   role_group: string;
   hub_enrolled: boolean;
+  photo_url: string | null;
+  photo_thumb_url: string | null;
 }
 
 interface StaffRowWithDate extends StaffRow {
@@ -30,6 +33,11 @@ function deriveStatus(hubEnrolled: boolean): "active" | "inactive" | "pending" {
  *   { educators: Educator[], total: number, enrolled: number }
  */
 export async function GET(request: NextRequest) {
+  const session = await getDashboardSession();
+  if (!session) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
   try {
     const supabase = getSupabase();
     const { searchParams } = new URL(request.url);
@@ -54,7 +62,7 @@ export async function GET(request: NextRequest) {
       // Admin: include created_at
       const { data: staffRows, error: staffError } = await supabase
         .from("partnership_staff")
-        .select("id, first_name, last_name, email, role_group, hub_enrolled, created_at")
+        .select("id, first_name, last_name, email, role_group, hub_enrolled, photo_url, photo_thumb_url, created_at")
         .eq("partnership_id", partnership.id)
         .order("last_name", { ascending: true })
         .order("first_name", { ascending: true });
@@ -73,6 +81,8 @@ export async function GET(request: NextRequest) {
         hubEnrolled: row.hub_enrolled,
         status: deriveStatus(row.hub_enrolled),
         createdAt: row.created_at,
+        photoUrl: row.photo_url,
+        photoThumbUrl: row.photo_thumb_url,
       }));
 
       const enrolled = educators.filter((e) => e.hubEnrolled).length;
@@ -82,7 +92,7 @@ export async function GET(request: NextRequest) {
     // Standard view (no created_at)
     const { data: staffRows, error: staffError } = await supabase
       .from("partnership_staff")
-      .select("id, first_name, last_name, email, role_group, hub_enrolled")
+      .select("id, first_name, last_name, email, role_group, hub_enrolled, photo_url, photo_thumb_url")
       .eq("partnership_id", partnership.id)
       .order("last_name", { ascending: true })
       .order("first_name", { ascending: true });
@@ -100,6 +110,8 @@ export async function GET(request: NextRequest) {
       roleGroup: row.role_group,
       hubEnrolled: row.hub_enrolled,
       status: deriveStatus(row.hub_enrolled),
+      photoUrl: row.photo_url,
+      photoThumbUrl: row.photo_thumb_url,
     }));
 
     const enrolled = educators.filter((e) => e.hubEnrolled).length;

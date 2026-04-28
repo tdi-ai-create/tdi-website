@@ -93,11 +93,23 @@ function EmptyState({ icon: Icon, title, description, action }: { icon: React.El
 // ============= TAB COMPONENTS =============
 
 // QUICK WINS TAB
+const QW_CATEGORIES = ['Stress Relief', 'Time Savers', 'Classroom Tools', 'Communication', 'Self-Care', 'Other'];
+const QW_TYPES = ['read', 'watch', 'do', 'download', 'reflect'] as const;
+
+function titleToSlug(t: string) {
+  return t.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').trim();
+}
+
+const EMPTY_QW_FORM = { title: '', slug: '', description: '', category: 'Classroom Tools', type: 'do', duration_minutes: 10, capacity: '', is_published: false };
+
 function QuickWinsTab() {
   const [quickWins, setQuickWins] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingQW, setEditingQW] = useState<any | null>(null);
+  const [form, setForm] = useState(EMPTY_QW_FORM);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -125,12 +137,209 @@ function QuickWinsTab() {
     reflect: Edit2,
   };
 
+  const openCreate = () => {
+    setForm(EMPTY_QW_FORM);
+    setEditingQW(null);
+    setShowCreateForm(true);
+  };
+
+  const openEdit = (qw: any) => {
+    setForm({
+      title: qw.title || '',
+      slug: qw.slug || '',
+      description: qw.description || '',
+      category: qw.category || 'Classroom Tools',
+      type: qw.type || 'do',
+      duration_minutes: qw.duration_minutes || 10,
+      capacity: qw.capacity || '',
+      is_published: qw.is_published || false,
+    });
+    setEditingQW(qw);
+    setShowCreateForm(false);
+  };
+
+  const closeModal = () => {
+    setShowCreateForm(false);
+    setEditingQW(null);
+    setForm(EMPTY_QW_FORM);
+  };
+
+  const handleSave = async () => {
+    if (!form.title.trim() || !form.slug.trim()) return;
+    setIsSubmitting(true);
+    const supabase = getSupabase();
+    const payload = {
+      title: form.title.trim(),
+      slug: form.slug.trim(),
+      description: form.description || null,
+      category: form.category || null,
+      type: form.type,
+      duration_minutes: form.duration_minutes || null,
+      capacity: form.capacity || null,
+      is_published: form.is_published,
+    };
+    try {
+      if (editingQW) {
+        const { error } = await supabase.from('hub_quick_wins').update(payload).eq('id', editingQW.id);
+        if (!error) {
+          setQuickWins(prev => prev.map(qw => qw.id === editingQW.id ? { ...qw, ...payload } : qw));
+          closeModal();
+        }
+      } else {
+        const { data, error } = await supabase.from('hub_quick_wins').insert(payload).select().single();
+        if (!error && data) {
+          setQuickWins(prev => [data, ...prev]);
+          closeModal();
+        }
+      }
+    } catch (err) {
+      console.error('Error saving quick win:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const isModalOpen = showCreateForm || !!editingQW;
+
   if (isLoading) {
     return <div className="py-8 text-center text-gray-500">Loading Quick Wins...</div>;
   }
 
   return (
     <div>
+      {/* Create / Edit Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-semibold text-lg text-gray-900">
+                {editingQW ? 'Edit Quick Win' : 'Create Quick Win'}
+              </h3>
+              <button onClick={closeModal} className="p-1 rounded-lg hover:bg-gray-100">
+                <X size={20} className="text-gray-400" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Title <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={form.title}
+                  onChange={(e) => setForm(f => ({ ...f, title: e.target.value, slug: editingQW ? f.slug : titleToSlug(e.target.value) }))}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
+                  placeholder="Quick win title"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Slug <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={form.slug}
+                  onChange={(e) => setForm(f => ({ ...f, slug: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50 font-mono"
+                  placeholder="url-friendly-slug"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                  value={form.description}
+                  onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50 resize-none"
+                  rows={3}
+                  placeholder="Brief description for educators"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <select
+                    value={form.category}
+                    onChange={(e) => setForm(f => ({ ...f, category: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
+                  >
+                    {QW_CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                  <select
+                    value={form.type}
+                    onChange={(e) => setForm(f => ({ ...f, type: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
+                  >
+                    {QW_TYPES.map(t => <option key={t} value={t} className="capitalize">{t}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Duration (minutes)</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={form.duration_minutes}
+                    onChange={(e) => setForm(f => ({ ...f, duration_minutes: parseInt(e.target.value) || 0 }))}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Capacity</label>
+                  <select
+                    value={form.capacity}
+                    onChange={(e) => setForm(f => ({ ...f, capacity: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
+                  >
+                    <option value="">Not set</option>
+                    <option value="low">Low — Grab-and-go</option>
+                    <option value="medium">Medium — Some prep</option>
+                    <option value="high">High — Significant investment</option>
+                  </select>
+                </div>
+              </div>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.is_published}
+                  onChange={(e) => setForm(f => ({ ...f, is_published: e.target.checked }))}
+                  className="w-4 h-4 rounded"
+                />
+                <span className="text-sm text-gray-700">Published</span>
+              </label>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={closeModal}
+                className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={isSubmitting || !form.title.trim() || !form.slug.trim()}
+                className="px-4 py-2 text-sm font-medium text-white rounded-lg disabled:opacity-50"
+                style={{ backgroundColor: theme.accent }}
+              >
+                {isSubmitting ? 'Saving...' : editingQW ? 'Save Changes' : 'Create Quick Win'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Filter Bar */}
       <div className="flex flex-wrap gap-3 mb-6">
         <div className="relative flex-1 min-w-[200px]">
@@ -144,7 +353,7 @@ function QuickWinsTab() {
           />
         </div>
         <button
-          onClick={() => setShowCreateForm(true)}
+          onClick={openCreate}
           className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2"
           style={{ backgroundColor: theme.accent }}
         >
@@ -160,6 +369,7 @@ function QuickWinsTab() {
             <tr>
               <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Title</th>
               <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Category</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Capacity</th>
               <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Type</th>
               <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Duration</th>
               <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
@@ -169,7 +379,7 @@ function QuickWinsTab() {
           <tbody className="divide-y divide-gray-100">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={6}>
+                <td colSpan={7}>
                   <EmptyState
                     icon={Zap}
                     title="No Quick Wins Yet"
@@ -188,6 +398,19 @@ function QuickWinsTab() {
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">{qw.category || '-'}</td>
                     <td className="px-4 py-3">
+                      {qw.capacity ? (
+                        <span
+                          className="px-2 py-1 rounded-full text-xs font-medium capitalize"
+                          style={{
+                            backgroundColor: qw.capacity === 'low' ? '#6BA36822' : qw.capacity === 'medium' ? '#E8B84B22' : '#E8927C22',
+                            color: qw.capacity === 'low' ? '#6BA368' : qw.capacity === 'medium' ? '#E8B84B' : '#E8927C',
+                          }}
+                        >
+                          {qw.capacity}
+                        </span>
+                      ) : <span className="text-gray-400 text-xs">-</span>}
+                    </td>
+                    <td className="px-4 py-3">
                       <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
                         <TypeIcon size={12} />
                         {qw.type}
@@ -203,7 +426,7 @@ function QuickWinsTab() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <button className="p-1.5 rounded hover:bg-gray-100" title="Edit">
+                        <button onClick={() => openEdit(qw)} className="p-1.5 rounded hover:bg-gray-100" title="Edit">
                           <Edit2 size={14} />
                         </button>
                         <button className="p-1.5 rounded hover:bg-gray-100 text-red-500" title="Delete">

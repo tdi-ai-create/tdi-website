@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
+import { getDashboardSession } from "@/lib/supabase-server";
 
 interface TimelineEventRow {
   id: string;
@@ -16,6 +17,11 @@ interface TimelineEventRow {
  * Sourced from the timeline_events table filtered by Roosevelt partnership id.
  */
 export async function GET() {
+  const session = await getDashboardSession();
+  if (!session) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
   try {
     const supabase = getSupabase();
 

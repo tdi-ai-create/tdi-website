@@ -33,7 +33,8 @@ export async function GET(request: NextRequest) {
       '<p>OAuth client credentials are not configured on the server.</p>');
   }
 
-  const redirectUri = `${origin}/api/olivia/auth/callback`;
+  const redirectUri = process.env.OLIVIA_GOOGLE_REDIRECT_URI
+    ?? `${origin}/api/olivia/auth/callback`;
 
   try {
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {

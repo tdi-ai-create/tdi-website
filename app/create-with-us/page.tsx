@@ -2,7 +2,8 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import Script from 'next/script';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 // Creator interface with content path
 interface Creator {
@@ -129,6 +130,25 @@ export default function CreateWithUsPage() {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [creators, setCreators] = useState<Creator[]>(fallbackCreators);
   const [activeSection, setActiveSection] = useState<string>('');
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const turnstileWidgetId = useRef<string | null>(null);
+
+  const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '';
+  const INTAKE_API_URL = '/api/creators/intake';
+
+  const renderTurnstile = useCallback(() => {
+    if (!turnstileRef.current || !TURNSTILE_SITE_KEY || turnstileWidgetId.current) return;
+    const w = window as unknown as Record<string, unknown>;
+    const turnstile = w.turnstile as { render: (el: HTMLElement, opts: Record<string, unknown>) => string; reset: (id: string) => void } | undefined;
+    if (!turnstile) return;
+    turnstileWidgetId.current = turnstile.render(turnstileRef.current, {
+      sitekey: TURNSTILE_SITE_KEY,
+      callback: (token: string) => setTurnstileToken(token),
+      'expired-callback': () => setTurnstileToken(null),
+      'error-callback': () => setTurnstileToken(null),
+    });
+  }, [TURNSTILE_SITE_KEY]);
 
   // Fetch creators from API
   useEffect(() => {
@@ -200,36 +220,49 @@ export default function CreateWithUsPage() {
     }));
   };
 
+  const resetTurnstile = useCallback(() => {
+    const w = window as unknown as Record<string, unknown>;
+    const turnstile = w.turnstile as { reset: (id: string) => void } | undefined;
+    if (turnstile && turnstileWidgetId.current) {
+      turnstile.reset(turnstileWidgetId.current);
+      setTurnstileToken(null);
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!turnstileToken) return;
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
-    const formData = new FormData(e.currentTarget);
-
-    // Add the content types as a formatted string
     const selectedTypes = contentTypes
       .filter(t => formState.contentTypes.includes(t.id))
       .map(t => t.label)
       .join(', ');
-    formData.set('content_types', selectedTypes || 'None selected');
 
-    // Add referral source
     const referralValue = formState.referral === 'Other'
       ? `Other: ${formState.otherReferral}`
       : formState.referral;
-    formData.set('referral_source', referralValue);
 
+    const payload = {
+      name: formState.name,
+      email: formState.email,
+      strategy: formState.strategy,
+      content_types: selectedTypes || 'None selected',
+      referral_dropdown: referralValue,
+      'cf-turnstile-response': turnstileToken,
+    };
 
     try {
-      const response = await fetch('https://api.web3forms.com/submit', {
+      const response = await fetch(INTAKE_API_URL, {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();
 
-      if (result.success) {
+      if (result.ok) {
         setSubmitStatus('success');
         setFormState({
           name: '',
@@ -239,13 +272,22 @@ export default function CreateWithUsPage() {
           referral: '',
           otherReferral: '',
         });
+
+        if (typeof window !== 'undefined' && typeof (window as unknown as Record<string, unknown>).gtag === 'function') {
+          (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', 'creator_application_submitted', {
+            event_category: 'Creator Intake',
+            event_label: selectedTypes,
+          });
+        }
       } else {
-        console.error('Web3Forms error:', result);
+        console.error('Intake API error:', result);
         setSubmitStatus('error');
+        resetTurnstile();
       }
     } catch (err) {
       console.error('Form submission error:', err);
       setSubmitStatus('error');
+      resetTurnstile();
     } finally {
       setIsSubmitting(false);
     }
@@ -525,11 +567,7 @@ export default function CreateWithUsPage() {
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-6" encType="multipart/form-data">
-                {/* Web3Forms Access Key */}
-                <input type="hidden" name="access_key" value="2ac6e03c-f09d-436f-bb54-a96ec7f00c34" />
-                <input type="hidden" name="subject" value="New Content Creator Application - TDI" />
-                <input type="hidden" name="from_name" value="TDI Content Creator Form" />
+              <form onSubmit={handleSubmit} className="space-y-6">
 
                 {/* Name */}
                 <div>
@@ -643,6 +681,9 @@ export default function CreateWithUsPage() {
                   )}
                 </div>
 
+                {/* Cloudflare Turnstile */}
+                <div ref={turnstileRef} className="flex justify-center" />
+
                 {/* Error Message */}
                 {submitStatus === 'error' && (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
@@ -653,7 +694,7 @@ export default function CreateWithUsPage() {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  disabled={isSubmitting || formState.contentTypes.length === 0}
+                  disabled={isSubmitting || formState.contentTypes.length === 0 || !turnstileToken}
                   className="w-full bg-[#ffba06] text-[#1e2749] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-[#e5a800] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-md hover:shadow-lg"
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Application'}
@@ -841,6 +882,12 @@ export default function CreateWithUsPage() {
           </div>
         </div>
       </section>
+
+      <Script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+        strategy="lazyOnload"
+        onReady={renderTurnstile}
+      />
     </main>
   );
 }
