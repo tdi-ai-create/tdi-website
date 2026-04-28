@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
+import { getDashboardSession } from "@/lib/supabase-server";
 
 const PILOT_END_DATE = new Date("2026-06-30T23:59:59.000-04:00");
 
@@ -9,6 +10,11 @@ const PILOT_END_DATE = new Date("2026-06-30T23:59:59.000-04:00");
  * Queries: partnerships (phase/quotas) + partnership_staff (hub enrollment count)
  */
 export async function GET() {
+  const session = await getDashboardSession();
+  if (!session) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
   try {
     const supabase = getSupabase();
 
