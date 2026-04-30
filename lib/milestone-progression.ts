@@ -1,6 +1,7 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-type DbClient = ReturnType<typeof createClient>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DbClient = SupabaseClient<any>;
 
 function milestoneAppliesTo(
   milestone: { applies_to?: string[] | null },
@@ -24,14 +25,14 @@ export async function progressMilestone(
   const { creatorId, milestoneId, completedBy, contentPath } = params;
   const completedAt = new Date().toISOString();
 
-  const { data: milestone } = await (supabase
-    .from('milestones') as any)
+  const { data: milestone } = await supabase
+    .from('milestones')
     .select('id, phase_id, sort_order, title, name, applies_to')
     .eq('id', milestoneId)
     .single();
 
-  await (supabase
-    .from('creator_milestones') as any)
+  await supabase
+    .from('creator_milestones')
     .update({
       status: 'completed',
       completed_at: completedAt,
@@ -52,8 +53,8 @@ export async function progressMilestone(
 
   let nextMilestoneName: string | null = null;
 
-  let { data: nextMilestone } = await (supabase
-    .from('milestones') as any)
+  let { data: nextMilestone } = await supabase
+    .from('milestones')
     .select('id, sort_order, title, name')
     .eq('phase_id', milestone.phase_id)
     .gt('sort_order', milestone.sort_order)
@@ -63,8 +64,8 @@ export async function progressMilestone(
     .maybeSingle();
 
   if (!nextMilestone) {
-    const { data: phases } = await (supabase
-      .from('phases') as any)
+    const { data: phases } = await supabase
+      .from('phases')
       .select('id, sort_order')
       .order('sort_order', { ascending: true });
 
@@ -80,7 +81,7 @@ export async function progressMilestone(
       .order('sort_order', { ascending: true });
 
     if (futureMilestones) {
-      for (const fm of futureMilestones as Array<{ id: string; sort_order: number; title?: string; name?: string; applies_to?: string[] | null }>) {
+      for (const fm of futureMilestones as Array<{ id: any; sort_order: any; title: any; name: any; applies_to?: string[] | null }>) {
         if (!contentPath || milestoneAppliesTo(fm, contentPath)) {
           nextMilestone = fm;
           break;
@@ -90,8 +91,8 @@ export async function progressMilestone(
   }
 
   if (nextMilestone) {
-    await (supabase
-      .from('creator_milestones') as any)
+    await supabase
+      .from('creator_milestones')
       .update({
         status: 'available',
         completed_at: null,
