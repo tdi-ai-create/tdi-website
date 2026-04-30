@@ -94,6 +94,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
   const [relatedCourses, setRelatedCourses] = useState<RelatedCourse[]>([]);
   const [authorCourses, setAuthorCourses] = useState<RelatedCourse[]>([]);
+  const [enrolledCount, setEnrolledCount] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [showCapacityFeedback, setShowCapacityFeedback] = useState(false);
@@ -129,6 +130,12 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         }
 
         setCourse(courseData);
+
+        // Fetch enrolled count (service role endpoint — bypasses RLS)
+        fetch(`/api/hub/enrollment-count?courseId=${courseData.id}`)
+          .then((r) => r.ok ? r.json() : null)
+          .then((data) => { if (data?.count != null) setEnrolledCount(data.count); })
+          .catch(() => {});
 
         // Fetch modules with lessons
         console.log('[CourseDetail] Fetching modules for course_id:', courseData.id);
@@ -288,7 +295,12 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
     const success = await enroll();
     console.log('[CourseDetailPage] enroll result:', success);
     if (success) {
-      showToast('You are enrolled! 🎉', 'success');
+      const newCount = (enrolledCount ?? 0) + 1;
+      setEnrolledCount(newCount);
+      const countMsg = newCount > 1
+        ? `You're joining ${newCount.toLocaleString()} educators in this course.`
+        : 'Welcome to the course!';
+      showToast(`You're in! ${countMsg} 🎉`, 'success');
     } else {
       showToast('Failed to enroll. Please try again.', 'error');
     }
@@ -501,13 +513,13 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                   </div>
                 )}
                 {totalLessons > 0 && (
-                  <div className="px-6" style={course.capacity ? { borderRight: '1px solid rgba(255,255,255,0.08)' } : {}}>
+                  <div className="px-6" style={(course.capacity || (enrolledCount !== null && enrolledCount > 0)) ? { borderRight: '1px solid rgba(255,255,255,0.08)' } : {}}>
                     <div className="text-xl font-bold text-white">{totalLessons}</div>
                     <div className="text-xs font-bold tracking-widest uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>Lessons</div>
                   </div>
                 )}
                 {course.capacity && (
-                  <div className="px-6">
+                  <div className="px-6" style={(enrolledCount !== null && enrolledCount > 0) ? { borderRight: '1px solid rgba(255,255,255,0.08)' } : {}}>
                     <div
                       className="text-xl font-bold capitalize"
                       style={{
@@ -522,6 +534,16 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                       title="How much effort is needed to implement this in your practice"
                     >
                       Capacity
+                    </div>
+                  </div>
+                )}
+                {enrolledCount !== null && enrolledCount > 0 && (
+                  <div className="px-6">
+                    <div className="text-xl font-bold" style={{ color: '#E8927C' }}>
+                      {enrolledCount.toLocaleString()}
+                    </div>
+                    <div className="text-xs font-bold tracking-widest uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>
+                      Enrolled
                     </div>
                   </div>
                 )}
@@ -887,7 +909,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
               minHeight: '52px',
             }}
           >
-            {isEnrolling ? 'Enrolling...' : !user ? 'Sign in to Enroll' : 'Enroll in Course'}
+            {isEnrolling ? 'Enrolling...' : !user ? 'Sign in to Enroll' : 'Join this course'}
           </button>
         </div>
       )}
