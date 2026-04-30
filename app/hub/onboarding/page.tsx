@@ -95,6 +95,7 @@ export default function OnboardingPage() {
   const [stressScore, setStressScore] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [communityCount, setCommunityCount] = useState<number | null>(null);
 
   // User state
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -120,8 +121,17 @@ export default function OnboardingPage() {
     setTimeout(() => {
       setStep(newStep);
       setIsTransitioning(false);
-      // Scroll to top when changing steps
       window.scrollTo({ top: 0, behavior: 'instant' });
+      if (newStep === 5 && communityCount === null) {
+        fetch('/api/hub/community-count')
+          .then((r) => r.json())
+          .then((data) => {
+            if (typeof data.count === 'number' && data.count > 0) {
+              setCommunityCount(data.count);
+            }
+          })
+          .catch(() => {});
+      }
     }, 150);
   };
 
@@ -433,7 +443,7 @@ export default function OnboardingPage() {
                 maxWidth: '520px',
               }}
             >
-              Teachers Deserve It started as a conversation about what educators actually need. The Learning Hub is where that conversation becomes action. Courses, tools, and a space built just for you.
+              Teachers Deserve It started as a conversation about what educators actually need. The Learning Hub is where that conversation becomes action. Courses, tools, and a community built just for you.
             </p>
 
             {/* CTA Button */}
@@ -1455,7 +1465,9 @@ export default function OnboardingPage() {
               color: 'white',
             }}
           >
-            You're all set.
+            {communityCount !== null
+              ? `You're in. So are ${communityCount.toLocaleString()}+ other educators.`
+              : "You're in. So are thousands of other educators."}
           </h1>
 
           <p
@@ -1467,7 +1479,7 @@ export default function OnboardingPage() {
               lineHeight: 1.6,
             }}
           >
-            We picked a Quick Win based on what you told us. It takes about 3 minutes. No pressure.
+            You just joined a community of educators doing the same hard work you are. We picked a Quick Win based on what you told us — it takes about 3 minutes.
           </p>
 
           <p
@@ -1491,7 +1503,7 @@ export default function OnboardingPage() {
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
-            {isSaving ? 'Saving...' : 'Go to my Dashboard'}
+            {isSaving ? 'Saving...' : 'Meet your Dashboard'}
           </button>
         </div>
       )}
