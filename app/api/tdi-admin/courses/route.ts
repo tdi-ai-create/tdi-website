@@ -25,6 +25,7 @@ export async function GET(request: Request) {
     const status = searchParams.get('status'); // 'published', 'draft', or null for all
     const category = searchParams.get('category');
     const search = searchParams.get('search');
+    const originType = searchParams.get('origin_type');
     const sortBy = searchParams.get('sort') || 'updated_at';
     const sortOrder = searchParams.get('order') || 'desc';
 
@@ -52,6 +53,10 @@ export async function GET(request: Request) {
 
     if (search) {
       query = query.ilike('title', `%${search}%`);
+    }
+
+    if (originType) {
+      query = query.eq('origin_type', originType);
     }
 
     // Apply sorting
@@ -116,12 +121,14 @@ export async function POST(request: Request) {
       description,
       category,
       difficulty,
+      capacity,
       estimated_minutes,
       pd_hours,
       is_free,
       price,
       thumbnail_url,
       creator_id,
+      origin_type,
     } = body;
 
     if (!title) {
@@ -157,12 +164,14 @@ export async function POST(request: Request) {
         description: description || '',
         category: category || 'Other',
         difficulty: difficulty || 'beginner',
+        capacity: capacity || null,
         estimated_minutes: estimated_minutes || 0,
         pd_hours: pd_hours || 0,
         is_free: is_free !== false,
         price: is_free ? null : (price || null),
         thumbnail_url: thumbnail_url || null,
         creator_id: creator_id || null,
+        origin_type: origin_type || null,
         is_published: false,
       })
       .select()
