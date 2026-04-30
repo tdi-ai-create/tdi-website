@@ -129,7 +129,7 @@ function ExampleDataNotice({
 }
 
 export default function HubAdminPage() {
-  const { teamMember, permissions } = useTDIAdmin();
+  const { teamMember, permissions, isOwner } = useTDIAdmin();
   const [stats, setStats] = useState<HubStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasExampleData, setHasExampleData] = useState(false);
@@ -256,6 +256,35 @@ export default function HubAdminPage() {
             />
           </div>
         </div>
+
+        {/* CMO Dashboard Widget — owners only */}
+        {isOwner && (
+          <div className="mb-8">
+            <h2 className="text-sm font-semibold text-gray-900 mb-4">Executive</h2>
+            <Link
+              href="/tdi-admin/cmo"
+              className="flex items-center justify-between bg-white rounded-xl p-5 border border-gray-100 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:border-gray-200 transition-all duration-200 group"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+            >
+              <div className="flex items-center gap-4">
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: 'rgba(13, 148, 136, 0.1)' }}
+                >
+                  <BarChart3 size={20} style={{ color: '#0D9488' }} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">CMO Dashboard</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Weekly metrics, ARR, TikTok, Substack, UTM tracking</p>
+                </div>
+              </div>
+              <ChevronRight
+                size={20}
+                className="text-gray-300 group-hover:text-gray-500 group-hover:translate-x-1 transition-all duration-200"
+              />
+            </Link>
+          </div>
+        )}
 
         {/* Quick Actions */}
         <div>
