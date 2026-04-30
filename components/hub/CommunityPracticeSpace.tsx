@@ -218,7 +218,7 @@ export default function CommunityPracticeSpace({
             From the Practice
           </h2>
           <p className="text-sm" style={{ color: '#6B7280' }}>
-            How educators are using and adapting this course in their classrooms
+            How educators like you are making this work in real classrooms
           </p>
         </div>
         <div className="flex gap-5 text-sm" style={{ color: '#6B7280' }}>
@@ -242,7 +242,7 @@ export default function CommunityPracticeSpace({
               Share Your Practice
             </h3>
             <p className="text-sm mb-5" style={{ color: '#6B7280' }}>
-              Tell other educators how you used or adapted something from this course. Not a review, just what you tried and what happened.
+              Tell other educators how you used or adapted something from this course. Not a review — just what you tried and what happened. Your note might be exactly what someone else needs.
             </p>
 
             <div className="mb-4">
@@ -365,10 +365,10 @@ export default function CommunityPracticeSpace({
           >
             <div>
               <div className="text-sm font-semibold mb-0.5" style={{ color: '#1B2A4A' }}>
-                Share your practice with other educators
+                This is where educators help each other.
               </div>
               <div className="text-xs" style={{ color: '#9CA3AF' }}>
-                Enroll in this course to post notes and mark notes as helpful.
+                Enroll to share what worked for you — and help other educators figure it out too.
               </div>
             </div>
             <button
@@ -425,10 +425,10 @@ export default function CommunityPracticeSpace({
         >
           <div className="text-4xl mb-3" style={{ color: '#E5E7EB' }}>📝</div>
           <h4 className="text-base font-semibold mb-1" style={{ color: '#1B2A4A' }}>
-            No practice notes yet
+            No notes yet
           </h4>
           <p className="text-sm" style={{ color: '#9CA3AF' }}>
-            Be the first to share how you used this course!
+            Be the first educator to share what worked — and help the ones who come after you.
           </p>
         </div>
       ) : (
