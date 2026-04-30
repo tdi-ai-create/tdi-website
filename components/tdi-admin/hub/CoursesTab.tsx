@@ -44,6 +44,18 @@ const DIFFICULTY_COLORS: Record<string, string> = {
   advanced: 'bg-rose-100 text-rose-700',
 };
 
+const ORIGIN_COLORS: Record<string, string> = {
+  internal: 'bg-blue-100 text-blue-700',
+  external_creator: 'bg-purple-100 text-purple-700',
+  mixed: 'bg-indigo-100 text-indigo-700',
+};
+
+const ORIGIN_LABELS: Record<string, string> = {
+  internal: 'Internal',
+  external_creator: 'External',
+  mixed: 'Mixed',
+};
+
 interface Course {
   id: string;
   title: string;
@@ -51,6 +63,7 @@ interface Course {
   description: string;
   category: string;
   difficulty: string;
+  capacity?: 'low' | 'medium' | 'high' | null;
   estimated_minutes: number;
   pd_hours: number;
   is_published: boolean;
@@ -59,6 +72,7 @@ interface Course {
   thumbnail_url: string | null;
   module_count: number;
   lesson_count: number;
+  origin_type: 'internal' | 'external_creator' | 'mixed' | null;
   created_at: string;
   updated_at: string;
 }
@@ -129,6 +143,7 @@ function CreateCourseModal({
     description: '',
     category: 'Other',
     difficulty: 'beginner',
+    capacity: '',
     estimated_minutes: 60,
     pd_hours: 1,
     is_free: true,
@@ -145,6 +160,7 @@ function CreateCourseModal({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
+          capacity: form.capacity || null,
           price: form.is_free ? null : parseFloat(form.price) || null,
         }),
       });
@@ -245,6 +261,23 @@ function CreateCourseModal({
                 </label>
               ))}
             </div>
+          </div>
+
+          {/* Capacity */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Capacity
+            </label>
+            <select
+              value={form.capacity}
+              onChange={(e) => setForm({ ...form, capacity: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
+            >
+              <option value="">Not set</option>
+              <option value="low">Low — Grab-and-go, minimal prep</option>
+              <option value="medium">Medium — Some prep, 1-2 sessions</option>
+              <option value="high">High — Significant investment, multi-session</option>
+            </select>
           </div>
 
           {/* Time fields */}
@@ -500,6 +533,7 @@ export function CoursesTab() {
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
+  const [originFilter, setOriginFilter] = useState<'all' | 'internal' | 'external_creator' | 'mixed' | 'untagged'>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean;
@@ -530,10 +564,14 @@ export function CoursesTab() {
     loadCourses();
   }, [statusFilter]);
 
-  // Filter courses by search (client-side for responsiveness)
-  const filteredCourses = courses.filter((c) =>
-    c.title.toLowerCase().includes(search.toLowerCase())
-  );
+  // Filter courses by search and origin (client-side for responsiveness)
+  const filteredCourses = courses.filter((c) => {
+    const matchesSearch = c.title.toLowerCase().includes(search.toLowerCase());
+    const matchesOrigin =
+      originFilter === 'all' ||
+      (originFilter === 'untagged' ? !c.origin_type : c.origin_type === originFilter);
+    return matchesSearch && matchesOrigin;
+  });
 
   // Pagination
   const totalPages = Math.ceil(filteredCourses.length / pageSize);
@@ -657,6 +695,22 @@ export function CoursesTab() {
           ))}
         </div>
 
+        {/* Origin Filter */}
+        <select
+          value={originFilter}
+          onChange={(e) => {
+            setOriginFilter(e.target.value as typeof originFilter);
+            setCurrentPage(1);
+          }}
+          className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
+        >
+          <option value="all">All Origins</option>
+          <option value="internal">Internal</option>
+          <option value="external_creator">External Creator</option>
+          <option value="mixed">Mixed</option>
+          <option value="untagged">Untagged</option>
+        </select>
+
         {/* Create Button */}
         <button
           onClick={() => setShowCreateModal(true)}
@@ -693,6 +747,9 @@ export function CoursesTab() {
                   <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
                     <FileText size={14} className="inline mr-1" />
                     Lessons
+                  </th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Origin
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
                     Status
@@ -739,6 +796,21 @@ export function CoursesTab() {
                     </td>
                     <td className="px-4 py-3 text-center text-sm text-gray-600">
                       {course.lesson_count}
+                    </td>
+                    <td className="px-4 py-3">
+                      {course.origin_type ? (
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            ORIGIN_COLORS[course.origin_type] || 'bg-gray-100 text-gray-700'
+                          }`}
+                        >
+                          {ORIGIN_LABELS[course.origin_type] || course.origin_type}
+                        </span>
+                      ) : (
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-400">
+                          —
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <span
