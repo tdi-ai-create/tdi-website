@@ -1,16 +1,8 @@
 'use client';
 
-declare global {
-  interface Window {
-    turnstile?: {
-      render: (el: HTMLElement, opts: Record<string, unknown>) => string;
-      reset: (widgetId?: string) => void;
-    };
-  }
-}
-
 import Image from 'next/image';
 import Link from 'next/link';
+import Script from 'next/script';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 // Creator interface with content path
@@ -136,11 +128,27 @@ export default function CreateWithUsPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const [turnstileReady, setTurnstileReady] = useState(false);
-  const turnstileRef = useRef<HTMLDivElement>(null);
   const [creators, setCreators] = useState<Creator[]>(fallbackCreators);
   const [activeSection, setActiveSection] = useState<string>('');
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const turnstileWidgetId = useRef<string | null>(null);
+
+  const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '';
+  const INTAKE_API_URL = '/api/creators/intake';
+
+  const renderTurnstile = useCallback(() => {
+    if (!turnstileRef.current || !TURNSTILE_SITE_KEY || turnstileWidgetId.current) return;
+    const w = window as unknown as Record<string, unknown>;
+    const turnstile = w.turnstile as { render: (el: HTMLElement, opts: Record<string, unknown>) => string; reset: (id: string) => void } | undefined;
+    if (!turnstile) return;
+    turnstileWidgetId.current = turnstile.render(turnstileRef.current, {
+      sitekey: TURNSTILE_SITE_KEY,
+      callback: (token: string) => setTurnstileToken(token),
+      'expired-callback': () => setTurnstileToken(null),
+      'error-callback': () => setTurnstileToken(null),
+    });
+  }, [TURNSTILE_SITE_KEY]);
 
   // Fetch creators from API
   useEffect(() => {
@@ -212,35 +220,14 @@ export default function CreateWithUsPage() {
     }));
   };
 
-  const handleTurnstileCallback = useCallback((token: string) => {
-    setTurnstileToken(token);
+  const resetTurnstile = useCallback(() => {
+    const w = window as unknown as Record<string, unknown>;
+    const turnstile = w.turnstile as { reset: (id: string) => void } | undefined;
+    if (turnstile && turnstileWidgetId.current) {
+      turnstile.reset(turnstileWidgetId.current);
+      setTurnstileToken(null);
+    }
   }, []);
-
-  const handleTurnstileExpiry = useCallback(() => {
-    setTurnstileToken(null);
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-    if (!siteKey || !turnstileRef.current) return;
-
-    const script = document.createElement('script');
-    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-    script.async = true;
-    script.onload = () => {
-      if (window.turnstile && turnstileRef.current) {
-        window.turnstile.render(turnstileRef.current, {
-          sitekey: siteKey,
-          callback: handleTurnstileCallback,
-          'expired-callback': handleTurnstileExpiry,
-        });
-        setTurnstileReady(true);
-      }
-    };
-    document.head.appendChild(script);
-    return () => { document.head.removeChild(script); };
-  }, [handleTurnstileCallback, handleTurnstileExpiry]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -257,37 +244,50 @@ export default function CreateWithUsPage() {
       ? `Other: ${formState.otherReferral}`
       : formState.referral;
 
+    const payload = {
+      name: formState.name,
+      email: formState.email,
+      strategy: formState.strategy,
+      content_types: selectedTypes || 'None selected',
+      referral_dropdown: referralValue,
+      'cf-turnstile-response': turnstileToken,
+    };
+
     try {
-      const response = await fetch('/api/creators/intake', {
+      const response = await fetch(INTAKE_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formState.name,
-          email: formState.email,
-          strategy: formState.strategy,
-          content_types: selectedTypes || 'None selected',
-          referral_dropdown: referralValue,
-          other_referral: formState.referral === 'Other' ? formState.otherReferral : undefined,
-          'cf-turnstile-response': turnstileToken,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();
 
-      if (response.ok && result.success) {
+      if (result.ok) {
         setSubmitStatus('success');
-        setFormState({ name: '', email: '', strategy: '', contentTypes: [], referral: '', otherReferral: '' });
-        setTurnstileToken(null);
-        if (window.turnstile) window.turnstile.reset();
+        setFormState({
+          name: '',
+          email: '',
+          strategy: '',
+          contentTypes: [],
+          referral: '',
+          otherReferral: '',
+        });
+
+        if (typeof window !== 'undefined' && typeof (window as unknown as Record<string, unknown>).gtag === 'function') {
+          (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', 'creator_application_submitted', {
+            event_category: 'Creator Intake',
+            event_label: selectedTypes,
+          });
+        }
       } else {
-        console.error('Intake error:', result);
+        console.error('Intake API error:', result);
         setSubmitStatus('error');
-        if (window.turnstile) window.turnstile.reset();
-        setTurnstileToken(null);
+        resetTurnstile();
       }
     } catch (err) {
       console.error('Form submission error:', err);
       setSubmitStatus('error');
+      resetTurnstile();
     } finally {
       setIsSubmitting(false);
     }
@@ -681,15 +681,15 @@ export default function CreateWithUsPage() {
                   )}
                 </div>
 
+                {/* Cloudflare Turnstile */}
+                <div ref={turnstileRef} className="flex justify-center" />
+
                 {/* Error Message */}
                 {submitStatus === 'error' && (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
                     Something went wrong. Please try again or email us directly at hello@teachersdeserveit.com
                   </div>
                 )}
-
-                {/* Cloudflare Turnstile */}
-                <div ref={turnstileRef} className="flex justify-center" />
 
                 {/* Submit Button */}
                 <button
@@ -882,6 +882,12 @@ export default function CreateWithUsPage() {
           </div>
         </div>
       </section>
+
+      <Script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+        strategy="lazyOnload"
+        onReady={renderTurnstile}
+      />
     </main>
   );
 }
