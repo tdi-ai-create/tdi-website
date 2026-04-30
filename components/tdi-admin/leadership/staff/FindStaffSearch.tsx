@@ -27,7 +27,7 @@ export function FindStaffSearch({ partnershipId, userEmail }: FindStaffSearchPro
   const [loading, setLoading] = useState(false)
   const [selectedStaff, setSelectedStaff] = useState<StaffResult | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const search = useCallback(async (q: string) => {
     if (q.length < 2) {

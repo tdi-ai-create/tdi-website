@@ -72,15 +72,27 @@ export default function CourseCatalogPage() {
     setIsLoading(true);
 
     try {
-      // Fetch all published courses
-      const { data: courseData } = await supabase
+      // Fetch all published courses (capacity column added in migration 043)
+      const { data: courseData, error: courseError } = await supabase
         .from('hub_courses')
         .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url, is_published, access_tier, is_free_rotating, capacity, title_es, description_es')
         .eq('is_published', true)
         .order('created_at', { ascending: false });
 
-      if (courseData) {
-        setCourses(courseData);
+      let finalCourseData = courseData;
+      if (courseError) {
+        // capacity column may not exist yet (migration 043 pending) — retry without it
+        console.warn('Course fetch failed, retrying without capacity:', courseError.message);
+        const { data: fallbackData } = await supabase
+          .from('hub_courses')
+          .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url, is_published, access_tier, is_free_rotating, title_es, description_es')
+          .eq('is_published', true)
+          .order('created_at', { ascending: false });
+        finalCourseData = fallbackData as typeof courseData;
+      }
+
+      if (finalCourseData) {
+        setCourses(finalCourseData);
       }
 
       // Fetch user's enrollments if logged in
@@ -317,8 +329,8 @@ export default function CourseCatalogPage() {
           })}
         </div>
 
-        {/* Capacity Filter Row */}
-        <div className="flex items-center gap-2 mb-6 flex-wrap">
+        {/* Capacity Filter Row — hidden until migration 043 populates capacity data */}
+        {courses.some(c => c.capacity) && <div className="flex items-center gap-2 mb-6 flex-wrap">
           <span
             className="text-[11px] font-bold tracking-wider flex-shrink-0"
             style={{
@@ -346,7 +358,7 @@ export default function CourseCatalogPage() {
               {tUI(label)}
             </button>
           ))}
-        </div>
+        </div>}
 
         {/* In Progress Section - only show when filter is All */}
         {inProgressCourses.length > 0 && activeFilter === 'All' && (
