@@ -21,12 +21,20 @@ import { SectionHighlight } from '@/components/dashboard/shared/SectionHighlight
 import { TDISuggestions } from '@/components/dashboard/shared/TDISuggestions'
 import { STATIC_DEFAULTS } from '@/lib/dashboard/dashboardDefaults'
 import { generateSuggestions, type TDISuggestion } from '@/lib/dashboard/generateSuggestions'
+import { StaffRosterWithPhotos, StaffPhotoUpload, FindStaffSearch } from '@/components/tdi-admin/leadership/staff'
 import { ArrowLeft, Loader2, Building2, Upload, ExternalLink, Calendar, Mail, Phone, MessageCircle } from 'lucide-react'
 import Image from 'next/image'
+import OnboardingChecklist from '@/components/dashboard/leadership/OnboardingChecklist'
+import StaffEngagementRoster from '@/components/dashboard/leadership/StaffEngagementRoster'
+import ActivationReadinessScore from '@/components/dashboard/leadership/ActivationReadinessScore'
+import CourseCompletionFunnel from '@/components/dashboard/leadership/CourseCompletionFunnel'
+import LoginTrendChart from '@/components/dashboard/leadership/LoginTrendChart'
+import ObservationImpactScorecard from '@/components/dashboard/leadership/ObservationImpactScorecard'
 
 // Tab configuration - mirrors principal dashboard
 const ADMIN_TABS = [
   { key: 'overview', label: 'Overview' },
+  { key: '90-days', label: '90 Days' },
   { key: 'our-partnership', label: 'Our Partnership' },
   { key: 'blueprint', label: 'Blueprint' },
   { key: 'next-year', label: 'Next Year' },
@@ -1397,6 +1405,27 @@ export default function AdminPartnershipDetailPage() {
                 </div>
               </div>
             </div>
+
+            {/* Staff Roster with Photos */}
+            <StaffRosterWithPhotos
+              partnershipId={partnershipId}
+              userEmail={userEmail}
+              editMode={editMode}
+            />
+
+            {/* Bulk Photo Upload (edit mode only) */}
+            {editMode && (
+              <StaffPhotoUpload
+                partnershipId={partnershipId}
+                userEmail={userEmail}
+              />
+            )}
+
+            {/* Find Staff - Walkthrough Search */}
+            <FindStaffSearch
+              partnershipId={partnershipId}
+              userEmail={userEmail}
+            />
           </>
         )}
 
@@ -1457,6 +1486,44 @@ export default function AdminPartnershipDetailPage() {
                 </p>
               </div>
             </div>
+          </>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════
+            90 DAYS TAB — First 90 Days Framework Quick Wins
+            ═══════════════════════════════════════════════════════════════════ */}
+        {activeTab === '90-days' && (
+          <>
+            <div className="mb-4 p-4 rounded-xl border border-teal-200 bg-teal-50">
+              <div className="flex items-start gap-2">
+                <span className="text-teal-500 text-lg flex-shrink-0">✦</span>
+                <div>
+                  <p className="text-sm font-semibold text-teal-800 mb-1">First 90 Days Dashboard</p>
+                  <p className="text-sm text-teal-700 leading-relaxed">
+                    Live Hub signals for the onboarding activation framework. Use the Activation
+                    Readiness Score as the single readiness number for Phase 0 gate reviews.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 1: Activation Score + Onboarding Checklist */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-0">
+              <ActivationReadinessScore partnershipId={partnershipId} />
+              <OnboardingChecklist partnershipId={partnershipId} />
+            </div>
+
+            {/* Row 2: Staff Engagement Roster (full width) */}
+            <StaffEngagementRoster partnershipId={partnershipId} />
+
+            {/* Row 3: Course Funnel + Login Trend */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-0">
+              <CourseCompletionFunnel partnershipId={partnershipId} />
+              <LoginTrendChart partnershipId={partnershipId} />
+            </div>
+
+            {/* Row 4: Observation Impact Scorecard */}
+            <ObservationImpactScorecard observations={observationImpact.observations} />
           </>
         )}
 
