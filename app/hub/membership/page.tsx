@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { useHub } from '@/components/hub/HubContext';
 import { useMembership, MembershipTier, getShortTierLabel, getTierBadgeColors } from '@/lib/hub/use-membership';
-import { Check, Sparkles, Crown, Zap } from 'lucide-react';
+import { Check, Sparkles, Crown, Zap, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 interface TierFeature {
   text: string;
@@ -96,9 +98,61 @@ const PRICING_TIERS: PricingTier[] = [
 
 export default function MembershipPage() {
   const { user } = useHub();
-  const { membership, effectiveTier, isLoading } = useMembership();
+  const { membership, effectiveTier, isLoading, refetch } = useMembership();
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const searchParams = useSearchParams();
 
   const isDistrictUser = membership?.source === 'district_partner';
+  const isStripeUser = membership?.source === 'stripe' && membership?.status === 'active';
+
+  const showSuccess = searchParams.get('success') === 'true';
+  const showCanceled = searchParams.get('canceled') === 'true';
+
+  async function handleUpgrade(tier: string) {
+    setCheckoutLoading(tier);
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tier }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error || 'Failed to start checkout');
+      }
+    } catch {
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setCheckoutLoading(null);
+    }
+  }
+
+  async function handleManageSubscription() {
+    setPortalLoading(true);
+    try {
+      const res = await fetch('/api/stripe/portal', {
+        method: 'POST',
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error || 'Failed to open subscription management');
+      }
+    } catch {
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setPortalLoading(false);
+    }
+  }
+
+  // Refetch membership after successful checkout
+  if (showSuccess && membership?.source !== 'stripe') {
+    refetch();
+  }
 
   return (
     <div className="p-4 md:p-8 max-w-6xl mx-auto">
@@ -122,6 +176,22 @@ export default function MembershipPage() {
         </p>
       </div>
 
+      {/* Success / Canceled Banner */}
+      {showSuccess && (
+        <div className="mb-8 p-4 rounded-xl bg-green-50 border border-green-100">
+          <p className="font-semibold text-green-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+            Payment successful! Your membership has been upgraded.
+          </p>
+        </div>
+      )}
+      {showCanceled && (
+        <div className="mb-8 p-4 rounded-xl bg-yellow-50 border border-yellow-100">
+          <p className="font-semibold text-yellow-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+            Checkout was canceled. No charges were made.
+          </p>
+        </div>
+      )}
+
       {/* Current Plan Banner (if logged in) */}
       {user && !isLoading && (
         <div className="mb-8 p-4 rounded-xl bg-blue-50 border border-blue-100">
@@ -139,9 +209,25 @@ export default function MembershipPage() {
                 )}
               </p>
             </div>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getTierBadgeColors(effectiveTier)}`}>
-              {membership?.status === 'active' ? 'Active' : membership?.status || 'Free'}
-            </span>
+            <div className="flex items-center gap-3">
+              <span className={`px-3 py-1 rounded-full text-sm font-medium ${getTierBadgeColors(effectiveTier)}`}>
+                {membership?.status === 'active' ? 'Active' : membership?.status || 'Free'}
+              </span>
+              {isStripeUser && (
+                <button
+                  onClick={handleManageSubscription}
+                  disabled={portalLoading}
+                  className="px-4 py-1.5 text-sm font-medium text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50"
+                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  {portalLoading ? (
+                    <span className="flex items-center gap-1.5"><Loader2 className="w-3 h-3 animate-spin" /> Loading...</span>
+                  ) : (
+                    'Manage Subscription'
+                  )}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -283,18 +369,20 @@ export default function MembershipPage() {
                 </button>
               ) : isUpgrade ? (
                 <button
-                  onClick={() => {
-                    // TODO: Integrate with Stripe checkout
-                    alert(`Stripe integration coming soon! Upgrade to ${tier.name} for $${tier.price}/mo`);
-                  }}
-                  className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
+                  onClick={() => handleUpgrade(tier.id)}
+                  disabled={checkoutLoading === tier.id}
+                  className={`w-full py-3 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 ${
                     tier.highlight
                       ? 'bg-blue-600 text-white hover:bg-blue-700'
                       : 'bg-gray-900 text-white hover:bg-gray-800'
                   }`}
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
-                  {tier.buttonText}
+                  {checkoutLoading === tier.id ? (
+                    <span className="flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Processing...</span>
+                  ) : (
+                    tier.buttonText
+                  )}
                 </button>
               ) : (
                 <button
