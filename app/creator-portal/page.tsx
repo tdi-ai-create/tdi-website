@@ -2,11 +2,11 @@
 
 import { useState, useEffect, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Mail, Loader2, CheckCircle, AlertCircle, Sparkles } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import TDIPortalLoader from '@/components/TDIPortalLoader';
+import PortalSignIn from '@/components/auth/PortalSignIn';
 
-// Server-side API call to check email (bypasses RLS)
 async function checkEmailExists(email: string): Promise<{ exists: boolean; type: 'creator' | 'admin' | null }> {
   try {
     const response = await fetch('/api/creator-portal/check-email', {
@@ -21,7 +21,11 @@ async function checkEmailExists(email: string): Promise<{ exists: boolean; type:
   }
 }
 
-type LoginState = 'idle' | 'loading' | 'sent' | 'error' | 'not_found' | 'google_error';
+function redirectUrlForType(type: 'creator' | 'admin' | null): string | null {
+  if (type === 'admin') return '/admin/creators';
+  if (type === 'creator') return '/creator-portal/dashboard';
+  return null;
+}
 
 interface CreatorPortalLoginContentProps {
   onPendingRedirect: (url: string) => void;
@@ -29,23 +33,17 @@ interface CreatorPortalLoginContentProps {
 
 function CreatorPortalLoginContent({ onPendingRedirect }: CreatorPortalLoginContentProps) {
   const searchParams = useSearchParams();
-  const [email, setEmail] = useState('');
-  const [loginState, setLoginState] = useState<LoginState>('idle');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
-  // Check if user is already logged in and valid - queue redirect instead of navigating
+  // Check if user is already logged in and valid
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user?.email) {
-        const { type: userType } = await checkEmailExists(session.user.email);
-        if (userType === 'admin') {
-          onPendingRedirect('/admin/creators');
-        } else if (userType === 'creator') {
-          onPendingRedirect('/creator-portal/dashboard');
+        const { type } = await checkEmailExists(session.user.email);
+        const url = redirectUrlForType(type);
+        if (url) {
+          onPendingRedirect(url);
         } else {
-          // User has a session but isn't in our system - sign them out silently
           await supabase.auth.signOut();
         }
       }
@@ -53,285 +51,86 @@ function CreatorPortalLoginContent({ onPendingRedirect }: CreatorPortalLoginCont
     checkSession();
   }, [onPendingRedirect]);
 
-  // Handle magic link callback and Google OAuth callback errors
+  // Handle magic link / Google OAuth callback errors and session
   useEffect(() => {
     const handleAuthCallback = async () => {
       const error = searchParams.get('error');
       const errorDescription = searchParams.get('error_description');
 
       if (error) {
-        // Handle "not registered" error specially - show the Account Not Found state
-        if (error === 'not_registered') {
-          setLoginState('not_found');
-          return;
-        }
-        setLoginState('error');
-        setErrorMessage(errorDescription || 'Authentication failed');
+        console.error('Auth callback error:', error, errorDescription);
         return;
       }
 
-      // Only check session if there's a hash in the URL (magic link redirect)
-      // This prevents showing "Account Not Found" on normal page loads
-      const hasAuthParams = window.location.hash.includes('access_token') ||
-                           searchParams.get('code') !== null;
+      const hasAuthParams =
+        window.location.hash.includes('access_token') || searchParams.get('code') !== null;
 
-      if (!hasAuthParams) {
-        return;
-      }
+      if (!hasAuthParams) return;
 
-      // Check for session after magic link redirect
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user?.email) {
-        const { type: userType } = await checkEmailExists(session.user.email);
-        if (userType === 'admin') {
-          onPendingRedirect('/admin/creators');
-        } else if (userType === 'creator') {
-          onPendingRedirect('/creator-portal/dashboard');
+        const { type } = await checkEmailExists(session.user.email);
+        const url = redirectUrlForType(type);
+        if (url) {
+          onPendingRedirect(url);
         } else {
-          // User authenticated but not in our system - sign them out
           await supabase.auth.signOut();
-          setLoginState('not_found');
         }
       }
     };
-
     handleAuthCallback();
   }, [searchParams, onPendingRedirect]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoginState('loading');
-    setErrorMessage('');
-
-    try {
-      // Check if this email exists in creators or admin_users table (server-side to bypass RLS)
-      const { exists } = await checkEmailExists(email);
-
-      if (!exists) {
-        setLoginState('not_found');
-        return;
-      }
-
-      // Send magic link
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/creator-portal`,
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      setLoginState('sent');
-    } catch (err) {
-      console.error('Login error:', err);
-      setLoginState('error');
-      setErrorMessage('Failed to send login link. Please try again.');
+  const handleEmailPreCheck = async (email: string): Promise<{ allowed: boolean; error?: string }> => {
+    const { exists } = await checkEmailExists(email);
+    if (!exists) {
+      return {
+        allowed: false,
+        error: "We couldn't find a creator account with that email. If you're interested in creating content with TDI, apply at /create-with-us.",
+      };
     }
+    return { allowed: true };
   };
 
-  // Google Sign-In handler
-  const handleGoogleLogin = async () => {
-    setErrorMessage('');
-    setIsGoogleLoading(true);
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/creator-portal/auth/callback`,
-        queryParams: {
-          prompt: 'select_account',
-        },
-      },
-    });
-
-    if (error) {
-      setErrorMessage('Google sign-in failed. Try the magic link option below.');
-      setLoginState('google_error');
-      setIsGoogleLoading(false);
+  const handleSuccess = async (
+    trigger: 'google' | 'emailPassword' | 'magicLink' | 'signUp' | 'forgotPassword',
+    email: string,
+  ): Promise<string | void> => {
+    if (trigger === 'emailPassword') {
+      const { type } = await checkEmailExists(email);
+      const url = redirectUrlForType(type);
+      if (url) {
+        onPendingRedirect(url);
+      } else {
+        // Should not happen since pre-check passed, but handle gracefully
+        await supabase.auth.signOut();
+        return "Account not found. Please contact TDI.";
+      }
+      return;
+    }
+    if (trigger === 'magicLink') {
+      return `We sent a magic link to ${email}. Click the link in your email to sign in.`;
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-200px)] flex items-center justify-center px-4 py-12 bg-gradient-to-b from-gray-50 to-white">
-      <div className="w-full max-w-md">
-        {/* Login Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-          {/* Header */}
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 text-[#ffba06]">
-              <Sparkles className="w-5 h-5" />
-              <span className="text-sm font-semibold uppercase tracking-wide">TDI Creator Studio</span>
-            </div>
-          </div>
-
-          {/* Success State - Email Sent */}
-          {loginState === 'sent' && (
-            <div className="text-center py-6">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-green-600" />
-              </div>
-              <h2 className="text-xl font-semibold text-[#1e2749] mb-2">
-                Check your email!
-              </h2>
-              <p className="text-gray-600 text-sm">
-                We sent a magic link to <strong className="text-[#1e2749]">{email}</strong>.
-                <br />Click the link in your email to sign in.
-              </p>
-              <button
-                onClick={() => setLoginState('idle')}
-                className="mt-6 text-[#80a4ed] hover:text-[#1e2749] text-sm font-medium transition-colors"
-              >
-                Use a different email
-              </button>
-            </div>
-          )}
-
-          {/* Not Found State */}
-          {loginState === 'not_found' && (
-            <div className="text-center py-6">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertCircle className="w-8 h-8 text-orange-500" />
-              </div>
-              <h2 className="text-xl font-semibold text-[#1e2749] mb-2">
-                Account Not Found
-              </h2>
-              <p className="text-gray-600 text-sm">
-                We couldn&apos;t find a creator account with that email.
-                <br />
-                If you&apos;re interested in creating content with TDI,{' '}
-                <a
-                  href="/create-with-us"
-                  className="text-[#80a4ed] hover:text-[#1e2749] font-medium transition-colors"
-                >
-                  apply here
-                </a>.
-              </p>
-              <button
-                onClick={() => {
-                  setLoginState('idle');
-                  setEmail('');
-                }}
-                className="mt-6 text-[#80a4ed] hover:text-[#1e2749] text-sm font-medium transition-colors"
-              >
-                Try a different email
-              </button>
-            </div>
-          )}
-
-          {/* Login Form */}
-          {loginState !== 'sent' && loginState !== 'not_found' && (
-            <>
-              {/* Google Sign-In */}
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={isGoogleLoading || loginState === 'loading'}
-                className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200 text-gray-700 font-medium disabled:opacity-50"
-              >
-                {isGoogleLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                  </svg>
-                )}
-                Continue with Google
-              </button>
-
-              {/* Divider */}
-              <div className="flex items-center gap-3 my-4">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-gray-400 text-sm">or</span>
-                <div className="flex-1 h-px bg-gray-200" />
-              </div>
-
-              {/* Google Error Message */}
-              {loginState === 'google_error' && errorMessage && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700 text-sm">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  {errorMessage}
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit}>
-                <div className="mb-6">
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Email address
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  required
-                  disabled={loginState === 'loading'}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#ffba06] focus:border-[#ffba06] transition-all disabled:bg-gray-50 disabled:cursor-not-allowed text-[#1e2749] outline-none"
-                />
-              </div>
-
-              {/* Error Message */}
-              {loginState === 'error' && errorMessage && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700 text-sm">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  {errorMessage}
-                </div>
-              )}
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={loginState === 'loading' || !email}
-                className="w-full bg-[#1e2749] text-white py-3 px-6 rounded-xl font-medium hover:bg-[#2a3459] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {loginState === 'loading' ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Sending link...
-                  </>
-                ) : (
-                  <>
-                    <Mail className="w-5 h-5" />
-                    Send Magic Link
-                  </>
-                )}
-              </button>
-              </form>
-            </>
-          )}
-        </div>
-
-        {/* Footer Link */}
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Looking to partner with TDI?{' '}
-          <a
-            href="/create-with-us"
-            className="text-[#80a4ed] hover:text-[#1e2749] font-medium transition-colors"
-          >
-            Apply to create content
-          </a>
-        </p>
-      </div>
-    </div>
+    <PortalSignIn
+      portalTitle="TDI Creator Studio"
+      portalSubtitle="Sign in to your creator account"
+      methods={{ google: true, emailPassword: true, magicLink: true, signUp: false }}
+      onEmailPreCheck={handleEmailPreCheck}
+      onSuccess={handleSuccess}
+      magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/creator-portal` : '/creator-portal'}
+      googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/creator-portal/auth/callback` : '/creator-portal/auth/callback'}
+      backHref="/"
+    />
   );
 }
 
 function LoadingFallback() {
   return (
-    <div className="min-h-[calc(100vh-200px)] flex items-center justify-center">
-      <div className="text-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#ffba06] mx-auto mb-4" />
-        <p className="text-gray-600">Loading...</p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FAFAF8' }}>
+      <Loader2 className="w-8 h-8 animate-spin text-[#E8B84B]" />
     </div>
   );
 }
@@ -343,7 +142,6 @@ export default function CreatorPortalPage() {
   const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
   const hasRedirectedRef = useRef(false);
 
-  // Hard minimum timer as backup
   useEffect(() => {
     const timer = setTimeout(() => setTimerDone(true), 4500);
     return () => clearTimeout(timer);
@@ -351,7 +149,6 @@ export default function CreatorPortalPage() {
 
   const showPage = animationComplete && timerDone;
 
-  // Execute pending redirect ONLY after animation gates open
   useEffect(() => {
     if (showPage && pendingRedirect && !hasRedirectedRef.current) {
       hasRedirectedRef.current = true;
@@ -359,27 +156,15 @@ export default function CreatorPortalPage() {
     }
   }, [showPage, pendingRedirect, router]);
 
-  // Callback for child component to queue a redirect
-  const handlePendingRedirect = (url: string) => {
-    setPendingRedirect(url);
-  };
-
   return (
     <>
-      {/* LOADER: shows until animation calls onComplete */}
       {!animationComplete && (
-        <TDIPortalLoader
-          portal="creators"
-          onComplete={() => setAnimationComplete(true)}
-        />
+        <TDIPortalLoader portal="creators" onComplete={() => setAnimationComplete(true)} />
       )}
 
-      {/* BACKUP: plain gold screen if animation ends early but timer hasn't */}
       {!showPage && animationComplete && (
         <div style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 9998,
+          position: 'fixed', inset: 0, zIndex: 9998,
           background: 'linear-gradient(135deg, #ffba06, #e5a800)',
           transition: 'opacity 500ms ease-out',
           opacity: timerDone ? 0 : 1,
@@ -387,14 +172,13 @@ export default function CreatorPortalPage() {
         }} />
       )}
 
-      {/* PAGE: hidden until both gates pass */}
       <div style={{
         visibility: showPage ? 'visible' : 'hidden',
         opacity: showPage ? 1 : 0,
         transition: 'opacity 300ms ease-in',
       }}>
         <Suspense fallback={<LoadingFallback />}>
-          <CreatorPortalLoginContent onPendingRedirect={handlePendingRedirect} />
+          <CreatorPortalLoginContent onPendingRedirect={setPendingRedirect} />
         </Suspense>
       </div>
     </>
