@@ -31,6 +31,7 @@ interface QuickWin {
   course_slug?: string;
   access_tier?: string;
   is_free_rotating?: boolean;
+  capacity?: 'low' | 'medium' | 'high' | null;
   title_es?: string | null;
   description_es?: string | null;
 }
@@ -38,6 +39,7 @@ interface QuickWin {
 export default function QuickWinsPage() {
   const [quickWins, setQuickWins] = useState<QuickWin[]>([]);
   const [activeFilter, setActiveFilter] = useState('All');
+  const [capacityFilter, setCapacityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
   const [isLoading, setIsLoading] = useState(true);
   const { isFavorite, toggleFavorite } = useFavorites();
   const { language, t } = useLanguage();
@@ -73,6 +75,7 @@ export default function QuickWinsPage() {
           content_type: qw.quick_win_type || 'activity',
           access_tier: qw.access_tier,
           is_free_rotating: qw.is_free_rotating,
+          capacity: qw.capacity,
           title_es: qw.title_es,
           description_es: qw.description_es,
         }));
@@ -118,11 +121,15 @@ export default function QuickWinsPage() {
     });
   }, [language, quickWins.length, isLoading, loadQuickWins]);
 
-  // Filter quick wins
+  // Filter quick wins by category and capacity
   const filteredQuickWins = quickWins.filter((qw) => {
-    if (activeFilter === 'All') return true;
-    if (activeFilter === 'Saved') return isFavorite(qw.id);
-    return qw.category === activeFilter;
+    const categoryMatch = (() => {
+      if (activeFilter === 'All') return true;
+      if (activeFilter === 'Saved') return isFavorite(qw.id);
+      return qw.category === activeFilter;
+    })();
+    const capacityMatch = capacityFilter === 'all' || qw.capacity === capacityFilter;
+    return categoryMatch && capacityMatch;
   });
 
   // Loading skeleton
@@ -215,6 +222,37 @@ export default function QuickWinsPage() {
               </button>
             );
           })}
+        </div>
+
+        {/* Capacity Filter Row */}
+        <div className="flex items-center gap-2 mb-6 flex-wrap">
+          <span
+            className="text-[11px] font-bold tracking-wider flex-shrink-0"
+            style={{
+              color: '#9CA3AF',
+              textTransform: 'uppercase',
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            {tUI('Capacity')}
+          </span>
+          {([['all', 'All'], ['low', 'Low'], ['medium', 'Medium'], ['high', 'High']] as const).map(([val, label]) => (
+            <button
+              key={val}
+              onClick={() => setCapacityFilter(val)}
+              className="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0"
+              style={{
+                backgroundColor: capacityFilter === val
+                  ? (val === 'low' ? '#6BA368' : val === 'medium' ? '#E8B84B' : val === 'high' ? '#E8927C' : '#1B2A4A')
+                  : 'white',
+                color: capacityFilter === val ? 'white' : '#6B7280',
+                border: capacityFilter === val ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {tUI(label)}
+            </button>
+          ))}
         </div>
 
         {/* Quick Wins Grid or Empty State */}
