@@ -37,6 +37,7 @@ interface Course {
   is_published: boolean;
   access_tier?: string;
   is_free_rotating?: boolean;
+  capacity?: 'low' | 'medium' | 'high' | null;
   title_es?: string | null;
   description_es?: string | null;
 }
@@ -53,6 +54,7 @@ export default function CourseCatalogPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [enrollments, setEnrollments] = useState<Record<string, Enrollment>>({});
   const [activeFilter, setActiveFilter] = useState('All');
+  const [capacityFilter, setCapacityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
   const [isLoading, setIsLoading] = useState(true);
   const [isEnrolling, setIsEnrolling] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -73,7 +75,7 @@ export default function CourseCatalogPage() {
       // Fetch all published courses
       const { data: courseData } = await supabase
         .from('hub_courses')
-        .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url, is_published, access_tier, is_free_rotating, title_es, description_es')
+        .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url, is_published, access_tier, is_free_rotating, capacity, title_es, description_es')
         .eq('is_published', true)
         .order('created_at', { ascending: false });
 
@@ -190,12 +192,16 @@ export default function CourseCatalogPage() {
     }
   };
 
-  // Filter courses based on category
+  // Filter courses based on category and capacity
   const filteredCourses = courses.filter((course) => {
-    if (activeFilter === 'All') return true;
-    if (activeFilter === 'Saved') return isFavorite(course.id);
-    if (activeFilter === 'In Progress') return !!enrollments[course.id];
-    return course.category === activeFilter;
+    const categoryMatch = (() => {
+      if (activeFilter === 'All') return true;
+      if (activeFilter === 'Saved') return isFavorite(course.id);
+      if (activeFilter === 'In Progress') return !!enrollments[course.id];
+      return course.category === activeFilter;
+    })();
+    const capacityMatch = capacityFilter === 'all' || course.capacity === capacityFilter;
+    return categoryMatch && capacityMatch;
   });
 
   // Get in-progress courses (enrolled but not completed)
@@ -309,6 +315,37 @@ export default function CourseCatalogPage() {
               </button>
             );
           })}
+        </div>
+
+        {/* Capacity Filter Row */}
+        <div className="flex items-center gap-2 mb-6 flex-wrap">
+          <span
+            className="text-[11px] font-bold tracking-wider flex-shrink-0"
+            style={{
+              color: '#9CA3AF',
+              textTransform: 'uppercase',
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            {tUI('Capacity')}
+          </span>
+          {([['all', 'All'], ['low', 'Low'], ['medium', 'Medium'], ['high', 'High']] as const).map(([val, label]) => (
+            <button
+              key={val}
+              onClick={() => setCapacityFilter(val)}
+              className="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0"
+              style={{
+                backgroundColor: capacityFilter === val
+                  ? (val === 'low' ? '#6BA368' : val === 'medium' ? '#E8B84B' : val === 'high' ? '#E8927C' : '#1B2A4A')
+                  : 'white',
+                color: capacityFilter === val ? 'white' : '#6B7280',
+                border: capacityFilter === val ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {tUI(label)}
+            </button>
+          ))}
         </div>
 
         {/* In Progress Section - only show when filter is All */}
