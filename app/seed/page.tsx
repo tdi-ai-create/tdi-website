@@ -77,10 +77,10 @@ export default function SeedPage() {
               style={{ backgroundColor: '#1e2749' }}
             >
               <p className="text-4xl font-bold mb-2" style={{ color: '#ffba06' }}>
-                $12.5–13M
+                $13M
               </p>
               <p className="font-semibold" style={{ color: '#ffffff' }}>
-                Post-Money Valuation
+                Post-Money (at $2M)
               </p>
             </div>
             <div
@@ -120,7 +120,7 @@ export default function SeedPage() {
               { label: 'Active District Partners', value: '8' },
               { label: 'Blended ACV', value: '~$20,000' },
               { label: 'Contract Range', value: '$15K–$54K (by Blueprint phase)' },
-              { label: 'LTV:CAC', value: '27:1 gross-margin-adjusted · 42:1 headline' },
+              { label: 'LTV:CAC', value: '27:1 (gross-margin-adjusted)' },
               { label: 'CAC', value: '$1,992' },
               { label: '5-Year LTV', value: '$55,000' },
               { label: 'Renewal Rate', value: '98%' },
@@ -210,26 +210,26 @@ export default function SeedPage() {
             className="text-2xl md:text-3xl font-bold text-center mb-4"
             style={{ color: '#1e2749' }}
           >
-            Two Scenarios — Proven Path vs. Seed-Deployed
+            Year-by-Year Growth Path
           </h2>
           <p
             className="text-center mb-10"
             style={{ color: '#1e2749', opacity: 0.7 }}
           >
-            Conservative path leads. Funded path shows what seed unlocks.
+            Two scenarios. Both validated.
           </p>
 
           <div className="grid md:grid-cols-2 gap-8">
             {/* Conservative */}
-            <div className="rounded-xl overflow-hidden" style={{ border: '2px solid #1B365D' }}>
+            <div className="rounded-xl border overflow-hidden" style={{ borderColor: '#e5e7eb' }}>
               <div
                 className="px-6 py-4"
-                style={{ backgroundColor: '#1B365D' }}
+                style={{ backgroundColor: '#f5f5f5' }}
               >
-                <h3 className="font-bold text-lg" style={{ color: '#ffffff' }}>
+                <h3 className="font-bold text-lg" style={{ color: '#1e2749' }}>
                   Conservative (No New Funding)
                 </h3>
-                <p className="text-sm mt-1" style={{ color: '#ffffff', opacity: 0.7 }}>
+                <p className="text-sm mt-1" style={{ color: '#1e2749', opacity: 0.6 }}>
                   Organic growth · founder-led sales
                 </p>
               </div>
@@ -279,16 +279,16 @@ export default function SeedPage() {
             {/* Funded */}
             <div
               className="rounded-xl overflow-hidden"
-              style={{ border: '2px solid #2A9D8F' }}
+              style={{ border: '2px solid #ffba06' }}
             >
               <div
                 className="px-6 py-4"
-                style={{ backgroundColor: '#2A9D8F' }}
+                style={{ backgroundColor: '#1e2749' }}
               >
-                <h3 className="font-bold text-lg" style={{ color: '#ffffff' }}>
-                  Funded Path — $2M Seed Deployed
+                <h3 className="font-bold text-lg" style={{ color: '#ffba06' }}>
+                  Fully Funded ($2M Seed)
                 </h3>
-                <p className="text-sm mt-1" style={{ color: '#ffffff', opacity: 0.8 }}>
+                <p className="text-sm mt-1" style={{ color: '#ffffff', opacity: 0.7 }}>
                   4× BD capacity · marketing engine
                 </p>
               </div>
@@ -532,27 +532,36 @@ export default function SeedPage() {
             className="text-2xl md:text-3xl font-bold text-center mb-10"
             style={{ color: '#1e2749' }}
           >
-            Use of Funds
+            Use of Funds ($2M Seed)
           </h2>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 gap-4">
             {[
-              { bucket: 'Sales & district acquisition', pct: '50%' },
-              { bucket: 'Platform & product development', pct: '30%' },
-              { bucket: 'Operations & working capital', pct: '20%' },
-            ].map(({ bucket, pct }) => (
+              { bucket: 'Regional BD leads (4 hires)', amount: '$800K', pct: '40%', detail: '~$200K fully-loaded each · 4 regions' },
+              { bucket: 'Marketing & demand gen', amount: '$400K', pct: '20%', detail: 'Conferences, content, digital' },
+              { bucket: 'Product & tech team', amount: '$400K', pct: '20%', detail: 'Data platform, Blueprint tooling' },
+              { bucket: 'Working capital & ops', amount: '$400K', pct: '20%', detail: 'Runway buffer, admin' },
+            ].map(({ bucket, amount, pct, detail }) => (
               <div
                 key={bucket}
-                className="rounded-xl p-6 text-center border"
+                className="rounded-xl p-5 border"
                 style={{ borderColor: '#e5e7eb' }}
               >
-                <p
-                  className="text-4xl font-bold mb-3"
-                  style={{ color: '#1e2749' }}
-                >
-                  {pct}
+                <div className="flex justify-between items-start mb-2">
+                  <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
+                    {bucket}
+                  </span>
+                  <span
+                    className="text-sm font-bold ml-3 whitespace-nowrap"
+                    style={{ color: '#ffba06', backgroundColor: '#1e2749', padding: '2px 8px', borderRadius: 99 }}
+                  >
+                    {pct}
+                  </span>
+                </div>
+                <p className="text-xl font-bold mb-1" style={{ color: '#1e2749' }}>
+                  {amount}
                 </p>
-                <p className="text-sm font-medium" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  {bucket}
+                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>
+                  {detail}
                 </p>
               </div>
             ))}
