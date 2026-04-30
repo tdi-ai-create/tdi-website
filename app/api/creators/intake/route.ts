@@ -1,105 +1,114 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { Resend } from 'resend';
+import { NextRequest, NextResponse } from 'next/server';
 
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !serviceRoleKey) throw new Error('Missing Supabase credentials');
-  return createClient(supabaseUrl, serviceRoleKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-}
+const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
-async function verifyTurnstile(token: string): Promise<boolean> {
+async function verifyTurnstile(token: string, ip: string | null): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) {
-    // Dev-only shortcut: when TURNSTILE_SECRET_KEY is absent, verification is skipped.
-    // TURNSTILE_SECRET_KEY is set across all Vercel environments so this branch is
-    // unreachable in any deployed context.
-    console.warn('[intake] TURNSTILE_SECRET_KEY not set — skipping verification');
-    return true;
+    console.error('TURNSTILE_SECRET_KEY not set — rejecting request');
+    return false;
   }
-  const resp = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+
+  const form = new URLSearchParams({ secret, response: token });
+  if (ip) form.set('remoteip', ip);
+
+  const res = await fetch(TURNSTILE_VERIFY_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ secret, response: token }).toString(),
+    body: form.toString(),
   });
-  const data = await resp.json() as { success: boolean };
-  return data.success === true;
+
+  const result = await res.json();
+  return result.success === true;
 }
 
-const MAX_FIELD_LEN = 5000;
-
-// POST /api/creators/intake
-// Accepts a creator intake form submission, verifies Turnstile, writes to
-// pending_creators table, and sends notification emails to Rachel and Rae.
 export async function POST(request: NextRequest) {
+  let body: Record<string, unknown>;
   try {
-    const body = await request.json() as {
-      name?: string;
-      email?: string;
-      strategy?: string;
-      content_types?: string;
-      referral_dropdown?: string;
-      other_referral?: string;
-      'cf-turnstile-response'?: string;
-    };
-
-    const { name, email, strategy, content_types, referral_dropdown, other_referral } = body;
-    const turnstileToken = body['cf-turnstile-response'];
-
-    if (!name || !email || !strategy || !content_types || !referral_dropdown) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
-
-    if (!turnstileToken) {
-      return NextResponse.json({ error: 'Missing Turnstile token' }, { status: 400 });
-    }
-
-    if (
-      name.length > MAX_FIELD_LEN ||
-      email.length > MAX_FIELD_LEN ||
-      strategy.length > MAX_FIELD_LEN ||
-      content_types.length > MAX_FIELD_LEN ||
-      referral_dropdown.length > MAX_FIELD_LEN ||
-      (other_referral && other_referral.length > MAX_FIELD_LEN)
-    ) {
-      return NextResponse.json({ error: 'Input exceeds maximum allowed length' }, { status: 400 });
-    }
-
-    const turnstileOk = await verifyTurnstile(turnstileToken);
-    if (!turnstileOk) {
-      return NextResponse.json({ error: 'Bot check failed. Please try again.' }, { status: 403 });
-    }
-
-    const supabase = getSupabaseAdmin();
-    const { error: dbError } = await supabase.from('pending_creators').insert({
-      name, email, strategy, content_types, referral_dropdown, other_referral: other_referral ?? null,
-    });
-
-    if (dbError) {
-      console.error('[intake] Supabase error:', dbError.message);
-      return NextResponse.json({ error: 'Could not save application' }, { status: 500 });
-    }
-
-    const resendKey = process.env.RESEND_API_KEY;
-    if (resendKey) {
-      const resend = new Resend(resendKey);
-      const notifyBody = `New creator application received:\n\nName: ${name}\nEmail: ${email}\nContent types: ${content_types}\nReferral: ${referral_dropdown}${other_referral ? ' (' + other_referral + ')' : ''}\n\nStrategy:\n${strategy}\n\nReview in TDI admin: https://teachersdeserveit.com/tdi-admin/`;
-      await resend.emails.send({
-        from: 'TDI Creators <noreply@teachersdeserveit.com>',
-        to: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
-        subject: `New Creator Application: ${name}`,
-        text: notifyBody,
-      });
-    } else {
-      console.warn('[intake] RESEND_API_KEY not set — skipping notification emails');
-    }
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('[intake] Unhandled error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
+
+  if (!body.name || !body.email) {
+    return NextResponse.json({ error: 'name and email are required' }, { status: 400 });
+  }
+
+  const turnstileToken = (body['cf-turnstile-response'] ?? body.turnstile_token) as string | undefined;
+  if (!turnstileToken) {
+    return NextResponse.json({ error: 'Turnstile token is required' }, { status: 400 });
+  }
+
+  const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null;
+  const valid = await verifyTurnstile(turnstileToken, clientIp);
+  if (!valid) {
+    return NextResponse.json({ error: 'Turnstile verification failed' }, { status: 403 });
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    return NextResponse.json({ error: 'Server config error' }, { status: 500 });
+  }
+
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  const name = String(body.name);
+  const email = String(body.email);
+  const strategy = body.strategy ? String(body.strategy) : null;
+  const contentTypes = body.content_types ? String(body.content_types) : null;
+  const referralSource = body.referral_dropdown ? String(body.referral_dropdown) : null;
+
+  const { error } = await supabase.from('pending_creators').insert({
+    name,
+    email,
+    strategy,
+    referral_source: referralSource,
+    content_types: contentTypes,
+  });
+
+  if (error) {
+    console.error('Failed to insert pending_creators:', error);
+    return NextResponse.json({ error: 'Failed to save submission' }, { status: 500 });
+  }
+
+  const resendApiKey = process.env.RESEND_API_KEY;
+  if (resendApiKey) {
+    const emailBody = `
+Hi Rachel,
+
+A new creator application has been submitted on teachersdeserveit.com/create-with-us:
+
+Name: ${name}
+Email: ${email}
+Strategy/Topic: ${strategy || '(not provided)'}
+Content Types: ${contentTypes || '(not selected)'}
+Referral Source: ${referralSource || '(not provided)'}
+
+Sign in to the Admin Portal to review:
+https://www.teachersdeserveit.com/tdi-admin/creators
+
+- TDI Creator Studio
+    `.trim();
+
+    fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
+        to: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+        subject: `[New Creator Application] ${name}`,
+        text: emailBody,
+      }),
+    }).catch((err) => console.warn('Email notification failed (non-fatal):', err));
+  }
+
+  return NextResponse.json({ ok: true, type: 'creator_intake' });
 }
