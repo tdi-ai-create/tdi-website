@@ -23,17 +23,22 @@ export async function fetchDashboardData(slug: string): Promise<DashboardData | 
 
   if (error || !partnership) return null
 
-  // Fetch all related data in parallel
+  // Fetch organization first — its id is needed for the buildings FK
+  const { data: organization } = await supabase
+    .from('organizations')
+    .select('*')
+    .eq('partnership_id', partnership.id)
+    .single()
+
+  // Fetch remaining related data in parallel
   const [
-    { data: organization },
     { data: buildings },
     { data: timelineEvents },
     { data: actionItems },
     { data: metrics },
     { data: defaultsRaw },
   ] = await Promise.all([
-    supabase.from('organizations').select('*').eq('partnership_id', partnership.id).single(),
-    supabase.from('buildings').select('*').eq('organization_id', partnership.id).order('name'),
+    supabase.from('buildings').select('*').eq('organization_id', organization?.id).order('name'),
     supabase.from('timeline_events').select('*').eq('partnership_id', partnership.id).order('sort_order'),
     supabase.from('action_items').select('*').eq('partnership_id', partnership.id).order('sort_order'),
     supabase.from('metric_snapshots').select('*').eq('partnership_id', partnership.id).order('snapshot_date', { ascending: false }),
