@@ -705,14 +705,14 @@ export async function getPartnershipStats(): Promise<{
   const pendingSetup = partnerships?.filter(p => p.status === 'setup_in_progress').length || 0;
   const awaitingAccept = partnerships?.filter(p => p.status === 'invited').length || 0;
 
-  // Get total educators
-  const { count: totalEducators } = await supabase
-    .from('staff_members')
-    .select('*', { count: 'exact', head: true });
+  // Sum staff_enrolled from partnerships (populated via admin dashboard — reflects actual enrolled count)
+  const { data: enrolledData } = await supabase
+    .from('partnerships')
+    .select('staff_enrolled');
 
   return {
     activeCount,
-    totalEducators: totalEducators || 0,
+    totalEducators: enrolledData?.reduce((sum, p) => sum + (p.staff_enrolled || 0), 0) || 0,
     pendingSetup,
     awaitingAccept,
   };
