@@ -3,10 +3,10 @@
 import React from 'react'
 
 const HEAT_STYLES: Record<string, { bg: string; color: string; emoji: string }> = {
-  hot: { bg: '#FEE2E2', color: '#991B1B', emoji: '\uD83D\uDD25' },
-  warm: { bg: '#FEF3C7', color: '#854D0E', emoji: '\uD83D\uDFE1' },
-  cold: { bg: '#DBEAFE', color: '#1E40AF', emoji: '\u2744\uFE0F' },
-  parked: { bg: '#F3F4F6', color: '#374151', emoji: '\uD83C\uDD7F\uFE0F' },
+  hot: { bg: '#FEE2E2', color: '#991B1B', emoji: '🔥' },
+  warm: { bg: '#FEF3C7', color: '#854D0E', emoji: '🟡' },
+  cold: { bg: '#DBEAFE', color: '#1E40AF', emoji: '❄️' },
+  parked: { bg: '#F3F4F6', color: '#374151', emoji: '🅿️' },
 }
 
 const TYPE_COLORS: Record<string, string> = {
@@ -18,7 +18,8 @@ const TYPE_COLORS: Record<string, string> = {
   reactivation: '#6366F1',
 }
 
-interface SalesCardOpp {
+export interface SalesCardOpp {
+  id: string
   name: string
   value: number | null
   probability: number
@@ -29,96 +30,89 @@ interface SalesCardOpp {
   stage: string
   source: string | null
   lastActivityAt: string | null
+  heat: string
+  contract_year?: string | null
 }
 
 function extractSubtitle(opp: SalesCardOpp): string {
-  if (!opp.notes) return opp.source || 'No context'
+  if (opp.needs_invoice) {
+    const yr = opp.contract_year ? `${opp.contract_year} ` : ''
+    return `${yr}invoice owed`
+  }
+  if (!opp.notes) return opp.source?.toLowerCase() || ''
   const meetingMatch = opp.notes.match(/[Mm]eeting (?:LOCKED|locked|scheduled|set)[^.]*/i)
-  if (meetingMatch) return meetingMatch[0]
+  if (meetingMatch) return meetingMatch[0].toLowerCase()
   const firstSentence = opp.notes.split('.')[0]
-  return firstSentence.length > 60 ? firstSentence.slice(0, 57) + '...' : firstSentence
+  return firstSentence.length > 55 ? firstSentence.slice(0, 52) + '...' : firstSentence
 }
 
-function getHeat(opp: SalesCardOpp): string {
-  if (['signed', 'proposal_sent', 'likely_yes'].includes(opp.stage)) return 'hot'
-  if (!opp.lastActivityAt) return 'cold'
-  const days = (Date.now() - new Date(opp.lastActivityAt).getTime()) / (1000 * 60 * 60 * 24)
-  if (days <= 7) return 'hot'
-  if (days <= 30) return 'warm'
-  if (days <= 90) return 'cold'
-  return 'parked'
+function shortName(name: string): string {
+  if (!name) return 'Unnamed'
+  const parts = name.split(/ [·\-] /)
+  return parts[0].length > 35 ? parts[0].slice(0, 33) + '…' : parts[0]
 }
 
-function Tag({ color, bg, children }: { color: string; bg: string; children: React.ReactNode }) {
-  return (
-    <span style={{
-      fontSize: 9, fontWeight: 600, padding: '2px 6px',
-      borderRadius: 6, background: bg, color: color,
-    }}>{children}</span>
-  )
-}
-
-export function SalesCard({ opp, compact = false }: { opp: SalesCardOpp; compact?: boolean }) {
-  const heat = HEAT_STYLES[getHeat(opp)] || HEAT_STYLES.warm
-  const heatLabel = getHeat(opp)
+export function SalesCard({ opp, onClick }: { opp: SalesCardOpp; onClick?: () => void }) {
+  const heat = HEAT_STYLES[opp.heat || 'warm'] || HEAT_STYLES.warm
   const typeColor = TYPE_COLORS[opp.type] || '#6B7280'
-  const ownerInitial = opp.assignedTo ? opp.assignedTo.charAt(0).toUpperCase() : '?'
-  const ownerColor = opp.assignedTo?.includes('jim') ? '#F59E0B' : '#3B82F6'
+  const isJim = opp.assignedTo?.includes('jim')
+  const ownerColor = isJim ? '#F59E0B' : '#3B82F6'
+  const ownerInitial = isJim ? 'J' : opp.assignedTo ? 'R' : '?'
   const factored = (opp.value || 0) * (opp.probability || 0) / 100
   const subtitle = extractSubtitle(opp)
 
   return (
-    <div style={{
-      background: 'white',
-      border: '1px solid #E5E7EB',
-      borderLeft: `3px solid ${typeColor}`,
-      borderRadius: 8,
-      padding: compact ? 10 : 14,
-      cursor: 'pointer',
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: '#0a0f1e', lineHeight: 1.3 }}>
-          {opp.name}
-        </div>
+    <div
+      onClick={onClick}
+      style={{
+        background: 'white',
+        border: '1px solid #E5E7EB',
+        borderLeft: `3px solid ${typeColor}`,
+        borderRadius: 8,
+        padding: '10px 12px',
+        marginBottom: 6,
+        cursor: 'pointer',
+        transition: 'border-color 0.1s',
+      }}
+      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#0a0f1e' }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#E5E7EB' }}
+    >
+      {/* Line 1: Title + owner avatar */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+        <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#0a0f1e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+          {shortName(opp.name)}
+          {opp.type === 'renewal' && (
+            <span style={{ marginLeft: 6, fontSize: 9, padding: '1px 5px', borderRadius: 4, background: '#FEF3C7', color: '#854D0E', fontWeight: 700 }}>renewal</span>
+          )}
+        </p>
         <div style={{
-          width: 22, height: 22, borderRadius: '50%',
-          background: ownerColor + '20',
-          color: ownerColor,
+          width: 18, height: 18, borderRadius: '50%',
+          background: ownerColor + '20', color: ownerColor,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 10, fontWeight: 700, flexShrink: 0,
-        }}>
-          {ownerInitial}
-        </div>
+          fontSize: 10, fontWeight: 700, flexShrink: 0, marginLeft: 6,
+        }}>{ownerInitial}</div>
       </div>
 
-      <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4, lineHeight: 1.4 }}>
-        {subtitle}
-      </div>
-
-      {(opp.type || opp.needs_invoice) && (
-        <div style={{ display: 'flex', gap: 4, marginTop: 8, flexWrap: 'wrap' }}>
-          {opp.type === 'renewal' && <Tag color="#854D0E" bg="#FEF3C7">renewal</Tag>}
-          {opp.type === 'pilot' && <Tag color="#854D0E" bg="#FEF3C7">pilot</Tag>}
-          {opp.type === 'expansion' && <Tag color="#5B21B6" bg="#EDE9FE">expansion</Tag>}
-          {opp.needs_invoice && <Tag color="#DC2626" bg="#FEE2E2">invoice</Tag>}
-        </div>
+      {/* Line 2: Contextual subtitle */}
+      {subtitle && (
+        <p style={{ margin: 0, fontSize: 11, color: '#6B7280', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {subtitle}
+        </p>
       )}
 
-      <div style={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        marginTop: 10, paddingTop: 10, borderTop: '1px solid #F3F4F6',
-      }}>
-        <div style={{ fontSize: 12, fontWeight: 600 }}>
-          ${((opp.value || 0) / 1000).toFixed(0)}K
-          <span style={{ color: '#6B7280', fontWeight: 500, marginLeft: 6 }}>
-            ${(factored / 1000).toFixed(0)}K
+      {/* Line 3: Money + heat pill */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
+        <span style={{ fontSize: 12, fontWeight: 600 }}>
+          {opp.value ? `$${(opp.value / 1000).toFixed(0)}K` : '-'}
+          <span style={{ color: '#6B7280', fontWeight: 400, marginLeft: 6 }}>· ${(factored / 1000).toFixed(0)}K factored</span>
+        </span>
+        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+          {opp.needs_invoice && (
+            <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 4, background: '#FEE2E2', color: '#991B1B', fontWeight: 600 }}>invoice</span>
+          )}
+          <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 6px', borderRadius: 6, background: heat.bg, color: heat.color }}>
+            {heat.emoji}
           </span>
-        </div>
-        <div style={{
-          fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 8,
-          background: heat.bg, color: heat.color,
-        }}>
-          {heat.emoji} {heatLabel}
         </div>
       </div>
     </div>
