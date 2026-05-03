@@ -14,17 +14,20 @@ interface SalesOpportunity {
   stage: string
   value: number | null
   probability: number | null
-  heat: 'hot' | 'warm' | 'cold' | 'parked' | null
   assigned_to_email: string | null
   source: string | null
   notes: string | null
   last_activity_at: string | null
   is_contact_only: boolean
+  needs_invoice: boolean | null
+  invoice_amount: number | null
+  invoice_notes: string | null
+  contract_year: string | null
   created_at: string
   updated_at: string
 }
 
-// UI Opportunity shape - keeps rendering code unchanged
+// UI Opportunity shape
 interface Opportunity {
   id: string
   supabase_id: string
@@ -38,8 +41,13 @@ interface Opportunity {
   isRenewal: boolean
   isContactOnly: boolean
   lastActivityAt: string | null
-  heat: string
   probability: number
+  source: string | null
+  notes: string | null
+  needs_invoice: boolean
+  invoice_amount: number | null
+  invoice_notes: string | null
+  contract_year: string | null
 }
 
 interface ActivityNote {
@@ -89,44 +97,40 @@ const STAGE_COLORS: Record<string, string> = {
   'lost': 'bg-red-100 border-red-200 text-red-700',
 }
 
+// Probability map for weighted value
+const STAGE_PROBABILITY: Record<string, number> = {
+  unassigned: 0, targeting: 5, engaged: 10, qualified: 30,
+  likely_yes: 50, proposal_sent: 70, signed: 90, paid: 100, lost: 0,
+}
+
 const DEAL_TYPES = [
-  { value: 'renewal', label: 'Renewal', color: '#10B981', emoji: '🔄' },
-  { value: 'new_business', label: 'New Business', color: '#3B82F6', emoji: '🆕' },
-  { value: 'expansion', label: 'Expansion', color: '#8B5CF6', emoji: '📈' },
-  { value: 'pilot', label: 'Pilot', color: '#F59E0B', emoji: '🧪' },
+  { value: 'renewal', label: 'Renewal' },
+  { value: 'new_business', label: 'New Business' },
+  { value: 'expansion', label: 'Expansion' },
+  { value: 'pilot', label: 'Pilot' },
 ]
 
-const HEAT_LEVELS = [
-  { value: 'hot', label: 'Hot', color: '#EF4444', emoji: '🔥' },
-  { value: 'warm', label: 'Warm', color: '#F59E0B', emoji: '🟡' },
-  { value: 'cold', label: 'Cold', color: '#3B82F6', emoji: '❄️' },
-  { value: 'parked', label: 'Parked', color: '#6B7280', emoji: '🅿️' },
-]
-
-const STAGE_GROUPS: Record<string, { label: string; stages: string[]; description: string; color: string }> = {
+const STAGE_GROUPS: Record<string, { label: string; stages: string[]; color: string; textColor: string; description: string }> = {
   pipeline: {
     label: 'Pipeline',
     stages: ['targeting', 'engaged'],
-    description: 'Top of funnel — building interest',
-    color: '#9CA3AF',
+    color: '#B4B2A9',
+    textColor: '#2C2C2A',
+    description: 'Top of funnel',
   },
-  active_deals: {
+  active: {
     label: 'Active Deals',
     stages: ['qualified', 'likely_yes'],
-    description: 'Real conversations with money on the table',
-    color: '#FFBA06',
+    color: '#FAC775',
+    textColor: '#412402',
+    description: 'Real conversations',
   },
   closing: {
     label: 'Closing',
     stages: ['proposal_sent', 'signed'],
+    color: '#97C459',
+    textColor: '#173404',
     description: 'Final stretch',
-    color: '#10B981',
-  },
-  closed: {
-    label: 'Closed',
-    stages: ['paid', 'lost'],
-    description: 'Done',
-    color: '#6B7280',
   },
 }
 
@@ -136,9 +140,28 @@ function factoredRevenue(opp: Opportunity): number {
 }
 
 function formatCurrency(n: number): string {
-  if (n >= 1000000) return `$${(n / 1000000).toFixed(1)}M`
-  if (n >= 1000) return `$${(n / 1000).toFixed(0)}K`
-  return `$${n.toLocaleString()}`
+  if (n >= 1000000) return `$${(n / 1000000).toFixed(2)}M`
+  if (n >= 1000) return `$${Math.round(n / 1000)}K`
+  return `$${n}`
+}
+
+function formatCurrencyFull(n: number): string {
+  return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
+}
+
+function opportunitySubtitle(opp: Opportunity): string {
+  const parts: string[] = []
+  if (opp.needs_invoice) parts.push(`${opp.contract_year || ''} invoice owed`.trim())
+  if (opp.notes) {
+    const meetingMatch = opp.notes.match(/Meeting (?:LOCKED|locked|set)[^.]*/i)
+    if (meetingMatch && parts.length < 2) {
+      parts.push(meetingMatch[0].toLowerCase())
+    }
+  }
+  if (opp.source && parts.length < 2) {
+    parts.push(opp.source.toLowerCase())
+  }
+  return parts.slice(0, 3).join(' · ')
 }
 
 export default function SalesPage() {
@@ -161,9 +184,10 @@ export default function SalesPage() {
   const [updatingOpportunity, setUpdatingOpportunity] = useState<string | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
-  const [selectedHeat, setSelectedHeat] = useState<string[]>([])
+  const [selectedSources, setSelectedSources] = useState<string[]>([])
   const [selectedStageGroup, setSelectedStageGroup] = useState<string | null>(null)
-  const [sortBy, setSortBy] = useState<string>('value')
+  const [showInvoiceOnly, setShowInvoiceOnly] = useState(false)
+  const [sortByFactored, setSortByFactored] = useState(false)
 
   useEffect(() => {
     loadAll()
@@ -174,7 +198,6 @@ export default function SalesPage() {
     setError('')
 
     try {
-      // Fetch opportunities from Supabase
       const { data, error: fetchError } = await supabase
         .from('sales_opportunities')
         .select('*')
@@ -183,7 +206,6 @@ export default function SalesPage() {
 
       if (fetchError) throw fetchError
 
-      // Map Supabase rows to UI Opportunity shape
       const mapped: Opportunity[] = (data || []).map((row: SalesOpportunity) => ({
         id: row.ghl_opportunity_id || row.id,
         supabase_id: row.id,
@@ -197,14 +219,18 @@ export default function SalesPage() {
         isRenewal: row.type === 'renewal' || row.name.toLowerCase().includes('renewal'),
         isContactOnly: row.is_contact_only || false,
         lastActivityAt: row.last_activity_at,
-        heat: row.heat || 'warm',
         probability: row.probability ?? STAGE_PROBABILITY[row.stage] ?? 0,
+        source: row.source,
+        notes: row.notes,
+        needs_invoice: row.needs_invoice || false,
+        invoice_amount: row.invoice_amount,
+        invoice_notes: row.invoice_notes,
+        contract_year: row.contract_year,
       }))
 
       setOpportunities(mapped)
       setLastSynced(new Date())
 
-      // Fetch activity notes
       const { data: notesData } = await supabase
         .from('activity_log')
         .select('*')
@@ -233,7 +259,6 @@ export default function SalesPage() {
     })
 
     if (!insertError) {
-      // Refresh notes
       const { data: notesData } = await supabase
         .from('activity_log')
         .select('*')
@@ -242,13 +267,11 @@ export default function SalesPage() {
 
       setNotes(notesData ?? [])
 
-      // Update last_activity_at on the opportunity
       await supabase
         .from('sales_opportunities')
         .update({ last_activity_at: new Date().toISOString() })
         .eq('id', supabaseId)
 
-      // Update local state
       setOpportunities(prev => prev.map(opp =>
         opp.supabase_id === supabaseId
           ? { ...opp, lastActivityAt: new Date().toISOString() }
@@ -271,7 +294,6 @@ export default function SalesPage() {
     const originalStage = originalOpp?.stage
     const originalStageName = originalOpp?.stageName
 
-    // Optimistic UI update
     setOpportunities(prev => prev.map(opp =>
       opp.supabase_id === supabaseId
         ? { ...opp, stage: newStageId, stageName: newStageName }
@@ -281,7 +303,6 @@ export default function SalesPage() {
     setUpdatingOpportunity(supabaseId)
 
     try {
-      // 1. Update Supabase (primary - source of truth)
       const { error: supabaseError } = await supabase
         .from('sales_opportunities')
         .update({ stage: newStageId, updated_at: new Date().toISOString() })
@@ -289,7 +310,6 @@ export default function SalesPage() {
 
       if (supabaseError) throw new Error('Supabase update failed: ' + supabaseError.message)
 
-      // 2. Write back to GHL if we have a GHL ID (secondary - keeps GHL in sync)
       if (ghlId) {
         try {
           await fetch(`/api/ghl/opportunity/${ghlId}`, {
@@ -297,10 +317,9 @@ export default function SalesPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               pipelineStageId: newStageId,
-              pipelineId: 'tdi-crm', // placeholder for GHL compatibility
+              pipelineId: 'tdi-crm',
             }),
           })
-          // GHL failure is non-blocking - Supabase is source of truth
         } catch {
           console.warn('GHL write-back failed - Supabase updated successfully')
         }
@@ -308,7 +327,6 @@ export default function SalesPage() {
 
       showToast(`Stage updated to "${newStageName}"`, 'success')
     } catch (err: any) {
-      // Revert optimistic update on Supabase failure
       setOpportunities(prev => prev.map(opp =>
         opp.supabase_id === supabaseId
           ? { ...opp, stage: originalStage ?? '', stageName: originalStageName ?? '' }
@@ -329,7 +347,6 @@ export default function SalesPage() {
   }
 
   function isNeedsAttention(opp: Opportunity) {
-    // Needs attention if no activity in 14 days
     if (!opp.lastActivityAt) return true
     const daysSinceActivity = (Date.now() - new Date(opp.lastActivityAt).getTime()) / (1000 * 60 * 60 * 24)
     return daysSinceActivity > 14
@@ -400,12 +417,11 @@ export default function SalesPage() {
     },
   ]
 
-  // Active preset filter function
   const presetFilter = activePreset
     ? PRESETS.find(p => p.id === activePreset)?.filter
     : null
 
-  // Apply all filters to get the visible opportunities list
+  // Apply all filters
   const filteredUnsorted = opportunities.filter(opp => {
     if (hideContactOnly && opp.isContactOnly) return false
     if (hideUnassigned && opp.stage === 'unassigned') return false
@@ -414,20 +430,19 @@ export default function SalesPage() {
     if (search && !opp.name.toLowerCase().includes(search.toLowerCase())) return false
     if (selectedStage !== 'all' && opp.stage !== selectedStage) return false
     if (selectedTypes.length > 0 && !selectedTypes.includes(opp.type)) return false
-    if (selectedHeat.length > 0 && !selectedHeat.includes(opp.heat)) return false
+    if (selectedSources.length > 0 && !selectedSources.includes(opp.source || 'Other')) return false
     if (selectedStageGroup) {
       const group = STAGE_GROUPS[selectedStageGroup]
       if (group && !group.stages.includes(opp.stage)) return false
     }
+    if (showInvoiceOnly && !opp.needs_invoice) return false
     return true
   })
 
-  // Sort
-  const filtered = sortBy === 'factored_revenue'
+  const filtered = sortByFactored
     ? [...filteredUnsorted].sort((a, b) => factoredRevenue(b) - factoredRevenue(a))
     : filteredUnsorted
 
-  // Count per preset (applied against base-filtered list, ignoring active preset)
   const baseFiltered = opportunities.filter(opp => {
     if (hideContactOnly && opp.isContactOnly) return false
     return true
@@ -437,7 +452,7 @@ export default function SalesPage() {
     PRESETS.map(p => [p.id, baseFiltered.filter(p.filter).length])
   )
 
-  // Group by stage for kanban (exclude lost)
+  // Kanban grouping
   const kanbanStages = STAGE_OPTIONS.filter(s => s.id !== 'lost')
   const byStage: Record<string, Opportunity[]> = {}
   kanbanStages.forEach(s => { byStage[s.id] = [] })
@@ -445,21 +460,23 @@ export default function SalesPage() {
     if (byStage[opp.stage]) byStage[opp.stage].push(opp)
   })
 
-  // Probability map for weighted value
-  const STAGE_PROBABILITY: Record<string, number> = {
-    unassigned: 0, targeting: 5, engaged: 10, qualified: 30,
-    likely_yes: 50, proposal_sent: 70, signed: 90, paid: 100, lost: 0,
-  }
+  // Pipeline stats
+  const activeOpps = opportunities.filter(o => !o.isContactOnly && !['lost', 'paid'].includes(o.stage))
+  const pipelineValue = activeOpps.reduce((sum, o) => sum + (o.value ?? 0), 0)
+  const pipelineFactored = activeOpps.reduce((sum, o) => sum + factoredRevenue(o), 0)
+  const renewalOpps = activeOpps.filter(o => o.type === 'renewal')
+  const renewalFactored = renewalOpps.reduce((sum, o) => sum + factoredRevenue(o), 0)
+  const invoiceCount = opportunities.filter(o => o.needs_invoice).length
 
-  // Summary stats - pipeline-wide (excluding contact-only)
-  const pipelineOpps = opportunities.filter(o => !o.isContactOnly && o.stage !== 'paid' && o.stage !== 'lost')
-  const totalValue = pipelineOpps.reduce((sum, o) => sum + (o.value ?? 0), 0)
-  const weightedValue = pipelineOpps.reduce((sum, o) => {
-    const prob = STAGE_PROBABILITY[o.stage] || 0
-    return sum + ((o.value || 0) * prob / 100)
-  }, 0)
-  const renewalCount = opportunities.filter(o => o.isRenewal && !o.isContactOnly && o.stage !== 'paid' && o.stage !== 'lost').length
-  const needsAttentionCount = pipelineOpps.filter(o => isNeedsAttention(o)).length
+  // Source counts for dynamic filter chips
+  const sourceCounts = activeOpps.reduce((acc, o) => {
+    const src = o.source || 'Other'
+    acc[src] = (acc[src] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+  const topSources = Object.entries(sourceCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6)
 
   const OppCard = ({ opp }: { opp: Opportunity }) => {
     const latestNote = getLatestNote(opp.supabase_id)
@@ -497,7 +514,6 @@ export default function SalesPage() {
           </div>
         )}
 
-        {/* Move to stage dropdown */}
         <div className="flex items-center gap-2">
           <select
             value={opp.stage}
@@ -521,7 +537,6 @@ export default function SalesPage() {
           )}
         </div>
 
-        {/* Log note toggle */}
         {activeNoteOpp === opp.supabase_id ? (
           <div className="space-y-2 pt-1 border-t border-gray-100">
             <textarea
@@ -611,53 +626,118 @@ export default function SalesPage() {
         </div>
       )}
 
-      {/* Summary cards */}
+      {/* Hero summary row */}
       {!loading && !error && (
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-          <div className="bg-white border border-gray-100 rounded-xl relative overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-            <div className="h-0.5 w-full bg-indigo-500" />
-            <div className="p-4">
-              <p className="text-2xl font-bold text-indigo-600">{opportunities.length}</p>
-              <p className="text-sm text-gray-500 mt-0.5">Total Opportunities</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 12 }}>
+          {/* Hero: Pipeline Value */}
+          <div style={{
+            background: 'linear-gradient(135deg, #FFBA06 0%, #FF8C00 100%)',
+            borderRadius: 16,
+            padding: '24px 28px',
+            color: '#0a0f1e',
+            boxShadow: '0 4px 12px rgba(255,186,6,0.2)',
+          }}>
+            <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8, opacity: 0.7 }}>
+              Pipeline Value
+            </div>
+            <div style={{ fontSize: 36, fontWeight: 800, lineHeight: 1 }}>
+              {formatCurrencyFull(pipelineValue)}
+            </div>
+            <div style={{ fontSize: 13, marginTop: 10, opacity: 0.85 }}>
+              Factored: <strong>{formatCurrencyFull(pipelineFactored)}</strong>
+              {' · '}
+              {activeOpps.length} active
             </div>
           </div>
-          <div className="bg-white border border-gray-100 rounded-xl relative overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-            <div className="h-0.5 w-full bg-indigo-500" />
-            <div className="p-4">
-              <p className="text-2xl font-bold text-amber-600">{renewalCount}</p>
-              <p className="text-sm text-gray-500 mt-0.5">Renewal Opportunities</p>
+
+          {/* Renewals card */}
+          <div style={{ background: 'white', borderRadius: 12, padding: '20px 24px', border: '1px solid #E5E7EB' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: '#6B7280', marginBottom: 8 }}>
+              Renewals
+            </div>
+            <div style={{ fontSize: 26, fontWeight: 800, color: '#0a0f1e' }}>
+              {renewalOpps.length}
+            </div>
+            <div style={{ fontSize: 12, color: '#6B7280', marginTop: 6 }}>
+              {formatCurrency(renewalFactored)} factored
             </div>
           </div>
-          <div className="bg-white border border-gray-100 rounded-xl relative overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-            <div className="h-0.5 w-full bg-indigo-500" />
-            <div className="p-4">
-              <p className="text-2xl font-bold text-red-500">{needsAttentionCount}</p>
-              <p className="text-sm text-gray-500 mt-0.5">Needs Attention</p>
+
+          {/* Needs Invoicing card */}
+          <div
+            onClick={() => setShowInvoiceOnly(!showInvoiceOnly)}
+            style={{
+              background: showInvoiceOnly ? '#FEF3C7' : '#FFFBEB',
+              borderRadius: 12,
+              padding: '20px 24px',
+              border: showInvoiceOnly ? '2px solid #F59E0B' : '1px solid #FCD34D',
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+            }}
+          >
+            <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: '#92400E', marginBottom: 8 }}>
+              Needs Invoicing
+            </div>
+            <div style={{ fontSize: 26, fontWeight: 800, color: '#92400E' }}>
+              {invoiceCount}
+            </div>
+            <div style={{ fontSize: 12, color: '#92400E', marginTop: 6 }}>
+              25-26 AR outstanding
             </div>
           </div>
-          <div className="bg-white border border-gray-100 rounded-xl relative overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-            <div className="h-0.5 w-full bg-indigo-500" />
-            <div className="p-4">
-              <p className="text-2xl font-bold text-green-600">
-                ${totalValue.toLocaleString()}
-              </p>
-              <p className="text-sm text-gray-500 mt-0.5">Pipeline Value</p>
-              <p className="text-xs text-gray-400 mt-1">
-                ${Math.round(weightedValue).toLocaleString()} weighted
-              </p>
-            </div>
+        </div>
+      )}
+
+      {/* Stage Group bar */}
+      {!loading && !error && (
+        <div style={{ background: 'white', borderRadius: 12, padding: 20, border: '1px solid #E5E7EB' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>
+            Pipeline by Stage Group
           </div>
-          <div className="rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #FFBA06 0%, #FF8C00 100%)', boxShadow: '0 4px 12px rgba(255,186,6,0.2)' }}>
-            <div className="p-4">
-              <p className="text-2xl font-bold text-gray-900">
-                {formatCurrency(filtered.reduce((sum, opp) => sum + factoredRevenue(opp), 0))}
-              </p>
-              <p className="text-sm text-gray-800 mt-0.5 font-medium">Factored Revenue</p>
-              <p className="text-xs text-gray-700 mt-1 opacity-80">
-                Value × Probability
-              </p>
-            </div>
-          </div>
+
+          {(() => {
+            const groupData = Object.entries(STAGE_GROUPS).map(([key, g]) => {
+              const groupOpps = activeOpps.filter(o => g.stages.includes(o.stage))
+              const groupValue = groupOpps.reduce((s, o) => s + (o.value ?? 0), 0)
+              return { key, ...g, opps: groupOpps, value: groupValue }
+            })
+            const totalValue = groupData.reduce((s, g) => s + g.value, 0) || 1
+
+            return (
+              <>
+                <div style={{ display: 'flex', alignItems: 'stretch', gap: 4, height: 48, borderRadius: 8, overflow: 'hidden' }}>
+                  {groupData.map(g => (
+                    <div
+                      key={g.key}
+                      onClick={() => setSelectedStageGroup(selectedStageGroup === g.key ? null : g.key)}
+                      style={{
+                        flex: g.value / totalValue,
+                        minWidth: g.value > 0 ? 60 : 0,
+                        background: g.color,
+                        color: g.textColor,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 13,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        opacity: selectedStageGroup && selectedStageGroup !== g.key ? 0.4 : 1,
+                        transition: 'opacity 0.15s',
+                      }}
+                      title={`${g.label}: ${formatCurrencyFull(g.value)} across ${g.opps.length} opportunities`}
+                    >
+                      {g.label} · {formatCurrency(g.value)}
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10, fontSize: 11, color: '#6B7280' }}>
+                  {groupData.map(g => (
+                    <span key={g.key}>{g.opps.length} {g.description.toLowerCase()}</span>
+                  ))}
+                </div>
+              </>
+            )
+          })()}
         </div>
       )}
 
@@ -711,6 +791,9 @@ export default function SalesPage() {
               <span className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded">
                 {PRESETS.find(p => p.id === activePreset)?.label} filter active
               </span>
+            )}
+            {showInvoiceOnly && (
+              <span className="bg-amber-50 text-amber-700 px-2 py-0.5 rounded">Invoice filter active</span>
             )}
           </div>
 
@@ -766,17 +849,16 @@ export default function SalesPage() {
             </select>
           </div>
 
-          {/* Multi-dimensional filters */}
+          {/* Deal Type + Source filter rows */}
           <div style={{ marginTop: 4, padding: 16, background: '#F9FAFB', borderRadius: 12, border: '1px solid #E5E7EB' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>
-              Filter by
-            </div>
-
-            {/* Deal Type filters */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 12, color: '#6B7280', minWidth: 80 }}>Deal Type:</span>
+            {/* Deal Type */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 1, minWidth: 70 }}>
+                Deal Type:
+              </span>
               {DEAL_TYPES.map(t => {
                 const active = selectedTypes.includes(t.value)
+                const count = activeOpps.filter(o => o.type === t.value).length
                 return (
                   <button
                     key={t.value}
@@ -784,146 +866,76 @@ export default function SalesPage() {
                       active ? prev.filter(x => x !== t.value) : [...prev, t.value]
                     )}
                     style={{
-                      padding: '6px 12px',
+                      padding: '5px 10px',
                       fontSize: 12,
                       fontWeight: 600,
-                      background: active ? t.color : 'white',
-                      color: active ? 'white' : t.color,
-                      border: `1px solid ${t.color}`,
-                      borderRadius: 16,
+                      background: active ? '#0a0f1e' : 'white',
+                      color: active ? 'white' : '#0a0f1e',
+                      border: '1px solid #0a0f1e',
+                      borderRadius: 14,
                       cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
                     }}
                   >
-                    <span>{t.emoji}</span>
-                    {t.label}
+                    {t.label} · {count}
                   </button>
                 )
               })}
             </div>
 
-            {/* Heat filters */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 12, color: '#6B7280', minWidth: 80 }}>Heat:</span>
-              {HEAT_LEVELS.map(h => {
-                const active = selectedHeat.includes(h.value)
+            {/* Source filters */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 1, minWidth: 70 }}>
+                Source:
+              </span>
+              {topSources.map(([source, count]) => {
+                const active = selectedSources.includes(source)
                 return (
                   <button
-                    key={h.value}
-                    onClick={() => setSelectedHeat(prev =>
-                      active ? prev.filter(x => x !== h.value) : [...prev, h.value]
+                    key={source}
+                    onClick={() => setSelectedSources(prev =>
+                      active ? prev.filter(x => x !== source) : [...prev, source]
                     )}
                     style={{
-                      padding: '6px 12px',
+                      padding: '5px 10px',
                       fontSize: 12,
-                      fontWeight: 600,
-                      background: active ? h.color : 'white',
-                      color: active ? 'white' : h.color,
-                      border: `1px solid ${h.color}`,
-                      borderRadius: 16,
+                      fontWeight: 500,
+                      background: active ? '#FFBA06' : 'white',
+                      color: active ? '#0a0f1e' : '#6B7280',
+                      border: active ? '1px solid #FFBA06' : '1px solid #D1D5DB',
+                      borderRadius: 14,
                       cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
                     }}
                   >
-                    <span>{h.emoji}</span>
-                    {h.label}
+                    {source} · {count}
                   </button>
                 )
               })}
             </div>
 
-            {/* Stage Group filters */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 12, color: '#6B7280', minWidth: 80 }}>Stage:</span>
-              {Object.entries(STAGE_GROUPS).map(([key, g]) => {
-                const active = selectedStageGroup === key
-                return (
-                  <button
-                    key={key}
-                    onClick={() => setSelectedStageGroup(active ? null : key)}
-                    style={{
-                      padding: '6px 12px',
-                      fontSize: 12,
-                      fontWeight: 600,
-                      background: active ? g.color : 'white',
-                      color: active ? 'white' : g.color,
-                      border: `1px solid ${g.color}`,
-                      borderRadius: 16,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {g.label}
-                  </button>
-                )
-              })}
-              {(selectedTypes.length > 0 || selectedHeat.length > 0 || selectedStageGroup) && (
-                <button
-                  onClick={() => {
-                    setSelectedTypes([])
-                    setSelectedHeat([])
-                    setSelectedStageGroup(null)
-                  }}
-                  style={{
-                    padding: '6px 12px',
-                    fontSize: 12,
-                    fontWeight: 600,
-                    background: 'transparent',
-                    color: '#6B7280',
-                    border: 'none',
-                    textDecoration: 'underline',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Clear all
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Pipeline by Stage Group */}
-      {!loading && !error && (
-        <div style={{
-          background: 'white',
-          borderRadius: 12,
-          padding: 20,
-          border: '1px solid #E5E7EB',
-        }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16 }}>
-            Pipeline by Stage Group
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-            {Object.entries(STAGE_GROUPS).map(([key, g]) => {
-              const groupOpps = filtered.filter(o => g.stages.includes(o.stage))
-              const groupValue = groupOpps.reduce((s, o) => s + (o.value || 0), 0)
-              const groupFactored = groupOpps.reduce((s, o) => s + factoredRevenue(o), 0)
-              const totalFilteredValue = filtered.reduce((s, o) => s + (o.value || 0), 0)
-              const pct = totalFilteredValue > 0 ? Math.round(groupValue / totalFilteredValue * 100) : 0
-              return (
-                <div key={key} style={{
-                  padding: 16,
-                  background: '#F9FAFB',
-                  borderRadius: 10,
-                  borderLeft: `4px solid ${g.color}`,
-                }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: g.color, marginBottom: 4 }}>{g.label}</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: '#0a0f1e', lineHeight: 1 }}>
-                    {formatCurrency(groupValue)}
-                  </div>
-                  <div style={{ fontSize: 11, color: '#6B7280', marginTop: 6 }}>
-                    {groupOpps.length} opps · {pct}% of pipeline
-                  </div>
-                  <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
-                    Factored: <strong style={{ color: '#0a0f1e' }}>{formatCurrency(groupFactored)}</strong>
-                  </div>
-                </div>
-              )
-            })}
+            {/* Clear filters */}
+            {(selectedTypes.length > 0 || selectedSources.length > 0 || selectedStageGroup || showInvoiceOnly) && (
+              <button
+                onClick={() => {
+                  setSelectedTypes([])
+                  setSelectedSources([])
+                  setSelectedStageGroup(null)
+                  setShowInvoiceOnly(false)
+                }}
+                style={{
+                  marginTop: 10,
+                  padding: '4px 8px',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  background: 'transparent',
+                  color: '#6B7280',
+                  border: 'none',
+                  textDecoration: 'underline',
+                  cursor: 'pointer',
+                }}
+              >
+                Clear all filters
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -941,54 +953,71 @@ export default function SalesPage() {
       {!loading && !error && view === 'list' && (
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
-              <tr>
-                <th className="text-left px-5 py-3">Opportunity</th>
-                <th className="text-left px-4 py-3">Stage</th>
-                <th className="text-left px-4 py-3">Value</th>
-                <th
-                  className="text-left px-4 py-3 cursor-pointer hover:text-indigo-600 select-none"
-                  onClick={() => setSortBy(sortBy === 'factored_revenue' ? 'value' : 'factored_revenue')}
-                >
-                  Factored {sortBy === 'factored_revenue' ? '▼' : ''}
+            <thead>
+              <tr style={{ background: '#F9FAFB', borderBottom: '1px solid #E5E7EB' }}>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 1 }}>
+                  Opportunity
                 </th>
-                <th className="text-left px-4 py-3">Heat</th>
-                <th className="text-left px-4 py-3">Latest Note</th>
-                <th className="text-left px-4 py-3">Last Activity</th>
-                <th className="px-4 py-3" />
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 1 }}>
+                  Stage
+                </th>
+                <th style={{ padding: '12px 16px', textAlign: 'right', fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 1 }}>
+                  Value
+                </th>
+                <th
+                  onClick={() => setSortByFactored(!sortByFactored)}
+                  style={{
+                    padding: '12px 16px',
+                    textAlign: 'right',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: sortByFactored ? '#FFBA06' : '#6B7280',
+                    textTransform: 'uppercase',
+                    letterSpacing: 1,
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                  }}
+                >
+                  Factored {sortByFactored && '↓'}
+                </th>
+                <th style={{ padding: '12px 16px', width: 80 }} />
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-5 py-8 text-center text-gray-400 text-sm">
+                  <td colSpan={5} className="px-5 py-8 text-center text-gray-400 text-sm">
                     No opportunities match your filters.
                   </td>
                 </tr>
               ) : (
                 filtered.map(opp => {
                   const stageColor = getStageColor(opp.stage)
-                  const latestNote = getLatestNote(opp.supabase_id)
-                  const attention = isNeedsAttention(opp)
+                  const subtitle = opportunitySubtitle(opp)
 
                   return (
-                    <tr key={opp.supabase_id} className={`hover:bg-gray-50 ${attention ? 'bg-red-50/30' : ''}`}>
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium text-gray-900">{opp.name}</p>
+                    <tr key={opp.supabase_id} className="hover:bg-gray-50">
+                      <td style={{ padding: '14px 16px' }}>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: '#0a0f1e', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                          {opp.name}
                           {opp.isRenewal && (
-                            <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">
-                              Renewal
+                            <span style={{ fontSize: 10, padding: '2px 6px', background: '#FEF3C7', color: '#92400E', borderRadius: 8, fontWeight: 700 }}>
+                              RENEWAL
                             </span>
                           )}
-                          {attention && (
-                            <span className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded">
-                              Overdue
+                          {opp.needs_invoice && (
+                            <span style={{ fontSize: 10, padding: '2px 6px', background: '#FEE2E2', color: '#991B1B', borderRadius: 8, fontWeight: 700 }}>
+                              INVOICE
                             </span>
                           )}
                         </div>
+                        {subtitle && (
+                          <div style={{ fontSize: 12, color: '#6B7280', marginTop: 3 }}>
+                            {subtitle}
+                          </div>
+                        )}
                       </td>
-                      <td className="px-4 py-3">
+                      <td style={{ padding: '14px 16px' }}>
                         <div className="flex items-center gap-2">
                           <select
                             value={opp.stage}
@@ -1012,36 +1041,18 @@ export default function SalesPage() {
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3 font-medium text-gray-700">
-                        {opp.value ? `$${opp.value.toLocaleString()}` : '-'}
+                      <td style={{ padding: '14px 16px', textAlign: 'right', fontSize: 14, fontWeight: 600, color: '#0a0f1e' }}>
+                        {opp.value ? formatCurrencyFull(opp.value) : '-'}
                       </td>
-                      <td className="px-4 py-3">
-                        <span className="font-semibold text-gray-900 text-sm">{formatCurrency(factoredRevenue(opp))}</span>
-                        <div className="text-xs text-gray-400">{opp.probability}%</div>
+                      <td style={{ padding: '14px 16px', textAlign: 'right' }}>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: '#0a0f1e' }}>
+                          {formatCurrencyFull(factoredRevenue(opp))}
+                        </div>
+                        <div style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 500 }}>
+                          {opp.probability}%
+                        </div>
                       </td>
-                      <td className="px-4 py-3 text-xs">
-                        {(() => {
-                          const h = HEAT_LEVELS.find(x => x.value === opp.heat)
-                          return h ? (
-                            <span style={{ color: h.color, fontWeight: 600 }}>{h.emoji} {h.label}</span>
-                          ) : (
-                            <span className="text-gray-400">—</span>
-                          )
-                        })()}
-                      </td>
-                      <td className="px-4 py-3 text-xs text-gray-500 max-w-48">
-                        {latestNote ? (
-                          <p className="truncate">{latestNote.body}</p>
-                        ) : (
-                          <span className="text-gray-300">No notes</span>
-                        )}
-                      </td>
-                      <td className={`px-4 py-3 text-xs font-medium ${attention ? 'text-red-500' : 'text-gray-500'}`}>
-                        {opp.lastActivityAt
-                          ? new Date(opp.lastActivityAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                          : '-'}
-                      </td>
-                      <td className="px-4 py-3">
+                      <td style={{ padding: '14px 16px', textAlign: 'right' }}>
                         {activeNoteOpp === opp.supabase_id ? (
                           <div className="space-y-1 min-w-48">
                             <textarea
@@ -1097,7 +1108,6 @@ export default function SalesPage() {
 
               return (
                 <div key={stage.id} className="w-72 flex-shrink-0">
-                  {/* Stage header */}
                   <div className={`rounded-t-xl px-3 py-2 border ${stageColor} flex items-center justify-between`}>
                     <span className="text-xs font-semibold">{stage.name}</span>
                     <div className="flex items-center gap-2">
@@ -1108,7 +1118,6 @@ export default function SalesPage() {
                     </div>
                   </div>
 
-                  {/* Cards */}
                   <div className="bg-gray-50 border border-t-0 border-gray-200 rounded-b-xl p-2 space-y-2 min-h-24 max-h-screen overflow-y-auto">
                     {stageOpps.length === 0 ? (
                       <p className="text-xs text-gray-300 text-center py-4">No opportunities</p>
