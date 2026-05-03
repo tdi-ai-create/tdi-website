@@ -68,12 +68,13 @@ export function KanbanColumn({
     >
       <div style={{
         padding: '10px 12px',
-        background: isDragOver ? '#DBEAFE' : '#F3F4F6',
+        background: isDragOver ? '#E0E7FF' : '#EEF2FF',
+        borderTop: '3px solid #6366F1',
         borderRadius: '8px 8px 0 0',
         transition: 'background 0.15s',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#0a0f1e' }}>{label}</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#312E81' }}>{label}</span>
           <span style={{ fontSize: 12, color: '#6B7280' }}>{opportunities.length}</span>
         </div>
         <div style={{ fontSize: 11, color: '#6B7280', marginTop: 3 }}>
