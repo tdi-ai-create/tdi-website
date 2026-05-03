@@ -167,7 +167,7 @@ export default function HubAdminPage() {
               style={{
                 color: tab.id === 'overview' ? '#111827' : '#6B7280',
                 borderBottom: tab.id === 'overview'
-                  ? '2px solid #00B5AD'
+                  ? '2px solid #EAB308'
                   : '2px solid transparent',
               }}
             >

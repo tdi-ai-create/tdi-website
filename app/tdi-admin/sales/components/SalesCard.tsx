@@ -15,7 +15,7 @@ const TYPE_COLORS: Record<string, string> = {
   expansion: '#8B5CF6',
   pilot: '#F59E0B',
   upsell: '#EC4899',
-  reactivation: '#6366F1',
+  reactivation: '#2563EB',
 }
 
 export interface SalesCardOpp {

@@ -85,10 +85,10 @@ export function AnalyticsTab() {
 
 function PulseSection({ pulse }: { pulse: AnalyticsData['pulse'] }) {
   const cards = [
-    { label: 'Pipeline', value: `$${(pulse.totalPipeline / 1000).toFixed(0)}K`, color: '#6366F1' },
-    { label: 'Factored', value: `$${(pulse.factored / 1000).toFixed(0)}K`, color: '#6366F1' },
-    { label: 'Active deals', value: String(pulse.activeCount), color: '#6366F1' },
-    { label: 'Avg deal size', value: `$${(pulse.avgDealSize / 1000).toFixed(0)}K`, color: '#6366F1' },
+    { label: 'Pipeline', value: `$${(pulse.totalPipeline / 1000).toFixed(0)}K`, color: '#10B981' },
+    { label: 'Factored', value: `$${(pulse.factored / 1000).toFixed(0)}K`, color: '#10B981' },
+    { label: 'Active deals', value: String(pulse.activeCount), color: '#10B981' },
+    { label: 'Avg deal size', value: `$${(pulse.avgDealSize / 1000).toFixed(0)}K`, color: '#10B981' },
     { label: 'Win rate', value: `${pulse.winRate}%`, color: '#10B981' },
     { label: 'Won YTD', value: `$${(pulse.wonValue / 1000).toFixed(0)}K`, color: '#10B981' },
   ]
@@ -103,7 +103,7 @@ function PulseSection({ pulse }: { pulse: AnalyticsData['pulse'] }) {
         <div key={c.label} style={{
           background: 'white',
           border: '1px solid #F3F4F6',
-          borderTop: '3px solid #6366F1',
+          borderTop: '3px solid #10B981',
           borderRadius: 12,
           padding: '16px 18px',
           boxShadow: '0 1px 4px rgba(0,0,0,0.04)',

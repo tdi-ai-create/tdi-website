@@ -238,7 +238,7 @@ function PortalAccessCell({
       disabled={sending}
       className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-50"
       style={{
-        background: sending ? '#FEF3C7' : '#16A34A',
+        background: sending ? '#FEF3C7' : '#2563EB',
         color: sending ? '#92400E' : '#fff',
       }}
     >
@@ -1436,9 +1436,9 @@ export default function LeadershipDashboardPage() {
               </div>
 
               {/* Active */}
-              <div className="bg-white rounded-xl p-4 border border-gray-100" style={{ borderLeft: '3px solid #16A34A', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <div className="bg-white rounded-xl p-4 border border-gray-100" style={{ borderLeft: '3px solid #2563EB', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                 <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full" style={{ background: '#16A34A' }} />
+                  <div className="w-2 h-2 rounded-full" style={{ background: '#2563EB' }} />
                   Active ({pipelineCounts.active})
                 </h3>
                 <div className="space-y-2">

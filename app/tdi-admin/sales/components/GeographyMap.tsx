@@ -36,13 +36,13 @@ const STATE_POSITIONS: Record<string, { x: number; y: number }> = {
 function getColor(value: number, maxValue: number): string {
   if (value === 0) return '#F3F4F6'
   const ratio = Math.min(value / maxValue, 1)
-  // Interpolate from light indigo to deep indigo
-  if (ratio < 0.15) return '#E0E7FF'
-  if (ratio < 0.3) return '#C7D2FE'
-  if (ratio < 0.5) return '#A5B4FC'
-  if (ratio < 0.7) return '#818CF8'
-  if (ratio < 0.85) return '#6366F1'
-  return '#4338CA'
+  // Interpolate from light green to deep green
+  if (ratio < 0.15) return '#D1FAE5'
+  if (ratio < 0.3) return '#A7F3D0'
+  if (ratio < 0.5) return '#6EE7B7'
+  if (ratio < 0.7) return '#34D399'
+  if (ratio < 0.85) return '#10B981'
+  return '#059669'
 }
 
 export function GeographyMap({ byState }: { byState: Record<string, StateData> }) {
@@ -83,7 +83,7 @@ export function GeographyMap({ byState }: { byState: Record<string, StateData> }
                   height={32}
                   rx={6}
                   fill={fill}
-                  stroke={isHovered ? '#0a0f1e' : hasData ? '#4338CA' : '#E5E7EB'}
+                  stroke={isHovered ? '#0a0f1e' : hasData ? '#059669' : '#E5E7EB'}
                   strokeWidth={isHovered ? 2 : 1}
                   opacity={hasData ? 1 : 0.5}
                 />
@@ -137,7 +137,7 @@ export function GeographyMap({ byState }: { byState: Record<string, StateData> }
       {/* Legend */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, marginTop: 16 }}>
         <span style={{ fontSize: 10, color: '#6B7280', marginRight: 4 }}>$0</span>
-        {['#F3F4F6', '#E0E7FF', '#C7D2FE', '#A5B4FC', '#818CF8', '#6366F1', '#4338CA'].map((c, i) => (
+        {['#F3F4F6', '#D1FAE5', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669'].map((c, i) => (
           <div key={i} style={{ width: 28, height: 10, background: c, borderRadius: 2 }} />
         ))}
         <span style={{ fontSize: 10, color: '#6B7280', marginLeft: 4 }}>

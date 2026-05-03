@@ -219,11 +219,11 @@ function StatusIndicator({ status }: { status: string }) {
   }
 
   const dots: Record<string, string> = {
-    total:          '#8B5CF6',
+    total:          '#EC4899',
     stalled:        '#F59E0B',
     followedUp:     '#10B981',
     waitingOnCreator:'#06B6D4',
-    waitingOnTDI:   '#8B5CF6',
+    waitingOnTDI:   '#EC4899',
   };
 
   const labels: Record<string, string> = {
@@ -234,7 +234,7 @@ function StatusIndicator({ status }: { status: string }) {
     waitingOnTDI:    'NEEDS REVIEW',
   };
 
-  const color = dots[status] || '#8B5CF6';
+  const color = dots[status] || '#EC4899';
   const label = labels[status] || status.toUpperCase();
 
   return (
@@ -275,7 +275,7 @@ function StatCard({
           e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.5)';
           e.currentTarget.style.boxShadow = '0 8px 28px rgba(139, 92, 246, 0.1), 0 2px 8px rgba(0,0,0,0.06)';
           const topBar = e.currentTarget.querySelector('.stat-top-bar') as HTMLElement;
-          if (topBar) topBar.style.background = '#8B5CF6';
+          if (topBar) topBar.style.background = '#EC4899';
         }
       }}
       onMouseLeave={e => {
@@ -291,7 +291,7 @@ function StatCard({
       {/* Accent top bar - revealed on hover/active */}
       <div
         className="stat-top-bar absolute top-0 left-0 right-0 h-0.5"
-        style={{ background: isActive ? '#8B5CF6' : 'transparent', transition: 'background 0.25s' }}
+        style={{ background: isActive ? '#EC4899' : 'transparent', transition: 'background 0.25s' }}
       />
 
       <div className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-2">{label}</div>
@@ -842,11 +842,11 @@ export default function CreatorStudioPage() {
         };
       case 'followed_up':
         return {
-          dotColor: '#8B5CF6',
+          dotColor: '#EC4899',
           label: 'Followed Up',
           isCheckmark: false,
-          bgColor: '#EDE9FE',
-          textColor: '#5B21B6'
+          bgColor: '#FCE7F3',
+          textColor: '#BE185D'
         };
       default:
         return {
@@ -1040,7 +1040,7 @@ export default function CreatorStudioPage() {
             <button
               onClick={() => setShowAddModal(true)}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 text-white shadow-sm hover:shadow-md hover:opacity-90"
-              style={{ backgroundColor: '#8B5CF6' }}
+              style={{ backgroundColor: '#EC4899' }}
             >
               <Plus className="w-4 h-4" />
               Add Creator
@@ -1108,7 +1108,7 @@ export default function CreatorStudioPage() {
               </h2>
               <div className="space-y-3">
                 {[
-                  { key: 'onboarding', label: 'Onboarding', color: '#8B5CF6' },
+                  { key: 'onboarding', label: 'Onboarding', color: '#EC4899' },
                   { key: 'agreement', label: 'Agreement', color: '#A78BFA' },
                   { key: 'course_design', label: 'Prep & Resources', color: '#A78BFA' },
                   { key: 'test_prep', label: 'Production', color: '#C4B5FD' },
@@ -1200,7 +1200,7 @@ export default function CreatorStudioPage() {
                 <div className="space-y-3">
                   {closestToLaunch.map((creator) => {
                     const isNearLaunch = creator.progressPercentage >= 90;
-                    const progressColor = isNearLaunch ? '#16A34A' : '#8B5CF6';
+                    const progressColor = isNearLaunch ? '#16A34A' : '#EC4899';
                     return (
                       <Link
                         key={creator.id}
@@ -1209,7 +1209,7 @@ export default function CreatorStudioPage() {
                       >
                         <div
                           className="w-9 h-9 rounded-full text-white flex items-center justify-center text-sm font-medium flex-shrink-0 ring-2 ring-white shadow-sm"
-                          style={{ background: '#8B5CF6' }}
+                          style={{ background: '#EC4899' }}
                         >
                           {creator.name.charAt(0).toUpperCase()}
                         </div>
@@ -1235,7 +1235,7 @@ export default function CreatorStudioPage() {
                               <span className="text-xs font-bold" style={{ color: '#16A34A' }}>{creator.progressPercentage}%</span>
                             </div>
                           ) : (
-                            <span className="text-xs font-semibold w-9 text-right" style={{ color: '#8B5CF6' }}>{creator.progressPercentage}%</span>
+                            <span className="text-xs font-semibold w-9 text-right" style={{ color: '#EC4899' }}>{creator.progressPercentage}%</span>
                           )}
                         </div>
                       </Link>
@@ -1299,7 +1299,7 @@ export default function CreatorStudioPage() {
                             >
                               <div
                                 className="w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0"
-                                style={{ backgroundColor: '#8B5CF6' }}
+                                style={{ backgroundColor: '#EC4899' }}
                               >
                                 {creator.name.charAt(0).toUpperCase()}
                               </div>
@@ -1519,11 +1519,11 @@ export default function CreatorStudioPage() {
             {followedUpCreators.length > 0 && (
               <div
                 className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] border-l-4"
-                style={{ borderLeftColor: '#8B5CF6' }}
+                style={{ borderLeftColor: '#EC4899' }}
               >
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
-                    <UserCheck className="w-5 h-5" style={{ color: '#8B5CF6' }} />
+                    <UserCheck className="w-5 h-5" style={{ color: '#EC4899' }} />
                     Followed Up by Team
                     <span className="text-xs font-normal text-gray-500">({stats.followedUp})</span>
                   </h3>
@@ -1563,7 +1563,7 @@ export default function CreatorStudioPage() {
                       >
                         <div
                           className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium flex-shrink-0"
-                          style={{ backgroundColor: '#8B5CF6' }}
+                          style={{ backgroundColor: '#EC4899' }}
                         >
                           {creator.name.charAt(0).toUpperCase()}
                         </div>
@@ -1586,7 +1586,7 @@ export default function CreatorStudioPage() {
                             )}
                           </p>
                         </div>
-                        <p className="text-xs flex-shrink-0" style={{ color: '#8B5CF6' }}>
+                        <p className="text-xs flex-shrink-0" style={{ color: '#EC4899' }}>
                           {14 - daysSinceFollowUp > 0 ? `${14 - daysSinceFollowUp}d until re-stall` : 'Re-stalling soon'}
                         </p>
                       </Link>
@@ -1596,7 +1596,7 @@ export default function CreatorStudioPage() {
                     <button
                       onClick={() => handleStatCardClick('followedUp')}
                       className="w-full text-center text-xs pt-1"
-                      style={{ color: '#8B5CF6' }}
+                      style={{ color: '#EC4899' }}
                     >
                       View all {stats.followedUp} followed up creators →
                     </button>
@@ -1645,7 +1645,7 @@ export default function CreatorStudioPage() {
           {locationData && (
             <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] mb-5">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
-                <MapPin className="w-5 h-5" style={{ color: '#8B5CF6' }} />
+                <MapPin className="w-5 h-5" style={{ color: '#EC4899' }} />
                 Geographic Distribution
               </h2>
 
@@ -1844,7 +1844,7 @@ export default function CreatorStudioPage() {
                 <Filter className="w-4 h-4" />
                 Filters
                 {activeFiltersCount > 0 && (
-                  <span className="text-white text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#8B5CF6' }}>
+                  <span className="text-white text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#EC4899' }}>
                     {activeFiltersCount}
                   </span>
                 )}
@@ -2191,7 +2191,7 @@ export default function CreatorStudioPage() {
             <button
               onClick={handleBulkCopy}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 text-white shadow-sm hover:shadow-md hover:opacity-90"
-              style={{ backgroundColor: '#8B5CF6' }}
+              style={{ backgroundColor: '#EC4899' }}
             >
               {copiedSection === 'bulk' ? (
                 <>
@@ -2231,7 +2231,7 @@ export default function CreatorStudioPage() {
           {analyticsLoading && (
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
-                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#8B5CF6' }} />
+                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#EC4899' }} />
                 <p className="text-gray-600">Loading analytics data...</p>
               </div>
             </div>
@@ -2379,7 +2379,7 @@ export default function CreatorStudioPage() {
                           <XAxis dataKey="monthLabel" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
                           <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
                           <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                          <Bar dataKey="course" stackId="a" fill="#8B5CF6" radius={[0, 0, 0, 0]} name="Course" />
+                          <Bar dataKey="course" stackId="a" fill="#EC4899" radius={[0, 0, 0, 0]} name="Course" />
                           <Bar dataKey="blog" stackId="a" fill="#3B82F6" name="Blog" />
                           <Bar dataKey="download" stackId="a" fill="#22C55E" name="Download" />
                           <Bar dataKey="notSet" stackId="a" fill="#9CA3AF" radius={[4, 4, 0, 0]} name="Not Set" />
@@ -2472,7 +2472,7 @@ export default function CreatorStudioPage() {
                               {analyticsData.journeyTimes.slice(0, 10).map((entry, index) => (
                                 <Cell
                                   key={`cell-${index}`}
-                                  fill={entry.contentPath === 'course' ? '#8B5CF6' : entry.contentPath === 'blog' ? '#3B82F6' : entry.contentPath === 'download' ? '#22C55E' : '#9CA3AF'}
+                                  fill={entry.contentPath === 'course' ? '#EC4899' : entry.contentPath === 'blog' ? '#3B82F6' : entry.contentPath === 'download' ? '#22C55E' : '#9CA3AF'}
                                 />
                               ))}
                             </Bar>
@@ -2490,7 +2490,7 @@ export default function CreatorStudioPage() {
                     <p className="text-sm text-gray-500 mb-4">Creator progression through phases</p>
                     <div className="space-y-2">
                       {analyticsData.completionFunnel.map((stage, index) => {
-                        const colors = ['#6366F1', '#7C3AED', '#8B5CF6', '#A78BFA', '#C4B5FD', '#22C55E'];
+                        const colors = ['#EC4899', '#DB2777', '#F472B6', '#F9A8D4', '#FBCFE8', '#22C55E'];
                         return (
                           <div key={stage.phase} className="flex items-center gap-3">
                             <div className="w-32 text-sm text-gray-600 truncate">{stage.name}</div>
@@ -2499,7 +2499,7 @@ export default function CreatorStudioPage() {
                                 className="h-full rounded-full flex items-center justify-end px-3 transition-all duration-500"
                                 style={{
                                   width: `${stage.percent}%`,
-                                  backgroundColor: colors[index] || '#6366F1',
+                                  backgroundColor: colors[index] || '#EC4899',
                                   minWidth: stage.count > 0 ? '50px' : '0',
                                 }}
                               >
@@ -2658,9 +2658,9 @@ export default function CreatorStudioPage() {
                           <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
                           <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
                           <Legend />
-                          <Bar dataKey="courses" fill="#8B5CF6" name="Courses" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="courses" fill="#EC4899" name="Courses" radius={[4, 4, 0, 0]} />
                           <Bar dataKey="blogs" fill="#3B82F6" name="Blogs" radius={[4, 4, 0, 0]} />
-                          <Line type="monotone" dataKey="cumulativeCourses" stroke="#6366F1" strokeWidth={2} dot={false} name="Total Courses" />
+                          <Line type="monotone" dataKey="cumulativeCourses" stroke="#EC4899" strokeWidth={2} dot={false} name="Total Courses" />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -2697,7 +2697,7 @@ export default function CreatorStudioPage() {
                                 <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
                                   <div
                                     className="h-full rounded-full"
-                                    style={{ width: `${item.percent}%`, backgroundColor: '#8B5CF6' }}
+                                    style={{ width: `${item.percent}%`, backgroundColor: '#EC4899' }}
                                   />
                                 </div>
                                 <span className="text-sm font-medium text-gray-600 w-8 text-right">{item.count}</span>
@@ -2708,7 +2708,7 @@ export default function CreatorStudioPage() {
                         </div>
                         <div className="space-y-3">
                           <div className="bg-purple-50 rounded-xl p-4 text-center">
-                            <p className="font-bold" style={{ fontSize: 28, color: '#8B5CF6' }}>{analyticsData.geographicDistribution.withState}</p>
+                            <p className="font-bold" style={{ fontSize: 28, color: '#EC4899' }}>{analyticsData.geographicDistribution.withState}</p>
                             <p className="text-sm text-gray-600">With Location</p>
                           </div>
                           <div className="bg-gray-50 rounded-xl p-4 text-center">
@@ -2872,7 +2872,7 @@ export default function CreatorStudioPage() {
                                   className="h-full rounded-full transition-all"
                                   style={{
                                     width: `${stage.percent}%`,
-                                    backgroundColor: index === 0 ? '#6366F1' : index < 3 ? '#8B5CF6' : index < 5 ? '#F59E0B' : '#22C55E',
+                                    backgroundColor: index === 0 ? '#EC4899' : index < 3 ? '#F472B6' : index < 5 ? '#F59E0B' : '#22C55E',
                                   }}
                                 />
                               </div>
@@ -2913,7 +2913,7 @@ export default function CreatorStudioPage() {
       {activeTab === 'payouts' && (
         <div className="bg-white rounded-2xl p-8 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
           <div className="text-center py-12">
-            <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg" style={{ backgroundColor: '#8B5CF6' }}>
+            <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg" style={{ backgroundColor: '#EC4899' }}>
               <DollarSign className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-xl font-semibold mb-2 text-gray-900">
@@ -3044,7 +3044,7 @@ export default function CreatorStudioPage() {
                   type="submit"
                   disabled={isAdding}
                   className="flex-1 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2 text-white shadow-sm hover:shadow-md hover:opacity-90"
-                  style={{ backgroundColor: '#8B5CF6' }}
+                  style={{ backgroundColor: '#EC4899' }}
                 >
                   {isAdding ? (
                     <>
@@ -3067,8 +3067,8 @@ export default function CreatorStudioPage() {
           <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#EDE9FE' }}>
-                  <MessageCircle className="w-5 h-5" style={{ color: '#8B5CF6' }} />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FCE7F3' }}>
+                  <MessageCircle className="w-5 h-5" style={{ color: '#EC4899' }} />
                 </div>
                 <h2 className="text-lg font-semibold text-gray-900">Mark as Followed Up</h2>
               </div>
@@ -3105,7 +3105,7 @@ export default function CreatorStudioPage() {
                   onClick={handleMarkFollowedUp}
                   disabled={isMarkingFollowUp}
                   className="flex-1 px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:opacity-90"
-                  style={{ backgroundColor: '#8B5CF6' }}
+                  style={{ backgroundColor: '#EC4899' }}
                 >
                   {isMarkingFollowUp ? (
                     <>

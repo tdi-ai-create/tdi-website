@@ -29,7 +29,7 @@ export function PipelineTrend({ snapshots }: { snapshots: Snapshot[] }) {
   return (
     <div>
       <svg viewBox="0 0 100 100" style={{ width: '100%', height: 200 }} preserveAspectRatio="none">
-        <polyline points={points} fill="none" stroke="#6366F1" strokeWidth="0.5" />
+        <polyline points={points} fill="none" stroke="#10B981" strokeWidth="0.5" />
       </svg>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#6B7280', marginTop: 8 }}>
         <span>{snapshots[0].snapshot_date}</span>

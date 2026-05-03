@@ -2,49 +2,62 @@
 // Portal-wide design consistency system v1.0
 
 export const ADMIN_COLORS = {
-  // Section accent colors - Approved color system v1.0
-  hub: {
-    accent: '#00B5AD',       // Teal
+  // Section accent colors — synced with sidebar PORTAL_COLORS in AdminLayoutClient.tsx
+  cmo: {
+    accent: '#2A9D8F',       // Teal
     accentLight: '#E0F7F6',
-    accentDark: '#007A75',
-    bg15: 'rgba(0, 181, 173, 0.15)',
-    border30: 'rgba(0, 181, 173, 0.3)',
+    accentDark: '#1F7A6F',
+    bg15: 'rgba(42, 157, 143, 0.15)',
+    border30: 'rgba(42, 157, 143, 0.3)',
+  },
+  sales: {
+    accent: '#10B981',       // Green
+    accentLight: '#D1FAE5',
+    accentDark: '#059669',
+    bg15: 'rgba(16, 185, 129, 0.15)',
+    border30: 'rgba(16, 185, 129, 0.3)',
+  },
+  intelligence: {
+    accent: '#F97316',       // Orange (Operations)
+    accentLight: '#FFF7ED',
+    accentDark: '#C2410C',
+    bg15: 'rgba(249, 115, 22, 0.15)',
+    border30: 'rgba(249, 115, 22, 0.3)',
+  },
+  hub: {
+    accent: '#EAB308',       // Gold / Yellow
+    accentLight: '#FEF9C3',
+    accentDark: '#A16207',
+    bg15: 'rgba(234, 179, 8, 0.15)',
+    border30: 'rgba(234, 179, 8, 0.3)',
   },
   creators: {
+    accent: '#EC4899',       // Pink
+    accentLight: '#FCE7F3',
+    accentDark: '#BE185D',
+    bg15: 'rgba(236, 72, 153, 0.15)',
+    border30: 'rgba(236, 72, 153, 0.3)',
+  },
+  leadership: {
+    accent: '#2563EB',       // Blue
+    accentLight: '#DBEAFE',
+    accentDark: '#1D4ED8',
+    bg15: 'rgba(37, 99, 235, 0.15)',
+    border30: 'rgba(37, 99, 235, 0.3)',
+  },
+  funding: {
     accent: '#8B5CF6',       // Violet
     accentLight: '#EDE9FE',
-    accentDark: '#5B21B6',
+    accentDark: '#6D28D9',
     bg15: 'rgba(139, 92, 246, 0.15)',
     border30: 'rgba(139, 92, 246, 0.3)',
   },
-  leadership: {
-    accent: '#16A34A',       // Green
-    accentLight: '#DCFCE7',
-    accentDark: '#166534',
-    bg15: 'rgba(22, 163, 74, 0.15)',
-    border30: 'rgba(22, 163, 74, 0.3)',
-  },
-  intelligence: {
-    accent: '#F59E0B',       // Amber (Operations)
-    accentLight: '#FEF3C7',
-    accentDark: '#B45309',
-    bg15: 'rgba(245, 158, 11, 0.15)',
-    border30: 'rgba(245, 158, 11, 0.3)',
-  },
-  sales: {
-    accent: '#6366F1',       // Indigo
-    accentLight: '#E0E7FF',
-    accentDark: '#4338CA',
-    bg15: 'rgba(99, 102, 241, 0.15)',
-    border30: 'rgba(99, 102, 241, 0.3)',
-  },
-  // Legacy alias for team (maps to intelligence/amber)
   team: {
-    accent: '#F59E0B',       // Amber
-    accentLight: '#FEF3C7',
-    accentDark: '#B45309',
-    bg15: 'rgba(245, 158, 11, 0.15)',
-    border30: 'rgba(245, 158, 11, 0.3)',
+    accent: '#6B7280',       // Gray
+    accentLight: '#F3F4F6',
+    accentDark: '#374151',
+    bg15: 'rgba(107, 114, 128, 0.15)',
+    border30: 'rgba(107, 114, 128, 0.3)',
   },
 } as const;
 

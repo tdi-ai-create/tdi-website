@@ -40,7 +40,7 @@ export function ConversionFunnel({ funnel }: { funnel: FunnelStage[] }) {
                 <div style={{
                   height: '100%',
                   width: `${width}%`,
-                  background: 'linear-gradient(90deg, #6366F1 0%, #4338CA 100%)',
+                  background: 'linear-gradient(90deg, #10B981 0%, #059669 100%)',
                   display: 'flex',
                   alignItems: 'center',
                   paddingLeft: 12,
