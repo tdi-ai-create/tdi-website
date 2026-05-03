@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
+import { AnalyticsTab } from './components/AnalyticsTab'
 
 type ViewMode = 'kanban' | 'list'
+type PageTab = 'pipeline' | 'analytics'
 
 // Supabase sales_opportunities row shape
 interface SalesOpportunity {
@@ -166,6 +168,7 @@ function opportunitySubtitle(opp: Opportunity): string {
 
 export default function SalesPage() {
   const supabase = getSupabase()
+  const [pageTab, setPageTab] = useState<PageTab>('pipeline')
   const [view, setView] = useState<ViewMode>('list')
   const [opportunities, setOpportunities] = useState<Opportunity[]>([])
   const [notes, setNotes] = useState<ActivityNote[]>([])
@@ -618,6 +621,52 @@ export default function SalesPage() {
           </div>
         </div>
       </div>
+
+      {/* Tab Navigation */}
+      <div style={{
+        display: 'flex',
+        borderBottom: '1px solid #E5E7EB',
+        gap: 0,
+      }}>
+        <button
+          onClick={() => setPageTab('pipeline')}
+          style={{
+            padding: '12px 24px',
+            fontSize: 14,
+            fontWeight: pageTab === 'pipeline' ? 700 : 500,
+            color: pageTab === 'pipeline' ? '#0a0f1e' : '#6B7280',
+            background: 'transparent',
+            border: 'none',
+            borderBottom: pageTab === 'pipeline' ? '2px solid #FFBA06' : '2px solid transparent',
+            cursor: 'pointer',
+            marginBottom: -1,
+          }}
+        >
+          Pipeline
+        </button>
+        <button
+          onClick={() => setPageTab('analytics')}
+          style={{
+            padding: '12px 24px',
+            fontSize: 14,
+            fontWeight: pageTab === 'analytics' ? 700 : 500,
+            color: pageTab === 'analytics' ? '#0a0f1e' : '#6B7280',
+            background: 'transparent',
+            border: 'none',
+            borderBottom: pageTab === 'analytics' ? '2px solid #FFBA06' : '2px solid transparent',
+            cursor: 'pointer',
+            marginBottom: -1,
+          }}
+        >
+          Analytics
+        </button>
+      </div>
+
+      {/* Analytics Tab */}
+      {pageTab === 'analytics' && <AnalyticsTab />}
+
+      {/* Pipeline Tab */}
+      {pageTab === 'pipeline' && <>
 
       {/* Error */}
       {error && (
@@ -1131,6 +1180,8 @@ export default function SalesPage() {
           </div>
         </div>
       )}
+
+      </>}
 
       {/* Toast notification */}
       {toast && (
