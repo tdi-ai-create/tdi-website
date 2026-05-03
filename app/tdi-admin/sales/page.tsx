@@ -10,10 +10,11 @@ interface SalesOpportunity {
   id: string
   ghl_opportunity_id: string | null
   name: string
-  type: 'new_business' | 'renewal' | 'upsell' | 'reactivation'
+  type: 'new_business' | 'renewal' | 'upsell' | 'reactivation' | 'expansion' | 'pilot'
   stage: string
   value: number | null
   probability: number | null
+  heat: 'hot' | 'warm' | 'cold' | 'parked' | null
   assigned_to_email: string | null
   source: string | null
   notes: string | null
@@ -37,6 +38,8 @@ interface Opportunity {
   isRenewal: boolean
   isContactOnly: boolean
   lastActivityAt: string | null
+  heat: string
+  probability: number
 }
 
 interface ActivityNote {
@@ -86,6 +89,58 @@ const STAGE_COLORS: Record<string, string> = {
   'lost': 'bg-red-100 border-red-200 text-red-700',
 }
 
+const DEAL_TYPES = [
+  { value: 'renewal', label: 'Renewal', color: '#10B981', emoji: '🔄' },
+  { value: 'new_business', label: 'New Business', color: '#3B82F6', emoji: '🆕' },
+  { value: 'expansion', label: 'Expansion', color: '#8B5CF6', emoji: '📈' },
+  { value: 'pilot', label: 'Pilot', color: '#F59E0B', emoji: '🧪' },
+]
+
+const HEAT_LEVELS = [
+  { value: 'hot', label: 'Hot', color: '#EF4444', emoji: '🔥' },
+  { value: 'warm', label: 'Warm', color: '#F59E0B', emoji: '🟡' },
+  { value: 'cold', label: 'Cold', color: '#3B82F6', emoji: '❄️' },
+  { value: 'parked', label: 'Parked', color: '#6B7280', emoji: '🅿️' },
+]
+
+const STAGE_GROUPS: Record<string, { label: string; stages: string[]; description: string; color: string }> = {
+  pipeline: {
+    label: 'Pipeline',
+    stages: ['targeting', 'engaged'],
+    description: 'Top of funnel — building interest',
+    color: '#9CA3AF',
+  },
+  active_deals: {
+    label: 'Active Deals',
+    stages: ['qualified', 'likely_yes'],
+    description: 'Real conversations with money on the table',
+    color: '#FFBA06',
+  },
+  closing: {
+    label: 'Closing',
+    stages: ['proposal_sent', 'signed'],
+    description: 'Final stretch',
+    color: '#10B981',
+  },
+  closed: {
+    label: 'Closed',
+    stages: ['paid', 'lost'],
+    description: 'Done',
+    color: '#6B7280',
+  },
+}
+
+function factoredRevenue(opp: Opportunity): number {
+  const value = opp.value || 0
+  return Math.round(value * opp.probability / 100)
+}
+
+function formatCurrency(n: number): string {
+  if (n >= 1000000) return `$${(n / 1000000).toFixed(1)}M`
+  if (n >= 1000) return `$${(n / 1000).toFixed(0)}K`
+  return `$${n.toLocaleString()}`
+}
+
 export default function SalesPage() {
   const supabase = getSupabase()
   const [view, setView] = useState<ViewMode>('list')
@@ -105,6 +160,10 @@ export default function SalesPage() {
   const [activePreset, setActivePreset] = useState<string | null>(null)
   const [updatingOpportunity, setUpdatingOpportunity] = useState<string | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+  const [selectedHeat, setSelectedHeat] = useState<string[]>([])
+  const [selectedStageGroup, setSelectedStageGroup] = useState<string | null>(null)
+  const [sortBy, setSortBy] = useState<string>('value')
 
   useEffect(() => {
     loadAll()
@@ -138,6 +197,8 @@ export default function SalesPage() {
         isRenewal: row.type === 'renewal' || row.name.toLowerCase().includes('renewal'),
         isContactOnly: row.is_contact_only || false,
         lastActivityAt: row.last_activity_at,
+        heat: row.heat || 'warm',
+        probability: row.probability ?? STAGE_PROBABILITY[row.stage] ?? 0,
       }))
 
       setOpportunities(mapped)
@@ -345,15 +406,26 @@ export default function SalesPage() {
     : null
 
   // Apply all filters to get the visible opportunities list
-  const filtered = opportunities.filter(opp => {
+  const filteredUnsorted = opportunities.filter(opp => {
     if (hideContactOnly && opp.isContactOnly) return false
     if (hideUnassigned && opp.stage === 'unassigned') return false
     if (hideZeroValue && !opp.value) return false
     if (presetFilter && !presetFilter(opp)) return false
     if (search && !opp.name.toLowerCase().includes(search.toLowerCase())) return false
     if (selectedStage !== 'all' && opp.stage !== selectedStage) return false
+    if (selectedTypes.length > 0 && !selectedTypes.includes(opp.type)) return false
+    if (selectedHeat.length > 0 && !selectedHeat.includes(opp.heat)) return false
+    if (selectedStageGroup) {
+      const group = STAGE_GROUPS[selectedStageGroup]
+      if (group && !group.stages.includes(opp.stage)) return false
+    }
     return true
   })
+
+  // Sort
+  const filtered = sortBy === 'factored_revenue'
+    ? [...filteredUnsorted].sort((a, b) => factoredRevenue(b) - factoredRevenue(a))
+    : filteredUnsorted
 
   // Count per preset (applied against base-filtered list, ignoring active preset)
   const baseFiltered = opportunities.filter(opp => {
@@ -541,7 +613,7 @@ export default function SalesPage() {
 
       {/* Summary cards */}
       {!loading && !error && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="bg-white border border-gray-100 rounded-xl relative overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
             <div className="h-0.5 w-full bg-indigo-500" />
             <div className="p-4">
@@ -572,6 +644,17 @@ export default function SalesPage() {
               <p className="text-sm text-gray-500 mt-0.5">Pipeline Value</p>
               <p className="text-xs text-gray-400 mt-1">
                 ${Math.round(weightedValue).toLocaleString()} weighted
+              </p>
+            </div>
+          </div>
+          <div className="rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #FFBA06 0%, #FF8C00 100%)', boxShadow: '0 4px 12px rgba(255,186,6,0.2)' }}>
+            <div className="p-4">
+              <p className="text-2xl font-bold text-gray-900">
+                {formatCurrency(filtered.reduce((sum, opp) => sum + factoredRevenue(opp), 0))}
+              </p>
+              <p className="text-sm text-gray-800 mt-0.5 font-medium">Factored Revenue</p>
+              <p className="text-xs text-gray-700 mt-1 opacity-80">
+                Value × Probability
               </p>
             </div>
           </div>
@@ -682,6 +765,166 @@ export default function SalesPage() {
               ))}
             </select>
           </div>
+
+          {/* Multi-dimensional filters */}
+          <div style={{ marginTop: 4, padding: 16, background: '#F9FAFB', borderRadius: 12, border: '1px solid #E5E7EB' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>
+              Filter by
+            </div>
+
+            {/* Deal Type filters */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 12, color: '#6B7280', minWidth: 80 }}>Deal Type:</span>
+              {DEAL_TYPES.map(t => {
+                const active = selectedTypes.includes(t.value)
+                return (
+                  <button
+                    key={t.value}
+                    onClick={() => setSelectedTypes(prev =>
+                      active ? prev.filter(x => x !== t.value) : [...prev, t.value]
+                    )}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      background: active ? t.color : 'white',
+                      color: active ? 'white' : t.color,
+                      border: `1px solid ${t.color}`,
+                      borderRadius: 16,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                    }}
+                  >
+                    <span>{t.emoji}</span>
+                    {t.label}
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Heat filters */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 12, color: '#6B7280', minWidth: 80 }}>Heat:</span>
+              {HEAT_LEVELS.map(h => {
+                const active = selectedHeat.includes(h.value)
+                return (
+                  <button
+                    key={h.value}
+                    onClick={() => setSelectedHeat(prev =>
+                      active ? prev.filter(x => x !== h.value) : [...prev, h.value]
+                    )}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      background: active ? h.color : 'white',
+                      color: active ? 'white' : h.color,
+                      border: `1px solid ${h.color}`,
+                      borderRadius: 16,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                    }}
+                  >
+                    <span>{h.emoji}</span>
+                    {h.label}
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Stage Group filters */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 12, color: '#6B7280', minWidth: 80 }}>Stage:</span>
+              {Object.entries(STAGE_GROUPS).map(([key, g]) => {
+                const active = selectedStageGroup === key
+                return (
+                  <button
+                    key={key}
+                    onClick={() => setSelectedStageGroup(active ? null : key)}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      background: active ? g.color : 'white',
+                      color: active ? 'white' : g.color,
+                      border: `1px solid ${g.color}`,
+                      borderRadius: 16,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {g.label}
+                  </button>
+                )
+              })}
+              {(selectedTypes.length > 0 || selectedHeat.length > 0 || selectedStageGroup) && (
+                <button
+                  onClick={() => {
+                    setSelectedTypes([])
+                    setSelectedHeat([])
+                    setSelectedStageGroup(null)
+                  }}
+                  style={{
+                    padding: '6px 12px',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    background: 'transparent',
+                    color: '#6B7280',
+                    border: 'none',
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Clear all
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pipeline by Stage Group */}
+      {!loading && !error && (
+        <div style={{
+          background: 'white',
+          borderRadius: 12,
+          padding: 20,
+          border: '1px solid #E5E7EB',
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16 }}>
+            Pipeline by Stage Group
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+            {Object.entries(STAGE_GROUPS).map(([key, g]) => {
+              const groupOpps = filtered.filter(o => g.stages.includes(o.stage))
+              const groupValue = groupOpps.reduce((s, o) => s + (o.value || 0), 0)
+              const groupFactored = groupOpps.reduce((s, o) => s + factoredRevenue(o), 0)
+              const totalFilteredValue = filtered.reduce((s, o) => s + (o.value || 0), 0)
+              const pct = totalFilteredValue > 0 ? Math.round(groupValue / totalFilteredValue * 100) : 0
+              return (
+                <div key={key} style={{
+                  padding: 16,
+                  background: '#F9FAFB',
+                  borderRadius: 10,
+                  borderLeft: `4px solid ${g.color}`,
+                }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: g.color, marginBottom: 4 }}>{g.label}</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: '#0a0f1e', lineHeight: 1 }}>
+                    {formatCurrency(groupValue)}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#6B7280', marginTop: 6 }}>
+                    {groupOpps.length} opps · {pct}% of pipeline
+                  </div>
+                  <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
+                    Factored: <strong style={{ color: '#0a0f1e' }}>{formatCurrency(groupFactored)}</strong>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
 
@@ -703,6 +946,13 @@ export default function SalesPage() {
                 <th className="text-left px-5 py-3">Opportunity</th>
                 <th className="text-left px-4 py-3">Stage</th>
                 <th className="text-left px-4 py-3">Value</th>
+                <th
+                  className="text-left px-4 py-3 cursor-pointer hover:text-indigo-600 select-none"
+                  onClick={() => setSortBy(sortBy === 'factored_revenue' ? 'value' : 'factored_revenue')}
+                >
+                  Factored {sortBy === 'factored_revenue' ? '▼' : ''}
+                </th>
+                <th className="text-left px-4 py-3">Heat</th>
                 <th className="text-left px-4 py-3">Latest Note</th>
                 <th className="text-left px-4 py-3">Last Activity</th>
                 <th className="px-4 py-3" />
@@ -711,7 +961,7 @@ export default function SalesPage() {
             <tbody className="divide-y divide-gray-100">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-5 py-8 text-center text-gray-400 text-sm">
+                  <td colSpan={8} className="px-5 py-8 text-center text-gray-400 text-sm">
                     No opportunities match your filters.
                   </td>
                 </tr>
@@ -764,6 +1014,20 @@ export default function SalesPage() {
                       </td>
                       <td className="px-4 py-3 font-medium text-gray-700">
                         {opp.value ? `$${opp.value.toLocaleString()}` : '-'}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="font-semibold text-gray-900 text-sm">{formatCurrency(factoredRevenue(opp))}</span>
+                        <div className="text-xs text-gray-400">{opp.probability}%</div>
+                      </td>
+                      <td className="px-4 py-3 text-xs">
+                        {(() => {
+                          const h = HEAT_LEVELS.find(x => x.value === opp.heat)
+                          return h ? (
+                            <span style={{ color: h.color, fontWeight: 600 }}>{h.emoji} {h.label}</span>
+                          ) : (
+                            <span className="text-gray-400">—</span>
+                          )
+                        })()}
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-500 max-w-48">
                         {latestNote ? (
