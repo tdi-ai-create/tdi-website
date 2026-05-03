@@ -470,7 +470,7 @@ export default function LeadershipDashboardPage() {
       <div className="px-6 py-6">
         {/* Page Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Lead Dashboard</h1>
+          <h1 className="font-extrabold" style={{ fontSize: 28, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Lead Dashboard</h1>
           <p className="text-sm text-gray-500 mt-1">
             Manage school partnerships, reports, action items, and billing.
           </p>
@@ -487,8 +487,8 @@ export default function LeadershipDashboardPage() {
             <div className="p-5 flex items-center justify-between">
               <div>
                 <p
-                  className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
+                  className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  style={{ fontSize: 28, fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.activeCount}
                 </p>
@@ -513,8 +513,8 @@ export default function LeadershipDashboardPage() {
             <div className="p-5 flex items-center justify-between">
               <div>
                 <p
-                  className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
+                  className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  style={{ fontSize: 28, fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.totalEducators}
                 </p>
@@ -539,8 +539,8 @@ export default function LeadershipDashboardPage() {
             <div className="p-5 flex items-center justify-between">
               <div>
                 <p
-                  className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
+                  className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  style={{ fontSize: 28, fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.pendingSetup}
                 </p>
@@ -565,8 +565,8 @@ export default function LeadershipDashboardPage() {
             <div className="p-5 flex items-center justify-between">
               <div>
                 <p
-                  className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
+                  className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  style={{ fontSize: 28, fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.awaitingAccept}
                 </p>

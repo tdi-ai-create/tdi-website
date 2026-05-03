@@ -295,7 +295,7 @@ function StatCard({
       />
 
       <div className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-2">{label}</div>
-      <div className="text-3xl font-bold text-gray-900 tracking-tight leading-none mb-2">{value}</div>
+      <div className="font-bold text-gray-900 tracking-tight leading-none mb-2" style={{ fontSize: 28 }}>{value}</div>
 
       {/* Status indicator */}
       <StatusIndicator status={status} />
@@ -1035,7 +1035,7 @@ export default function CreatorStudioPage() {
       <div className="px-6 py-6">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Creator Studio</h1>
+          <h1 className="font-extrabold" style={{ fontSize: 28, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Creator Studio</h1>
           {canEdit && (
             <button
               onClick={() => setShowAddModal(true)}
@@ -1103,7 +1103,7 @@ export default function CreatorStudioPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
             {/* Pipeline Funnel */}
             <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-              <h2 className="text-lg font-semibold mb-4 text-gray-900">
+              <h2 className="font-bold mb-4" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                 Creator Pipeline
               </h2>
               <div className="space-y-3">
@@ -1162,7 +1162,7 @@ export default function CreatorStudioPage() {
             {/* Closest to Launch */}
             <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
+                <h3 className="font-bold flex items-center gap-2" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                   <Trophy className="w-5 h-5 text-amber-500" />
                   Closest to Launch
                 </h3>
@@ -1256,7 +1256,7 @@ export default function CreatorStudioPage() {
                 return (
                   <>
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
+                      <h3 className="font-bold flex items-center gap-2" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                         <CalendarDays className="w-5 h-5 text-blue-500" />
                         Scheduled for Launch
                       </h3>
@@ -1343,7 +1343,7 @@ export default function CreatorStudioPage() {
                 return (
                   <>
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
+                      <h3 className="font-bold flex items-center gap-2" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                         <Globe className="w-5 h-5 text-green-500" />
                         Recently Published
                       </h3>
