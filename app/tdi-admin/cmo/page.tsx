@@ -51,13 +51,21 @@ export default function CMODashboardPage() {
   const [arrData, setArrData] = useState<PaidARR[]>([]);
   const [dataLoading, setDataLoading] = useState(false);
 
-  // Verify migration 040 has been applied (portal layout already handles auth)
+  // Verify migration applied + find most recent week with data
   useEffect(() => {
     const probe = async () => {
-      const { error } = await supabase.from('cmo_weekly_metrics').select('id').limit(1);
+      const { data, error } = await supabase
+        .from('cmo_weekly_metrics')
+        .select('week_start')
+        .order('week_start', { ascending: false })
+        .limit(1);
       if (error?.code === '42P01' || error?.message?.includes('does not exist')) {
         setPageState('db_pending');
       } else {
+        // Auto-select the most recent week that has data
+        if (data && data.length > 0) {
+          setWeekStart(data[0].week_start);
+        }
         setPageState('ready');
       }
     };
