@@ -472,7 +472,7 @@ export default function ExampleLessonPage() {
               {/* Tab nav */}
               <div style={{ display: 'flex', borderBottom: `1px solid ${T.g200}` }}>
                 {[
-                  { key: 'reviews', label: `Reviews (${EXAMPLE_LESSON.totalRatings})`, icon: <Star size={16} /> },
+                  { key: 'reviews', label: `Conversation (${EXAMPLE_LESSON.totalRatings})`, icon: <MessageCircle size={16} /> },
                   { key: 'questions', label: `Q&A (${EXAMPLE_LESSON.questions.length})`, icon: <MessageCircle size={16} /> },
                   { key: 'resources', label: `Resources (${EXAMPLE_LESSON.resources.length})`, icon: <Download size={16} /> },
                 ].map((tab) => (
@@ -532,7 +532,7 @@ export default function ExampleLessonPage() {
                           ))}
                         </div>
                         <div style={{ fontSize: 12, color: T.g600 }}>
-                          {EXAMPLE_LESSON.totalRatings} teachers rated
+                          {EXAMPLE_LESSON.totalRatings} teachers in the conversation
                         </div>
                       </div>
 
@@ -567,10 +567,10 @@ export default function ExampleLessonPage() {
                     >
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 600, color: T.navy, marginBottom: 2 }}>
-                          Tried it in your classroom?
+                          Tried it in your classroom? Add to the conversation.
                         </div>
                         <div style={{ fontSize: 13, color: T.g600 }}>
-                          Share what worked, what you adjusted, and help other teachers learn from you.
+                          Share what worked, what you adjusted, and help the teachers reading this next.
                         </div>
                       </div>
                       <button
@@ -586,7 +586,7 @@ export default function ExampleLessonPage() {
                           whiteSpace: 'nowrap',
                         }}
                       >
-                        Write a Review
+                        Add to the Conversation
                       </button>
                     </div>
 
