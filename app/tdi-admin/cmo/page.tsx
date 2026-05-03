@@ -143,26 +143,28 @@ export default function CMODashboardPage() {
 
   return (
     <div style={{ background: PORTAL_TOKENS.pageBg }}>
-      {/* Section header */}
-      <div className="w-full" style={{ backgroundColor: PORTAL_TOKENS.sectionHeaderBg }}>
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-6">
-          <div className="flex items-center gap-3 mb-1">
-            <BarChart3 size={24} className="text-teal-400" />
-            <h1
-              className="font-bold text-white"
-              style={{ fontSize: 28, fontFamily: ADMIN_TYPOGRAPHY.fontFamily.heading }}
-            >
-              CMO Dashboard
-            </h1>
-          </div>
-          <p className="text-gray-300 text-sm" style={{ fontFamily: ADMIN_TYPOGRAPHY.fontFamily.body }}>
-            Attract → Warm → Convert — weekly marketing funnel
-          </p>
-        </div>
-      </div>
-
       {/* Content */}
       <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-6 space-y-6">
+        {/* Section header */}
+        <div style={{ marginBottom: 8 }}>
+          <h1
+            style={{
+              fontSize: 28,
+              fontWeight: 800,
+              color: '#2B3A67',
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              margin: 0,
+              display: 'inline-block',
+              borderBottom: '3px solid #2A9D8F',
+              paddingBottom: 8,
+            }}
+          >
+            CMO Dashboard
+          </h1>
+          <p style={{ fontSize: 13, color: '#6B7280', marginTop: 8, fontFamily: "'DM Sans', sans-serif" }}>
+            Attract → Warm → Convert · weekly marketing funnel
+          </p>
+        </div>
         {/* Week selector */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
