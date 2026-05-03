@@ -15,13 +15,9 @@ interface TopBarStats {
 export function StickyTopBar({
   stats,
   onAddLead,
-  onToggleFilters,
-  activeFilterCount,
 }: {
   stats: TopBarStats
   onAddLead: () => void
-  onToggleFilters: () => void
-  activeFilterCount: number
 }) {
   return (
     <div style={{
@@ -45,54 +41,37 @@ export function StickyTopBar({
           <span style={{ fontSize: 13, color: '#6B7280', fontWeight: 500, marginLeft: 8 }}>pipeline</span>
         </div>
         <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
-          ${(stats.factored / 1000).toFixed(0)}K factored · {stats.activeCount} active
+          ${(stats.factored / 1000).toFixed(0)}K factored &middot; {stats.activeCount} active
         </div>
       </div>
 
       <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
         <div style={{ borderLeft: '1px solid #E5E7EB', paddingLeft: 24 }}>
-          <div style={{ fontSize: 14, fontWeight: 700 }}>R · ${(stats.raeValue / 1000).toFixed(0)}K</div>
+          <div style={{ fontSize: 14, fontWeight: 700 }}>R &middot; ${(stats.raeValue / 1000).toFixed(0)}K</div>
           <div style={{ fontSize: 11, color: '#6B7280' }}>{stats.raeCount} opps</div>
         </div>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 700 }}>J · ${(stats.jimValue / 1000).toFixed(0)}K</div>
+          <div style={{ fontSize: 14, fontWeight: 700 }}>J &middot; ${(stats.jimValue / 1000).toFixed(0)}K</div>
           <div style={{ fontSize: 11, color: '#6B7280' }}>{stats.jimCount} opps</div>
         </div>
         <div style={{ borderLeft: '1px solid #E5E7EB', paddingLeft: 24 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#EF4444' }}>🔥 {stats.hotCount} hot</div>
-          <div style={{ fontSize: 11, color: '#F59E0B' }}>⚠️ {stats.invoiceCount} invoices</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#EF4444' }}>{'\uD83D\uDD25'} {stats.hotCount} hot</div>
+          <div style={{ fontSize: 11, color: '#F59E0B' }}>{'\u26A0\uFE0F'} {stats.invoiceCount} invoices</div>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 8 }}>
-        <button onClick={onToggleFilters} style={{
-          fontSize: 13,
-          padding: '8px 14px',
-          borderRadius: 8,
-          border: '1px solid #D1D5DB',
-          background: activeFilterCount > 0 ? '#FEF3C7' : 'white',
-          color: '#0a0f1e',
-          cursor: 'pointer',
-          fontWeight: 500,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-        }}>
-          Filters {activeFilterCount > 0 && `(${activeFilterCount})`} ▾
-        </button>
-        <button onClick={onAddLead} style={{
-          fontSize: 13,
-          padding: '8px 16px',
-          borderRadius: 8,
-          border: 'none',
-          background: '#FFBA06',
-          color: '#0a0f1e',
-          cursor: 'pointer',
-          fontWeight: 700,
-        }}>
-          + Add lead
-        </button>
-      </div>
+      <button onClick={onAddLead} style={{
+        fontSize: 13,
+        padding: '8px 16px',
+        borderRadius: 8,
+        border: 'none',
+        background: '#FFBA06',
+        color: '#0a0f1e',
+        cursor: 'pointer',
+        fontWeight: 700,
+      }}>
+        + Add lead
+      </button>
     </div>
   )
 }

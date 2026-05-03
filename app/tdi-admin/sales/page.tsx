@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { getSupabase } from '@/lib/supabase'
 import { AnalyticsTab } from './components/AnalyticsTab'
 import { StickyTopBar } from './components/StickyTopBar'
-import { FilterPanel, countActiveFilters, EMPTY_FILTERS, type ActiveFilters } from './components/FilterPanel'
+import { FilterPanel, EMPTY_FILTERS, type ActiveFilters } from './components/FilterPanel'
 import { KanbanColumn } from './components/KanbanColumn'
 import { SalesCard, type SalesCardOpp } from './components/SalesCard'
 
@@ -82,12 +82,6 @@ const STAGE_LABELS: Record<string, string> = {
   signed: 'Signed',
 }
 
-const STAGE_GROUP_MAP: Record<string, string[]> = {
-  pipeline: ['targeting', 'engaged'],
-  active_deals: ['qualified', 'likely_yes'],
-  closing: ['proposal_sent', 'signed'],
-}
-
 const DEFAULT_KANBAN_STAGES = ['qualified', 'likely_yes', 'proposal_sent']
 const ALL_ACTIVE_STAGES = ['targeting', 'engaged', 'qualified', 'likely_yes', 'proposal_sent', 'signed']
 
@@ -128,7 +122,6 @@ export default function SalesPage() {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
   // Filter state
-  const [showFilters, setShowFilters] = useState(false)
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(EMPTY_FILTERS)
   const [showAllStages, setShowAllStages] = useState(false)
 
@@ -207,17 +200,29 @@ export default function SalesPage() {
       const f = activeFilters
       if (f.search && !opp.name.toLowerCase().includes(f.search.toLowerCase())) return false
       if (f.deal_types.length > 0 && !f.deal_types.includes(opp.type)) return false
-      if (f.heat.length > 0 && !f.heat.includes(opp.heat)) return false
-      if (f.owners.length > 0 && !f.owners.includes(opp.assignedTo || '')) return false
       if (f.sources.length > 0 && !f.sources.includes(opp.source || 'Other')) return false
-      if (f.needs_invoice && !opp.needs_invoice) return false
-      if (f.stage_groups.length > 0) {
-        const allowedStages = f.stage_groups.flatMap(g => STAGE_GROUP_MAP[g] || [])
-        if (!allowedStages.includes(opp.stage)) return false
-      }
       return true
     })
   }, [activeOpps, activeFilters])
+
+  // Counts for filter chips
+  const dealTypeCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    activeOpps.forEach(o => {
+      const t = o.type || 'Unknown'
+      counts[t] = (counts[t] || 0) + 1
+    })
+    return counts
+  }, [activeOpps])
+
+  const sourceCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    activeOpps.forEach(o => {
+      const src = o.source || 'Other'
+      counts[src] = (counts[src] || 0) + 1
+    })
+    return counts
+  }, [activeOpps])
 
   // Stats for sticky top bar
   const stats = useMemo(() => {
@@ -317,65 +322,16 @@ export default function SalesPage() {
               <StickyTopBar
                 stats={stats}
                 onAddLead={() => showToastMsg('Add Lead UI ships in the next CCP', 'success')}
-                onToggleFilters={() => setShowFilters(true)}
-                activeFilterCount={countActiveFilters(activeFilters)}
               />
 
-              {/* Filter Panel (slide-in) */}
+              {/* Inline Filter Row */}
               <FilterPanel
-                isOpen={showFilters}
-                onClose={() => setShowFilters(false)}
                 activeFilters={activeFilters}
                 setActiveFilters={setActiveFilters}
                 sources={uniqueSources}
+                dealTypeCounts={dealTypeCounts}
+                sourceCounts={sourceCounts}
               />
-
-              {/* Search bar */}
-              <div style={{ marginBottom: 12, display: 'flex', gap: 8, alignItems: 'center' }}>
-                <input
-                  type="text"
-                  value={activeFilters.search}
-                  onChange={e => setActiveFilters({ ...activeFilters, search: e.target.value })}
-                  placeholder="Search opportunities..."
-                  style={{
-                    border: '1px solid #D1D5DB', borderRadius: 8, padding: '8px 12px',
-                    fontSize: 13, width: 280, outline: 'none',
-                  }}
-                />
-                <span style={{ fontSize: 12, color: '#6B7280' }}>
-                  {filtered.length} of {activeOpps.length} opportunities
-                </span>
-              </div>
-
-              {/* Active filter pills */}
-              {countActiveFilters(activeFilters) > 0 && (
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
-                  {activeFilters.deal_types.map(t => (
-                    <FilterPill key={`dt-${t}`} label={t} onRemove={() => setActiveFilters({ ...activeFilters, deal_types: activeFilters.deal_types.filter(x => x !== t) })} />
-                  ))}
-                  {activeFilters.heat.map(h => (
-                    <FilterPill key={`h-${h}`} label={h} onRemove={() => setActiveFilters({ ...activeFilters, heat: activeFilters.heat.filter(x => x !== h) })} />
-                  ))}
-                  {activeFilters.stage_groups.map(s => (
-                    <FilterPill key={`sg-${s}`} label={s.replace('_', ' ')} onRemove={() => setActiveFilters({ ...activeFilters, stage_groups: activeFilters.stage_groups.filter(x => x !== s) })} />
-                  ))}
-                  {activeFilters.owners.map(o => (
-                    <FilterPill key={`o-${o}`} label={o.split('@')[0]} onRemove={() => setActiveFilters({ ...activeFilters, owners: activeFilters.owners.filter(x => x !== o) })} />
-                  ))}
-                  {activeFilters.sources.map(s => (
-                    <FilterPill key={`s-${s}`} label={s} onRemove={() => setActiveFilters({ ...activeFilters, sources: activeFilters.sources.filter(x => x !== s) })} />
-                  ))}
-                  {activeFilters.needs_invoice && (
-                    <FilterPill label="Needs Invoice" onRemove={() => setActiveFilters({ ...activeFilters, needs_invoice: false })} />
-                  )}
-                  <button
-                    onClick={() => setActiveFilters(EMPTY_FILTERS)}
-                    style={{ fontSize: 11, color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
-                  >
-                    Clear all
-                  </button>
-                </div>
-              )}
 
               {/* KANBAN VIEW */}
               {view === 'kanban' && (
@@ -447,20 +403,3 @@ export default function SalesPage() {
   )
 }
 
-function FilterPill({ label, onRemove }: { label: string; onRemove: () => void }) {
-  return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 4,
-      padding: '4px 10px', fontSize: 11, fontWeight: 600,
-      background: '#EEF2FF', color: '#4338CA', borderRadius: 12,
-    }}>
-      {label}
-      <button
-        onClick={onRemove}
-        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#4338CA', padding: 0, lineHeight: 1 }}
-      >
-        ×
-      </button>
-    </span>
-  )
-}
