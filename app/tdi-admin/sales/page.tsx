@@ -123,7 +123,7 @@ export default function SalesPage() {
 
   // Filter state
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(EMPTY_FILTERS)
-  const [showAllStages, setShowAllStages] = useState(false)
+  const [showAllStages, setShowAllStages] = useState(true)
 
   useEffect(() => {
     loadAll()
