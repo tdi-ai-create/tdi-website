@@ -25,7 +25,7 @@ export function TeamPerformance({ byOwner }: { byOwner: Record<string, OwnerData
   return (
     <div style={{ display: 'grid', gridTemplateColumns: owners.length > 1 ? '1fr 1fr' : '1fr', gap: 16 }}>
       {owners.map(([email, data]) => {
-        const name = email.split('@')[0]
+        const name = email.includes('@') ? email.split('@')[0] : email
         const winRate = (data.won + data.lost) > 0
           ? Math.round((data.won / (data.won + data.lost)) * 100)
           : 0

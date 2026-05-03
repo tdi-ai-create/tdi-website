@@ -101,9 +101,21 @@ export async function GET() {
     })
 
     // Owner / team performance
+    // Map raw IDs or emails to display names
+    const OWNER_NAMES: Record<string, string> = {
+      'rae@teachersdeserveit.com': 'Rae',
+      'jim@teachersdeserveit.com': 'Jim',
+    }
+    function resolveOwner(raw: string | null): string {
+      if (!raw) return 'unassigned'
+      if (OWNER_NAMES[raw]) return OWNER_NAMES[raw]
+      if (raw.includes('@')) return raw.split('@')[0]
+      // Raw ID — default to Rae (primary closer)
+      return 'Rae'
+    }
     const byOwner: Record<string, { count: number; value: number; factored: number; won: number; lost: number }> = {}
     ;(opps || []).forEach((o: any) => {
-      const owner = o.assigned_to_email || 'unassigned'
+      const owner = resolveOwner(o.assigned_to_email)
       if (!byOwner[owner]) byOwner[owner] = { count: 0, value: 0, factored: 0, won: 0, lost: 0 }
       if (!['lost', 'paid'].includes(o.stage)) {
         byOwner[owner].count++
