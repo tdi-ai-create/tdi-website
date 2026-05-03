@@ -85,7 +85,7 @@ export default function HubLayoutClient({
   const pathname = usePathname();
 
   // For login page and public example pages, render without auth guard
-  if (pathname === '/hub/login' || pathname.startsWith('/hub/auth') || pathname === '/hub/courses/example') {
+  if (pathname === '/hub/login' || pathname.startsWith('/hub/auth') || pathname?.startsWith('/hub/courses/example')) {
     return (
       <div className="min-h-screen" style={{ backgroundColor: '#F0EEE9' }}>
         {children}
