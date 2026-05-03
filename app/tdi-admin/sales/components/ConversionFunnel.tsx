@@ -40,13 +40,13 @@ export function ConversionFunnel({ funnel }: { funnel: FunnelStage[] }) {
                 <div style={{
                   height: '100%',
                   width: `${width}%`,
-                  background: 'linear-gradient(90deg, #FFBA06 0%, #FF8C00 100%)',
+                  background: 'linear-gradient(90deg, #6366F1 0%, #4338CA 100%)',
                   display: 'flex',
                   alignItems: 'center',
                   paddingLeft: 12,
                   fontSize: 12,
                   fontWeight: 700,
-                  color: '#0a0f1e',
+                  color: 'white',
                   minWidth: 80,
                 }}>
                   {stage.count} &middot; ${(stage.value / 1000).toFixed(0)}K

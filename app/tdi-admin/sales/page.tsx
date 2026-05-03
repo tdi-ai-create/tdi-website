@@ -347,11 +347,11 @@ export default function SalesPage() {
   const stagesToShow = showAllStages ? ALL_ACTIVE_STAGES : DEFAULT_KANBAN_STAGES
 
   return (
-    <div style={{ padding: '24px 32px', maxWidth: '100%' }}>
+    <div style={{ padding: '24px 32px', maxWidth: '100%', fontFamily: "'DM Sans', sans-serif" }}>
       {/* Header row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0a0f1e', margin: 0 }}>Sales</h1>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#2B3A67', margin: 0, fontFamily: "'Source Serif 4', Georgia, serif" }}>Sales</h1>
           {lastSynced && (
             <p style={{ fontSize: 12, color: '#9CA3AF', margin: '4px 0 0' }}>
               Last loaded {lastSynced.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}

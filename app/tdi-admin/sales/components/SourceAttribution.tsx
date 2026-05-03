@@ -31,7 +31,7 @@ export function SourceAttribution({ bySource }: { bySource: Record<string, Sourc
               <div style={{
                 height: '100%',
                 width: `${(data.value / max) * 100}%`,
-                background: '#FFBA06',
+                background: '#6366F1',
               }} />
             </div>
           </div>
