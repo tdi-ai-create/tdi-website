@@ -12,14 +12,21 @@ const HEAT_LABELS: Record<string, { label: string; color: string }> = {
 }
 
 export function KanbanColumn({
+  stage,
   label,
   opportunities,
   onCardClick,
+  onDrop,
+  onCardContextMenu,
 }: {
+  stage: string
   label: string
   opportunities: SalesCardOpp[]
   onCardClick: (opp: SalesCardOpp) => void
+  onDrop?: (oppId: string, toStage: string) => void
+  onCardContextMenu?: (e: React.MouseEvent, oppId: string) => void
 }) {
+  const [isDragOver, setIsDragOver] = useState(false)
   const total = opportunities.reduce((s, o) => s + (o.value || 0), 0)
   const factored = opportunities.reduce((s, o) => s + (o.value || 0) * (o.probability || 0) / 100, 0)
 
@@ -29,17 +36,41 @@ export function KanbanColumn({
     if (byHeat[h]) byHeat[h].push(o)
     else byHeat.warm.push(o)
   })
-  // Sort each group by factored value desc
   Object.values(byHeat).forEach(arr =>
     arr.sort((a, b) => ((b.value || 0) * (b.probability || 0)) - ((a.value || 0) * (a.probability || 0)))
   )
 
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    setIsDragOver(true)
+  }
+
+  function handleDragLeave() {
+    setIsDragOver(false)
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault()
+    setIsDragOver(false)
+    const oppId = e.dataTransfer.getData('text/plain')
+    if (oppId && onDrop) {
+      onDrop(oppId, stage)
+    }
+  }
+
   return (
-    <div style={{ minWidth: 300, flex: 1, display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{ minWidth: 300, flex: 1, display: 'flex', flexDirection: 'column' }}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       <div style={{
         padding: '10px 12px',
-        background: '#F3F4F6',
+        background: isDragOver ? '#DBEAFE' : '#F3F4F6',
         borderRadius: '8px 8px 0 0',
+        transition: 'background 0.15s',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: 13, fontWeight: 600, color: '#0a0f1e' }}>{label}</span>
@@ -51,16 +82,20 @@ export function KanbanColumn({
       </div>
 
       <div style={{
-        background: '#F3F4F6',
+        background: isDragOver ? '#EFF6FF' : '#F3F4F6',
+        border: isDragOver ? '2px dashed #3B82F6' : '2px solid transparent',
         padding: 8,
         borderRadius: '0 0 8px 8px',
         flex: 1,
         minHeight: 200,
         maxHeight: 'calc(100vh - 280px)',
         overflowY: 'auto',
+        transition: 'background 0.15s, border-color 0.15s',
       }}>
         {opportunities.length === 0 ? (
-          <p style={{ fontSize: 12, color: '#9CA3AF', textAlign: 'center', padding: 16 }}>No opportunities</p>
+          <p style={{ fontSize: 12, color: isDragOver ? '#3B82F6' : '#9CA3AF', textAlign: 'center', padding: 16 }}>
+            {isDragOver ? 'Drop here' : 'No opportunities'}
+          </p>
         ) : (
           HEAT_ORDER.map(heat => {
             const cards = byHeat[heat]
@@ -73,6 +108,7 @@ export function KanbanColumn({
                 cards={cards}
                 isCollapsible={isCollapsible}
                 onCardClick={onCardClick}
+                onCardContextMenu={onCardContextMenu}
               />
             )
           })
@@ -87,11 +123,13 @@ function CollapsibleHeatGroup({
   cards,
   isCollapsible,
   onCardClick,
+  onCardContextMenu,
 }: {
   heat: string
   cards: SalesCardOpp[]
   isCollapsible: boolean
   onCardClick: (opp: SalesCardOpp) => void
+  onCardContextMenu?: (e: React.MouseEvent, oppId: string) => void
 }) {
   const [isOpen, setIsOpen] = useState(!isCollapsible)
   const meta = HEAT_LABELS[heat] || HEAT_LABELS.warm
@@ -119,7 +157,7 @@ function CollapsibleHeatGroup({
         {meta.label} &middot; {cards.length}
       </div>
       {isOpen && cards.map(opp => (
-        <SalesCard key={opp.id} opp={opp} onClick={() => onCardClick(opp)} />
+        <SalesCard key={opp.id} opp={opp} onClick={() => onCardClick(opp)} draggable onContextMenu={onCardContextMenu ? (e) => onCardContextMenu(e, opp.id) : undefined} />
       ))}
     </div>
   )

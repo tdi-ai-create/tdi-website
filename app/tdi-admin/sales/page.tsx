@@ -171,9 +171,112 @@ export default function SalesPage() {
     setLoading(false)
   }
 
+  // Context menu state
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; opp: Opportunity } | null>(null)
+  const [noteModal, setNoteModal] = useState<Opportunity | null>(null)
+  const [noteText, setNoteText] = useState('')
+  const [savingNote, setSavingNote] = useState(false)
+
   function showToastMsg(message: string, type: 'success' | 'error') {
     setToast({ message, type })
     setTimeout(() => setToast(null), 3000)
+  }
+
+  // Drag-and-drop: move opp to new stage
+  async function handleStageDrop(oppId: string, toStage: string) {
+    const opp = opportunities.find(o => o.supabase_id === oppId)
+    if (!opp || opp.stage === toStage) return
+
+    const newProb = STAGE_PROBABILITY[toStage] ?? opp.probability
+    const oldStage = opp.stage
+
+    // Optimistic update
+    setOpportunities(prev => prev.map(o =>
+      o.supabase_id === oppId
+        ? { ...o, stage: toStage, stageName: STAGE_DISPLAY[toStage] || toStage, probability: newProb }
+        : o
+    ))
+
+    const { error: updateError } = await supabase
+      .from('sales_opportunities')
+      .update({ stage: toStage, probability: newProb, updated_at: new Date().toISOString() })
+      .eq('id', oppId)
+
+    if (updateError) {
+      // Revert
+      setOpportunities(prev => prev.map(o =>
+        o.supabase_id === oppId
+          ? { ...o, stage: oldStage, stageName: STAGE_DISPLAY[oldStage] || oldStage, probability: STAGE_PROBABILITY[oldStage] ?? opp.probability }
+          : o
+      ))
+      showToastMsg('Failed to update stage', 'error')
+    } else {
+      showToastMsg(`Moved to ${STAGE_DISPLAY[toStage] || toStage}`, 'success')
+    }
+  }
+
+  // Context menu: move to stage
+  async function handleMoveToStage(opp: Opportunity, toStage: string) {
+    setContextMenu(null)
+    await handleStageDrop(opp.supabase_id, toStage)
+  }
+
+  // Context menu: delete (mark as lost)
+  async function handleDeleteOpp(opp: Opportunity) {
+    setContextMenu(null)
+    setOpportunities(prev => prev.filter(o => o.supabase_id !== opp.supabase_id))
+
+    const { error: updateError } = await supabase
+      .from('sales_opportunities')
+      .update({ stage: 'lost', updated_at: new Date().toISOString() })
+      .eq('id', opp.supabase_id)
+
+    if (updateError) {
+      loadAll()
+      showToastMsg('Failed to remove deal', 'error')
+    } else {
+      showToastMsg(`"${opp.name}" marked as lost`, 'success')
+    }
+  }
+
+  // Context menu: add note
+  async function handleSaveNote() {
+    if (!noteModal || !noteText.trim()) return
+    setSavingNote(true)
+
+    await supabase.from('activity_log').insert({
+      opportunity_id: noteModal.supabase_id,
+      activity_type: 'note',
+      subject: 'Note',
+      body: noteText.trim(),
+      logged_by_email: 'admin@teachersdeserveit.com',
+      activity_date: new Date().toISOString(),
+    })
+
+    await supabase
+      .from('sales_opportunities')
+      .update({ last_activity_at: new Date().toISOString() })
+      .eq('id', noteModal.supabase_id)
+
+    setOpportunities(prev => prev.map(o =>
+      o.supabase_id === noteModal.supabase_id
+        ? { ...o, lastActivityAt: new Date().toISOString() }
+        : o
+    ))
+
+    setSavingNote(false)
+    setNoteText('')
+    setNoteModal(null)
+    showToastMsg('Note saved', 'success')
+  }
+
+  // Handle right-click on card
+  function handleCardContextMenu(e: React.MouseEvent, oppId: string) {
+    e.preventDefault()
+    const opp = opportunities.find(o => o.supabase_id === oppId)
+    if (opp) {
+      setContextMenu({ x: e.clientX, y: e.clientY, opp })
+    }
   }
 
   // Active opps (exclude contact-only, paid, lost)
@@ -352,9 +455,12 @@ export default function SalesPage() {
                     {stagesToShow.map(stage => (
                       <KanbanColumn
                         key={stage}
-                        label={STAGE_LABELS[stage] || stage}
+                        stage={stage}
+                        label={`${STAGE_LABELS[stage] || stage} (${STAGE_PROBABILITY[stage] || 0}%)`}
                         opportunities={filtered.filter(o => o.stage === stage).map(toCardOpp)}
                         onCardClick={(opp) => showToastMsg(`Detail panel for "${opp.name}" ships in next CCP`, 'success')}
+                        onDrop={handleStageDrop}
+                        onCardContextMenu={handleCardContextMenu}
                       />
                     ))}
                   </div>
@@ -383,6 +489,123 @@ export default function SalesPage() {
               )}
             </>
           )}
+        </>
+      )}
+
+      {/* Context Menu */}
+      {contextMenu && (
+        <>
+          <div onClick={() => setContextMenu(null)} style={{ position: 'fixed', inset: 0, zIndex: 300 }} />
+          <div style={{
+            position: 'fixed',
+            left: contextMenu.x,
+            top: contextMenu.y,
+            zIndex: 301,
+            background: 'white',
+            border: '1px solid #E5E7EB',
+            borderRadius: 10,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+            padding: '6px 0',
+            minWidth: 200,
+          }}>
+            <div style={{ padding: '6px 14px', fontSize: 11, color: '#9CA3AF', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              {contextMenu.opp.name.length > 30 ? contextMenu.opp.name.slice(0, 28) + '...' : contextMenu.opp.name}
+            </div>
+            <div style={{ height: 1, background: '#F3F4F6', margin: '4px 0' }} />
+
+            <div style={{ padding: '4px 14px', fontSize: 11, color: '#9CA3AF', fontWeight: 600 }}>Move to stage</div>
+            {ALL_ACTIVE_STAGES.filter(s => s !== contextMenu.opp.stage).map(s => (
+              <button
+                key={s}
+                onClick={() => handleMoveToStage(contextMenu.opp, s)}
+                style={{
+                  display: 'block', width: '100%', textAlign: 'left',
+                  padding: '8px 14px', fontSize: 13, color: '#0a0f1e',
+                  background: 'none', border: 'none', cursor: 'pointer',
+                }}
+                onMouseEnter={e => { (e.target as HTMLElement).style.background = '#F3F4F6' }}
+                onMouseLeave={e => { (e.target as HTMLElement).style.background = 'none' }}
+              >
+                {STAGE_LABELS[s] || s} ({STAGE_PROBABILITY[s]}%)
+              </button>
+            ))}
+
+            <div style={{ height: 1, background: '#F3F4F6', margin: '4px 0' }} />
+
+            <button
+              onClick={() => { setContextMenu(null); setNoteModal(contextMenu.opp); setNoteText('') }}
+              style={{
+                display: 'block', width: '100%', textAlign: 'left',
+                padding: '8px 14px', fontSize: 13, color: '#0a0f1e',
+                background: 'none', border: 'none', cursor: 'pointer',
+              }}
+              onMouseEnter={e => { (e.target as HTMLElement).style.background = '#F3F4F6' }}
+              onMouseLeave={e => { (e.target as HTMLElement).style.background = 'none' }}
+            >
+              + Add note
+            </button>
+
+            <div style={{ height: 1, background: '#F3F4F6', margin: '4px 0' }} />
+
+            <button
+              onClick={() => handleDeleteOpp(contextMenu.opp)}
+              style={{
+                display: 'block', width: '100%', textAlign: 'left',
+                padding: '8px 14px', fontSize: 13, color: '#EF4444',
+                background: 'none', border: 'none', cursor: 'pointer',
+              }}
+              onMouseEnter={e => { (e.target as HTMLElement).style.background = '#FEF2F2' }}
+              onMouseLeave={e => { (e.target as HTMLElement).style.background = 'none' }}
+            >
+              Mark as lost
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Note Modal */}
+      {noteModal && (
+        <>
+          <div onClick={() => { setNoteModal(null); setNoteText('') }} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 400 }} />
+          <div style={{
+            position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+            background: 'white', borderRadius: 16, padding: 24, width: 420,
+            boxShadow: '0 20px 60px rgba(0,0,0,0.2)', zIndex: 401,
+          }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 4px' }}>Add Note</h3>
+            <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 16px' }}>{noteModal.name}</p>
+            <textarea
+              value={noteText}
+              onChange={e => setNoteText(e.target.value)}
+              placeholder="Note or next step..."
+              autoFocus
+              rows={4}
+              style={{
+                width: '100%', border: '1px solid #D1D5DB', borderRadius: 8,
+                padding: '10px 12px', fontSize: 13, resize: 'vertical', outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 12 }}>
+              <button
+                onClick={() => { setNoteModal(null); setNoteText('') }}
+                style={{ padding: '8px 16px', fontSize: 13, borderRadius: 8, border: '1px solid #D1D5DB', background: 'white', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveNote}
+                disabled={savingNote || !noteText.trim()}
+                style={{
+                  padding: '8px 16px', fontSize: 13, fontWeight: 600, borderRadius: 8,
+                  border: 'none', background: '#0a0f1e', color: 'white', cursor: 'pointer',
+                  opacity: savingNote || !noteText.trim() ? 0.5 : 1,
+                }}
+              >
+                {savingNote ? 'Saving...' : 'Save Note'}
+              </button>
+            </div>
+          </div>
         </>
       )}
 

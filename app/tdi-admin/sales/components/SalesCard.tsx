@@ -52,7 +52,7 @@ function shortName(name: string): string {
   return parts[0].length > 35 ? parts[0].slice(0, 33) + '…' : parts[0]
 }
 
-export function SalesCard({ opp, onClick }: { opp: SalesCardOpp; onClick?: () => void }) {
+export function SalesCard({ opp, onClick, draggable = false, onContextMenu }: { opp: SalesCardOpp; onClick?: () => void; draggable?: boolean; onContextMenu?: (e: React.MouseEvent) => void }) {
   const heat = HEAT_STYLES[opp.heat || 'warm'] || HEAT_STYLES.warm
   const typeColor = TYPE_COLORS[opp.type] || '#6B7280'
   const isJim = opp.assignedTo?.includes('jim')
@@ -64,6 +64,15 @@ export function SalesCard({ opp, onClick }: { opp: SalesCardOpp; onClick?: () =>
   return (
     <div
       onClick={onClick}
+      draggable={draggable}
+      onDragStart={draggable ? (e) => {
+        e.dataTransfer.setData('text/plain', opp.id)
+        e.dataTransfer.effectAllowed = 'move'
+        ;(e.currentTarget as HTMLElement).style.opacity = '0.5'
+      } : undefined}
+      onDragEnd={draggable ? (e) => {
+        ;(e.currentTarget as HTMLElement).style.opacity = '1'
+      } : undefined}
       style={{
         background: 'white',
         border: '1px solid #E5E7EB',
@@ -71,9 +80,10 @@ export function SalesCard({ opp, onClick }: { opp: SalesCardOpp; onClick?: () =>
         borderRadius: 8,
         padding: '10px 12px',
         marginBottom: 6,
-        cursor: 'pointer',
-        transition: 'border-color 0.1s',
+        cursor: draggable ? 'grab' : 'pointer',
+        transition: 'border-color 0.1s, opacity 0.15s',
       }}
+      onContextMenu={onContextMenu}
       onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#0a0f1e' }}
       onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#E5E7EB' }}
     >
