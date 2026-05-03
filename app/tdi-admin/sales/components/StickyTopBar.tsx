@@ -55,8 +55,14 @@ export function StickyTopBar({
           <div style={{ fontSize: 11, color: '#6B7280' }}>{stats.jimCount} opps</div>
         </div>
         <div style={{ borderLeft: '1px solid #E5E7EB', paddingLeft: 24 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#EF4444' }}>{'\uD83D\uDD25'} {stats.hotCount} hot</div>
-          <div style={{ fontSize: 11, color: '#F59E0B' }}>{'\u26A0\uFE0F'} {stats.invoiceCount} invoices</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#EF4444', display: 'flex', alignItems: 'center', gap: 5 }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'linear-gradient(135deg, #EF4444, #F97316)', display: 'inline-block' }} />
+            {stats.hotCount} hot
+          </div>
+          <div style={{ fontSize: 11, color: '#F59E0B', display: 'flex', alignItems: 'center', gap: 5 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#F59E0B', display: 'inline-block' }} />
+            {stats.invoiceCount} invoices
+          </div>
         </div>
       </div>
 

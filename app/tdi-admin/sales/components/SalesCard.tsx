@@ -2,11 +2,11 @@
 
 import React from 'react'
 
-const HEAT_STYLES: Record<string, { bg: string; color: string; emoji: string }> = {
-  hot: { bg: '#FEE2E2', color: '#991B1B', emoji: '🔥' },
-  warm: { bg: '#FEF3C7', color: '#854D0E', emoji: '🟡' },
-  cold: { bg: '#DBEAFE', color: '#1E40AF', emoji: '❄️' },
-  parked: { bg: '#F3F4F6', color: '#374151', emoji: '🅿️' },
+const HEAT_STYLES: Record<string, { bg: string; color: string; dot: string }> = {
+  hot: { bg: '#FEE2E2', color: '#991B1B', dot: '#EF4444' },
+  warm: { bg: '#FEF3C7', color: '#854D0E', dot: '#F59E0B' },
+  cold: { bg: '#DBEAFE', color: '#1E40AF', dot: '#3B82F6' },
+  parked: { bg: '#F3F4F6', color: '#374151', dot: '#9CA3AF' },
 }
 
 const TYPE_COLORS: Record<string, string> = {
@@ -110,8 +110,9 @@ export function SalesCard({ opp, onClick }: { opp: SalesCardOpp; onClick?: () =>
           {opp.needs_invoice && (
             <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 4, background: '#FEE2E2', color: '#991B1B', fontWeight: 600 }}>invoice</span>
           )}
-          <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 6px', borderRadius: 6, background: heat.bg, color: heat.color }}>
-            {heat.emoji}
+          <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 6px', borderRadius: 6, background: heat.bg, color: heat.color, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: heat.dot, display: 'inline-block' }} />
+            {opp.heat || 'warm'}
           </span>
         </div>
       </div>

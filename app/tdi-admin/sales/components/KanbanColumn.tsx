@@ -5,10 +5,10 @@ import { SalesCard, type SalesCardOpp } from './SalesCard'
 
 const HEAT_ORDER = ['hot', 'warm', 'cold', 'parked'] as const
 const HEAT_LABELS: Record<string, { label: string; color: string }> = {
-  hot: { label: '🔥 Hot', color: '#EF4444' },
-  warm: { label: '🟡 Warm', color: '#F59E0B' },
-  cold: { label: '❄️ Cold', color: '#3B82F6' },
-  parked: { label: '🅿️ Parked', color: '#6B7280' },
+  hot: { label: 'Hot', color: '#EF4444' },
+  warm: { label: 'Warm', color: '#F59E0B' },
+  cold: { label: 'Cold', color: '#3B82F6' },
+  parked: { label: 'Parked', color: '#6B7280' },
 }
 
 export function KanbanColumn({
@@ -114,8 +114,9 @@ function CollapsibleHeatGroup({
           gap: 4,
         }}
       >
-        {isCollapsible && <span style={{ fontSize: 8 }}>{isOpen ? '▼' : '▶'}</span>}
-        {meta.label} · {cards.length}
+        {isCollapsible && <span style={{ fontSize: 8, display: 'inline-block', transition: 'transform 0.15s', transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}>&#9654;</span>}
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: meta.color, display: 'inline-block' }} />
+        {meta.label} &middot; {cards.length}
       </div>
       {isOpen && cards.map(opp => (
         <SalesCard key={opp.id} opp={opp} onClick={() => onCardClick(opp)} />
