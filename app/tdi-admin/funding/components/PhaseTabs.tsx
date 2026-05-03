@@ -40,7 +40,7 @@ export function PhaseTabs({
               borderRadius: 20,
               border: 'none',
               cursor: 'pointer',
-              background: active ? '#6366F1' : '#F3F4F6',
+              background: active ? '#8B5CF6' : '#F3F4F6',
               color: active ? 'white' : '#374151',
               transition: 'all 0.15s',
             }}

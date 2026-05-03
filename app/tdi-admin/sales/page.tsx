@@ -359,10 +359,10 @@ export default function SalesPage() {
           )}
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <button onClick={loadAll} style={{ fontSize: 12, color: '#6366F1', background: 'none', border: 'none', cursor: 'pointer' }}>
+          <button onClick={loadAll} style={{ fontSize: 12, color: '#10B981', background: 'none', border: 'none', cursor: 'pointer' }}>
             Refresh
           </button>
-          <div style={{ display: 'flex', background: '#EEF2FF', borderRadius: 8, padding: 2 }}>
+          <div style={{ display: 'flex', background: '#ECFDF5', borderRadius: 8, padding: 2 }}>
             {(['list', 'kanban'] as ViewMode[]).map(v => (
               <button
                 key={v}
@@ -371,7 +371,7 @@ export default function SalesPage() {
                   padding: '6px 14px', fontSize: 12, fontWeight: 600, borderRadius: 6,
                   border: 'none', cursor: 'pointer',
                   background: view === v ? 'white' : 'transparent',
-                  color: view === v ? '#4338CA' : '#6B7280',
+                  color: view === v ? '#047857' : '#6B7280',
                   boxShadow: view === v ? '0 1px 3px rgba(99,102,241,0.15)' : 'none',
                 }}
               >
@@ -392,7 +392,7 @@ export default function SalesPage() {
               padding: '12px 24px', fontSize: 14, background: 'transparent', border: 'none',
               fontWeight: pageTab === tab ? 700 : 500,
               color: pageTab === tab ? '#0a0f1e' : '#6B7280',
-              borderBottom: pageTab === tab ? '2px solid #6366F1' : '2px solid transparent',
+              borderBottom: pageTab === tab ? '2px solid #10B981' : '2px solid transparent',
               cursor: 'pointer', marginBottom: -1,
             }}
           >

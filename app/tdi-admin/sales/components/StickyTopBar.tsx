@@ -23,7 +23,7 @@ export function StickyTopBar({
     <div style={{
       background: 'white',
       border: '1px solid #E5E7EB',
-      borderTop: '3px solid #6366F1',
+      borderTop: '3px solid #10B981',
       borderRadius: 12,
       padding: '14px 20px',
       marginBottom: 16,
@@ -72,7 +72,7 @@ export function StickyTopBar({
         padding: '8px 16px',
         borderRadius: 8,
         border: 'none',
-        background: '#6366F1',
+        background: '#10B981',
         color: 'white',
         cursor: 'pointer',
         fontWeight: 700,

@@ -81,7 +81,7 @@ export default function OperationsPage() {
               color: activeTab === tab.id ? '#0a0f1e' : '#6B7280',
               background: 'transparent',
               border: 'none',
-              borderBottom: activeTab === tab.id ? '2px solid #FFBA06' : '2px solid transparent',
+              borderBottom: activeTab === tab.id ? '2px solid #F97316' : '2px solid transparent',
               cursor: 'pointer',
               marginBottom: -1,
             }}

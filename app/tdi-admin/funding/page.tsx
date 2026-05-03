@@ -67,7 +67,7 @@ export default function FundingPage() {
           onClick={() => alert('Add Pursuit form ships in Phase B')}
           style={{
             fontSize: 13, fontWeight: 700, padding: '10px 20px', borderRadius: 8,
-            border: 'none', background: '#6366F1', color: 'white', cursor: 'pointer',
+            border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer',
           }}
         >
           + Add Pursuit
@@ -87,14 +87,14 @@ export default function FundingPage() {
       {/* In-flight summary */}
       {data.alerts.in_flight_count > 0 && (
         <div style={{
-          background: '#EEF2FF', border: '1px solid #C7D2FE', borderRadius: 10,
+          background: 'rgba(139, 92, 246, 0.08)', border: '1px solid rgba(139, 92, 246, 0.3)', borderRadius: 10,
           padding: '12px 18px', marginBottom: 20,
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
-          <span style={{ fontSize: 13, color: '#4338CA', fontWeight: 500 }}>
+          <span style={{ fontSize: 13, color: '#6D28D9', fontWeight: 500 }}>
             {data.alerts.in_flight_count} active {data.alerts.in_flight_count === 1 ? 'pursuit' : 'pursuits'} in flight
           </span>
-          <span style={{ fontSize: 15, fontWeight: 700, color: '#4338CA' }}>
+          <span style={{ fontSize: 15, fontWeight: 700, color: '#6D28D9' }}>
             ${data.alerts.in_flight_total.toLocaleString()} total
           </span>
         </div>

@@ -94,9 +94,9 @@ export function FilterPanel({
                 padding: '5px 12px',
                 fontSize: 12,
                 fontWeight: 600,
-                background: active ? '#6366F1' : 'white',
+                background: active ? '#10B981' : 'white',
                 color: active ? 'white' : '#0a0f1e',
-                border: `1.5px solid ${active ? '#6366F1' : '#D1D5DB'}`,
+                border: `1.5px solid ${active ? '#10B981' : '#D1D5DB'}`,
                 borderRadius: 20,
                 cursor: 'pointer',
               }}
@@ -123,9 +123,9 @@ export function FilterPanel({
                 padding: '5px 12px',
                 fontSize: 12,
                 fontWeight: 500,
-                background: active ? '#6366F1' : 'white',
+                background: active ? '#10B981' : 'white',
                 color: active ? 'white' : '#374151',
-                border: `1.5px solid ${active ? '#6366F1' : '#D1D5DB'}`,
+                border: `1.5px solid ${active ? '#10B981' : '#D1D5DB'}`,
                 borderRadius: 20,
                 cursor: 'pointer',
               }}
