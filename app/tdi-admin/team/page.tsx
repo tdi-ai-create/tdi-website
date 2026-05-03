@@ -182,7 +182,7 @@ export default function TeamManagementPage() {
             className="font-bold mb-3"
             style={{
               fontFamily: "'Source Serif 4', Georgia, serif",
-              fontSize: '24px',
+              fontSize: '28px',
               color: '#2B3A67',
             }}
           >

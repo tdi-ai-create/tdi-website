@@ -248,7 +248,7 @@ export default function FundingPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Funding</h1>
+          <h1 className="font-extrabold" style={{ fontSize: 28, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Funding</h1>
           <p className="text-sm text-gray-500 mt-1">Grant tracking - districts we are actively helping fund</p>
         </div>
         <button
@@ -263,21 +263,21 @@ export default function FundingPage() {
       {!loading && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-2xl font-bold text-gray-900">{counts.active}</p>
+            <p className="font-bold text-gray-900" style={{ fontSize: 28 }}>{counts.active}</p>
             <p className="text-sm text-gray-500 mt-0.5">Active pursuits</p>
           </div>
           <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-2xl font-bold text-emerald-600">{counts.awarded}</p>
+            <p className="font-bold text-emerald-600" style={{ fontSize: 28 }}>{counts.awarded}</p>
             <p className="text-sm text-gray-500 mt-0.5">Grants awarded</p>
           </div>
           <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="font-bold text-gray-900" style={{ fontSize: 28 }}>
               {counts.totalAwarded > 0 ? `$${counts.totalAwarded.toLocaleString()}` : '-'}
             </p>
             <p className="text-sm text-gray-500 mt-0.5">Total awarded</p>
           </div>
           <div className={`border rounded-xl p-4 ${counts.upcomingDeadlines > 0 ? 'bg-red-50 border-red-200' : 'bg-white border-gray-200'}`}>
-            <p className={`text-2xl font-bold ${counts.upcomingDeadlines > 0 ? 'text-red-600' : 'text-gray-900'}`}>
+            <p className={`font-bold ${counts.upcomingDeadlines > 0 ? 'text-red-600' : 'text-gray-900'}`} style={{ fontSize: 28 }}>
               {counts.upcomingDeadlines}
             </p>
             <p className="text-sm text-gray-500 mt-0.5">Deadlines in 14 days</p>

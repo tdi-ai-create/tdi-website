@@ -1631,7 +1631,7 @@ export default function CreatorStudioPage() {
                         <IconComponent className="w-5 h-5" style={{ color: path.color }} />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold leading-none" style={{ color: theme.accent }}>{path.count}</p>
+                        <p className="font-bold leading-none" style={{ fontSize: 28, color: theme.accent }}>{path.count}</p>
                         <p className="text-sm text-gray-500">{path.label}</p>
                       </div>
                     </button>
@@ -1698,13 +1698,13 @@ export default function CreatorStudioPage() {
                   <div className="pt-4 border-t border-gray-100">
                     <div className="grid grid-cols-2 gap-3">
                       <div className="rounded-lg p-3 text-center" style={{ backgroundColor: theme.accentLight }}>
-                        <p className="text-2xl font-bold" style={{ color: theme.accent }}>
+                        <p className="font-bold" style={{ fontSize: 28, color: theme.accent }}>
                           {locationData.creatorsWithLocation}
                         </p>
                         <p className="text-xs text-gray-600">With Location</p>
                       </div>
                       <div className="bg-gray-50 rounded-lg p-3 text-center">
-                        <p className="text-2xl font-bold text-gray-400">
+                        <p className="font-bold text-gray-400" style={{ fontSize: 28 }}>
                           {locationData.noLocationCount}
                         </p>
                         <p className="text-xs text-gray-500">Not Shared</p>
@@ -2708,11 +2708,11 @@ export default function CreatorStudioPage() {
                         </div>
                         <div className="space-y-3">
                           <div className="bg-purple-50 rounded-xl p-4 text-center">
-                            <p className="text-3xl font-bold" style={{ color: '#8B5CF6' }}>{analyticsData.geographicDistribution.withState}</p>
+                            <p className="font-bold" style={{ fontSize: 28, color: '#8B5CF6' }}>{analyticsData.geographicDistribution.withState}</p>
                             <p className="text-sm text-gray-600">With Location</p>
                           </div>
                           <div className="bg-gray-50 rounded-xl p-4 text-center">
-                            <p className="text-3xl font-bold text-gray-400">{analyticsData.geographicDistribution.withoutState}</p>
+                            <p className="font-bold text-gray-400" style={{ fontSize: 28 }}>{analyticsData.geographicDistribution.withoutState}</p>
                             <p className="text-sm text-gray-500">Not Shared</p>
                           </div>
                         </div>

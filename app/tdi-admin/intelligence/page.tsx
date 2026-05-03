@@ -30,7 +30,7 @@ export default function OperationsPage() {
   if (loading) {
     return (
       <div style={{ padding: '24px 32px' }}>
-        <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0 }}>Operations</h1>
+        <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Operations</h1>
         <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[...Array(4)].map((_, i) => (
             <div key={i} style={{ height: 48, background: '#F3F4F6', borderRadius: 8 }} />
@@ -43,7 +43,7 @@ export default function OperationsPage() {
   if (error || !data) {
     return (
       <div style={{ padding: '24px 32px' }}>
-        <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0 }}>Operations</h1>
+        <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Operations</h1>
         <div style={{ marginTop: 24, background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 12, padding: '16px 20px', color: '#991B1B', fontSize: 13 }}>
           Failed to load operations data{error ? `: ${error}` : ''}
         </div>
@@ -62,7 +62,7 @@ export default function OperationsPage() {
     <div style={{ padding: '24px 32px' }}>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0 }}>Operations</h1>
+        <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Operations</h1>
         <p style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>
           District Command Center · Contracts, Renewals, Collections
         </p>

@@ -1354,7 +1354,7 @@ export default function LeadershipDashboardPage() {
                     <div
                       className={`w-16 h-16 rounded-full mx-auto mb-2 flex items-center justify-center ${stage.color}`}
                     >
-                      <span className="text-2xl font-bold">{stage.count}</span>
+                      <span className="font-bold" style={{ fontSize: 28 }}>{stage.count}</span>
                     </div>
                     <p className="text-sm font-medium text-gray-700">
                       {stage.label}

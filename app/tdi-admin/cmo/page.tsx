@@ -149,8 +149,8 @@ export default function CMODashboardPage() {
           <div className="flex items-center gap-3 mb-1">
             <BarChart3 size={24} className="text-teal-400" />
             <h1
-              className="text-2xl font-bold text-white"
-              style={{ fontFamily: ADMIN_TYPOGRAPHY.fontFamily.heading }}
+              className="font-bold text-white"
+              style={{ fontSize: 28, fontFamily: ADMIN_TYPOGRAPHY.fontFamily.heading }}
             >
               CMO Dashboard
             </h1>
