@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { US_STATES } from './us-states'
 
 interface StateData {
   count: number
@@ -15,35 +16,9 @@ const SEGMENTS = [
   { key: 'targeting_area', label: 'Targeting Areas', sublabel: 'outbound' },
 ] as const
 
-// Simplified US state paths (center coordinates for label placement + SVG paths)
-// Using a stylized hex/grid map for clean rendering without heavy D3 dependency
-const STATE_POSITIONS: Record<string, { x: number; y: number }> = {
-  AK: { x: 80, y: 460 }, HI: { x: 200, y: 460 },
-  WA: { x: 105, y: 50 }, OR: { x: 95, y: 105 }, CA: { x: 75, y: 210 },
-  NV: { x: 135, y: 175 }, ID: { x: 170, y: 100 }, MT: { x: 240, y: 55 },
-  WY: { x: 240, y: 130 }, UT: { x: 175, y: 195 }, CO: { x: 265, y: 210 },
-  AZ: { x: 165, y: 285 }, NM: { x: 240, y: 290 },
-  ND: { x: 340, y: 60 }, SD: { x: 340, y: 115 }, NE: { x: 345, y: 165 },
-  KS: { x: 365, y: 220 }, OK: { x: 370, y: 275 }, TX: { x: 340, y: 350 },
-  MN: { x: 400, y: 75 }, IA: { x: 410, y: 155 }, MO: { x: 430, y: 225 },
-  AR: { x: 440, y: 290 }, LA: { x: 440, y: 350 },
-  WI: { x: 455, y: 85 }, IL: { x: 470, y: 175 }, MS: { x: 480, y: 310 },
-  MI: { x: 520, y: 105 }, IN: { x: 520, y: 185 }, AL: { x: 525, y: 300 },
-  OH: { x: 565, y: 175 }, KY: { x: 555, y: 230 }, TN: { x: 535, y: 260 },
-  GA: { x: 560, y: 310 }, FL: { x: 580, y: 380 },
-  WV: { x: 595, y: 210 }, VA: { x: 625, y: 225 }, NC: { x: 620, y: 265 },
-  SC: { x: 600, y: 295 },
-  PA: { x: 625, y: 155 }, NJ: { x: 665, y: 175 }, DE: { x: 665, y: 205 },
-  MD: { x: 645, y: 195 }, DC: { x: 655, y: 215 },
-  NY: { x: 650, y: 115 }, CT: { x: 680, y: 135 }, RI: { x: 695, y: 140 },
-  MA: { x: 690, y: 120 }, VT: { x: 660, y: 75 }, NH: { x: 675, y: 80 },
-  ME: { x: 700, y: 55 },
-}
-
 function getColor(value: number, maxValue: number): string {
-  if (value === 0) return '#F3F4F6'
+  if (value === 0) return '#F1F5F9'
   const ratio = Math.min(value / maxValue, 1)
-  // Interpolate from light green to deep green
   if (ratio < 0.15) return '#D1FAE5'
   if (ratio < 0.3) return '#A7F3D0'
   if (ratio < 0.5) return '#6EE7B7'
@@ -56,7 +31,6 @@ export function GeographyMap({ byState }: { byState: Record<string, StateData> }
   const [hoveredState, setHoveredState] = useState<string | null>(null)
   const [activeSegments, setActiveSegments] = useState<Set<string>>(new Set(['current_client', 'new_inquiry', 'targeting_area']))
 
-  // Check if classification data exists
   const hasClassifications = Object.values(byState).some(s => s.byClassification && Object.keys(s.byClassification).length > 0)
 
   // Filter state data by active segments
@@ -64,12 +38,9 @@ export function GeographyMap({ byState }: { byState: Record<string, StateData> }
   if (hasClassifications && activeSegments.size < 3) {
     Object.entries(byState).forEach(([state, data]) => {
       const cls = data.byClassification || {}
-      let count = 0, value = 0, won = 0
+      let count = 0, value = 0
       activeSegments.forEach(seg => {
-        if (cls[seg]) {
-          count += cls[seg].count
-          value += cls[seg].value
-        }
+        if (cls[seg]) { count += cls[seg].count; value += cls[seg].value }
       })
       if (count > 0) filteredByState[state] = { count, value, won: data.won, byClassification: cls }
     })
@@ -77,7 +48,6 @@ export function GeographyMap({ byState }: { byState: Record<string, StateData> }
     Object.assign(filteredByState, byState)
   }
 
-  // Compute segment totals for labels
   const segmentTotals = SEGMENTS.map(seg => {
     let count = 0, value = 0
     Object.values(byState).forEach(s => {
@@ -99,8 +69,8 @@ export function GeographyMap({ byState }: { byState: Record<string, StateData> }
     .sort(([, a], [, b]) => b.value - a.value)
 
   const maxValue = sorted.length > 0 ? sorted[0][1].value : 1
-  const stateMap = Object.fromEntries(sorted)
-  const hoveredData = hoveredState ? stateMap[hoveredState] : null
+  const stateDataMap = Object.fromEntries(sorted)
+  const hoveredData = hoveredState ? stateDataMap[hoveredState] : null
 
   return (
     <div>
@@ -150,12 +120,11 @@ export function GeographyMap({ byState }: { byState: Record<string, StateData> }
         </div>
       )}
 
-      {/* Map */}
-      <div style={{ position: 'relative', width: '100%', maxWidth: 780, margin: '0 auto' }}>
-        <svg viewBox="0 0 780 500" style={{ width: '100%', height: 'auto' }}>
-          {/* State hexagons */}
-          {Object.entries(STATE_POSITIONS).map(([abbr, pos]) => {
-            const data = stateMap[abbr]
+      {/* US Choropleth Map */}
+      <div style={{ position: 'relative', width: '100%', maxWidth: 960, margin: '0 auto' }}>
+        <svg viewBox="0 0 960 600" style={{ width: '100%', height: 'auto' }}>
+          {Object.entries(US_STATES).map(([abbr, state]) => {
+            const data = stateDataMap[abbr]
             const value = data?.value || 0
             const fill = getColor(value, maxValue)
             const hasData = value > 0
@@ -164,42 +133,32 @@ export function GeographyMap({ byState }: { byState: Record<string, StateData> }
             return (
               <g
                 key={abbr}
-                onMouseEnter={() => hasData && setHoveredState(abbr)}
+                onMouseEnter={() => setHoveredState(abbr)}
                 onMouseLeave={() => setHoveredState(null)}
                 style={{ cursor: hasData ? 'pointer' : 'default' }}
               >
-                <rect
-                  x={pos.x - 22}
-                  y={pos.y - 16}
-                  width={44}
-                  height={32}
-                  rx={6}
+                <path
+                  d={state.path}
                   fill={fill}
-                  stroke={isHovered ? '#0a0f1e' : hasData ? '#059669' : '#E5E7EB'}
-                  strokeWidth={isHovered ? 2 : 1}
-                  opacity={hasData ? 1 : 0.5}
+                  stroke={isHovered ? '#0a0f1e' : '#E2E8F0'}
+                  strokeWidth={isHovered ? 2 : 0.75}
+                  style={{ transition: 'fill 0.15s' }}
                 />
-                <text
-                  x={pos.x}
-                  y={pos.y - 2}
-                  textAnchor="middle"
-                  style={{
-                    fontSize: hasData ? 11 : 9,
-                    fontWeight: hasData ? 700 : 500,
-                    fill: hasData ? '#0a0f1e' : '#9CA3AF',
-                    pointerEvents: 'none',
-                  }}
-                >
-                  {abbr}
-                </text>
                 {hasData && (
                   <text
-                    x={pos.x}
-                    y={pos.y + 11}
+                    x={state.labelX}
+                    y={state.labelY}
                     textAnchor="middle"
-                    style={{ fontSize: 8, fontWeight: 600, fill: '#6B7280', pointerEvents: 'none' }}
+                    dominantBaseline="middle"
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      fill: value / maxValue > 0.5 ? 'white' : '#1B365D',
+                      pointerEvents: 'none',
+                      textShadow: value / maxValue > 0.5 ? '0 1px 2px rgba(0,0,0,0.3)' : 'none',
+                    }}
                   >
-                    ${(value / 1000).toFixed(0)}K
+                    {abbr}
                   </text>
                 )}
               </g>
@@ -210,10 +169,10 @@ export function GeographyMap({ byState }: { byState: Record<string, StateData> }
         {/* Hover tooltip */}
         {hoveredState && hoveredData && (
           <div style={{
-            position: 'absolute', top: 8, right: 8,
+            position: 'absolute', top: 12, right: 12,
             background: 'white', border: '1px solid #E5E7EB', borderRadius: 10,
             padding: '12px 16px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            minWidth: 160,
+            minWidth: 160, zIndex: 5,
           }}>
             <div style={{ fontSize: 16, fontWeight: 800, color: '#0a0f1e' }}>{hoveredState}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: '#0a0f1e', marginTop: 4 }}>
@@ -224,12 +183,25 @@ export function GeographyMap({ byState }: { byState: Record<string, StateData> }
             </div>
           </div>
         )}
+
+        {/* Tooltip for states with no data */}
+        {hoveredState && !hoveredData && (
+          <div style={{
+            position: 'absolute', top: 12, right: 12,
+            background: 'white', border: '1px solid #E5E7EB', borderRadius: 10,
+            padding: '10px 14px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            zIndex: 5,
+          }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#9CA3AF' }}>{hoveredState}</div>
+            <div style={{ fontSize: 12, color: '#9CA3AF' }}>No pipeline activity</div>
+          </div>
+        )}
       </div>
 
       {/* Legend */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, marginTop: 16 }}>
         <span style={{ fontSize: 10, color: '#6B7280', marginRight: 4 }}>$0</span>
-        {['#F3F4F6', '#D1FAE5', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669'].map((c, i) => (
+        {['#F1F5F9', '#D1FAE5', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669'].map((c, i) => (
           <div key={i} style={{ width: 28, height: 10, background: c, borderRadius: 2 }} />
         ))}
         <span style={{ fontSize: 10, color: '#6B7280', marginLeft: 4 }}>
@@ -237,7 +209,7 @@ export function GeographyMap({ byState }: { byState: Record<string, StateData> }
         </span>
       </div>
 
-      {/* Top states table below map */}
+      {/* Top states table */}
       <div style={{ marginTop: 20 }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>
           Top States by Pipeline Value
@@ -248,10 +220,11 @@ export function GeographyMap({ byState }: { byState: Record<string, StateData> }
               key={state}
               style={{
                 padding: '10px 12px',
-                background: hoveredState === state ? '#FFFBEB' : '#F9FAFB',
+                background: hoveredState === state ? '#F0FDF4' : '#F9FAFB',
                 borderRadius: 8,
                 borderLeft: `3px solid ${getColor(data.value, maxValue)}`,
                 transition: 'background 0.1s',
+                cursor: 'pointer',
               }}
               onMouseEnter={() => setHoveredState(state)}
               onMouseLeave={() => setHoveredState(null)}
@@ -268,7 +241,7 @@ export function GeographyMap({ byState }: { byState: Record<string, StateData> }
         </div>
       </div>
 
-      {sorted.length === 0 && (
+      {sorted.length === 0 && activeSegments.size > 0 && (
         <div style={{ padding: 40, textAlign: 'center', color: '#6B7280' }}>
           No geographic data available.
         </div>
