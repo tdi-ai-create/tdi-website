@@ -406,6 +406,24 @@ export default function SalesPage() {
     }
   }
 
+  // Handle inline field edit from SalesCard
+  function handleFieldSaved(oppId: string, field: string, newValue: any) {
+    setOpportunities(prev => prev.map(o => {
+      if (o.supabase_id !== oppId) return o
+      const updated = { ...o }
+      if (field === 'value') updated.value = newValue
+      else if (field === 'heat') updated.heat = newValue
+      else if (field === 'notes') updated.notes = newValue
+      else if (field === 'source') updated.source = newValue
+      else if (field === 'stage') {
+        updated.stage = newValue
+        updated.stageName = STAGE_DISPLAY[newValue] || newValue
+        updated.probability = STAGE_PROBABILITY[newValue] ?? updated.probability
+      }
+      return updated
+    }))
+  }
+
   // Active opps: 26-27 only, exclude contact-only, paid, lost, deleted
   const activeOpps = useMemo(() =>
     opportunities.filter(o =>
@@ -613,6 +631,7 @@ export default function SalesPage() {
                         onCardClick={(opp) => showToastMsg(`Detail panel for "${opp.name}" ships in next CCP`, 'success')}
                         onDrop={handleStageDrop}
                         onCardContextMenu={handleCardContextMenu}
+                        onFieldSaved={handleFieldSaved}
                       />
                     ))}
                   </div>
@@ -634,6 +653,7 @@ export default function SalesPage() {
                           key={opp.supabase_id}
                           opp={toCardOpp(opp)}
                           onClick={() => showToastMsg(`Detail panel for "${opp.name}" ships in next CCP`, 'success')}
+                          onFieldSaved={handleFieldSaved}
                         />
                       ))
                   )}

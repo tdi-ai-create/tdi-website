@@ -18,6 +18,7 @@ export function KanbanColumn({
   onCardClick,
   onDrop,
   onCardContextMenu,
+  onFieldSaved,
 }: {
   stage: string
   label: string
@@ -25,6 +26,7 @@ export function KanbanColumn({
   onCardClick: (opp: SalesCardOpp) => void
   onDrop?: (oppId: string, toStage: string) => void
   onCardContextMenu?: (e: React.MouseEvent, oppId: string) => void
+  onFieldSaved?: (oppId: string, field: string, newValue: any) => void
 }) {
   const [isDragOver, setIsDragOver] = useState(false)
   const total = opportunities.reduce((s, o) => s + (o.value || 0), 0)
@@ -110,6 +112,7 @@ export function KanbanColumn({
                 isCollapsible={isCollapsible}
                 onCardClick={onCardClick}
                 onCardContextMenu={onCardContextMenu}
+                onFieldSaved={onFieldSaved}
               />
             )
           })
@@ -125,12 +128,14 @@ function CollapsibleHeatGroup({
   isCollapsible,
   onCardClick,
   onCardContextMenu,
+  onFieldSaved,
 }: {
   heat: string
   cards: SalesCardOpp[]
   isCollapsible: boolean
   onCardClick: (opp: SalesCardOpp) => void
   onCardContextMenu?: (e: React.MouseEvent, oppId: string) => void
+  onFieldSaved?: (oppId: string, field: string, newValue: any) => void
 }) {
   const [isOpen, setIsOpen] = useState(!isCollapsible)
   const meta = HEAT_LABELS[heat] || HEAT_LABELS.warm
@@ -158,7 +163,7 @@ function CollapsibleHeatGroup({
         {meta.label} &middot; {cards.length}
       </div>
       {isOpen && cards.map(opp => (
-        <SalesCard key={opp.id} opp={opp} onClick={() => onCardClick(opp)} draggable onContextMenu={onCardContextMenu ? (e) => onCardContextMenu(e, opp.id) : undefined} />
+        <SalesCard key={opp.id} opp={opp} onClick={() => onCardClick(opp)} draggable onContextMenu={onCardContextMenu ? (e) => onCardContextMenu(e, opp.id) : undefined} onFieldSaved={onFieldSaved} />
       ))}
     </div>
   )
