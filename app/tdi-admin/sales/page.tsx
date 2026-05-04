@@ -9,7 +9,7 @@ import { KanbanColumn } from './components/KanbanColumn'
 import { SalesCard, type SalesCardOpp } from './components/SalesCard'
 
 type ViewMode = 'kanban' | 'list'
-type PageTab = 'pipeline' | 'analytics' | 'trash'
+type PageTab = 'pipeline' | 'analytics' | 'trash' | 'invoices'
 
 interface SalesOpportunity {
   id: string
@@ -28,8 +28,11 @@ interface SalesOpportunity {
   invoice_amount: number | null
   invoice_notes: string | null
   contract_year: string | null
+  school_year: string | null
   heat: string | null
   on_jims_call_sheet: boolean | null
+  payment_received: boolean | null
+  invoice_sent_at: string | null
   deleted_at: string | null
   deleted_by: string | null
   deletion_reason: string | null
@@ -59,6 +62,9 @@ interface Opportunity {
   contract_year: string | null
   heat: string
   onCallSheet: boolean
+  schoolYear: string
+  paymentReceived: boolean
+  invoiceSentAt: string | null
   deleted_at: string | null
   deleted_by: string | null
   deletion_reason: string | null
@@ -172,6 +178,9 @@ export default function SalesPage() {
         contract_year: row.contract_year,
         heat: row.heat || 'warm',
         onCallSheet: row.on_jims_call_sheet || false,
+        schoolYear: row.contract_year || row.school_year || '2026-27',
+        paymentReceived: row.payment_received || false,
+        invoiceSentAt: row.invoice_sent_at,
         deleted_at: row.deleted_at,
         deleted_by: row.deleted_by,
         deletion_reason: row.deletion_reason,
@@ -298,6 +307,20 @@ export default function SalesPage() {
     }
   }
 
+  // Mark invoice as paid
+  async function handleMarkPaid(opp: Opportunity) {
+    setOpportunities(prev => prev.map(o =>
+      o.supabase_id === opp.supabase_id
+        ? { ...o, paymentReceived: true }
+        : o
+    ))
+    await supabase
+      .from('sales_opportunities')
+      .update({ payment_received: true, payment_received_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+      .eq('id', opp.supabase_id)
+    showToastMsg(`"${opp.name}" marked as paid`, 'success')
+  }
+
   // Toggle call sheet flag on an opp
   async function handleToggleCallSheet(oppId: string) {
     const opp = opportunities.find(o => o.supabase_id === oppId)
@@ -383,15 +406,29 @@ export default function SalesPage() {
     }
   }
 
-  // Active opps (exclude contact-only, paid, lost, deleted)
+  // Active opps: 26-27 only, exclude contact-only, paid, lost, deleted
   const activeOpps = useMemo(() =>
-    opportunities.filter(o => !o.isContactOnly && !['lost', 'paid'].includes(o.stage) && !o.deleted_at),
+    opportunities.filter(o =>
+      !o.isContactOnly && !['lost', 'paid'].includes(o.stage) && !o.deleted_at
+      && o.schoolYear === '2026-27'
+    ),
     [opportunities]
   )
 
   // Trashed opps
   const trashedOpps = useMemo(() =>
     opportunities.filter(o => o.deleted_at),
+    [opportunities]
+  )
+
+  // Outstanding invoices: prior year, unpaid
+  const outstandingInvoices = useMemo(() =>
+    opportunities.filter(o =>
+      !o.deleted_at
+      && o.schoolYear !== '2026-27'
+      && !o.paymentReceived
+      && (o.needs_invoice || (o.invoice_amount && o.invoice_amount > 0) || o.stage === 'paid')
+    ),
     [opportunities]
   )
 
@@ -494,6 +531,7 @@ export default function SalesPage() {
         {([
           { id: 'pipeline' as PageTab, label: 'Pipeline' },
           { id: 'analytics' as PageTab, label: 'Analytics' },
+          ...(outstandingInvoices.length > 0 ? [{ id: 'invoices' as PageTab, label: `Outstanding Invoices (${outstandingInvoices.length})` }] : []),
           ...(trashedOpps.length > 0 ? [{ id: 'trash' as PageTab, label: `Trash (${trashedOpps.length})` }] : []),
         ]).map(tab => (
           <button
@@ -604,6 +642,90 @@ export default function SalesPage() {
             </>
           )}
         </>
+      )}
+
+      {/* Outstanding Invoices Tab */}
+      {pageTab === 'invoices' && (
+        <div>
+          {(() => {
+            const totalOwed = outstandingInvoices.reduce((s, o) => s + (o.invoice_amount || o.value || 0), 0)
+            return (
+              <>
+                <div style={{
+                  background: '#FEF3C7', border: '1px solid #F59E0B', borderRadius: 12,
+                  padding: '16px 20px', marginBottom: 20,
+                }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#854D0E' }}>
+                    {outstandingInvoices.length} invoices outstanding · ${totalOwed.toLocaleString('en-US', { minimumFractionDigits: 0 })} total
+                  </div>
+                  <div style={{ fontSize: 12, color: '#854D0E', opacity: 0.85, marginTop: 4 }}>
+                    Prior-year contracts where payment has not yet been received. These do NOT count toward current 26-27 pipeline.
+                  </div>
+                </div>
+
+                {outstandingInvoices.length === 0 ? (
+                  <p style={{ textAlign: 'center', color: '#9CA3AF', padding: 40 }}>No outstanding invoices.</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {outstandingInvoices.map(opp => {
+                      const amount = opp.invoice_amount || opp.value || 0
+                      const daysOutstanding = opp.invoiceSentAt
+                        ? Math.floor((Date.now() - new Date(opp.invoiceSentAt).getTime()) / 86400000)
+                        : null
+                      return (
+                        <div key={opp.supabase_id} style={{
+                          background: 'white', border: '1px solid #E5E7EB',
+                          borderLeft: '4px solid #F59E0B', borderRadius: 10, padding: '14px 18px',
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: '#0a0f1e' }}>{opp.name}</div>
+                              <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
+                                {opp.schoolYear}
+                                {opp.invoiceSentAt && ` · Invoice sent ${new Date(opp.invoiceSentAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
+                                {daysOutstanding !== null && ` · ${daysOutstanding} days outstanding`}
+                              </div>
+                              {opp.notes && (
+                                <div style={{ fontSize: 11, color: '#6B7280', marginTop: 6, fontStyle: 'italic' }}>
+                                  {opp.notes.length > 200 ? opp.notes.slice(0, 197) + '...' : opp.notes}
+                                </div>
+                              )}
+                            </div>
+                            <div style={{ textAlign: 'right', minWidth: 120 }}>
+                              <div style={{ fontSize: 18, fontWeight: 800, color: '#0a0f1e' }}>
+                                ${amount.toLocaleString()}
+                              </div>
+                              <span style={{
+                                fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
+                                background: '#FEE2E2', color: '#991B1B',
+                              }}>
+                                UNPAID
+                              </span>
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                            <button
+                              onClick={() => handleMarkPaid(opp)}
+                              style={{ fontSize: 12, padding: '6px 12px', borderRadius: 6, border: '1px solid #10B981', background: 'white', color: '#10B981', cursor: 'pointer', fontWeight: 600 }}
+                            >
+                              Mark paid
+                            </button>
+                            <button
+                              onClick={() => handleDeleteOpp(opp)}
+                              style={{ fontSize: 12, padding: '6px 12px', borderRadius: 6, border: '1px solid #D1D5DB', background: 'white', color: '#6B7280', cursor: 'pointer' }}
+                            >
+                              Move to Trash
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </>
+            )
+          })()}
+        </div>
       )}
 
       {/* Trash Tab */}
