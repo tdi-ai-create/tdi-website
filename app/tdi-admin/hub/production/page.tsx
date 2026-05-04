@@ -295,7 +295,7 @@ function QuickWinsTab() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Capacity</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Lift</label>
                   <select
                     value={form.capacity}
                     onChange={(e) => setForm(f => ({ ...f, capacity: e.target.value }))}
@@ -369,7 +369,7 @@ function QuickWinsTab() {
             <tr>
               <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Title</th>
               <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Category</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Capacity</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Lift</th>
               <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Type</th>
               <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Duration</th>
               <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
