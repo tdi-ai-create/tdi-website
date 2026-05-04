@@ -2,22 +2,25 @@
 
 interface TopBarStats {
   totalPipeline: number
-  factored: number
   activeCount: number
-  raeValue: number
-  raeCount: number
-  jimValue: number
-  jimCount: number
   hotCount: number
   invoiceCount: number
+  callSheetCount: number
+  callSheetValue: number
 }
 
 export function StickyTopBar({
   stats,
   onAddLead,
+  onExport,
+  showCallSheetOnly,
+  onToggleCallSheet,
 }: {
   stats: TopBarStats
   onAddLead: () => void
+  onExport?: () => void
+  showCallSheetOnly?: boolean
+  onToggleCallSheet?: () => void
 }) {
   return (
     <div style={{
@@ -46,16 +49,8 @@ export function StickyTopBar({
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-        <div style={{ borderLeft: '1px solid #E5E7EB', paddingLeft: 24 }}>
-          <div style={{ fontSize: 14, fontWeight: 700 }}>R &middot; ${(stats.raeValue / 1000).toFixed(0)}K</div>
-          <div style={{ fontSize: 11, color: '#6B7280' }}>{stats.raeCount} opps</div>
-        </div>
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 700 }}>J &middot; ${(stats.jimValue / 1000).toFixed(0)}K</div>
-          <div style={{ fontSize: 11, color: '#6B7280' }}>{stats.jimCount} opps</div>
-        </div>
-        <div style={{ borderLeft: '1px solid #E5E7EB', paddingLeft: 24 }}>
+      <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
+        <div style={{ borderLeft: '1px solid #E5E7EB', paddingLeft: 20 }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: '#EF4444', display: 'flex', alignItems: 'center', gap: 5 }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'linear-gradient(135deg, #EF4444, #F97316)', display: 'inline-block' }} />
             {stats.hotCount} hot
@@ -65,20 +60,53 @@ export function StickyTopBar({
             {stats.invoiceCount} invoices
           </div>
         </div>
+
+        {/* Jim's call sheet count */}
+        {stats.callSheetCount > 0 && (
+          <button
+            onClick={onToggleCallSheet}
+            style={{
+              borderLeft: '1px solid #E5E7EB',
+              paddingLeft: 20,
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              textAlign: 'left',
+            }}
+          >
+            <div style={{
+              fontSize: 13, fontWeight: 600,
+              color: showCallSheetOnly ? '#F97316' : '#0a0f1e',
+              display: 'flex', alignItems: 'center', gap: 5,
+            }}>
+              <span style={{ fontSize: 14 }}>📞</span>
+              Jim's list: {stats.callSheetCount}
+            </div>
+            <div style={{ fontSize: 11, color: '#6B7280' }}>
+              ${(stats.callSheetValue / 1000).toFixed(0)}K
+            </div>
+          </button>
+        )}
       </div>
 
-      <button onClick={onAddLead} style={{
-        fontSize: 13,
-        padding: '8px 16px',
-        borderRadius: 8,
-        border: 'none',
-        background: '#10B981',
-        color: 'white',
-        cursor: 'pointer',
-        fontWeight: 700,
-      }}>
-        + Add lead
-      </button>
+      <div style={{ display: 'flex', gap: 8 }}>
+        {onExport && (
+          <button onClick={onExport} style={{
+            fontSize: 13, padding: '8px 14px', borderRadius: 8,
+            border: '1px solid #D1D5DB', background: 'white', color: '#374151',
+            cursor: 'pointer', fontWeight: 500,
+          }}>
+            Export
+          </button>
+        )}
+        <button onClick={onAddLead} style={{
+          fontSize: 13, padding: '8px 16px', borderRadius: 8,
+          border: 'none', background: '#10B981', color: 'white',
+          cursor: 'pointer', fontWeight: 700,
+        }}>
+          + Add lead
+        </button>
+      </div>
     </div>
   )
 }

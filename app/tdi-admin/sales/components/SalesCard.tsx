@@ -25,6 +25,7 @@ export interface SalesCardOpp {
   probability: number
   type: string
   assignedTo: string | null
+  onCallSheet: boolean
   notes: string | null
   needs_invoice: boolean
   stage: string
@@ -55,9 +56,6 @@ function shortName(name: string): string {
 export function SalesCard({ opp, onClick, draggable = false, onContextMenu }: { opp: SalesCardOpp; onClick?: () => void; draggable?: boolean; onContextMenu?: (e: React.MouseEvent) => void }) {
   const heat = HEAT_STYLES[opp.heat || 'warm'] || HEAT_STYLES.warm
   const typeColor = TYPE_COLORS[opp.type] || '#6B7280'
-  const isJim = opp.assignedTo?.includes('jim')
-  const ownerColor = isJim ? '#F59E0B' : '#3B82F6'
-  const ownerInitial = isJim ? 'J' : opp.assignedTo ? 'R' : '?'
   const factored = (opp.value || 0) * (opp.probability || 0) / 100
   const subtitle = extractSubtitle(opp)
 
@@ -87,7 +85,7 @@ export function SalesCard({ opp, onClick, draggable = false, onContextMenu }: { 
       onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#0a0f1e' }}
       onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#E5E7EB' }}
     >
-      {/* Line 1: Title + owner avatar */}
+      {/* Line 1: Title + call sheet indicator */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#0a0f1e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
           {shortName(opp.name)}
@@ -95,12 +93,11 @@ export function SalesCard({ opp, onClick, draggable = false, onContextMenu }: { 
             <span style={{ marginLeft: 6, fontSize: 9, padding: '1px 5px', borderRadius: 4, background: '#FEF3C7', color: '#854D0E', fontWeight: 700 }}>renewal</span>
           )}
         </p>
-        <div style={{
-          width: 18, height: 18, borderRadius: '50%',
-          background: ownerColor + '20', color: ownerColor,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 10, fontWeight: 700, flexShrink: 0, marginLeft: 6,
-        }}>{ownerInitial}</div>
+        {opp.onCallSheet && (
+          <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 4, background: '#FFF7ED', color: '#C2410C', fontWeight: 600, flexShrink: 0, marginLeft: 6 }}>
+            📞 Jim
+          </span>
+        )}
       </div>
 
       {/* Line 2: Contextual subtitle */}

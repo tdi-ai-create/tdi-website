@@ -29,6 +29,7 @@ interface SalesOpportunity {
   invoice_notes: string | null
   contract_year: string | null
   heat: string | null
+  on_jims_call_sheet: boolean | null
   deleted_at: string | null
   deleted_by: string | null
   deletion_reason: string | null
@@ -57,6 +58,7 @@ interface Opportunity {
   invoice_notes: string | null
   contract_year: string | null
   heat: string
+  onCallSheet: boolean
   deleted_at: string | null
   deleted_by: string | null
   deletion_reason: string | null
@@ -107,6 +109,7 @@ function toCardOpp(opp: Opportunity): SalesCardOpp {
     probability: opp.probability,
     type: opp.type,
     assignedTo: opp.assignedTo,
+    onCallSheet: opp.onCallSheet,
     notes: opp.notes,
     needs_invoice: opp.needs_invoice,
     stage: opp.stage,
@@ -130,6 +133,7 @@ export default function SalesPage() {
   // Filter state
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(EMPTY_FILTERS)
   const [showAllStages, setShowAllStages] = useState(true)
+  const [showCallSheetOnly, setShowCallSheetOnly] = useState(false)
 
   useEffect(() => {
     loadAll()
@@ -167,6 +171,7 @@ export default function SalesPage() {
         invoice_notes: row.invoice_notes,
         contract_year: row.contract_year,
         heat: row.heat || 'warm',
+        onCallSheet: row.on_jims_call_sheet || false,
         deleted_at: row.deleted_at,
         deleted_by: row.deleted_by,
         deletion_reason: row.deletion_reason,
@@ -293,6 +298,51 @@ export default function SalesPage() {
     }
   }
 
+  // Toggle call sheet flag on an opp
+  async function handleToggleCallSheet(oppId: string) {
+    const opp = opportunities.find(o => o.supabase_id === oppId)
+    if (!opp) return
+    const newVal = !opp.onCallSheet
+    setOpportunities(prev => prev.map(o =>
+      o.supabase_id === oppId ? { ...o, onCallSheet: newVal } : o
+    ))
+    await supabase
+      .from('sales_opportunities')
+      .update({ on_jims_call_sheet: newVal, updated_at: new Date().toISOString() })
+      .eq('id', oppId)
+  }
+
+  // Export pipeline to CSV
+  function handleExport() {
+    const rows = activeOpps
+      .filter(o => !o.deleted_at)
+      .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
+    const headers = ['Name', 'Stage', 'Value', 'Probability', 'Type', 'Source', 'Heat', 'On Jim Call Sheet', 'Last Activity', 'Notes']
+    const csvRows = [
+      headers.join(','),
+      ...rows.map(o => [
+        `"${(o.name || '').replace(/"/g, '""')}"`,
+        o.stage,
+        o.value ?? 0,
+        o.probability,
+        o.type,
+        `"${(o.source || '').replace(/"/g, '""')}"`,
+        o.heat,
+        o.onCallSheet ? 'Yes' : 'No',
+        o.lastActivityAt ? new Date(o.lastActivityAt).toLocaleDateString() : '',
+        `"${(o.notes || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
+      ].join(','))
+    ]
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `tdi-pipeline-${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+    showToastMsg(`Exported ${rows.length} deals to CSV`, 'success')
+  }
+
   // Context menu: add note
   async function handleSaveNote() {
     if (!noteModal || !noteText.trim()) return
@@ -364,9 +414,10 @@ export default function SalesPage() {
       if (f.search && !opp.name.toLowerCase().includes(f.search.toLowerCase())) return false
       if (f.deal_types.length > 0 && !f.deal_types.includes(opp.type)) return false
       if (f.sources.length > 0 && !f.sources.includes(opp.source || 'Other')) return false
+      if (showCallSheetOnly && !opp.onCallSheet) return false
       return true
     })
-  }, [activeOpps, activeFilters])
+  }, [activeOpps, activeFilters, showCallSheetOnly])
 
   // Counts for filter chips
   const dealTypeCounts = useMemo(() => {
@@ -389,18 +440,14 @@ export default function SalesPage() {
 
   // Stats for sticky top bar
   const stats = useMemo(() => {
-    const raeOpps = activeOpps.filter(o => !o.assignedTo?.includes('jim'))
-    const jimOpps = activeOpps.filter(o => o.assignedTo?.includes('jim'))
+    const callSheetOpps = activeOpps.filter(o => o.onCallSheet)
     return {
       totalPipeline: activeOpps.reduce((s, o) => s + (o.value ?? 0), 0),
-      factored: activeOpps.reduce((s, o) => s + factoredRevenue(o), 0),
       activeCount: activeOpps.length,
-      raeValue: raeOpps.reduce((s, o) => s + factoredRevenue(o), 0),
-      raeCount: raeOpps.length,
-      jimValue: jimOpps.reduce((s, o) => s + factoredRevenue(o), 0),
-      jimCount: jimOpps.length,
       hotCount: activeOpps.filter(o => o.heat === 'hot').length,
-      invoiceCount: opportunities.filter(o => o.needs_invoice).length,
+      invoiceCount: opportunities.filter(o => o.needs_invoice && !o.deleted_at).length,
+      callSheetCount: callSheetOpps.length,
+      callSheetValue: callSheetOpps.reduce((s, o) => s + (o.value ?? 0), 0),
     }
   }, [activeOpps, opportunities])
 
@@ -489,6 +536,9 @@ export default function SalesPage() {
               <StickyTopBar
                 stats={stats}
                 onAddLead={() => showToastMsg('Add Lead UI ships in the next CCP', 'success')}
+                onExport={handleExport}
+                showCallSheetOnly={showCallSheetOnly}
+                onToggleCallSheet={() => setShowCallSheetOnly(!showCallSheetOnly)}
               />
 
               {/* Inline Filter Row */}
