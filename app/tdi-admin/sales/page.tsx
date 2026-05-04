@@ -9,7 +9,7 @@ import { KanbanColumn } from './components/KanbanColumn'
 import { SalesCard, type SalesCardOpp } from './components/SalesCard'
 
 type ViewMode = 'kanban' | 'list'
-type PageTab = 'pipeline' | 'analytics'
+type PageTab = 'pipeline' | 'analytics' | 'trash'
 
 interface SalesOpportunity {
   id: string
@@ -29,6 +29,9 @@ interface SalesOpportunity {
   invoice_notes: string | null
   contract_year: string | null
   heat: string | null
+  deleted_at: string | null
+  deleted_by: string | null
+  deletion_reason: string | null
   created_at: string
   updated_at: string
 }
@@ -54,6 +57,9 @@ interface Opportunity {
   invoice_notes: string | null
   contract_year: string | null
   heat: string
+  deleted_at: string | null
+  deleted_by: string | null
+  deletion_reason: string | null
 }
 
 const STAGE_DISPLAY: Record<string, string> = {
@@ -161,6 +167,9 @@ export default function SalesPage() {
         invoice_notes: row.invoice_notes,
         contract_year: row.contract_year,
         heat: row.heat || 'warm',
+        deleted_at: row.deleted_at,
+        deleted_by: row.deleted_by,
+        deletion_reason: row.deletion_reason,
       }))
 
       setOpportunities(mapped)
@@ -221,21 +230,66 @@ export default function SalesPage() {
     await handleStageDrop(opp.supabase_id, toStage)
   }
 
-  // Context menu: delete (mark as lost)
+  // Context menu: soft delete (move to trash)
   async function handleDeleteOpp(opp: Opportunity) {
     setContextMenu(null)
-    setOpportunities(prev => prev.filter(o => o.supabase_id !== opp.supabase_id))
+    // Optimistic: mark as deleted locally
+    setOpportunities(prev => prev.map(o =>
+      o.supabase_id === opp.supabase_id
+        ? { ...o, deleted_at: new Date().toISOString(), deleted_by: 'admin', deletion_reason: null }
+        : o
+    ))
 
     const { error: updateError } = await supabase
       .from('sales_opportunities')
-      .update({ stage: 'lost', updated_at: new Date().toISOString() })
+      .update({ deleted_at: new Date().toISOString(), deleted_by: 'admin', updated_at: new Date().toISOString() })
       .eq('id', opp.supabase_id)
 
     if (updateError) {
       loadAll()
-      showToastMsg('Failed to remove deal', 'error')
+      showToastMsg('Failed to delete deal', 'error')
     } else {
-      showToastMsg(`"${opp.name}" marked as lost`, 'success')
+      showToastMsg(`"${opp.name}" moved to Trash`, 'success')
+    }
+  }
+
+  // Restore from trash
+  async function handleRestoreOpp(opp: Opportunity) {
+    setOpportunities(prev => prev.map(o =>
+      o.supabase_id === opp.supabase_id
+        ? { ...o, deleted_at: null, deleted_by: null, deletion_reason: null }
+        : o
+    ))
+
+    const { error: updateError } = await supabase
+      .from('sales_opportunities')
+      .update({ deleted_at: null, deleted_by: null, deletion_reason: null, updated_at: new Date().toISOString() })
+      .eq('id', opp.supabase_id)
+
+    if (updateError) {
+      loadAll()
+      showToastMsg('Failed to restore deal', 'error')
+    } else {
+      showToastMsg(`"${opp.name}" restored to pipeline`, 'success')
+    }
+  }
+
+  // Permanent delete
+  async function handlePermanentDelete(opp: Opportunity) {
+    if (!confirm(`Permanently delete "${opp.name}"? This cannot be undone.`)) return
+
+    setOpportunities(prev => prev.filter(o => o.supabase_id !== opp.supabase_id))
+
+    const { error: deleteError } = await supabase
+      .from('sales_opportunities')
+      .delete()
+      .eq('id', opp.supabase_id)
+
+    if (deleteError) {
+      loadAll()
+      showToastMsg('Failed to permanently delete', 'error')
+    } else {
+      showToastMsg(`"${opp.name}" permanently deleted`, 'success')
     }
   }
 
@@ -279,9 +333,15 @@ export default function SalesPage() {
     }
   }
 
-  // Active opps (exclude contact-only, paid, lost)
+  // Active opps (exclude contact-only, paid, lost, deleted)
   const activeOpps = useMemo(() =>
-    opportunities.filter(o => !o.isContactOnly && !['lost', 'paid'].includes(o.stage)),
+    opportunities.filter(o => !o.isContactOnly && !['lost', 'paid'].includes(o.stage) && !o.deleted_at),
+    [opportunities]
+  )
+
+  // Trashed opps
+  const trashedOpps = useMemo(() =>
+    opportunities.filter(o => o.deleted_at),
     [opportunities]
   )
 
@@ -384,25 +444,29 @@ export default function SalesPage() {
 
       {/* Tab navigation */}
       <div style={{ display: 'flex', borderBottom: '1px solid #E5E7EB', marginBottom: 20, gap: 0 }}>
-        {(['pipeline', 'analytics'] as PageTab[]).map(tab => (
+        {([
+          { id: 'pipeline' as PageTab, label: 'Pipeline' },
+          { id: 'analytics' as PageTab, label: 'Analytics' },
+          ...(trashedOpps.length > 0 ? [{ id: 'trash' as PageTab, label: `Trash (${trashedOpps.length})` }] : []),
+        ]).map(tab => (
           <button
-            key={tab}
-            onClick={() => setPageTab(tab)}
+            key={tab.id}
+            onClick={() => setPageTab(tab.id)}
             style={{
               padding: '12px 24px', fontSize: 14, background: 'transparent', border: 'none',
-              fontWeight: pageTab === tab ? 700 : 500,
-              color: pageTab === tab ? '#0a0f1e' : '#6B7280',
-              borderBottom: pageTab === tab ? '2px solid #10B981' : '2px solid transparent',
+              fontWeight: pageTab === tab.id ? 700 : 500,
+              color: pageTab === tab.id ? '#0a0f1e' : '#6B7280',
+              borderBottom: pageTab === tab.id ? '2px solid #10B981' : '2px solid transparent',
               cursor: 'pointer', marginBottom: -1,
             }}
           >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {tab.label}
           </button>
         ))}
       </div>
 
       {/* Analytics Tab */}
-      {pageTab === 'analytics' && <AnalyticsTab />}
+      {pageTab === 'analytics' && <AnalyticsTab opportunities={activeOpps.map(o => ({ value: o.value, probability: o.probability, stage: o.stage, name: o.name }))} />}
 
       {/* Pipeline Tab */}
       {pageTab === 'pipeline' && (
@@ -490,6 +554,52 @@ export default function SalesPage() {
             </>
           )}
         </>
+      )}
+
+      {/* Trash Tab */}
+      {pageTab === 'trash' && (
+        <div>
+          <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 16, fontStyle: 'italic' }}>
+            Items in Trash are hidden from the pipeline but can be restored.
+          </div>
+          {trashedOpps.length === 0 ? (
+            <p style={{ textAlign: 'center', color: '#9CA3AF', padding: 40 }}>Trash is empty.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {trashedOpps.map(opp => (
+                <div key={opp.supabase_id} style={{
+                  background: 'white', border: '1px solid #E5E7EB', borderRadius: 10,
+                  padding: '14px 18px', opacity: 0.7,
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: '#0a0f1e' }}>{opp.name}</div>
+                    <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>
+                      {opp.value ? `$${opp.value.toLocaleString()}` : '-'}
+                      {opp.deleted_by && ` · Deleted by ${opp.deleted_by}`}
+                      {opp.deleted_at && ` on ${new Date(opp.deleted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                      {opp.deletion_reason && ` · ${opp.deletion_reason}`}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      onClick={() => handleRestoreOpp(opp)}
+                      style={{ fontSize: 12, padding: '6px 12px', borderRadius: 6, border: '1px solid #10B981', background: 'white', color: '#10B981', cursor: 'pointer', fontWeight: 600 }}
+                    >
+                      Restore
+                    </button>
+                    <button
+                      onClick={() => handlePermanentDelete(opp)}
+                      style={{ fontSize: 12, padding: '6px 12px', borderRadius: 6, border: '1px solid #EF4444', background: 'white', color: '#EF4444', cursor: 'pointer', fontWeight: 600 }}
+                    >
+                      Delete forever
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       )}
 
       {/* Context Menu */}

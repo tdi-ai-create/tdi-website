@@ -7,6 +7,7 @@ import { GeographyMap } from './GeographyMap'
 import { PipelineTrend } from './PipelineTrend'
 import { TeamPerformance } from './TeamPerformance'
 import { SegmentBreakdown } from './SegmentBreakdown'
+import { FactoredCalculator } from './FactoredCalculator'
 
 interface AnalyticsData {
   pulse: {
@@ -26,7 +27,7 @@ interface AnalyticsData {
   snapshots: { snapshot_date: string; total_pipeline: number; factored_pipeline: number; active_count: number }[]
 }
 
-export function AnalyticsTab() {
+export function AnalyticsTab({ opportunities = [] }: { opportunities?: { value: number | null; probability: number; stage: string; name: string }[] }) {
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -55,6 +56,10 @@ export function AnalyticsTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <PulseSection pulse={data.pulse} />
+
+      {opportunities.length > 0 && (
+        <FactoredCalculator opportunities={opportunities} />
+      )}
 
       <Section title="Conversion Funnel" subtitle="Where deals stall and where they progress">
         <ConversionFunnel funnel={data.funnel} />

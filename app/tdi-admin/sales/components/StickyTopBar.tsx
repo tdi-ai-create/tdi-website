@@ -42,7 +42,7 @@ export function StickyTopBar({
           <span style={{ fontSize: 13, color: '#6B7280', fontWeight: 500, marginLeft: 8 }}>pipeline</span>
         </div>
         <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
-          ${(stats.factored / 1000).toFixed(0)}K factored &middot; {stats.activeCount} active
+          {stats.activeCount} active
         </div>
       </div>
 
