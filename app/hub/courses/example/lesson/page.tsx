@@ -12,13 +12,13 @@ import {
   CheckCircle,
   ChevronRight,
   ChevronLeft,
-  Star,
   ThumbsUp,
   MessageCircle,
   Download,
   FileText,
   Clock,
   Send,
+  HelpCircle,
 } from 'lucide-react';
 
 // TDI Brand Tokens (match the example course page)
@@ -33,8 +33,20 @@ const T = {
   g400: '#9CA3AF',
   g600: '#4B5563',
   g800: '#1F2937',
-  starGold: '#F59E0B',
 };
+
+// Contribution type config — colors, labels, descriptions
+const CONTRIBUTION_TYPES = [
+  { id: 'tried_it', label: 'Tried it', description: 'Used the lesson as written', color: '#2A9D8F' },
+  { id: 'adapted_it', label: 'Adapted it', description: 'Changed something to make it work', color: '#F4C430' },
+  { id: 'still_trying', label: 'Still trying', description: 'In progress, not yet finished', color: '#7BB6D9' },
+  { id: 'got_stuck', label: 'Got stuck', description: 'Hit a wall, need a second brain', color: '#F4A28C' },
+  { id: 'didnt_land', label: "Didn't land", description: "Tried it, didn't work, here's why", color: '#64748B' },
+] as const;
+
+function getTypeConfig(typeId: string) {
+  return CONTRIBUTION_TYPES.find(t => t.id === typeId) || CONTRIBUTION_TYPES[0];
+}
 
 // Hardcoded example lesson data
 const EXAMPLE_LESSON = {
@@ -47,55 +59,50 @@ const EXAMPLE_LESSON = {
     "The 90-second method that changes everything. In this lesson, we break down why transitions eat up so much instructional time, and exactly how to design a transition system your students can run themselves.",
   instructor: 'Rae Hughart',
   videoCaption: 'Video: 90-Second Transition Method',
-  rating: 4.8,
-  totalRatings: 312,
-  ratingBreakdown: [
-    { stars: 5, count: 218, pct: 70 },
-    { stars: 4, count: 64, pct: 21 },
-    { stars: 3, count: 22, pct: 7 },
-    { stars: 2, count: 5, pct: 1.5 },
-    { stars: 1, count: 3, pct: 0.5 },
-  ],
-  reviews: [
+  totalContributions: 312,
+  pulse: {
+    tried_it: 218,
+    adapted_it: 64,
+    still_trying: 22,
+    got_stuck: 5,
+    didnt_land: 3,
+  },
+  contributions: [
     {
-      stars: 5,
+      type: 'tried_it',
       author: 'Maria S.',
       role: '4th grade teacher, Year 12',
       date: '3 days ago',
       title: 'Used this Monday morning. Game changer.',
       body: "I tried the 90-second transition technique with my kids on Monday and was shocked. We went from losing 8-10 minutes between subjects to being seated and ready in under 2. The trick that worked for us: I made the timer visible on the projector. The students started self-monitoring.",
       helpful: 47,
-      adjustments: null,
     },
     {
-      stars: 4,
+      type: 'adapted_it',
       author: 'James R.',
       role: 'Middle school SPED, Year 6',
       date: '1 week ago',
       title: 'Worked great, but I had to adjust Section 2',
       body: "The core method works. I had to slow down the visual cues part for my students who need more processing time. I added a 'preview' step where I show them what the transition will look like before we do it. After that adjustment, my class transitions dropped from 6 minutes to 90 seconds. Section 2 just needs more scaffolding for SPED settings.",
       helpful: 38,
-      adjustments: 'Adapted Section 2 for SPED setting - added preview step',
     },
     {
-      stars: 5,
+      type: 'tried_it',
       author: 'Karen T.',
       role: 'Kindergarten, Year 3',
       date: '2 weeks ago',
       title: 'My principal asked what I changed',
       body: "Did this lesson on a Sunday night, tried it Monday. By Wednesday my principal walked by and asked what I changed because the class felt different. I told her about the lesson and now my whole grade level is doing the course together. The 90-second framework is short enough that even my Kindergarteners get it.",
       helpful: 52,
-      adjustments: null,
     },
     {
-      stars: 4,
+      type: 'adapted_it',
       author: 'David L.',
       role: 'High school English, Year 18',
       date: '3 weeks ago',
       title: 'Solid foundation, needed to adapt for HS',
       body: "Most classroom management content assumes elementary. This one was easier to adapt because the principle (90 seconds, visual cues, ownership) maps to high school just as well. I changed the cue from a chime to a slide on my projector. Same result.",
       helpful: 29,
-      adjustments: 'Replaced chime cue with projector slide for high school',
     },
   ],
   questions: [
@@ -141,7 +148,10 @@ export default function ExampleLessonPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [captionLang, setCaptionLang] = useState('en');
   const [showCaptionMenu, setShowCaptionMenu] = useState(false);
-  const [activeTab, setActiveTab] = useState<'reviews' | 'questions' | 'resources'>('reviews');
+  const [activeTab, setActiveTab] = useState<'conversation' | 'questions' | 'resources'>('conversation');
+  const [conversationFilter, setConversationFilter] = useState<string | null>(null);
+  const [showHelpfulTooltip, setShowHelpfulTooltip] = useState<number | null>(null);
+  const [pulseAnimated, setPulseAnimated] = useState(false);
   const [newQuestion, setNewQuestion] = useState('');
 
   return (
@@ -472,7 +482,7 @@ export default function ExampleLessonPage() {
               {/* Tab nav */}
               <div style={{ display: 'flex', borderBottom: `1px solid ${T.g200}` }}>
                 {[
-                  { key: 'reviews', label: `Conversation (${EXAMPLE_LESSON.totalRatings})`, icon: <MessageCircle size={16} /> },
+                  { key: 'conversation', label: `Conversation (${EXAMPLE_LESSON.totalContributions})`, icon: <MessageCircle size={16} /> },
                   { key: 'questions', label: `Q&A (${EXAMPLE_LESSON.questions.length})`, icon: <MessageCircle size={16} /> },
                   { key: 'resources', label: `Resources (${EXAMPLE_LESSON.resources.length})`, icon: <Download size={16} /> },
                 ].map((tab) => (
@@ -503,59 +513,59 @@ export default function ExampleLessonPage() {
 
               {/* Tab content */}
               <div style={{ padding: 24 }}>
-                {/* REVIEWS TAB */}
-                {activeTab === 'reviews' && (
+                {/* CONVERSATION TAB */}
+                {activeTab === 'conversation' && (
                   <div>
-                    {/* Rating summary */}
+                    {/* Pulse — contribution breakdown */}
                     <div
                       style={{
-                        display: 'grid',
-                        gridTemplateColumns: '180px 1fr',
-                        gap: 32,
                         paddingBottom: 24,
                         marginBottom: 24,
                         borderBottom: `1px solid ${T.g200}`,
                       }}
                     >
-                      <div style={{ textAlign: 'center' }}>
-                        <div style={{ fontSize: 48, fontWeight: 800, color: T.navy, lineHeight: 1 }}>
-                          {EXAMPLE_LESSON.rating}
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: 2, marginTop: 6, marginBottom: 6 }}>
-                          {[1, 2, 3, 4, 5].map((s) => (
-                            <Star
-                              key={s}
-                              size={16}
-                              fill={s <= Math.round(EXAMPLE_LESSON.rating) ? T.starGold : T.g200}
-                              color={s <= Math.round(EXAMPLE_LESSON.rating) ? T.starGold : T.g200}
-                            />
-                          ))}
-                        </div>
-                        <div style={{ fontSize: 12, color: T.g600 }}>
-                          {EXAMPLE_LESSON.totalRatings} teachers in the conversation
-                        </div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: T.navy, marginBottom: 4 }}>
+                        What teachers are doing with this lesson
                       </div>
-
-                      <div>
-                        {EXAMPLE_LESSON.ratingBreakdown.map((b) => (
-                          <div key={b.stars} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-                            <div style={{ fontSize: 12, color: T.g600, width: 36 }}>{b.stars} star</div>
-                            <div style={{ flex: 1, height: 6, background: T.g100, borderRadius: 3, overflow: 'hidden' }}>
-                              <div style={{ width: `${b.pct}%`, height: '100%', background: T.starGold }} />
+                      <div style={{ fontSize: 12, color: T.g400, marginBottom: 16 }}>
+                        {EXAMPLE_LESSON.totalContributions} teachers in the conversation
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        {CONTRIBUTION_TYPES.map((type, idx) => {
+                          const count = EXAMPLE_LESSON.pulse[type.id as keyof typeof EXAMPLE_LESSON.pulse];
+                          const maxCount = Math.max(...Object.values(EXAMPLE_LESSON.pulse));
+                          const widthPct = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                          return (
+                            <div key={type.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                              <span style={{ fontSize: 12, color: T.g600, width: 80, textAlign: 'right', flexShrink: 0 }}>
+                                {type.label}
+                              </span>
+                              <div style={{ flex: 1, height: 10, background: T.g100, borderRadius: 5, overflow: 'hidden' }}>
+                                <div
+                                  style={{
+                                    height: '100%',
+                                    borderRadius: 5,
+                                    backgroundColor: type.color,
+                                    width: `${widthPct}%`,
+                                    transition: `width 600ms cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 80}ms`,
+                                    opacity: count > 0 ? 1 : 0.3,
+                                  }}
+                                />
+                              </div>
+                              <span style={{ fontSize: 12, color: T.g600, width: 32, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                                {count}
+                              </span>
                             </div>
-                            <div style={{ fontSize: 12, color: T.g600, width: 40, textAlign: 'right' }}>
-                              {b.count}
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
 
-                    {/* Write a review prompt */}
+                    {/* CTA card */}
                     <div
                       style={{
                         background: T.warmWhite,
-                        border: `1px dashed ${T.g200}`,
+                        border: `1px solid ${T.g200}`,
                         borderRadius: 10,
                         padding: 16,
                         marginBottom: 24,
@@ -567,17 +577,17 @@ export default function ExampleLessonPage() {
                     >
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 600, color: T.navy, marginBottom: 2 }}>
-                          Tried it in your classroom? Add to the conversation.
+                          Tried it? Adapted it? Still working through it?
                         </div>
                         <div style={{ fontSize: 13, color: T.g600 }}>
-                          Share what worked, what you adjusted, and help the teachers reading this next.
+                          Tell us what happened — your story helps the next teacher.
                         </div>
                       </div>
                       <button
                         style={{
                           padding: '10px 16px',
-                          background: T.gold,
-                          color: T.navy,
+                          background: T.navy,
+                          color: 'white',
                           border: 'none',
                           borderRadius: 8,
                           fontSize: 13,
@@ -586,91 +596,141 @@ export default function ExampleLessonPage() {
                           whiteSpace: 'nowrap',
                         }}
                       >
-                        Add to the Conversation
+                        Share my experience
                       </button>
                     </div>
 
-                    {/* Reviews list */}
-                    {EXAMPLE_LESSON.reviews.map((r, i) => (
-                      <div
-                        key={i}
+                    {/* Filter chips */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+                      <button
+                        onClick={() => setConversationFilter(null)}
                         style={{
-                          paddingBottom: 20,
-                          marginBottom: 20,
-                          borderBottom: i < EXAMPLE_LESSON.reviews.length - 1 ? `1px solid ${T.g100}` : 'none',
+                          padding: '6px 12px',
+                          borderRadius: 20,
+                          border: 'none',
+                          fontSize: 12,
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          background: conversationFilter === null ? T.navy : T.g100,
+                          color: conversationFilter === null ? 'white' : T.g600,
                         }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 }}>
-                          {[1, 2, 3, 4, 5].map((s) => (
-                            <Star
-                              key={s}
-                              size={14}
-                              fill={s <= r.stars ? T.starGold : T.g200}
-                              color={s <= r.stars ? T.starGold : T.g200}
-                            />
-                          ))}
-                          <span style={{ marginLeft: 6, fontSize: 14, fontWeight: 700, color: T.navy }}>
-                            {r.title}
-                          </span>
-                        </div>
-
-                        <div style={{ fontSize: 12, color: T.g600, marginBottom: 10 }}>
-                          <strong style={{ color: T.navy }}>{r.author}</strong> - {r.role} &bull; {r.date}
-                        </div>
-
-                        <div style={{ fontSize: 14, color: T.g800, lineHeight: 1.6, marginBottom: 10 }}>
-                          {r.body}
-                        </div>
-
-                        {r.adjustments && (
-                          <div
+                        All {EXAMPLE_LESSON.totalContributions}
+                      </button>
+                      {CONTRIBUTION_TYPES.map(type => {
+                        const count = EXAMPLE_LESSON.pulse[type.id as keyof typeof EXAMPLE_LESSON.pulse];
+                        const isActive = conversationFilter === type.id;
+                        return (
+                          <button
+                            key={type.id}
+                            onClick={() => setConversationFilter(isActive ? null : type.id)}
                             style={{
-                              display: 'inline-block',
-                              padding: '4px 10px',
-                              background: '#FFF7E0',
-                              border: `1px solid ${T.gold}`,
-                              borderRadius: 6,
+                              padding: '6px 12px',
+                              borderRadius: 20,
+                              border: 'none',
                               fontSize: 12,
-                              color: T.navy,
                               fontWeight: 600,
-                              marginBottom: 10,
+                              cursor: 'pointer',
+                              background: isActive ? type.color : T.g100,
+                              color: isActive ? 'white' : T.g600,
                             }}
                           >
-                            {'\uD83D\uDD27'} {r.adjustments}
-                          </div>
-                        )}
+                            {type.label} {count}
+                          </button>
+                        );
+                      })}
+                    </div>
 
-                        <div style={{ display: 'flex', gap: 12, fontSize: 12, color: T.g600 }}>
-                          <button
+                    {/* Contributions list */}
+                    {EXAMPLE_LESSON.contributions
+                      .filter(c => !conversationFilter || c.type === conversationFilter)
+                      .map((c, i, arr) => {
+                        const config = getTypeConfig(c.type);
+                        return (
+                          <div
+                            key={i}
                             style={{
-                              background: 'transparent',
-                              border: 'none',
-                              color: T.g600,
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 4,
-                              padding: 0,
-                              fontSize: 12,
+                              paddingBottom: 20,
+                              marginBottom: 20,
+                              borderBottom: i < arr.length - 1 ? `1px solid ${T.g100}` : 'none',
+                              paddingLeft: 12,
+                              borderLeft: `3px solid ${config.color}`,
                             }}
                           >
-                            <ThumbsUp size={13} /> Helpful ({r.helpful})
-                          </button>
-                          <button
-                            style={{
-                              background: 'transparent',
-                              border: 'none',
-                              color: T.g600,
-                              cursor: 'pointer',
-                              padding: 0,
-                              fontSize: 12,
-                            }}
-                          >
-                            Reply
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                            {/* Type tag */}
+                            <span
+                              style={{
+                                display: 'inline-block',
+                                fontSize: 11,
+                                fontWeight: 600,
+                                padding: '2px 8px',
+                                borderRadius: 4,
+                                marginBottom: 6,
+                                background: `${config.color}18`,
+                                color: config.color,
+                              }}
+                            >
+                              {config.label}
+                            </span>
+
+                            {c.title && (
+                              <div style={{ fontSize: 14, fontWeight: 700, color: T.navy, marginBottom: 4 }}>
+                                {c.title}
+                              </div>
+                            )}
+
+                            <div style={{ fontSize: 12, color: T.g600, marginBottom: 10 }}>
+                              <strong style={{ color: T.navy }}>{c.author}</strong> - {c.role} &bull; {c.date}
+                            </div>
+
+                            <div style={{ fontSize: 14, color: T.g800, lineHeight: 1.6, marginBottom: 10 }}>
+                              {c.body}
+                            </div>
+
+                            <div style={{ display: 'flex', gap: 12, fontSize: 12, color: T.g600, position: 'relative' }}>
+                              <button
+                                onMouseEnter={() => setShowHelpfulTooltip(i)}
+                                onMouseLeave={() => setShowHelpfulTooltip(null)}
+                                style={{
+                                  background: 'transparent',
+                                  border: 'none',
+                                  color: T.g600,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 4,
+                                  padding: 0,
+                                  fontSize: 12,
+                                }}
+                              >
+                                <ThumbsUp size={13} /> Helpful ({c.helpful})
+                                <HelpCircle size={11} style={{ opacity: 0.4 }} />
+                              </button>
+                              {showHelpfulTooltip === i && (
+                                <div
+                                  style={{
+                                    position: 'absolute',
+                                    bottom: '100%',
+                                    left: 0,
+                                    marginBottom: 8,
+                                    padding: '8px 12px',
+                                    background: '#1F2937',
+                                    color: 'white',
+                                    fontSize: 11,
+                                    borderRadius: 8,
+                                    width: 220,
+                                    lineHeight: 1.4,
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                                    zIndex: 10,
+                                  }}
+                                >
+                                  &ldquo;Helpful&rdquo; means another teacher learned something from this story. It&rsquo;s a signal to others, not a rating of the post.
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
                   </div>
                 )}
 
