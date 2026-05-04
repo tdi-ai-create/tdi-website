@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { AlertsBanner } from './components/AlertsBanner'
+import { USChoroplethMap } from '@/components/tdi-admin/shared/USChoroplethMap'
 import { MetricsRow } from './components/MetricsRow'
 import { RevenuePipeline } from './components/RevenuePipeline'
 import { InvoicesTab } from './components/InvoicesTab'
@@ -99,6 +100,15 @@ export default function OperationsPage() {
         <>
           <MetricsRow metrics={data.metrics} />
           <RevenuePipeline revenue={data.revenue} />
+          {data.byState && Object.keys(data.byState).length > 0 && (
+            <div style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 16, padding: 24, marginTop: 24 }}>
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Geography</div>
+                <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>Where TDI partnerships are active</div>
+              </div>
+              <USChoroplethMap byState={data.byState} valueLabel="partnerships" accentColor="#F97316" />
+            </div>
+          )}
         </>
       )}
 

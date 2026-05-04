@@ -160,6 +160,39 @@ export async function GET() {
       .filter(d => d.activeCount > 0)
       .sort((a, b) => b.totalValue - a.totalValue)
 
+    // Geography: extract state from name/notes
+    const statePatterns: Record<string, RegExp> = {
+      'IL': /\b(IL|Illinois|Chicago|Wheaton|DuPage|Naperville|Carol Stream|Bloomingdale|Mokena|Frankfort|Schiller|Lansing|Addison|Glen Ellyn|Saunemin|Aurora|Kaneland|McHenry|Harvard|Knoxville|Olympia|Momence)\b/i,
+      'NJ': /\b(NJ|New Jersey|Lodi|Burlington)\b/i,
+      'NY': /\b(NY|New York|Elmont|Cheektowaga|BHBL|Maplebrook)\b/i,
+      'WI': /\b(WI|Wisconsin|Hamilton|Templeton|Antigo|Black River|Abbotsford|Alma Center|Medford|Ladysmith|Whitehall|Osseo)\b/i,
+      'VA': /\b(VA|Virginia|Prince William|Pulaski|Waynesboro)\b/i,
+      'PA': /\b(PA|Pennsylvania|Middletown|Tidioute)\b/i,
+      'KY': /\b(KY|Kentucky|Henry County|Boone|New Haven)\b/i,
+      'IN': /\b(IN|Indiana|North Adams|Putnam|Greencastle|Hendricks|Dubois|Vigo)\b/i,
+      'MD': /\b(MD|Maryland|PGCPS|Allenwood)\b/i,
+      'OH': /\b(OH|Ohio|Plymouth Shiloh)\b/i,
+      'ME': /\b(ME|Maine|RSU)\b/i,
+      'MT': /\b(MT|Montana|Yellowstone)\b/i,
+      'AL': /\b(AL|Alabama|Leeds)\b/i,
+      'LA': /\b(LA|Louisiana|Chanel)\b/i,
+      'CO': /\b(CO|Colorado|Denver|DPS)\b/i,
+      'TX': /\b(TX|Texas|Leander)\b/i,
+    }
+    const byState: Record<string, { count: number; value: number; won: number }> = {}
+    allOpps.filter((o: any) => !['lost'].includes(o.stage)).forEach((o: any) => {
+      const text = `${o.name || ''} ${o.notes || ''}`
+      for (const [state, pattern] of Object.entries(statePatterns)) {
+        if (pattern.test(text)) {
+          if (!byState[state]) byState[state] = { count: 0, value: 0, won: 0 }
+          byState[state].count++
+          byState[state].value += o.value || 0
+          if (o.stage === 'paid') byState[state].won++
+          break
+        }
+      }
+    })
+
     return NextResponse.json({
       alerts,
       metrics,
@@ -167,6 +200,7 @@ export async function GET() {
       invoicesData,
       renewalsData,
       districtsData,
+      byState,
     })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })

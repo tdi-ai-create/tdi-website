@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Loader2, BarChart3 } from 'lucide-react';
+import { USChoroplethMap } from '@/components/tdi-admin/shared/USChoroplethMap';
 import { getSupabase } from '@/lib/supabase';
 import { ADMIN_TYPOGRAPHY, PORTAL_TOKENS } from '@/components/tdi-admin/ui/design-tokens';
 import { FunnelCards } from '@/components/admin/cmo/FunnelCards';
@@ -216,6 +217,40 @@ export default function CMODashboardPage() {
 
         {/* Rae's Brief */}
         <RaeBrief briefs={briefs} />
+
+        {/* Audience Geography */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 18, fontWeight: 700, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Audience Geography</div>
+            <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>Substack subscriber distribution · 50 states, 101 countries</div>
+          </div>
+          <USChoroplethMap
+            byState={{
+              NY: { count: 605, value: 605, label: 'subscribers' },
+              IL: { count: 405, value: 405, label: 'subscribers' },
+              CA: { count: 380, value: 380, label: 'subscribers' },
+              GA: { count: 341, value: 341, label: 'subscribers' },
+              PA: { count: 301, value: 301, label: 'subscribers' },
+              TX: { count: 245, value: 245, label: 'subscribers' },
+              FL: { count: 220, value: 220, label: 'subscribers' },
+              OH: { count: 185, value: 185, label: 'subscribers' },
+              NC: { count: 165, value: 165, label: 'subscribers' },
+              VA: { count: 148, value: 148, label: 'subscribers' },
+              MI: { count: 132, value: 132, label: 'subscribers' },
+              NJ: { count: 128, value: 128, label: 'subscribers' },
+              MA: { count: 115, value: 115, label: 'subscribers' },
+              IN: { count: 108, value: 108, label: 'subscribers' },
+              WI: { count: 95, value: 95, label: 'subscribers' },
+              MN: { count: 88, value: 88, label: 'subscribers' },
+              CO: { count: 82, value: 82, label: 'subscribers' },
+              MD: { count: 78, value: 78, label: 'subscribers' },
+              WA: { count: 72, value: 72, label: 'subscribers' },
+              MO: { count: 68, value: 68, label: 'subscribers' },
+            }}
+            valueLabel="subscribers"
+            accentColor="#2A9D8F"
+          />
+        </div>
 
         {/* Charts */}
         <div className="grid md:grid-cols-2 gap-6">
