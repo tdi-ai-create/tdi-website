@@ -59,7 +59,7 @@ export async function GET() {
     })
 
     // Geography: extract state from name/notes heuristics
-    const byState: Record<string, { count: number; value: number; won: number }> = {}
+    const byState: Record<string, { count: number; value: number; won: number; byClassification: Record<string, { count: number; value: number }> }> = {}
     const statePatterns: Record<string, RegExp> = {
       'IL': /\b(IL|Illinois|Chicago|Wheaton|DuPage|Naperville|Carol Stream|Bloomingdale|Mokena|Frankfort|Schiller|Lansing|Addison|Glen Ellyn|Saunemin|Aurora|Kaneland|McHenry|Harvard|Knoxville|Olympia|Momence)\b/i,
       'NJ': /\b(NJ|New Jersey|Lodi|Burlington)\b/i,
@@ -84,19 +84,27 @@ export async function GET() {
       let matched = false
       for (const [state, pattern] of Object.entries(statePatterns)) {
         if (pattern.test(text)) {
-          if (!byState[state]) byState[state] = { count: 0, value: 0, won: 0 }
+          if (!byState[state]) byState[state] = { count: 0, value: 0, won: 0, byClassification: {} }
           byState[state].count++
           byState[state].value += o.value || 0
           if (o.stage === 'paid') byState[state].won++
+          const cls = o.lead_classification || 'targeting_area'
+          if (!byState[state].byClassification[cls]) byState[state].byClassification[cls] = { count: 0, value: 0 }
+          byState[state].byClassification[cls].count++
+          byState[state].byClassification[cls].value += o.value || 0
           matched = true
           break
         }
       }
       if (!matched) {
-        if (!byState['Other']) byState['Other'] = { count: 0, value: 0, won: 0 }
+        if (!byState['Other']) byState['Other'] = { count: 0, value: 0, won: 0, byClassification: {} }
         byState['Other'].count++
         byState['Other'].value += o.value || 0
         if (o.stage === 'paid') byState['Other'].won++
+        const cls = o.lead_classification || 'targeting_area'
+        if (!byState['Other'].byClassification[cls]) byState['Other'].byClassification[cls] = { count: 0, value: 0 }
+        byState['Other'].byClassification[cls].count++
+        byState['Other'].byClassification[cls].value += o.value || 0
       }
     })
 
