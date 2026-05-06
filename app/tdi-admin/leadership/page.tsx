@@ -159,6 +159,8 @@ function PortalAccessCell({
   const [sending, setSending] = useState(false);
   const [sentAt, setSentAt] = useState<string | null>(null);
   const [lastLogin, setLastLogin] = useState<string | null>(null);
+  const [resetting, setResetting] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   useEffect(() => {
     fetch(`/api/tdi-admin/leadership/${partnershipId}/invite-status`, {
@@ -195,20 +197,62 @@ function PortalAccessCell({
     setSending(false);
   }
 
+  async function sendPasswordReset() {
+    setResetting(true);
+    const res = await fetch('/api/tdi-admin/leadership/reset-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-email': userEmail,
+      },
+      body: JSON.stringify({
+        partnershipId,
+        email: contactEmail,
+      }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setResetSent(true);
+      setTimeout(() => setResetSent(false), 4000);
+    }
+    setResetting(false);
+  }
+
   if (status === 'loading') {
     return <div className="w-4 h-4 rounded-full border-2 border-gray-200 border-t-gray-400 animate-spin" />;
   }
 
   if (status === 'active') {
     return (
-      <div className="flex items-center gap-1.5">
-        <div className="w-2 h-2 rounded-full bg-green-500" />
-        <span className="text-xs text-green-700 font-medium">Active</span>
-        {lastLogin && (
-          <span className="text-xs text-gray-400">
-            · {new Date(lastLogin).toLocaleDateString()}
-          </span>
-        )}
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-1.5">
+          <div className="w-2 h-2 rounded-full bg-green-500" />
+          <span className="text-xs text-green-700 font-medium">Active</span>
+          {lastLogin && (
+            <span className="text-xs text-gray-400">
+              · {new Date(lastLogin).toLocaleDateString()}
+            </span>
+          )}
+        </div>
+        <button
+          onClick={sendPasswordReset}
+          disabled={resetting || resetSent}
+          className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-all disabled:opacity-60"
+          style={{
+            background: resetSent ? '#DCFCE7' : '#EFF6FF',
+            color: resetSent ? '#166534' : '#1D4ED8',
+          }}
+          title="Send password reset email to partner"
+        >
+          {resetting ? (
+            <Loader2 className="w-3 h-3 animate-spin" />
+          ) : resetSent ? (
+            <Check className="w-3 h-3" />
+          ) : (
+            <RefreshCw className="w-3 h-3" />
+          )}
+          {resetting ? 'Sending…' : resetSent ? 'Sent!' : 'Reset PW'}
+        </button>
       </div>
     );
   }
@@ -238,7 +282,7 @@ function PortalAccessCell({
       disabled={sending}
       className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-50"
       style={{
-        background: sending ? '#FEF3C7' : '#2563EB',
+        background: sending ? '#FEF3C7' : '#16A34A',
         color: sending ? '#92400E' : '#fff',
       }}
     >
@@ -470,7 +514,7 @@ export default function LeadershipDashboardPage() {
       <div className="px-6 py-6">
         {/* Page Header */}
         <div className="mb-6">
-          <h1 className="font-extrabold" style={{ fontSize: 28, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Lead Dashboard</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Lead Dashboard</h1>
           <p className="text-sm text-gray-500 mt-1">
             Manage school partnerships, reports, action items, and billing.
           </p>
@@ -487,8 +531,8 @@ export default function LeadershipDashboardPage() {
             <div className="p-5 flex items-center justify-between">
               <div>
                 <p
-                  className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontSize: 28, fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
+                  className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.activeCount}
                 </p>
@@ -513,8 +557,8 @@ export default function LeadershipDashboardPage() {
             <div className="p-5 flex items-center justify-between">
               <div>
                 <p
-                  className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontSize: 28, fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
+                  className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.totalEducators}
                 </p>
@@ -539,8 +583,8 @@ export default function LeadershipDashboardPage() {
             <div className="p-5 flex items-center justify-between">
               <div>
                 <p
-                  className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontSize: 28, fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
+                  className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.pendingSetup}
                 </p>
@@ -565,8 +609,8 @@ export default function LeadershipDashboardPage() {
             <div className="p-5 flex items-center justify-between">
               <div>
                 <p
-                  className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontSize: 28, fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
+                  className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.awaitingAccept}
                 </p>
@@ -1354,7 +1398,7 @@ export default function LeadershipDashboardPage() {
                     <div
                       className={`w-16 h-16 rounded-full mx-auto mb-2 flex items-center justify-center ${stage.color}`}
                     >
-                      <span className="font-bold" style={{ fontSize: 28 }}>{stage.count}</span>
+                      <span className="text-2xl font-bold">{stage.count}</span>
                     </div>
                     <p className="text-sm font-medium text-gray-700">
                       {stage.label}
@@ -1436,9 +1480,9 @@ export default function LeadershipDashboardPage() {
               </div>
 
               {/* Active */}
-              <div className="bg-white rounded-xl p-4 border border-gray-100" style={{ borderLeft: '3px solid #2563EB', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <div className="bg-white rounded-xl p-4 border border-gray-100" style={{ borderLeft: '3px solid #16A34A', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                 <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full" style={{ background: '#2563EB' }} />
+                  <div className="w-2 h-2 rounded-full" style={{ background: '#16A34A' }} />
                   Active ({pipelineCounts.active})
                 </h3>
                 <div className="space-y-2">
