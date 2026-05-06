@@ -99,7 +99,7 @@ export async function POST() {
 
         // Probability map
         const probabilityMap: Record<string, number> = {
-          unassigned: 0, targeting: 5, engaged: 10, qualified: 30,
+          unassigned: 0, targeting: 0, engaged: 10, qualified: 30,
           likely_yes: 50, proposal_sent: 70, signed: 90, paid: 100, lost: 0,
         }
 
