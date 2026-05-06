@@ -23,6 +23,7 @@ interface SalesOpportunity {
   invoice_amount: number | null
   invoice_notes: string | null
   contract_year: string | null
+  on_jims_call_sheet: boolean | null
   created_at: string
   updated_at: string
 }
@@ -48,6 +49,7 @@ interface Opportunity {
   invoice_amount: number | null
   invoice_notes: string | null
   contract_year: string | null
+  onJimsList: boolean
 }
 
 interface ActivityNote {
@@ -62,7 +64,7 @@ interface ActivityNote {
 // Stage display name map
 const STAGE_DISPLAY: Record<string, string> = {
   unassigned: 'Unassigned',
-  targeting: 'Targeting (5%)',
+  targeting: 'Targeting (0%)',
   engaged: 'Engaged (10%)',
   qualified: 'Qualified (30%)',
   likely_yes: 'Likely Yes (50%)',
@@ -75,7 +77,7 @@ const STAGE_DISPLAY: Record<string, string> = {
 // Stage order for kanban columns and dropdown
 const STAGE_OPTIONS = [
   { id: 'unassigned', name: 'Unassigned' },
-  { id: 'targeting', name: 'Targeting (5%)' },
+  { id: 'targeting', name: 'Targeting (0%)' },
   { id: 'engaged', name: 'Engaged (10%)' },
   { id: 'qualified', name: 'Qualified (30%)' },
   { id: 'likely_yes', name: 'Likely Yes (50%)' },
@@ -99,7 +101,7 @@ const STAGE_COLORS: Record<string, string> = {
 
 // Probability map for weighted value
 const STAGE_PROBABILITY: Record<string, number> = {
-  unassigned: 0, targeting: 5, engaged: 10, qualified: 30,
+  unassigned: 0, targeting: 0, engaged: 10, qualified: 30,
   likely_yes: 50, proposal_sent: 70, signed: 90, paid: 100, lost: 0,
 }
 
@@ -226,6 +228,7 @@ export default function SalesPage() {
         invoice_amount: row.invoice_amount,
         invoice_notes: row.invoice_notes,
         contract_year: row.contract_year,
+        onJimsList: row.on_jims_call_sheet || false,
       }))
 
       setOpportunities(mapped)
@@ -287,6 +290,59 @@ export default function SalesPage() {
   function showToast(message: string, type: 'success' | 'error') {
     setToast({ message, type })
     setTimeout(() => setToast(null), 3000)
+  }
+
+  async function toggleJimsList(supabaseId: string) {
+    const opp = opportunities.find(o => o.supabase_id === supabaseId)
+    if (!opp) return
+    const newVal = !opp.onJimsList
+    setOpportunities(prev => prev.map(o =>
+      o.supabase_id === supabaseId ? { ...o, onJimsList: newVal } : o
+    ))
+    const { error: updateError } = await supabase
+      .from('sales_opportunities')
+      .update({ on_jims_call_sheet: newVal, updated_at: new Date().toISOString() })
+      .eq('id', supabaseId)
+    if (updateError) {
+      setOpportunities(prev => prev.map(o =>
+        o.supabase_id === supabaseId ? { ...o, onJimsList: !newVal } : o
+      ))
+      showToast('Failed to update', 'error')
+    } else {
+      showToast(newVal ? "Added to Jim's list" : "Removed from Jim's list", 'success')
+    }
+  }
+
+  function exportCsv(rows: Opportunity[], filename: string) {
+    const escape = (v: any) => {
+      if (v === null || v === undefined) return ''
+      const s = String(v)
+      return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+    }
+    const header = 'Name,Value,Stage,Source,Notes'
+    const lines = rows.map(r =>
+      [r.name, r.value ? `$${r.value}` : '', r.stageName, r.source || '', (r.notes || '').split('\n')[0].slice(0, 200)]
+        .map(escape).join(',')
+    )
+    const csv = [header, ...lines].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function exportJimsList() {
+    const jimsOpps = activeOpps.filter(o => o.onJimsList)
+    const today = new Date().toISOString().split('T')[0]
+    exportCsv(jimsOpps, `jims-call-list-${today}.csv`)
+  }
+
+  function exportAllActive() {
+    const today = new Date().toISOString().split('T')[0]
+    exportCsv(activeOpps, `all-active-pipeline-${today}.csv`)
   }
 
   async function updateStage(supabaseId: string, ghlId: string | null, newStageId: string, newStageName: string) {
@@ -467,6 +523,7 @@ export default function SalesPage() {
   const renewalOpps = activeOpps.filter(o => o.type === 'renewal')
   const renewalFactored = renewalOpps.reduce((sum, o) => sum + factoredRevenue(o), 0)
   const invoiceCount = opportunities.filter(o => o.needs_invoice).length
+  const jimsListCount = activeOpps.filter(o => o.onJimsList).length
 
   // Source counts for dynamic filter chips
   const sourceCounts = activeOpps.reduce((acc, o) => {
@@ -483,8 +540,23 @@ export default function SalesPage() {
     const attention = isNeedsAttention(opp)
 
     return (
-      <div className={`bg-white border rounded-xl p-4 space-y-2 ${attention ? 'border-red-300' : 'border-gray-100'}`} style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-        <div className="flex items-start justify-between gap-2">
+      <div className={`bg-white border rounded-xl p-4 space-y-2 relative ${attention ? 'border-red-300' : 'border-gray-100'}`} style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+        {/* Jim's list toggle */}
+        <button
+          onClick={(e) => { e.stopPropagation(); toggleJimsList(opp.supabase_id) }}
+          title={opp.onJimsList ? "Remove from Jim's list" : "Add to Jim's list"}
+          className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center transition-all ${
+            opp.onJimsList
+              ? 'bg-green-100 text-green-700 hover:bg-green-200'
+              : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+          }`}
+        >
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+          </svg>
+        </button>
+
+        <div className="flex items-start justify-between gap-2 pr-8">
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-gray-900 truncate">{opp.name}</p>
           </div>
@@ -592,6 +664,18 @@ export default function SalesPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={exportJimsList}
+            className="text-xs px-3 py-1.5 rounded-lg font-medium bg-green-600 text-white hover:bg-green-700 transition-colors"
+          >
+            Export Jim&apos;s List
+          </button>
+          <button
+            onClick={exportAllActive}
+            className="text-xs px-3 py-1.5 rounded-lg font-medium border border-gray-300 hover:bg-gray-50 transition-colors"
+          >
+            Export All
+          </button>
           <button
             onClick={loadAll}
             className="text-xs text-indigo-600 hover:underline"
