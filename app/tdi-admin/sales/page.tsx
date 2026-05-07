@@ -7,6 +7,7 @@ import { StickyTopBar } from './components/StickyTopBar'
 import { FilterPanel, EMPTY_FILTERS, type ActiveFilters } from './components/FilterPanel'
 import { KanbanColumn } from './components/KanbanColumn'
 import { SalesCard, type SalesCardOpp } from './components/SalesCard'
+import AddLeadModal from '@/components/sales/AddLeadModal'
 
 type ViewMode = 'kanban' | 'list'
 type PageTab = 'pipeline' | 'analytics' | 'trash' | 'invoices'
@@ -153,8 +154,35 @@ export default function SalesPage() {
   const [showAllStages, setShowAllStages] = useState(true)
   const [showCallSheetOnly, setShowCallSheetOnly] = useState(false)
 
+  // Add Lead modal state
+  const [addLeadModalOpen, setAddLeadModalOpen] = useState(false)
+
   useEffect(() => {
     loadAll()
+  }, [])
+
+  // Realtime: refresh when enrichment completes on any lead
+  useEffect(() => {
+    const channel = supabase
+      .channel('leads-enrichment-updates')
+      .on(
+        'postgres_changes' as any,
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'sales_opportunities',
+        },
+        (payload: any) => {
+          if (payload.new?.enrichment_status === 'complete' || payload.new?.enrichment_status === 'failed') {
+            loadAll()
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   async function loadAll() {
@@ -701,7 +729,7 @@ export default function SalesPage() {
               {/* Sticky Top Bar */}
               <StickyTopBar
                 stats={stats}
-                onAddLead={() => showToastMsg('Add Lead UI ships in the next CCP', 'success')}
+                onAddLead={() => setAddLeadModalOpen(true)}
                 onExport={handleExport}
                 onExportJimsList={handleExportJimsList}
                 showCallSheetOnly={showCallSheetOnly}
@@ -1085,6 +1113,17 @@ export default function SalesPage() {
           </div>
         </>
       )}
+
+      {/* Add Lead Modal */}
+      <AddLeadModal
+        isOpen={addLeadModalOpen}
+        onClose={() => setAddLeadModalOpen(false)}
+        onLeadCreated={() => {
+          // Realtime subscription will handle the UI update when enrichment completes.
+          // Immediately refetch so the new card appears in the pipeline.
+          loadAll()
+        }}
+      />
 
       {/* Toast */}
       {toast && (
