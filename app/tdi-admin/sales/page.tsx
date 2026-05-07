@@ -319,9 +319,9 @@ export default function SalesPage() {
       const s = String(v)
       return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
     }
-    const header = 'Name,Value,Stage,Source,Notes'
+    const header = 'Name,Amount,Stage,Source,Notes'
     const lines = rows.map(r =>
-      [r.name, r.value ? `$${r.value}` : '', r.stageName, r.source || '', (r.notes || '').split('\n')[0].slice(0, 200)]
+      [r.name, r.value ? `$${r.value.toLocaleString()}` : '', r.stageName, r.source || '', (r.notes || '').replace(/\n/g, ' ').slice(0, 300)]
         .map(escape).join(',')
     )
     const csv = [header, ...lines].join('\n')

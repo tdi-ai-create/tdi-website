@@ -43,7 +43,8 @@ export async function POST() {
     const stageNameToTDI: Record<string, string> = {
       'unassigned': 'unassigned',
       'new (0%)': 'unassigned',
-      'targeting (5%)': 'targeting',
+      'targeting (5%)': 'targeting',  // GHL still shows 5% label but we map to 0%
+      'targeting (0%)': 'targeting',
       'engaged (10%)': 'engaged',
       'qualified (30%)': 'qualified',
       'likely yes (50%)': 'likely_yes',
@@ -99,7 +100,7 @@ export async function POST() {
 
         // Probability map
         const probabilityMap: Record<string, number> = {
-          unassigned: 0, targeting: 5, engaged: 10, qualified: 30,
+          unassigned: 0, targeting: 0, engaged: 10, qualified: 30,
           likely_yes: 50, proposal_sent: 70, signed: 90, paid: 100, lost: 0,
         }
 
