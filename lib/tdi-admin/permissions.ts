@@ -51,6 +51,7 @@ export interface TeamPermissions {
   cmo?: { access?: boolean };
   sales?: { access?: boolean };
   funding?: { access?: boolean };
+  settings?: { access?: boolean };
 }
 
 export type PortalSection = 'cmo' | 'sales' | 'intelligence' | 'learning_hub' | 'creator_studio' | 'funding' | 'leadership' | 'settings';
