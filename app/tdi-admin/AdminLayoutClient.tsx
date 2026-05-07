@@ -185,7 +185,7 @@ function AdminSidebar({ user }: { user: User }) {
           {NAV_ITEMS.map(item => {
             const active = isActive(item.href);
             // Check access - owners see all, others need section access
-            const hasAccess = isOwner || accessibleSections.includes(item.section as 'learning_hub' | 'creator_studio' | 'leadership');
+            const hasAccess = isOwner || accessibleSections.includes(item.section as any);
 
             if (!hasAccess) return null;
 

@@ -342,7 +342,7 @@ export default function TeamManagementPage() {
 
                 {/* Actions */}
                 <div className="flex items-center gap-2">
-                  {member.role !== 'owner' && (
+                  {isOwner && (
                     <>
                       <button
                         onClick={() => handleEditPermissions(member)}
@@ -563,6 +563,55 @@ export default function TeamManagementPage() {
             </div>
 
             <div className="p-6 space-y-6">
+              {/* Portal Access Toggles */}
+              <div>
+                <h3
+                  className="text-sm font-bold uppercase tracking-wider mb-3"
+                  style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  Portal Access
+                </h3>
+                <div className="space-y-2">
+                  {[
+                    { key: 'cmo', label: 'CMO Dashboard' },
+                    { key: 'sales', label: 'Sales' },
+                    { key: 'funding', label: 'Funding' },
+                  ].map(portal => {
+                    const portalPerms = (editPermissions as any)[portal.key] || {};
+                    const hasAccess = portalPerms.access === true;
+                    return (
+                      <label
+                        key={portal.key}
+                        className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 cursor-pointer"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        <span className="text-sm font-medium text-gray-700">{portal.label}</span>
+                        <input
+                          type="checkbox"
+                          checked={editingMember?.role === 'owner' ? true : hasAccess}
+                          disabled={editingMember?.role === 'owner'}
+                          onChange={() => {
+                            setEditPermissions(prev => ({
+                              ...prev,
+                              [portal.key]: { access: !hasAccess },
+                            }));
+                          }}
+                          className="w-5 h-5 rounded"
+                          style={{ accentColor: '#E8B84B' }}
+                        />
+                      </label>
+                    );
+                  })}
+                </div>
+                {editingMember?.role === 'owner' && (
+                  <p className="text-xs text-amber-600 mt-2 px-3" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                    Owner has full access to all portals by default.
+                  </p>
+                )}
+              </div>
+
+              <div className="border-t border-gray-200 pt-4" />
+
               {/* Learning Hub Section */}
               <PermissionSection
                 title="Learning Hub"
