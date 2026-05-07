@@ -36,6 +36,9 @@ interface SalesOpportunity {
   deleted_at: string | null
   deleted_by: string | null
   deletion_reason: string | null
+  contact_name: string | null
+  contact_email: string | null
+  contact_phone: string | null
   created_at: string
   updated_at: string
 }
@@ -68,6 +71,9 @@ interface Opportunity {
   deleted_at: string | null
   deleted_by: string | null
   deletion_reason: string | null
+  contactName: string | null
+  contactEmail: string | null
+  contactPhone: string | null
 }
 
 const STAGE_DISPLAY: Record<string, string> = {
@@ -188,6 +194,9 @@ export default function SalesPage() {
         deleted_at: row.deleted_at,
         deleted_by: row.deleted_by,
         deletion_reason: row.deletion_reason,
+        contactName: row.contact_name,
+        contactEmail: row.contact_email,
+        contactPhone: row.contact_phone,
       }))
 
       setOpportunities(mapped)
@@ -394,28 +403,39 @@ export default function SalesPage() {
   }
 
   // Export Jim's list to CSV
+  function csvDownload(rows: string[], filename: string) {
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function esc(v: any): string {
+    if (v === null || v === undefined) return ''
+    const s = String(v)
+    return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+  }
+
   function handleExportJimsList() {
     const rows = activeOpps
       .filter(o => !o.deleted_at && o.onCallSheet)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
-    const headers = ['Name', 'Amount', 'Stage', 'Source', 'Notes']
+    const headers = 'Name,Phone,Email,Notes,Stage,Amount'
     const csvRows = [
-      headers.join(','),
+      headers,
       ...rows.map(o => [
-        `"${(o.name || '').replace(/"/g, '""')}"`,
+        esc(o.name),
+        esc(o.contactPhone),
+        esc(o.contactEmail),
+        esc((o.notes || '').replace(/\n/g, ' ').slice(0, 300)),
+        esc(o.stageName),
         o.value ? `$${o.value.toLocaleString()}` : '',
-        o.stageName,
-        `"${(o.source || '').replace(/"/g, '""')}"`,
-        `"${(o.notes || '').replace(/"/g, '""').replace(/\n/g, ' ').slice(0, 300)}"`,
       ].join(','))
     ]
-    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `jims-call-list-${new Date().toISOString().split('T')[0]}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
+    csvDownload(csvRows, `jims-call-list-${new Date().toISOString().split('T')[0]}.csv`)
     showToastMsg(`Exported ${rows.length} Jim's list deals to CSV`, 'success')
   }
 
@@ -424,29 +444,19 @@ export default function SalesPage() {
     const rows = activeOpps
       .filter(o => !o.deleted_at)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
-    const headers = ['Name', 'Stage', 'Value', 'Probability', 'Type', 'Source', 'Heat', 'On Jim Call Sheet', 'Last Activity', 'Notes']
+    const headers = 'Name,Phone,Email,Notes,Stage,Amount'
     const csvRows = [
-      headers.join(','),
+      headers,
       ...rows.map(o => [
-        `"${(o.name || '').replace(/"/g, '""')}"`,
-        o.stage,
-        o.value ?? 0,
-        o.probability,
-        o.type,
-        `"${(o.source || '').replace(/"/g, '""')}"`,
-        o.heat,
-        o.onCallSheet ? 'Yes' : 'No',
-        o.lastActivityAt ? new Date(o.lastActivityAt).toLocaleDateString() : '',
-        `"${(o.notes || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
+        esc(o.name),
+        esc(o.contactPhone),
+        esc(o.contactEmail),
+        esc((o.notes || '').replace(/\n/g, ' ').slice(0, 300)),
+        esc(o.stageName),
+        o.value ? `$${o.value.toLocaleString()}` : '',
       ].join(','))
     ]
-    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `tdi-pipeline-${new Date().toISOString().split('T')[0]}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
+    csvDownload(csvRows, `tdi-pipeline-${new Date().toISOString().split('T')[0]}.csv`)
     showToastMsg(`Exported ${rows.length} deals to CSV`, 'success')
   }
 
