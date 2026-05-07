@@ -44,6 +44,8 @@ export interface SalesCardOpp {
   lastActivityAt: string | null
   heat: string
   contract_year?: string | null
+  city?: string | null
+  state?: string | null
 }
 
 function extractSubtitle(opp: SalesCardOpp): string {
@@ -165,6 +167,13 @@ export function SalesCard({ opp, onClick, draggable = false, onContextMenu, onFi
           )}
         </div>
       </div>
+
+      {/* City, State */}
+      {(opp.city || opp.state) && (
+        <p style={{ margin: '2px 0 0 0', fontSize: 10, color: '#9CA3AF', fontWeight: 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {[opp.city, opp.state].filter(Boolean).join(', ')}
+        </p>
+      )}
 
       {/* Line 2: Contextual subtitle or latest note */}
       {latestNote ? (

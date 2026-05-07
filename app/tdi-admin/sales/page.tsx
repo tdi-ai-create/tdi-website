@@ -41,6 +41,8 @@ interface SalesOpportunity {
   contact_email: string | null
   contact_phone: string | null
   website: string | null
+  city: string | null
+  state: string | null
   created_at: string
   updated_at: string
 }
@@ -77,6 +79,8 @@ interface Opportunity {
   contactEmail: string | null
   contactPhone: string | null
   website: string | null
+  city: string | null
+  state: string | null
 }
 
 const STAGE_DISPLAY: Record<string, string> = {
@@ -132,6 +136,8 @@ function toCardOpp(opp: Opportunity): SalesCardOpp {
     lastActivityAt: opp.lastActivityAt,
     heat: opp.heat,
     contract_year: opp.contract_year,
+    city: opp.city,
+    state: opp.state,
   }
 }
 
@@ -228,6 +234,8 @@ export default function SalesPage() {
         contactEmail: row.contact_email,
         contactPhone: row.contact_phone,
         website: row.website,
+        city: row.city,
+        state: row.state,
       }))
 
       setOpportunities(mapped)

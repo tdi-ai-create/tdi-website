@@ -130,6 +130,8 @@ export async function POST() {
             contact_name: opp.contact?.name || null,
             contact_email: opp.contact?.email || null,
             contact_phone: opp.contact?.phone || null,
+            city: opp.contact?.city || null,
+            state: opp.contact?.state || null,
           })
 
         if (oppError) {
