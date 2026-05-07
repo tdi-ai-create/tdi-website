@@ -8,20 +8,32 @@ import { TDIAdminProvider, useTDIAdmin } from '@/lib/tdi-admin/context';
 import { ShieldAlert, LogOut, Settings } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 
-// Portal accent colors - Approved color system v1.0
+// Portal accent colors - Approved color system v2.0
 const PORTAL_COLORS = {
-  hub: { accent: '#00B5AD', light: '#E0F7F6', bg15: 'rgba(0, 181, 173, 0.15)', border30: 'rgba(0, 181, 173, 0.3)' },
-  creators: { accent: '#8B5CF6', light: '#EDE9FE', bg15: 'rgba(139, 92, 246, 0.15)', border30: 'rgba(139, 92, 246, 0.3)' },
-  leadership: { accent: '#16A34A', light: '#DCFCE7', bg15: 'rgba(22, 163, 74, 0.15)', border30: 'rgba(22, 163, 74, 0.3)' },
-  intelligence: { accent: '#F59E0B', light: '#FEF3C7', bg15: 'rgba(245, 158, 11, 0.15)', border30: 'rgba(245, 158, 11, 0.3)' },
-  sales: { accent: '#6366F1', light: '#EEF2FF', bg15: 'rgba(99, 102, 241, 0.15)', border30: 'rgba(99, 102, 241, 0.3)' },
-  funding: { accent: '#EC4899', light: '#FCE7F3', bg15: 'rgba(236, 72, 153, 0.15)', border30: 'rgba(236, 72, 153, 0.3)' },
-  cmo: { accent: '#0D9488', light: '#CCFBF1', bg15: 'rgba(13, 148, 136, 0.15)', border30: 'rgba(13, 148, 136, 0.3)' },
+  cmo: { accent: '#2A9D8F', light: '#E0F7F6', bg15: 'rgba(42, 157, 143, 0.15)', border30: 'rgba(42, 157, 143, 0.3)' },
+  sales: { accent: '#10B981', light: '#D1FAE5', bg15: 'rgba(16, 185, 129, 0.15)', border30: 'rgba(16, 185, 129, 0.3)' },
+  intelligence: { accent: '#F97316', light: '#FFF7ED', bg15: 'rgba(249, 115, 22, 0.15)', border30: 'rgba(249, 115, 22, 0.3)' },
+  leadership: { accent: '#2563EB', light: '#DBEAFE', bg15: 'rgba(37, 99, 235, 0.15)', border30: 'rgba(37, 99, 235, 0.3)' },
+  hub: { accent: '#EAB308', light: '#FEF9C3', bg15: 'rgba(234, 179, 8, 0.15)', border30: 'rgba(234, 179, 8, 0.3)' },
+  creators: { accent: '#EC4899', light: '#FCE7F3', bg15: 'rgba(236, 72, 153, 0.15)', border30: 'rgba(236, 72, 153, 0.3)' },
+  funding: { accent: '#8B5CF6', light: '#EDE9FE', bg15: 'rgba(139, 92, 246, 0.15)', border30: 'rgba(139, 92, 246, 0.3)' },
   team: { accent: '#6B7280', light: '#F3F4F6', bg15: 'rgba(107, 114, 128, 0.15)', border30: 'rgba(107, 114, 128, 0.3)' },
 };
 
-// Navigation items - order: Sales, Learning Hub, Lead Dashboard, Creator Studio, Operations, Funding
+// Navigation items - order: CMO, Sales, Operations, Leadership, Hub, Creator Studio, Funding
 const NAV_ITEMS = [
+  {
+    id: 'cmo',
+    label: 'CMO Dashboard',
+    href: '/tdi-admin/cmo',
+    section: 'cmo',
+    accent: PORTAL_COLORS.cmo.accent,
+    icon: (active: boolean) => (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+      </svg>
+    ),
+  },
   {
     id: 'sales',
     label: 'Sales',
@@ -31,42 +43,6 @@ const NAV_ITEMS = [
     icon: (active: boolean) => (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.281m5.94 2.28l-2.28 5.941" />
-      </svg>
-    ),
-  },
-  {
-    id: 'hub',
-    label: 'Learning Hub',
-    href: '/tdi-admin/hub',
-    section: 'learning_hub',
-    accent: PORTAL_COLORS.hub.accent,
-    icon: (active: boolean) => (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-      </svg>
-    ),
-  },
-  {
-    id: 'leadership',
-    label: 'Lead Dashboard',
-    href: '/tdi-admin/leadership',
-    section: 'leadership',
-    accent: PORTAL_COLORS.leadership.accent,
-    icon: (active: boolean) => (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-      </svg>
-    ),
-  },
-  {
-    id: 'creators',
-    label: 'Creator Studio',
-    href: '/tdi-admin/creators',
-    section: 'creator_studio',
-    accent: PORTAL_COLORS.creators.accent,
-    icon: (active: boolean) => (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
       </svg>
     ),
   },
@@ -83,6 +59,30 @@ const NAV_ITEMS = [
     ),
   },
   {
+    id: 'hub',
+    label: 'Learning Hub',
+    href: '/tdi-admin/hub',
+    section: 'learning_hub',
+    accent: PORTAL_COLORS.hub.accent,
+    icon: (active: boolean) => (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+      </svg>
+    ),
+  },
+  {
+    id: 'creators',
+    label: 'Creator Studio',
+    href: '/tdi-admin/creators',
+    section: 'creator_studio',
+    accent: PORTAL_COLORS.creators.accent,
+    icon: (active: boolean) => (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+      </svg>
+    ),
+  },
+  {
     id: 'funding',
     label: 'Funding',
     href: '/tdi-admin/funding',
@@ -94,15 +94,19 @@ const NAV_ITEMS = [
       </svg>
     ),
   },
+];
+
+// Sub-nav items (below divider)
+const SUB_NAV_ITEMS = [
   {
-    id: 'cmo',
-    label: 'CMO Dashboard',
-    href: '/tdi-admin/cmo',
-    section: 'cmo',
-    accent: PORTAL_COLORS.cmo.accent,
+    id: 'leadership',
+    label: 'Lead Dashboard',
+    href: '/tdi-admin/leadership',
+    section: 'leadership',
+    accent: PORTAL_COLORS.leadership.accent,
     icon: (active: boolean) => (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
       </svg>
     ),
   },
@@ -140,7 +144,8 @@ function AdminSidebar({ user }: { user: User }) {
   }
 
   function getActiveItem() {
-    return NAV_ITEMS.find(item => pathname.startsWith(item.href));
+    return NAV_ITEMS.find(item => pathname.startsWith(item.href))
+      || SUB_NAV_ITEMS.find(item => pathname.startsWith(item.href));
   }
 
   const activeItem = getActiveItem();
@@ -184,6 +189,35 @@ function AdminSidebar({ user }: { user: User }) {
 
             if (!hasAccess) return null;
 
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-2 ${collapsed ? '' : 'lg:px-3'} py-2.5 rounded-lg transition-all group ${
+                  active
+                    ? 'bg-white/10 text-white'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+                style={active ? { borderLeft: `3px solid ${item.accent}`, paddingLeft: '9px' } : {}}
+                title={item.label}
+              >
+                <span
+                  style={{ color: active ? item.accent : undefined }}
+                  className={`flex-shrink-0 transition-colors ${!active ? 'group-hover:text-white' : ''}`}
+                >
+                  {item.icon(active)}
+                </span>
+                {!collapsed && <span className="hidden lg:block text-sm font-medium truncate">{item.label}</span>}
+              </Link>
+            );
+          })}
+
+          {/* Divider + Sub-nav */}
+          <div className="my-2 mx-2 border-t border-white/10" />
+          {SUB_NAV_ITEMS.map(item => {
+            const active = isActive(item.href);
+            const hasAccess = isOwner || accessibleSections.includes(item.section as any);
+            if (!hasAccess) return null;
             return (
               <Link
                 key={item.href}
@@ -429,7 +463,8 @@ function AdminLayoutContent({ children, user }: { children: React.ReactNode; use
   const { isLoading: adminLoading, hasAccess } = useTDIAdmin();
 
   // Determine active accent color for the top bar
-  const activeItem = NAV_ITEMS.find(item => pathname.startsWith(item.href));
+  const activeItem = NAV_ITEMS.find(item => pathname.startsWith(item.href))
+    || SUB_NAV_ITEMS.find(item => pathname.startsWith(item.href));
   const isTeamPage = pathname.startsWith('/tdi-admin/team');
   const activeAccent = isTeamPage
     ? PORTAL_COLORS.team.accent

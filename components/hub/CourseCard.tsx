@@ -15,9 +15,9 @@ const CATEGORY_COLORS: Record<string, { bar: string; bg: string; text: string }>
 };
 
 const CAPACITY_STYLES: Record<string, { color: string; label: string }> = {
-  low:    { color: '#6BA368', label: 'Low Capacity' },
-  medium: { color: '#E8B84B', label: 'Medium Capacity' },
-  high:   { color: '#E8927C', label: 'High Capacity' },
+  low:    { color: '#6BA368', label: 'Low Lift' },
+  medium: { color: '#E8B84B', label: 'Medium Lift' },
+  high:   { color: '#E8927C', label: 'High Lift' },
 };
 
 interface CourseCardProps {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Loader2, BarChart3 } from 'lucide-react';
+import { USChoroplethMap } from '@/components/tdi-admin/shared/USChoroplethMap';
 import { getSupabase } from '@/lib/supabase';
 import { ADMIN_TYPOGRAPHY, PORTAL_TOKENS } from '@/components/tdi-admin/ui/design-tokens';
 import { FunnelCards } from '@/components/admin/cmo/FunnelCards';
@@ -51,13 +52,21 @@ export default function CMODashboardPage() {
   const [arrData, setArrData] = useState<PaidARR[]>([]);
   const [dataLoading, setDataLoading] = useState(false);
 
-  // Verify migration 040 has been applied (portal layout already handles auth)
+  // Verify migration applied + find most recent week with data
   useEffect(() => {
     const probe = async () => {
-      const { error } = await supabase.from('cmo_weekly_metrics').select('id').limit(1);
+      const { data, error } = await supabase
+        .from('cmo_weekly_metrics')
+        .select('week_start')
+        .order('week_start', { ascending: false })
+        .limit(1);
       if (error?.code === '42P01' || error?.message?.includes('does not exist')) {
         setPageState('db_pending');
       } else {
+        // Auto-select the most recent week that has data
+        if (data && data.length > 0) {
+          setWeekStart(data[0].week_start);
+        }
         setPageState('ready');
       }
     };
@@ -143,26 +152,28 @@ export default function CMODashboardPage() {
 
   return (
     <div style={{ background: PORTAL_TOKENS.pageBg }}>
-      {/* Section header */}
-      <div className="w-full" style={{ backgroundColor: PORTAL_TOKENS.sectionHeaderBg }}>
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-6">
-          <div className="flex items-center gap-3 mb-1">
-            <BarChart3 size={24} className="text-teal-400" />
-            <h1
-              className="text-2xl font-bold text-white"
-              style={{ fontFamily: ADMIN_TYPOGRAPHY.fontFamily.heading }}
-            >
-              CMO Dashboard
-            </h1>
-          </div>
-          <p className="text-gray-300 text-sm" style={{ fontFamily: ADMIN_TYPOGRAPHY.fontFamily.body }}>
-            Attract → Warm → Convert — weekly marketing funnel
-          </p>
-        </div>
-      </div>
-
       {/* Content */}
       <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-6 space-y-6">
+        {/* Section header */}
+        <div style={{ marginBottom: 8 }}>
+          <h1
+            style={{
+              fontSize: 28,
+              fontWeight: 800,
+              color: '#2B3A67',
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              margin: 0,
+              display: 'inline-block',
+              borderBottom: '3px solid #2A9D8F',
+              paddingBottom: 8,
+            }}
+          >
+            CMO Dashboard
+          </h1>
+          <p style={{ fontSize: 13, color: '#6B7280', marginTop: 8, fontFamily: "'DM Sans', sans-serif" }}>
+            Attract → Warm → Convert · weekly marketing funnel
+          </p>
+        </div>
         {/* Week selector */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -206,6 +217,40 @@ export default function CMODashboardPage() {
 
         {/* Rae's Brief */}
         <RaeBrief briefs={briefs} />
+
+        {/* Audience Geography */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 18, fontWeight: 700, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Audience Geography</div>
+            <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>Substack subscriber distribution · 50 states, 101 countries</div>
+          </div>
+          <USChoroplethMap
+            byState={{
+              NY: { count: 605, value: 605, label: 'subscribers' },
+              IL: { count: 405, value: 405, label: 'subscribers' },
+              CA: { count: 380, value: 380, label: 'subscribers' },
+              GA: { count: 341, value: 341, label: 'subscribers' },
+              PA: { count: 301, value: 301, label: 'subscribers' },
+              TX: { count: 245, value: 245, label: 'subscribers' },
+              FL: { count: 220, value: 220, label: 'subscribers' },
+              OH: { count: 185, value: 185, label: 'subscribers' },
+              NC: { count: 165, value: 165, label: 'subscribers' },
+              VA: { count: 148, value: 148, label: 'subscribers' },
+              MI: { count: 132, value: 132, label: 'subscribers' },
+              NJ: { count: 128, value: 128, label: 'subscribers' },
+              MA: { count: 115, value: 115, label: 'subscribers' },
+              IN: { count: 108, value: 108, label: 'subscribers' },
+              WI: { count: 95, value: 95, label: 'subscribers' },
+              MN: { count: 88, value: 88, label: 'subscribers' },
+              CO: { count: 82, value: 82, label: 'subscribers' },
+              MD: { count: 78, value: 78, label: 'subscribers' },
+              WA: { count: 72, value: 72, label: 'subscribers' },
+              MO: { count: 68, value: 68, label: 'subscribers' },
+            }}
+            valueLabel="subscribers"
+            accentColor="#2A9D8F"
+          />
+        </div>
 
         {/* Charts */}
         <div className="grid md:grid-cols-2 gap-6">

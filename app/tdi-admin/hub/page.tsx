@@ -54,8 +54,8 @@ function StatCard({
       <div className="h-0.5 w-full" style={{ background: theme.accent }} />
       <div className="p-5">
         <p
-          className="text-2xl font-bold mb-1"
-          style={{ color: theme.accent }}
+          className="font-bold mb-1"
+          style={{ color: theme.accent, fontSize: 28, fontFamily: "'DM Sans', sans-serif" }}
         >
           {typeof value === 'number' ? value.toLocaleString() : value}
         </p>
@@ -167,7 +167,7 @@ export default function HubAdminPage() {
               style={{
                 color: tab.id === 'overview' ? '#111827' : '#6B7280',
                 borderBottom: tab.id === 'overview'
-                  ? '2px solid #00B5AD'
+                  ? '2px solid #EAB308'
                   : '2px solid transparent',
               }}
             >
@@ -181,7 +181,7 @@ export default function HubAdminPage() {
       <div className="px-6 py-6">
         {/* Page Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Learning Hub</h1>
+          <h1 className="font-extrabold" style={{ fontSize: 28, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Learning Hub</h1>
           <p className="text-sm text-gray-500 mt-1">Manage enrollments, content, and analytics</p>
         </div>
 
@@ -192,7 +192,7 @@ export default function HubAdminPage() {
 
         {/* Stats Overview */}
         <div className="mb-8">
-          <h2 className="text-sm font-semibold text-gray-900 mb-4">Quick Stats</h2>
+          <h2 className="font-bold mb-4" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Quick Stats</h2>
           {isLoading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
               {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -226,7 +226,7 @@ export default function HubAdminPage() {
 
         {/* Section Cards */}
         <div className="mb-8">
-          <h2 className="text-sm font-semibold text-gray-900 mb-4">Manage</h2>
+          <h2 className="font-bold mb-4" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Manage</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <SectionCard
               title="Operations"
