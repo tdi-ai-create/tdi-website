@@ -39,6 +39,7 @@ interface SalesOpportunity {
   contact_name: string | null
   contact_email: string | null
   contact_phone: string | null
+  website: string | null
   created_at: string
   updated_at: string
 }
@@ -74,6 +75,7 @@ interface Opportunity {
   contactName: string | null
   contactEmail: string | null
   contactPhone: string | null
+  website: string | null
 }
 
 const STAGE_DISPLAY: Record<string, string> = {
@@ -197,6 +199,7 @@ export default function SalesPage() {
         contactName: row.contact_name,
         contactEmail: row.contact_email,
         contactPhone: row.contact_phone,
+        website: row.website,
       }))
 
       setOpportunities(mapped)
@@ -419,23 +422,30 @@ export default function SalesPage() {
     return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
   }
 
-  function handleExportJimsList() {
-    const rows = activeOpps
-      .filter(o => !o.deleted_at && o.onCallSheet)
-      .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
-    const headers = 'Name,Phone,Email,Notes,Stage,Amount'
+  function exportRows(rows: Opportunity[], filename: string) {
+    const headers = 'Name,Contact Name,Phone,Email,Website,Stage,Amount,Source,Notes'
     const csvRows = [
       headers,
       ...rows.map(o => [
         esc(o.name),
+        esc(o.contactName),
         esc(o.contactPhone),
         esc(o.contactEmail),
-        esc((o.notes || '').replace(/\n/g, ' ').slice(0, 300)),
+        esc(o.website),
         esc(o.stageName),
         o.value ? `$${o.value.toLocaleString()}` : '',
+        esc(o.source),
+        esc((o.notes || '').replace(/\n/g, ' ').slice(0, 300)),
       ].join(','))
     ]
-    csvDownload(csvRows, `jims-call-list-${new Date().toISOString().split('T')[0]}.csv`)
+    csvDownload(csvRows, filename)
+  }
+
+  function handleExportJimsList() {
+    const rows = activeOpps
+      .filter(o => !o.deleted_at && o.onCallSheet)
+      .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
+    exportRows(rows, `jims-call-list-${new Date().toISOString().split('T')[0]}.csv`)
     showToastMsg(`Exported ${rows.length} Jim's list deals to CSV`, 'success')
   }
 
@@ -444,19 +454,7 @@ export default function SalesPage() {
     const rows = activeOpps
       .filter(o => !o.deleted_at)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
-    const headers = 'Name,Phone,Email,Notes,Stage,Amount'
-    const csvRows = [
-      headers,
-      ...rows.map(o => [
-        esc(o.name),
-        esc(o.contactPhone),
-        esc(o.contactEmail),
-        esc((o.notes || '').replace(/\n/g, ' ').slice(0, 300)),
-        esc(o.stageName),
-        o.value ? `$${o.value.toLocaleString()}` : '',
-      ].join(','))
-    ]
-    csvDownload(csvRows, `tdi-pipeline-${new Date().toISOString().split('T')[0]}.csv`)
+    exportRows(rows, `tdi-pipeline-${new Date().toISOString().split('T')[0]}.csv`)
     showToastMsg(`Exported ${rows.length} deals to CSV`, 'success')
   }
 
