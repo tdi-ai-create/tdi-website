@@ -1,7 +1,7 @@
 'use client'
 
 const STAGE_LABELS: Record<string, string> = {
-  targeting: 'Targeting (5%)',
+  targeting: 'Targeting (0%)',
   engaged: 'Engaged (10%)',
   qualified: 'Qualified (30%)',
   likely_yes: 'Likely Yes (50%)',
