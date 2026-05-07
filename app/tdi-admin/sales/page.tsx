@@ -616,6 +616,24 @@ export default function SalesPage() {
           <button onClick={loadAll} style={{ fontSize: 12, color: '#10B981', background: 'none', border: 'none', cursor: 'pointer' }}>
             Refresh
           </button>
+          <button
+            onClick={async () => {
+              showToastMsg('Syncing contacts from GHL...', 'success')
+              try {
+                const res = await fetch('/api/ghl/sync-contacts', { method: 'POST' })
+                const data = await res.json()
+                if (data.success) {
+                  showToastMsg(`Synced ${data.updated} contacts from GHL`, 'success')
+                  loadAll()
+                } else {
+                  showToastMsg(data.error || 'Sync failed', 'error')
+                }
+              } catch { showToastMsg('Sync failed', 'error') }
+            }}
+            style={{ fontSize: 12, color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer' }}
+          >
+            Sync Contacts
+          </button>
           <div style={{ display: 'flex', background: '#ECFDF5', borderRadius: 8, padding: 2 }}>
             {(['list', 'kanban'] as ViewMode[]).map(v => (
               <button

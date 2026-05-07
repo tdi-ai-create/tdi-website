@@ -127,6 +127,9 @@ export async function POST() {
             assigned_to_email: opp.assignedTo || null,
             source: 'GHL Import',
             notes: `Imported from GHL on ${new Date().toISOString().split('T')[0]}`,
+            contact_name: opp.contact?.name || null,
+            contact_email: opp.contact?.email || null,
+            contact_phone: opp.contact?.phone || null,
           })
 
         if (oppError) {
