@@ -72,7 +72,7 @@ interface Opportunity {
 
 const STAGE_DISPLAY: Record<string, string> = {
   unassigned: 'Unassigned',
-  targeting: 'Targeting (5%)',
+  targeting: 'Targeting (0%)',
   engaged: 'Engaged (10%)',
   qualified: 'Qualified (30%)',
   likely_yes: 'Likely Yes (50%)',
@@ -83,7 +83,7 @@ const STAGE_DISPLAY: Record<string, string> = {
 }
 
 const STAGE_PROBABILITY: Record<string, number> = {
-  unassigned: 0, targeting: 5, engaged: 10, qualified: 30,
+  unassigned: 0, targeting: 0, engaged: 10, qualified: 30,
   likely_yes: 50, proposal_sent: 70, signed: 90, paid: 100, lost: 0,
 }
 
@@ -135,6 +135,10 @@ export default function SalesPage() {
   const [error, setError] = useState('')
   const [lastSynced, setLastSynced] = useState<Date | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+  const [oppNotes, setOppNotes] = useState<Record<string, { body: string; created_at: string }[]>>({})
+  const [quickNoteOppId, setQuickNoteOppId] = useState<string | null>(null)
+  const [quickNoteText, setQuickNoteText] = useState('')
+  const [savingQuickNote, setSavingQuickNote] = useState(false)
 
   // Filter state
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(EMPTY_FILTERS)
@@ -188,6 +192,20 @@ export default function SalesPage() {
 
       setOpportunities(mapped)
       setLastSynced(new Date())
+
+      // Load notes
+      const { data: notesData } = await supabase
+        .from('opportunity_notes')
+        .select('opportunity_id, body, created_at')
+        .order('created_at', { ascending: false })
+      if (notesData) {
+        const grouped: Record<string, { body: string; created_at: string }[]> = {}
+        notesData.forEach((n: any) => {
+          if (!grouped[n.opportunity_id]) grouped[n.opportunity_id] = []
+          grouped[n.opportunity_id].push({ body: n.body, created_at: n.created_at })
+        })
+        setOppNotes(grouped)
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to load opportunities')
     }
@@ -335,7 +353,73 @@ export default function SalesPage() {
       .eq('id', oppId)
   }
 
-  // Export pipeline to CSV
+  // Quick-add note
+  async function handleQuickNoteSave() {
+    if (!quickNoteOppId || !quickNoteText.trim()) return
+    setSavingQuickNote(true)
+    const body = quickNoteText.trim()
+    const now = new Date().toISOString()
+
+    await supabase.from('opportunity_notes').insert({
+      opportunity_id: quickNoteOppId,
+      body,
+      created_at: now,
+      created_by: 'admin',
+    })
+
+    // Update local state
+    setOppNotes(prev => ({
+      ...prev,
+      [quickNoteOppId]: [{ body, created_at: now }, ...(prev[quickNoteOppId] || [])],
+    }))
+
+    // Update last_activity_at
+    await supabase
+      .from('sales_opportunities')
+      .update({ last_activity_at: now, updated_at: now })
+      .eq('id', quickNoteOppId)
+
+    setOpportunities(prev => prev.map(o =>
+      o.supabase_id === quickNoteOppId ? { ...o, lastActivityAt: now } : o
+    ))
+
+    setSavingQuickNote(false)
+    setQuickNoteText('')
+    setQuickNoteOppId(null)
+    showToastMsg('Note saved', 'success')
+  }
+
+  function getLatestNoteForOpp(oppId: string): { body: string; created_at: string } | null {
+    return oppNotes[oppId]?.[0] || null
+  }
+
+  // Export Jim's list to CSV
+  function handleExportJimsList() {
+    const rows = activeOpps
+      .filter(o => !o.deleted_at && o.onCallSheet)
+      .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
+    const headers = ['Name', 'Amount', 'Stage', 'Source', 'Notes']
+    const csvRows = [
+      headers.join(','),
+      ...rows.map(o => [
+        `"${(o.name || '').replace(/"/g, '""')}"`,
+        o.value ? `$${o.value.toLocaleString()}` : '',
+        o.stageName,
+        `"${(o.source || '').replace(/"/g, '""')}"`,
+        `"${(o.notes || '').replace(/"/g, '""').replace(/\n/g, ' ').slice(0, 300)}"`,
+      ].join(','))
+    ]
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `jims-call-list-${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+    showToastMsg(`Exported ${rows.length} Jim's list deals to CSV`, 'success')
+  }
+
+  // Export all active pipeline to CSV
   function handleExport() {
     const rows = activeOpps
       .filter(o => !o.deleted_at)
@@ -593,6 +677,7 @@ export default function SalesPage() {
                 stats={stats}
                 onAddLead={() => showToastMsg('Add Lead UI ships in the next CCP', 'success')}
                 onExport={handleExport}
+                onExportJimsList={handleExportJimsList}
                 showCallSheetOnly={showCallSheetOnly}
                 onToggleCallSheet={() => setShowCallSheetOnly(!showCallSheetOnly)}
               />
@@ -632,6 +717,9 @@ export default function SalesPage() {
                         onDrop={handleStageDrop}
                         onCardContextMenu={handleCardContextMenu}
                         onFieldSaved={handleFieldSaved}
+                        onToggleCallSheet={handleToggleCallSheet}
+                        onAddNote={(oppId) => setQuickNoteOppId(oppId)}
+                        getNoteForOpp={getLatestNoteForOpp}
                       />
                     ))}
                   </div>
@@ -654,6 +742,9 @@ export default function SalesPage() {
                           opp={toCardOpp(opp)}
                           onClick={() => showToastMsg(`Detail panel for "${opp.name}" ships in next CCP`, 'success')}
                           onFieldSaved={handleFieldSaved}
+                          onToggleCallSheet={handleToggleCallSheet}
+                          onAddNote={(oppId) => setQuickNoteOppId(oppId)}
+                          latestNote={getLatestNoteForOpp(opp.supabase_id)}
                         />
                       ))
                   )}
@@ -905,6 +996,64 @@ export default function SalesPage() {
                 }}
               >
                 {savingNote ? 'Saving...' : 'Save Note'}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Quick-add note modal */}
+      {quickNoteOppId && (
+        <>
+          <div onClick={() => { setQuickNoteOppId(null); setQuickNoteText('') }} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 150 }} />
+          <div style={{
+            position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+            background: 'white', borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw',
+            boxShadow: '0 12px 40px rgba(0,0,0,0.2)', zIndex: 151,
+          }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#0a0f1e', marginBottom: 4 }}>Add Note</div>
+            <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 12 }}>
+              {opportunities.find(o => o.supabase_id === quickNoteOppId)?.name || ''}
+            </div>
+            {/* Show recent notes */}
+            {oppNotes[quickNoteOppId] && oppNotes[quickNoteOppId].length > 0 && (
+              <div style={{ maxHeight: 120, overflowY: 'auto', marginBottom: 12, padding: 8, background: '#F9FAFB', borderRadius: 8 }}>
+                {oppNotes[quickNoteOppId].slice(0, 3).map((n, i) => (
+                  <div key={i} style={{ fontSize: 11, color: '#6B7280', marginBottom: 6 }}>
+                    <span style={{ color: '#374151' }}>{n.body}</span>
+                    <span style={{ marginLeft: 6, color: '#9CA3AF' }}>{new Date(n.created_at).toLocaleDateString()}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <textarea
+              value={quickNoteText}
+              onChange={(e) => setQuickNoteText(e.target.value)}
+              placeholder="Type a note... (e.g. 'called - left voicemail')"
+              autoFocus
+              rows={3}
+              style={{
+                width: '100%', padding: 10, border: '1.5px solid #D1D5DB', borderRadius: 8,
+                fontSize: 13, outline: 'none', resize: 'vertical', fontFamily: "'DM Sans', sans-serif",
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleQuickNoteSave() }
+                if (e.key === 'Escape') { setQuickNoteOppId(null); setQuickNoteText('') }
+              }}
+            />
+            <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+              <button
+                onClick={() => { setQuickNoteOppId(null); setQuickNoteText('') }}
+                style={{ flex: 1, padding: '8px 16px', borderRadius: 8, border: '1px solid #D1D5DB', background: 'white', cursor: 'pointer', fontSize: 13 }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleQuickNoteSave}
+                disabled={savingQuickNote || !quickNoteText.trim()}
+                style={{ flex: 1, padding: '8px 16px', borderRadius: 8, border: 'none', background: '#10B981', color: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 13, opacity: savingQuickNote || !quickNoteText.trim() ? 0.5 : 1 }}
+              >
+                {savingQuickNote ? 'Saving...' : 'Save Note'}
               </button>
             </div>
           </div>

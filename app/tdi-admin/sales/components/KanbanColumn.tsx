@@ -19,6 +19,9 @@ export function KanbanColumn({
   onDrop,
   onCardContextMenu,
   onFieldSaved,
+  onToggleCallSheet,
+  onAddNote,
+  getNoteForOpp,
 }: {
   stage: string
   label: string
@@ -27,6 +30,9 @@ export function KanbanColumn({
   onDrop?: (oppId: string, toStage: string) => void
   onCardContextMenu?: (e: React.MouseEvent, oppId: string) => void
   onFieldSaved?: (oppId: string, field: string, newValue: any) => void
+  onToggleCallSheet?: (oppId: string) => void
+  onAddNote?: (oppId: string) => void
+  getNoteForOpp?: (oppId: string) => { body: string; created_at: string } | null
 }) {
   const [isDragOver, setIsDragOver] = useState(false)
   const total = opportunities.reduce((s, o) => s + (o.value || 0), 0)
@@ -113,6 +119,9 @@ export function KanbanColumn({
                 onCardClick={onCardClick}
                 onCardContextMenu={onCardContextMenu}
                 onFieldSaved={onFieldSaved}
+                onToggleCallSheet={onToggleCallSheet}
+                onAddNote={onAddNote}
+                getNoteForOpp={getNoteForOpp}
               />
             )
           })
@@ -129,6 +138,9 @@ function CollapsibleHeatGroup({
   onCardClick,
   onCardContextMenu,
   onFieldSaved,
+  onToggleCallSheet,
+  onAddNote,
+  getNoteForOpp,
 }: {
   heat: string
   cards: SalesCardOpp[]
@@ -136,6 +148,9 @@ function CollapsibleHeatGroup({
   onCardClick: (opp: SalesCardOpp) => void
   onCardContextMenu?: (e: React.MouseEvent, oppId: string) => void
   onFieldSaved?: (oppId: string, field: string, newValue: any) => void
+  onToggleCallSheet?: (oppId: string) => void
+  onAddNote?: (oppId: string) => void
+  getNoteForOpp?: (oppId: string) => { body: string; created_at: string } | null
 }) {
   const [isOpen, setIsOpen] = useState(!isCollapsible)
   const meta = HEAT_LABELS[heat] || HEAT_LABELS.warm
@@ -163,7 +178,7 @@ function CollapsibleHeatGroup({
         {meta.label} &middot; {cards.length}
       </div>
       {isOpen && cards.map(opp => (
-        <SalesCard key={opp.id} opp={opp} onClick={() => onCardClick(opp)} draggable onContextMenu={onCardContextMenu ? (e) => onCardContextMenu(e, opp.id) : undefined} onFieldSaved={onFieldSaved} />
+        <SalesCard key={opp.id} opp={opp} onClick={() => onCardClick(opp)} draggable onContextMenu={onCardContextMenu ? (e) => onCardContextMenu(e, opp.id) : undefined} onFieldSaved={onFieldSaved} onToggleCallSheet={onToggleCallSheet} onAddNote={onAddNote} latestNote={getNoteForOpp ? getNoteForOpp(opp.id) : null} />
       ))}
     </div>
   )
