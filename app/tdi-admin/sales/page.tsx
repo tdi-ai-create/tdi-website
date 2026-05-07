@@ -195,7 +195,7 @@ export default function SalesPage() {
 
       // Load notes
       const { data: notesData } = await supabase
-        .from('opportunity_notes')
+        .from('sales_opportunity_notes')
         .select('opportunity_id, body, created_at')
         .order('created_at', { ascending: false })
       if (notesData) {
