@@ -282,14 +282,16 @@ export default function TDIAdminCreatorDetailPage() {
     const notes = await getCreatorNotes(creatorId, true);
     setAllNotes(notes);
 
-    // Load projected date history
-    const sb = getSupabase();
-    const { data: history } = await sb
-      .from('projected_date_history')
-      .select('*')
-      .eq('creator_id', creatorId)
-      .order('changed_at', { ascending: false });
-    setDateHistory(history || []);
+    // Load projected date history via API (bypasses RLS)
+    try {
+      const historyRes = await fetch(`/api/admin/creators/${creatorId}/date-history`)
+      if (historyRes.ok) {
+        const historyData = await historyRes.json()
+        setDateHistory(historyData.history || [])
+      }
+    } catch {
+      // Silently handle — history card will show "no changes"
+    }
 
     setIsLoading(false);
   }, [creatorId]);

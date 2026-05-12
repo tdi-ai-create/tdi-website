@@ -48,8 +48,18 @@ interface CreatorRecord {
   projected_completion_date: string | null;
   projected_publish_date: string | null;
   is_active: boolean | null;
+  is_test_account: boolean | null;
   lifecycle_state: string | null;
   paused_at: string | null;
+  paused_by: string | null;
+  pause_reason: string | null;
+  pause_type: string | null;
+  last_check_in_at: string | null;
+  unpaused_at: string | null;
+  unpause_token: string | null;
+  projected_date_set_at: string | null;
+  projected_date_set_by: string | null;
+  affiliate_slug: string | null;
 }
 
 export async function GET() {
@@ -111,7 +121,13 @@ export async function GET() {
       .order('created_at', { ascending: false });
 
     const typedMilestones = (allCreatorMilestones || []) as MilestoneRecord[];
-    const typedCreators = (creators || []) as CreatorRecord[];
+    const allCreators = (creators || []) as CreatorRecord[];
+    // Filter out test accounts and paused/inactive creators for analytics
+    const typedCreators = allCreators.filter(c =>
+      !c.is_test_account
+      && c.is_active !== false
+      && (!c.lifecycle_state || c.lifecycle_state === 'active')
+    );
     const typedEvents = (allMilestoneEvents || []) as MilestoneEventRecord[];
 
     // ==========================================
@@ -919,6 +935,8 @@ function calculatePublishingPipeline(creators: CreatorRecord[]) {
     c => (c.status === 'active' || c.status === null)
       && !c.published_date
       && c.is_active !== false
+      && !c.is_test_account
+      && (!c.lifecycle_state || c.lifecycle_state === 'active')
       && c.content_path && ['download', 'course'].includes(c.content_path)
   );
 
