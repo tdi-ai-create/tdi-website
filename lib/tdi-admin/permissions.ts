@@ -135,7 +135,7 @@ export function hasPermission(
   section: PortalSection,
   action: string
 ): boolean {
-  const sectionPermissions = permissions[section];
+  const sectionPermissions = (permissions as Record<string, any>)[section];
   if (!sectionPermissions) return false;
   return (sectionPermissions as Record<string, boolean>)[action] === true;
 }
@@ -147,7 +147,7 @@ export function hasAnySectionPermission(
   permissions: TeamPermissions,
   section: PortalSection
 ): boolean {
-  const sectionPermissions = permissions[section];
+  const sectionPermissions = (permissions as Record<string, any>)[section];
   if (!sectionPermissions) return false;
   return Object.values(sectionPermissions).some(v => v === true);
 }
