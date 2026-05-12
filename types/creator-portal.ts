@@ -57,8 +57,14 @@ export interface Milestone {
   created_at: string;
 }
 
-// Content path types
+// Content path types (blog eliminated as standalone path 2026-05-12; kept for legacy data)
 export type ContentPath = 'blog' | 'download' | 'course';
+
+// Lifecycle state for pause/break system
+export type LifecycleState = 'active' | 'paused' | 'archived';
+
+// Pause type for mid-project vs between-projects breaks
+export type PauseType = 'mid_project' | 'between_projects';
 
 // Publish status types
 export type PublishStatus = 'in_progress' | 'scheduled' | 'published';
@@ -144,6 +150,19 @@ export interface Creator {
   target_completion_date: string | null;
   target_date_set_at: string | null;
   target_date_set_by: string | null;
+  // Projected publish date (auto-computed = target_completion_date + 30 days)
+  projected_publish_date: string | null;
+  // Affiliate system
+  affiliate_slug: string | null;
+  // Lifecycle / pause system
+  lifecycle_state: LifecycleState;
+  paused_at: string | null;
+  paused_by: string | null;
+  pause_reason: string | null;
+  pause_type: PauseType | null;
+  last_check_in_at: string | null;
+  unpaused_at: string | null;
+  unpause_token: string | null;
   // Archive and project tracking fields
   status: CreatorStatus;
   post_launch_notes: string | null;
@@ -308,4 +327,88 @@ export interface CreatorListItem extends Creator {
   progressPercentage: number;
   // New: core vs bonus progress
   progress?: ProgressBreakdown;
+}
+
+// Affiliate system types
+
+export interface AffiliateClick {
+  id: string;
+  creator_id: string;
+  slug: string;
+  clicked_at: string;
+  ip_address: string | null;
+  user_agent: string | null;
+  referrer: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  utm_content: string | null;
+  utm_term: string | null;
+  session_id: string | null;
+  created_at: string;
+}
+
+export interface AffiliateSignup {
+  id: string;
+  click_id: string | null;
+  creator_id: string;
+  user_email: string | null;
+  signed_up_at: string;
+  created_at: string;
+}
+
+export interface AffiliateConversion {
+  id: string;
+  signup_id: string | null;
+  creator_id: string;
+  amount_cents: number;
+  creator_payout_cents: number;
+  payout_percentage: number;
+  converted_at: string;
+  description: string | null;
+  created_at: string;
+}
+
+export type PayoutStatus = 'pending' | 'processing' | 'paid' | 'cancelled';
+
+export interface AffiliatePayout {
+  id: string;
+  creator_id: string;
+  period_start: string;
+  period_end: string;
+  total_clicks: number;
+  total_signups: number;
+  total_conversions: number;
+  total_revenue_cents: number;
+  payout_amount_cents: number;
+  status: PayoutStatus;
+  paid_at: string | null;
+  paid_by: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+// Pause history types
+
+export interface CreatorPauseHistoryEntry {
+  id: string;
+  creator_id: string;
+  action: 'paused' | 'unpaused' | 'check_in';
+  pause_type: PauseType | null;
+  reason: string | null;
+  performed_by: string | null;
+  performed_at: string;
+  created_at: string;
+}
+
+// Projected date history types
+
+export interface ProjectedDateHistoryEntry {
+  id: string;
+  creator_id: string;
+  completion_date: string | null;
+  publish_date: string | null;
+  set_by: string | null;
+  set_at: string;
+  created_at: string;
 }
