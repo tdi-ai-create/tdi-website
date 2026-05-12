@@ -791,7 +791,7 @@ export function PhaseProgress({
   const phasesForPath: Record<string, string[]> = {
     blog: ['onboarding', 'agreement', 'launch'],
     download: ['onboarding', 'agreement', 'production', 'launch'],
-    course: ['onboarding', 'agreement', 'course_design', 'test_prep', 'production', 'launch'],
+    course: ['onboarding', 'agreement', 'course_design', 'test_prep', 'production', 'marketing_blog', 'launch'],
   };
   const allowedPhases = phasesForPath[effectiveContentPath] || phasesForPath.course;
   const filteredPhases = phases.filter((phase) => allowedPhases.includes(phase.id));

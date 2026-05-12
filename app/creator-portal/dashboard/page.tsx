@@ -16,6 +16,8 @@ import TDIPortalLoader from '@/components/TDIPortalLoader';
 import LocationPromptModal from '@/components/creator-portal/LocationPromptModal';
 import { SurveyPopup } from '@/components/creator-portal/SurveyPopup';
 import ProjectedDateCountdown from '@/components/creator-portal/ProjectedDateCountdown';
+import { TakeABreakButton } from '@/components/creator-portal/TakeABreak';
+import PausedScreen from '@/components/creator-portal/PausedScreen';
 import type { CreatorDashboardData, MilestoneWithStatus } from '@/types/creator-portal';
 
 // Component to handle search params (must be wrapped in Suspense)
@@ -538,6 +540,20 @@ export default function CreatorDashboardPage() {
               <SearchParamsHandler onAgreementSigned={handleAgreementSigned} />
             </Suspense>
 
+            {/* Paused State Screen — intercepts entire dashboard */}
+            {(dashboardData?.creator as any)?.lifecycle_state === 'paused' && dashboardData && (
+              <PausedScreen
+                creatorId={dashboardData.creator.id}
+                creatorEmail={dashboardData.creator.email}
+                firstName={dashboardData.creator.name?.split(' ')[0] || 'there'}
+                pauseType={(dashboardData.creator as any)?.pause_type || null}
+                onUnpaused={() => window.location.reload()}
+              />
+            )}
+
+            {/* Normal dashboard — only render when NOT paused */}
+            {(dashboardData?.creator as any)?.lifecycle_state !== 'paused' && <>
+
             {/* Studio Header */}
             <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
               <div className="container-wide py-4 flex items-center justify-between">
@@ -557,6 +573,13 @@ export default function CreatorDashboardPage() {
                   </div>
                 </div>
 
+                {dashboardData && (
+                  <TakeABreakButton
+                    creatorId={dashboardData.creator.id}
+                    creatorEmail={dashboardData.creator.email}
+                    onPaused={() => window.location.reload()}
+                  />
+                )}
                 <button
                   onClick={handleSignOut}
                   className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#1e2749] transition-colors"
@@ -807,6 +830,8 @@ export default function CreatorDashboardPage() {
                 </p>
               </div>
             </footer>
+
+            </>}
           </div>
         )}
       </div>

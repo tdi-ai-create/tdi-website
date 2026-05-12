@@ -5,6 +5,7 @@ export type PhaseId =
   | 'course_design'
   | 'test_prep'
   | 'production'
+  | 'marketing_blog'
   | 'launch';
 
 // Milestone status types
