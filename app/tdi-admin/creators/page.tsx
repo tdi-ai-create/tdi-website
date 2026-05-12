@@ -303,6 +303,279 @@ function StatCard({
   );
 }
 
+// ==========================================
+// Projected Publishing Pipeline Component
+// ==========================================
+
+interface PipelineData {
+  forecast: { month: string; monthLabel: string; download: number; course: number; total: number }[];
+  detailList: { month: string; monthLabel: string; count: number; creators: { id: string; name: string; email: string; contentPath: string | null; projectedPublishDate: string | null }[] }[];
+  noProjectedDate: { id: string; name: string; email: string; contentPath: string | null }[];
+  pastProjectedDate: { id: string; name: string; email: string; contentPath: string | null; projectedCompletionDate: string | null; daysOverdue: number }[];
+}
+
+function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
+  const [expandedMonths, setExpandedMonths] = useState<Record<string, boolean>>({});
+  const [showNoDateModal, setShowNoDateModal] = useState(false);
+  const [showPastDateModal, setShowPastDateModal] = useState(false);
+
+  const toggleMonth = (key: string) => {
+    setExpandedMonths(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  return (
+    <div>
+      <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
+        Projected Publishing Pipeline
+      </h2>
+
+      {/* Warning Callouts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+        {/* Callout A: No projected date */}
+        <button
+          onClick={() => data.noProjectedDate.length > 0 && setShowNoDateModal(true)}
+          className={`bg-white rounded-2xl p-5 shadow-[0_1px_4px_rgba(0,0,0,0.04)] text-left transition-all ${
+            data.noProjectedDate.length > 0 ? 'hover:shadow-md cursor-pointer' : ''
+          }`}
+          style={data.noProjectedDate.length > 0 ? { borderLeft: '3px solid #F59E0B' } : {}}
+          disabled={data.noProjectedDate.length === 0}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#FEF3C7' }}>
+              <CalendarDays className="w-5 h-5" style={{ color: '#D97706' }} />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Creators with no projected date</p>
+              <p className="text-2xl font-bold text-gray-900">{data.noProjectedDate.length}</p>
+            </div>
+          </div>
+          {data.noProjectedDate.length > 0 && (
+            <p className="text-xs text-gray-400 mt-2">Click to view list</p>
+          )}
+        </button>
+
+        {/* Callout B: Past projected date */}
+        <button
+          onClick={() => data.pastProjectedDate.length > 0 && setShowPastDateModal(true)}
+          className={`bg-white rounded-2xl p-5 shadow-[0_1px_4px_rgba(0,0,0,0.04)] text-left transition-all ${
+            data.pastProjectedDate.length > 0 ? 'hover:shadow-md cursor-pointer' : ''
+          }`}
+          style={data.pastProjectedDate.length > 0 ? { borderLeft: '3px solid #F59E0B' } : {}}
+          disabled={data.pastProjectedDate.length === 0}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#FEF3C7' }}>
+              <Clock className="w-5 h-5" style={{ color: '#D97706' }} />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Creators past their projected date</p>
+              <p className="text-2xl font-bold text-gray-900">{data.pastProjectedDate.length}</p>
+            </div>
+          </div>
+          {data.pastProjectedDate.length > 0 && (
+            <p className="text-xs text-gray-400 mt-2">These creators may need a check-in. Click to view.</p>
+          )}
+        </button>
+      </div>
+
+      {/* Pipeline Forecast Bar Chart */}
+      <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] mb-5">
+        <h3 className="text-lg font-semibold mb-1 text-gray-900">
+          Pipeline Forecast
+        </h3>
+        <p className="text-sm text-gray-500 mb-4">Projected content launches by month</p>
+        <div className="h-[280px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data.forecast}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+              <XAxis dataKey="monthLabel" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} allowDecimals={false} />
+              <Tooltip
+                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+              />
+              <Legend />
+              <Bar dataKey="download" stackId="a" fill="#D4C1E8" name="Download" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="course" stackId="a" fill="#EC4899" name="Course" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        {data.forecast.every(m => m.total === 0) && (
+          <p className="text-sm text-gray-400 text-center mt-2">
+            No projected publish dates set yet
+          </p>
+        )}
+      </div>
+
+      {/* Detail List — Grouped by Month */}
+      <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900">
+          Monthly Detail
+        </h3>
+        <div className="space-y-1">
+          {data.detailList.map(month => {
+            const isExpanded = expandedMonths[month.month] ?? false;
+            return (
+              <div key={month.month} className="border border-gray-100 rounded-xl overflow-hidden">
+                <button
+                  onClick={() => toggleMonth(month.month)}
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    {isExpanded ? (
+                      <ChevronUp className="w-4 h-4 text-gray-400" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    )}
+                    <span className="text-sm font-semibold text-gray-900">{month.monthLabel}</span>
+                    <span className="text-xs text-gray-400">({month.count} creator{month.count !== 1 ? 's' : ''})</span>
+                  </div>
+                </button>
+                {isExpanded && (
+                  <div className="px-4 pb-3 border-t border-gray-50">
+                    {month.creators.length === 0 ? (
+                      <p className="text-sm text-gray-400 py-2">No creators projected for this month</p>
+                    ) : (
+                      <div className="divide-y divide-gray-50">
+                        {month.creators.map(creator => (
+                          <div key={creator.id} className="flex items-center justify-between py-2">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600">
+                                {creator.name.charAt(0).toUpperCase()}
+                              </div>
+                              <Link
+                                href={`/tdi-admin/creators/${creator.id}`}
+                                className="text-sm font-medium text-gray-900 hover:text-purple-600 transition-colors"
+                              >
+                                {creator.name}
+                              </Link>
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                creator.contentPath === 'course'
+                                  ? 'bg-pink-50 text-pink-700'
+                                  : 'bg-purple-50 text-purple-700'
+                              }`}>
+                                {creator.contentPath === 'course' ? 'Course' : 'Download'}
+                              </span>
+                            </div>
+                            <span className="text-xs text-gray-500">
+                              publishes by {creator.projectedPublishDate
+                                ? new Date(creator.projectedPublishDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                                : '—'}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* No Projected Date Modal */}
+      {showNoDateModal && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#FEF3C7' }}>
+                  <CalendarDays className="w-5 h-5" style={{ color: '#D97706' }} />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">No Projected Date</h2>
+                  <p className="text-sm text-gray-500">{data.noProjectedDate.length} creator{data.noProjectedDate.length !== 1 ? 's' : ''}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowNoDateModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="divide-y divide-gray-100">
+                {data.noProjectedDate.map(creator => (
+                  <div key={creator.id} className="flex items-center justify-between py-3">
+                    <div>
+                      <Link
+                        href={`/tdi-admin/creators/${creator.id}`}
+                        className="text-sm font-medium text-gray-900 hover:text-purple-600 transition-colors"
+                      >
+                        {creator.name}
+                      </Link>
+                      <p className="text-xs text-gray-400">{creator.email}</p>
+                    </div>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                      creator.contentPath === 'course'
+                        ? 'bg-pink-50 text-pink-700'
+                        : creator.contentPath === 'download'
+                        ? 'bg-purple-50 text-purple-700'
+                        : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      {creator.contentPath || 'Not set'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Past Projected Date Modal */}
+      {showPastDateModal && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#FEF3C7' }}>
+                  <Clock className="w-5 h-5" style={{ color: '#D97706' }} />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Past Projected Date</h2>
+                  <p className="text-sm text-gray-500">These creators may need a check-in</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPastDateModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="divide-y divide-gray-100">
+                {data.pastProjectedDate.map(creator => (
+                  <div key={creator.id} className="flex items-center justify-between py-3">
+                    <div>
+                      <Link
+                        href={`/tdi-admin/creators/${creator.id}`}
+                        className="text-sm font-medium text-gray-900 hover:text-purple-600 transition-colors"
+                      >
+                        {creator.name}
+                      </Link>
+                      <p className="text-xs text-gray-400">
+                        Projected: {creator.projectedCompletionDate
+                          ? new Date(creator.projectedCompletionDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                          : '—'}
+                      </p>
+                    </div>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                      {creator.daysOverdue} day{creator.daysOverdue !== 1 ? 's' : ''} overdue
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function CreatorStudioPage() {
   const { permissions, isOwner } = useTDIAdmin();
   const hasAccess = isOwner || hasAnySectionPermission(permissions, 'creator_studio');
@@ -381,6 +654,12 @@ export default function CreatorStudioPage() {
     selfCompleteRatio?: { contentPath: string; selfComplete: number; adminAdvance: number; other: number; total: number; selfCompletePercent: number; adminAdvancePercent: number }[];
     eventEngagementHeatmap?: { id: string; name: string; initials: string; contentPath: string | null; engagementLevel: 'hot' | 'warm' | 'cool' | 'cold'; eventsLast30Days: number; eventsLast7Days: number; lastEventAt: string | null }[];
     eventFunnelAnalysis?: { phase: string; name: string; count: number; percent: number; avgDaysToPhase: number | null; sampleSize: number }[];
+    publishingPipeline?: {
+      forecast: { month: string; monthLabel: string; download: number; course: number; total: number }[];
+      detailList: { month: string; monthLabel: string; count: number; creators: { id: string; name: string; email: string; contentPath: string | null; projectedPublishDate: string | null }[] }[];
+      noProjectedDate: { id: string; name: string; email: string; contentPath: string | null }[];
+      pastProjectedDate: { id: string; name: string; email: string; contentPath: string | null; projectedCompletionDate: string | null; daysOverdue: number }[];
+    };
   } | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
@@ -2721,6 +3000,13 @@ export default function CreatorStudioPage() {
                   </div>
                 </div>
               </div>
+
+              {/* ==========================================
+                  SECTION 5: PROJECTED PUBLISHING PIPELINE
+                  ========================================== */}
+              {analyticsData.publishingPipeline && (
+                <ProjectedPublishingPipeline data={analyticsData.publishingPipeline} />
+              )}
 
               {/* ==========================================
                   SECTION 4: EVENT-DRIVEN INSIGHTS (overlay)

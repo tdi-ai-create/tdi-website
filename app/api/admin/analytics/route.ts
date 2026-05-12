@@ -45,6 +45,8 @@ interface CreatorRecord {
   publish_status: string | null;
   published_date: string | null;
   state: string | null;
+  projected_completion_date: string | null;
+  projected_publish_date: string | null;
 }
 
 export async function GET() {
@@ -152,6 +154,11 @@ export async function GET() {
     const geographicDistribution = calculateGeographicDistribution(typedCreators);
 
     // ==========================================
+    // SECTION 5: PROJECTED PUBLISHING PIPELINE
+    // ==========================================
+    const publishingPipeline = calculatePublishingPipeline(typedCreators);
+
+    // ==========================================
     // SECTION 4: EVENT-DRIVEN INSIGHTS (overlay)
     // ==========================================
 
@@ -182,6 +189,8 @@ export async function GET() {
       // Section 3
       publishedPerMonth,
       geographicDistribution,
+      // Section 5: Publishing Pipeline
+      publishingPipeline,
       // Section 4: Event-driven overlay
       realtimeActivityFeed,
       selfCompleteRatio,
@@ -891,5 +900,111 @@ function calculateGeographicDistribution(creators: CreatorRecord[]) {
     withState: creatorsWithState,
     withoutState: creatorsWithoutState,
     states: stateData.slice(0, 15), // Top 15 states
+  };
+}
+
+// ==========================================
+// SECTION 5: PROJECTED PUBLISHING PIPELINE
+// ==========================================
+
+function calculatePublishingPipeline(creators: CreatorRecord[]) {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  // Only active, unpublished creators
+  const eligible = creators.filter(
+    c => (c.status === 'active' || c.status === null) && !c.published_date
+  );
+
+  // Build 6 months: current month + 5 future months
+  const months: { start: Date; end: Date; label: string; key: string }[] = [];
+  for (let i = 0; i < 6; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    const end = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59);
+    months.push({
+      start: d,
+      end,
+      label: d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+      key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`,
+    });
+  }
+
+  // Forecast: count by month and content_path
+  const forecast = months.map(m => {
+    const creatorsInMonth = eligible.filter(c => {
+      if (!c.projected_publish_date) return false;
+      const pd = new Date(c.projected_publish_date);
+      return pd >= m.start && pd <= m.end;
+    });
+
+    const download = creatorsInMonth.filter(c => c.content_path === 'download').length;
+    const course = creatorsInMonth.filter(c => c.content_path === 'course').length;
+
+    return {
+      month: m.key,
+      monthLabel: m.label,
+      download,
+      course,
+      total: download + course,
+    };
+  });
+
+  // Detail list: creators grouped by month
+  const detailList = months.map(m => {
+    const creatorsInMonth = eligible
+      .filter(c => {
+        if (!c.projected_publish_date) return false;
+        const pd = new Date(c.projected_publish_date);
+        return pd >= m.start && pd <= m.end;
+      })
+      .map(c => ({
+        id: c.id,
+        name: c.name,
+        email: c.email,
+        contentPath: c.content_path,
+        projectedPublishDate: c.projected_publish_date,
+      }))
+      .sort((a, b) => new Date(a.projectedPublishDate!).getTime() - new Date(b.projectedPublishDate!).getTime());
+
+    return {
+      month: m.key,
+      monthLabel: m.label,
+      count: creatorsInMonth.length,
+      creators: creatorsInMonth,
+    };
+  });
+
+  // Warning: creators with no projected date
+  const noProjectedDate = eligible
+    .filter(c => !c.projected_completion_date)
+    .map(c => ({
+      id: c.id,
+      name: c.name,
+      email: c.email,
+      contentPath: c.content_path,
+    }));
+
+  // Warning: creators past their projected completion date
+  const pastProjectedDate = eligible
+    .filter(c => c.projected_completion_date && new Date(c.projected_completion_date) < today)
+    .map(c => {
+      const projDate = new Date(c.projected_completion_date!);
+      const daysOverdue = Math.floor((today.getTime() - projDate.getTime()) / (1000 * 60 * 60 * 24));
+      return {
+        id: c.id,
+        name: c.name,
+        email: c.email,
+        contentPath: c.content_path,
+        projectedCompletionDate: c.projected_completion_date,
+        daysOverdue,
+      };
+    })
+    .sort((a, b) => b.daysOverdue - a.daysOverdue);
+
+  return {
+    forecast,
+    detailList,
+    noProjectedDate,
+    pastProjectedDate,
   };
 }
