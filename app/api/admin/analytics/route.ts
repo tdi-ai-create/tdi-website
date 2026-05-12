@@ -913,7 +913,10 @@ function calculatePublishingPipeline(creators: CreatorRecord[]) {
 
   // Only active, unpublished creators
   const eligible = creators.filter(
-    c => (c.status === 'active' || c.status === null) && !c.published_date
+    c => (c.status === 'active' || c.status === null)
+      && !c.published_date
+      && c.is_active !== false
+      && c.content_path && ['download', 'course'].includes(c.content_path)
   );
 
   // Build 6 months: current month + 5 future months

@@ -45,6 +45,7 @@ import {
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
+import ProjectedDateCountdown from '@/components/creator-portal/ProjectedDateCountdown';
 import { copyToClipboard } from '@/lib/tdi-admin/clipboard';
 import { getSupabase } from '@/lib/supabase';
 
@@ -214,9 +215,14 @@ export default function TDIAdminCreatorDetailPage() {
   // Projected date history state
   const [dateHistory, setDateHistory] = useState<Array<{
     id: string;
-    target_date: string;
-    set_at: string;
-    set_by: string;
+    old_completion_date: string | null;
+    new_completion_date: string | null;
+    old_publish_date: string | null;
+    new_publish_date: string | null;
+    changed_by: string | null;
+    changed_by_type: string | null;
+    reason: string | null;
+    changed_at: string;
     notes: string | null;
   }>>([]);
   const [showOverrideModal, setShowOverrideModal] = useState(false);
@@ -279,10 +285,10 @@ export default function TDIAdminCreatorDetailPage() {
     // Load projected date history
     const sb = getSupabase();
     const { data: history } = await sb
-      .from('creator_target_date_history')
+      .from('projected_date_history')
       .select('*')
       .eq('creator_id', creatorId)
-      .order('set_at', { ascending: false });
+      .order('changed_at', { ascending: false });
     setDateHistory(history || []);
 
     setIsLoading(false);
@@ -1193,6 +1199,13 @@ export default function TDIAdminCreatorDetailPage() {
             ) : (
               // Creator View Preview
               <div className="space-y-4">
+                <ProjectedDateCountdown
+                  creatorId={creator.id}
+                  creatorEmail={creator.email}
+                  projectedCompletionDate={(creator as any).projected_completion_date || null}
+                  projectedPublishDate={(creator as any).projected_publish_date || null}
+                  onDateUpdated={() => {}}
+                />
                 <PhaseProgress
                   phases={filteredPhases}
                   creator={creator}
@@ -1877,7 +1890,7 @@ export default function TDIAdminCreatorDetailPage() {
               {canEdit && (
                 <button
                   onClick={() => {
-                    setOverrideDate(creator.target_completion_date || '');
+                    setOverrideDate((creator as any).projected_completion_date || '');
                     setOverrideReason('');
                     setShowOverrideModal(true);
                   }}
@@ -1895,32 +1908,32 @@ export default function TDIAdminCreatorDetailPage() {
                 <div>
                   <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Target completion</div>
                   <div className="text-sm font-semibold mt-0.5" style={{ color: '#2B3A67' }}>
-                    {creator.target_completion_date
-                      ? new Date(creator.target_completion_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                    {(creator as any).projected_completion_date
+                      ? new Date((creator as any).projected_completion_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                       : 'Not set'}
                   </div>
                 </div>
                 <div>
                   <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Last updated</div>
                   <div className="text-sm mt-0.5 text-gray-700">
-                    {creator.target_date_set_at ? (
+                    {(creator as any).projected_date_set_at ? (
                       <>
                         {(() => {
-                          const diff = Date.now() - new Date(creator.target_date_set_at).getTime();
+                          const diff = Date.now() - new Date((creator as any).projected_date_set_at).getTime();
                           const days = Math.floor(diff / 86400000);
                           if (days === 0) return 'Today';
                           if (days === 1) return 'Yesterday';
                           if (days < 30) return `${days} days ago`;
                           return `${Math.floor(days / 30)} months ago`;
                         })()}
-                        {creator.target_date_set_by && (
+                        {(creator as any).projected_date_set_by && (
                           <span className="text-gray-500">
                             {' by '}
-                            {creator.target_date_set_by.startsWith('admin:')
-                              ? creator.target_date_set_by.replace('admin:', '').split('@')[0]
-                              : creator.target_date_set_by.includes('@')
+                            {(creator as any).projected_date_set_by.startsWith('admin:')
+                              ? (creator as any).projected_date_set_by.replace('admin:', '').split('@')[0]
+                              : (creator as any).projected_date_set_by.includes('@')
                                 ? 'creator'
-                                : creator.target_date_set_by}
+                                : (creator as any).projected_date_set_by}
                           </span>
                         )}
                       </>
@@ -1935,7 +1948,7 @@ export default function TDIAdminCreatorDetailPage() {
             {/* Frequent-changes callout */}
             {(() => {
               const thirtyDaysAgo = Date.now() - 30 * 86400000;
-              const recentChanges = dateHistory.filter(h => new Date(h.set_at).getTime() > thirtyDaysAgo);
+              const recentChanges = dateHistory.filter(h => new Date(h.changed_at).getTime() > thirtyDaysAgo);
               if (recentChanges.length >= 3) {
                 return (
                   <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 mb-4">
@@ -1964,10 +1977,10 @@ export default function TDIAdminCreatorDetailPage() {
                   </thead>
                   <tbody>
                     {dateHistory.map((entry) => {
-                      const setBy = entry.set_by || '';
+                      const setBy = entry.changed_by || '';
                       const isAdmin = setBy.startsWith('admin:');
-                      const isSystemEstimate = setBy === 'system-estimate';
-                      const isSystem = setBy === 'system' || setBy.startsWith('system');
+                      const isSystemEstimate = setBy === 'system-estimate' || entry.changed_by_type === 'system-estimate';
+                      const isSystem = setBy === 'system' || setBy.startsWith('system') || entry.changed_by_type === 'system';
                       const displayName = isAdmin
                         ? setBy.replace('admin:', '').split('@')[0]
                         : setBy.includes('@')
@@ -1977,10 +1990,12 @@ export default function TDIAdminCreatorDetailPage() {
                       return (
                         <tr key={entry.id} className="border-b border-gray-50">
                           <td className="py-2 pr-3 text-gray-600">
-                            {new Date(entry.set_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            {new Date(entry.changed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                           </td>
                           <td className="py-2 pr-3 font-medium" style={{ color: '#2B3A67' }}>
-                            {new Date(entry.target_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            {entry.new_completion_date
+                              ? new Date(entry.new_completion_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                              : 'Cleared'}
                           </td>
                           <td className="py-2 pr-3 text-gray-600">{displayName}</td>
                           <td className="py-2">
@@ -2018,7 +2033,7 @@ export default function TDIAdminCreatorDetailPage() {
               <div className="mt-3 space-y-1">
                 {dateHistory.filter(h => h.notes).map(entry => (
                   <div key={entry.id} className="text-xs text-gray-500 italic">
-                    {new Date(entry.set_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} — {entry.notes}
+                    {new Date(entry.changed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} — {entry.notes}
                   </div>
                 ))}
               </div>
