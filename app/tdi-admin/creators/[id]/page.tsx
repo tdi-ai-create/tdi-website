@@ -46,6 +46,7 @@ import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
 import { copyToClipboard } from '@/lib/tdi-admin/clipboard';
+import { getSupabase } from '@/lib/supabase';
 
 // Creators theme colors
 const theme = PORTAL_THEMES.creators;
@@ -210,6 +211,19 @@ export default function TDIAdminCreatorDetailPage() {
     published_date: string | null;
   }>>([]);
 
+  // Projected date history state
+  const [dateHistory, setDateHistory] = useState<Array<{
+    id: string;
+    target_date: string;
+    set_at: string;
+    set_by: string;
+    notes: string | null;
+  }>>([]);
+  const [showOverrideModal, setShowOverrideModal] = useState(false);
+  const [overrideDate, setOverrideDate] = useState('');
+  const [overrideReason, setOverrideReason] = useState('');
+  const [isSavingOverride, setIsSavingOverride] = useState(false);
+
   const adminEmail = teamMember?.email || '';
 
   const loadData = useCallback(async () => {
@@ -261,6 +275,15 @@ export default function TDIAdminCreatorDetailPage() {
 
     const notes = await getCreatorNotes(creatorId, true);
     setAllNotes(notes);
+
+    // Load projected date history
+    const sb = getSupabase();
+    const { data: history } = await sb
+      .from('creator_target_date_history')
+      .select('*')
+      .eq('creator_id', creatorId)
+      .order('set_at', { ascending: false });
+    setDateHistory(history || []);
 
     setIsLoading(false);
   }, [creatorId]);
@@ -485,6 +508,39 @@ export default function TDIAdminCreatorDetailPage() {
     setEditingField(null);
     setEditFieldValue('');
     setFieldError(null);
+  };
+
+  const handleOverrideTargetDate = async () => {
+    if (!canEdit || !overrideDate || !overrideReason.trim()) return;
+    setIsSavingOverride(true);
+    try {
+      const response = await fetch('/api/admin/override-target-date', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          newDate: overrideDate,
+          reason: overrideReason.trim(),
+          adminEmail,
+        }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        await loadData();
+        setShowOverrideModal(false);
+        setOverrideDate('');
+        setOverrideReason('');
+        setSuccessMessage('Target date updated');
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        alert(`Failed to override date: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error overriding target date:', error);
+      alert('Error overriding target date.');
+    } finally {
+      setIsSavingOverride(false);
+    }
   };
 
   const handlePublishStatusUpdate = async (action: string) => {
@@ -1808,6 +1864,167 @@ export default function TDIAdminCreatorDetailPage() {
             </div>
           )}
 
+          {/* Projected Date History Card */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3
+                className="font-semibold flex items-center gap-2"
+                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
+              >
+                <CalendarDays className="w-4 h-4" style={{ color: theme.accent }} />
+                Projected Date History
+              </h3>
+              {canEdit && (
+                <button
+                  onClick={() => {
+                    setOverrideDate(creator.target_completion_date || '');
+                    setOverrideReason('');
+                    setShowOverrideModal(true);
+                  }}
+                  className="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                  style={{ color: '#2B3A67' }}
+                >
+                  Override date
+                </button>
+              )}
+            </div>
+
+            {/* Current state */}
+            <div className="rounded-lg border border-gray-100 bg-gray-50 p-4 mb-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Target completion</div>
+                  <div className="text-sm font-semibold mt-0.5" style={{ color: '#2B3A67' }}>
+                    {creator.target_completion_date
+                      ? new Date(creator.target_completion_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                      : 'Not set'}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Last updated</div>
+                  <div className="text-sm mt-0.5 text-gray-700">
+                    {creator.target_date_set_at ? (
+                      <>
+                        {(() => {
+                          const diff = Date.now() - new Date(creator.target_date_set_at).getTime();
+                          const days = Math.floor(diff / 86400000);
+                          if (days === 0) return 'Today';
+                          if (days === 1) return 'Yesterday';
+                          if (days < 30) return `${days} days ago`;
+                          return `${Math.floor(days / 30)} months ago`;
+                        })()}
+                        {creator.target_date_set_by && (
+                          <span className="text-gray-500">
+                            {' by '}
+                            {creator.target_date_set_by.startsWith('admin:')
+                              ? creator.target_date_set_by.replace('admin:', '').split('@')[0]
+                              : creator.target_date_set_by.includes('@')
+                                ? 'creator'
+                                : creator.target_date_set_by}
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <span className="text-gray-400">Never</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Frequent-changes callout */}
+            {(() => {
+              const thirtyDaysAgo = Date.now() - 30 * 86400000;
+              const recentChanges = dateHistory.filter(h => new Date(h.set_at).getTime() > thirtyDaysAgo);
+              if (recentChanges.length >= 3) {
+                return (
+                  <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 mb-4">
+                    <p className="text-xs text-amber-800">
+                      This creator has updated their date {recentChanges.length} times in the last 30 days. Consider checking in to see if they need support.
+                    </p>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+
+            {/* History table */}
+            {dateHistory.length === 0 ? (
+              <p className="text-sm text-gray-400">No date changes recorded yet.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-gray-100">
+                      <th className="text-left py-2 pr-3 font-medium text-gray-500 uppercase tracking-wide">Changed</th>
+                      <th className="text-left py-2 pr-3 font-medium text-gray-500 uppercase tracking-wide">Date set to</th>
+                      <th className="text-left py-2 pr-3 font-medium text-gray-500 uppercase tracking-wide">By</th>
+                      <th className="text-left py-2 font-medium text-gray-500 uppercase tracking-wide">Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dateHistory.map((entry) => {
+                      const setBy = entry.set_by || '';
+                      const isAdmin = setBy.startsWith('admin:');
+                      const isSystemEstimate = setBy === 'system-estimate';
+                      const isSystem = setBy === 'system' || setBy.startsWith('system');
+                      const displayName = isAdmin
+                        ? setBy.replace('admin:', '').split('@')[0]
+                        : setBy.includes('@')
+                          ? setBy.split('@')[0]
+                          : setBy;
+
+                      return (
+                        <tr key={entry.id} className="border-b border-gray-50">
+                          <td className="py-2 pr-3 text-gray-600">
+                            {new Date(entry.set_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </td>
+                          <td className="py-2 pr-3 font-medium" style={{ color: '#2B3A67' }}>
+                            {new Date(entry.target_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </td>
+                          <td className="py-2 pr-3 text-gray-600">{displayName}</td>
+                          <td className="py-2">
+                            {isAdmin && (
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700">
+                                Admin override
+                              </span>
+                            )}
+                            {isSystemEstimate && (
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600">
+                                Auto-estimated
+                              </span>
+                            )}
+                            {isSystem && !isSystemEstimate && (
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600">
+                                System
+                              </span>
+                            )}
+                            {!isAdmin && !isSystem && (
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-50 text-green-700">
+                                Creator
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Show notes for entries that have them */}
+            {dateHistory.some(h => h.notes) && (
+              <div className="mt-3 space-y-1">
+                {dateHistory.filter(h => h.notes).map(entry => (
+                  <div key={entry.id} className="text-xs text-gray-500 italic">
+                    {new Date(entry.set_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} — {entry.notes}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Notes Card */}
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <h3
@@ -2342,6 +2559,72 @@ export default function TDIAdminCreatorDetailPage() {
                   <>
                     <RotateCcw className="w-4 h-4" />
                     Request Changes
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Target Date Override Modal */}
+      {showOverrideModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="p-6 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900">Override target date</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Set a new target completion date for {creator?.name || 'this creator'}
+              </p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  New target date
+                </label>
+                <input
+                  type="date"
+                  value={overrideDate}
+                  onChange={(e) => setOverrideDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Why are you overriding?
+                </label>
+                <textarea
+                  value={overrideReason}
+                  onChange={(e) => setOverrideReason(e.target.value)}
+                  placeholder="e.g. Creator requested extension due to schedule conflict..."
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent resize-none"
+                />
+              </div>
+            </div>
+            <div className="p-6 border-t border-gray-100 flex gap-3">
+              <button
+                onClick={() => {
+                  setShowOverrideModal(false);
+                  setOverrideDate('');
+                  setOverrideReason('');
+                }}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleOverrideTargetDate}
+                disabled={!overrideDate || !overrideReason.trim() || isSavingOverride}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                style={{ backgroundColor: theme.accent }}
+              >
+                {isSavingOverride ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <CalendarDays className="w-4 h-4" />
+                    Save override
                   </>
                 )}
               </button>
