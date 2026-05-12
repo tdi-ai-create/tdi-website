@@ -14,6 +14,7 @@ import { PastProjects } from '@/components/creator-portal/PastProjects';
 import TDIPortalLoader from '@/components/TDIPortalLoader';
 import LocationPromptModal from '@/components/creator-portal/LocationPromptModal';
 import { SurveyPopup } from '@/components/creator-portal/SurveyPopup';
+import ProjectedDateCountdown from '@/components/creator-portal/ProjectedDateCountdown';
 import type { CreatorDashboardData, MilestoneWithStatus } from '@/types/creator-portal';
 
 // Component to handle search params (must be wrapped in Suspense)
@@ -616,6 +617,26 @@ export default function CreatorDashboardPage() {
                 totalMilestones={dashboardData.totalMilestones}
                 progressPercentage={dashboardData.progressPercentage}
               />
+
+              {/* Projected Completion Date Countdown */}
+              <div className="mt-6">
+                <ProjectedDateCountdown
+                  creatorId={dashboardData.creator.id}
+                  creatorEmail={dashboardData.creator.email}
+                  projectedCompletionDate={(dashboardData.creator as any).projected_completion_date || null}
+                  projectedPublishDate={(dashboardData.creator as any).projected_publish_date || null}
+                  onDateUpdated={(newDate, publishDate) => {
+                    setDashboardData(prev => prev ? {
+                      ...prev,
+                      creator: {
+                        ...prev.creator,
+                        projected_completion_date: newDate,
+                        projected_publish_date: publishDate,
+                      } as any,
+                    } : prev)
+                  }}
+                />
+              </div>
 
               {/* Target Date Countdown Card */}
               {dashboardData.creator.target_completion_date && (() => {
