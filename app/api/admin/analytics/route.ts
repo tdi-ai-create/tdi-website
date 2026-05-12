@@ -47,6 +47,9 @@ interface CreatorRecord {
   state: string | null;
   projected_completion_date: string | null;
   projected_publish_date: string | null;
+  is_active: boolean | null;
+  lifecycle_state: string | null;
+  paused_at: string | null;
 }
 
 export async function GET() {
