@@ -3,7 +3,8 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { LogOut, AlertCircle, Mail, User, CheckCircle, X, Target, Calendar, RefreshCw } from 'lucide-react';
+import Link from 'next/link';
+import { LogOut, AlertCircle, Mail, User, CheckCircle, X, Target, Calendar, RefreshCw, ExternalLink } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CreatorDashboardHeader } from '@/components/creator-portal/CreatorDashboardHeader';
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
@@ -729,6 +730,28 @@ export default function CreatorDashboardPage() {
                 {/* Sidebar */}
                 <div className="space-y-6">
                   <CourseDetailsPanel creator={dashboardData.creator} />
+
+                  {/* Affiliate Link Card */}
+                  {(dashboardData.creator as any).affiliate_slug && (
+                    <Link
+                      href="/creator-portal/affiliate"
+                      className="block bg-gradient-to-r from-[#1e2749] to-[#2a3459] rounded-xl p-5 text-white hover:shadow-lg transition-shadow group"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-semibold text-sm">Your Affiliate Link</h3>
+                        <ExternalLink className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" />
+                      </div>
+                      <p className="text-white/70 text-xs mb-3">
+                        Earn 50% on every paid conversion
+                      </p>
+                      <div className="bg-white/10 rounded-lg px-3 py-2">
+                        <p className="text-xs font-mono text-white/90 truncate">
+                          teachersdeserveit.com/r/{(dashboardData.creator as any).affiliate_slug}
+                        </p>
+                      </div>
+                    </Link>
+                  )}
+
                   <NotesPanel
                     notes={dashboardData.notes}
                     creatorId={dashboardData.creator.id}
