@@ -41,8 +41,7 @@ function AgreementContent() {
       if (!session?.user?.email) { router.push('/creator-portal'); return; }
 
       // Check for admin preview mode
-      const urlParams = new URLSearchParams(window.location.search);
-      const asCreator = urlParams.get('as_creator');
+      const asCreator = searchParams.get('as_creator');
       const fetchBody = asCreator
         ? { creatorId: asCreator }
         : { email: session.user.email };
@@ -55,8 +54,16 @@ function AgreementContent() {
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        // If admin without as_creator param, redirect to admin portal
-        if (errData.isAdmin && !asCreator) { router.push('/tdi-admin/creators'); return; }
+        if (errData.isAdmin) {
+          if (asCreator) {
+            // Admin preview but API failed for this creator — try direct ID fetch
+            setError('Could not load this creator');
+            setIsLoading(false);
+            return;
+          }
+          router.push('/tdi-admin/creators');
+          return;
+        }
         router.push('/creator-portal');
         return;
       }
