@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, Users, Calendar, Tag, FileText, FolderOpen, ExternalLink, Video, Palette, CheckCircle, FileDown, PenLine } from 'lucide-react';
+import { BookOpen, Users, Calendar, Tag, Share2, FileText, FolderOpen, ExternalLink, Video, Palette, CheckCircle, FileDown, PenLine } from 'lucide-react';
 import type { Creator, ContentPath } from '@/types/creator-portal';
 
 interface CourseDetailsPanelProps {
@@ -68,11 +68,16 @@ export function CourseDetailsPanel({ creator }: CourseDetailsPanelProps) {
       isEmpty: !creator.target_publish_month,
     },
     {
-      icon: Tag,
-      label: 'Your Discount Code',
-      value: creator.discount_code || 'Coming soon',
-      isEmpty: !creator.discount_code,
+      icon: Share2,
+      label: 'Your Affiliate Link',
+      value: (creator as any).affiliate_slug
+        ? `teachersdeserveit.com/r/${(creator as any).affiliate_slug}`
+        : 'Being set up',
+      isEmpty: !(creator as any).affiliate_slug,
       isCode: true,
+      copyValue: (creator as any).affiliate_slug
+        ? `https://teachersdeserveit.com/r/${(creator as any).affiliate_slug}`
+        : undefined,
     },
   ];
 
@@ -100,17 +105,30 @@ export function CourseDetailsPanel({ creator }: CourseDetailsPanelProps) {
                   <p className="text-xs text-gray-500 uppercase tracking-wide">
                     {detail.label}
                   </p>
-                  <p
-                    className={`text-sm mt-0.5 ${
-                      detail.isEmpty
-                        ? 'text-gray-400 italic'
-                        : detail.isCode
-                        ? 'font-mono bg-slate-100 px-2 py-1 rounded text-[#1e2749] inline-block'
-                        : 'text-[#1e2749] font-medium'
-                    }`}
-                  >
-                    {detail.value}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p
+                      className={`text-sm mt-0.5 ${
+                        detail.isEmpty
+                          ? 'text-gray-400 italic'
+                          : detail.isCode
+                          ? 'font-mono bg-slate-100 px-2 py-1 rounded text-[#1e2749] inline-block text-xs'
+                          : 'text-[#1e2749] font-medium'
+                      }`}
+                    >
+                      {detail.value}
+                    </p>
+                    {(detail as any).copyValue && (
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText((detail as any).copyValue)
+                        }}
+                        className="text-[#80a4ed] hover:text-[#1e2749] transition-colors flex-shrink-0"
+                        title="Copy link"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             );

@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
         agreement_signed: true,
         agreement_signed_at: new Date().toISOString(),
         agreement_signed_name: signedName,
+        agreement_version: 'v2.3',
       })
       .eq('id', creatorId)
       .select();
