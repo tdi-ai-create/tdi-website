@@ -3,7 +3,7 @@ import { Resend } from 'resend';
 
 // POST /api/creators/send-email
 // Sends an email on behalf of Teachers Deserve It Team to a creator.
-// Used by Creator Studio agents (Rachel, Anne Marie) for welcome emails,
+// Used by Creator Studio agents for welcome emails,
 // follow-ups, and creator communications.
 //
 // Auth: Authorization: Bearer ${CRON_SECRET}

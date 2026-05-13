@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
   const resendApiKey = process.env.RESEND_API_KEY;
   if (resendApiKey) {
     const emailBody = `
-Hi Rachel,
+Hi Creator Studio Team,
 
 A new creator application has been submitted on teachersdeserveit.com/create-with-us:
 

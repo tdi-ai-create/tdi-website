@@ -534,7 +534,7 @@ export default function AboutPage() {
 
           {/* Team Members (no bios, card style like Content Creators) */}
           <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto">
-            {/* Rachel Patragas */}
+            {/* Teachers Deserve It Team Member */}
             <div className="text-center p-3">
               <div
                 className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
@@ -542,7 +542,7 @@ export default function AboutPage() {
               >
                 <span className="text-white font-bold text-sm">RP</span>
               </div>
-              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Rachel Patragas</p>
+              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Teachers Deserve It Team Member</p>
               <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Director of Creative Solutions</p>
             </div>
 

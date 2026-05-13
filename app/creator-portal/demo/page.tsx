@@ -70,7 +70,7 @@ const mockNotes: CreatorNote[] = [
     id: 'note-1',
     creator_id: 'demo-creator-123',
     content: 'Great progress on your course outline! The structure looks solid. Looking forward to our next check-in.',
-    author: 'Rachel Patragas',
+    author: 'Teachers Deserve It Team Member',
     visible_to_creator: true,
     created_at: '2025-01-15T10:30:00Z',
   },
@@ -78,7 +78,7 @@ const mockNotes: CreatorNote[] = [
     id: 'note-2',
     creator_id: 'demo-creator-123',
     content: 'Welcome to the TDI Creator family! So excited to work with you on this course.',
-    author: 'Rachel Patragas',
+    author: 'Teachers Deserve It Team Member',
     visible_to_creator: true,
     created_at: '2024-12-01T09:00:00Z',
   },
@@ -95,7 +95,7 @@ const initialPhases: DemoPhase[] = [
       {
         id: 'm1',
         phase_id: 'onboarding',
-        title: 'Welcome Call with Rachel',
+        title: 'Welcome Call with the TDI Team',
         description: 'Meet your TDI contact and discuss your course vision',
         sort_order: 1,
         requires_team_action: false,
@@ -176,7 +176,7 @@ const initialPhases: DemoPhase[] = [
         id: 'm7',
         phase_id: 'course_design',
         title: 'Course Design Review Call',
-        description: 'Review your course outline with Rachel',
+        description: 'Review your course outline with the TDI Team',
         sort_order: 2,
         requires_team_action: false,
         created_at: '',
@@ -1126,14 +1126,14 @@ export default function CreatorPortalDemoPage() {
                   <User className="w-5 h-5 text-[#80a4ed]" />
                 </div>
                 <div>
-                  <p className="font-medium text-[#1e2749]">Rachel Patragas</p>
+                  <p className="font-medium text-[#1e2749]">Teachers Deserve It Team Member</p>
                   <p className="text-sm text-gray-500">Director of Creative Solutions</p>
                   <a
-                    href="mailto:rachel@teachersdeserveit.com"
+                    href="mailto:CreatorStudio@Teachersdeserveit.com"
                     className="inline-flex items-center gap-1.5 text-sm text-[#80a4ed] hover:text-[#1e2749] mt-2 transition-colors"
                   >
                     <Mail className="w-4 h-4" />
-                    rachel@teachersdeserveit.com
+                    CreatorStudio@Teachersdeserveit.com
                   </a>
                 </div>
               </div>

@@ -62,7 +62,7 @@ const phases = [
   },
   {
     title: 'Connect',
-    description: 'Meet with Rachel and Rae to discuss your idea',
+    description: 'Meet with our team to discuss your idea',
     icon: (
       <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -460,7 +460,7 @@ export default function CreateWithUsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-[#1e2749] mb-1">Rachel Patragas</h3>
+              <h3 className="text-2xl font-bold text-[#1e2749] mb-1">Teachers Deserve It Team Member</h3>
               <p className="text-[#80a4ed] font-medium mb-3">Director of Creative Solutions</p>
               <div className="w-16 h-1 bg-[#ffba06] mx-auto md:mx-0" />
             </div>
@@ -533,7 +533,7 @@ export default function CreateWithUsPage() {
                 data-animate="true"
               >
                 Tell us about yourself and the strategies you'd love to share.
-                Rachel from our team will be in touch within a few days to discuss next steps and get your headshot.
+                Our team will be in touch within a few days to discuss next steps and get your headshot.
               </p>
             </div>
 
@@ -563,7 +563,7 @@ export default function CreateWithUsPage() {
                 </div>
                 <h3 className="text-xl font-semibold text-green-800 mb-2">Application Received!</h3>
                 <p className="text-green-700">
-                  Thanks for your interest in creating with TDI. Rachel will review your application and reach out soon.
+                  Thanks for your interest in creating with TDI. Our team will review your application and reach out soon.
                 </p>
               </div>
             ) : (

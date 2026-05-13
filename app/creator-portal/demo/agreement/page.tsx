@@ -159,7 +159,7 @@ export default function DemoAgreementPage() {
               </div>
               <div>
                 <p className="font-medium text-[#1e2749]">Support you&apos;ll receive</p>
-                <p className="text-gray-600 text-sm">We want to make this as easy as possible! With access to Creator Studio, templates, editing support, design support and Rachel as your dedicated contact... you are going to look like such a pro!</p>
+                <p className="text-gray-600 text-sm">We want to make this as easy as possible! With access to Creator Studio, templates, editing support, design support and the Creator Studio team as your dedicated contact... you are going to look like such a pro!</p>
               </div>
             </div>
 
@@ -242,7 +242,7 @@ export default function DemoAgreementPage() {
                 <li>Access to the Creator Studio to track your progress</li>
                 <li>Templates and guidance for course development</li>
                 <li>Light editing and formatting support</li>
-                <li>A dedicated contact (Rachel, Director of Creative Solutions) for questions</li>
+                <li>A dedicated Creator Studio team contact for questions</li>
               </ul>
 
               <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">6. Good Faith & Communication</h3>
@@ -281,11 +281,11 @@ export default function DemoAgreementPage() {
               Book a Call with Rae
             </a>
             <a
-              href="mailto:rachel@teachersdeserveit.com?subject=Question about Creator Agreement"
+              href="mailto:CreatorStudio@Teachersdeserveit.com?subject=Question about Creator Agreement"
               className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 text-sm transition-colors"
             >
               <Mail className="w-4 h-4" />
-              Email Rachel
+              Email Creator Studio
             </a>
           </div>
         </div>

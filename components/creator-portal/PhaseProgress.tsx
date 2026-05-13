@@ -248,7 +248,7 @@ function MilestoneItem({
   // Special "Waiting on TDI" card style
   if (isWaitingOnTdi) {
     const emailSubject = encodeURIComponent('Checking in on my Creator Portal progress');
-    const emailBody = encodeURIComponent(`Hi Rachel,\n\nI wanted to check in on my progress. I'm currently waiting on: ${milestoneTitle}\n\nThanks!`);
+    const emailBody = encodeURIComponent(`Hi Creator Studio Team,\n\nI wanted to check in on my progress. I'm currently waiting on: ${milestoneTitle}\n\nThanks!`);
 
     return (
       <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
