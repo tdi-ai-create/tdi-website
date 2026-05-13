@@ -119,13 +119,15 @@ function AgreementContent() {
     );
   }
 
-  if (alreadySigned && !isDemo) {
+  // If already signed v2.3, show "already signed" message
+  // v1.0 signers can re-sign (they need to upgrade to v2.3)
+  if (alreadySigned && agreementVersion === 'v2.3' && !isDemo) {
     return (
       <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
         <div className="bg-white rounded-2xl shadow-lg max-w-md w-full p-10 text-center">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-[#1e2749] mb-2">Already signed</h2>
-          <p className="text-gray-600 mb-6">You&apos;ve already signed your creator agreement.</p>
+          <p className="text-gray-600 mb-6">You&apos;ve already signed your v2.3 creator agreement.</p>
           <Link href={backLink} className="text-[#80a4ed] hover:text-[#1e2749] font-medium">
             Back to dashboard
           </Link>
