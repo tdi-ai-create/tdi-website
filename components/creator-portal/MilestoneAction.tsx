@@ -829,7 +829,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
       return (
         <AdminPreviewWrapper actionLabel={config.label || 'Review & Sign Agreement'}>
           <a
-            href="/creator-portal/agreement"
+            href={isAdminPreview ? `/creator-portal/agreement?as_creator=${creatorId}` : '/creator-portal/agreement'}
             target="_blank"
             rel="noopener noreferrer"
             className={`inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors ${isAdminPreview ? 'pointer-events-auto' : ''}`}
