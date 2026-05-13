@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
             body: JSON.stringify({
               from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
               to: [creator.email],
-              cc: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+              cc: ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
               subject: 'You have a new note from the TDI team!',
               html: `
                 <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">

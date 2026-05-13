@@ -514,13 +514,14 @@ function calculateCompletionFunnel(
   creatorMilestones: MilestoneRecord[],
   phases: { id: string; name: string; sort_order: number }[]
 ) {
-  const phaseOrder = ['onboarding', 'agreement', 'course_design', 'test_prep', 'production', 'launch'];
+  const phaseOrder = ['onboarding', 'agreement', 'course_design', 'test_prep', 'production', 'marketing_blog', 'launch'];
   const phaseNames: Record<string, string> = {
     onboarding: 'Started Onboarding',
     agreement: 'Completed Agreement',
     course_design: 'Completed Prep & Resources',
     test_prep: 'Completed Test & Prep',
     production: 'Completed Production',
+    marketing_blog: 'Completed Marketing Blog',
     launch: 'Launched',
   };
 
@@ -818,13 +819,14 @@ function calculateEventFunnelAnalysis(
   events: MilestoneEventRecord[],
   creators: CreatorRecord[]
 ) {
-  const phaseOrder = ['onboarding', 'agreement', 'course_design', 'test_prep', 'production', 'launch'];
+  const phaseOrder = ['onboarding', 'agreement', 'course_design', 'test_prep', 'production', 'marketing_blog', 'launch'];
   const phaseNames: Record<string, string> = {
     onboarding: 'Onboarding',
     agreement: 'Agreement',
     course_design: 'Prep & Resources',
     test_prep: 'Test & Prep',
     production: 'Production',
+    marketing_blog: 'Marketing Blog',
     launch: 'Launch',
   };
 

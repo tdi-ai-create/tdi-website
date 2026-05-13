@@ -114,6 +114,7 @@ const phaseDescriptions: Record<string, string> = {
   agreement: 'Formalizing the partnership with signed agreements.',
   course_design: 'Collaborating on course structure and content planning.',
   production: 'Building the course content and media.',
+  marketing_blog: 'Writing and publishing the marketing blog post.',
   launch: 'Final preparations for publishing.',
 };
 
@@ -158,7 +159,7 @@ export default function TDIAdminCreatorDetailPage() {
   const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
 
   // View mode toggle
-  const [viewMode, setViewMode] = useState<'admin' | 'creator'>('admin');
+  // viewMode removed — admin view is the only view. Use "Open Portal" for creator preview.
 
   // Website visibility state
   const [isEditingWebsite, setIsEditingWebsite] = useState(false);
@@ -984,60 +985,29 @@ export default function TDIAdminCreatorDetailPage() {
               className="text-xl font-semibold"
               style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
             >
-              {viewMode === 'admin' ? 'Milestones' : 'Creator View Preview'}
+              Milestones
             </h2>
 
-            {/* View Mode Toggle */}
-            <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setViewMode('admin')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'admin'
-                    ? 'bg-white shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-                style={{ color: viewMode === 'admin' ? '#2B3A67' : undefined }}
-              >
-                <Users className="w-4 h-4" />
-                Admin
-              </button>
-              <button
-                onClick={() => setViewMode('creator')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'creator'
-                    ? 'bg-white shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-                style={{ color: viewMode === 'creator' ? '#2B3A67' : undefined }}
-              >
-                <UserCircle className="w-4 h-4" />
-                Creator View
-              </button>
-              <a
-                href={`/creator-portal/dashboard?as_creator=${creatorId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors ml-2"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-                Open Portal
-              </a>
-            </div>
+            <a
+              href={`/creator-portal/dashboard?as_creator=${creatorId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
+              style={{ color: '#2B3A67' }}
+            >
+              <ExternalLink className="w-4 h-4" />
+              Open Creator Portal
+            </a>
           </div>
 
-          {/* Creator View Banner */}
-          {viewMode === 'creator' && (
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center gap-3">
-              <Eye className="w-5 h-5 text-blue-600" />
-              <div>
-                <p className="text-blue-800 font-medium">Viewing as: {creator.name}</p>
-                <p className="text-blue-600 text-sm">This is what the creator sees in their dashboard</p>
-              </div>
+          {false && (
+            <div className="hidden">
+              {/* Removed Creator View banner */}
             </div>
           )}
 
           {/* Admin Helper Text */}
-          {viewMode === 'admin' && canEdit && (
+          {canEdit && (
             <p className="text-sm text-gray-500">Click checkboxes to mark complete during calls</p>
           )}
 
@@ -1058,13 +1028,12 @@ export default function TDIAdminCreatorDetailPage() {
             const phasesForPath: Record<string, string[]> = {
               blog: ['onboarding', 'agreement', 'launch'],
               download: ['onboarding', 'agreement', 'production', 'launch'],
-              course: ['onboarding', 'agreement', 'course_design', 'test_prep', 'production', 'launch'],
+              course: ['onboarding', 'agreement', 'course_design', 'test_prep', 'production', 'marketing_blog', 'launch'],
             };
             const allowedPhases = phasesForPath[creator.content_path || 'course'] || phasesForPath.course;
             const filteredPhases = phases.filter((phase) => allowedPhases.includes(phase.id));
 
-            return viewMode === 'admin' ? (
-            filteredPhases.map((phase) => {
+            return filteredPhases.map((phase) => {
               const isExpanded = expandedPhases.has(phase.id);
               const applicableMilestones = phase.milestones.filter((m: MilestoneWithStatus) => m.isApplicable !== false);
               const completedCount = applicableMilestones.filter((m: MilestoneWithStatus) => m.status === 'completed').length;
@@ -1206,31 +1175,13 @@ export default function TDIAdminCreatorDetailPage() {
                   )}
                 </div>
               );
-            })
-            ) : (
-              // Creator View Preview
-              <div className="space-y-4">
-                <ProjectedDateCountdown
-                  creatorId={creator.id}
-                  creatorEmail={creator.email}
-                  projectedCompletionDate={(creator as any).projected_completion_date || null}
-                  projectedPublishDate={(creator as any).projected_publish_date || null}
-                  onDateUpdated={() => {}}
-                />
-                <PhaseProgress
-                  phases={filteredPhases}
-                  creator={creator}
-                  creatorId={creatorId}
-                  isAdminPreview={true}
-                />
-              </div>
-            );
+            });
           })()}
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {viewMode === 'creator' ? (
+          {false ? (
             <>
               {/* Creator View Sidebar - mirrors what creators see */}
               <CourseDetailsPanel creator={creator} />
@@ -1254,7 +1205,6 @@ export default function TDIAdminCreatorDetailPage() {
                   {canEdit && (
                     <button
                       onClick={() => {
-                        setViewMode('admin');
                         setIsEditingDetails(true);
                       }}
                       className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
@@ -1280,7 +1230,7 @@ export default function TDIAdminCreatorDetailPage() {
                   {/* Add Note */}
                   {canEdit && (
                     <button
-                      onClick={() => setViewMode('admin')}
+                      onClick={() => {}}
                       className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
                       style={{ color: '#2B3A67' }}
                     >

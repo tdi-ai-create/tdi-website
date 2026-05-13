@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
           },
           body: JSON.stringify({
             from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-            to: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+            to: ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
             subject: `🎉 ${existingCreator.name} signed their agreement!`,
             html: `
               <div style="font-family: sans-serif; max-width: 600px;">

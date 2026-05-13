@@ -304,7 +304,7 @@ Leadership and ownership:
 - Omar Garcia - Chief Financial Officer and part owner. Drives the financial strategy and operational systems that allow TDI to scale sustainably and deliver measurable ROI for every partner district.
 
 Key contributors:
-- Rachel Patragas - Director of Creative Solutions. A major creative force behind TDI's content, systems, and creator community.
+- Teachers Deserve It Team - Director of Creative Solutions. A major creative force behind TDI's content, systems, and creator community.
 - Jim Ford - Business Development Coordinator. Helps schools find their way to TDI and navigate partnership options.
 - Olivia Smith - Executive Communication Coordinator. Keeps the team and partners connected and communication flowing.
 

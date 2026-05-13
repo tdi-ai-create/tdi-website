@@ -462,7 +462,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
       exampleLabel: 'See blog draft example'
     },
     drive_folder_created: {
-      tip: 'Create a Google Drive folder and share it with rachel@teachersdeserveit.com',
+      tip: 'Create a Google Drive folder and share it with creatorstudio@teachersdeserveit.com',
       exampleUrl: '/docs/creator-portal-examples#7-asset-folder-structure',
       exampleLabel: 'See folder structure'
     },
@@ -882,7 +882,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                 {isSubmitting ? 'Confirming...' : (config.label || "I've Reviewed the Notes")}
               </button>
               <a
-                href={`mailto:rachel@teachersdeserveit.com?subject=${encodeURIComponent(`Question about my intake notes - ${creatorName || 'Creator'}`)}`}
+                href={`mailto:creatorstudio@teachersdeserveit.com?subject=${encodeURIComponent(`Question about my intake notes - ${creatorName || 'Creator'}`)}`}
                 className="inline-flex items-center gap-2 px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <Mail className="w-4 h-4" />

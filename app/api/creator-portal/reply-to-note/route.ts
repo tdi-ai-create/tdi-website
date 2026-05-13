@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
           },
           body: JSON.stringify({
             from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-            to: ['rae@teachersdeserveit.com', 'rachel@teachersdeserveit.com'],
+            to: ['rae@teachersdeserveit.com', 'creatorstudio@teachersdeserveit.com'],
             subject: `Creator Reply: ${creatorName}`,
             html: emailHtml,
           }),

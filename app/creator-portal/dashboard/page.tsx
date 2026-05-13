@@ -842,14 +842,14 @@ export default function CreatorDashboardPage() {
                         <User className="w-5 h-5 text-[#80a4ed]" />
                       </div>
                       <div>
-                        <p className="font-medium text-[#1e2749]">Rachel Patragas</p>
-                        <p className="text-sm text-gray-500">Director of Creative Solutions</p>
+                        <p className="font-medium text-[#1e2749]">Teachers Deserve It Team</p>
+                        <p className="text-sm text-gray-500">Creator Studio Support</p>
                         <a
-                          href="mailto:rachel@teachersdeserveit.com"
+                          href="mailto:creatorstudio@teachersdeserveit.com"
                           className="inline-flex items-center gap-1.5 text-sm text-[#80a4ed] hover:text-[#1e2749] mt-2 transition-colors"
                         >
                           <Mail className="w-4 h-4" />
-                          rachel@teachersdeserveit.com
+                          creatorstudio@teachersdeserveit.com
                         </a>
                       </div>
                     </div>
@@ -864,10 +864,10 @@ export default function CreatorDashboardPage() {
                 <p>
                   Questions? Reach out to{' '}
                   <a
-                    href="mailto:rachel@teachersdeserveit.com"
+                    href="mailto:creatorstudio@teachersdeserveit.com"
                     className="text-[#80a4ed] hover:text-[#1e2749]"
                   >
-                    rachel@teachersdeserveit.com
+                    creatorstudio@teachersdeserveit.com
                   </a>
                 </p>
               </div>

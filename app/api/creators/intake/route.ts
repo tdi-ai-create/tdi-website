@@ -103,7 +103,7 @@ https://www.teachersdeserveit.com/tdi-admin/creators
       },
       body: JSON.stringify({
         from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-        to: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+        to: ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
         subject: `[New Creator Application] ${name}`,
         text: emailBody,
       }),

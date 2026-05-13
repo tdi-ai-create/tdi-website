@@ -272,7 +272,7 @@ function MilestoneItem({
               Our team is working on this -  we&apos;ll update your portal once complete.
             </p>
             <a
-              href={`mailto:rachel@teachersdeserveit.com?subject=${emailSubject}&body=${emailBody}`}
+              href={`mailto:creatorstudio@teachersdeserveit.com?subject=${emailSubject}&body=${emailBody}`}
               className="text-sm text-slate-500 hover:text-slate-700 underline mt-2 inline-block"
             >
               Taking longer than expected? Let us know →

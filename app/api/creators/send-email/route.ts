@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
 // POST /api/creators/send-email
-// Sends an email on behalf of Rachel Patragas to a creator.
+// Sends an email on behalf of Teachers Deserve It Team to a creator.
 // Used by Creator Studio agents (Rachel, Anne Marie) for welcome emails,
 // follow-ups, and creator communications.
 //
@@ -42,11 +42,11 @@ export async function POST(request: NextRequest) {
 
     const resend = new Resend(resendKey);
     const { data, error } = await resend.emails.send({
-      from: 'Rachel Patragas <rachel@teachersdeserveit.com>',
+      from: 'Teachers Deserve It Team <creatorstudio@teachersdeserveit.com>',
       to: Array.isArray(to) ? to : [to],
       subject,
       text: body,
-      replyTo: replyTo ?? 'rachel@teachersdeserveit.com',
+      replyTo: replyTo ?? 'creatorstudio@teachersdeserveit.com',
     });
 
     if (error) {

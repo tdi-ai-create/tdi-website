@@ -81,8 +81,8 @@ export function CompletionBanner({ creatorName, contentPath, onReady, creatorId 
 
       <p className="text-green-600 text-sm mt-4">
         Or reach out to{' '}
-        <a href="mailto:rachel@teachersdeserveit.com" className="underline hover:text-green-800">
-          rachel@teachersdeserveit.com
+        <a href="mailto:creatorstudio@teachersdeserveit.com" className="underline hover:text-green-800">
+          creatorstudio@teachersdeserveit.com
         </a>
         {' '}anytime.
       </p>
