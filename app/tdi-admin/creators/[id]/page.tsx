@@ -1013,6 +1013,15 @@ export default function TDIAdminCreatorDetailPage() {
                 <UserCircle className="w-4 h-4" />
                 Creator View
               </button>
+              <a
+                href={`/creator-portal/dashboard?as_creator=${creatorId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors ml-2"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                Open Portal
+              </a>
             </div>
           </div>
 

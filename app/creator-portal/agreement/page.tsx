@@ -40,13 +40,26 @@ function AgreementContent() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.email) { router.push('/creator-portal'); return; }
 
+      // Check for admin preview mode
+      const urlParams = new URLSearchParams(window.location.search);
+      const asCreator = urlParams.get('as_creator');
+      const fetchBody = asCreator
+        ? { creatorId: asCreator }
+        : { email: session.user.email };
+
       const response = await fetch('/api/creator-portal/dashboard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: session.user.email }),
+        body: JSON.stringify(fetchBody),
       });
 
-      if (!response.ok) { router.push('/creator-portal'); return; }
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        // If admin without as_creator param, redirect to admin portal
+        if (errData.isAdmin && !asCreator) { router.push('/tdi-admin/creators'); return; }
+        router.push('/creator-portal');
+        return;
+      }
 
       const data = await response.json();
       setCreatorName(data.creator.name);

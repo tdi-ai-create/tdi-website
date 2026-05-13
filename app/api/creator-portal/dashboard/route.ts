@@ -24,11 +24,12 @@ export async function POST(request: NextRequest) {
   console.log('[dashboard-api] Called');
 
   try {
-    const { email } = await request.json();
-    console.log('[dashboard-api] Email:', email);
+    const body = await request.json();
+    const { email, creatorId: directCreatorId } = body;
+    console.log('[dashboard-api] Email:', email, 'DirectId:', directCreatorId);
 
-    if (!email) {
-      return NextResponse.json({ error: 'Email required' }, { status: 400 });
+    if (!email && !directCreatorId) {
+      return NextResponse.json({ error: 'Email or creatorId required' }, { status: 400 });
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -43,12 +44,14 @@ export async function POST(request: NextRequest) {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    // Get creator by email
-    const { data: creator, error: creatorError } = await supabase
-      .from('creators')
-      .select('*')
-      .ilike('email', email.toLowerCase())
-      .maybeSingle();
+    // Get creator by email or ID
+    let creatorQuery = supabase.from('creators').select('*');
+    if (directCreatorId) {
+      creatorQuery = creatorQuery.eq('id', directCreatorId);
+    } else {
+      creatorQuery = creatorQuery.ilike('email', email.toLowerCase());
+    }
+    const { data: creator, error: creatorError } = await creatorQuery.maybeSingle();
 
     console.log('[dashboard-api] Creator query:', { creator, error: creatorError?.message });
 

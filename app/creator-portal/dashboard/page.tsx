@@ -42,6 +42,8 @@ function SearchParamsHandler({
 export default function CreatorDashboardPage() {
   const router = useRouter();
   const [dashboardData, setDashboardData] = useState<CreatorDashboardData | null>(null);
+  const [isAdminPreview, setIsAdminPreview] = useState(false);
+  const [previewCreatorName, setPreviewCreatorName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -109,10 +111,28 @@ export default function CreatorDashboardPage() {
         console.log('[Dashboard] API response:', { status: response.status, data });
 
         if (!response.ok) {
-          // Check if user is admin
+          // Check if user is admin — support preview mode
           if (data.isAdmin) {
-            console.log('[Dashboard] User is admin, redirecting...');
-            router.push('/admin/creators');
+            const urlParams = new URLSearchParams(window.location.search);
+            const asCreator = urlParams.get('as_creator');
+            if (asCreator) {
+              // Admin preview mode: fetch the target creator's dashboard
+              const previewRes = await fetch('/api/creator-portal/dashboard', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ creatorId: asCreator }),
+              });
+              if (previewRes.ok) {
+                const previewData = await previewRes.json();
+                setDashboardData(previewData);
+                setIsAdminPreview(true);
+                setPreviewCreatorName(previewData.creator?.name || 'Creator');
+                setDataLoaded(true);
+                return;
+              }
+            }
+            // No preview param — redirect to new admin portal
+            router.push('/tdi-admin/creators');
             return;
           }
 
@@ -539,6 +559,28 @@ export default function CreatorDashboardPage() {
             <Suspense fallback={null}>
               <SearchParamsHandler onAgreementSigned={handleAgreementSigned} />
             </Suspense>
+
+            {/* Admin Preview Banner */}
+            {isAdminPreview && dashboardData && (
+              <div style={{
+                background: '#EFF6FF',
+                borderBottom: '1px solid #BFDBFE',
+                padding: '10px 24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: 13,
+                color: '#1E40AF',
+              }}>
+                <span>Viewing as <strong>{previewCreatorName}</strong> (admin preview mode)</span>
+                <a
+                  href={`/tdi-admin/creators/${dashboardData.creator.id}`}
+                  style={{ color: '#2563EB', fontWeight: 600, textDecoration: 'none' }}
+                >
+                  Exit Preview
+                </a>
+              </div>
+            )}
 
             {/* Paused State Screen — intercepts entire dashboard */}
             {(dashboardData?.creator as any)?.lifecycle_state === 'paused' && dashboardData && (
