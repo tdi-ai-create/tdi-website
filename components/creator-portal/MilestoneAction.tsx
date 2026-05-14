@@ -828,16 +828,21 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
     case 'sign_agreement':
       return (
         <AdminPreviewWrapper actionLabel={config.label || 'Review & Sign Agreement'}>
-          <a
-            href={isAdminPreview ? `/creator-portal/agreement?as_creator=${creatorId}` : '/creator-portal/agreement'}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors ${isAdminPreview ? 'pointer-events-auto' : ''}`}
-          >
-            <FileText className="w-4 h-4" />
-            {config.label || 'Review & Sign Agreement'}
-            <ExternalLink className="w-3 h-3" />
-          </a>
+          <div className="space-y-3">
+            <p className="text-sm text-gray-600" style={{ lineHeight: 1.7 }}>
+              Review and digitally sign your Independent Content Creator Agreement. Takes about 5-10 minutes to read through the plain-language version, plus a moment to sign.
+            </p>
+            <a
+              href={isAdminPreview ? `/creator-portal/agreement?as_creator=${creatorId}` : '/creator-portal/agreement'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center gap-2 px-5 py-2.5 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors text-sm font-medium ${isAdminPreview ? 'pointer-events-auto' : ''}`}
+            >
+              <FileText className="w-4 h-4" />
+              Review &amp; sign agreement
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
         </AdminPreviewWrapper>
       );
 
