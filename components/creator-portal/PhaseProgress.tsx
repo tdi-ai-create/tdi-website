@@ -404,8 +404,8 @@ function MilestoneItem({
           </span>
         </div>
 
-        {/* Rich Content Accordion - only for creator-action milestones, not team_action */}
-        {!milestone.requires_team_action && milestone.status !== 'locked' && (
+        {/* Rich Content Accordion - skip for sign_agreement (handled by Q&A agreement page) */}
+        {!milestone.requires_team_action && milestone.status !== 'locked' && milestone.action_type !== 'sign_agreement' && (
           /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           <RichContentAccordion richContent={(milestone as any).rich_content} />
         )}
