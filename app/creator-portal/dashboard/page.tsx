@@ -18,6 +18,7 @@ import { SurveyPopup } from '@/components/creator-portal/SurveyPopup';
 import ProjectedDateCountdown from '@/components/creator-portal/ProjectedDateCountdown';
 import { TakeABreakButton } from '@/components/creator-portal/TakeABreak';
 import PausedScreen from '@/components/creator-portal/PausedScreen';
+import PepTalkCallout from '@/components/creator-portal/PepTalkCallout';
 import type { CreatorDashboardData, MilestoneWithStatus } from '@/types/creator-portal';
 
 // Component to handle search params (must be wrapped in Suspense)
@@ -790,6 +791,16 @@ export default function CreatorDashboardPage() {
                       content_path: dashboardData.creator.content_path,
                     }}
                   />
+
+                  {/* Pep talk callout — shows after path selection during onboarding */}
+                  {dashboardData.creator.current_phase === 'onboarding' && dashboardData.creator.content_path && (
+                    <PepTalkCallout
+                      creatorId={dashboardData.creator.id}
+                      creatorName={dashboardData.creator.name}
+                      creatorEmail={dashboardData.creator.email}
+                      contentPath={dashboardData.creator.content_path}
+                    />
+                  )}
                 </div>
 
                 {/* Sidebar */}
