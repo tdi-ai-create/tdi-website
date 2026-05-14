@@ -50,6 +50,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Set pep_talk_requested_at for persistence
+    await (supabase.from('creators') as any)
+      .update({ pep_talk_requested_at: new Date().toISOString() })
+      .eq('id', creatorId)
+
     return NextResponse.json({ success: true })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })

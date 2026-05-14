@@ -7,10 +7,11 @@ interface PepTalkCalloutProps {
   creatorName: string
   creatorEmail: string
   contentPath: string | null
+  pepTalkRequestedAt?: string | null
 }
 
-export default function PepTalkCallout({ creatorId, creatorName, creatorEmail, contentPath }: PepTalkCalloutProps) {
-  const [sent, setSent] = useState(false)
+export default function PepTalkCallout({ creatorId, creatorName, creatorEmail, contentPath, pepTalkRequestedAt }: PepTalkCalloutProps) {
+  const [sent, setSent] = useState(!!pepTalkRequestedAt)
   const [sending, setSending] = useState(false)
   const [dismissed, setDismissed] = useState(false)
 

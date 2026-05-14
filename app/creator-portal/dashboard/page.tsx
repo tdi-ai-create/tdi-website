@@ -799,6 +799,7 @@ export default function CreatorDashboardPage() {
                       creatorName={dashboardData.creator.name}
                       creatorEmail={dashboardData.creator.email}
                       contentPath={dashboardData.creator.content_path}
+                      pepTalkRequestedAt={(dashboardData.creator as any).pep_talk_requested_at || null}
                     />
                   )}
                 </div>
