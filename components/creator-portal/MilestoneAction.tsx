@@ -1273,7 +1273,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
 
             {/* Path Selection Cards */}
             <div className="grid gap-4">
-              {(config.options || []).map((option: { value: string; label: string; description: string }) => (
+              {(config.options || []).filter((o: { value: string }) => o.value !== 'blog').map((option: { value: string; label: string; description: string }) => (
                 <button
                   key={option.value}
                   onClick={() => {
