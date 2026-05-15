@@ -26,7 +26,7 @@ export const leadership: FeaturedTeamMember[] = [
 
 export const team: TeamMember[] = [
   { name: 'Jim Ford', title: 'District Outreach', imageSlug: 'jim-ford', isHuman: true },
-  { name: 'Bella Daily', title: 'Special Projects Lead', imageSlug: 'bella-daily', isHuman: true },
+  { name: 'Bella Dailey', title: 'Special Projects Lead', imageSlug: 'bella-dailey', isHuman: true },
   { name: 'Mel Martinez', title: 'Executive Assistant', imageSlug: 'mel-martinez', isHuman: true },
   { name: 'Holly Scott', title: 'Customer Success', imageSlug: 'holly-scott', isHuman: false },
   { name: 'Olivia Smith', title: 'Executive Ops', imageSlug: 'olivia-smith', isHuman: false },
