@@ -88,12 +88,20 @@ export default function TeamStrip({ members, copy, linkText = 'Meet the team', l
           <CreatorAvatar key={`creator-${m.name}-${i}`} member={m} />
         ))}
       </div>
-      <p style={{ fontSize: 14, color: '#1e2749', margin: 0, maxWidth: 600 }}>
-        {copy}{' '}
-        <Link href={linkHref} style={{ color: '#2A9D8F', fontWeight: 500, textDecoration: 'underline' }}>
-          {linkText}
-        </Link>
+      <p style={{ fontSize: 14, color: '#1e2749', margin: 0, maxWidth: 520 }}>
+        {copy}
       </p>
+      <Link
+        href={linkHref}
+        style={{
+          fontSize: 13, fontWeight: 500, color: '#1e2749',
+          padding: '8px 16px', borderRadius: 999,
+          background: 'white', border: '1px solid #2A9D8F',
+          textDecoration: 'none', whiteSpace: 'nowrap',
+        }}
+      >
+        {linkText}
+      </Link>
     </div>
   )
 }
