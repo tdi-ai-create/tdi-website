@@ -8,6 +8,7 @@ export interface FeaturedTeamMember {
 export interface SupportingTeamMember {
   name: string
   title: string
+  imageSlug: string
 }
 
 export const featuredTeam: FeaturedTeamMember[] = [
@@ -20,26 +21,26 @@ export const featuredTeam: FeaturedTeamMember[] = [
 ]
 
 export const supportingTeam: SupportingTeamMember[] = [
-  { name: 'Nora Reeves', title: 'COO' },
-  { name: 'Amara Obi', title: 'Outreach' },
-  { name: 'Anne Marie Schmitt', title: 'Outreach' },
-  { name: 'Chris Copypaste', title: 'Engineering' },
-  { name: 'Dr. Jasmine Cole', title: 'Research' },
-  { name: 'Dr. Maya Johnson', title: 'Curriculum' },
-  { name: 'Elena Vasquez', title: 'Sales Ops' },
-  { name: 'Holly Scott', title: 'Customer Success' },
-  { name: 'Izzy Reeves', title: 'Content' },
-  { name: 'Lily Chen', title: 'Design' },
-  { name: 'Olivia Smith', title: 'Executive Ops' },
-  { name: 'Quinn Nakamura', title: 'Product' },
-  { name: 'Ravi Patel', title: 'Strategy' },
-  { name: 'Rodrigo Vega', title: 'Operations' },
-  { name: 'Sandra Reyes', title: 'Accounting' },
-  { name: 'Sebastian Cole', title: 'Legal' },
-  { name: 'Sophia Castillo', title: 'Sales Prep' },
-  { name: 'Vanessa Thornton', title: 'Sales Enablement' },
-  { name: 'Victor Nash', title: 'Finance' },
-  { name: 'Zara Okonkwo', title: 'Social' },
+  { name: 'Nora Reeves', title: 'COO', imageSlug: 'nora-reeves' },
+  { name: 'Amara Obi', title: 'Outreach', imageSlug: 'amara-obi' },
+  { name: 'Anne Marie Schmitt', title: 'Outreach', imageSlug: 'anne-marie-schmitt' },
+  { name: 'Chris Copypaste', title: 'Engineering', imageSlug: 'chris-copypaste' },
+  { name: 'Dr. Jasmine Cole', title: 'Research', imageSlug: 'jasmine-cole' },
+  { name: 'Dr. Maya Johnson', title: 'Curriculum', imageSlug: 'maya-johnson' },
+  { name: 'Elena Vasquez', title: 'Sales Ops', imageSlug: 'elena-vasquez' },
+  { name: 'Holly Scott', title: 'Customer Success', imageSlug: 'holly-scott' },
+  { name: 'Izzy Reeves', title: 'Content', imageSlug: 'izzy-reeves' },
+  { name: 'Lily Chen', title: 'Design', imageSlug: 'lily-chen' },
+  { name: 'Olivia Smith', title: 'Executive Ops', imageSlug: 'olivia-smith' },
+  { name: 'Quinn Nakamura', title: 'Product', imageSlug: 'quinn-nakamura' },
+  { name: 'Ravi Patel', title: 'Strategy', imageSlug: 'ravi-patel' },
+  { name: 'Rodrigo Vega', title: 'Operations', imageSlug: 'rodrigo-vega' },
+  { name: 'Sandra Reyes', title: 'Accounting', imageSlug: 'sandra-reyes' },
+  { name: 'Sebastian Cole', title: 'Legal', imageSlug: 'sebastian-cole' },
+  { name: 'Sophia Castillo', title: 'Sales Prep', imageSlug: 'sophia-castillo' },
+  { name: 'Vanessa Thornton', title: 'Sales Enablement', imageSlug: 'vanessa-thornton' },
+  { name: 'Victor Nash', title: 'Finance', imageSlug: 'victor-nash' },
+  { name: 'Zara Okonkwo', title: 'Social', imageSlug: 'zara-okonkwo' },
 ]
 
 export function getInitials(name: string): string {
