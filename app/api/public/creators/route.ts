@@ -21,7 +21,7 @@ export async function GET() {
     // Fetch only creators marked for website display
     const { data: creators, error } = await supabase
       .from('creators')
-      .select('id, name, website_display_name, website_title, website_bio, headshot_url, display_order, content_path')
+      .select('id, name, website_display_name, website_title, website_bio, headshot_url, display_order, content_path, topic')
       .eq('display_on_website', true)
       .order('display_order', { ascending: true });
 

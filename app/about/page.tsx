@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import SymbolAnimation from '@/components/SymbolAnimation';
 import ContentCreatorsSection from '@/components/ContentCreatorsSection';
+import AboutTeamSection from '@/components/AboutTeamSection';
+import AboutCreatorsSection from '@/components/AboutCreatorsSection';
 
 // Navigation sections
 const navSections = [
@@ -484,99 +486,10 @@ export default function AboutPage() {
       </section>
 
       {/* The Team */}
-      <section id="team" className="py-20 scroll-mt-32" style={{ backgroundColor: '#f5f5f5' }}>
+      <section className="py-16 scroll-mt-32" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
-            The Team That Makes It Possible
-          </h2>
-          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
-            A passionate group of educators, strategists, and creatives<br />committed to transforming professional development.
-          </p>
-
-          {/* Leadership Team with Bios */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto mb-12">
-
-            {/* Kristin Williams */}
-            <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-              <div
-                className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
-                style={{ backgroundColor: '#ffba06' }}
-              >
-                <svg className="w-10 h-10" fill="#1e2749" viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-              </div>
-              <h4 className="font-bold text-lg mb-1" style={{ color: '#1e2749' }}>Kristin Williams</h4>
-              <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Chief Marketing Officer</p>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Shapes the voice and visibility of TDI, turning eight years of cross-industry marketing expertise into meaningful connections with educators nationwide.
-              </p>
-            </div>
-
-            {/* Omar Garcia */}
-            <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-              <div
-                className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
-                style={{ backgroundColor: '#ffba06' }}
-              >
-                <svg className="w-10 h-10" fill="#1e2749" viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-              </div>
-              <h4 className="font-bold text-lg mb-1" style={{ color: '#1e2749' }}>Omar Garcia</h4>
-              <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Chief Financial Officer</p>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Drives financial strategy and operational systems that allow TDI to scale sustainably while delivering measurable ROI for every partner district.
-              </p>
-            </div>
-
-          </div>
-
-          {/* Team Members (no bios, card style like Content Creators) */}
-          <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto">
-            {/* Teachers Deserve It Team Member */}
-            <div className="text-center p-3">
-              <div
-                className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                style={{ backgroundColor: '#1A6B6B' }}
-              >
-                <span className="text-white font-bold text-sm">RP</span>
-              </div>
-              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Teachers Deserve It Team Member</p>
-              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Director of Creative Solutions</p>
-            </div>
-
-            {/* Jim Ford */}
-            <div className="text-center p-3">
-              <div
-                className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                style={{ backgroundColor: '#1A6B6B' }}
-              >
-                <span className="text-white font-bold text-sm">JF</span>
-              </div>
-              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Jim Ford</p>
-              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Business Development Coordinator</p>
-            </div>
-
-            {/* Olivia Smith */}
-            <div className="text-center p-3">
-              <div
-                className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                style={{ backgroundColor: '#1A6B6B' }}
-              >
-                <span className="text-white font-bold text-sm">OS</span>
-              </div>
-              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Olivia Smith</p>
-              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Executive Communication Coordinator</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Content Creators - Dynamic from database */}
-      <section id="creators" className="pt-4 pb-16 scroll-mt-32" style={{ backgroundColor: '#f5f5f5' }}>
-        <div className="container-default">
-          <ContentCreatorsSection />
+          <AboutTeamSection />
+          <AboutCreatorsSection />
         </div>
       </section>
 
