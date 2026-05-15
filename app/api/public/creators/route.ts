@@ -38,6 +38,7 @@ export async function GET() {
       bio: c.website_bio || null,
       headshotUrl: c.headshot_url || null,
       contentPath: c.content_path || null,
+      topic: c.topic || null,
     }));
 
     // Return with cache header (1 hour)
