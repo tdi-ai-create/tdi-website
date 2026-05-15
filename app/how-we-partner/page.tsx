@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { TabbedCalculator } from '@/components/calculators/TabbedCalculator';
+import TeamStrip from '@/components/TeamStrip'
 
 type TabId = 'approach' | 'in-person' | 'learning-hub' | 'dashboard' | 'book' | 'results' | 'calculator';
 
@@ -1298,6 +1299,25 @@ export default function HowWePartnerPage() {
       </section>
 
       {/* Final CTA */}
+      {/* Team Strip */}
+      <section style={{ backgroundColor: '#ffffff', borderTop: '0.5px solid #E5E7EB', borderBottom: '0.5px solid #E5E7EB' }}>
+        <div className="container-default">
+          <TeamStrip
+            members={[
+              { type: 'team', name: 'Dr. Maya Johnson', imageSlug: 'maya-johnson' },
+              { type: 'team', name: 'Dr. Jasmine Cole', imageSlug: 'jasmine-cole' },
+              { type: 'team', name: 'Lily Chen', imageSlug: 'lily-chen' },
+              { type: 'team', name: 'Holly Scott', imageSlug: 'holly-scott' },
+              { type: 'team', name: 'Olivia Smith', imageSlug: 'olivia-smith' },
+              { type: 'team', name: 'Rodrigo Vega', imageSlug: 'rodrigo-vega' },
+              { type: 'creator', name: 'Amy Storer', topic: 'Math' },
+              { type: 'creator', name: 'Lindsay Hall', topic: 'Math' },
+            ]}
+            copy="Every partnership is supported by specialists across curriculum, research, design, and customer success."
+          />
+        </div>
+      </section>
+
       <section className="py-16 md:py-20" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default text-center">
           <h2 className="text-2xl md:text-4xl font-bold mb-4" style={{ color: '#ffffff' }}>

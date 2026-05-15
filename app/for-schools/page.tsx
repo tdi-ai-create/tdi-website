@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import TeamStrip from '@/components/TeamStrip'
 
 // GA4 scroll tracking hook
 function useScrollTracking() {
@@ -811,6 +812,25 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* SECTION 9: Final CTA */}
+      {/* Team Strip */}
+      <section style={{ backgroundColor: '#ffffff', borderTop: '0.5px solid #E5E7EB', borderBottom: '0.5px solid #E5E7EB' }}>
+        <div className="container-default">
+          <TeamStrip
+            members={[
+              { type: 'team', name: 'Jim Ford', imageSlug: 'jim-ford', isHuman: true },
+              { type: 'team', name: 'Holly Scott', imageSlug: 'holly-scott' },
+              { type: 'team', name: 'Olivia Smith', imageSlug: 'olivia-smith' },
+              { type: 'team', name: 'Nora Reeves', imageSlug: 'nora-reeves' },
+              { type: 'team', name: 'Dr. Maya Johnson', imageSlug: 'maya-johnson' },
+              { type: 'team', name: 'Elena Vasquez', imageSlug: 'elena-vasquez' },
+              { type: 'creator', name: 'Dr. Stephanie Nardi', topic: 'Science' },
+              { type: 'creator', name: 'Catherine Dorian', topic: 'Literacy' },
+            ]}
+            copy="When you partner with TDI, you get a team that doesn't disappear after signing."
+          />
+        </div>
+      </section>
+
       <section
         id="section-finalcta"
         className="py-20 md:py-28 relative overflow-hidden"
