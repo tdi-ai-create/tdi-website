@@ -67,26 +67,155 @@ export default function HubWelcomePage() {
         </div>
       </section>
 
-      {/* FEATURES */}
+      {/* WHAT EDUCATORS SEE */}
       <section id="features" style={{ padding: '80px 16px', backgroundColor: 'white' }}>
-        <div className="container-default" style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <h2 style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0' }}>What's Inside</h2>
-            <p style={{ fontSize: 16, color: '#6B7280' }}>Everything educators need. Nothing they don't.</p>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              What Educators See
+            </p>
+            <h2 style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0' }}>Built for the hour they don't have</h2>
+            <p style={{ fontSize: 16, color: '#6B7280', maxWidth: 700, margin: '0 auto' }}>
+              Quick Wins sorted by topic, time, and effort level. Full courses for deep dives. An AI tutor on standby. And real teacher feedback on every lesson.
+            </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 32, alignItems: 'start' }}>
+            <div>
+              <div style={{ position: 'relative', width: '100%', borderRadius: 12, overflow: 'hidden', background: '#1e2749', aspectRatio: '4/3', marginBottom: 24 }}>
+                <Image src="/hub-welcome/hub-courses-quickwins.png" alt="Courses and Quick Wins library with LIFT filters" width={800} height={600} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+              <h3 style={{ fontSize: 18, fontWeight: 600, color: '#1e2749', margin: '0 0 8px 0' }}>The LIFT Filter</h3>
+              <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
+                Filter every strategy by how much effort it takes — low, medium, or high. Find a 5-minute win on a hard day, or a deeper investment when you have the bandwidth.
+              </p>
+            </div>
+
+            <div>
+              <div style={{ display: 'grid', gap: 16 }}>
+                <div style={{ padding: 20, background: '#F9FAFB', borderRadius: 12, border: '0.5px solid #E5E7EB' }}>
+                  <h4 style={{ fontSize: 15, fontWeight: 600, color: '#1e2749', margin: '0 0 6px 0' }}>Desi, your AI tutor</h4>
+                  <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
+                    24/7 conversational support trained on TDI methodology. Ask a question, get a real answer rooted in your context.
+                  </p>
+                </div>
+                <div style={{ padding: 20, background: '#F9FAFB', borderRadius: 12, border: '0.5px solid #E5E7EB' }}>
+                  <h4 style={{ fontSize: 15, fontWeight: 600, color: '#1e2749', margin: '0 0 6px 0' }}>Transformation Tracker</h4>
+                  <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
+                    Watch your own growth. Complete a course, check in, and see how far you've come — not just what's left to do.
+                  </p>
+                </div>
+                <div style={{ padding: 20, background: '#F9FAFB', borderRadius: 12, border: '0.5px solid #E5E7EB' }}>
+                  <h4 style={{ fontSize: 15, fontWeight: 600, color: '#1e2749', margin: '0 0 6px 0' }}>What Teachers Are Saying</h4>
+                  <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
+                    Real feedback from real classrooms. Every course shows what worked, what to adapt, and what got stuck.
+                  </p>
+                </div>
+                <div style={{ padding: 20, background: '#F9FAFB', borderRadius: 12, border: '0.5px solid #E5E7EB' }}>
+                  <h4 style={{ fontSize: 15, fontWeight: 600, color: '#1e2749', margin: '0 0 6px 0' }}>PD Certificates</h4>
+                  <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
+                    Earn certificates as you complete courses. Track PD hours for licensure and evaluation.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* MOMENT MODE */}
+      <section style={{ padding: '80px 16px', backgroundColor: '#1e2749' }}>
+        <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 48, alignItems: 'center' }}>
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#ffba06', marginBottom: 16 }}>
+                Moment Mode
+              </p>
+              <h2 style={{ fontSize: 36, fontWeight: 700, color: 'white', margin: '0 0 20px 0', lineHeight: 1.15 }}>
+                A sacred space built for the moments you need to pause.
+              </h2>
+              <p style={{ fontSize: 16, color: 'white', opacity: 0.85, lineHeight: 1.7, margin: '0 0 16px 0' }}>
+                Research shows just 3 minutes of intentional pause can lower cortisol and reset your nervous system. So we built one into the Hub.
+              </p>
+              <p style={{ fontSize: 16, color: 'white', opacity: 0.85, lineHeight: 1.7, margin: '0 0 24px 0' }}>
+                No one is tracking this. No one is watching. Just breathing exercises, affirmations, gentle tools, and journaling — for when you need them.
+              </p>
+              <p style={{ fontSize: 15, color: '#ffba06', fontStyle: 'italic', margin: 0 }}>
+                You deserve to pause without guilt.
+              </p>
+            </div>
+            <div style={{ position: 'relative', width: '100%', borderRadius: 12, overflow: 'hidden', background: '#000', aspectRatio: '4/3' }}>
+              <Image src="/hub-welcome/hub-moment-mode.png" alt="Moment Mode pause space" width={800} height={600} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* IN-LESSON COMMUNITY */}
+      <section style={{ padding: '80px 16px', backgroundColor: 'white' }}>
+        <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              Every Lesson, A Conversation
+            </p>
+            <h2 style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0' }}>Not a quiz. A community.</h2>
+            <p style={{ fontSize: 16, color: '#6B7280', maxWidth: 700, margin: '0 auto' }}>
+              Every lesson opens up a conversation thread. Educators share what they tried, what they adapted, and what got stuck — so the next teacher learns from the last.
+            </p>
+          </div>
+
+          <div style={{ position: 'relative', width: '100%', maxWidth: 1000, margin: '0 auto 32px', borderRadius: 12, overflow: 'hidden', background: '#f9fafb', aspectRatio: '16/9' }}>
+            <Image src="/hub-welcome/hub-conversation.png" alt="Community conversation per lesson" width={1200} height={675} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, maxWidth: 900, margin: '0 auto' }}>
             {[
-              { title: 'Full Course Library', desc: 'Deep-dive courses on classroom management, retention, transitions, and more — built by educators who teach.' },
-              { title: 'Quick Wins', desc: 'Short, practical strategies sorted by topic, time, and grade level. For when you need something tomorrow.' },
-              { title: 'Desi AI Tutor', desc: 'A built-in AI tutor that answers PD questions 24/7 — trained on TDI methodology.' },
-              { title: 'Moment Mode', desc: 'A 3-minute reset space for the moments you need to pause. No log-in. No metrics. Just breathing room.' },
-              { title: 'Community Conversation', desc: 'Tried it. Adapted it. Still trying. Real teacher feedback per lesson. No "did you finish" surveys.' },
-              { title: 'PD Certificates', desc: 'Earn certificates as you complete courses. Track PD hours for licensure and evaluation.' },
-            ].map((f, i) => (
-              <div key={i} style={{ padding: 20, background: '#F9FAFB', borderRadius: 12, border: '0.5px solid #E5E7EB' }}>
-                <h3 style={{ fontSize: 16, fontWeight: 600, color: '#1e2749', margin: '0 0 8px 0' }}>{f.title}</h3>
-                <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
+              { label: 'Tried it', color: '#0F6E56', bg: '#E1F5EE' },
+              { label: 'Adapted it', color: '#854F0B', bg: '#FAEEDA' },
+              { label: 'Still trying', color: '#185FA5', bg: '#E6F1FB' },
+              { label: 'Got stuck', color: '#993C1D', bg: '#FAECE7' },
+              { label: 'Didn\'t land', color: '#6B7280', bg: '#F1F3F5' },
+            ].map((tag, i) => (
+              <div key={i} style={{ padding: '12px 8px', borderRadius: 8, background: tag.bg, textAlign: 'center' }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: tag.color, margin: 0 }}>{tag.label}</p>
+              </div>
+            ))}
+          </div>
+          <p style={{ textAlign: 'center', fontSize: 13, color: '#6B7280', margin: '16px 0 0 0' }}>
+            Five honest contribution types replace star ratings. Real teachers. Real stories. No survey fatigue.
+          </p>
+        </div>
+      </section>
+
+      {/* COMMUNITY CHECK-INS */}
+      <section style={{ padding: '80px 16px', backgroundColor: '#F0FAF6' }}>
+        <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#0F6E56', marginBottom: 12 }}>
+              Community Built. Community Driven. Community First.
+            </p>
+            <h2 style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0' }}>How we listen to teachers — without making it feel like a survey.</h2>
+            <p style={{ fontSize: 16, color: '#6B7280', maxWidth: 720, margin: '0 auto' }}>
+              The Hub collects signal across five dimensions of educator wellbeing. Color scales, two-choice prompts, word clouds, and fill-in-the-blanks. No long forms. No survey burnout. Just honest data on how teachers are really doing.
+            </p>
+          </div>
+
+          <div style={{ position: 'relative', width: '100%', maxWidth: 1100, margin: '0 auto 32px', borderRadius: 12, overflow: 'hidden', background: 'white', aspectRatio: '16/10' }}>
+            <Image src="/hub-welcome/hub-checkin-categories.png" alt="Learning Hub Check-In Categories" width={1200} height={750} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, maxWidth: 1000, margin: '0 auto' }}>
+            {[
+              { num: '1', label: 'Mood / Stress', signal: 'mood trend alerts' },
+              { num: '2', label: 'Energy', signal: 'capacity signal' },
+              { num: '3', label: 'Belonging', signal: 'retention intent signal' },
+              { num: '4', label: 'Purpose', signal: 'connection-to-why signal' },
+              { num: '5', label: 'Needs', signal: 'content + support routing' },
+            ].map((cat, i) => (
+              <div key={i} style={{ padding: 16, background: 'white', borderRadius: 10, border: '0.5px solid #D4EDE0' }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: '#0F6E56', margin: '0 0 4px 0' }}>0{cat.num}</p>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#1e2749', margin: '0 0 4px 0' }}>{cat.label}</p>
+                <p style={{ fontSize: 11, color: '#6B7280', margin: 0 }}>feeds {cat.signal}</p>
               </div>
             ))}
           </div>
@@ -129,6 +258,57 @@ export default function HubWelcomePage() {
         </div>
       </section>
 
+      {/* IMPLEMENTATION & COMPLIANCE ANALYTICS */}
+      <section style={{ padding: '80px 16px', backgroundColor: 'white' }}>
+        <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <span style={{ display: 'inline-block', padding: '6px 14px', background: '#1e2749', color: 'white', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 16 }}>
+              ◆ Included With Every Service
+            </span>
+            <h2 style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0' }}>Implementation & Compliance Analytics</h2>
+            <p style={{ fontSize: 16, color: '#6B7280', maxWidth: 720, margin: '0 auto' }}>
+              All data collected from memberships linked to your account flows into your dashboard. Popular topics, survey responses, evidence submitted — board-ready, audit-ready, and built for the people who need to prove it worked.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12, marginBottom: 48 }}>
+            {[
+              'Board presentation-ready progress reports',
+              'Grant applications & funding renewal evidence',
+              'State accountability & compliance documentation',
+              'Accreditation review preparation',
+              'Teacher & administrator evaluation evidence',
+              'ROI documentation for district leadership',
+              'Classroom implementation rate tracking',
+              'Professional development hours & licensure records',
+              'Principal & leadership evaluation support',
+              'Continuous improvement documentation year over year',
+            ].map((item, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 16px', background: '#F9FAFB', borderRadius: 8 }}>
+                <span style={{ color: '#185FA5', fontSize: 16, fontWeight: 700, flexShrink: 0, marginTop: -2 }}>✓</span>
+                <p style={{ fontSize: 13, color: '#1e2749', margin: 0, lineHeight: 1.5 }}>{item}</p>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ position: 'relative', width: '100%', maxWidth: 1100, margin: '0 auto 24px', borderRadius: 12, overflow: 'hidden', background: '#f9fafb', aspectRatio: '16/10', border: '0.5px solid #E5E7EB' }}>
+            <Image src="/hub-welcome/hub-analytics-overview.png" alt="District-level analytics dashboard" width={1200} height={750} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 24 }}>
+            <div style={{ position: 'relative', width: '100%', borderRadius: 12, overflow: 'hidden', background: '#f9fafb', aspectRatio: '4/3', border: '0.5px solid #E5E7EB' }}>
+              <Image src="/hub-welcome/hub-building-comparison.png" alt="Building comparison table" width={800} height={600} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+            <div style={{ position: 'relative', width: '100%', borderRadius: 12, overflow: 'hidden', background: '#f9fafb', aspectRatio: '4/3', border: '0.5px solid #E5E7EB' }}>
+              <Image src="/hub-welcome/hub-harmony-detail.png" alt="Per-building drill-down" width={800} height={600} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+          </div>
+          <p style={{ textAlign: 'center', fontSize: 13, color: '#6B7280', margin: '24px 0 0 0' }}>
+            Building-level comparison and per-school drill-downs included. Track champions, observation completion, and leading indicators across your whole district.
+          </p>
+        </div>
+      </section>
+
       {/* PRICING */}
       <section style={{ padding: '80px 16px', backgroundColor: '#f9fafb' }}>
         <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -139,7 +319,6 @@ export default function HubWelcomePage() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
 
-            {/* Free */}
             <div style={{ background: 'white', borderRadius: 16, padding: 24, border: '0.5px solid #E5E7EB' }}>
               <h3 style={{ fontSize: 24, fontWeight: 700, color: '#1e2749', margin: '0 0 4px 0' }}>Free</h3>
               <p style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0' }}>$0</p>
@@ -154,7 +333,6 @@ export default function HubWelcomePage() {
               </Link>
             </div>
 
-            {/* Essentials */}
             <div style={{ background: 'white', borderRadius: 16, padding: 24, border: '0.5px solid #E5E7EB' }}>
               <h3 style={{ fontSize: 24, fontWeight: 700, color: '#1e2749', margin: '0 0 4px 0' }}>Essentials</h3>
               <p style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 0 0' }}>$5<span style={{ fontSize: 14, fontWeight: 400, color: '#6B7280' }}>/mo</span></p>
@@ -170,7 +348,6 @@ export default function HubWelcomePage() {
               </Link>
             </div>
 
-            {/* Professional - MOST POPULAR */}
             <div style={{ background: 'white', borderRadius: 16, padding: 24, border: '2px solid #2A9D8F', position: 'relative' }}>
               <span style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#2A9D8F', color: 'white', padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase' }}>Most Popular</span>
               <h3 style={{ fontSize: 24, fontWeight: 700, color: '#1e2749', margin: '0 0 4px 0' }}>Professional</h3>
@@ -188,7 +365,6 @@ export default function HubWelcomePage() {
               </Link>
             </div>
 
-            {/* All-Access */}
             <div style={{ background: 'white', borderRadius: 16, padding: 24, border: '0.5px solid #E5E7EB' }}>
               <h3 style={{ fontSize: 24, fontWeight: 700, color: '#1e2749', margin: '0 0 4px 0' }}>All-Access</h3>
               <p style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 0 0' }}>$25<span style={{ fontSize: 14, fontWeight: 400, color: '#6B7280' }}>/mo</span></p>
