@@ -39,18 +39,29 @@ function FeaturedCard({ member }: { member: typeof featuredTeam[0] }) {
 }
 
 function SupportingCircle({ member }: { member: typeof supportingTeam[0] }) {
+  const [imgError, setImgError] = useState(false)
   const initials = getInitials(member.name)
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <div style={{
-        width: 56, height: 56, borderRadius: '50%', margin: '0 auto 6px',
-        background: '#E1F5EE', color: '#0F6E56',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 14, fontWeight: 500,
-      }}>
-        {initials}
-      </div>
+      {!imgError ? (
+        <Image
+          src={`/team/${member.imageSlug}.jpg`}
+          alt={member.name}
+          width={56} height={56}
+          style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', margin: '0 auto 6px' }}
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <div style={{
+          width: 56, height: 56, borderRadius: '50%', margin: '0 auto 6px',
+          background: '#E1F5EE', color: '#0F6E56',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 14, fontWeight: 500,
+        }}>
+          {initials}
+        </div>
+      )}
       <p style={{ fontSize: 12, fontWeight: 500, color: '#1e2749', margin: '0 0 2px 0' }}>{member.name}</p>
       <p style={{ fontSize: 11, color: '#6B7280', margin: 0 }}>{member.title}</p>
     </div>
@@ -67,7 +78,7 @@ export default function AboutTeamSection() {
       {/* Featured cards */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+        gridTemplateColumns: 'repeat(3, 1fr)',
         gap: 16,
         marginBottom: 32,
       }}>
