@@ -80,13 +80,13 @@ function TeamCircle({ member }: { member: typeof team[0] }) {
         <Image
           src={`/team/${member.imageSlug}.jpg`}
           alt={member.name}
-          width={90} height={90}
-          style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', margin: '0 auto 8px', ...goldRing }}
+          width={110} height={110}
+          style={{ width: 110, height: 110, borderRadius: '50%', objectFit: 'cover', margin: '0 auto 8px', ...goldRing }}
           onError={() => setImgError(true)}
         />
       ) : (
         <div style={{
-          width: 90, height: 90, borderRadius: '50%', margin: '0 auto 8px',
+          width: 110, height: 110, borderRadius: '50%', margin: '0 auto 8px',
           background: member.isHuman ? '#1B365D' : '#E1F5EE',
           color: member.isHuman ? 'white' : '#0F6E56',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -122,7 +122,7 @@ export default function AboutTeamSection() {
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+        gridTemplateColumns: 'repeat(5, 1fr)',
         gap: 16,
       }}>
         {team.map(member => (
