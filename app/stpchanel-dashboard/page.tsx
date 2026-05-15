@@ -2896,7 +2896,7 @@ export default function StPeterChanelDashboard() {
             <div className="bg-[#1e2749] rounded-xl p-4">
               <p className="text-white">
                 <span className="font-medium">Thank you for investing in your team.</span>
-                <span className="text-white/80 ml-1">Partnerships like yours help us support 87,000+ educators nationwide.</span>
+                <span className="text-white/80 ml-1">Partnerships like yours help us support 100,000+ educators nationwide.</span>
               </p>
             </div>
 

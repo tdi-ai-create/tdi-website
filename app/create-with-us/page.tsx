@@ -829,10 +829,10 @@ export default function CreateWithUsPage() {
               </span>
               <div className="flex-1">
                 <h3 className="text-xl md:text-2xl font-bold text-[#1e2749] mb-3 group-hover:text-[#80a4ed] transition-colors duration-300">
-                  Reach 87,000+ Educators
+                  Reach 100,000+ Educators
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Your strategies reach our engaged community of teachers across 21 states who are actively looking for practical, real-world solutions from educators like you.
+                  Your strategies reach our engaged community of teachers across all 50 states who are actively looking for practical, real-world solutions from educators like you.
                 </p>
               </div>
             </div>

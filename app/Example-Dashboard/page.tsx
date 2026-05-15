@@ -2950,7 +2950,7 @@ export default function ExampleDashboard() {
               {/* Data source footer */}
               <p className="text-xs text-gray-500 mt-4 pt-3 border-t border-gray-50">
                 Industry data: RAND Corporation (2025), Learning Policy Institute, TNTP ·
-                TDI data: Partner school surveys across 21 states ·
+                TDI data: Partner school surveys across all 50 states ·
                 District data: Hub analytics + staff surveys
               </p>
             </div>

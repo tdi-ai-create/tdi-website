@@ -110,7 +110,7 @@ export default function AboutPage() {
         <div className="container-default">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center max-w-5xl mx-auto">
             <div>
-              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>87K+</p>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>100K+</p>
               <p style={{ color: '#ffffff', opacity: 0.9 }}>educators in our community</p>
             </div>
             <div className="md:col-span-1">
@@ -179,6 +179,14 @@ export default function AboutPage() {
             </div>
 
           </div>
+        </div>
+      </section>
+
+      {/* The Team */}
+      <section className="py-16 scroll-mt-32" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-default">
+          <AboutTeamSection />
+          <AboutCreatorsSection />
         </div>
       </section>
 
@@ -430,7 +438,7 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>87,000+</p>
+              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>100,000+</p>
               <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>Educators in Our Community</p>
             </div>
             <div>
@@ -451,14 +459,6 @@ export default function AboutPage() {
           <p className="text-center text-sm mt-8 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
             The industry average for PD classroom transfer is just 5-10% (Joyce & Showers, 2002).<br />Our partners average 65% because TDI is built for Monday morning, not &quot;someday.&quot;
           </p>
-        </div>
-      </section>
-
-      {/* The Team */}
-      <section className="py-16 scroll-mt-32" style={{ backgroundColor: '#f5f5f5' }}>
-        <div className="container-default">
-          <AboutTeamSection />
-          <AboutCreatorsSection />
         </div>
       </section>
 

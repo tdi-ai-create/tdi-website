@@ -322,7 +322,7 @@ export default function GetStartedPage() {
           </p>
 
           <div className="flex flex-wrap justify-center gap-2 mt-4">
-            {['87,000+ educators served', '21 states', 'Takes 10 seconds'].map((item) => (
+            {['100,000+ educators served', 'all 50 states', 'Takes 10 seconds'].map((item) => (
               <span
                 key={item}
                 className="px-3 py-1 rounded-full text-xs font-semibold"
@@ -403,7 +403,7 @@ export default function GetStartedPage() {
                 <div className="w-6 h-6 rounded-full bg-amber-200 border-2 border-white" />
               </div>
               <p className="text-xs" style={{ color: '#6b7280' }}>
-                Join 87,000+ educators who started right here
+                Join 100,000+ educators who started right here
               </p>
             </div>
           </div>

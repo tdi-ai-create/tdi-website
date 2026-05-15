@@ -351,7 +351,7 @@ export default function Home() {
                 className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover-glow"
                 style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
               >
-                Join 87,000+ Educators
+                Join 100,000+ Educators
               </a>
               <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.6 }}>
                 Or{' '}
@@ -477,10 +477,10 @@ export default function Home() {
         <div className="container-default text-center">
           <h2 className="mb-4" style={{ color: 'white' }}>Practical Strategies, 3x a Week</h2>
           <p className="text-lg mb-2 max-w-xl mx-auto" style={{ color: 'white', opacity: 0.8 }}>
-            Join 87,000+ educators getting real strategies delivered to their inbox. Not theory, not fluff, just stuff that works.
+            Join 100,000+ educators getting real strategies delivered to their inbox. Not theory, not fluff, just stuff that works.
           </p>
           <p className="text-base mb-6" style={{ color: '#ffba06' }}>
-            Join 87,000+ educators who decided they deserved better.
+            Join 100,000+ educators who decided they deserved better.
           </p>
           <a
             href="https://raehughart.substack.com"
@@ -556,7 +556,7 @@ export default function Home() {
 
       {/* SECTION 12: Final CTA */}
       {/* Team Strip */}
-      <section style={{ backgroundColor: '#ffffff', borderTop: '0.5px solid #E5E7EB', borderBottom: '0.5px solid #E5E7EB' }}>
+      <section style={{ backgroundColor: '#F0FAF6', borderTop: '0.5px solid #D4EDE0', borderBottom: '0.5px solid #D4EDE0' }}>
         <div className="container-default">
           <TeamStrip
             members={[
@@ -580,7 +580,7 @@ export default function Home() {
             Whether you're a teacher looking for support or a leader trying to keep your team from burning out, we've got you.
           </p>
           <p className="text-sm mb-8" style={{ color: '#1e2749', opacity: 0.6 }}>
-            Join 87,000+ educators who've already taken the first step.
+            Join 100,000+ educators who've already taken the first step.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

@@ -24,7 +24,7 @@ const features = [
   },
   {
     title: 'A Community That Gets It',
-    description: "Connect with 87,000+ educators who understand the good days and the 'crying in your car' days.",
+    description: "Connect with 100,000+ educators who understand the good days and the 'crying in your car' days.",
     icon: '🤝',
   },
   {
@@ -37,7 +37,7 @@ const features = [
 const stats = [
   { number: '38%', label: 'increase in strategy implementation' },
   { number: '95%', label: 'of teachers report time savings' },
-  { number: '87,000+', label: 'educators in the community' },
+  { number: '100,000+', label: 'educators in the community' },
 ];
 
 export default function WhatWeOfferPage() {
@@ -49,7 +49,7 @@ export default function WhatWeOfferPage() {
           <div className="text-center">
             <h1 className="mb-4">Professional Development That Respects Your Time</h1>
             <p className="text-xl mb-8" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-              On-demand courses, practical strategies, and a community of 87,000+ educators. All built by teachers who've been in your shoes.
+              On-demand courses, practical strategies, and a community of 100,000+ educators. All built by teachers who've been in your shoes.
             </p>
             <Button href="https://tdi.thinkific.com" external>
               Explore the Learning Hub

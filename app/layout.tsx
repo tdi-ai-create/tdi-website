@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     default: "Teachers Deserve It | Professional Development That Actually Works",
     template: "%s | Teachers Deserve It",
   },
-  description: "Join 87,000+ educators with PD that respects your time. Practical strategies, wellness support, and a community that gets it. For teachers and schools.",
+  description: "Join 100,000+ educators with PD that respects your time. Practical strategies, wellness support, and a community that gets it. For teachers and schools.",
   keywords: ["professional development", "teacher PD", "teacher wellness", "school PD", "teacher burnout", "education"],
   authors: [{ name: "Teachers Deserve It" }],
   creator: "Teachers Deserve It",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     url: "https://teachersdeserveit.com",
     siteName: "Teachers Deserve It",
     title: "Teachers Deserve It | Professional Development That Actually Works",
-    description: "Join 87,000+ educators with PD that respects your time. Practical strategies, wellness support, and a community that gets it.",
+    description: "Join 100,000+ educators with PD that respects your time. Practical strategies, wellness support, and a community that gets it.",
     images: [
       {
         url: "/og-image.png",
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Teachers Deserve It | Professional Development That Actually Works",
-    description: "Join 87,000+ educators with PD that respects your time. Practical strategies, wellness support, and a community that gets it.",
+    description: "Join 100,000+ educators with PD that respects your time. Practical strategies, wellness support, and a community that gets it.",
     images: ["/og-image.png"],
   },
   robots: {

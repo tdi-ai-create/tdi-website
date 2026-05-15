@@ -46,7 +46,7 @@ export default function CalculatorPage() {
             Ready to Take the Next Step?
           </h2>
           <p className="text-sm md:text-base mb-6" style={{ color: '#1e2749', opacity: 0.7 }}>
-            Join 87,000+ educators who are building sustainable teaching practices.
+            Join 100,000+ educators who are building sustainable teaching practices.
           </p>
           <Link
             href="/join"

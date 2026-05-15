@@ -298,7 +298,7 @@ export function TDICalculator() {
                 </h3>
                 
                 <p className="text-center mb-6" style={{ opacity: 0.7 }}>
-                  Get practical strategies delivered to your inbox 3x/week. Join 87,000+ educators.
+                  Get practical strategies delivered to your inbox 3x/week. Join 100,000+ educators.
                 </p>
 
                 <form onSubmit={handlePopupSubmit} className="space-y-4">
@@ -315,7 +315,7 @@ export function TDICalculator() {
                     className="w-full py-3 rounded-lg font-bold transition-all"
                     style={{ backgroundColor: 'var(--tdi-navy)', color: 'white' }}
                   >
-                    Join 87,000+ Educators
+                    Join 100,000+ Educators
                   </button>
                 </form>
 

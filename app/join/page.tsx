@@ -87,7 +87,7 @@ export default function JoinPage() {
                   Weekly Strategies
                 </h3>
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  3x/week, practical ideas you can use immediately. Join 87,000+ educators already getting them.
+                  3x/week, practical ideas you can use immediately. Join 100,000+ educators already getting them.
                 </p>
                 <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
                   Read the latest →

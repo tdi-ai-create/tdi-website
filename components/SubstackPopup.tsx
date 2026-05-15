@@ -123,7 +123,7 @@ export function SubstackPopup() {
             Stay in the Loop
           </h2>
           <p className="text-gray-500 text-sm mb-6">
-            Join 87,000+ educators getting strategies that actually work - delivered weekly.
+            Join 100,000+ educators getting strategies that actually work - delivered weekly.
           </p>
 
           {/* Substack form */}

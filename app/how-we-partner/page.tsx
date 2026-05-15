@@ -1300,7 +1300,7 @@ export default function HowWePartnerPage() {
 
       {/* Final CTA */}
       {/* Team Strip */}
-      <section style={{ backgroundColor: '#ffffff', borderTop: '0.5px solid #E5E7EB', borderBottom: '0.5px solid #E5E7EB' }}>
+      <section style={{ backgroundColor: '#F0FAF6', borderTop: '0.5px solid #D4EDE0', borderBottom: '0.5px solid #D4EDE0' }}>
         <div className="container-default">
           <TeamStrip
             members={[

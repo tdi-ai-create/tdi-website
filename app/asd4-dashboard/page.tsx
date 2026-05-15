@@ -5009,7 +5009,7 @@ Thank you for setting the example. It matters more than you know.`;
                 <Heart className="w-6 h-6 text-[#ffba06] fill-[#ffba06] flex-shrink-0" />
                 <p className="text-white">
                   <span className="font-medium">Thank you for investing in your team.</span>
-                  <span className="text-white/80 ml-1">Partnerships like yours help us support 87,000+ educators nationwide.</span>
+                  <span className="text-white/80 ml-1">Partnerships like yours help us support 100,000+ educators nationwide.</span>
                 </p>
               </div>
             </div>

@@ -156,7 +156,7 @@ export default function ForSchoolsPage() {
       question: 'How do we know this will work for our specific context?',
       answer: (
         <>
-          TDI serves 87,000+ educators across 21 states in schools ranging from rural single-building districts to multi-school urban systems. Every partnership is customized - your dashboard, your goals, your pace. Start with the{' '}
+          TDI serves 100,000+ educators across all 50 states in schools ranging from rural single-building districts to multi-school urban systems. Every partnership is customized - your dashboard, your goals, your pace. Start with the{' '}
           <Link href="/pd-diagnostic" className="font-semibold underline" style={{ color: '#35A7FF' }}>
             free PD Diagnostic
           </Link>{' '}
@@ -763,7 +763,7 @@ export default function ForSchoolsPage() {
               Download the TDI District Summary
             </h2>
             <p className="text-lg mb-8 max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,0.8)' }}>
-              One page. Everything your leadership team needs to start the conversation — 100,000+ educators, 21 states, 94% would recommend.
+              One page. Everything your leadership team needs to start the conversation — 100,000+ educators, all 50 states, 94% would recommend.
             </p>
             <a
               href="/district-summary.pdf"
@@ -813,7 +813,7 @@ export default function ForSchoolsPage() {
 
       {/* SECTION 9: Final CTA */}
       {/* Team Strip */}
-      <section style={{ backgroundColor: '#ffffff', borderTop: '0.5px solid #E5E7EB', borderBottom: '0.5px solid #E5E7EB' }}>
+      <section style={{ backgroundColor: '#F0FAF6', borderTop: '0.5px solid #D4EDE0', borderBottom: '0.5px solid #D4EDE0' }}>
         <div className="container-default">
           <TeamStrip
             members={[

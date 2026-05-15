@@ -542,7 +542,7 @@ function NominatePageInner() {
           <p className="text-lg md:text-xl mb-3 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
             Nominate them. <span className="font-bold">If it leads to a partnership, we celebrate you.</span>
           </p>
-          <p className="text-sm mb-4" style={{ color: '#ffffff', opacity: 0.8 }}>Trusted by 87,000+ educators in 21 states</p>
+          <p className="text-sm mb-4" style={{ color: '#ffffff', opacity: 0.8 }}>Trusted by 100,000+ educators in all 50 states</p>
           <div className="inline-block px-5 py-2 rounded-lg mb-4" style={{ backgroundColor: 'rgba(53, 167, 255, 0.2)', border: '1px solid #35A7FF' }}>
             <p className="text-sm font-semibold" style={{ color: '#35A7FF' }}>
               Only <span className="text-xl font-bold">{VIP_SPOTS_REMAINING}</span> Blueprint Founders Circle spots available for Fall 2026
@@ -601,9 +601,9 @@ function NominatePageInner() {
                 <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="flex -space-x-2"><div className="w-6 h-6 rounded-full bg-teal-200 border-2 border-white" /><div className="w-6 h-6 rounded-full bg-blue-200 border-2 border-white" /><div className="w-6 h-6 rounded-full bg-amber-200 border-2 border-white" /></div>
-                    <span className="text-xs text-gray-500">87,000+ educators</span>
+                    <span className="text-xs text-gray-500">100,000+ educators</span>
                   </div>
-                  <span className="text-xs text-gray-400">21 states</span>
+                  <span className="text-xs text-gray-400">all 50 states</span>
                 </div>
               </div>
             </div>
@@ -616,7 +616,7 @@ function NominatePageInner() {
         <div className="container-default">
           <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 max-w-2xl mx-auto">
             <div className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white shadow-sm"><MapPin className="w-5 h-5" style={{ color: '#35A7FF' }} /><p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>21</p><p className="text-sm font-medium" style={{ color: '#1e2749' }}>States</p></div>
-            <div className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white shadow-sm"><Users className="w-5 h-5" style={{ color: '#35A7FF' }} /><p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>87K+</p><p className="text-sm font-medium" style={{ color: '#1e2749' }}>Educators</p></div>
+            <div className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white shadow-sm"><Users className="w-5 h-5" style={{ color: '#35A7FF' }} /><p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>100K+</p><p className="text-sm font-medium" style={{ color: '#1e2749' }}>Educators</p></div>
             <div className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white shadow-sm"><TrendingUp className="w-5 h-5" style={{ color: '#35A7FF' }} /><p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>65%</p><p className="text-sm font-medium" style={{ color: '#1e2749' }}>Implementation</p></div>
           </div>
         </div>
