@@ -190,7 +190,7 @@ export default function AboutPage() {
               <p className="text-sm font-semibold uppercase tracking-wide mb-2" style={{ color: '#ffba06' }}>
                 Watch Rae's Story
               </p>
-              <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>
+              <h2 className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>
                 TEDx Talk: Why Teachers Deserve Better
               </h2>
             </div>
