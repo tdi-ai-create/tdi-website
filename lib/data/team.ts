@@ -12,9 +12,10 @@ export interface TeamMember {
   isHuman: boolean
 }
 
-export const founder: FeaturedTeamMember = {
+export const founder = {
   name: 'Rae Hughart',
   title: 'CEO & Founder',
+  credentials: 'Award-winning educator. TEDx speaker. Bestselling author.',
   description: 'I started Teachers Deserve It because I watched too many incredible educators burn out alone. We\'re building something different here. A team and a community that gives teachers what they actually need to thrive.',
   imageSlug: 'rae-hughart',
 }

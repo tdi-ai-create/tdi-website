@@ -31,7 +31,8 @@ function HeroStrip() {
         }}>{initials}</div>
       )}
       <div style={{ flex: 1, minWidth: 240 }}>
-        <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', color: '#2A9D8F', margin: '0 0 4px 0' }}>A note from the founder</p>
+        <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', color: '#2A9D8F', margin: '0 0 6px 0' }}>A note from the founder</p>
+        <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 4px 0', fontStyle: 'italic' }}>{founder.credentials}</p>
         <p style={{ fontSize: 20, fontWeight: 500, color: '#1e2749', margin: '0 0 4px 0' }}>{founder.name}</p>
         <p style={{ fontSize: 13, color: '#2A9D8F', margin: '0 0 12px 0', fontWeight: 500 }}>{founder.title}</p>
         <p style={{ fontSize: 13, color: '#4B5563', lineHeight: 1.6, margin: 0 }}>{founder.description}</p>
