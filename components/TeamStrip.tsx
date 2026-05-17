@@ -4,10 +4,20 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import { getTopicConfig } from '@/lib/data/creator-topics'
-import { BookOpen, Activity, Calculator, FlaskConical, Palette, GraduationCap, Sparkles } from 'lucide-react'
+import {
+  BookOpen, BookMarked, PenLine, Activity, Calculator, FlaskConical, Palette,
+  GraduationCap, Sparkles, Globe, Languages, HeartHandshake, Music, Library,
+  HeartPulse, LayoutGrid, Lightbulb, Route, ClipboardCheck, NotebookPen,
+  PencilRuler, Baby, Puzzle, MessagesSquare, Star, Users, Sprout, Clock,
+  Target, Home as HomeIcon, Laptop, Scale,
+} from 'lucide-react'
 
 const ICON_COMPONENTS: Record<string, any> = {
-  BookOpen, Activity, Calculator, FlaskConical, Palette, GraduationCap, Sparkles,
+  BookOpen, BookMarked, PenLine, Activity, Calculator, FlaskConical, Palette,
+  GraduationCap, Sparkles, Globe, Languages, HeartHandshake, Music, Library,
+  HeartPulse, LayoutGrid, Lightbulb, Route, ClipboardCheck, NotebookPen,
+  PencilRuler, Baby, Puzzle, MessagesSquare, Star, Users, Sprout, Clock,
+  Target, HomeIcon, Laptop, Scale,
 }
 
 interface TeamStripMember {
