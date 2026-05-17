@@ -43,7 +43,7 @@ import {
   ExternalLink,
   MousePointerClick,
   BookMarked, PenLine, Activity, FlaskConical, Calculator,
-  GraduationCap, Sparkles, Globe, Languages, HeartHandshake, Music, Library,
+  GraduationCap, Sparkles, Languages, HeartHandshake, Music, Library,
   HeartPulse, Lightbulb, Route, ClipboardCheck, NotebookPen,
   PencilRuler, Baby, Puzzle, MessagesSquare, Star, Sprout,
   Target, Home as HomeIcon, Laptop, Scale,
@@ -51,7 +51,7 @@ import {
 
 const TOPIC_ICON_MAP: Record<string, any> = {
   BookOpen, BookMarked, PenLine, Activity, Calculator, FlaskConical, Palette,
-  GraduationCap, Sparkles, Globe, Languages, HeartHandshake, Music, Library,
+  GraduationCap, Sparkles, Languages, HeartHandshake, Music, Library,
   HeartPulse, LayoutGrid, Lightbulb, Route, ClipboardCheck, NotebookPen,
   PencilRuler, Baby, Puzzle, MessagesSquare, Star, Users, Sprout, Clock,
   Target, HomeIcon, Laptop, Scale,
