@@ -291,21 +291,11 @@ export default function HubWelcomePage() {
             ))}
           </div>
 
-          <div style={{ width: '100%', maxWidth: 1100, margin: '0 auto 24px', borderRadius: 12, overflow: 'hidden', border: '0.5px solid #E5E7EB' }}>
-            <Image src="/hub-welcome/hub-analytics-overview.png" alt="District-level analytics dashboard" width={1200} height={750} style={{ width: '100%', height: 'auto', display: 'block' }} />
+          <div style={{ background: '#F9FAFB', borderRadius: 12, padding: 32, textAlign: 'center', border: '0.5px solid #E5E7EB', maxWidth: 900, margin: '0 auto' }}>
+            <p style={{ fontSize: 15, color: '#1e2749', lineHeight: 1.7, margin: 0 }}>
+              Building-level dashboards, per-school drill-downs, observation timelines, leading indicators, and Love Note highlights are included with every TDI partnership. <Link href="/for-schools" style={{ color: '#2A9D8F', fontWeight: 500 }}>Explore partnership options →</Link>
+            </p>
           </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 24 }}>
-            <div style={{ width: '100%', borderRadius: 12, overflow: 'hidden', border: '0.5px solid #E5E7EB' }}>
-              <Image src="/hub-welcome/hub-building-comparison.png" alt="Building comparison table" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
-            </div>
-            <div style={{ width: '100%', borderRadius: 12, overflow: 'hidden', border: '0.5px solid #E5E7EB' }}>
-              <Image src="/hub-welcome/hub-harmony-detail.png" alt="Per-building drill-down" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
-            </div>
-          </div>
-          <p style={{ textAlign: 'center', fontSize: 13, color: '#6B7280', margin: '24px 0 0 0' }}>
-            Building-level comparison and per-school drill-downs included. Track champions, observation completion, and leading indicators across your whole district.
-          </p>
         </div>
       </section>
 
