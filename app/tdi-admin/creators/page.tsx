@@ -411,7 +411,7 @@ function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
               />
               <Legend />
-              <Bar dataKey="download" stackId="a" fill="#D4C1E8" name="Download" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="download" stackId="a" fill="#ffba06" name="Download" radius={[0, 0, 0, 0]} />
               <Bar dataKey="course" stackId="a" fill="#1e2749" name="Course" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -3342,7 +3342,7 @@ export default function CreatorStudioPage() {
                           red: 'bg-gray-500',
                         };
                         const bgColors = {
-                          green: 'bg-green-50 hover:bg-yellow-100',
+                          green: 'bg-yellow-50 hover:bg-yellow-100',
                           yellow: 'bg-yellow-50 hover:bg-yellow-100',
                           orange: 'bg-gray-50 hover:bg-gray-100',
                           red: 'bg-gray-50 hover:bg-gray-100',
@@ -3429,7 +3429,7 @@ export default function CreatorStudioPage() {
                     <p className="text-sm text-gray-500 mb-4">Creator progression through phases</p>
                     <div className="space-y-2">
                       {analyticsData.completionFunnel.map((stage, index) => {
-                        const colors = ['#1e2749', '#DB2777', '#F472B6', '#F9A8D4', '#FBCFE8', '#ffba06'];
+                        const colors = ['#1e2749', '#2B3A67', '#475569', '#94A3B8', '#CBD5E1', '#ffba06'];
                         return (
                           <div key={stage.phase} className="flex items-center gap-3">
                             <div className="w-32 text-sm text-gray-600 truncate">{stage.name}</div>
