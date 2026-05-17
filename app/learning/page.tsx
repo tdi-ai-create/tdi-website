@@ -84,6 +84,11 @@ export default function HubWelcomePage() {
               </div>
             </div>
           </div>
+          <div style={{ textAlign: 'center', marginTop: 48 }}>
+            <Link href="/hub/membership" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '14px 32px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
+              Join the Hub
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -134,6 +139,11 @@ export default function HubWelcomePage() {
           <p style={{ fontSize: 18, color: '#1e2749', opacity: 0.75, maxWidth: 600, margin: '0 auto', lineHeight: 1.6 }}>
             That's over 7x the industry average of just 10% implementation in 180 days. The Hub is one piece of our research-backed approach to educator learning that actually transfers to the classroom.
           </p>
+          <div style={{ textAlign: 'center', marginTop: 48 }}>
+            <Link href="/hub/membership" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '14px 32px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
+              Join the Hub
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -175,8 +185,23 @@ export default function HubWelcomePage() {
               <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: '0 0 20px 0' }}>
                 Full courses, quick wins, an AI tutor, and a community that knows what your classroom actually looks like.
               </p>
-              <div style={{ width: '100%', borderRadius: 8, overflow: 'hidden' }}>
-                <Image src="/hub-welcome/hub-user-dashboard.png" alt="Learning Hub educator view" width={800} height={500} style={{ width: '100%', height: 'auto', display: 'block' }} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
+                  <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E1F5EE', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#0F6E56', fontWeight: 600, fontSize: 12 }}>✓</span>
+                  Full course library + Quick Wins
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
+                  <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E1F5EE', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#0F6E56', fontWeight: 600, fontSize: 12 }}>✓</span>
+                  Desi AI tutor on call
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
+                  <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E1F5EE', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#0F6E56', fontWeight: 600, fontSize: 12 }}>✓</span>
+                  Moment Mode for wellness
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
+                  <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E1F5EE', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#0F6E56', fontWeight: 600, fontSize: 12 }}>✓</span>
+                  PD certificates + transformation tracker
+                </div>
               </div>
             </div>
 
@@ -186,8 +211,23 @@ export default function HubWelcomePage() {
               <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: '0 0 20px 0' }}>
                 Implementation analytics, board-ready reports, and compliance documentation pulled from real classroom data.
               </p>
-              <div style={{ width: '100%', borderRadius: 8, overflow: 'hidden' }}>
-                <Image src="/hub-welcome/hub-admin-dashboard.png" alt="Admin analytics dashboard" width={800} height={500} style={{ width: '100%', height: 'auto', display: 'block' }} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
+                  <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E6F1FB', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#185FA5', fontWeight: 600, fontSize: 12 }}>✓</span>
+                  Real-time implementation tracking
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
+                  <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E6F1FB', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#185FA5', fontWeight: 600, fontSize: 12 }}>✓</span>
+                  Board-ready progress reports
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
+                  <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E6F1FB', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#185FA5', fontWeight: 600, fontSize: 12 }}>✓</span>
+                  Building-level dashboards
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
+                  <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E6F1FB', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#185FA5', fontWeight: 600, fontSize: 12 }}>✓</span>
+                  Compliance + evaluation evidence
+                </div>
               </div>
             </div>
           </div>
@@ -227,6 +267,11 @@ export default function HubWelcomePage() {
           <p style={{ textAlign: 'center', fontSize: 13, color: '#6B7280', margin: '16px 0 0 0' }}>
             Five honest contribution types replace star ratings. Real teachers. Real stories. No survey fatigue.
           </p>
+          <div style={{ textAlign: 'center', marginTop: 48 }}>
+            <Link href="/hub/membership" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '14px 32px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
+              Join the Hub
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -289,6 +334,10 @@ export default function HubWelcomePage() {
                 <p style={{ fontSize: 13, color: '#1e2749', margin: 0, lineHeight: 1.5 }}>{item}</p>
               </div>
             ))}
+          </div>
+
+          <div style={{ width: '100%', maxWidth: 1100, margin: '0 auto 32px', borderRadius: 12, overflow: 'hidden', border: '0.5px solid #E5E7EB' }}>
+            <Image src="/hub-welcome/hub-admin-dashboard.png" alt="District-level admin analytics dashboard" width={1200} height={750} style={{ width: '100%', height: 'auto', display: 'block' }} />
           </div>
 
           <div style={{ background: '#F9FAFB', borderRadius: 12, padding: 32, textAlign: 'center', border: '0.5px solid #E5E7EB', maxWidth: 900, margin: '0 auto' }}>
