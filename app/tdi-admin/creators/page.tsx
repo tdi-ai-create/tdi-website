@@ -3180,6 +3180,68 @@ export default function CreatorStudioPage() {
           {!analyticsLoading && analyticsData && (
             <>
               {/* ==========================================
+                  SECTION 0: TOPIC DISTRIBUTION
+                  ========================================== */}
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
+                  Topic Distribution
+                </h2>
+                <p className="text-sm text-gray-500 mb-4">How many creators across each topic. Empty topics highlight recruiting gaps.</p>
+
+                <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] mb-6">
+                  {(() => {
+                    const topicCounts: Record<string, number> = {};
+                    Object.keys(TOPIC_ICON_MAP).forEach((iconName) => {});
+                    Object.keys({}).forEach(() => {});
+                    const allTopics = Object.entries(require('@/lib/data/creator-topics').TOPIC_MAP) as Array<[string, any]>;
+                    allTopics.forEach(([name]) => { topicCounts[name] = 0; });
+                    dashboardData.creators.forEach((creator: any) => {
+                      if (creator.topic && topicCounts[creator.topic] !== undefined) topicCounts[creator.topic]++;
+                      if (Array.isArray(creator.secondary_topics)) {
+                        creator.secondary_topics.forEach((st: string) => {
+                          if (topicCounts[st] !== undefined) topicCounts[st]++;
+                        });
+                      }
+                    });
+                    const sorted = allTopics.sort((a, b) => topicCounts[b[0]] - topicCounts[a[0]]);
+                    return (
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+                        {sorted.map(([topicName, config]) => {
+                          const count = topicCounts[topicName] || 0;
+                          const Icon = TOPIC_ICON_MAP[config.icon] || Sparkles;
+                          const isEmpty = count === 0;
+                          return (
+                            <div
+                              key={topicName}
+                              className="flex items-center gap-2 p-2 rounded-lg"
+                              style={{
+                                background: isEmpty ? '#F9FAFB' : config.background,
+                                border: isEmpty ? '1px dashed #E5E7EB' : `1px solid ${config.border}`,
+                                opacity: isEmpty ? 0.6 : 1,
+                              }}
+                            >
+                              <div
+                                className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                                style={{ background: isEmpty ? '#F3F4F6' : 'white' }}
+                              >
+                                <Icon style={{ width: 16, height: 16, color: isEmpty ? '#9CA3AF' : config.iconColor }} />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-xs font-medium truncate" style={{ color: isEmpty ? '#9CA3AF' : '#1e2749' }}>{topicName}</p>
+                                <p className="text-xs" style={{ color: isEmpty ? '#9CA3AF' : config.iconColor, fontWeight: 600 }}>
+                                  {count} creator{count === 1 ? '' : 's'}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* ==========================================
                   SECTION 1: PIPELINE HEALTH
                   ========================================== */}
               <div>
