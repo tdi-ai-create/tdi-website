@@ -48,8 +48,8 @@ export default function HubWelcomePage() {
               <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: '0 0 20px 0' }}>
                 Full courses, quick wins, an AI tutor, and a community that knows what your classroom actually looks like.
               </p>
-              <div style={{ position: 'relative', width: '100%', borderRadius: 8, overflow: 'hidden', background: '#1e2749', aspectRatio: '16/10' }}>
-                <Image src="/hub-welcome/hub-user-dashboard.png" alt="Learning Hub educator view" width={800} height={500} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div style={{ width: '100%', borderRadius: 8, overflow: 'hidden' }}>
+                <Image src="/hub-welcome/hub-user-dashboard.png" alt="Learning Hub educator view" width={800} height={500} style={{ width: '100%', height: 'auto', display: 'block' }} />
               </div>
             </div>
 
@@ -59,8 +59,8 @@ export default function HubWelcomePage() {
               <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: '0 0 20px 0' }}>
                 Implementation analytics, board-ready reports, and compliance documentation pulled from real classroom data.
               </p>
-              <div style={{ position: 'relative', width: '100%', borderRadius: 8, overflow: 'hidden', background: '#1e2749', aspectRatio: '16/10' }}>
-                <Image src="/hub-welcome/hub-admin-dashboard.png" alt="Admin analytics dashboard" width={800} height={500} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div style={{ width: '100%', borderRadius: 8, overflow: 'hidden' }}>
+                <Image src="/hub-welcome/hub-admin-dashboard.png" alt="Admin analytics dashboard" width={800} height={500} style={{ width: '100%', height: 'auto', display: 'block' }} />
               </div>
             </div>
           </div>
@@ -82,8 +82,8 @@ export default function HubWelcomePage() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 32, alignItems: 'start' }}>
             <div>
-              <div style={{ position: 'relative', width: '100%', borderRadius: 12, overflow: 'hidden', background: '#1e2749', aspectRatio: '4/3', marginBottom: 24 }}>
-                <Image src="/hub-welcome/hub-courses-quickwins.png" alt="Courses and Quick Wins library with LIFT filters" width={800} height={600} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div style={{ width: '100%', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
+                <Image src="/hub-welcome/hub-courses-quickwins.png" alt="Courses and Quick Wins library with LIFT filters" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
               </div>
               <h3 style={{ fontSize: 18, fontWeight: 600, color: '#1e2749', margin: '0 0 8px 0' }}>The LIFT Filter</h3>
               <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
@@ -144,8 +144,8 @@ export default function HubWelcomePage() {
                 You deserve to pause without guilt.
               </p>
             </div>
-            <div style={{ position: 'relative', width: '100%', borderRadius: 12, overflow: 'hidden', background: '#000', aspectRatio: '4/3' }}>
-              <Image src="/hub-welcome/hub-moment-mode.png" alt="Moment Mode pause space" width={800} height={600} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <div style={{ width: '100%', borderRadius: 12, overflow: 'hidden' }}>
+              <Image src="/hub-welcome/hub-moment-mode.png" alt="Moment Mode pause space" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
             </div>
           </div>
         </div>
@@ -164,8 +164,8 @@ export default function HubWelcomePage() {
             </p>
           </div>
 
-          <div style={{ position: 'relative', width: '100%', maxWidth: 1000, margin: '0 auto 32px', borderRadius: 12, overflow: 'hidden', background: '#f9fafb', aspectRatio: '16/9' }}>
-            <Image src="/hub-welcome/hub-conversation.png" alt="Community conversation per lesson" width={1200} height={675} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <div style={{ width: '100%', maxWidth: 1000, margin: '0 auto 32px', borderRadius: 12, overflow: 'hidden' }}>
+            <Image src="/hub-welcome/hub-conversation.png" alt="Community conversation per lesson" width={1200} height={675} style={{ width: '100%', height: 'auto', display: 'block' }} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, maxWidth: 900, margin: '0 auto' }}>
@@ -200,8 +200,8 @@ export default function HubWelcomePage() {
             </p>
           </div>
 
-          <div style={{ position: 'relative', width: '100%', maxWidth: 1100, margin: '0 auto 32px', borderRadius: 12, overflow: 'hidden', background: 'white', aspectRatio: '16/10' }}>
-            <Image src="/hub-welcome/hub-checkin-categories.png" alt="Learning Hub Check-In Categories" width={1200} height={750} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <div style={{ width: '100%', maxWidth: 1100, margin: '0 auto 32px', borderRadius: 12, overflow: 'hidden' }}>
+            <Image src="/hub-welcome/hub-checkin-categories.png" alt="Learning Hub Check-In Categories" width={1200} height={750} style={{ width: '100%', height: 'auto', display: 'block' }} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, maxWidth: 1000, margin: '0 auto' }}>
@@ -291,16 +291,16 @@ export default function HubWelcomePage() {
             ))}
           </div>
 
-          <div style={{ position: 'relative', width: '100%', maxWidth: 1100, margin: '0 auto 24px', borderRadius: 12, overflow: 'hidden', background: '#f9fafb', aspectRatio: '16/10', border: '0.5px solid #E5E7EB' }}>
-            <Image src="/hub-welcome/hub-analytics-overview.png" alt="District-level analytics dashboard" width={1200} height={750} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <div style={{ width: '100%', maxWidth: 1100, margin: '0 auto 24px', borderRadius: 12, overflow: 'hidden', border: '0.5px solid #E5E7EB' }}>
+            <Image src="/hub-welcome/hub-analytics-overview.png" alt="District-level analytics dashboard" width={1200} height={750} style={{ width: '100%', height: 'auto', display: 'block' }} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 24 }}>
-            <div style={{ position: 'relative', width: '100%', borderRadius: 12, overflow: 'hidden', background: '#f9fafb', aspectRatio: '4/3', border: '0.5px solid #E5E7EB' }}>
-              <Image src="/hub-welcome/hub-building-comparison.png" alt="Building comparison table" width={800} height={600} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <div style={{ width: '100%', borderRadius: 12, overflow: 'hidden', border: '0.5px solid #E5E7EB' }}>
+              <Image src="/hub-welcome/hub-building-comparison.png" alt="Building comparison table" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
             </div>
-            <div style={{ position: 'relative', width: '100%', borderRadius: 12, overflow: 'hidden', background: '#f9fafb', aspectRatio: '4/3', border: '0.5px solid #E5E7EB' }}>
-              <Image src="/hub-welcome/hub-harmony-detail.png" alt="Per-building drill-down" width={800} height={600} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <div style={{ width: '100%', borderRadius: 12, overflow: 'hidden', border: '0.5px solid #E5E7EB' }}>
+              <Image src="/hub-welcome/hub-harmony-detail.png" alt="Per-building drill-down" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
             </div>
           </div>
           <p style={{ textAlign: 'center', fontSize: 13, color: '#6B7280', margin: '24px 0 0 0' }}>
