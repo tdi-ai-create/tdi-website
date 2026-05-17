@@ -47,11 +47,11 @@ export default function HubWelcomePage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 32, alignItems: 'start' }}>
             <div>
               <div style={{ width: '100%', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
-                <Image src="/hub-welcome/hub-courses-quickwins.png" alt="Courses and Quick Wins library with LIFT filters" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
+                <Image src="/hub-welcome/hub-user-dashboard.png" alt="Personalized educator dashboard" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
               </div>
-              <h3 style={{ fontSize: 18, fontWeight: 600, color: '#1e2749', margin: '0 0 8px 0' }}>The LIFT Filter</h3>
+              <h3 style={{ fontSize: 18, fontWeight: 600, color: '#1e2749', margin: '0 0 8px 0' }}>Your Hub, your way</h3>
               <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
-                Filter every strategy by how much effort it takes — low, medium, or high. Find a 5-minute win on a hard day, or a deeper investment when you have the bandwidth.
+                A personalized dashboard that meets you where you are. Continue where you left off, track your growth, find what fits your moment — from a 3-minute win to a full course.
               </p>
             </div>
 
@@ -92,15 +92,57 @@ export default function HubWelcomePage() {
         </div>
       </section>
 
+      {/* 2.5 TESTIMONIALS */}
+      <section style={{ padding: '80px 16px', backgroundColor: '#1e2749' }}>
+        <div className="container-default" style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#ffba06', marginBottom: 12 }}>
+              What Educators Are Saying
+            </p>
+            <h2 style={{ fontSize: 32, fontWeight: 700, color: 'white', margin: 0 }}>
+              Real teachers. Real classrooms. Real results.
+            </h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
+
+            <div style={{ padding: 28, background: 'rgba(255,255,255,0.05)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
+              <p style={{ fontSize: 16, color: 'white', lineHeight: 1.6, margin: '0 0 20px 0', fontStyle: 'italic' }}>
+                "I finally feel like I have strategies that work AND time to breathe. TDI changed how I approach my classroom and myself."
+              </p>
+              <p style={{ fontSize: 13, color: '#ffba06', margin: 0, fontWeight: 500 }}>Sarah K.</p>
+              <p style={{ fontSize: 12, color: 'white', opacity: 0.7, margin: 0 }}>5th Grade Teacher</p>
+            </div>
+
+            <div style={{ padding: 28, background: 'rgba(255,255,255,0.05)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
+              <p style={{ fontSize: 16, color: 'white', lineHeight: 1.6, margin: '0 0 20px 0', fontStyle: 'italic' }}>
+                "Our teachers are actually excited about PD now. I don't have to chase them down or babysit. They're learning because they want to."
+              </p>
+              <p style={{ fontSize: 13, color: '#ffba06', margin: 0, fontWeight: 500 }}>Michelle M.</p>
+              <p style={{ fontSize: 12, color: 'white', opacity: 0.7, margin: 0 }}>K-8 School Director</p>
+            </div>
+
+            <div style={{ padding: 28, background: 'rgba(255,255,255,0.05)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
+              <p style={{ fontSize: 16, color: 'white', lineHeight: 1.6, margin: '0 0 20px 0', fontStyle: 'italic' }}>
+                "This was the first PD I didn\'t have to apologize for. Our teachers actually thanked me."
+              </p>
+              <p style={{ fontSize: 13, color: '#ffba06', margin: 0, fontWeight: 500 }}>James T.</p>
+              <p style={{ fontSize: 12, color: 'white', opacity: 0.7, margin: 0 }}>School Principal</p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* 3. COMMUNITY CHECK-INS */}
-      <section style={{ padding: '80px 16px', backgroundColor: '#F0FAF6' }}>
+      <section style={{ padding: '80px 16px', backgroundColor: '#0F6E56' }}>
         <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#0F6E56', marginBottom: 12 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#ffba06', marginBottom: 12 }}>
               Community Built. Community Driven. Community First.
             </p>
-            <h2 style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0' }}>How we listen to teachers — without making it feel like a survey.</h2>
-            <p style={{ fontSize: 16, color: '#6B7280', maxWidth: 720, margin: '0 auto' }}>
+            <h2 style={{ fontSize: 32, fontWeight: 700, color: 'white', margin: '0 0 12px 0' }}>How we listen to teachers — without making it feel like a survey.</h2>
+            <p style={{ fontSize: 16, color: 'white', opacity: 0.85, maxWidth: 720, margin: '0 auto' }}>
               The Hub collects signal across five dimensions of educator wellbeing. Color scales, two-choice prompts, word clouds, and fill-in-the-blanks. No long forms. No survey burnout. Just honest data on how teachers are really doing.
             </p>
           </div>
@@ -117,7 +159,7 @@ export default function HubWelcomePage() {
               { num: '4', label: 'Purpose', signal: 'connection-to-why signal' },
               { num: '5', label: 'Needs', signal: 'content + support routing' },
             ].map((cat, i) => (
-              <div key={i} style={{ padding: 16, background: 'white', borderRadius: 10, border: '0.5px solid #D4EDE0' }}>
+              <div key={i} style={{ padding: 16, background: 'rgba(255,255,255,0.95)', borderRadius: 10 }}>
                 <p style={{ fontSize: 11, fontWeight: 600, color: '#0F6E56', margin: '0 0 4px 0' }}>0{cat.num}</p>
                 <p style={{ fontSize: 14, fontWeight: 600, color: '#1e2749', margin: '0 0 4px 0' }}>{cat.label}</p>
                 <p style={{ fontSize: 11, color: '#6B7280', margin: 0 }}>feeds {cat.signal}</p>
@@ -169,7 +211,7 @@ export default function HubWelcomePage() {
       </section>
 
       {/* 6. ONE HUB. TWO VIEWS. */}
-      <section style={{ padding: '80px 16px', backgroundColor: '#f9fafb' }}>
+      <section style={{ padding: '80px 16px', backgroundColor: '#E6F1FB' }}>
         <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <h2 style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0' }}>One Hub. Two Views.</h2>
