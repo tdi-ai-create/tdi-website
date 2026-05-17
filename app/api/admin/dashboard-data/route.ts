@@ -107,8 +107,10 @@ export async function GET(request: NextRequest) {
 
       // Calculate if creator is stalled (14+ days no activity, incomplete milestones, not in progress status)
       // A followed-up creator returns to stalled if 14 days pass since follow-up with no new activity
+      // Paused creators are never stalled - they're in a separate intentional state
       let isStalled = false;
-      if (hasIncompleteCoreMillestones && publishStatus === 'in_progress') {
+      const creatorIsPaused = creator.lifecycle_state === 'paused' || creator.is_active === false;
+      if (!creatorIsPaused && hasIncompleteCoreMillestones && publishStatus === 'in_progress') {
         if (isInFollowedUpStatus) {
           // For followed-up creators: stall again if 14 days since follow-up AND no activity after follow-up
           const fourteenDaysAfterFollowUp = new Date(lastFollowedUpAt.getTime() + 14 * 24 * 60 * 60 * 1000);
@@ -125,8 +127,13 @@ export async function GET(request: NextRequest) {
       // If creator had activity after being followed up, they're back to active (clear followed_up status implicitly)
       const isActiveAfterFollowUp = isInFollowedUpStatus && lastActivityDate > lastFollowedUpAt;
 
-      let waitingOn: 'creator' | 'tdi' | 'stalled' | 'launched' | 'followed_up' = 'creator';
-      if (publishStatus === 'published' || publishStatus === 'scheduled' || corePercent === 100) {
+      // Paused creators (lifecycle_state === 'paused' or is_active === false) are a separate state
+      const isPaused = creator.lifecycle_state === 'paused' || creator.is_active === false;
+
+      let waitingOn: 'creator' | 'tdi' | 'stalled' | 'launched' | 'followed_up' | 'paused' = 'creator';
+      if (isPaused) {
+        waitingOn = 'paused';
+      } else if (publishStatus === 'published' || publishStatus === 'scheduled' || corePercent === 100) {
         waitingOn = 'launched';
       } else if (isStalled) {
         waitingOn = 'stalled';
