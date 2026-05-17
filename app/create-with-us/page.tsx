@@ -12,6 +12,7 @@ interface Creator {
   title?: string;
   headshotUrl?: string | null;
   contentPath?: 'blog' | 'download' | 'course' | null;
+  topic?: string | null;
 }
 
 import { getTopicConfig } from '@/lib/data/creator-topics'
