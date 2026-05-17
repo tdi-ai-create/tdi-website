@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { getTopicConfig } from '@/lib/data/creator-topics';
+import { getTopicConfig, TOPIC_MAP } from '@/lib/data/creator-topics';
 import dynamic from 'next/dynamic';
 import {
   Search,
@@ -3193,7 +3193,7 @@ export default function CreatorStudioPage() {
                     const topicCounts: Record<string, number> = {};
                     Object.keys(TOPIC_ICON_MAP).forEach((iconName) => {});
                     Object.keys({}).forEach(() => {});
-                    const allTopics = Object.entries(require('@/lib/data/creator-topics').TOPIC_MAP) as Array<[string, any]>;
+                    const allTopics = Object.entries(TOPIC_MAP) as Array<[string, any]>;
                     allTopics.forEach(([name]) => { topicCounts[name] = 0; });
                     dashboardData.creators.forEach((creator: any) => {
                       if (creator.topic && topicCounts[creator.topic] !== undefined) topicCounts[creator.topic]++;
