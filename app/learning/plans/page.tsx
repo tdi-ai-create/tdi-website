@@ -236,6 +236,47 @@ export default function PlansPage() {
         </div>
       </section>
 
+      {/* SOCIAL PROOF STRIP */}
+      <section style={{ padding: '40px 16px', backgroundColor: 'white', borderTop: '0.5px solid #E5E7EB' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+            Trusted by 100,000+ educators
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 32, maxWidth: 800, margin: '24px auto 0', alignItems: 'center' }}>
+            <div>
+              <p style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: 0 }}>100K+</p>
+              <p style={{ fontSize: 12, color: '#6B7280', margin: 0 }}>Educators</p>
+            </div>
+            <div>
+              <p style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: 0 }}>All 50</p>
+              <p style={{ fontSize: 12, color: '#6B7280', margin: 0 }}>States</p>
+            </div>
+            <div>
+              <p style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: 0 }}>100+</p>
+              <p style={{ fontSize: 12, color: '#6B7280', margin: 0 }}>Countries</p>
+            </div>
+            <div>
+              <p style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: 0 }}>75%</p>
+              <p style={{ fontSize: 12, color: '#6B7280', margin: 0 }}>Implementation rate</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FOUNDER NOTE */}
+      <section style={{ padding: '80px 16px', backgroundColor: '#FAF3E0' }}>
+        <div style={{ maxWidth: 720, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#1e2749', marginBottom: 16, opacity: 0.7 }}>
+            A note from our founder
+          </p>
+          <p style={{ fontSize: 18, color: '#1e2749', lineHeight: 1.7, margin: '0 0 24px 0', fontStyle: 'italic' }}>
+            "I built the Learning Hub because I watched too many incredible educators burn out alone. Not because they didn't care. Because the system was never built to actually support them. This is the PD I wish I had as a 6th grade teacher — practical, honest, and respectful of your time. We can't wait to share it with you."
+          </p>
+          <p style={{ fontSize: 14, fontWeight: 600, color: '#1e2749', margin: 0 }}>Rae Hughart</p>
+          <p style={{ fontSize: 13, color: '#1e2749', opacity: 0.7, margin: 0 }}>CEO & Founder, Teachers Deserve It</p>
+        </div>
+      </section>
+
       {/* WAITLIST FORM */}
       <section id="waitlist" style={{ padding: '80px 16px', backgroundColor: '#1e2749' }}>
         <div style={{ maxWidth: 600, margin: '0 auto' }}>
@@ -371,6 +412,94 @@ export default function PlansPage() {
               </p>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section style={{ padding: '80px 16px', backgroundColor: '#F9FAFB' }}>
+        <div style={{ maxWidth: 800, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              Frequently Asked Questions
+            </p>
+            <h2 style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: 0 }}>
+              Real questions from real educators
+            </h2>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {[
+              {
+                q: "How is this different from free PD I can find on YouTube?",
+                a: "Free PD is everywhere — but it's scattered, unverified, and rarely tied to real classroom implementation. The Hub is built by classroom-tested educators, organized by what you actually need (not what's trending), and gives you community feedback on every lesson. You're not searching alone, you're learning with 100,000+ educators who've tried it before you."
+              },
+              {
+                q: "What if my staff won't actually use it?",
+                a: "We hear you. That's why we built the LIFT filter — strategies sorted by effort, so teachers can find a 5-minute win on a hard day. 75% of teachers implement a strategy within 10 days of joining. The Hub is designed for the educator who doesn't have an hour, not for the one with all the time in the world."
+              },
+              {
+                q: "Can this count toward PD hours or licensure?",
+                a: "Yes. All-Access members earn PD certificates that document hours completed. We can also generate compliance documentation for state requirements when schools partner with us at the district level."
+              },
+              {
+                q: "What's your stance on creator pay?",
+                a: "Every creator earns ongoing revenue when educators enroll in their content. They keep ownership of their work, and we handle production, marketing, and distribution. We pay our community because we believe teachers deserve better — and that includes the teachers building this with us."
+              },
+              {
+                q: "Can my admin see what I'm learning?",
+                a: "Only if your school partners with us. In that case, admins see implementation data and aggregate trends — not individual transcripts or check-in responses. Personal wellness check-ins are private to you. Always."
+              },
+              {
+                q: "What happens if I cancel?",
+                a: "Cancel anytime, no questions. You keep access through the end of your billing period and lose nothing you've already downloaded or earned. We're not in the business of trapping people."
+              },
+              {
+                q: "Why are you launching now?",
+                a: "We've spent two years building this with educators, and after 100K+ teachers told us what they needed, it's time to deliver. June 2026 is when we open the doors — and the waitlist gets first access."
+              },
+              {
+                q: "What does my school or district get?",
+                a: "Bulk pricing, dashboards to track implementation, compliance and board-ready reports, and the full TDI partnership infrastructure. Schools and districts get more than memberships — they get our team. See partnership options on the For Schools page."
+              },
+            ].map((item, i) => (
+              <details
+                key={i}
+                style={{
+                  background: 'white',
+                  borderRadius: 12,
+                  border: '0.5px solid #E5E7EB',
+                  padding: 0,
+                }}
+              >
+                <summary
+                  style={{
+                    cursor: 'pointer',
+                    padding: '20px 24px',
+                    fontSize: 15,
+                    fontWeight: 600,
+                    color: '#1e2749',
+                    listStyle: 'none',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: 16,
+                  }}
+                >
+                  {item.q}
+                  <span style={{ fontSize: 20, color: '#2A9D8F', fontWeight: 400, flexShrink: 0 }}>+</span>
+                </summary>
+                <div style={{ padding: '0 24px 20px', fontSize: 14, color: '#4B5563', lineHeight: 1.7 }}>
+                  {item.a}
+                </div>
+              </details>
+            ))}
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: 40 }}>
+            <p style={{ fontSize: 14, color: '#6B7280', margin: 0 }}>
+              Still have questions? <Link href="/contact" style={{ color: '#2A9D8F', fontWeight: 500 }}>Get in touch →</Link>
+            </p>
+          </div>
         </div>
       </section>
 

@@ -471,6 +471,86 @@ export default function HubWelcomePage() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section style={{ padding: '80px 16px', backgroundColor: '#F9FAFB' }}>
+        <div style={{ maxWidth: 800, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              Frequently Asked Questions
+            </p>
+            <h2 style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: 0 }}>
+              What educators and admins ask before joining
+            </h2>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {[
+              {
+                q: "How do I know teachers will actually implement what they learn?",
+                a: "Because they do — 75% of teachers implement a strategy within 10 days, over 7x the industry average. The Hub is built around hybrid learning, community accountability, and Quick Wins that fit into real teaching days. It's not designed to be admired. It's designed to be used."
+              },
+              {
+                q: "Does this replace our existing PD?",
+                a: "Not necessarily — the Hub works alongside whatever you're already doing. Many schools use it to extend their TDI partnership year-round. Others use it as their core PD platform. The Hub is flexible enough to play either role."
+              },
+              {
+                q: "How does the Hub measure success?",
+                a: "Implementation rate, classroom impact stories, wellbeing check-ins across 5 dimensions, and PD hours completed. Admins see all of this in their Implementation & Compliance Analytics Dashboard — included with every TDI service."
+              },
+              {
+                q: "What does rollout look like for a school?",
+                a: "Schools can start with memberships for individual teachers or onboard at the district level with bulk pricing. We support every rollout with implementation planning, kickoff sessions, and ongoing engagement reports."
+              },
+              {
+                q: "Can teachers learn here without admin oversight?",
+                a: "Absolutely. Individual memberships are private — teachers learn on their own time, track their own growth, and own their own data. Admin visibility only applies when schools choose to partner at the district level."
+              },
+              {
+                q: "What if I want to bring this to my whole school?",
+                a: "Bulk pricing is available at launch, and TDI partnerships layer the Hub with observations, executive sessions, and grant support. See partnership options on the For Schools page."
+              },
+            ].map((item, i) => (
+              <details
+                key={i}
+                style={{
+                  background: 'white',
+                  borderRadius: 12,
+                  border: '0.5px solid #E5E7EB',
+                  padding: 0,
+                }}
+              >
+                <summary
+                  style={{
+                    cursor: 'pointer',
+                    padding: '20px 24px',
+                    fontSize: 15,
+                    fontWeight: 600,
+                    color: '#1e2749',
+                    listStyle: 'none',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: 16,
+                  }}
+                >
+                  {item.q}
+                  <span style={{ fontSize: 20, color: '#2A9D8F', fontWeight: 400, flexShrink: 0 }}>+</span>
+                </summary>
+                <div style={{ padding: '0 24px 20px', fontSize: 14, color: '#4B5563', lineHeight: 1.7 }}>
+                  {item.a}
+                </div>
+              </details>
+            ))}
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: 40 }}>
+            <p style={{ fontSize: 14, color: '#6B7280', margin: 0 }}>
+              Have more questions? <Link href="/contact" style={{ color: '#2A9D8F', fontWeight: 500 }}>Get in touch →</Link>
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* 11. FINAL CTA */}
       <section style={{ padding: '80px 16px', backgroundColor: '#1e2749' }}>
         <div className="container-default" style={{ maxWidth: 720, margin: '0 auto', textAlign: 'center' }}>
