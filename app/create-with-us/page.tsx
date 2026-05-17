@@ -14,6 +14,23 @@ interface Creator {
   contentPath?: 'blog' | 'download' | 'course' | null;
 }
 
+import { getTopicConfig } from '@/lib/data/creator-topics'
+import {
+  BookOpen, BookMarked, PenLine, Activity, Calculator, FlaskConical, Palette,
+  GraduationCap, Sparkles, Globe, Languages, HeartHandshake, Music, Library,
+  HeartPulse, LayoutGrid, Lightbulb, Route, ClipboardCheck, NotebookPen,
+  PencilRuler, Baby, Puzzle, MessagesSquare, Star, Users, Sprout, Clock,
+  Target, Home as HomeIcon, Laptop, Scale,
+} from 'lucide-react'
+
+const ICON_MAP: Record<string, any> = {
+  BookOpen, BookMarked, PenLine, Activity, Calculator, FlaskConical, Palette,
+  GraduationCap, Sparkles, Globe, Languages, HeartHandshake, Music, Library,
+  HeartPulse, LayoutGrid, Lightbulb, Route, ClipboardCheck, NotebookPen,
+  PencilRuler, Baby, Puzzle, MessagesSquare, Star, Users, Sprout, Clock,
+  Target, HomeIcon, Laptop, Scale,
+}
+
 // Fallback creators (used if API fails)
 const fallbackCreators: Creator[] = [
   { name: 'Erin Light' },
@@ -740,22 +757,26 @@ export default function CreateWithUsPage() {
                   className="bg-white border rounded-xl p-5 text-center hover:shadow-md transition-shadow duration-300"
                   style={{ borderColor: '#E5E7EB' }}
                 >
-                  {creator.headshotUrl ? (
-                    <img
-                      src={creator.headshotUrl}
-                      alt={creator.name}
-                      className="w-16 h-16 rounded-full mx-auto mb-3 object-cover"
-                    />
-                  ) : (
-                    <div
-                      className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center"
-                      style={{ backgroundColor: '#5BBEC4' }}
-                    >
-                      <span className="text-white font-bold text-base">{getInitials(creator.name)}</span>
-                    </div>
-                  )}
+                  {(() => {
+                    const topicConfig = getTopicConfig(creator.topic);
+                    const TopicIcon = ICON_MAP[topicConfig.icon] || Sparkles;
+                    return creator.headshotUrl ? (
+                      <img
+                        src={creator.headshotUrl}
+                        alt={creator.name}
+                        className="w-16 h-16 rounded-full mx-auto mb-3 object-cover"
+                      />
+                    ) : (
+                      <div
+                        className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center"
+                        style={{ backgroundColor: topicConfig.background, border: `1.5px solid ${topicConfig.border}` }}
+                      >
+                        <TopicIcon style={{ width: 28, height: 28, color: topicConfig.iconColor }} />
+                      </div>
+                    );
+                  })()}
                   <p className="font-bold text-base mb-1" style={{ color: '#1a1a2e' }}>{creator.name}</p>
-                  <p className="text-sm" style={{ color: '#6B7280' }}>{creator.title || 'Content Creator'}</p>
+                  <p className="text-sm" style={{ color: '#6B7280' }}>{creator.topic || creator.title || 'Content Creator'}</p>
                 </div>
             ))}
           </div>
