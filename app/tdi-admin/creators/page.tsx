@@ -44,7 +44,7 @@ import {
   MousePointerClick,
   BookMarked, PenLine, Activity, FlaskConical, Calculator,
   GraduationCap, Sparkles, Globe, Languages, HeartHandshake, Music, Library,
-  HeartPulse, LayoutGrid, Lightbulb, Route, ClipboardCheck, NotebookPen,
+  HeartPulse, Lightbulb, Route, ClipboardCheck, NotebookPen,
   PencilRuler, Baby, Puzzle, MessagesSquare, Star, Sprout,
   Target, Home as HomeIcon, Laptop, Scale,
 } from 'lucide-react';
