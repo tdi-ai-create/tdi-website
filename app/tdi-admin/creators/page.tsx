@@ -225,19 +225,19 @@ function StatusIndicator({ status }: { status: string }) {
   if (status === 'launched') {
     return (
       <div className="flex items-center gap-1.5">
-        <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+        <div className="w-4 h-4 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-            <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#16A34A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#ffba06" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
-        <span className="text-xs font-semibold tracking-wide" style={{ color: '#16A34A' }}>LIVE</span>
+        <span className="text-xs font-semibold tracking-wide" style={{ color: '#ffba06' }}>LIVE</span>
       </div>
     );
   }
 
   const dots: Record<string, string> = {
     total:          '#1e2749',
-    stalled:        '#F59E0B',
+    stalled:        '#6B7280',
     followedUp:     '#10B981',
     waitingOnCreator:'#06B6D4',
     waitingOnTDI:   '#1e2749',
@@ -354,12 +354,12 @@ function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
           className={`bg-white rounded-2xl p-5 shadow-[0_1px_4px_rgba(0,0,0,0.04)] text-left transition-all ${
             data.noProjectedDate.length > 0 ? 'hover:shadow-md cursor-pointer' : ''
           }`}
-          style={data.noProjectedDate.length > 0 ? { borderLeft: '3px solid #F59E0B' } : {}}
+          style={data.noProjectedDate.length > 0 ? { borderLeft: '3px solid #6B7280' } : {}}
           disabled={data.noProjectedDate.length === 0}
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#FEF3C7' }}>
-              <CalendarDays className="w-5 h-5" style={{ color: '#D97706' }} />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
+              <CalendarDays className="w-5 h-5" style={{ color: '#374151' }} />
             </div>
             <div>
               <p className="text-sm text-gray-500">Creators with no projected date</p>
@@ -377,12 +377,12 @@ function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
           className={`bg-white rounded-2xl p-5 shadow-[0_1px_4px_rgba(0,0,0,0.04)] text-left transition-all ${
             data.pastProjectedDate.length > 0 ? 'hover:shadow-md cursor-pointer' : ''
           }`}
-          style={data.pastProjectedDate.length > 0 ? { borderLeft: '3px solid #F59E0B' } : {}}
+          style={data.pastProjectedDate.length > 0 ? { borderLeft: '3px solid #6B7280' } : {}}
           disabled={data.pastProjectedDate.length === 0}
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#FEF3C7' }}>
-              <Clock className="w-5 h-5" style={{ color: '#D97706' }} />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
+              <Clock className="w-5 h-5" style={{ color: '#374151' }} />
             </div>
             <div>
               <p className="text-sm text-gray-500">Creators past their projected date</p>
@@ -461,14 +461,14 @@ function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
                               </div>
                               <Link
                                 href={`/tdi-admin/creators/${creator.id}`}
-                                className="text-sm font-medium text-gray-900 hover:text-purple-600 transition-colors"
+                                className="text-sm font-medium text-gray-900 hover:text-slate-700 transition-colors"
                               >
                                 {creator.name}
                               </Link>
                               <span className={`text-xs px-2 py-0.5 rounded-full ${
                                 creator.contentPath === 'course'
                                   ? 'bg-slate-100 text-slate-800'
-                                  : 'bg-purple-50 text-purple-700'
+                                  : 'bg-slate-50 text-slate-700'
                               }`}>
                                 {creator.contentPath === 'course' ? 'Course' : 'Download'}
                               </span>
@@ -496,8 +496,8 @@ function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
           <div className="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#FEF3C7' }}>
-                  <CalendarDays className="w-5 h-5" style={{ color: '#D97706' }} />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
+                  <CalendarDays className="w-5 h-5" style={{ color: '#374151' }} />
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">No Projected Date</h2>
@@ -518,7 +518,7 @@ function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
                     <div>
                       <Link
                         href={`/tdi-admin/creators/${creator.id}`}
-                        className="text-sm font-medium text-gray-900 hover:text-purple-600 transition-colors"
+                        className="text-sm font-medium text-gray-900 hover:text-slate-700 transition-colors"
                       >
                         {creator.name}
                       </Link>
@@ -528,7 +528,7 @@ function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
                       creator.contentPath === 'course'
                         ? 'bg-slate-100 text-slate-800'
                         : creator.contentPath === 'download'
-                        ? 'bg-purple-50 text-purple-700'
+                        ? 'bg-slate-50 text-slate-700'
                         : 'bg-gray-100 text-gray-500'
                     }`}>
                       {creator.contentPath || 'Not set'}
@@ -547,8 +547,8 @@ function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
           <div className="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#FEF3C7' }}>
-                  <Clock className="w-5 h-5" style={{ color: '#D97706' }} />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
+                  <Clock className="w-5 h-5" style={{ color: '#374151' }} />
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">Past Projected Date</h2>
@@ -569,7 +569,7 @@ function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
                     <div>
                       <Link
                         href={`/tdi-admin/creators/${creator.id}`}
-                        className="text-sm font-medium text-gray-900 hover:text-purple-600 transition-colors"
+                        className="text-sm font-medium text-gray-900 hover:text-slate-700 transition-colors"
                       >
                         {creator.name}
                       </Link>
@@ -579,7 +579,7 @@ function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
                           : '\u2014'}
                       </p>
                     </div>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-gray-700">
                       {creator.daysOverdue} day{creator.daysOverdue !== 1 ? 's' : ''} overdue
                     </span>
                   </div>
@@ -881,8 +881,8 @@ function AffiliateTab() {
                     <td className="py-2.5 px-3">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                         batch.status === 'paid'
-                          ? 'bg-green-50 text-green-700'
-                          : 'bg-amber-50 text-amber-700'
+                          ? 'bg-green-50 text-yellow-700'
+                          : 'bg-amber-50 text-gray-700'
                       }`}>
                         {batch.status === 'paid' ? 'Paid' : 'Pending'}
                       </span>
@@ -906,7 +906,7 @@ function AffiliateTab() {
                               setPaidReference('');
                               setPaidDate(new Date().toISOString().split('T')[0]);
                             }}
-                            className="text-xs font-medium px-2 py-1 rounded bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
+                            className="text-xs font-medium px-2 py-1 rounded bg-green-50 text-yellow-700 hover:bg-yellow-100 transition-colors"
                           >
                             Mark Paid
                           </button>
@@ -964,7 +964,7 @@ function AffiliateTab() {
                           className="text-gray-400 hover:text-gray-600"
                           title="Copy affiliate link"
                         >
-                          {copiedSlug === c.slug ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+                          {copiedSlug === c.slug ? <Check className="w-3 h-3 text-yellow-500" /> : <Copy className="w-3 h-3" />}
                         </button>
                       </div>
                     </td>
@@ -1156,14 +1156,14 @@ function AffiliateTab() {
                                   {new Date(c.converted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                 </td>
                                 <td className="py-1.5 px-3 text-right text-gray-600">{formatCents(c.gross_amount_cents)}</td>
-                                <td className="py-1.5 px-3 text-right font-medium text-green-700">{formatCents(c.creator_payout_cents)}</td>
+                                <td className="py-1.5 px-3 text-right font-medium text-yellow-700">{formatCents(c.creator_payout_cents)}</td>
                                 <td className="py-1.5 px-3">
                                   {c.refunded ? (
-                                    <span className="text-red-600">Refunded</span>
+                                    <span className="text-gray-700">Refunded</span>
                                   ) : c.paid_to_creator_at ? (
-                                    <span className="text-green-600">Paid</span>
+                                    <span className="text-yellow-600">Paid</span>
                                   ) : c.payout_id ? (
-                                    <span className="text-amber-600">Batched</span>
+                                    <span className="text-gray-700">Batched</span>
                                   ) : (
                                     <span className="text-gray-400">Pending</span>
                                   )}
@@ -1190,10 +1190,10 @@ function AffiliateTab() {
                             {drillDownData.payouts.map(p => (
                               <tr key={p.id} className="border-b border-gray-50">
                                 <td className="py-1.5 px-3 font-medium text-gray-700">{formatPeriodLabel(p.period)}</td>
-                                <td className="py-1.5 px-3 text-right font-semibold text-green-700">{formatCents(p.payout_amount_cents)}</td>
+                                <td className="py-1.5 px-3 text-right font-semibold text-yellow-700">{formatCents(p.payout_amount_cents)}</td>
                                 <td className="py-1.5 px-3">
                                   <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                                    p.status === 'paid' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'
+                                    p.status === 'paid' ? 'bg-green-50 text-yellow-700' : 'bg-amber-50 text-gray-700'
                                   }`}>
                                     {p.status === 'paid' ? 'Paid' : 'Pending'}
                                   </span>
@@ -1726,13 +1726,13 @@ export default function CreatorStudioPage() {
   const getPathBadge = (path: string | null) => {
     switch (path) {
       case 'course':
-        return { icon: <BookOpen className="w-3.5 h-3.5" />, label: 'Course', color: 'bg-purple-100 text-purple-700' };
+        return { icon: <BookOpen className="w-3.5 h-3.5" />, label: 'Course', color: 'bg-slate-100 text-slate-700' };
       case 'blog':
-        return { icon: <FileText className="w-3.5 h-3.5" />, label: 'Blog', color: 'bg-purple-100 text-purple-700' };
+        return { icon: <FileText className="w-3.5 h-3.5" />, label: 'Blog', color: 'bg-slate-100 text-slate-700' };
       case 'download':
-        return { icon: <DownloadIcon className="w-3.5 h-3.5" />, label: 'Download', color: 'bg-purple-100 text-purple-700' };
+        return { icon: <DownloadIcon className="w-3.5 h-3.5" />, label: 'Download', color: 'bg-slate-100 text-slate-700' };
       default:
-        return { icon: <HelpCircle className="w-3.5 h-3.5" />, label: 'Not set', color: 'bg-orange-100 text-orange-600' };
+        return { icon: <HelpCircle className="w-3.5 h-3.5" />, label: 'Not set', color: 'bg-gray-100 text-gray-700' };
     }
   };
 
@@ -1750,7 +1750,7 @@ export default function CreatorStudioPage() {
     switch (waitingOn) {
       case 'tdi':
         return {
-          dotColor: '#3B82F6',
+          dotColor: '#1e2749',
           label: 'TDI',
           isCheckmark: false,
           bgColor: '#DBEAFE',
@@ -1758,7 +1758,7 @@ export default function CreatorStudioPage() {
         };
       case 'launched':
         return {
-          dotColor: '#16A34A',
+          dotColor: '#ffba06',
           label: 'Live',
           isCheckmark: true,
           bgColor: '#DCFCE7',
@@ -1774,10 +1774,10 @@ export default function CreatorStudioPage() {
         };
       default:
         return {
-          dotColor: '#F59E0B',
+          dotColor: '#6B7280',
           label: 'Creator',
           isCheckmark: false,
-          bgColor: '#FEF3C7',
+          bgColor: '#F3F4F6',
           textColor: '#92400E'
         };
     }
@@ -1942,7 +1942,7 @@ export default function CreatorStudioPage() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                     isActive
-                      ? 'border-violet-600 text-violet-600'
+                      ? 'border-violet-600 text-slate-700'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -2036,7 +2036,7 @@ export default function CreatorStudioPage() {
                   { key: 'agreement', label: 'Agreement', color: '#A78BFA' },
                   { key: 'course_design', label: 'Prep & Resources', color: '#A78BFA' },
                   { key: 'test_prep', label: 'Production', color: '#C4B5FD' },
-                  { key: 'launch', label: 'Launch', color: '#16A34A' },
+                  { key: 'launch', label: 'Launch', color: '#ffba06' },
                 ].map((phase) => {
                   const count = phaseCounts[phase.key as keyof typeof phaseCounts];
                   const widthPercent = Math.max((count / maxPhaseCount) * 100, 5);
@@ -2087,7 +2087,7 @@ export default function CreatorStudioPage() {
             <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold flex items-center gap-2" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>
-                  <Trophy className="w-5 h-5 text-amber-500" />
+                  <Trophy className="w-5 h-5 text-gray-600" />
                   Closest to Launch
                 </h3>
                 {closestToLaunch.length > 0 && (
@@ -2100,7 +2100,7 @@ export default function CreatorStudioPage() {
                     }}
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
                       copiedSection === 'closestToLaunch'
-                        ? 'bg-green-50 text-green-600 border border-green-200'
+                        ? 'bg-green-50 text-yellow-600 border border-green-200'
                         : 'text-gray-500 hover:bg-gray-100 border border-transparent'
                     }`}
                   >
@@ -2124,7 +2124,7 @@ export default function CreatorStudioPage() {
                 <div className="space-y-3">
                   {closestToLaunch.map((creator) => {
                     const isNearLaunch = creator.progressPercentage >= 90;
-                    const progressColor = isNearLaunch ? '#16A34A' : '#1e2749';
+                    const progressColor = isNearLaunch ? '#ffba06' : '#1e2749';
                     return (
                       <Link
                         key={creator.id}
@@ -2138,7 +2138,7 @@ export default function CreatorStudioPage() {
                           {creator.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate text-gray-900 group-hover:text-violet-600 transition-colors">
+                          <p className="text-sm font-medium truncate text-gray-900 group-hover:text-slate-700 transition-colors">
                             {creator.name}
                           </p>
                         </div>
@@ -2151,12 +2151,12 @@ export default function CreatorStudioPage() {
                           </div>
                           {isNearLaunch ? (
                             <div className="flex items-center gap-1">
-                              <div className="w-3.5 h-3.5 rounded-full bg-green-100 flex items-center justify-center">
+                              <div className="w-3.5 h-3.5 rounded-full bg-yellow-100 flex items-center justify-center">
                                 <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
-                                  <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#16A34A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                  <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#ffba06" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
                               </div>
-                              <span className="text-xs font-bold" style={{ color: '#16A34A' }}>{creator.progressPercentage}%</span>
+                              <span className="text-xs font-bold" style={{ color: '#ffba06' }}>{creator.progressPercentage}%</span>
                             </div>
                           ) : (
                             <span className="text-xs font-semibold w-9 text-right" style={{ color: '#1e2749' }}>{creator.progressPercentage}%</span>
@@ -2189,7 +2189,7 @@ export default function CreatorStudioPage() {
                           onClick={() => handleCopyEmails(scheduled.map(c => c.email), 'scheduled')}
                           className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
                             copiedSection === 'scheduled'
-                              ? 'bg-green-50 text-green-600 border border-green-200'
+                              ? 'bg-green-50 text-yellow-600 border border-green-200'
                               : 'text-gray-500 hover:bg-gray-100 border border-transparent'
                           }`}
                         >
@@ -2235,7 +2235,7 @@ export default function CreatorStudioPage() {
                                   {creator.name}
                                 </p>
                               </div>
-                              <div className={`text-xs flex-shrink-0 px-2 py-0.5 rounded ${isPastDue ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>
+                              <div className={`text-xs flex-shrink-0 px-2 py-0.5 rounded ${isPastDue ? 'bg-gray-100 text-gray-700' : 'bg-blue-100 text-blue-700'}`}>
                                 {isPastDue ? 'Past due' : scheduledDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                               </div>
                             </Link>
@@ -2268,7 +2268,7 @@ export default function CreatorStudioPage() {
                   <>
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-bold flex items-center gap-2" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>
-                        <Globe className="w-5 h-5 text-green-500" />
+                        <Globe className="w-5 h-5 text-yellow-500" />
                         Recently Published
                       </h3>
                       {published.length > 0 && (
@@ -2276,7 +2276,7 @@ export default function CreatorStudioPage() {
                           onClick={() => handleCopyEmails(published.map(c => c.email), 'published')}
                           className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
                             copiedSection === 'published'
-                              ? 'bg-green-50 text-green-600 border border-green-200'
+                              ? 'bg-green-50 text-yellow-600 border border-green-200'
                               : 'text-gray-500 hover:bg-gray-100 border border-transparent'
                           }`}
                         >
@@ -2309,11 +2309,11 @@ export default function CreatorStudioPage() {
                               <Check className="w-4 h-4" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium truncate text-gray-900 group-hover:text-green-600 transition-colors">
+                              <p className="text-sm font-medium truncate text-gray-900 group-hover:text-yellow-600 transition-colors">
                                 {creator.name}
                               </p>
                               {creator.post_launch_notes && (
-                                <p className="text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded-lg mt-1 truncate flex items-center gap-1">
+                                <p className="text-xs text-gray-700 bg-amber-50 px-2 py-1 rounded-lg mt-1 truncate flex items-center gap-1">
                                   <Clock className="w-3 h-3 flex-shrink-0" />
                                   <span className="truncate">{creator.post_launch_notes}</span>
                                 </p>
@@ -2334,11 +2334,11 @@ export default function CreatorStudioPage() {
             {/* Needs Your Attention */}
             <div
               className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] border-l-4"
-              style={{ borderLeftColor: '#F59E0B' }}
+              style={{ borderLeftColor: '#6B7280' }}
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
-                  <AlertTriangle className="w-5 h-5 text-amber-500" />
+                  <AlertTriangle className="w-5 h-5 text-gray-600" />
                   Needs Your Attention
                   {needsAttentionCount > 0 && (
                     <span className="text-xs font-normal text-gray-500">({needsAttentionCount})</span>
@@ -2349,7 +2349,7 @@ export default function CreatorStudioPage() {
                     onClick={() => handleCopyEmails(needsAttention.map(c => c.email), 'needsAttention')}
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
                       copiedSection === 'needsAttention'
-                        ? 'bg-green-50 text-green-600 border border-green-200'
+                        ? 'bg-green-50 text-yellow-600 border border-green-200'
                         : 'text-gray-500 hover:bg-gray-100 border border-transparent'
                     }`}
                   >
@@ -2368,7 +2368,7 @@ export default function CreatorStudioPage() {
                 )}
               </div>
               {needsAttention.length === 0 ? (
-                <div className="flex items-center gap-2 text-green-600 py-2">
+                <div className="flex items-center gap-2 text-yellow-600 py-2">
                   <span>✓</span>
                   <p className="text-sm">All caught up! No creators waiting on team feedback.</p>
                 </div>
@@ -2382,11 +2382,11 @@ export default function CreatorStudioPage() {
                       <Link
                         key={creator.id}
                         href={`/tdi-admin/creators/${creator.id}`}
-                        className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-purple-50 transition-colors group"
+                        className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-slate-50 transition-colors group"
                       >
                         <div
                           className={`w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium flex-shrink-0 ${
-                            hasPostLaunchNotes && !isWaitingOnTDI ? 'bg-green-500' : ''
+                            hasPostLaunchNotes && !isWaitingOnTDI ? 'bg-yellow-500' : ''
                           }`}
                           style={{ backgroundColor: hasPostLaunchNotes && !isWaitingOnTDI ? undefined : theme.accent }}
                         >
@@ -2398,13 +2398,13 @@ export default function CreatorStudioPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p
-                            className="text-sm font-medium truncate group-hover:text-purple-700"
+                            className="text-sm font-medium truncate group-hover:text-slate-700"
                             style={{ color: '#2B3A67' }}
                           >
                             {creator.name}
                           </p>
                           {hasPostLaunchNotes ? (
-                            <p className="text-xs text-amber-700 truncate flex items-center gap-1">
+                            <p className="text-xs text-gray-700 truncate flex items-center gap-1">
                               <Clock className="w-3 h-3 flex-shrink-0" />
                               {creator.post_launch_notes}
                             </p>
@@ -2415,7 +2415,7 @@ export default function CreatorStudioPage() {
                           )}
                         </div>
                         {hasPostLaunchNotes && !isWaitingOnTDI ? (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 flex-shrink-0">
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 flex-shrink-0">
                             Published
                           </span>
                         ) : (
@@ -2455,7 +2455,7 @@ export default function CreatorStudioPage() {
                     onClick={() => handleCopyEmails(followedUpCreators.map(c => c.email), 'followedUp')}
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
                       copiedSection === 'followedUp'
-                        ? 'bg-green-50 text-green-600 border border-green-200'
+                        ? 'bg-green-50 text-yellow-600 border border-green-200'
                         : 'text-gray-500 hover:bg-gray-100 border border-transparent'
                     }`}
                   >
@@ -2483,7 +2483,7 @@ export default function CreatorStudioPage() {
                       <Link
                         key={creator.id}
                         href={`/tdi-admin/creators/${creator.id}`}
-                        className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-purple-50 transition-colors group"
+                        className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-slate-50 transition-colors group"
                       >
                         <div
                           className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium flex-shrink-0"
@@ -2492,7 +2492,7 @@ export default function CreatorStudioPage() {
                           {creator.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate group-hover:text-purple-700" style={{ color: '#2B3A67' }}>
+                          <p className="text-sm font-medium truncate group-hover:text-slate-700" style={{ color: '#2B3A67' }}>
                             {creator.name}
                           </p>
                           <p className="text-xs text-gray-500 truncate flex items-center gap-1">
@@ -2546,7 +2546,7 @@ export default function CreatorStudioPage() {
                     <button
                       key={path.key}
                       onClick={() => handlePathClick(path.key)}
-                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-purple-50 transition-colors cursor-pointer text-left"
+                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer text-left"
                     >
                       <div
                         className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
@@ -2656,7 +2656,7 @@ export default function CreatorStudioPage() {
                     className="flex items-start gap-2 group"
                   >
                     <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
-                      activity.type === 'team' ? 'bg-blue-500' : 'bg-green-500'
+                      activity.type === 'team' ? 'bg-blue-500' : 'bg-yellow-500'
                     }`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm">
@@ -2673,7 +2673,7 @@ export default function CreatorStudioPage() {
               </div>
             )}
             <p className="text-xs text-gray-500 mt-3 pt-2 border-t border-gray-100">
-              <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span> Creator
+              <span className="inline-block w-2 h-2 rounded-full bg-yellow-500 mr-1"></span> Creator
               <span className="mx-2">·</span>
               <span className="inline-block w-2 h-2 rounded-full bg-blue-500 mr-1"></span> Team
             </p>
@@ -2723,7 +2723,7 @@ export default function CreatorStudioPage() {
                   className={`p-4 rounded-xl text-sm ${
                     syncResult.success
                       ? 'bg-green-50 border border-green-200 text-green-800'
-                      : 'bg-red-50 border border-red-200 text-red-800'
+                      : 'bg-gray-50 border border-red-200 text-gray-800'
                   }`}
                 >
                   <p className="font-medium">{syncResult.success ? 'Sync Complete' : 'Sync Failed'}</p>
@@ -2761,7 +2761,7 @@ export default function CreatorStudioPage() {
                 onClick={() => setShowFilters(!showFilters)}
                 className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 font-medium ${
                   showFilters || activeFiltersCount > 0
-                    ? 'bg-purple-50 text-purple-700 border border-purple-200'
+                    ? 'bg-slate-50 text-slate-700 border border-purple-200'
                     : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
                 }`}
               >
@@ -2844,7 +2844,7 @@ export default function CreatorStudioPage() {
                       setFilterPublishStatus('all');
                       setActiveStatFilter(null);
                     }}
-                    className="self-end px-3 py-2 text-sm text-gray-500 hover:text-purple-600 transition-colors"
+                    className="self-end px-3 py-2 text-sm text-gray-500 hover:text-slate-700 transition-colors"
                   >
                     Clear all filters
                   </button>
@@ -2855,7 +2855,7 @@ export default function CreatorStudioPage() {
                     type="checkbox"
                     checked={showArchived}
                     onChange={(e) => setShowArchived(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    className="w-4 h-4 rounded border-gray-300 text-slate-700 focus:ring-purple-500"
                   />
                   <span className="text-sm text-gray-600">
                     Show Archived {dashboardData?.stats.archived ? `(${dashboardData.stats.archived})` : ''}
@@ -2867,9 +2867,9 @@ export default function CreatorStudioPage() {
 
           {/* Active stat filter indicator */}
           {activeStatFilter && (
-            <div className="px-5 py-3 border-b border-gray-100 flex items-center gap-2 bg-purple-50">
+            <div className="px-5 py-3 border-b border-gray-100 flex items-center gap-2 bg-slate-50">
               <span className="text-sm text-gray-600">Showing:</span>
-              <span className="text-sm font-semibold capitalize text-purple-700">
+              <span className="text-sm font-semibold capitalize text-slate-700">
                 {activeStatFilter === 'waitingOnCreator' ? 'Waiting on Creator' :
                  activeStatFilter === 'waitingOnTDI' ? 'Waiting on TDI' :
                  activeStatFilter === 'followedUp' ? 'Followed Up' :
@@ -2877,7 +2877,7 @@ export default function CreatorStudioPage() {
               </span>
               <button
                 onClick={() => setActiveStatFilter(null)}
-                className="text-gray-400 hover:text-purple-600 transition-colors"
+                className="text-gray-400 hover:text-slate-700 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2975,8 +2975,8 @@ export default function CreatorStudioPage() {
                       <tr
                         key={creator.id}
                         className={`hover:bg-gray-50 transition-colors cursor-pointer ${
-                          creator.isStalled ? 'border-l-4 border-l-red-400 bg-red-50/30' : ''
-                        } ${isSelected ? 'bg-purple-50' : ''}`}
+                          creator.isStalled ? 'border-l-4 border-l-slate-700 bg-slate-50/50' : ''
+                        } ${isSelected ? 'bg-slate-50' : ''}`}
                         onClick={() => window.location.href = `/tdi-admin/creators/${creator.id}`}
                       >
                         {/* Checkbox */}
@@ -3085,7 +3085,7 @@ export default function CreatorStudioPage() {
                             {waitingBadge.isCheckmark ? (
                               <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#DCFCE7' }}>
                                 <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
-                                  <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#16A34A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                  <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#ffba06" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
                               </div>
                             ) : (
@@ -3101,7 +3101,7 @@ export default function CreatorStudioPage() {
                         {/* Last Active */}
                         <td className="px-4 py-3">
                           <span className={`text-sm flex items-center gap-1 ${
-                            isInactive ? 'text-red-600 font-medium' : 'text-gray-600'
+                            isInactive ? 'text-gray-700 font-medium' : 'text-gray-600'
                           }`}>
                             <Clock className="w-3.5 h-3.5" />
                             {getRelativeTime(creator.lastActivityDate)}
@@ -3146,7 +3146,7 @@ export default function CreatorStudioPage() {
             </button>
             <button
               onClick={() => setShowBulkDeleteModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border border-red-200 text-red-600 hover:bg-red-50"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border border-red-200 text-gray-700 hover:bg-gray-50"
             >
               <Trash2 className="w-4 h-4" />
               Delete
@@ -3252,7 +3252,7 @@ export default function CreatorStudioPage() {
                                   {item.avgDays}
                                 </td>
                                 <td className="py-2 text-right">
-                                  <span className={`font-semibold ${item.currentlyStuck > 3 ? 'text-amber-600' : 'text-gray-600'}`}>
+                                  <span className={`font-semibold ${item.currentlyStuck > 3 ? 'text-gray-700' : 'text-gray-600'}`}>
                                     {item.currentlyStuck}
                                   </span>
                                 </td>
@@ -3319,8 +3319,8 @@ export default function CreatorStudioPage() {
                           <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
                           <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
                           <Bar dataKey="course" stackId="a" fill="#1e2749" radius={[0, 0, 0, 0]} name="Course" />
-                          <Bar dataKey="blog" stackId="a" fill="#3B82F6" name="Blog" />
-                          <Bar dataKey="download" stackId="a" fill="#22C55E" name="Download" />
+                          <Bar dataKey="blog" stackId="a" fill="#1e2749" name="Blog" />
+                          <Bar dataKey="download" stackId="a" fill="#ffba06" name="Download" />
                           <Bar dataKey="notSet" stackId="a" fill="#9CA3AF" radius={[4, 4, 0, 0]} name="Not Set" />
                         </BarChart>
                       </ResponsiveContainer>
@@ -3336,16 +3336,16 @@ export default function CreatorStudioPage() {
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 max-h-[300px] overflow-y-auto">
                       {analyticsData.activityHeatmap.slice(0, 40).map((creator) => {
                         const colors = {
-                          green: 'bg-green-500',
+                          green: 'bg-yellow-500',
                           yellow: 'bg-yellow-500',
-                          orange: 'bg-orange-500',
-                          red: 'bg-red-500',
+                          orange: 'bg-gray-500',
+                          red: 'bg-gray-500',
                         };
                         const bgColors = {
-                          green: 'bg-green-50 hover:bg-green-100',
+                          green: 'bg-green-50 hover:bg-yellow-100',
                           yellow: 'bg-yellow-50 hover:bg-yellow-100',
-                          orange: 'bg-orange-50 hover:bg-orange-100',
-                          red: 'bg-red-50 hover:bg-red-100',
+                          orange: 'bg-gray-50 hover:bg-gray-100',
+                          red: 'bg-gray-50 hover:bg-gray-100',
                         };
                         return (
                           <Link
@@ -3366,10 +3366,10 @@ export default function CreatorStudioPage() {
                       })}
                     </div>
                     <div className="flex items-center gap-4 mt-4 pt-3 border-t border-gray-100 text-xs text-gray-500">
-                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" /> 0-7 days</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500" /> 0-7 days</span>
                       <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500" /> 8-14 days</span>
-                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-500" /> 15-30 days</span>
-                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" /> 30+ days</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-gray-500" /> 15-30 days</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-gray-500" /> 30+ days</span>
                     </div>
                   </div>
                 </div>
@@ -3411,7 +3411,7 @@ export default function CreatorStudioPage() {
                               {analyticsData.journeyTimes.slice(0, 10).map((entry, index) => (
                                 <Cell
                                   key={`cell-${index}`}
-                                  fill={entry.contentPath === 'course' ? '#1e2749' : entry.contentPath === 'blog' ? '#3B82F6' : entry.contentPath === 'download' ? '#22C55E' : '#9CA3AF'}
+                                  fill={entry.contentPath === 'course' ? '#1e2749' : entry.contentPath === 'blog' ? '#1e2749' : entry.contentPath === 'download' ? '#ffba06' : '#9CA3AF'}
                                 />
                               ))}
                             </Bar>
@@ -3429,7 +3429,7 @@ export default function CreatorStudioPage() {
                     <p className="text-sm text-gray-500 mb-4">Creator progression through phases</p>
                     <div className="space-y-2">
                       {analyticsData.completionFunnel.map((stage, index) => {
-                        const colors = ['#1e2749', '#DB2777', '#F472B6', '#F9A8D4', '#FBCFE8', '#22C55E'];
+                        const colors = ['#1e2749', '#DB2777', '#F472B6', '#F9A8D4', '#FBCFE8', '#ffba06'];
                         return (
                           <div key={stage.phase} className="flex items-center gap-3">
                             <div className="w-32 text-sm text-gray-600 truncate">{stage.name}</div>
@@ -3463,7 +3463,7 @@ export default function CreatorStudioPage() {
                         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                           Stalled Creator Alerts
                           {analyticsData.stalledCreators.length > 0 && (
-                            <span className="text-sm font-normal px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                            <span className="text-sm font-normal px-2 py-0.5 rounded-full bg-amber-100 text-gray-700">
                               {analyticsData.stalledCreators.length} creators
                             </span>
                           )}
@@ -3475,7 +3475,7 @@ export default function CreatorStudioPage() {
                           onClick={() => handleCopyEmails(analyticsData.stalledCreators.map(c => c.email), 'stalledAnalytics')}
                           className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
                             copiedSection === 'stalledAnalytics'
-                              ? 'bg-green-50 text-green-600 border border-green-200'
+                              ? 'bg-green-50 text-yellow-600 border border-green-200'
                               : 'text-gray-500 hover:bg-gray-100 border border-gray-200'
                           }`}
                         >
@@ -3488,7 +3488,7 @@ export default function CreatorStudioPage() {
                       )}
                     </div>
                     {analyticsData.stalledCreators.length === 0 ? (
-                      <div className="flex items-center gap-2 text-green-600 py-4">
+                      <div className="flex items-center gap-2 text-yellow-600 py-4">
                         <Check className="w-5 h-5" />
                         <p className="text-sm">All caught up! No stalled creators.</p>
                       </div>
@@ -3509,8 +3509,8 @@ export default function CreatorStudioPage() {
                             {analyticsData.stalledCreators.map((creator) => {
                               const bgColor = {
                                 yellow: 'bg-yellow-50',
-                                orange: 'bg-orange-50',
-                                red: 'bg-red-50',
+                                orange: 'bg-gray-50',
+                                red: 'bg-gray-50',
                               };
                               return (
                                 <tr
@@ -3558,7 +3558,7 @@ export default function CreatorStudioPage() {
                                         e.stopPropagation();
                                         openFollowUpModal({ id: creator.id, name: creator.name });
                                       }}
-                                      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-lg bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors"
+                                      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-purple-200 transition-colors"
                                     >
                                       <MessageCircle className="w-3.5 h-3.5" />
                                       Mark Followed Up
@@ -3598,7 +3598,7 @@ export default function CreatorStudioPage() {
                           <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
                           <Legend />
                           <Bar dataKey="courses" fill="#1e2749" name="Courses" radius={[4, 4, 0, 0]} />
-                          <Bar dataKey="blogs" fill="#3B82F6" name="Blogs" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="blogs" fill="#1e2749" name="Blogs" radius={[4, 4, 0, 0]} />
                           <Line type="monotone" dataKey="cumulativeCourses" stroke="#1e2749" strokeWidth={2} dot={false} name="Total Courses" />
                         </BarChart>
                       </ResponsiveContainer>
@@ -3646,7 +3646,7 @@ export default function CreatorStudioPage() {
                           </div>
                         </div>
                         <div className="space-y-3">
-                          <div className="bg-purple-50 rounded-xl p-4 text-center">
+                          <div className="bg-slate-50 rounded-xl p-4 text-center">
                             <p className="font-bold" style={{ fontSize: 28, color: '#1e2749' }}>{analyticsData.geographicDistribution.withState}</p>
                             <p className="text-sm text-gray-600">With Location</p>
                           </div>
@@ -3687,8 +3687,8 @@ export default function CreatorStudioPage() {
                         {analyticsData.realtimeActivityFeed?.slice(0, 20).map((event) => (
                           <div key={event.id} className="flex items-start gap-3 py-2 border-b border-gray-50 last:border-0">
                             <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
-                              event.triggerType === 'self_complete' ? 'bg-green-400' :
-                              event.triggerType === 'admin_advance' ? 'bg-purple-400' : 'bg-gray-300'
+                              event.triggerType === 'self_complete' ? 'bg-yellow-400' :
+                              event.triggerType === 'admin_advance' ? 'bg-slate-700' : 'bg-gray-300'
                             }`} />
                             <div className="min-w-0 flex-1">
                               <p className="text-sm font-medium text-gray-900 truncate">{event.creatorName}</p>
@@ -3696,8 +3696,8 @@ export default function CreatorStudioPage() {
                             </div>
                             <div className="flex-shrink-0 text-right">
                               <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                                event.triggerType === 'self_complete' ? 'bg-green-50 text-green-700' :
-                                event.triggerType === 'admin_advance' ? 'bg-purple-50 text-purple-700' : 'bg-gray-50 text-gray-500'
+                                event.triggerType === 'self_complete' ? 'bg-green-50 text-yellow-700' :
+                                event.triggerType === 'admin_advance' ? 'bg-slate-50 text-slate-700' : 'bg-gray-50 text-gray-500'
                               }`}>
                                 {event.triggerLabel}
                               </span>
@@ -3723,30 +3723,30 @@ export default function CreatorStudioPage() {
                             </div>
                             <div className="h-5 bg-gray-100 rounded-full overflow-hidden flex">
                               <div
-                                className="h-full bg-green-400 transition-all"
+                                className="h-full bg-yellow-400 transition-all"
                                 style={{ width: `${row.selfCompletePercent}%` }}
                                 title={`Self-complete: ${row.selfCompletePercent}%`}
                               />
                               <div
-                                className="h-full bg-purple-400 transition-all"
+                                className="h-full bg-slate-700 transition-all"
                                 style={{ width: `${row.adminAdvancePercent}%` }}
                                 title={`Admin advance: ${row.adminAdvancePercent}%`}
                               />
                             </div>
                             <div className="flex gap-4 mt-1">
-                              <span className="text-xs text-green-600">{row.selfCompletePercent}% self</span>
-                              <span className="text-xs text-purple-600">{row.adminAdvancePercent}% admin</span>
+                              <span className="text-xs text-yellow-600">{row.selfCompletePercent}% self</span>
+                              <span className="text-xs text-slate-700">{row.adminAdvancePercent}% admin</span>
                             </div>
                           </div>
                         ))}
                       </div>
                       <div className="flex gap-4 mt-4 pt-3 border-t border-gray-50">
                         <div className="flex items-center gap-1.5">
-                          <div className="w-3 h-3 rounded-full bg-green-400" />
+                          <div className="w-3 h-3 rounded-full bg-yellow-400" />
                           <span className="text-xs text-gray-500">Self-Complete</span>
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <div className="w-3 h-3 rounded-full bg-purple-400" />
+                          <div className="w-3 h-3 rounded-full bg-slate-700" />
                           <span className="text-xs text-gray-500">Admin Advance</span>
                         </div>
                       </div>
@@ -3772,8 +3772,8 @@ export default function CreatorStudioPage() {
                       <div className="flex flex-wrap gap-2 max-h-[220px] overflow-y-auto">
                         {analyticsData.eventEngagementHeatmap?.slice(0, 40).map((creator) => {
                           const colorMap: Record<string, string> = {
-                            hot: 'bg-red-100 border-red-200 text-red-700',
-                            warm: 'bg-orange-100 border-orange-200 text-orange-700',
+                            hot: 'bg-gray-100 border-red-200 text-gray-800',
+                            warm: 'bg-gray-100 border-orange-200 text-gray-700',
                             cool: 'bg-yellow-100 border-yellow-200 text-yellow-700',
                             cold: 'bg-gray-100 border-gray-200 text-gray-500',
                           };
@@ -3805,7 +3805,7 @@ export default function CreatorStudioPage() {
                                 <span className="text-sm font-medium text-gray-700">{stage.name}</span>
                                 <div className="flex items-center gap-2">
                                   {dropOff > 5 && (
-                                    <span className="text-xs text-red-500">-{dropOff}%</span>
+                                    <span className="text-xs text-gray-600">-{dropOff}%</span>
                                   )}
                                   <span className="text-xs text-gray-500">{stage.count} creators</span>
                                   {stage.avgDaysToPhase !== null && (
@@ -3818,7 +3818,7 @@ export default function CreatorStudioPage() {
                                   className="h-full rounded-full transition-all"
                                   style={{
                                     width: `${stage.percent}%`,
-                                    backgroundColor: index === 0 ? '#1e2749' : index < 3 ? '#F472B6' : index < 5 ? '#F59E0B' : '#22C55E',
+                                    backgroundColor: index === 0 ? '#1e2749' : index < 3 ? '#F472B6' : index < 5 ? '#6B7280' : '#ffba06',
                                   }}
                                 />
                               </div>
@@ -3845,7 +3845,7 @@ export default function CreatorStudioPage() {
                     setAnalyticsData(null);
                     setAnalyticsLoading(false);
                   }}
-                  className="mt-3 text-sm text-purple-600 hover:text-purple-700"
+                  className="mt-3 text-sm text-slate-700 hover:text-slate-700"
                 >
                   Try again
                 </button>
@@ -4064,8 +4064,8 @@ export default function CreatorStudioPage() {
           <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl max-h-[80vh] overflow-hidden flex flex-col">
             <div className="p-6 border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 text-gray-700" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900">Delete {selectedCreatorIds.size} Creator{selectedCreatorIds.size > 1 ? 's' : ''}</h2>
@@ -4074,8 +4074,8 @@ export default function CreatorStudioPage() {
               </div>
             </div>
             <div className="p-6 overflow-y-auto flex-1">
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                <p className="text-sm text-red-800">
+              <div className="bg-gray-50 border border-red-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-gray-800">
                   You are about to permanently delete {selectedCreatorIds.size} creator{selectedCreatorIds.size > 1 ? 's' : ''} and all their associated data.
                 </p>
               </div>
@@ -4083,7 +4083,7 @@ export default function CreatorStudioPage() {
               <ul className="space-y-2 max-h-40 overflow-y-auto">
                 {getSelectedCreators().map(creator => (
                   <li key={creator.id} className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
-                    <X className="w-4 h-4 text-red-500 flex-shrink-0" />
+                    <X className="w-4 h-4 text-gray-600 flex-shrink-0" />
                     <span className="font-medium">{creator.name}</span>
                     <span className="text-gray-400">({creator.email})</span>
                   </li>
