@@ -4,6 +4,7 @@ import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { MicrosoftClarity } from "@/components/MicrosoftClarity";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { Header } from "@/components/layout/Header";
+import { AnnouncementBanner } from "@/components/layout/AnnouncementBanner";
 import { Footer } from "@/components/layout/Footer";
 import { EmailPopup } from "@/components/EmailPopup";
 import { SubstackPopup } from "@/components/SubstackPopup";
@@ -79,6 +80,7 @@ export default function RootLayout({
           <MicrosoftClarity />
           <ScrollToTop />
           <MainSiteWrapper>
+            <AnnouncementBanner />
             <Header />
           </MainSiteWrapper>
           <main className="min-h-screen">
