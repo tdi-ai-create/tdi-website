@@ -79,7 +79,7 @@ function AgreementContent() {
       });
       if (!response.ok) { const data = await response.json(); throw new Error(data.error || 'Failed to sign agreement'); }
       setIsSigned(true);
-      setTimeout(() => router.push('/creator-portal/dashboard?agreement=signed'), 2000);
+      setTimeout(() => router.push('/creator-portal/select-topic'), 2000);
     } catch (err) { setError(err instanceof Error ? err.message : 'Something went wrong'); setIsSigning(false); }
   };
 

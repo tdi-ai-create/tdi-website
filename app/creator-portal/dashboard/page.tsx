@@ -100,6 +100,18 @@ export default function CreatorDashboardPage() {
         console.log('[Dashboard] User email:', email);
         setUserEmail(email);
 
+        // Topic-selection gate: redirect creator to topic picker if not chosen yet
+        const { data: creatorTopicCheck } = await supabase
+          .from('creators')
+          .select('topic_chosen_by_creator')
+          .eq('email', email)
+          .maybeSingle();
+        if (creatorTopicCheck && !creatorTopicCheck.topic_chosen_by_creator) {
+          console.log('[Dashboard] Creator has not chosen topic, redirecting to select-topic');
+          router.push('/creator-portal/select-topic');
+          return;
+        }
+
         // Fetch dashboard data via API (uses service role to bypass RLS)
         console.log('[Dashboard] Fetching dashboard data...');
         const response = await fetch('/api/creator-portal/dashboard', {
