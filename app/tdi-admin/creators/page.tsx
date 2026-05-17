@@ -95,6 +95,7 @@ interface EnrichedCreator {
   course_title: string | null;
   course_audience: string | null;
   content_path: string | null;
+  topic?: string | null;
   current_phase: string;
   target_publish_month: string | null;
   created_at: string;
@@ -2977,18 +2978,33 @@ export default function CreatorStudioPage() {
                         {/* Creator */}
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
-                            <div
-                              className="w-9 h-9 rounded-full flex items-center justify-center text-white font-medium flex-shrink-0"
-                              style={{ backgroundColor: creator.progressPercentage === 100 ? '#22c55e' : theme.accent }}
-                            >
-                              {creator.name.charAt(0).toUpperCase()}
-                            </div>
+                            {(() => {
+                              const topicConfig = getTopicConfig(creator.topic);
+                              const TopicIcon = TOPIC_ICON_MAP[topicConfig.icon] || Sparkles;
+                              const isComplete = creator.progressPercentage === 100;
+                              return (
+                                <div
+                                  className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+                                  style={{
+                                    backgroundColor: isComplete ? '#22c55e' : topicConfig.background,
+                                    border: isComplete ? 'none' : `1.5px solid ${topicConfig.border}`,
+                                  }}
+                                  title={creator.topic || 'No topic chosen yet'}
+                                >
+                                  {isComplete ? (
+                                    <span className="text-white font-medium">{creator.name.charAt(0).toUpperCase()}</span>
+                                  ) : (
+                                    <TopicIcon style={{ width: 18, height: 18, color: topicConfig.iconColor }} />
+                                  )}
+                                </div>
+                              );
+                            })()}
                             <div className="min-w-0">
                               <p className="font-medium truncate" style={{ color: '#2B3A67' }}>
                                 {creator.name}
                               </p>
-                              <p className="text-xs text-gray-500 truncate md:hidden">
-                                {creator.course_title || creator.email}
+                              <p className="text-xs text-gray-500 truncate">
+                                {creator.topic || creator.course_title || creator.email}
                               </p>
                             </div>
                           </div>
