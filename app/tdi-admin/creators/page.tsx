@@ -411,7 +411,7 @@ function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
               />
               <Legend />
-              <Bar dataKey="download" stackId="a" fill="#ffba06" name="Download" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="download" stackId="a" fill="#ffba06" name="Quick Tool (Download)" radius={[0, 0, 0, 0]} />
               <Bar dataKey="course" stackId="a" fill="#1e2749" name="Course" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -470,7 +470,7 @@ function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
                                   ? 'bg-slate-100 text-slate-800'
                                   : 'bg-slate-50 text-slate-700'
                               }`}>
-                                {creator.contentPath === 'course' ? 'Course' : 'Download'}
+                                {creator.contentPath === 'course' ? 'Course' : 'Quick Tool (Download)'}
                               </span>
                             </div>
                             <span className="text-xs text-gray-500">
@@ -1730,7 +1730,7 @@ export default function CreatorStudioPage() {
       case 'blog':
         return { icon: <FileText className="w-3.5 h-3.5" />, label: 'Blog', color: 'bg-slate-100 text-slate-700' };
       case 'download':
-        return { icon: <DownloadIcon className="w-3.5 h-3.5" />, label: 'Download', color: 'bg-slate-100 text-slate-700' };
+        return { icon: <DownloadIcon className="w-3.5 h-3.5" />, label: 'Quick Tool (Download)', color: 'bg-slate-100 text-slate-700' };
       default:
         return { icon: <HelpCircle className="w-3.5 h-3.5" />, label: 'Not set', color: 'bg-gray-100 text-gray-700' };
     }
@@ -1907,7 +1907,7 @@ export default function CreatorStudioPage() {
   const pathChartData = [
     { name: 'Course', value: pathCounts.course, color: theme.accent },
     { name: 'Blog', value: pathCounts.blog, color: '#B8A1D4' },
-    { name: 'Download', value: pathCounts.download, color: '#D4C1E8' },
+    { name: 'Quick Tool (Download)', value: pathCounts.download, color: '#D4C1E8' },
     { name: 'Not Set', value: pathCounts.notSet, color: '#E8E0F0' },
   ].filter(d => d.value > 0);
 
@@ -2537,7 +2537,7 @@ export default function CreatorStudioPage() {
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { key: 'blog', icon: FileText, label: 'Blog', count: pathCounts.blog, color: theme.accent },
-                  { key: 'download', icon: DownloadIcon, label: 'Download', count: pathCounts.download, color: theme.accent },
+                  { key: 'download', icon: DownloadIcon, label: 'Quick Tool (Download)', count: pathCounts.download, color: theme.accent },
                   { key: 'course', icon: BookOpen, label: 'Course', count: pathCounts.course, color: theme.accent },
                   { key: 'notSet', icon: HelpCircle, label: 'Not Set', count: pathCounts.notSet, color: '#E8927C' },
                 ].map((path) => {
@@ -2787,7 +2787,7 @@ export default function CreatorStudioPage() {
                   >
                     <option value="all">All Paths</option>
                     <option value="blog">Blog</option>
-                    <option value="download">Download</option>
+                    <option value="download">Quick Tool (Download)</option>
                     <option value="course">Course</option>
                     <option value="notSet">Not Set</option>
                   </select>
@@ -3320,7 +3320,7 @@ export default function CreatorStudioPage() {
                           <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
                           <Bar dataKey="course" stackId="a" fill="#1e2749" radius={[0, 0, 0, 0]} name="Course" />
                           <Bar dataKey="blog" stackId="a" fill="#1e2749" name="Blog" />
-                          <Bar dataKey="download" stackId="a" fill="#ffba06" name="Download" />
+                          <Bar dataKey="download" stackId="a" fill="#ffba06" name="Quick Tool (Download)" />
                           <Bar dataKey="notSet" stackId="a" fill="#9CA3AF" radius={[4, 4, 0, 0]} name="Not Set" />
                         </BarChart>
                       </ResponsiveContainer>

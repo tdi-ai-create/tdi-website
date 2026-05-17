@@ -870,7 +870,7 @@ export default function TDIAdminCreatorDetailPage() {
       case 'blog':
         return { icon: <PenLine className="w-4 h-4" />, label: 'Blog', color: 'bg-green-100 text-green-700' };
       case 'download':
-        return { icon: <Package className="w-4 h-4" />, label: 'Download', color: 'bg-amber-100 text-amber-700' };
+        return { icon: <Package className="w-4 h-4" />, label: 'Quick Tool (Download)', color: 'bg-amber-100 text-amber-700' };
       default:
         return null;
     }
@@ -1279,7 +1279,7 @@ export default function TDIAdminCreatorDetailPage() {
                   >
                     <option value="">Not set</option>
                     <option value="blog">Blog</option>
-                    <option value="download">Download</option>
+                    <option value="download">Quick Tool (Download)</option>
                     <option value="course">Course</option>
                   </select>
                 </div>

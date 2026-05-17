@@ -590,7 +590,7 @@ function PhaseCard({
   const getPathLabel = (path: string | null | undefined) => {
     switch (path) {
       case 'blog': return 'Blog';
-      case 'download': return 'Download';
+      case 'download': return 'Quick Tool (Download)';
       case 'course': return 'Course';
       default: return 'your';
     }
