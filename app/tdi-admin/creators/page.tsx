@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { getTopicConfig } from '@/lib/data/creator-topics';
 import dynamic from 'next/dynamic';
 import {
   Search,
@@ -41,7 +42,20 @@ import {
   Trash2,
   ExternalLink,
   MousePointerClick,
+  BookMarked, PenLine, Activity, FlaskConical, Calculator,
+  GraduationCap, Sparkles, Globe, Languages, HeartHandshake, Music, Library,
+  HeartPulse, LayoutGrid, Lightbulb, Route, ClipboardCheck, NotebookPen,
+  PencilRuler, Baby, Puzzle, MessagesSquare, Star, Sprout,
+  Target, Home as HomeIcon, Laptop, Scale,
 } from 'lucide-react';
+
+const TOPIC_ICON_MAP: Record<string, any> = {
+  BookOpen, BookMarked, PenLine, Activity, Calculator, FlaskConical, Palette,
+  GraduationCap, Sparkles, Globe, Languages, HeartHandshake, Music, Library,
+  HeartPulse, LayoutGrid, Lightbulb, Route, ClipboardCheck, NotebookPen,
+  PencilRuler, Baby, Puzzle, MessagesSquare, Star, Users, Sprout, Clock,
+  Target, HomeIcon, Laptop, Scale,
+};
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
