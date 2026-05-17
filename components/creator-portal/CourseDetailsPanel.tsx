@@ -23,11 +23,11 @@ export function getContentLabels(contentPath: ContentPath | null) {
       };
     case 'download':
       return {
-        panelTitle: 'Download Details',
-        titleLabel: 'Download Title',
+        panelTitle: 'Quick Tool Details',
+        titleLabel: 'Quick Tool Title',
         launchLabel: 'Target Launch',
-        outlineLabel: 'Download Outline',
-        liveLabel: 'Your Download (Live!)',
+        outlineLabel: 'Quick Tool Outline',
+        liveLabel: 'Your Quick Tool (Live!)',
         liveSubtext: 'Learning Hub',
         icon: FileDown,
       };
@@ -255,7 +255,7 @@ export function CourseDetailsPanel({ creator }: CourseDetailsPanelProps) {
                 <CheckCircle className="w-4 h-4 text-gray-600" />
               </div>
               <div className="flex-grow">
-                <p className="text-sm text-[#1e2749]">Download Design</p>
+                <p className="text-sm text-[#1e2749]">Quick Tool Design</p>
               </div>
               <span className={`text-xs px-2 py-1 rounded-full ${creator.wants_download_design ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
                 {creator.wants_download_design ? 'TDI will design' : 'Self-designing'}

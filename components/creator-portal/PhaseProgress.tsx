@@ -38,7 +38,7 @@ function formatSubmissionData(data: SubmissionData): { label: string; timestamp:
     case 'path_selection': {
       const pathLabels: Record<string, string> = {
         blog: 'Blog Post',
-        download: 'Free Download',
+        download: 'Quick Tool (Download)',
         course: 'Learning Hub Course',
       };
       const label = pathLabels[data.content_path || ''] || data.content_path || '';
@@ -63,7 +63,7 @@ function formatSubmissionData(data: SubmissionData): { label: string; timestamp:
     case 'preferences': {
       const prefs: string[] = [];
       if (data.wants_video_editing) prefs.push('Video editing');
-      if (data.wants_download_design) prefs.push('Download design');
+      if (data.wants_download_design) prefs.push('Quick Tool design');
       return {
         label: prefs.length > 0 ? `Selected: ${prefs.join(', ')}` : 'Preferences saved',
         timestamp: formatDate(data.submitted_at),

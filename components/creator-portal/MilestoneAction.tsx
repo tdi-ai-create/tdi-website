@@ -1106,9 +1106,9 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
           impactText: 'Track your impact as educators read your insights',
         },
         download: {
-          actionLabel: 'Download Live!',
-          headline: 'Your Download is Live!',
-          viewLabel: 'View Your Download:',
+          actionLabel: 'Quick Tool Live!',
+          headline: 'Your Quick Tool is Live!',
+          viewLabel: 'View Your Quick Tool:',
           linkText: 'Open in TDI Store',
           shareText: 'Share your download with your network',
           impactText: 'Track your impact as educators use your resource',
@@ -1223,7 +1223,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                   <div className="grid gap-3">
                     <div className="bg-white rounded-lg p-3 border border-gray-100">
                       <div className="flex items-center justify-between mb-1">
-                        <p className="font-medium text-[#1e2749] text-sm">Digital Download</p>
+                        <p className="font-medium text-[#1e2749] text-sm">Quick Tool (Download)</p>
                         <a
                           href="https://tdi.thinkific.com/products/digital_downloads/new-digital-download-67"
                           target="_blank"
