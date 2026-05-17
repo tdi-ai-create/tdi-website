@@ -2562,7 +2562,7 @@ export default function TDIAdminCreatorDetailPage() {
                   type="date"
                   value={overrideDate}
                   onChange={(e) => setOverrideDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent"
                 />
               </div>
               <div>
@@ -2574,7 +2574,7 @@ export default function TDIAdminCreatorDetailPage() {
                   onChange={(e) => setOverrideReason(e.target.value)}
                   placeholder="e.g. Creator requested extension due to schedule conflict..."
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent resize-none"
                 />
               </div>
             </div>
