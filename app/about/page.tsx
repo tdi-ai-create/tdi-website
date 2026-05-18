@@ -11,12 +11,12 @@ import AboutCreatorsSection from '@/components/AboutCreatorsSection';
 // Navigation sections
 const navSections = [
   { id: 'our-story', label: 'Our Story' },
-  { id: 'founder', label: 'Founder' },
   { id: 'our-symbol', label: 'Our Symbol' },
-  { id: 'blueprint', label: 'Blueprint' },
-  { id: 'impact', label: 'Impact' },
   { id: 'team', label: 'Team' },
   { id: 'creators', label: 'Creators' },
+  { id: 'founder', label: 'Founder' },
+  { id: 'blueprint', label: 'Blueprint' },
+  { id: 'impact', label: 'Impact' },
 ];
 
 export default function AboutPage() {
@@ -183,6 +183,60 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* The Story Behind the Symbol */}
+      <section id="our-symbol" className="py-16 md:py-24 scroll-mt-32" style={{ background: '#faf3e0' }}>
+        <div className="max-w-5xl mx-auto px-6">
+
+          <h2 className="text-2xl md:text-3xl font-bold mb-12" style={{ color: '#1e3a5f' }}>
+            The Story Behind Our Symbol
+          </h2>
+
+          <div className="flex flex-col md:flex-row items-start gap-10 md:gap-16">
+
+            {/* Animation — LEFT side on desktop, top on mobile */}
+            <div className="w-48 h-48 md:w-64 md:h-64 flex-shrink-0 mx-auto md:mx-0 md:sticky md:top-32">
+              <SymbolAnimation />
+            </div>
+
+            {/* Text — RIGHT side on desktop, below on mobile */}
+            <div className="flex-1 space-y-5" style={{ color: '#1e3a5f', fontSize: '16px', lineHeight: '1.85' }}>
+              <p>
+                When I was teaching 6th grade, I ran a mastery learning classroom. Thirty-six students working through content at their own pace, all active at the same time. I needed a fast way to check off their work. To initial that I'd seen it, that they were good to move on.
+              </p>
+
+              <p>
+                So I'd scribble a quick lowercase h. Hughart. My last name, fast and messy, on paper after paper after paper.
+              </p>
+
+              <p>
+                Year over year, it got messier. The h barely looked like a letter anymore. But my students always knew exactly what it was. That little scribble meant I see you. You got it. Keep going.
+              </p>
+
+              <p>
+                It showed up everywhere. On their progress checks, their accomplishments, their big moments and their small ones. Not a grade. Not a checkmark. Just a quick, human sign-off that said I was paying attention and I wasn't going anywhere.
+              </p>
+
+              <p>
+                That's where our symbol comes from. My messy, real, teacher shorthand with a circle swept around it. One continuous stroke that never lifts off the paper. The circle is the part that says I've got you. I circled back. The way a teacher wraps care around a student without making a big deal about it.
+              </p>
+
+              <p>
+                One stroke says two things: I see you. I've got you.
+              </p>
+
+              <p>
+                You'll notice this mark when you enter our portals. The Creators Studio, the Leadership Dashboard, the Learning Hub. A line enters the screen, forms the mark, holds for just a moment, then unravels and carries you in. It was always just one line passing through. The same line that wrote "I see you" becomes the line that takes you where you need to go.
+              </p>
+
+              <p>
+                That felt right for what we do. We're not here to sit on a shelf. We're here to move through your practice and leave something behind that matters.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* The Team */}
       <section className="py-16 scroll-mt-32" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
@@ -293,60 +347,6 @@ export default function AboutPage() {
                 </svg>
               </a>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* The Story Behind the Symbol */}
-      <section id="our-symbol" className="py-16 md:py-24 scroll-mt-32" style={{ background: '#faf3e0' }}>
-        <div className="max-w-5xl mx-auto px-6">
-
-          <h2 className="text-2xl md:text-3xl font-bold mb-12" style={{ color: '#1e3a5f' }}>
-            The Story Behind Our Symbol
-          </h2>
-
-          <div className="flex flex-col md:flex-row items-start gap-10 md:gap-16">
-
-            {/* Animation — LEFT side on desktop, top on mobile */}
-            <div className="w-48 h-48 md:w-64 md:h-64 flex-shrink-0 mx-auto md:mx-0 md:sticky md:top-32">
-              <SymbolAnimation />
-            </div>
-
-            {/* Text — RIGHT side on desktop, below on mobile */}
-            <div className="flex-1 space-y-5" style={{ color: '#1e3a5f', fontSize: '16px', lineHeight: '1.85' }}>
-              <p>
-                When I was teaching 6th grade, I ran a mastery learning classroom. Thirty-six students working through content at their own pace, all active at the same time. I needed a fast way to check off their work. To initial that I'd seen it, that they were good to move on.
-              </p>
-
-              <p>
-                So I'd scribble a quick lowercase h. Hughart. My last name, fast and messy, on paper after paper after paper.
-              </p>
-
-              <p>
-                Year over year, it got messier. The h barely looked like a letter anymore. But my students always knew exactly what it was. That little scribble meant I see you. You got it. Keep going.
-              </p>
-
-              <p>
-                It showed up everywhere. On their progress checks, their accomplishments, their big moments and their small ones. Not a grade. Not a checkmark. Just a quick, human sign-off that said I was paying attention and I wasn't going anywhere.
-              </p>
-
-              <p>
-                That's where our symbol comes from. My messy, real, teacher shorthand with a circle swept around it. One continuous stroke that never lifts off the paper. The circle is the part that says I've got you. I circled back. The way a teacher wraps care around a student without making a big deal about it.
-              </p>
-
-              <p>
-                One stroke says two things: I see you. I've got you.
-              </p>
-
-              <p>
-                You'll notice this mark when you enter our portals. The Creators Studio, the Leadership Dashboard, the Learning Hub. A line enters the screen, forms the mark, holds for just a moment, then unravels and carries you in. It was always just one line passing through. The same line that wrote "I see you" becomes the line that takes you where you need to go.
-              </p>
-
-              <p>
-                That felt right for what we do. We're not here to sit on a shelf. We're here to move through your practice and leave something behind that matters.
-              </p>
-            </div>
-
           </div>
         </div>
       </section>

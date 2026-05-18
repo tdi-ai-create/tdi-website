@@ -38,7 +38,7 @@ function CreatorCircle({ creator }: { creator: Creator }) {
         border: `2px solid ${config.border}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        <IconComponent style={{ width: 28, height: 28, color: config.iconColor }} />
+        <IconComponent style={{ width: 34, height: 34, color: config.iconColor }} />
       </div>
       <p style={{ fontSize: 12, fontWeight: 500, color: '#1e2749', margin: '0 0 2px 0' }}>{displayName}</p>
       {creator.topic && (

@@ -12,6 +12,9 @@ const socialLinks: Record<string, { href: string; label: string; icon: typeof Li
     { href: 'https://tiktok.com/@RaehughartEDU', label: 'Rae Hughart on TikTok', icon: Music2 },
     { href: 'https://raehughart.substack.com/', label: 'Rae Hughart on Substack', icon: BookOpen },
   ],
+  'Kristin Williams': [
+    { href: 'https://www.linkedin.com/in/kristin-williams-aa126585/?skipRedirect=true', label: 'Kristin Williams on LinkedIn', icon: Linkedin },
+  ],
   'Omar Garcia': [
     { href: 'https://www.linkedin.com/in/ogtaxstrategy/', label: 'Omar Garcia on LinkedIn', icon: Linkedin },
   ],
@@ -113,7 +116,7 @@ function LeadershipCard({ member }: { member: typeof leadership[0] }) {
 function TeamCircle({ member }: { member: typeof team[0] }) {
   const [imgError, setImgError] = useState(false)
   const initials = getInitials(member.name)
-  const goldRing = member.isHuman ? { boxShadow: '0 0 0 3px #C9A961' } : {}
+  const goldRing = member.isHuman ? { boxShadow: '0 0 0 4.5px #C9A961' } : {}
 
   return (
     <div style={{ textAlign: 'center' }}>
