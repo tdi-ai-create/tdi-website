@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { CalculatorSuite } from '@/components/calculators/v2/CalculatorSuite';
 
 export const metadata = {
@@ -18,13 +19,14 @@ export default function CalculatorPage() {
             Whether you lead a school or teach in one, the right numbers can change the conversation.
           </p>
         </div>
-        {/* Yellow accent strip at bottom of hero */}
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#ffba06]" />
       </section>
 
       {/* Calculator Suite */}
       <section className="bg-[#f5f5f5] py-12 md:py-16 px-6">
-        <CalculatorSuite defaultTab="admin" />
+        <Suspense fallback={<div className="max-w-4xl mx-auto h-96" />}>
+          <CalculatorSuite />
+        </Suspense>
       </section>
     </main>
   );
