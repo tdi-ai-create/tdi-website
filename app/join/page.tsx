@@ -67,6 +67,32 @@ export default function JoinPage() {
         </div>
       </section>
 
+      {/* Not a quiz, A community */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#ffffff' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              REAL CONVERSATIONS
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              Not a quiz. A community.
+            </h2>
+            <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 700, margin: '0 auto', lineHeight: 1.5 }}>
+              Every lesson opens up a conversation thread. Educators share what they tried, what they adapted, and what got stuck, so the next teacher learns from the last.
+            </p>
+          </div>
+          <div style={{ width: '100%', maxWidth: 900, margin: '0 auto', borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 32px rgba(30,39,73,0.08)' }}>
+            <Image
+              src="/hub-welcome/hub-conversation.png"
+              alt="Community conversation per lesson"
+              width={1200}
+              height={675}
+              style={{ width: '100%', height: 'auto', display: 'block' }}
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Free Ways to Get Started */}
       <section className="section bg-white">
         <div className="container-default">
