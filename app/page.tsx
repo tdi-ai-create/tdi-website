@@ -121,10 +121,10 @@ export default function Home() {
       {/* SECTION 4: Stats Bar */}
       <AnimatedStatsBar
         stats={[
-          { value: 87000, suffix: '+', label: 'Educators in Our Community' },
+          { value: 100000, suffix: '+', label: 'Educators in Our Community' },
           { value: 65, suffix: '%', label: 'Implementation Rate', subtext: 'vs 10% industry average' },
           { value: 94, suffix: '%', label: 'Would Recommend' },
-          { value: 21, label: 'States with Partner Schools' },
+          { value: 50, label: 'States + 100 Countries' },
         ]}
       />
       <p className="text-center text-sm py-2" style={{ backgroundColor: '#1e2749', color: '#ffffff', opacity: 0.9 }}>
