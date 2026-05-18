@@ -30,16 +30,18 @@ export function CalculatorSuite({ defaultTab = 'admin' }: CalculatorSuiteProps) 
   return (
     <div className="w-full max-w-4xl mx-auto">
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200 mb-8 sticky top-0 bg-white z-10">
-        <div className="flex gap-8 md:gap-12 overflow-x-auto justify-center md:justify-start max-w-4xl mx-auto px-4">
-          {tabs.map((tab) => (
+      <div className="mb-8 sticky top-0 bg-white z-10 border-b border-gray-200">
+        <div className="grid grid-cols-3 max-w-4xl mx-auto">
+          {tabs.map((tab, i) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-2 py-5 border-b-[3px] transition-colors whitespace-nowrap ${
+              className={`py-5 border-b-[3px] transition-colors text-center ${
+                i < tabs.length - 1 ? 'border-r border-r-gray-200' : ''
+              } ${
                 activeTab === tab.id
-                  ? 'border-[#ffba06] text-[#1e2749]'
-                  : 'border-transparent text-gray-500 hover:text-[#1e2749]'
+                  ? 'border-b-[#ffba06] text-[#1e2749]'
+                  : 'border-b-transparent text-gray-500 hover:text-[#1e2749]'
               }`}
             >
               <div className="font-semibold text-lg">{tab.label}</div>
