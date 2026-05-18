@@ -121,7 +121,7 @@ export default function Home() {
       {/* SECTION 4: Stats Bar */}
       <AnimatedStatsBar
         stats={[
-          { value: 100000, suffix: '+', label: 'Educators in Our Community' },
+          { value: 100000, suffix: '+', label: 'Educators in Our Community', subtext: 'Teachers, Paras, Coaches, Leaders' },
           { value: 74, suffix: '%', label: 'Implementation Rate', subtext: 'vs 10% industry average' },
           { value: 94, suffix: '%', label: 'Would Recommend', subtext: 'to a friend, colleague, or neighboring school' },
           { value: 50, label: 'States + 100 Countries', subtext: 'with educators using TDI tools' },
