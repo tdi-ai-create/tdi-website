@@ -232,7 +232,7 @@ export default function CertifiedStatesMap() {
             </p>
 
             {stateDOE && (
-              
+                <a
                 href={stateDOE}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -246,7 +246,7 @@ export default function CertifiedStatesMap() {
             )}
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 8 }}>
-              
+                <a
                 href="/learning/plans"
                 style={{
                   textAlign: 'center', padding: '14px 16px', background: '#1e2749',
@@ -255,7 +255,7 @@ export default function CertifiedStatesMap() {
               >
                 Join the Hub
               </a>
-              
+                <a
                 href="/about"
                 style={{
                   textAlign: 'center', padding: '14px 16px', background: 'white',
