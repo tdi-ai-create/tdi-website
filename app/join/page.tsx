@@ -125,6 +125,24 @@ export default function JoinPage() {
         </div>
       </section>
 
+      {/* Implementation Stat */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#ffffff' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 16 }}>
+            REAL CLASSROOM IMPACT
+          </p>
+          <p style={{ fontSize: 72, fontWeight: 800, color: '#1e2749', margin: '0 0 8px 0', lineHeight: 1 }}>
+            74%
+          </p>
+          <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+            Classroom application rate within 30 days
+          </h2>
+          <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
+            Most PD ends when the slide deck closes. TDI's average educator applies what they learned in their classroom within the first 30 days, because the strategies are built for the hour you don't have.
+          </p>
+        </div>
+      </section>
+
       {/* Free Ways to Get Started */}
       <section className="section bg-white">
         <div className="container-default">
