@@ -105,6 +105,7 @@ export default function PlansPage() {
   async function handleCheckout(tierId: string) {
     setCheckoutError(null)
     setCheckoutLoading(tierId)
+    const newTab = window.open('', '_blank')
     try {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
@@ -113,12 +114,14 @@ export default function PlansPage() {
       })
       const data = await res.json()
       if (!res.ok || !data.url) {
+        if (newTab) newTab.close()
         setCheckoutError(data.error || 'Could not start checkout. Please try again.')
         setCheckoutLoading(null)
         return
       }
-      window.location.href = data.url
+      if (newTab) newTab.location.href = data.url
     } catch (err: any) {
+      if (newTab) newTab.close()
       setCheckoutError(err.message || 'Network error. Please try again.')
       setCheckoutLoading(null)
     }
