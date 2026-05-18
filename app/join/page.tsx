@@ -94,6 +94,37 @@ export default function JoinPage() {
         </div>
       </section>
 
+      {/* Moment Mode */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#1e2749', color: '#ffffff' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#ffba06', marginBottom: 12 }}>
+              FOR THE HARD DAYS
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#ffffff', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              Moment Mode
+            </h2>
+            <p style={{ fontSize: 17, color: '#cbd5e1', maxWidth: 700, margin: '0 auto', lineHeight: 1.5 }}>
+              For the moment you need it most. One quick strategy. One small win. Sometimes that's all you have time for, and that's enough.
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, maxWidth: 900, margin: '0 auto' }}>
+            <div style={{ background: 'rgba(255,255,255,0.06)', padding: 24, borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }}>
+              <p style={{ fontSize: 32, fontWeight: 700, color: '#ffba06', margin: '0 0 8px 0' }}>5 min</p>
+              <p style={{ fontSize: 15, color: '#cbd5e1', margin: 0, lineHeight: 1.5 }}>Watch one quick strategy between classes</p>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.06)', padding: 24, borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }}>
+              <p style={{ fontSize: 32, fontWeight: 700, color: '#ffba06', margin: '0 0 8px 0' }}>1 take</p>
+              <p style={{ fontSize: 15, color: '#cbd5e1', margin: 0, lineHeight: 1.5 }}>Try it tomorrow morning, see if it lands</p>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.06)', padding: 24, borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }}>
+              <p style={{ fontSize: 32, fontWeight: 700, color: '#ffba06', margin: '0 0 8px 0' }}>0 prep</p>
+              <p style={{ fontSize: 15, color: '#cbd5e1', margin: 0, lineHeight: 1.5 }}>Strategies you can use without rewriting your plan</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Free Ways to Get Started */}
       <section className="section bg-white">
         <div className="container-default">
