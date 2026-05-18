@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 
 const SCOPES = [
-  'https://www.googleapis.com/auth/gmail.metadata',
+  'https://www.googleapis.com/auth/gmail.readonly',
   'https://www.googleapis.com/auth/calendar.readonly',
 ];
 
@@ -15,8 +15,8 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const origin = new URL(request.url).origin;
-  const redirectUri = `${origin}/api/olivia/auth/callback`;
+  const redirectUri = process.env.OLIVIA_GOOGLE_REDIRECT_URI
+    ?? `${new URL(request.url).origin}/api/olivia/auth/callback`;
   const state = randomBytes(24).toString('hex');
 
   const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
