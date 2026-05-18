@@ -76,7 +76,7 @@ function ThankYouContent() {
           </div>
 
           <div className="text-center">
-            
+            <a
               href="https://tdi.thinkific.com/"
               target="_blank"
               rel="noopener"

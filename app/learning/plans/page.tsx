@@ -248,7 +248,7 @@ export default function PlansPage() {
                   </ul>
 
                   {tier.ctaType === 'free' ? (
-                    
+                    <a
                       href={FREE_DOWNLOADS_URL}
                       target="_blank"
                       rel="noopener"
