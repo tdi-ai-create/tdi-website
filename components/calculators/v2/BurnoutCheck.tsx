@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Thermometer } from './visuals';
 
 const stressMap: Record<number, { color: string; light: string; label: string }> = {
   1:  { color: '#80a4ed', light: '#a8c0f0', label: 'Mostly steady' },
@@ -22,7 +24,10 @@ const stressInsights = {
 };
 
 export function BurnoutCheck() {
-  const [stress, setStress] = useState(5);
+  const searchParams = useSearchParams();
+  const stressParam = searchParams?.get('stress');
+  const initialStress = stressParam ? Math.max(1, Math.min(10, parseInt(stressParam))) : 5;
+  const [stress, setStress] = useState(isNaN(initialStress) ? 5 : initialStress);
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -73,48 +78,36 @@ export function BurnoutCheck() {
           On a scale of 1 to 10, how stressed are you right now?
         </h3>
 
-        {/* Orb + number */}
-        <div className="flex items-center justify-center gap-5 mb-7 min-h-[60px]">
-          <div
-            className="w-14 h-14 rounded-full transition-all duration-500 relative"
-            style={{
-              background: `radial-gradient(circle at 30% 30%, ${c.light}, ${c.color} 70%)`,
-              boxShadow: `0 0 0 8px ${c.color}1F`,
-            }}
-          >
-            <div
-              className="absolute inset-2 rounded-full"
-              style={{ background: 'radial-gradient(circle at 35% 35%, rgba(255,255,255,0.4), transparent 60%)' }}
-            />
+        {/* Thermometer + number + slider */}
+        <div className="grid md:grid-cols-[auto_1fr] gap-10 items-center mb-8">
+          <div className="flex justify-center">
+            <Thermometer value={stress} size="medium" />
           </div>
           <div>
-            <span
-              className="font-serif text-5xl font-semibold leading-none transition-colors"
-              style={{ color: c.color }}
-            >
-              {stress}
-            </span>
-            <span className="text-base font-medium text-gray-500 ml-1">/10</span>
-          </div>
-        </div>
+            <div className="flex items-baseline gap-1.5 mb-6">
+              <span
+                className="font-serif text-6xl md:text-7xl font-bold leading-none transition-colors"
+                style={{ color: c.color }}
+              >
+                {stress}
+              </span>
+              <span className="text-xl text-gray-500 font-medium">/10</span>
+            </div>
+            <div className="font-serif text-xl italic text-gray-700 mb-7">{c.label}</div>
 
-        <div className="text-center text-base font-semibold uppercase tracking-wide text-gray-500 mb-6">
-          {c.label}
-        </div>
-
-        {/* Slider */}
-        <div className="mb-8">
-          <input
-            type="range"
-            min={1} max={10} step={1}
-            value={stress}
-            onChange={(e) => setStress(Number(e.target.value))}
-            className="w-full h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer"
-            style={{ accentColor: c.color }}
-          />
-          <div className="flex justify-between mt-3 text-xs text-gray-500 uppercase tracking-wider font-semibold">
-            <span>Steady</span>
-            <span>In crisis</span>
+            {/* Slider */}
+            <input
+              type="range"
+              min={1} max={10} step={1}
+              value={stress}
+              onChange={(e) => setStress(Number(e.target.value))}
+              className="w-full h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer"
+              style={{ accentColor: c.color }}
+            />
+            <div className="flex justify-between mt-3 text-xs text-gray-500 uppercase tracking-wider font-semibold">
+              <span>Steady</span>
+              <span>In crisis</span>
+            </div>
           </div>
         </div>
 
@@ -135,10 +128,10 @@ export function BurnoutCheck() {
             Your stress trajectory with sustained support
           </h4>
           <div className="grid grid-cols-4 gap-3">
-            <TimelineStop when="Today" value={stress} color={c.color} percent={stress * 10} current />
-            <TimelineStop when="3 mo" value={future3} color="#ffba06" percent={future3 * 10} />
-            <TimelineStop when="6 mo" value={future6} color="#80a4ed" percent={future6 * 10} />
-            <TimelineStop when="12 mo" value={future12} color="#80a4ed" percent={future12 * 10} />
+            <TimelineStop when="Today" value={stress} color={c.color} current />
+            <TimelineStop when="3 mo" value={future3} color="#ffba06" />
+            <TimelineStop when="6 mo" value={future6} color="#80a4ed" />
+            <TimelineStop when="12 mo" value={future12} color="#80a4ed" />
           </div>
         </div>
 
@@ -173,18 +166,18 @@ export function BurnoutCheck() {
   );
 }
 
-function TimelineStop({ when, value, color, percent, current }: { when: string; value: number; color: string; percent: number; current?: boolean }) {
+function TimelineStop({ when, value, color, current }: { when: string; value: number; color: string; current?: boolean }) {
   return (
     <div
-      className={`text-center p-4 rounded border ${current ? 'border-2' : 'border-gray-200'}`}
+      className={`text-center p-5 rounded-lg border ${current ? 'border-2' : 'border-gray-200'}`}
       style={current ? { borderColor: color, background: `${color}10` } : { background: '#fafafa' }}
     >
-      <div className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-2">{when}</div>
-      <div className="font-serif text-3xl font-bold leading-none mb-2" style={{ color }}>
-        {value}
+      <div className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-2.5">{when}</div>
+      <div className="flex justify-center mb-2.5">
+        <Thermometer value={value} size="small" />
       </div>
-      <div className="h-1 rounded-full bg-gray-200 overflow-hidden">
-        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${percent}%`, background: color }} />
+      <div className="font-serif text-2xl font-bold leading-none" style={{ color }}>
+        {value}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import Link from 'next/link';
 import TeamStrip from '@/components/TeamStrip'
+import { CompactAdmin } from '@/components/calculators/v2/compact/CompactAdmin';
 
 // GA4 scroll tracking hook
 function useScrollTracking() {
@@ -482,88 +483,22 @@ export default function ForSchoolsPage() {
       {/* SECTION 4: Benefit (The Math) */}
       <section
         id="section-benefit"
-        className="py-20 md:py-28"
-        style={{ backgroundColor: '#ffffff' }}
+        className="py-16 md:py-20 px-6"
+        style={{ backgroundColor: '#f5f5f5' }}
       >
-        <div className="container-default">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="text-xs uppercase tracking-widest font-bold mb-3" style={{ color: '#F96767' }}>
               The Math
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e2749', fontFamily: 'serif' }}>
+              Where does your PD budget actually go?
             </h2>
-            <p className="text-center text-lg mb-12" style={{ color: '#1e2749', opacity: 0.7 }}>
-              Compare your current PD investment to a TDI partnership.
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#4b5563' }}>
+              Most schools spend $15-20K a year on PD that produces a 10% implementation rate. TDI delivers 65%. 6.5x the classroom impact - and most schools already have the funding.
             </p>
-
-            {/* Side-by-side comparison */}
-            <div className="grid md:grid-cols-2 gap-6 md:gap-8 mb-10">
-              {/* Traditional PD */}
-              <div className="p-8 rounded-2xl" style={{ backgroundColor: '#fef2f2', border: '2px solid #fecaca' }}>
-                <h3 className="text-xl font-bold mb-6 text-center" style={{ color: '#991b1b' }}>Traditional PD</h3>
-                <div className="space-y-5">
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Annual cost</span>
-                    <span className="text-xl font-bold" style={{ color: '#1e2749' }}>$15-20K</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Implementation rate</span>
-                    <span className="text-xl font-bold" style={{ color: '#ef4444' }}>10%</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Retention tracking</span>
-                    <span className="text-xl font-bold" style={{ color: '#1e2749' }}>None</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Sustained coaching</span>
-                    <span className="text-xl font-bold" style={{ color: '#1e2749' }}>Rare</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* TDI Partnership */}
-              <div className="p-8 rounded-2xl" style={{ backgroundColor: '#f0fdf4', border: '2px solid #86efac' }}>
-                <h3 className="text-xl font-bold mb-6 text-center" style={{ color: '#166534' }}>TDI Partnership</h3>
-                <div className="space-y-5">
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Starting at</span>
-                    <span className="text-xl font-bold" style={{ color: '#1e2749' }}>$6,600</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Implementation rate</span>
-                    <span className="text-xl font-bold" style={{ color: '#22c55e' }}>65%</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Retention savings</span>
-                    <span className="text-xl font-bold" style={{ color: '#1e2749' }}>$20-25K/teacher</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Sustained coaching</span>
-                    <span className="text-xl font-bold" style={{ color: '#22c55e' }}>Built-in</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <p className="text-center text-lg font-semibold mb-6" style={{ color: '#38618C' }}>
-              6.5x the classroom impact at a fraction of the cost
-            </p>
-
-            <p className="text-center text-sm mb-8" style={{ color: '#1e2749', opacity: 0.5 }}>
-              (Learning Policy Institute, 2024; urban district average)
-            </p>
-
-            <div className="text-center">
-              <Link
-                href="/get-started"
-                className="inline-flex items-center gap-2 font-semibold transition-all hover:gap-3"
-                style={{ color: '#35A7FF' }}
-              >
-                See your school&apos;s specific numbers
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
           </div>
+          <CompactAdmin />
         </div>
       </section>
 

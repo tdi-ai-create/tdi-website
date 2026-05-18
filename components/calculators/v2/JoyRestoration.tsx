@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Battery } from './visuals';
 
 const joyMap: Record<number, { color: string; light: string; label: string }> = {
   1:  { color: '#57534e', light: '#a8a29e', label: 'Just clocking in' },
@@ -52,47 +53,35 @@ export function JoyRestoration() {
           How connected do you feel to your purpose as a teacher right now?
         </h3>
 
-        {/* Orb + number */}
-        <div className="flex items-center justify-center gap-5 mb-7 min-h-[60px]">
-          <div
-            className="w-14 h-14 rounded-full transition-all duration-500 relative"
-            style={{
-              background: `radial-gradient(circle at 30% 30%, ${c.light}, ${c.color} 70%)`,
-              boxShadow: `0 0 0 8px ${c.color}1F`,
-            }}
-          >
-            <div
-              className="absolute inset-2 rounded-full"
-              style={{ background: 'radial-gradient(circle at 35% 35%, rgba(255,255,255,0.4), transparent 60%)' }}
-            />
+        {/* Battery + number + slider */}
+        <div className="grid md:grid-cols-[auto_1fr] gap-10 items-center mb-8">
+          <div className="flex justify-center">
+            <Battery value={joy} size="medium" />
           </div>
           <div>
-            <span
-              className="font-serif text-5xl font-semibold leading-none transition-colors"
-              style={{ color: c.color }}
-            >
-              {joy}
-            </span>
-            <span className="text-base font-medium text-gray-500 ml-1">/10</span>
-          </div>
-        </div>
+            <div className="flex items-baseline gap-1.5 mb-6">
+              <span
+                className="font-serif text-6xl md:text-7xl font-bold leading-none transition-colors"
+                style={{ color: c.color }}
+              >
+                {joy}
+              </span>
+              <span className="text-xl text-gray-500 font-medium">/10</span>
+            </div>
+            <div className="font-serif text-xl italic mb-7" style={{ color: c.color }}>{c.label}</div>
 
-        <div className="text-center text-base font-semibold uppercase tracking-wide text-gray-500 mb-6">
-          {c.label}
-        </div>
-
-        <div className="mb-8">
-          <input
-            type="range"
-            min={1} max={10} step={1}
-            value={joy}
-            onChange={(e) => setJoy(Number(e.target.value))}
-            className="w-full h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer"
-            style={{ accentColor: c.color }}
-          />
-          <div className="flex justify-between mt-3 text-xs text-gray-500 uppercase tracking-wider font-semibold">
-            <span>Disconnected</span>
-            <span>Fully alive in it</span>
+            <input
+              type="range"
+              min={1} max={10} step={1}
+              value={joy}
+              onChange={(e) => setJoy(Number(e.target.value))}
+              className="w-full h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer"
+              style={{ accentColor: c.color }}
+            />
+            <div className="flex justify-between mt-3 text-xs text-gray-500 uppercase tracking-wider font-semibold">
+              <span>Disconnected</span>
+              <span>Fully alive in it</span>
+            </div>
           </div>
         </div>
 
@@ -111,10 +100,10 @@ export function JoyRestoration() {
             Your joy trajectory with the right support
           </h4>
           <div className="grid grid-cols-4 gap-3">
-            <TimelineStop when="Today" value={joy} color={c.color} percent={joy * 10} current />
-            <TimelineStop when="3 mo" value={future3} color="#0d7377" percent={future3 * 10} />
-            <TimelineStop when="6 mo" value={future6} color="#0d7377" percent={future6 * 10} />
-            <TimelineStop when="12 mo" value={future12} color="#0d7377" percent={future12 * 10} />
+            <TimelineStop when="Today" value={joy} color={c.color} current />
+            <TimelineStop when="3 mo" value={future3} color="#0d7377" />
+            <TimelineStop when="6 mo" value={future6} color="#0d7377" />
+            <TimelineStop when="12 mo" value={future12} color="#0d7377" />
           </div>
         </div>
 
@@ -138,18 +127,18 @@ export function JoyRestoration() {
   );
 }
 
-function TimelineStop({ when, value, color, percent, current }: { when: string; value: number; color: string; percent: number; current?: boolean }) {
+function TimelineStop({ when, value, color, current }: { when: string; value: number; color: string; current?: boolean }) {
   return (
     <div
-      className={`text-center p-4 rounded border ${current ? 'border-2' : 'border-gray-200'}`}
+      className={`text-center p-5 rounded-lg border ${current ? 'border-2' : 'border-gray-200'}`}
       style={current ? { borderColor: color, background: `${color}10` } : { background: '#fafafa' }}
     >
-      <div className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-2">{when}</div>
-      <div className="font-serif text-3xl font-bold leading-none mb-2" style={{ color }}>
-        {value}
+      <div className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-2.5">{when}</div>
+      <div className="flex justify-center mb-2.5">
+        <Battery value={value} size="small" />
       </div>
-      <div className="h-1 rounded-full bg-gray-200 overflow-hidden">
-        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${percent}%`, background: color }} />
+      <div className="font-serif text-2xl font-bold leading-none" style={{ color }}>
+        {value}
       </div>
     </div>
   );

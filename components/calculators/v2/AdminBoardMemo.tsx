@@ -1,10 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { grantsByState } from './grantsByState';
+import { Funnel } from './visuals';
 
 export function AdminBoardMemo() {
-  const [budget, setBudget] = useState(50000);
+  const searchParams = useSearchParams();
+  const budgetParam = searchParams?.get('budget');
+  const initialBudget = budgetParam
+    ? Math.max(10000, Math.min(200000, parseInt(budgetParam)))
+    : 50000;
+  const [budget, setBudget] = useState(isNaN(initialBudget) ? 50000 : initialBudget);
   const [teachers, setTeachers] = useState(50);
   const [morale, setMorale] = useState(5);
   const [benchmark, setBenchmark] = useState(50);
@@ -130,6 +137,9 @@ export function AdminBoardMemo() {
           <p className="text-sm text-gray-500 italic mb-6">
             Auto-generated from your inputs. Download. Forward. Bring to your budget meeting.
           </p>
+
+          {/* Funnel visual */}
+          <Funnel budget={budget} variant="side-by-side" />
 
           {/* Stat grid */}
           <div className="grid grid-cols-2 gap-3 mb-6">

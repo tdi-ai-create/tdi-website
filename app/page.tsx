@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
-import { TabbedCalculator } from '@/components/calculators/TabbedCalculator';
+import { DualTeaser } from '@/components/calculators/v2/compact/DualTeaser';
 import { FAQ } from '@/components/FAQ';
 import { ParallaxHero } from '@/components/ParallaxHero';
 import { CoursesSection } from '@/components/CoursesSection';
@@ -427,46 +427,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 8: Calculator with Parallax Background */}
-      <section className="relative py-16 md:py-24 overflow-hidden">
-        {/* Parallax Background Image */}
-        <div
-          className="absolute inset-0 parallax-calc-bg"
-          style={{
-            backgroundImage: "url('/images/calculator-background.webp')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center center',
-            backgroundRepeat: 'no-repeat',
-            backgroundAttachment: 'fixed',
-          }}
-        />
-
-        {/* Dark Overlay for readability */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundColor: 'rgba(30, 39, 73, 0.85)'
-          }}
-        />
-
-        {/* Calculator Content */}
-        <div className="relative z-10 container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#ffffff' }}>
-            See What's Possible
+      {/* SECTION 8: Calculator */}
+      <section className="py-16 md:py-20 px-6" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+            See What&apos;s Possible
           </h2>
-          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
-            Whether you're a school leader or a teacher,<br />explore the potential impact of partnering with TDI.
+          <p className="text-center mb-12 max-w-2xl mx-auto text-lg" style={{ color: '#4b5563' }}>
+            Whether you&apos;re a school leader or a classroom teacher, see how TDI can make a difference.
           </p>
-
-          {/* Calculator Component */}
-          <TabbedCalculator />
-
-          <div className="text-center mt-6 p-4 rounded-lg max-w-xl mx-auto" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(4px)' }}>
-            <p className="text-sm font-medium" style={{ color: '#ffffff' }}>
-              TDI partnerships start at $6,600. Most schools offset 50-80% through Title II-A, IV-A, or state PD grants.{' '}
-              <Link href="/funding" className="underline font-bold" style={{ color: '#ffba06' }}>See your funding options →</Link>
-            </p>
-          </div>
+          <DualTeaser />
         </div>
       </section>
 
