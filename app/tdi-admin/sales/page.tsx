@@ -86,19 +86,19 @@ interface Opportunity {
 
 const STAGE_DISPLAY: Record<string, string> = {
   unassigned: 'Unassigned',
-  targeting: 'Targeting (0%)',
-  engaged: 'Engaged (10%)',
-  qualified: 'Qualified (30%)',
-  likely_yes: 'Likely Yes (50%)',
-  proposal_sent: 'Proposal Sent (70%)',
-  signed: 'Signed (90%)',
+  targeting: 'Targeting (5%)',
+  engaged: 'Engaged (20%)',
+  qualified: 'Qualified (45%)',
+  likely_yes: 'Likely Yes (65%)',
+  proposal_sent: 'Proposal Sent (80%)',
+  signed: 'Signed (95%)',
   paid: 'Paid (100%)',
   lost: 'Lost',
 }
 
 const STAGE_PROBABILITY: Record<string, number> = {
-  unassigned: 0, targeting: 0, engaged: 10, qualified: 30,
-  likely_yes: 50, proposal_sent: 70, signed: 90, paid: 100, lost: 0,
+  unassigned: 0, targeting: 5, engaged: 20, qualified: 45,
+  likely_yes: 65, proposal_sent: 80, signed: 95, paid: 100, lost: 0,
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -627,7 +627,7 @@ export default function SalesPage() {
   const stats = useMemo(() => {
     const callSheetOpps = activeOpps.filter(o => o.onCallSheet)
     return {
-      totalPipeline: activeOpps.reduce((s, o) => s + (o.value ?? 0), 0),
+      totalPipeline: activeOpps.reduce((s, o) => s + ((o.value ?? 0) * (o.probability ?? 0) / 100), 0),
       activeCount: activeOpps.length,
       hotCount: activeOpps.filter(o => o.heat === 'hot').length,
       invoiceCount: opportunities.filter(o => o.needs_invoice && !o.deleted_at).length,
