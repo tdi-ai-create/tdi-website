@@ -122,7 +122,7 @@ export default function Home() {
       <AnimatedStatsBar
         stats={[
           { value: 100000, suffix: '+', label: 'Educators in Our Community' },
-          { value: 65, suffix: '%', label: 'Implementation Rate', subtext: 'vs 10% industry average' },
+          { value: 74, suffix: '%', label: 'Implementation Rate', subtext: 'vs 10% industry average' },
           { value: 94, suffix: '%', label: 'Would Recommend' },
           { value: 50, label: 'States + 100 Countries' },
         ]}
