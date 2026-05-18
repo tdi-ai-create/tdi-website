@@ -136,7 +136,7 @@ export default function CertifiedStatesMap() {
                   </div>
                   <span style="font-weight:700;font-size:14px;color:#1e2749;">Approved!</span>
                 </div>
-                <div style="font-size:12px;color:#6B7280;line-height:1.4;">Click to learn more about TDI PD in this state</div>
+                <div style="font-size:12px;color:#1e2749;line-height:1.4;font-weight:600;">↓ Click to see more</div>
               `);
           })
           .on('mouseout', function() {

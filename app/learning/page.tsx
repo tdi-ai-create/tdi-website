@@ -33,7 +33,7 @@ export default function HubWelcomePage() {
  </section>
 
  {/* 2. WHAT EDUCATORS SEE */}
- <section id="features" style={{ padding: '80px 16px', backgroundColor: 'white' }}>
+ <section id="features" style={{ padding: '56px 16px', backgroundColor: 'white' }}>
  <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
  <div style={{ textAlign: 'center', marginBottom: 48 }}>
  <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
@@ -94,7 +94,7 @@ export default function HubWelcomePage() {
  </section>
 
  {/* Certified in All 50 States */}
- <section style={{ padding: '80px 16px', backgroundColor: '#ffffff' }}>
+ <section style={{ padding: '56px 16px', backgroundColor: '#ffffff' }}>
  <div style={{ maxWidth: 1100, margin: '0 auto' }}>
  <div style={{ textAlign: 'center', marginBottom: 40 }}>
  <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
@@ -112,7 +112,7 @@ export default function HubWelcomePage() {
  </section>
 
  {/* 7. IN-LESSON COMMUNITY (Not a quiz) */}
- <section style={{ padding: '80px 16px', backgroundColor: 'white' }}>
+ <section style={{ padding: '56px 16px', backgroundColor: 'white' }}>
  <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
  <div style={{ textAlign: 'center', marginBottom: 48 }}>
  <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
@@ -153,7 +153,7 @@ export default function HubWelcomePage() {
  </section>
 
  {/* 6. ONE HUB. TWO VIEWS. */}
- <section style={{ padding: '80px 16px', backgroundColor: '#E6F1FB' }}>
+ <section style={{ padding: '56px 16px', backgroundColor: '#E6F1FB' }}>
  <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
  <div style={{ textAlign: 'center', marginBottom: 48 }}>
  <h2 style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0' }}>One Hub. Two Views.</h2>
@@ -219,7 +219,7 @@ export default function HubWelcomePage() {
  </section>
 
  {/* 8. MOMENT MODE */}
- <section style={{ padding: '80px 16px', backgroundColor: '#1e2749' }}>
+ <section style={{ padding: '56px 16px', backgroundColor: '#1e2749' }}>
  <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 48, alignItems: 'center' }}>
  <div>
@@ -247,7 +247,7 @@ export default function HubWelcomePage() {
  </section>
 
  {/* 4. IMPLEMENTATION STAT */}
- <section style={{ padding: '80px 16px', backgroundColor: '#E6F1FB' }}>
+ <section style={{ padding: '56px 16px', backgroundColor: '#E6F1FB' }}>
  <div className="container-default" style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
  <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#185FA5', marginBottom: 16 }}>
  Implementation That Sticks
@@ -267,7 +267,7 @@ export default function HubWelcomePage() {
  </section>
 
  {/* 2.5 TESTIMONIALS */}
- <section style={{ padding: '80px 16px', backgroundColor: '#1e2749' }}>
+ <section style={{ padding: '56px 16px', backgroundColor: '#1e2749' }}>
  <div className="container-default" style={{ maxWidth: 1100, margin: '0 auto' }}>
  <div style={{ textAlign: 'center', marginBottom: 48 }}>
  <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#ffba06', marginBottom: 12 }}>
@@ -309,7 +309,7 @@ export default function HubWelcomePage() {
  </section>
 
  {/* 3. COMMUNITY CHECK-INS */}
- <section style={{ padding: '80px 16px', backgroundColor: '#0F6E56' }}>
+ <section style={{ padding: '56px 16px', backgroundColor: '#0F6E56' }}>
  <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
  <div style={{ textAlign: 'center', marginBottom: 48 }}>
  <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#ffba06', marginBottom: 12 }}>
@@ -365,7 +365,7 @@ export default function HubWelcomePage() {
  </section>
 
  {/* 9. IMPLEMENTATION & COMPLIANCE ANALYTICS (text-only) */}
- <section style={{ padding: '80px 16px', backgroundColor: 'white' }}>
+ <section style={{ padding: '56px 16px', backgroundColor: 'white' }}>
  <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
  <div style={{ textAlign: 'center', marginBottom: 48 }}>
  <span style={{ display: 'inline-block', padding: '6px 14px', background: '#1e2749', color: 'white', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 16 }}>
@@ -410,7 +410,7 @@ export default function HubWelcomePage() {
  </section>
 
  {/* 10. PRICING */}
- <section style={{ padding: '80px 16px', backgroundColor: '#f9fafb' }}>
+ <section style={{ padding: '56px 16px', backgroundColor: '#f9fafb' }}>
  <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
  <div style={{ textAlign: 'center', marginBottom: 48 }}>
  <h2 style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0' }}>Membership Plans</h2>
@@ -491,7 +491,7 @@ export default function HubWelcomePage() {
  </section>
 
  {/* FAQ */}
- <section style={{ padding: '80px 16px', backgroundColor: '#F9FAFB' }}>
+ <section style={{ padding: '56px 16px', backgroundColor: '#F9FAFB' }}>
  <div style={{ maxWidth: 800, margin: '0 auto' }}>
  <div style={{ textAlign: 'center', marginBottom: 40 }}>
  <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
@@ -571,7 +571,7 @@ export default function HubWelcomePage() {
  </section>
 
  {/* 11. FINAL CTA */}
- <section style={{ padding: '80px 16px', backgroundColor: '#1e2749' }}>
+ <section style={{ padding: '56px 16px', backgroundColor: '#1e2749' }}>
  <div className="container-default" style={{ maxWidth: 720, margin: '0 auto', textAlign: 'center' }}>
  <h2 style={{ fontSize: 36, fontWeight: 700, color: 'white', margin: '0 0 16px 0' }}>Ready to give your team PD that sticks?</h2>
  <p style={{ fontSize: 16, color: 'white', opacity: 0.85, margin: '0 0 32px 0' }}>
