@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import { useState, useEffect } from 'react';
 import SymbolAnimation from '@/components/SymbolAnimation';
 import ContentCreatorsSection from '@/components/ContentCreatorsSection';
@@ -591,6 +592,24 @@ export default function AboutPage() {
               They're done pretending burnout is a badge of honor. They're practical optimists who believe there's a smarter way to do this work. They're still here because they still believe in teaching. They just refuse to destroy themselves doing it.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Certified in All 50 States */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#E6F1FB' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              OUR REACH
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              Serving educators in all 50 states
+            </h2>
+            <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
+              From day one, our mission has been to reach every classroom. Today TDI is in all 50 US states and 100+ countries. Hover any state to explore.
+            </p>
+          </div>
+          <CertifiedStatesMap />
         </div>
       </section>
 

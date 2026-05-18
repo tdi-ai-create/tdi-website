@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import Link from 'next/link';
 import Script from 'next/script';
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -759,6 +760,24 @@ export default function CreateWithUsPage() {
                 </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Certified in All 50 States */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#E6F1FB' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              YOUR AUDIENCE
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              Your content reaches educators in every state
+            </h2>
+            <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
+              When you create with TDI, your work lands in classrooms across all 50 US states and 100+ countries. Hover any state to explore our reach.
+            </p>
+          </div>
+          <CertifiedStatesMap />
         </div>
       </section>
 
