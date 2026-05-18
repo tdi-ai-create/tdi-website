@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
+import TeamStrip from '@/components/TeamStrip';
 import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import { CoursesSection } from '@/components/CoursesSection';
 import { TabbedCalculator } from '@/components/calculators';

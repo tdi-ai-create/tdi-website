@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import AboutCreatorsSection from '@/components/AboutCreatorsSection';
 import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import Link from 'next/link';
 import Script from 'next/script';
@@ -748,40 +749,7 @@ export default function CreateWithUsPage() {
               Join these incredible educators who are already making an impact through TDI.
             </p>
           </div>
-
-          <div
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 opacity-0 translate-y-8 transition-all duration-700 delay-200"
-            data-animate="true"
-          >
-            {creators.map((creator) => (
-                <div
-                  key={creator.id || creator.name}
-                  className="bg-white border rounded-xl p-5 text-center hover:shadow-md transition-shadow duration-300"
-                  style={{ borderColor: '#E5E7EB' }}
-                >
-                  {(() => {
-                    const topicConfig = getTopicConfig(creator.topic);
-                    const TopicIcon = ICON_MAP[topicConfig.icon] || Sparkles;
-                    return creator.headshotUrl ? (
-                      <img
-                        src={creator.headshotUrl}
-                        alt={creator.name}
-                        className="w-16 h-16 rounded-full mx-auto mb-3 object-cover"
-                      />
-                    ) : (
-                      <div
-                        className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center"
-                        style={{ backgroundColor: topicConfig.background, border: `1.5px solid ${topicConfig.border}` }}
-                      >
-                        <TopicIcon style={{ width: 28, height: 28, color: topicConfig.iconColor }} />
-                      </div>
-                    );
-                  })()}
-                  <p className="font-bold text-base mb-1" style={{ color: '#1a1a2e' }}>{creator.name}</p>
-                  <p className="text-sm" style={{ color: '#6B7280' }}>{creator.topic || creator.title || 'Content Creator'}</p>
-                </div>
-            ))}
-          </div>
+          <AboutCreatorsSection />
         </div>
       </section>
 
