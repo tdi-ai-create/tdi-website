@@ -93,6 +93,161 @@ export default function HubWelcomePage() {
  </div>
  </section>
 
+ {/* 7. IN-LESSON COMMUNITY (Not a quiz) */}
+ <section style={{ padding: '80px 16px', backgroundColor: 'white' }}>
+ <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
+ <div style={{ textAlign: 'center', marginBottom: 48 }}>
+ <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+ Every Lesson, A Conversation
+ </p>
+ <h2 style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0' }}>Not a quiz. A community.</h2>
+ <p style={{ fontSize: 16, color: '#6B7280', maxWidth: 700, margin: '0 auto' }}>
+ Every lesson opens up a conversation thread. Educators share what they tried, what they adapted, and what got stuck - so the next teacher learns from the last.
+ </p>
+ </div>
+
+ <div style={{ width: '100%', maxWidth: 1000, margin: '0 auto 32px', borderRadius: 12, overflow: 'hidden' }}>
+ <Image src="/hub-welcome/hub-conversation.png" alt="Community conversation per lesson" width={1200} height={675} style={{ width: '100%', height: 'auto', display: 'block' }} />
+ </div>
+
+ <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, maxWidth: 900, margin: '0 auto' }}>
+ {[
+ { label: 'Tried it', color: '#0F6E56', bg: '#E1F5EE' },
+ { label: 'Adapted it', color: '#854F0B', bg: '#FAEEDA' },
+ { label: 'Still trying', color: '#185FA5', bg: '#E6F1FB' },
+ { label: 'Got stuck', color: '#993C1D', bg: '#FAECE7' },
+ { label: 'Didn\'t land', color: '#6B7280', bg: '#F1F3F5' },
+ ].map((tag, i) => (
+ <div key={i} style={{ padding: '12px 8px', borderRadius: 8, background: tag.bg, textAlign: 'center' }}>
+ <p style={{ fontSize: 13, fontWeight: 600, color: tag.color, margin: 0 }}>{tag.label}</p>
+ </div>
+ ))}
+ </div>
+ <p style={{ textAlign: 'center', fontSize: 13, color: '#6B7280', margin: '16px 0 0 0' }}>
+ Five honest contribution types replace star ratings. Real teachers. Real stories. No survey fatigue.
+ </p>
+ <div style={{ textAlign: 'center', marginTop: 48 }}>
+ <Link href="/learning/plans" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '14px 32px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
+ Join the Hub
+ </Link>
+ </div>
+ </div>
+ </section>
+
+ {/* 6. ONE HUB. TWO VIEWS. */}
+ <section style={{ padding: '80px 16px', backgroundColor: '#E6F1FB' }}>
+ <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
+ <div style={{ textAlign: 'center', marginBottom: 48 }}>
+ <h2 style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0' }}>One Hub. Two Views.</h2>
+ <p style={{ fontSize: 16, color: '#6B7280', maxWidth: 600, margin: '0 auto' }}>
+ Built for the people doing the work, and the people leading them.
+ </p>
+ </div>
+
+ <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: 32 }}>
+ <div style={{ background: 'white', borderRadius: 16, padding: 24, border: '0.5px solid #E5E7EB' }}>
+ <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', color: '#2A9D8F', margin: '0 0 8px 0' }}>For Educators</p>
+ <h3 style={{ fontSize: 22, fontWeight: 600, color: '#1e2749', margin: '0 0 12px 0' }}>Learn at your own pace</h3>
+ <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: '0 0 20px 0' }}>
+ Full courses, quick wins, an AI tutor, and a community that knows what your classroom actually looks like.
+ </p>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+ <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
+ <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E1F5EE', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#0F6E56', fontWeight: 600, fontSize: 12 }}>✓</span>
+ Full course library + Quick Wins
+ </div>
+ <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
+ <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E1F5EE', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#0F6E56', fontWeight: 600, fontSize: 12 }}>✓</span>
+ Desi AI tutor on call
+ </div>
+ <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
+ <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E1F5EE', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#0F6E56', fontWeight: 600, fontSize: 12 }}>✓</span>
+ Moment Mode for wellness
+ </div>
+ <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
+ <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E1F5EE', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#0F6E56', fontWeight: 600, fontSize: 12 }}>✓</span>
+ PD certificates + transformation tracker
+ </div>
+ </div>
+ </div>
+
+ <div style={{ background: 'white', borderRadius: 16, padding: 24, border: '0.5px solid #E5E7EB' }}>
+ <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', color: '#2A9D8F', margin: '0 0 8px 0' }}>For Admins</p>
+ <h3 style={{ fontSize: 22, fontWeight: 600, color: '#1e2749', margin: '0 0 12px 0' }}>See exactly what's working</h3>
+ <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: '0 0 20px 0' }}>
+ Implementation analytics, board-ready reports, and compliance documentation pulled from real classroom data.
+ </p>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+ <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
+ <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E6F1FB', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#185FA5', fontWeight: 600, fontSize: 12 }}>✓</span>
+ Real-time implementation tracking
+ </div>
+ <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
+ <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E6F1FB', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#185FA5', fontWeight: 600, fontSize: 12 }}>✓</span>
+ Board-ready progress reports
+ </div>
+ <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
+ <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E6F1FB', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#185FA5', fontWeight: 600, fontSize: 12 }}>✓</span>
+ Building-level dashboards
+ </div>
+ <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
+ <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E6F1FB', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#185FA5', fontWeight: 600, fontSize: 12 }}>✓</span>
+ Compliance + evaluation evidence
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ {/* 8. MOMENT MODE */}
+ <section style={{ padding: '80px 16px', backgroundColor: '#1e2749' }}>
+ <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
+ <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 48, alignItems: 'center' }}>
+ <div>
+ <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#ffba06', marginBottom: 16 }}>
+ Moment Mode
+ </p>
+ <h2 style={{ fontSize: 36, fontWeight: 700, color: 'white', margin: '0 0 20px 0', lineHeight: 1.15 }}>
+ A sacred space built for the moments you need to pause.
+ </h2>
+ <p style={{ fontSize: 16, color: 'white', opacity: 0.85, lineHeight: 1.7, margin: '0 0 16px 0' }}>
+ Research shows just 3 minutes of intentional pause can lower cortisol and reset your nervous system. So we built one into the Hub.
+ </p>
+ <p style={{ fontSize: 16, color: 'white', opacity: 0.85, lineHeight: 1.7, margin: '0 0 24px 0' }}>
+ No one is tracking this. No one is watching. Just breathing exercises, affirmations, gentle tools, and journaling - for when you need them.
+ </p>
+ <p style={{ fontSize: 15, color: '#ffba06', fontStyle: 'italic', margin: 0 }}>
+ You deserve to pause without guilt.
+ </p>
+ </div>
+ <div style={{ width: '100%', borderRadius: 12, overflow: 'hidden' }}>
+ <Image src="/hub-welcome/hub-moment-mode.png" alt="Moment Mode pause space" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
+ </div>
+ </div>
+ </div>
+ </section>
+
+ {/* 4. IMPLEMENTATION STAT */}
+ <section style={{ padding: '80px 16px', backgroundColor: '#E6F1FB' }}>
+ <div className="container-default" style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
+ <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#185FA5', marginBottom: 16 }}>
+ Implementation That Sticks
+ </p>
+ <h2 style={{ fontSize: 'clamp(40px, 6vw, 64px)', fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.1 }}>
+ 75% of teachers implement a strategy within 10 days.
+ </h2>
+ <p style={{ fontSize: 18, color: '#1e2749', opacity: 0.75, maxWidth: 600, margin: '0 auto', lineHeight: 1.6 }}>
+ That's over 7x the industry average of just 10% implementation in 180 days. The Hub is one piece of our research-backed approach to educator learning that actually transfers to the classroom.
+ </p>
+ <div style={{ textAlign: 'center', marginTop: 48 }}>
+ <Link href="/learning/plans" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '14px 32px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
+ Join the Hub
+ </Link>
+ </div>
+ </div>
+ </section>
+
  {/* 2.5 TESTIMONIALS */}
  <section style={{ padding: '80px 16px', backgroundColor: '#1e2749' }}>
  <div className="container-default" style={{ maxWidth: 1100, margin: '0 auto' }}>
@@ -170,23 +325,21 @@ export default function HubWelcomePage() {
  </div>
  </section>
 
- {/* 4. IMPLEMENTATION STAT */}
- <section style={{ padding: '80px 16px', backgroundColor: '#E6F1FB' }}>
- <div className="container-default" style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
- <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#185FA5', marginBottom: 16 }}>
- Implementation That Sticks
+ {/* Certified in All 50 States */}
+ <section style={{ padding: '80px 16px', backgroundColor: '#ffffff' }}>
+ <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+ <div style={{ textAlign: 'center', marginBottom: 40 }}>
+ <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+ PD CREDIT APPROVED
  </p>
- <h2 style={{ fontSize: 'clamp(40px, 6vw, 64px)', fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.1 }}>
- 75% of teachers implement a strategy within 10 days.
+ <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+ Approved in all 50 states
  </h2>
- <p style={{ fontSize: 18, color: '#1e2749', opacity: 0.75, maxWidth: 600, margin: '0 auto', lineHeight: 1.6 }}>
- That's over 7x the industry average of just 10% implementation in 180 days. The Hub is one piece of our research-backed approach to educator learning that actually transfers to the classroom.
+ <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
+ Teachers Deserve It PD Credits are approved for professional development hours in every US state. Hover any state to confirm.
  </p>
- <div style={{ textAlign: 'center', marginTop: 48 }}>
- <Link href="/learning/plans" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '14px 32px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
- Join the Hub
- </Link>
  </div>
+ <CertifiedStatesMap />
  </div>
  </section>
 
@@ -208,141 +361,6 @@ export default function HubWelcomePage() {
  linkText="Meet our creators"
  linkHref="/about#creators"
  />
- </div>
- </section>
-
- {/* 6. ONE HUB. TWO VIEWS. */}
- <section style={{ padding: '80px 16px', backgroundColor: '#E6F1FB' }}>
- <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
- <div style={{ textAlign: 'center', marginBottom: 48 }}>
- <h2 style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0' }}>One Hub. Two Views.</h2>
- <p style={{ fontSize: 16, color: '#6B7280', maxWidth: 600, margin: '0 auto' }}>
- Built for the people doing the work, and the people leading them.
- </p>
- </div>
-
- <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: 32 }}>
- <div style={{ background: 'white', borderRadius: 16, padding: 24, border: '0.5px solid #E5E7EB' }}>
- <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', color: '#2A9D8F', margin: '0 0 8px 0' }}>For Educators</p>
- <h3 style={{ fontSize: 22, fontWeight: 600, color: '#1e2749', margin: '0 0 12px 0' }}>Learn at your own pace</h3>
- <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: '0 0 20px 0' }}>
- Full courses, quick wins, an AI tutor, and a community that knows what your classroom actually looks like.
- </p>
- <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
- <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
- <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E1F5EE', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#0F6E56', fontWeight: 600, fontSize: 12 }}>✓</span>
- Full course library + Quick Wins
- </div>
- <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
- <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E1F5EE', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#0F6E56', fontWeight: 600, fontSize: 12 }}>✓</span>
- Desi AI tutor on call
- </div>
- <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
- <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E1F5EE', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#0F6E56', fontWeight: 600, fontSize: 12 }}>✓</span>
- Moment Mode for wellness
- </div>
- <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
- <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E1F5EE', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#0F6E56', fontWeight: 600, fontSize: 12 }}>✓</span>
- PD certificates + transformation tracker
- </div>
- </div>
- </div>
-
- <div style={{ background: 'white', borderRadius: 16, padding: 24, border: '0.5px solid #E5E7EB' }}>
- <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', color: '#2A9D8F', margin: '0 0 8px 0' }}>For Admins</p>
- <h3 style={{ fontSize: 22, fontWeight: 600, color: '#1e2749', margin: '0 0 12px 0' }}>See exactly what's working</h3>
- <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: '0 0 20px 0' }}>
- Implementation analytics, board-ready reports, and compliance documentation pulled from real classroom data.
- </p>
- <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
- <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
- <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E6F1FB', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#185FA5', fontWeight: 600, fontSize: 12 }}>✓</span>
- Real-time implementation tracking
- </div>
- <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
- <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E6F1FB', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#185FA5', fontWeight: 600, fontSize: 12 }}>✓</span>
- Board-ready progress reports
- </div>
- <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
- <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E6F1FB', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#185FA5', fontWeight: 600, fontSize: 12 }}>✓</span>
- Building-level dashboards
- </div>
- <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#1e2749' }}>
- <span style={{ width: 24, height: 24, borderRadius: 6, background: '#E6F1FB', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#185FA5', fontWeight: 600, fontSize: 12 }}>✓</span>
- Compliance + evaluation evidence
- </div>
- </div>
- </div>
- </div>
- </div>
- </section>
-
- {/* 7. IN-LESSON COMMUNITY (Not a quiz) */}
- <section style={{ padding: '80px 16px', backgroundColor: 'white' }}>
- <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
- <div style={{ textAlign: 'center', marginBottom: 48 }}>
- <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
- Every Lesson, A Conversation
- </p>
- <h2 style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0' }}>Not a quiz. A community.</h2>
- <p style={{ fontSize: 16, color: '#6B7280', maxWidth: 700, margin: '0 auto' }}>
- Every lesson opens up a conversation thread. Educators share what they tried, what they adapted, and what got stuck - so the next teacher learns from the last.
- </p>
- </div>
-
- <div style={{ width: '100%', maxWidth: 1000, margin: '0 auto 32px', borderRadius: 12, overflow: 'hidden' }}>
- <Image src="/hub-welcome/hub-conversation.png" alt="Community conversation per lesson" width={1200} height={675} style={{ width: '100%', height: 'auto', display: 'block' }} />
- </div>
-
- <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, maxWidth: 900, margin: '0 auto' }}>
- {[
- { label: 'Tried it', color: '#0F6E56', bg: '#E1F5EE' },
- { label: 'Adapted it', color: '#854F0B', bg: '#FAEEDA' },
- { label: 'Still trying', color: '#185FA5', bg: '#E6F1FB' },
- { label: 'Got stuck', color: '#993C1D', bg: '#FAECE7' },
- { label: 'Didn\'t land', color: '#6B7280', bg: '#F1F3F5' },
- ].map((tag, i) => (
- <div key={i} style={{ padding: '12px 8px', borderRadius: 8, background: tag.bg, textAlign: 'center' }}>
- <p style={{ fontSize: 13, fontWeight: 600, color: tag.color, margin: 0 }}>{tag.label}</p>
- </div>
- ))}
- </div>
- <p style={{ textAlign: 'center', fontSize: 13, color: '#6B7280', margin: '16px 0 0 0' }}>
- Five honest contribution types replace star ratings. Real teachers. Real stories. No survey fatigue.
- </p>
- <div style={{ textAlign: 'center', marginTop: 48 }}>
- <Link href="/learning/plans" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '14px 32px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
- Join the Hub
- </Link>
- </div>
- </div>
- </section>
-
- {/* 8. MOMENT MODE */}
- <section style={{ padding: '80px 16px', backgroundColor: '#1e2749' }}>
- <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
- <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 48, alignItems: 'center' }}>
- <div>
- <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#ffba06', marginBottom: 16 }}>
- Moment Mode
- </p>
- <h2 style={{ fontSize: 36, fontWeight: 700, color: 'white', margin: '0 0 20px 0', lineHeight: 1.15 }}>
- A sacred space built for the moments you need to pause.
- </h2>
- <p style={{ fontSize: 16, color: 'white', opacity: 0.85, lineHeight: 1.7, margin: '0 0 16px 0' }}>
- Research shows just 3 minutes of intentional pause can lower cortisol and reset your nervous system. So we built one into the Hub.
- </p>
- <p style={{ fontSize: 16, color: 'white', opacity: 0.85, lineHeight: 1.7, margin: '0 0 24px 0' }}>
- No one is tracking this. No one is watching. Just breathing exercises, affirmations, gentle tools, and journaling - for when you need them.
- </p>
- <p style={{ fontSize: 15, color: '#ffba06', fontStyle: 'italic', margin: 0 }}>
- You deserve to pause without guilt.
- </p>
- </div>
- <div style={{ width: '100%', borderRadius: 12, overflow: 'hidden' }}>
- <Image src="/hub-welcome/hub-moment-mode.png" alt="Moment Mode pause space" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
- </div>
- </div>
  </div>
  </section>
 
@@ -469,24 +487,6 @@ export default function HubWelcomePage() {
  <p style={{ textAlign: 'center', marginTop: 32, fontSize: 13, color: '#6B7280' }}>
  Bulk pricing available for schools and districts. <Link href="/for-schools" style={{ color: '#2A9D8F', fontWeight: 500 }}>See partnership options →</Link>
  </p>
- </div>
- </section>
-
- {/* Certified in All 50 States */}
- <section style={{ padding: '80px 16px', backgroundColor: '#ffffff' }}>
- <div style={{ maxWidth: 1100, margin: '0 auto' }}>
- <div style={{ textAlign: 'center', marginBottom: 40 }}>
- <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
- PD CREDIT APPROVED
- </p>
- <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
- Approved in all 50 states
- </h2>
- <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
- Teachers Deserve It PD Credits are approved for professional development hours in every US state. Hover any state to confirm.
- </p>
- </div>
- <CertifiedStatesMap />
  </div>
  </section>
 
