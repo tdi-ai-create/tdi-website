@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import { CoursesSection } from '@/components/CoursesSection';
 import { TabbedCalculator } from '@/components/calculators';
 
@@ -47,6 +48,211 @@ export default function JoinPage() {
           </div>
         </div>
       </section>
+
+      {/* Certified in All 50 States */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#E6F1FB' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              YES, THIS COUNTS IN YOUR STATE
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              Approved PD in all 50 states
+            </h2>
+            <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
+              Every hour you spend with TDI counts toward your PD recertification. Hover any state to confirm. Click for your state Department of Education link.
+            </p>
+          </div>
+          <CertifiedStatesMap />
+        </div>
+      </section>
+
+{/* 7. IN-LESSON COMMUNITY (Not a quiz) */}
+ <section style={{ padding: '56px 16px', backgroundColor: 'white' }}>
+ <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
+ <div style={{ textAlign: 'center', marginBottom: 48 }}>
+ <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+ Every Lesson, A Conversation
+ </p>
+ <h2 style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0' }}>Not a quiz. A community.</h2>
+ <p style={{ fontSize: 16, color: '#6B7280', maxWidth: 700, margin: '0 auto' }}>
+ Every lesson opens up a conversation thread. Educators share what they tried, what they adapted, and what got stuck - so the next teacher learns from the last.
+ </p>
+ </div>
+
+ <div style={{ width: '100%', maxWidth: 1000, margin: '0 auto 32px', borderRadius: 12, overflow: 'hidden' }}>
+ <Image src="/hub-welcome/hub-conversation.png" alt="Community conversation per lesson" width={1200} height={675} style={{ width: '100%', height: 'auto', display: 'block' }} />
+ </div>
+
+ <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, maxWidth: 900, margin: '0 auto' }}>
+ {[
+ { label: 'Tried it', color: '#0F6E56', bg: '#E1F5EE' },
+ { label: 'Adapted it', color: '#854F0B', bg: '#FAEEDA' },
+ { label: 'Still trying', color: '#185FA5', bg: '#E6F1FB' },
+ { label: 'Got stuck', color: '#993C1D', bg: '#FAECE7' },
+ { label: 'Didn\'t land', color: '#6B7280', bg: '#F1F3F5' },
+ ].map((tag, i) => (
+ <div key={i} style={{ padding: '12px 8px', borderRadius: 8, background: tag.bg, textAlign: 'center' }}>
+ <p style={{ fontSize: 13, fontWeight: 600, color: tag.color, margin: 0 }}>{tag.label}</p>
+ </div>
+ ))}
+ </div>
+ <p style={{ textAlign: 'center', fontSize: 13, color: '#6B7280', margin: '16px 0 0 0' }}>
+ Five honest contribution types replace star ratings. Real teachers. Real stories. No survey fatigue.
+ </p>
+ <div style={{ textAlign: 'center', marginTop: 48 }}>
+ <Link href="/learning/plans" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '14px 32px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
+ Join the Hub
+ </Link>
+ </div>
+ </div>
+ </section>
+
+{/* 8. MOMENT MODE */}
+ <section style={{ padding: '56px 16px', backgroundColor: '#1e2749' }}>
+ <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
+ <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 48, alignItems: 'center' }}>
+ <div>
+ <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#ffba06', marginBottom: 16 }}>
+ Moment Mode
+ </p>
+ <h2 style={{ fontSize: 36, fontWeight: 700, color: 'white', margin: '0 0 20px 0', lineHeight: 1.15 }}>
+ A sacred space built for the moments you need to pause.
+ </h2>
+ <p style={{ fontSize: 16, color: 'white', opacity: 0.85, lineHeight: 1.7, margin: '0 0 16px 0' }}>
+ Research shows just 3 minutes of intentional pause can lower cortisol and reset your nervous system. So we built one into the Hub.
+ </p>
+ <p style={{ fontSize: 16, color: 'white', opacity: 0.85, lineHeight: 1.7, margin: '0 0 24px 0' }}>
+ No one is tracking this. No one is watching. Just breathing exercises, affirmations, gentle tools, and journaling - for when you need them.
+ </p>
+ <p style={{ fontSize: 15, color: '#ffba06', fontStyle: 'italic', margin: 0 }}>
+ You deserve to pause without guilt.
+ </p>
+ </div>
+ <div style={{ width: '100%', borderRadius: 12, overflow: 'hidden' }}>
+ <Image src="/hub-welcome/hub-moment-mode.png" alt="Moment Mode pause space" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
+ </div>
+ </div>
+ </div>
+ </section>
+
+ {/* 4. IMPLEMENTATION STAT */}
+ <section style={{ padding: '56px 16px', backgroundColor: '#E6F1FB' }}>
+ <div className="container-default" style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
+ <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#185FA5', marginBottom: 16 }}>
+ Implementation That Sticks
+ </p>
+ <h2 style={{ fontSize: 'clamp(40px, 6vw, 64px)', fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.1 }}>
+ 75% of teachers implement a strategy within 10 days.
+ </h2>
+ <p style={{ fontSize: 18, color: '#1e2749', opacity: 0.75, maxWidth: 600, margin: '0 auto', lineHeight: 1.6 }}>
+ That's over 7x the industry average of just 10% implementation in 180 days. The Hub is one piece of our research-backed approach to educator learning that actually transfers to the classroom.
+ </p>
+ <div style={{ textAlign: 'center', marginTop: 48 }}>
+ <Link href="/learning/plans" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '14px 32px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
+ Join the Hub
+ </Link>
+ </div>
+ </div>
+ </section>
+
+ {/* 2.5 TESTIMONIALS */}
+ <section style={{ padding: '56px 16px', backgroundColor: '#1e2749' }}>
+ <div className="container-default" style={{ maxWidth: 1100, margin: '0 auto' }}>
+ <div style={{ textAlign: 'center', marginBottom: 48 }}>
+ <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#ffba06', marginBottom: 12 }}>
+ What Educators Are Saying
+ </p>
+ <h2 style={{ fontSize: 32, fontWeight: 700, color: 'white', margin: 0 }}>
+ Real teachers. Real classrooms. Real results.
+ </h2>
+ </div>
+
+ <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
+
+ <div style={{ padding: 28, background: 'rgba(255,255,255,0.05)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
+ <p style={{ fontSize: 16, color: 'white', lineHeight: 1.6, margin: '0 0 20px 0', fontStyle: 'italic' }}>
+ "I finally feel like I have strategies that work AND time to breathe. TDI changed how I approach my classroom and myself."
+ </p>
+ <p style={{ fontSize: 13, color: '#ffba06', margin: 0, fontWeight: 500 }}>Sarah K.</p>
+ <p style={{ fontSize: 12, color: 'white', opacity: 0.7, margin: 0 }}>5th Grade Teacher</p>
+ </div>
+
+ <div style={{ padding: 28, background: 'rgba(255,255,255,0.05)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
+ <p style={{ fontSize: 16, color: 'white', lineHeight: 1.6, margin: '0 0 20px 0', fontStyle: 'italic' }}>
+ "Our teachers are actually excited about PD now. I don't have to chase them down or babysit. They're learning because they want to."
+ </p>
+ <p style={{ fontSize: 13, color: '#ffba06', margin: 0, fontWeight: 500 }}>Michelle M.</p>
+ <p style={{ fontSize: 12, color: 'white', opacity: 0.7, margin: 0 }}>K-8 School Director</p>
+ </div>
+
+ <div style={{ padding: 28, background: 'rgba(255,255,255,0.05)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
+ <p style={{ fontSize: 16, color: 'white', lineHeight: 1.6, margin: '0 0 20px 0', fontStyle: 'italic' }}>
+ "This was the first PD I didn\'t have to apologize for. Our teachers actually thanked me."
+ </p>
+ <p style={{ fontSize: 13, color: '#ffba06', margin: 0, fontWeight: 500 }}>James T.</p>
+ <p style={{ fontSize: 12, color: 'white', opacity: 0.7, margin: 0 }}>School Principal</p>
+ </div>
+
+ </div>
+ </div>
+ </section>
+
+ {/* 3. COMMUNITY CHECK-INS */}
+ <section style={{ padding: '56px 16px', backgroundColor: '#0F6E56' }}>
+ <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
+ <div style={{ textAlign: 'center', marginBottom: 48 }}>
+ <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#ffba06', marginBottom: 12 }}>
+ Community Built. Community Driven. Community First.
+ </p>
+ <h2 style={{ fontSize: 32, fontWeight: 700, color: 'white', margin: '0 0 12px 0' }}>How we listen to teachers - without making it feel like a survey.</h2>
+ <p style={{ fontSize: 16, color: 'white', opacity: 0.85, maxWidth: 720, margin: '0 auto' }}>
+ The Hub collects signal across five dimensions of educator wellbeing. Color scales, two-choice prompts, word clouds, and fill-in-the-blanks. No long forms. No survey burnout. Just honest data on how teachers are really doing.
+ </p>
+ </div>
+
+ <div style={{ width: '100%', maxWidth: 1100, margin: '0 auto 32px', borderRadius: 12, overflow: 'hidden' }}>
+ <Image src="/hub-welcome/hub-checkin-categories.png" alt="Learning Hub Check-In Categories" width={1200} height={750} style={{ width: '100%', height: 'auto', display: 'block' }} />
+ </div>
+
+ <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, maxWidth: 1000, margin: '0 auto' }}>
+ {[
+ { num: '1', label: 'Mood / Stress', signal: 'mood trend alerts' },
+ { num: '2', label: 'Energy', signal: 'capacity signal' },
+ { num: '3', label: 'Belonging', signal: 'retention intent signal' },
+ { num: '4', label: 'Purpose', signal: 'connection-to-why signal' },
+ { num: '5', label: 'Needs', signal: 'content + support routing' },
+ ].map((cat, i) => (
+ <div key={i} style={{ padding: 16, background: 'rgba(255,255,255,0.95)', borderRadius: 10 }}>
+ <p style={{ fontSize: 11, fontWeight: 600, color: '#0F6E56', margin: '0 0 4px 0' }}>0{cat.num}</p>
+ <p style={{ fontSize: 14, fontWeight: 600, color: '#1e2749', margin: '0 0 4px 0' }}>{cat.label}</p>
+ <p style={{ fontSize: 11, color: '#6B7280', margin: 0 }}>feeds {cat.signal}</p>
+ </div>
+ ))}
+ </div>
+ </div>
+ </section>
+
+ {/* 5. BUILT WITH EDUCATORS - TeamStrip */}
+ <section style={{ backgroundColor: '#F0FAF6', borderTop: '0.5px solid #D4EDE0', borderBottom: '0.5px solid #D4EDE0' }}>
+ <div className="container-default">
+ <TeamStrip
+ members={[
+ { type: 'team', name: 'Dr. Maya Johnson', imageSlug: 'maya-johnson' },
+ { type: 'team', name: 'Dr. Jasmine Cole', imageSlug: 'jasmine-cole' },
+ { type: 'creator', name: 'Dr. Stephanie Nardi', topic: 'Science' },
+ { type: 'creator', name: 'Amy Storer', topic: 'Math' },
+ { type: 'creator', name: 'Catherine Dorian', topic: 'Literacy' },
+ { type: 'creator', name: 'Lindsay Hall', topic: 'Math' },
+ { type: 'creator', name: 'Aitabé Fornés', topic: 'Leadership' },
+ { type: 'creator', name: 'Erin Light', topic: 'Art & SEL' },
+ ]}
+ copy="Every course in the Hub is built by educators who've been in the classroom. Real strategies. Real results."
+ linkText="Meet our creators"
+ linkHref="/about#creators"
+ />
+ </div>
+ </section>
 
       {/* Free Ways to Get Started */}
       <section className="section bg-white">
