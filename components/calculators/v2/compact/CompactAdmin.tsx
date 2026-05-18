@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Funnel } from '../visuals/Funnel';
+import { ClassroomClock } from '../visuals/ClassroomClock';
 
 export function CompactAdmin() {
   const [budget, setBudget] = useState(50000);
@@ -14,7 +14,7 @@ export function CompactAdmin() {
 
       <div className="grid md:grid-cols-[auto_1fr] gap-9 items-center">
         <div className="flex justify-center">
-          <Funnel budget={budget} variant="tdi-only" />
+          <ClassroomClock variant="tdi-only" />
         </div>
         <div>
           <h3 className="font-serif text-2xl font-semibold text-[#1e2749] mb-4 leading-tight">

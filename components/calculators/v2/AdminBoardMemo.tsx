@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { grantsByState } from './grantsByState';
-import { Funnel } from './visuals';
+import { ClassroomClock } from './visuals';
 
 export function AdminBoardMemo() {
   const searchParams = useSearchParams();
@@ -138,8 +138,8 @@ export function AdminBoardMemo() {
             Auto-generated from your inputs. Download. Forward. Bring to your budget meeting.
           </p>
 
-          {/* Funnel visual */}
-          <Funnel budget={budget} variant="side-by-side" />
+          {/* Clock visual */}
+          <ClassroomClock variant="side-by-side" />
 
           {/* Stat grid */}
           <div className="grid grid-cols-2 gap-3 mb-6">
