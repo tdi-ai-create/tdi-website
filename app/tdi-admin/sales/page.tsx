@@ -8,6 +8,7 @@ import { FilterPanel, EMPTY_FILTERS, type ActiveFilters } from './components/Fil
 import { KanbanColumn } from './components/KanbanColumn'
 import { SalesCard, type SalesCardOpp } from './components/SalesCard'
 import AddLeadModal from '@/components/sales/AddLeadModal'
+import { OpportunityDetailPanel, type FullOpportunity } from './components/OpportunityDetailPanel'
 
 type ViewMode = 'kanban' | 'list'
 type PageTab = 'pipeline' | 'analytics' | 'trash' | 'invoices'
@@ -162,6 +163,7 @@ export default function SalesPage() {
 
   // Add Lead modal state
   const [addLeadModalOpen, setAddLeadModalOpen] = useState(false)
+  const [detailPanelOppId, setDetailPanelOppId] = useState<string | null>(null)
 
   useEffect(() => {
     loadAll()
@@ -775,7 +777,7 @@ export default function SalesPage() {
                         stage={stage}
                         label={`${STAGE_LABELS[stage] || stage} (${STAGE_PROBABILITY[stage] || 0}%)`}
                         opportunities={filtered.filter(o => o.stage === stage).map(toCardOpp)}
-                        onCardClick={(opp) => showToastMsg(`Detail panel for "${opp.name}" ships in next CCP`, 'success')}
+                        onCardClick={(opp) => setDetailPanelOppId(opp.id)}
                         onDrop={handleStageDrop}
                         onCardContextMenu={handleCardContextMenu}
                         onFieldSaved={handleFieldSaved}
@@ -802,7 +804,7 @@ export default function SalesPage() {
                         <SalesCard
                           key={opp.supabase_id}
                           opp={toCardOpp(opp)}
-                          onClick={() => showToastMsg(`Detail panel for "${opp.name}" ships in next CCP`, 'success')}
+                          onClick={() => setDetailPanelOppId(opp.supabase_id)}
                           onFieldSaved={handleFieldSaved}
                           onToggleCallSheet={handleToggleCallSheet}
                           onAddNote={(oppId) => setQuickNoteOppId(oppId)}
@@ -1121,6 +1123,25 @@ export default function SalesPage() {
           </div>
         </>
       )}
+
+      {/* Detail Panel */}
+      <OpportunityDetailPanel
+        opportunityId={detailPanelOppId}
+        onClose={() => setDetailPanelOppId(null)}
+        onUpdate={(id, changes) => {
+          setOpportunities(prev => prev.map(o => {
+            if (o.supabase_id !== id) return o
+            return {
+              ...o,
+              ...(changes.stage ? { stage: changes.stage, stageName: STAGE_DISPLAY[changes.stage] || changes.stage, probability: STAGE_PROBABILITY[changes.stage] ?? o.probability } : {}),
+              ...(changes.value !== undefined ? { value: changes.value } : {}),
+              ...(changes.assigned_to_email !== undefined ? { assignedTo: changes.assigned_to_email } : {}),
+              ...(changes.name ? { name: changes.name } : {}),
+            }
+          }))
+        }}
+        showToast={showToastMsg}
+      />
 
       {/* Add Lead Modal */}
       <AddLeadModal
