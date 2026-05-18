@@ -19,7 +19,7 @@ function HeroStrip() {
           src={`/team/${founder.imageSlug}.jpg`}
           alt={founder.name}
           width={140} height={140}
-          style={{ width: 140, height: 140, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+          style={{ width: 140, height: 140, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, boxShadow: '0 0 0 3px #C9A961' }}
           onError={() => setImgError(true)}
         />
       ) : (
@@ -28,6 +28,7 @@ function HeroStrip() {
           background: '#1B365D', color: 'white',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 38, fontWeight: 500,
+          boxShadow: '0 0 0 3px #C9A961',
         }}>{initials}</div>
       )}
       <div style={{ flex: 1, minWidth: 240 }}>
@@ -52,7 +53,7 @@ function LeadershipCard({ member }: { member: typeof leadership[0] }) {
           src={`/team/${member.imageSlug}.jpg`}
           alt={member.name}
           width={96} height={96}
-          style={{ width: 96, height: 96, borderRadius: '50%', objectFit: 'cover', margin: '0 auto 12px' }}
+          style={{ width: 96, height: 96, borderRadius: '50%', objectFit: 'cover', margin: '0 auto 12px', boxShadow: '0 0 0 3px #C9A961' }}
           onError={() => setImgError(true)}
         />
       ) : (
@@ -61,6 +62,7 @@ function LeadershipCard({ member }: { member: typeof leadership[0] }) {
           background: '#1B365D', color: 'white',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 26, fontWeight: 500,
+          boxShadow: '0 0 0 3px #C9A961',
         }}>{initials}</div>
       )}
       <p style={{ fontSize: 16, fontWeight: 500, color: '#1e2749', margin: '0 0 2px 0' }}>{member.name}</p>
