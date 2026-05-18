@@ -627,7 +627,7 @@ export default function SalesPage() {
   const stats = useMemo(() => {
     const callSheetOpps = activeOpps.filter(o => o.onCallSheet)
     return {
-      totalPipeline: activeOpps.reduce((s, o) => s + ((o.value ?? 0) * (o.probability ?? 0) / 100), 0),
+      totalPipeline: activeOpps.reduce((s, o) => s + (o.value ?? 0), 0),
       activeCount: activeOpps.length,
       hotCount: activeOpps.filter(o => o.heat === 'hot').length,
       invoiceCount: opportunities.filter(o => o.needs_invoice && !o.deleted_at).length,
