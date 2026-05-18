@@ -93,6 +93,24 @@ export default function HubWelcomePage() {
  </div>
  </section>
 
+ {/* Certified in All 50 States */}
+ <section style={{ padding: '80px 16px', backgroundColor: '#ffffff' }}>
+ <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+ <div style={{ textAlign: 'center', marginBottom: 40 }}>
+ <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+ PD CREDIT APPROVED
+ </p>
+ <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+ Approved in all 50 states
+ </h2>
+ <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
+ Teachers Deserve It PD Credits are approved for professional development hours in every US state. Hover any state to confirm.
+ </p>
+ </div>
+ <CertifiedStatesMap />
+ </div>
+ </section>
+
  {/* 7. IN-LESSON COMMUNITY (Not a quiz) */}
  <section style={{ padding: '80px 16px', backgroundColor: 'white' }}>
  <div className="container-default" style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -322,24 +340,6 @@ export default function HubWelcomePage() {
  </div>
  ))}
  </div>
- </div>
- </section>
-
- {/* Certified in All 50 States */}
- <section style={{ padding: '80px 16px', backgroundColor: '#ffffff' }}>
- <div style={{ maxWidth: 1100, margin: '0 auto' }}>
- <div style={{ textAlign: 'center', marginBottom: 40 }}>
- <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
- PD CREDIT APPROVED
- </p>
- <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
- Approved in all 50 states
- </h2>
- <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
- Teachers Deserve It PD Credits are approved for professional development hours in every US state. Hover any state to confirm.
- </p>
- </div>
- <CertifiedStatesMap />
  </div>
  </section>
 
