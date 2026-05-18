@@ -74,7 +74,19 @@ export function OpportunityContextMenu(props: Props) {
       className="fixed z-[100] bg-white border border-gray-200 rounded-xl shadow-2xl overflow-visible"
       style={{ left: pos.x, top: pos.y, minWidth: 220 }}
     >
-      <ContextMenu opportunity={opportunity} {...props} />
+      <ContextMenu
+        opportunity={opportunity}
+        onClose={props.onClose}
+        onOpenDetail={props.onOpenDetail}
+        onStageChange={props.onStageChange}
+        onHeatChange={props.onHeatChange}
+        onAssignChange={props.onAssignChange}
+        onAddNote={props.onAddNote}
+        onMarkWon={props.onMarkWon}
+        onMarkLost={props.onMarkLost}
+        onDelete={props.onDelete}
+        showToast={props.showToast}
+      />
     </div>
   )
 }
