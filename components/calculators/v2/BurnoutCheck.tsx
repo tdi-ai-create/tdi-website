@@ -60,12 +60,12 @@ export function BurnoutCheck() {
   return (
     <div className="max-w-2xl mx-auto">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#c2410c] to-[#F96767] text-white rounded-xl p-10 md:p-12 mb-8 relative overflow-hidden">
-        <div className="text-xs uppercase tracking-widest text-white/80 font-semibold mb-3">For Teachers</div>
-        <h2 className="font-serif text-3xl md:text-4xl font-semibold leading-tight mb-3">
+      <div className="bg-gradient-to-br from-[#c2410c] to-[#F96767] text-white rounded-xl p-6 md:p-8 mb-6 relative overflow-hidden">
+        <div className="text-[10px] uppercase tracking-widest text-white/80 font-semibold mb-2">For Teachers</div>
+        <h2 className="font-serif text-lg md:text-xl font-semibold leading-snug mb-2">
           Where is your stress today, and where could it be in 12 months?
         </h2>
-        <p className="text-base md:text-lg text-white/90 leading-relaxed">
+        <p className="text-sm text-white/90 leading-relaxed">
           One question. Real research. The truth about what happens when you stop carrying it alone.
         </p>
       </div>
@@ -74,7 +74,7 @@ export function BurnoutCheck() {
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 md:p-10 relative">
         <div className="absolute top-0 left-0 w-16 h-1 bg-[#ffba06] rounded-tl-xl" />
 
-        <h3 className="font-serif text-2xl md:text-3xl font-semibold text-[#1e2749] text-center mb-8 leading-tight">
+        <h3 className="font-serif text-lg md:text-xl font-semibold text-[#1e2749] text-center mb-6 leading-snug">
           On a scale of 1 to 10, how stressed are you right now?
         </h3>
 

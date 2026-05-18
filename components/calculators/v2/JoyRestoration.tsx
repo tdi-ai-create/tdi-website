@@ -35,12 +35,12 @@ export function JoyRestoration() {
   return (
     <div className="max-w-2xl mx-auto">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#0d7377] to-[#ffba06] text-white rounded-xl p-10 md:p-12 mb-8 relative overflow-hidden">
-        <div className="text-xs uppercase tracking-widest text-white/85 font-semibold mb-3">For Teachers</div>
-        <h2 className="font-serif text-3xl md:text-4xl font-semibold leading-tight mb-3">
+      <div className="bg-gradient-to-br from-[#0d7377] to-[#ffba06] text-white rounded-xl p-6 md:p-8 mb-6 relative overflow-hidden">
+        <div className="text-[10px] uppercase tracking-widest text-white/85 font-semibold mb-2">For Teachers</div>
+        <h2 className="font-serif text-lg md:text-xl font-semibold leading-snug mb-2">
           The joy isn&apos;t gone. It&apos;s buried under systems that don&apos;t support you.
         </h2>
-        <p className="text-base md:text-lg text-white/95 leading-relaxed">
+        <p className="text-sm text-white/95 leading-relaxed">
           One question. A trajectory. A reminder of why you started, and what it looks like to come back to it.
         </p>
       </div>
@@ -49,7 +49,7 @@ export function JoyRestoration() {
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 md:p-10 relative">
         <div className="absolute top-0 left-0 w-16 h-1 bg-[#ffba06] rounded-tl-xl" />
 
-        <h3 className="font-serif text-2xl md:text-3xl font-semibold text-[#1e2749] text-center mb-8 leading-tight">
+        <h3 className="font-serif text-lg md:text-xl font-semibold text-[#1e2749] text-center mb-6 leading-snug">
           How connected do you feel to your purpose as a teacher right now?
         </h3>
 
