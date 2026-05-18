@@ -101,10 +101,10 @@ export default function HubWelcomePage() {
  PD CREDIT APPROVED
  </p>
  <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
- Approved in all 50 states
+ Don't search for another PD provider
  </h2>
  <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
- Teachers Deserve It PD Credits are approved for professional development hours in every US state. Hover any state to confirm.
+ Teachers Deserve It PD Credits are approved in all 50 US states. Hover any state to confirm. Click for details and your state Department of Education.
  </p>
  </div>
  <CertifiedStatesMap />
