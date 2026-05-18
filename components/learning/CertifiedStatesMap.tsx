@@ -82,8 +82,8 @@ export default function CertifiedStatesMap() {
           })
           .on('mousemove', function(event: any) {
             tooltip
-              .style('left', (event.pageX + 14) + 'px')
-              .style('top', (event.pageY - 14) + 'px');
+              .style('left', (event.clientX + 14) + 'px')
+              .style('top', (event.clientY - 14) + 'px');
           })
           .on('mouseout', function() {
             d3.select(this).attr('fill', '#1e2749');
