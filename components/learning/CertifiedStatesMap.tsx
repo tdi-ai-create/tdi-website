@@ -67,7 +67,18 @@ export default function CertifiedStatesMap() {
             const name = stateNames[abbr] || abbr || 'State';
             tooltip
               .style('opacity', 1)
-              .html(`<div style="font-weight:700;font-size:14px;margin-bottom:4px;color:#1e2749">${name}</div><div style="font-size:13px;color:#6B7280;">Yes — Teachers Deserve It PD Credits are approved in this state</div>`);
+              .html(`
+                <div style="font-weight:700;font-size:15px;margin-bottom:6px;color:#1e2749">${name}</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                  <div style="width:22px;height:22px;border-radius:50%;background:#ffba06;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="12" height="12" viewBox="0 0 10 10" fill="none">
+                      <path d="M1.5 5L4 7.5L8.5 2.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <span style="font-weight:700;font-size:14px;color:#1e2749;">Approved!</span>
+                </div>
+                <div style="font-size:12px;color:#6B7280;line-height:1.4;">Teachers Deserve It PD Credits are approved in this state</div>
+              `);
           })
           .on('mousemove', function(event: any) {
             tooltip
