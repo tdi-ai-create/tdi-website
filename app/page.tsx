@@ -124,7 +124,7 @@ export default function Home() {
           { value: 100000, suffix: '+', label: 'Educators in Our Community' },
           { value: 74, suffix: '%', label: 'Implementation Rate', subtext: 'vs 10% industry average' },
           { value: 94, suffix: '%', label: 'Would Recommend' },
-          { value: 50, label: 'States + 100 Countries' },
+          { value: 50, label: 'States + 100 Countries', subtext: 'with educators using TDI tools' },
         ]}
       />
       <p className="text-center text-sm py-2" style={{ backgroundColor: '#1e2749', color: '#ffffff', opacity: 0.9 }}>
