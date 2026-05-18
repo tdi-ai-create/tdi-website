@@ -61,18 +61,20 @@ export function AdminBoardMemo() {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden max-w-5xl mx-auto">
       {/* Yellow accent strip */}
       <div className="h-1 w-16 bg-[#ffba06]" />
 
-      <div className="grid md:grid-cols-2 gap-0">
-        {/* INPUTS */}
-        <div className="p-8 md:p-10 md:border-r border-gray-200">
-          <h3 className="font-serif text-2xl text-[#1e2749] mb-2">Your school today</h3>
-          <p className="text-base text-gray-600 mb-8">
-            Four sliders. One question. Real-time board memo.
-          </p>
+      {/* ============================================ */}
+      {/* INPUTS SECTION - Top, compact horizontal     */}
+      {/* ============================================ */}
+      <div className="p-8 md:p-10 border-b border-gray-200">
+        <h3 className="font-serif text-2xl text-[#1e2749] mb-2">Your school today</h3>
+        <p className="text-base text-gray-600 mb-8">
+          Five inputs. One question. Real-time board memo.
+        </p>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           <SliderInput
             label="Annual PD budget"
             value={fmt(budget)}
@@ -98,59 +100,66 @@ export function AdminBoardMemo() {
             minLabel="Low" maxLabel="High"
           />
           <SliderInput
-            label="Students at grade-level benchmark"
+            label="Students at benchmark"
             value={`${benchmark}%`}
             min={20} max={90} step={5}
             sliderValue={benchmark}
             onChange={setBenchmark}
             minLabel="20%" maxLabel="90%"
           />
-
-          <div className="mt-6">
-            <label className="block text-base font-medium text-gray-700 mb-2">
-              What state? <span className="text-sm text-gray-500 italic">(unlocks grant match)</span>
-            </label>
-            <select
-              value={state}
-              onChange={(e) => setState(e.target.value)}
-              className="w-full p-3 border-2 border-gray-200 rounded-lg text-base focus:border-[#1e2749] focus:outline-none focus:ring-2 focus:ring-[#1e2749]/10"
-            >
-              <option value="IL">Illinois</option>
-              <option value="MD">Maryland</option>
-              <option value="CO">Colorado</option>
-              <option value="TX">Texas</option>
-              <option value="CA">California</option>
-              <option value="FL">Florida</option>
-              <option value="other">Another state</option>
-            </select>
-          </div>
         </div>
 
-        {/* OUTPUT */}
-        <div className="p-8 md:p-10 bg-[#f5f5f5]">
-          <div className="text-xs uppercase tracking-widest text-[#F96767] font-bold mb-2">
-            Board Memo Preview
-          </div>
-          <h3 className="font-serif text-xl text-[#1e2749] font-semibold leading-tight mb-1">
-            Your TDI Funding &amp; Impact Pathway
-          </h3>
-          <p className="text-sm text-gray-500 italic mb-6">
-            Auto-generated from your inputs. Download. Forward. Bring to your budget meeting.
-          </p>
+        <div className="max-w-md">
+          <label className="block text-base font-medium text-gray-700 mb-2">
+            What state? <span className="text-sm text-gray-500 italic">(unlocks grant match)</span>
+          </label>
+          <select
+            value={state}
+            onChange={(e) => setState(e.target.value)}
+            className="w-full p-3 border-2 border-gray-200 rounded-lg text-base focus:border-[#1e2749] focus:outline-none focus:ring-2 focus:ring-[#1e2749]/10"
+          >
+            <option value="IL">Illinois</option>
+            <option value="MD">Maryland</option>
+            <option value="CO">Colorado</option>
+            <option value="TX">Texas</option>
+            <option value="CA">California</option>
+            <option value="FL">Florida</option>
+            <option value="other">Another state</option>
+          </select>
+        </div>
+      </div>
 
-          {/* Clock visual */}
+      {/* ============================================ */}
+      {/* OUTPUT SECTION - Full width below            */}
+      {/* ============================================ */}
+      <div className="p-8 md:p-10 bg-[#f5f5f5]">
+        <div className="text-xs uppercase tracking-widest text-[#F96767] font-bold mb-2 text-center">
+          Board Memo Preview
+        </div>
+        <h3 className="font-serif text-2xl md:text-3xl text-[#1e2749] font-semibold leading-tight mb-1 text-center">
+          Your TDI Funding &amp; Impact Pathway
+        </h3>
+        <p className="text-sm text-gray-500 italic mb-8 text-center max-w-xl mx-auto">
+          Auto-generated from your inputs. Download. Forward. Bring to your budget meeting.
+        </p>
+
+        {/* CLASSROOM CLOCK - now has room to breathe */}
+        <div className="mb-8">
           <ClassroomClock variant="side-by-side" />
+        </div>
 
-          {/* Stat grid */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            <StatCard label="Current cost-per-implementation" value={fmt(currentCPI)} />
-            <StatCard label="With TDI partnership" value={fmt(tdiCPI)} highlight />
-            <StatCard label="Retention savings (Yr 1)" value={fmt(retentionSaved)} />
-            <StatCard label="Projected benchmark gain" value={`+${benchmarkGain} pts`} />
-          </div>
+        {/* STAT GRID - 4 across on desktop, 2x2 on mobile */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+          <StatCard label="Current cost-per-implementation" value={fmt(currentCPI)} />
+          <StatCard label="With TDI partnership" value={fmt(tdiCPI)} highlight />
+          <StatCard label="Retention savings (Yr 1)" value={fmt(retentionSaved)} />
+          <StatCard label="Projected benchmark gain" value={`+${benchmarkGain} pts`} />
+        </div>
 
+        {/* GRANTS + JUSTIFICATION - 2 column on desktop, stacked on mobile */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Grants */}
-          <div className="mb-6">
+          <div>
             <div className="text-xs uppercase tracking-wide text-gray-500 font-bold mb-2">
               Likely Funding Sources
             </div>
@@ -179,41 +188,41 @@ export function AdminBoardMemo() {
           </div>
 
           {/* Board justification */}
-          <div className="mb-6">
+          <div>
             <div className="text-xs uppercase tracking-wide text-gray-500 font-bold mb-2">
               One-Sentence Board Justification
             </div>
-            <div className="bg-white border-l-4 border-[#1e2749] p-4 rounded">
+            <div className="bg-white border-l-4 border-[#1e2749] p-4 rounded h-full">
               <div className="text-[#ffba06] text-2xl leading-none mb-1">&ldquo;</div>
               <p className="font-serif text-base text-gray-900 italic leading-relaxed">
                 We are reallocating <strong>{fmt(budget)}</strong> of existing PD spend into a TDI partnership that delivers <strong>6.5x the classroom implementation rate</strong>, funded primarily through {grants[0].short} allocations our district already receives.
               </p>
             </div>
           </div>
+        </div>
 
-          {/* Email capture + CTAs */}
-          <div className="space-y-3">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@school.edu"
-              className="w-full p-3 border-2 border-gray-200 rounded-lg text-base focus:border-[#1e2749] focus:outline-none focus:ring-2 focus:ring-[#1e2749]/10"
-            />
-            <button
-              onClick={handleGenerateMemo}
-              disabled={!email || isGenerating}
-              className="w-full px-8 py-4 bg-[#ffba06] text-[#1e2749] rounded-lg font-semibold text-base shadow-md hover:bg-[#e6a505] hover:-translate-y-0.5 hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isGenerating ? 'Generating PDF...' : 'Download Board Memo (PDF)'}
-            </button>
-            <a
-              href="/free-pd-plan"
-              className="block w-full text-center px-8 py-4 border-2 border-[#1e2749] text-[#1e2749] rounded-lg font-semibold text-base hover:bg-[#1e2749] hover:text-white transition-all"
-            >
-              Get Your Free PD Plan
-            </a>
-          </div>
+        {/* CTAs - centered, max width */}
+        <div className="max-w-md mx-auto space-y-3">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="your@school.edu"
+            className="w-full p-3 border-2 border-gray-200 rounded-lg text-base focus:border-[#1e2749] focus:outline-none focus:ring-2 focus:ring-[#1e2749]/10"
+          />
+          <button
+            onClick={handleGenerateMemo}
+            disabled={!email || isGenerating}
+            className="w-full px-8 py-4 bg-[#ffba06] text-[#1e2749] rounded-lg font-semibold text-base shadow-md hover:bg-[#e6a505] hover:-translate-y-0.5 hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isGenerating ? 'Generating PDF...' : 'Download Board Memo (PDF)'}
+          </button>
+          <a
+            href="/free-pd-plan"
+            className="block w-full text-center px-8 py-4 border-2 border-[#1e2749] text-[#1e2749] rounded-lg font-semibold text-base hover:bg-[#1e2749] hover:text-white transition-all"
+          >
+            Get Your Free PD Plan
+          </a>
         </div>
       </div>
     </div>
