@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import Image from 'next/image'
 import TeamStrip from '@/components/TeamStrip'
 
