@@ -596,7 +596,7 @@ export default function OnboardingPage() {
             <div className="max-w-4xl mx-auto">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
                 {[
-                  { number: '87K+', label: 'Educators in our community' },
+                  { number: '100K+', label: 'Educators in our community' },
                   { number: '21', label: 'States with partner schools' },
                   { number: '65%', label: 'Implementation rate' },
                   { number: '4.8/5', label: 'Average course rating' },

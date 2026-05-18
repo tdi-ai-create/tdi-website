@@ -1,0 +1,274 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import * as d3 from 'd3';
+import * as topojson from 'topojson-client';
+
+const stateAbbreviations: Record<string, string> = {
+  '01':'AL','02':'AK','04':'AZ','05':'AR','06':'CA','08':'CO','09':'CT','10':'DE',
+  '11':'DC','12':'FL','13':'GA','15':'HI','16':'ID','17':'IL','18':'IN','19':'IA',
+  '20':'KS','21':'KY','22':'LA','23':'ME','24':'MD','25':'MA','26':'MI','27':'MN',
+  '28':'MS','29':'MO','30':'MT','31':'NE','32':'NV','33':'NH','34':'NJ','35':'NM',
+  '36':'NY','37':'NC','38':'ND','39':'OH','40':'OK','41':'OR','42':'PA','44':'RI',
+  '45':'SC','46':'SD','47':'TN','48':'TX','49':'UT','50':'VT','51':'VA','53':'WA',
+  '54':'WV','55':'WI','56':'WY',
+};
+
+const stateNames: Record<string, string> = {
+  AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',
+  CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',
+  HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',
+  LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',
+  MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',
+  NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',
+  OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',
+  SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',
+  VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',
+};
+
+const stateDOEUrls: Record<string, string> = {
+  AL:'https://www.alabamaachieves.org/',
+  AK:'https://education.alaska.gov/',
+  AZ:'https://www.azed.gov/',
+  AR:'https://dese.ade.arkansas.gov/',
+  CA:'https://www.cde.ca.gov/',
+  CO:'https://www.cde.state.co.us/',
+  CT:'https://portal.ct.gov/SDE',
+  DE:'https://www.doe.k12.de.us/',
+  DC:'https://osse.dc.gov/',
+  FL:'https://www.fldoe.org/',
+  GA:'https://www.gadoe.org/',
+  HI:'https://www.hawaiipublicschools.org/',
+  ID:'https://www.sde.idaho.gov/',
+  IL:'https://www.isbe.net/',
+  IN:'https://www.in.gov/doe/',
+  IA:'https://educate.iowa.gov/',
+  KS:'https://www.ksde.org/',
+  KY:'https://www.education.ky.gov/',
+  LA:'https://www.louisianabelieves.com/',
+  ME:'https://www.maine.gov/doe/',
+  MD:'https://marylandpublicschools.org/',
+  MA:'https://www.doe.mass.edu/',
+  MI:'https://www.michigan.gov/mde',
+  MN:'https://education.mn.gov/',
+  MS:'https://www.mdek12.org/',
+  MO:'https://dese.mo.gov/',
+  MT:'https://opi.mt.gov/',
+  NE:'https://www.education.ne.gov/',
+  NV:'https://doe.nv.gov/',
+  NH:'https://www.education.nh.gov/',
+  NJ:'https://www.nj.gov/education/',
+  NM:'https://webnew.ped.state.nm.us/',
+  NY:'https://www.nysed.gov/',
+  NC:'https://www.dpi.nc.gov/',
+  ND:'https://www.nd.gov/dpi/',
+  OH:'https://education.ohio.gov/',
+  OK:'https://sde.ok.gov/',
+  OR:'https://www.oregon.gov/ode/',
+  PA:'https://www.education.pa.gov/',
+  RI:'https://www.ride.ri.gov/',
+  SC:'https://ed.sc.gov/',
+  SD:'https://doe.sd.gov/',
+  TN:'https://www.tn.gov/education.html',
+  TX:'https://tea.texas.gov/',
+  UT:'https://www.schools.utah.gov/',
+  VT:'https://education.vermont.gov/',
+  VA:'https://www.doe.virginia.gov/',
+  WA:'https://www.k12.wa.us/',
+  WV:'https://wvde.us/',
+  WI:'https://dpi.wi.gov/',
+  WY:'https://edu.wyoming.gov/',
+};
+
+export default function CertifiedStatesMap() {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedState, setSelectedState] = useState<{abbr: string; name: string} | null>(null);
+
+  useEffect(() => {
+    if (!svgRef.current) return;
+
+    fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json')
+      .then(r => r.json())
+      .then((us: any) => {
+        const states = topojson.feature(us, us.objects.states) as any;
+        const svg = d3.select(svgRef.current);
+        svg.selectAll('*').remove();
+
+        const width = 960;
+        const height = 600;
+        const projection = d3.geoAlbersUsa().fitSize([width, height], states);
+        const path = d3.geoPath().projection(projection);
+
+        svg.attr('viewBox', `0 0 ${width} ${height}`).attr('preserveAspectRatio', 'xMidYMid meet');
+
+        const tooltip = d3.select(tooltipRef.current);
+
+        svg.append('g')
+          .selectAll('path')
+          .data(states.features)
+          .join('path')
+          .attr('d', path as any)
+          .attr('fill', '#1e2749')
+          .attr('stroke', '#ffffff')
+          .attr('stroke-width', 1.2)
+          .style('cursor', 'pointer')
+          .style('transition', 'fill 0.18s ease')
+          .on('mouseover', function() {
+            d3.select(this).attr('fill', '#ffba06');
+          })
+          .on('mousemove', function(event: any, d: any) {
+            const fips = String(d.id).padStart(2, '0');
+            const abbr = stateAbbreviations[fips];
+            const name = stateNames[abbr] || abbr || 'State';
+            tooltip
+              .style('opacity', 1)
+              .style('left', (event.clientX + 14) + 'px')
+              .style('top', (event.clientY - 14) + 'px')
+              .html(`
+                <div style="font-weight:700;font-size:15px;margin-bottom:6px;color:#1e2749">${name}</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                  <div style="width:22px;height:22px;border-radius:50%;background:#ffba06;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="12" height="12" viewBox="0 0 10 10" fill="none">
+                      <path d="M1.5 5L4 7.5L8.5 2.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <span style="font-weight:700;font-size:14px;color:#1e2749;">Approved!</span>
+                </div>
+                <div style="font-size:12px;color:#1e2749;line-height:1.4;font-weight:600;">↓ Click to see more</div>
+              `);
+          })
+          .on('mouseout', function() {
+            d3.select(this).attr('fill', '#1e2749');
+            tooltip.style('opacity', 0);
+          })
+          .on('click', function(event: any, d: any) {
+            const fips = String(d.id).padStart(2, '0');
+            const abbr = stateAbbreviations[fips];
+            const name = stateNames[abbr] || abbr;
+            if (abbr) setSelectedState({ abbr, name });
+            tooltip.style('opacity', 0);
+          });
+
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error('Map load failed:', err);
+        setIsLoading(false);
+      });
+  }, []);
+
+  const stateDOE = selectedState ? stateDOEUrls[selectedState.abbr] : null;
+
+  return (
+    <div style={{ position: 'relative', width: '100%' }}>
+      {isLoading && (
+        <div style={{ textAlign: 'center', padding: 60, color: '#9CA3AF' }}>Loading map...</div>
+      )}
+      <svg ref={svgRef} style={{ width: '100%', height: 'auto', maxWidth: 960 }} />
+      <div
+        ref={tooltipRef}
+        style={{
+          position: 'fixed',
+          opacity: 0,
+          background: 'white',
+          border: '1px solid #E5E7EB',
+          borderRadius: 10,
+          padding: '12px 14px',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.10)',
+          pointerEvents: 'none',
+          transition: 'opacity 0.15s ease',
+          zIndex: 50,
+          maxWidth: 280,
+        }}
+      />
+
+      {selectedState && (
+        <div
+          onClick={() => setSelectedState(null)}
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(30, 39, 73, 0.6)', zIndex: 100,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 16,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'white', borderRadius: 16, maxWidth: 520, width: '100%',
+              padding: 32, boxShadow: '0 24px 60px rgba(0,0,0,0.20)', position: 'relative',
+            }}
+          >
+            <button
+              onClick={() => setSelectedState(null)}
+              style={{
+                position: 'absolute', top: 16, right: 16, background: 'transparent',
+                border: 'none', fontSize: 24, color: '#9CA3AF', cursor: 'pointer', lineHeight: 1,
+              }}
+              aria-label="Close"
+            >
+              ×
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <div style={{
+                width: 44, height: 44, borderRadius: '50%', background: '#ffba06',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                <svg width="22" height="22" viewBox="0 0 10 10" fill="none">
+                  <path d="M1.5 5L4 7.5L8.5 2.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', color: '#2A9D8F', margin: 0 }}>PD CREDITS APPROVED</p>
+                <h3 style={{ fontSize: 22, fontWeight: 700, color: '#1e2749', margin: '4px 0 0 0' }}>Do you live in {selectedState.name}?</h3>
+              </div>
+            </div>
+
+            <p style={{ fontSize: 15, color: '#374151', lineHeight: 1.6, margin: '0 0 24px 0' }}>
+              Teachers Deserve It professional development is approved for PD credit in {selectedState.name}. Every hour you spend in the Hub counts toward your renewal and recertification requirements.
+            </p>
+
+            {stateDOE && (
+                <a
+                href={stateDOE}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14,
+                  color: '#2A9D8F', fontWeight: 500, textDecoration: 'none', marginBottom: 24,
+                }}
+              >
+                Confirm with {selectedState.name} Department of Education →
+              </a>
+            )}
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 8 }}>
+                <a
+                href="/learning/plans"
+                style={{
+                  textAlign: 'center', padding: '14px 16px', background: '#1e2749',
+                  color: 'white', borderRadius: 10, fontWeight: 600, fontSize: 14, textDecoration: 'none',
+                }}
+              >
+                Join the Hub
+              </a>
+                <a
+                href="/about"
+                style={{
+                  textAlign: 'center', padding: '14px 16px', background: 'white',
+                  color: '#1e2749', border: '1.5px solid #1e2749', borderRadius: 10,
+                  fontWeight: 600, fontSize: 14, textDecoration: 'none',
+                }}
+              >
+                Meet the TDI Team
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

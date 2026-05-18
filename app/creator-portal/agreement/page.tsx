@@ -4,10 +4,15 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, CheckCircle, ChevronDown, Calendar, Mail, Video, DollarSign, Share2, HeartHandshake, FileText, Eye, PartyPopper } from 'lucide-react';
+import {
+  ArrowLeft, Loader2, CheckCircle, ChevronDown,
+  Coins, Calendar, Infinity, ShieldCheck, DoorOpen,
+  Briefcase, Heart, Lock, RefreshCw, MessageCircle, Mail,
+} from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
-// Component to handle search params (must be wrapped in Suspense)
+const Q_ICONS = [Coins, Calendar, Infinity, ShieldCheck, DoorOpen, Briefcase, Heart, Lock, RefreshCw, MessageCircle, Mail];
+
 function AgreementContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -17,493 +22,310 @@ function AgreementContent() {
   const [creatorId, setCreatorId] = useState<string | null>(null);
   const [agreed, setAgreed] = useState(false);
   const [signatureName, setSignatureName] = useState('');
-  const [showFullAgreement, setShowFullAgreement] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSigning, setIsSigning] = useState(false);
   const [isSigned, setIsSigned] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [alreadySigned, setAlreadySigned] = useState(false);
+  const [agreementVersion, setAgreementVersion] = useState<string | null>(null);
+  const [expandedLegal, setExpandedLegal] = useState<Set<number>>(new Set());
 
-  const today = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-
+  const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   const backLink = isDemo ? '/creator-portal/demo' : '/creator-portal/dashboard';
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Demo mode - skip auth, use demo data
-      if (isDemo) {
-        setCreatorName('Sarah Johnson');
-        setSignatureName('Sarah Johnson');
-        setIsLoading(false);
-        return;
-      }
+      if (isDemo) { setCreatorName('Sarah Johnson'); setSignatureName('Sarah Johnson'); setIsLoading(false); return; }
 
-      // Real mode - check authentication
       const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.email) { router.push('/creator-portal'); return; }
 
-      if (!session?.user?.email) {
-        router.push('/creator-portal');
-        return;
-      }
+      const asCreator = searchParams.get('as_creator');
+      const fetchBody = asCreator ? { creatorId: asCreator } : { email: session.user.email };
 
-      // Fetch creator data
       const response = await fetch('/api/creator-portal/dashboard', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: session.user.email }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(fetchBody),
       });
 
       if (!response.ok) {
-        router.push('/creator-portal');
-        return;
+        const errData = await response.json().catch(() => ({}));
+        if (errData.isAdmin) {
+          if (asCreator) { setError('Could not load this creator'); setIsLoading(false); return; }
+          router.push('/tdi-admin/creators'); return;
+        }
+        router.push('/creator-portal'); return;
       }
 
       const data = await response.json();
       setCreatorName(data.creator.name);
       setCreatorId(data.creator.id);
       setSignatureName(data.creator.name);
-
-      // Check if already signed
-      if (data.creator.agreement_signed) {
-        setAlreadySigned(true);
-      }
-
+      setAgreementVersion(data.creator.agreement_version || null);
+      if (data.creator.agreement_signed) setAlreadySigned(true);
       setIsLoading(false);
     };
-
     checkAuth();
-  }, [router, isDemo]);
+  }, [router, isDemo, searchParams]);
 
   const handleSign = async () => {
     if (!agreed || !signatureName.trim()) return;
-
-    setIsSigning(true);
-    setError(null);
-
-    // Demo mode - just show success and redirect
-    if (isDemo) {
-      setIsSigned(true);
-      return;
-    }
-
-    // Real mode - save to database
+    setIsSigning(true); setError(null);
+    if (isDemo) { setIsSigned(true); return; }
     if (!creatorId) return;
-
     try {
       const response = await fetch('/api/creator-portal/sign-agreement', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          creatorId,
-          signedName: signatureName.trim(),
-        }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ creatorId, signedName: signatureName.trim() }),
       });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to sign agreement');
-      }
-
-      // Redirect to dashboard with success message
-      router.push('/creator-portal/dashboard?agreement=signed');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
-      setIsSigning(false);
-    }
+      if (!response.ok) { const data = await response.json(); throw new Error(data.error || 'Failed to sign agreement'); }
+      setIsSigned(true);
+      setTimeout(() => router.push('/creator-portal/dashboard?agreement=signed'), 2000);
+    } catch (err) { setError(err instanceof Error ? err.message : 'Something went wrong'); setIsSigning(false); }
   };
 
-  const handleContinue = () => {
-    if (isDemo) {
-      router.push('/creator-portal/demo?signed=true');
-    } else {
-      router.push('/creator-portal/dashboard?agreement=signed');
-    }
-  };
+  const isV1Signer = agreementVersion === 'v1.0';
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#80a4ed]" />
-      </div>
-    );
+  function toggleLegal(i: number) {
+    const next = new Set(expandedLegal);
+    next.has(i) ? next.delete(i) : next.add(i);
+    setExpandedLegal(next);
   }
 
-  // Success state after signing
-  if (isSigned) {
-    return (
-      <div className="min-h-screen bg-[#f5f5f5]">
-        {/* Demo Banner */}
-        {isDemo && (
-          <div className="bg-[#ffba06] text-[#1e2749] py-2 px-4 text-center text-sm font-medium">
-            <Eye className="w-4 h-4 inline mr-2" />
-            DEMO MODE - This is a preview of the agreement signing experience
-          </div>
-        )}
+  if (isLoading) return (
+    <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
+      <Loader2 className="w-8 h-8 animate-spin text-[#80a4ed]" />
+    </div>
+  );
 
-        <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <PartyPopper className="w-10 h-10 text-green-600" />
-            </div>
-            <h1 className="text-3xl font-bold text-[#1e2749] mb-4">
-              Welcome to the TDI Creator Family!
-            </h1>
-            <p className="text-gray-600 mb-2">
-              <strong>{signatureName}</strong>, you&apos;ve officially signed the Independent Content Creator Agreement.
-            </p>
-            <p className="text-gray-500 text-sm mb-8">
-              Signed on {today}
-            </p>
-
-            {isDemo && (
-              <div className="bg-[#ffba06]/10 border border-[#ffba06] rounded-lg p-4 mb-8">
-                <p className="text-sm text-[#1e2749]">
-                  <strong>Demo Mode:</strong> In the real portal, this would update your milestone status and send a notification to the TDI team.
-                </p>
-              </div>
-            )}
-
-            <button
-              onClick={handleContinue}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3459] transition-colors text-lg font-semibold"
-            >
-              <CheckCircle className="w-5 h-5" />
-              Continue to Dashboard
-            </button>
-          </div>
-        </main>
+  if (isSigned) return (
+    <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
+      <div className="bg-white rounded-2xl shadow-lg max-w-md w-full p-10 text-center">
+        <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+        <h2 style={{ fontSize: 22, fontWeight: 500, color: '#1e2749' }}>Agreement signed</h2>
+        <p style={{ color: '#6B7280', marginTop: 8, fontSize: 14 }}>Redirecting to your dashboard...</p>
       </div>
-    );
-  }
+    </div>
+  );
 
-  if (alreadySigned && !isDemo) {
-    return (
-      <div className="min-h-screen bg-[#f5f5f5]">
-        <header className="bg-white border-b border-gray-200">
-          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <Link
-              href="/creator-portal/dashboard"
-              className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-[#1e2749]"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Dashboard
-            </Link>
-          </div>
-        </header>
-        <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-8 h-8 text-green-600" />
-            </div>
-            <h1 className="text-2xl font-bold text-[#1e2749] mb-2">Agreement Already Signed</h1>
-            <p className="text-gray-600 mb-6">
-              You&apos;ve already signed the Independent Content Creator Agreement.
-            </p>
-            <Link
-              href="/creator-portal/dashboard"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3459] transition-colors"
-            >
-              Return to Dashboard
-            </Link>
-          </div>
-        </main>
+  if (alreadySigned && agreementVersion === 'v2.3' && !isDemo) return (
+    <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
+      <div className="bg-white rounded-2xl shadow-lg max-w-md w-full p-10 text-center">
+        <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+        <h2 style={{ fontSize: 22, fontWeight: 500, color: '#1e2749' }}>Already signed</h2>
+        <p style={{ color: '#6B7280', marginTop: 8, fontSize: 14, marginBottom: 24 }}>You&apos;ve already signed your v2.3 creator agreement.</p>
+        <Link href={backLink} style={{ color: '#80a4ed', fontWeight: 500 }}>Back to dashboard</Link>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
-      {/* Demo Banner */}
-      {isDemo && (
-        <div className="bg-[#ffba06] text-[#1e2749] py-2 px-4 text-center text-sm font-medium">
-          <Eye className="w-4 h-4 inline mr-2" />
-          DEMO MODE - This is a preview of the agreement signing experience
-          <Link href="/creator-portal/demo" className="ml-4 underline hover:no-underline">
-            Back to Demo Dashboard
-          </Link>
-        </div>
-      )}
-
+    <div className="min-h-screen bg-[#f5f5f5]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link
-            href={backLink}
-            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-[#1e2749]"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Dashboard
+      <header style={{ background: 'white', borderBottom: '1px solid #E5E7EB', position: 'sticky', top: 0, zIndex: 50 }}>
+        <div style={{ maxWidth: 880, margin: '0 auto', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link href={backLink} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#6B7280', fontSize: 14, textDecoration: 'none' }}>
+            <ArrowLeft style={{ width: 16, height: 16 }} /> Back
           </Link>
-          <div className="flex items-center gap-3 mt-4">
-            <Image
-              src="/images/logo.webp"
-              alt="Teachers Deserve It"
-              width={100}
-              height={30}
-              className="h-8 w-auto"
-            />
-            <div className="h-6 w-px bg-gray-300" />
-            <span className="text-[#ffba06] font-semibold text-sm uppercase tracking-wide">
-              Creator Agreement
-            </span>
-          </div>
+          <Image src="/images/logo.webp" alt="TDI" width={100} height={30} style={{ height: 28, width: 'auto' }} />
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Friendly Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#1e2749] mb-2">Let&apos;s Make It Official</h1>
-          <p className="text-gray-600">Review the highlights below, then scroll down to sign. No scary legal stuff here!</p>
+      <main style={{ maxWidth: 880, margin: '0 auto', padding: '40px 24px 60px' }}>
+
+        {/* Re-sign banner */}
+        {isV1Signer && (
+          <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: '16px 20px', marginBottom: 32, fontSize: 14, color: '#92400E', lineHeight: 1.6 }}>
+            Welcome back. We&apos;ve updated your agreement based on creator feedback &mdash; the new model earns you more. Everything you&apos;ve already earned stays paid under your old terms, and any questions are always welcome at <a href="mailto:creatorstudio@teachersdeserveit.com" style={{ color: '#92400E', textDecoration: 'underline' }}>creatorstudio@teachersdeserveit.com</a>.
+          </div>
+        )}
+
+        {/* Hero */}
+        <div style={{ marginBottom: 32 }}>
+          <p style={{ fontSize: 13, fontWeight: 500, color: '#9CA3AF', letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 8 }}>
+            A note from the team &mdash; read what you need, skim the rest
+          </p>
+          <h1 style={{ fontSize: 32, fontWeight: 500, color: '#1e2749', margin: 0, fontFamily: "'Source Serif 4', Georgia, serif" }}>
+            Your creator agreement
+          </h1>
+          <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.7, marginTop: 12, maxWidth: 640 }}>
+            We know contracts can feel intimidating. We&apos;ve broken this into plain-language questions so you can read at your own pace. The legal version of each answer is right there if you want it &mdash; and there&apos;s a full PDF at the bottom of the page if you&apos;d rather read it all in one place.
+          </p>
         </div>
 
-        {/* TLDR / Highlights Section */}
-        <div className="bg-[#fef9eb] border border-[#ffba06] rounded-xl p-6 mb-6">
-          <h2 className="text-xl font-semibold text-[#1e2749] mb-4">
-            The Quick Version (TLDR)
-          </h2>
-
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-[#1e2749] rounded-full flex items-center justify-center flex-shrink-0">
-                <Video className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p className="font-medium text-[#1e2749]">What you&apos;re creating</p>
-                <p className="text-gray-600 text-sm">1-2 hours of video content + 2-6 downloadable resources for a course. Don&apos;t worry about these numbers! We&apos;ll help you make sure your tools are valuable and best for our audience!</p>
-              </div>
+        {/* Rae's CEO note */}
+        <div style={{ background: 'white', border: '0.5px solid #E5E7EB', borderRadius: 12, padding: '28px', marginBottom: 40 }}>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+            <div style={{
+              width: 56, height: 56, borderRadius: '50%', flexShrink: 0,
+              background: '#FBEAF0', color: '#72243E',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 18, fontWeight: 500,
+            }}>
+              RH
             </div>
-
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-[#1e2749] rounded-full flex items-center justify-center flex-shrink-0">
-                <DollarSign className="w-5 h-5 text-white" />
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 13, fontWeight: 500, color: '#9CA3AF', letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 10 }}>
+                A note from Rae
+              </p>
+              <div style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontSize: 16, color: '#374151', lineHeight: 1.7, fontStyle: 'italic' }}>
+                <p style={{ margin: '0 0 12px 0' }}>
+                  When I started Teachers Deserve It, the goal was simple: build the kind of place educators deserve &mdash; one that pays you fairly, celebrates your expertise, and treats you like the brilliant professional you are. Creator Studio is the heart of that.
+                </p>
+                <p style={{ margin: '0 0 12px 0' }}>
+                  This agreement isn&apos;t a contract we&apos;re hiding behind. It&apos;s the boundary that lets us do right by you &mdash; pay you on time, protect your work, and stay out of your way so you can do what you do best.
+                </p>
+                <p style={{ margin: 0 }}>
+                  If anything in here makes you pause, that&apos;s not a problem. That&apos;s the point. Talk to us. We&apos;d rather build something you actually trust than rush you into something you don&apos;t.
+                </p>
               </div>
-              <div>
-                <p className="font-medium text-[#1e2749]">How you get paid</p>
-                <p className="text-gray-600 text-sm">30% commission on sales using your code. We want you to feel valued! If you have questions, we are here to help!</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-[#1e2749] rounded-full flex items-center justify-center flex-shrink-0">
-                <Share2 className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p className="font-medium text-[#1e2749]">How can I celebrate this?</p>
-                <p className="text-gray-600 text-sm">Share it out! We will help you a TON with this. Feel free to share it on your resume, portfolio, and social media as a Teachers Deserve It Content Creator.</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-[#1e2749] rounded-full flex items-center justify-center flex-shrink-0">
-                <HeartHandshake className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p className="font-medium text-[#1e2749]">Support you&apos;ll receive</p>
-                <p className="text-gray-600 text-sm">We want to make this as easy as possible! With access to Creator Studio, templates, editing support, design support and Rachel as your dedicated contact... you are going to look like such a pro!</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-[#1e2749] rounded-full flex items-center justify-center flex-shrink-0">
-                <FileText className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p className="font-medium text-[#1e2749]">The fine print</p>
-                <p className="text-gray-600 text-sm">You&apos;re an independent contractor. Standard stuff!</p>
-              </div>
+              <p style={{ fontSize: 14, color: '#6B7280', fontStyle: 'italic', marginTop: 16 }}>
+                &mdash; Rae Hughart, CEO &middot; Teachers Deserve It
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Full Agreement (Expandable) */}
-        <div className="bg-white border border-gray-200 rounded-xl mb-6 overflow-hidden">
-          <button
-            onClick={() => setShowFullAgreement(!showFullAgreement)}
-            className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
-          >
-            <span className="font-medium text-[#1e2749] flex items-center gap-2">
-              <FileText className="w-5 h-5" />
-              Read Full Agreement
+        {/* Q&A blocks */}
+        <div style={{ borderRadius: 12, overflow: 'hidden' }}>
+          {QA_BLOCKS.map((block, i) => {
+            const Icon = Q_ICONS[i] || Mail;
+            const isEven = i % 2 === 1;
+            return (
+              <div key={i} style={{ background: isEven ? '#F9FAFB' : 'white', padding: '28px 32px' }}>
+                <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+                  <div style={{
+                    width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
+                    background: '#EFF6FF', color: '#2563EB',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginTop: 2,
+                  }}>
+                    <Icon style={{ width: 20, height: 20 }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: 20, fontWeight: 500, color: '#1e2749', margin: '0 0 12px 0', lineHeight: 1.4 }}>
+                      {block.question}
+                    </p>
+                    <div style={{ fontSize: 15, color: '#374151', lineHeight: 1.7 }}
+                      dangerouslySetInnerHTML={{ __html: block.answer }}
+                    />
+                    {block.legal && (
+                      <div style={{ marginTop: 14 }}>
+                        <button
+                          onClick={() => toggleLegal(i)}
+                          style={{
+                            background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                            fontSize: 13, color: '#2563EB', display: 'flex', alignItems: 'center', gap: 4,
+                          }}
+                        >
+                          See the legal version
+                          <ChevronDown style={{ width: 14, height: 14, transition: 'transform 0.15s', transform: expandedLegal.has(i) ? 'rotate(180deg)' : 'rotate(0)' }} />
+                        </button>
+                        {expandedLegal.has(i) && (
+                          <div style={{
+                            marginTop: 10, padding: '14px 16px',
+                            background: isEven ? '#F3F4F6' : '#F9FAFB', borderRadius: 8,
+                            fontSize: 13, color: '#6B7280', lineHeight: 1.6, whiteSpace: 'pre-line',
+                          }}>
+                            {block.legal}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Closing warmth */}
+        <div style={{ textAlign: 'center', padding: '32px 0', maxWidth: 540, margin: '0 auto' }}>
+          <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.7, fontStyle: 'italic' }}>
+            That&apos;s everything. If anything still feels unclear or you&apos;d like to talk it through before signing, we&apos;d love to hear from you at <a href="mailto:creatorstudio@teachersdeserveit.com" style={{ color: '#2563EB' }}>creatorstudio@teachersdeserveit.com</a>.
+          </p>
+          <p style={{ fontSize: 16, color: '#6B7280', fontStyle: 'italic', marginTop: 8 }}>
+            There&apos;s no rush. Take your time.
+          </p>
+        </div>
+
+        {/* Signature form */}
+        <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 28 }}>
+          <p style={{ fontSize: 18, fontWeight: 500, color: '#1e2749', margin: '0 0 20px 0' }}>Sign your agreement</p>
+
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: 12, cursor: 'pointer', marginBottom: 20 }}>
+            <input type="checkbox" checked={agreed} onChange={() => setAgreed(!agreed)}
+              style={{ width: 20, height: 20, marginTop: 2, accentColor: '#1e2749' }} />
+            <span style={{ fontSize: 14, color: '#374151', lineHeight: 1.5 }}>
+              I have read and agree to the Creator Agreement (v2.3). I understand the compensation model, content licensing terms, and termination provisions described above.
             </span>
-            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${showFullAgreement ? 'rotate-180' : ''}`} />
-          </button>
+          </label>
 
-          {showFullAgreement && (
-            <div className="p-6 border-t border-gray-200 prose prose-sm max-w-none">
-              <p className="text-sm text-gray-500 mb-4">
-                <strong>Effective Date:</strong> {today}
-              </p>
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ display: 'block', fontSize: 14, fontWeight: 500, color: '#374151', marginBottom: 6 }}>Your full legal name</label>
+            <input type="text" value={signatureName} onChange={(e) => setSignatureName(e.target.value)}
+              placeholder="Type your full name"
+              style={{ width: '100%', padding: '10px 14px', border: '1px solid #D1D5DB', borderRadius: 10, fontSize: 14, color: '#1e2749', outline: 'none' }} />
+            <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 4 }}>Date: {today}</p>
+          </div>
 
-              <p className="text-sm text-gray-700">
-                This Independent Content Creator Agreement (&ldquo;Agreement&rdquo;) is made between Teachers Deserve It, LLC (&ldquo;TDI&rdquo;) and you (&ldquo;Creator&rdquo;) as of the date signed below.
-              </p>
-
-              <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">1. What You&apos;re Creating</h3>
-              <p className="text-sm text-gray-700">You agree to develop one original professional learning course for the TDI Learning Hub, including:</p>
-              <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
-                <li>1&ndash;2 hours of pre-recorded video content (broken into 3&ndash;5 minute videos)</li>
-                <li>2&ndash;6 downloadable resources (templates, checklists, guides, etc.)</li>
-                <li>Course title, description, and implementation notes</li>
-              </ul>
-              <p className="text-sm text-gray-700">All content must align with TDI&apos;s mission and be submitted by your agreed-upon target launch date.</p>
-
-              <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">2. Timeline</h3>
-              <p className="text-sm text-gray-700">
-                You&apos;ll work with your TDI contact to set a target publish month. If you need more time, just communicate with us&mdash;we&apos;re flexible and want to set you up for success.
-              </p>
-
-              <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">3. How You Get Paid</h3>
-              <p className="text-sm text-gray-700">Instead of a flat fee, you&apos;ll earn ongoing commission:</p>
-              <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
-                <li>You&apos;ll receive a custom discount code to share publicly</li>
-                <li>You earn 30% commission on any purchases made with your code (courses or All Access Memberships)</li>
-                <li>Commissions are calculated after discounts, excluding taxes/fees</li>
-                <li>Payouts happen quarterly</li>
-              </ul>
-
-              <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">4. Who Owns What</h3>
-              <p className="text-sm text-gray-700">Once submitted, your course materials become the property of Teachers Deserve It, LLC. This means:</p>
-              <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
-                <li>TDI can host, distribute, promote, edit, and adapt the content</li>
-                <li>TDI can use your name, bio, and photo in connection with the course</li>
-                <li>You cannot sell or publish the same course elsewhere</li>
-              </ul>
-              <p className="text-sm text-gray-700 mt-2">However, you CAN (and should!):</p>
-              <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
-                <li>Celebrate and share your course publicly</li>
-                <li>Add it to your portfolio, resume, and LinkedIn</li>
-                <li>Reference it as a &ldquo;TDI-branded project&rdquo;</li>
-                <li>Share similar strategies in other contexts (speaking, coaching)&mdash;just not the exact course content</li>
-              </ul>
-
-              <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">5. Support You&apos;ll Receive</h3>
-              <p className="text-sm text-gray-700">TDI provides:</p>
-              <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
-                <li>Access to the Creator Studio to track your progress</li>
-                <li>Templates and guidance for course development</li>
-                <li>Light editing and formatting support</li>
-                <li>A dedicated contact (Rachel, Director of Creative Solutions) for questions</li>
-              </ul>
-
-              <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">6. Good Faith & Communication</h3>
-              <p className="text-sm text-gray-700">We&apos;re building something together. If something isn&apos;t working, let&apos;s talk about it. TDI reserves the right to:</p>
-              <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
-                <li>Delay publishing if content needs more work</li>
-                <li>Update or archive courses that become outdated</li>
-                <li>Pause commissions if discount codes are misused</li>
-              </ul>
-
-              <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">7. Independent Contractor</h3>
-              <p className="text-sm text-gray-700">
-                You&apos;re an independent contractor, not a TDI employee. You&apos;re responsible for your own taxes and don&apos;t receive employee benefits.
-              </p>
-
-              <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">8. Confidentiality</h3>
-              <p className="text-sm text-gray-700">
-                Please keep any behind-the-scenes TDI materials confidential. Public TDI content is fine to share.
-              </p>
-            </div>
+          {error && (
+            <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#991B1B' }}>{error}</div>
           )}
+
+          <button onClick={handleSign} disabled={!agreed || !signatureName.trim() || isSigning}
+            style={{
+              width: '100%', padding: '12px 0', background: '#1e2749', color: 'white',
+              border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 500, cursor: 'pointer',
+              opacity: (!agreed || !signatureName.trim() || isSigning) ? 0.4 : 1,
+            }}>
+            {isSigning ? 'Signing...' : 'Sign agreement'}
+          </button>
         </div>
 
-        {/* Questions Section */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
-          <h3 className="font-semibold text-[#1e2749] mb-2">Have Questions?</h3>
-          <p className="text-gray-600 text-sm mb-4">We want you to feel confident about this partnership. Reach out anytime!</p>
-          <div className="flex flex-wrap gap-3">
-            <a
-              href="https://calendly.com/rae-teachersdeserveit/creator-chat"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 text-sm transition-colors"
-            >
-              <Calendar className="w-4 h-4" />
-              Book a Call with Rae
+        {/* Full contract download */}
+        <div style={{ background: '#F9FAFB', borderRadius: 12, padding: '24px 28px', marginTop: 24 }}>
+          <p style={{ fontSize: 18, fontWeight: 500, color: '#1e2749', margin: '0 0 6px 0' }}>The complete legal version</p>
+          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.7, margin: '0 0 16px 0' }}>
+            Want to read the full formal agreement in one place &mdash; or save a copy for your records? You can do both here.
+          </p>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <a href="/creator-portal/agreement/full" target="_blank" rel="noopener noreferrer"
+              style={{ padding: '10px 20px', border: '1px solid #D1D5DB', borderRadius: 10, color: '#1e2749', fontSize: 14, fontWeight: 500, textDecoration: 'none', background: 'white' }}>
+              View full agreement
             </a>
-            <a
-              href="mailto:rachel@teachersdeserveit.com?subject=Question about Creator Agreement"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 text-sm transition-colors"
-            >
-              <Mail className="w-4 h-4" />
-              Email Rachel
+            <a href="/agreement-v2.3.pdf" target="_blank" rel="noopener noreferrer"
+              style={{ padding: '10px 20px', border: '1px solid #D1D5DB', borderRadius: 10, color: '#1e2749', fontSize: 14, fontWeight: 500, textDecoration: 'none', background: 'white' }}>
+              Download as PDF
             </a>
           </div>
         </div>
 
-        {/* Signature Section */}
-        <div className="bg-white border-2 border-[#1e2749] rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-[#1e2749] mb-4">Sign Agreement</h3>
+        <p style={{ textAlign: 'center', marginTop: 24, fontSize: 13, color: '#9CA3AF' }}>
+          Template version 2.3 &mdash; May 2026
+        </p>
 
-          <div className="space-y-4">
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
-                className="mt-1 w-5 h-5 rounded border-gray-300 text-[#1e2749] focus:ring-[#ffba06]"
-              />
-              <span className="text-gray-700">I have read and agree to the Independent Content Creator Agreement</span>
-            </label>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Your Full Name</label>
-              <input
-                type="text"
-                value={signatureName}
-                onChange={(e) => setSignatureName(e.target.value)}
-                placeholder="Type your full name to sign"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffba06] focus:border-transparent"
-              />
-            </div>
-
-            <div className="text-sm text-gray-500">
-              Date: {today}
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                {error}
-              </div>
-            )}
-
-            <button
-              onClick={handleSign}
-              disabled={!agreed || !signatureName.trim() || isSigning}
-              className="w-full py-3 bg-[#1e2749] text-white rounded-lg font-medium hover:bg-[#2a3459] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
-            >
-              {isSigning ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Signing...
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="w-5 h-5" />
-                  Sign Agreement
-                </>
-              )}
-            </button>
-          </div>
-        </div>
       </main>
     </div>
   );
 }
 
+const QA_BLOCKS = [
+  { question: 'How do I actually make money?', answer: 'You get a unique affiliate link. Anyone who signs up to TDI through it earns you <strong>50% of revenue, forever</strong>. Paid by the 15th of every month, with a clear breakdown of what was earned and what was deducted.<br/><br/>Net revenue = gross minus payment processing fees, taxes, and refunds. Never deducted: TDI overhead, platform costs, or other operating expenses.', legal: "Creator's sole compensation under this Agreement is a 50% share of Affiliate Revenue. \"Affiliate Revenue\" means the net revenue (gross revenue minus payment processing fees, taxes/regulatory charges, and refunds) generated by users who sign up to TDI through Creator's unique affiliate link. Revenue accrues regardless of which Creator's content the referred user ultimately purchases. Payouts are made monthly by the 15th of the following month, accompanied by a transparency statement itemizing each conversion. TDI will never deduct overhead, platform costs, or operating expenses from Creator's share." },
+  { question: 'When do I get paid?', answer: 'By the 15th of the month after the conversion happens. So a sale in May = paid by June 15. You\'ll get a transparency statement showing every line item.', legal: 'Payouts are made monthly by the 15th of the following month, accompanied by a transparency statement itemizing each conversion, gross amount, deductions, and net payout.' },
+  { question: 'How long does my affiliate link last?', answer: 'Forever, while your TDI account is active or paused. The link doesn\'t expire. The cookie that tracks clicks lasts 90 days &mdash; so if someone clicks today and signs up 89 days later, you still earn.', legal: 'Affiliate tracking cookies persist for 90 days from the date of click. Creator\'s affiliate link remains active for the duration of this Agreement and during any paused period.' },
+  { question: 'Who owns the stuff I make?', answer: 'TDI owns the final published version. This is what lets us legally distribute, market, and protect your work. You can reference your work in your portfolio, list TDI as a client, and share that you created it.<br/><br/>You also keep ownership of anything you brought with you &mdash; templates, frameworks, materials you already owned.', legal: "Creator assigns to TDI ownership of the final published version of Content created under this Agreement (\"Work Product\"). This assignment enables TDI to distribute, market, sublicense, and protect the Content. Creator retains ownership of all pre-existing materials, frameworks, templates, and methodologies brought to the project (\"Creator IP\"). Creator may reference the Work Product in professional portfolios, list TDI as a client, and describe the work publicly. TDI grants Creator a perpetual, non-exclusive license to reference the Work Product for personal branding purposes." },
+  { question: 'Can I quit anytime?', answer: 'Yes. Either of us can end this with 14 days\' notice in writing. Anything you\'ve already earned through your termination date stays paid &mdash; no clawbacks, no drama.<br/><br/>After termination, no new revenue accrues, but anything earned keeps paying out monthly until it\'s done.', legal: 'This Agreement is effective upon signing and continues until terminated. Either party may terminate with 14 days\' written notice. Upon termination: (a) all earned but unpaid compensation will be paid within 30 days; (b) TDI retains license to continue distributing existing Content; (c) Creator\'s affiliate link is deactivated and no new revenue accrues after the termination date.' },
+  { question: 'Can I work with other education companies?', answer: 'Yes, absolutely. You\'re not exclusive to TDI by default. Run your own offerings, work with other clients, do your own thing. We only ask you not to recreate the exact same content for a direct TDI competitor.', legal: 'Default: Non-Exclusive (Option A). Creator is free to create content for other platforms, run independent businesses, and engage in any professional activities. Creator agrees not to recreate substantially the same Content for a direct competitor of TDI during the term of this Agreement. "Direct competitor" means a platform that offers paid professional development courses specifically for K-12 educators.' },
+  { question: 'Have your own business, podcast, or side hustle?', answer: 'Beautiful. Keep doing all of it. TDI works alongside &mdash; not instead of &mdash; your existing work. If you run a business, have your own products, speak at conferences, host a podcast, write a newsletter, anything else: we\'re here for it.<br/><br/>This is about celebrating the brilliant brains behind classrooms &mdash; yours included.', legal: null },
+  { question: 'What\'s all the FERPA stuff about?', answer: 'FERPA is the federal student privacy law. We ask you to not include identifiable student information (names, photos, performance data) in your content unless you have proper consent. This protects you, the students, and us. If you film in a real classroom, you just follow the school\'s rules &mdash; TDI will help coordinate.', legal: 'Creator shall not include personally identifiable student information (names, images, performance data, behavioral records) in Content unless proper written consent has been obtained per applicable law. If Content involves filming in educational settings, Creator will coordinate with the institution\'s administration to ensure compliance with their media/consent policies. TDI will provide guidance and support for FERPA compliance as needed.' },
+  { question: 'I already signed an older agreement &mdash; what changes?', answer: 'The compensation model is now fully affiliate-based. Anything earned under your previous agreement stays paid under those terms. From the day you sign this version forward, the new model applies.<br/><br/>We changed it because creators told us they made more money this way. We listened.', legal: "Creator's prior agreement (if any) is superseded by this Agreement upon execution. Compensation earned under previous terms remains payable under those terms. All future compensation is governed by Section 2 of this Agreement." },
+  { question: 'What if there\'s a disagreement?', answer: 'First, we talk it out &mdash; most issues resolve in conversation. If we genuinely can\'t agree after 30 days, we\'d go to arbitration rather than court. Faster and easier for everyone.', legal: 'Dispute Resolution: Good faith negotiation for 30 days, then binding arbitration under AAA Commercial Rules in DuPage County, Illinois. Governing Law: Illinois.' },
+  { question: 'Who do I contact with questions?', answer: 'Anytime, anything: <a href="mailto:creatorstudio@teachersdeserveit.com" style="color: #2563EB">creatorstudio@teachersdeserveit.com</a>. We mean it &mdash; we\'d rather answer 100 questions than have you sign something you\'re not 100% comfortable with.', legal: null },
+];
+
 export default function AgreementPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#80a4ed]" />
-      </div>
-    }>
+    <Suspense fallback={<div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-[#80a4ed]" /></div>}>
       <AgreementContent />
     </Suspense>
   );

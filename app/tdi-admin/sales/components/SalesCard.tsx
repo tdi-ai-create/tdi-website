@@ -25,7 +25,7 @@ const TYPE_COLORS: Record<string, string> = {
   new_business: '#3B82F6',
   expansion: '#8B5CF6',
   pilot: '#F59E0B',
-  upsell: '#EC4899',
+  upsell: '#1e2749',
   reactivation: '#2563EB',
 }
 

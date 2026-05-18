@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import AboutCreatorsSection from '@/components/AboutCreatorsSection';
 import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import Link from 'next/link';
 import Script from 'next/script';
@@ -13,6 +14,24 @@ interface Creator {
   title?: string;
   headshotUrl?: string | null;
   contentPath?: 'blog' | 'download' | 'course' | null;
+  topic?: string | null;
+}
+
+import { getTopicConfig } from '@/lib/data/creator-topics'
+import {
+  BookOpen, BookMarked, PenLine, Activity, Calculator, FlaskConical, Palette,
+  GraduationCap, Sparkles, Globe, Languages, HeartHandshake, Music, Library,
+  HeartPulse, LayoutGrid, Lightbulb, Route, ClipboardCheck, NotebookPen,
+  PencilRuler, Baby, Puzzle, MessagesSquare, Star, Users, Sprout, Clock,
+  Target, Home as HomeIcon, Laptop, Scale,
+} from 'lucide-react'
+
+const ICON_MAP: Record<string, any> = {
+  BookOpen, BookMarked, PenLine, Activity, Calculator, FlaskConical, Palette,
+  GraduationCap, Sparkles, Globe, Languages, HeartHandshake, Music, Library,
+  HeartPulse, LayoutGrid, Lightbulb, Route, ClipboardCheck, NotebookPen,
+  PencilRuler, Baby, Puzzle, MessagesSquare, Star, Users, Sprout, Clock,
+  Target, HomeIcon, Laptop, Scale,
 }
 
 // Fallback creators (used if API fails)
@@ -63,7 +82,7 @@ const phases = [
   },
   {
     title: 'Connect',
-    description: 'Meet with Rachel and Rae to discuss your idea',
+    description: 'Meet with our team to discuss your idea',
     icon: (
       <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -461,7 +480,7 @@ export default function CreateWithUsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-[#1e2749] mb-1">Rachel Patragas</h3>
+              <h3 className="text-2xl font-bold text-[#1e2749] mb-1">Teachers Deserve It Team Member</h3>
               <p className="text-[#80a4ed] font-medium mb-3">Director of Creative Solutions</p>
               <div className="w-16 h-1 bg-[#ffba06] mx-auto md:mx-0" />
             </div>
@@ -534,7 +553,7 @@ export default function CreateWithUsPage() {
                 data-animate="true"
               >
                 Tell us about yourself and the strategies you'd love to share.
-                Rachel from our team will be in touch within a few days to discuss next steps and get your headshot.
+                Our team will be in touch within a few days to discuss next steps and get your headshot.
               </p>
             </div>
 
@@ -564,7 +583,7 @@ export default function CreateWithUsPage() {
                 </div>
                 <h3 className="text-xl font-semibold text-green-800 mb-2">Application Received!</h3>
                 <p className="text-green-700">
-                  Thanks for your interest in creating with TDI. Rachel will review your application and reach out soon.
+                  Thanks for your interest in creating with TDI. Our team will review your application and reach out soon.
                 </p>
               </div>
             ) : (
@@ -730,36 +749,25 @@ export default function CreateWithUsPage() {
               Join these incredible educators who are already making an impact through TDI.
             </p>
           </div>
+          <AboutCreatorsSection />
+        </div>
+      </section>
 
-          <div
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 opacity-0 translate-y-8 transition-all duration-700 delay-200"
-            data-animate="true"
-          >
-            {creators.map((creator) => (
-                <div
-                  key={creator.id || creator.name}
-                  className="bg-white border rounded-xl p-5 text-center hover:shadow-md transition-shadow duration-300"
-                  style={{ borderColor: '#E5E7EB' }}
-                >
-                  {creator.headshotUrl ? (
-                    <img
-                      src={creator.headshotUrl}
-                      alt={creator.name}
-                      className="w-16 h-16 rounded-full mx-auto mb-3 object-cover"
-                    />
-                  ) : (
-                    <div
-                      className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center"
-                      style={{ backgroundColor: '#5BBEC4' }}
-                    >
-                      <span className="text-white font-bold text-base">{getInitials(creator.name)}</span>
-                    </div>
-                  )}
-                  <p className="font-bold text-base mb-1" style={{ color: '#1a1a2e' }}>{creator.name}</p>
-                  <p className="text-sm" style={{ color: '#6B7280' }}>{creator.title || 'Content Creator'}</p>
-                </div>
-            ))}
+      {/* Certified in All 50 States */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#E6F1FB' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              YOUR AUDIENCE
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              Your content reaches educators in every state
+            </h2>
+            <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
+              When you create with TDI, your work lands in classrooms across all 50 US states and 100+ countries. Hover any state to explore our reach.
+            </p>
           </div>
+          <CertifiedStatesMap />
         </div>
       </section>
 
@@ -848,10 +856,10 @@ export default function CreateWithUsPage() {
               </span>
               <div className="flex-1">
                 <h3 className="text-xl md:text-2xl font-bold text-[#1e2749] mb-3 group-hover:text-[#80a4ed] transition-colors duration-300">
-                  Reach 87,000+ Educators
+                  Reach 100,000+ Educators
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Your strategies reach our engaged community of teachers across 21 states who are actively looking for practical, real-world solutions from educators like you.
+                  Your strategies reach our engaged community of teachers across all 50 states who are actively looking for practical, real-world solutions from educators like you.
                 </p>
               </div>
             </div>

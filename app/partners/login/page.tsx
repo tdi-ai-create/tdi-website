@@ -206,7 +206,7 @@ function PartnerLoginContent() {
                 <div>
                   <h4 className="font-bold text-lg mb-2" style={{ color: '#ffffff' }}>Stay Connected</h4>
                   <p className="text-sm mb-4" style={{ color: '#ffba06' }}>
-                    Join 87,000+ educators who decided<br />they deserved better.
+                    Join 100,000+ educators who decided<br />they deserved better.
                   </p>
                   <form action="https://formsubmit.co/Olivia@teachersdeserveit.com" method="POST" className="space-y-3">
                     <input type="hidden" name="_subject" value="New Email Signup from TDI Website" />

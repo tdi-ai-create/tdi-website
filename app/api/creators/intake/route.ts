@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
   const resendApiKey = process.env.RESEND_API_KEY;
   if (resendApiKey) {
     const emailBody = `
-Hi Rachel,
+Hi Creator Studio Team,
 
 A new creator application has been submitted on teachersdeserveit.com/create-with-us:
 
@@ -103,7 +103,7 @@ https://www.teachersdeserveit.com/tdi-admin/creators
       },
       body: JSON.stringify({
         from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-        to: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+        to: ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
         subject: `[New Creator Application] ${name}`,
         text: emailBody,
       }),

@@ -73,7 +73,7 @@ export function EmailPopup({ delay = 90000 }: EmailPopupProps) {
           Want strategies that actually work?
         </p>
         <p className="text-xs text-gray-500 mb-3">
-          Join 87,000+ educators. Weekly, no spam.
+          Join 100,000+ educators. Weekly, no spam.
         </p>
         <a
           href="https://teachersdeserveit.substack.com"

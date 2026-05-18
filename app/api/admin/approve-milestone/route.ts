@@ -429,7 +429,7 @@ export async function POST(request: Request) {
               </a>
 
               <p style="color: #666; margin-top: 30px; font-size: 14px;">
-                Questions? Reply to this email or reach out to Rachel at rachel@teachersdeserveit.com
+                Questions? Reply to this email or reach out to the TDI team at creatorstudio@teachersdeserveit.com
               </p>
 
               <p style="color: #666; font-size: 14px;"> - The TDI Team</p>

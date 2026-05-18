@@ -22,7 +22,7 @@ async function checkEmailExists(email: string): Promise<{ exists: boolean; type:
 }
 
 function redirectUrlForType(type: 'creator' | 'admin' | null): string | null {
-  if (type === 'admin') return '/admin/creators';
+  if (type === 'admin') return '/tdi-admin/creators';
   if (type === 'creator') return '/creator-portal/dashboard';
   return null;
 }

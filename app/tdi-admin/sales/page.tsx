@@ -7,6 +7,8 @@ import { StickyTopBar } from './components/StickyTopBar'
 import { FilterPanel, EMPTY_FILTERS, type ActiveFilters } from './components/FilterPanel'
 import { KanbanColumn } from './components/KanbanColumn'
 import { SalesCard, type SalesCardOpp } from './components/SalesCard'
+import AddLeadModal from '@/components/sales/AddLeadModal'
+import { OpportunityDetailPanel, type FullOpportunity } from './components/OpportunityDetailPanel'
 
 type ViewMode = 'kanban' | 'list'
 type PageTab = 'pipeline' | 'analytics' | 'trash' | 'invoices'
@@ -84,19 +86,19 @@ interface Opportunity {
 
 const STAGE_DISPLAY: Record<string, string> = {
   unassigned: 'Unassigned',
-  targeting: 'Targeting (0%)',
-  engaged: 'Engaged (10%)',
-  qualified: 'Qualified (30%)',
-  likely_yes: 'Likely Yes (50%)',
-  proposal_sent: 'Proposal Sent (70%)',
-  signed: 'Signed (90%)',
+  targeting: 'Targeting (5%)',
+  engaged: 'Engaged (20%)',
+  qualified: 'Qualified (45%)',
+  likely_yes: 'Likely Yes (65%)',
+  proposal_sent: 'Proposal Sent (80%)',
+  signed: 'Signed (95%)',
   paid: 'Paid (100%)',
   lost: 'Lost',
 }
 
 const STAGE_PROBABILITY: Record<string, number> = {
-  unassigned: 0, targeting: 0, engaged: 10, qualified: 30,
-  likely_yes: 50, proposal_sent: 70, signed: 90, paid: 100, lost: 0,
+  unassigned: 0, targeting: 5, engaged: 20, qualified: 45,
+  likely_yes: 65, proposal_sent: 80, signed: 95, paid: 100, lost: 0,
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -159,8 +161,36 @@ export default function SalesPage() {
   const [showAllStages, setShowAllStages] = useState(true)
   const [showCallSheetOnly, setShowCallSheetOnly] = useState(false)
 
+  // Add Lead modal state
+  const [addLeadModalOpen, setAddLeadModalOpen] = useState(false)
+  const [detailPanelOppId, setDetailPanelOppId] = useState<string | null>(null)
+
   useEffect(() => {
     loadAll()
+  }, [])
+
+  // Realtime: refresh when enrichment completes on any lead
+  useEffect(() => {
+    const channel = supabase
+      .channel('leads-enrichment-updates')
+      .on(
+        'postgres_changes' as any,
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'sales_opportunities',
+        },
+        (payload: any) => {
+          if (payload.new?.enrichment_status === 'complete' || payload.new?.enrichment_status === 'failed') {
+            loadAll()
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   async function loadAll() {
@@ -709,7 +739,7 @@ export default function SalesPage() {
               {/* Sticky Top Bar */}
               <StickyTopBar
                 stats={stats}
-                onAddLead={() => showToastMsg('Add Lead UI ships in the next CCP', 'success')}
+                onAddLead={() => setAddLeadModalOpen(true)}
                 onExport={handleExport}
                 onExportJimsList={handleExportJimsList}
                 showCallSheetOnly={showCallSheetOnly}
@@ -747,7 +777,7 @@ export default function SalesPage() {
                         stage={stage}
                         label={`${STAGE_LABELS[stage] || stage} (${STAGE_PROBABILITY[stage] || 0}%)`}
                         opportunities={filtered.filter(o => o.stage === stage).map(toCardOpp)}
-                        onCardClick={(opp) => showToastMsg(`Detail panel for "${opp.name}" ships in next CCP`, 'success')}
+                        onCardClick={(opp) => setDetailPanelOppId(opp.id)}
                         onDrop={handleStageDrop}
                         onCardContextMenu={handleCardContextMenu}
                         onFieldSaved={handleFieldSaved}
@@ -774,7 +804,7 @@ export default function SalesPage() {
                         <SalesCard
                           key={opp.supabase_id}
                           opp={toCardOpp(opp)}
-                          onClick={() => showToastMsg(`Detail panel for "${opp.name}" ships in next CCP`, 'success')}
+                          onClick={() => setDetailPanelOppId(opp.supabase_id)}
                           onFieldSaved={handleFieldSaved}
                           onToggleCallSheet={handleToggleCallSheet}
                           onAddNote={(oppId) => setQuickNoteOppId(oppId)}
@@ -1093,6 +1123,36 @@ export default function SalesPage() {
           </div>
         </>
       )}
+
+      {/* Detail Panel */}
+      <OpportunityDetailPanel
+        opportunityId={detailPanelOppId}
+        onClose={() => setDetailPanelOppId(null)}
+        onUpdate={(id, changes) => {
+          setOpportunities(prev => prev.map(o => {
+            if (o.supabase_id !== id) return o
+            return {
+              ...o,
+              ...(changes.stage ? { stage: changes.stage, stageName: STAGE_DISPLAY[changes.stage] || changes.stage, probability: STAGE_PROBABILITY[changes.stage] ?? o.probability } : {}),
+              ...(changes.value !== undefined ? { value: changes.value } : {}),
+              ...(changes.assigned_to_email !== undefined ? { assignedTo: changes.assigned_to_email } : {}),
+              ...(changes.name ? { name: changes.name } : {}),
+            }
+          }))
+        }}
+        showToast={showToastMsg}
+      />
+
+      {/* Add Lead Modal */}
+      <AddLeadModal
+        isOpen={addLeadModalOpen}
+        onClose={() => setAddLeadModalOpen(false)}
+        onLeadCreated={() => {
+          // Realtime subscription will handle the UI update when enrichment completes.
+          // Immediately refetch so the new card appears in the pipeline.
+          loadAll()
+        }}
+      />
 
       {/* Toast */}
       {toast && (

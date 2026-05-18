@@ -167,7 +167,7 @@ export function Footer() {
             <div>
               <h4 className="font-bold text-lg mb-2" style={{ color: '#ffffff' }}>Stay Connected</h4>
               <p className="text-sm mb-4" style={{ color: '#ffba06' }}>
-                Join 87,000+ educators who decided<br />they deserved better.
+                Join 100,000+ educators who decided<br />they deserved better.
               </p>
               <form
                 action="https://formsubmit.co/Olivia@teachersdeserveit.com"
@@ -215,7 +215,7 @@ export function Footer() {
         <div className="px-4 md:px-8 lg:px-16 py-4 md:py-6">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
             <p className="text-sm" style={{ color: 'white', opacity: 0.5 }}>
-              © 2026 Teachers Deserve It. All rights reserved.
+              © 2026 Teachers Deserve It. All rights reserved. <span style={{ opacity: 0.7 }}>· Built by a team of 30+ and a movement 100k strong.</span>
             </p>
             <div className="flex flex-wrap justify-center md:justify-end gap-4 md:gap-6">
               <Link href="/privacy" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>

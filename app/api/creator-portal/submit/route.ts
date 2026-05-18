@@ -681,7 +681,7 @@ export async function POST(request: Request) {
             },
             body: JSON.stringify({
               from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-              to: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+              to: ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
               subject: emailSubject,
               html: `
                 <div style="font-family: sans-serif; max-width: 600px;">

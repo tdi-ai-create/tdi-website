@@ -17,7 +17,7 @@ export function PastProjects({ projects }: PastProjectsProps) {
 
   const contentPathLabels: Record<string, string> = {
     blog: 'Blog Post',
-    download: 'Digital Download',
+    download: 'Quick Tool (Download)',
     course: 'Online Course',
   };
 

@@ -159,7 +159,7 @@ export async function POST(request: Request) {
           },
           body: JSON.stringify({
             from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-            to: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+            to: ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
             subject: `[Creator Portal] ${creator.name} is ready to create again!`,
             html: `
               <div style="font-family: sans-serif; max-width: 600px;">

@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
           body: JSON.stringify({
             from: 'TDI Creator Studio <creators@teachersdeserveit.com>',
             to: [creator.email],
-            cc: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+            cc: ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
             subject: `Action Needed: Revision requested for ${milestoneTitle}`,
             html: `
               <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -200,7 +200,7 @@ export async function POST(request: NextRequest) {
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 32px 0;" />
 
                 <p style="color: #6b7280; font-size: 14px;">
-                  Questions? Reach out to Rachel at <a href="mailto:rachel@teachersdeserveit.com" style="color: #80a4ed;">rachel@teachersdeserveit.com</a>
+                  Questions? Reach out to the TDI team at <a href="mailto:creatorstudio@teachersdeserveit.com" style="color: #80a4ed;">creatorstudio@teachersdeserveit.com</a>
                 </p>
 
                 <p style="color: #6b7280; font-size: 14px;"> -  The TDI Team</p>

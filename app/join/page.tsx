@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
+import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import { CoursesSection } from '@/components/CoursesSection';
 import { TabbedCalculator } from '@/components/calculators';
 
@@ -48,319 +50,336 @@ export default function JoinPage() {
         </div>
       </section>
 
-      {/* Free Ways to Get Started */}
-      <section className="section bg-white">
-        <div className="container-default">
-          <h2 className="text-center mb-2">Free Ways to Get Started</h2>
-          <p className="text-center mb-12" style={{ opacity: 0.6 }}>
-            No commitment. Just value.
+      {/* Certified in All 50 States */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#E6F1FB' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              YES, THIS COUNTS IN YOUR STATE
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              Approved PD in all 50 states
+            </h2>
+            <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
+              Every hour you spend with TDI counts toward your PD recertification. Hover any state to confirm. Click for your state Department of Education link.
+            </p>
+          </div>
+          <CertifiedStatesMap />
+        </div>
+      </section>
+
+      {/* Not a quiz, A community */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#ffffff' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              REAL CONVERSATIONS
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              Not a quiz. A community.
+            </h2>
+            <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 700, margin: '0 auto', lineHeight: 1.5 }}>
+              Every lesson opens up a conversation thread. Educators share what they tried, what they adapted, and what got stuck, so the next teacher learns from the last.
+            </p>
+          </div>
+          <div style={{ width: '100%', maxWidth: 900, margin: '0 auto', borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 32px rgba(30,39,73,0.08)' }}>
+            <Image
+              src="/hub-welcome/hub-conversation.png"
+              alt="Community conversation per lesson"
+              width={1200}
+              height={675}
+              style={{ width: '100%', height: 'auto', display: 'block' }}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Moment Mode */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#1e2749', color: '#ffffff' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#ffba06', marginBottom: 12 }}>
+              FOR THE HARD DAYS
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#ffffff', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              Moment Mode
+            </h2>
+            <p style={{ fontSize: 17, color: '#cbd5e1', maxWidth: 700, margin: '0 auto', lineHeight: 1.5 }}>
+              For the moment you need it most. One quick strategy. One small win. Sometimes that's all you have time for, and that's enough.
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, maxWidth: 900, margin: '0 auto' }}>
+            <div style={{ background: 'rgba(255,255,255,0.06)', padding: 24, borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }}>
+              <p style={{ fontSize: 32, fontWeight: 700, color: '#ffba06', margin: '0 0 8px 0' }}>5 min</p>
+              <p style={{ fontSize: 15, color: '#cbd5e1', margin: 0, lineHeight: 1.5 }}>Watch one quick strategy between classes</p>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.06)', padding: 24, borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }}>
+              <p style={{ fontSize: 32, fontWeight: 700, color: '#ffba06', margin: '0 0 8px 0' }}>1 take</p>
+              <p style={{ fontSize: 15, color: '#cbd5e1', margin: 0, lineHeight: 1.5 }}>Try it tomorrow morning, see if it lands</p>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.06)', padding: 24, borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }}>
+              <p style={{ fontSize: 32, fontWeight: 700, color: '#ffba06', margin: '0 0 8px 0' }}>0 prep</p>
+              <p style={{ fontSize: 15, color: '#cbd5e1', margin: 0, lineHeight: 1.5 }}>Strategies you can use without rewriting your plan</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Implementation Stat */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#ffffff' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 16 }}>
+            REAL CLASSROOM IMPACT
           </p>
+          <p style={{ fontSize: 72, fontWeight: 800, color: '#1e2749', margin: '0 0 8px 0', lineHeight: 1 }}>
+            74%
+          </p>
+          <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+            Classroom application rate within 30 days
+          </h2>
+          <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
+            Most PD ends when the slide deck closes. TDI's average educator applies what they learned in their classroom within the first 30 days, because the strategies are built for the hour you don't have.
+          </p>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+      {/* Free Ways to Get Started */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#E6F1FB' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              NO COMMITMENT, JUST VALUE
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              Free ways to get started
+            </h2>
+            <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 700, margin: '0 auto', lineHeight: 1.5 }}>
+              Three ways to start using TDI today. Pick whichever fits the hour you have.
+            </p>
+          </div>
 
-            {/* Card 1: Blog/Newsletter */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, maxWidth: 1000, margin: '0 auto' }}>
             <a
               href="https://raehughart.substack.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+              style={{ display: 'block', padding: 28, background: '#ffffff', borderRadius: 12, borderTop: '3px solid #ffba06', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(30,39,73,0.08)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
             >
-              <div
-                className="h-[160px] flex items-center justify-center p-6"
-                style={{ backgroundColor: '#ffba06' }}
-              >
-                {/* Substack/Newsletter Icon */}
-                <svg
-                  className="w-16 h-16"
-                  fill="white"
-                  viewBox="0 0 24 24"
-                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
-                >
-                  <path d="M22 4H2v2h20V4zm0 4H2v10l10 4 10-4V8zm-10 9.18L6 15.62v-5.24l6 2.4 6-2.4v5.24l-6 1.56z"/>
-                </svg>
-              </div>
-              <div className="bg-white p-5">
-                <h3
-                  className="text-lg font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749' }}
-                >
-                  Weekly Strategies
-                </h3>
-                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  3x/week, practical ideas you can use immediately. Join 87,000+ educators already getting them.
-                </p>
-                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
-                  Read the latest →
-                </span>
-              </div>
+              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: 'uppercase', color: '#2A9D8F', margin: '0 0 12px 0' }}>
+                Weekly strategies
+              </p>
+              <h3 style={{ fontSize: 22, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0', lineHeight: 1.25 }}>
+                Three ideas a week, straight to your inbox
+              </h3>
+              <p style={{ fontSize: 15, color: '#6B7280', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+                Practical ideas you can use immediately. Join 100,000+ educators already getting them.
+              </p>
+              <span style={{ fontSize: 15, fontWeight: 600, color: '#1e2749' }}>
+                Read the latest →
+              </span>
             </a>
 
-            {/* Card 2: Podcast */}
             <a
               href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274"
               target="_blank"
               rel="noopener noreferrer"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+              style={{ display: 'block', padding: 28, background: '#ffffff', borderRadius: 12, borderTop: '3px solid #ffba06', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(30,39,73,0.08)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
             >
-              <div
-                className="h-[160px] flex items-center justify-center p-6"
-                style={{ backgroundColor: '#ffba06' }}
-              >
-                {/* Headphones/Podcast Icon */}
-                <svg
-                  className="w-16 h-16"
-                  fill="white"
-                  viewBox="0 0 24 24"
-                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
-                >
-                  <path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z"/>
-                </svg>
-              </div>
-              <div className="bg-white p-5">
-                <h3
-                  className="text-lg font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749' }}
-                >
-                  Listen<br />& Learn
-                </h3>
-                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  The Sustainable Teaching podcast. Real talk about sustainable teaching from people who get it.
-                </p>
-                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
-                  Start listening →
-                </span>
-              </div>
+              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: 'uppercase', color: '#2A9D8F', margin: '0 0 12px 0' }}>
+                Listen and learn
+              </p>
+              <h3 style={{ fontSize: 22, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0', lineHeight: 1.25 }}>
+                Sustainable Teaching, the podcast
+              </h3>
+              <p style={{ fontSize: 15, color: '#6B7280', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+                Real talk about sustainable teaching from people who get it. New episodes every Friday.
+              </p>
+              <span style={{ fontSize: 15, fontWeight: 600, color: '#1e2749' }}>
+                Start listening →
+              </span>
             </a>
 
-            {/* Card 3: Free Resources */}
             <a
               href="https://tdi.thinkific.com/collections/downloads"
               target="_blank"
               rel="noopener noreferrer"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+              style={{ display: 'block', padding: 28, background: '#ffffff', borderRadius: 12, borderTop: '3px solid #ffba06', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(30,39,73,0.08)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
             >
-              <div
-                className="h-[160px] flex items-center justify-center p-6"
-                style={{ backgroundColor: '#ffba06' }}
-              >
-                {/* Download Icon */}
-                <svg
-                  className="w-16 h-16"
-                  fill="white"
-                  viewBox="0 0 24 24"
-                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
-                >
-                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                </svg>
-              </div>
-              <div className="bg-white p-5">
-                <h3
-                  className="text-lg font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749' }}
-                >
-                  Free<br />Resource
-                </h3>
-                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  Ready-to-use downloads for your classroom, for teachers and paras alike.
-                </p>
-                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
-                  Browse downloads →
-                </span>
-              </div>
+              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: 'uppercase', color: '#2A9D8F', margin: '0 0 12px 0' }}>
+                Free downloads
+              </p>
+              <h3 style={{ fontSize: 22, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0', lineHeight: 1.25 }}>
+                Ready for Monday morning
+              </h3>
+              <p style={{ fontSize: 15, color: '#6B7280', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+                Ready-to-use downloads for your classroom. Built for teachers and paras alike.
+              </p>
+              <span style={{ fontSize: 15, fontWeight: 600, color: '#1e2749' }}>
+                Browse downloads →
+              </span>
             </a>
-
           </div>
         </div>
       </section>
 
       {/* For Teachers & Paraprofessionals */}
-      <section className="section" style={{ backgroundColor: '#f5f5f5' }}>
-        <div className="container-default">
-          <h2 className="text-center mb-2">For Teachers & Paraprofessionals</h2>
-          <p className="text-center mb-12" style={{ opacity: 0.6 }}>
-            PD that respects your time and actually helps.
-          </p>
+      <section style={{ padding: '56px 16px', backgroundColor: '#ffffff' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              FOR TEACHERS AND PARAPROFESSIONALS
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              PD that respects your time and actually helps
+            </h2>
+            <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 700, margin: '0 auto', lineHeight: 1.5 }}>
+              When you are ready to go deeper, here is where to go next.
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-
-            {/* Card 1: Go Deeper */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16, maxWidth: 900, margin: '0 auto' }}>
             <a
               href="https://raehughart.substack.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow"
-              style={{ borderTop: '4px solid #ffba06' }}
+              style={{ display: 'block', padding: 32, background: '#ffffff', borderRadius: 12, border: '1px solid #E5E7EB', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(30,39,73,0.08)'; e.currentTarget.style.borderColor = '#ffba06'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#E5E7EB'; }}
             >
-              <h3
-                className="text-xl font-bold mb-3"
-                style={{ color: '#1e2749' }}
-              >
-                Exclusive<br />Content
-              </h3>
-              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Premium strategies, behind-the-scenes access, and a community of educators who are done settling for the status quo.
+              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: 'uppercase', color: '#ffba06', margin: '0 0 12px 0' }}>
+                Exclusive content
               </p>
-              <span className="font-semibold text-sm" style={{ color: '#ffba06' }}>
+              <h3 style={{ fontSize: 24, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0', lineHeight: 1.25 }}>
+                Premium strategies and the inside view
+              </h3>
+              <p style={{ fontSize: 15, color: '#6B7280', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+                Behind-the-scenes access and a community of educators who are done settling for the status quo.
+              </p>
+              <span style={{ fontSize: 15, fontWeight: 600, color: '#1e2749' }}>
                 See premium options →
               </span>
             </a>
 
-            {/* Card 2: Learning Hub */}
             <a
               href="https://tdi.thinkific.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow"
-              style={{ borderTop: '4px solid #ffba06' }}
+              style={{ display: 'block', padding: 32, background: '#ffffff', borderRadius: 12, border: '1px solid #E5E7EB', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(30,39,73,0.08)'; e.currentTarget.style.borderColor = '#ffba06'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#E5E7EB'; }}
             >
-              <h3
-                className="text-xl font-bold mb-3"
-                style={{ color: '#1e2749' }}
-              >
-                Learning Hub
-                <span className="block">All-Access</span>
-              </h3>
-              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
-                100+ hours of on-demand PD. Bite-sized videos you can finish in one sitting. Strategies you'll actually use Monday morning.
+              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: 'uppercase', color: '#ffba06', margin: '0 0 12px 0' }}>
+                Learning Hub all-access
               </p>
-              <span className="font-semibold text-sm" style={{ color: '#ffba06' }}>
+              <h3 style={{ fontSize: 24, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0', lineHeight: 1.25 }}>
+                100+ hours of on-demand PD
+              </h3>
+              <p style={{ fontSize: 15, color: '#6B7280', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+                Bite-sized videos you can finish in one sitting. Strategies you will actually use Monday morning.
+              </p>
+              <span style={{ fontSize: 15, fontWeight: 600, color: '#1e2749' }}>
                 Explore the Learning Hub →
               </span>
             </a>
-
           </div>
 
-          {/* Request for School CTA */}
-          <div className="mt-12 text-center">
-            <p className="mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+          <div style={{ marginTop: 40, textAlign: 'center' }}>
+            <p style={{ fontSize: 16, color: '#6B7280', margin: '0 0 16px 0' }}>
               Love what you see? Think your whole school could benefit?
             </p>
             <a
               href="/for-schools/request"
-              className="inline-block px-6 py-3 rounded-lg font-semibold border-2 transition-all hover:bg-gray-100"
-              style={{ borderColor: '#1e2749', color: '#1e2749' }}
+              style={{ display: 'inline-block', padding: '12px 24px', borderRadius: 8, fontWeight: 600, fontSize: 15, border: '2px solid #1e2749', color: '#1e2749', textDecoration: 'none', transition: 'background-color 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#1e2749'; e.currentTarget.style.color = '#ffffff'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#1e2749'; }}
             >
-              Request TDI for Your School
+              Request TDI for your school
             </a>
           </div>
         </div>
       </section>
 
       {/* For School Leaders */}
-      <section className="section bg-white">
-        <div className="container-default">
-          <h2 className="text-center mb-2">For School Leaders</h2>
-          <p className="text-center mb-12" style={{ opacity: 0.6 }}>
-            Support your whole building, teachers and paraprofessionals, with PD they'll actually use.
-          </p>
+      <section style={{ padding: '56px 16px', backgroundColor: '#1e2749', color: '#ffffff' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#ffba06', marginBottom: 12 }}>
+              FOR SCHOOL LEADERS
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#ffffff', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              Support your whole building
+            </h2>
+            <p style={{ fontSize: 17, color: '#cbd5e1', maxWidth: 700, margin: '0 auto', lineHeight: 1.5 }}>
+              Teachers and paraprofessionals, with PD they will actually use. Pick the door that fits where you are.
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-
-            {/* Card 1: Bring TDI */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, maxWidth: 1000, margin: '0 auto' }}>
             <a
               href="/get-started"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+              style={{ display: 'block', padding: 28, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, textDecoration: 'none', transition: 'background-color 0.2s, border-color 0.2s, transform 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.borderColor = 'rgba(255,186,6,0.5)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
-              <div
-                className="h-[160px] flex items-center justify-center p-6"
-                style={{ backgroundColor: '#80a4ed' }}
-              >
-                {/* Team/Group Icon */}
-                <svg
-                  className="w-16 h-16"
-                  fill="white"
-                  viewBox="0 0 24 24"
-                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
-                >
-                  <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-                </svg>
-              </div>
-              <div className="bg-white p-5">
-                <h3
-                  className="text-lg font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749' }}
-                >
-                  Work With<br />the Team
-                </h3>
-                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  Whole-school PD designed for real implementation.
-                </p>
-                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
-                  Learn more →
-                </span>
-              </div>
+              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: 'uppercase', color: '#ffba06', margin: '0 0 12px 0' }}>
+                Work with the team
+              </p>
+              <h3 style={{ fontSize: 22, fontWeight: 700, color: '#ffffff', margin: '0 0 12px 0', lineHeight: 1.25 }}>
+                Whole-school PD, real implementation
+              </h3>
+              <p style={{ fontSize: 15, color: '#cbd5e1', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+                Designed for the building, not just the binder. Start the conversation about what TDI looks like for your school.
+              </p>
+              <span style={{ fontSize: 15, fontWeight: 600, color: '#ffba06' }}>
+                Learn more →
+              </span>
             </a>
 
-            {/* Card 2: Explore What's Possible */}
             <a
               href="/contact"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+              style={{ display: 'block', padding: 28, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, textDecoration: 'none', transition: 'background-color 0.2s, border-color 0.2s, transform 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.borderColor = 'rgba(255,186,6,0.5)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
-              <div
-                className="h-[160px] flex items-center justify-center p-6"
-                style={{ backgroundColor: '#80a4ed' }}
-              >
-                {/* Compass/Explore Icon */}
-                <svg
-                  className="w-16 h-16"
-                  fill="white"
-                  viewBox="0 0 24 24"
-                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
-                >
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5.5-2.5l7.51-3.49L17.5 6.5 9.99 9.99 6.5 17.5zm5.5-6.6c.61 0 1.1.49 1.1 1.1s-.49 1.1-1.1 1.1-1.1-.49-1.1-1.1.49-1.1 1.1-1.1z"/>
-                </svg>
-              </div>
-              <div className="bg-white p-5">
-                <h3
-                  className="text-lg font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749' }}
-                >
-                  Explore What's Possible
-                </h3>
-                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  Let's discuss partnership models for your school.
-                </p>
-                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
-                  Get in touch →
-                </span>
-              </div>
+              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: 'uppercase', color: '#ffba06', margin: '0 0 12px 0' }}>
+                Explore what is possible
+              </p>
+              <h3 style={{ fontSize: 22, fontWeight: 700, color: '#ffffff', margin: '0 0 12px 0', lineHeight: 1.25 }}>
+                See the partnership models
+              </h3>
+              <p style={{ fontSize: 15, color: '#cbd5e1', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+                Ignite, Accelerate, Sustain. Three phases that meet your school where it is and grow from there.
+              </p>
+              <span style={{ fontSize: 15, fontWeight: 600, color: '#ffba06' }}>
+                Get in touch →
+              </span>
             </a>
 
-            {/* Card 3: Chat with Team */}
             <a
               href="/contact"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+              style={{ display: 'block', padding: 28, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, textDecoration: 'none', transition: 'background-color 0.2s, border-color 0.2s, transform 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.borderColor = 'rgba(255,186,6,0.5)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
-              <div
-                className="h-[160px] flex items-center justify-center p-6"
-                style={{ backgroundColor: '#80a4ed' }}
-              >
-                {/* Chat/Message Icon */}
-                <svg
-                  className="w-16 h-16"
-                  fill="white"
-                  viewBox="0 0 24 24"
-                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
-                >
-                  <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
-                </svg>
-              </div>
-              <div className="bg-white p-5">
-                <h3
-                  className="text-lg font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749' }}
-                >
-                  Schedule a Chat
-                </h3>
-                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  Have questions? Let's talk.
-                </p>
-                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
-                  Contact us →
-                </span>
-              </div>
+              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: 'uppercase', color: '#ffba06', margin: '0 0 12px 0' }}>
+                Schedule a chat
+              </p>
+              <h3 style={{ fontSize: 22, fontWeight: 700, color: '#ffffff', margin: '0 0 12px 0', lineHeight: 1.25 }}>
+                Have questions? Let us talk
+              </h3>
+              <p style={{ fontSize: 15, color: '#cbd5e1', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+                Not sure where to start? Book a no-pressure conversation with the team and we will help you find the right path.
+              </p>
+              <span style={{ fontSize: 15, fontWeight: 600, color: '#ffba06' }}>
+                Contact us →
+              </span>
             </a>
-
           </div>
         </div>
       </section>

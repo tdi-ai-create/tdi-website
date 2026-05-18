@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
         agreement_signed: true,
         agreement_signed_at: new Date().toISOString(),
         agreement_signed_name: signedName,
+        agreement_version: 'v2.3',
       })
       .eq('id', creatorId)
       .select();
@@ -157,7 +158,7 @@ export async function POST(request: NextRequest) {
           },
           body: JSON.stringify({
             from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-            to: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+            to: ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
             subject: `🎉 ${existingCreator.name} signed their agreement!`,
             html: `
               <div style="font-family: sans-serif; max-width: 600px;">

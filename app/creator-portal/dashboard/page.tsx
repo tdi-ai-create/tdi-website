@@ -3,7 +3,8 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { LogOut, AlertCircle, Mail, User, CheckCircle, X, Target, Calendar, RefreshCw } from 'lucide-react';
+import Link from 'next/link';
+import { LogOut, AlertCircle, Mail, User, CheckCircle, X, Target, Calendar, RefreshCw, ExternalLink } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CreatorDashboardHeader } from '@/components/creator-portal/CreatorDashboardHeader';
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
@@ -15,6 +16,9 @@ import TDIPortalLoader from '@/components/TDIPortalLoader';
 import LocationPromptModal from '@/components/creator-portal/LocationPromptModal';
 import { SurveyPopup } from '@/components/creator-portal/SurveyPopup';
 import ProjectedDateCountdown from '@/components/creator-portal/ProjectedDateCountdown';
+import { TakeABreakButton } from '@/components/creator-portal/TakeABreak';
+import PausedScreen from '@/components/creator-portal/PausedScreen';
+import PepTalkCallout from '@/components/creator-portal/PepTalkCallout';
 import type { CreatorDashboardData, MilestoneWithStatus } from '@/types/creator-portal';
 
 // Component to handle search params (must be wrapped in Suspense)
@@ -39,6 +43,8 @@ function SearchParamsHandler({
 export default function CreatorDashboardPage() {
   const router = useRouter();
   const [dashboardData, setDashboardData] = useState<CreatorDashboardData | null>(null);
+  const [isAdminPreview, setIsAdminPreview] = useState(false);
+  const [previewCreatorName, setPreviewCreatorName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -94,6 +100,18 @@ export default function CreatorDashboardPage() {
         console.log('[Dashboard] User email:', email);
         setUserEmail(email);
 
+        // Topic-selection gate: redirect creator to topic picker if not chosen yet
+        const { data: creatorTopicCheck } = await supabase
+          .from('creators')
+          .select('topic_chosen_by_creator')
+          .eq('email', email)
+          .maybeSingle();
+        if (creatorTopicCheck && !creatorTopicCheck.topic_chosen_by_creator) {
+          console.log('[Dashboard] Creator has not chosen topic, redirecting to select-topic');
+          router.push('/creator-portal/select-topic');
+          return;
+        }
+
         // Fetch dashboard data via API (uses service role to bypass RLS)
         console.log('[Dashboard] Fetching dashboard data...');
         const response = await fetch('/api/creator-portal/dashboard', {
@@ -106,10 +124,28 @@ export default function CreatorDashboardPage() {
         console.log('[Dashboard] API response:', { status: response.status, data });
 
         if (!response.ok) {
-          // Check if user is admin
+          // Check if user is admin — support preview mode
           if (data.isAdmin) {
-            console.log('[Dashboard] User is admin, redirecting...');
-            router.push('/admin/creators');
+            const urlParams = new URLSearchParams(window.location.search);
+            const asCreator = urlParams.get('as_creator');
+            if (asCreator) {
+              // Admin preview mode: fetch the target creator's dashboard
+              const previewRes = await fetch('/api/creator-portal/dashboard', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ creatorId: asCreator }),
+              });
+              if (previewRes.ok) {
+                const previewData = await previewRes.json();
+                setDashboardData(previewData);
+                setIsAdminPreview(true);
+                setPreviewCreatorName(previewData.creator?.name || 'Creator');
+                setDataLoaded(true);
+                return;
+              }
+            }
+            // No preview param — redirect to new admin portal
+            router.push('/tdi-admin/creators');
             return;
           }
 
@@ -537,6 +573,42 @@ export default function CreatorDashboardPage() {
               <SearchParamsHandler onAgreementSigned={handleAgreementSigned} />
             </Suspense>
 
+            {/* Admin Preview Banner */}
+            {isAdminPreview && dashboardData && (
+              <div style={{
+                background: '#EFF6FF',
+                borderBottom: '1px solid #BFDBFE',
+                padding: '10px 24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: 13,
+                color: '#1E40AF',
+              }}>
+                <span>Viewing as <strong>{previewCreatorName}</strong> (admin preview mode)</span>
+                <a
+                  href={`/tdi-admin/creators/${dashboardData.creator.id}`}
+                  style={{ color: '#2563EB', fontWeight: 600, textDecoration: 'none' }}
+                >
+                  Exit Preview
+                </a>
+              </div>
+            )}
+
+            {/* Paused State Screen — intercepts entire dashboard */}
+            {(dashboardData?.creator as any)?.lifecycle_state === 'paused' && dashboardData && (
+              <PausedScreen
+                creatorId={dashboardData.creator.id}
+                creatorEmail={dashboardData.creator.email}
+                firstName={dashboardData.creator.name?.split(' ')[0] || 'there'}
+                pauseType={(dashboardData.creator as any)?.pause_type || null}
+                onUnpaused={() => window.location.reload()}
+              />
+            )}
+
+            {/* Normal dashboard — only render when NOT paused */}
+            {(dashboardData?.creator as any)?.lifecycle_state !== 'paused' && <>
+
             {/* Studio Header */}
             <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
               <div className="container-wide py-4 flex items-center justify-between">
@@ -556,6 +628,13 @@ export default function CreatorDashboardPage() {
                   </div>
                 </div>
 
+                {dashboardData && (
+                  <TakeABreakButton
+                    creatorId={dashboardData.creator.id}
+                    creatorEmail={dashboardData.creator.email}
+                    onPaused={() => window.location.reload()}
+                  />
+                )}
                 <button
                   onClick={handleSignOut}
                   className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#1e2749] transition-colors"
@@ -724,11 +803,44 @@ export default function CreatorDashboardPage() {
                       content_path: dashboardData.creator.content_path,
                     }}
                   />
+
+                  {/* Pep talk callout — shows after path selection during onboarding */}
+                  {dashboardData.creator.current_phase === 'onboarding' && dashboardData.creator.content_path && (
+                    <PepTalkCallout
+                      creatorId={dashboardData.creator.id}
+                      creatorName={dashboardData.creator.name}
+                      creatorEmail={dashboardData.creator.email}
+                      contentPath={dashboardData.creator.content_path}
+                      pepTalkRequestedAt={(dashboardData.creator as any).pep_talk_requested_at || null}
+                    />
+                  )}
                 </div>
 
                 {/* Sidebar */}
                 <div className="space-y-6">
                   <CourseDetailsPanel creator={dashboardData.creator} />
+
+                  {/* Affiliate Link Card */}
+                  {(dashboardData.creator as any).affiliate_slug && (
+                    <Link
+                      href="/creator-portal/affiliate"
+                      className="block bg-gradient-to-r from-[#1e2749] to-[#2a3459] rounded-xl p-5 text-white hover:shadow-lg transition-shadow group"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-semibold text-sm">Your Affiliate Link</h3>
+                        <ExternalLink className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" />
+                      </div>
+                      <p className="text-white/70 text-xs mb-3">
+                        Earn 50% on every paid conversion
+                      </p>
+                      <div className="bg-white/10 rounded-lg px-3 py-2">
+                        <p className="text-xs font-mono text-white/90 truncate">
+                          teachersdeserveit.com/r/{(dashboardData.creator as any).affiliate_slug}
+                        </p>
+                      </div>
+                    </Link>
+                  )}
+
                   <NotesPanel
                     notes={dashboardData.notes}
                     creatorId={dashboardData.creator.id}
@@ -754,14 +866,14 @@ export default function CreatorDashboardPage() {
                         <User className="w-5 h-5 text-[#80a4ed]" />
                       </div>
                       <div>
-                        <p className="font-medium text-[#1e2749]">Rachel Patragas</p>
-                        <p className="text-sm text-gray-500">Director of Creative Solutions</p>
+                        <p className="font-medium text-[#1e2749]">Teachers Deserve It Team</p>
+                        <p className="text-sm text-gray-500">Creator Studio Support</p>
                         <a
-                          href="mailto:rachel@teachersdeserveit.com"
+                          href="mailto:creatorstudio@teachersdeserveit.com"
                           className="inline-flex items-center gap-1.5 text-sm text-[#80a4ed] hover:text-[#1e2749] mt-2 transition-colors"
                         >
                           <Mail className="w-4 h-4" />
-                          rachel@teachersdeserveit.com
+                          creatorstudio@teachersdeserveit.com
                         </a>
                       </div>
                     </div>
@@ -776,14 +888,16 @@ export default function CreatorDashboardPage() {
                 <p>
                   Questions? Reach out to{' '}
                   <a
-                    href="mailto:rachel@teachersdeserveit.com"
+                    href="mailto:creatorstudio@teachersdeserveit.com"
                     className="text-[#80a4ed] hover:text-[#1e2749]"
                   >
-                    rachel@teachersdeserveit.com
+                    creatorstudio@teachersdeserveit.com
                   </a>
                 </p>
               </div>
             </footer>
+
+            </>}
           </div>
         )}
       </div>

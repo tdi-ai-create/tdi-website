@@ -21,7 +21,7 @@ export async function GET() {
     // Fetch only creators marked for website display
     const { data: creators, error } = await supabase
       .from('creators')
-      .select('id, name, website_display_name, website_title, website_bio, headshot_url, display_order, content_path')
+      .select('id, name, website_display_name, website_title, website_bio, headshot_url, display_order, content_path, topic')
       .eq('display_on_website', true)
       .order('display_order', { ascending: true });
 
@@ -38,6 +38,7 @@ export async function GET() {
       bio: c.website_bio || null,
       headshotUrl: c.headshot_url || null,
       contentPath: c.content_path || null,
+      topic: c.topic || null,
     }));
 
     // Return with cache header (1 hour)
