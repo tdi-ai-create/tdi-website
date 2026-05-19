@@ -101,13 +101,15 @@ export default function CreatorDashboardPage() {
         setUserEmail(email);
 
         // Topic-selection gate: redirect creator to topic picker if not chosen yet
+        // Only gate creators who haven't selected a content path yet (truly new creators).
+        // Existing creators who were onboarded before this feature should not be blocked.
         const { data: creatorTopicCheck } = await supabase
           .from('creators')
-          .select('topic_chosen_by_creator')
+          .select('topic_chosen_by_creator, content_path')
           .eq('email', email)
           .maybeSingle();
-        if (creatorTopicCheck && !creatorTopicCheck.topic_chosen_by_creator) {
-          console.log('[Dashboard] Creator has not chosen topic, redirecting to select-topic');
+        if (creatorTopicCheck && !creatorTopicCheck.topic_chosen_by_creator && !creatorTopicCheck.content_path) {
+          console.log('[Dashboard] New creator has not chosen topic, redirecting to select-topic');
           router.push('/creator-portal/select-topic');
           return;
         }
