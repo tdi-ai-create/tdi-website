@@ -83,21 +83,27 @@ export default function SelectTopicPage() {
   async function saveAndContinue() {
     if (!primaryTopic || !creatorId) return
     setSaving(true)
-    const { error } = await supabase
-      .from('creators')
-      .update({
-        topic: primaryTopic,
-        secondary_topics: secondaryTopics,
-        topic_chosen_by_creator: true,
+    try {
+      const response = await fetch('/api/creator-portal/set-topic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          topic: primaryTopic,
+          secondaryTopics,
+        }),
       })
-      .eq('id', creatorId)
-
-    if (error) {
-      alert('Error saving: ' + error.message)
+      const data = await response.json()
+      if (!response.ok || !data.success) {
+        alert('Error saving topic: ' + (data.error || 'Unknown error'))
+        setSaving(false)
+        return
+      }
+      router.push('/creator-portal/dashboard?topic=saved')
+    } catch (err) {
+      alert('Network error saving topic. Please try again.')
       setSaving(false)
-      return
     }
-    router.push('/creator-portal/dashboard?topic=saved')
   }
 
   if (loading) {
