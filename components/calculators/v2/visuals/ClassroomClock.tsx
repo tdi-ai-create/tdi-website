@@ -1,11 +1,145 @@
 'use client';
 
 interface ClassroomClockProps {
-  variant?: 'side-by-side' | 'tdi-only';
+  variant?: 'side-by-side' | 'tdi-only' | 'proof-strip';
   className?: string;
 }
 
 export function ClassroomClock({ variant = 'side-by-side', className = '' }: ClassroomClockProps) {
+  if (variant === 'proof-strip') {
+    return (
+      <div className={`classroom-clock-proof-strip ${className}`} style={{
+        background: '#fafaf9',
+        border: '1px solid #e5e5e5',
+        borderRadius: 12,
+        padding: '22px 24px',
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'baseline',
+          marginBottom: 18,
+        }}>
+          <div>
+            <div style={{
+              fontSize: 10,
+              color: '#737373',
+              textTransform: 'uppercase',
+              letterSpacing: '0.12em',
+              fontWeight: 700,
+              marginBottom: 2,
+            }}>
+              Why those numbers
+            </div>
+            <div style={{
+              fontFamily: 'Fraunces, Georgia, serif',
+              fontSize: 17,
+              fontWeight: 600,
+              color: '#1e2749',
+            }}>
+              Same money. Two completely different speeds.
+            </div>
+          </div>
+          <div style={{ fontSize: 11, color: '#737373', fontStyle: 'italic' }}>
+            Across all TDI partner schools
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+          {/* Traditional */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 18,
+            padding: 12,
+            background: 'white',
+            border: '1px solid #e5e5e5',
+            borderRadius: 10,
+          }}>
+            <MiniTraditionalClock />
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{
+                fontSize: 10,
+                color: '#737373',
+                textTransform: 'uppercase',
+                letterSpacing: '0.12em',
+                fontWeight: 700,
+                marginBottom: 4,
+              }}>
+                Traditional PD
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                <span style={{
+                  fontFamily: 'Fraunces, Georgia, serif',
+                  fontSize: 32,
+                  fontWeight: 700,
+                  color: '#1e2749',
+                  lineHeight: 1,
+                }}>
+                  10%
+                </span>
+              </div>
+              <div style={{ fontSize: 11, color: '#737373', marginTop: 4 }}>over 365 days</div>
+            </div>
+          </div>
+
+          {/* TDI */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 18,
+            padding: 12,
+            background: 'white',
+            border: '1.5px solid #0d7377',
+            borderRadius: 10,
+          }}>
+            <MiniTdiClock />
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{
+                fontSize: 10,
+                color: '#0d7377',
+                textTransform: 'uppercase',
+                letterSpacing: '0.12em',
+                fontWeight: 700,
+                marginBottom: 4,
+              }}>
+                With TDI
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                <span style={{
+                  fontFamily: 'Fraunces, Georgia, serif',
+                  fontSize: 32,
+                  fontWeight: 700,
+                  color: '#0d7377',
+                  lineHeight: 1,
+                }}>
+                  75%
+                </span>
+              </div>
+              <div style={{ fontSize: 11, color: '#0d7377', marginTop: 4 }}>in 10 days</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{
+          marginTop: 16,
+          paddingTop: 14,
+          borderTop: '1px solid #e5e5e5',
+          textAlign: 'center',
+        }}>
+          <span style={{
+            fontFamily: 'Fraunces, Georgia, serif',
+            fontSize: 16,
+            fontWeight: 600,
+            color: '#1e2749',
+          }}>
+            That&apos;s <span style={{ color: '#c2410c' }}>27x faster</span> and <span style={{ color: '#0d7377' }}>7.5x more.</span>
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   if (variant === 'tdi-only') {
     return (
       <div className={`classroom-clock-tdi-only ${className}`} style={{ textAlign: 'center' }}>
@@ -324,6 +458,73 @@ function TdiClock() {
       <path d="M 120 120 L 117 38 L 120 30 L 123 38 Z" fill="#1e2749" transform="rotate(270 120 120)" />
       <circle cx="120" cy="120" r="8" fill="#1e2749" />
       <circle cx="120" cy="120" r="3" fill="#ffba06" />
+    </svg>
+  );
+}
+
+function MiniTraditionalClock() {
+  return (
+    <svg width="76" height="76" viewBox="0 0 240 240" style={{ flexShrink: 0 }}>
+      <defs>
+        <radialGradient id="tradBezProof" cx="50%" cy="50%" r="50%">
+          <stop offset="85%" stopColor="#fafaf9" />
+          <stop offset="100%" stopColor="#d4d4d4" />
+        </radialGradient>
+        <radialGradient id="tradFaceProof" cx="35%" cy="30%" r="75%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="100%" stopColor="#f5f4f1" />
+        </radialGradient>
+      </defs>
+      <circle cx="120" cy="120" r="115" fill="url(#tradBezProof)" stroke="#1e2749" strokeWidth="0.8" opacity="0.4" />
+      <circle cx="120" cy="120" r="102" fill="url(#tradFaceProof)" stroke="#1e2749" strokeWidth="2" />
+      <g stroke="#1e2749" strokeWidth="3" strokeLinecap="round">
+        <line x1="120" y1="22" x2="120" y2="40" />
+        <line x1="218" y1="120" x2="206" y2="120" />
+        <line x1="120" y1="218" x2="120" y2="206" />
+        <line x1="22" y1="120" x2="34" y2="120" />
+      </g>
+      <path d="M 120 32 A 88 88 0 0 1 173 49 L 120 120 Z" fill="#9a9994" opacity="0.85" />
+      <path d="M 120 120 L 115 38 L 120 28 L 125 38 Z" fill="#1e2749" transform="rotate(36 120 120)" />
+      <circle cx="120" cy="120" r="12" fill="#1e2749" />
+      <circle cx="120" cy="120" r="5" fill="#ffba06" />
+    </svg>
+  );
+}
+
+function MiniTdiClock() {
+  return (
+    <svg width="76" height="76" viewBox="0 0 240 240" style={{ flexShrink: 0 }}>
+      <defs>
+        <radialGradient id="tdiBezProof" cx="50%" cy="50%" r="50%">
+          <stop offset="85%" stopColor="#fdf9ed" />
+          <stop offset="100%" stopColor="#ffba06" />
+        </radialGradient>
+        <radialGradient id="tdiFaceProof" cx="35%" cy="30%" r="75%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="100%" stopColor="#f7f5f0" />
+        </radialGradient>
+        <linearGradient id="tdiArcProof" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#14a098" />
+          <stop offset="100%" stopColor="#0d7377" />
+        </linearGradient>
+        <linearGradient id="goldArcProof" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#ffd54a" />
+          <stop offset="100%" stopColor="#ffba06" />
+        </linearGradient>
+      </defs>
+      <circle cx="120" cy="120" r="115" fill="url(#tdiBezProof)" stroke="#1e2749" strokeWidth="0.8" opacity="0.6" />
+      <circle cx="120" cy="120" r="102" fill="url(#tdiFaceProof)" stroke="#1e2749" strokeWidth="2" />
+      <g stroke="#1e2749" strokeWidth="3" strokeLinecap="round">
+        <line x1="120" y1="22" x2="120" y2="40" />
+        <line x1="218" y1="120" x2="206" y2="120" />
+        <line x1="120" y1="218" x2="120" y2="206" />
+        <line x1="22" y1="120" x2="34" y2="120" />
+      </g>
+      <path d="M 120 32 A 88 88 0 1 1 32 120 L 120 120 Z" fill="url(#tdiArcProof)" opacity="0.92" />
+      <path d="M 120 32 A 88 88 0 0 1 162.3 43.5 L 120 120 Z" fill="url(#goldArcProof)" opacity="0.98" />
+      <path d="M 120 120 L 115 38 L 120 28 L 125 38 Z" fill="#1e2749" transform="rotate(270 120 120)" />
+      <circle cx="120" cy="120" r="12" fill="#1e2749" />
+      <circle cx="120" cy="120" r="5" fill="#ffba06" />
     </svg>
   );
 }
