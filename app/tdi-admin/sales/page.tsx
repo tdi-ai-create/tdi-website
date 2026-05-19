@@ -623,13 +623,14 @@ export default function SalesPage() {
     return counts
   }, [activeOpps])
 
-  // Stats for sticky top bar
+  // Stats for sticky top bar (exclude Targeting from pipeline totals — cold outbound, 5% probability)
   const stats = useMemo(() => {
+    const pipelineOpps = activeOpps.filter(o => o.stage !== 'targeting')
     const callSheetOpps = activeOpps.filter(o => o.onCallSheet)
     return {
-      totalPipeline: activeOpps.reduce((s, o) => s + (o.value ?? 0), 0),
-      activeCount: activeOpps.length,
-      hotCount: activeOpps.filter(o => o.heat === 'hot').length,
+      totalPipeline: pipelineOpps.reduce((s, o) => s + (o.value ?? 0), 0),
+      activeCount: pipelineOpps.length,
+      hotCount: pipelineOpps.filter(o => o.heat === 'hot').length,
       invoiceCount: opportunities.filter(o => o.needs_invoice && !o.deleted_at).length,
       callSheetCount: callSheetOpps.length,
       callSheetValue: callSheetOpps.reduce((s, o) => s + (o.value ?? 0), 0),
