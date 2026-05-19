@@ -71,16 +71,21 @@ function AgreementContent() {
     if (!agreed || !signatureName.trim()) return;
     setIsSigning(true); setError(null);
     if (isDemo) { setIsSigned(true); return; }
-    if (!creatorId) return;
+    if (!creatorId) {
+      setError('Unable to identify your creator account. Please reload the page and try again.');
+      setIsSigning(false);
+      return;
+    }
     try {
       const response = await fetch('/api/creator-portal/sign-agreement', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ creatorId, signedName: signatureName.trim() }),
       });
-      if (!response.ok) { const data = await response.json(); throw new Error(data.error || 'Failed to sign agreement'); }
+      const data = await response.json();
+      if (!response.ok || !data.success) { throw new Error(data.error || 'Failed to sign agreement'); }
       setIsSigned(true);
       setTimeout(() => router.push('/creator-portal/dashboard?agreement=signed'), 2000);
-    } catch (err) { setError(err instanceof Error ? err.message : 'Something went wrong'); setIsSigning(false); }
+    } catch (err) { setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.'); setIsSigning(false); }
   };
 
   const isV1Signer = agreementVersion === 'v1.0';
