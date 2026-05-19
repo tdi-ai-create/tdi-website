@@ -94,7 +94,11 @@ export async function POST(request: Request) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateData: any = {
       status: newStatus,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      ...(newStatus === 'completed' ? {
+        completed_at: new Date().toISOString(),
+        completed_by: 'creator',
+      } : {}),
     };
 
     // Build submission data object for structured data capture
