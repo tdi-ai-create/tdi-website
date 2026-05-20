@@ -117,6 +117,16 @@ function factoredRevenue(opp: Opportunity): number {
   return Math.round((opp.value || 0) * opp.probability / 100)
 }
 
+// Normalize school year to abbreviated format: '2026-2027' → '2026-27'
+function normalizeSchoolYear(value: string | null | undefined): string {
+  if (!value) return '2026-27'
+  const match = value.match(/^(\d{4})-(\d{4})$/)
+  if (match) {
+    return `${match[1]}-${match[2].slice(2)}`
+  }
+  return value
+}
+
 function formatCurrencyFull(n: number): string {
   return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 }
@@ -226,7 +236,7 @@ export default function SalesPage() {
         contract_year: row.contract_year,
         heat: row.heat || 'warm',
         onCallSheet: row.on_jims_call_sheet || false,
-        schoolYear: row.contract_year || row.school_year || '2026-27',
+        schoolYear: normalizeSchoolYear(row.contract_year || row.school_year),
         paymentReceived: row.payment_received || false,
         invoiceSentAt: row.invoice_sent_at,
         deleted_at: row.deleted_at,
