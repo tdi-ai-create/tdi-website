@@ -531,9 +531,9 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                     <div
                       className="text-xs font-bold tracking-widest uppercase mt-0.5"
                       style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}
-                      title="How much effort is needed to implement this in your practice"
+                      title="How much brain power and time a resource takes to put into action"
                     >
-                      Capacity
+                      Lift
                     </div>
                   </div>
                 )}

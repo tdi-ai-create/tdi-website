@@ -47,9 +47,14 @@ export interface TeamPermissions {
     financial_data?: boolean;
   };
   team_access?: boolean;
+  // Portal-level access flags (for portals that don't have granular sub-permissions yet)
+  cmo?: { access?: boolean };
+  sales?: { access?: boolean };
+  funding?: { access?: boolean };
+  settings?: { access?: boolean };
 }
 
-export type PortalSection = 'learning_hub' | 'creator_studio' | 'leadership' | 'intelligence';
+export type PortalSection = 'cmo' | 'sales' | 'intelligence' | 'learning_hub' | 'creator_studio' | 'funding' | 'leadership' | 'settings';
 
 // Permission definitions for UI
 export const LEARNING_HUB_PERMISSIONS = [
@@ -130,7 +135,7 @@ export function hasPermission(
   section: PortalSection,
   action: string
 ): boolean {
-  const sectionPermissions = permissions[section];
+  const sectionPermissions = (permissions as Record<string, any>)[section];
   if (!sectionPermissions) return false;
   return (sectionPermissions as Record<string, boolean>)[action] === true;
 }
@@ -142,7 +147,7 @@ export function hasAnySectionPermission(
   permissions: TeamPermissions,
   section: PortalSection
 ): boolean {
-  const sectionPermissions = permissions[section];
+  const sectionPermissions = (permissions as Record<string, any>)[section];
   if (!sectionPermissions) return false;
   return Object.values(sectionPermissions).some(v => v === true);
 }
@@ -153,18 +158,14 @@ export function hasAnySectionPermission(
 export function getAccessibleSections(permissions: TeamPermissions): PortalSection[] {
   const sections: PortalSection[] = [];
 
-  if (hasAnySectionPermission(permissions, 'learning_hub')) {
-    sections.push('learning_hub');
-  }
-  if (hasAnySectionPermission(permissions, 'creator_studio')) {
-    sections.push('creator_studio');
-  }
-  if (hasAnySectionPermission(permissions, 'leadership')) {
-    sections.push('leadership');
-  }
-  if (hasAnySectionPermission(permissions, 'intelligence')) {
-    sections.push('intelligence');
-  }
+  if (permissions.cmo?.access) sections.push('cmo');
+  if (permissions.sales?.access) sections.push('sales');
+  if (hasAnySectionPermission(permissions, 'intelligence')) sections.push('intelligence');
+  if (hasAnySectionPermission(permissions, 'learning_hub')) sections.push('learning_hub');
+  if (hasAnySectionPermission(permissions, 'creator_studio')) sections.push('creator_studio');
+  if (permissions.funding?.access) sections.push('funding');
+  if (hasAnySectionPermission(permissions, 'leadership')) sections.push('leadership');
+  if (permissions.team_access) sections.push('settings');
 
   return sections;
 }
@@ -188,6 +189,9 @@ export function canManageTeam(member: TeamMember | null): boolean {
  */
 export function getDefaultPermissions(): TeamPermissions {
   return {
+    cmo: { access: false },
+    sales: { access: false },
+    funding: { access: false },
     learning_hub: {
       view_enrollments: true,
       export_reports: false,

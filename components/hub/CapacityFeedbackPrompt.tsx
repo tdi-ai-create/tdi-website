@@ -83,7 +83,7 @@ export default function CapacityFeedbackPrompt({
               className="font-medium pr-6 mb-0.5"
               style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '14px', color: '#2B3A67' }}
             >
-              We rated this <strong>{capacityLabel}</strong> capacity.
+              We rated this <strong>{capacityLabel} Lift</strong>.
             </p>
             <p
               className="mb-3 text-xs"

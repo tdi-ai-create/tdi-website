@@ -106,12 +106,15 @@ export async function POST(request: Request) {
       }, { status: 422 });
     }
 
-    const { nextMilestoneName, phaseId } = await progressMilestone(supabase, {
-      creatorId,
-      milestoneId: milestone.id,
-      completedBy: `admin:${adminEmail}`,
-      contentPath,
-    });
+    const { nextMilestoneName, phaseId } = await progressMilestone(
+      supabase as Parameters<typeof progressMilestone>[0],
+      {
+        creatorId,
+        milestoneId: milestone.id,
+        completedBy: `admin:${adminEmail}`,
+        contentPath,
+      },
+    );
 
     if (notes && typeof notes === 'string' && notes.trim()) {
       await supabase.from('creator_notes').insert({

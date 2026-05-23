@@ -74,7 +74,7 @@ https://www.teachersdeserveit.com/admin/creators/${creatorId}
           },
           body: JSON.stringify({
             from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-            to: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+            to: ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
             subject: `[Action Needed] ${title}`,
             text: emailBody,
           }),
@@ -92,7 +92,7 @@ https://www.teachersdeserveit.com/admin/creators/${creatorId}
     } else {
       // Fallback: log the email for now
       console.log('[send-notification] Email notification (no RESEND_API_KEY):');
-      console.log('To: rachel@teachersdeserveit.com, rae@teachersdeserveit.com');
+      console.log('To: creatorstudio@teachersdeserveit.com, rae@teachersdeserveit.com');
       console.log('Subject: [Action Needed]', title);
       console.log('Body:', emailBody);
     }

@@ -462,7 +462,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
       exampleLabel: 'See blog draft example'
     },
     drive_folder_created: {
-      tip: 'Create a Google Drive folder and share it with rachel@teachersdeserveit.com',
+      tip: 'Create a Google Drive folder and share it with creatorstudio@teachersdeserveit.com',
       exampleUrl: '/docs/creator-portal-examples#7-asset-folder-structure',
       exampleLabel: 'See folder structure'
     },
@@ -828,16 +828,21 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
     case 'sign_agreement':
       return (
         <AdminPreviewWrapper actionLabel={config.label || 'Review & Sign Agreement'}>
-          <a
-            href="/creator-portal/agreement"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors ${isAdminPreview ? 'pointer-events-auto' : ''}`}
-          >
-            <FileText className="w-4 h-4" />
-            {config.label || 'Review & Sign Agreement'}
-            <ExternalLink className="w-3 h-3" />
-          </a>
+          <div className="space-y-3">
+            <p className="text-sm text-gray-600" style={{ lineHeight: 1.7 }}>
+              Review and digitally sign your Independent Content Creator Agreement. Takes about 5-10 minutes to read through the plain-language version, plus a moment to sign.
+            </p>
+            <a
+              href={isAdminPreview ? `/creator-portal/agreement?as_creator=${creatorId}` : '/creator-portal/agreement'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center gap-2 px-5 py-2.5 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors text-sm font-medium ${isAdminPreview ? 'pointer-events-auto' : ''}`}
+            >
+              <FileText className="w-4 h-4" />
+              Review &amp; sign agreement
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
         </AdminPreviewWrapper>
       );
 
@@ -882,11 +887,11 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                 {isSubmitting ? 'Confirming...' : (config.label || "I've Reviewed the Notes")}
               </button>
               <a
-                href={`mailto:rachel@teachersdeserveit.com?subject=${encodeURIComponent(`Question about my intake notes - ${creatorName || 'Creator'}`)}`}
+                href={`mailto:creatorstudio@teachersdeserveit.com?subject=${encodeURIComponent(`Question about my intake notes - ${creatorName || 'Creator'}`)}`}
                 className="inline-flex items-center gap-2 px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <Mail className="w-4 h-4" />
-                Email Rachel
+                Email Creator Studio
               </a>
             </div>
             {error && <p className="text-sm text-red-600">{error}</p>}
@@ -1101,9 +1106,9 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
           impactText: 'Track your impact as educators read your insights',
         },
         download: {
-          actionLabel: 'Download Live!',
-          headline: 'Your Download is Live!',
-          viewLabel: 'View Your Download:',
+          actionLabel: 'Quick Tool Live!',
+          headline: 'Your Quick Tool is Live!',
+          viewLabel: 'View Your Quick Tool:',
           linkText: 'Open in TDI Store',
           shareText: 'Share your download with your network',
           impactText: 'Track your impact as educators use your resource',
@@ -1178,33 +1183,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
 
     case 'select':
       // Content path selection with visual cards and program overview
-      const getCompensationBadge = (pathValue: string) => {
-        switch (pathValue) {
-          case 'blog':
-            return (
-              <span className="inline-flex items-center gap-1 text-xs text-gray-500 mt-2">
-                <Handshake className="w-3 h-3" />
-                Collaborative contribution - Builds your visibility
-              </span>
-            );
-          case 'download':
-            return (
-              <span className="inline-flex items-center gap-1 text-xs text-gray-500 mt-2">
-                <Handshake className="w-3 h-3" />
-                Collaborative contribution - Builds your portfolio
-              </span>
-            );
-          case 'course':
-            return (
-              <span className="inline-flex items-center gap-1 text-xs text-green-600 font-medium mt-2">
-                <DollarSign className="w-3 h-3" />
-                Revenue share - Earn with every enrollment
-              </span>
-            );
-          default:
-            return null;
-        }
-      };
+      // Both paths earn the same way (50% affiliate) — no differentiated badges needed
 
       return (
         <AdminPreviewWrapper actionLabel={config.label || 'Select an Option'}>
@@ -1244,25 +1223,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                   <div className="grid gap-3">
                     <div className="bg-white rounded-lg p-3 border border-gray-100">
                       <div className="flex items-center justify-between mb-1">
-                        <p className="font-medium text-[#1e2749] text-sm">Blog Post</p>
-                        <a
-                          href="https://raehughart.substack.com/p/the-loneliness-nobody-warned-you"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[10px] text-[#80a4ed] hover:text-[#1e2749] flex items-center gap-1"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                          View Example
-                        </a>
-                      </div>
-                      <p className="text-xs text-gray-600 leading-relaxed">
-                        Write and publish a blog post on the TDI platform. Great for getting your voice out there and building your presence in the education community.
-                      </p>
-                    </div>
-
-                    <div className="bg-white rounded-lg p-3 border border-gray-100">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="font-medium text-[#1e2749] text-sm">Digital Download</p>
+                        <p className="font-medium text-[#1e2749] text-sm">Quick Tool (Download)</p>
                         <a
                           href="https://tdi.thinkific.com/products/digital_downloads/new-digital-download-67"
                           target="_blank"
@@ -1278,12 +1239,9 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                       </p>
                     </div>
 
-                    <div className="bg-white rounded-lg p-3 border border-green-100 ring-1 ring-green-200">
+                    <div className="bg-white rounded-lg p-3 border border-gray-100">
                       <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-[#1e2749] text-sm">Online Course</span>
-                          <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium">REVENUE</span>
-                        </div>
+                        <p className="font-medium text-[#1e2749] text-sm">Learning Hub Course</p>
                         <a
                           href="https://tdi.thinkific.com/products/courses/new-course-21"
                           target="_blank"
@@ -1296,10 +1254,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                         </a>
                       </div>
                       <p className="text-xs text-gray-600 leading-relaxed">
-                        Build a full online course with video modules. <span className="font-medium text-[#38618C]">This path includes a digital download and blog post</span> to support your launch. You&apos;ll earn ongoing revenue with every enrollment.
-                      </p>
-                      <p className="text-[10px] text-green-700 mt-1">
-                        Tip: Use code <span className="font-mono font-medium">&quot;Free Month&quot;</span> to preview the example course for free.
+                        Build a full online course with video modules. <span className="font-medium text-[#38618C]">Includes a companion marketing blog post</span> to support your launch.
                       </p>
                     </div>
                   </div>
@@ -1307,7 +1262,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                   {/* Tip */}
                   <div className="bg-slate-50 rounded-lg p-3 border border-slate-200">
                     <p className="text-xs text-slate-700">
-                      <strong>How it works:</strong> Each path builds on the one before it. Choosing &quot;Online Course&quot; automatically includes a digital download and blog post as part of your launch package.
+                      <strong>How it works:</strong> Both paths include a companion marketing blog post as part of your launch to help promote your work. You earn 50% on every signup through your affiliate link.
                     </p>
                   </div>
                 </div>
@@ -1317,13 +1272,13 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
             {/* Helper Note - Cumulative Paths */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
               <p className="text-sm text-blue-800">
-                <strong>Select one option below.</strong> Each path builds on the one before it &mdash; for example, choosing &quot;Online Course&quot; automatically includes a blog post and digital download as part of your launch.
+                <strong>Select one path below.</strong> Both include a companion marketing blog post as part of your launch to help promote your work.
               </p>
             </div>
 
             {/* Path Selection Cards */}
             <div className="grid gap-4">
-              {(config.options || []).map((option: { value: string; label: string; description: string }) => (
+              {(config.options || []).filter((o: { value: string }) => o.value !== 'blog').map((option: { value: string; label: string; description: string }) => (
                 <button
                   key={option.value}
                   onClick={() => {
@@ -1336,17 +1291,13 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                   className={`relative flex items-start gap-4 p-5 rounded-xl border-2 transition-all text-left ${
                     selectedPath === option.value
                       ? 'border-[#1e2749] bg-slate-50 shadow-md'
-                      : option.value === 'course'
-                        ? 'border-slate-200 bg-slate-50/50 hover:border-[#1e2749] hover:shadow-md'
-                        : 'border-slate-200 bg-white hover:border-[#1e2749] hover:shadow-md'
+                      : 'border-slate-200 bg-white hover:border-[#1e2749] hover:shadow-md'
                   } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <div className={`flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center ${
                     selectedPath === option.value
                       ? 'bg-[#1e2749] text-white'
-                      : option.value === 'course'
-                        ? 'bg-slate-100 text-[#1e2749]'
-                        : 'bg-slate-100 text-[#1e2749]'
+                      : 'bg-slate-100 text-[#1e2749]'
                   }`}>
                     {getPathIcon(option.value)}
                   </div>
@@ -1355,16 +1306,10 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                       <span className="font-semibold text-[#1e2749] text-lg">
                         {option.label}
                       </span>
-                      {option.value === 'course' && (
-                        <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium">
-                          EARN REVENUE
-                        </span>
-                      )}
                     </div>
                     <p className="text-sm text-gray-600 leading-relaxed">
                       {option.description}
                     </p>
-                    {getCompensationBadge(option.value)}
                   </div>
                   {selectedPath === option.value && isSubmitting && (
                     <div className="absolute top-4 right-4">

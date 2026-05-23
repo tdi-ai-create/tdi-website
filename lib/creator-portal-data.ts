@@ -22,6 +22,7 @@ const PHASE_ORDER: PhaseId[] = [
   'course_design',
   'test_prep',
   'production',
+  'marketing_blog',
   'launch',
 ];
 

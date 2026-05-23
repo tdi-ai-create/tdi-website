@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     // Notification data structure - ready to connect to email service
     // Options: SendGrid, Resend, Postmark, or a webhook to Slack/email
     const notificationData = {
-      to: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+      to: ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
       subject: `Action Needed: ${creatorName} is waiting on TDI`,
       body: `
 Creator: ${creatorName} (${creatorEmail})

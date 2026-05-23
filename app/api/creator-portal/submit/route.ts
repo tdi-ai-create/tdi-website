@@ -94,7 +94,11 @@ export async function POST(request: Request) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateData: any = {
       status: newStatus,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      ...(newStatus === 'completed' ? {
+        completed_at: new Date().toISOString(),
+        completed_by: 'creator',
+      } : {}),
     };
 
     // Build submission data object for structured data capture
@@ -681,7 +685,7 @@ export async function POST(request: Request) {
             },
             body: JSON.stringify({
               from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-              to: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+              to: ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
               subject: emailSubject,
               html: `
                 <div style="font-family: sans-serif; max-width: 600px;">

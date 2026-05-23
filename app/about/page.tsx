@@ -1,19 +1,22 @@
 'use client';
 
 import Link from 'next/link';
+import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import { useState, useEffect } from 'react';
 import SymbolAnimation from '@/components/SymbolAnimation';
 import ContentCreatorsSection from '@/components/ContentCreatorsSection';
+import AboutTeamSection from '@/components/AboutTeamSection';
+import AboutCreatorsSection from '@/components/AboutCreatorsSection';
 
 // Navigation sections
 const navSections = [
   { id: 'our-story', label: 'Our Story' },
-  { id: 'founder', label: 'Founder' },
   { id: 'our-symbol', label: 'Our Symbol' },
-  { id: 'blueprint', label: 'Blueprint' },
-  { id: 'impact', label: 'Impact' },
   { id: 'team', label: 'Team' },
   { id: 'creators', label: 'Creators' },
+  { id: 'founder', label: 'Founder' },
+  { id: 'blueprint', label: 'Blueprint' },
+  { id: 'impact', label: 'Impact' },
 ];
 
 export default function AboutPage() {
@@ -108,7 +111,7 @@ export default function AboutPage() {
         <div className="container-default">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center max-w-5xl mx-auto">
             <div>
-              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>87K+</p>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>100K+</p>
               <p style={{ color: '#ffffff', opacity: 0.9 }}>educators in our community</p>
             </div>
             <div className="md:col-span-1">
@@ -180,140 +183,11 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Meet Rae Section + TEDx Talk */}
-      <section id="founder" className="py-16 md:py-20 scroll-mt-32" style={{ backgroundColor: '#f5f5f5' }}>
+      {/* The Team */}
+      <section className="py-16 scroll-mt-32" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
-            Meet the Founder
-          </h2>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
-            {/* Photo */}
-            <div className="flex justify-center">
-              <img
-                src="/images/rae-headshot.webp"
-                alt="Rae Hughart"
-                className="rounded-2xl shadow-lg w-full max-w-md"
-                style={{ filter: 'grayscale(100%)' }}
-              />
-            </div>
-
-            {/* Bio */}
-            <div>
-              <h3 className="text-2xl font-bold mb-2" style={{ color: '#1e2749' }}>Rae Hughart</h3>
-              <p className="text-lg mb-4" style={{ color: '#80a4ed' }}>CEO & Founder</p>
-
-              <p className="mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
-                Rae Hughart is an award-winning educator, internationally recognized speaker, and bestselling author dedicated to transforming how we support teachers.
-              </p>
-              <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
-                After experiencing burnout firsthand, she founded Teachers Deserve It to create sustainable professional development that respects educators' time while delivering real results.
-              </p>
-
-              {/* Links */}
-              <div className="space-y-3">
-                <a
-                  href="https://www.youtube.com/watch?v=OLzaa7Hv3mo&list=PPSV"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 font-semibold transition-colors hover:opacity-80"
-                  style={{ color: '#1e2749' }}
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                  </svg>
-                  Watch the TEDx Talk
-                </a>
-
-                <a
-                  href="https://www.amazon.com/dp/1951600401?ref=cm_sw_r_ffobk_cp_ud_dp_QE98EJQJZH2CF260TPNZ"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 font-semibold transition-colors hover:opacity-80"
-                  style={{ color: '#1e2749' }}
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2L3 7l1.63 1.27A2 2 0 0 0 4 10v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-.63-1.73L21 7l-9-5zM6 10h12v8H6v-8zm6-5.5L17.5 8H6.5L12 4.5z"/>
-                  </svg>
-                  Books on Amazon
-                </a>
-              </div>
-
-{/* Social Links */}
-<div className="flex gap-4 mt-6">
-  <a
-    href="https://www.instagram.com/raehughart/"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
-    style={{ backgroundColor: '#1e2749' }}
-  >
-    <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
-      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-    </svg>
-  </a>
-  <a
-    href="https://www.tiktok.com/@raehughartedu"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
-    style={{ backgroundColor: '#1e2749' }}
-  >
-    <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
-      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-    </svg>
-  </a>
-  <a
-    href="https://www.linkedin.com/in/rae-hughart/"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
-    style={{ backgroundColor: '#1e2749' }}
-  >
-    <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
-      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-    </svg>
-  </a>
-  <a
-    href="https://www.facebook.com/TeachFurther/"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
-    style={{ backgroundColor: '#1e2749' }}
-  >
-    <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
-      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-    </svg>
-  </a>
-</div>
-            </div>
-          </div>
-
-          {/* TEDx Video - within Meet the Founder section */}
-          <div className="max-w-3xl mx-auto mt-16 pt-12 border-t border-gray-200">
-            <div className="text-center mb-6">
-              <p className="text-sm font-semibold uppercase tracking-wide" style={{ color: '#ffba06' }}>
-                Watch Rae's Story
-              </p>
-              <h3 className="text-xl font-bold mt-2" style={{ color: '#1e2749' }}>
-                TEDx Talk: Why Teachers Deserve Better
-              </h3>
-            </div>
-            <div className="relative w-full rounded-xl overflow-hidden shadow-lg" style={{ paddingBottom: '56.25%' }}>
-              <iframe
-                className="absolute top-0 left-0 w-full h-full"
-                src="https://www.youtube.com/embed/OLzaa7Hv3mo"
-                title="Rae Hughart TEDx Talk"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
-            <p className="text-center text-sm mt-4" style={{ color: '#1e2749', opacity: 0.6 }}>
-              This talk has inspired thousands of educators to rethink professional development.
-            </p>
-          </div>
-
+          <AboutTeamSection />
+          <AboutCreatorsSection />
         </div>
       </section>
 
@@ -367,6 +241,112 @@ export default function AboutPage() {
               </p>
             </div>
 
+          </div>
+        </div>
+      </section>
+
+      {/* TEDx Talk Section */}
+      <section id="founder" className="py-16 md:py-20 scroll-mt-32" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-default">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-8">
+              <p className="text-sm font-semibold uppercase tracking-wide mb-2" style={{ color: '#ffba06' }}>
+                Watch Rae's Story
+              </p>
+              <h2 className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>
+                TEDx Talk: Why Teachers Deserve Better
+              </h2>
+            </div>
+
+            <div className="relative w-full rounded-xl overflow-hidden shadow-lg" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src="https://www.youtube.com/embed/OLzaa7Hv3mo"
+                title="Rae Hughart TEDx Talk"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+
+            <p className="text-center text-sm mt-4 mb-8" style={{ color: '#1e2749', opacity: 0.6 }}>
+              This talk has inspired thousands of educators to rethink professional development.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+              <a
+                href="https://www.youtube.com/watch?v=OLzaa7Hv3mo&list=PPSV"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 font-semibold transition-colors hover:opacity-80"
+                style={{ color: '#1e2749' }}
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+                Watch on YouTube
+              </a>
+
+              <a
+                href="https://www.amazon.com/dp/1951600401?ref=cm_sw_r_ffobk_cp_ud_dp_QE98EJQJZH2CF260TPNZ"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 font-semibold transition-colors hover:opacity-80"
+                style={{ color: '#1e2749' }}
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2L3 7l1.63 1.27A2 2 0 0 0 4 10v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-.63-1.73L21 7l-9-5zM6 10h12v8H6v-8zm6-5.5L17.5 8H6.5L12 4.5z"/>
+                </svg>
+                Books on Amazon
+              </a>
+            </div>
+
+            <div className="flex gap-4 justify-center">
+              <a
+                href="https://www.instagram.com/raehughart/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                style={{ backgroundColor: '#1e2749' }}
+              >
+                <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+              </a>
+              <a
+                href="https://www.tiktok.com/@raehughartedu"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                style={{ backgroundColor: '#1e2749' }}
+              >
+                <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                </svg>
+              </a>
+              <a
+                href="https://www.linkedin.com/in/rae-hughart/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                style={{ backgroundColor: '#1e2749' }}
+              >
+                <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+              </a>
+              <a
+                href="https://www.facebook.com/TeachFurther/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                style={{ backgroundColor: '#1e2749' }}
+              >
+                <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -459,7 +439,7 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>87,000+</p>
+              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>100,000+</p>
               <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>Educators in Our Community</p>
             </div>
             <div>
@@ -483,103 +463,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* The Team */}
-      <section id="team" className="py-20 scroll-mt-32" style={{ backgroundColor: '#f5f5f5' }}>
-        <div className="container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
-            The Team That Makes It Possible
-          </h2>
-          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
-            A passionate group of educators, strategists, and creatives<br />committed to transforming professional development.
-          </p>
-
-          {/* Leadership Team with Bios */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto mb-12">
-
-            {/* Kristin Williams */}
-            <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-              <div
-                className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
-                style={{ backgroundColor: '#ffba06' }}
-              >
-                <svg className="w-10 h-10" fill="#1e2749" viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-              </div>
-              <h4 className="font-bold text-lg mb-1" style={{ color: '#1e2749' }}>Kristin Williams</h4>
-              <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Chief Marketing Officer</p>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Shapes the voice and visibility of TDI, turning eight years of cross-industry marketing expertise into meaningful connections with educators nationwide.
-              </p>
-            </div>
-
-            {/* Omar Garcia */}
-            <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-              <div
-                className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
-                style={{ backgroundColor: '#ffba06' }}
-              >
-                <svg className="w-10 h-10" fill="#1e2749" viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-              </div>
-              <h4 className="font-bold text-lg mb-1" style={{ color: '#1e2749' }}>Omar Garcia</h4>
-              <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Chief Financial Officer</p>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Drives financial strategy and operational systems that allow TDI to scale sustainably while delivering measurable ROI for every partner district.
-              </p>
-            </div>
-
-          </div>
-
-          {/* Team Members (no bios, card style like Content Creators) */}
-          <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto">
-            {/* Rachel Patragas */}
-            <div className="text-center p-3">
-              <div
-                className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                style={{ backgroundColor: '#1A6B6B' }}
-              >
-                <span className="text-white font-bold text-sm">RP</span>
-              </div>
-              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Rachel Patragas</p>
-              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Director of Creative Solutions</p>
-            </div>
-
-            {/* Jim Ford */}
-            <div className="text-center p-3">
-              <div
-                className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                style={{ backgroundColor: '#1A6B6B' }}
-              >
-                <span className="text-white font-bold text-sm">JF</span>
-              </div>
-              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Jim Ford</p>
-              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Business Development Coordinator</p>
-            </div>
-
-            {/* Olivia Smith */}
-            <div className="text-center p-3">
-              <div
-                className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                style={{ backgroundColor: '#1A6B6B' }}
-              >
-                <span className="text-white font-bold text-sm">OS</span>
-              </div>
-              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Olivia Smith</p>
-              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Executive Communication Coordinator</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Content Creators - Dynamic from database */}
-      <section id="creators" className="pt-4 pb-16 scroll-mt-32" style={{ backgroundColor: '#f5f5f5' }}>
-        <div className="container-default">
-          <ContentCreatorsSection />
-        </div>
-      </section>
-
       {/* Our Community */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
@@ -591,6 +474,24 @@ export default function AboutPage() {
               They're done pretending burnout is a badge of honor. They're practical optimists who believe there's a smarter way to do this work. They're still here because they still believe in teaching. They just refuse to destroy themselves doing it.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Certified in All 50 States */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#E6F1FB' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              OUR REACH
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              Serving educators in all 50 states
+            </h2>
+            <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
+              From day one, our mission has been to reach every classroom. Today TDI is in all 50 US states and 100+ countries. Hover any state to explore.
+            </p>
+          </div>
+          <CertifiedStatesMap />
         </div>
       </section>
 

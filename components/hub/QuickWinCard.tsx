@@ -5,9 +5,9 @@ import { Lock, Sparkles, Heart } from 'lucide-react';
 import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
 
 const CAPACITY_STYLES: Record<string, { color: string; label: string }> = {
-  low:    { color: '#6BA368', label: 'Low' },
-  medium: { color: '#E8B84B', label: 'Medium' },
-  high:   { color: '#E8927C', label: 'High' },
+  low:    { color: '#6BA368', label: 'Low Lift' },
+  medium: { color: '#E8B84B', label: 'Medium Lift' },
+  high:   { color: '#E8927C', label: 'High Lift' },
 };
 
 // Category colors - elevated design

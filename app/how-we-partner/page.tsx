@@ -3,7 +3,8 @@
 import { useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { TabbedCalculator } from '@/components/calculators/TabbedCalculator';
+import { CompactAdmin } from '@/components/calculators/v2/compact/CompactAdmin';
+import TeamStrip from '@/components/TeamStrip'
 
 type TabId = 'approach' | 'in-person' | 'learning-hub' | 'dashboard' | 'book' | 'results' | 'calculator';
 
@@ -959,15 +960,14 @@ function CalculatorPanel() {
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: '#1e2749' }}>
-          See What's Possible<br />for Your School
+          See What&apos;s Possible<br />for Your School
         </h2>
         <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
-          Answer a few questions and get a personalized snapshot based on data from our partner schools.
+          Slide the budget to see what reaches the classroom with TDI.
         </p>
       </div>
 
-      {/* Calculator */}
-      <TabbedCalculator defaultTab="schools" />
+      <CompactAdmin />
 
       {/* Dual CTA */}
       <div className="text-center space-y-3">
@@ -984,7 +984,7 @@ function CalculatorPanel() {
             className="text-sm font-medium hover:underline"
             style={{ color: '#1e2749' }}
           >
-            Or start the conversation now →
+            Or start the conversation now &rarr;
           </Link>
         </div>
       </div>
@@ -1167,9 +1167,9 @@ export default function HowWePartnerPage() {
                   <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14h-2v-4H8v-2h4V7h2v4h4v2h-4v4z" />
                 </svg>
               </div>
-              <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Calculate Impact</h3>
+              <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Build Your Board Memo</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                See potential improvements in retention and stress.
+                Generate a board-ready memo with grant funding pathways in 90 seconds.
               </p>
             </Link>
 
@@ -1212,9 +1212,9 @@ export default function HowWePartnerPage() {
                   <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z" />
                 </svg>
               </div>
-              <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Explore Funding</h3>
+              <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Funding Pathways</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                80% of partner schools secure external funding.
+                Title II-A, IV-A, ESSER, and state grants mapped to TDI services.
               </p>
             </Link>
           </div>
@@ -1298,6 +1298,25 @@ export default function HowWePartnerPage() {
       </section>
 
       {/* Final CTA */}
+      {/* Team Strip */}
+      <section style={{ backgroundColor: '#F0FAF6', borderTop: '0.5px solid #D4EDE0', borderBottom: '0.5px solid #D4EDE0' }}>
+        <div className="container-default">
+          <TeamStrip
+            members={[
+              { type: 'team', name: 'Dr. Maya Johnson', imageSlug: 'maya-johnson' },
+              { type: 'team', name: 'Dr. Jasmine Cole', imageSlug: 'jasmine-cole' },
+              { type: 'team', name: 'Lily Chen', imageSlug: 'lily-chen' },
+              { type: 'team', name: 'Holly Scott', imageSlug: 'holly-scott' },
+              { type: 'team', name: 'Olivia Smith', imageSlug: 'olivia-smith' },
+              { type: 'team', name: 'Rodrigo Vega', imageSlug: 'rodrigo-vega' },
+              { type: 'creator', name: 'Amy Storer', topic: 'Math' },
+              { type: 'creator', name: 'Lindsay Hall', topic: 'Math' },
+            ]}
+            copy="Every partnership is supported by specialists across curriculum, research, design, and customer success."
+          />
+        </div>
+      </section>
+
       <section className="py-16 md:py-20" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default text-center">
           <h2 className="text-2xl md:text-4xl font-bold mb-4" style={{ color: '#ffffff' }}>

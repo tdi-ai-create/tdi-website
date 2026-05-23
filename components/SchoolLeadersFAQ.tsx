@@ -47,7 +47,7 @@ const schoolLeaderFAQs: FAQItem[] = [
     question: "How do we know this will work for our specific context?",
     answer: (
       <>
-        TDI serves 87,000+ educators across 21 states in schools ranging from rural single-building districts to multi-school urban systems. Every partnership is customized - your dashboard, your goals, your pace. Start with the{' '}
+        TDI serves 100,000+ educators across all 50 states in schools ranging from rural single-building districts to multi-school urban systems. Every partnership is customized - your dashboard, your goals, your pace. Start with the{' '}
         <Link href="/pd-diagnostic" className="font-semibold underline" style={{ color: '#35A7FF' }}>
           free PD Diagnostic
         </Link>{' '}

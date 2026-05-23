@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { TabbedCalculator } from '@/components/calculators/TabbedCalculator';
+import { CompactAdmin } from '@/components/calculators/v2/compact/CompactAdmin';
 
 type TabId = 'approach' | 'in-person' | 'learning-hub' | 'dashboard' | 'book' | 'results' | 'calculator';
 
@@ -538,7 +538,7 @@ function CalculatorPanel() {
           Answer a few questions and get a personalized snapshot based on data from our partner schools.
         </p>
       </div>
-      <TabbedCalculator defaultTab="schools" />
+      <CompactAdmin />
     </div>
   );
 }

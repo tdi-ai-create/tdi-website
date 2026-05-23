@@ -238,7 +238,7 @@ function PortalAccessCell({
       disabled={sending}
       className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-50"
       style={{
-        background: sending ? '#FEF3C7' : '#16A34A',
+        background: sending ? '#FEF3C7' : '#2563EB',
         color: sending ? '#92400E' : '#fff',
       }}
     >
@@ -470,7 +470,7 @@ export default function LeadershipDashboardPage() {
       <div className="px-6 py-6">
         {/* Page Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Lead Dashboard</h1>
+          <h1 className="font-extrabold" style={{ fontSize: 28, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Lead Dashboard</h1>
           <p className="text-sm text-gray-500 mt-1">
             Manage school partnerships, reports, action items, and billing.
           </p>
@@ -487,8 +487,8 @@ export default function LeadershipDashboardPage() {
             <div className="p-5 flex items-center justify-between">
               <div>
                 <p
-                  className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
+                  className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  style={{ fontSize: 28, fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.activeCount}
                 </p>
@@ -513,8 +513,8 @@ export default function LeadershipDashboardPage() {
             <div className="p-5 flex items-center justify-between">
               <div>
                 <p
-                  className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
+                  className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  style={{ fontSize: 28, fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.totalEducators}
                 </p>
@@ -539,8 +539,8 @@ export default function LeadershipDashboardPage() {
             <div className="p-5 flex items-center justify-between">
               <div>
                 <p
-                  className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
+                  className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  style={{ fontSize: 28, fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.pendingSetup}
                 </p>
@@ -565,8 +565,8 @@ export default function LeadershipDashboardPage() {
             <div className="p-5 flex items-center justify-between">
               <div>
                 <p
-                  className="text-2xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
+                  className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  style={{ fontSize: 28, fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
                 >
                   {stats.awaitingAccept}
                 </p>
@@ -1354,7 +1354,7 @@ export default function LeadershipDashboardPage() {
                     <div
                       className={`w-16 h-16 rounded-full mx-auto mb-2 flex items-center justify-center ${stage.color}`}
                     >
-                      <span className="text-2xl font-bold">{stage.count}</span>
+                      <span className="font-bold" style={{ fontSize: 28 }}>{stage.count}</span>
                     </div>
                     <p className="text-sm font-medium text-gray-700">
                       {stage.label}
@@ -1436,9 +1436,9 @@ export default function LeadershipDashboardPage() {
               </div>
 
               {/* Active */}
-              <div className="bg-white rounded-xl p-4 border border-gray-100" style={{ borderLeft: '3px solid #16A34A', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <div className="bg-white rounded-xl p-4 border border-gray-100" style={{ borderLeft: '3px solid #2563EB', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                 <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full" style={{ background: '#16A34A' }} />
+                  <div className="w-2 h-2 rounded-full" style={{ background: '#2563EB' }} />
                   Active ({pipelineCounts.active})
                 </h3>
                 <div className="space-y-2">

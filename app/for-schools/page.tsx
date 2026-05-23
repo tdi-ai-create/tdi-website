@@ -1,7 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import Link from 'next/link';
+import TeamStrip from '@/components/TeamStrip'
+import { CompactAdmin } from '@/components/calculators/v2/compact/CompactAdmin';
 
 // GA4 scroll tracking hook
 function useScrollTracking() {
@@ -155,7 +158,7 @@ export default function ForSchoolsPage() {
       question: 'How do we know this will work for our specific context?',
       answer: (
         <>
-          TDI serves 87,000+ educators across 21 states in schools ranging from rural single-building districts to multi-school urban systems. Every partnership is customized - your dashboard, your goals, your pace. Start with the{' '}
+          TDI serves 100,000+ educators across all 50 states in schools ranging from rural single-building districts to multi-school urban systems. Every partnership is customized - your dashboard, your goals, your pace. Start with the{' '}
           <Link href="/pd-diagnostic" className="font-semibold underline" style={{ color: '#35A7FF' }}>
             free PD Diagnostic
           </Link>{' '}
@@ -480,88 +483,22 @@ export default function ForSchoolsPage() {
       {/* SECTION 4: Benefit (The Math) */}
       <section
         id="section-benefit"
-        className="py-20 md:py-28"
-        style={{ backgroundColor: '#ffffff' }}
+        className="py-16 md:py-20 px-6"
+        style={{ backgroundColor: '#f5f5f5' }}
       >
-        <div className="container-default">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="text-xs uppercase tracking-widest font-bold mb-3" style={{ color: '#F96767' }}>
               The Math
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e2749', fontFamily: 'serif' }}>
+              Where does your PD budget actually go?
             </h2>
-            <p className="text-center text-lg mb-12" style={{ color: '#1e2749', opacity: 0.7 }}>
-              Compare your current PD investment to a TDI partnership.
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#4b5563' }}>
+              Most schools spend $15-20K a year on PD that produces a 10% implementation rate. TDI delivers 65%. 6.5x the classroom impact - and most schools already have the funding.
             </p>
-
-            {/* Side-by-side comparison */}
-            <div className="grid md:grid-cols-2 gap-6 md:gap-8 mb-10">
-              {/* Traditional PD */}
-              <div className="p-8 rounded-2xl" style={{ backgroundColor: '#fef2f2', border: '2px solid #fecaca' }}>
-                <h3 className="text-xl font-bold mb-6 text-center" style={{ color: '#991b1b' }}>Traditional PD</h3>
-                <div className="space-y-5">
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Annual cost</span>
-                    <span className="text-xl font-bold" style={{ color: '#1e2749' }}>$15-20K</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Implementation rate</span>
-                    <span className="text-xl font-bold" style={{ color: '#ef4444' }}>10%</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Retention tracking</span>
-                    <span className="text-xl font-bold" style={{ color: '#1e2749' }}>None</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Sustained coaching</span>
-                    <span className="text-xl font-bold" style={{ color: '#1e2749' }}>Rare</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* TDI Partnership */}
-              <div className="p-8 rounded-2xl" style={{ backgroundColor: '#f0fdf4', border: '2px solid #86efac' }}>
-                <h3 className="text-xl font-bold mb-6 text-center" style={{ color: '#166534' }}>TDI Partnership</h3>
-                <div className="space-y-5">
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Starting at</span>
-                    <span className="text-xl font-bold" style={{ color: '#1e2749' }}>$6,600</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Implementation rate</span>
-                    <span className="text-xl font-bold" style={{ color: '#22c55e' }}>65%</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Retention savings</span>
-                    <span className="text-xl font-bold" style={{ color: '#1e2749' }}>$20-25K/teacher</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Sustained coaching</span>
-                    <span className="text-xl font-bold" style={{ color: '#22c55e' }}>Built-in</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <p className="text-center text-lg font-semibold mb-6" style={{ color: '#38618C' }}>
-              6.5x the classroom impact at a fraction of the cost
-            </p>
-
-            <p className="text-center text-sm mb-8" style={{ color: '#1e2749', opacity: 0.5 }}>
-              (Learning Policy Institute, 2024; urban district average)
-            </p>
-
-            <div className="text-center">
-              <Link
-                href="/get-started"
-                className="inline-flex items-center gap-2 font-semibold transition-all hover:gap-3"
-                style={{ color: '#35A7FF' }}
-              >
-                See your school&apos;s specific numbers
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
           </div>
+          <CompactAdmin />
         </div>
       </section>
 
@@ -762,7 +699,7 @@ export default function ForSchoolsPage() {
               Download the TDI District Summary
             </h2>
             <p className="text-lg mb-8 max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,0.8)' }}>
-              One page. Everything your leadership team needs to start the conversation — 100,000+ educators, 21 states, 94% would recommend.
+              One page. Everything your leadership team needs to start the conversation — 100,000+ educators, all 50 states, 94% would recommend.
             </p>
             <a
               href="/district-summary.pdf"
@@ -793,6 +730,24 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
+      {/* Certified in All 50 States */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#E6F1FB' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              ADMIN-FRIENDLY APPROVAL
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              Yes, we're approved in your state
+            </h2>
+            <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
+              TDI PD credits are pre-approved in all 50 US states. Hover your state to confirm. Click for your state Department of Education link.
+            </p>
+          </div>
+          <CertifiedStatesMap />
+        </div>
+      </section>
+
       {/* SECTION 8: Objections FAQ */}
       <section
         id="section-faq"
@@ -811,6 +766,25 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* SECTION 9: Final CTA */}
+      {/* Team Strip */}
+      <section style={{ backgroundColor: '#F0FAF6', borderTop: '0.5px solid #D4EDE0', borderBottom: '0.5px solid #D4EDE0' }}>
+        <div className="container-default">
+          <TeamStrip
+            members={[
+              { type: 'team', name: 'Jim Ford', imageSlug: 'jim-ford', isHuman: true },
+              { type: 'team', name: 'Holly Scott', imageSlug: 'holly-scott' },
+              { type: 'team', name: 'Olivia Smith', imageSlug: 'olivia-smith' },
+              { type: 'team', name: 'Nora Reeves', imageSlug: 'nora-reeves' },
+              { type: 'team', name: 'Dr. Maya Johnson', imageSlug: 'maya-johnson' },
+              { type: 'team', name: 'Elena Vasquez', imageSlug: 'elena-vasquez' },
+              { type: 'creator', name: 'Dr. Stephanie Nardi', topic: 'Science' },
+              { type: 'creator', name: 'Catherine Dorian', topic: 'Literacy' },
+            ]}
+            copy="When you partner with TDI, you get a team that doesn't disappear after signing."
+          />
+        </div>
+      </section>
+
       <section
         id="section-finalcta"
         className="py-20 md:py-28 relative overflow-hidden"

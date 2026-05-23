@@ -38,7 +38,7 @@ function formatSubmissionData(data: SubmissionData): { label: string; timestamp:
     case 'path_selection': {
       const pathLabels: Record<string, string> = {
         blog: 'Blog Post',
-        download: 'Free Download',
+        download: 'Quick Tool (Download)',
         course: 'Learning Hub Course',
       };
       const label = pathLabels[data.content_path || ''] || data.content_path || '';
@@ -63,7 +63,7 @@ function formatSubmissionData(data: SubmissionData): { label: string; timestamp:
     case 'preferences': {
       const prefs: string[] = [];
       if (data.wants_video_editing) prefs.push('Video editing');
-      if (data.wants_download_design) prefs.push('Download design');
+      if (data.wants_download_design) prefs.push('Quick Tool design');
       return {
         label: prefs.length > 0 ? `Selected: ${prefs.join(', ')}` : 'Preferences saved',
         timestamp: formatDate(data.submitted_at),
@@ -248,7 +248,7 @@ function MilestoneItem({
   // Special "Waiting on TDI" card style
   if (isWaitingOnTdi) {
     const emailSubject = encodeURIComponent('Checking in on my Creator Portal progress');
-    const emailBody = encodeURIComponent(`Hi Rachel,\n\nI wanted to check in on my progress. I'm currently waiting on: ${milestoneTitle}\n\nThanks!`);
+    const emailBody = encodeURIComponent(`Hi Creator Studio Team,\n\nI wanted to check in on my progress. I'm currently waiting on: ${milestoneTitle}\n\nThanks!`);
 
     return (
       <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
@@ -272,7 +272,7 @@ function MilestoneItem({
               Our team is working on this -  we&apos;ll update your portal once complete.
             </p>
             <a
-              href={`mailto:rachel@teachersdeserveit.com?subject=${emailSubject}&body=${emailBody}`}
+              href={`mailto:creatorstudio@teachersdeserveit.com?subject=${emailSubject}&body=${emailBody}`}
               className="text-sm text-slate-500 hover:text-slate-700 underline mt-2 inline-block"
             >
               Taking longer than expected? Let us know →
@@ -404,8 +404,8 @@ function MilestoneItem({
           </span>
         </div>
 
-        {/* Rich Content Accordion - only for creator-action milestones, not team_action */}
-        {!milestone.requires_team_action && milestone.status !== 'locked' && (
+        {/* Rich Content Accordion - skip for sign_agreement (handled by Q&A agreement page) */}
+        {!milestone.requires_team_action && milestone.status !== 'locked' && milestone.action_type !== 'sign_agreement' && (
           /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           <RichContentAccordion richContent={(milestone as any).rich_content} />
         )}
@@ -454,7 +454,7 @@ function MilestoneItem({
                 {isAgreementMilestone && (
                   <>
                     <Link
-                      href="/creator-portal/agreement"
+                      href={isAdminPreview && creatorId ? `/creator-portal/agreement?as_creator=${creatorId}` : '/creator-portal/agreement'}
                       className="inline-flex items-center gap-2 text-sm font-medium bg-[#1e2749] text-white px-4 py-2 rounded-lg hover:bg-[#2a3459] transition-colors"
                     >
                       <FileSignature className="w-4 h-4" />
@@ -590,7 +590,7 @@ function PhaseCard({
   const getPathLabel = (path: string | null | undefined) => {
     switch (path) {
       case 'blog': return 'Blog';
-      case 'download': return 'Download';
+      case 'download': return 'Quick Tool (Download)';
       case 'course': return 'Course';
       default: return 'your';
     }
@@ -791,7 +791,7 @@ export function PhaseProgress({
   const phasesForPath: Record<string, string[]> = {
     blog: ['onboarding', 'agreement', 'launch'],
     download: ['onboarding', 'agreement', 'production', 'launch'],
-    course: ['onboarding', 'agreement', 'course_design', 'test_prep', 'production', 'launch'],
+    course: ['onboarding', 'agreement', 'course_design', 'test_prep', 'production', 'marketing_blog', 'launch'],
   };
   const allowedPhases = phasesForPath[effectiveContentPath] || phasesForPath.course;
   const filteredPhases = phases.filter((phase) => allowedPhases.includes(phase.id));

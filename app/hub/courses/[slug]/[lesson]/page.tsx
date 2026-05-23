@@ -7,6 +7,7 @@ import { useHub } from '@/components/hub/HubContext';
 import { getSupabase } from '@/lib/supabase';
 import { useProgressTracking } from '@/lib/hooks/useProgressTracking';
 import LessonContent from '@/components/hub/LessonContent';
+import LessonConversation from '@/components/hub/LessonConversation';
 import CourseCompletionModal from '@/components/hub/CourseCompletionModal';
 import {
   ArrowLeft,
@@ -17,6 +18,8 @@ import {
   ChevronRight,
   Menu,
   X,
+  MessageCircle,
+  BookOpen,
 } from 'lucide-react';
 import { type QuizQuestion, type QuizResponse, getLessonQuestions, getUserResponses } from '@/lib/hub/quiz';
 
@@ -68,6 +71,7 @@ export default function LessonPage({ params }: LessonPageProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [hasTranscript, setHasTranscript] = useState(false);
   const [hasTranscriptEs, setHasTranscriptEs] = useState(false);
+  const [activeTab, setActiveTab] = useState<'lesson' | 'conversation'>('lesson');
 
   // Quiz state
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
@@ -337,6 +341,39 @@ export default function LessonPage({ params }: LessonPageProps) {
               Course outline
             </button>
 
+            {/* Lesson / Conversation tabs */}
+            <div className="flex gap-0 border-b border-gray-200 mb-6">
+              <button
+                onClick={() => setActiveTab('lesson')}
+                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors relative"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: activeTab === 'lesson' ? '#1B2A4A' : '#9CA3AF',
+                  borderBottom: activeTab === 'lesson' ? '2px solid #E8B84B' : '2px solid transparent',
+                  marginBottom: '-1px',
+                }}
+              >
+                <BookOpen size={16} />
+                Lesson
+              </button>
+              <button
+                onClick={() => setActiveTab('conversation')}
+                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors relative"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: activeTab === 'conversation' ? '#1B2A4A' : '#9CA3AF',
+                  borderBottom: activeTab === 'conversation' ? '2px solid #E8B84B' : '2px solid transparent',
+                  marginBottom: '-1px',
+                }}
+              >
+                <MessageCircle size={16} />
+                Conversation
+              </button>
+            </div>
+
+            {/* ── LESSON TAB ── */}
+            {activeTab === 'lesson' && (<>
+
             {/* Video placeholder (if video_url exists) */}
             {currentLesson.video_url && (
               <div
@@ -540,6 +577,17 @@ export default function LessonPage({ params }: LessonPageProps) {
                   </a>
                 )}
               </div>
+            )}
+
+            </>)}
+
+            {/* ── CONVERSATION TAB ── */}
+            {activeTab === 'conversation' && (
+              <LessonConversation
+                lessonId={currentLesson.id}
+                courseId={course.id}
+                userId={user?.id || null}
+              />
             )}
           </div>
 

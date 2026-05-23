@@ -24,14 +24,14 @@ export async function progressMilestone(
   const { creatorId, milestoneId, completedBy, contentPath } = params;
   const completedAt = new Date().toISOString();
 
-  const { data: milestone } = await supabase
-    .from('milestones')
+  const { data: milestone } = await (supabase
+    .from('milestones') as any)
     .select('id, phase_id, sort_order, title, name, applies_to')
     .eq('id', milestoneId)
     .single();
 
-  await supabase
-    .from('creator_milestones')
+  await (supabase
+    .from('creator_milestones') as any)
     .update({
       status: 'completed',
       completed_at: completedAt,
@@ -52,8 +52,8 @@ export async function progressMilestone(
 
   let nextMilestoneName: string | null = null;
 
-  let { data: nextMilestone } = await supabase
-    .from('milestones')
+  let { data: nextMilestone } = await (supabase
+    .from('milestones') as any)
     .select('id, sort_order, title, name')
     .eq('phase_id', milestone.phase_id)
     .gt('sort_order', milestone.sort_order)
@@ -63,8 +63,8 @@ export async function progressMilestone(
     .maybeSingle();
 
   if (!nextMilestone) {
-    const { data: phases } = await supabase
-      .from('phases')
+    const { data: phases } = await (supabase
+      .from('phases') as any)
       .select('id, sort_order')
       .order('sort_order', { ascending: true });
 
@@ -90,8 +90,8 @@ export async function progressMilestone(
   }
 
   if (nextMilestone) {
-    await supabase
-      .from('creator_milestones')
+    await (supabase
+      .from('creator_milestones') as any)
       .update({
         status: 'available',
         completed_at: null,

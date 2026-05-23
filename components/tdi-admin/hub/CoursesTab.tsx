@@ -263,10 +263,10 @@ function CreateCourseModal({
             </div>
           </div>
 
-          {/* Capacity */}
+          {/* Lift */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Capacity
+              Lift
             </label>
             <select
               value={form.capacity}

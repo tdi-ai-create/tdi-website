@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { getTopicConfig, TOPIC_MAP } from '@/lib/data/creator-topics';
 import dynamic from 'next/dynamic';
 import {
   Search,
@@ -39,7 +40,22 @@ import {
   Settings,
   RefreshCw,
   Trash2,
+  ExternalLink,
+  MousePointerClick,
+  BookMarked, PenLine, Activity, FlaskConical, Calculator,
+  GraduationCap, Sparkles, Languages, HeartHandshake, Music, Library,
+  HeartPulse, Lightbulb, Route, ClipboardCheck, NotebookPen,
+  PencilRuler, Baby, Puzzle, MessagesSquare, Star, Sprout,
+  Target, Home as HomeIcon, Laptop, Scale,
 } from 'lucide-react';
+
+const TOPIC_ICON_MAP: Record<string, any> = {
+  BookOpen, BookMarked, PenLine, Activity, Calculator, FlaskConical, Palette,
+  GraduationCap, Sparkles, Languages, HeartHandshake, Music, Library,
+  HeartPulse, LayoutGrid, Lightbulb, Route, ClipboardCheck, NotebookPen,
+  PencilRuler, Baby, Puzzle, MessagesSquare, Star, Users, Sprout, Clock,
+  Target, HomeIcon, Laptop, Scale,
+};
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
@@ -75,14 +91,14 @@ const USMapChart = dynamic(() => import('@/components/tdi-admin/USMapChart'), {
 });
 
 // Tab types
-type TabId = 'dashboard' | 'creators' | 'analytics' | 'payouts';
+type TabId = 'dashboard' | 'creators' | 'analytics' | 'affiliate';
 
 // Tab configuration
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
   { id: 'creators', label: 'Creators', icon: Users },
   { id: 'analytics', label: 'Analytics', icon: TrendingUp },
-  { id: 'payouts', label: 'Payouts', icon: DollarSign },
+  { id: 'affiliate', label: 'Affiliate', icon: DollarSign },
 ];
 
 // Types
@@ -93,6 +109,7 @@ interface EnrichedCreator {
   course_title: string | null;
   course_audience: string | null;
   content_path: string | null;
+  topic?: string | null;
   current_phase: string;
   target_publish_month: string | null;
   created_at: string;
@@ -208,22 +225,22 @@ function StatusIndicator({ status }: { status: string }) {
   if (status === 'launched') {
     return (
       <div className="flex items-center gap-1.5">
-        <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+        <div className="w-4 h-4 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-            <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#16A34A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#ffba06" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
-        <span className="text-xs font-semibold tracking-wide" style={{ color: '#16A34A' }}>LIVE</span>
+        <span className="text-xs font-semibold tracking-wide" style={{ color: '#ffba06' }}>LIVE</span>
       </div>
     );
   }
 
   const dots: Record<string, string> = {
-    total:          '#8B5CF6',
-    stalled:        '#F59E0B',
+    total:          '#1e2749',
+    stalled:        '#6B7280',
     followedUp:     '#10B981',
     waitingOnCreator:'#06B6D4',
-    waitingOnTDI:   '#8B5CF6',
+    waitingOnTDI:   '#1e2749',
   };
 
   const labels: Record<string, string> = {
@@ -234,7 +251,7 @@ function StatusIndicator({ status }: { status: string }) {
     waitingOnTDI:    'NEEDS REVIEW',
   };
 
-  const color = dots[status] || '#8B5CF6';
+  const color = dots[status] || '#1e2749';
   const label = labels[status] || status.toUpperCase();
 
   return (
@@ -275,7 +292,7 @@ function StatCard({
           e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.5)';
           e.currentTarget.style.boxShadow = '0 8px 28px rgba(139, 92, 246, 0.1), 0 2px 8px rgba(0,0,0,0.06)';
           const topBar = e.currentTarget.querySelector('.stat-top-bar') as HTMLElement;
-          if (topBar) topBar.style.background = '#8B5CF6';
+          if (topBar) topBar.style.background = '#1e2749';
         }
       }}
       onMouseLeave={e => {
@@ -291,15 +308,916 @@ function StatCard({
       {/* Accent top bar - revealed on hover/active */}
       <div
         className="stat-top-bar absolute top-0 left-0 right-0 h-0.5"
-        style={{ background: isActive ? '#8B5CF6' : 'transparent', transition: 'background 0.25s' }}
+        style={{ background: isActive ? '#1e2749' : 'transparent', transition: 'background 0.25s' }}
       />
 
       <div className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-2">{label}</div>
-      <div className="text-3xl font-bold text-gray-900 tracking-tight leading-none mb-2">{value}</div>
+      <div className="font-bold text-gray-900 tracking-tight leading-none mb-2" style={{ fontSize: 28 }}>{value}</div>
 
       {/* Status indicator */}
       <StatusIndicator status={status} />
     </button>
+  );
+}
+
+// ==========================================
+// Projected Publishing Pipeline Component
+// ==========================================
+
+interface PipelineData {
+  forecast: { month: string; monthLabel: string; download: number; course: number; total: number }[];
+  detailList: { month: string; monthLabel: string; count: number; creators: { id: string; name: string; email: string; contentPath: string | null; projectedPublishDate: string | null }[] }[];
+  noProjectedDate: { id: string; name: string; email: string; contentPath: string | null }[];
+  pastProjectedDate: { id: string; name: string; email: string; contentPath: string | null; projectedCompletionDate: string | null; daysOverdue: number }[];
+}
+
+function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
+  const [expandedMonths, setExpandedMonths] = useState<Record<string, boolean>>({});
+  const [showNoDateModal, setShowNoDateModal] = useState(false);
+  const [showPastDateModal, setShowPastDateModal] = useState(false);
+
+  const toggleMonth = (key: string) => {
+    setExpandedMonths(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  return (
+    <div>
+      <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
+        Projected Publishing Pipeline
+      </h2>
+
+      {/* Warning Callouts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+        {/* Callout A: No projected date */}
+        <button
+          onClick={() => data.noProjectedDate.length > 0 && setShowNoDateModal(true)}
+          className={`bg-white rounded-2xl p-5 shadow-[0_1px_4px_rgba(0,0,0,0.04)] text-left transition-all ${
+            data.noProjectedDate.length > 0 ? 'hover:shadow-md cursor-pointer' : ''
+          }`}
+          style={data.noProjectedDate.length > 0 ? { borderLeft: '3px solid #6B7280' } : {}}
+          disabled={data.noProjectedDate.length === 0}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
+              <CalendarDays className="w-5 h-5" style={{ color: '#374151' }} />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Creators with no projected date</p>
+              <p className="text-2xl font-bold text-gray-900">{data.noProjectedDate.length}</p>
+            </div>
+          </div>
+          {data.noProjectedDate.length > 0 && (
+            <p className="text-xs text-gray-400 mt-2">Click to view list</p>
+          )}
+        </button>
+
+        {/* Callout B: Past projected date */}
+        <button
+          onClick={() => data.pastProjectedDate.length > 0 && setShowPastDateModal(true)}
+          className={`bg-white rounded-2xl p-5 shadow-[0_1px_4px_rgba(0,0,0,0.04)] text-left transition-all ${
+            data.pastProjectedDate.length > 0 ? 'hover:shadow-md cursor-pointer' : ''
+          }`}
+          style={data.pastProjectedDate.length > 0 ? { borderLeft: '3px solid #6B7280' } : {}}
+          disabled={data.pastProjectedDate.length === 0}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
+              <Clock className="w-5 h-5" style={{ color: '#374151' }} />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Creators past their projected date</p>
+              <p className="text-2xl font-bold text-gray-900">{data.pastProjectedDate.length}</p>
+            </div>
+          </div>
+          {data.pastProjectedDate.length > 0 && (
+            <p className="text-xs text-gray-400 mt-2">These creators may need a check-in. Click to view.</p>
+          )}
+        </button>
+      </div>
+
+      {/* Pipeline Forecast Bar Chart */}
+      <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] mb-5">
+        <h3 className="text-lg font-semibold mb-1 text-gray-900">
+          Pipeline Forecast
+        </h3>
+        <p className="text-sm text-gray-500 mb-4">Projected content launches by month</p>
+        <div className="h-[280px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data.forecast}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+              <XAxis dataKey="monthLabel" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} allowDecimals={false} />
+              <Tooltip
+                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+              />
+              <Legend />
+              <Bar dataKey="download" stackId="a" fill="#ffba06" name="Quick Tool (Download)" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="course" stackId="a" fill="#1e2749" name="Course" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        {data.forecast.every(m => m.total === 0) && (
+          <p className="text-sm text-gray-400 text-center mt-2">
+            No projected publish dates set yet
+          </p>
+        )}
+      </div>
+
+      {/* Detail List — Grouped by Month */}
+      <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900">
+          Monthly Detail
+        </h3>
+        <div className="space-y-1">
+          {data.detailList.map(month => {
+            const isExpanded = expandedMonths[month.month] ?? false;
+            return (
+              <div key={month.month} className="border border-gray-100 rounded-xl overflow-hidden">
+                <button
+                  onClick={() => toggleMonth(month.month)}
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    {isExpanded ? (
+                      <ChevronUp className="w-4 h-4 text-gray-400" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    )}
+                    <span className="text-sm font-semibold text-gray-900">{month.monthLabel}</span>
+                    <span className="text-xs text-gray-400">({month.count} creator{month.count !== 1 ? 's' : ''})</span>
+                  </div>
+                </button>
+                {isExpanded && (
+                  <div className="px-4 pb-3 border-t border-gray-50">
+                    {month.creators.length === 0 ? (
+                      <p className="text-sm text-gray-400 py-2">No creators projected for this month</p>
+                    ) : (
+                      <div className="divide-y divide-gray-50">
+                        {month.creators.map(creator => (
+                          <div key={creator.id} className="flex items-center justify-between py-2">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600">
+                                {creator.name.charAt(0).toUpperCase()}
+                              </div>
+                              <Link
+                                href={`/tdi-admin/creators/${creator.id}`}
+                                className="text-sm font-medium text-gray-900 hover:text-slate-700 transition-colors"
+                              >
+                                {creator.name}
+                              </Link>
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                creator.contentPath === 'course'
+                                  ? 'bg-slate-100 text-slate-800'
+                                  : 'bg-slate-50 text-slate-700'
+                              }`}>
+                                {creator.contentPath === 'course' ? 'Course' : 'Quick Tool (Download)'}
+                              </span>
+                            </div>
+                            <span className="text-xs text-gray-500">
+                              publishes by {creator.projectedPublishDate
+                                ? new Date(creator.projectedPublishDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                                : '—'}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* No Projected Date Modal */}
+      {showNoDateModal && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
+                  <CalendarDays className="w-5 h-5" style={{ color: '#374151' }} />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">No Projected Date</h2>
+                  <p className="text-sm text-gray-500">{data.noProjectedDate.length} creator{data.noProjectedDate.length !== 1 ? 's' : ''}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowNoDateModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="divide-y divide-gray-100">
+                {data.noProjectedDate.map(creator => (
+                  <div key={creator.id} className="flex items-center justify-between py-3">
+                    <div>
+                      <Link
+                        href={`/tdi-admin/creators/${creator.id}`}
+                        className="text-sm font-medium text-gray-900 hover:text-slate-700 transition-colors"
+                      >
+                        {creator.name}
+                      </Link>
+                      <p className="text-xs text-gray-400">{creator.email}</p>
+                    </div>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                      creator.contentPath === 'course'
+                        ? 'bg-slate-100 text-slate-800'
+                        : creator.contentPath === 'download'
+                        ? 'bg-slate-50 text-slate-700'
+                        : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      {creator.contentPath || 'Not set'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Past Projected Date Modal */}
+      {showPastDateModal && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
+                  <Clock className="w-5 h-5" style={{ color: '#374151' }} />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Past Projected Date</h2>
+                  <p className="text-sm text-gray-500">These creators may need a check-in</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPastDateModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="divide-y divide-gray-100">
+                {data.pastProjectedDate.map((creator: PipelineData['pastProjectedDate'][number]) => (
+                  <div key={creator.id} className="flex items-center justify-between py-3">
+                    <div>
+                      <Link
+                        href={`/tdi-admin/creators/${creator.id}`}
+                        className="text-sm font-medium text-gray-900 hover:text-slate-700 transition-colors"
+                      >
+                        {creator.name}
+                      </Link>
+                      <p className="text-xs text-gray-400">
+                        Projected: {creator.projectedCompletionDate
+                          ? new Date(creator.projectedCompletionDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                          : '\u2014'}
+                      </p>
+                    </div>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-gray-700">
+                      {creator.daysOverdue} day{creator.daysOverdue !== 1 ? 's' : ''} overdue
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// =============================================================================
+// AFFILIATE TAB COMPONENT
+// =============================================================================
+
+interface AffiliateMetrics {
+  period: string;
+  clicks: number;
+  conversions: number;
+  creatorPayoutCents: number;
+  tdiRevenueCents: number;
+}
+
+interface LeaderboardCreator {
+  id: string;
+  name: string;
+  email: string;
+  slug: string;
+  clicks: number;
+  signups: number;
+  conversions: number;
+  earnedCents: number;
+  lifetimeEarnedCents: number;
+  lastActivity: string | null;
+}
+
+interface PayoutBatch {
+  period: string;
+  totalPayoutCents: number;
+  totalConversions: number;
+  status: string;
+  generatedAt: string;
+  generatedBy: string | null;
+  payoutIds: string[];
+  creators: Array<{ name: string; email: string; payoutCents: number; conversions: number }>;
+}
+
+interface CreatorDrillDown {
+  clicks: Array<{ id: string; clicked_at: string; referrer_url: string | null; landing_page: string | null }>;
+  signups: Array<{ id: string; signed_up_at: string; user_email: string | null }>;
+  conversions: Array<{ id: string; converted_at: string; user_email: string | null; gross_amount_cents: number; net_revenue_cents: number; creator_payout_cents: number; refunded: boolean; payout_id: string | null; paid_to_creator_at: string | null }>;
+  payouts: Array<{ id: string; period: string; payout_amount_cents: number; status: string; paid_at: string | null; paid_method: string | null }>;
+}
+
+function formatCents(cents: number): string {
+  return `$${(cents / 100).toFixed(2)}`;
+}
+
+function getPreviousPeriod(): string {
+  const now = new Date();
+  const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function getCurrentPeriod(): string {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function formatPeriodLabel(period: string): string {
+  const [year, month] = period.split('-').map(Number);
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return `${months[month - 1]} ${year}`;
+}
+
+function getPeriodOptions(): { value: string; label: string }[] {
+  const options: { value: string; label: string }[] = [];
+  const now = new Date();
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    options.push({ value: val, label: formatPeriodLabel(val) });
+  }
+  return options;
+}
+
+function AffiliateTab() {
+  const [period, setPeriod] = useState(getCurrentPeriod());
+  const [metrics, setMetrics] = useState<AffiliateMetrics | null>(null);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardCreator[]>([]);
+  const [batches, setBatches] = useState<PayoutBatch[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
+
+  // Mark paid modal
+  const [markPaidBatch, setMarkPaidBatch] = useState<PayoutBatch | null>(null);
+  const [paidMethod, setPaidMethod] = useState('');
+  const [paidReference, setPaidReference] = useState('');
+  const [paidDate, setPaidDate] = useState(new Date().toISOString().split('T')[0]);
+  const [markingPaid, setMarkingPaid] = useState(false);
+
+  // Creator drill-down
+  const [drillDownCreator, setDrillDownCreator] = useState<LeaderboardCreator | null>(null);
+  const [drillDownData, setDrillDownData] = useState<CreatorDrillDown | null>(null);
+  const [drillDownLoading, setDrillDownLoading] = useState(false);
+
+  // Link copied toast
+  const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [metricsRes, leaderboardRes, batchesRes] = await Promise.all([
+        fetch(`/api/admin/affiliate/metrics?period=${period}`).then(r => r.json()),
+        fetch(`/api/admin/affiliate/leaderboard?period=${period}`).then(r => r.json()),
+        fetch('/api/admin/affiliate/payouts').then(r => r.json()),
+      ]);
+      setMetrics(metricsRes);
+      setLeaderboard(leaderboardRes.creators || []);
+      setBatches(batchesRes.batches || []);
+    } catch (err) {
+      console.error('Failed to load affiliate data:', err);
+    }
+    setLoading(false);
+  }, [period]);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const handleGenerate = async () => {
+    const generatePeriod = getPreviousPeriod();
+    if (!confirm(`Generate payout batch for ${formatPeriodLabel(generatePeriod)}?`)) return;
+    setGenerating(true);
+    try {
+      const res = await fetch('/api/admin/affiliate/payouts/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ period: generatePeriod }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(`Created ${data.payoutsCreated} payout(s) from ${data.totalConversions} conversion(s).`);
+        await loadData();
+      } else {
+        alert(data.error || 'Failed to generate payouts');
+      }
+    } catch {
+      alert('Error generating payouts');
+    }
+    setGenerating(false);
+  };
+
+  const handleMarkPaid = async () => {
+    if (!markPaidBatch || !paidMethod) return;
+    setMarkingPaid(true);
+    try {
+      const res = await fetch('/api/admin/affiliate/payouts/mark-paid', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          payoutIds: markPaidBatch.payoutIds,
+          paidMethod,
+          paidReference,
+          paidAt: new Date(paidDate).toISOString(),
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMarkPaidBatch(null);
+        setPaidMethod('');
+        setPaidReference('');
+        await loadData();
+      } else {
+        alert(data.error || 'Failed to mark as paid');
+      }
+    } catch {
+      alert('Error marking paid');
+    }
+    setMarkingPaid(false);
+  };
+
+  const openDrillDown = async (creator: LeaderboardCreator) => {
+    setDrillDownCreator(creator);
+    setDrillDownLoading(true);
+    try {
+      const res = await fetch(`/api/admin/affiliate/creator?id=${creator.id}`);
+      const data = await res.json();
+      setDrillDownData(data);
+    } catch {
+      setDrillDownData(null);
+    }
+    setDrillDownLoading(false);
+  };
+
+  const handleCopyLink = (slug: string) => {
+    navigator.clipboard.writeText(`https://teachersdeserveit.com/r/${slug}`);
+    setCopiedSlug(slug);
+    setTimeout(() => setCopiedSlug(null), 2000);
+  };
+
+  const periodOptions = getPeriodOptions();
+
+  if (loading && !metrics) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 animate-spin" style={{ color: theme.accent }} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Period selector */}
+      <div className="flex items-center justify-between">
+        <select
+          value={period}
+          onChange={e => setPeriod(e.target.value)}
+          className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-slate-300 focus:border-transparent"
+        >
+          {periodOptions.map(o => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+        {loading && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
+      </div>
+
+      {/* Section 1: Top Metrics */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { label: 'Clicks', value: metrics?.clicks || 0, format: (v: number) => v.toLocaleString() },
+          { label: 'Conversions', value: metrics?.conversions || 0, format: (v: number) => v.toLocaleString() },
+          { label: 'Creator Payouts', value: metrics?.creatorPayoutCents || 0, format: formatCents },
+          { label: 'TDI Revenue', value: metrics?.tdiRevenueCents || 0, format: formatCents },
+        ].map(card => (
+          <div
+            key={card.label}
+            className="bg-white rounded-xl p-5 border border-gray-100"
+            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+          >
+            <div className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-2">{card.label}</div>
+            <div className="font-bold text-gray-900 tracking-tight" style={{ fontSize: 28 }}>
+              {card.format(card.value)}
+            </div>
+            <div className="text-xs text-gray-400 mt-1">{formatPeriodLabel(period)}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Section 2: Monthly Payouts */}
+      <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+            Monthly Payouts
+          </h3>
+          <div className="flex items-center gap-2">
+            <a
+              href={`/api/admin/affiliate/payouts/export?period=${getPreviousPeriod()}`}
+              className="px-3 py-1.5 text-xs font-medium border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+            >
+              <DownloadIcon className="w-3 h-3 inline mr-1" />
+              Export CSV
+            </a>
+            <button
+              onClick={handleGenerate}
+              disabled={generating}
+              className="px-3 py-1.5 text-xs font-medium rounded-lg text-white transition-colors disabled:opacity-50 flex items-center gap-1"
+              style={{ backgroundColor: theme.accent }}
+            >
+              {generating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />}
+              Generate {formatPeriodLabel(getPreviousPeriod())}
+            </button>
+          </div>
+        </div>
+
+        {batches.length === 0 ? (
+          <p className="text-sm text-gray-400 py-4">No payout batches generated yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50/80">
+                  <th className="text-left py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Period</th>
+                  <th className="text-right py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Payout</th>
+                  <th className="text-right py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Conv.</th>
+                  <th className="text-left py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Status</th>
+                  <th className="text-left py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Generated</th>
+                  <th className="text-right py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {batches.map((batch, i) => (
+                  <tr key={i} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                    <td className="py-2.5 px-3 font-medium text-gray-900">{formatPeriodLabel(batch.period)}</td>
+                    <td className="py-2.5 px-3 text-right font-semibold" style={{ color: '#2B3A67' }}>
+                      {formatCents(batch.totalPayoutCents)}
+                    </td>
+                    <td className="py-2.5 px-3 text-right text-gray-600">{batch.totalConversions}</td>
+                    <td className="py-2.5 px-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        batch.status === 'paid'
+                          ? 'bg-green-50 text-yellow-700'
+                          : 'bg-amber-50 text-gray-700'
+                      }`}>
+                        {batch.status === 'paid' ? 'Paid' : 'Pending'}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-3 text-gray-500 text-xs">
+                      {new Date(batch.generatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </td>
+                    <td className="py-2.5 px-3 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <a
+                          href={`/api/admin/affiliate/payouts/export?period=${batch.period}`}
+                          className="text-xs text-gray-500 hover:text-gray-900"
+                        >
+                          CSV
+                        </a>
+                        {batch.status === 'pending' && (
+                          <button
+                            onClick={() => {
+                              setMarkPaidBatch(batch);
+                              setPaidMethod('');
+                              setPaidReference('');
+                              setPaidDate(new Date().toISOString().split('T')[0]);
+                            }}
+                            className="text-xs font-medium px-2 py-1 rounded bg-green-50 text-yellow-700 hover:bg-yellow-100 transition-colors"
+                          >
+                            Mark Paid
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Section 3: Creator Leaderboard */}
+      <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          Creator Leaderboard
+        </h3>
+
+        {leaderboard.length === 0 ? (
+          <p className="text-sm text-gray-400 py-4">No creators with affiliate slugs yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50/80">
+                  <th className="text-left py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Creator</th>
+                  <th className="text-left py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide hidden md:table-cell">Slug</th>
+                  <th className="text-right py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Clicks</th>
+                  <th className="text-right py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide hidden md:table-cell">Signups</th>
+                  <th className="text-right py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Conv.</th>
+                  <th className="text-right py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Earned</th>
+                  <th className="text-right py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide hidden lg:table-cell">Lifetime</th>
+                  <th className="text-left py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide hidden lg:table-cell">Last Active</th>
+                </tr>
+              </thead>
+              <tbody>
+                {leaderboard.map(c => (
+                  <tr key={c.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                    <td className="py-2.5 px-3">
+                      <button
+                        onClick={() => openDrillDown(c)}
+                        className="font-medium hover:underline text-left"
+                        style={{ color: '#2B3A67' }}
+                      >
+                        {c.name}
+                      </button>
+                    </td>
+                    <td className="py-2.5 px-3 hidden md:table-cell">
+                      <div className="flex items-center gap-1">
+                        <code className="text-xs text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded">{c.slug}</code>
+                        <button
+                          onClick={() => handleCopyLink(c.slug)}
+                          className="text-gray-400 hover:text-gray-600"
+                          title="Copy affiliate link"
+                        >
+                          {copiedSlug === c.slug ? <Check className="w-3 h-3 text-yellow-500" /> : <Copy className="w-3 h-3" />}
+                        </button>
+                      </div>
+                    </td>
+                    <td className="py-2.5 px-3 text-right text-gray-600">{c.clicks}</td>
+                    <td className="py-2.5 px-3 text-right text-gray-600 hidden md:table-cell">{c.signups}</td>
+                    <td className="py-2.5 px-3 text-right text-gray-600">{c.conversions}</td>
+                    <td className="py-2.5 px-3 text-right font-semibold" style={{ color: c.earnedCents > 0 ? '#059669' : '#9CA3AF' }}>
+                      {c.earnedCents > 0 ? formatCents(c.earnedCents) : '--'}
+                    </td>
+                    <td className="py-2.5 px-3 text-right text-gray-500 hidden lg:table-cell">
+                      {c.lifetimeEarnedCents > 0 ? formatCents(c.lifetimeEarnedCents) : '--'}
+                    </td>
+                    <td className="py-2.5 px-3 text-gray-400 text-xs hidden lg:table-cell">
+                      {c.lastActivity
+                        ? new Date(c.lastActivity).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                        : '--'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Mark Paid Modal */}
+      {markPaidBatch && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="p-6 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900">Mark Batch as Paid</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                {formatPeriodLabel(markPaidBatch.period)} &middot; {formatCents(markPaidBatch.totalPayoutCents)} to {markPaidBatch.creators.length} creator(s)
+              </p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Payment method</label>
+                <select
+                  value={paidMethod}
+                  onChange={e => setPaidMethod(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-slate-400 focus:border-transparent"
+                >
+                  <option value="">Select method...</option>
+                  <option value="check">Check</option>
+                  <option value="ach">ACH</option>
+                  <option value="paypal">PayPal</option>
+                  <option value="venmo">Venmo</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Reference number (optional)</label>
+                <input
+                  type="text"
+                  value={paidReference}
+                  onChange={e => setPaidReference(e.target.value)}
+                  placeholder="e.g. check #1234"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-slate-400 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Paid date</label>
+                <input
+                  type="date"
+                  value={paidDate}
+                  onChange={e => setPaidDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-slate-400 focus:border-transparent"
+                />
+              </div>
+            </div>
+            <div className="p-6 border-t border-gray-100 flex gap-3">
+              <button
+                onClick={() => setMarkPaidBatch(null)}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleMarkPaid}
+                disabled={!paidMethod || markingPaid}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg text-white transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                style={{ backgroundColor: '#059669' }}
+              >
+                {markingPaid ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                Mark Paid
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Creator Drill-Down Modal */}
+      {drillDownCreator && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">{drillDownCreator.name}</h3>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  <code className="bg-gray-50 px-1.5 py-0.5 rounded text-xs">{drillDownCreator.slug}</code>
+                  <span className="mx-2">&middot;</span>
+                  {drillDownCreator.email}
+                </p>
+              </div>
+              <button onClick={() => { setDrillDownCreator(null); setDrillDownData(null); }} className="text-gray-400 hover:text-gray-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {drillDownLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+                </div>
+              ) : drillDownData ? (
+                <>
+                  {/* Click history */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1">
+                      <MousePointerClick className="w-3.5 h-3.5" /> Recent Clicks ({drillDownData.clicks.length})
+                    </h4>
+                    {drillDownData.clicks.length === 0 ? (
+                      <p className="text-xs text-gray-400">No clicks recorded.</p>
+                    ) : (
+                      <div className="max-h-40 overflow-y-auto border border-gray-100 rounded-lg">
+                        <table className="w-full text-xs">
+                          <tbody>
+                            {drillDownData.clicks.slice(0, 20).map(c => (
+                              <tr key={c.id} className="border-b border-gray-50">
+                                <td className="py-1.5 px-3 text-gray-500">
+                                  {new Date(c.clicked_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                                </td>
+                                <td className="py-1.5 px-3 text-gray-400 truncate max-w-[200px]">{c.referrer_url || '--'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Signup history */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1">
+                      <UserCheck className="w-3.5 h-3.5" /> Signups ({drillDownData.signups.length})
+                    </h4>
+                    {drillDownData.signups.length === 0 ? (
+                      <p className="text-xs text-gray-400">No signups recorded.</p>
+                    ) : (
+                      <div className="max-h-40 overflow-y-auto border border-gray-100 rounded-lg">
+                        <table className="w-full text-xs">
+                          <tbody>
+                            {drillDownData.signups.map(s => (
+                              <tr key={s.id} className="border-b border-gray-50">
+                                <td className="py-1.5 px-3 text-gray-500">
+                                  {new Date(s.signed_up_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                </td>
+                                <td className="py-1.5 px-3 text-gray-600">{s.user_email || '--'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Conversion history */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1">
+                      <DollarSign className="w-3.5 h-3.5" /> Conversions ({drillDownData.conversions.length})
+                    </h4>
+                    {drillDownData.conversions.length === 0 ? (
+                      <p className="text-xs text-gray-400">No conversions recorded.</p>
+                    ) : (
+                      <div className="max-h-48 overflow-y-auto border border-gray-100 rounded-lg">
+                        <table className="w-full text-xs">
+                          <thead>
+                            <tr className="bg-gray-50 border-b border-gray-100">
+                              <th className="py-1.5 px-3 text-left font-medium text-gray-500">Date</th>
+                              <th className="py-1.5 px-3 text-right font-medium text-gray-500">Gross</th>
+                              <th className="py-1.5 px-3 text-right font-medium text-gray-500">Payout</th>
+                              <th className="py-1.5 px-3 text-left font-medium text-gray-500">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {drillDownData.conversions.map(c => (
+                              <tr key={c.id} className="border-b border-gray-50">
+                                <td className="py-1.5 px-3 text-gray-500">
+                                  {new Date(c.converted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                </td>
+                                <td className="py-1.5 px-3 text-right text-gray-600">{formatCents(c.gross_amount_cents)}</td>
+                                <td className="py-1.5 px-3 text-right font-medium text-yellow-700">{formatCents(c.creator_payout_cents)}</td>
+                                <td className="py-1.5 px-3">
+                                  {c.refunded ? (
+                                    <span className="text-gray-700">Refunded</span>
+                                  ) : c.paid_to_creator_at ? (
+                                    <span className="text-yellow-600">Paid</span>
+                                  ) : c.payout_id ? (
+                                    <span className="text-gray-700">Batched</span>
+                                  ) : (
+                                    <span className="text-gray-400">Pending</span>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Payout history */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" /> Payout History ({drillDownData.payouts.length})
+                    </h4>
+                    {drillDownData.payouts.length === 0 ? (
+                      <p className="text-xs text-gray-400">No payouts yet.</p>
+                    ) : (
+                      <div className="border border-gray-100 rounded-lg">
+                        <table className="w-full text-xs">
+                          <tbody>
+                            {drillDownData.payouts.map(p => (
+                              <tr key={p.id} className="border-b border-gray-50">
+                                <td className="py-1.5 px-3 font-medium text-gray-700">{formatPeriodLabel(p.period)}</td>
+                                <td className="py-1.5 px-3 text-right font-semibold text-yellow-700">{formatCents(p.payout_amount_cents)}</td>
+                                <td className="py-1.5 px-3">
+                                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                                    p.status === 'paid' ? 'bg-green-50 text-yellow-700' : 'bg-amber-50 text-gray-700'
+                                  }`}>
+                                    {p.status === 'paid' ? 'Paid' : 'Pending'}
+                                  </span>
+                                </td>
+                                <td className="py-1.5 px-3 text-gray-400">
+                                  {p.paid_at ? `Paid ${new Date(p.paid_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}
+                                  {p.paid_method ? ` via ${p.paid_method}` : ''}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-gray-500">Failed to load creator details.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -381,6 +1299,12 @@ export default function CreatorStudioPage() {
     selfCompleteRatio?: { contentPath: string; selfComplete: number; adminAdvance: number; other: number; total: number; selfCompletePercent: number; adminAdvancePercent: number }[];
     eventEngagementHeatmap?: { id: string; name: string; initials: string; contentPath: string | null; engagementLevel: 'hot' | 'warm' | 'cool' | 'cold'; eventsLast30Days: number; eventsLast7Days: number; lastEventAt: string | null }[];
     eventFunnelAnalysis?: { phase: string; name: string; count: number; percent: number; avgDaysToPhase: number | null; sampleSize: number }[];
+    publishingPipeline?: {
+      forecast: { month: string; monthLabel: string; download: number; course: number; total: number }[];
+      detailList: { month: string; monthLabel: string; count: number; creators: { id: string; name: string; email: string; contentPath: string | null; projectedPublishDate: string | null }[] }[];
+      noProjectedDate: { id: string; name: string; email: string; contentPath: string | null }[];
+      pastProjectedDate: { id: string; name: string; email: string; contentPath: string | null; projectedCompletionDate: string | null; daysOverdue: number }[];
+    };
   } | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
@@ -802,13 +1726,13 @@ export default function CreatorStudioPage() {
   const getPathBadge = (path: string | null) => {
     switch (path) {
       case 'course':
-        return { icon: <BookOpen className="w-3.5 h-3.5" />, label: 'Course', color: 'bg-purple-100 text-purple-700' };
+        return { icon: <BookOpen className="w-3.5 h-3.5" />, label: 'Course', color: 'bg-slate-100 text-slate-700' };
       case 'blog':
-        return { icon: <FileText className="w-3.5 h-3.5" />, label: 'Blog', color: 'bg-purple-100 text-purple-700' };
+        return { icon: <FileText className="w-3.5 h-3.5" />, label: 'Blog', color: 'bg-slate-100 text-slate-700' };
       case 'download':
-        return { icon: <DownloadIcon className="w-3.5 h-3.5" />, label: 'Download', color: 'bg-purple-100 text-purple-700' };
+        return { icon: <DownloadIcon className="w-3.5 h-3.5" />, label: 'Quick Tool (Download)', color: 'bg-slate-100 text-slate-700' };
       default:
-        return { icon: <HelpCircle className="w-3.5 h-3.5" />, label: 'Not set', color: 'bg-orange-100 text-orange-600' };
+        return { icon: <HelpCircle className="w-3.5 h-3.5" />, label: 'Not set', color: 'bg-gray-100 text-gray-700' };
     }
   };
 
@@ -826,7 +1750,7 @@ export default function CreatorStudioPage() {
     switch (waitingOn) {
       case 'tdi':
         return {
-          dotColor: '#3B82F6',
+          dotColor: '#1e2749',
           label: 'TDI',
           isCheckmark: false,
           bgColor: '#DBEAFE',
@@ -834,7 +1758,7 @@ export default function CreatorStudioPage() {
         };
       case 'launched':
         return {
-          dotColor: '#16A34A',
+          dotColor: '#ffba06',
           label: 'Live',
           isCheckmark: true,
           bgColor: '#DCFCE7',
@@ -842,18 +1766,18 @@ export default function CreatorStudioPage() {
         };
       case 'followed_up':
         return {
-          dotColor: '#8B5CF6',
+          dotColor: '#1e2749',
           label: 'Followed Up',
           isCheckmark: false,
-          bgColor: '#EDE9FE',
-          textColor: '#5B21B6'
+          bgColor: '#FCE7F3',
+          textColor: '#BE185D'
         };
       default:
         return {
-          dotColor: '#F59E0B',
+          dotColor: '#6B7280',
           label: 'Creator',
           isCheckmark: false,
-          bgColor: '#FEF3C7',
+          bgColor: '#F3F4F6',
           textColor: '#92400E'
         };
     }
@@ -983,7 +1907,7 @@ export default function CreatorStudioPage() {
   const pathChartData = [
     { name: 'Course', value: pathCounts.course, color: theme.accent },
     { name: 'Blog', value: pathCounts.blog, color: '#B8A1D4' },
-    { name: 'Download', value: pathCounts.download, color: '#D4C1E8' },
+    { name: 'Quick Tool (Download)', value: pathCounts.download, color: '#D4C1E8' },
     { name: 'Not Set', value: pathCounts.notSet, color: '#E8E0F0' },
   ].filter(d => d.value > 0);
 
@@ -1018,7 +1942,7 @@ export default function CreatorStudioPage() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                     isActive
-                      ? 'border-violet-600 text-violet-600'
+                      ? 'border-violet-600 text-slate-700'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -1035,12 +1959,12 @@ export default function CreatorStudioPage() {
       <div className="px-6 py-6">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Creator Studio</h1>
+          <h1 className="font-extrabold" style={{ fontSize: 28, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Creator Studio</h1>
           {canEdit && (
             <button
               onClick={() => setShowAddModal(true)}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 text-white shadow-sm hover:shadow-md hover:opacity-90"
-              style={{ backgroundColor: '#8B5CF6' }}
+              style={{ backgroundColor: '#1e2749' }}
             >
               <Plus className="w-4 h-4" />
               Add Creator
@@ -1103,16 +2027,16 @@ export default function CreatorStudioPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
             {/* Pipeline Funnel */}
             <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-              <h2 className="text-lg font-semibold mb-4 text-gray-900">
+              <h2 className="font-bold mb-4" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                 Creator Pipeline
               </h2>
               <div className="space-y-3">
                 {[
-                  { key: 'onboarding', label: 'Onboarding', color: '#8B5CF6' },
+                  { key: 'onboarding', label: 'Onboarding', color: '#1e2749' },
                   { key: 'agreement', label: 'Agreement', color: '#A78BFA' },
                   { key: 'course_design', label: 'Prep & Resources', color: '#A78BFA' },
                   { key: 'test_prep', label: 'Production', color: '#C4B5FD' },
-                  { key: 'launch', label: 'Launch', color: '#16A34A' },
+                  { key: 'launch', label: 'Launch', color: '#ffba06' },
                 ].map((phase) => {
                   const count = phaseCounts[phase.key as keyof typeof phaseCounts];
                   const widthPercent = Math.max((count / maxPhaseCount) * 100, 5);
@@ -1162,8 +2086,8 @@ export default function CreatorStudioPage() {
             {/* Closest to Launch */}
             <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
-                  <Trophy className="w-5 h-5 text-amber-500" />
+                <h3 className="font-bold flex items-center gap-2" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>
+                  <Trophy className="w-5 h-5 text-gray-600" />
                   Closest to Launch
                 </h3>
                 {closestToLaunch.length > 0 && (
@@ -1176,7 +2100,7 @@ export default function CreatorStudioPage() {
                     }}
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
                       copiedSection === 'closestToLaunch'
-                        ? 'bg-green-50 text-green-600 border border-green-200'
+                        ? 'bg-green-50 text-yellow-600 border border-green-200'
                         : 'text-gray-500 hover:bg-gray-100 border border-transparent'
                     }`}
                   >
@@ -1200,7 +2124,7 @@ export default function CreatorStudioPage() {
                 <div className="space-y-3">
                   {closestToLaunch.map((creator) => {
                     const isNearLaunch = creator.progressPercentage >= 90;
-                    const progressColor = isNearLaunch ? '#16A34A' : '#8B5CF6';
+                    const progressColor = isNearLaunch ? '#ffba06' : '#1e2749';
                     return (
                       <Link
                         key={creator.id}
@@ -1209,12 +2133,12 @@ export default function CreatorStudioPage() {
                       >
                         <div
                           className="w-9 h-9 rounded-full text-white flex items-center justify-center text-sm font-medium flex-shrink-0 ring-2 ring-white shadow-sm"
-                          style={{ background: '#8B5CF6' }}
+                          style={{ background: '#1e2749' }}
                         >
                           {creator.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate text-gray-900 group-hover:text-violet-600 transition-colors">
+                          <p className="text-sm font-medium truncate text-gray-900 group-hover:text-slate-700 transition-colors">
                             {creator.name}
                           </p>
                         </div>
@@ -1227,15 +2151,15 @@ export default function CreatorStudioPage() {
                           </div>
                           {isNearLaunch ? (
                             <div className="flex items-center gap-1">
-                              <div className="w-3.5 h-3.5 rounded-full bg-green-100 flex items-center justify-center">
+                              <div className="w-3.5 h-3.5 rounded-full bg-yellow-100 flex items-center justify-center">
                                 <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
-                                  <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#16A34A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                  <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#ffba06" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
                               </div>
-                              <span className="text-xs font-bold" style={{ color: '#16A34A' }}>{creator.progressPercentage}%</span>
+                              <span className="text-xs font-bold" style={{ color: '#ffba06' }}>{creator.progressPercentage}%</span>
                             </div>
                           ) : (
-                            <span className="text-xs font-semibold w-9 text-right" style={{ color: '#8B5CF6' }}>{creator.progressPercentage}%</span>
+                            <span className="text-xs font-semibold w-9 text-right" style={{ color: '#1e2749' }}>{creator.progressPercentage}%</span>
                           )}
                         </div>
                       </Link>
@@ -1256,7 +2180,7 @@ export default function CreatorStudioPage() {
                 return (
                   <>
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
+                      <h3 className="font-bold flex items-center gap-2" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                         <CalendarDays className="w-5 h-5 text-blue-500" />
                         Scheduled for Launch
                       </h3>
@@ -1265,7 +2189,7 @@ export default function CreatorStudioPage() {
                           onClick={() => handleCopyEmails(scheduled.map(c => c.email), 'scheduled')}
                           className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
                             copiedSection === 'scheduled'
-                              ? 'bg-green-50 text-green-600 border border-green-200'
+                              ? 'bg-green-50 text-yellow-600 border border-green-200'
                               : 'text-gray-500 hover:bg-gray-100 border border-transparent'
                           }`}
                         >
@@ -1299,7 +2223,7 @@ export default function CreatorStudioPage() {
                             >
                               <div
                                 className="w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0"
-                                style={{ backgroundColor: '#8B5CF6' }}
+                                style={{ backgroundColor: '#1e2749' }}
                               >
                                 {creator.name.charAt(0).toUpperCase()}
                               </div>
@@ -1311,7 +2235,7 @@ export default function CreatorStudioPage() {
                                   {creator.name}
                                 </p>
                               </div>
-                              <div className={`text-xs flex-shrink-0 px-2 py-0.5 rounded ${isPastDue ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>
+                              <div className={`text-xs flex-shrink-0 px-2 py-0.5 rounded ${isPastDue ? 'bg-gray-100 text-gray-700' : 'bg-blue-100 text-blue-700'}`}>
                                 {isPastDue ? 'Past due' : scheduledDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                               </div>
                             </Link>
@@ -1343,8 +2267,8 @@ export default function CreatorStudioPage() {
                 return (
                   <>
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
-                        <Globe className="w-5 h-5 text-green-500" />
+                      <h3 className="font-bold flex items-center gap-2" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>
+                        <Globe className="w-5 h-5 text-yellow-500" />
                         Recently Published
                       </h3>
                       {published.length > 0 && (
@@ -1352,7 +2276,7 @@ export default function CreatorStudioPage() {
                           onClick={() => handleCopyEmails(published.map(c => c.email), 'published')}
                           className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
                             copiedSection === 'published'
-                              ? 'bg-green-50 text-green-600 border border-green-200'
+                              ? 'bg-green-50 text-yellow-600 border border-green-200'
                               : 'text-gray-500 hover:bg-gray-100 border border-transparent'
                           }`}
                         >
@@ -1385,11 +2309,11 @@ export default function CreatorStudioPage() {
                               <Check className="w-4 h-4" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium truncate text-gray-900 group-hover:text-green-600 transition-colors">
+                              <p className="text-sm font-medium truncate text-gray-900 group-hover:text-yellow-600 transition-colors">
                                 {creator.name}
                               </p>
                               {creator.post_launch_notes && (
-                                <p className="text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded-lg mt-1 truncate flex items-center gap-1">
+                                <p className="text-xs text-gray-700 bg-amber-50 px-2 py-1 rounded-lg mt-1 truncate flex items-center gap-1">
                                   <Clock className="w-3 h-3 flex-shrink-0" />
                                   <span className="truncate">{creator.post_launch_notes}</span>
                                 </p>
@@ -1410,11 +2334,11 @@ export default function CreatorStudioPage() {
             {/* Needs Your Attention */}
             <div
               className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] border-l-4"
-              style={{ borderLeftColor: '#F59E0B' }}
+              style={{ borderLeftColor: '#6B7280' }}
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
-                  <AlertTriangle className="w-5 h-5 text-amber-500" />
+                  <AlertTriangle className="w-5 h-5 text-gray-600" />
                   Needs Your Attention
                   {needsAttentionCount > 0 && (
                     <span className="text-xs font-normal text-gray-500">({needsAttentionCount})</span>
@@ -1425,7 +2349,7 @@ export default function CreatorStudioPage() {
                     onClick={() => handleCopyEmails(needsAttention.map(c => c.email), 'needsAttention')}
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
                       copiedSection === 'needsAttention'
-                        ? 'bg-green-50 text-green-600 border border-green-200'
+                        ? 'bg-green-50 text-yellow-600 border border-green-200'
                         : 'text-gray-500 hover:bg-gray-100 border border-transparent'
                     }`}
                   >
@@ -1444,7 +2368,7 @@ export default function CreatorStudioPage() {
                 )}
               </div>
               {needsAttention.length === 0 ? (
-                <div className="flex items-center gap-2 text-green-600 py-2">
+                <div className="flex items-center gap-2 text-yellow-600 py-2">
                   <span>✓</span>
                   <p className="text-sm">All caught up! No creators waiting on team feedback.</p>
                 </div>
@@ -1458,11 +2382,11 @@ export default function CreatorStudioPage() {
                       <Link
                         key={creator.id}
                         href={`/tdi-admin/creators/${creator.id}`}
-                        className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-purple-50 transition-colors group"
+                        className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-slate-50 transition-colors group"
                       >
                         <div
                           className={`w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium flex-shrink-0 ${
-                            hasPostLaunchNotes && !isWaitingOnTDI ? 'bg-green-500' : ''
+                            hasPostLaunchNotes && !isWaitingOnTDI ? 'bg-yellow-500' : ''
                           }`}
                           style={{ backgroundColor: hasPostLaunchNotes && !isWaitingOnTDI ? undefined : theme.accent }}
                         >
@@ -1474,13 +2398,13 @@ export default function CreatorStudioPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p
-                            className="text-sm font-medium truncate group-hover:text-purple-700"
+                            className="text-sm font-medium truncate group-hover:text-slate-700"
                             style={{ color: '#2B3A67' }}
                           >
                             {creator.name}
                           </p>
                           {hasPostLaunchNotes ? (
-                            <p className="text-xs text-amber-700 truncate flex items-center gap-1">
+                            <p className="text-xs text-gray-700 truncate flex items-center gap-1">
                               <Clock className="w-3 h-3 flex-shrink-0" />
                               {creator.post_launch_notes}
                             </p>
@@ -1491,7 +2415,7 @@ export default function CreatorStudioPage() {
                           )}
                         </div>
                         {hasPostLaunchNotes && !isWaitingOnTDI ? (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 flex-shrink-0">
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 flex-shrink-0">
                             Published
                           </span>
                         ) : (
@@ -1519,11 +2443,11 @@ export default function CreatorStudioPage() {
             {followedUpCreators.length > 0 && (
               <div
                 className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] border-l-4"
-                style={{ borderLeftColor: '#8B5CF6' }}
+                style={{ borderLeftColor: '#1e2749' }}
               >
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
-                    <UserCheck className="w-5 h-5" style={{ color: '#8B5CF6' }} />
+                    <UserCheck className="w-5 h-5" style={{ color: '#1e2749' }} />
                     Followed Up by Team
                     <span className="text-xs font-normal text-gray-500">({stats.followedUp})</span>
                   </h3>
@@ -1531,7 +2455,7 @@ export default function CreatorStudioPage() {
                     onClick={() => handleCopyEmails(followedUpCreators.map(c => c.email), 'followedUp')}
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
                       copiedSection === 'followedUp'
-                        ? 'bg-green-50 text-green-600 border border-green-200'
+                        ? 'bg-green-50 text-yellow-600 border border-green-200'
                         : 'text-gray-500 hover:bg-gray-100 border border-transparent'
                     }`}
                   >
@@ -1559,16 +2483,16 @@ export default function CreatorStudioPage() {
                       <Link
                         key={creator.id}
                         href={`/tdi-admin/creators/${creator.id}`}
-                        className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-purple-50 transition-colors group"
+                        className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-slate-50 transition-colors group"
                       >
                         <div
                           className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium flex-shrink-0"
-                          style={{ backgroundColor: '#8B5CF6' }}
+                          style={{ backgroundColor: '#1e2749' }}
                         >
                           {creator.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate group-hover:text-purple-700" style={{ color: '#2B3A67' }}>
+                          <p className="text-sm font-medium truncate group-hover:text-slate-700" style={{ color: '#2B3A67' }}>
                             {creator.name}
                           </p>
                           <p className="text-xs text-gray-500 truncate flex items-center gap-1">
@@ -1586,7 +2510,7 @@ export default function CreatorStudioPage() {
                             )}
                           </p>
                         </div>
-                        <p className="text-xs flex-shrink-0" style={{ color: '#8B5CF6' }}>
+                        <p className="text-xs flex-shrink-0" style={{ color: '#1e2749' }}>
                           {14 - daysSinceFollowUp > 0 ? `${14 - daysSinceFollowUp}d until re-stall` : 'Re-stalling soon'}
                         </p>
                       </Link>
@@ -1596,7 +2520,7 @@ export default function CreatorStudioPage() {
                     <button
                       onClick={() => handleStatCardClick('followedUp')}
                       className="w-full text-center text-xs pt-1"
-                      style={{ color: '#8B5CF6' }}
+                      style={{ color: '#1e2749' }}
                     >
                       View all {stats.followedUp} followed up creators →
                     </button>
@@ -1613,7 +2537,7 @@ export default function CreatorStudioPage() {
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { key: 'blog', icon: FileText, label: 'Blog', count: pathCounts.blog, color: theme.accent },
-                  { key: 'download', icon: DownloadIcon, label: 'Download', count: pathCounts.download, color: theme.accent },
+                  { key: 'download', icon: DownloadIcon, label: 'Quick Tool (Download)', count: pathCounts.download, color: theme.accent },
                   { key: 'course', icon: BookOpen, label: 'Course', count: pathCounts.course, color: theme.accent },
                   { key: 'notSet', icon: HelpCircle, label: 'Not Set', count: pathCounts.notSet, color: '#E8927C' },
                 ].map((path) => {
@@ -1622,7 +2546,7 @@ export default function CreatorStudioPage() {
                     <button
                       key={path.key}
                       onClick={() => handlePathClick(path.key)}
-                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-purple-50 transition-colors cursor-pointer text-left"
+                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer text-left"
                     >
                       <div
                         className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
@@ -1631,7 +2555,7 @@ export default function CreatorStudioPage() {
                         <IconComponent className="w-5 h-5" style={{ color: path.color }} />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold leading-none" style={{ color: theme.accent }}>{path.count}</p>
+                        <p className="font-bold leading-none" style={{ fontSize: 28, color: theme.accent }}>{path.count}</p>
                         <p className="text-sm text-gray-500">{path.label}</p>
                       </div>
                     </button>
@@ -1645,7 +2569,7 @@ export default function CreatorStudioPage() {
           {locationData && (
             <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] mb-5">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
-                <MapPin className="w-5 h-5" style={{ color: '#8B5CF6' }} />
+                <MapPin className="w-5 h-5" style={{ color: '#1e2749' }} />
                 Geographic Distribution
               </h2>
 
@@ -1698,13 +2622,13 @@ export default function CreatorStudioPage() {
                   <div className="pt-4 border-t border-gray-100">
                     <div className="grid grid-cols-2 gap-3">
                       <div className="rounded-lg p-3 text-center" style={{ backgroundColor: theme.accentLight }}>
-                        <p className="text-2xl font-bold" style={{ color: theme.accent }}>
+                        <p className="font-bold" style={{ fontSize: 28, color: theme.accent }}>
                           {locationData.creatorsWithLocation}
                         </p>
                         <p className="text-xs text-gray-600">With Location</p>
                       </div>
                       <div className="bg-gray-50 rounded-lg p-3 text-center">
-                        <p className="text-2xl font-bold text-gray-400">
+                        <p className="font-bold text-gray-400" style={{ fontSize: 28 }}>
                           {locationData.noLocationCount}
                         </p>
                         <p className="text-xs text-gray-500">Not Shared</p>
@@ -1732,7 +2656,7 @@ export default function CreatorStudioPage() {
                     className="flex items-start gap-2 group"
                   >
                     <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
-                      activity.type === 'team' ? 'bg-blue-500' : 'bg-green-500'
+                      activity.type === 'team' ? 'bg-blue-500' : 'bg-yellow-500'
                     }`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm">
@@ -1749,7 +2673,7 @@ export default function CreatorStudioPage() {
               </div>
             )}
             <p className="text-xs text-gray-500 mt-3 pt-2 border-t border-gray-100">
-              <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span> Creator
+              <span className="inline-block w-2 h-2 rounded-full bg-yellow-500 mr-1"></span> Creator
               <span className="mx-2">·</span>
               <span className="inline-block w-2 h-2 rounded-full bg-blue-500 mr-1"></span> Team
             </p>
@@ -1799,7 +2723,7 @@ export default function CreatorStudioPage() {
                   className={`p-4 rounded-xl text-sm ${
                     syncResult.success
                       ? 'bg-green-50 border border-green-200 text-green-800'
-                      : 'bg-red-50 border border-red-200 text-red-800'
+                      : 'bg-gray-50 border border-red-200 text-gray-800'
                   }`}
                 >
                   <p className="font-medium">{syncResult.success ? 'Sync Complete' : 'Sync Failed'}</p>
@@ -1837,14 +2761,14 @@ export default function CreatorStudioPage() {
                 onClick={() => setShowFilters(!showFilters)}
                 className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 font-medium ${
                   showFilters || activeFiltersCount > 0
-                    ? 'bg-purple-50 text-purple-700 border border-purple-200'
+                    ? 'bg-slate-50 text-slate-700 border border-purple-200'
                     : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
                 }`}
               >
                 <Filter className="w-4 h-4" />
                 Filters
                 {activeFiltersCount > 0 && (
-                  <span className="text-white text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#8B5CF6' }}>
+                  <span className="text-white text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#1e2749' }}>
                     {activeFiltersCount}
                   </span>
                 )}
@@ -1863,7 +2787,7 @@ export default function CreatorStudioPage() {
                   >
                     <option value="all">All Paths</option>
                     <option value="blog">Blog</option>
-                    <option value="download">Download</option>
+                    <option value="download">Quick Tool (Download)</option>
                     <option value="course">Course</option>
                     <option value="notSet">Not Set</option>
                   </select>
@@ -1920,7 +2844,7 @@ export default function CreatorStudioPage() {
                       setFilterPublishStatus('all');
                       setActiveStatFilter(null);
                     }}
-                    className="self-end px-3 py-2 text-sm text-gray-500 hover:text-purple-600 transition-colors"
+                    className="self-end px-3 py-2 text-sm text-gray-500 hover:text-slate-700 transition-colors"
                   >
                     Clear all filters
                   </button>
@@ -1931,7 +2855,7 @@ export default function CreatorStudioPage() {
                     type="checkbox"
                     checked={showArchived}
                     onChange={(e) => setShowArchived(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    className="w-4 h-4 rounded border-gray-300 text-slate-700 focus:ring-purple-500"
                   />
                   <span className="text-sm text-gray-600">
                     Show Archived {dashboardData?.stats.archived ? `(${dashboardData.stats.archived})` : ''}
@@ -1943,9 +2867,9 @@ export default function CreatorStudioPage() {
 
           {/* Active stat filter indicator */}
           {activeStatFilter && (
-            <div className="px-5 py-3 border-b border-gray-100 flex items-center gap-2 bg-purple-50">
+            <div className="px-5 py-3 border-b border-gray-100 flex items-center gap-2 bg-slate-50">
               <span className="text-sm text-gray-600">Showing:</span>
-              <span className="text-sm font-semibold capitalize text-purple-700">
+              <span className="text-sm font-semibold capitalize text-slate-700">
                 {activeStatFilter === 'waitingOnCreator' ? 'Waiting on Creator' :
                  activeStatFilter === 'waitingOnTDI' ? 'Waiting on TDI' :
                  activeStatFilter === 'followedUp' ? 'Followed Up' :
@@ -1953,7 +2877,7 @@ export default function CreatorStudioPage() {
               </span>
               <button
                 onClick={() => setActiveStatFilter(null)}
-                className="text-gray-400 hover:text-purple-600 transition-colors"
+                className="text-gray-400 hover:text-slate-700 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2051,8 +2975,8 @@ export default function CreatorStudioPage() {
                       <tr
                         key={creator.id}
                         className={`hover:bg-gray-50 transition-colors cursor-pointer ${
-                          creator.isStalled ? 'border-l-4 border-l-red-400 bg-red-50/30' : ''
-                        } ${isSelected ? 'bg-purple-50' : ''}`}
+                          creator.isStalled ? 'border-l-4 border-l-slate-700 bg-slate-50/50' : ''
+                        } ${isSelected ? 'bg-slate-50' : ''}`}
                         onClick={() => window.location.href = `/tdi-admin/creators/${creator.id}`}
                       >
                         {/* Checkbox */}
@@ -2068,18 +2992,33 @@ export default function CreatorStudioPage() {
                         {/* Creator */}
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
-                            <div
-                              className="w-9 h-9 rounded-full flex items-center justify-center text-white font-medium flex-shrink-0"
-                              style={{ backgroundColor: creator.progressPercentage === 100 ? '#22c55e' : theme.accent }}
-                            >
-                              {creator.name.charAt(0).toUpperCase()}
-                            </div>
+                            {(() => {
+                              const topicConfig = getTopicConfig(creator.topic);
+                              const TopicIcon = TOPIC_ICON_MAP[topicConfig.icon] || Sparkles;
+                              const isComplete = creator.progressPercentage === 100;
+                              return (
+                                <div
+                                  className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+                                  style={{
+                                    backgroundColor: isComplete ? '#22c55e' : topicConfig.background,
+                                    border: isComplete ? 'none' : `1.5px solid ${topicConfig.border}`,
+                                  }}
+                                  title={creator.topic || 'No topic chosen yet'}
+                                >
+                                  {isComplete ? (
+                                    <span className="text-white font-medium">{creator.name.charAt(0).toUpperCase()}</span>
+                                  ) : (
+                                    <TopicIcon style={{ width: 18, height: 18, color: topicConfig.iconColor }} />
+                                  )}
+                                </div>
+                              );
+                            })()}
                             <div className="min-w-0">
                               <p className="font-medium truncate" style={{ color: '#2B3A67' }}>
                                 {creator.name}
                               </p>
-                              <p className="text-xs text-gray-500 truncate md:hidden">
-                                {creator.course_title || creator.email}
+                              <p className="text-xs text-gray-500 truncate">
+                                {creator.topic || creator.course_title || creator.email}
                               </p>
                             </div>
                           </div>
@@ -2146,7 +3085,7 @@ export default function CreatorStudioPage() {
                             {waitingBadge.isCheckmark ? (
                               <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#DCFCE7' }}>
                                 <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
-                                  <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#16A34A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                  <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#ffba06" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
                               </div>
                             ) : (
@@ -2162,7 +3101,7 @@ export default function CreatorStudioPage() {
                         {/* Last Active */}
                         <td className="px-4 py-3">
                           <span className={`text-sm flex items-center gap-1 ${
-                            isInactive ? 'text-red-600 font-medium' : 'text-gray-600'
+                            isInactive ? 'text-gray-700 font-medium' : 'text-gray-600'
                           }`}>
                             <Clock className="w-3.5 h-3.5" />
                             {getRelativeTime(creator.lastActivityDate)}
@@ -2191,7 +3130,7 @@ export default function CreatorStudioPage() {
             <button
               onClick={handleBulkCopy}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 text-white shadow-sm hover:shadow-md hover:opacity-90"
-              style={{ backgroundColor: '#8B5CF6' }}
+              style={{ backgroundColor: '#1e2749' }}
             >
               {copiedSection === 'bulk' ? (
                 <>
@@ -2207,7 +3146,7 @@ export default function CreatorStudioPage() {
             </button>
             <button
               onClick={() => setShowBulkDeleteModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border border-red-200 text-red-600 hover:bg-red-50"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border border-red-200 text-gray-700 hover:bg-gray-50"
             >
               <Trash2 className="w-4 h-4" />
               Delete
@@ -2231,7 +3170,7 @@ export default function CreatorStudioPage() {
           {analyticsLoading && (
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
-                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#8B5CF6' }} />
+                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#1e2749' }} />
                 <p className="text-gray-600">Loading analytics data...</p>
               </div>
             </div>
@@ -2240,6 +3179,68 @@ export default function CreatorStudioPage() {
           {/* Analytics Content */}
           {!analyticsLoading && analyticsData && (
             <>
+              {/* ==========================================
+                  SECTION 0: TOPIC DISTRIBUTION
+                  ========================================== */}
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
+                  Topic Distribution
+                </h2>
+                <p className="text-sm text-gray-500 mb-4">How many creators across each topic. Empty topics highlight recruiting gaps.</p>
+
+                <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] mb-6">
+                  {(() => {
+                    const topicCounts: Record<string, number> = {};
+                    Object.keys(TOPIC_ICON_MAP).forEach((iconName) => {});
+                    Object.keys({}).forEach(() => {});
+                    const allTopics = Object.entries(TOPIC_MAP) as Array<[string, any]>;
+                    allTopics.forEach(([name]) => { topicCounts[name] = 0; });
+                    dashboardData.creators.forEach((creator: any) => {
+                      if (creator.topic && topicCounts[creator.topic] !== undefined) topicCounts[creator.topic]++;
+                      if (Array.isArray(creator.secondary_topics)) {
+                        creator.secondary_topics.forEach((st: string) => {
+                          if (topicCounts[st] !== undefined) topicCounts[st]++;
+                        });
+                      }
+                    });
+                    const sorted = allTopics.sort((a, b) => topicCounts[b[0]] - topicCounts[a[0]]);
+                    return (
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+                        {sorted.map(([topicName, config]) => {
+                          const count = topicCounts[topicName] || 0;
+                          const Icon = TOPIC_ICON_MAP[config.icon] || Sparkles;
+                          const isEmpty = count === 0;
+                          return (
+                            <div
+                              key={topicName}
+                              className="flex items-center gap-2 p-2 rounded-lg"
+                              style={{
+                                background: isEmpty ? '#F9FAFB' : config.background,
+                                border: isEmpty ? '1px dashed #E5E7EB' : `1px solid ${config.border}`,
+                                opacity: isEmpty ? 0.6 : 1,
+                              }}
+                            >
+                              <div
+                                className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                                style={{ background: isEmpty ? '#F3F4F6' : 'white' }}
+                              >
+                                <Icon style={{ width: 16, height: 16, color: isEmpty ? '#9CA3AF' : config.iconColor }} />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-xs font-medium truncate" style={{ color: isEmpty ? '#9CA3AF' : '#1e2749' }}>{topicName}</p>
+                                <p className="text-xs" style={{ color: isEmpty ? '#9CA3AF' : config.iconColor, fontWeight: 600 }}>
+                                  {count} creator{count === 1 ? '' : 's'}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+
               {/* ==========================================
                   SECTION 1: PIPELINE HEALTH
                   ========================================== */}
@@ -2313,7 +3314,7 @@ export default function CreatorStudioPage() {
                                   {item.avgDays}
                                 </td>
                                 <td className="py-2 text-right">
-                                  <span className={`font-semibold ${item.currentlyStuck > 3 ? 'text-amber-600' : 'text-gray-600'}`}>
+                                  <span className={`font-semibold ${item.currentlyStuck > 3 ? 'text-gray-700' : 'text-gray-600'}`}>
                                     {item.currentlyStuck}
                                   </span>
                                 </td>
@@ -2379,9 +3380,9 @@ export default function CreatorStudioPage() {
                           <XAxis dataKey="monthLabel" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
                           <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
                           <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                          <Bar dataKey="course" stackId="a" fill="#8B5CF6" radius={[0, 0, 0, 0]} name="Course" />
-                          <Bar dataKey="blog" stackId="a" fill="#3B82F6" name="Blog" />
-                          <Bar dataKey="download" stackId="a" fill="#22C55E" name="Download" />
+                          <Bar dataKey="course" stackId="a" fill="#1e2749" radius={[0, 0, 0, 0]} name="Course" />
+                          <Bar dataKey="blog" stackId="a" fill="#1e2749" name="Blog" />
+                          <Bar dataKey="download" stackId="a" fill="#ffba06" name="Quick Tool (Download)" />
                           <Bar dataKey="notSet" stackId="a" fill="#9CA3AF" radius={[4, 4, 0, 0]} name="Not Set" />
                         </BarChart>
                       </ResponsiveContainer>
@@ -2397,16 +3398,16 @@ export default function CreatorStudioPage() {
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 max-h-[300px] overflow-y-auto">
                       {analyticsData.activityHeatmap.slice(0, 40).map((creator) => {
                         const colors = {
-                          green: 'bg-green-500',
+                          green: 'bg-yellow-500',
                           yellow: 'bg-yellow-500',
-                          orange: 'bg-orange-500',
-                          red: 'bg-red-500',
+                          orange: 'bg-gray-500',
+                          red: 'bg-gray-500',
                         };
                         const bgColors = {
-                          green: 'bg-green-50 hover:bg-green-100',
+                          green: 'bg-yellow-50 hover:bg-yellow-100',
                           yellow: 'bg-yellow-50 hover:bg-yellow-100',
-                          orange: 'bg-orange-50 hover:bg-orange-100',
-                          red: 'bg-red-50 hover:bg-red-100',
+                          orange: 'bg-gray-50 hover:bg-gray-100',
+                          red: 'bg-gray-50 hover:bg-gray-100',
                         };
                         return (
                           <Link
@@ -2427,10 +3428,10 @@ export default function CreatorStudioPage() {
                       })}
                     </div>
                     <div className="flex items-center gap-4 mt-4 pt-3 border-t border-gray-100 text-xs text-gray-500">
-                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" /> 0-7 days</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500" /> 0-7 days</span>
                       <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500" /> 8-14 days</span>
-                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-500" /> 15-30 days</span>
-                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" /> 30+ days</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-gray-500" /> 15-30 days</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-gray-500" /> 30+ days</span>
                     </div>
                   </div>
                 </div>
@@ -2472,7 +3473,7 @@ export default function CreatorStudioPage() {
                               {analyticsData.journeyTimes.slice(0, 10).map((entry, index) => (
                                 <Cell
                                   key={`cell-${index}`}
-                                  fill={entry.contentPath === 'course' ? '#8B5CF6' : entry.contentPath === 'blog' ? '#3B82F6' : entry.contentPath === 'download' ? '#22C55E' : '#9CA3AF'}
+                                  fill={entry.contentPath === 'course' ? '#1e2749' : entry.contentPath === 'blog' ? '#1e2749' : entry.contentPath === 'download' ? '#ffba06' : '#9CA3AF'}
                                 />
                               ))}
                             </Bar>
@@ -2490,7 +3491,7 @@ export default function CreatorStudioPage() {
                     <p className="text-sm text-gray-500 mb-4">Creator progression through phases</p>
                     <div className="space-y-2">
                       {analyticsData.completionFunnel.map((stage, index) => {
-                        const colors = ['#6366F1', '#7C3AED', '#8B5CF6', '#A78BFA', '#C4B5FD', '#22C55E'];
+                        const colors = ['#1e2749', '#2B3A67', '#475569', '#94A3B8', '#CBD5E1', '#ffba06'];
                         return (
                           <div key={stage.phase} className="flex items-center gap-3">
                             <div className="w-32 text-sm text-gray-600 truncate">{stage.name}</div>
@@ -2499,7 +3500,7 @@ export default function CreatorStudioPage() {
                                 className="h-full rounded-full flex items-center justify-end px-3 transition-all duration-500"
                                 style={{
                                   width: `${stage.percent}%`,
-                                  backgroundColor: colors[index] || '#6366F1',
+                                  backgroundColor: colors[index] || '#1e2749',
                                   minWidth: stage.count > 0 ? '50px' : '0',
                                 }}
                               >
@@ -2524,7 +3525,7 @@ export default function CreatorStudioPage() {
                         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                           Stalled Creator Alerts
                           {analyticsData.stalledCreators.length > 0 && (
-                            <span className="text-sm font-normal px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                            <span className="text-sm font-normal px-2 py-0.5 rounded-full bg-amber-100 text-gray-700">
                               {analyticsData.stalledCreators.length} creators
                             </span>
                           )}
@@ -2536,7 +3537,7 @@ export default function CreatorStudioPage() {
                           onClick={() => handleCopyEmails(analyticsData.stalledCreators.map(c => c.email), 'stalledAnalytics')}
                           className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
                             copiedSection === 'stalledAnalytics'
-                              ? 'bg-green-50 text-green-600 border border-green-200'
+                              ? 'bg-green-50 text-yellow-600 border border-green-200'
                               : 'text-gray-500 hover:bg-gray-100 border border-gray-200'
                           }`}
                         >
@@ -2549,7 +3550,7 @@ export default function CreatorStudioPage() {
                       )}
                     </div>
                     {analyticsData.stalledCreators.length === 0 ? (
-                      <div className="flex items-center gap-2 text-green-600 py-4">
+                      <div className="flex items-center gap-2 text-yellow-600 py-4">
                         <Check className="w-5 h-5" />
                         <p className="text-sm">All caught up! No stalled creators.</p>
                       </div>
@@ -2570,8 +3571,8 @@ export default function CreatorStudioPage() {
                             {analyticsData.stalledCreators.map((creator) => {
                               const bgColor = {
                                 yellow: 'bg-yellow-50',
-                                orange: 'bg-orange-50',
-                                red: 'bg-red-50',
+                                orange: 'bg-gray-50',
+                                red: 'bg-gray-50',
                               };
                               return (
                                 <tr
@@ -2619,7 +3620,7 @@ export default function CreatorStudioPage() {
                                         e.stopPropagation();
                                         openFollowUpModal({ id: creator.id, name: creator.name });
                                       }}
-                                      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-lg bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors"
+                                      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-purple-200 transition-colors"
                                     >
                                       <MessageCircle className="w-3.5 h-3.5" />
                                       Mark Followed Up
@@ -2658,9 +3659,9 @@ export default function CreatorStudioPage() {
                           <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
                           <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
                           <Legend />
-                          <Bar dataKey="courses" fill="#8B5CF6" name="Courses" radius={[4, 4, 0, 0]} />
-                          <Bar dataKey="blogs" fill="#3B82F6" name="Blogs" radius={[4, 4, 0, 0]} />
-                          <Line type="monotone" dataKey="cumulativeCourses" stroke="#6366F1" strokeWidth={2} dot={false} name="Total Courses" />
+                          <Bar dataKey="courses" fill="#1e2749" name="Courses" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="blogs" fill="#1e2749" name="Blogs" radius={[4, 4, 0, 0]} />
+                          <Line type="monotone" dataKey="cumulativeCourses" stroke="#1e2749" strokeWidth={2} dot={false} name="Total Courses" />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -2697,7 +3698,7 @@ export default function CreatorStudioPage() {
                                 <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
                                   <div
                                     className="h-full rounded-full"
-                                    style={{ width: `${item.percent}%`, backgroundColor: '#8B5CF6' }}
+                                    style={{ width: `${item.percent}%`, backgroundColor: '#1e2749' }}
                                   />
                                 </div>
                                 <span className="text-sm font-medium text-gray-600 w-8 text-right">{item.count}</span>
@@ -2707,12 +3708,12 @@ export default function CreatorStudioPage() {
                           </div>
                         </div>
                         <div className="space-y-3">
-                          <div className="bg-purple-50 rounded-xl p-4 text-center">
-                            <p className="text-3xl font-bold" style={{ color: '#8B5CF6' }}>{analyticsData.geographicDistribution.withState}</p>
+                          <div className="bg-slate-50 rounded-xl p-4 text-center">
+                            <p className="font-bold" style={{ fontSize: 28, color: '#1e2749' }}>{analyticsData.geographicDistribution.withState}</p>
                             <p className="text-sm text-gray-600">With Location</p>
                           </div>
                           <div className="bg-gray-50 rounded-xl p-4 text-center">
-                            <p className="text-3xl font-bold text-gray-400">{analyticsData.geographicDistribution.withoutState}</p>
+                            <p className="font-bold text-gray-400" style={{ fontSize: 28 }}>{analyticsData.geographicDistribution.withoutState}</p>
                             <p className="text-sm text-gray-500">Not Shared</p>
                           </div>
                         </div>
@@ -2721,6 +3722,13 @@ export default function CreatorStudioPage() {
                   </div>
                 </div>
               </div>
+
+              {/* ==========================================
+                  SECTION 5: PROJECTED PUBLISHING PIPELINE
+                  ========================================== */}
+              {analyticsData.publishingPipeline && (
+                <ProjectedPublishingPipeline data={analyticsData.publishingPipeline} />
+              )}
 
               {/* ==========================================
                   SECTION 4: EVENT-DRIVEN INSIGHTS (overlay)
@@ -2741,8 +3749,8 @@ export default function CreatorStudioPage() {
                         {analyticsData.realtimeActivityFeed?.slice(0, 20).map((event) => (
                           <div key={event.id} className="flex items-start gap-3 py-2 border-b border-gray-50 last:border-0">
                             <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
-                              event.triggerType === 'self_complete' ? 'bg-green-400' :
-                              event.triggerType === 'admin_advance' ? 'bg-purple-400' : 'bg-gray-300'
+                              event.triggerType === 'self_complete' ? 'bg-yellow-400' :
+                              event.triggerType === 'admin_advance' ? 'bg-slate-700' : 'bg-gray-300'
                             }`} />
                             <div className="min-w-0 flex-1">
                               <p className="text-sm font-medium text-gray-900 truncate">{event.creatorName}</p>
@@ -2750,8 +3758,8 @@ export default function CreatorStudioPage() {
                             </div>
                             <div className="flex-shrink-0 text-right">
                               <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                                event.triggerType === 'self_complete' ? 'bg-green-50 text-green-700' :
-                                event.triggerType === 'admin_advance' ? 'bg-purple-50 text-purple-700' : 'bg-gray-50 text-gray-500'
+                                event.triggerType === 'self_complete' ? 'bg-green-50 text-yellow-700' :
+                                event.triggerType === 'admin_advance' ? 'bg-slate-50 text-slate-700' : 'bg-gray-50 text-gray-500'
                               }`}>
                                 {event.triggerLabel}
                               </span>
@@ -2777,30 +3785,30 @@ export default function CreatorStudioPage() {
                             </div>
                             <div className="h-5 bg-gray-100 rounded-full overflow-hidden flex">
                               <div
-                                className="h-full bg-green-400 transition-all"
+                                className="h-full bg-yellow-400 transition-all"
                                 style={{ width: `${row.selfCompletePercent}%` }}
                                 title={`Self-complete: ${row.selfCompletePercent}%`}
                               />
                               <div
-                                className="h-full bg-purple-400 transition-all"
+                                className="h-full bg-slate-700 transition-all"
                                 style={{ width: `${row.adminAdvancePercent}%` }}
                                 title={`Admin advance: ${row.adminAdvancePercent}%`}
                               />
                             </div>
                             <div className="flex gap-4 mt-1">
-                              <span className="text-xs text-green-600">{row.selfCompletePercent}% self</span>
-                              <span className="text-xs text-purple-600">{row.adminAdvancePercent}% admin</span>
+                              <span className="text-xs text-yellow-600">{row.selfCompletePercent}% self</span>
+                              <span className="text-xs text-slate-700">{row.adminAdvancePercent}% admin</span>
                             </div>
                           </div>
                         ))}
                       </div>
                       <div className="flex gap-4 mt-4 pt-3 border-t border-gray-50">
                         <div className="flex items-center gap-1.5">
-                          <div className="w-3 h-3 rounded-full bg-green-400" />
+                          <div className="w-3 h-3 rounded-full bg-yellow-400" />
                           <span className="text-xs text-gray-500">Self-Complete</span>
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <div className="w-3 h-3 rounded-full bg-purple-400" />
+                          <div className="w-3 h-3 rounded-full bg-slate-700" />
                           <span className="text-xs text-gray-500">Admin Advance</span>
                         </div>
                       </div>
@@ -2826,8 +3834,8 @@ export default function CreatorStudioPage() {
                       <div className="flex flex-wrap gap-2 max-h-[220px] overflow-y-auto">
                         {analyticsData.eventEngagementHeatmap?.slice(0, 40).map((creator) => {
                           const colorMap: Record<string, string> = {
-                            hot: 'bg-red-100 border-red-200 text-red-700',
-                            warm: 'bg-orange-100 border-orange-200 text-orange-700',
+                            hot: 'bg-gray-100 border-red-200 text-gray-800',
+                            warm: 'bg-gray-100 border-orange-200 text-gray-700',
                             cool: 'bg-yellow-100 border-yellow-200 text-yellow-700',
                             cold: 'bg-gray-100 border-gray-200 text-gray-500',
                           };
@@ -2859,7 +3867,7 @@ export default function CreatorStudioPage() {
                                 <span className="text-sm font-medium text-gray-700">{stage.name}</span>
                                 <div className="flex items-center gap-2">
                                   {dropOff > 5 && (
-                                    <span className="text-xs text-red-500">-{dropOff}%</span>
+                                    <span className="text-xs text-gray-600">-{dropOff}%</span>
                                   )}
                                   <span className="text-xs text-gray-500">{stage.count} creators</span>
                                   {stage.avgDaysToPhase !== null && (
@@ -2872,7 +3880,7 @@ export default function CreatorStudioPage() {
                                   className="h-full rounded-full transition-all"
                                   style={{
                                     width: `${stage.percent}%`,
-                                    backgroundColor: index === 0 ? '#6366F1' : index < 3 ? '#8B5CF6' : index < 5 ? '#F59E0B' : '#22C55E',
+                                    backgroundColor: index === 0 ? '#1e2749' : index < 3 ? '#F472B6' : index < 5 ? '#6B7280' : '#ffba06',
                                   }}
                                 />
                               </div>
@@ -2899,7 +3907,7 @@ export default function CreatorStudioPage() {
                     setAnalyticsData(null);
                     setAnalyticsLoading(false);
                   }}
-                  className="mt-3 text-sm text-purple-600 hover:text-purple-700"
+                  className="mt-3 text-sm text-slate-700 hover:text-slate-700"
                 >
                   Try again
                 </button>
@@ -2909,22 +3917,9 @@ export default function CreatorStudioPage() {
         </div>
       )}
 
-      {/* PAYOUTS TAB */}
-      {activeTab === 'payouts' && (
-        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-          <div className="text-center py-12">
-            <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg" style={{ backgroundColor: '#8B5CF6' }}>
-              <DollarSign className="w-8 h-8 text-white" />
-            </div>
-            <h2 className="text-xl font-semibold mb-2 text-gray-900">
-              Creator Payouts Coming Soon
-            </h2>
-            <p className="text-gray-500 max-w-md mx-auto">
-              Manage creator payouts, view payment history, track pending payments,
-              and configure revenue share settings.
-            </p>
-          </div>
-        </div>
+      {/* AFFILIATE TAB */}
+      {activeTab === 'affiliate' && (
+        <AffiliateTab />
       )}
 
       {/* Add Creator Modal */}
@@ -3044,7 +4039,7 @@ export default function CreatorStudioPage() {
                   type="submit"
                   disabled={isAdding}
                   className="flex-1 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2 text-white shadow-sm hover:shadow-md hover:opacity-90"
-                  style={{ backgroundColor: '#8B5CF6' }}
+                  style={{ backgroundColor: '#1e2749' }}
                 >
                   {isAdding ? (
                     <>
@@ -3067,8 +4062,8 @@ export default function CreatorStudioPage() {
           <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#EDE9FE' }}>
-                  <MessageCircle className="w-5 h-5" style={{ color: '#8B5CF6' }} />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FCE7F3' }}>
+                  <MessageCircle className="w-5 h-5" style={{ color: '#1e2749' }} />
                 </div>
                 <h2 className="text-lg font-semibold text-gray-900">Mark as Followed Up</h2>
               </div>
@@ -3105,7 +4100,7 @@ export default function CreatorStudioPage() {
                   onClick={handleMarkFollowedUp}
                   disabled={isMarkingFollowUp}
                   className="flex-1 px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:opacity-90"
-                  style={{ backgroundColor: '#8B5CF6' }}
+                  style={{ backgroundColor: '#1e2749' }}
                 >
                   {isMarkingFollowUp ? (
                     <>
@@ -3131,8 +4126,8 @@ export default function CreatorStudioPage() {
           <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl max-h-[80vh] overflow-hidden flex flex-col">
             <div className="p-6 border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 text-gray-700" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900">Delete {selectedCreatorIds.size} Creator{selectedCreatorIds.size > 1 ? 's' : ''}</h2>
@@ -3141,8 +4136,8 @@ export default function CreatorStudioPage() {
               </div>
             </div>
             <div className="p-6 overflow-y-auto flex-1">
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                <p className="text-sm text-red-800">
+              <div className="bg-gray-50 border border-red-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-gray-800">
                   You are about to permanently delete {selectedCreatorIds.size} creator{selectedCreatorIds.size > 1 ? 's' : ''} and all their associated data.
                 </p>
               </div>
@@ -3150,7 +4145,7 @@ export default function CreatorStudioPage() {
               <ul className="space-y-2 max-h-40 overflow-y-auto">
                 {getSelectedCreators().map(creator => (
                   <li key={creator.id} className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
-                    <X className="w-4 h-4 text-red-500 flex-shrink-0" />
+                    <X className="w-4 h-4 text-gray-600 flex-shrink-0" />
                     <span className="font-medium">{creator.name}</span>
                     <span className="text-gray-400">({creator.email})</span>
                   </li>

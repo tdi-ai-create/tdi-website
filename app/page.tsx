@@ -1,9 +1,11 @@
 import Link from 'next/link';
-import { TabbedCalculator } from '@/components/calculators/TabbedCalculator';
+import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
+import { DualTeaser } from '@/components/calculators/v2/compact/DualTeaser';
 import { FAQ } from '@/components/FAQ';
 import { ParallaxHero } from '@/components/ParallaxHero';
 import { CoursesSection } from '@/components/CoursesSection';
 import { AnimatedStatsBar } from '@/components/AnimatedStatsBar';
+import TeamStrip from '@/components/TeamStrip'
 
 export default function Home() {
   return (
@@ -119,10 +121,10 @@ export default function Home() {
       {/* SECTION 4: Stats Bar */}
       <AnimatedStatsBar
         stats={[
-          { value: 87000, suffix: '+', label: 'Educators in Our Community' },
-          { value: 65, suffix: '%', label: 'Implementation Rate', subtext: 'vs 10% industry average' },
-          { value: 94, suffix: '%', label: 'Would Recommend' },
-          { value: 21, label: 'States with Partner Schools' },
+          { value: 100000, suffix: '+', label: 'Educators in Our Community', subtext: 'Teachers, Paras, Coaches, Leaders' },
+          { value: 74, suffix: '%', label: 'Implementation Rate', subtext: 'vs 10% industry average' },
+          { value: 94, suffix: '%', label: 'Would Recommend', subtext: 'to a friend or neighboring school' },
+          { value: 50, label: 'States + 100 Countries', subtext: 'with educators using TDI tools' },
         ]}
       />
       <p className="text-center text-sm py-2" style={{ backgroundColor: '#1e2749', color: '#ffffff', opacity: 0.9 }}>
@@ -350,7 +352,7 @@ export default function Home() {
                 className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover-glow"
                 style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
               >
-                Join 87,000+ Educators
+                Join 100,000+ Educators
               </a>
               <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.6 }}>
                 Or{' '}
@@ -425,46 +427,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 8: Calculator with Parallax Background */}
-      <section className="relative py-16 md:py-24 overflow-hidden">
-        {/* Parallax Background Image */}
-        <div
-          className="absolute inset-0 parallax-calc-bg"
-          style={{
-            backgroundImage: "url('/images/calculator-background.webp')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center center',
-            backgroundRepeat: 'no-repeat',
-            backgroundAttachment: 'fixed',
-          }}
-        />
-
-        {/* Dark Overlay for readability */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundColor: 'rgba(30, 39, 73, 0.85)'
-          }}
-        />
-
-        {/* Calculator Content */}
-        <div className="relative z-10 container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#ffffff' }}>
-            See What's Possible
+      {/* SECTION 8: Calculator */}
+      <section className="py-16 md:py-20 px-6" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+            See What&apos;s Possible
           </h2>
-          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
-            Whether you're a school leader or a teacher,<br />explore the potential impact of partnering with TDI.
+          <p className="text-center mb-12 max-w-2xl mx-auto text-lg" style={{ color: '#4b5563' }}>
+            Whether you&apos;re a school leader or a classroom teacher, see how TDI can make a difference.
           </p>
-
-          {/* Calculator Component */}
-          <TabbedCalculator />
-
-          <div className="text-center mt-6 p-4 rounded-lg max-w-xl mx-auto" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(4px)' }}>
-            <p className="text-sm font-medium" style={{ color: '#ffffff' }}>
-              TDI partnerships start at $6,600. Most schools offset 50-80% through Title II-A, IV-A, or state PD grants.{' '}
-              <Link href="/funding" className="underline font-bold" style={{ color: '#ffba06' }}>See your funding options →</Link>
-            </p>
-          </div>
+          <DualTeaser />
         </div>
       </section>
 
@@ -476,10 +448,10 @@ export default function Home() {
         <div className="container-default text-center">
           <h2 className="mb-4" style={{ color: 'white' }}>Practical Strategies, 3x a Week</h2>
           <p className="text-lg mb-2 max-w-xl mx-auto" style={{ color: 'white', opacity: 0.8 }}>
-            Join 87,000+ educators getting real strategies delivered to their inbox. Not theory, not fluff, just stuff that works.
+            Join 100,000+ educators getting real strategies delivered to their inbox. Not theory, not fluff, just stuff that works.
           </p>
           <p className="text-base mb-6" style={{ color: '#ffba06' }}>
-            Join 87,000+ educators who decided they deserved better.
+            Join 100,000+ educators who decided they deserved better.
           </p>
           <a
             href="https://raehughart.substack.com"
@@ -553,7 +525,43 @@ export default function Home() {
       {/* SECTION 12: FAQ */}
       <FAQ limit={6} showSeeAll={true} />
 
+      {/* Certified in All 50 States */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#E6F1FB' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              PD CREDIT APPROVED
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              Trusted by educators in every state
+            </h2>
+            <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
+              Teachers Deserve It serves educators across all 50 US states and 100+ countries. Hover any state to confirm PD credit approval. Click for details.
+            </p>
+          </div>
+          <CertifiedStatesMap />
+        </div>
+      </section>
+
       {/* SECTION 12: Final CTA */}
+      {/* Team Strip */}
+      <section style={{ backgroundColor: '#F0FAF6', borderTop: '0.5px solid #D4EDE0', borderBottom: '0.5px solid #D4EDE0' }}>
+        <div className="container-default">
+          <TeamStrip
+            members={[
+              { type: 'team', name: 'Kristin Williams', imageSlug: 'kristin-williams', isHuman: true },
+              { type: 'team', name: 'Holly Scott', imageSlug: 'holly-scott' },
+              { type: 'team', name: 'Bella Dailey', imageSlug: 'bella-dailey', isHuman: true },
+              { type: 'team', name: 'Mel Martinez', imageSlug: 'mel-martinez', isHuman: true },
+              { type: 'team', name: 'Dr. Maya Johnson', imageSlug: 'maya-johnson' },
+              { type: 'creator', name: 'Dr. Stephanie Nardi', topic: 'Science' },
+              { type: 'creator', name: 'Amy Storer', topic: 'Math' },
+            ]}
+            copy="Teachers Deserve It is built by a team of educators, specialists, and creators making this work possible for schools across all 50 states."
+          />
+        </div>
+      </section>
+
       <section className="section" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default text-center">
           <h2 className="mb-4" style={{ color: '#1e2749' }}>Ready to Reimagine PD?</h2>
@@ -561,7 +569,7 @@ export default function Home() {
             Whether you're a teacher looking for support or a leader trying to keep your team from burning out, we've got you.
           </p>
           <p className="text-sm mb-8" style={{ color: '#1e2749', opacity: 0.6 }}>
-            Join 87,000+ educators who've already taken the first step.
+            Join 100,000+ educators who've already taken the first step.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
