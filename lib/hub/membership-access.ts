@@ -7,7 +7,7 @@
  *
  * Pricing:
  * - free: $0 - rotating content only
- * - essentials: $5/mo - individual downloads
+ * - essentials: $5/mo - individual downloads and community access
  * - professional: $10/mo - comprehensive resource packs
  * - all_access: $25/mo - full course library
  */
