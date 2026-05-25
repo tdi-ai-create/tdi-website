@@ -59,7 +59,17 @@ export async function GET(
     .limit(50)
   if (!activityErr) activity = activityData ?? []
 
-  return NextResponse.json({ ...opp, notes_list, activity })
+  // Fetch email log — graceful if table doesn't exist yet
+  let emails: unknown[] = []
+  const { data: emailData, error: emailErr } = await supabase
+    .from('email_log')
+    .select('id, gmail_message_id, gmail_thread_id, from_email, to_emails, subject, date, snippet, direction, matched_on')
+    .eq('opportunity_id', id)
+    .order('date', { ascending: false })
+    .limit(50)
+  if (!emailErr) emails = emailData ?? []
+
+  return NextResponse.json({ ...opp, notes_list, activity, emails })
 }
 
 export async function PATCH(
