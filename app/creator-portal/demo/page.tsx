@@ -103,7 +103,7 @@ const initialPhases: DemoPhase[] = [
         completed_at: '2024-12-05T00:00:00Z',
         progress_id: 'p1',
         action_type: 'calendly',
-        action_config: { url: 'https://calendly.com/rae-teachersdeserveit/creator-chat', label: 'Book Welcome Call' },
+        action_config: { url: 'https://calendar.app.google/YMeiaFR7vVeQiPZo7', label: 'Book Welcome Call' },
       },
       {
         id: 'm2',
@@ -183,7 +183,7 @@ const initialPhases: DemoPhase[] = [
         completed_at: null,
         progress_id: 'p7',
         action_type: 'calendly',
-        action_config: { url: 'https://calendly.com/rae-teachersdeserveit/creator-chat', label: 'Book Design Review' },
+        action_config: { url: 'https://calendar.app.google/YMeiaFR7vVeQiPZo7', label: 'Book Design Review' },
       },
       {
         id: 'm8',
@@ -229,7 +229,7 @@ const initialPhases: DemoPhase[] = [
         completed_at: null,
         progress_id: 'p10',
         action_type: 'calendly',
-        action_config: { url: 'https://calendly.com/rae-teachersdeserveit/creator-chat', label: 'Book Tech Check' },
+        action_config: { url: 'https://calendar.app.google/YMeiaFR7vVeQiPZo7', label: 'Book Tech Check' },
       },
       {
         id: 'm11',
@@ -493,7 +493,7 @@ export default function CreatorPortalDemoPage() {
         return (
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <a
-              href={config.url || 'https://calendly.com/rae-teachersdeserveit/creator-chat'}
+              href={config.url || 'https://calendar.app.google/YMeiaFR7vVeQiPZo7'}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-all hover:scale-105 active:scale-95"
@@ -975,7 +975,7 @@ export default function CreatorPortalDemoPage() {
                   <p className="text-xs text-gray-500 uppercase tracking-wide mb-3">Book a Call</p>
                   <div className="flex flex-col gap-2">
                     <a
-                      href="https://calendly.com/rae-teachersdeserveit/creator-chat"
+                      href="https://calendar.app.google/YMeiaFR7vVeQiPZo7"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-all hover:scale-105 active:scale-95"

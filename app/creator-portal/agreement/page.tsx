@@ -157,7 +157,7 @@ function AgreementContent() {
           </p>
         </div>
 
-        {/* Rae's CEO note */}
+        {/* Team note */}
         <div style={{ background: 'white', border: '0.5px solid #E5E7EB', borderRadius: 12, padding: '28px', marginBottom: 40 }}>
           <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
             <div style={{
@@ -166,15 +166,15 @@ function AgreementContent() {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 18, fontWeight: 500,
             }}>
-              RH
+              TDI
             </div>
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 13, fontWeight: 500, color: '#9CA3AF', letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 10 }}>
-                A note from Rae
+                A note from our team
               </p>
               <div style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontSize: 16, color: '#374151', lineHeight: 1.7, fontStyle: 'italic' }}>
                 <p style={{ margin: '0 0 12px 0' }}>
-                  When I started Teachers Deserve It, the goal was simple: build the kind of place educators deserve &mdash; one that pays you fairly, celebrates your expertise, and treats you like the brilliant professional you are. Creator Studio is the heart of that.
+                  When we started Teachers Deserve It, the goal was simple: build the kind of place educators deserve &mdash; one that pays you fairly, celebrates your expertise, and treats you like the brilliant professional you are. Creator Studio is the heart of that.
                 </p>
                 <p style={{ margin: '0 0 12px 0' }}>
                   This agreement isn&apos;t a contract we&apos;re hiding behind. It&apos;s the boundary that lets us do right by you &mdash; pay you on time, protect your work, and stay out of your way so you can do what you do best.
@@ -184,7 +184,7 @@ function AgreementContent() {
                 </p>
               </div>
               <p style={{ fontSize: 14, color: '#6B7280', fontStyle: 'italic', marginTop: 16 }}>
-                &mdash; Rae Hughart, CEO &middot; Teachers Deserve It
+                &mdash; The Teachers Deserve It Team
               </p>
             </div>
           </div>

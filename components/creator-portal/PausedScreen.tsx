@@ -98,7 +98,7 @@ export default function PausedScreen({ creatorId, creatorEmail, firstName, pause
           </button>
           <p style={{ fontSize: 13, color: '#9CA3AF' }}>
             Questions or need anything?{' '}
-            <a href="mailto:rae@teachersdeserveit.com" style={{ color: '#80a4ed' }}>Email rae@teachersdeserveit.com</a>
+            <a href="mailto:CreatorStudio@teachersdeserveit.com" style={{ color: '#80a4ed' }}>Email CreatorStudio@teachersdeserveit.com</a>
           </p>
         </div>
       </div>

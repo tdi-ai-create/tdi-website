@@ -522,7 +522,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
         <AdminPreviewWrapper actionLabel={config.label || 'Book a Call'}>
           <div className="flex flex-wrap items-center gap-3">
             <a
-              href={config.url || 'https://calendly.com/rae-teachersdeserveit/creator-chat'}
+              href={config.url || 'https://calendar.app.google/YMeiaFR7vVeQiPZo7'}
               target="_blank"
               rel="noopener noreferrer"
               className={`inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors ${isAdminPreview ? 'pointer-events-auto' : ''}`}

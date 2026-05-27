@@ -272,13 +272,13 @@ export default function DemoAgreementPage() {
           <p className="text-gray-600 text-sm mb-4">We want you to feel confident. Reach out anytime!</p>
           <div className="flex flex-wrap gap-3">
             <a
-              href="https://calendly.com/rae-teachersdeserveit/creator-chat"
+              href="https://calendar.app.google/YMeiaFR7vVeQiPZo7"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 text-sm transition-colors"
             >
               <Calendar className="w-4 h-4" />
-              Book a Call with Rae
+              Book a Call with Our Team
             </a>
             <a
               href="mailto:CreatorStudio@Teachersdeserveit.com?subject=Question about Creator Agreement"
