@@ -833,7 +833,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
               Review and digitally sign your Independent Content Creator Agreement. Takes about 5-10 minutes to read through the plain-language version, plus a moment to sign.
             </p>
             <a
-              href={isAdminPreview ? `/creator-portal/agreement?as_creator=${creatorId}` : '/creator-portal/agreement'}
+              href={`/creator-portal/agreement?as_creator=${creatorId}`}
               target="_blank"
               rel="noopener noreferrer"
               className={`inline-flex items-center gap-2 px-5 py-2.5 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors text-sm font-medium ${isAdminPreview ? 'pointer-events-auto' : ''}`}

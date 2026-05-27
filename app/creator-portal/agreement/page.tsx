@@ -1,15 +1,29 @@
 'use client';
 
+/**
+ * Interim Agreement Acknowledgment Page — TEA-4629 Mitigation
+ *
+ * This replaces the signature capture flow with a simpler "I Acknowledge"
+ * button that does NOT require supabase.auth.getSession() (which is broken
+ * after the Learning Hub Supabase switch in lib/supabase.ts).
+ *
+ * Creator identity is resolved via the `as_creator` URL param, which the
+ * dashboard/milestone components now always include in the agreement link.
+ *
+ * TODO: Restore proper signature capture once the lib/supabase-hub.ts
+ * architectural fix ships (separate Supabase clients for Hub vs Creator Portal).
+ */
+
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
-  ArrowLeft, Loader2, CheckCircle, ChevronDown,
+  ArrowLeft, Loader2, CheckCircle, ChevronDown, Download, FileText,
   Coins, Calendar, Infinity, ShieldCheck, DoorOpen,
   Briefcase, Heart, Lock, RefreshCw, MessageCircle, Mail,
+  AlertCircle, Sparkles,
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 
 const Q_ICONS = [Coins, Calendar, Infinity, ShieldCheck, DoorOpen, Briefcase, Heart, Lock, RefreshCw, MessageCircle, Mail];
 
@@ -20,72 +34,99 @@ function AgreementContent() {
 
   const [creatorName, setCreatorName] = useState('');
   const [creatorId, setCreatorId] = useState<string | null>(null);
-  const [agreed, setAgreed] = useState(false);
-  const [signatureName, setSignatureName] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [isSigning, setIsSigning] = useState(false);
-  const [isSigned, setIsSigned] = useState(false);
+  const [isAcknowledging, setIsAcknowledging] = useState(false);
+  const [isAcknowledged, setIsAcknowledged] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [alreadySigned, setAlreadySigned] = useState(false);
   const [agreementVersion, setAgreementVersion] = useState<string | null>(null);
   const [expandedLegal, setExpandedLegal] = useState<Set<number>>(new Set());
+  const [whatsNewOpen, setWhatsNewOpen] = useState(false);
+  const [faqOpen, setFaqOpen] = useState<Set<number>>(new Set());
 
-  const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   const backLink = isDemo ? '/creator-portal/demo' : '/creator-portal/dashboard';
 
   useEffect(() => {
-    const checkAuth = async () => {
-      if (isDemo) { setCreatorName('Sarah Johnson'); setSignatureName('Sarah Johnson'); setIsLoading(false); return; }
-
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user?.email) { router.push('/creator-portal'); return; }
-
-      const asCreator = searchParams.get('as_creator');
-      const fetchBody = asCreator ? { creatorId: asCreator } : { email: session.user.email };
-
-      const response = await fetch('/api/creator-portal/dashboard', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(fetchBody),
-      });
-
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        if (errData.isAdmin) {
-          if (asCreator) { setError('Could not load this creator'); setIsLoading(false); return; }
-          router.push('/tdi-admin/creators'); return;
-        }
-        router.push('/creator-portal'); return;
+    const loadCreator = async () => {
+      if (isDemo) {
+        setCreatorName('Sarah Johnson');
+        setIsLoading(false);
+        return;
       }
 
-      const data = await response.json();
-      setCreatorName(data.creator.name);
-      setCreatorId(data.creator.id);
-      setSignatureName(data.creator.name);
-      setAgreementVersion(data.creator.agreement_version || null);
-      if (data.creator.agreement_signed) setAlreadySigned(true);
-      setIsLoading(false);
+      // TEA-4629 interim: resolve creator identity from URL param, NOT auth.getSession()
+      const asCreator = searchParams.get('as_creator');
+
+      if (!asCreator) {
+        // No creator ID in URL — can't identify who this is without the broken auth call.
+        // Show a helpful message instead of crashing.
+        setError(
+          'We couldn\'t identify your account. Please go back to your dashboard and click the agreement link again. If this keeps happening, email CreatorStudio@teachersdeserveit.com.'
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/creator-portal/dashboard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ creatorId: asCreator }),
+        });
+
+        if (!response.ok) {
+          setError('Could not load your creator profile. Please try again or contact our team.');
+          setIsLoading(false);
+          return;
+        }
+
+        const data = await response.json();
+        setCreatorName(data.creator.name);
+        setCreatorId(data.creator.id);
+        setAgreementVersion(data.creator.agreement_version || null);
+        if (data.creator.agreement_signed) setAlreadySigned(true);
+        setIsLoading(false);
+      } catch {
+        setError('Something went wrong loading your profile. Please try again.');
+        setIsLoading(false);
+      }
     };
-    checkAuth();
+    loadCreator();
   }, [router, isDemo, searchParams]);
 
-  const handleSign = async () => {
-    if (!agreed || !signatureName.trim()) return;
-    setIsSigning(true); setError(null);
-    if (isDemo) { setIsSigned(true); return; }
-    if (!creatorId) {
-      setError('Unable to identify your creator account. Please reload the page and try again.');
-      setIsSigning(false);
+  const handleAcknowledge = async () => {
+    setIsAcknowledging(true);
+    setError(null);
+
+    if (isDemo) {
+      setIsAcknowledged(true);
       return;
     }
+
+    if (!creatorId) {
+      setError('Unable to identify your creator account. Please reload the page and try again.');
+      setIsAcknowledging(false);
+      return;
+    }
+
     try {
-      const response = await fetch('/api/creator-portal/sign-agreement', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ creatorId, signedName: signatureName.trim() }),
+      const response = await fetch('/api/creator-portal/acknowledge-agreement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ creatorId }),
       });
+
       const data = await response.json();
-      if (!response.ok || !data.success) { throw new Error(data.error || 'Failed to sign agreement'); }
-      setIsSigned(true);
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to acknowledge agreement');
+      }
+
+      setIsAcknowledged(true);
       setTimeout(() => router.push('/creator-portal/dashboard?agreement=signed'), 2000);
-    } catch (err) { setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.'); setIsSigning(false); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      setIsAcknowledging(false);
+    }
   };
 
   const isV1Signer = agreementVersion === 'v1.0';
@@ -96,17 +137,23 @@ function AgreementContent() {
     setExpandedLegal(next);
   }
 
+  function toggleFaq(i: number) {
+    const next = new Set(faqOpen);
+    next.has(i) ? next.delete(i) : next.add(i);
+    setFaqOpen(next);
+  }
+
   if (isLoading) return (
     <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
       <Loader2 className="w-8 h-8 animate-spin text-[#80a4ed]" />
     </div>
   );
 
-  if (isSigned) return (
+  if (isAcknowledged) return (
     <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
       <div className="bg-white rounded-2xl shadow-lg max-w-md w-full p-10 text-center">
         <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h2 style={{ fontSize: 22, fontWeight: 500, color: '#1e2749' }}>Agreement signed</h2>
+        <h2 style={{ fontSize: 22, fontWeight: 500, color: '#1e2749' }}>Agreement acknowledged</h2>
         <p style={{ color: '#6B7280', marginTop: 8, fontSize: 14 }}>Redirecting to your dashboard...</p>
       </div>
     </div>
@@ -119,6 +166,23 @@ function AgreementContent() {
         <h2 style={{ fontSize: 22, fontWeight: 500, color: '#1e2749' }}>Already signed</h2>
         <p style={{ color: '#6B7280', marginTop: 8, fontSize: 14, marginBottom: 24 }}>You&apos;ve already signed your v2.3 creator agreement.</p>
         <Link href={backLink} style={{ color: '#80a4ed', fontWeight: 500 }}>Back to dashboard</Link>
+      </div>
+    </div>
+  );
+
+  // Error-only state (no creator ID, couldn't load profile)
+  if (error && !creatorId) return (
+    <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center p-6">
+      <div className="bg-white rounded-2xl shadow-lg max-w-md w-full p-10 text-center">
+        <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+        <h2 style={{ fontSize: 20, fontWeight: 500, color: '#1e2749', marginBottom: 12 }}>Something went wrong</h2>
+        <p style={{ color: '#6B7280', fontSize: 14, lineHeight: 1.7, marginBottom: 24 }}>{error}</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <Link href="/creator-portal/dashboard" style={{ color: '#80a4ed', fontWeight: 500 }}>Back to dashboard</Link>
+          <a href="mailto:CreatorStudio@teachersdeserveit.com" style={{ color: '#6B7280', fontSize: 13 }}>
+            CreatorStudio@teachersdeserveit.com
+          </a>
+        </div>
       </div>
     </div>
   );
@@ -140,9 +204,43 @@ function AgreementContent() {
         {/* Re-sign banner */}
         {isV1Signer && (
           <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: '16px 20px', marginBottom: 32, fontSize: 14, color: '#92400E', lineHeight: 1.6 }}>
-            Welcome back. We&apos;ve updated your agreement based on creator feedback &mdash; the new model earns you more. Everything you&apos;ve already earned stays paid under your old terms, and any questions are always welcome at <a href="mailto:creatorstudio@teachersdeserveit.com" style={{ color: '#92400E', textDecoration: 'underline' }}>creatorstudio@teachersdeserveit.com</a>.
+            Welcome back. We&apos;ve updated your agreement based on creator feedback &mdash; the new model earns you more. Everything you&apos;ve already earned stays paid under your old terms, and any questions are always welcome at <a href="mailto:CreatorStudio@teachersdeserveit.com" style={{ color: '#92400E', textDecoration: 'underline' }}>CreatorStudio@teachersdeserveit.com</a>.
           </div>
         )}
+
+        {/* What's New dropdown */}
+        <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 12, padding: '20px 24px', marginBottom: 24 }}>
+          <button
+            onClick={() => setWhatsNewOpen(!whatsNewOpen)}
+            style={{
+              background: 'none', border: 'none', padding: 0, cursor: 'pointer', width: '100%',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Sparkles style={{ width: 18, height: 18, color: '#2563EB' }} />
+              <span style={{ fontSize: 15, fontWeight: 600, color: '#1e2749' }}>
+                What&apos;s New in Our Updated Agreement
+              </span>
+            </div>
+            <ChevronDown style={{ width: 18, height: 18, color: '#2563EB', transition: 'transform 0.15s', transform: whatsNewOpen ? 'rotate(180deg)' : 'rotate(0)' }} />
+          </button>
+          {whatsNewOpen && (
+            <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #BFDBFE' }}>
+              {/* TODO: Replace placeholder highlights with final content from Rae */}
+              <ul style={{ margin: 0, paddingLeft: 20, fontSize: 14, color: '#374151', lineHeight: 1.8 }}>
+                <li>[Highlight 1 — placeholder]</li>
+                <li>[Highlight 2 — placeholder]</li>
+                <li>[Highlight 3 — placeholder]</li>
+              </ul>
+            </div>
+          )}
+        </div>
+
+        {/* Temporary flow notice */}
+        <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: '16px 20px', marginBottom: 32, fontSize: 14, color: '#92400E', lineHeight: 1.7 }}>
+          We&apos;re rolling out an updated agreement and a smoother signing experience. While we finalize the new flow, please review the agreement below and click &ldquo;I Acknowledge&rdquo; to confirm you&apos;ve read it. If you have questions, <a href="mailto:CreatorStudio@teachersdeserveit.com" style={{ color: '#92400E', textDecoration: 'underline' }}>reach out to our team</a> &mdash; we&apos;re happy to walk through any of it with you.
+        </div>
 
         {/* Hero */}
         <div style={{ marginBottom: 32 }}>
@@ -187,6 +285,28 @@ function AgreementContent() {
                 &mdash; The Teachers Deserve It Team
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Download agreement PDF — prominent */}
+        <div style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 12, padding: '24px 28px', marginBottom: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+            <FileText style={{ width: 20, height: 20, color: '#1e2749' }} />
+            <p style={{ fontSize: 18, fontWeight: 500, color: '#1e2749', margin: 0 }}>Download the full agreement</p>
+          </div>
+          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.7, margin: '0 0 16px 0' }}>
+            Read the complete legal version on your own time, or save a copy for your records.
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+            <a href="/agreement-v2.3.pdf" target="_blank" rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: '#1e2749', color: 'white', borderRadius: 10, fontSize: 14, fontWeight: 500, textDecoration: 'none' }}>
+              <Download style={{ width: 16, height: 16 }} />
+              Download PDF
+            </a>
+            <a href="/creator-portal/agreement/full" target="_blank" rel="noopener noreferrer"
+              style={{ padding: '10px 20px', border: '1px solid #D1D5DB', borderRadius: 10, color: '#1e2749', fontSize: 14, fontWeight: 500, textDecoration: 'none', background: 'white' }}>
+              View full agreement online
+            </a>
           </div>
         </div>
 
@@ -243,51 +363,88 @@ function AgreementContent() {
           })}
         </div>
 
+        {/* FAQ Accordion */}
+        <div style={{ marginTop: 40 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 500, color: '#1e2749', marginBottom: 16 }}>Common Questions</h2>
+          <div style={{ borderRadius: 12, border: '1px solid #E5E7EB', overflow: 'hidden' }}>
+            {/* TODO: Replace placeholder FAQ content with final copy from Rae */}
+            {FAQ_ITEMS.map((item, i) => (
+              <div key={i} style={{ borderBottom: i < FAQ_ITEMS.length - 1 ? '1px solid #E5E7EB' : 'none' }}>
+                <button
+                  onClick={() => toggleFaq(i)}
+                  style={{
+                    width: '100%', background: 'white', border: 'none', padding: '16px 20px',
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    textAlign: 'left',
+                  }}
+                >
+                  <span style={{ fontSize: 15, fontWeight: 500, color: '#1e2749' }}>{item.q}</span>
+                  <ChevronDown style={{ width: 16, height: 16, color: '#9CA3AF', flexShrink: 0, transition: 'transform 0.15s', transform: faqOpen.has(i) ? 'rotate(180deg)' : 'rotate(0)' }} />
+                </button>
+                {faqOpen.has(i) && (
+                  <div style={{ padding: '0 20px 16px', fontSize: 14, color: '#6B7280', lineHeight: 1.7 }}>
+                    {item.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Closing warmth */}
         <div style={{ textAlign: 'center', padding: '32px 0', maxWidth: 540, margin: '0 auto' }}>
           <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.7, fontStyle: 'italic' }}>
-            That&apos;s everything. If anything still feels unclear or you&apos;d like to talk it through before signing, we&apos;d love to hear from you at <a href="mailto:creatorstudio@teachersdeserveit.com" style={{ color: '#2563EB' }}>creatorstudio@teachersdeserveit.com</a>.
+            That&apos;s everything. If anything still feels unclear or you&apos;d like to talk it through, we&apos;d love to hear from you at <a href="mailto:CreatorStudio@teachersdeserveit.com" style={{ color: '#2563EB' }}>CreatorStudio@teachersdeserveit.com</a>.
           </p>
           <p style={{ fontSize: 16, color: '#6B7280', fontStyle: 'italic', marginTop: 8 }}>
             There&apos;s no rush. Take your time.
           </p>
         </div>
 
-        {/* Signature form */}
+        {/* Acknowledge form — replaces signature form for interim flow */}
         <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 28 }}>
-          <p style={{ fontSize: 18, fontWeight: 500, color: '#1e2749', margin: '0 0 20px 0' }}>Sign your agreement</p>
-
-          <label style={{ display: 'flex', alignItems: 'flex-start', gap: 12, cursor: 'pointer', marginBottom: 20 }}>
-            <input type="checkbox" checked={agreed} onChange={() => setAgreed(!agreed)}
-              style={{ width: 20, height: 20, marginTop: 2, accentColor: '#1e2749' }} />
-            <span style={{ fontSize: 14, color: '#374151', lineHeight: 1.5 }}>
-              I have read and agree to the Creator Agreement (v2.3). I understand the compensation model, content licensing terms, and termination provisions described above.
-            </span>
-          </label>
-
-          <div style={{ marginBottom: 20 }}>
-            <label style={{ display: 'block', fontSize: 14, fontWeight: 500, color: '#374151', marginBottom: 6 }}>Your full legal name</label>
-            <input type="text" value={signatureName} onChange={(e) => setSignatureName(e.target.value)}
-              placeholder="Type your full name"
-              style={{ width: '100%', padding: '10px 14px', border: '1px solid #D1D5DB', borderRadius: 10, fontSize: 14, color: '#1e2749', outline: 'none' }} />
-            <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 4 }}>Date: {today}</p>
-          </div>
+          <p style={{ fontSize: 18, fontWeight: 500, color: '#1e2749', margin: '0 0 8px 0' }}>Acknowledge your agreement</p>
+          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.7, margin: '0 0 20px 0' }}>
+            By clicking below, you confirm that you&apos;ve reviewed the Creator Partnership Agreement (v2.3) and understand the compensation model, content licensing terms, and termination provisions described above.
+          </p>
 
           {error && (
             <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#991B1B' }}>{error}</div>
           )}
 
-          <button onClick={handleSign} disabled={!agreed || !signatureName.trim() || isSigning}
+          <button onClick={handleAcknowledge} disabled={isAcknowledging}
             style={{
-              width: '100%', padding: '12px 0', background: '#1e2749', color: 'white',
-              border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 500, cursor: 'pointer',
-              opacity: (!agreed || !signatureName.trim() || isSigning) ? 0.4 : 1,
+              width: '100%', padding: '14px 0', background: '#1e2749', color: 'white',
+              border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 500, cursor: 'pointer',
+              opacity: isAcknowledging ? 0.6 : 1,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             }}>
-            {isSigning ? 'Signing...' : 'Sign agreement'}
+            {isAcknowledging ? (
+              <>
+                <Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} />
+                Acknowledging...
+              </>
+            ) : (
+              <>
+                <CheckCircle style={{ width: 16, height: 16 }} />
+                I Acknowledge
+              </>
+            )}
           </button>
+
+          <p style={{ textAlign: 'center', marginTop: 12, fontSize: 13, color: '#9CA3AF' }}>
+            Questions?{' '}
+            <a href="mailto:CreatorStudio@teachersdeserveit.com" style={{ color: '#80a4ed' }}>
+              Contact our team
+            </a>
+            {' '}or{' '}
+            <a href="https://calendar.app.google/YMeiaFR7vVeQiPZo7" target="_blank" rel="noopener noreferrer" style={{ color: '#80a4ed' }}>
+              book a call
+            </a>
+          </p>
         </div>
 
-        {/* Full contract download */}
+        {/* Full contract download (repeated at bottom for convenience) */}
         <div style={{ background: '#F9FAFB', borderRadius: 12, padding: '24px 28px', marginTop: 24 }}>
           <p style={{ fontSize: 18, fontWeight: 500, color: '#1e2749', margin: '0 0 6px 0' }}>The complete legal version</p>
           <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.7, margin: '0 0 16px 0' }}>
@@ -314,6 +471,30 @@ function AgreementContent() {
   );
 }
 
+/* TODO: Replace placeholder FAQ content with final copy from Rae */
+const FAQ_ITEMS = [
+  {
+    q: 'How does the royalty / affiliate model work?',
+    a: 'You get a unique affiliate link. Anyone who signs up to TDI through your link earns you 50% of net revenue, forever. Payouts happen monthly by the 15th.',
+  },
+  {
+    q: 'Do I keep ownership of my content?',
+    a: 'TDI owns the final published version (so we can distribute and protect it), but you retain ownership of any pre-existing materials you brought with you and can reference your work in portfolios.',
+  },
+  {
+    q: 'Is this an exclusive arrangement?',
+    a: 'No. You can work with other companies, run your own offerings, and do your own thing. We just ask that you don\'t recreate the exact same content for a direct TDI competitor.',
+  },
+  {
+    q: 'Can I leave at any time?',
+    a: 'Yes. Either side can end the agreement with 14 days\' written notice. Anything you\'ve already earned stays paid — no clawbacks.',
+  },
+  {
+    q: 'What happens to my earnings after I leave?',
+    a: 'Earned but unpaid compensation is paid out within 30 days of termination. No new revenue accrues after the termination date, but anything already earned keeps paying out.',
+  },
+];
+
 const QA_BLOCKS = [
   { question: 'How do I actually make money?', answer: 'You get a unique affiliate link. Anyone who signs up to TDI through it earns you <strong>50% of revenue, forever</strong>. Paid by the 15th of every month, with a clear breakdown of what was earned and what was deducted.<br/><br/>Net revenue = gross minus payment processing fees, taxes, and refunds. Never deducted: TDI overhead, platform costs, or other operating expenses.', legal: "Creator's sole compensation under this Agreement is a 50% share of Affiliate Revenue. \"Affiliate Revenue\" means the net revenue (gross revenue minus payment processing fees, taxes/regulatory charges, and refunds) generated by users who sign up to TDI through Creator's unique affiliate link. Revenue accrues regardless of which Creator's content the referred user ultimately purchases. Payouts are made monthly by the 15th of the following month, accompanied by a transparency statement itemizing each conversion. TDI will never deduct overhead, platform costs, or operating expenses from Creator's share." },
   { question: 'When do I get paid?', answer: 'By the 15th of the month after the conversion happens. So a sale in May = paid by June 15. You\'ll get a transparency statement showing every line item.', legal: 'Payouts are made monthly by the 15th of the following month, accompanied by a transparency statement itemizing each conversion, gross amount, deductions, and net payout.' },
@@ -323,9 +504,9 @@ const QA_BLOCKS = [
   { question: 'Can I work with other education companies?', answer: 'Yes, absolutely. You\'re not exclusive to TDI by default. Run your own offerings, work with other clients, do your own thing. We only ask you not to recreate the exact same content for a direct TDI competitor.', legal: 'Default: Non-Exclusive (Option A). Creator is free to create content for other platforms, run independent businesses, and engage in any professional activities. Creator agrees not to recreate substantially the same Content for a direct competitor of TDI during the term of this Agreement. "Direct competitor" means a platform that offers paid professional development courses specifically for K-12 educators.' },
   { question: 'Have your own business, podcast, or side hustle?', answer: 'Beautiful. Keep doing all of it. TDI works alongside &mdash; not instead of &mdash; your existing work. If you run a business, have your own products, speak at conferences, host a podcast, write a newsletter, anything else: we\'re here for it.<br/><br/>This is about celebrating the brilliant brains behind classrooms &mdash; yours included.', legal: null },
   { question: 'What\'s all the FERPA stuff about?', answer: 'FERPA is the federal student privacy law. We ask you to not include identifiable student information (names, photos, performance data) in your content unless you have proper consent. This protects you, the students, and us. If you film in a real classroom, you just follow the school\'s rules &mdash; TDI will help coordinate.', legal: 'Creator shall not include personally identifiable student information (names, images, performance data, behavioral records) in Content unless proper written consent has been obtained per applicable law. If Content involves filming in educational settings, Creator will coordinate with the institution\'s administration to ensure compliance with their media/consent policies. TDI will provide guidance and support for FERPA compliance as needed.' },
-  { question: 'I already signed an older agreement &mdash; what changes?', answer: 'The compensation model is now fully affiliate-based. Anything earned under your previous agreement stays paid under those terms. From the day you sign this version forward, the new model applies.<br/><br/>We changed it because creators told us they made more money this way. We listened.', legal: "Creator's prior agreement (if any) is superseded by this Agreement upon execution. Compensation earned under previous terms remains payable under those terms. All future compensation is governed by Section 2 of this Agreement." },
+  { question: 'I already signed an older agreement — what changes?', answer: 'The compensation model is now fully affiliate-based. Anything earned under your previous agreement stays paid under those terms. From the day you sign this version forward, the new model applies.<br/><br/>We changed it because creators told us they made more money this way. We listened.', legal: "Creator's prior agreement (if any) is superseded by this Agreement upon execution. Compensation earned under previous terms remains payable under those terms. All future compensation is governed by Section 2 of this Agreement." },
   { question: 'What if there\'s a disagreement?', answer: 'First, we talk it out &mdash; most issues resolve in conversation. If we genuinely can\'t agree after 30 days, we\'d go to arbitration rather than court. Faster and easier for everyone.', legal: 'Dispute Resolution: Good faith negotiation for 30 days, then binding arbitration under AAA Commercial Rules in DuPage County, Illinois. Governing Law: Illinois.' },
-  { question: 'Who do I contact with questions?', answer: 'Anytime, anything: <a href="mailto:creatorstudio@teachersdeserveit.com" style="color: #2563EB">creatorstudio@teachersdeserveit.com</a>. We mean it &mdash; we\'d rather answer 100 questions than have you sign something you\'re not 100% comfortable with.', legal: null },
+  { question: 'Who do I contact with questions?', answer: 'Anytime, anything: <a href="mailto:CreatorStudio@teachersdeserveit.com" style="color: #2563EB">CreatorStudio@teachersdeserveit.com</a>. We mean it &mdash; we\'d rather answer 100 questions than have you sign something you\'re not 100% comfortable with.', legal: null },
 ];
 
 export default function AgreementPage() {
