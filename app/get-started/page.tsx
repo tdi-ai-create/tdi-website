@@ -35,6 +35,9 @@ export default function GetStartedPage() {
     pd_plan_audience: [] as string[],
     pd_plan_scope: '',
     pd_pain_point: '',
+    teacher_pd_frustration: '',
+    teacher_pd_leadership_wish: '',
+    teacher_pd_contact: '',
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -138,6 +141,11 @@ export default function GetStartedPage() {
       'City': formData.schoolCity,
       'State': formData.schoolState,
       'Path': isTeacherPath ? 'Teacher/Para - Nomination' : 'Leader - PD Plan Request',
+      ...(isTeacherPath && {
+        'PD Frustration': formData.teacher_pd_frustration,
+        'PD Leadership Wish': formData.teacher_pd_leadership_wish,
+        'PD Contact': formData.teacher_pd_contact,
+      }),
       ...(!isTeacherPath && {
         'PD Plan Audience': formData.pd_plan_audience.join(', '),
         'PD Plan Scope': formData.pd_plan_scope,
@@ -165,6 +173,11 @@ export default function GetStartedPage() {
           path: isTeacherPath ? 'nomination' : 'pd-plan',
           source: 'get-started page',
           tags: ['get-started', selectedRole?.toLowerCase().replace(' ', '-')],
+          ...(isTeacherPath && {
+            teacher_pd_frustration: formData.teacher_pd_frustration,
+            teacher_pd_leadership_wish: formData.teacher_pd_leadership_wish,
+            teacher_pd_contact: formData.teacher_pd_contact,
+          }),
           ...(!isTeacherPath && {
             pd_plan_audience: formData.pd_plan_audience.join(', '),
             pd_plan_scope: formData.pd_plan_scope,
@@ -296,7 +309,7 @@ export default function GetStartedPage() {
             onClick={() => {
               setStep(1);
               setSelectedRole(null);
-              setFormData({ name: '', email: '', schoolName: '', schoolCity: '', schoolState: '', pd_plan_audience: [], pd_plan_scope: '', pd_pain_point: '' });
+              setFormData({ name: '', email: '', schoolName: '', schoolCity: '', schoolState: '', pd_plan_audience: [], pd_plan_scope: '', pd_pain_point: '', teacher_pd_frustration: '', teacher_pd_leadership_wish: '', teacher_pd_contact: '' });
               setFormErrors({});
             }}
             className="text-sm underline"
@@ -322,7 +335,7 @@ export default function GetStartedPage() {
           </p>
 
           <div className="flex flex-wrap justify-center gap-2 mt-4">
-            {['100,000+ educators served', 'all 50 states', 'Takes 10 seconds'].map((item) => (
+            {['87,000+ educators served', '21 states', 'Takes 10 seconds'].map((item) => (
               <span
                 key={item}
                 className="px-3 py-1 rounded-full text-xs font-semibold"
@@ -403,7 +416,7 @@ export default function GetStartedPage() {
                 <div className="w-6 h-6 rounded-full bg-amber-200 border-2 border-white" />
               </div>
               <p className="text-xs" style={{ color: '#6b7280' }}>
-                Join 100,000+ educators who started right here
+                Join 87,000+ educators who started right here
               </p>
             </div>
           </div>
@@ -528,6 +541,53 @@ export default function GetStartedPage() {
                   {formErrors.schoolState && <p className="text-red-500 text-xs mt-1">{formErrors.schoolState}</p>}
                 </div>
               </div>
+
+              {/* Teacher/Para Fields */}
+              {(selectedRole === 'Teacher' || selectedRole === 'Para') && (
+                <>
+                  <div className="mb-5">
+                    <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                      What&#39;s the biggest frustration with professional development at your school right now?
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Your answer"
+                      value={formData.teacher_pd_frustration}
+                      onChange={(e) => setFormData(prev => ({ ...prev, teacher_pd_frustration: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:border-gray-500"
+                      style={{ borderColor: '#d1d5db' }}
+                    />
+                  </div>
+
+                  <div className="mb-5">
+                    <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                      What&#39;s one thing you wish your leadership knew about how teachers at your school feel about PD?
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Your answer"
+                      value={formData.teacher_pd_leadership_wish}
+                      onChange={(e) => setFormData(prev => ({ ...prev, teacher_pd_leadership_wish: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:border-gray-500"
+                      style={{ borderColor: '#d1d5db' }}
+                    />
+                  </div>
+
+                  <div className="mb-5">
+                    <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                      Who is in charge of professional development at your school or district? Include name and school email
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Name and school email"
+                      value={formData.teacher_pd_contact}
+                      onChange={(e) => setFormData(prev => ({ ...prev, teacher_pd_contact: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:border-gray-500"
+                      style={{ borderColor: '#d1d5db' }}
+                    />
+                  </div>
+                </>
+              )}
 
               {/* PD Plan Fields - Leader Path Only */}
               {(selectedRole === 'Building Leader' || selectedRole === 'District Leader') && (
