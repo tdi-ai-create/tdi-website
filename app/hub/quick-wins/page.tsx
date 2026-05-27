@@ -75,7 +75,7 @@ export default function QuickWinsPage() {
           content_type: qw.quick_win_type || 'activity',
           access_tier: qw.access_tier,
           is_free_rotating: qw.is_free_rotating,
-          capacity: qw.capacity,
+          capacity: qw.lift === 'LOW' ? 'low' : qw.lift === 'MED' ? 'medium' : qw.lift === 'HIGH' ? 'high' : null,
           title_es: qw.title_es,
           description_es: qw.description_es,
         }));
