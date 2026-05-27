@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import {
   generateEmailHTML,
   getEmailSubject,

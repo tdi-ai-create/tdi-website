@@ -1,6 +1,6 @@
 'use client';
 
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 
 const PARTNER_COOKIE = 'tdi_partnership_id';
 

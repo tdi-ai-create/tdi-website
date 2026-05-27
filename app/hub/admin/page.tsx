@@ -18,7 +18,7 @@ import {
   getAdminStats,
 } from '@/lib/hub/admin';
 import { getAdminFeedbackStats } from '@/lib/hub/feedback';
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import {
   BarChart,
   Bar,

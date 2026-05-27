@@ -1,3 +1,20 @@
+/**
+ * Supabase client for the CREATOR PORTAL project.
+ *
+ * This is the main Supabase project — creators, milestones, admin, partners,
+ * sales, and everything that is NOT the Learning Hub.
+ *
+ * - Hub pages must NEVER import from this file — use @/lib/supabase-hub instead.
+ * - Creator Portal, TDI Admin, and Partner pages import from HERE.
+ *
+ * History: TEA-4629 temporarily made this file prefer Learning Hub env vars,
+ * which broke Creator Portal auth. Reverted — Hub now has its own client.
+ *
+ * Env vars:
+ *   NEXT_PUBLIC_SUPABASE_URL
+ *   NEXT_PUBLIC_SUPABASE_ANON_KEY
+ */
+
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // Lazy-initialized Supabase client to avoid build-time errors
@@ -8,8 +25,8 @@ export function getSupabase(): SupabaseClient {
     return supabaseInstance;
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error('Supabase environment variables are not configured');

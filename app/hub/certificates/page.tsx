@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useHub } from '@/components/hub/HubContext';
 import EmptyState from '@/components/hub/EmptyState';
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { Award, Download, ExternalLink } from 'lucide-react';
 import ShareMenu from '@/components/hub/ShareMenu';
 

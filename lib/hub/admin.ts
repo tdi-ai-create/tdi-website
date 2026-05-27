@@ -1,4 +1,4 @@
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 
 // Hardcoded admin emails
 const ADMIN_EMAILS = [

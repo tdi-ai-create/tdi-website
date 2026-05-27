@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { createSupabaseServerClient } from '@/lib/supabase-server';
+import { createHubServerClient as createSupabaseServerClient } from '@/lib/supabase-hub-server';
 
 const serviceClient = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,

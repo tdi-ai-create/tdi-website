@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
 import CourseCard from '@/components/hub/CourseCard';
 import EmptyState from '@/components/hub/EmptyState';
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { enrollInCourse } from '@/lib/hooks/useEnrollment';
 import { useFavorites } from '@/lib/hub/useFavorites';
 import { useLanguage } from '@/lib/hub/useLanguage';

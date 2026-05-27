@@ -1,4 +1,4 @@
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 
 // Characters for verification code (no I/O/0/1 to avoid confusion)
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';

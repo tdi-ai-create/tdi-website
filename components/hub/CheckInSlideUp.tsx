@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { getSupabase } from '@/lib/supabase'
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub'
 import { getNextQuestion, scoreResponse, type CheckInQuestion } from '@/lib/hub/checkInQuestions'
 import { useHub } from '@/components/hub/HubContext'
 import { useTranslation } from '@/lib/hub/useTranslation'

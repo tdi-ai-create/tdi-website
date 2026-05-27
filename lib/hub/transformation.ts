@@ -1,4 +1,4 @@
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 
 export interface TrackerEligibility {
   isEligible: boolean;

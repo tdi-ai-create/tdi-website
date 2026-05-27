@@ -1,4 +1,4 @@
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 
 // Feedback types
 export type FeedbackType = 'course_feedback' | 'general_satisfaction' | 'feature_request';

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { useEnrollment } from '@/lib/hooks/useEnrollment';
 import { useProgressTracking } from '@/lib/hooks/useProgressTracking';
 import { useLanguage } from '@/lib/hub/useLanguage';
