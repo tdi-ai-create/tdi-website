@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { Check, Lock, Sparkles, Heart } from 'lucide-react';
+import { Check, Lock, Heart, User } from 'lucide-react';
 import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
+import { useTranslation } from '@/lib/hub/useTranslation';
+import CoverImageOverlay from '@/components/hub/CoverImageOverlay';
 
 // Category colors - elevated design
 const CATEGORY_COLORS: Record<string, { bar: string; bg: string; text: string }> = {
@@ -12,12 +14,6 @@ const CATEGORY_COLORS: Record<string, { bar: string; bg: string; text: string }>
   'Leadership': { bar: '#9B7CB8', bg: '#EDE9FE', text: '#4C1D95' },
   'Communication': { bar: '#E8927C', bg: '#FEE2E2', text: '#991B1B' },
   'New Teacher': { bar: '#5BBEC4', bg: '#E1F5EE', text: '#085041' },
-};
-
-const CAPACITY_STYLES: Record<string, { color: string; label: string }> = {
-  low:    { color: '#6BA368', label: 'Low Lift' },
-  medium: { color: '#E8B84B', label: 'Medium Lift' },
-  high:   { color: '#E8927C', label: 'High Lift' },
 };
 
 interface CourseCardProps {
@@ -32,7 +28,11 @@ interface CourseCardProps {
     thumbnail_url?: string;
     access_tier?: string;
     is_free_rotating?: boolean;
+    is_published?: boolean;
     capacity?: 'low' | 'medium' | 'high' | null;
+    author_name?: string | null;
+    author_avatar_url?: string | null;
+    objectives?: string[] | null;
   };
   enrollment?: {
     status: 'active' | 'completed';
@@ -67,9 +67,13 @@ export default function CourseCard({
   const isCompleted = enrollment?.status === 'completed';
   const isEnrolled = !!enrollment;
   const progress = enrollment?.progress_percentage || 0;
+  // Coming Soon: course exists in catalog but enrollment is not yet enabled.
+  // Trumps Completed / In Progress / Upgrade / Enroll regardless of tier.
+  const isComingSoon = course.is_published === false;
 
   // Check access using membership hook
   const { canAccess } = useMembership();
+  const { tUI } = useTranslation();
   const contentAccess: ContentAccess = {
     access_tier: course.access_tier || 'all_access',
     is_free_rotating: course.is_free_rotating,
@@ -95,39 +99,62 @@ export default function CourseCard({
         }}
       />
 
-      {/* Thumbnail */}
+      {/* Cover image with LIFT pill + tier label overlays — 16:9 to match 1280×720 covers */}
+      <CoverImageOverlay
+        className="aspect-video"
+        imageUrl={course.thumbnail_url}
+        imageAlt={course.title}
+        liftRating={course.capacity}
+        tier={course.access_tier}
+        variant="course"
+      />
+
+      {/* Author + objectives box */}
       <div
-        className="h-[130px] relative"
-        style={{ backgroundColor: '#F5F5F5' }}
+        className="px-4 py-3 flex gap-3"
+        style={{
+          backgroundColor: '#FAFAF8',
+          borderBottom: '1px solid rgba(0,0,0,0.04)',
+        }}
       >
-        {course.thumbnail_url ? (
-          <img
-            src={course.thumbnail_url}
-            alt={course.title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <span
-              className="text-gray-400 text-sm"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
+        <div className="flex-shrink-0 mt-0.5">
+          {course.author_avatar_url ? (
+            <img
+              src={course.author_avatar_url}
+              alt={course.author_name || tUI('Instructor')}
+              className="w-8 h-8 rounded-full object-cover"
+            />
+          ) : (
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: '#F3F4F6' }}
             >
-              Course thumbnail
-            </span>
-          </div>
-        )}
-        {/* Tier badge */}
-        {isFreeRotating ? (
-          <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-500 text-white shadow-sm">
-            <Sparkles size={12} />
-            Free This Week
-          </span>
-        ) : !hasAccess && course.access_tier && course.access_tier !== 'free_rotating' ? (
-          <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-700 text-white shadow-sm">
-            <Lock size={12} />
-            {course.access_tier === 'essentials' ? 'Essentials' : course.access_tier === 'professional' ? 'Pro' : 'All-Access'}
-          </span>
-        ) : null}
+              <User size={14} style={{ color: '#9CA3AF' }} />
+            </div>
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p
+            className="text-[11px] font-semibold truncate"
+            style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}
+          >
+            {course.author_name || 'Teachers Deserve It Team'}
+          </p>
+          {course.objectives && course.objectives.length > 0 && (
+            <ul className="mt-1 space-y-0.5">
+              {course.objectives.slice(0, 3).map((obj, i) => (
+                <li
+                  key={i}
+                  className="text-[10px] leading-tight line-clamp-1"
+                  style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  <span style={{ color: '#D4A853', marginRight: '4px' }}>&#x2022;</span>
+                  {obj}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
 
       {/* Favorite button */}
@@ -140,7 +167,7 @@ export default function CourseCard({
             border: 'none',
             cursor: 'pointer',
           }}
-          aria-label={isFavorited ? 'Remove from saved' : 'Save course'}
+          aria-label={isFavorited ? tUI('Remove from saved') : tUI('Save course')}
         >
           <Heart
             size={14}
@@ -166,7 +193,7 @@ export default function CourseCard({
             fontFamily: "'DM Sans', sans-serif",
           }}
         >
-          {course.category}
+          {tUI(course.category)}
         </span>
 
         {/* Title */}
@@ -203,7 +230,7 @@ export default function CourseCard({
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
-            {course.pd_hours} PD Hours
+            {course.pd_hours} {tUI('PD Hours')}
           </span>
           <span
             className="text-[12px]"
@@ -212,20 +239,8 @@ export default function CourseCard({
               color: '#9CA3AF',
             }}
           >
-            ~{course.estimated_minutes} min
+            ~{course.estimated_minutes} {tUI('min')}
           </span>
-          {course.capacity && CAPACITY_STYLES[course.capacity] && (
-            <span
-              className="text-[11px] font-semibold px-2 py-1 rounded"
-              style={{
-                backgroundColor: CAPACITY_STYLES[course.capacity].color + '22',
-                color: CAPACITY_STYLES[course.capacity].color,
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
-              {CAPACITY_STYLES[course.capacity].label}
-            </span>
-          )}
         </div>
       </div>
 
@@ -234,7 +249,23 @@ export default function CourseCard({
         className="px-4 py-3"
         style={{ backgroundColor: '#FFFFFF', borderTop: '1px solid rgba(0,0,0,0.04)' }}
       >
-        {isCompleted ? (
+        {isComingSoon ? (
+          <div
+            className="w-full py-2 rounded-lg font-medium text-center select-none"
+            role="status"
+            aria-label={tUI('Coming Soon')}
+            style={{
+              backgroundColor: '#F3F4F6',
+              color: '#6B7280',
+              border: '1px solid rgba(0,0,0,0.08)',
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '14px',
+              cursor: 'not-allowed',
+            }}
+          >
+            {tUI('Coming Soon')}
+          </div>
+        ) : isCompleted ? (
           <div
             className="flex items-center justify-center gap-2"
             style={{
@@ -243,7 +274,7 @@ export default function CourseCard({
             }}
           >
             <Check size={18} />
-            <span className="font-medium">Completed</span>
+            <span className="font-medium">{tUI('Completed')}</span>
           </div>
         ) : isEnrolled ? (
           <div className="space-y-2">
@@ -270,7 +301,7 @@ export default function CourseCard({
                 fontSize: '14px',
               }}
             >
-              Continue ({progress}%)
+              {tUI('Continue')} ({progress}%)
             </Link>
           </div>
         ) : !hasAccess ? (
@@ -286,7 +317,7 @@ export default function CourseCard({
             }}
           >
             <Lock size={14} />
-            Upgrade to Access
+            {tUI('Upgrade to Access')}
           </Link>
         ) : (
           <button
@@ -300,7 +331,7 @@ export default function CourseCard({
               fontSize: '14px',
             }}
           >
-            {isEnrolling ? 'Enrolling...' : 'Enroll'}
+            {isEnrolling ? tUI('Enrolling...') : tUI('Enroll')}
           </button>
         )}
       </div>
