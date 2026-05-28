@@ -993,12 +993,6 @@ export default function HubDashboard() {
                     style={{ background: '#F0F6FF', border: '0.5px solid #C8DEFF' }}
                   >
                     <div>
-                      <div
-                        className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-2"
-                        style={{ background: '#1B2A4A', color: '#FFBA06', fontSize: '10px' }}
-                      >
-                        {course.pd_hours} {tUI('PD Hours')}
-                      </div>
                       <div className="text-sm font-semibold mb-0.5" style={{ color: '#1B2A4A' }}>{course.title}</div>
                       <div className="text-xs" style={{ color: '#6B7280' }}>{course.reason || tUI('Popular with educators')}</div>
                     </div>
@@ -1416,28 +1410,69 @@ export default function HubDashboard() {
                     {celebrateCopied ? tUI('Copied!') : tUI('Copy and paste anywhere')}
                   </button>
 
-                  {/* Share shortcuts -- compact row */}
-                  <div className="flex flex-wrap gap-1.5 justify-center">
-                    {[
-                      { label: 'Email', href: `mailto:?subject=${encodeURIComponent('My teacher win today')}&body=${encodedMessage}` },
-                      { label: 'Gmail', href: `https://mail.google.com/mail/?view=cm&su=${encodeURIComponent('My teacher win today')}&body=${encodedMessage}` },
-                      { label: 'Text', href: `sms:?&body=${encodedMessage}` },
-                      { label: 'Facebook', href: `https://www.facebook.com/sharer/sharer.php?quote=${encodedMessage}` },
-                      { label: 'Twitter', href: `https://twitter.com/intent/tweet?text=${encodedMessage}` },
-                      { label: 'LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://teachersdeserveit.com')}` },
-                      { label: 'WhatsApp', href: `https://wa.me/?text=${encodedMessage}` },
-                    ].map((ch) => (
-                      <a
-                        key={ch.label}
-                        href={ch.href}
-                        target={ch.label === 'Email' || ch.label === 'Text' ? undefined : '_blank'}
-                        rel={ch.label === 'Email' || ch.label === 'Text' ? undefined : 'noopener noreferrer'}
-                        className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium border transition-colors hover:bg-gray-50"
-                        style={{ borderColor: '#E5E7EB', color: '#6B7280' }}
-                      >
-                        {tUI(ch.label)}
-                      </a>
-                    ))}
+                  {/* Email options */}
+                  <p className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: '#9CA3AF' }}>
+                    {tUI('Email it')}
+                  </p>
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    <a href={`mailto:?subject=${encodeURIComponent('My teacher win today')}&body=${encodedMessage}`}
+                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
+                      <span style={{ fontSize: '20px' }}>@</span>{tUI('Default')}
+                    </a>
+                    <a href={`https://mail.google.com/mail/?view=cm&su=${encodeURIComponent('My teacher win today')}&body=${encodedMessage}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
+                      <span style={{ fontSize: '20px', color: '#EA4335' }}>G</span>{tUI('Gmail')}
+                    </a>
+                    <a href={`https://outlook.live.com/mail/0/deeplink/compose?subject=${encodeURIComponent('My teacher win today')}&body=${encodedMessage}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
+                      <span style={{ fontSize: '20px', color: '#0078D4' }}>O</span>{tUI('Outlook')}
+                    </a>
+                  </div>
+
+                  {/* Share options */}
+                  <p className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: '#9CA3AF' }}>
+                    {tUI('Share it')}
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <a href={`sms:?&body=${encodedMessage}`}
+                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
+                      <span style={{ fontSize: '20px', color: '#34C759' }}>+</span>{tUI('Text')}
+                    </a>
+                    <a href={`https://www.facebook.com/sharer/sharer.php?quote=${encodedMessage}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
+                      <span style={{ fontSize: '20px', color: '#1877F2' }}>f</span>{tUI('Facebook')}
+                    </a>
+                    <a href={`https://twitter.com/intent/tweet?text=${encodedMessage}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
+                      <span style={{ fontSize: '20px' }}>X</span>{tUI('Twitter')}
+                    </a>
+                    <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://teachersdeserveit.com')}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
+                      <span style={{ fontSize: '20px', color: '#0A66C2' }}>in</span>{tUI('LinkedIn')}
+                    </a>
+                    <a href={`https://wa.me/?text=${encodedMessage}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
+                      <span style={{ fontSize: '20px', color: '#25D366' }}>W</span>{tUI('WhatsApp')}
+                    </a>
+                    <button onClick={() => { navigator.clipboard.writeText('https://teachersdeserveit.com'); }}
+                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
+                      <span style={{ fontSize: '20px' }}>~</span>{tUI('Link')}
+                    </button>
                   </div>
                 </div>
               );
