@@ -439,26 +439,34 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
   // Rotating share messages
   const getShareMessages = () => {
-    if (!quickWin) return { short: '', medium: '', long: '' };
+    if (!quickWin) return { short: '', medium: '' };
     const url = typeof window !== 'undefined' ? window.location.href : '';
     const title = quickWin.title;
     const shorts = [
-      `Found this amazing teacher tool: "${title}" -- grab it free`,
-      `This 5-min resource is a game changer: "${title}"`,
-      `Every teacher needs this in their toolkit: "${title}"`,
-      `Just downloaded "${title}" and wow. Sharing because you need this too`,
-      `Teacher friends -- stop what you are doing and get "${title}"`,
+      `Just found "${title}" and honestly my lesson plans just wrote themselves`,
+      `Ok but "${title}" is the tool I didnt know I needed until 10 minutes ago`,
+      `Teacher friends. "${title}". You are welcome.`,
+      `Consider my evening FREE. Just grabbed "${title}" and my planning is done`,
+      `"${title}" just saved me an hour. Feet up, PJs on.`,
+      `Forwarding this before I even finish reading it because its that good: "${title}"`,
+      `The group chat needs to know about "${title}" immediately`,
+      `POV: you find "${title}" and suddenly teaching feels possible again`,
+      `Not gatekeeping "${title}". Everyone in the lounge is getting this link.`,
+      `Grabbed "${title}" during lunch. Used it by 5th period. Thats the vibe.`,
     ];
     const mediums = [
-      `I just found "${title}" on Teachers Deserve It and it is exactly the kind of tool I wish I had years ago. Takes 5 minutes, zero prep. ${url}`,
-      `If you are a teacher who needs a quick win today, download "${title}". It is free, practical, and actually useful. ${url}`,
-      `Sharing this because every educator I know could use it: "${title}" from Teachers Deserve It. ${url}`,
-      `My favorite kind of PD -- something I can actually use tomorrow morning. "${title}" ${url}`,
+      `Just found "${title}" on Teachers Deserve It and I am not keeping this to myself. 5 minutes, zero prep, actually useful. My Sunday scaries just evaporated. ${url}`,
+      `OK so "${title}" just cut my planning time in half and I am telling everyone. PJs on, feet up, grading can wait. You need this. ${url}`,
+      `"${title}" is the kind of thing you find and immediately text your teacher bestie about. So here I am, texting you. Grab it before you forget. ${url}`,
+      `Found "${title}" on Teachers Deserve It and honestly I wish someone had sent me this my first year. Sharing it forward. ${url}`,
+      `Not being dramatic but "${title}" just changed my whole Monday. Its free, its fast, and its actually practical. Unlike most PD. ${url}`,
+      `Sending this to every educator I know. "${title}" is a 5-minute download that actually respects your time. Revolutionary concept. ${url}`,
+      `My co-teacher just asked why I was smiling at my phone. Its because I found "${title}" and my week just got 10x easier. Sharing the joy. ${url}`,
+      `"${title}" from Teachers Deserve It. Downloaded it, used it, loved it, sharing it. In that order. ${url}`,
     ];
-    // Pick deterministically based on title length
-    const idx = title.length % shorts.length;
-    const midx = title.length % mediums.length;
-    return { short: shorts[idx], medium: mediums[midx], url };
+    // Rotate based on a hash of the title so each tool gets different messages
+    const hash = title.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+    return { short: shorts[hash % shorts.length], medium: mediums[hash % mediums.length] };
   };
 
   const handleMarkDone = async () => {
@@ -1208,70 +1216,101 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   {linkCopied ? 'Copied to clipboard!' : 'Copy message + link'}
                 </button>
 
-                {/* Share channels */}
-                <p className="text-xs font-semibold mb-3 uppercase tracking-wider" style={{ color: '#9CA3AF' }}>
-                  Or share directly
+                {/* Email options */}
+                <p className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: '#9CA3AF' }}>
+                  Email it
                 </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {/* Email */}
+                <div className="grid grid-cols-3 gap-2 mb-4">
                   <a
-                    href={`mailto:?subject=${encodeURIComponent('Check out this teacher tool: ' + quickWin.title)}&body=${encodedMsg}`}
-                    className="flex items-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+                    href={`mailto:?subject=${encodeURIComponent(msgs.short)}&body=${encodedMsg}`}
+                    className="flex flex-col items-center gap-1 py-2.5 px-2 rounded-lg text-xs font-medium transition-colors hover:bg-gray-50"
                     style={{ border: '1px solid #E5E7EB', color: '#374151' }}
                   >
-                    <span style={{ fontSize: '16px' }}>@</span>
-                    Email a colleague
+                    <span style={{ fontSize: '18px' }}>@</span>
+                    Default
                   </a>
-                  {/* Text */}
+                  <a
+                    href={`https://mail.google.com/mail/?view=cm&su=${encodeURIComponent(msgs.short)}&body=${encodedMsg}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center gap-1 py-2.5 px-2 rounded-lg text-xs font-medium transition-colors hover:bg-gray-50"
+                    style={{ border: '1px solid #E5E7EB', color: '#374151' }}
+                  >
+                    <span style={{ fontSize: '18px', color: '#EA4335' }}>G</span>
+                    Gmail
+                  </a>
+                  <a
+                    href={`https://outlook.live.com/mail/0/deeplink/compose?subject=${encodeURIComponent(msgs.short)}&body=${encodedMsg}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center gap-1 py-2.5 px-2 rounded-lg text-xs font-medium transition-colors hover:bg-gray-50"
+                    style={{ border: '1px solid #E5E7EB', color: '#374151' }}
+                  >
+                    <span style={{ fontSize: '18px', color: '#0078D4' }}>O</span>
+                    Outlook
+                  </a>
+                </div>
+
+                {/* Social + messaging */}
+                <p className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: '#9CA3AF' }}>
+                  Share it
+                </p>
+                <div className="grid grid-cols-3 gap-2 mb-4">
                   <a
                     href={`sms:?body=${encodedMsg}`}
-                    className="flex items-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+                    className="flex flex-col items-center gap-1 py-2.5 px-2 rounded-lg text-xs font-medium transition-colors hover:bg-gray-50"
                     style={{ border: '1px solid #E5E7EB', color: '#374151' }}
                   >
-                    <span style={{ fontSize: '16px' }}>+</span>
-                    Text a friend
+                    <span style={{ fontSize: '18px', color: '#34C759' }}>+</span>
+                    Text
                   </a>
-                  {/* Facebook */}
                   <a
                     href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedShort}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+                    className="flex flex-col items-center gap-1 py-2.5 px-2 rounded-lg text-xs font-medium transition-colors hover:bg-gray-50"
                     style={{ border: '1px solid #E5E7EB', color: '#374151' }}
                   >
-                    <span style={{ fontSize: '16px', color: '#1877F2' }}>f</span>
+                    <span style={{ fontSize: '18px', color: '#1877F2' }}>f</span>
                     Facebook
                   </a>
-                  {/* X/Twitter */}
                   <a
                     href={`https://twitter.com/intent/tweet?text=${encodedShort}&url=${encodedUrl}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+                    className="flex flex-col items-center gap-1 py-2.5 px-2 rounded-lg text-xs font-medium transition-colors hover:bg-gray-50"
                     style={{ border: '1px solid #E5E7EB', color: '#374151' }}
                   >
-                    <span style={{ fontSize: '16px' }}>X</span>
-                    X / Twitter
+                    <span style={{ fontSize: '18px' }}>X</span>
+                    Twitter
                   </a>
-                  {/* LinkedIn */}
                   <a
                     href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+                    className="flex flex-col items-center gap-1 py-2.5 px-2 rounded-lg text-xs font-medium transition-colors hover:bg-gray-50"
                     style={{ border: '1px solid #E5E7EB', color: '#374151' }}
                   >
-                    <span style={{ fontSize: '16px', color: '#0A66C2' }}>in</span>
+                    <span style={{ fontSize: '18px', color: '#0A66C2' }}>in</span>
                     LinkedIn
                   </a>
-                  {/* Copy link only */}
-                  <button
-                    onClick={() => copyToClipboard(url)}
-                    className="flex items-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+                  <a
+                    href={`https://wa.me/?text=${encodedMsg}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center gap-1 py-2.5 px-2 rounded-lg text-xs font-medium transition-colors hover:bg-gray-50"
                     style={{ border: '1px solid #E5E7EB', color: '#374151' }}
                   >
-                    <span style={{ fontSize: '16px' }}>~</span>
-                    Link only
+                    <span style={{ fontSize: '18px', color: '#25D366' }}>W</span>
+                    WhatsApp
+                  </a>
+                  <button
+                    onClick={() => copyToClipboard(url)}
+                    className="flex flex-col items-center gap-1 py-2.5 px-2 rounded-lg text-xs font-medium transition-colors hover:bg-gray-50"
+                    style={{ border: '1px solid #E5E7EB', color: '#374151' }}
+                  >
+                    <span style={{ fontSize: '18px' }}>~</span>
+                    Link
                   </button>
                 </div>
               </div>
