@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
 import CourseCard from '@/components/hub/CourseCard';
 import EmptyState from '@/components/hub/EmptyState';
-import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
+import { getSupabase } from '@/lib/supabase';
 import { enrollInCourse } from '@/lib/hooks/useEnrollment';
 import { useFavorites } from '@/lib/hub/useFavorites';
 import { useLanguage } from '@/lib/hub/useLanguage';
 import { useTranslation } from '@/lib/hub/useTranslation';
-import { BookOpen, CheckCircle, AlertCircle, Heart, Info } from 'lucide-react';
+import { BookOpen, CheckCircle, AlertCircle, Heart } from 'lucide-react';
 
 // Filter categories
 const FILTER_CATEGORIES = [
@@ -40,6 +40,9 @@ interface Course {
   capacity?: 'low' | 'medium' | 'high' | null;
   title_es?: string | null;
   description_es?: string | null;
+  author_name?: string | null;
+  author_avatar_url?: string | null;
+  objectives?: string[] | null;
 }
 
 interface Enrollment {
@@ -72,15 +75,32 @@ export default function CourseCatalogPage() {
     setIsLoading(true);
 
     try {
-      // Fetch all published courses
-      const { data: courseData } = await supabase
+      // Pre-launch: render all rows in the catalog (published + unpublished).
+      // Unpublished rows render with a Coming Soon footer; published rows enroll normally.
+      // Columns omitted (objectives, author_name, author_avatar_url): migrations 006/062
+      // exist in the repo but are not yet applied to the LEARNING_HUB Supabase project.
+      const baseColumns =
+        'id, slug, title, description, category, pd_hours, estimated_minutes, ' +
+        'thumbnail_url, is_published, access_tier, is_free_rotating, title_es, description_es';
+
+      const { data: courseData, error: courseError } = await supabase
         .from('hub_courses')
-        .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url, is_published, access_tier, is_free_rotating, capacity, title_es, description_es')
-        .eq('is_published', true)
+        .select(`${baseColumns}, capacity`)
         .order('created_at', { ascending: false });
 
-      if (courseData) {
-        setCourses(courseData);
+      let finalCourseData = courseData;
+      if (courseError) {
+        // capacity column may not exist yet (migration 043 pending) — retry without it
+        console.warn('Course fetch failed, retrying without capacity:', courseError.message);
+        const { data: fallbackData } = await supabase
+          .from('hub_courses')
+          .select(baseColumns)
+          .order('created_at', { ascending: false });
+        finalCourseData = fallbackData as typeof courseData;
+      }
+
+      if (finalCourseData) {
+        setCourses(finalCourseData);
       }
 
       // Fetch user's enrollments if logged in
@@ -317,30 +337,17 @@ export default function CourseCatalogPage() {
           })}
         </div>
 
-        {/* Lift Filter Row */}
-        <div className="flex items-center gap-2 mb-6 flex-wrap">
+        {/* LIFT Filter Row — hidden until migration 043 populates capacity data */}
+        {courses.some(c => c.capacity) && <div className="flex items-center gap-2 mb-6 flex-wrap">
           <span
             className="text-[11px] font-bold tracking-wider flex-shrink-0"
             style={{
               color: '#9CA3AF',
               textTransform: 'uppercase',
               fontFamily: "'DM Sans', sans-serif",
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
             }}
           >
-            {tUI('Lift')}
-            <span className="relative group" style={{ display: 'inline-flex' }}>
-              <Info size={13} style={{ color: '#9CA3AF', cursor: 'help' }} />
-              <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-72 p-3 rounded-lg text-left normal-case tracking-normal pointer-events-none opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity z-50"
-                style={{ background: '#1B2A4A', color: 'white', fontSize: 12, fontWeight: 400, lineHeight: 1.5, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-                <strong style={{ display: 'block', marginBottom: 6, fontSize: 13 }}>Lift = how much brain power and time a resource takes to put into action.</strong>
-                <span style={{ display: 'block', marginBottom: 4 }}><strong>Low lift</strong> — Grab and go. Sentence starters, one-page downloads, quick reference cards.</span>
-                <span style={{ display: 'block', marginBottom: 4 }}><strong>Medium lift</strong> — Some prep needed. Reflection downloads, structured activities. 15-30 min to plan.</span>
-                <span style={{ display: 'block' }}><strong>High lift</strong> — Sustained effort. Courses, multi-week guides, full curriculum frameworks.</span>
-              </span>
-            </span>
+            {tUI('LIFT')}
           </span>
           {([['all', 'All'], ['low', 'Low'], ['medium', 'Medium'], ['high', 'High']] as const).map(([val, label]) => (
             <button
@@ -359,7 +366,7 @@ export default function CourseCatalogPage() {
               {tUI(label)}
             </button>
           ))}
-        </div>
+        </div>}
 
         {/* In Progress Section - only show when filter is All */}
         {inProgressCourses.length > 0 && activeFilter === 'All' && (
