@@ -5,6 +5,7 @@ import QuickWinCard from '@/components/hub/QuickWinCard';
 import EmptyState from '@/components/hub/EmptyState';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { useFavorites } from '@/lib/hub/useFavorites';
+import { useMembership, type ContentAccess } from '@/lib/hub/use-membership';
 import { useLanguage } from '@/lib/hub/useLanguage';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import { Zap, Heart, Info } from 'lucide-react';
@@ -43,6 +44,7 @@ export default function QuickWinsPage() {
   const [capacityFilter, setCapacityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
   const [isLoading, setIsLoading] = useState(true);
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { canAccess } = useMembership();
   const { language, t } = useLanguage();
   const { tUI } = useTranslation();
 
@@ -281,6 +283,7 @@ export default function QuickWinsPage() {
                 onToggleFavorite={toggleFavorite}
                 displayTitle={t(qw.title, qw.title_es)}
                 displayDescription={t(qw.description, qw.description_es)}
+                hasAccess={canAccess({ access_tier: qw.access_tier || 'essentials', is_free_rotating: qw.is_free_rotating } as ContentAccess)}
               />
             ))}
           </div>

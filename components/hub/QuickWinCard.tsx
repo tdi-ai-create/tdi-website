@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Lock, Heart } from 'lucide-react';
-import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
+import { useMembership } from '@/lib/hub/use-membership';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import CoverImageOverlay from '@/components/hub/CoverImageOverlay';
 
@@ -37,6 +37,8 @@ interface QuickWinCardProps {
   onToggleFavorite?: (id: string, type: 'course' | 'quick_win') => void;
   displayTitle?: string;
   displayDescription?: string;
+  /** When provided, skips the per-card useMembership hook (perf optimization). */
+  hasAccess?: boolean;
 }
 
 export default function QuickWinCard({
@@ -45,19 +47,19 @@ export default function QuickWinCard({
   onToggleFavorite,
   displayTitle,
   displayDescription,
+  hasAccess: hasAccessProp,
 }: QuickWinCardProps) {
   const colors = CATEGORY_COLORS[quickWin.category] || { bg: '#F3F4F6', text: '#374151' };
   // Use display props if provided, otherwise fall back to quickWin data
   const title = displayTitle || quickWin.title;
 
-  // Check access using membership hook
+  // Check access: prefer prop from parent (avoids per-card hook), fall back to hook
   const { canAccess } = useMembership();
   const { tUI } = useTranslation();
-  const contentAccess: ContentAccess = {
+  const hasAccess = hasAccessProp ?? canAccess({
     access_tier: quickWin.access_tier || 'essentials',
     is_free_rotating: quickWin.is_free_rotating,
-  };
-  const hasAccess = canAccess(contentAccess);
+  });
   const isFreeRotating = quickWin.is_free_rotating;
 
   const getTypeLabel = () => {
