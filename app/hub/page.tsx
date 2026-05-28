@@ -392,7 +392,7 @@ export default function HubDashboard() {
                 <div className="p-6">
                   {/* Where to Start - new user experience */}
                   <h2
-                    className="text-xl font-semibold mb-1"
+                    className="text-base font-semibold mb-1"
                     style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif" }}
                   >
                     {tUI('Your first 5 minutes start here')}
@@ -455,8 +455,8 @@ export default function HubDashboard() {
                   {/* Browse Courses button */}
                   <Link
                     href="/hub/courses"
-                    className="block w-full text-center text-sm font-semibold text-white rounded-lg px-4 py-2.5 mb-3"
-                    style={{ background: '#1e2749' }}
+                    className="block w-full text-center text-sm font-semibold rounded-lg px-4 py-2.5 mb-3"
+                    style={{ background: '#1e2749', color: 'white' }}
                   >
                     {tUI('Browse Courses')}
                   </Link>
@@ -589,8 +589,8 @@ export default function HubDashboard() {
                         </div>
                         <Link
                           href={`/hub/quick-wins/${qw.slug}`}
-                          className="flex-shrink-0 text-xs font-semibold text-white rounded-lg px-4 py-1.5 whitespace-nowrap"
-                          style={{ background: '#1B2A4A' }}
+                          className="flex-shrink-0 text-xs font-semibold rounded-lg px-4 py-1.5 whitespace-nowrap"
+                          style={{ background: '#1B2A4A', color: 'white' }}
                         >
                           {tUI('Try it now')}
                         </Link>
