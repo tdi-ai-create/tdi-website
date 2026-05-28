@@ -843,33 +843,31 @@ export default function HubDashboard() {
         onClick={() => setShowCelebrateModal(false)}
       >
         <div
-          className="w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
+          className="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col bg-white"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
-          <div className="px-6 py-5 relative" style={{ background: '#1e2749' }}>
+          {/* Compact header */}
+          <div className="px-5 py-4 flex items-center justify-between" style={{ background: '#1e2749' }}>
+            <div>
+              <p style={{ fontSize: '13px', fontWeight: 600, color: 'white' }}>
+                {tUI('Share your win')}
+              </p>
+              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>
+                {tUI('Pick one, we will write the rest')}
+              </p>
+            </div>
             <button
               onClick={() => setShowCelebrateModal(false)}
-              className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+              className="text-white/60 hover:text-white"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
-            <h2 className="text-lg font-bold text-white">
-              {tUI('You deserve to brag a little')}
-            </h2>
-            <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
-              {tUI('Pick what you want to celebrate and share it with the world')}
-            </p>
           </div>
 
-          {/* Body */}
-          <div className="bg-white px-6 py-5 overflow-y-auto flex-1">
-            {/* Section 1: Pick your win */}
-            <div className="mb-5">
-              <h3 className="text-sm font-semibold mb-3" style={{ color: '#1B2A4A' }}>
-                {tUI('Pick your win')}
-              </h3>
-              <div className="flex flex-wrap gap-2">
+          <div className="overflow-y-auto flex-1">
+            {/* Step 1: Pick your win (always visible) */}
+            <div className="px-5 py-4">
+              <div className="grid grid-cols-2 gap-2">
                 {CELEBRATION_CATEGORIES.map((cat) => (
                   <button
                     key={cat.key}
@@ -877,11 +875,11 @@ export default function HubDashboard() {
                       setSelectedCelebration(cat.key);
                       setCelebrateCopied(false);
                     }}
-                    className="px-3 py-1.5 rounded-full text-xs font-medium transition-all border"
+                    className="text-left px-3 py-2.5 rounded-xl text-xs font-medium transition-all border"
                     style={
                       selectedCelebration === cat.key
-                        ? { background: '#FFBA06', borderColor: '#FFBA06', color: '#1B2A4A' }
-                        : { background: '#F9FAFB', borderColor: '#E5E7EB', color: '#4B5563' }
+                        ? { background: '#FFBA06', borderColor: '#FFBA06', color: '#1e2749' }
+                        : { background: 'white', borderColor: '#E5E7EB', color: '#4B5563' }
                     }
                   >
                     {tUI(cat.label)}
@@ -890,135 +888,62 @@ export default function HubDashboard() {
               </div>
             </div>
 
-            {/* Section 2: Pre-written message */}
-            {selectedCelebration && (
-              <div className="mb-5">
-                <h3 className="text-sm font-semibold mb-3" style={{ color: '#1B2A4A' }}>
-                  {tUI('Your share message')}
-                </h3>
-                <div
-                  className="p-4 rounded-xl text-sm leading-relaxed whitespace-pre-line"
-                  style={{ background: '#F9FAFB', color: '#374151', border: '1px solid #E5E7EB' }}
-                >
-                  {getCelebrationMessage(selectedCelebration, tip)}
-                </div>
-              </div>
-            )}
-
-            {/* Section 3: Share channels */}
+            {/* Step 2: Message + share (only after selection) */}
             {selectedCelebration && (() => {
               const message = getCelebrationMessage(selectedCelebration, tip);
               const encodedMessage = encodeURIComponent(message);
               return (
-                <div>
-                  <h3 className="text-sm font-semibold mb-3" style={{ color: '#1B2A4A' }}>
-                    {tUI('Share it')}
-                  </h3>
+                <div className="px-5 pb-5" style={{ borderTop: '1px solid #F3F4F6' }}>
+                  {/* The message -- this is the star */}
+                  <div
+                    className="my-4 p-4 rounded-xl"
+                    style={{ background: '#1e2749' }}
+                  >
+                    <p style={{ fontSize: '14px', color: 'white', lineHeight: '1.6', fontStyle: 'italic' }}>
+                      &ldquo;{message}&rdquo;
+                    </p>
+                  </div>
 
-                  {/* Copy button */}
+                  {/* Copy -- primary action */}
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(message);
                       setCelebrateCopied(true);
                       setTimeout(() => setCelebrateCopied(false), 2000);
                     }}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold mb-4 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold mb-4"
                     style={
                       celebrateCopied
-                        ? { background: '#D1FAE5', color: '#065F46', border: '1px solid #A7F3D0' }
-                        : { background: '#FFBA06', color: '#1B2A4A', border: '1px solid #FFBA06' }
+                        ? { background: '#D1FAE5', color: '#065F46' }
+                        : { background: '#FFBA06', color: '#1e2749' }
                     }
                   >
-                    {celebrateCopied ? <Check size={16} /> : <Copy size={16} />}
-                    {celebrateCopied ? tUI('Copied!') : tUI('Copy message')}
+                    {celebrateCopied ? <Check size={14} /> : <Copy size={14} />}
+                    {celebrateCopied ? tUI('Copied!') : tUI('Copy and paste anywhere')}
                   </button>
 
-                  {/* Email options */}
-                  <div className="mb-3">
-                    <div className="text-xs font-medium mb-2" style={{ color: '#9CA3AF' }}>
-                      {tUI('Email')}
-                    </div>
-                    <div className="flex flex-wrap gap-2">
+                  {/* Share shortcuts -- compact row */}
+                  <div className="flex flex-wrap gap-1.5 justify-center">
+                    {[
+                      { label: 'Email', href: `mailto:?subject=${encodeURIComponent('My teacher win today')}&body=${encodedMessage}` },
+                      { label: 'Gmail', href: `https://mail.google.com/mail/?view=cm&su=${encodeURIComponent('My teacher win today')}&body=${encodedMessage}` },
+                      { label: 'Text', href: `sms:?&body=${encodedMessage}` },
+                      { label: 'Facebook', href: `https://www.facebook.com/sharer/sharer.php?quote=${encodedMessage}` },
+                      { label: 'Twitter', href: `https://twitter.com/intent/tweet?text=${encodedMessage}` },
+                      { label: 'LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://teachersdeserveit.com')}` },
+                      { label: 'WhatsApp', href: `https://wa.me/?text=${encodedMessage}` },
+                    ].map((ch) => (
                       <a
-                        href={`mailto:?subject=${encodeURIComponent('My teacher win today')}&body=${encodedMessage}`}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
+                        key={ch.label}
+                        href={ch.href}
+                        target={ch.label === 'Email' || ch.label === 'Text' ? undefined : '_blank'}
+                        rel={ch.label === 'Email' || ch.label === 'Text' ? undefined : 'noopener noreferrer'}
+                        className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium border transition-colors hover:bg-gray-50"
+                        style={{ borderColor: '#E5E7EB', color: '#6B7280' }}
                       >
-                        <Mail size={12} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
-                        {tUI('Default')}
+                        {tUI(ch.label)}
                       </a>
-                      <a
-                        href={`https://mail.google.com/mail/?view=cm&su=${encodeURIComponent('My teacher win today')}&body=${encodedMessage}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
-                      >
-                        {tUI('Gmail')}
-                      </a>
-                      <a
-                        href={`https://outlook.live.com/mail/0/deeplink/compose?subject=${encodeURIComponent('My teacher win today')}&body=${encodedMessage}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
-                      >
-                        {tUI('Outlook')}
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* Social options */}
-                  <div>
-                    <div className="text-xs font-medium mb-2" style={{ color: '#9CA3AF' }}>
-                      {tUI('Social')}
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <a
-                        href={`sms:?&body=${encodedMessage}`}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
-                      >
-                        <MessageCircle size={12} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
-                        {tUI('Text')}
-                      </a>
-                      <a
-                        href={`https://www.facebook.com/sharer/sharer.php?quote=${encodedMessage}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
-                      >
-                        {tUI('Facebook')}
-                      </a>
-                      <a
-                        href={`https://twitter.com/intent/tweet?text=${encodedMessage}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
-                      >
-                        {tUI('Twitter')}
-                      </a>
-                      <a
-                        href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://teachersdeserveit.com')}&summary=${encodedMessage}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
-                      >
-                        {tUI('LinkedIn')}
-                      </a>
-                      <a
-                        href={`https://wa.me/?text=${encodedMessage}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
-                      >
-                        {tUI('WhatsApp')}
-                      </a>
-                    </div>
+                    ))}
                   </div>
                 </div>
               );
