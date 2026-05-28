@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useHub } from '@/components/hub/HubContext';
 import { useTranslation } from '@/lib/hub/useTranslation';
-import EmptyState from '@/components/hub/EmptyState';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import {
   Award,
@@ -22,15 +21,17 @@ import {
   Clock,
   Printer,
   Star,
-  Lock,
+  Trophy,
+  Compass,
+  Timer,
+  Activity,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import ShareMenu from '@/components/hub/ShareMenu';
 import {
   checkRecognitions,
+  RECOGNITIONS,
   type Recognition,
-  type EarnedRecognition,
-  type RecognitionProgress,
   type RecognitionResult,
 } from '@/lib/hub/recognitions';
 
@@ -61,7 +62,10 @@ interface Certificate {
   };
 }
 
-type TabType = 'certificates' | 'field-notes';
+interface ActivityDay {
+  label: string;
+  count: number;
+}
 
 export default function CertificatesPage() {
   const { user, profile } = useHub();
@@ -69,7 +73,15 @@ export default function CertificatesPage() {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [recognitionData, setRecognitionData] = useState<RecognitionResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabType>('certificates');
+  const [toolsExplored, setToolsExplored] = useState(0);
+  const [daysActive, setDaysActive] = useState(0);
+  const [activityByDay, setActivityByDay] = useState<ActivityDay[]>([]);
+
+  const hoursSaved = useMemo(() => {
+    const minutes = toolsExplored * 5;
+    const hours = Math.round(minutes / 60);
+    return hours < 1 && toolsExplored > 0 ? '<1' : `~${hours}`;
+  }, [toolsExplored]);
 
   useEffect(() => {
     async function loadData() {
@@ -79,8 +91,8 @@ export default function CertificatesPage() {
       setIsLoading(true);
 
       try {
-        // Load certificates and recognitions in parallel
-        const [certsResult, recsResult] = await Promise.all([
+        // Load certificates, recognitions, tools count, and activity stats in parallel
+        const [certsResult, recsResult, toolsResult, activityResult] = await Promise.all([
           supabase
             .from('hub_certificates')
             .select(`
@@ -95,6 +107,16 @@ export default function CertificatesPage() {
             .eq('user_id', user.id)
             .order('issued_at', { ascending: false }),
           checkRecognitions(user.id, supabase),
+          supabase
+            .from('hub_activity_log')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', user.id)
+            .eq('action', 'quick_win_viewed'),
+          supabase
+            .from('hub_activity_log')
+            .select('created_at')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: true }),
         ]);
 
         if (certsResult.data) {
@@ -114,6 +136,33 @@ export default function CertificatesPage() {
         }
 
         setRecognitionData(recsResult);
+        setToolsExplored(toolsResult.count || 0);
+
+        // Calculate days active and activity by day (last 7 days)
+        if (activityResult.data) {
+          const uniqueDays = new Set(
+            activityResult.data.map((r: { created_at: string }) =>
+              new Date(r.created_at).toISOString().split('T')[0]
+            )
+          );
+          setDaysActive(uniqueDays.size);
+
+          // Build last 6 months activity sparkline
+          const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          const now = new Date();
+          const last6Months: ActivityDay[] = [];
+          for (let i = 5; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const monthStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            const label = monthLabels[d.getMonth()];
+            const count = activityResult.data.filter(
+              (r: { created_at: string }) =>
+                r.created_at.startsWith(monthStr)
+            ).length;
+            last6Months.push({ label, count });
+          }
+          setActivityByDay(last6Months);
+        }
       } catch (error) {
         console.error('Error loading achievements:', error);
       } finally {
@@ -252,18 +301,55 @@ export default function CertificatesPage() {
     return ICON_MAP[iconName] || Star;
   };
 
+  const earnedCount = recognitionData?.earned.length || 0;
+  const totalRecognitions = RECOGNITIONS.length;
+  const progressPercent = totalRecognitions > 0 ? (earnedCount / totalRecognitions) * 100 : 0;
+
+  // SVG progress ring calculations
+  const ringRadius = 70;
+  const ringCircumference = 2 * Math.PI * ringRadius;
+  const ringOffset = ringCircumference - (progressPercent / 100) * ringCircumference;
+
+  // Activity sparkline max for relative height
+  const maxActivity = Math.max(...activityByDay.map((d) => d.count), 1);
+
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="p-4 md:p-8 max-w-3xl mx-auto">
-        <div className="mb-8">
-          <div className="h-8 bg-gray-200 rounded w-48 mb-2 animate-pulse" />
-          <div className="h-5 bg-gray-100 rounded w-96 animate-pulse" />
+      <div className="p-4 md:p-8 max-w-4xl mx-auto">
+        <div className="mb-8 flex items-start justify-between">
+          <div>
+            <div className="h-8 bg-gray-200 rounded w-48 mb-2 animate-pulse" />
+            <div className="h-5 bg-gray-100 rounded w-96 animate-pulse" />
+          </div>
+          <div className="h-10 bg-gray-200 rounded w-40 animate-pulse" />
         </div>
-        <div className="flex gap-4 mb-8">
-          <div className="h-10 bg-gray-200 rounded w-32 animate-pulse" />
-          <div className="h-10 bg-gray-100 rounded w-32 animate-pulse" />
+        {/* Stats skeleton */}
+        <div className="hub-card mb-8 animate-pulse">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="text-center space-y-2">
+                <div className="h-8 bg-gray-200 rounded w-16 mx-auto" />
+                <div className="h-4 bg-gray-100 rounded w-24 mx-auto" />
+              </div>
+            ))}
+          </div>
         </div>
+        {/* Ring + Sparkline skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="hub-card animate-pulse flex items-center justify-center h-56">
+            <div className="w-40 h-40 rounded-full bg-gray-200" />
+          </div>
+          <div className="hub-card animate-pulse h-56">
+            <div className="h-4 bg-gray-200 rounded w-32 mb-4" />
+            <div className="flex items-end gap-3 h-32">
+              {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                <div key={i} className="flex-1 bg-gray-200 rounded" style={{ height: `${30 + i * 8}%` }} />
+              ))}
+            </div>
+          </div>
+        </div>
+        {/* Cards skeleton */}
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="hub-card h-40 animate-pulse">
@@ -283,83 +369,283 @@ export default function CertificatesPage() {
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-3xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1
-          className="font-bold mb-2"
-          style={{
-            fontFamily: "'Source Serif 4', Georgia, serif",
-            fontSize: '28px',
-            color: '#1e2749',
-          }}
-        >
-          {tUI('Your Achievements')}
-        </h1>
-        <p
-          className="text-gray-500 text-[15px] max-w-[560px]"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
-        >
-          {tUI('Every step forward deserves to be seen. These are yours.')}
-        </p>
+    <div className="p-4 md:p-8 max-w-4xl mx-auto">
+      {/* Header with Share button */}
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+          <h1
+            className="font-bold mb-2"
+            style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontSize: '28px',
+              color: '#1e2749',
+            }}
+          >
+            {tUI('Your Achievements')}
+          </h1>
+          <p
+            className="text-gray-500 text-[15px] max-w-[560px]"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            {tUI('Every step forward deserves to be seen. These are yours.')}
+          </p>
+        </div>
+        <ShareMenu
+          type="tip"
+          text={`I've earned ${earnedCount} recognitions on TDI Learning Hub, explored ${toolsExplored} tools, and saved ${hoursSaved} hours. teachersdeserveit.com`}
+          url="https://www.teachersdeserveit.com/hub"
+          buttonVariant="primary"
+          buttonSize="md"
+        />
       </div>
 
-      {/* Tab Navigation */}
+      {/* ========== 1. Hero Stats Row ========== */}
       <div
-        className="flex gap-1 mb-8 p-1 rounded-lg w-fit"
-        style={{ backgroundColor: '#f3f4f6' }}
+        className="rounded-xl p-6 mb-8"
+        style={{
+          backgroundColor: '#fff',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+        }}
       >
-        <button
-          onClick={() => setActiveTab('certificates')}
-          className="px-5 py-2 rounded-md text-sm font-medium transition-all"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            backgroundColor: activeTab === 'certificates' ? '#fff' : 'transparent',
-            color: activeTab === 'certificates' ? '#1e2749' : '#6b7280',
-            boxShadow: activeTab === 'certificates' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-          }}
-        >
-          {tUI('Certificates')}
-        </button>
-        <button
-          onClick={() => setActiveTab('field-notes')}
-          className="px-5 py-2 rounded-md text-sm font-medium transition-all"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            backgroundColor: activeTab === 'field-notes' ? '#fff' : 'transparent',
-            color: activeTab === 'field-notes' ? '#1e2749' : '#6b7280',
-            boxShadow: activeTab === 'field-notes' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-          }}
-        >
-          {tUI('Field Notes')}
-          {recognitionData && recognitionData.earned.length > 0 && (
-            <span
-              className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full text-[11px] font-bold"
-              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {/* Recognitions earned */}
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Trophy size={18} style={{ color: '#ffba06' }} />
+              <span
+                className="font-bold"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '28px',
+                  color: '#ffba06',
+                }}
+              >
+                {earnedCount}
+              </span>
+            </div>
+            <p
+              className="text-[13px]"
+              style={{ fontFamily: "'DM Sans', sans-serif", color: '#6b7280' }}
             >
-              {recognitionData.earned.length}
-            </span>
-          )}
-        </button>
+              {tUI('Recognitions earned')}
+            </p>
+          </div>
+
+          {/* Tools explored */}
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Compass size={18} style={{ color: '#1e2749' }} />
+              <span
+                className="font-bold"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '28px',
+                  color: '#1e2749',
+                }}
+              >
+                {toolsExplored}
+              </span>
+            </div>
+            <p
+              className="text-[13px]"
+              style={{ fontFamily: "'DM Sans', sans-serif", color: '#6b7280' }}
+            >
+              {tUI('Tools explored')}
+            </p>
+          </div>
+
+          {/* Hours saved */}
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Timer size={18} style={{ color: '#1e2749' }} />
+              <span
+                className="font-bold"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '28px',
+                  color: '#1e2749',
+                }}
+              >
+                {hoursSaved} hrs
+              </span>
+            </div>
+            <p
+              className="text-[13px]"
+              style={{ fontFamily: "'DM Sans', sans-serif", color: '#6b7280' }}
+            >
+              {tUI('Hours saved')}
+            </p>
+          </div>
+
+          {/* Days active */}
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Activity size={18} style={{ color: '#1e2749' }} />
+              <span
+                className="font-bold"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '28px',
+                  color: '#1e2749',
+                }}
+              >
+                {daysActive}
+              </span>
+            </div>
+            <p
+              className="text-[13px]"
+              style={{ fontFamily: "'DM Sans', sans-serif", color: '#6b7280' }}
+            >
+              {tUI('Days active')}
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Certificates Tab */}
-      {activeTab === 'certificates' && (
-        <>
-          {certificates.length > 0 ? (
-            <div className="space-y-4">
-              {certificates.map((cert) => (
+      {/* ========== 2 & 3. Progress Ring + Activity Sparkline ========== */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        {/* Progress Ring */}
+        <div
+          className="rounded-xl p-6 flex flex-col items-center justify-center"
+          style={{
+            backgroundColor: '#fff',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+          }}
+        >
+          <svg width="180" height="180" viewBox="0 0 180 180">
+            {/* Background arc */}
+            <circle
+              cx="90"
+              cy="90"
+              r={ringRadius}
+              fill="none"
+              stroke="#1e2749"
+              strokeWidth="14"
+              opacity="0.1"
+            />
+            {/* Progress arc */}
+            <circle
+              cx="90"
+              cy="90"
+              r={ringRadius}
+              fill="none"
+              stroke="#ffba06"
+              strokeWidth="14"
+              strokeLinecap="round"
+              strokeDasharray={ringCircumference}
+              strokeDashoffset={ringOffset}
+              transform="rotate(-90 90 90)"
+              style={{ transition: 'stroke-dashoffset 0.8s ease-out' }}
+            />
+            {/* Center text */}
+            <text
+              x="90"
+              y="85"
+              textAnchor="middle"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '32px',
+                fontWeight: 700,
+                fill: '#1e2749',
+              }}
+            >
+              {earnedCount}/{totalRecognitions}
+            </text>
+            <text
+              x="90"
+              y="108"
+              textAnchor="middle"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '13px',
+                fill: '#6b7280',
+              }}
+            >
+              {tUI('Field Notes earned')}
+            </text>
+          </svg>
+        </div>
+
+        {/* Activity Sparkline */}
+        <div
+          className="rounded-xl p-6 flex flex-col"
+          style={{
+            backgroundColor: '#fff',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+          }}
+        >
+          <h3
+            className="font-semibold mb-4"
+            style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontSize: '16px',
+              color: '#1e2749',
+            }}
+          >
+            {tUI('Last 6 months')}
+          </h3>
+          <div className="flex items-end gap-3 flex-1" style={{ minHeight: '120px' }}>
+            {activityByDay.map((day, i) => {
+              const heightPercent = day.count > 0 ? Math.max((day.count / maxActivity) * 100, 12) : 8;
+              return (
+                <div key={i} className="flex-1 flex flex-col items-center gap-2">
+                  <div
+                    className="w-full rounded-t-md transition-all"
+                    style={{
+                      height: `${heightPercent}%`,
+                      minHeight: '8px',
+                      backgroundColor: day.count > 0 ? '#ffba06' : '#e5e7eb',
+                    }}
+                  />
+                  <span
+                    className="text-[11px]"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      color: day.count > 0 ? '#1e2749' : '#9ca3af',
+                    }}
+                  >
+                    {day.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ========== 4. Earned Recognitions ========== */}
+      {recognitionData && recognitionData.earned.length > 0 && (
+        <section className="mb-10">
+          <h2
+            className="text-lg font-semibold mb-5"
+            style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              color: '#1e2749',
+            }}
+          >
+            {tUI('Earned')}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {recognitionData.earned.map((item) => {
+              const IconComponent = getIcon(item.recognition.icon);
+              return (
                 <div
-                  key={cert.id}
-                  className="hub-card"
-                  style={{ borderTop: '4px solid #E8B84B' }}
+                  key={item.recognition.id}
+                  className="rounded-xl relative overflow-hidden"
+                  style={{
+                    backgroundColor: '#fff',
+                    borderLeft: '4px solid #ffba06',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+                    padding: '20px',
+                  }}
                 >
                   <div className="flex items-start gap-4">
+                    {/* Icon in gold circle */}
                     <div
                       className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{ backgroundColor: '#FFF8E7' }}
                     >
-                      <Award size={24} style={{ color: '#E8B84B' }} />
+                      <IconComponent size={22} style={{ color: '#d4960a' }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3
@@ -370,349 +656,276 @@ export default function CertificatesPage() {
                           color: '#1e2749',
                         }}
                       >
-                        {cert.course.title}
+                        {tUI(item.recognition.title)}
                       </h3>
-                      <div className="flex flex-wrap items-center gap-3 mb-3">
-                        <span
-                          className="inline-block text-[12px] font-medium px-2 py-1 rounded"
-                          style={{
-                            backgroundColor: '#E8B84B',
-                            color: '#1e2749',
-                            fontFamily: "'DM Sans', sans-serif",
-                          }}
-                        >
-                          {cert.pd_hours} {tUI('PD Hours')}
-                        </span>
-                        <span
-                          className="text-[13px] text-gray-500"
-                          style={{ fontFamily: "'DM Sans', sans-serif" }}
-                        >
-                          {tUI('Issued')} {formatDate(cert.issued_at)}
-                        </span>
-                      </div>
                       <p
-                        className="text-[12px] text-gray-400 font-mono mb-4"
-                        style={{ fontFamily: 'monospace' }}
+                        className="text-[14px] text-gray-600 mb-2"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
                       >
-                        {tUI('Verification')}: {cert.verification_code}
+                        {tUI(item.recognition.description)}
+                      </p>
+                      <p
+                        className="text-[14px] mb-3 leading-relaxed"
+                        style={{
+                          fontFamily: "'Source Serif 4', Georgia, serif",
+                          fontStyle: 'italic',
+                          color: '#4a5568',
+                        }}
+                      >
+                        {tUI(item.recognition.personalNote)}
                       </p>
                       <div className="flex flex-wrap items-center gap-3">
-                        <a
-                          href={`/api/hub/certificate/${cert.verification_code}`}
-                          download={`TDI-Certificate-${cert.verification_code}.pdf`}
-                          className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-                          style={{
-                            backgroundColor: '#E8B84B',
-                            color: '#1e2749',
-                            fontFamily: "'DM Sans', sans-serif",
-                          }}
-                        >
-                          <Download size={16} />
-                          {tUI('Download PDF')}
-                        </a>
-                        <ShareMenu
-                          type="certificate"
-                          text={`PD Certificate for ${cert.course.title}`}
-                          url={`https://www.teachersdeserveit.com/hub/verify/${cert.verification_code}`}
-                          courseTitle={cert.course.title}
-                          pdHours={cert.pd_hours}
-                          buttonVariant="secondary"
-                          buttonSize="md"
-                        />
-                        <Link
-                          href={`/hub/verify/${cert.verification_code}`}
-                          target="_blank"
-                          className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+                        <span
+                          className="text-[12px] text-gray-400"
                           style={{ fontFamily: "'DM Sans', sans-serif" }}
                         >
-                          {tUI('Verify')}
-                          <ExternalLink size={14} />
-                        </Link>
+                          {tUI('Earned')} {formatDate(item.earnedAt)}
+                        </span>
+                        <button
+                          onClick={() => handlePrint(item.recognition)}
+                          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                          style={{ fontFamily: "'DM Sans', sans-serif" }}
+                        >
+                          <Printer size={14} />
+                          {tUI('Print')}
+                        </button>
+                        <ShareMenu
+                          type="tip"
+                          text={`I earned "${item.recognition.title}" on the Teachers Deserve It Learning Hub! ${item.recognition.personalNote}`}
+                          url="https://www.teachersdeserveit.com/hub"
+                          buttonVariant="ghost"
+                          buttonSize="sm"
+                        />
                       </div>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div
-              className="hub-card py-16"
-              style={{ backgroundColor: '#FFF8E7', border: 'none' }}
-            >
-              <EmptyState
-                icon={Award}
-                iconBgColor="#FFF8E7"
-                title={tUI('No certificates yet.')}
-                description={tUI(
-                  'Complete a course to earn your first PD certificate. Your school can verify it anytime.'
-                )}
-                buttonText={tUI('Browse Courses')}
-                buttonLink="/hub/courses"
-              />
-            </div>
-          )}
-        </>
+              );
+            })}
+          </div>
+        </section>
       )}
 
-      {/* Field Notes Tab */}
-      {activeTab === 'field-notes' && recognitionData && (
-        <div className="space-y-10">
-          {/* Earned Section */}
-          <section>
-            <h2
-              className="text-lg font-semibold mb-4"
+      {/* Empty state for no earned recognitions */}
+      {recognitionData && recognitionData.earned.length === 0 && (
+        <section className="mb-10">
+          <div
+            className="rounded-xl py-10 text-center"
+            style={{ backgroundColor: '#FFFDF5', border: '1px dashed #e5d9b6', padding: '40px 20px' }}
+          >
+            <Sparkles
+              size={28}
+              className="mx-auto mb-3"
+              style={{ color: '#d4960a' }}
+            />
+            <p
+              className="text-[15px] font-medium mb-1"
               style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
+                fontFamily: "'DM Sans', sans-serif",
                 color: '#1e2749',
               }}
             >
-              {tUI('Earned')}
-            </h2>
+              {tUI('Your first Field Note is closer than you think')}
+            </p>
+            <p
+              className="text-[13px] text-gray-400"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {tUI('Keep exploring tools and using Moment Mode to earn recognitions.')}
+            </p>
+          </div>
+        </section>
+      )}
 
-            {recognitionData.earned.length > 0 ? (
-              <div className="space-y-4">
-                {recognitionData.earned.map((item) => {
-                  const IconComponent = getIcon(item.recognition.icon);
-                  return (
-                    <div
-                      key={item.recognition.id}
-                      className="hub-card relative overflow-hidden"
-                      style={{ borderLeft: '4px solid #ffba06' }}
-                    >
-                      {/* Gold accent top strip */}
-                      <div
-                        className="absolute top-0 right-0 w-24 h-24 opacity-[0.04] rounded-bl-full"
-                        style={{ backgroundColor: '#ffba06' }}
-                      />
-
-                      <div className="flex items-start gap-4">
-                        <div
-                          className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: '#FFF8E7' }}
-                        >
-                          <IconComponent size={22} style={{ color: '#d4960a' }} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3
-                              className="font-semibold"
-                              style={{
-                                fontFamily: "'DM Sans', sans-serif",
-                                fontSize: '16px',
-                                color: '#1e2749',
-                              }}
-                            >
-                              {tUI(item.recognition.title)}
-                            </h3>
-                            <span
-                              className="inline-block w-2 h-2 rounded-full"
-                              style={{ backgroundColor: '#ffba06' }}
-                            />
-                          </div>
-                          <p
-                            className="text-[14px] text-gray-600 mb-2"
-                            style={{ fontFamily: "'DM Sans', sans-serif" }}
-                          >
-                            {tUI(item.recognition.description)}
-                          </p>
-                          <p
-                            className="text-[14px] mb-3 leading-relaxed"
-                            style={{
-                              fontFamily: "'DM Sans', sans-serif",
-                              fontStyle: 'italic',
-                              color: '#4a5568',
-                            }}
-                          >
-                            {tUI(item.recognition.personalNote)}
-                          </p>
-                          <div className="flex flex-wrap items-center gap-3">
-                            <span
-                              className="text-[12px] text-gray-400"
-                              style={{ fontFamily: "'DM Sans', sans-serif" }}
-                            >
-                              {tUI('Earned')} {formatDate(item.earnedAt)}
-                            </span>
-                            <button
-                              onClick={() => handlePrint(item.recognition)}
-                              className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
-                              style={{ fontFamily: "'DM Sans', sans-serif" }}
-                            >
-                              <Printer size={14} />
-                              {tUI('Print')}
-                            </button>
-                            <ShareMenu
-                              type="tip"
-                              text={`I earned "${item.recognition.title}" on the Teachers Deserve It Learning Hub! ${item.recognition.personalNote}`}
-                              url="https://www.teachersdeserveit.com/hub"
-                              buttonVariant="ghost"
-                              buttonSize="sm"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div
-                className="hub-card py-10 text-center"
-                style={{ backgroundColor: '#FFFDF5', border: '1px dashed #e5d9b6' }}
-              >
-                <Sparkles
-                  size={28}
-                  className="mx-auto mb-3"
-                  style={{ color: '#d4960a' }}
-                />
-                <p
-                  className="text-[15px] font-medium mb-1"
+      {/* ========== 5. In Progress ========== */}
+      {recognitionData && recognitionData.progress.length > 0 && (
+        <section className="mb-10">
+          <h2
+            className="text-lg font-semibold mb-5"
+            style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              color: '#1e2749',
+            }}
+          >
+            {tUI('In Progress')}
+          </h2>
+          <div className="space-y-3">
+            {recognitionData.progress.map((item) => {
+              const IconComponent = getIcon(item.recognition.icon);
+              const remaining = item.recognition.threshold - item.current;
+              const percentage = Math.round(
+                (item.current / item.recognition.threshold) * 100
+              );
+              return (
+                <div
+                  key={item.recognition.id}
+                  className="rounded-xl flex items-center gap-4"
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    color: '#1e2749',
+                    backgroundColor: '#fff',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+                    padding: '16px 20px',
                   }}
                 >
-                  {tUI('Your first Field Note is closer than you think')}
-                </p>
-                <p
-                  className="text-[13px] text-gray-400"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  {tUI('Keep exploring tools and using Moment Mode to earn recognitions.')}
-                </p>
-              </div>
-            )}
-          </section>
-
-          {/* In Progress Section */}
-          {recognitionData.progress.length > 0 && (
-            <section>
-              <h2
-                className="text-lg font-semibold mb-4"
-                style={{
-                  fontFamily: "'Source Serif 4', Georgia, serif",
-                  color: '#1e2749',
-                }}
-              >
-                {tUI('In Progress')}
-              </h2>
-              <div className="space-y-3">
-                {recognitionData.progress.map((item) => {
-                  const IconComponent = getIcon(item.recognition.icon);
-                  const percentage = Math.round(
-                    (item.current / item.recognition.threshold) * 100
-                  );
-                  return (
-                    <div
-                      key={item.recognition.id}
-                      className="hub-card"
-                      style={{ borderLeft: '4px solid #e5e7eb' }}
-                    >
-                      <div className="flex items-start gap-4">
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: '#f9fafb' }}
-                        >
-                          <IconComponent size={18} style={{ color: '#9ca3af' }} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3
-                            className="font-medium text-[15px] mb-1"
-                            style={{
-                              fontFamily: "'DM Sans', sans-serif",
-                              color: '#1e2749',
-                            }}
-                          >
-                            {tUI(item.recognition.title)}
-                          </h3>
-                          <p
-                            className="text-[13px] text-gray-500 mb-3"
-                            style={{ fontFamily: "'DM Sans', sans-serif" }}
-                          >
-                            {tUI(item.recognition.description)}
-                          </p>
-                          {/* Progress bar */}
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="flex-1 h-2 rounded-full overflow-hidden"
-                              style={{ backgroundColor: '#f3f4f6' }}
-                            >
-                              <div
-                                className="h-full rounded-full transition-all"
-                                style={{
-                                  width: `${percentage}%`,
-                                  backgroundColor: '#ffba06',
-                                }}
-                              />
-                            </div>
-                            <span
-                              className="text-[12px] text-gray-400 flex-shrink-0"
-                              style={{ fontFamily: "'DM Sans', sans-serif" }}
-                            >
-                              {item.current}/{item.recognition.threshold}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          )}
-
-          {/* Coming Soon Section */}
-          {recognitionData.available.length > 0 && (
-            <section>
-              <h2
-                className="text-lg font-semibold mb-4"
-                style={{
-                  fontFamily: "'Source Serif 4', Georgia, serif",
-                  color: '#9ca3af',
-                }}
-              >
-                {tUI('Coming Soon')}
-              </h2>
-              <div className="space-y-2">
-                {recognitionData.available.map((rec) => (
                   <div
-                    key={rec.id}
-                    className="hub-card opacity-50"
-                    style={{
-                      borderLeft: '4px solid #e5e7eb',
-                      backgroundColor: '#fafafa',
-                    }}
+                    className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: '#f9fafb' }}
                   >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: '#f3f4f6' }}
+                    <IconComponent size={18} style={{ color: '#9ca3af' }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3
+                        className="font-medium text-[15px]"
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          color: '#1e2749',
+                        }}
                       >
-                        <Lock size={14} style={{ color: '#d1d5db' }} />
-                      </div>
-                      <div className="min-w-0">
-                        <h3
-                          className="font-medium text-[14px]"
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            color: '#9ca3af',
-                          }}
-                        >
-                          {tUI(rec.title)}
-                        </h3>
-                        <p
-                          className="text-[12px] text-gray-400"
-                          style={{ fontFamily: "'DM Sans', sans-serif" }}
-                        >
-                          {tUI(rec.description)}
-                        </p>
-                      </div>
+                        {tUI(item.recognition.title)}
+                      </h3>
+                      <span
+                        className="text-[12px] flex-shrink-0 ml-3"
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          color: '#ffba06',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {percentage}%
+                      </span>
+                    </div>
+                    <p
+                      className="text-[13px] text-gray-500 mb-2"
+                      style={{ fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                      {remaining} {tUI('more to go!')}
+                    </p>
+                    {/* Progress bar */}
+                    <div
+                      className="w-full h-2 rounded-full overflow-hidden"
+                      style={{ backgroundColor: '#f3f4f6' }}
+                    >
+                      <div
+                        className="h-full rounded-full transition-all"
+                        style={{
+                          width: `${percentage}%`,
+                          backgroundColor: '#ffba06',
+                        }}
+                      />
                     </div>
                   </div>
-                ))}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* ========== Certificates Section ========== */}
+      {certificates.length > 0 && (
+        <section className="mb-10">
+          <h2
+            className="text-lg font-semibold mb-5"
+            style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              color: '#1e2749',
+            }}
+          >
+            {tUI('Certificates')}
+          </h2>
+          <div className="space-y-4">
+            {certificates.map((cert) => (
+              <div
+                key={cert.id}
+                className="rounded-xl"
+                style={{
+                  backgroundColor: '#fff',
+                  borderTop: '4px solid #E8B84B',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+                  padding: '20px',
+                }}
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: '#FFF8E7' }}
+                  >
+                    <Award size={24} style={{ color: '#E8B84B' }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3
+                      className="font-semibold mb-1"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: '16px',
+                        color: '#1e2749',
+                      }}
+                    >
+                      {cert.course.title}
+                    </h3>
+                    <div className="flex flex-wrap items-center gap-3 mb-3">
+                      <span
+                        className="inline-block text-[12px] font-medium px-2 py-1 rounded"
+                        style={{
+                          backgroundColor: '#E8B84B',
+                          color: '#1e2749',
+                          fontFamily: "'DM Sans', sans-serif",
+                        }}
+                      >
+                        {cert.pd_hours} {tUI('PD Hours')}
+                      </span>
+                      <span
+                        className="text-[13px] text-gray-500"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        {tUI('Issued')} {formatDate(cert.issued_at)}
+                      </span>
+                    </div>
+                    <p
+                      className="text-[12px] text-gray-400 font-mono mb-4"
+                      style={{ fontFamily: 'monospace' }}
+                    >
+                      {tUI('Verification')}: {cert.verification_code}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <a
+                        href={`/api/hub/certificate/${cert.verification_code}`}
+                        download={`TDI-Certificate-${cert.verification_code}.pdf`}
+                        className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                        style={{
+                          backgroundColor: '#E8B84B',
+                          color: '#1e2749',
+                          fontFamily: "'DM Sans', sans-serif",
+                        }}
+                      >
+                        <Download size={16} />
+                        {tUI('Download PDF')}
+                      </a>
+                      <ShareMenu
+                        type="certificate"
+                        text={`PD Certificate for ${cert.course.title}`}
+                        url={`https://www.teachersdeserveit.com/hub/verify/${cert.verification_code}`}
+                        courseTitle={cert.course.title}
+                        pdHours={cert.pd_hours}
+                        buttonVariant="secondary"
+                        buttonSize="md"
+                      />
+                      <Link
+                        href={`/hub/verify/${cert.verification_code}`}
+                        target="_blank"
+                        className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        {tUI('Verify')}
+                        <ExternalLink size={14} />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </section>
-          )}
-        </div>
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );
