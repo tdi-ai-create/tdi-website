@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
-import { getSupabase } from '@/lib/supabase';
+import { getSupabase as getDefaultSupabase } from '@/lib/supabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 type AuthView = 'main' | 'signup' | 'forgot';
 type LoginMethod = 'email' | 'magic';
@@ -41,6 +42,8 @@ export interface PortalSignInProps {
   /** Shown in top-left back link.  Pass null to hide. */
   backHref?: string | null;
   backLabel?: string;
+  /** Optional Supabase client getter. Hub passes its own client; others use Creator Portal default. */
+  getSupabaseClient?: () => SupabaseClient;
 }
 
 const DEFAULT_METHODS: Required<PortalSignInMethods> = {
@@ -70,8 +73,10 @@ export default function PortalSignIn({
   forgotPasswordRedirectTo,
   backHref = '/',
   backLabel = 'Back to site',
+  getSupabaseClient,
 }: PortalSignInProps) {
   const methods = { ...DEFAULT_METHODS, ...methodsProp };
+  const getSupabase = getSupabaseClient || getDefaultSupabase;
 
   const [view, setView] = useState<AuthView>('main');
   const [loginMethod, setLoginMethod] = useState<LoginMethod>('email');

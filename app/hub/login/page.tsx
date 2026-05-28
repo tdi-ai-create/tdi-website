@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getCurrentUser } from '@/lib/hub-auth';
+import { getHubSupabase } from '@/lib/supabase-hub';
 import TDIPortalLoader from '@/components/TDIPortalLoader';
 import PortalSignIn from '@/components/auth/PortalSignIn';
 import { attributePartnership } from '@/lib/hub/partnerships';
@@ -87,6 +88,7 @@ export default function HubLoginPage() {
           portalSubtitle="Professional development that fits your life"
           methods={{ google: true, emailPassword: true, magicLink: true, signUp: true }}
           onSuccess={handleSuccess}
+          getSupabaseClient={getHubSupabase}
           magicLinkRedirectTo={
             typeof window !== 'undefined'
               ? `${window.location.origin}/hub/auth/callback?returnUrl=${encodeURIComponent(returnUrl)}`
