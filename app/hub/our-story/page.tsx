@@ -19,18 +19,11 @@ import {
 // ─── Stats Data ─────────────────────────────────────────────────────────────
 const STATS = [
   { value: '100K+', label: 'Educators' },
-  { value: 'All 50 States', label: '' },
-  { value: '95%', label: 'Saved Planning Time' },
-  { value: '65%', label: 'Implementation Rate' },
+  { value: 'All 50', label: 'States' },
+  { value: '100+', label: 'Countries' },
+  { value: '74%', label: 'Classroom Implementation' },
 ];
 
-// ─── Visit List Items ───────────────────────────────────────────────────────
-const VISIT_ITEMS = [
-  'We observe up to 15 classrooms per visit',
-  'Observations are growth-focused, not evaluative',
-  'We meet with teachers one-on-one after observations',
-  'Leadership debrief at the end of each day',
-];
 
 export default function OurStoryPage() {
   const { user } = useHub();
@@ -88,6 +81,27 @@ export default function OurStoryPage() {
           }}
         />
         <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
+          {/* TDI Mark - centered above eyebrow */}
+          <div className="flex justify-center mb-6">
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 100 100"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ opacity: 0.95 }}
+            >
+              <circle cx="50" cy="50" r="46" stroke="#ffba06" strokeWidth="3" fill="none" />
+              <path
+                d="M 35 30 L 35 70 M 35 50 Q 35 42 45 42 Q 55 42 55 52 L 55 70"
+                stroke="#ffba06"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fill="none"
+              />
+            </svg>
+          </div>
           <p
             style={{
               fontFamily: "'DM Sans', sans-serif",
@@ -127,20 +141,17 @@ export default function OurStoryPage() {
             )}
           </p>
         </div>
-        {/* Gold bottom accent */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: 60,
-            height: 4,
-            borderRadius: 2,
-            backgroundColor: '#ffba06',
-          }}
-        />
       </section>
+
+      {/* Yellow accent strip - signature TDI pattern */}
+      <div
+        style={{
+          height: '5px',
+          backgroundColor: '#ffba06',
+          width: '100%',
+        }}
+        aria-hidden="true"
+      />
 
       {/* ─── Section 2: Who We Are ────────────────────────────────────────── */}
       <section style={{ padding: '64px 24px' }}>
@@ -193,42 +204,37 @@ export default function OurStoryPage() {
             )}
           </p>
 
-          {/* Stats Row */}
+          {/* Stats band - navy background, yellow numbers */}
           <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-              gap: 24,
-              borderTop: '1px solid #E2E8F0',
-              paddingTop: 32,
-            }}
+            className="rounded-lg overflow-hidden mt-8"
+            style={{ backgroundColor: '#1e2749' }}
           >
-            {STATS.map((stat, i) => (
-              <div key={i} style={{ textAlign: 'center' }}>
-                <p
-                  style={{
-                    fontFamily: "'Source Serif 4', serif",
-                    fontSize: 28,
-                    fontWeight: 700,
-                    color: '#1e2749',
-                    marginBottom: 4,
-                  }}
-                >
-                  {stat.value}
-                </p>
-                {stat.label && (
-                  <p
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 px-6 py-8">
+              {STATS.map((stat, i) => (
+                <div key={i} className="text-center">
+                  <div
+                    className="text-4xl md:text-5xl font-bold mb-2"
                     style={{
-                      fontSize: 13,
-                      color: '#718096',
-                      fontWeight: 500,
+                      color: '#ffba06',
+                      fontFamily: 'Fraunces, serif',
+                    }}
+                  >
+                    {stat.value}
+                  </div>
+                  <div
+                    className="text-sm uppercase tracking-wider"
+                    style={{
+                      color: '#ffffff',
+                      opacity: 0.85,
+                      fontFamily: 'DM Sans, sans-serif',
+                      letterSpacing: '0.08em',
                     }}
                   >
                     {stat.label}
-                  </p>
-                )}
-              </div>
-            ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -303,107 +309,119 @@ export default function OurStoryPage() {
         </div>
       </section>
 
-      {/* ─── Section 4: More Than a Platform ──────────────────────────────── */}
-      <section style={{ padding: '0 24px 64px' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <p
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.15em',
-              color: '#ffba06',
-              marginBottom: 24,
-              textAlign: 'center',
-            }}
-          >
-            {tUI('ACCESS IS NOT ENOUGH')}
-          </p>
-
+      {/* ─── Section 4: What a Visit Looks Like ─────────────────────────── */}
+      <section
+        className="w-full py-16 md:py-20 my-12"
+        style={{ backgroundColor: '#1e2749' }}
+      >
+        <div className="max-w-5xl mx-auto px-6">
+          {/* Small gold eyebrow */}
           <div
+            className="text-center text-sm uppercase mb-3"
             style={{
-              background: 'linear-gradient(135deg, #1e2749 0%, #2B3A67 100%)',
-              borderRadius: 16,
-              padding: 'clamp(32px, 5vw, 56px)',
-              marginBottom: 32,
+              color: '#ffba06',
+              fontFamily: 'DM Sans, sans-serif',
+              letterSpacing: '0.12em',
+              fontWeight: 600,
             }}
           >
-            <p
-              style={{
-                fontFamily: "'Source Serif 4', serif",
-                fontSize: 'clamp(22px, 3vw, 30px)',
-                fontWeight: 700,
-                color: '#FFFFFF',
-                lineHeight: 1.4,
-                marginBottom: 16,
-              }}
-            >
-              {tUI('The Hub gives you tools. Our team makes sure they actually work.')}
-            </p>
-            <p
-              style={{
-                fontSize: 16,
-                lineHeight: 1.75,
-                color: 'rgba(255, 255, 255, 0.7)',
-              }}
-            >
-              {tUI(
-                'When your school partners with TDI, we do not just hand you a login. We show up. In your building. In your classrooms. Watching real teaching and giving real, affirming feedback.'
-              )}
-            </p>
+            What a visit looks like
           </div>
 
-          {/* What a Visit Looks Like */}
-          <div
+          {/* Section headline */}
+          <h2
+            className="text-center text-3xl md:text-4xl mb-12"
             style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: 16,
-              padding: 'clamp(28px, 4vw, 44px)',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+              color: '#ffffff',
+              fontFamily: 'Fraunces, serif',
+              fontWeight: 600,
+              lineHeight: 1.2,
             }}
           >
-            <p
-              style={{
-                fontSize: 14,
-                fontWeight: 700,
-                color: '#1e2749',
-                marginBottom: 20,
-                letterSpacing: '0.02em',
-              }}
-            >
-              {tUI('What a visit looks like:')}
-            </p>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-              {VISIT_ITEMS.map((item, i) => (
-                <li
-                  key={i}
+            We show up. In your building. In your classrooms.
+          </h2>
+
+          {/* 4-up grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            {[
+              {
+                number: '01',
+                title: 'Up to 15 classrooms per visit',
+                body: 'We move through your building, observing real teaching in real conditions. Not a sample. Not a showcase.',
+              },
+              {
+                number: '02',
+                title: 'Growth-focused, never evaluative',
+                body: 'We are not there to rate or rank. We are there to notice what is working and reflect it back.',
+              },
+              {
+                number: '03',
+                title: 'One-on-one with every teacher',
+                body: 'After observations, we sit down with each teacher individually. No group debriefs. No skipped voices.',
+              },
+              {
+                number: '04',
+                title: 'Leadership debrief at end of day',
+                body: 'We close the loop with your leadership team so insights translate into next steps before we leave.',
+              },
+            ].map((item) => (
+              <div
+                key={item.number}
+                className="flex gap-5 items-start p-6 rounded-lg"
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                  border: '1px solid rgba(255, 186, 6, 0.15)',
+                }}
+              >
+                {/* Gold number circle */}
+                <div
+                  className="flex-shrink-0 flex items-center justify-center"
                   style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: 12,
-                    padding: '12px 0',
-                    borderBottom:
-                      i < VISIT_ITEMS.length - 1 ? '1px solid #F0EEE9' : 'none',
-                    fontSize: 15,
-                    color: '#4A5568',
-                    lineHeight: 1.6,
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ffba06',
                   }}
                 >
                   <span
                     style={{
-                      display: 'inline-block',
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      backgroundColor: '#ffba06',
-                      marginTop: 7,
-                      flexShrink: 0,
+                      color: '#1e2749',
+                      fontFamily: 'Fraunces, serif',
+                      fontSize: '18px',
+                      fontWeight: 700,
                     }}
-                  />
-                  {tUI(item)}
-                </li>
-              ))}
-            </ul>
+                  >
+                    {item.number}
+                  </span>
+                </div>
+
+                {/* Card content */}
+                <div className="flex-1">
+                  <h3
+                    className="text-lg md:text-xl mb-2"
+                    style={{
+                      color: '#ffffff',
+                      fontFamily: 'DM Sans, sans-serif',
+                      fontWeight: 600,
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {item.title}
+                  </h3>
+                  <p
+                    className="text-sm md:text-base"
+                    style={{
+                      color: '#ffffff',
+                      opacity: 0.75,
+                      fontFamily: 'DM Sans, sans-serif',
+                      lineHeight: 1.55,
+                    }}
+                  >
+                    {item.body}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
