@@ -16,8 +16,13 @@ import {
   ArrowRight,
   TrendingUp,
   Heart,
+  Share2,
+  X,
+  Copy,
+  Mail,
+  MessageCircle,
+  Check,
 } from 'lucide-react';
-import ShareMenu from '@/components/hub/ShareMenu';
 
 // Daily motivational messages - picks based on day of week
 const DAILY_MESSAGES = [
@@ -40,6 +45,88 @@ const FALLBACK_TIPS = [
   'Your students do not need you to be perfect. They need you to be present.',
   'Five minutes of silence can change your entire afternoon.',
 ];
+
+const CELEBRATION_CATEGORIES = [
+  { key: 'showed-up', label: 'I showed up for myself today' },
+  { key: 'tried-new', label: 'I tried something new in my classroom' },
+  { key: 'earned-pd', label: 'I earned PD hours on my own time' },
+  { key: 'found-tool', label: 'I found a tool that saved me hours' },
+  { key: 'invested', label: 'I invested in myself when nobody asked me to' },
+  { key: 'tough-week', label: 'I made it through a tough week' },
+  { key: 'helped', label: 'I helped another teacher by sharing a resource' },
+  { key: 'completed', label: 'I completed a course' },
+] as const;
+
+const CELEBRATION_MESSAGES: Record<string, string[]> = {
+  'showed-up': [
+    'Took 5 minutes for myself today between 2nd and 3rd period. Revolutionary concept, I know. teachersdeserveit.com',
+    'Today I chose to invest in myself before I burned out. Wild behavior for a teacher. teachersdeserveit.com',
+    'Logged into my PD hub today instead of doom-scrolling the teacher subreddit. Growth. teachersdeserveit.com',
+    'Showed up for myself today. Not for admin, not for evals. For me. teachersdeserveit.com',
+    'Opened a PD resource during my planning period instead of stress-eating crackers. Progress. teachersdeserveit.com',
+  ],
+  'tried-new': [
+    'Tried a new strategy today and my kids actually responded. Mark the calendar. teachersdeserveit.com',
+    'Downloaded a tool, used it by lunch, and my afternoon class was smoother. This is the PD I actually need. teachersdeserveit.com',
+    'Tested a new idea in 3rd period. Nobody cried. Calling it a win. teachersdeserveit.com',
+    'Took a risk with a new approach today. My students were more engaged than I expected. teachersdeserveit.com',
+  ],
+  'earned-pd': [
+    'Getting PD hours from my couch in my pajamas. The future is now. teachersdeserveit.com',
+    'Earned PD credit without sitting through a 3-hour after-school session. I will never go back. teachersdeserveit.com',
+    'Racking up PD hours at my own pace, on my own terms. This is how it should work. teachersdeserveit.com',
+    'Just earned PD hours while my laundry was running. Multitasking queen. teachersdeserveit.com',
+  ],
+  'found-tool': [
+    'Found a 5-minute download that replaced 45 minutes of planning. Consider my Sunday free. teachersdeserveit.com',
+    'My co-teacher asked why I was smiling. It is because I found a tool that does the thing I hate. teachersdeserveit.com',
+    'Discovered a resource that cut my prep time in half. Why did nobody tell me sooner. teachersdeserveit.com',
+    'Found the cheat code. A tool that does in 5 minutes what used to take my entire planning period. teachersdeserveit.com',
+  ],
+  'invested': [
+    'Nobody told me to do this PD. I just wanted to be better. Teachers are different. teachersdeserveit.com',
+    'Investing in myself because nobody else budgeted for it. Classic. teachersdeserveit.com',
+    'Spent my own time getting better at my craft. No stipend, no requirement. Just drive. teachersdeserveit.com',
+    'Did professional development because I wanted to, not because I had to. That hits different. teachersdeserveit.com',
+  ],
+  'tough-week': [
+    'Survived another week. Downloaded a stress tool. Eating ice cream. This is recovery. teachersdeserveit.com',
+    'Made it to Friday. That is the whole tweet. teachersdeserveit.com',
+    'This week tried to break me but I am still here and still learning. teachersdeserveit.com',
+    'Rough week but I showed up every single day. Give teachers a raise or at least a nap. teachersdeserveit.com',
+  ],
+  'helped': [
+    'Sent a resource to my teacher bestie today. We rise by lifting others or whatever. teachersdeserveit.com',
+    'Shared a tool in the group chat and three people texted back THANK YOU. That is my PD. teachersdeserveit.com',
+    'Helped a colleague find a resource today. Community over competition, always. teachersdeserveit.com',
+    'Forwarded a resource to my team and someone said it changed their whole lesson. That feeling. teachersdeserveit.com',
+  ],
+  'completed': [
+    'Just finished a course in my pajamas on a Tuesday night. Who needs Netflix. teachersdeserveit.com',
+    'Course complete. Certificate earned. Resume updated. Boss move. teachersdeserveit.com',
+    'Finished a full PD course on my own time. Somebody put this on my evaluation. teachersdeserveit.com',
+    'Another course done. Another skill unlocked. Teachers never stop learning. teachersdeserveit.com',
+  ],
+};
+
+function getCelebrationMessage(categoryKey: string, tipText: string): string {
+  const messages = CELEBRATION_MESSAGES[categoryKey];
+  if (!messages || messages.length === 0) return '';
+  // Deterministic pick based on category + current date
+  const dateStr = new Date().toISOString().slice(0, 10);
+  let hash = 0;
+  const seed = categoryKey + dateStr;
+  for (let i = 0; i < seed.length; i++) {
+    hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+  }
+  const index = Math.abs(hash) % messages.length;
+  let msg = messages[index];
+  // Append tip if relevant for certain categories
+  if (['showed-up', 'invested'].includes(categoryKey) && tipText) {
+    msg += '\n\nToday\'s TDI tip: "' + tipText + '"';
+  }
+  return msg;
+}
 
 interface Enrollment {
   id: string;
@@ -87,6 +174,9 @@ export default function HubDashboard() {
   const [recommendations, setRecommendations] = useState<RecommendedCourse[]>([]);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [savedCourses, setSavedCourses] = useState<SavedCourse[]>([]);
+  const [showCelebrateModal, setShowCelebrateModal] = useState(false);
+  const [celebrateCopied, setCelebrateCopied] = useState(false);
+  const [selectedCelebration, setSelectedCelebration] = useState<string | null>(null);
 
   const firstName = profile?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Teacher';
   const dailyMessage = DAILY_MESSAGES[new Date().getDay()];
@@ -633,12 +723,14 @@ export default function HubDashboard() {
             <div className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.8)' }}>
               {tip}
             </div>
-            <ShareMenu
-              type="tip"
-              text={tip}
-              buttonVariant="ghost"
-              buttonSize="sm"
-            />
+            <button
+              onClick={() => setShowCelebrateModal(true)}
+              className="flex items-center gap-2 text-sm font-medium transition-colors"
+              style={{ color: 'rgba(255,255,255,0.6)' }}
+            >
+              <Share2 size={14} />
+              {tUI('Share your wins')}
+            </button>
           </div>
 
           {/* Certificates Widget */}
@@ -743,6 +835,198 @@ export default function HubDashboard() {
         </div>
       </div>
     </div>
+    {/* Celebrate & Share Modal */}
+    {showCelebrateModal && (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        style={{ background: 'rgba(0,0,0,0.5)' }}
+        onClick={() => setShowCelebrateModal(false)}
+      >
+        <div
+          className="w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="px-6 py-5 relative" style={{ background: '#1e2749' }}>
+            <button
+              onClick={() => setShowCelebrateModal(false)}
+              className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+            >
+              <X size={20} />
+            </button>
+            <h2 className="text-lg font-bold text-white">
+              {tUI('You deserve to brag a little')}
+            </h2>
+            <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
+              {tUI('Pick what you want to celebrate and share it with the world')}
+            </p>
+          </div>
+
+          {/* Body */}
+          <div className="bg-white px-6 py-5 overflow-y-auto flex-1">
+            {/* Section 1: Pick your win */}
+            <div className="mb-5">
+              <h3 className="text-sm font-semibold mb-3" style={{ color: '#1B2A4A' }}>
+                {tUI('Pick your win')}
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {CELEBRATION_CATEGORIES.map((cat) => (
+                  <button
+                    key={cat.key}
+                    onClick={() => {
+                      setSelectedCelebration(cat.key);
+                      setCelebrateCopied(false);
+                    }}
+                    className="px-3 py-1.5 rounded-full text-xs font-medium transition-all border"
+                    style={
+                      selectedCelebration === cat.key
+                        ? { background: '#FFBA06', borderColor: '#FFBA06', color: '#1B2A4A' }
+                        : { background: '#F9FAFB', borderColor: '#E5E7EB', color: '#4B5563' }
+                    }
+                  >
+                    {tUI(cat.label)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Section 2: Pre-written message */}
+            {selectedCelebration && (
+              <div className="mb-5">
+                <h3 className="text-sm font-semibold mb-3" style={{ color: '#1B2A4A' }}>
+                  {tUI('Your share message')}
+                </h3>
+                <div
+                  className="p-4 rounded-xl text-sm leading-relaxed whitespace-pre-line"
+                  style={{ background: '#F9FAFB', color: '#374151', border: '1px solid #E5E7EB' }}
+                >
+                  {getCelebrationMessage(selectedCelebration, tip)}
+                </div>
+              </div>
+            )}
+
+            {/* Section 3: Share channels */}
+            {selectedCelebration && (() => {
+              const message = getCelebrationMessage(selectedCelebration, tip);
+              const encodedMessage = encodeURIComponent(message);
+              return (
+                <div>
+                  <h3 className="text-sm font-semibold mb-3" style={{ color: '#1B2A4A' }}>
+                    {tUI('Share it')}
+                  </h3>
+
+                  {/* Copy button */}
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(message);
+                      setCelebrateCopied(true);
+                      setTimeout(() => setCelebrateCopied(false), 2000);
+                    }}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold mb-4 transition-colors"
+                    style={
+                      celebrateCopied
+                        ? { background: '#D1FAE5', color: '#065F46', border: '1px solid #A7F3D0' }
+                        : { background: '#FFBA06', color: '#1B2A4A', border: '1px solid #FFBA06' }
+                    }
+                  >
+                    {celebrateCopied ? <Check size={16} /> : <Copy size={16} />}
+                    {celebrateCopied ? tUI('Copied!') : tUI('Copy message')}
+                  </button>
+
+                  {/* Email options */}
+                  <div className="mb-3">
+                    <div className="text-xs font-medium mb-2" style={{ color: '#9CA3AF' }}>
+                      {tUI('Email')}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <a
+                        href={`mailto:?subject=${encodeURIComponent('My teacher win today')}&body=${encodedMessage}`}
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
+                      >
+                        <Mail size={12} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
+                        {tUI('Default')}
+                      </a>
+                      <a
+                        href={`https://mail.google.com/mail/?view=cm&su=${encodeURIComponent('My teacher win today')}&body=${encodedMessage}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
+                      >
+                        {tUI('Gmail')}
+                      </a>
+                      <a
+                        href={`https://outlook.live.com/mail/0/deeplink/compose?subject=${encodeURIComponent('My teacher win today')}&body=${encodedMessage}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
+                      >
+                        {tUI('Outlook')}
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Social options */}
+                  <div>
+                    <div className="text-xs font-medium mb-2" style={{ color: '#9CA3AF' }}>
+                      {tUI('Social')}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <a
+                        href={`sms:?&body=${encodedMessage}`}
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
+                      >
+                        <MessageCircle size={12} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
+                        {tUI('Text')}
+                      </a>
+                      <a
+                        href={`https://www.facebook.com/sharer/sharer.php?quote=${encodedMessage}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
+                      >
+                        {tUI('Facebook')}
+                      </a>
+                      <a
+                        href={`https://twitter.com/intent/tweet?text=${encodedMessage}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
+                      >
+                        {tUI('Twitter')}
+                      </a>
+                      <a
+                        href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://teachersdeserveit.com')}&summary=${encodedMessage}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
+                      >
+                        {tUI('LinkedIn')}
+                      </a>
+                      <a
+                        href={`https://wa.me/?text=${encodedMessage}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
+                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
+                      >
+                        {tUI('WhatsApp')}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   );
 }
