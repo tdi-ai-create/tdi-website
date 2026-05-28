@@ -33,6 +33,7 @@ const BASE_NAV_ITEMS: NavItem[] = [
   { href: '/hub/courses', label: 'Courses', exact: false },
   { href: '/hub/quick-wins', label: 'Quick Wins', exact: false },
   { href: '/hub/certificates', label: 'Certificates', exact: false },
+  { href: '/hub/our-story', label: 'Our Story', exact: false },
   { href: '/hub/settings', label: 'Settings', exact: false },
   { href: 'https://raehughart.substack.com/', label: 'Blog', exact: false, external: true },
   { href: 'https://www.teachersdeserveit.com/create-with-us', label: 'Become a Creator', exact: false, external: true },
@@ -200,6 +201,28 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
               </Link>
             );
           })}
+          <a
+            href="https://raehughart.substack.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center transition-colors"
+            style={{
+              color: 'rgba(255, 255, 255, 0.45)',
+              background: 'transparent',
+              borderRadius: '8px',
+              padding: '6px 14px',
+              fontSize: '14px',
+              fontWeight: 500,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#FFFFFF';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.45)';
+            }}
+          >
+            {tUI('Blog')}
+          </a>
         </div>
 
         {/* Right Side - Desktop */}

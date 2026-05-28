@@ -155,6 +155,16 @@ export default function HubMobileNav({
             </Link>
           );
         })}
+        <a
+          href="https://raehughart.substack.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={onClose}
+          className="flex items-center gap-2 py-4 px-4 text-lg rounded-lg transition-colors text-white/80 hover:bg-white/5 hover:text-white"
+          style={{ fontFamily: "'DM Sans', sans-serif" }}
+        >
+          Blog
+        </a>
       </nav>
 
       {/* Language Toggle + Moment Mode Button - Bottom */}
