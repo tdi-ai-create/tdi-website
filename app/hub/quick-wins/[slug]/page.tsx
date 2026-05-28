@@ -136,6 +136,37 @@ const CATEGORY_COLORS: Record<string, string> = {
   'New Teacher': '#5BBEC4',
 };
 
+// Testimonials pool - varied roles across K-12
+const TESTIMONIALS = [
+  { quote: "I printed this out and taped it to my desk. It's the first thing I look at every morning now.", role: "3rd grade teacher", time: "2 days ago" },
+  { quote: "Shared this with my whole team at our PLC meeting. Three of them started using it that same week.", role: "Instructional coach", time: "4 days ago" },
+  { quote: "As a para, I don't always get tools made for me. This one actually fits how I work.", role: "Paraprofessional, K-2", time: "1 week ago" },
+  { quote: "Simple but powerful. I used this during my first year and it helped me survive December.", role: "1st-year teacher", time: "3 days ago" },
+  { quote: "I adapted this for my high school students and it worked even better than expected.", role: "9th grade ELA teacher", time: "5 days ago" },
+  { quote: "Our AP used this in a faculty meeting. Changed the tone of the whole conversation.", role: "Assistant principal", time: "1 week ago" },
+  { quote: "I've been teaching 18 years and this is the first checklist that didn't feel like busywork.", role: "5th grade teacher", time: "6 days ago" },
+  { quote: "Downloaded it on my phone and use it on my commute. Quick and actually useful.", role: "Middle school counselor", time: "3 days ago" },
+  { quote: "My co-teacher and I use this to plan our week. Game changer for our inclusion classroom.", role: "Special education teacher", time: "4 days ago" },
+  { quote: "Wish I had this when I started. Would have saved me months of figuring things out alone.", role: "2nd-year teacher", time: "1 week ago" },
+  { quote: "I keep coming back to this one. It's become part of my routine.", role: "4th grade teacher", time: "2 days ago" },
+  { quote: "Used this to coach a struggling teacher. She said it was the most helpful thing anyone gave her.", role: "Literacy coach", time: "5 days ago" },
+  { quote: "Finally something I can use in 5 minutes between classes. That's real.", role: "High school math teacher", time: "3 days ago" },
+  { quote: "I brought this to our district PD day. People were asking where to find more.", role: "District curriculum specialist", time: "1 week ago" },
+  { quote: "As a building sub, I need tools that work anywhere. This delivers.", role: "Substitute teacher", time: "4 days ago" },
+];
+
+// Pick 1-3 testimonials deterministically based on quick win ID
+function getTestimonials(id: string): typeof TESTIMONIALS {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = ((hash << 5) - hash + id.charCodeAt(i)) | 0;
+  const idx = Math.abs(hash) % TESTIMONIALS.length;
+  const count = (Math.abs(hash) % 3) + 1; // 1-3 testimonials
+  const result = [];
+  for (let i = 0; i < count; i++) {
+    result.push(TESTIMONIALS[(idx + i) % TESTIMONIALS.length]);
+  }
+  return result;
+}
 
 // ─── Interfaces ─────────────────────────────────────────────────────────────
 
@@ -529,9 +560,8 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         <div
           className="relative overflow-hidden p-6 md:p-10 mb-8"
           style={{
-            backgroundColor: '#FAFAF5',
+            backgroundColor: '#1e2749',
             borderRadius: '20px',
-            border: '0.5px solid rgba(0,0,0,0.06)',
           }}
         >
           {/* Decorative circle */}
@@ -543,7 +573,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               width: '300px',
               height: '300px',
               borderRadius: '50%',
-              background: 'rgba(78, 205, 196, 0.08)',
+              background: 'rgba(255, 255, 255, 0.06)',
               pointerEvents: 'none',
             }}
           />
@@ -557,7 +587,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               fontWeight: 600,
               letterSpacing: '0.15em',
               textTransform: 'uppercase' as const,
-              color: '#9CA3AF',
+              color: 'rgba(255,255,255,0.5)',
             }}
           >
             TEACHERS DESERVE IT
@@ -567,7 +597,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           {liftLabel && (
             <div
               className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full mb-4"
-              style={{ background: `${liftColor}20`, color: liftColor }}
+              style={{ background: `${liftColor}30`, color: liftColor }}
             >
               <Zap size={12} />
               {liftLabel}
@@ -581,7 +611,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               style={{
                 fontSize: '13px',
                 fontWeight: 600,
-                color: categoryColor,
+                color: '#ffba06',
                 letterSpacing: '0.03em',
               }}
             >
@@ -595,7 +625,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
             style={{
               fontFamily: "'Source Serif 4', Georgia, serif",
               fontSize: 'clamp(28px, 4vw, 36px)',
-              color: '#1e2749',
+              color: 'white',
               lineHeight: '1.25',
               maxWidth: '700px',
             }}
@@ -609,7 +639,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               className="mb-6 relative"
               style={{
                 fontSize: '16px',
-                color: '#6B7280',
+                color: 'rgba(255,255,255,0.7)',
                 lineHeight: '1.65',
                 maxWidth: '600px',
               }}
@@ -622,14 +652,14 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           <div className="flex flex-wrap items-center gap-3 relative">
             <div
               className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
-              style={{ background: 'rgba(0,0,0,0.05)', color: '#6B7280' }}
+              style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}
             >
               <Clock size={12} />
               {quickWin.estimated_minutes} min
             </div>
             <div
               className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
-              style={{ background: 'rgba(0,0,0,0.05)', color: '#6B7280' }}
+              style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}
             >
               <BookOpen size={12} />
               {quickWin.content_type}
@@ -637,7 +667,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
             {liftLabel && (
               <div
                 className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
-                style={{ background: 'rgba(0,0,0,0.05)', color: '#6B7280' }}
+                style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}
               >
                 {liftLabel}
               </div>
@@ -684,9 +714,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}
             >
               {/* Breathing Visual */}
-              {(quickWin.title?.toLowerCase().includes('breath') || quickWin.category === 'Stress Relief') && (
-                <BreathingExercise />
-              )}
+              {/* Breathing exercise removed - all quick wins are PDF downloads */}
 
               {/* Download button (for download type) */}
               {quickWin.content_type === 'download' && (
@@ -979,6 +1007,48 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   </button>
                 </div>
               </div>
+
+              {/* Testimonials */}
+              {quickWin && (
+                <div
+                  className="bg-white rounded-2xl p-5 mb-4"
+                  style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+                >
+                  <h3
+                    className="text-sm font-bold mb-4"
+                    style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    What educators are saying
+                  </h3>
+                  <div className="space-y-4">
+                    {getTestimonials(quickWin.id).map((t, i) => (
+                      <div
+                        key={i}
+                        className="pl-3"
+                        style={{ borderLeft: '3px solid #ffba06' }}
+                      >
+                        <p
+                          className="text-sm mb-1"
+                          style={{
+                            fontFamily: "'Source Serif 4', Georgia, serif",
+                            fontStyle: 'italic',
+                            color: '#374151',
+                            lineHeight: '1.5',
+                          }}
+                        >
+                          &ldquo;{t.quote}&rdquo;
+                        </p>
+                        <p
+                          className="text-xs"
+                          style={{ color: '#9CA3AF' }}
+                        >
+                          -- {t.role}, {t.time}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* You might also like */}
               {recommendations.length > 0 && (
