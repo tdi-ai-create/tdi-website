@@ -204,6 +204,16 @@ export default function QuickWinsPage() {
           </p>
         </div>
 
+        {/* ES notice */}
+        {language === 'es' && (
+          <div
+            className="mb-4 px-4 py-3 rounded-xl text-sm"
+            style={{ backgroundColor: '#E8F4FD', border: '1px solid #07A0C3', color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}
+          >
+            Las herramientas est&aacute;n actualmente en ingl&eacute;s. Traducciones al espa&ntilde;ol pr&oacute;ximamente.
+          </div>
+        )}
+
         {/* Filter Pills */}
         <div className="flex gap-2 mb-8 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
           {FILTER_CATEGORIES.map((category) => {
