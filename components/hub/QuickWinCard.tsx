@@ -158,7 +158,7 @@ export default function QuickWinCard({
             href={quickWin.course_slug
               ? `/hub/courses/${quickWin.course_slug}/${quickWin.slug}`
               : `/hub/quick-wins/${quickWin.slug}`}
-            className="text-xs font-semibold rounded-lg px-4 py-2 inline-block transition-opacity hover:opacity-90 self-start"
+            className="text-xs font-semibold rounded-lg py-2.5 block text-center transition-opacity hover:opacity-90"
             style={{
               backgroundColor: '#1B2A4A',
               color: 'white',
@@ -170,7 +170,7 @@ export default function QuickWinCard({
         ) : (
           <Link
             href="/hub/membership"
-            className="text-xs font-medium px-4 py-2 rounded-lg inline-flex items-center gap-1 transition-colors hover:bg-gray-50 self-start"
+            className="text-xs font-medium py-2.5 rounded-lg flex items-center justify-center gap-1 transition-colors hover:bg-gray-50"
             style={{
               border: '1px solid #9CA3AF',
               color: '#6B7280',
