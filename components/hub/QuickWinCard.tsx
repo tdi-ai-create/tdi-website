@@ -50,10 +50,8 @@ export default function QuickWinCard({
   hasAccess: hasAccessProp,
 }: QuickWinCardProps) {
   const colors = CATEGORY_COLORS[quickWin.category] || { bg: '#F3F4F6', text: '#374151' };
-  // Use display props if provided, otherwise fall back to quickWin data
   const title = displayTitle || quickWin.title;
 
-  // Check access: prefer prop from parent (avoids per-card hook), fall back to hook
   const { canAccess } = useMembership();
   const { tUI } = useTranslation();
   const hasAccess = hasAccessProp ?? canAccess({
@@ -75,17 +73,18 @@ export default function QuickWinCard({
 
   return (
     <div
-      className="flex flex-col overflow-hidden relative"
+      className="flex flex-row overflow-hidden relative"
       style={{
         backgroundColor: 'white',
         borderRadius: '16px',
         border: '0.5px solid rgba(0,0,0,0.06)',
         opacity: !hasAccess && !isFreeRotating ? 0.82 : 1,
+        minHeight: 140,
       }}
     >
-      {/* Cover image with LIFT pill + tier label overlays */}
+      {/* Left: Cover image / placeholder */}
       <CoverImageOverlay
-        className="h-[130px]"
+        className="w-[140px] flex-shrink-0"
         imageUrl={quickWin.thumbnail_url}
         imageAlt={quickWin.title}
         liftRating={quickWin.capacity}
@@ -116,10 +115,11 @@ export default function QuickWinCard({
         </button>
       )}
 
-      <div className="p-4 flex-1">
+      {/* Right: Content */}
+      <div className="p-4 flex-1 flex flex-col justify-center min-w-0">
         {/* Category tag */}
         <div
-          className="inline-block text-[10px] font-bold px-2 py-0.5 rounded mb-2"
+          className="inline-block text-[10px] font-bold px-2 py-0.5 rounded mb-1.5 self-start"
           style={{
             backgroundColor: colors.bg,
             color: colors.text,
@@ -137,6 +137,10 @@ export default function QuickWinCard({
           style={{
             color: '#1B2A4A',
             fontFamily: "'DM Sans', sans-serif",
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical' as const,
+            overflow: 'hidden',
           }}
         >
           {title}
@@ -144,7 +148,7 @@ export default function QuickWinCard({
 
         {/* Meta */}
         <div
-          className="text-xs mb-3 flex items-center gap-2 flex-wrap"
+          className="text-xs mb-2.5 flex items-center gap-2 flex-wrap"
           style={{
             color: '#9CA3AF',
             fontFamily: "'DM Sans', sans-serif",
@@ -162,7 +166,7 @@ export default function QuickWinCard({
             href={quickWin.course_slug
               ? `/hub/courses/${quickWin.course_slug}/${quickWin.slug}`
               : `/hub/quick-wins/${quickWin.slug}`}
-            className="text-xs font-semibold rounded-lg px-3 py-1.5 inline-block transition-opacity hover:opacity-90"
+            className="text-xs font-semibold rounded-lg px-3 py-1.5 inline-block transition-opacity hover:opacity-90 self-start"
             style={{
               backgroundColor: '#1B2A4A',
               color: 'white',
@@ -174,7 +178,7 @@ export default function QuickWinCard({
         ) : (
           <Link
             href="/hub/membership"
-            className="text-xs font-medium px-3 py-1.5 rounded-lg inline-flex items-center gap-1 transition-colors hover:bg-gray-50"
+            className="text-xs font-medium px-3 py-1.5 rounded-lg inline-flex items-center gap-1 transition-colors hover:bg-gray-50 self-start"
             style={{
               border: '1px solid #9CA3AF',
               color: '#6B7280',
