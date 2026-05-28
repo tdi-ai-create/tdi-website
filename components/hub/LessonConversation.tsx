@@ -532,7 +532,18 @@ export default function LessonConversation({
   const isEmpty = !data || data.total_contributions === 0
 
   if (isEmpty) {
-    return <ConversationEmptyState onShare={() => setShowCompose(true)} />
+    return (
+      <>
+        <ConversationEmptyState onShare={() => setShowCompose(true)} />
+        {showCompose && (
+          <ComposeModal
+            onClose={() => setShowCompose(false)}
+            onSubmit={handleSubmit}
+            submitting={submitting}
+          />
+        )}
+      </>
+    )
   }
 
   return (

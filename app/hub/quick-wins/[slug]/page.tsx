@@ -883,45 +883,6 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               </div>
             )}
 
-            {/* Mark as Used */}
-            <div className="mb-8">
-              {isCompleted ? (
-                <div className="text-center">
-                  <div
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full mb-4"
-                    style={{ backgroundColor: '#D1FAE5' }}
-                  >
-                    <CheckCircle size={20} className="text-green-600" />
-                    <span className="font-medium text-green-700">
-                      Nice work! That took just {quickWin.estimated_minutes} minutes.
-                    </span>
-                  </div>
-                  <div>
-                    <Link
-                      href="/hub/quick-wins"
-                      className="inline-flex items-center justify-center gap-2 px-6 py-3 font-medium transition-colors"
-                      style={{ backgroundColor: '#ffba06', color: '#1e2749', borderRadius: '12px' }}
-                    >
-                      <Zap size={18} />
-                      Try Another Quick Win
-                    </Link>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  onClick={handleMarkDone}
-                  disabled={!user}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium border transition-colors disabled:opacity-50"
-                  style={{ borderColor: '#1e2749', color: '#1e2749', borderRadius: '10px', background: 'transparent' }}
-                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#1e2749'; e.currentTarget.style.color = '#ffffff'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#1e2749'; }}
-                >
-                  <Check size={16} />
-                  Mark as Used
-                </button>
-              )}
-            </div>
-
             {/* ─── COMMUNITY CONVERSATION ───────────────────────────── */}
             <LessonConversation
               lessonId={quickWin.id}
@@ -1150,14 +1111,6 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         )}
       </div>
 
-      {showCapacityFeedback && quickWin.capacity && (
-        <CapacityFeedbackPrompt
-          contentType="quick_win"
-          contentId={quickWin.id}
-          officialCapacity={quickWin.capacity}
-          onDismiss={() => setShowCapacityFeedback(false)}
-        />
-      )}
     </div>
   );
 }
