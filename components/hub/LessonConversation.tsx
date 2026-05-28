@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { MessageCircle, HelpCircle, X } from 'lucide-react'
+import { useTranslation } from '@/lib/hub/useTranslation'
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 
@@ -57,7 +58,7 @@ function getTypeConfig(type: ContributionType) {
 
 // ─── PULSE COMPONENT ────────────────────────────────────────────────────────
 
-function Pulse({ pulse, total }: { pulse: PulseCounts; total: number }) {
+function Pulse({ pulse, total, tUI }: { pulse: PulseCounts; total: number; tUI: (s: string) => string }) {
   const [animated, setAnimated] = useState(false)
 
   useEffect(() => {
@@ -73,10 +74,10 @@ function Pulse({ pulse, total }: { pulse: PulseCounts; total: number }) {
       style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
     >
       <p className="text-sm font-semibold text-gray-900 mb-1">
-        What teachers are doing with this lesson
+        {tUI('What teachers are doing with this lesson')}
       </p>
       <p className="text-xs text-gray-400 mb-5">
-        {total.toLocaleString()} teacher{total !== 1 ? 's' : ''} in the conversation
+        {total.toLocaleString()} {total !== 1 ? tUI('teachers') : tUI('teacher')} {tUI('in the conversation')}
       </p>
 
       <div className="space-y-3">
@@ -87,7 +88,7 @@ function Pulse({ pulse, total }: { pulse: PulseCounts; total: number }) {
           return (
             <div key={type.id} className="flex items-center gap-3">
               <span className="text-xs text-gray-600 w-24 flex-shrink-0 text-right">
-                {type.label}
+                {tUI(type.label)}
               </span>
               <div className="flex-1 h-3 bg-gray-50 rounded-full overflow-hidden">
                 <div
@@ -118,11 +119,13 @@ function FilterChips({
   total,
   activeFilter,
   onFilterChange,
+  tUI,
 }: {
   pulse: PulseCounts
   total: number
   activeFilter: ContributionType | null
   onFilterChange: (type: ContributionType | null) => void
+  tUI: (s: string) => string
 }) {
   return (
     <div className="flex flex-wrap gap-2">
@@ -134,7 +137,7 @@ function FilterChips({
           color: activeFilter === null ? 'white' : '#6B7280',
         }}
       >
-        All {total}
+        {tUI('All')} {total}
       </button>
       {CONTRIBUTION_TYPES.map(type => {
         const count = pulse[type.id]
@@ -149,7 +152,7 @@ function FilterChips({
               color: isActive ? 'white' : '#6B7280',
             }}
           >
-            {type.label} {count}
+            {tUI(type.label)} {count}
           </button>
         )
       })}
@@ -159,7 +162,7 @@ function FilterChips({
 
 // ─── POST CARD ──────────────────────────────────────────────────────────────
 
-function PostCard({ post }: { post: ConversationPost }) {
+function PostCard({ post, tUI }: { post: ConversationPost; tUI: (s: string) => string }) {
   const config = getTypeConfig(post.contribution_type)
   const [showTooltip, setShowTooltip] = useState(false)
 
@@ -183,7 +186,7 @@ function PostCard({ post }: { post: ConversationPost }) {
               color: config.color,
             }}
           >
-            {config.label}
+            {tUI(config.label)}
           </span>
 
           {/* Title */}
@@ -211,7 +214,7 @@ function PostCard({ post }: { post: ConversationPost }) {
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
               >
-                Helpful ({post.helpful_count})
+                {tUI('Helpful')} ({post.helpful_count})
                 <HelpCircle size={12} className="opacity-50" />
               </button>
               {showTooltip && (
@@ -233,10 +236,12 @@ function ComposeModal({
   onClose,
   onSubmit,
   submitting,
+  tUI,
 }: {
   onClose: () => void
   onSubmit: (data: { contribution_type: ContributionType; title: string; body: string }) => void
   submitting: boolean
+  tUI: (s: string) => string
 }) {
   const [selectedType, setSelectedType] = useState<ContributionType | null>(null)
   const [title, setTitle] = useState('')
@@ -254,7 +259,7 @@ function ComposeModal({
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <h3 className="text-base font-semibold text-gray-900">
-            What happened when you tried this lesson?
+            {tUI('What happened when you tried this lesson?')}
           </h3>
           <button
             onClick={onClose}
@@ -287,8 +292,8 @@ function ComposeModal({
                     style={{ accentColor: type.color }}
                   />
                   <div>
-                    <span className="text-sm font-medium text-gray-900">{type.label}</span>
-                    <span className="text-sm text-gray-500"> — {type.description}</span>
+                    <span className="text-sm font-medium text-gray-900">{tUI(type.label)}</span>
+                    <span className="text-sm text-gray-500"> — {tUI(type.description)}</span>
                   </div>
                 </label>
               )
@@ -300,7 +305,7 @@ function ComposeModal({
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
-              placeholder="Tell us what happened. What worked? What did you change? What would you tell another teacher about to try this?"
+              placeholder={tUI('Tell us what happened. What worked? What did you change? What would you tell the next teacher?')}
               rows={5}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 resize-none focus:outline-none focus:border-gray-400 transition-colors"
             />
@@ -309,7 +314,7 @@ function ComposeModal({
           {/* Optional title */}
           <div>
             <label className="text-xs text-gray-500 mb-1 block">
-              Optional: Title for your post
+              {tUI('Optional: Title for your post')}
             </label>
             <input
               type="text"
@@ -326,7 +331,7 @@ function ComposeModal({
             onClick={onClose}
             className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
           >
-            Cancel
+            {tUI('Cancel')}
           </button>
           <button
             onClick={() => {
@@ -341,7 +346,7 @@ function ComposeModal({
               cursor: canSubmit ? 'pointer' : 'not-allowed',
             }}
           >
-            {submitting ? 'Sharing...' : 'Share'}
+            {submitting ? tUI('Sharing...') : tUI('Share')}
           </button>
         </div>
       </div>
@@ -351,17 +356,17 @@ function ComposeModal({
 
 // ─── CTA CARD ───────────────────────────────────────────────────────────────
 
-function CTACard({ onShare }: { onShare: () => void }) {
+function CTACard({ onShare, tUI }: { onShare: () => void; tUI: (s: string) => string }) {
   return (
     <div
       className="bg-white rounded-xl border border-gray-100 p-6 transition-shadow hover:shadow-md"
       style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
     >
       <p className="text-sm font-semibold text-gray-900 mb-1">
-        Tried it? Adapted it? Still working through it?
+        {tUI('Tried it? Adapted it? Still working through it?')}
       </p>
       <p className="text-sm text-gray-500 mb-4">
-        Tell us what happened — your story helps the next teacher.
+        {tUI('Tell us what happened...')}
       </p>
       <div className="flex justify-end">
         <button
@@ -369,7 +374,7 @@ function CTACard({ onShare }: { onShare: () => void }) {
           className="px-5 py-2 rounded-lg text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:shadow-md"
           style={{ backgroundColor: '#2B3A67' }}
         >
-          Share my experience
+          {tUI('Share my experience')}
         </button>
       </div>
     </div>
@@ -378,7 +383,7 @@ function CTACard({ onShare }: { onShare: () => void }) {
 
 // ─── EMPTY STATE ────────────────────────────────────────────────────────────
 
-function ConversationEmptyState({ onShare }: { onShare: () => void }) {
+function ConversationEmptyState({ onShare, tUI }: { onShare: () => void; tUI: (s: string) => string }) {
   return (
     <div
       className="bg-white rounded-xl border border-gray-100 p-8 text-center"
@@ -403,19 +408,17 @@ function ConversationEmptyState({ onShare }: { onShare: () => void }) {
           color: '#2B3A67',
         }}
       >
-        Be the first teacher in this conversation
+        {tUI('Be the first teacher in this conversation')}
       </h3>
       <p className="text-sm text-gray-500 max-w-sm mx-auto mb-6">
-        When you try this lesson — even part of it — share what happened.
-        What worked? What did you change? Your story is what makes the next
-        teacher&apos;s experience better.
+        {tUI("When you try this lesson -- even part of it -- share what happened. What worked? What did you change? Your story is what makes the next teacher's experience better.")}
       </p>
       <button
         onClick={onShare}
         className="px-5 py-2 rounded-lg text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:shadow-md"
         style={{ backgroundColor: '#2B3A67' }}
       >
-        Share my experience
+        {tUI('Share my experience')}
       </button>
     </div>
   )
@@ -436,6 +439,7 @@ export default function LessonConversation({
   userId,
   apiBasePath,
 }: LessonConversationProps) {
+  const { tUI } = useTranslation()
   const [data, setData] = useState<ConversationData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -534,12 +538,13 @@ export default function LessonConversation({
   if (isEmpty) {
     return (
       <>
-        <ConversationEmptyState onShare={() => setShowCompose(true)} />
+        <ConversationEmptyState onShare={() => setShowCompose(true)} tUI={tUI} />
         {showCompose && (
           <ComposeModal
             onClose={() => setShowCompose(false)}
             onSubmit={handleSubmit}
             submitting={submitting}
+            tUI={tUI}
           />
         )}
       </>
@@ -549,10 +554,10 @@ export default function LessonConversation({
   return (
     <div className="space-y-5">
       {/* Pulse */}
-      <Pulse pulse={data!.pulse} total={data!.total_contributions} />
+      <Pulse pulse={data!.pulse} total={data!.total_contributions} tUI={tUI} />
 
       {/* CTA */}
-      {userId && <CTACard onShare={() => setShowCompose(true)} />}
+      {userId && <CTACard onShare={() => setShowCompose(true)} tUI={tUI} />}
 
       {/* Filter chips */}
       <FilterChips
@@ -560,16 +565,17 @@ export default function LessonConversation({
         total={data!.total_contributions}
         activeFilter={activeFilter}
         onFilterChange={handleFilterChange}
+        tUI={tUI}
       />
 
       {/* Posts */}
       <div className="space-y-3">
         {data!.posts.length === 0 ? (
           <p className="text-sm text-gray-400 text-center py-8">
-            No posts match this filter.
+            {tUI('No posts match this filter.')}
           </p>
         ) : (
-          data!.posts.map(post => <PostCard key={post.id} post={post} />)
+          data!.posts.map(post => <PostCard key={post.id} post={post} tUI={tUI} />)
         )}
       </div>
 
@@ -579,6 +585,7 @@ export default function LessonConversation({
           onClose={() => setShowCompose(false)}
           onSubmit={handleSubmit}
           submitting={submitting}
+          tUI={tUI}
         />
       )}
     </div>

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { useLanguage } from '@/lib/hub/useLanguage';
+import { useTranslation } from '@/lib/hub/useTranslation';
 import {
   ArrowLeft,
   Clock,
@@ -209,6 +210,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const [showCapacityFeedback, setShowCapacityFeedback] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const { language, t } = useLanguage();
+  const { tUI } = useTranslation();
 
   // For "do" type - action step checkboxes
   const [checkedSteps, setCheckedSteps] = useState<Set<number>>(new Set());
@@ -560,9 +562,9 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
     return (
       <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: '#F0EEE9' }}>
         <div className="max-w-[600px] mx-auto text-center py-16">
-          <p className="text-gray-500">Quick Win not found.</p>
+          <p className="text-gray-500">{tUI('Quick Win not found.')}</p>
           <Link href="/hub/quick-wins" className="text-[#ffba06] hover:underline mt-4 inline-block">
-            Browse Quick Wins
+            {tUI('Browse Quick Wins')}
           </Link>
         </div>
       </div>
@@ -572,7 +574,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const actionSteps = quickWin.content_type === 'activity' ? parseActionSteps(quickWin.content) : [];
   const allStepsChecked = actionSteps.length > 0 && checkedSteps.size === actionSteps.length;
 
-  const liftLabel = quickWin.capacity === 'low' ? 'Low Lift' : quickWin.capacity === 'medium' ? 'Medium Lift' : quickWin.capacity === 'high' ? 'High Lift' : null;
+  const liftLabel = quickWin.capacity === 'low' ? tUI('Low Lift') : quickWin.capacity === 'medium' ? tUI('Medium Lift') : quickWin.capacity === 'high' ? tUI('High Lift') : null;
   const liftColor = quickWin.capacity === 'low' ? '#6BA368' : quickWin.capacity === 'medium' ? '#ffba06' : quickWin.capacity === 'high' ? '#E8927C' : '#9CA3AF';
 
 
@@ -591,7 +593,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           onMouseLeave={(e) => (e.currentTarget.style.color = '#6B7280')}
         >
           <ArrowLeft size={16} />
-          Back to Quick Wins
+          {tUI('Back to Quick Wins')}
         </Link>
 
         <div
@@ -615,7 +617,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     color: 'rgba(255,255,255,0.5)',
                   }}
                 >
-                  TEACHERS DESERVE IT
+                  {tUI('TEACHERS DESERVE IT')}
                 </p>
                 {liftLabel && (
                   <div
@@ -677,17 +679,17 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}
                 >
                   <Clock size={12} />
-                  {quickWin.estimated_minutes} min
+                  {quickWin.estimated_minutes} {tUI('min')}
                 </div>
                 <div
                   className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
                   style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}
                 >
                   <BookOpen size={12} />
-                  PDF Download
+                  {tUI('PDF Download')}
                 </div>
                 <div className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                  by Teachers Deserve It
+                  {tUI('by Teachers Deserve It')}
                 </div>
               </div>
             </div>
@@ -704,7 +706,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
                 >
                   <Download size={16} />
-                  Download Tool
+                  {tUI('Download Tool')}
                 </a>
               ) : (
                 <div
@@ -712,7 +714,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.35)' }}
                 >
                   <Download size={16} />
-                  Download coming soon
+                  {tUI('Download coming soon')}
                 </div>
               )}
               {/* Save */}
@@ -726,7 +728,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                 }}
               >
                 <Bookmark size={14} fill={isSaved ? '#ffba06' : 'none'} />
-                {isSaved ? 'Saved' : 'Save to Library'}
+                {isSaved ? tUI('Saved') : tUI('Save to Library')}
               </button>
               {/* Share */}
               <button
@@ -738,7 +740,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                 }}
               >
                 <Share2 size={14} />
-                {linkCopied ? 'Copied!' : 'Share'}
+                {linkCopied ? tUI('Copied!') : tUI('Share')}
               </button>
             </div>
           </div>
@@ -771,7 +773,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                       style={{ backgroundColor: '#ffba06', color: '#1e2749', borderRadius: '12px' }}
                     >
                       <Download size={22} />
-                      Download Resource
+                      {tUI('Download Resource')}
                     </a>
                   ) : (
                     <div
@@ -779,7 +781,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                       style={{ backgroundColor: '#E5E7EB', color: '#9CA3AF', borderRadius: '12px', cursor: 'not-allowed' }}
                     >
                       <Download size={22} />
-                      Download coming soon
+                      {tUI('Download coming soon')}
                     </div>
                   )}
                 </div>
@@ -811,12 +813,12 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     >
                       <Play size={32} style={{ color: '#1e2749', marginLeft: '4px' }} />
                     </div>
-                    <p style={{ color: '#6B7280' }}>Video player coming soon</p>
+                    <p style={{ color: '#6B7280' }}>{tUI('Video player coming soon')}</p>
                   </div>
                   {quickWin.content && (
                     <div>
                       <h3 className="font-semibold mb-3" style={{ fontSize: '16px', color: '#1e2749' }}>
-                        Key Takeaways
+                        {tUI('Key Takeaways')}
                       </h3>
                       <div
                         className="prose prose-gray max-w-none"
@@ -832,7 +834,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               {quickWin.content_type === 'activity' && actionSteps.length > 0 && (
                 <div>
                   <h3 className="font-semibold mb-4" style={{ fontSize: '16px', color: '#1e2749' }}>
-                    Complete these steps:
+                    {tUI('Complete these steps:')}
                   </h3>
                   <div className="space-y-3">
                     {actionSteps.map((step, index) => (
@@ -876,7 +878,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   {allStepsChecked && (
                     <div className="mt-6 p-4 text-center" style={{ backgroundColor: '#D1FAE5', borderRadius: '12px' }}>
                       <CheckCircle size={24} className="text-green-600 mx-auto mb-2" />
-                      <p className="font-medium text-green-700">All steps completed! You&apos;re doing great.</p>
+                      <p className="font-medium text-green-700">{tUI("All steps completed! You're doing great.")}</p>
                     </div>
                   )}
                 </div>
@@ -899,23 +901,23 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                       className="font-medium"
                       style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontSize: '18px', color: '#1e2749' }}
                     >
-                      {quickWin.content || 'What is on your mind today?'}
+                      {quickWin.content || tUI('What is on your mind today?')}
                     </p>
                   </div>
                   <textarea
                     value={reflection}
                     onChange={(e) => setReflection(e.target.value)}
-                    placeholder="Write your thoughts here..."
+                    placeholder={tUI('Write your thoughts here...')}
                     className="w-full p-4 border resize-none focus:outline-none focus:border-[#ffba06]"
                     style={{ minHeight: '200px', borderColor: '#E5E5E5', fontSize: '15px', borderRadius: '8px' }}
                   />
                   <p className="text-xs mt-2 mb-4 flex items-center gap-1" style={{ color: '#9CA3AF' }}>
-                    This is private. Just for you.
+                    {tUI('This is private. Just for you.')}
                   </p>
                   {reflectionSaved ? (
                     <div className="p-4 text-center" style={{ backgroundColor: '#D1FAE5', borderRadius: '12px' }}>
                       <CheckCircle size={24} className="text-green-600 mx-auto mb-2" />
-                      <p className="font-medium text-green-700">Reflection saved!</p>
+                      <p className="font-medium text-green-700">{tUI('Reflection saved!')}</p>
                     </div>
                   ) : (
                     <button
@@ -928,7 +930,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                         borderRadius: '12px',
                       }}
                     >
-                      {isSaving ? 'Saving...' : 'Save Reflection'}
+                      {isSaving ? tUI('Saving...') : tUI('Save Reflection')}
                     </button>
                   )}
                 </div>
@@ -942,7 +944,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                 style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}
               >
                 <h3 className="font-semibold mb-3" style={{ fontSize: '16px', color: '#1e2749' }}>
-                  How to use this
+                  {tUI('How to use this')}
                 </h3>
                 <div
                   className="prose prose-gray max-w-none"
@@ -980,7 +982,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                       style={{ backgroundColor: '#ffba06', color: '#1e2749', borderRadius: '12px' }}
                     >
                       <Download size={18} />
-                      Download Resource
+                      {tUI('Download Resource')}
                     </a>
                   )}
 
@@ -997,7 +999,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     }}
                   >
                     {isSaved ? <CheckCircle size={18} /> : <Bookmark size={18} />}
-                    {isSaved ? 'Saved to Library' : 'Save to My Library'}
+                    {isSaved ? tUI('Saved to Library') : tUI('Save to My Library')}
                   </button>
 
                   {/* Share button */}
@@ -1007,7 +1009,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     style={{ borderColor: '#E5E7EB', color: '#6B7280', borderRadius: '12px', background: 'transparent' }}
                   >
                     <Share2 size={16} />
-                    {linkCopied ? 'Copied!' : 'Share this Quick Win'}
+                    {linkCopied ? tUI('Copied!') : tUI('Share this Quick Win')}
                   </button>
                 </div>
               </div>
@@ -1022,7 +1024,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     className="mb-3"
                     style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.05em', textTransform: 'uppercase' as const, fontSize: '11px', fontWeight: 600 }}
                   >
-                    What educators are saying
+                    {tUI('What educators are saying')}
                   </p>
                   <div className="space-y-4">
                     {getTestimonials(quickWin.id).map((t, i) => (
@@ -1061,10 +1063,10 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}
                 >
                   <h3 className="font-semibold mb-1" style={{ fontSize: '15px', color: '#1e2749' }}>
-                    You might also like
+                    {tUI('You might also like')}
                   </h3>
                   <p className="text-xs mb-4" style={{ color: '#9CA3AF' }}>
-                    Based on this tool&apos;s category
+                    {tUI("Based on this tool's category")}
                   </p>
                   <div className="space-y-3">
                     {recommendations.map((rec) => {
@@ -1097,7 +1099,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                                 {rec.category}
                               </span>
                               <span className="text-xs flex items-center gap-1" style={{ color: '#ffba06' }}>
-                                Try it <ExternalLink size={10} />
+                                {tUI('Try it')} <ExternalLink size={10} />
                               </span>
                             </div>
                           </div>
@@ -1115,10 +1117,10 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         {moreQuickWins.length > 0 && (
           <div className="mt-12 mb-8">
             <h2 className="font-bold mb-1" style={{ fontSize: '22px', color: '#1e2749', fontFamily: "'Source Serif 4', Georgia, serif" }}>
-              Explore more Quick Wins
+              {tUI('Explore more Quick Wins')}
             </h2>
             <p className="text-sm mb-6" style={{ color: '#9CA3AF' }}>
-              Browse the full library of tools for your classroom
+              {tUI('Browse the full library of tools for your classroom')}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {moreQuickWins.map((qw) => {
@@ -1147,7 +1149,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                         {qw.title}
                       </p>
                       <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                        {qw.estimated_minutes} min · Download
+                        {qw.estimated_minutes} {tUI('min')} · {tUI('Download')}
                       </span>
                     </div>
                   </Link>
@@ -1160,7 +1162,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                 className="text-sm font-medium px-6 py-2.5 rounded-lg inline-block transition-colors hover:opacity-90"
                 style={{ backgroundColor: '#1e2749', color: 'white' }}
               >
-                View all Quick Wins
+                {tUI('View all Quick Wins')}
               </Link>
             </div>
           </div>
@@ -1185,7 +1187,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               {/* Header */}
               <div className="p-5 pb-3" style={{ background: '#1e2749' }}>
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-base font-bold text-white">Share this tool</h3>
+                  <h3 className="text-base font-bold text-white">{tUI('Share this tool')}</h3>
                   <button
                     onClick={() => setShowShareModal(false)}
                     className="text-white/60 hover:text-white text-lg leading-none"
@@ -1193,7 +1195,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     x
                   </button>
                 </div>
-                <p className="text-sm text-white/60">Help another educator find something great</p>
+                <p className="text-sm text-white/60">{tUI('Help another educator find something great')}</p>
               </div>
 
               {/* Pre-written message */}
@@ -1213,12 +1215,12 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     color: linkCopied ? '#065F46' : '#374151',
                   }}
                 >
-                  {linkCopied ? 'Copied to clipboard!' : 'Copy message + link'}
+                  {linkCopied ? tUI('Copied to clipboard!') : tUI('Copy message + link')}
                 </button>
 
                 {/* Email options */}
                 <p className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: '#9CA3AF' }}>
-                  Email it
+                  {tUI('Email it')}
                 </p>
                 <div className="grid grid-cols-3 gap-2 mb-4">
                   <a
@@ -1227,7 +1229,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     style={{ border: '1px solid #E5E7EB', color: '#374151' }}
                   >
                     <span style={{ fontSize: '18px' }}>@</span>
-                    Default
+                    {tUI('Default')}
                   </a>
                   <a
                     href={`https://mail.google.com/mail/?view=cm&su=${encodeURIComponent(msgs.short)}&body=${encodedMsg}`}
@@ -1237,7 +1239,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     style={{ border: '1px solid #E5E7EB', color: '#374151' }}
                   >
                     <span style={{ fontSize: '18px', color: '#EA4335' }}>G</span>
-                    Gmail
+                    {tUI('Gmail')}
                   </a>
                   <a
                     href={`https://outlook.live.com/mail/0/deeplink/compose?subject=${encodeURIComponent(msgs.short)}&body=${encodedMsg}`}
@@ -1247,13 +1249,13 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     style={{ border: '1px solid #E5E7EB', color: '#374151' }}
                   >
                     <span style={{ fontSize: '18px', color: '#0078D4' }}>O</span>
-                    Outlook
+                    {tUI('Outlook')}
                   </a>
                 </div>
 
                 {/* Social + messaging */}
                 <p className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: '#9CA3AF' }}>
-                  Share it
+                  {tUI('Share it')}
                 </p>
                 <div className="grid grid-cols-3 gap-2 mb-4">
                   <a
@@ -1262,7 +1264,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     style={{ border: '1px solid #E5E7EB', color: '#374151' }}
                   >
                     <span style={{ fontSize: '18px', color: '#34C759' }}>+</span>
-                    Text
+                    {tUI('Text')}
                   </a>
                   <a
                     href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedShort}`}
@@ -1272,7 +1274,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     style={{ border: '1px solid #E5E7EB', color: '#374151' }}
                   >
                     <span style={{ fontSize: '18px', color: '#1877F2' }}>f</span>
-                    Facebook
+                    {tUI('Facebook')}
                   </a>
                   <a
                     href={`https://twitter.com/intent/tweet?text=${encodedShort}&url=${encodedUrl}`}
@@ -1282,7 +1284,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     style={{ border: '1px solid #E5E7EB', color: '#374151' }}
                   >
                     <span style={{ fontSize: '18px' }}>X</span>
-                    Twitter
+                    {tUI('Twitter')}
                   </a>
                   <a
                     href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
@@ -1292,7 +1294,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     style={{ border: '1px solid #E5E7EB', color: '#374151' }}
                   >
                     <span style={{ fontSize: '18px', color: '#0A66C2' }}>in</span>
-                    LinkedIn
+                    {tUI('LinkedIn')}
                   </a>
                   <a
                     href={`https://wa.me/?text=${encodedMsg}`}
@@ -1302,7 +1304,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     style={{ border: '1px solid #E5E7EB', color: '#374151' }}
                   >
                     <span style={{ fontSize: '18px', color: '#25D366' }}>W</span>
-                    WhatsApp
+                    {tUI('WhatsApp')}
                   </a>
                   <button
                     onClick={() => copyToClipboard(url)}
@@ -1310,7 +1312,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     style={{ border: '1px solid #E5E7EB', color: '#374151' }}
                   >
                     <span style={{ fontSize: '18px' }}>~</span>
-                    Link
+                    {tUI('Link')}
                   </button>
                 </div>
               </div>
