@@ -105,6 +105,7 @@ export default function CourseCard({
             src={course.thumbnail_url}
             alt={course.title}
             className="w-full h-full object-cover"
+            style={{ objectPosition: 'top' }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

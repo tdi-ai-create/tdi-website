@@ -80,7 +80,12 @@ export default function CourseCatalogPage() {
         .order('created_at', { ascending: false });
 
       if (courseData) {
-        setCourses(courseData);
+        // Add cache-buster to thumbnail URLs to force fresh load
+        const bust = Date.now();
+        setCourses(courseData.map(c => ({
+          ...c,
+          thumbnail_url: c.thumbnail_url ? `${c.thumbnail_url}?v=${bust}` : undefined,
+        })));
       }
 
       // Fetch user's enrollments if logged in
