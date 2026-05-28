@@ -12,6 +12,7 @@ interface NavItem {
   href: string;
   label: string;
   exact: boolean;
+  external?: boolean;
 }
 
 interface HubMobileNavProps {
@@ -108,27 +109,49 @@ export default function HubMobileNav({
         {navItems.map((item) => {
           const isAdminLink = item.href === '/hub/admin';
           const isSchoolLink = item.href === '/hub/champion';
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onClose}
-              className={`flex items-center gap-2 py-4 px-4 text-lg rounded-lg transition-colors ${
-                isActive(item.href, item.exact)
-                  ? 'bg-white/10 text-white'
-                  : 'text-white/80 hover:bg-white/5 hover:text-white'
-              }`}
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
+          const active = !item.external && isActive(item.href, item.exact);
+          const className = `flex items-center gap-2 py-4 px-4 text-lg rounded-lg transition-colors ${
+            active
+              ? 'bg-white/10 text-white'
+              : 'text-white/80 hover:bg-white/5 hover:text-white'
+          }`;
+          const inner = (
+            <>
               {isSchoolLink && <Building size={18} />}
               {isAdminLink && <Shield size={18} />}
               {item.label}
-              {isActive(item.href, item.exact) && (
+              {active && (
                 <span
                   className="ml-2 inline-block w-2 h-2 rounded-full"
                   style={{ backgroundColor: '#E8B84B' }}
                 />
               )}
+            </>
+          );
+          if (item.external) {
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={onClose}
+                className={className}
+                style={{ fontFamily: "'DM Sans', sans-serif" }}
+              >
+                {inner}
+              </a>
+            );
+          }
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onClose}
+              className={className}
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {inner}
             </Link>
           );
         })}

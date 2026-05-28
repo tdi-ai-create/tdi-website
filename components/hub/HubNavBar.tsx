@@ -25,6 +25,7 @@ interface NavItem {
   href: string;
   label: string;
   exact: boolean;
+  external?: boolean;
 }
 
 const BASE_NAV_ITEMS: NavItem[] = [
@@ -33,6 +34,8 @@ const BASE_NAV_ITEMS: NavItem[] = [
   { href: '/hub/quick-wins', label: 'Quick Wins', exact: false },
   { href: '/hub/certificates', label: 'Certificates', exact: false },
   { href: '/hub/settings', label: 'Settings', exact: false },
+  { href: 'https://raehughart.substack.com/', label: 'Blog', exact: false, external: true },
+  { href: 'https://www.teachersdeserveit.com/create-with-us', label: 'Become a Creator', exact: false, external: true },
 ];
 
 export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps) {
@@ -141,23 +144,51 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
         {/* Desktop Nav Links */}
         <div className="hidden md:flex items-center justify-center flex-1 gap-1">
           {navItems.map((item) => {
-            const active = isActive(item.href, item.exact);
+            const active = !item.external && isActive(item.href, item.exact);
             const isAdminLink = item.href === '/tdi-admin';
             const isSchoolLink = item.href === '/hub/champion';
+            const linkStyle = {
+              color: active ? '#FFFFFF' : 'rgba(255, 255, 255, 0.45)',
+              background: active ? 'rgba(255,255,255,0.12)' : 'transparent',
+              borderRadius: '8px',
+              padding: '6px 14px',
+              fontSize: '14px',
+              fontWeight: 500,
+              gap: '4px',
+            };
+            const inner = (
+              <>
+                {isSchoolLink && <Building size={14} />}
+                {isAdminLink && <Shield size={14} />}
+                {tUI(item.label)}
+              </>
+            );
+            if (item.external) {
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center transition-colors"
+                  style={linkStyle}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#FFFFFF';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'rgba(255, 255, 255, 0.45)';
+                  }}
+                >
+                  {inner}
+                </a>
+              );
+            }
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className="flex items-center transition-colors"
-                style={{
-                  color: active ? '#FFFFFF' : 'rgba(255, 255, 255, 0.45)',
-                  background: active ? 'rgba(255,255,255,0.12)' : 'transparent',
-                  borderRadius: '8px',
-                  padding: '6px 14px',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  gap: '4px',
-                }}
+                style={linkStyle}
                 onMouseEnter={(e) => {
                   if (!active) e.currentTarget.style.color = '#FFFFFF';
                 }}
@@ -165,9 +196,7 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
                   if (!active) e.currentTarget.style.color = 'rgba(255, 255, 255, 0.45)';
                 }}
               >
-                {isSchoolLink && <Building size={14} />}
-                {isAdminLink && <Shield size={14} />}
-                {tUI(item.label)}
+                {inner}
               </Link>
             );
           })}
