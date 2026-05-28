@@ -247,19 +247,19 @@ export default function CourseCard({
             <span className="font-medium">Completed</span>
           </div>
         ) : true ? (
-          /* Coming Soon state -- course playback not yet live */
-          <div
-            className="w-full py-2.5 rounded-lg font-medium text-center"
+          /* Explore course -- detail page has Coming Soon for actual enrollment */
+          <Link
+            href={`/hub/courses/${course.slug}`}
+            className="block w-full py-2.5 rounded-lg font-medium text-center transition-opacity hover:opacity-90"
             style={{
-              backgroundColor: '#F3F4F6',
-              color: '#6B7280',
+              backgroundColor: '#1e2749',
+              color: 'white',
               fontFamily: "'DM Sans', sans-serif",
               fontSize: '14px',
-              cursor: 'default',
             }}
           >
-            Coming Soon
-          </div>
+            Explore Course
+          </Link>
         ) : isEnrolled ? (
           <div className="space-y-2">
             {/* Gradient progress bar */}
