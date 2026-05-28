@@ -268,91 +268,84 @@ export default function OurStoryPage() {
               'Our Creator Studio has active creators building content for you right now.'
             )}
           </p>
-          {/* Creator avatar row - faces of real educators behind the Hub */}
+          {/* Creator role icons - representing the team behind the Hub */}
           <div className="flex items-center gap-4 mt-6 mb-6 flex-wrap">
-            {/* Stacked avatar circles */}
             <div className="flex -space-x-3">
               {[
-                { src: '/images/creators/creator-1.jpg', alt: 'TDI creator' },
-                { src: '/images/creators/creator-2.jpg', alt: 'TDI creator' },
-                { src: '/images/creators/creator-3.jpg', alt: 'TDI creator' },
-                { src: '/images/creators/creator-4.jpg', alt: 'TDI creator' },
-                { src: '/images/creators/creator-5.jpg', alt: 'TDI creator' },
-              ].map((creator, i) => (
+                {
+                  label: 'Teacher',
+                  bg: '#1e2749',
+                  icon: (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="9" cy="7" r="4" stroke="white" strokeWidth="2" />
+                    </svg>
+                  ),
+                },
+                {
+                  label: 'Coach',
+                  bg: '#1e2749',
+                  icon: (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.7.6 1 1.5 1 2.3v1h6v-1c0-.8.3-1.7 1-2.3A7 7 0 0 0 12 2z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  ),
+                },
+                {
+                  label: 'Specialist',
+                  bg: '#1e2749',
+                  icon: (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  ),
+                },
+                {
+                  label: 'Creator',
+                  bg: '#1e2749',
+                  icon: (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  ),
+                },
+                {
+                  label: 'Designer',
+                  bg: '#1e2749',
+                  icon: (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="3" stroke="white" strokeWidth="2" />
+                      <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  ),
+                },
+                {
+                  label: 'Community',
+                  bg: '#ffba06',
+                  icon: (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="#1e2749" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="9" cy="7" r="4" stroke="#1e2749" strokeWidth="2" />
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="#1e2749" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  ),
+                },
+              ].map((role, i) => (
                 <div
                   key={i}
-                  className="rounded-full overflow-hidden"
+                  className="rounded-full flex items-center justify-center"
                   style={{
                     width: '56px',
                     height: '56px',
                     border: '3px solid #ffba06',
-                    backgroundColor: '#f5f5f5',
+                    backgroundColor: role.bg,
                     boxShadow: '0 2px 8px rgba(30, 39, 73, 0.15)',
                   }}
+                  aria-label={role.label}
                 >
-                  <img
-                    src={creator.src}
-                    alt={creator.alt}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                    }}
-                    onError={(e) => {
-                      // Fallback to navy initial circle if image missing
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                    }}
-                  />
+                  {role.icon}
                 </div>
               ))}
-
-              {/* Icon circles representing types of expertise */}
-              <div
-                className="rounded-full flex items-center justify-center"
-                style={{
-                  width: '56px',
-                  height: '56px',
-                  border: '3px solid #ffba06',
-                  backgroundColor: '#fff8e1',
-                  boxShadow: '0 2px 8px rgba(30, 39, 73, 0.15)',
-                }}
-                aria-label="Specialist expertise"
-              >
-                {/* Beaker icon for specialists */}
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"
-                    stroke="#1e2749"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-
-              <div
-                className="rounded-full flex items-center justify-center"
-                style={{
-                  width: '56px',
-                  height: '56px',
-                  border: '3px solid #ffba06',
-                  backgroundColor: '#fde8e8',
-                  boxShadow: '0 2px 8px rgba(30, 39, 73, 0.15)',
-                }}
-                aria-label="Coach expertise"
-              >
-                {/* Lightbulb icon for coaches */}
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.7.6 1 1.5 1 2.3v1h6v-1c0-.8.3-1.7 1-2.3A7 7 0 0 0 12 2z"
-                    stroke="#1e2749"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
             </div>
 
             {/* Right-side label */}
