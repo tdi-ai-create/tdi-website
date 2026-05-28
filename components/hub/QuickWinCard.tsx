@@ -130,16 +130,12 @@ export default function QuickWinCard({
           {tUI(quickWin.category)}
         </div>
 
-        {/* Title */}
+        {/* Title — full, no truncation */}
         <div
-          className="text-[13px] font-semibold mb-0.5 leading-tight"
+          className="text-sm font-semibold mb-1 leading-snug"
           style={{
             color: '#1B2A4A',
             fontFamily: "'DM Sans', sans-serif",
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical' as const,
-            overflow: 'hidden',
           }}
         >
           {title}
@@ -147,7 +143,7 @@ export default function QuickWinCard({
 
         {/* Meta */}
         <div
-          className="text-[11px] mb-2"
+          className="text-[11px] mb-3"
           style={{
             color: '#9CA3AF',
             fontFamily: "'DM Sans', sans-serif",
@@ -162,7 +158,7 @@ export default function QuickWinCard({
             href={quickWin.course_slug
               ? `/hub/courses/${quickWin.course_slug}/${quickWin.slug}`
               : `/hub/quick-wins/${quickWin.slug}`}
-            className="text-[11px] font-semibold rounded-lg px-2.5 py-1 inline-block transition-opacity hover:opacity-90 self-start"
+            className="text-xs font-semibold rounded-lg px-4 py-2 inline-block transition-opacity hover:opacity-90 self-start"
             style={{
               backgroundColor: '#1B2A4A',
               color: 'white',
@@ -174,14 +170,14 @@ export default function QuickWinCard({
         ) : (
           <Link
             href="/hub/membership"
-            className="text-[11px] font-medium px-2.5 py-1 rounded-lg inline-flex items-center gap-1 transition-colors hover:bg-gray-50 self-start"
+            className="text-xs font-medium px-4 py-2 rounded-lg inline-flex items-center gap-1 transition-colors hover:bg-gray-50 self-start"
             style={{
               border: '1px solid #9CA3AF',
               color: '#6B7280',
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
-            <Lock size={9} />
+            <Lock size={10} />
             {tUI('Upgrade')}
           </Link>
         )}
