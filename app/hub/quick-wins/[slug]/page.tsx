@@ -682,32 +682,6 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           {/* ─── LEFT COLUMN ─────────────────────────────────────────── */}
           <div className="w-full lg:w-[62%]">
 
-            {/* Testimonial quote block */}
-            <div
-              className="mb-6 p-5"
-              style={{
-                borderLeft: '4px solid #ffba06',
-                backgroundColor: '#FFFDF5',
-                borderRadius: '0 12px 12px 0',
-              }}
-            >
-              <p
-                className="mb-2"
-                style={{
-                  fontFamily: "'Source Serif 4', Georgia, serif",
-                  fontStyle: 'italic',
-                  fontSize: '15px',
-                  color: '#1e2749',
-                  lineHeight: '1.65',
-                }}
-              >
-                &ldquo;This tool changed how I start my mornings. Simple but powerful.&rdquo;
-              </p>
-              <p style={{ fontSize: '12px', color: '#9CA3AF' }}>
-                -- 4th grade teacher, 3 days ago
-              </p>
-            </div>
-
             {/* ─── MAIN CONTENT CARD ──────────────────────────────────── */}
             <div
               className="bg-white p-6 md:p-8 mb-6"
@@ -1015,8 +989,8 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
                 >
                   <h3
-                    className="text-sm font-bold mb-4"
-                    style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}
+                    className="text-xs font-semibold mb-3"
+                    style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.05em', textTransform: 'uppercase' as const }}
                   >
                     What educators are saying
                   </h3>
@@ -1056,9 +1030,12 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   className="bg-white p-6"
                   style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}
                 >
-                  <h3 className="font-semibold mb-4" style={{ fontSize: '15px', color: '#1e2749' }}>
+                  <h3 className="font-semibold mb-1" style={{ fontSize: '15px', color: '#1e2749' }}>
                     You might also like
                   </h3>
+                  <p className="text-xs mb-4" style={{ color: '#9CA3AF' }}>
+                    Based on this tool&apos;s category
+                  </p>
                   <div className="space-y-3">
                     {recommendations.map((rec) => {
                       const recColor = CATEGORY_COLORS[rec.category || ''] || '#ffba06';
@@ -1107,41 +1084,67 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         {/* ─── BOTTOM: EXPLORE MORE ──────────────────────────────────── */}
         {moreQuickWins.length > 0 && (
           <div className="mt-12 mb-8">
-            <h2 className="font-bold mb-6" style={{ fontSize: '20px', color: '#1e2749', fontFamily: "'Source Serif 4', Georgia, serif" }}>
+            <h2 className="font-bold mb-1" style={{ fontSize: '22px', color: '#1e2749', fontFamily: "'Source Serif 4', Georgia, serif" }}>
               Explore more Quick Wins
             </h2>
-            <div
-              className="flex gap-4 overflow-x-auto pb-4"
-              style={{ scrollbarWidth: 'thin', scrollbarColor: '#D1D5DB transparent' }}
-            >
+            <p className="text-sm mb-6" style={{ color: '#9CA3AF' }}>
+              Browse the full library of tools for your classroom
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {moreQuickWins.map((qw) => {
                 const qwColor = CATEGORY_COLORS[qw.category || ''] || '#ffba06';
                 return (
                   <Link
                     key={qw.id}
                     href={`/hub/quick-wins/${qw.slug}`}
-                    className="flex-shrink-0 bg-white p-4 transition-shadow hover:shadow-md"
-                    style={{ width: '220px', border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}
+                    className="flex flex-row overflow-hidden bg-white transition-shadow hover:shadow-md"
+                    style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '12px' }}
                   >
-                    {/* Color bar */}
-                    <div className="w-full h-2 mb-3" style={{ backgroundColor: qwColor, borderRadius: '4px' }} />
-                    <p className="text-sm font-semibold mb-2 line-clamp-2" style={{ color: '#1e2749', lineHeight: '1.4' }}>
-                      {qw.title}
-                    </p>
-                    <div className="flex items-center gap-2">
+                    {/* Left: colored placeholder */}
+                    <div
+                      className="w-[100px] flex-shrink-0 flex flex-col justify-center px-3"
+                      style={{ backgroundColor: '#FAFAF5' }}
+                    >
                       <span
-                        className="text-xs px-2 py-0.5 rounded-full"
-                        style={{ background: `${qwColor}18`, color: qwColor, fontSize: '10px' }}
+                        className="text-xs font-bold leading-tight"
+                        style={{ color: '#1e2749', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}
+                      >
+                        {qw.title}
+                      </span>
+                      <span
+                        className="text-[9px] mt-1 uppercase tracking-wider"
+                        style={{ color: '#9CA3AF' }}
+                      >
+                        {'download'}
+                      </span>
+                    </div>
+                    {/* Right: details */}
+                    <div className="p-3 flex-1 flex flex-col justify-center min-w-0">
+                      <span
+                        className="text-[10px] font-bold px-1.5 py-0.5 rounded self-start mb-1"
+                        style={{ backgroundColor: `${qwColor}18`, color: qwColor, textTransform: 'uppercase' as const, letterSpacing: '0.04em' }}
                       >
                         {qw.category}
                       </span>
+                      <p className="text-sm font-semibold mb-1 leading-snug" style={{ color: '#1e2749' }}>
+                        {qw.title}
+                      </p>
                       <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                        {qw.estimated_minutes}m
+                        {qw.estimated_minutes} min · Download
                       </span>
                     </div>
                   </Link>
                 );
               })}
+            </div>
+            <div className="text-center mt-6">
+              <Link
+                href="/hub/quick-wins"
+                className="text-sm font-medium px-6 py-2.5 rounded-lg inline-block transition-colors hover:opacity-90"
+                style={{ backgroundColor: '#1e2749', color: 'white' }}
+              >
+                View all Quick Wins
+              </Link>
             </div>
           </div>
         )}
