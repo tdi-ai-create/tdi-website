@@ -76,15 +76,14 @@ export default function QuickWinCard({
       className="flex flex-row overflow-hidden relative"
       style={{
         backgroundColor: 'white',
-        borderRadius: '16px',
+        borderRadius: '12px',
         border: '0.5px solid rgba(0,0,0,0.06)',
         opacity: !hasAccess && !isFreeRotating ? 0.82 : 1,
-        minHeight: 140,
       }}
     >
-      {/* Left: Cover image / placeholder */}
+      {/* Left: Cover image / placeholder — 50% width */}
       <CoverImageOverlay
-        className="w-[140px] flex-shrink-0"
+        className="w-1/2 flex-shrink-0"
         imageUrl={quickWin.thumbnail_url}
         imageAlt={quickWin.title}
         liftRating={quickWin.capacity}
@@ -96,7 +95,7 @@ export default function QuickWinCard({
       {onToggleFavorite && (
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavorite(quickWin.id, 'quick_win') }}
-          className="absolute top-3 right-3 p-1.5 rounded-full transition-all z-10"
+          className="absolute top-2 right-2 p-1 rounded-full transition-all z-10"
           style={{
             background: isFavorited ? '#FEE2E2' : 'rgba(0,0,0,0.04)',
             border: 'none',
@@ -105,7 +104,7 @@ export default function QuickWinCard({
           aria-label={isFavorited ? tUI('Remove from saved') : tUI('Save quick win')}
         >
           <Heart
-            size={14}
+            size={12}
             style={{
               color: isFavorited ? '#E53935' : '#9CA3AF',
               fill: isFavorited ? '#E53935' : 'none',
@@ -115,11 +114,11 @@ export default function QuickWinCard({
         </button>
       )}
 
-      {/* Right: Content */}
-      <div className="p-4 flex-1 flex flex-col justify-center min-w-0">
+      {/* Right: Content — 50% width */}
+      <div className="w-1/2 p-3 flex flex-col justify-center min-w-0">
         {/* Category tag */}
         <div
-          className="inline-block text-[10px] font-bold px-2 py-0.5 rounded mb-1.5 self-start"
+          className="inline-block text-[9px] font-bold px-1.5 py-0.5 rounded mb-1 self-start"
           style={{
             backgroundColor: colors.bg,
             color: colors.text,
@@ -133,7 +132,7 @@ export default function QuickWinCard({
 
         {/* Title */}
         <div
-          className="text-sm font-semibold mb-1 leading-snug"
+          className="text-[13px] font-semibold mb-0.5 leading-tight"
           style={{
             color: '#1B2A4A',
             fontFamily: "'DM Sans', sans-serif",
@@ -148,16 +147,13 @@ export default function QuickWinCard({
 
         {/* Meta */}
         <div
-          className="text-xs mb-2.5 flex items-center gap-2 flex-wrap"
+          className="text-[11px] mb-2"
           style={{
             color: '#9CA3AF',
             fontFamily: "'DM Sans', sans-serif",
           }}
         >
-          <span>
-            {quickWin.estimated_minutes} {tUI('min')}
-            {quickWin.content_type && ` · ${getTypeLabel()}`}
-          </span>
+          {quickWin.estimated_minutes} {tUI('min')} · {getTypeLabel()}
         </div>
 
         {/* Action */}
@@ -166,7 +162,7 @@ export default function QuickWinCard({
             href={quickWin.course_slug
               ? `/hub/courses/${quickWin.course_slug}/${quickWin.slug}`
               : `/hub/quick-wins/${quickWin.slug}`}
-            className="text-xs font-semibold rounded-lg px-3 py-1.5 inline-block transition-opacity hover:opacity-90 self-start"
+            className="text-[11px] font-semibold rounded-lg px-2.5 py-1 inline-block transition-opacity hover:opacity-90 self-start"
             style={{
               backgroundColor: '#1B2A4A',
               color: 'white',
@@ -178,14 +174,14 @@ export default function QuickWinCard({
         ) : (
           <Link
             href="/hub/membership"
-            className="text-xs font-medium px-3 py-1.5 rounded-lg inline-flex items-center gap-1 transition-colors hover:bg-gray-50 self-start"
+            className="text-[11px] font-medium px-2.5 py-1 rounded-lg inline-flex items-center gap-1 transition-colors hover:bg-gray-50 self-start"
             style={{
               border: '1px solid #9CA3AF',
               color: '#6B7280',
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
-            <Lock size={10} />
+            <Lock size={9} />
             {tUI('Upgrade')}
           </Link>
         )}
