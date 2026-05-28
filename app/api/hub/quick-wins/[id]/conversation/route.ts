@@ -4,8 +4,8 @@ import { createClient } from '@supabase/supabase-js'
 // Use Hub project URL with service role key for server-side queries
 // The quick_win_responses table lives in the Hub Supabase project
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.LEARNING_HUB_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
 const VALID_TYPES = ['tried_it', 'adapted_it', 'still_trying', 'got_stuck', 'didnt_land'] as const
