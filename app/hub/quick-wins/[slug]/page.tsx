@@ -19,6 +19,7 @@ import {
   BookOpen,
   Bookmark,
   ExternalLink,
+  Info,
 } from 'lucide-react';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
 import LessonConversation from '@/components/hub/LessonConversation';
@@ -620,12 +621,24 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   {tUI('TEACHERS DESERVE IT')}
                 </p>
                 {liftLabel && (
-                  <div
-                    className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full"
-                    style={{ background: `${liftColor}30`, color: liftColor }}
-                  >
-                    <Zap size={10} />
-                    {liftLabel}
+                  <div className="inline-flex items-center gap-1.5">
+                    <div
+                      className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full"
+                      style={{ background: `${liftColor}30`, color: liftColor }}
+                    >
+                      <Zap size={10} />
+                      {liftLabel}
+                    </div>
+                    <span className="relative group" style={{ display: 'inline-flex' }}>
+                      <Info size={13} style={{ color: 'rgba(255,255,255,0.4)', cursor: 'help' }} />
+                      <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3 rounded-lg text-left pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50"
+                        style={{ background: '#1B2A4A', color: 'white', fontSize: 12, fontWeight: 400, lineHeight: 1.5, boxShadow: '0 4px 12px rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <strong style={{ display: 'block', marginBottom: 6, fontSize: 13 }}>Lift = how much brain power and time a resource takes to put into action.</strong>
+                        <span style={{ display: 'block', marginBottom: 4 }}><strong>Low lift</strong> -- Grab and go. Sentence starters, one-page downloads, quick reference cards.</span>
+                        <span style={{ display: 'block', marginBottom: 4 }}><strong>Medium lift</strong> -- Some prep needed. Reflection downloads, structured activities. 15-30 min to plan.</span>
+                        <span style={{ display: 'block' }}><strong>High lift</strong> -- Sustained effort. Courses, multi-week guides, full curriculum frameworks.</span>
+                      </span>
+                    </span>
                   </div>
                 )}
               </div>
