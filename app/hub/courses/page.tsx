@@ -203,7 +203,9 @@ export default function CourseCatalogPage() {
       if (activeFilter === 'All') return true;
       if (activeFilter === 'Saved') return isFavorite(course.id);
       if (activeFilter === 'In Progress') return !!enrollments[course.id];
-      return course.category === activeFilter;
+      // Match kebab-case DB values against Title Case filter labels
+      const normalizedCategory = course.category?.replace(/-/g, ' ').replace(/&/g, '&').replace(/\b\w/g, c => c.toUpperCase());
+      return normalizedCategory === activeFilter || course.category === activeFilter;
     })();
     const capacityMatch = capacityFilter === 'all' || course.capacity === capacityFilter;
     return categoryMatch && capacityMatch;

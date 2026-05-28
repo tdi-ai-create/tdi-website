@@ -7,11 +7,17 @@ import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
 // Category colors - elevated design
 const CATEGORY_COLORS: Record<string, { bar: string; bg: string; text: string }> = {
   'Stress & Wellness': { bar: '#7C9CBF', bg: '#E8F0F8', text: '#3D5A80' },
+  'stress-&-wellness': { bar: '#7C9CBF', bg: '#E8F0F8', text: '#3D5A80' },
   'Classroom Management': { bar: '#E8B84B', bg: '#FEF3C7', text: '#854F0B' },
+  'classroom-management': { bar: '#E8B84B', bg: '#FEF3C7', text: '#854F0B' },
   'Time Savers': { bar: '#6BA368', bg: '#E8F5E9', text: '#27500A' },
+  'time-savers': { bar: '#6BA368', bg: '#E8F5E9', text: '#27500A' },
   'Leadership': { bar: '#9B7CB8', bg: '#EDE9FE', text: '#4C1D95' },
+  'leadership': { bar: '#9B7CB8', bg: '#EDE9FE', text: '#4C1D95' },
   'Communication': { bar: '#E8927C', bg: '#FEE2E2', text: '#991B1B' },
+  'communication': { bar: '#E8927C', bg: '#FEE2E2', text: '#991B1B' },
   'New Teacher': { bar: '#5BBEC4', bg: '#E1F5EE', text: '#085041' },
+  'new-teacher': { bar: '#5BBEC4', bg: '#E1F5EE', text: '#085041' },
 };
 
 const CAPACITY_STYLES: Record<string, { color: string; label: string }> = {
@@ -167,7 +173,7 @@ export default function CourseCard({
             fontFamily: "'DM Sans', sans-serif",
           }}
         >
-          {course.category}
+          {course.category.replace(/-/g, ' ').replace(/&/g, '&').replace(/\b\w/g, c => c.toUpperCase())}
         </span>
 
         {/* Title */}
@@ -195,29 +201,10 @@ export default function CourseCard({
         </p>
 
         {/* Meta row */}
-        <div className="flex items-center gap-3 mb-4 flex-wrap">
-          <span
-            className="text-[11px] font-semibold px-2 py-1 rounded"
-            style={{
-              backgroundColor: '#FEF3C7',
-              color: '#854F0B',
-              fontFamily: "'DM Sans', sans-serif",
-            }}
-          >
-            {course.pd_hours} PD Hours
-          </span>
-          <span
-            className="text-[12px]"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              color: '#9CA3AF',
-            }}
-          >
-            ~{course.estimated_minutes} min
-          </span>
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
           {course.capacity && CAPACITY_STYLES[course.capacity] && (
             <span
-              className="text-[11px] font-semibold px-2 py-1 rounded"
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full"
               style={{
                 backgroundColor: CAPACITY_STYLES[course.capacity].color + '22',
                 color: CAPACITY_STYLES[course.capacity].color,
@@ -225,6 +212,14 @@ export default function CourseCard({
               }}
             >
               {CAPACITY_STYLES[course.capacity].label}
+            </span>
+          )}
+          {course.estimated_minutes > 0 && (
+            <span
+              className="text-[11px]"
+              style={{ fontFamily: "'DM Sans', sans-serif", color: '#9CA3AF' }}
+            >
+              ~{course.estimated_minutes} min
             </span>
           )}
         </div>
