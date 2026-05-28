@@ -116,7 +116,11 @@ function LeadershipCard({ member }: { member: typeof leadership[0] }) {
 function TeamCircle({ member }: { member: typeof team[0] }) {
   const [imgError, setImgError] = useState(false)
   const initials = getInitials(member.name)
-  const goldRing = member.isHuman ? { boxShadow: '0 0 0 4.5px #C9A961' } : {}
+  const ringStyle = member.isMascot
+    ? { boxShadow: '0 0 0 4.5px #2A9D8F' }
+    : member.isHuman
+      ? { boxShadow: '0 0 0 4.5px #C9A961' }
+      : {}
 
   return (
     <div style={{ textAlign: 'center' }}>
@@ -125,7 +129,7 @@ function TeamCircle({ member }: { member: typeof team[0] }) {
           src={`/team/${member.imageSlug}.jpg`}
           alt={member.name}
           width={110} height={110}
-          style={{ width: 110, height: 110, borderRadius: '50%', objectFit: 'cover', margin: '0 auto 8px', ...goldRing }}
+          style={{ width: 110, height: 110, borderRadius: '50%', objectFit: 'cover', margin: '0 auto 8px', ...ringStyle }}
           onError={() => setImgError(true)}
         />
       ) : (
@@ -135,7 +139,7 @@ function TeamCircle({ member }: { member: typeof team[0] }) {
           color: member.isHuman ? 'white' : '#0F6E56',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 22, fontWeight: 500,
-          ...goldRing,
+          ...ringStyle,
         }}>{initials}</div>
       )}
       <p style={{ fontSize: 12, fontWeight: 500, color: '#1e2749', margin: '0 0 2px 0' }}>{member.name}</p>
