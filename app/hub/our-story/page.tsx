@@ -364,6 +364,8 @@ export default function OurStoryPage() {
 
           <a
             href="/about#creators"
+            target="_blank"
+            rel="noopener noreferrer"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
