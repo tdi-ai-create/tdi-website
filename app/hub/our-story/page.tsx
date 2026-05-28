@@ -20,7 +20,6 @@ import {
 const STATS = [
   { value: '100K+', label: 'Educators' },
   { value: 'All 50', label: 'States' },
-  { value: '100+', label: 'Countries' },
   { value: '74%', label: 'Classroom Implementation' },
 ];
 
@@ -188,7 +187,7 @@ export default function OurStoryPage() {
             className="rounded-lg overflow-hidden mt-8"
             style={{ backgroundColor: '#1e2749' }}
           >
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 px-6 py-8">
+            <div className="grid grid-cols-3 gap-6 px-6 py-8">
               {STATS.map((stat, i) => (
                 <div key={i} className="text-center">
                   <div
