@@ -913,15 +913,18 @@ export default function CertificatesPage() {
                         <Download size={16} />
                         {tUI('Download PDF')}
                       </a>
-                      <ShareMenu
-                        type="certificate"
-                        text={`PD Certificate for ${cert.course.title}`}
-                        url={`https://www.teachersdeserveit.com/hub/verify/${cert.verification_code}`}
-                        courseTitle={cert.course.title}
-                        pdHours={cert.pd_hours}
-                        buttonVariant="secondary"
-                        buttonSize="md"
-                      />
+                      <button
+                        onClick={() => {
+                          setShareMessage(`Just completed "${cert.course.title}" on the TDI Learning Hub. Certificate earned. Resume updated. teachersdeserveit.com`);
+                          setShareTitle('Share this certificate');
+                          setShareOpen(true);
+                        }}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors hover:bg-gray-50"
+                        style={{ borderColor: '#E5E7EB', color: '#374151' }}
+                      >
+                        <Share2 size={16} />
+                        {tUI('Share')}
+                      </button>
                       <Link
                         href={`/hub/verify/${cert.verification_code}`}
                         target="_blank"
