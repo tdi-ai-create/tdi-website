@@ -182,7 +182,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         console.log('[QuickWinDetail] Fetching quick win with slug:', slug);
         const { data, error } = await supabase
           .from('hub_quick_wins')
-          .select('id, slug, title, description, content, category, quick_win_type, duration_minutes, download_url, capacity, title_es, description_es, content_es')
+          .select('id, slug, title, description, content, category, quick_win_type, duration_minutes, download_url, lift, title_es, description_es, content_es')
           .eq('slug', slug)
           .eq('is_published', true)
           .single();
@@ -207,7 +207,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           content_type: data.quick_win_type || 'activity',
           video_url: null, // hub_quick_wins doesn't have video_url
           download_url: data.download_url,
-          capacity: data.capacity || null,
+          capacity: data.lift === 'LOW' ? 'low' : data.lift === 'MED' ? 'medium' : data.lift === 'HIGH' ? 'high' : null,
           title_es: data.title_es,
           description_es: data.description_es,
           content_es: data.content_es,
