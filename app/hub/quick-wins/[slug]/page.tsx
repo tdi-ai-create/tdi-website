@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
@@ -16,13 +16,18 @@ import {
   CheckCircle,
   Share2,
   BookOpen,
-  Mail,
   Bookmark,
   ExternalLink,
+  ThumbsUp,
+  MessageSquare,
+  Send,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
 
-// Breathing Exercise Component
+// ─── Breathing Exercise Component ───────────────────────────────────────────
+
 function BreathingExercise() {
   const [phase, setPhase] = useState(0);
   const [count, setCount] = useState(4);
@@ -121,7 +126,8 @@ function BreathingExercise() {
   );
 }
 
-// Category colors
+// ─── Constants ──────────────────────────────────────────────────────────────
+
 const CATEGORY_COLORS: Record<string, string> = {
   'Stress Relief': '#7C9CBF',
   'Time Savers': '#6BA368',
@@ -133,6 +139,18 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Leadership': '#9B7CB8',
   'New Teacher': '#5BBEC4',
 };
+
+const EXPERIENCE_STATUSES = ['Tried it', 'Adapted it', 'Still trying', 'Got stuck'] as const;
+type ExperienceStatus = typeof EXPERIENCE_STATUSES[number];
+
+const STATUS_COLORS: Record<ExperienceStatus, string> = {
+  'Tried it': '#6BA368',
+  'Adapted it': '#E8B84B',
+  'Still trying': '#5BBEC4',
+  'Got stuck': '#E8927C',
+};
+
+// ─── Interfaces ─────────────────────────────────────────────────────────────
 
 interface QuickWin {
   id: string;
@@ -155,11 +173,58 @@ interface QuickWinPageProps {
   params: Promise<{ slug: string }>;
 }
 
+interface ExperiencePost {
+  id: string;
+  status: ExperienceStatus;
+  story: string;
+  user_display_name: string;
+  submitted_at: string;
+  helpful_count: number;
+}
+
+interface QuestionPost {
+  id: string;
+  question: string;
+  user_display_name: string;
+  asked_at: string;
+  answers: AnswerPost[];
+}
+
+interface AnswerPost {
+  id: string;
+  answer: string;
+  user_display_name: string;
+  answered_at: string;
+}
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+function timeAgo(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return 'just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  const diffDay = Math.floor(diffHr / 24);
+  if (diffDay < 30) return `${diffDay}d ago`;
+  const diffMon = Math.floor(diffDay / 30);
+  return `${diffMon}mo ago`;
+}
+
+function avatarInitial(name: string): string {
+  return (name || 'T').charAt(0).toUpperCase();
+}
+
+// ─── Main Component ─────────────────────────────────────────────────────────
+
 export default function QuickWinPage({ params }: QuickWinPageProps) {
   const resolvedParams = use(params);
   const { slug } = resolvedParams;
   const router = useRouter();
-  const { user } = useHub();
+  const { user, profile } = useHub();
 
   const [quickWin, setQuickWin] = useState<QuickWin | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -181,6 +246,26 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const [linkCopied, setLinkCopied] = useState(false);
   const [recommendations, setRecommendations] = useState<QuickWin[]>([]);
   const [moreQuickWins, setMoreQuickWins] = useState<QuickWin[]>([]);
+
+  // Community: Experience posts
+  const [experiences, setExperiences] = useState<ExperiencePost[]>([]);
+  const [expFilter, setExpFilter] = useState<'All' | ExperienceStatus>('All');
+  const [showExpForm, setShowExpForm] = useState(false);
+  const [expStatus, setExpStatus] = useState<ExperienceStatus>('Tried it');
+  const [expStory, setExpStory] = useState('');
+  const [expSubmitting, setExpSubmitting] = useState(false);
+
+  // Community: Q&A
+  const [questions, setQuestions] = useState<QuestionPost[]>([]);
+  const [newQuestion, setNewQuestion] = useState('');
+  const [questionSubmitting, setQuestionSubmitting] = useState(false);
+  const [expandedQuestion, setExpandedQuestion] = useState<string | null>(null);
+  const [answerText, setAnswerText] = useState('');
+  const [answerSubmitting, setAnswerSubmitting] = useState(false);
+
+  const displayName = profile?.display_name || 'Teacher';
+
+  // ─── Data Loading ─────────────────────────────────────────────────────────
 
   // Fetch quick win data
   useEffect(() => {
@@ -216,7 +301,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           estimated_minutes: data.duration_minutes || 5,
           content_type: data.quick_win_type || 'activity',
           video_url: null,
-          download_url: data.download_url || null,
+          download_url: data.file_url || null,
           capacity: data.lift === 'LOW' ? 'low' : data.lift === 'MED' ? 'medium' : data.lift === 'HIGH' ? 'high' : null,
           title_es: data.title_es || null,
           description_es: data.description_es || null,
@@ -302,7 +387,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           estimated_minutes: (d.duration_minutes as number) || 5,
           content_type: (d.quick_win_type as string) || 'activity',
           video_url: null,
-          download_url: (d.download_url as string) || null,
+          download_url: (d.file_url as string) || null,
         }));
 
         if (mapped.length < 3) {
@@ -325,7 +410,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                 estimated_minutes: (d.duration_minutes as number) || 5,
                 content_type: (d.quick_win_type as string) || 'activity',
                 video_url: null,
-                download_url: (d.download_url as string) || null,
+                download_url: (d.file_url as string) || null,
               }));
               setRecommendations([...mapped, ...extra]);
             });
@@ -353,11 +438,105 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
             estimated_minutes: (d.duration_minutes as number) || 5,
             content_type: (d.quick_win_type as string) || 'activity',
             video_url: null,
-            download_url: (d.download_url as string) || null,
+            download_url: (d.file_url as string) || null,
           }))
         );
       });
   }, [quickWin?.id]);
+
+  // Load community experiences
+  const loadExperiences = useCallback(async (qwId: string) => {
+    const supabase = getSupabase();
+    const { data } = await supabase
+      .from('hub_activity_log')
+      .select('*')
+      .eq('action', 'quick_win_experience')
+      .order('created_at', { ascending: false });
+
+    if (data) {
+      const posts: ExperiencePost[] = data
+        .filter((row: Record<string, unknown>) => {
+          const meta = row.metadata as Record<string, unknown> | null;
+          return meta && meta.quick_win_id === qwId;
+        })
+        .map((row: Record<string, unknown>) => {
+          const meta = row.metadata as Record<string, unknown>;
+          return {
+            id: row.id as string,
+            status: (meta.status as ExperienceStatus) || 'Tried it',
+            story: (meta.story as string) || '',
+            user_display_name: (meta.user_display_name as string) || 'Teacher',
+            submitted_at: (meta.submitted_at as string) || (row.created_at as string) || new Date().toISOString(),
+            helpful_count: (meta.helpful_count as number) || 0,
+          };
+        });
+      setExperiences(posts);
+    }
+  }, []);
+
+  // Load Q&A
+  const loadQuestions = useCallback(async (qwId: string) => {
+    const supabase = getSupabase();
+
+    // Load questions
+    const { data: qData } = await supabase
+      .from('hub_activity_log')
+      .select('*')
+      .eq('action', 'quick_win_question')
+      .order('created_at', { ascending: false });
+
+    // Load answers
+    const { data: aData } = await supabase
+      .from('hub_activity_log')
+      .select('*')
+      .eq('action', 'quick_win_answer')
+      .order('created_at', { ascending: true });
+
+    const answersMap = new Map<string, AnswerPost[]>();
+    if (aData) {
+      for (const row of aData) {
+        const meta = row.metadata as Record<string, unknown> | null;
+        if (!meta || meta.quick_win_id !== qwId) continue;
+        const questionId = meta.question_id as string;
+        if (!questionId) continue;
+        const arr = answersMap.get(questionId) || [];
+        arr.push({
+          id: row.id as string,
+          answer: (meta.answer as string) || '',
+          user_display_name: (meta.user_display_name as string) || 'Teacher',
+          answered_at: (meta.answered_at as string) || (row.created_at as string) || new Date().toISOString(),
+        });
+        answersMap.set(questionId, arr);
+      }
+    }
+
+    if (qData) {
+      const posts: QuestionPost[] = qData
+        .filter((row: Record<string, unknown>) => {
+          const meta = row.metadata as Record<string, unknown> | null;
+          return meta && meta.quick_win_id === qwId;
+        })
+        .map((row: Record<string, unknown>) => {
+          const meta = row.metadata as Record<string, unknown>;
+          return {
+            id: row.id as string,
+            question: (meta.question as string) || '',
+            user_display_name: (meta.user_display_name as string) || 'Teacher',
+            asked_at: (meta.asked_at as string) || (row.created_at as string) || new Date().toISOString(),
+            answers: answersMap.get(row.id as string) || [],
+          };
+        });
+      setQuestions(posts);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!quickWin) return;
+    loadExperiences(quickWin.id);
+    loadQuestions(quickWin.id);
+  }, [quickWin?.id, loadExperiences, loadQuestions]);
+
+  // ─── Handlers ─────────────────────────────────────────────────────────────
 
   const handleSaveToLibrary = async () => {
     if (!quickWin || !user) return;
@@ -444,15 +623,95 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
     setCheckedSteps(newChecked);
   };
 
+  const handleSubmitExperience = async () => {
+    if (!quickWin || !user || !expStory.trim()) return;
+    setExpSubmitting(true);
+    const supabase = getSupabase();
+    await supabase.from('hub_activity_log').insert({
+      user_id: user.id,
+      action: 'quick_win_experience',
+      metadata: {
+        quick_win_id: quickWin.id,
+        quick_win_title: quickWin.title,
+        status: expStatus,
+        story: expStory.trim(),
+        submitted_at: new Date().toISOString(),
+        user_display_name: displayName,
+      },
+    });
+    setExpStory('');
+    setShowExpForm(false);
+    setExpSubmitting(false);
+    loadExperiences(quickWin.id);
+  };
+
+  const handleHelpful = async (experienceId: string) => {
+    if (!user || !quickWin) return;
+    const supabase = getSupabase();
+    await supabase.from('hub_activity_log').insert({
+      user_id: user.id,
+      action: 'quick_win_experience_helpful',
+      metadata: {
+        quick_win_id: quickWin.id,
+        experience_id: experienceId,
+        marked_at: new Date().toISOString(),
+      },
+    });
+  };
+
+  const handleSubmitQuestion = async () => {
+    if (!quickWin || !user || !newQuestion.trim()) return;
+    setQuestionSubmitting(true);
+    const supabase = getSupabase();
+    await supabase.from('hub_activity_log').insert({
+      user_id: user.id,
+      action: 'quick_win_question',
+      metadata: {
+        quick_win_id: quickWin.id,
+        quick_win_title: quickWin.title,
+        question: newQuestion.trim(),
+        asked_at: new Date().toISOString(),
+        user_display_name: displayName,
+      },
+    });
+    setNewQuestion('');
+    setQuestionSubmitting(false);
+    loadQuestions(quickWin.id);
+  };
+
+  const handleSubmitAnswer = async (questionId: string) => {
+    if (!quickWin || !user || !answerText.trim()) return;
+    setAnswerSubmitting(true);
+    const supabase = getSupabase();
+    await supabase.from('hub_activity_log').insert({
+      user_id: user.id,
+      action: 'quick_win_answer',
+      metadata: {
+        quick_win_id: quickWin.id,
+        question_id: questionId,
+        answer: answerText.trim(),
+        answered_at: new Date().toISOString(),
+        user_display_name: displayName,
+      },
+    });
+    setAnswerText('');
+    setAnswerSubmitting(false);
+    setExpandedQuestion(null);
+    loadQuestions(quickWin.id);
+  };
+
   // Parse action steps from content (for "do" type)
   const parseActionSteps = (content: string | null): string[] => {
     if (!content) return [];
-    // Try to parse numbered list or bullet points
     const lines = content.split('\n').filter((line) => line.trim());
     return lines.map((line) => line.replace(/^[\d\.\-\*\•]\s*/, '').trim()).filter(Boolean);
   };
 
+  // ─── Derived values ───────────────────────────────────────────────────────
+
   const categoryColor = quickWin ? CATEGORY_COLORS[quickWin.category || ''] || '#E8B84B' : '#E8B84B';
+
+  // ─── Loading state ────────────────────────────────────────────────────────
 
   if (isLoading) {
     return (
@@ -483,23 +742,30 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const actionSteps = quickWin.content_type === 'activity' ? parseActionSteps(quickWin.content) : [];
   const allStepsChecked = actionSteps.length > 0 && checkedSteps.size === actionSteps.length;
 
-  // Category colors for elevated design
-  const categoryColors = {
-    bg: `${categoryColor}20`,
-    text: categoryColor,
-  };
-
   const liftLabel = quickWin.capacity === 'low' ? 'Low Lift' : quickWin.capacity === 'medium' ? 'Medium Lift' : quickWin.capacity === 'high' ? 'High Lift' : null;
   const liftColor = quickWin.capacity === 'low' ? '#6BA368' : quickWin.capacity === 'medium' ? '#E8B84B' : quickWin.capacity === 'high' ? '#E8927C' : '#9CA3AF';
 
+  // Community data
+  const filteredExperiences = expFilter === 'All'
+    ? experiences
+    : experiences.filter(e => e.status === expFilter);
+
+  const statusCounts = EXPERIENCE_STATUSES.reduce((acc, status) => {
+    acc[status] = experiences.filter(e => e.status === status).length;
+    return acc;
+  }, {} as Record<ExperienceStatus, number>);
+  const totalExperiences = experiences.length;
+
+  // ─── Render ───────────────────────────────────────────────────────────────
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F0EEE9', fontFamily: "'DM Sans', sans-serif" }}>
-      {/* Two-column layout */}
-      <div className="max-w-[1100px] mx-auto px-4 md:px-8 py-6 md:py-12">
+      {/* ─── HERO HEADER ───────────────────────────────────────────────── */}
+      <div className="max-w-[1100px] mx-auto px-4 md:px-8 pt-6 md:pt-10">
         {/* Back link */}
         <Link
           href="/hub/quick-wins"
-          className="inline-flex items-center gap-2 text-sm mb-8 transition-colors"
+          className="inline-flex items-center gap-2 text-sm mb-6 transition-colors"
           style={{ color: '#6B7280' }}
           onMouseEnter={(e) => (e.currentTarget.style.color = '#1B2A4A')}
           onMouseLeave={(e) => (e.currentTarget.style.color = '#6B7280')}
@@ -508,76 +774,159 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           Back to Quick Wins
         </Link>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* LEFT COLUMN - 60% */}
-          <div className="w-full lg:w-[60%]">
-            {/* Category badge */}
-            {quickWin.category && (
-              <div
-                className="inline-block text-xs font-bold px-3 py-1 rounded-full mb-4"
-                style={{
-                  background: categoryColors.bg,
-                  color: categoryColors.text,
-                  letterSpacing: '0.05em',
-                  textTransform: 'uppercase',
-                  fontSize: '10px',
-                }}
-              >
-                {quickWin.category}
-              </div>
-            )}
+        <div
+          className="relative overflow-hidden p-6 md:p-10 mb-8"
+          style={{
+            backgroundColor: '#FAFAF5',
+            borderRadius: '20px',
+            border: '0.5px solid rgba(0,0,0,0.06)',
+          }}
+        >
+          {/* Decorative circle */}
+          <div
+            className="absolute hidden md:block"
+            style={{
+              top: '-60px',
+              right: '-60px',
+              width: '300px',
+              height: '300px',
+              borderRadius: '50%',
+              background: `${categoryColor}12`,
+              pointerEvents: 'none',
+            }}
+          />
 
-            {/* Title */}
-            <h1
-              className="font-bold mb-4"
+          {/* Small caps branding */}
+          <p
+            className="mb-4"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '11px',
+              fontWeight: 600,
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase' as const,
+              color: '#9CA3AF',
+            }}
+          >
+            TEACHERS DESERVE IT
+          </p>
+
+          {/* LIFT badge */}
+          {liftLabel && (
+            <div
+              className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full mb-4"
+              style={{ background: `${liftColor}20`, color: liftColor }}
+            >
+              <Zap size={12} />
+              {liftLabel}
+            </div>
+          )}
+
+          {/* Category subtitle */}
+          {quickWin.category && (
+            <p
+              className="mb-2"
               style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                fontSize: '28px',
-                color: '#1B2A4A',
-                lineHeight: '1.3',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: categoryColor,
+                letterSpacing: '0.03em',
               }}
             >
-              {t(quickWin.title, quickWin.title_es)}
-            </h1>
+              {quickWin.category}
+            </p>
+          )}
 
-            {/* Meta row */}
-            <div className="flex flex-wrap items-center gap-3 mb-6">
-              <div
-                className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
-                style={{ background: '#F3F4F6', color: '#6B7280' }}
-              >
-                <Clock size={12} />
-                {quickWin.estimated_minutes} min
-              </div>
-              <div
-                className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
-                style={{ background: '#F3F4F6', color: '#6B7280' }}
-              >
-                <BookOpen size={12} />
-                {quickWin.content_type}
-              </div>
-              {liftLabel && (
-                <div
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full"
-                  style={{ background: `${liftColor}18`, color: liftColor }}
-                >
-                  <Zap size={12} />
-                  {liftLabel}
-                </div>
-              )}
+          {/* Title */}
+          <h1
+            className="font-bold mb-4 relative"
+            style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontSize: 'clamp(28px, 4vw, 36px)',
+              color: '#1B2A4A',
+              lineHeight: '1.25',
+              maxWidth: '700px',
+            }}
+          >
+            {t(quickWin.title, quickWin.title_es)}
+          </h1>
+
+          {/* Description */}
+          {quickWin.description && (
+            <p
+              className="mb-6 relative"
+              style={{
+                fontSize: '16px',
+                color: '#6B7280',
+                lineHeight: '1.65',
+                maxWidth: '600px',
+              }}
+            >
+              {t(quickWin.description, quickWin.description_es)}
+            </p>
+          )}
+
+          {/* Meta row */}
+          <div className="flex flex-wrap items-center gap-3 relative">
+            <div
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
+              style={{ background: 'rgba(0,0,0,0.05)', color: '#6B7280' }}
+            >
+              <Clock size={12} />
+              {quickWin.estimated_minutes} min
             </div>
-
-            {/* Description callout */}
-            {quickWin.description && (
+            <div
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
+              style={{ background: 'rgba(0,0,0,0.05)', color: '#6B7280' }}
+            >
+              <BookOpen size={12} />
+              {quickWin.content_type}
+            </div>
+            {liftLabel && (
               <div
-                className="rounded-2xl p-5 mb-6 text-sm leading-relaxed"
-                style={{ background: '#F0F6FF', border: '0.5px solid #C8DEFF', color: '#1E3A8A', borderRadius: '16px' }}
+                className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
+                style={{ background: 'rgba(0,0,0,0.05)', color: '#6B7280' }}
               >
-                {t(quickWin.description, quickWin.description_es)}
+                {liftLabel}
               </div>
             )}
+          </div>
+        </div>
+      </div>
 
-            {/* Content area */}
+      {/* ─── TWO-COLUMN LAYOUT ─────────────────────────────────────────── */}
+      <div className="max-w-[1100px] mx-auto px-4 md:px-8 pb-6 md:pb-12">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* ─── LEFT COLUMN ─────────────────────────────────────────── */}
+          <div className="w-full lg:w-[62%]">
+
+            {/* Testimonial quote block */}
+            <div
+              className="mb-6 p-5"
+              style={{
+                borderLeft: '4px solid #E8B84B',
+                backgroundColor: '#FFFDF5',
+                borderRadius: '0 12px 12px 0',
+              }}
+            >
+              <p
+                className="mb-2"
+                style={{
+                  fontFamily: "'Source Serif 4', Georgia, serif",
+                  fontStyle: 'italic',
+                  fontSize: '15px',
+                  color: '#1B2A4A',
+                  lineHeight: '1.65',
+                }}
+              >
+                &ldquo;This tool changed how I start my mornings. Simple but powerful.&rdquo;
+              </p>
+              <p style={{ fontSize: '12px', color: '#9CA3AF' }}>
+                -- 4th grade teacher, 3 days ago
+              </p>
+            </div>
+
+            {/* ─── MAIN CONTENT CARD ──────────────────────────────────── */}
             <div
               className="bg-white p-6 md:p-8 mb-6"
               style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}
@@ -587,8 +936,34 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                 <BreathingExercise />
               )}
 
+              {/* Download button (for download type) */}
+              {quickWin.content_type === 'download' && (
+                <div className="mb-6">
+                  {quickWin.download_url ? (
+                    <a
+                      href={quickWin.download_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-3 w-full py-4 font-semibold text-lg transition-opacity hover:opacity-90"
+                      style={{ backgroundColor: '#E8B84B', color: '#1B2A4A', borderRadius: '12px' }}
+                    >
+                      <Download size={22} />
+                      Download Resource
+                    </a>
+                  ) : (
+                    <div
+                      className="flex items-center justify-center gap-3 w-full py-4 font-semibold text-lg"
+                      style={{ backgroundColor: '#E5E7EB', color: '#9CA3AF', borderRadius: '12px', cursor: 'not-allowed' }}
+                    >
+                      <Download size={22} />
+                      Download coming soon
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Read type */}
-              {(quickWin.content_type === 'read' || (!quickWin.video_url && !quickWin.download_url && actionSteps.length === 0)) && (
+              {(quickWin.content_type === 'read' || (!quickWin.video_url && !quickWin.download_url && actionSteps.length === 0 && quickWin.content_type !== 'reflection')) && (
                 <div>
                   {quickWin.content && (
                     <div
@@ -597,7 +972,6 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                       dangerouslySetInnerHTML={{ __html: t(quickWin.content, quickWin.content_es) || '' }}
                     />
                   )}
-
                   <div
                     className="p-4 mb-6"
                     style={{ backgroundColor: '#FFF8E7', border: '1px solid #E8B84B', borderRadius: '12px' }}
@@ -703,37 +1077,13 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                 </div>
               )}
 
-              {/* Download type */}
-              {quickWin.content_type === 'download' && (
-                <div>
-                  {quickWin.content && (
-                    <div
-                      className="prose prose-gray max-w-none mb-6"
-                      style={{ fontSize: '15px', color: '#374151', lineHeight: '1.7' }}
-                      dangerouslySetInnerHTML={{ __html: quickWin.content }}
-                    />
-                  )}
-                  {quickWin.download_url ? (
-                    <a
-                      href={quickWin.download_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-3 w-full py-4 font-semibold text-lg transition-opacity hover:opacity-90"
-                      style={{ backgroundColor: '#E8B84B', color: '#1B2A4A', borderRadius: '12px' }}
-                    >
-                      <Download size={22} />
-                      Download Resource
-                    </a>
-                  ) : (
-                    <div
-                      className="flex items-center justify-center gap-3 w-full py-4 font-semibold text-lg"
-                      style={{ backgroundColor: '#E5E7EB', color: '#9CA3AF', borderRadius: '12px', cursor: 'not-allowed' }}
-                    >
-                      <Download size={22} />
-                      Download coming soon
-                    </div>
-                  )}
-                </div>
+              {/* Download content description */}
+              {quickWin.content_type === 'download' && quickWin.content && (
+                <div
+                  className="prose prose-gray max-w-none"
+                  style={{ fontSize: '15px', color: '#374151', lineHeight: '1.7' }}
+                  dangerouslySetInnerHTML={{ __html: quickWin.content }}
+                />
               )}
 
               {/* Reflection type */}
@@ -797,8 +1147,8 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               </div>
             )}
 
-            {/* Mark as Used - subtle secondary button */}
-            <div className="mb-6">
+            {/* Mark as Used */}
+            <div className="mb-8">
               {isCompleted ? (
                 <div className="text-center">
                   <div
@@ -835,10 +1185,354 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                 </button>
               )}
             </div>
+
+            {/* ─── COMMUNITY: "I TRIED IT" SECTION ─────────────────────── */}
+            <div
+              className="bg-white p-6 md:p-8 mb-6"
+              style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}
+            >
+              <div className="flex items-center justify-between mb-5">
+                <h2
+                  className="font-bold flex items-center gap-2"
+                  style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontSize: '20px', color: '#1B2A4A' }}
+                >
+                  <MessageSquare size={20} style={{ color: '#E8B84B' }} />
+                  What teachers are doing with this tool
+                  {totalExperiences > 0 && (
+                    <span
+                      className="text-xs font-medium px-2 py-0.5 rounded-full"
+                      style={{ background: '#F3F4F6', color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                      {totalExperiences}
+                    </span>
+                  )}
+                </h2>
+              </div>
+
+              {/* Status progress bars */}
+              {totalExperiences > 0 && (
+                <div className="mb-6 space-y-2.5">
+                  {EXPERIENCE_STATUSES.map(status => {
+                    const count = statusCounts[status];
+                    const pct = totalExperiences > 0 ? (count / totalExperiences) * 100 : 0;
+                    return (
+                      <div key={status} className="flex items-center gap-3">
+                        <span className="text-xs font-medium w-[90px] flex-shrink-0" style={{ color: '#374151' }}>
+                          {status}
+                        </span>
+                        <div className="flex-1 h-2 rounded-full" style={{ backgroundColor: '#F3F4F6' }}>
+                          <div
+                            className="h-2 rounded-full transition-all"
+                            style={{
+                              width: `${Math.max(pct, 2)}%`,
+                              backgroundColor: STATUS_COLORS[status],
+                            }}
+                          />
+                        </div>
+                        <span className="text-xs font-medium w-6 text-right" style={{ color: '#9CA3AF' }}>
+                          {count}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Prompt card */}
+              {!showExpForm ? (
+                <div
+                  className="p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-3"
+                  style={{ background: '#FAFAF5', borderRadius: '12px', border: '1px dashed #D1D5DB' }}
+                >
+                  <p className="text-sm flex-1" style={{ color: '#374151' }}>
+                    Tried it? Adapted it? Still working through it?
+                  </p>
+                  <button
+                    onClick={() => setShowExpForm(true)}
+                    className="px-4 py-2 text-sm font-semibold flex-shrink-0 transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: '#E8B84B', color: '#1B2A4A', borderRadius: '8px' }}
+                  >
+                    Share my experience
+                  </button>
+                </div>
+              ) : (
+                <div
+                  className="p-5 mb-6"
+                  style={{ background: '#FAFAF5', borderRadius: '12px', border: '1px solid #E5E7EB' }}
+                >
+                  <p className="text-sm font-semibold mb-3" style={{ color: '#1B2A4A' }}>
+                    How did it go?
+                  </p>
+                  {/* Status radio buttons */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {EXPERIENCE_STATUSES.map(status => (
+                      <label
+                        key={status}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium cursor-pointer transition-all"
+                        style={{
+                          borderRadius: '20px',
+                          border: `1.5px solid ${expStatus === status ? STATUS_COLORS[status] : '#D1D5DB'}`,
+                          backgroundColor: expStatus === status ? `${STATUS_COLORS[status]}15` : 'white',
+                          color: expStatus === status ? STATUS_COLORS[status] : '#6B7280',
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name="exp-status"
+                          value={status}
+                          checked={expStatus === status}
+                          onChange={() => setExpStatus(status)}
+                          className="sr-only"
+                        />
+                        {status}
+                      </label>
+                    ))}
+                  </div>
+                  <textarea
+                    value={expStory}
+                    onChange={(e) => setExpStory(e.target.value)}
+                    placeholder="Tell other teachers about your experience..."
+                    className="w-full p-3 border resize-none focus:outline-none focus:border-[#E8B84B] text-sm"
+                    style={{ minHeight: '100px', borderColor: '#E5E5E5', borderRadius: '8px' }}
+                  />
+                  <button
+                    onClick={handleSubmitExperience}
+                    disabled={!expStory.trim() || expSubmitting || !user}
+                    className="w-full mt-3 py-3 text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
+                    style={{ backgroundColor: '#E8B84B', color: '#1B2A4A', borderRadius: '10px' }}
+                  >
+                    {expSubmitting ? 'Submitting...' : 'Submit'}
+                  </button>
+                  <button
+                    onClick={() => setShowExpForm(false)}
+                    className="w-full mt-2 py-2 text-xs"
+                    style={{ color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer' }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+
+              {/* Filter tabs */}
+              {totalExperiences > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                  {(['All', ...EXPERIENCE_STATUSES] as const).map(tab => (
+                    <button
+                      key={tab}
+                      onClick={() => setExpFilter(tab)}
+                      className="px-3 py-1 text-xs font-medium transition-all"
+                      style={{
+                        borderRadius: '16px',
+                        backgroundColor: expFilter === tab ? '#1B2A4A' : '#F3F4F6',
+                        color: expFilter === tab ? 'white' : '#6B7280',
+                      }}
+                    >
+                      {tab}
+                      {tab === 'All' ? ` (${totalExperiences})` : ` (${statusCounts[tab]})`}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Experience posts */}
+              <div className="space-y-4">
+                {filteredExperiences.map(exp => (
+                  <div
+                    key={exp.id}
+                    className="p-4"
+                    style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '12px' }}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <span
+                        className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                        style={{
+                          backgroundColor: `${STATUS_COLORS[exp.status]}18`,
+                          color: STATUS_COLORS[exp.status],
+                        }}
+                      >
+                        {exp.status}
+                      </span>
+                      <span className="text-xs" style={{ color: '#9CA3AF' }}>
+                        {exp.user_display_name}
+                      </span>
+                      <span className="text-xs" style={{ color: '#D1D5DB' }}>
+                        {'\u00B7'}
+                      </span>
+                      <span className="text-xs" style={{ color: '#9CA3AF' }}>
+                        {timeAgo(exp.submitted_at)}
+                      </span>
+                    </div>
+                    <p className="text-sm mb-3" style={{ color: '#374151', lineHeight: '1.6' }}>
+                      {exp.story}
+                    </p>
+                    <button
+                      onClick={() => handleHelpful(exp.id)}
+                      className="inline-flex items-center gap-1.5 text-xs transition-colors"
+                      style={{ color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                    >
+                      <ThumbsUp size={13} />
+                      Helpful {exp.helpful_count > 0 && `(${exp.helpful_count})`}
+                    </button>
+                  </div>
+                ))}
+                {filteredExperiences.length === 0 && totalExperiences === 0 && (
+                  <p className="text-sm text-center py-6" style={{ color: '#9CA3AF' }}>
+                    Be the first to share your experience with this tool.
+                  </p>
+                )}
+                {filteredExperiences.length === 0 && totalExperiences > 0 && (
+                  <p className="text-sm text-center py-4" style={{ color: '#9CA3AF' }}>
+                    No experiences match this filter.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* ─── Q&A SECTION ─────────────────────────────────────────── */}
+            <div
+              className="bg-white p-6 md:p-8 mb-6"
+              style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}
+            >
+              <h2
+                className="font-bold flex items-center gap-2 mb-5"
+                style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontSize: '20px', color: '#1B2A4A' }}
+              >
+                Q&A
+                {questions.length > 0 && (
+                  <span
+                    className="text-xs font-medium px-2 py-0.5 rounded-full"
+                    style={{ background: '#F3F4F6', color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    {questions.length}
+                  </span>
+                )}
+              </h2>
+
+              {/* New question input */}
+              <div className="flex gap-2 mb-6">
+                <input
+                  type="text"
+                  value={newQuestion}
+                  onChange={(e) => setNewQuestion(e.target.value)}
+                  placeholder="Type your question..."
+                  className="flex-1 px-4 py-2.5 text-sm border focus:outline-none focus:border-[#1B2A4A]"
+                  style={{ borderColor: '#E5E7EB', borderRadius: '10px' }}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmitQuestion(); } }}
+                />
+                <button
+                  onClick={handleSubmitQuestion}
+                  disabled={!newQuestion.trim() || questionSubmitting || !user}
+                  className="px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50 flex items-center gap-1.5"
+                  style={{ backgroundColor: '#1B2A4A', borderRadius: '10px' }}
+                >
+                  <Send size={14} />
+                  Post
+                </button>
+              </div>
+
+              {/* Questions list */}
+              <div className="space-y-4">
+                {questions.map(q => (
+                  <div
+                    key={q.id}
+                    className="p-4"
+                    style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '12px' }}
+                  >
+                    <div className="flex items-start gap-3">
+                      {/* Avatar */}
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold"
+                        style={{ backgroundColor: '#E8B84B20', color: '#E8B84B' }}
+                      >
+                        {avatarInitial(q.user_display_name)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-medium" style={{ color: '#1B2A4A' }}>
+                            {q.user_display_name}
+                          </span>
+                          <span className="text-xs" style={{ color: '#9CA3AF' }}>
+                            {timeAgo(q.asked_at)}
+                          </span>
+                        </div>
+                        <p className="text-sm mb-2" style={{ color: '#374151', lineHeight: '1.6' }}>
+                          {q.question}
+                        </p>
+
+                        {/* Answers */}
+                        {q.answers.length > 0 && (
+                          <div className="ml-2 pl-3 space-y-3 mt-3" style={{ borderLeft: '2px solid #F3F4F6' }}>
+                            {q.answers.map(a => (
+                              <div key={a.id}>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <div
+                                    className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                                    style={{ backgroundColor: '#5BBEC420', color: '#5BBEC4' }}
+                                  >
+                                    {avatarInitial(a.user_display_name)}
+                                  </div>
+                                  <span className="text-xs font-medium" style={{ color: '#1B2A4A' }}>
+                                    {a.user_display_name}
+                                  </span>
+                                  <span className="text-xs" style={{ color: '#9CA3AF' }}>
+                                    {timeAgo(a.answered_at)}
+                                  </span>
+                                </div>
+                                <p className="text-sm ml-8" style={{ color: '#374151', lineHeight: '1.6' }}>
+                                  {a.answer}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Reply toggle */}
+                        <button
+                          onClick={() => setExpandedQuestion(expandedQuestion === q.id ? null : q.id)}
+                          className="inline-flex items-center gap-1 text-xs mt-2 transition-colors"
+                          style={{ color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                        >
+                          {expandedQuestion === q.id ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                          Reply
+                        </button>
+
+                        {/* Reply form */}
+                        {expandedQuestion === q.id && (
+                          <div className="flex gap-2 mt-2">
+                            <input
+                              type="text"
+                              value={answerText}
+                              onChange={(e) => setAnswerText(e.target.value)}
+                              placeholder="Write a reply..."
+                              className="flex-1 px-3 py-2 text-sm border focus:outline-none focus:border-[#1B2A4A]"
+                              style={{ borderColor: '#E5E7EB', borderRadius: '8px' }}
+                              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmitAnswer(q.id); } }}
+                            />
+                            <button
+                              onClick={() => handleSubmitAnswer(q.id)}
+                              disabled={!answerText.trim() || answerSubmitting || !user}
+                              className="px-3 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                              style={{ backgroundColor: '#1B2A4A', borderRadius: '8px' }}
+                            >
+                              <Send size={12} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {questions.length === 0 && (
+                  <p className="text-sm text-center py-6" style={{ color: '#9CA3AF' }}>
+                    No questions yet. Be the first to ask!
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* RIGHT COLUMN - 40% Sidebar */}
-          <div className="w-full lg:w-[40%]">
+          {/* ─── RIGHT COLUMN SIDEBAR ────────────────────────────────── */}
+          <div className="w-full lg:w-[38%]">
             <div className="lg:sticky lg:top-24 space-y-6">
               {/* Action card */}
               <div
@@ -846,6 +1540,20 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                 style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}
               >
                 <div className="space-y-3">
+                  {/* Download Resource (if download type) */}
+                  {quickWin.content_type === 'download' && quickWin.download_url && (
+                    <a
+                      href={quickWin.download_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-3 text-sm font-semibold transition-opacity hover:opacity-90"
+                      style={{ backgroundColor: '#E8B84B', color: '#1B2A4A', borderRadius: '12px' }}
+                    >
+                      <Download size={18} />
+                      Download Resource
+                    </a>
+                  )}
+
                   {/* Save to My Library */}
                   <button
                     onClick={handleSaveToLibrary}
@@ -861,20 +1569,6 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     {isSaved ? <CheckCircle size={18} /> : <Bookmark size={18} />}
                     {isSaved ? 'Saved to Library' : 'Save to My Library'}
                   </button>
-
-                  {/* Download Resource (if download type) */}
-                  {quickWin.content_type === 'download' && quickWin.download_url && (
-                    <a
-                      href={quickWin.download_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full py-3 text-sm font-semibold transition-opacity hover:opacity-90"
-                      style={{ backgroundColor: '#E8B84B', color: '#1B2A4A', borderRadius: '12px' }}
-                    >
-                      <Download size={18} />
-                      Download Resource
-                    </a>
-                  )}
 
                   {/* Share button */}
                   <button
@@ -938,32 +1632,11 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   </div>
                 </div>
               )}
-
-              {/* Community section */}
-              <div
-                className="p-6"
-                style={{ background: 'linear-gradient(135deg, #1B2A4A, #2D4470)', borderRadius: '16px' }}
-              >
-                <h3 className="font-semibold mb-2 text-white" style={{ fontSize: '15px' }}>
-                  Join the conversation
-                </h3>
-                <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.7)', lineHeight: '1.6' }}>
-                  Share how you used this tool with other educators
-                </p>
-                <a
-                  href="mailto:community@teachersdeserveit.com"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: '#E8B84B', color: '#1B2A4A', borderRadius: '10px' }}
-                >
-                  <Mail size={16} />
-                  Connect with us
-                </a>
-              </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom section - Explore more Quick Wins */}
+        {/* ─── BOTTOM: EXPLORE MORE ──────────────────────────────────── */}
         {moreQuickWins.length > 0 && (
           <div className="mt-12 mb-8">
             <h2 className="font-bold mb-6" style={{ fontSize: '20px', color: '#1B2A4A', fontFamily: "'Source Serif 4', Georgia, serif" }}>
