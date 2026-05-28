@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
@@ -11,6 +11,10 @@ import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { checkTrackerEligibility, type TrackerEligibility } from '@/lib/hub/transformation';
 import { getRecommendations, hasCompletedOnboarding, type RecommendedCourse } from '@/lib/hub/recommendations';
 import { checkRecognitions } from '@/lib/hub/recognitions';
+import dynamic from 'next/dynamic';
+import GiftElement from '@/components/hub/GiftElement';
+
+const OnboardingTour = dynamic(() => import('@/components/hub/OnboardingTour'), { ssr: false });
 import {
   BookOpen,
   Award,
@@ -179,6 +183,9 @@ export default function HubDashboard() {
   const [showCelebrateModal, setShowCelebrateModal] = useState(false);
   const [celebrateCopied, setCelebrateCopied] = useState(false);
   const [selectedCelebration, setSelectedCelebration] = useState<string | null>(null);
+  const [showTour, setShowTour] = useState(false);
+  const [tourChecked, setTourChecked] = useState(false);
+  const [tourCompleted, setTourCompleted] = useState(false);
 
   const firstName = profile?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Teacher';
   const dailyMessage = DAILY_MESSAGES[new Date().getDay()];
@@ -353,6 +360,34 @@ export default function HubDashboard() {
     loadSavedCourses();
   }, [favorites]);
 
+  // Check if user needs the onboarding tour
+  useEffect(() => {
+    if (!user?.id || tourChecked) return;
+
+    async function checkTourStatus() {
+      const supabase = getSupabase();
+      const { data } = await supabase
+        .from('hub_activity_log')
+        .select('id')
+        .eq('user_id', user!.id)
+        .eq('action', 'tour_completed')
+        .limit(1)
+        .maybeSingle();
+
+      setTourChecked(true);
+      if (data) {
+        setTourCompleted(true);
+      }
+    }
+
+    checkTourStatus();
+  }, [user?.id, tourChecked]);
+
+  const handleTourComplete = useCallback((stopsSeen: number) => {
+    setShowTour(false);
+    setTourCompleted(true);
+  }, []);
+
   // Loading skeleton
   if (isLoading) {
     return (
@@ -434,6 +469,28 @@ export default function HubDashboard() {
 
       {/* Main Content - Constrained width */}
       <div className="max-w-5xl mx-auto px-4 md:px-6 py-6">
+        {/* Tour welcome card -- persistent until they take the tour */}
+        {tourChecked && !tourCompleted && !showTour && (
+          <div
+            className="mb-6 p-4 flex items-center justify-between rounded-xl"
+            style={{ backgroundColor: '#1e2749', border: '1px solid rgba(255,255,255,0.1)' }}
+          >
+            <div>
+              <p className="text-sm font-semibold text-white">{tUI('Welcome to the new TDI Learning Hub')}</p>
+              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{tUI('A lot has changed. Take a quick tour when you are ready.')}</p>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+              <button
+                onClick={() => setShowTour(true)}
+                className="text-xs font-semibold px-4 py-2 rounded-lg"
+                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+              >
+                {tUI('Take the tour')}
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Main Grid - Left column (main) + Right column (sidebar) */}
         <div className="grid lg:grid-cols-[1fr_340px] gap-6">
         {/* Left Column - Main Content */}
@@ -743,6 +800,9 @@ export default function HubDashboard() {
             </button>
           </div>
 
+          {/* The Gift */}
+          <GiftElement />
+
           {/* Achievements Widget */}
           <div
             className="bg-white rounded-2xl p-5 mb-4"
@@ -970,6 +1030,7 @@ export default function HubDashboard() {
         </div>
       </div>
     )}
+    {showTour && <OnboardingTour onComplete={handleTourComplete} />}
     </div>
   );
 }
