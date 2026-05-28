@@ -184,7 +184,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
                 className="text-xs font-bold tracking-widest uppercase mb-2"
                 style={{ color: '#9CA3AF', letterSpacing: '0.1em' }}
               >
-                {tUI('Daily check-in')}
+                {tUI('Vibe Check')}
               </div>
 
               {/* Question text */}
