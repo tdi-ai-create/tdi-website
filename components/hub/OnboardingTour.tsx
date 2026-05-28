@@ -541,18 +541,35 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
 
   return (
     <>
-      {/* Click-blocker behind spotlight */}
+      {/* Click-blocker behind spotlight -- clicking dark area does nothing (must use buttons) */}
       <div
         style={{
           position: 'fixed',
           inset: 0,
           zIndex: 1000009,
         }}
-        onClick={handleSkip}
+        onClick={(e) => e.stopPropagation()}
       />
 
       {/* Spotlight hole */}
       <div style={spotlightStyle} />
+
+      {/* Clickable area over the highlighted element -- advances tour */}
+      {hasTarget && targetRect && (
+        <div
+          style={{
+            position: 'fixed',
+            top: targetRect.top - PAD,
+            left: targetRect.left - PAD,
+            width: targetRect.width + PAD * 2,
+            height: targetRect.height + PAD * 2,
+            borderRadius: RADIUS,
+            zIndex: 1000012,
+            cursor: 'pointer',
+          }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); goNext(); }}
+        />
+      )}
 
       {/* Tooltip card */}
       <div
