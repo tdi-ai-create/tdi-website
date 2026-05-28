@@ -629,6 +629,29 @@ export default function ProfileSettingsPage() {
           </div>
         </div>
       )}
+
+      {/* Take the Tour */}
+      <div className="hub-card mb-6">
+        <h2
+          className="font-semibold mb-2"
+          style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67', fontSize: '16px' }}
+        >
+          Learning Hub Tour
+        </h2>
+        <p
+          className="text-sm mb-4"
+          style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}
+        >
+          Take a guided tour of the Hub features anytime. See what is new and discover tools you might have missed.
+        </p>
+        <Link
+          href="/hub?tour=start"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-opacity hover:opacity-90"
+          style={{ backgroundColor: '#ffba06', color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}
+        >
+          Take the tour
+        </Link>
+      </div>
     </div>
   );
 }

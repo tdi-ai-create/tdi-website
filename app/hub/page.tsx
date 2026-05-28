@@ -360,9 +360,19 @@ export default function HubDashboard() {
     loadSavedCourses();
   }, [favorites]);
 
-  // Check if user needs the onboarding tour
+  // Check if user needs the onboarding tour (or if ?tour=start was passed)
   useEffect(() => {
     if (!user?.id || tourChecked) return;
+
+    // Check for ?tour=start param (from Settings "Take the tour" link)
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('tour') === 'start') {
+      setTourChecked(true);
+      setShowTour(true);
+      // Clean up the URL
+      window.history.replaceState({}, '', '/hub');
+      return;
+    }
 
     async function checkTourStatus() {
       const supabase = getSupabase();
