@@ -69,8 +69,10 @@ export default function HubAuthGuard({ children }: HubAuthGuardProps) {
         setProfile(userProfile);
 
         // Check if onboarding is complete
-        // Redirect to onboarding if not completed and not already on an excluded route
-        if (userProfile && !userProfile.onboarding_completed && !skipOnboardingCheck) {
+        // Skip onboarding for owner/admin roles and migrated users
+        const skipRoles = ['owner', 'school_leader', 'district_staff'];
+        const isPrivilegedRole = userProfile?.role && skipRoles.includes(userProfile.role);
+        if (userProfile && !userProfile.onboarding_completed && !skipOnboardingCheck && !isPrivilegedRole) {
           router.push('/hub/onboarding');
           return;
         }
