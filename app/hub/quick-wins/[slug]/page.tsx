@@ -949,12 +949,12 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   className="bg-white rounded-2xl p-5 mb-4"
                   style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
                 >
-                  <h3
-                    className="text-xs font-semibold mb-3"
-                    style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.05em', textTransform: 'uppercase' as const }}
+                  <p
+                    className="mb-3"
+                    style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.05em', textTransform: 'uppercase' as const, fontSize: '11px', fontWeight: 600 }}
                   >
                     What educators are saying
-                  </h3>
+                  </p>
                   <div className="space-y-4">
                     {getTestimonials(quickWin.id).map((t, i) => (
                       <div
