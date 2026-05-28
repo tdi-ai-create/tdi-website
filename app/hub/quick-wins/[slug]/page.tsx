@@ -558,115 +558,151 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         </Link>
 
         <div
-          className="relative overflow-hidden p-6 md:p-10 mb-8"
+          className="relative overflow-hidden mb-8"
           style={{
             backgroundColor: '#1e2749',
             borderRadius: '20px',
           }}
         >
-          {/* Decorative circle */}
-          <div
-            className="absolute hidden md:block"
-            style={{
-              top: '-60px',
-              right: '-60px',
-              width: '300px',
-              height: '300px',
-              borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.06)',
-              pointerEvents: 'none',
-            }}
-          />
-
-          {/* Top row: branding + LIFT badge */}
-          <div className="flex items-center gap-3 mb-3">
-            <p
-              style={{
-                fontSize: '11px',
-                fontWeight: 600,
-                letterSpacing: '0.15em',
-                textTransform: 'uppercase' as const,
-                color: 'rgba(255,255,255,0.5)',
-              }}
-            >
-              TEACHERS DESERVE IT
-            </p>
-            {liftLabel && (
-              <div
-                className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full"
-                style={{ background: `${liftColor}30`, color: liftColor }}
-              >
-                <Zap size={10} />
-                {liftLabel}
+          <div className="flex flex-col md:flex-row">
+            {/* Left: content */}
+            <div className="flex-1 p-6 md:p-10">
+              {/* Top row: branding + LIFT badge */}
+              <div className="flex items-center gap-3 mb-3">
+                <p
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase' as const,
+                    color: 'rgba(255,255,255,0.5)',
+                  }}
+                >
+                  TEACHERS DESERVE IT
+                </p>
+                {liftLabel && (
+                  <div
+                    className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full"
+                    style={{ background: `${liftColor}30`, color: liftColor }}
+                  >
+                    <Zap size={10} />
+                    {liftLabel}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          {/* Category */}
-          {quickWin.category && (
-            <p
-              className="mb-1"
-              style={{
-                fontSize: '13px',
-                fontWeight: 600,
-                color: '#ffba06',
-                letterSpacing: '0.03em',
-              }}
-            >
-              {quickWin.category}
-            </p>
-          )}
+              {/* Category */}
+              {quickWin.category && (
+                <p
+                  className="mb-1"
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: '#ffba06',
+                    letterSpacing: '0.03em',
+                  }}
+                >
+                  {quickWin.category}
+                </p>
+              )}
 
-          {/* Title */}
-          <h1
-            className="font-bold mb-3 relative"
-            style={{
-              fontFamily: "'Source Serif 4', Georgia, serif",
-              fontSize: 'clamp(26px, 3.5vw, 34px)',
-              color: 'white',
-              lineHeight: '1.2',
-              maxWidth: '700px',
-            }}
-          >
-            {t(quickWin.title, quickWin.title_es)}
-          </h1>
+              {/* Title */}
+              <h1
+                className="font-bold mb-3"
+                style={{
+                  fontFamily: "'Source Serif 4', Georgia, serif",
+                  fontSize: 'clamp(26px, 3.5vw, 34px)',
+                  color: 'white',
+                  lineHeight: '1.2',
+                }}
+              >
+                {t(quickWin.title, quickWin.title_es)}
+              </h1>
 
-          {/* Description */}
-          {quickWin.description && (
-            <p
-              className="mb-4 relative"
-              style={{
-                fontSize: '15px',
-                color: 'rgba(255,255,255,0.65)',
-                lineHeight: '1.6',
-                maxWidth: '600px',
-              }}
-            >
-              {t(quickWin.description, quickWin.description_es)}
-            </p>
-          )}
+              {/* Description */}
+              {quickWin.description && (
+                <p
+                  className="mb-4"
+                  style={{
+                    fontSize: '15px',
+                    color: 'rgba(255,255,255,0.65)',
+                    lineHeight: '1.6',
+                  }}
+                >
+                  {t(quickWin.description, quickWin.description_es)}
+                </p>
+              )}
 
-          {/* Meta row */}
-          <div className="flex flex-wrap items-center gap-3 relative">
-            <div
-              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
-              style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}
-            >
-              <Clock size={12} />
-              {quickWin.estimated_minutes} min
+              {/* Meta row */}
+              <div className="flex flex-wrap items-center gap-3">
+                <div
+                  className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
+                  style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}
+                >
+                  <Clock size={12} />
+                  {quickWin.estimated_minutes} min
+                </div>
+                <div
+                  className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
+                  style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}
+                >
+                  <BookOpen size={12} />
+                  PDF Download
+                </div>
+                <div className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                  by Teachers Deserve It
+                </div>
+              </div>
             </div>
-            <div
-              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
-              style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}
-            >
-              <BookOpen size={12} />
-              PDF Download
-            </div>
-            <div
-              className="text-xs"
-              style={{ color: 'rgba(255,255,255,0.45)' }}
-            >
-              by Teachers Deserve It
+
+            {/* Right: action card inside hero */}
+            <div className="md:w-[280px] flex-shrink-0 p-6 md:p-8 flex flex-col justify-center gap-3">
+              {/* Download button */}
+              {quickWin.download_url ? (
+                <a
+                  href={quickWin.download_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 py-3 px-4 font-semibold text-sm rounded-xl transition-opacity hover:opacity-90"
+                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                >
+                  <Download size={16} />
+                  Download Tool
+                </a>
+              ) : (
+                <div
+                  className="flex items-center justify-center gap-2 py-3 px-4 text-sm rounded-xl"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.35)' }}
+                >
+                  <Download size={16} />
+                  Download coming soon
+                </div>
+              )}
+              {/* Save */}
+              <button
+                onClick={handleSaveToLibrary}
+                className="flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl transition-colors"
+                style={{
+                  backgroundColor: isSaved ? 'rgba(255,255,255,0.15)' : 'transparent',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: isSaved ? '#ffba06' : 'rgba(255,255,255,0.8)',
+                }}
+              >
+                <Bookmark size={14} fill={isSaved ? '#ffba06' : 'none'} />
+                {isSaved ? 'Saved' : 'Save to Library'}
+              </button>
+              {/* Share */}
+              <button
+                onClick={handleShareLink}
+                className="flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl transition-colors"
+                style={{
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: linkCopied ? '#ffba06' : 'rgba(255,255,255,0.8)',
+                }}
+              >
+                <Share2 size={14} />
+                {linkCopied ? 'Copied!' : 'Share'}
+              </button>
             </div>
           </div>
         </div>
