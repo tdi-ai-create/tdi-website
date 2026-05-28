@@ -185,8 +185,20 @@ export default function CertificatesPage() {
     });
   };
 
+  const earnedCount = recognitionData?.earned.length || 0;
+
   const handlePrint = useCallback((rec: Recognition) => {
     const displayName = profile?.display_name || 'Educator';
+    const roleMap: Record<string, string> = {
+      classroom_teacher: 'Classroom Teacher',
+      para: 'Paraprofessional',
+      coach: 'Instructional Coach',
+      school_leader: 'School Leader',
+      district_staff: 'District Staff',
+      other: '',
+    };
+    const role = profile?.role ? roleMap[profile.role] || '' : '';
+    const dateEarned = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
@@ -194,117 +206,379 @@ export default function CertificatesPage() {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>${rec.title} - Field Note</title>
+        <title>${rec.title} - Certificate of Recognition</title>
         <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
         <style>
-          @page { size: landscape; margin: 0; }
+          @page { size: portrait; margin: 0.5in; }
+          * { margin: 0; padding: 0; box-sizing: border-box; }
           body {
-            margin: 0;
-            padding: 0;
             font-family: 'DM Sans', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+            color: #1e2749;
             background: #fff;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
           }
-          .certificate {
-            width: 10in;
-            height: 7.5in;
-            padding: 1in;
-            box-sizing: border-box;
-            border: 3px solid #1e2749;
+
+          /* ===== PAGE 1: CERTIFICATE ===== */
+          .certificate-page {
+            width: 7.5in;
+            height: 10in;
+            margin: 0 auto;
+            padding: 0.6in;
             position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
+            border: 4px double #1e2749;
           }
-          .certificate::before {
+          .certificate-page::before {
             content: '';
             position: absolute;
-            inset: 8px;
-            border: 1px solid #ffba06;
+            inset: 6px;
+            border: 2px solid #ffba06;
+            pointer-events: none;
           }
-          .org {
+          .cert-org {
             font-family: 'Source Serif 4', Georgia, serif;
-            font-size: 14px;
-            letter-spacing: 4px;
+            font-size: 13px;
+            letter-spacing: 5px;
             text-transform: uppercase;
             color: #1e2749;
-            margin-bottom: 12px;
+            font-variant: small-caps;
+            margin-bottom: 14px;
           }
-          .divider {
+          .cert-divider {
             width: 60px;
             height: 3px;
             background: #ffba06;
-            margin: 16px auto;
+            margin: 14px auto;
+            border: none;
           }
-          .title {
+          .cert-subtitle {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            color: #9CA3AF;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+          }
+          .cert-title {
             font-family: 'Source Serif 4', Georgia, serif;
-            font-size: 36px;
+            font-size: 38px;
             font-weight: 700;
             color: #1e2749;
-            margin: 12px 0 8px;
+            line-height: 1.2;
+            margin-bottom: 6px;
           }
-          .description {
-            font-size: 16px;
-            color: #4a5568;
-            margin-bottom: 20px;
+          .cert-presented {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            color: #9CA3AF;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 18px;
+            margin-bottom: 6px;
           }
-          .note {
-            font-style: italic;
-            font-size: 15px;
-            color: #1e2749;
-            max-width: 500px;
-            line-height: 1.6;
-            margin-bottom: 24px;
-          }
-          .name {
+          .cert-name {
             font-family: 'Source Serif 4', Georgia, serif;
-            font-size: 22px;
-            font-weight: 600;
+            font-size: 26px;
+            font-weight: 700;
             color: #1e2749;
             margin-bottom: 4px;
           }
-          .date {
-            font-size: 13px;
-            color: #718096;
+          .cert-role {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 16px;
           }
-          .footer {
-            position: absolute;
-            bottom: 40px;
+          .cert-journey {
+            font-family: 'Source Serif 4', Georgia, serif;
             font-style: italic;
+            font-size: 14px;
+            color: #6B7280;
+            max-width: 440px;
+            line-height: 1.7;
+            margin-bottom: 16px;
+          }
+          .cert-note {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-style: italic;
+            font-size: 15px;
+            color: #1e2749;
+            max-width: 460px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+          }
+          .cert-date {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: #6B7280;
+            margin-bottom: 18px;
+          }
+          .cert-signature {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 14px;
+            color: #1e2749;
+            margin-bottom: 2px;
+          }
+          .cert-website {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            color: #9CA3AF;
+          }
+          .cert-footer {
+            position: absolute;
+            bottom: 28px;
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-style: italic;
+            font-size: 11px;
+            color: #9CA3AF;
+          }
+
+          /* ===== PAGE 2: PD ADVOCACY TOOLKIT ===== */
+          .toolkit-page {
+            page-break-before: always;
+            width: 7.5in;
+            margin: 0 auto;
+            padding: 0.4in 0;
+            font-family: 'DM Sans', sans-serif;
+          }
+          .toolkit-header {
+            text-align: center;
+            margin-bottom: 28px;
+            padding-bottom: 18px;
+            border-bottom: 2px solid #ffba06;
+          }
+          .toolkit-header h1 {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: #1e2749;
+            margin-bottom: 4px;
+          }
+          .toolkit-header p {
+            font-size: 13px;
+            color: #9CA3AF;
+          }
+          .toolkit-section {
+            margin-bottom: 22px;
+          }
+          .toolkit-section h2 {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e2749;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e5e7eb;
+          }
+          .toolkit-section p,
+          .toolkit-section li {
+            font-size: 12.5px;
+            color: #374151;
+            line-height: 1.65;
+          }
+          .toolkit-section ul {
+            list-style: none;
+            padding: 0;
+          }
+          .toolkit-section ul li {
+            padding: 3px 0 3px 20px;
+            position: relative;
+          }
+          .toolkit-section ul li::before {
+            content: attr(data-icon);
+            position: absolute;
+            left: 0;
+            top: 3px;
+          }
+          .toolkit-section ol {
+            padding-left: 20px;
+          }
+          .toolkit-section ol li {
+            padding: 3px 0;
+          }
+          .email-template {
+            border: 1.5px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin-top: 10px;
+            background: #fafafa;
             font-size: 12px;
-            color: #a0aec0;
+            color: #374151;
+            line-height: 1.7;
+            white-space: pre-wrap;
+          }
+          .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 8px;
+          }
+          .stat-box {
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 12px 14px;
+            text-align: center;
+          }
+          .stat-box .stat-value {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e2749;
+          }
+          .stat-box .stat-label {
+            font-size: 11px;
+            color: #6B7280;
+            margin-top: 2px;
+          }
+          .toolkit-footer {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 14px;
+            border-top: 2px solid #ffba06;
+          }
+          .toolkit-footer .tf-brand {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e2749;
+          }
+          .toolkit-footer .tf-url {
+            font-size: 12px;
+            color: #6B7280;
+            margin-top: 2px;
+          }
+          .toolkit-footer .tf-tagline {
+            font-size: 11px;
+            color: #9CA3AF;
+            font-style: italic;
+            margin-top: 4px;
+          }
+          .toolkit-questions p {
+            font-size: 12.5px;
+            color: #374151;
+            line-height: 1.65;
           }
         </style>
       </head>
       <body>
-        <div class="certificate">
-          <div class="org">Teachers Deserve It</div>
-          <div class="divider"></div>
-          <div class="title">${rec.title}</div>
-          <div class="description">${rec.description}</div>
-          <div class="divider"></div>
-          <div class="note">${rec.personalNote}</div>
-          <div class="name">${displayName}</div>
-          <div class="date">${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
-          <div class="footer">Just in case no one told you today, we see you.</div>
+        <!-- PAGE 1: CERTIFICATE -->
+        <div class="certificate-page">
+          <div class="cert-org">Teachers Deserve It</div>
+          <div class="cert-divider"></div>
+          <div class="cert-subtitle">Certificate of Recognition</div>
+          <div class="cert-title">${rec.title}</div>
+          <div class="cert-presented">Presented to</div>
+          <div class="cert-name">${displayName}</div>
+          ${role ? `<div class="cert-role">${role}</div>` : '<div style="margin-bottom:16px"></div>'}
+          <div class="cert-journey">You explored ${toolsExplored} tools, saved an estimated ${hoursSaved} hours of planning time, and showed up for yourself on ${daysActive} different days.</div>
+          <div class="cert-divider"></div>
+          <div class="cert-note">${rec.personalNote}</div>
+          <div class="cert-date">${dateEarned}</div>
+          <div class="cert-signature">&mdash;&mdash; Teachers Deserve It</div>
+          <div class="cert-website">teachersdeserveit.com</div>
+          <div class="cert-footer">Just in case no one told you today, we see you.</div>
         </div>
-        <script>window.onload = function() { window.print(); }</script>
+
+        <!-- PAGE 2: PD ADVOCACY TOOLKIT -->
+        <div class="toolkit-page">
+          <div class="toolkit-header">
+            <h1>Your PD Advocacy Toolkit</h1>
+            <p>From Teachers Deserve It</p>
+          </div>
+
+          <div class="toolkit-section">
+            <h2>What This Certificate Means</h2>
+            <p>This certificate documents your self-directed professional growth through the Teachers Deserve It Learning Hub. TDI is approved for professional development hours in all 50 states. The work you do here counts &mdash; and this certificate is your proof.</p>
+          </div>
+
+          <div class="toolkit-section">
+            <h2>How to Submit for PD Credit</h2>
+            <ol>
+              <li>Print this certificate (you&rsquo;re doing it right now!)</li>
+              <li>Email or hand-deliver to your principal or PD coordinator</li>
+              <li>Reference your state&rsquo;s requirements at your Department of Education website</li>
+              <li>Keep a copy in your professional portfolio</li>
+            </ol>
+          </div>
+
+          <div class="toolkit-section">
+            <h2>Sample Email Template</h2>
+            <div class="email-template">Dear [Principal/PD Coordinator],
+
+I completed professional development through Teachers Deserve It Learning Hub, an approved PD provider recognized in all 50 states. Attached is my certificate documenting this growth.
+
+During this period, I explored ${toolsExplored} tools, completed self-directed professional learning, and saved an estimated ${hoursSaved} hours of planning time. I would be happy to share what I learned with our team if that would be helpful.
+
+Thank you for supporting my professional growth.
+
+${displayName}</div>
+          </div>
+
+          <div class="toolkit-section">
+            <h2>Ways to Use This Certificate</h2>
+            <ul>
+              <li data-icon="\u{1F5BC}">Print and frame for your classroom or office</li>
+              <li data-icon="\u{1F4C2}">Add to your professional evaluation portfolio</li>
+              <li data-icon="\u{1F4CB}">Submit for PD recertification hours</li>
+              <li data-icon="\u{1F310}">Share on LinkedIn or professional networks</li>
+              <li data-icon="\u{1F4C4}">Include in your annual review documentation</li>
+              <li data-icon="\u{2709}">Forward to your principal using the email template above</li>
+              <li data-icon="\u{2B50}">Add to your resume under Professional Development</li>
+            </ul>
+          </div>
+
+          <div class="toolkit-section">
+            <h2>Your Growth at a Glance</h2>
+            <div class="stats-grid">
+              <div class="stat-box">
+                <div class="stat-value">${toolsExplored}</div>
+                <div class="stat-label">Tools explored</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value">${hoursSaved}</div>
+                <div class="stat-label">Hours saved</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value">${daysActive}</div>
+                <div class="stat-label">Days active</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value">${earnedCount}</div>
+                <div class="stat-label">Recognitions earned</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="toolkit-section toolkit-questions">
+            <h2>Questions?</h2>
+            <p>Email hello@teachersdeserveit.com</p>
+            <p>Visit teachersdeserveit.com/hub for more tools</p>
+            <p>All 50 states accept TDI for PD credit</p>
+          </div>
+
+          <div class="toolkit-footer">
+            <div class="tf-brand">Teachers Deserve It</div>
+            <div class="tf-url">teachersdeserveit.com</div>
+            <div class="tf-tagline">Built by educators, for educators</div>
+          </div>
+        </div>
+
+        <script>window.onload = function() { window.print(); }<\/script>
       </body>
       </html>
     `);
     printWindow.document.close();
-  }, [profile?.display_name]);
+  }, [profile, toolsExplored, hoursSaved, daysActive, earnedCount]);
 
   const getIcon = (iconName: string): LucideIcon => {
     return ICON_MAP[iconName] || Star;
   };
 
-  const earnedCount = recognitionData?.earned.length || 0;
   const totalRecognitions = RECOGNITIONS.length;
   const progressPercent = totalRecognitions > 0 ? (earnedCount / totalRecognitions) * 100 : 0;
 
