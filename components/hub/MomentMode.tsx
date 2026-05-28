@@ -99,8 +99,15 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   // Box breathing state
   const [breathPhase, setBreathPhase] = useState<BreathPhase>('inhale');
   const [breathCycle, setBreathCycle] = useState(1);
+  const breathCycleRef = useRef(1);
   const [phaseTimer, setPhaseTimer] = useState(BREATH_DURATION);
   const breathingRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Gentle tools state
+  const [gentleTools, setGentleTools] = useState<any[]>([]);
+
+  // Anonymous vent confirmation state
+  const [ventSent, setVentSent] = useState(false);
 
   // Affirmation state
   const [affirmations, setAffirmations] = useState<string[]>(FALLBACK_AFFIRMATIONS);
@@ -118,11 +125,13 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   // Access global Moment Mode context to suppress notifications
   const { setMomentModeActive } = useMomentMode();
 
-  // Fetch affirmations from TDI tips on mount
+  // Fetch affirmations and gentle tools on mount
   useEffect(() => {
-    async function fetchAffirmations() {
+    async function fetchData() {
       try {
         const supabase = getSupabase();
+
+        // Fetch affirmations
         const { data } = await supabase
           .from('hub_tdi_tips')
           .select('content')
@@ -133,11 +142,23 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
         if (data && data.length > 0) {
           setAffirmations(data.map((t) => t.content));
         }
+
+        // Fetch gentle tools (low-lift quick wins)
+        const { data: gentleData } = await supabase
+          .from('hub_quick_wins')
+          .select('id, slug, title, description, category')
+          .eq('is_published', true)
+          .eq('lift', 'LOW')
+          .limit(6);
+
+        if (gentleData && gentleData.length > 0) {
+          setGentleTools(gentleData);
+        }
       } catch {
-        // Use fallback affirmations
+        // Use fallback affirmations and hardcoded gentle tools
       }
     }
-    fetchAffirmations();
+    fetchData();
   }, []);
 
   // Handle escape key
@@ -215,17 +236,12 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
               if (currentPhase === 'hold1') return 'exhale';
               if (currentPhase === 'exhale') return 'hold2';
               if (currentPhase === 'hold2') {
-                // End of cycle
-                setBreathCycle((currentCycle) => {
-                  if (currentCycle >= TOTAL_CYCLES) {
-                    return currentCycle; // Stay at max
-                  }
-                  return currentCycle + 1;
-                });
-                // Check if we completed all cycles
-                if (breathCycle >= TOTAL_CYCLES) {
+                // End of cycle - use ref for accurate cycle count
+                if (breathCycleRef.current >= TOTAL_CYCLES) {
                   return 'complete';
                 }
+                breathCycleRef.current += 1;
+                setBreathCycle(breathCycleRef.current);
                 return 'inhale';
               }
               return currentPhase;
@@ -240,7 +256,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
     return () => {
       if (breathingRef.current) clearInterval(breathingRef.current);
     };
-  }, [state, breathPhase, breathCycle]);
+  }, [state, breathPhase]);
 
   const handleClose = () => {
     // Log moment mode completed when closing after meaningful use (30+ seconds)
@@ -274,6 +290,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
     setNoteText('');
     setNoteSent(false);
     setShowNoteForm(false);
+    setVentSent(false);
     if (timerRef.current) clearInterval(timerRef.current);
     onClose();
   };
@@ -281,6 +298,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   const resetBreathing = () => {
     setBreathPhase('inhale');
     setBreathCycle(1);
+    breathCycleRef.current = 1;
     setPhaseTimer(BREATH_DURATION);
     if (breathingRef.current) clearInterval(breathingRef.current);
   };
@@ -343,9 +361,31 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
     }
   };
 
-  const handleAnonymousSubmit = () => {
+  const handleAnonymousSubmit = async () => {
+    if (!anonymousVent.trim()) return;
+
+    try {
+      await fetch('/api/hub/anonymous-vent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: anonymousVent.trim() }),
+      });
+
+      // Log to activity log (without the message content - keep it anonymous)
+      const supabase = getSupabase();
+      if (user?.id) {
+        await supabase.from('hub_activity_log').insert({
+          user_id: user.id,
+          action: 'moment_anonymous_vent',
+          metadata: { submitted_at: new Date().toISOString() },
+        });
+      }
+    } catch {
+      // Silent fail - don't stress the user
+    }
+
     setAnonymousVent('');
-    alert('Your message has been received. Take care of yourself.');
+    setVentSent(true);
   };
 
   const getBreathPhaseText = (): string => {
@@ -491,6 +531,14 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                 onClick={() => {
                   resetBreathing();
                   setState('pause');
+                  if (user?.id) {
+                    const supabase = getSupabase();
+                    void supabase.from('hub_activity_log').insert({
+                      user_id: user.id,
+                      action: 'moment_feature_used',
+                      metadata: { feature: 'breathing', used_at: new Date().toISOString() },
+                    });
+                  }
                 }}
                 className="w-full flex items-center justify-center gap-3 p-4 rounded-lg transition-all hover:bg-white/20"
                 style={{
@@ -505,7 +553,17 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
               </button>
 
               <button
-                onClick={() => setState('affirmation')}
+                onClick={() => {
+                  setState('affirmation');
+                  if (user?.id) {
+                    const supabase = getSupabase();
+                    void supabase.from('hub_activity_log').insert({
+                      user_id: user.id,
+                      action: 'moment_feature_used',
+                      metadata: { feature: 'affirmation', used_at: new Date().toISOString() },
+                    });
+                  }
+                }}
                 className="w-full flex items-center justify-center gap-3 p-4 rounded-lg transition-all hover:bg-white/20"
                 style={{
                   fontFamily: "'DM Sans', sans-serif",
@@ -519,7 +577,17 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
               </button>
 
               <button
-                onClick={() => setState('gentle')}
+                onClick={() => {
+                  setState('gentle');
+                  if (user?.id) {
+                    const supabase = getSupabase();
+                    void supabase.from('hub_activity_log').insert({
+                      user_id: user.id,
+                      action: 'moment_feature_used',
+                      metadata: { feature: 'gentle_tools', used_at: new Date().toISOString() },
+                    });
+                  }
+                }}
                 className="w-full flex items-center justify-center gap-3 p-4 rounded-lg transition-all hover:bg-white/20"
                 style={{
                   fontFamily: "'DM Sans', sans-serif",
@@ -533,7 +601,17 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
               </button>
 
               <button
-                onClick={() => setState('journal')}
+                onClick={() => {
+                  setState('journal');
+                  if (user?.id) {
+                    const supabase = getSupabase();
+                    void supabase.from('hub_activity_log').insert({
+                      user_id: user.id,
+                      action: 'moment_feature_used',
+                      metadata: { feature: 'write_it_out', used_at: new Date().toISOString() },
+                    });
+                  }
+                }}
                 className="w-full flex items-center justify-center gap-3 p-4 rounded-lg transition-all hover:bg-white/20"
                 style={{
                   fontFamily: "'DM Sans', sans-serif",
@@ -838,62 +916,137 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
             </h3>
 
             <div>
-              {GENTLE_TOOLS.map((tool, index) => (
-                <button
-                  key={index}
-                  className="w-full text-left transition-all hover:bg-white/20"
-                  style={{
-                    padding: '12px 16px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '8px',
-                    marginBottom: '8px',
-                  }}
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <p
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: '15px',
-                          fontWeight: 600,
-                          color: 'white',
-                          lineHeight: '1.3',
-                        }}
-                      >
-                        {tool.title}
-                      </p>
-                      <p
-                        className="truncate"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: '13px',
-                          color: 'rgba(255, 255, 255, 0.6)',
-                          marginTop: '2px',
-                        }}
-                      >
-                        {tool.description}
-                      </p>
+              {(gentleTools.length > 0 ? gentleTools : GENTLE_TOOLS).map((tool, index) => {
+                const isFromDb = gentleTools.length > 0 && 'slug' in tool;
+                return isFromDb ? (
+                  <a
+                    key={tool.id || index}
+                    href={`/hub/quick-wins/${tool.slug}`}
+                    className="w-full text-left transition-all hover:bg-white/20 block"
+                    style={{
+                      padding: '12px 16px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '8px',
+                      marginBottom: '8px',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            fontSize: '15px',
+                            fontWeight: 600,
+                            color: 'white',
+                            lineHeight: '1.3',
+                          }}
+                        >
+                          {tool.title}
+                        </p>
+                        {tool.description && (
+                          <p
+                            className="truncate"
+                            style={{
+                              fontFamily: "'DM Sans', sans-serif",
+                              fontSize: '13px',
+                              color: 'rgba(255, 255, 255, 0.6)',
+                              marginTop: '2px',
+                            }}
+                          >
+                            {tool.description}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {tool.category && (
+                          <span
+                            style={{
+                              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                              color: 'rgba(255, 255, 255, 0.7)',
+                              fontFamily: "'DM Sans', sans-serif",
+                              fontSize: '10px',
+                              fontWeight: 600,
+                              padding: '3px 8px',
+                              borderRadius: '10px',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.05em',
+                            }}
+                          >
+                            {tool.category}
+                          </span>
+                        )}
+                        <span
+                          style={{
+                            color: '#E8B84B',
+                            fontFamily: "'DM Sans', sans-serif",
+                            fontSize: '12px',
+                            fontWeight: 600,
+                          }}
+                        >
+                          Try it &rarr;
+                        </span>
+                      </div>
                     </div>
-                    <span
-                      className="flex-shrink-0 inline-flex items-center gap-1"
-                      style={{
-                        backgroundColor: 'rgba(232, 184, 75, 0.2)',
-                        color: '#E8B84B',
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        padding: '4px 10px',
-                        borderRadius: '12px',
-                        border: '1px solid #E8B84B',
-                      }}
-                    >
-                      {tool.type === 'download' && <Download size={12} />}
-                      {tool.type === 'quick-win' ? 'Quick Win' : 'Download'}
-                    </span>
-                  </div>
-                </button>
-              ))}
+                  </a>
+                ) : (
+                  <button
+                    key={index}
+                    className="w-full text-left transition-all hover:bg-white/20"
+                    style={{
+                      padding: '12px 16px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '8px',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            fontSize: '15px',
+                            fontWeight: 600,
+                            color: 'white',
+                            lineHeight: '1.3',
+                          }}
+                        >
+                          {tool.title}
+                        </p>
+                        <p
+                          className="truncate"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            fontSize: '13px',
+                            color: 'rgba(255, 255, 255, 0.6)',
+                            marginTop: '2px',
+                          }}
+                        >
+                          {tool.description}
+                        </p>
+                      </div>
+                      <span
+                        className="flex-shrink-0 inline-flex items-center gap-1"
+                        style={{
+                          backgroundColor: 'rgba(232, 184, 75, 0.2)',
+                          color: '#E8B84B',
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          padding: '4px 10px',
+                          borderRadius: '12px',
+                          border: '1px solid #E8B84B',
+                        }}
+                      >
+                        {tool.type === 'download' && <Download size={12} />}
+                        {tool.type === 'quick-win' ? 'Quick Win' : 'Download'}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -980,39 +1133,59 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
 
             {journalTab === 'anonymous' && (
               <div>
-                <p
-                  className="text-sm mb-4"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    color: 'rgba(255, 255, 255, 0.6)',
-                  }}
-                >
-                  Send an anonymous message. No name, no tracking, just release.
-                </p>
-                <textarea
-                  value={anonymousVent}
-                  onChange={(e) => setAnonymousVent(e.target.value)}
-                  placeholder="Let it out..."
-                  className="w-full h-40 p-4 rounded-lg resize-none focus:outline-none mb-4"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    color: 'white',
-                  }}
-                />
-                <button
-                  onClick={handleAnonymousSubmit}
-                  disabled={!anonymousVent.trim()}
-                  className="w-full py-3 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    backgroundColor: '#E8B84B',
-                    color: '#2B3A67',
-                  }}
-                >
-                  {tUI('Send anonymously')}
-                </button>
+                {ventSent ? (
+                  <div
+                    className="text-center py-8"
+                    style={{ animation: 'fadeIn 0.5s ease-out' }}
+                  >
+                    <p
+                      className="leading-relaxed"
+                      style={{
+                        fontFamily: "'Source Serif 4', Georgia, serif",
+                        fontSize: '17px',
+                        color: 'rgba(255, 255, 255, 0.9)',
+                      }}
+                    >
+                      Your words have been received. Take care of yourself.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <p
+                      className="text-sm mb-4"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        color: 'rgba(255, 255, 255, 0.6)',
+                      }}
+                    >
+                      Send an anonymous message. No name, no tracking, just release.
+                    </p>
+                    <textarea
+                      value={anonymousVent}
+                      onChange={(e) => setAnonymousVent(e.target.value)}
+                      placeholder="Let it out..."
+                      className="w-full h-40 p-4 rounded-lg resize-none focus:outline-none mb-4"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        color: 'white',
+                      }}
+                    />
+                    <button
+                      onClick={handleAnonymousSubmit}
+                      disabled={!anonymousVent.trim()}
+                      className="w-full py-3 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        backgroundColor: '#E8B84B',
+                        color: '#2B3A67',
+                      }}
+                    >
+                      {tUI('Send anonymously')}
+                    </button>
+                  </>
+                )}
               </div>
             )}
           </div>
