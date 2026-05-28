@@ -483,7 +483,7 @@ export default function HubDashboard() {
                   {/* Where to Start - new user experience */}
                   <h2
                     className="font-semibold mb-1"
-                    style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif", fontSize: '16px' }}
+                    style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif", fontSize: '20px' }}
                   >
                     {tUI('Your first 5 minutes start here')}
                   </h2>
