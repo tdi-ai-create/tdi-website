@@ -27,6 +27,8 @@ import {
   Mail,
   MessageCircle,
   Check,
+  Lightbulb,
+  Target,
 } from 'lucide-react';
 
 // Daily motivational messages - picks based on day of week
@@ -153,8 +155,27 @@ interface QuickWin {
   id: string;
   slug: string;
   title: string;
+  description?: string;
   duration_minutes: number;
   category: string;
+}
+
+interface PersonalStats {
+  toolsExplored: number;
+  hoursSaved: number;
+  communitySize: number;
+}
+
+interface CommunityPulse {
+  exploring: number;
+  shared: number;
+}
+
+interface CommunityHighlight {
+  status: string;
+  body: string;
+  quickWinTitle: string;
+  quickWinSlug: string;
 }
 
 interface SavedCourse {
@@ -186,6 +207,11 @@ export default function HubDashboard() {
   const [showTour, setShowTour] = useState(false);
   const [tourChecked, setTourChecked] = useState(false);
   const [tourCompleted, setTourCompleted] = useState(false);
+  const [personalStats, setPersonalStats] = useState<PersonalStats | null>(null);
+  const [communityPulse, setCommunityPulse] = useState<CommunityPulse | null>(null);
+  const [featuredQuickWin, setFeaturedQuickWin] = useState<QuickWin | null>(null);
+  const [communityHighlights, setCommunityHighlights] = useState<CommunityHighlight[]>([]);
+  const [userGoal, setUserGoal] = useState<{ text: string; quickWin: QuickWin | null } | null>(null);
 
   const firstName = profile?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Teacher';
   const dailyMessage = DAILY_MESSAGES[new Date().getDay()];
@@ -257,23 +283,54 @@ export default function HubDashboard() {
           setEnrollments(enrichedEnrollments as Enrollment[]);
         }
 
-        // Fetch quick wins from hub_quick_wins
-        const { data: quickWinData } = await supabase
+        // Fetch ALL published quick wins for deterministic daily pick + role filtering
+        const { data: allQuickWinData } = await supabase
           .from('hub_quick_wins')
-          .select('id, slug, title, duration_minutes, category')
-          .eq('is_published', true)
-          .limit(6);
+          .select('id, slug, title, description, duration_minutes, category')
+          .eq('is_published', true);
 
-        if (quickWinData && quickWinData.length > 0) {
-          const mapped: QuickWin[] = quickWinData.map((qw) => ({
+        if (allQuickWinData && allQuickWinData.length > 0) {
+          let pool: QuickWin[] = allQuickWinData.map((qw) => ({
             id: qw.id,
             slug: qw.slug,
             title: qw.title,
+            description: qw.description || undefined,
             duration_minutes: qw.duration_minutes || 5,
             category: qw.category || 'Classroom Tools',
           }));
-          setQuickWins(mapped.slice(0, 3));
-          setFeaturedQuickWins(mapped.slice(0, 3));
+
+          // Role-specific filtering (Feature 4)
+          const userRole = profile?.role;
+          if (userRole && pool.length > 3) {
+            const roleCategories: Record<string, string[]> = {
+              coach: ['Leadership', 'Communication'],
+              school_leader: ['Leadership'],
+              para: ['Para'],
+            };
+            const preferred = roleCategories[userRole];
+            if (preferred) {
+              const filtered = pool.filter((qw) =>
+                preferred.some((cat) => qw.category.toLowerCase().includes(cat.toLowerCase()))
+              );
+              if (filtered.length >= 3) {
+                pool = filtered;
+              }
+            }
+            // classroom_teacher: no filter, show all
+          }
+
+          // Day-of-year for deterministic daily pick
+          const dayOfYearQW = Math.floor(
+            (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
+          );
+          const featuredIndex = dayOfYearQW % pool.length;
+          const featured = pool[featuredIndex];
+          setFeaturedQuickWin(featured);
+
+          // Remaining quick wins (exclude featured, take 2)
+          const remaining = pool.filter((qw) => qw.id !== featured.id).slice(0, 2);
+          setQuickWins(remaining);
+          setFeaturedQuickWins([featured, ...remaining]);
         }
 
         // Fetch TDI tip - pick based on date
@@ -324,6 +381,133 @@ export default function HubDashboard() {
           setFieldNotesCount(recResult.earned.length);
         } catch {
           // Silent fail
+        }
+
+        // --- New dashboard enrichment queries (Features 1, 2, 5, 6) ---
+        const now = new Date();
+        const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000).toISOString();
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000).toISOString();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+
+        try {
+          const [
+            toolsExploredResult,
+            communityJoinedResult,
+            exploringTodayResult,
+            sharedTodayResult,
+            highlightsResult,
+          ] = await Promise.all([
+            // Feature 1: tools explored this month
+            supabase
+              .from('hub_activity_log')
+              .select('id', { count: 'exact', head: true })
+              .eq('user_id', user.id)
+              .eq('action', 'quick_win_viewed')
+              .gte('created_at', thirtyDaysAgo),
+            // Feature 1: educators joined this week
+            supabase
+              .from('hub_profiles')
+              .select('id', { count: 'exact', head: true })
+              .gte('created_at', sevenDaysAgo),
+            // Feature 2: distinct users exploring today
+            supabase
+              .from('hub_activity_log')
+              .select('user_id')
+              .gte('created_at', todayStart),
+            // Feature 2: shared experiences today
+            supabase
+              .from('quick_win_responses')
+              .select('id', { count: 'exact', head: true })
+              .gte('created_at', todayStart),
+            // Feature 5: recent community highlights
+            supabase
+              .from('quick_win_responses')
+              .select('contribution_type, body, quick_win_id')
+              .order('created_at', { ascending: false })
+              .limit(3),
+          ]);
+
+          // Personal stats
+          const toolsCount = toolsExploredResult.count || 0;
+          setPersonalStats({
+            toolsExplored: toolsCount,
+            hoursSaved: Math.round((toolsCount * 5) / 60 * 10) / 10,
+            communitySize: communityJoinedResult.count || 0,
+          });
+
+          // Community pulse - count distinct user_ids
+          const distinctUsers = new Set(
+            (exploringTodayResult.data || []).map((r: { user_id: string }) => r.user_id)
+          );
+          setCommunityPulse({
+            exploring: distinctUsers.size,
+            shared: sharedTodayResult.count || 0,
+          });
+
+          // Community highlights - enrich with quick win titles
+          if (highlightsResult.data && highlightsResult.data.length > 0) {
+            const qwIds = [...new Set(highlightsResult.data.map((r: { quick_win_id: string }) => r.quick_win_id))];
+            const { data: qwTitles } = await supabase
+              .from('hub_quick_wins')
+              .select('id, title, slug')
+              .in('id', qwIds);
+
+            const titleMap = new Map((qwTitles || []).map((q: { id: string; title: string; slug: string }) => [q.id, { title: q.title, slug: q.slug }]));
+
+            setCommunityHighlights(
+              highlightsResult.data.map((r: { contribution_type: string; body: string; quick_win_id: string }) => {
+                const qw = titleMap.get(r.quick_win_id) || { title: 'Quick Win', slug: '' };
+                return {
+                  status: r.contribution_type === 'tried_it' ? 'Tried it' : r.contribution_type === 'adapted_it' ? 'Adapted it' : r.contribution_type.replace(/_/g, ' '),
+                  body: (r.body || '').slice(0, 50) + ((r.body || '').length > 50 ? '...' : ''),
+                  quickWinTitle: qw.title,
+                  quickWinSlug: qw.slug,
+                };
+              })
+            );
+          }
+
+          // Feature 6: Goals reminder
+          const onboardingData = profile?.onboarding_data as Record<string, unknown> | undefined;
+          const goals = (onboardingData?.goals as string[]) || [];
+          if (goals.length > 0 && allQuickWinData && allQuickWinData.length > 0) {
+            const goalText = goals[0];
+            // Try to find a quick win matching the goal theme
+            const goalLower = goalText.toLowerCase();
+            const matchingQW = allQuickWinData.find((qw) =>
+              (qw.title || '').toLowerCase().includes(goalLower) ||
+              (qw.description || '').toLowerCase().includes(goalLower) ||
+              (qw.category || '').toLowerCase().includes(goalLower)
+            );
+            if (matchingQW) {
+              setUserGoal({
+                text: goalText,
+                quickWin: {
+                  id: matchingQW.id,
+                  slug: matchingQW.slug,
+                  title: matchingQW.title,
+                  duration_minutes: matchingQW.duration_minutes || 5,
+                  category: matchingQW.category || 'Classroom Tools',
+                },
+              });
+            } else {
+              // Show goal with a random quick win suggestion
+              const randomQW = allQuickWinData[0];
+              setUserGoal({
+                text: goalText,
+                quickWin: randomQW ? {
+                  id: randomQW.id,
+                  slug: randomQW.slug,
+                  title: randomQW.title,
+                  duration_minutes: randomQW.duration_minutes || 5,
+                  category: randomQW.category || 'Classroom Tools',
+                } : null,
+              });
+            }
+          }
+        } catch (enrichErr) {
+          console.error('Error loading dashboard enrichment data:', enrichErr);
+          // Non-critical, dashboard still works without enrichment
         }
       } catch (error) {
         console.error('Error loading dashboard data:', error);
@@ -525,6 +709,41 @@ export default function HubDashboard() {
         <div className="grid lg:grid-cols-[1fr_340px] gap-6">
         {/* Left Column - Main Content */}
         <div className="space-y-6">
+          {/* Feature 1: Personal Stats Card */}
+          {personalStats && (personalStats.toolsExplored > 0 || personalStats.communitySize > 0) && (
+            <div
+              className="bg-white rounded-2xl p-5"
+              style={{ border: '0.5px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
+            >
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif" }}>
+                    {personalStats.toolsExplored}
+                  </div>
+                  <div className="text-xs mt-1" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
+                    {tUI('tools explored this month')}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif" }}>
+                    ~{personalStats.hoursSaved}
+                  </div>
+                  <div className="text-xs mt-1" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
+                    {tUI('hours saved')}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif" }}>
+                    {personalStats.communitySize}
+                  </div>
+                  <div className="text-xs mt-1" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
+                    {tUI('educators joined this week')}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Continue Learning / Where to Start Section */}
           <div>
             <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
@@ -577,7 +796,7 @@ export default function HubDashboard() {
                 </div>
               ) : (
                 <div className="p-6">
-                  {/* Where to Start - new user experience */}
+                  {/* Where to Start - new user experience with Featured Quick Win */}
                   <h2
                     className="font-semibold mb-1"
                     style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif", fontSize: '20px' }}
@@ -588,10 +807,67 @@ export default function HubDashboard() {
                     {tUI('Pick a quick win to try right now, or dive into a full course. No pressure, no deadlines.')}
                   </p>
 
-                  {/* Featured Quick Wins grid */}
-                  {featuredQuickWins.length > 0 && (
+                  {/* Feature 3: Today's Pick Hero Card */}
+                  {featuredQuickWin && (() => {
+                    const categoryColors: Record<string, string> = {
+                      'Stress Relief': '#E0F4FF',
+                      'Time Savers': '#FEF3C7',
+                      'Classroom Tools': '#E8F5E9',
+                      'Communication': '#F3E8FF',
+                      'Self-Care': '#FCE7F3',
+                    };
+                    const categoryBg = categoryColors[featuredQuickWin.category] || '#F3F4F6';
+                    const pickLabel = profile?.role
+                      ? `Picked for ${roleLabel.toLowerCase()}s`
+                      : "Today's pick for you";
+                    return (
+                      <div
+                        className="rounded-xl p-5 mb-4"
+                        style={{ background: 'linear-gradient(135deg, #FAFAF8 0%, #FFF8E7 100%)', border: '1px solid #E9E7E2' }}
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <Lightbulb size={14} style={{ color: '#D97706' }} />
+                          <span className="text-xs font-semibold" style={{ color: '#D97706' }}>
+                            {tUI(pickLabel)}
+                          </span>
+                        </div>
+                        <span
+                          className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-2"
+                          style={{ background: categoryBg, color: '#1e2749', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                        >
+                          {featuredQuickWin.category}
+                        </span>
+                        <div
+                          className="text-lg font-semibold mb-1"
+                          style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif" }}
+                        >
+                          {featuredQuickWin.title}
+                        </div>
+                        {featuredQuickWin.description && (
+                          <p className="text-sm mb-3" style={{ color: '#6B7280', lineHeight: '1.5' }}>
+                            {featuredQuickWin.description.slice(0, 120)}{featuredQuickWin.description.length > 120 ? '...' : ''}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-3">
+                          <Link
+                            href={`/hub/quick-wins/${featuredQuickWin.slug}`}
+                            className="text-sm font-semibold rounded-lg px-5 py-2 whitespace-nowrap"
+                            style={{ background: '#FFBA06', color: '#1e2749' }}
+                          >
+                            {tUI('Try it')}
+                          </Link>
+                          <span className="text-xs" style={{ color: '#9CA3AF' }}>
+                            {featuredQuickWin.duration_minutes} min
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* 2 more quick wins in smaller cards */}
+                  {quickWins.length > 0 && (
                     <div className="space-y-2.5 mb-5">
-                      {featuredQuickWins.map((qw) => {
+                      {quickWins.map((qw) => {
                         const categoryColors: Record<string, string> = {
                           'Stress Relief': '#E0F4FF',
                           'Time Savers': '#FEF3C7',
@@ -622,7 +898,7 @@ export default function HubDashboard() {
                                   {qw.title}
                                 </div>
                                 <div className="text-xs" style={{ color: '#9CA3AF' }}>
-                                  {qw.duration_minutes} min &middot; PDF Download
+                                  {qw.duration_minutes} min
                                 </div>
                               </div>
                               <Link
@@ -805,10 +1081,123 @@ export default function HubDashboard() {
               <ArrowRight size={14} />
             </Link>
           </div>
+
+          {/* Feature 5: Community Highlights */}
+          {communityHighlights.length > 0 && (
+            <div>
+              <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
+                {tUI('Community Highlights')}
+              </div>
+              <div
+                className="bg-white rounded-2xl divide-y"
+                style={{ border: '0.5px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
+              >
+                {communityHighlights.map((highlight, idx) => {
+                  const statusColors: Record<string, { bg: string; text: string }> = {
+                    'Tried it': { bg: '#E8F5E9', text: '#2E7D32' },
+                    'Adapted it': { bg: '#E0F4FF', text: '#1565C0' },
+                  };
+                  const statusStyle = statusColors[highlight.status] || { bg: '#F3F4F6', text: '#6B7280' };
+                  return (
+                    <div key={idx} className="px-4 py-3 flex items-start gap-3">
+                      <span
+                        className="inline-block text-xs font-bold px-2 py-0.5 rounded flex-shrink-0 mt-0.5"
+                        style={{ background: statusStyle.bg, color: statusStyle.text, fontSize: '10px' }}
+                      >
+                        {highlight.status}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm" style={{ color: '#4B5563' }}>
+                          {highlight.body}
+                        </p>
+                        {highlight.quickWinSlug && (
+                          <Link
+                            href={`/hub/quick-wins/${highlight.quickWinSlug}`}
+                            className="text-xs hover:underline mt-0.5 inline-block"
+                            style={{ color: '#38618C' }}
+                          >
+                            on {highlight.quickWinTitle}
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Feature 6: Goals Reminder */}
+          {userGoal && (
+            <div
+              className="rounded-2xl p-5"
+              style={{ background: 'linear-gradient(135deg, #F0F6FF 0%, #FAFAF8 100%)', border: '0.5px solid #C8DEFF' }}
+            >
+              <div className="flex items-start gap-3">
+                <div
+                  className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: '#E0F4FF' }}
+                >
+                  <Target size={16} style={{ color: '#1565C0' }} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium mb-1" style={{ color: '#1e2749' }}>
+                    {tUI('You said you wanted to')} &ldquo;{userGoal.text}&rdquo;
+                  </p>
+                  {userGoal.quickWin && (
+                    <Link
+                      href={`/hub/quick-wins/${userGoal.quickWin.slug}`}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold hover:underline"
+                      style={{ color: '#38618C' }}
+                    >
+                      {tUI('Try')}: {userGoal.quickWin.title}
+                      <ArrowRight size={12} />
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right Column - Sidebar */}
         <div className="space-y-4">
+          {/* Feature 7: Gift Element moved to top of sidebar */}
+          <GiftElement />
+
+          {/* Feature 2: Community Pulse */}
+          {communityPulse && (communityPulse.exploring > 0 || communityPulse.shared > 0) && (
+            <div
+              className="bg-white rounded-2xl p-4"
+              style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+            >
+              <div className="space-y-2.5">
+                {communityPulse.exploring > 0 && (
+                  <div className="flex items-center gap-2.5">
+                    <span
+                      className="w-2 h-2 rounded-full flex-shrink-0"
+                      style={{ background: '#4ADE80', boxShadow: '0 0 6px rgba(74,222,128,0.4)' }}
+                    />
+                    <span className="text-xs" style={{ color: '#6B7280' }}>
+                      <strong style={{ color: '#1e2749' }}>{communityPulse.exploring}</strong> {tUI('educators explored tools today')}
+                    </span>
+                  </div>
+                )}
+                {communityPulse.shared > 0 && (
+                  <div className="flex items-center gap-2.5">
+                    <span
+                      className="w-2 h-2 rounded-full flex-shrink-0"
+                      style={{ background: '#4ADE80', boxShadow: '0 0 6px rgba(74,222,128,0.4)' }}
+                    />
+                    <span className="text-xs" style={{ color: '#6B7280' }}>
+                      <strong style={{ color: '#1e2749' }}>{communityPulse.shared}</strong> {tUI('shared their experience')}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* TDI Tip */}
           <div className="rounded-2xl p-5 mb-4" style={{ background: '#1B2A4A' }}>
             <div
@@ -829,9 +1218,6 @@ export default function HubDashboard() {
               {tUI('Share your wins')}
             </button>
           </div>
-
-          {/* The Gift */}
-          <GiftElement />
 
           {/* Achievements Widget */}
           <div
