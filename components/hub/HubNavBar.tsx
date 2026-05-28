@@ -32,7 +32,7 @@ const BASE_NAV_ITEMS: NavItem[] = [
   { href: '/hub', label: 'Dashboard', exact: true },
   { href: '/hub/courses', label: 'Courses', exact: false },
   { href: '/hub/quick-wins', label: 'Quick Wins', exact: false },
-  { href: '/hub/certificates', label: 'Certificates', exact: false },
+  { href: '/hub/certificates', label: 'Achievements', exact: false },
   { href: '/hub/our-story', label: 'Our Story', exact: false },
   { href: 'https://raehughart.substack.com/', label: 'Blog', exact: false, external: true },
 ];

@@ -27,7 +27,7 @@ import {
   Activity,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import ShareMenu from '@/components/hub/ShareMenu';
+import UniversalShareModal from '@/components/hub/UniversalShareModal';
 import {
   checkRecognitions,
   RECOGNITIONS,
@@ -76,6 +76,9 @@ export default function CertificatesPage() {
   const [toolsExplored, setToolsExplored] = useState(0);
   const [daysActive, setDaysActive] = useState(0);
   const [activityByDay, setActivityByDay] = useState<ActivityDay[]>([]);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareMessage, setShareMessage] = useState('');
+  const [shareTitle, setShareTitle] = useState('Share my journey');
 
   const hoursSaved = useMemo(() => {
     const minutes = toolsExplored * 5;
@@ -390,13 +393,17 @@ export default function CertificatesPage() {
             {tUI('Every step forward deserves to be seen. These are yours.')}
           </p>
         </div>
-        <ShareMenu
-          type="tip"
-          text={`I've earned ${earnedCount} recognitions on TDI Learning Hub, explored ${toolsExplored} tools, and saved ${hoursSaved} hours. teachersdeserveit.com`}
-          url="https://www.teachersdeserveit.com/hub"
-          buttonVariant="primary"
-          buttonSize="md"
-        />
+        <button
+          onClick={() => {
+            setShareMessage(`Just checked my TDI Learning Hub journey. ${earnedCount} recognitions earned, ${toolsExplored} tools explored, and ~${hoursSaved} hours saved. Not bad for someone who also has 150 papers to grade. teachersdeserveit.com`);
+            setShareTitle('Share my journey');
+            setShareOpen(true);
+          }}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
+          style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+        >
+          {tUI('Share my journey')}
+        </button>
       </div>
 
       {/* ========== 1. Hero Stats Row ========== */}
@@ -689,13 +696,18 @@ export default function CertificatesPage() {
                           <Printer size={14} />
                           {tUI('Print')}
                         </button>
-                        <ShareMenu
-                          type="tip"
-                          text={`I earned "${item.recognition.title}" on the Teachers Deserve It Learning Hub! ${item.recognition.personalNote}`}
-                          url="https://www.teachersdeserveit.com/hub"
-                          buttonVariant="ghost"
-                          buttonSize="sm"
-                        />
+                        <button
+                          onClick={() => {
+                            setShareMessage(`Just earned "${item.recognition.title}" on the TDI Learning Hub. ${item.recognition.personalNote} teachersdeserveit.com`);
+                            setShareTitle('Share this win');
+                            setShareOpen(true);
+                          }}
+                          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                          style={{ fontFamily: "'DM Sans', sans-serif" }}
+                        >
+                          <Share2 size={14} />
+                          {tUI('Share')}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -927,6 +939,16 @@ export default function CertificatesPage() {
           </div>
         </section>
       )}
+
+      {/* Universal Share Modal */}
+      <UniversalShareModal
+        isOpen={shareOpen}
+        onClose={() => setShareOpen(false)}
+        title={shareTitle}
+        subtitle="Help another educator find something great"
+        message={shareMessage}
+        emailSubject="My TDI Learning Hub journey"
+      />
     </div>
   );
 }
