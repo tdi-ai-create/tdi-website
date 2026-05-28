@@ -1,14 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { Lock, Sparkles, Heart } from 'lucide-react';
+import { Lock, Heart } from 'lucide-react';
 import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
-
-const CAPACITY_STYLES: Record<string, { color: string; label: string }> = {
-  low:    { color: '#6BA368', label: 'Low Lift' },
-  medium: { color: '#E8B84B', label: 'Medium Lift' },
-  high:   { color: '#E8927C', label: 'High Lift' },
-};
+import { useTranslation } from '@/lib/hub/useTranslation';
+import CoverImageOverlay from '@/components/hub/CoverImageOverlay';
 
 // Category colors - elevated design
 const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
@@ -31,6 +27,7 @@ interface QuickWinCardProps {
     category: string;
     estimated_minutes: number;
     content_type: 'download' | 'activity' | 'video';
+    thumbnail_url?: string;
     course_slug?: string;
     access_tier?: string;
     is_free_rotating?: boolean;
@@ -55,6 +52,7 @@ export default function QuickWinCard({
 
   // Check access using membership hook
   const { canAccess } = useMembership();
+  const { tUI } = useTranslation();
   const contentAccess: ContentAccess = {
     access_tier: quickWin.access_tier || 'essentials',
     is_free_rotating: quickWin.is_free_rotating,
@@ -65,17 +63,17 @@ export default function QuickWinCard({
   const getTypeLabel = () => {
     switch (quickWin.content_type) {
       case 'download':
-        return 'Download';
+        return tUI('Download');
       case 'video':
-        return 'Video';
+        return tUI('Video');
       default:
-        return 'Activity';
+        return tUI('Activity');
     }
   };
 
   return (
     <div
-      className="p-4 relative"
+      className="flex flex-col overflow-hidden relative"
       style={{
         backgroundColor: 'white',
         borderRadius: '16px',
@@ -83,6 +81,16 @@ export default function QuickWinCard({
         opacity: !hasAccess && !isFreeRotating ? 0.82 : 1,
       }}
     >
+      {/* Cover image with LIFT pill + tier label overlays */}
+      <CoverImageOverlay
+        className="h-[130px]"
+        imageUrl={quickWin.thumbnail_url}
+        imageAlt={quickWin.title}
+        liftRating={quickWin.capacity}
+        tier={quickWin.access_tier}
+        variant="quick-win"
+      />
+
       {/* Favorite button */}
       {onToggleFavorite && (
         <button
@@ -93,7 +101,7 @@ export default function QuickWinCard({
             border: 'none',
             cursor: 'pointer',
           }}
-          aria-label={isFavorited ? 'Remove from saved' : 'Save quick win'}
+          aria-label={isFavorited ? tUI('Remove from saved') : tUI('Save quick win')}
         >
           <Heart
             size={14}
@@ -106,98 +114,76 @@ export default function QuickWinCard({
         </button>
       )}
 
-      {/* Tier badge - repositioned when favorite button present */}
-      {isFreeRotating ? (
-        <span className={`absolute ${onToggleFavorite ? 'top-3 right-12' : 'top-3 right-3'} inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-500 text-white`}>
-          <Sparkles size={10} />
-          Free
-        </span>
-      ) : !hasAccess && quickWin.access_tier && quickWin.access_tier !== 'free_rotating' ? (
-        <span className={`absolute ${onToggleFavorite ? 'top-3 right-12' : 'top-3 right-3'} inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-600 text-white`}>
-          <Lock size={10} />
-          {quickWin.access_tier === 'essentials' ? 'Essentials' : quickWin.access_tier === 'professional' ? 'Pro' : 'All-Access'}
-        </span>
-      ) : null}
+      <div className="p-4 flex-1">
+        {/* Category tag */}
+        <div
+          className="inline-block text-[10px] font-bold px-2 py-0.5 rounded mb-2"
+          style={{
+            backgroundColor: colors.bg,
+            color: colors.text,
+            letterSpacing: '0.05em',
+            textTransform: 'uppercase',
+            fontFamily: "'DM Sans', sans-serif",
+          }}
+        >
+          {tUI(quickWin.category)}
+        </div>
 
-      {/* Category tag */}
-      <div
-        className="inline-block text-[10px] font-bold px-2 py-0.5 rounded mb-2"
-        style={{
-          backgroundColor: colors.bg,
-          color: colors.text,
-          letterSpacing: '0.05em',
-          textTransform: 'uppercase',
-          fontFamily: "'DM Sans', sans-serif",
-        }}
-      >
-        {quickWin.category}
-      </div>
+        {/* Title */}
+        <div
+          className="text-sm font-semibold mb-1 leading-snug"
+          style={{
+            color: '#1B2A4A',
+            fontFamily: "'DM Sans', sans-serif",
+          }}
+        >
+          {title}
+        </div>
 
-      {/* Title */}
-      <div
-        className="text-sm font-semibold mb-1 leading-snug"
-        style={{
-          color: '#1B2A4A',
-          fontFamily: "'DM Sans', sans-serif",
-        }}
-      >
-        {title}
-      </div>
+        {/* Meta */}
+        <div
+          className="text-xs mb-3 flex items-center gap-2 flex-wrap"
+          style={{
+            color: '#9CA3AF',
+            fontFamily: "'DM Sans', sans-serif",
+          }}
+        >
+          <span>
+            {quickWin.estimated_minutes} {tUI('min')}
+            {quickWin.content_type && ` · ${getTypeLabel()}`}
+          </span>
+        </div>
 
-      {/* Meta */}
-      <div
-        className="text-xs mb-3 flex items-center gap-2 flex-wrap"
-        style={{
-          color: '#9CA3AF',
-          fontFamily: "'DM Sans', sans-serif",
-        }}
-      >
-        <span>
-          {quickWin.estimated_minutes} min
-          {quickWin.content_type && ` · ${getTypeLabel()}`}
-        </span>
-        {quickWin.capacity && CAPACITY_STYLES[quickWin.capacity] && (
-          <span
-            className="text-[10px] font-semibold px-1.5 py-0.5 rounded"
+        {/* Action */}
+        {hasAccess ? (
+          <Link
+            href={quickWin.course_slug
+              ? `/hub/courses/${quickWin.course_slug}/${quickWin.slug}`
+              : `/hub/quick-wins/${quickWin.slug}`}
+            className="text-xs font-semibold rounded-lg px-3 py-1.5 inline-block transition-opacity hover:opacity-90"
             style={{
-              backgroundColor: CAPACITY_STYLES[quickWin.capacity].color + '22',
-              color: CAPACITY_STYLES[quickWin.capacity].color,
+              backgroundColor: '#1B2A4A',
+              color: 'white',
+              fontFamily: "'DM Sans', sans-serif",
             }}
           >
-            {CAPACITY_STYLES[quickWin.capacity].label}
-          </span>
+            {tUI('Try it')}
+          </Link>
+        ) : (
+          <Link
+            href="/hub/membership"
+            className="text-xs font-medium px-3 py-1.5 rounded-lg inline-flex items-center gap-1 transition-colors hover:bg-gray-50"
+            style={{
+              border: '1px solid #9CA3AF',
+              color: '#6B7280',
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            <Lock size={10} />
+            {tUI('Upgrade')}
+          </Link>
         )}
       </div>
-
-      {/* Action */}
-      {hasAccess ? (
-        <Link
-          href={quickWin.course_slug
-            ? `/hub/courses/${quickWin.course_slug}/${quickWin.slug}`
-            : `/hub/quick-wins/${quickWin.slug}`}
-          className="text-xs font-semibold rounded-lg px-3 py-1.5 inline-block transition-opacity hover:opacity-90"
-          style={{
-            backgroundColor: '#1B2A4A',
-            color: 'white',
-            fontFamily: "'DM Sans', sans-serif",
-          }}
-        >
-          Try it
-        </Link>
-      ) : (
-        <Link
-          href="/hub/membership"
-          className="text-xs font-medium px-3 py-1.5 rounded-lg inline-flex items-center gap-1 transition-colors hover:bg-gray-50"
-          style={{
-            border: '1px solid #9CA3AF',
-            color: '#6B7280',
-            fontFamily: "'DM Sans', sans-serif",
-          }}
-        >
-          <Lock size={10} />
-          Upgrade
-        </Link>
-      )}
     </div>
   );
 }

@@ -28,6 +28,7 @@ interface QuickWin {
   category: string;
   estimated_minutes: number;
   content_type: 'download' | 'activity' | 'video';
+  thumbnail_url?: string;
   course_slug?: string;
   access_tier?: string;
   is_free_rotating?: boolean;
@@ -73,6 +74,7 @@ export default function QuickWinsPage() {
           category: qw.category || 'Classroom Tools',
           estimated_minutes: qw.duration_minutes || 5,
           content_type: qw.quick_win_type || 'activity',
+          thumbnail_url: qw.thumbnail_url,
           access_tier: qw.access_tier,
           is_free_rotating: qw.is_free_rotating,
           capacity: qw.lift === 'LOW' ? 'low' : qw.lift === 'MED' ? 'medium' : qw.lift === 'HIGH' ? 'high' : null,

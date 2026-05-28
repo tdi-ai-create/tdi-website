@@ -1,6 +1,6 @@
 'use client';
 
-import { getSupabase } from './supabase';
+import { getHubSupabase as getSupabase } from './supabase-hub';
 import type { User } from '@supabase/supabase-js';
 
 export interface HubProfile {
