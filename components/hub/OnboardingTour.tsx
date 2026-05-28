@@ -541,20 +541,23 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
 
   return (
     <>
-      {/* Click-blocker behind spotlight -- clicking dark area does nothing (must use buttons) */}
+      {/* Full-screen click blocker -- prevents ALL interaction with the page behind the tour */}
       <div
         style={{
           position: 'fixed',
           inset: 0,
           zIndex: 1000009,
+          background: 'transparent',
+          cursor: 'default',
         }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
       />
 
       {/* Spotlight hole */}
       <div style={spotlightStyle} />
 
-      {/* Clickable area over the highlighted element -- advances tour */}
+      {/* Clickable area over the highlighted element -- clicking advances the tour */}
       {hasTarget && targetRect && (
         <div
           style={{
@@ -566,8 +569,10 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
             borderRadius: RADIUS,
             zIndex: 1000012,
             cursor: 'pointer',
+            background: 'transparent',
           }}
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); goNext(); }}
+          onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
         />
       )}
 
