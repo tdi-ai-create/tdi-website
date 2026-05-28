@@ -5,7 +5,7 @@ import { X, Wind, Heart, Sparkles, BookOpen, Download, UserCircle, Send, Heart a
 import { incrementHardDayCount } from '@/lib/hub-auth';
 import { useMomentMode } from './MomentModeContext';
 import { useHub } from './HubContext';
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { useTranslation } from '@/lib/hub/useTranslation';
 
 type MomentState = 'entry' | 'pause' | 'affirmation' | 'gentle' | 'journal';

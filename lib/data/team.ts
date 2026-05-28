@@ -10,6 +10,7 @@ export interface TeamMember {
   title: string
   imageSlug: string
   isHuman: boolean
+  isMascot?: boolean
 }
 
 export const founder = {
@@ -49,6 +50,8 @@ export const team: TeamMember[] = [
   { name: 'Sophia Castillo', title: 'Sales Prep', imageSlug: 'sophia-castillo', isHuman: false },
   { name: 'Nora Reeves', title: 'COO', imageSlug: 'nora-reeves', isHuman: false },
   { name: 'Ravi Patel', title: 'Strategy', imageSlug: 'ravi-patel', isHuman: false },
+  { name: 'Alfred', title: 'Office Mascot', imageSlug: 'alfred', isHuman: false, isMascot: true },
+  { name: 'Harvey', title: 'Office Mascot', imageSlug: 'harvey', isHuman: false, isMascot: true },
 ]
 
 // Backwards compat - keep these exports so other files don't break

@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
-import { getSupabase } from '@/lib/supabase'
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub'
 import { useHub } from '@/components/hub/HubContext'
 
 export function useFavorites() {

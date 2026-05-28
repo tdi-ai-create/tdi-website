@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { createCertificate } from '@/lib/certificate';
 
 export type LessonStatus = 'not_started' | 'in_progress' | 'completed';

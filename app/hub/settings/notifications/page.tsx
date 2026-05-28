@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useHub } from '@/components/hub/HubContext';
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { User, Bell, Mail, Clock, Eye, Users, Check } from 'lucide-react';
 
 interface NotificationPreferences {

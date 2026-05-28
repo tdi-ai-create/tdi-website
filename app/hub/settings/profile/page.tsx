@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useHub } from '@/components/hub/HubContext';
 import AvatarDisplay from '@/components/hub/AvatarDisplay';
 import AvatarPicker from '@/components/hub/AvatarPicker';
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { signOut, updateHubProfile } from '@/lib/hub-auth';
 import {
   User,

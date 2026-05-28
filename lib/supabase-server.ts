@@ -1,3 +1,15 @@
+/**
+ * Server-side Supabase client for the CREATOR PORTAL project.
+ *
+ * Used by server components and API routes that need cookie-based auth
+ * against the Creator Portal Supabase project (partners, dashboards, admin).
+ *
+ * Hub API routes must NEVER import from this file —
+ * use @/lib/supabase-hub-server instead.
+ *
+ * History: TEA-4629 temporarily made this prefer Learning Hub env vars. Reverted.
+ */
+
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 
@@ -5,8 +17,8 @@ export async function createSupabaseServerClient() {
   const cookieStore = await cookies();
 
   return createServerClient(
-    process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {

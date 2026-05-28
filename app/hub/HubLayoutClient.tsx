@@ -7,7 +7,7 @@ import HubAuthGuard from '@/components/hub/HubAuthGuard';
 import HubNavBar from '@/components/hub/HubNavBar';
 import HubFooter from '@/components/hub/HubFooter';
 import { useHub } from '@/components/hub/HubContext';
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 
 const CheckInSlideUp = dynamic(() => import('@/components/hub/CheckInSlideUp'), { ssr: false });
 

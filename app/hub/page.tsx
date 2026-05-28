@@ -8,7 +8,7 @@ import { useFavorites } from '@/lib/hub/useFavorites';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import AvatarDisplay from '@/components/hub/AvatarDisplay';
 import EmptyState from '@/components/hub/EmptyState';
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { checkTrackerEligibility, type TrackerEligibility } from '@/lib/hub/transformation';
 import { getRecommendations, hasCompletedOnboarding, type RecommendedCourse } from '@/lib/hub/recommendations';
 import {

@@ -427,12 +427,14 @@ interface LessonConversationProps {
   lessonId: string
   courseId: string
   userId?: string | null
+  apiBasePath?: string
 }
 
 export default function LessonConversation({
   lessonId,
   courseId,
   userId,
+  apiBasePath,
 }: LessonConversationProps) {
   const [data, setData] = useState<ConversationData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -443,9 +445,8 @@ export default function LessonConversation({
 
   const fetchConversation = useCallback(async (typeFilter?: ContributionType | null) => {
     try {
-      const url = `/api/hub/lessons/${lessonId}/conversation${
-        typeFilter ? `?type=${typeFilter}` : ''
-      }`
+      const base = apiBasePath || `/api/hub/lessons/${lessonId}/conversation`
+      const url = `${base}${typeFilter ? `?type=${typeFilter}` : ''}`
       const res = await fetch(url)
       if (!res.ok) throw new Error('Failed to load conversation')
       const json = await res.json()
@@ -461,7 +462,7 @@ export default function LessonConversation({
     } finally {
       setLoading(false)
     }
-  }, [lessonId])
+  }, [lessonId, apiBasePath])
 
   useEffect(() => {
     fetchConversation()
@@ -479,7 +480,8 @@ export default function LessonConversation({
   }) {
     setSubmitting(true)
     try {
-      const res = await fetch(`/api/hub/lessons/${lessonId}/conversation`, {
+      const submitUrl = apiBasePath || `/api/hub/lessons/${lessonId}/conversation`
+      const res = await fetch(submitUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -530,7 +532,18 @@ export default function LessonConversation({
   const isEmpty = !data || data.total_contributions === 0
 
   if (isEmpty) {
-    return <ConversationEmptyState onShare={() => setShowCompose(true)} />
+    return (
+      <>
+        <ConversationEmptyState onShare={() => setShowCompose(true)} />
+        {showCompose && (
+          <ComposeModal
+            onClose={() => setShowCompose(false)}
+            onSubmit={handleSubmit}
+            submitting={submitting}
+          />
+        )}
+      </>
+    )
   }
 
   return (

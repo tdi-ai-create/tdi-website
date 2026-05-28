@@ -135,7 +135,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Who can I ask for help?',
-    a: 'Email rae@teachersdeserveit.com anytime.',
+    a: 'Email CreatorStudio@teachersdeserveit.com anytime.',
   },
 ];
 
@@ -356,8 +356,8 @@ export default function AffiliatePage() {
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
               <p className="text-white/70 text-sm">
                 Your affiliate link is being set up. Check back soon or email{' '}
-                <a href="mailto:rae@teachersdeserveit.com" className="underline text-white">
-                  rae@teachersdeserveit.com
+                <a href="mailto:CreatorStudio@teachersdeserveit.com" className="underline text-white">
+                  CreatorStudio@teachersdeserveit.com
                 </a>{' '}
                 if you have questions.
               </p>
@@ -594,10 +594,10 @@ export default function AffiliatePage() {
           <p>
             Questions? Email{' '}
             <a
-              href="mailto:rae@teachersdeserveit.com"
+              href="mailto:CreatorStudio@teachersdeserveit.com"
               className="text-[#80a4ed] hover:text-[#1e2749]"
             >
-              rae@teachersdeserveit.com
+              CreatorStudio@teachersdeserveit.com
             </a>
           </p>
         </div>

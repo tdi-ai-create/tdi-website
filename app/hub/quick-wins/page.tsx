@@ -3,8 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import QuickWinCard from '@/components/hub/QuickWinCard';
 import EmptyState from '@/components/hub/EmptyState';
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { useFavorites } from '@/lib/hub/useFavorites';
+import { useMembership, type ContentAccess } from '@/lib/hub/use-membership';
 import { useLanguage } from '@/lib/hub/useLanguage';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import { Zap, Heart, Info } from 'lucide-react';
@@ -28,6 +29,7 @@ interface QuickWin {
   category: string;
   estimated_minutes: number;
   content_type: 'download' | 'activity' | 'video';
+  thumbnail_url?: string;
   course_slug?: string;
   access_tier?: string;
   is_free_rotating?: boolean;
@@ -42,6 +44,7 @@ export default function QuickWinsPage() {
   const [capacityFilter, setCapacityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
   const [isLoading, setIsLoading] = useState(true);
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { canAccess } = useMembership();
   const { language, t } = useLanguage();
   const { tUI } = useTranslation();
 
@@ -73,9 +76,10 @@ export default function QuickWinsPage() {
           category: qw.category || 'Classroom Tools',
           estimated_minutes: qw.duration_minutes || 5,
           content_type: qw.quick_win_type || 'activity',
+          thumbnail_url: qw.thumbnail_url,
           access_tier: qw.access_tier,
           is_free_rotating: qw.is_free_rotating,
-          capacity: qw.capacity,
+          capacity: qw.lift === 'LOW' ? 'low' : qw.lift === 'MED' ? 'medium' : qw.lift === 'HIGH' ? 'high' : null,
           title_es: qw.title_es,
           description_es: qw.description_es,
         }));
@@ -157,7 +161,7 @@ export default function QuickWinsPage() {
           </div>
 
           {/* Grid skeleton */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
@@ -270,7 +274,7 @@ export default function QuickWinsPage() {
 
         {/* Quick Wins Grid or Empty State */}
         {filteredQuickWins.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             {filteredQuickWins.map((qw) => (
               <QuickWinCard
                 key={qw.id}
@@ -279,6 +283,7 @@ export default function QuickWinsPage() {
                 onToggleFavorite={toggleFavorite}
                 displayTitle={t(qw.title, qw.title_es)}
                 displayDescription={t(qw.description, qw.description_es)}
+                hasAccess={canAccess({ access_tier: qw.access_tier || 'essentials', is_free_rotating: qw.is_free_rotating } as ContentAccess)}
               />
             ))}
           </div>

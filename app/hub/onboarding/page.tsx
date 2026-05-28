@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import AvatarPicker from '@/components/hub/AvatarPicker';
-import { getSupabase } from '@/lib/supabase';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { getCurrentUser } from '@/lib/hub-auth';
 
 type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5;
