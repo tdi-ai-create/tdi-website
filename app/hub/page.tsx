@@ -7,18 +7,13 @@ import { useHub } from '@/components/hub/HubContext';
 import { useFavorites } from '@/lib/hub/useFavorites';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import AvatarDisplay from '@/components/hub/AvatarDisplay';
-import EmptyState from '@/components/hub/EmptyState';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { checkTrackerEligibility, type TrackerEligibility } from '@/lib/hub/transformation';
 import { getRecommendations, hasCompletedOnboarding, type RecommendedCourse } from '@/lib/hub/recommendations';
 import {
   BookOpen,
-  Zap,
   Award,
   ArrowRight,
-  Clock,
-  Sparkles,
-  Lock,
   TrendingUp,
   Heart,
 } from 'lucide-react';
@@ -66,8 +61,8 @@ interface QuickWin {
   id: string;
   slug: string;
   title: string;
-  estimated_minutes: number;
-  course_slug?: string;
+  duration_minutes: number;
+  category: string;
 }
 
 interface SavedCourse {
@@ -83,7 +78,8 @@ export default function HubDashboard() {
   const { favorites } = useFavorites();
   const { tUI } = useTranslation();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
-  const [quickWin, setQuickWin] = useState<QuickWin | null>(null);
+  const [quickWins, setQuickWins] = useState<QuickWin[]>([]);
+  const [featuredQuickWins, setFeaturedQuickWins] = useState<QuickWin[]>([]);
   const [tip, setTip] = useState<string>(FALLBACK_TIPS[0]);
   const [certificateCount, setCertificateCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -162,32 +158,23 @@ export default function HubDashboard() {
           setEnrollments(enrichedEnrollments as Enrollment[]);
         }
 
-        // Fetch random quick win
+        // Fetch quick wins from hub_quick_wins
         const { data: quickWinData } = await supabase
-          .from('hub_lessons')
-          .select(`
-            id,
-            slug,
-            title,
-            estimated_minutes,
-            course:hub_courses!inner(slug, is_published)
-          `)
-          .eq('is_quick_win', true)
-          .eq('hub_courses.is_published', true)
-          .limit(10);
+          .from('hub_quick_wins')
+          .select('id, slug, title, duration_minutes, category')
+          .eq('is_published', true)
+          .limit(6);
 
         if (quickWinData && quickWinData.length > 0) {
-          const randomIndex = Math.floor(Math.random() * quickWinData.length);
-          const qw = quickWinData[randomIndex];
-          const courseData = qw.course as { slug: string } | { slug: string }[] | null;
-          const courseSlug = Array.isArray(courseData) ? courseData[0]?.slug : courseData?.slug;
-          setQuickWin({
+          const mapped: QuickWin[] = quickWinData.map((qw) => ({
             id: qw.id,
             slug: qw.slug,
             title: qw.title,
-            estimated_minutes: qw.estimated_minutes,
-            course_slug: courseSlug,
-          });
+            duration_minutes: qw.duration_minutes || 5,
+            category: qw.category || 'Classroom Tools',
+          }));
+          setQuickWins(mapped.slice(0, 3));
+          setFeaturedQuickWins(mapped.slice(0, 3));
         }
 
         // Fetch TDI tip - pick based on date
@@ -351,10 +338,10 @@ export default function HubDashboard() {
         <div className="grid lg:grid-cols-[1fr_340px] gap-6">
         {/* Left Column - Main Content */}
         <div className="space-y-6">
-          {/* Continue Learning Section */}
+          {/* Continue Learning / Where to Start Section */}
           <div>
             <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-              {tUI('Continue Learning')}
+              {enrollments.length > 0 ? tUI('Continue Learning') : tUI('Where to Start')}
             </div>
             <div
               className="bg-white rounded-2xl mb-4"
@@ -403,14 +390,85 @@ export default function HubDashboard() {
                 </div>
               ) : (
                 <div className="p-6">
-                  <EmptyState
-                    icon={BookOpen}
-                    iconBgColor="#BFDBFE"
-                    title="You have not enrolled in any courses yet."
-                    description="Browse the catalog to find your first course."
-                    buttonText="Browse Courses"
-                    buttonLink="/hub/courses"
-                  />
+                  {/* Where to Start - new user experience */}
+                  <h2
+                    className="text-xl font-semibold mb-1"
+                    style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif" }}
+                  >
+                    {tUI('Your first 5 minutes start here')}
+                  </h2>
+                  <p className="text-sm mb-5" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>
+                    {tUI('Pick a quick win to try right now, or dive into a full course. No pressure, no deadlines.')}
+                  </p>
+
+                  {/* Featured Quick Wins grid */}
+                  {featuredQuickWins.length > 0 && (
+                    <div className="space-y-2.5 mb-5">
+                      {featuredQuickWins.map((qw) => {
+                        const categoryColors: Record<string, string> = {
+                          'Stress Relief': '#E0F4FF',
+                          'Time Savers': '#FEF3C7',
+                          'Classroom Tools': '#E8F5E9',
+                          'Communication': '#F3E8FF',
+                          'Self-Care': '#FCE7F3',
+                        };
+                        const categoryBg = categoryColors[qw.category] || '#F3F4F6';
+                        return (
+                          <div
+                            key={qw.id}
+                            className="flex items-center gap-3 rounded-xl overflow-hidden"
+                            style={{ border: '0.5px solid #E9E7E2', background: '#FAFAF8' }}
+                          >
+                            <div
+                              className="w-1.5 self-stretch flex-shrink-0"
+                              style={{ background: categoryBg }}
+                            />
+                            <div className="flex-1 py-3 pr-3 flex items-center gap-3">
+                              <div className="flex-1 min-w-0">
+                                <span
+                                  className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-1"
+                                  style={{ background: categoryBg, color: '#1e2749', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                                >
+                                  {qw.category}
+                                </span>
+                                <div className="text-sm font-semibold" style={{ color: '#1e2749' }}>
+                                  {qw.title}
+                                </div>
+                                <div className="text-xs" style={{ color: '#9CA3AF' }}>
+                                  {qw.duration_minutes} min &middot; PDF Download
+                                </div>
+                              </div>
+                              <Link
+                                href={`/hub/quick-wins/${qw.slug}`}
+                                className="flex-shrink-0 text-xs font-semibold rounded-lg px-4 py-1.5 whitespace-nowrap"
+                                style={{ background: '#FFBA06', color: '#1e2749' }}
+                              >
+                                {tUI('Try it')}
+                              </Link>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Browse Courses button */}
+                  <Link
+                    href="/hub/courses"
+                    className="block w-full text-center text-sm font-semibold text-white rounded-lg px-4 py-2.5 mb-3"
+                    style={{ background: '#1e2749' }}
+                  >
+                    {tUI('Browse Courses')}
+                  </Link>
+
+                  {/* Explore Quick Wins link */}
+                  <Link
+                    href="/hub/quick-wins"
+                    className="block text-center text-sm font-medium hover:underline"
+                    style={{ color: '#38618C' }}
+                  >
+                    {tUI('Or explore all Quick Wins')}
+                  </Link>
                 </div>
               )}
             </div>
@@ -493,30 +551,53 @@ export default function HubDashboard() {
             <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
               {tUI('Quick Wins')}
             </div>
-            {quickWin ? (
-              <div
-                className="rounded-xl p-3.5 cursor-pointer mb-4"
-                style={{ background: '#FAFAF8', border: '0.5px solid #E9E7E2' }}
-              >
-                <div
-                  className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-2"
-                  style={{ background: '#FEF3C7', color: '#854F0B', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '10px' }}
-                >
-                  {tUI('Quick Win')}
-                </div>
-                <div className="text-sm font-semibold mb-1 leading-snug" style={{ color: '#1B2A4A' }}>
-                  {quickWin.title}
-                </div>
-                <div className="text-xs mb-3" style={{ color: '#9CA3AF' }}>
-                  {quickWin.estimated_minutes} min
-                </div>
-                <Link
-                  href={`/hub/courses/${quickWin.course_slug}/${quickWin.slug}`}
-                  className="text-xs font-semibold text-white rounded-lg px-4 py-1.5 inline-block"
-                  style={{ background: '#1B2A4A' }}
-                >
-                  {tUI('Try it now')}
-                </Link>
+            {quickWins.length > 0 ? (
+              <div className="space-y-2.5 mb-4">
+                {quickWins.map((qw) => {
+                  const categoryColors: Record<string, string> = {
+                    'Stress Relief': '#E0F4FF',
+                    'Time Savers': '#FEF3C7',
+                    'Classroom Tools': '#E8F5E9',
+                    'Communication': '#F3E8FF',
+                    'Self-Care': '#FCE7F3',
+                  };
+                  const categoryBg = categoryColors[qw.category] || '#F3F4F6';
+                  return (
+                    <div
+                      key={qw.id}
+                      className="flex items-center gap-3 rounded-xl overflow-hidden"
+                      style={{ background: '#FAFAF8', border: '0.5px solid #E9E7E2' }}
+                    >
+                      <div
+                        className="w-1.5 self-stretch flex-shrink-0"
+                        style={{ background: categoryBg }}
+                      />
+                      <div className="flex-1 py-3 pr-3 flex items-center gap-3">
+                        <div className="flex-1 min-w-0">
+                          <span
+                            className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-1"
+                            style={{ background: categoryBg, color: '#1e2749', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                          >
+                            {qw.category}
+                          </span>
+                          <div className="text-sm font-semibold leading-snug" style={{ color: '#1B2A4A' }}>
+                            {qw.title}
+                          </div>
+                          <div className="text-xs" style={{ color: '#9CA3AF' }}>
+                            {qw.duration_minutes} min
+                          </div>
+                        </div>
+                        <Link
+                          href={`/hub/quick-wins/${qw.slug}`}
+                          className="flex-shrink-0 text-xs font-semibold text-white rounded-lg px-4 py-1.5 whitespace-nowrap"
+                          style={{ background: '#1B2A4A' }}
+                        >
+                          {tUI('Try it now')}
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <div
@@ -524,7 +605,7 @@ export default function HubDashboard() {
                 style={{ background: '#FAFAF8', border: '0.5px solid #E9E7E2' }}
               >
                 <p className="text-sm" style={{ color: '#9CA3AF' }}>
-                  {tUI('Quick Wins are coming soon. Short, practical tools you can use in 3-5 minutes.')}
+                  {tUI('Quick Wins are loading...')}
                 </p>
               </div>
             )}
