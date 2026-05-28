@@ -578,36 +578,34 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
             }}
           />
 
-          {/* Small caps branding */}
-          <p
-            className="mb-4"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '11px',
-              fontWeight: 600,
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase' as const,
-              color: 'rgba(255,255,255,0.5)',
-            }}
-          >
-            TEACHERS DESERVE IT
-          </p>
-
-          {/* LIFT badge */}
-          {liftLabel && (
-            <div
-              className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full mb-4"
-              style={{ background: `${liftColor}30`, color: liftColor }}
+          {/* Top row: branding + LIFT badge */}
+          <div className="flex items-center gap-3 mb-3">
+            <p
+              style={{
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase' as const,
+                color: 'rgba(255,255,255,0.5)',
+              }}
             >
-              <Zap size={12} />
-              {liftLabel}
-            </div>
-          )}
+              TEACHERS DESERVE IT
+            </p>
+            {liftLabel && (
+              <div
+                className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full"
+                style={{ background: `${liftColor}30`, color: liftColor }}
+              >
+                <Zap size={10} />
+                {liftLabel}
+              </div>
+            )}
+          </div>
 
-          {/* Category subtitle */}
+          {/* Category */}
           {quickWin.category && (
             <p
-              className="mb-2"
+              className="mb-1"
               style={{
                 fontSize: '13px',
                 fontWeight: 600,
@@ -621,12 +619,12 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
           {/* Title */}
           <h1
-            className="font-bold mb-4 relative"
+            className="font-bold mb-3 relative"
             style={{
               fontFamily: "'Source Serif 4', Georgia, serif",
-              fontSize: 'clamp(28px, 4vw, 36px)',
+              fontSize: 'clamp(26px, 3.5vw, 34px)',
               color: 'white',
-              lineHeight: '1.25',
+              lineHeight: '1.2',
               maxWidth: '700px',
             }}
           >
@@ -636,11 +634,11 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           {/* Description */}
           {quickWin.description && (
             <p
-              className="mb-6 relative"
+              className="mb-4 relative"
               style={{
-                fontSize: '16px',
-                color: 'rgba(255,255,255,0.7)',
-                lineHeight: '1.65',
+                fontSize: '15px',
+                color: 'rgba(255,255,255,0.65)',
+                lineHeight: '1.6',
                 maxWidth: '600px',
               }}
             >
@@ -662,16 +660,14 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}
             >
               <BookOpen size={12} />
-              {quickWin.content_type}
+              PDF Download
             </div>
-            {liftLabel && (
-              <div
-                className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
-                style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}
-              >
-                {liftLabel}
-              </div>
-            )}
+            <div
+              className="text-xs"
+              style={{ color: 'rgba(255,255,255,0.45)' }}
+            >
+              by Teachers Deserve It
+            </div>
           </div>
         </div>
       </div>
