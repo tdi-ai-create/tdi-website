@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use, useCallback } from 'react';
+import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
@@ -18,13 +18,9 @@ import {
   BookOpen,
   Bookmark,
   ExternalLink,
-  ThumbsUp,
-  MessageSquare,
-  Send,
-  ChevronDown,
-  ChevronUp,
 } from 'lucide-react';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
+import LessonConversation from '@/components/hub/LessonConversation';
 
 // ─── Breathing Exercise Component ───────────────────────────────────────────
 
@@ -74,7 +70,7 @@ function BreathingExercise() {
           <button
             onClick={() => setIsRunning(true)}
             className="px-8 py-2.5 rounded-full text-sm font-semibold text-white"
-            style={{ background: '#1B2A4A' }}
+            style={{ background: '#1e2749' }}
           >
             Start breathing exercise
           </button>
@@ -98,10 +94,10 @@ function BreathingExercise() {
                 background: `${current.color}30`,
               }}
             >
-              <span style={{ fontSize: '28px', fontWeight: 700, color: '#1B2A4A' }}>{count}</span>
+              <span style={{ fontSize: '28px', fontWeight: 700, color: '#1e2749' }}>{count}</span>
             </div>
           </div>
-          <div className="text-base font-semibold" style={{ color: '#1B2A4A' }}>{current.label}</div>
+          <div className="text-base font-semibold" style={{ color: '#1e2749' }}>{current.label}</div>
           <div className="text-sm" style={{ color: '#9CA3AF' }}>{current.sub}</div>
           <div className="flex gap-2 mt-1">
             {phases.map((_, i) => (
@@ -131,24 +127,15 @@ function BreathingExercise() {
 const CATEGORY_COLORS: Record<string, string> = {
   'Stress Relief': '#7C9CBF',
   'Time Savers': '#6BA368',
-  'Classroom Tools': '#E8B84B',
+  'Classroom Tools': '#ffba06',
   'Communication': '#E8927C',
   'Self-Care': '#9B7CB8',
   'Stress & Wellness': '#7C9CBF',
-  'Classroom Management': '#E8B84B',
+  'Classroom Management': '#ffba06',
   'Leadership': '#9B7CB8',
   'New Teacher': '#5BBEC4',
 };
 
-const EXPERIENCE_STATUSES = ['Tried it', 'Adapted it', 'Still trying', 'Got stuck'] as const;
-type ExperienceStatus = typeof EXPERIENCE_STATUSES[number];
-
-const STATUS_COLORS: Record<ExperienceStatus, string> = {
-  'Tried it': '#6BA368',
-  'Adapted it': '#E8B84B',
-  'Still trying': '#5BBEC4',
-  'Got stuck': '#E8927C',
-};
 
 // ─── Interfaces ─────────────────────────────────────────────────────────────
 
@@ -173,50 +160,9 @@ interface QuickWinPageProps {
   params: Promise<{ slug: string }>;
 }
 
-interface ExperiencePost {
-  id: string;
-  status: ExperienceStatus;
-  story: string;
-  user_display_name: string;
-  submitted_at: string;
-  helpful_count: number;
-}
-
-interface QuestionPost {
-  id: string;
-  question: string;
-  user_display_name: string;
-  asked_at: string;
-  answers: AnswerPost[];
-}
-
-interface AnswerPost {
-  id: string;
-  answer: string;
-  user_display_name: string;
-  answered_at: string;
-}
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-function timeAgo(dateStr: string): string {
-  const now = new Date();
-  const date = new Date(dateStr);
-  const diffMs = now.getTime() - date.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return 'just now';
-  if (diffMin < 60) return `${diffMin}m ago`;
-  const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
-  const diffDay = Math.floor(diffHr / 24);
-  if (diffDay < 30) return `${diffDay}d ago`;
-  const diffMon = Math.floor(diffDay / 30);
-  return `${diffMon}mo ago`;
-}
-
-function avatarInitial(name: string): string {
-  return (name || 'T').charAt(0).toUpperCase();
-}
 
 // ─── Main Component ─────────────────────────────────────────────────────────
 
@@ -224,7 +170,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const resolvedParams = use(params);
   const { slug } = resolvedParams;
   const router = useRouter();
-  const { user, profile } = useHub();
+  const { user } = useHub();
 
   const [quickWin, setQuickWin] = useState<QuickWin | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -247,23 +193,6 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const [recommendations, setRecommendations] = useState<QuickWin[]>([]);
   const [moreQuickWins, setMoreQuickWins] = useState<QuickWin[]>([]);
 
-  // Community: Experience posts
-  const [experiences, setExperiences] = useState<ExperiencePost[]>([]);
-  const [expFilter, setExpFilter] = useState<'All' | ExperienceStatus>('All');
-  const [showExpForm, setShowExpForm] = useState(false);
-  const [expStatus, setExpStatus] = useState<ExperienceStatus>('Tried it');
-  const [expStory, setExpStory] = useState('');
-  const [expSubmitting, setExpSubmitting] = useState(false);
-
-  // Community: Q&A
-  const [questions, setQuestions] = useState<QuestionPost[]>([]);
-  const [newQuestion, setNewQuestion] = useState('');
-  const [questionSubmitting, setQuestionSubmitting] = useState(false);
-  const [expandedQuestion, setExpandedQuestion] = useState<string | null>(null);
-  const [answerText, setAnswerText] = useState('');
-  const [answerSubmitting, setAnswerSubmitting] = useState(false);
-
-  const displayName = profile?.display_name || 'Teacher';
 
   // ─── Data Loading ─────────────────────────────────────────────────────────
 
@@ -444,97 +373,6 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
       });
   }, [quickWin?.id]);
 
-  // Load community experiences
-  const loadExperiences = useCallback(async (qwId: string) => {
-    const supabase = getSupabase();
-    const { data } = await supabase
-      .from('hub_activity_log')
-      .select('*')
-      .eq('action', 'quick_win_experience')
-      .order('created_at', { ascending: false });
-
-    if (data) {
-      const posts: ExperiencePost[] = data
-        .filter((row: Record<string, unknown>) => {
-          const meta = row.metadata as Record<string, unknown> | null;
-          return meta && meta.quick_win_id === qwId;
-        })
-        .map((row: Record<string, unknown>) => {
-          const meta = row.metadata as Record<string, unknown>;
-          return {
-            id: row.id as string,
-            status: (meta.status as ExperienceStatus) || 'Tried it',
-            story: (meta.story as string) || '',
-            user_display_name: (meta.user_display_name as string) || 'Teacher',
-            submitted_at: (meta.submitted_at as string) || (row.created_at as string) || new Date().toISOString(),
-            helpful_count: (meta.helpful_count as number) || 0,
-          };
-        });
-      setExperiences(posts);
-    }
-  }, []);
-
-  // Load Q&A
-  const loadQuestions = useCallback(async (qwId: string) => {
-    const supabase = getSupabase();
-
-    // Load questions
-    const { data: qData } = await supabase
-      .from('hub_activity_log')
-      .select('*')
-      .eq('action', 'quick_win_question')
-      .order('created_at', { ascending: false });
-
-    // Load answers
-    const { data: aData } = await supabase
-      .from('hub_activity_log')
-      .select('*')
-      .eq('action', 'quick_win_answer')
-      .order('created_at', { ascending: true });
-
-    const answersMap = new Map<string, AnswerPost[]>();
-    if (aData) {
-      for (const row of aData) {
-        const meta = row.metadata as Record<string, unknown> | null;
-        if (!meta || meta.quick_win_id !== qwId) continue;
-        const questionId = meta.question_id as string;
-        if (!questionId) continue;
-        const arr = answersMap.get(questionId) || [];
-        arr.push({
-          id: row.id as string,
-          answer: (meta.answer as string) || '',
-          user_display_name: (meta.user_display_name as string) || 'Teacher',
-          answered_at: (meta.answered_at as string) || (row.created_at as string) || new Date().toISOString(),
-        });
-        answersMap.set(questionId, arr);
-      }
-    }
-
-    if (qData) {
-      const posts: QuestionPost[] = qData
-        .filter((row: Record<string, unknown>) => {
-          const meta = row.metadata as Record<string, unknown> | null;
-          return meta && meta.quick_win_id === qwId;
-        })
-        .map((row: Record<string, unknown>) => {
-          const meta = row.metadata as Record<string, unknown>;
-          return {
-            id: row.id as string,
-            question: (meta.question as string) || '',
-            user_display_name: (meta.user_display_name as string) || 'Teacher',
-            asked_at: (meta.asked_at as string) || (row.created_at as string) || new Date().toISOString(),
-            answers: answersMap.get(row.id as string) || [],
-          };
-        });
-      setQuestions(posts);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!quickWin) return;
-    loadExperiences(quickWin.id);
-    loadQuestions(quickWin.id);
-  }, [quickWin?.id, loadExperiences, loadQuestions]);
 
   // ─── Handlers ─────────────────────────────────────────────────────────────
 
@@ -623,82 +461,6 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
     setCheckedSteps(newChecked);
   };
 
-  const handleSubmitExperience = async () => {
-    if (!quickWin || !user || !expStory.trim()) return;
-    setExpSubmitting(true);
-    const supabase = getSupabase();
-    await supabase.from('hub_activity_log').insert({
-      user_id: user.id,
-      action: 'quick_win_experience',
-      metadata: {
-        quick_win_id: quickWin.id,
-        quick_win_title: quickWin.title,
-        status: expStatus,
-        story: expStory.trim(),
-        submitted_at: new Date().toISOString(),
-        user_display_name: displayName,
-      },
-    });
-    setExpStory('');
-    setShowExpForm(false);
-    setExpSubmitting(false);
-    loadExperiences(quickWin.id);
-  };
-
-  const handleHelpful = async (experienceId: string) => {
-    if (!user || !quickWin) return;
-    const supabase = getSupabase();
-    await supabase.from('hub_activity_log').insert({
-      user_id: user.id,
-      action: 'quick_win_experience_helpful',
-      metadata: {
-        quick_win_id: quickWin.id,
-        experience_id: experienceId,
-        marked_at: new Date().toISOString(),
-      },
-    });
-  };
-
-  const handleSubmitQuestion = async () => {
-    if (!quickWin || !user || !newQuestion.trim()) return;
-    setQuestionSubmitting(true);
-    const supabase = getSupabase();
-    await supabase.from('hub_activity_log').insert({
-      user_id: user.id,
-      action: 'quick_win_question',
-      metadata: {
-        quick_win_id: quickWin.id,
-        quick_win_title: quickWin.title,
-        question: newQuestion.trim(),
-        asked_at: new Date().toISOString(),
-        user_display_name: displayName,
-      },
-    });
-    setNewQuestion('');
-    setQuestionSubmitting(false);
-    loadQuestions(quickWin.id);
-  };
-
-  const handleSubmitAnswer = async (questionId: string) => {
-    if (!quickWin || !user || !answerText.trim()) return;
-    setAnswerSubmitting(true);
-    const supabase = getSupabase();
-    await supabase.from('hub_activity_log').insert({
-      user_id: user.id,
-      action: 'quick_win_answer',
-      metadata: {
-        quick_win_id: quickWin.id,
-        question_id: questionId,
-        answer: answerText.trim(),
-        answered_at: new Date().toISOString(),
-        user_display_name: displayName,
-      },
-    });
-    setAnswerText('');
-    setAnswerSubmitting(false);
-    setExpandedQuestion(null);
-    loadQuestions(quickWin.id);
-  };
 
   // Parse action steps from content (for "do" type)
   const parseActionSteps = (content: string | null): string[] => {
@@ -709,7 +471,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
   // ─── Derived values ───────────────────────────────────────────────────────
 
-  const categoryColor = quickWin ? CATEGORY_COLORS[quickWin.category || ''] || '#E8B84B' : '#E8B84B';
+  const categoryColor = quickWin ? CATEGORY_COLORS[quickWin.category || ''] || '#ffba06' : '#ffba06';
 
   // ─── Loading state ────────────────────────────────────────────────────────
 
@@ -731,7 +493,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
       <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: '#F0EEE9' }}>
         <div className="max-w-[600px] mx-auto text-center py-16">
           <p className="text-gray-500">Quick Win not found.</p>
-          <Link href="/hub/quick-wins" className="text-[#E8B84B] hover:underline mt-4 inline-block">
+          <Link href="/hub/quick-wins" className="text-[#ffba06] hover:underline mt-4 inline-block">
             Browse Quick Wins
           </Link>
         </div>
@@ -743,18 +505,8 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const allStepsChecked = actionSteps.length > 0 && checkedSteps.size === actionSteps.length;
 
   const liftLabel = quickWin.capacity === 'low' ? 'Low Lift' : quickWin.capacity === 'medium' ? 'Medium Lift' : quickWin.capacity === 'high' ? 'High Lift' : null;
-  const liftColor = quickWin.capacity === 'low' ? '#6BA368' : quickWin.capacity === 'medium' ? '#E8B84B' : quickWin.capacity === 'high' ? '#E8927C' : '#9CA3AF';
+  const liftColor = quickWin.capacity === 'low' ? '#6BA368' : quickWin.capacity === 'medium' ? '#ffba06' : quickWin.capacity === 'high' ? '#E8927C' : '#9CA3AF';
 
-  // Community data
-  const filteredExperiences = expFilter === 'All'
-    ? experiences
-    : experiences.filter(e => e.status === expFilter);
-
-  const statusCounts = EXPERIENCE_STATUSES.reduce((acc, status) => {
-    acc[status] = experiences.filter(e => e.status === status).length;
-    return acc;
-  }, {} as Record<ExperienceStatus, number>);
-  const totalExperiences = experiences.length;
 
   // ─── Render ───────────────────────────────────────────────────────────────
 
@@ -767,7 +519,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           href="/hub/quick-wins"
           className="inline-flex items-center gap-2 text-sm mb-6 transition-colors"
           style={{ color: '#6B7280' }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = '#1B2A4A')}
+          onMouseEnter={(e) => (e.currentTarget.style.color = '#1e2749')}
           onMouseLeave={(e) => (e.currentTarget.style.color = '#6B7280')}
         >
           <ArrowLeft size={16} />
@@ -791,7 +543,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               width: '300px',
               height: '300px',
               borderRadius: '50%',
-              background: `${categoryColor}12`,
+              background: 'rgba(78, 205, 196, 0.08)',
               pointerEvents: 'none',
             }}
           />
@@ -843,7 +595,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
             style={{
               fontFamily: "'Source Serif 4', Georgia, serif",
               fontSize: 'clamp(28px, 4vw, 36px)',
-              color: '#1B2A4A',
+              color: '#1e2749',
               lineHeight: '1.25',
               maxWidth: '700px',
             }}
@@ -904,7 +656,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
             <div
               className="mb-6 p-5"
               style={{
-                borderLeft: '4px solid #E8B84B',
+                borderLeft: '4px solid #ffba06',
                 backgroundColor: '#FFFDF5',
                 borderRadius: '0 12px 12px 0',
               }}
@@ -915,7 +667,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   fontFamily: "'Source Serif 4', Georgia, serif",
                   fontStyle: 'italic',
                   fontSize: '15px',
-                  color: '#1B2A4A',
+                  color: '#1e2749',
                   lineHeight: '1.65',
                 }}
               >
@@ -945,7 +697,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-3 w-full py-4 font-semibold text-lg transition-opacity hover:opacity-90"
-                      style={{ backgroundColor: '#E8B84B', color: '#1B2A4A', borderRadius: '12px' }}
+                      style={{ backgroundColor: '#ffba06', color: '#1e2749', borderRadius: '12px' }}
                     >
                       <Download size={22} />
                       Download Resource
@@ -967,29 +719,11 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                 <div>
                   {quickWin.content && (
                     <div
-                      className="prose prose-gray max-w-none mb-8"
+                      className="prose prose-gray max-w-none"
                       style={{ fontSize: '15px', color: '#374151', lineHeight: '1.7' }}
                       dangerouslySetInnerHTML={{ __html: t(quickWin.content, quickWin.content_es) || '' }}
                     />
                   )}
-                  <div
-                    className="p-4 mb-6"
-                    style={{ backgroundColor: '#FFF8E7', border: '1px solid #E8B84B', borderRadius: '12px' }}
-                  >
-                    <p className="font-medium mb-2" style={{ color: '#1B2A4A' }}>
-                      Take a moment to reflect:
-                    </p>
-                    <textarea
-                      value={reflection}
-                      onChange={(e) => setReflection(e.target.value)}
-                      placeholder="What stood out to you? How might you apply this?"
-                      className="w-full p-3 border resize-none focus:outline-none focus:border-[#E8B84B]"
-                      style={{ minHeight: '100px', borderColor: '#E5E5E5', borderRadius: '8px' }}
-                    />
-                    <p className="text-xs mt-2" style={{ color: '#9CA3AF' }}>
-                      This is private. Just for you.
-                    </p>
-                  </div>
                 </div>
               )}
 
@@ -1004,13 +738,13 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
                       style={{ backgroundColor: 'rgba(27, 42, 74, 0.1)' }}
                     >
-                      <Play size={32} style={{ color: '#1B2A4A', marginLeft: '4px' }} />
+                      <Play size={32} style={{ color: '#1e2749', marginLeft: '4px' }} />
                     </div>
                     <p style={{ color: '#6B7280' }}>Video player coming soon</p>
                   </div>
                   {quickWin.content && (
                     <div>
-                      <h3 className="font-semibold mb-3" style={{ fontSize: '16px', color: '#1B2A4A' }}>
+                      <h3 className="font-semibold mb-3" style={{ fontSize: '16px', color: '#1e2749' }}>
                         Key Takeaways
                       </h3>
                       <div
@@ -1026,7 +760,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               {/* Activity type */}
               {quickWin.content_type === 'activity' && actionSteps.length > 0 && (
                 <div>
-                  <h3 className="font-semibold mb-4" style={{ fontSize: '16px', color: '#1B2A4A' }}>
+                  <h3 className="font-semibold mb-4" style={{ fontSize: '16px', color: '#1e2749' }}>
                     Complete these steps:
                   </h3>
                   <div className="space-y-3">
@@ -1092,7 +826,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   <div className="p-4 mb-4" style={{ backgroundColor: '#FFF8E7', borderRadius: '12px' }}>
                     <p
                       className="font-medium"
-                      style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontSize: '18px', color: '#1B2A4A' }}
+                      style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontSize: '18px', color: '#1e2749' }}
                     >
                       {quickWin.content || 'What is on your mind today?'}
                     </p>
@@ -1101,7 +835,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     value={reflection}
                     onChange={(e) => setReflection(e.target.value)}
                     placeholder="Write your thoughts here..."
-                    className="w-full p-4 border resize-none focus:outline-none focus:border-[#E8B84B]"
+                    className="w-full p-4 border resize-none focus:outline-none focus:border-[#ffba06]"
                     style={{ minHeight: '200px', borderColor: '#E5E5E5', fontSize: '15px', borderRadius: '8px' }}
                   />
                   <p className="text-xs mt-2 mb-4 flex items-center gap-1" style={{ color: '#9CA3AF' }}>
@@ -1118,8 +852,8 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                       disabled={!reflection.trim() || isSaving}
                       className="w-full py-3 font-medium transition-colors disabled:opacity-50"
                       style={{
-                        backgroundColor: reflection.trim() ? '#E8B84B' : '#E5E5E5',
-                        color: reflection.trim() ? '#1B2A4A' : '#9CA3AF',
+                        backgroundColor: reflection.trim() ? '#ffba06' : '#E5E5E5',
+                        color: reflection.trim() ? '#1e2749' : '#9CA3AF',
                         borderRadius: '12px',
                       }}
                     >
@@ -1136,7 +870,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                 className="bg-white p-6 md:p-8 mb-6"
                 style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}
               >
-                <h3 className="font-semibold mb-3" style={{ fontSize: '16px', color: '#1B2A4A' }}>
+                <h3 className="font-semibold mb-3" style={{ fontSize: '16px', color: '#1e2749' }}>
                   How to use this
                 </h3>
                 <div
@@ -1164,7 +898,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     <Link
                       href="/hub/quick-wins"
                       className="inline-flex items-center justify-center gap-2 px-6 py-3 font-medium transition-colors"
-                      style={{ backgroundColor: '#E8B84B', color: '#1B2A4A', borderRadius: '12px' }}
+                      style={{ backgroundColor: '#ffba06', color: '#1e2749', borderRadius: '12px' }}
                     >
                       <Zap size={18} />
                       Try Another Quick Win
@@ -1176,9 +910,9 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   onClick={handleMarkDone}
                   disabled={!user}
                   className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium border transition-colors disabled:opacity-50"
-                  style={{ borderColor: '#D1D5DB', color: '#6B7280', borderRadius: '10px', background: 'transparent' }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#1B2A4A'; e.currentTarget.style.color = '#1B2A4A'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#D1D5DB'; e.currentTarget.style.color = '#6B7280'; }}
+                  style={{ borderColor: '#1e2749', color: '#1e2749', borderRadius: '10px', background: 'transparent' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#1e2749'; e.currentTarget.style.color = '#ffffff'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#1e2749'; }}
                 >
                   <Check size={16} />
                   Mark as Used
@@ -1186,349 +920,13 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               )}
             </div>
 
-            {/* ─── COMMUNITY: "I TRIED IT" SECTION ─────────────────────── */}
-            <div
-              className="bg-white p-6 md:p-8 mb-6"
-              style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}
-            >
-              <div className="flex items-center justify-between mb-5">
-                <h2
-                  className="font-bold flex items-center gap-2"
-                  style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontSize: '20px', color: '#1B2A4A' }}
-                >
-                  <MessageSquare size={20} style={{ color: '#E8B84B' }} />
-                  What teachers are doing with this tool
-                  {totalExperiences > 0 && (
-                    <span
-                      className="text-xs font-medium px-2 py-0.5 rounded-full"
-                      style={{ background: '#F3F4F6', color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}
-                    >
-                      {totalExperiences}
-                    </span>
-                  )}
-                </h2>
-              </div>
-
-              {/* Status progress bars */}
-              {totalExperiences > 0 && (
-                <div className="mb-6 space-y-2.5">
-                  {EXPERIENCE_STATUSES.map(status => {
-                    const count = statusCounts[status];
-                    const pct = totalExperiences > 0 ? (count / totalExperiences) * 100 : 0;
-                    return (
-                      <div key={status} className="flex items-center gap-3">
-                        <span className="text-xs font-medium w-[90px] flex-shrink-0" style={{ color: '#374151' }}>
-                          {status}
-                        </span>
-                        <div className="flex-1 h-2 rounded-full" style={{ backgroundColor: '#F3F4F6' }}>
-                          <div
-                            className="h-2 rounded-full transition-all"
-                            style={{
-                              width: `${Math.max(pct, 2)}%`,
-                              backgroundColor: STATUS_COLORS[status],
-                            }}
-                          />
-                        </div>
-                        <span className="text-xs font-medium w-6 text-right" style={{ color: '#9CA3AF' }}>
-                          {count}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Prompt card */}
-              {!showExpForm ? (
-                <div
-                  className="p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-3"
-                  style={{ background: '#FAFAF5', borderRadius: '12px', border: '1px dashed #D1D5DB' }}
-                >
-                  <p className="text-sm flex-1" style={{ color: '#374151' }}>
-                    Tried it? Adapted it? Still working through it?
-                  </p>
-                  <button
-                    onClick={() => setShowExpForm(true)}
-                    className="px-4 py-2 text-sm font-semibold flex-shrink-0 transition-opacity hover:opacity-90"
-                    style={{ backgroundColor: '#E8B84B', color: '#1B2A4A', borderRadius: '8px' }}
-                  >
-                    Share my experience
-                  </button>
-                </div>
-              ) : (
-                <div
-                  className="p-5 mb-6"
-                  style={{ background: '#FAFAF5', borderRadius: '12px', border: '1px solid #E5E7EB' }}
-                >
-                  <p className="text-sm font-semibold mb-3" style={{ color: '#1B2A4A' }}>
-                    How did it go?
-                  </p>
-                  {/* Status radio buttons */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {EXPERIENCE_STATUSES.map(status => (
-                      <label
-                        key={status}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium cursor-pointer transition-all"
-                        style={{
-                          borderRadius: '20px',
-                          border: `1.5px solid ${expStatus === status ? STATUS_COLORS[status] : '#D1D5DB'}`,
-                          backgroundColor: expStatus === status ? `${STATUS_COLORS[status]}15` : 'white',
-                          color: expStatus === status ? STATUS_COLORS[status] : '#6B7280',
-                        }}
-                      >
-                        <input
-                          type="radio"
-                          name="exp-status"
-                          value={status}
-                          checked={expStatus === status}
-                          onChange={() => setExpStatus(status)}
-                          className="sr-only"
-                        />
-                        {status}
-                      </label>
-                    ))}
-                  </div>
-                  <textarea
-                    value={expStory}
-                    onChange={(e) => setExpStory(e.target.value)}
-                    placeholder="Tell other teachers about your experience..."
-                    className="w-full p-3 border resize-none focus:outline-none focus:border-[#E8B84B] text-sm"
-                    style={{ minHeight: '100px', borderColor: '#E5E5E5', borderRadius: '8px' }}
-                  />
-                  <button
-                    onClick={handleSubmitExperience}
-                    disabled={!expStory.trim() || expSubmitting || !user}
-                    className="w-full mt-3 py-3 text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
-                    style={{ backgroundColor: '#E8B84B', color: '#1B2A4A', borderRadius: '10px' }}
-                  >
-                    {expSubmitting ? 'Submitting...' : 'Submit'}
-                  </button>
-                  <button
-                    onClick={() => setShowExpForm(false)}
-                    className="w-full mt-2 py-2 text-xs"
-                    style={{ color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer' }}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              )}
-
-              {/* Filter tabs */}
-              {totalExperiences > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {(['All', ...EXPERIENCE_STATUSES] as const).map(tab => (
-                    <button
-                      key={tab}
-                      onClick={() => setExpFilter(tab)}
-                      className="px-3 py-1 text-xs font-medium transition-all"
-                      style={{
-                        borderRadius: '16px',
-                        backgroundColor: expFilter === tab ? '#1B2A4A' : '#F3F4F6',
-                        color: expFilter === tab ? 'white' : '#6B7280',
-                      }}
-                    >
-                      {tab}
-                      {tab === 'All' ? ` (${totalExperiences})` : ` (${statusCounts[tab]})`}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Experience posts */}
-              <div className="space-y-4">
-                {filteredExperiences.map(exp => (
-                  <div
-                    key={exp.id}
-                    className="p-4"
-                    style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '12px' }}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <span
-                        className="text-xs font-semibold px-2 py-0.5 rounded-full"
-                        style={{
-                          backgroundColor: `${STATUS_COLORS[exp.status]}18`,
-                          color: STATUS_COLORS[exp.status],
-                        }}
-                      >
-                        {exp.status}
-                      </span>
-                      <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                        {exp.user_display_name}
-                      </span>
-                      <span className="text-xs" style={{ color: '#D1D5DB' }}>
-                        {'\u00B7'}
-                      </span>
-                      <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                        {timeAgo(exp.submitted_at)}
-                      </span>
-                    </div>
-                    <p className="text-sm mb-3" style={{ color: '#374151', lineHeight: '1.6' }}>
-                      {exp.story}
-                    </p>
-                    <button
-                      onClick={() => handleHelpful(exp.id)}
-                      className="inline-flex items-center gap-1.5 text-xs transition-colors"
-                      style={{ color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                    >
-                      <ThumbsUp size={13} />
-                      Helpful {exp.helpful_count > 0 && `(${exp.helpful_count})`}
-                    </button>
-                  </div>
-                ))}
-                {filteredExperiences.length === 0 && totalExperiences === 0 && (
-                  <p className="text-sm text-center py-6" style={{ color: '#9CA3AF' }}>
-                    Be the first to share your experience with this tool.
-                  </p>
-                )}
-                {filteredExperiences.length === 0 && totalExperiences > 0 && (
-                  <p className="text-sm text-center py-4" style={{ color: '#9CA3AF' }}>
-                    No experiences match this filter.
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* ─── Q&A SECTION ─────────────────────────────────────────── */}
-            <div
-              className="bg-white p-6 md:p-8 mb-6"
-              style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}
-            >
-              <h2
-                className="font-bold flex items-center gap-2 mb-5"
-                style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontSize: '20px', color: '#1B2A4A' }}
-              >
-                Q&A
-                {questions.length > 0 && (
-                  <span
-                    className="text-xs font-medium px-2 py-0.5 rounded-full"
-                    style={{ background: '#F3F4F6', color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}
-                  >
-                    {questions.length}
-                  </span>
-                )}
-              </h2>
-
-              {/* New question input */}
-              <div className="flex gap-2 mb-6">
-                <input
-                  type="text"
-                  value={newQuestion}
-                  onChange={(e) => setNewQuestion(e.target.value)}
-                  placeholder="Type your question..."
-                  className="flex-1 px-4 py-2.5 text-sm border focus:outline-none focus:border-[#1B2A4A]"
-                  style={{ borderColor: '#E5E7EB', borderRadius: '10px' }}
-                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmitQuestion(); } }}
-                />
-                <button
-                  onClick={handleSubmitQuestion}
-                  disabled={!newQuestion.trim() || questionSubmitting || !user}
-                  className="px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50 flex items-center gap-1.5"
-                  style={{ backgroundColor: '#1B2A4A', borderRadius: '10px' }}
-                >
-                  <Send size={14} />
-                  Post
-                </button>
-              </div>
-
-              {/* Questions list */}
-              <div className="space-y-4">
-                {questions.map(q => (
-                  <div
-                    key={q.id}
-                    className="p-4"
-                    style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '12px' }}
-                  >
-                    <div className="flex items-start gap-3">
-                      {/* Avatar */}
-                      <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold"
-                        style={{ backgroundColor: '#E8B84B20', color: '#E8B84B' }}
-                      >
-                        {avatarInitial(q.user_display_name)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-medium" style={{ color: '#1B2A4A' }}>
-                            {q.user_display_name}
-                          </span>
-                          <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                            {timeAgo(q.asked_at)}
-                          </span>
-                        </div>
-                        <p className="text-sm mb-2" style={{ color: '#374151', lineHeight: '1.6' }}>
-                          {q.question}
-                        </p>
-
-                        {/* Answers */}
-                        {q.answers.length > 0 && (
-                          <div className="ml-2 pl-3 space-y-3 mt-3" style={{ borderLeft: '2px solid #F3F4F6' }}>
-                            {q.answers.map(a => (
-                              <div key={a.id}>
-                                <div className="flex items-center gap-2 mb-1">
-                                  <div
-                                    className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-                                    style={{ backgroundColor: '#5BBEC420', color: '#5BBEC4' }}
-                                  >
-                                    {avatarInitial(a.user_display_name)}
-                                  </div>
-                                  <span className="text-xs font-medium" style={{ color: '#1B2A4A' }}>
-                                    {a.user_display_name}
-                                  </span>
-                                  <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                                    {timeAgo(a.answered_at)}
-                                  </span>
-                                </div>
-                                <p className="text-sm ml-8" style={{ color: '#374151', lineHeight: '1.6' }}>
-                                  {a.answer}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Reply toggle */}
-                        <button
-                          onClick={() => setExpandedQuestion(expandedQuestion === q.id ? null : q.id)}
-                          className="inline-flex items-center gap-1 text-xs mt-2 transition-colors"
-                          style={{ color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                        >
-                          {expandedQuestion === q.id ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-                          Reply
-                        </button>
-
-                        {/* Reply form */}
-                        {expandedQuestion === q.id && (
-                          <div className="flex gap-2 mt-2">
-                            <input
-                              type="text"
-                              value={answerText}
-                              onChange={(e) => setAnswerText(e.target.value)}
-                              placeholder="Write a reply..."
-                              className="flex-1 px-3 py-2 text-sm border focus:outline-none focus:border-[#1B2A4A]"
-                              style={{ borderColor: '#E5E7EB', borderRadius: '8px' }}
-                              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmitAnswer(q.id); } }}
-                            />
-                            <button
-                              onClick={() => handleSubmitAnswer(q.id)}
-                              disabled={!answerText.trim() || answerSubmitting || !user}
-                              className="px-3 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-                              style={{ backgroundColor: '#1B2A4A', borderRadius: '8px' }}
-                            >
-                              <Send size={12} />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                {questions.length === 0 && (
-                  <p className="text-sm text-center py-6" style={{ color: '#9CA3AF' }}>
-                    No questions yet. Be the first to ask!
-                  </p>
-                )}
-              </div>
-            </div>
+            {/* ─── COMMUNITY CONVERSATION ───────────────────────────── */}
+            <LessonConversation
+              lessonId={quickWin.id}
+              courseId={quickWin.id}
+              userId={user?.id}
+              apiBasePath={`/api/hub/quick-wins/${quickWin.id}/conversation`}
+            />
           </div>
 
           {/* ─── RIGHT COLUMN SIDEBAR ────────────────────────────────── */}
@@ -1547,7 +945,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2 w-full py-3 text-sm font-semibold transition-opacity hover:opacity-90"
-                      style={{ backgroundColor: '#E8B84B', color: '#1B2A4A', borderRadius: '12px' }}
+                      style={{ backgroundColor: '#ffba06', color: '#1e2749', borderRadius: '12px' }}
                     >
                       <Download size={18} />
                       Download Resource
@@ -1560,8 +958,8 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     disabled={isSaved}
                     className="flex items-center justify-center gap-2 w-full py-3 text-sm font-semibold border-2 transition-all"
                     style={{
-                      borderColor: isSaved ? '#10B981' : '#1B2A4A',
-                      color: isSaved ? '#10B981' : '#1B2A4A',
+                      borderColor: isSaved ? '#10B981' : '#1e2749',
+                      color: isSaved ? '#10B981' : '#1e2749',
                       background: isSaved ? '#D1FAE5' : 'transparent',
                       borderRadius: '12px',
                     }}
@@ -1588,12 +986,12 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   className="bg-white p-6"
                   style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}
                 >
-                  <h3 className="font-semibold mb-4" style={{ fontSize: '15px', color: '#1B2A4A' }}>
+                  <h3 className="font-semibold mb-4" style={{ fontSize: '15px', color: '#1e2749' }}>
                     You might also like
                   </h3>
                   <div className="space-y-3">
                     {recommendations.map((rec) => {
-                      const recColor = CATEGORY_COLORS[rec.category || ''] || '#E8B84B';
+                      const recColor = CATEGORY_COLORS[rec.category || ''] || '#ffba06';
                       return (
                         <Link
                           key={rec.id}
@@ -1611,7 +1009,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                             <Zap size={18} style={{ color: recColor }} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium leading-tight mb-1" style={{ color: '#1B2A4A' }}>
+                            <p className="text-sm font-medium leading-tight mb-1" style={{ color: '#1e2749' }}>
                               {rec.title}
                             </p>
                             <div className="flex items-center gap-2">
@@ -1621,7 +1019,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                               >
                                 {rec.category}
                               </span>
-                              <span className="text-xs flex items-center gap-1" style={{ color: '#E8B84B' }}>
+                              <span className="text-xs flex items-center gap-1" style={{ color: '#ffba06' }}>
                                 Try it <ExternalLink size={10} />
                               </span>
                             </div>
@@ -1639,7 +1037,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         {/* ─── BOTTOM: EXPLORE MORE ──────────────────────────────────── */}
         {moreQuickWins.length > 0 && (
           <div className="mt-12 mb-8">
-            <h2 className="font-bold mb-6" style={{ fontSize: '20px', color: '#1B2A4A', fontFamily: "'Source Serif 4', Georgia, serif" }}>
+            <h2 className="font-bold mb-6" style={{ fontSize: '20px', color: '#1e2749', fontFamily: "'Source Serif 4', Georgia, serif" }}>
               Explore more Quick Wins
             </h2>
             <div
@@ -1647,7 +1045,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               style={{ scrollbarWidth: 'thin', scrollbarColor: '#D1D5DB transparent' }}
             >
               {moreQuickWins.map((qw) => {
-                const qwColor = CATEGORY_COLORS[qw.category || ''] || '#E8B84B';
+                const qwColor = CATEGORY_COLORS[qw.category || ''] || '#ffba06';
                 return (
                   <Link
                     key={qw.id}
@@ -1657,7 +1055,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   >
                     {/* Color bar */}
                     <div className="w-full h-2 mb-3" style={{ backgroundColor: qwColor, borderRadius: '4px' }} />
-                    <p className="text-sm font-semibold mb-2 line-clamp-2" style={{ color: '#1B2A4A', lineHeight: '1.4' }}>
+                    <p className="text-sm font-semibold mb-2 line-clamp-2" style={{ color: '#1e2749', lineHeight: '1.4' }}>
                       {qw.title}
                     </p>
                     <div className="flex items-center gap-2">
