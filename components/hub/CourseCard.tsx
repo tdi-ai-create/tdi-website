@@ -245,6 +245,20 @@ export default function CourseCard({
             <Check size={18} />
             <span className="font-medium">Completed</span>
           </div>
+        ) : true ? (
+          /* Coming Soon state -- course playback not yet live */
+          <div
+            className="w-full py-2.5 rounded-lg font-medium text-center"
+            style={{
+              backgroundColor: '#F3F4F6',
+              color: '#6B7280',
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '14px',
+              cursor: 'default',
+            }}
+          >
+            Coming Soon
+          </div>
         ) : isEnrolled ? (
           <div className="space-y-2">
             {/* Gradient progress bar */}
