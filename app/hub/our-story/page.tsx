@@ -81,27 +81,6 @@ export default function OurStoryPage() {
           }}
         />
         <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
-          {/* TDI Mark - centered above eyebrow */}
-          <div className="flex justify-center mb-6">
-            <svg
-              width="48"
-              height="48"
-              viewBox="0 0 100 100"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              style={{ opacity: 0.95 }}
-            >
-              <circle cx="50" cy="50" r="46" stroke="#ffba06" strokeWidth="3" fill="none" />
-              <path
-                d="M 35 30 L 35 70 M 35 50 Q 35 42 45 42 Q 55 42 55 52 L 55 70"
-                stroke="#ffba06"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                fill="none"
-              />
-            </svg>
-          </div>
           <p
             style={{
               fontFamily: "'DM Sans', sans-serif",
@@ -289,6 +268,108 @@ export default function OurStoryPage() {
               'Our Creator Studio has active creators building content for you right now.'
             )}
           </p>
+          {/* Creator avatar row - faces of real educators behind the Hub */}
+          <div className="flex items-center gap-4 mt-6 mb-6 flex-wrap">
+            {/* Stacked avatar circles */}
+            <div className="flex -space-x-3">
+              {[
+                { src: '/images/creators/creator-1.jpg', alt: 'TDI creator' },
+                { src: '/images/creators/creator-2.jpg', alt: 'TDI creator' },
+                { src: '/images/creators/creator-3.jpg', alt: 'TDI creator' },
+                { src: '/images/creators/creator-4.jpg', alt: 'TDI creator' },
+                { src: '/images/creators/creator-5.jpg', alt: 'TDI creator' },
+              ].map((creator, i) => (
+                <div
+                  key={i}
+                  className="rounded-full overflow-hidden"
+                  style={{
+                    width: '56px',
+                    height: '56px',
+                    border: '3px solid #ffba06',
+                    backgroundColor: '#f5f5f5',
+                    boxShadow: '0 2px 8px rgba(30, 39, 73, 0.15)',
+                  }}
+                >
+                  <img
+                    src={creator.src}
+                    alt={creator.alt}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                    }}
+                    onError={(e) => {
+                      // Fallback to navy initial circle if image missing
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                </div>
+              ))}
+
+              {/* Icon circles representing types of expertise */}
+              <div
+                className="rounded-full flex items-center justify-center"
+                style={{
+                  width: '56px',
+                  height: '56px',
+                  border: '3px solid #ffba06',
+                  backgroundColor: '#fff8e1',
+                  boxShadow: '0 2px 8px rgba(30, 39, 73, 0.15)',
+                }}
+                aria-label="Specialist expertise"
+              >
+                {/* Beaker icon for specialists */}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"
+                    stroke="#1e2749"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+
+              <div
+                className="rounded-full flex items-center justify-center"
+                style={{
+                  width: '56px',
+                  height: '56px',
+                  border: '3px solid #ffba06',
+                  backgroundColor: '#fde8e8',
+                  boxShadow: '0 2px 8px rgba(30, 39, 73, 0.15)',
+                }}
+                aria-label="Coach expertise"
+              >
+                {/* Lightbulb icon for coaches */}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.7.6 1 1.5 1 2.3v1h6v-1c0-.8.3-1.7 1-2.3A7 7 0 0 0 12 2z"
+                    stroke="#1e2749"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* Right-side label */}
+            <div
+              className="ml-2"
+              style={{
+                color: '#1e2749',
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '15px',
+                lineHeight: 1.45,
+                maxWidth: '320px',
+              }}
+            >
+              Teachers Deserve It is built by a team of educators, specialists, and creators making this work possible for schools across all 50 states.
+            </div>
+          </div>
+
           <a
             href="/about#creators"
             style={{
@@ -306,6 +387,164 @@ export default function OurStoryPage() {
             {tUI('Meet our creators')}
             <ArrowRight size={16} />
           </a>
+        </div>
+      </section>
+
+      {/* ─── Section 3b: How the Hub Gets Built ──────────────────────────── */}
+      <section className="w-full py-16 md:py-20 px-4 md:px-6">
+        <div className="max-w-6xl mx-auto">
+          {/* Section header */}
+          <div className="text-center mb-12 md:mb-16">
+            <div
+              className="text-sm uppercase mb-3"
+              style={{
+                color: '#ffba06',
+                fontFamily: 'DM Sans, sans-serif',
+                letterSpacing: '0.12em',
+                fontWeight: 600,
+              }}
+            >
+              How the Hub gets built
+            </div>
+            <h2
+              className="text-3xl md:text-5xl"
+              style={{
+                color: '#1e2749',
+                fontFamily: 'Fraunces, serif',
+                fontWeight: 700,
+                lineHeight: 1.15,
+              }}
+            >
+              From classroom idea to your fingertips.
+            </h2>
+          </div>
+
+          {/* 4-step horizontal flow */}
+          <div className="flex flex-col md:flex-row items-start md:items-stretch justify-between gap-8 md:gap-4 relative">
+            {[
+              {
+                title: 'Teacher Idea',
+                body: 'A working educator names a pain point or wishes a tool existed. Sometimes it is one of you.',
+                icon: (
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.7.6 1 1.5 1 2.3v1h6v-1c0-.8.3-1.7 1-2.3A7 7 0 0 0 12 2z"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                ),
+                accent: false,
+              },
+              {
+                title: 'Creator Builds',
+                body: 'A real educator designs the course, quick win, or download. Not a textbook company. Not a startup.',
+                icon: (
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                ),
+                accent: false,
+              },
+              {
+                title: 'Team Refines',
+                body: 'Our team handles editing, design, captions, Spanish translation, and platform polish.',
+                icon: (
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="3" stroke="white" strokeWidth="2" />
+                    <path
+                      d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                ),
+                accent: false,
+              },
+              {
+                title: 'You Use It',
+                body: 'It lands in the Hub. You open it Monday morning and it actually works in your classroom.',
+                icon: (
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4-6.2-4.6-6.2 4.6 2.4-7.4L2 9.4h7.6L12 2z"
+                      stroke="#1e2749"
+                      strokeWidth="2"
+                      strokeLinejoin="round"
+                      fill="#1e2749"
+                    />
+                  </svg>
+                ),
+                accent: true,
+              },
+            ].map((step, i) => (
+              <div key={i} className="flex-1 flex flex-col items-center text-center relative">
+                {/* Icon circle */}
+                <div
+                  className="rounded-full flex items-center justify-center mb-5 relative z-10"
+                  style={{
+                    width: '72px',
+                    height: '72px',
+                    backgroundColor: step.accent ? '#ffba06' : '#1e2749',
+                    boxShadow: '0 4px 12px rgba(30, 39, 73, 0.18)',
+                  }}
+                >
+                  {step.icon}
+                </div>
+
+                {/* Step title */}
+                <h3
+                  className="text-xl md:text-2xl mb-2"
+                  style={{
+                    color: '#1e2749',
+                    fontFamily: 'Fraunces, serif',
+                    fontWeight: 700,
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {step.title}
+                </h3>
+
+                {/* Step body */}
+                <p
+                  className="text-sm md:text-base max-w-[220px]"
+                  style={{
+                    color: '#1e2749',
+                    opacity: 0.75,
+                    fontFamily: 'DM Sans, sans-serif',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {step.body}
+                </p>
+
+                {/* Dashed connector line - hidden on mobile, only between cards on desktop */}
+                {i < 3 && (
+                  <div
+                    className="hidden md:block absolute"
+                    style={{
+                      top: '32px',
+                      left: 'calc(50% + 40px)',
+                      right: 'calc(-50% + 40px)',
+                      height: '2px',
+                      borderTop: '2px dashed #80a4ed',
+                      zIndex: 0,
+                    }}
+                    aria-hidden="true"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
