@@ -10,6 +10,7 @@ import AvatarDisplay from '@/components/hub/AvatarDisplay';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { checkTrackerEligibility, type TrackerEligibility } from '@/lib/hub/transformation';
 import { getRecommendations, hasCompletedOnboarding, type RecommendedCourse } from '@/lib/hub/recommendations';
+import { checkRecognitions } from '@/lib/hub/recognitions';
 import {
   BookOpen,
   Award,
@@ -169,6 +170,7 @@ export default function HubDashboard() {
   const [featuredQuickWins, setFeaturedQuickWins] = useState<QuickWin[]>([]);
   const [tip, setTip] = useState<string>(FALLBACK_TIPS[0]);
   const [certificateCount, setCertificateCount] = useState<number>(0);
+  const [fieldNotesCount, setFieldNotesCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const [trackerEligibility, setTrackerEligibility] = useState<TrackerEligibility | null>(null);
   const [recommendations, setRecommendations] = useState<RecommendedCourse[]>([]);
@@ -308,6 +310,14 @@ export default function HubDashboard() {
           .eq('user_id', user.id);
 
         setCertificateCount(certCount || 0);
+
+        // Check Field Notes (recognitions)
+        try {
+          const recResult = await checkRecognitions(user.id, supabase);
+          setFieldNotesCount(recResult.earned.length);
+        } catch {
+          // Silent fail
+        }
       } catch (error) {
         console.error('Error loading dashboard data:', error);
       } finally {
@@ -733,24 +743,32 @@ export default function HubDashboard() {
             </button>
           </div>
 
-          {/* Certificates Widget */}
+          {/* Achievements Widget */}
           <div
-            className="bg-white rounded-2xl p-5 flex items-center gap-3.5 mb-4"
+            className="bg-white rounded-2xl p-5 mb-4"
             style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
           >
-            <div
-              className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{ background: '#FEF3C7' }}
-            >
-              <Award size={20} style={{ color: '#D97706' }} />
+            <div className="flex items-center gap-3.5 mb-3">
+              <div
+                className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: '#FEF3C7' }}
+              >
+                <Award size={20} style={{ color: '#D97706' }} />
+              </div>
+              <div>
+                <div className="text-xl font-bold" style={{ color: '#1B2A4A' }}>{certificateCount + fieldNotesCount}</div>
+                <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{tUI('Achievements earned')}</div>
+              </div>
+              <Link href="/hub/certificates" className="ml-auto text-xs font-semibold" style={{ color: '#38618C' }}>
+                {tUI('View all')} →
+              </Link>
             </div>
-            <div>
-              <div className="text-xl font-bold" style={{ color: '#1B2A4A' }}>{certificateCount}</div>
-              <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{tUI('Certificates earned')}</div>
-            </div>
-            <Link href="/hub/certificates" className="ml-auto text-xs font-semibold" style={{ color: '#38618C' }}>
-              {tUI('View all')} →
-            </Link>
+            {(certificateCount > 0 || fieldNotesCount > 0) && (
+              <div className="flex gap-4 text-xs" style={{ color: '#6B7280' }}>
+                {certificateCount > 0 && <span>{certificateCount} {tUI('Certificates')}</span>}
+                {fieldNotesCount > 0 && <span>{fieldNotesCount} {tUI('Field Notes')}</span>}
+              </div>
+            )}
           </div>
 
           {/* Transformation Tracker - shown when not eligible */}
