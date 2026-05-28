@@ -469,24 +469,44 @@ export default function HubDashboard() {
 
       {/* Main Content - Constrained width */}
       <div className="max-w-5xl mx-auto px-4 md:px-6 py-6">
-        {/* Tour welcome card -- persistent until they take the tour */}
+        {/* Tour welcome overlay -- full screen, demands attention */}
         {tourChecked && !tourCompleted && !showTour && (
           <div
-            className="mb-6 p-4 flex items-center justify-between rounded-xl"
-            style={{ backgroundColor: '#1e2749', border: '1px solid rgba(255,255,255,0.1)' }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: 'linear-gradient(135deg, rgba(30,39,73,0.95) 0%, rgba(56,97,140,0.92) 100%)' }}
           >
-            <div>
-              <p className="text-sm font-semibold text-white">{tUI('Welcome to the new TDI Learning Hub')}</p>
-              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{tUI('A lot has changed. Take a quick tour when you are ready.')}</p>
-            </div>
-            <div className="flex items-center gap-2 flex-shrink-0 ml-4">
-              <button
-                onClick={() => setShowTour(true)}
-                className="text-xs font-semibold px-4 py-2 rounded-lg"
-                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            <div className="text-center max-w-md">
+              <div
+                className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6"
+                style={{ backgroundColor: 'rgba(255,186,6,0.15)' }}
               >
-                {tUI('Take the tour')}
-              </button>
+                <span style={{ fontSize: '28px', color: '#ffba06' }}>&#10024;</span>
+              </div>
+              <h2
+                className="text-2xl font-bold text-white mb-3"
+                style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
+              >
+                {tUI('Welcome to the new Learning Hub')}
+              </h2>
+              <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.7)', lineHeight: '1.7' }}>
+                {tUI('We built something new for you. A quick tour will show you the highlights -- it takes about 60 seconds and you can skip anytime.')}
+              </p>
+              <div className="flex flex-col gap-3 items-center">
+                <button
+                  onClick={() => setShowTour(true)}
+                  className="px-8 py-3 rounded-xl text-sm font-bold transition-opacity hover:opacity-90"
+                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                >
+                  {tUI('Show me around')}
+                </button>
+                <button
+                  onClick={() => setTourCompleted(true)}
+                  className="text-xs transition-colors"
+                  style={{ color: 'rgba(255,255,255,0.4)' }}
+                >
+                  {tUI('Skip for now')}
+                </button>
+              </div>
             </div>
           </div>
         )}
