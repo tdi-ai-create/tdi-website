@@ -22,7 +22,6 @@ const FILTER_CATEGORIES = [
   'Time Savers',
   'Leadership',
   'Communication',
-  'New Teacher',
 ];
 
 interface Course {
