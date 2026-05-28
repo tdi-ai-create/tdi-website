@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useHub } from '@/components/hub/HubContext';
+import { useTranslation } from '@/lib/hub/useTranslation';
 import AvatarDisplay from '@/components/hub/AvatarDisplay';
 import AvatarPicker from '@/components/hub/AvatarPicker';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
@@ -26,10 +27,89 @@ import {
   Lightbulb,
   Compass,
   CheckCheck,
+  Target,
+  BarChart3,
+  BookOpen,
+  Award,
+  Sparkles,
+  Wrench,
+  Library,
+  Bookmark,
+  Coffee,
+  Share2,
+  ExternalLink,
+  ChevronRight,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import {
+  checkRecognitions,
+  type RecognitionResult,
+} from '@/lib/hub/recognitions';
 
-type Role = 'classroom_teacher' | 'para' | 'coach' | 'school_leader' | 'district_staff' | 'other';
-type GoalType = 'reduce_stress' | 'save_time' | 'classroom_management' | 'find_joy' | 'team_growth' | 'role_support' | 'stop_bringing_work_home' | 'feel_like_myself' | 'make_it_to_summer' | 'better_parent_communication' | 'fresh_ideas' | 'figure_out_whats_next' | 'all_of_the_above';
+// ── Types ──────────────────────────────────────────────────────────────
+
+type Role =
+  | 'classroom_teacher'
+  | 'para'
+  | 'coach'
+  | 'school_leader'
+  | 'district_staff'
+  | 'other';
+type GoalType =
+  | 'reduce_stress'
+  | 'save_time'
+  | 'classroom_management'
+  | 'find_joy'
+  | 'team_growth'
+  | 'role_support'
+  | 'stop_bringing_work_home'
+  | 'feel_like_myself'
+  | 'make_it_to_summer'
+  | 'better_parent_communication'
+  | 'fresh_ideas'
+  | 'figure_out_whats_next'
+  | 'all_of_the_above';
+
+type GrowthTab =
+  | 'profile'
+  | 'goals'
+  | 'stats'
+  | 'wellbeing'
+  | 'library'
+  | 'recognitions';
+
+interface ActivityEntry {
+  id: string;
+  action: string;
+  metadata: Record<string, string> | null;
+  created_at: string;
+}
+
+interface FavoriteEntry {
+  id: string;
+  content_type: 'course' | 'quick_win';
+  content_id: string;
+  created_at: string;
+  title?: string;
+  category?: string;
+}
+
+interface CheckInEntry {
+  id: string;
+  score: number;
+  responses: Record<string, string> | null;
+  created_at: string;
+}
+
+interface StatsData {
+  toolsExplored: number;
+  hoursSaved: string;
+  communityContributions: number;
+  daysActive: number;
+  recentActivity: ActivityEntry[];
+}
+
+// ── Constants ──────────────────────────────────────────────────────────
 
 const ROLES: { value: Role; label: string; subtitle: string }[] = [
   { value: 'classroom_teacher', label: 'Classroom Teacher', subtitle: 'Any grade, any subject' },
@@ -71,10 +151,97 @@ const GRID_GOALS: { value: GoalType; label: string }[] = [
   { value: 'figure_out_whats_next', label: 'Figure out what is next' },
 ];
 
-const ALL_INDIVIDUAL_GOALS: GoalType[] = GRID_GOALS.map(g => g.value);
+const ALL_INDIVIDUAL_GOALS: GoalType[] = GRID_GOALS.map((g) => g.value);
+
+const GOAL_QUICK_WIN_MAP: Record<string, string[]> = {
+  reduce_stress: ['Breathing exercise', '2-minute reset', 'Stress journal prompt'],
+  save_time: ['Template pack', 'Batch grading tips', 'Auto-response email'],
+  classroom_management: ['Morning meeting script', 'Transition timer', 'Calm corner guide'],
+  find_joy: ['Gratitude prompt', 'Joy list builder', 'Celebration tracker'],
+  team_growth: ['Team check-in template', 'Feedback framework', 'Meeting agenda tool'],
+  role_support: ['Role clarity worksheet', 'Boundary builder', 'Communication guide'],
+  stop_bringing_work_home: ['End-of-day checklist', 'Priority matrix', 'Time boundary plan'],
+  feel_like_myself: ['Identity reflection', 'Values check-in', 'Self-care planner'],
+  make_it_to_summer: ['Countdown tracker', 'Weekly wins log', 'Survival mode toolkit'],
+  better_parent_communication: ['Email templates', 'Conference prep sheet', 'Positive note generator'],
+  fresh_ideas: ['Inspiration board', 'Lesson remix guide', 'Cross-curricular spark'],
+  figure_out_whats_next: ['Career reflection', 'Skills inventory', 'Goal mapping worksheet'],
+};
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  Sparkles,
+  Wrench,
+  Library,
+  Bookmark,
+  Heart,
+  Coffee,
+  MessageCircle,
+  Share2,
+  Calendar,
+  Clock,
+  Star: Award,
+};
+
+const TAB_CONFIG: { id: GrowthTab; label: string; icon: LucideIcon }[] = [
+  { id: 'profile', label: 'Profile', icon: User },
+  { id: 'goals', label: 'Goals', icon: Target },
+  { id: 'stats', label: 'My Stats', icon: BarChart3 },
+  { id: 'wellbeing', label: 'Wellbeing', icon: Heart },
+  { id: 'library', label: 'Library', icon: BookOpen },
+  { id: 'recognitions', label: 'Recognitions', icon: Award },
+];
+
+// ── Helpers ────────────────────────────────────────────────────────────
+
+function getIcon(name: string): LucideIcon {
+  return ICON_MAP[name] || Sparkles;
+}
+
+function humanizeAction(action: string): string {
+  const map: Record<string, string> = {
+    quick_win_viewed: 'Explored a tool',
+    quick_win_saved: 'Saved a tool',
+    moment_mode_completed: 'Completed a Moment Mode session',
+    share_used: 'Shared a resource',
+    course_started: 'Started a course',
+    course_completed: 'Completed a course',
+    daily_check_in: 'Did a Vibe Check',
+    page_view: 'Visited a page',
+  };
+  return map[action] || action.replace(/_/g, ' ');
+}
+
+function formatRelativeDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+  if (days === 0) return 'Today';
+  if (days === 1) return 'Yesterday';
+  if (days < 7) return `${days} days ago`;
+  if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+// ── Component ──────────────────────────────────────────────────────────
 
 export default function ProfileSettingsPage() {
   const { profile, user } = useHub();
+  const { tUI } = useTranslation();
+
+  // Active tab
+  const [activeTab, setActiveTab] = useState<GrowthTab>('profile');
+
+  // Profile state
   const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
   const [displayName, setDisplayName] = useState('');
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
@@ -86,7 +253,14 @@ export default function ProfileSettingsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [savedField, setSavedField] = useState<string | null>(null);
 
-  // Initialize state from profile
+  // Data for other tabs
+  const [statsData, setStatsData] = useState<StatsData | null>(null);
+  const [checkIns, setCheckIns] = useState<CheckInEntry[]>([]);
+  const [favorites, setFavorites] = useState<FavoriteEntry[]>([]);
+  const [recognitionData, setRecognitionData] = useState<RecognitionResult | null>(null);
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  // ── Initialize profile state ─────────────────────────────────────────
   useEffect(() => {
     if (profile) {
       setDisplayName(profile.display_name || '');
@@ -94,7 +268,6 @@ export default function ProfileSettingsPage() {
       setSelectedAvatarId(profile.avatar_id);
       setUploadedAvatarUrl(profile.avatar_url);
 
-      // Load goals from onboarding_data
       const onboardingData = profile.onboarding_data as { goals?: GoalType[] } | null;
       if (onboardingData?.goals) {
         setSelectedGoals(onboardingData.goals);
@@ -102,14 +275,141 @@ export default function ProfileSettingsPage() {
     }
   }, [profile]);
 
+  // ── Load data for all tabs ────────────────────────────────────────────
+  useEffect(() => {
+    if (!user?.id || dataLoaded) return;
+
+    const loadData = async () => {
+      const supabase = getSupabase();
+
+      const [
+        activityResult,
+        recentResult,
+        responsesResult,
+        checkInResult,
+        favoritesResult,
+        recognitionResult,
+      ] = await Promise.all([
+        // All activity for stats
+        supabase
+          .from('hub_activity_log')
+          .select('action, created_at')
+          .eq('user_id', user.id),
+        // Recent activity (last 5)
+        supabase
+          .from('hub_activity_log')
+          .select('id, action, metadata, created_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(5),
+        // Community contributions
+        supabase
+          .from('quick_win_responses')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id),
+        // Vibe Check history
+        supabase
+          .from('hub_assessments')
+          .select('id, score, responses, created_at')
+          .eq('user_id', user.id)
+          .eq('type', 'daily_check_in')
+          .order('created_at', { ascending: false }),
+        // Favorites with content info
+        supabase
+          .from('hub_favorites')
+          .select('id, content_type, content_id, created_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false }),
+        // Recognitions
+        checkRecognitions(user.id, supabase),
+      ]);
+
+      // Process stats
+      const allActivity = activityResult.data || [];
+      const toolsExplored = allActivity.filter(
+        (a: { action: string }) => a.action === 'quick_win_viewed'
+      ).length;
+      const uniqueDays = new Set(
+        allActivity.map((a: { created_at: string }) =>
+          new Date(a.created_at).toISOString().split('T')[0]
+        )
+      );
+
+      setStatsData({
+        toolsExplored,
+        hoursSaved: ((toolsExplored * 5) / 60).toFixed(1),
+        communityContributions: responsesResult.count || 0,
+        daysActive: uniqueDays.size,
+        recentActivity: (recentResult.data || []) as ActivityEntry[],
+      });
+
+      setCheckIns((checkInResult.data || []) as CheckInEntry[]);
+
+      // Enrich favorites with titles
+      const rawFavorites = (favoritesResult.data || []) as FavoriteEntry[];
+      if (rawFavorites.length > 0) {
+        const qwIds = rawFavorites
+          .filter((f) => f.content_type === 'quick_win')
+          .map((f) => f.content_id);
+        const courseIds = rawFavorites
+          .filter((f) => f.content_type === 'course')
+          .map((f) => f.content_id);
+
+        const [qwResult, courseResult] = await Promise.all([
+          qwIds.length > 0
+            ? supabase
+                .from('hub_quick_wins')
+                .select('id, title, category')
+                .in('id', qwIds)
+            : Promise.resolve({ data: [] }),
+          courseIds.length > 0
+            ? supabase
+                .from('hub_courses')
+                .select('id, title, category')
+                .in('id', courseIds)
+            : Promise.resolve({ data: [] }),
+        ]);
+
+        const titleMap: Record<string, { title: string; category: string }> = {};
+        for (const item of qwResult.data || []) {
+          titleMap[item.id] = { title: item.title, category: item.category };
+        }
+        for (const item of courseResult.data || []) {
+          titleMap[item.id] = { title: item.title, category: item.category };
+        }
+
+        setFavorites(
+          rawFavorites.map((f) => ({
+            ...f,
+            title: titleMap[f.content_id]?.title,
+            category: titleMap[f.content_id]?.category,
+          }))
+        );
+      } else {
+        setFavorites([]);
+      }
+
+      setRecognitionData(recognitionResult);
+      setDataLoaded(true);
+    };
+
+    loadData();
+  }, [user?.id, dataLoaded]);
+
+  // ── Derived state ─────────────────────────────────────────────────────
+
   const hasNameChanged = displayName !== (profile?.display_name || '');
   const hasRoleChanged = selectedRole !== profile?.role;
   const hasAvatarChanged =
     selectedAvatarId !== profile?.avatar_id ||
     uploadedAvatarUrl !== profile?.avatar_url;
+  const currentGoals =
+    (profile?.onboarding_data as { goals?: GoalType[] } | null)?.goals || [];
+  const hasGoalsChanged =
+    JSON.stringify([...selectedGoals].sort()) !==
+    JSON.stringify([...currentGoals].sort());
 
-  const currentGoals = (profile?.onboarding_data as { goals?: GoalType[] } | null)?.goals || [];
-  const hasGoalsChanged = JSON.stringify(selectedGoals.sort()) !== JSON.stringify(currentGoals.sort());
+  // ── Handlers ──────────────────────────────────────────────────────────
 
   const handleSaveName = async () => {
     if (!user?.id || !hasNameChanged) return;
@@ -146,19 +446,20 @@ export default function ProfileSettingsPage() {
 
   const handleAvatarFileSelect = async (file: File) => {
     if (!user?.id) return;
-
     setIsUploading(true);
     const supabase = getSupabase();
 
     try {
-      // Upload to Supabase Storage
       const fileExt = file.name.split('.').pop();
       const filePath = `${user.id}/avatar.${fileExt}`;
 
-      // Delete any existing avatar for this user first
       await supabase.storage
         .from('hub-avatars')
-        .remove([`${user.id}/avatar.jpg`, `${user.id}/avatar.png`, `${user.id}/avatar.webp`]);
+        .remove([
+          `${user.id}/avatar.jpg`,
+          `${user.id}/avatar.png`,
+          `${user.id}/avatar.webp`,
+        ]);
 
       const { error: uploadError } = await supabase.storage
         .from('hub-avatars')
@@ -206,7 +507,9 @@ export default function ProfileSettingsPage() {
         return prev.filter((g) => g !== goal && g !== 'all_of_the_above');
       } else {
         const newGoals = [...prev, goal];
-        const allIndividualSelected = ALL_INDIVIDUAL_GOALS.every((g) => newGoals.includes(g));
+        const allIndividualSelected = ALL_INDIVIDUAL_GOALS.every((g) =>
+          newGoals.includes(g)
+        );
         if (allIndividualSelected) {
           return [...newGoals, 'all_of_the_above'];
         }
@@ -220,14 +523,14 @@ export default function ProfileSettingsPage() {
     setIsSaving(true);
 
     const supabase = getSupabase();
-
-    // Update profile onboarding_data
-    const currentData = (profile?.onboarding_data || {}) as Record<string, unknown>;
+    const currentData = (profile?.onboarding_data || {}) as Record<
+      string,
+      unknown
+    >;
     await updateHubProfile(user.id, {
       onboarding_data: { ...currentData, goals: selectedGoals },
     });
 
-    // Update hub_user_goals table
     await supabase.from('hub_user_goals').delete().eq('user_id', user.id);
     if (selectedGoals.length > 0) {
       await supabase.from('hub_user_goals').insert(
@@ -245,35 +548,42 @@ export default function ProfileSettingsPage() {
   };
 
   const handleDeleteAccount = async () => {
-    // This would typically call a server action or API to delete the account
-    // For now, just sign out
     await signOut();
   };
 
+  // ── Quick win recommendations based on selected goals ─────────────────
+
+  const goalRecommendations = selectedGoals
+    .filter((g) => g !== 'all_of_the_above')
+    .flatMap((g) => (GOAL_QUICK_WIN_MAP[g] || []).map((title) => ({ goal: g, title })))
+    .slice(0, 3);
+
+  // ── Render ────────────────────────────────────────────────────────────
+
   return (
-    <div className="p-4 md:p-8 max-w-2xl mx-auto">
+    <div className="p-4 md:p-8 max-w-3xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <h1
-          className="font-bold mb-2"
+          className="font-bold mb-1"
           style={{
             fontFamily: "'Source Serif 4', Georgia, serif",
             fontSize: '28px',
-            color: '#2B3A67',
+            color: '#1e2749',
           }}
         >
-          Settings
+          {tUI('My Growth')}
         </h1>
         <p
-          className="text-gray-500 text-[15px] max-w-[560px]"
+          className="text-gray-500 text-[15px]"
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
-          Manage your profile and preferences
+          {tUI('Your journey, your way. Everything here is yours.')}
         </p>
       </div>
 
-      {/* Settings Tabs */}
-      <div className="flex gap-2 mb-8 border-b border-gray-200 pb-1">
+      {/* Settings-level tabs: still show Profile + Notifications */}
+      <div className="flex gap-2 mb-6 border-b border-gray-200 pb-1">
         <Link
           href="/hub/settings/profile"
           className="flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors"
@@ -284,7 +594,7 @@ export default function ProfileSettingsPage() {
           }}
         >
           <User size={18} />
-          Profile
+          {tUI('Profile')}
         </Link>
         <Link
           href="/hub/settings/notifications"
@@ -292,53 +602,161 @@ export default function ProfileSettingsPage() {
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
           <Bell size={18} />
-          Notifications
+          {tUI('Notifications')}
         </Link>
       </div>
 
-      {/* Section 1: Your Avatar */}
-      <div className="hub-card mb-6">
-        <h2
-          className="font-semibold mb-6"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: '16px',
-            color: '#2B3A67',
-          }}
-        >
-          Your Avatar
-          {savedField === 'avatar' && (
-            <span className="ml-2 text-sm text-green-600 font-normal">
-              <Check size={16} className="inline" /> Saved
-            </span>
-          )}
-        </h2>
+      {/* Growth Tab Pills */}
+      <div className="flex flex-wrap gap-2 mb-8">
+        {TAB_CONFIG.map((tab) => {
+          const isActive = activeTab === tab.id;
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all"
+              style={{
+                backgroundColor: isActive ? '#1e2749' : '#f3f4f6',
+                color: isActive ? '#ffffff' : '#6B7280',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              <Icon size={16} />
+              {tUI(tab.label)}
+            </button>
+          );
+        })}
+      </div>
 
-        <div className="flex items-center gap-6 mb-4">
-          <AvatarDisplay
-            size={96}
-            avatarId={isAvatarPickerOpen ? selectedAvatarId : profile?.avatar_id}
-            avatarUrl={isAvatarPickerOpen ? uploadedAvatarUrl : profile?.avatar_url}
-            displayName={profile?.display_name}
-          />
-          <div>
-            {!isAvatarPickerOpen ? (
-              <button
-                onClick={() => setIsAvatarPickerOpen(true)}
-                className="text-sm font-medium px-4 py-2 rounded-lg border-2 transition-colors hover:bg-[#FFF8E7]"
-                style={{
-                  borderColor: '#E8B84B',
-                  color: '#2B3A67',
-                  fontFamily: "'DM Sans', sans-serif",
-                }}
-              >
-                Change avatar
-              </button>
-            ) : (
-              <div className="flex gap-2">
+      {/* ════════════════════════════════════════════════════════════════════
+          TAB: Profile
+         ════════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'profile' && (
+        <div className="space-y-6">
+          {/* Avatar */}
+          <div className="hub-card">
+            <h2
+              className="font-semibold mb-6"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '16px',
+                color: '#2B3A67',
+              }}
+            >
+              {tUI('Your Avatar')}
+              {savedField === 'avatar' && (
+                <span className="ml-2 text-sm text-green-600 font-normal">
+                  <Check size={16} className="inline" /> {tUI('Saved')}
+                </span>
+              )}
+            </h2>
+
+            <div className="flex items-center gap-6 mb-4">
+              <AvatarDisplay
+                size={96}
+                avatarId={
+                  isAvatarPickerOpen ? selectedAvatarId : profile?.avatar_id
+                }
+                avatarUrl={
+                  isAvatarPickerOpen ? uploadedAvatarUrl : profile?.avatar_url
+                }
+                displayName={profile?.display_name}
+              />
+              <div>
+                {!isAvatarPickerOpen ? (
+                  <button
+                    onClick={() => setIsAvatarPickerOpen(true)}
+                    className="text-sm font-medium px-4 py-2 rounded-lg border-2 transition-colors hover:bg-[#FFF8E7]"
+                    style={{
+                      borderColor: '#E8B84B',
+                      color: '#2B3A67',
+                      fontFamily: "'DM Sans', sans-serif",
+                    }}
+                  >
+                    {tUI('Change avatar')}
+                  </button>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveAvatar}
+                      disabled={!hasAvatarChanged || isSaving}
+                      className="text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+                      style={{
+                        backgroundColor: '#E8B84B',
+                        color: '#2B3A67',
+                        fontFamily: "'DM Sans', sans-serif",
+                      }}
+                    >
+                      {isSaving ? tUI('Saving...') : tUI('Save')}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsAvatarPickerOpen(false);
+                        setSelectedAvatarId(profile?.avatar_id || null);
+                        setUploadedAvatarUrl(profile?.avatar_url || null);
+                      }}
+                      className="text-sm font-medium px-4 py-2 rounded-lg border transition-colors hover:bg-gray-50"
+                      style={{
+                        borderColor: '#E5E5E5',
+                        color: '#6B7280',
+                        fontFamily: "'DM Sans', sans-serif",
+                      }}
+                    >
+                      {tUI('Cancel')}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {isAvatarPickerOpen && (
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <AvatarPicker
+                  selectedAvatarId={selectedAvatarId}
+                  uploadedAvatarUrl={uploadedAvatarUrl}
+                  onSelect={handleAvatarSelect}
+                  onUpload={handleAvatarUpload}
+                  onClearUpload={handleAvatarClear}
+                  size="settings"
+                  isUploading={isUploading}
+                  onFileSelect={handleAvatarFileSelect}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Display Name */}
+          <div className="hub-card">
+            <h2
+              className="font-semibold mb-4"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '16px',
+                color: '#2B3A67',
+              }}
+            >
+              {tUI('Display Name')}
+              {savedField === 'name' && (
+                <span className="ml-2 text-sm text-green-600 font-normal">
+                  <Check size={16} className="inline" /> {tUI('Saved')}
+                </span>
+              )}
+            </h2>
+
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder={tUI('Your name')}
+                className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#E8B84B] transition-colors"
+                style={{ fontFamily: "'DM Sans', sans-serif" }}
+              />
+              {hasNameChanged && (
                 <button
-                  onClick={handleSaveAvatar}
-                  disabled={!hasAvatarChanged || isSaving}
+                  onClick={handleSaveName}
+                  disabled={isSaving}
                   className="text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
                   style={{
                     backgroundColor: '#E8B84B',
@@ -346,244 +764,788 @@ export default function ProfileSettingsPage() {
                     fontFamily: "'DM Sans', sans-serif",
                   }}
                 >
-                  {isSaving ? 'Saving...' : 'Save'}
+                  {isSaving ? tUI('Saving...') : tUI('Save')}
                 </button>
-                <button
-                  onClick={() => {
-                    setIsAvatarPickerOpen(false);
-                    setSelectedAvatarId(profile?.avatar_id || null);
-                    setUploadedAvatarUrl(profile?.avatar_url || null);
-                  }}
-                  className="text-sm font-medium px-4 py-2 rounded-lg border transition-colors hover:bg-gray-50"
-                  style={{
-                    borderColor: '#E5E5E5',
-                    color: '#6B7280',
-                    fontFamily: "'DM Sans', sans-serif",
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
 
-        {isAvatarPickerOpen && (
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <AvatarPicker
-              selectedAvatarId={selectedAvatarId}
-              uploadedAvatarUrl={uploadedAvatarUrl}
-              onSelect={handleAvatarSelect}
-              onUpload={handleAvatarUpload}
-              onClearUpload={handleAvatarClear}
-              size="settings"
-              isUploading={isUploading}
-              onFileSelect={handleAvatarFileSelect}
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Section 2: Display Name */}
-      <div className="hub-card mb-6">
-        <h2
-          className="font-semibold mb-4"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: '16px',
-            color: '#2B3A67',
-          }}
-        >
-          Display Name
-          {savedField === 'name' && (
-            <span className="ml-2 text-sm text-green-600 font-normal">
-              <Check size={16} className="inline" /> Saved
-            </span>
-          )}
-        </h2>
-
-        <div className="flex gap-3">
-          <input
-            type="text"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            placeholder="Your name"
-            className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#E8B84B] transition-colors"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
-          />
-          {hasNameChanged && (
-            <button
-              onClick={handleSaveName}
-              disabled={isSaving}
-              className="text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+          {/* Role Selector */}
+          <div className="hub-card">
+            <h2
+              className="font-semibold mb-4"
               style={{
-                backgroundColor: '#E8B84B',
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '16px',
                 color: '#2B3A67',
+              }}
+            >
+              {tUI('Your Role')}
+              {savedField === 'role' && (
+                <span className="ml-2 text-sm text-green-600 font-normal">
+                  <Check size={16} className="inline" /> {tUI('Saved')}
+                </span>
+              )}
+            </h2>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {ROLES.map((role) => {
+                const isSelected = selectedRole === role.value;
+                return (
+                  <button
+                    key={role.value}
+                    onClick={() => handleRoleChange(role.value)}
+                    disabled={isSaving}
+                    className="p-3 rounded-lg text-left transition-all focus:outline-none disabled:opacity-50"
+                    style={{
+                      backgroundColor: isSelected ? '#FFF8E7' : 'white',
+                      border: isSelected
+                        ? '2px solid #E8B84B'
+                        : '1.5px solid #E5E7EB',
+                    }}
+                  >
+                    <p
+                      className="font-medium text-sm"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        color: '#2B3A67',
+                      }}
+                    >
+                      {tUI(role.label)}
+                    </p>
+                    <p
+                      className="text-xs text-gray-500"
+                      style={{ fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                      {tUI(role.subtitle)}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Take the Tour */}
+          <div className="hub-card">
+            <h2
+              className="font-semibold mb-2"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: '#2B3A67',
+                fontSize: '16px',
+              }}
+            >
+              {tUI('Learning Hub Tour')}
+            </h2>
+            <p
+              className="text-sm mb-4"
+              style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {tUI(
+                'Take a guided tour of the Hub features anytime. See what is new and discover tools you might have missed.'
+              )}
+            </p>
+            <Link
+              href="/hub?tour=start"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-opacity hover:opacity-90"
+              style={{
+                backgroundColor: '#ffba06',
+                color: '#1e2749',
                 fontFamily: "'DM Sans', sans-serif",
               }}
             >
-              {isSaving ? 'Saving...' : 'Save'}
-            </button>
-          )}
-        </div>
-      </div>
+              {tUI('Take the tour')}
+            </Link>
+          </div>
 
-      {/* Section 3: Your Role */}
-      <div className="hub-card mb-6">
-        <h2
-          className="font-semibold mb-4"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: '16px',
-            color: '#2B3A67',
-          }}
-        >
-          Your Role
-          {savedField === 'role' && (
-            <span className="ml-2 text-sm text-green-600 font-normal">
-              <Check size={16} className="inline" /> Saved
-            </span>
-          )}
-        </h2>
+          {/* Account / Danger Zone */}
+          <div className="hub-card">
+            <h2
+              className="font-semibold mb-4"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '16px',
+                color: '#2B3A67',
+              }}
+            >
+              {tUI('Account')}
+            </h2>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {ROLES.map((role) => {
-            const isSelected = selectedRole === role.value;
-            return (
+            <div className="space-y-4">
               <button
-                key={role.value}
-                onClick={() => handleRoleChange(role.value)}
+                onClick={handleSignOut}
+                className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors"
+                style={{ fontFamily: "'DM Sans', sans-serif" }}
+              >
+                <LogOut size={18} />
+                {tUI('Sign out')}
+              </button>
+
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="flex items-center gap-2 text-sm text-gray-400 hover:text-red-600 transition-colors"
+                style={{ fontFamily: "'DM Sans', sans-serif" }}
+              >
+                <Trash2 size={16} />
+                {tUI('Delete my account')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════
+          TAB: Goals
+         ════════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'goals' && (
+        <div className="space-y-6">
+          <div className="hub-card">
+            <h2
+              className="font-semibold mb-2"
+              style={{
+                fontFamily: "'Source Serif 4', Georgia, serif",
+                fontSize: '18px',
+                color: '#1e2749',
+              }}
+            >
+              {tUI('Your Goals')}
+              {savedField === 'goals' && (
+                <span className="ml-2 text-sm text-green-600 font-normal">
+                  <Check size={16} className="inline" /> {tUI('Saved')}
+                </span>
+              )}
+            </h2>
+            <p
+              className="text-sm text-gray-500 mb-5"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {tUI(
+                'Select the areas where you want to grow. These shape your recommendations.'
+              )}
+            </p>
+
+            <div className="grid grid-cols-3 md:grid-cols-4 gap-2 mb-4">
+              {GRID_GOALS.map((goal) => {
+                const isSelected = selectedGoals.includes(goal.value);
+                return (
+                  <button
+                    key={goal.value}
+                    onClick={() => toggleGoal(goal.value)}
+                    className="p-2 rounded-lg transition-all focus:outline-none flex flex-col items-center justify-center text-center"
+                    style={{
+                      backgroundColor: isSelected ? '#FFF8E7' : '#FFFFFF',
+                      border: isSelected
+                        ? '2px solid #E8B84B'
+                        : '1.5px solid #E5E7EB',
+                      minHeight: '80px',
+                    }}
+                  >
+                    <div
+                      className="mb-1"
+                      style={{ color: isSelected ? '#E8B84B' : '#2B3A67' }}
+                    >
+                      {GoalIconMap[goal.value]}
+                    </div>
+                    <p
+                      className="font-medium text-[10px] leading-tight"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        color: '#2B3A67',
+                      }}
+                    >
+                      {tUI(goal.label)}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+
+            {hasGoalsChanged && (
+              <button
+                onClick={handleSaveGoals}
                 disabled={isSaving}
-                className="p-3 rounded-lg text-left transition-all focus:outline-none disabled:opacity-50"
+                className="text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
                 style={{
-                  backgroundColor: isSelected ? '#FFF8E7' : 'white',
-                  border: isSelected ? '2px solid #E8B84B' : '1.5px solid #E5E7EB',
+                  backgroundColor: '#E8B84B',
+                  color: '#2B3A67',
+                  fontFamily: "'DM Sans', sans-serif",
                 }}
               >
+                {isSaving ? tUI('Saving...') : tUI('Update goals')}
+              </button>
+            )}
+          </div>
+
+          {/* Recommendations based on goals */}
+          {goalRecommendations.length > 0 && (
+            <div className="hub-card">
+              <h2
+                className="font-semibold mb-4"
+                style={{
+                  fontFamily: "'Source Serif 4', Georgia, serif",
+                  fontSize: '18px',
+                  color: '#1e2749',
+                }}
+              >
+                {tUI('Based on your goals, we recommend:')}
+              </h2>
+              <div className="space-y-3">
+                {goalRecommendations.map((rec, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 p-3 rounded-lg"
+                    style={{ backgroundColor: '#FFFDF5', border: '1px solid #f0e6c8' }}
+                  >
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: '#FFF8E7' }}
+                    >
+                      <Lightbulb size={16} style={{ color: '#d4960a' }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className="font-medium text-sm"
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          color: '#1e2749',
+                        }}
+                      >
+                        {rec.title}
+                      </p>
+                      <p
+                        className="text-xs text-gray-400"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        {tUI(
+                          GRID_GOALS.find((g) => g.value === rec.goal)?.label || ''
+                        )}
+                      </p>
+                    </div>
+                    <ChevronRight size={16} className="text-gray-300" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════
+          TAB: My Stats
+         ════════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'stats' && (
+        <div className="space-y-6">
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              {
+                label: 'Tools explored',
+                value: statsData?.toolsExplored ?? 0,
+              },
+              {
+                label: 'Hours saved',
+                value: `~${statsData?.hoursSaved ?? '0'}`,
+              },
+              {
+                label: 'Community contributions',
+                value: statsData?.communityContributions ?? 0,
+              },
+              { label: 'Days active', value: statsData?.daysActive ?? 0 },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="hub-card text-center py-6"
+              >
                 <p
-                  className="font-medium text-sm"
+                  className="font-bold text-3xl mb-1"
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    color: '#2B3A67',
+                    fontFamily: "'Source Serif 4', Georgia, serif",
+                    color: '#1e2749',
                   }}
                 >
-                  {role.label}
+                  {stat.value}
                 </p>
                 <p
                   className="text-xs text-gray-500"
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
-                  {role.subtitle}
+                  {tUI(stat.label)}
                 </p>
-              </button>
-            );
-          })}
+              </div>
+            ))}
+          </div>
+
+          {/* Recent Activity */}
+          <div className="hub-card">
+            <h2
+              className="font-semibold mb-4"
+              style={{
+                fontFamily: "'Source Serif 4', Georgia, serif",
+                fontSize: '18px',
+                color: '#1e2749',
+              }}
+            >
+              {tUI('Your recent activity')}
+            </h2>
+
+            {statsData && statsData.recentActivity.length > 0 ? (
+              <div className="space-y-3">
+                {statsData.recentActivity.map((entry) => (
+                  <div
+                    key={entry.id}
+                    className="flex items-center justify-between py-2 border-b border-gray-50 last:border-b-0"
+                  >
+                    <p
+                      className="text-sm"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        color: '#1e2749',
+                      }}
+                    >
+                      {humanizeAction(entry.action)}
+                    </p>
+                    <p
+                      className="text-xs text-gray-400 flex-shrink-0 ml-4"
+                      style={{ fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                      {formatRelativeDate(entry.created_at)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p
+                className="text-sm text-gray-400"
+                style={{ fontFamily: "'DM Sans', sans-serif" }}
+              >
+                {tUI('No activity yet. Start exploring to see your stats grow.')}
+              </p>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Section 4: Your Goals */}
-      <div className="hub-card mb-6">
-        <h2
-          className="font-semibold mb-4"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: '16px',
-            color: '#2B3A67',
-          }}
-        >
-          Your Goals
-          {savedField === 'goals' && (
-            <span className="ml-2 text-sm text-green-600 font-normal">
-              <Check size={16} className="inline" /> Saved
-            </span>
-          )}
-        </h2>
+      {/* ════════════════════════════════════════════════════════════════════
+          TAB: Wellbeing (Vibe Check History)
+         ════════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'wellbeing' && (
+        <div className="space-y-6">
+          <div className="hub-card">
+            <h2
+              className="font-semibold mb-4"
+              style={{
+                fontFamily: "'Source Serif 4', Georgia, serif",
+                fontSize: '18px',
+                color: '#1e2749',
+              }}
+            >
+              {tUI('Vibe Check History')}
+            </h2>
 
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-2 mb-4">
-          {GRID_GOALS.map((goal) => {
-            const isSelected = selectedGoals.includes(goal.value);
-            return (
-              <button
-                key={goal.value}
-                onClick={() => toggleGoal(goal.value)}
-                className="p-2 rounded-lg transition-all focus:outline-none flex flex-col items-center justify-center text-center"
+            {checkIns.length > 0 ? (
+              <div className="space-y-3">
+                {checkIns.map((entry) => (
+                  <div
+                    key={entry.id}
+                    className="flex items-start gap-4 p-3 rounded-lg"
+                    style={{ backgroundColor: '#fafafa' }}
+                  >
+                    {/* Score indicator */}
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm"
+                      style={{
+                        backgroundColor:
+                          entry.score <= 2
+                            ? '#FEE2E2'
+                            : entry.score <= 3
+                            ? '#FEF3C7'
+                            : '#D1FAE5',
+                        color:
+                          entry.score <= 2
+                            ? '#991B1B'
+                            : entry.score <= 3
+                            ? '#92400E'
+                            : '#065F46',
+                        fontFamily: "'DM Sans', sans-serif",
+                      }}
+                    >
+                      {entry.score}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className="text-sm font-medium mb-0.5"
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          color: '#1e2749',
+                        }}
+                      >
+                        {entry.score <= 2
+                          ? tUI('Tough day')
+                          : entry.score <= 3
+                          ? tUI('Hanging in there')
+                          : tUI('Feeling good')}
+                      </p>
+                      <p
+                        className="text-xs text-gray-400"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        {formatDate(entry.created_at)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div
+                className="py-8 text-center rounded-lg"
                 style={{
-                  backgroundColor: isSelected ? '#FFF8E7' : '#FFFFFF',
-                  border: isSelected ? '2px solid #E8B84B' : '1.5px solid #E5E7EB',
-                  minHeight: '80px',
+                  backgroundColor: '#FFFDF5',
+                  border: '1px dashed #e5d9b6',
                 }}
               >
-                <div
-                  className="mb-1"
-                  style={{ color: isSelected ? '#E8B84B' : '#2B3A67' }}
-                >
-                  {GoalIconMap[goal.value]}
-                </div>
+                <Smile
+                  size={28}
+                  className="mx-auto mb-3"
+                  style={{ color: '#d4960a' }}
+                />
                 <p
-                  className="font-medium text-[10px] leading-tight"
+                  className="text-[15px] font-medium mb-1"
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
-                    color: '#2B3A67',
+                    color: '#1e2749',
                   }}
                 >
-                  {goal.label}
+                  {tUI('You have not done a Vibe Check yet.')}
                 </p>
-              </button>
-            );
-          })}
-        </div>
+                <p
+                  className="text-[13px] text-gray-400"
+                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  {tUI('Try one from the dashboard.')}
+                </p>
+              </div>
+            )}
+          </div>
 
-        {hasGoalsChanged && (
-          <button
-            onClick={handleSaveGoals}
-            disabled={isSaving}
-            className="text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
-            style={{
-              backgroundColor: '#E8B84B',
-              color: '#2B3A67',
-              fontFamily: "'DM Sans', sans-serif",
-            }}
-          >
-            {isSaving ? 'Saving...' : 'Update goals'}
-          </button>
-        )}
-      </div>
-
-      {/* Section 5: Danger Zone */}
-      <div className="hub-card">
-        <h2
-          className="font-semibold mb-4"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: '16px',
-            color: '#2B3A67',
-          }}
-        >
-          Account
-        </h2>
-
-        <div className="space-y-4">
-          <button
-            onClick={handleSignOut}
-            className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors"
+          {/* Privacy note */}
+          <p
+            className="text-xs text-gray-400 text-center"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
-            <LogOut size={18} />
-            Sign out
-          </button>
-
-          <button
-            onClick={() => setShowDeleteConfirm(true)}
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-red-600 transition-colors"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
-          >
-            <Trash2 size={16} />
-            Delete my account
-          </button>
+            {tUI('This data is completely private. Only you can see it.')}
+          </p>
         </div>
-      </div>
+      )}
 
-      {/* Delete Confirmation Modal */}
+      {/* ════════════════════════════════════════════════════════════════════
+          TAB: Library (Favorites)
+         ════════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'library' && (
+        <div className="space-y-6">
+          <div className="hub-card">
+            <h2
+              className="font-semibold mb-4"
+              style={{
+                fontFamily: "'Source Serif 4', Georgia, serif",
+                fontSize: '18px',
+                color: '#1e2749',
+              }}
+            >
+              {tUI('Your Library')}
+            </h2>
+
+            {favorites.length > 0 ? (
+              <div className="space-y-3">
+                {favorites.map((fav) => (
+                  <div
+                    key={fav.id}
+                    className="flex items-center gap-4 p-3 rounded-lg border border-gray-100 hover:border-[#E8B84B] transition-colors"
+                  >
+                    <div
+                      className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{
+                        backgroundColor:
+                          fav.content_type === 'course' ? '#EEF2FF' : '#FFF8E7',
+                      }}
+                    >
+                      {fav.content_type === 'course' ? (
+                        <BookOpen size={18} style={{ color: '#4F46E5' }} />
+                      ) : (
+                        <Lightbulb size={18} style={{ color: '#d4960a' }} />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className="font-medium text-sm truncate"
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          color: '#1e2749',
+                        }}
+                      >
+                        {fav.title || tUI('Untitled')}
+                      </p>
+                      <p
+                        className="text-xs text-gray-400"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        {fav.category || fav.content_type === 'course'
+                          ? tUI('Course')
+                          : tUI('Quick Win')}
+                      </p>
+                    </div>
+                    <Link
+                      href={
+                        fav.content_type === 'course'
+                          ? `/hub/courses`
+                          : `/hub/quick-wins`
+                      }
+                      className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors hover:bg-[#FFF8E7]"
+                      style={{
+                        color: '#2B3A67',
+                        border: '1px solid #E5E7EB',
+                        fontFamily: "'DM Sans', sans-serif",
+                      }}
+                    >
+                      {tUI('View')}
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div
+                className="py-8 text-center rounded-lg"
+                style={{
+                  backgroundColor: '#FFFDF5',
+                  border: '1px dashed #e5d9b6',
+                }}
+              >
+                <Bookmark
+                  size={28}
+                  className="mx-auto mb-3"
+                  style={{ color: '#d4960a' }}
+                />
+                <p
+                  className="text-[15px] font-medium mb-1"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    color: '#1e2749',
+                  }}
+                >
+                  {tUI('Your library is empty')}
+                </p>
+                <p
+                  className="text-[13px] text-gray-400"
+                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  {tUI(
+                    'Save tools you love by clicking the heart icon on any Quick Win or Course.'
+                  )}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════
+          TAB: Recognitions
+         ════════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'recognitions' && (
+        <div className="space-y-8">
+          {/* Earned */}
+          <section>
+            <h2
+              className="text-lg font-semibold mb-4"
+              style={{
+                fontFamily: "'Source Serif 4', Georgia, serif",
+                color: '#1e2749',
+              }}
+            >
+              {tUI('Earned')}
+            </h2>
+
+            {recognitionData && recognitionData.earned.length > 0 ? (
+              <div className="space-y-4">
+                {recognitionData.earned.map((item) => {
+                  const IconComponent = getIcon(item.recognition.icon);
+                  return (
+                    <div
+                      key={item.recognition.id}
+                      className="hub-card relative overflow-hidden"
+                      style={{ borderLeft: '4px solid #ffba06' }}
+                    >
+                      <div
+                        className="absolute top-0 right-0 w-24 h-24 opacity-[0.04] rounded-bl-full"
+                        style={{ backgroundColor: '#ffba06' }}
+                      />
+                      <div className="flex items-start gap-4">
+                        <div
+                          className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#FFF8E7' }}
+                        >
+                          <IconComponent
+                            size={22}
+                            style={{ color: '#d4960a' }}
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3
+                              className="font-semibold"
+                              style={{
+                                fontFamily: "'DM Sans', sans-serif",
+                                fontSize: '16px',
+                                color: '#1e2749',
+                              }}
+                            >
+                              {tUI(item.recognition.title)}
+                            </h3>
+                            <span
+                              className="inline-block w-2 h-2 rounded-full"
+                              style={{ backgroundColor: '#ffba06' }}
+                            />
+                          </div>
+                          <p
+                            className="text-[14px] text-gray-600 mb-2"
+                            style={{ fontFamily: "'DM Sans', sans-serif" }}
+                          >
+                            {tUI(item.recognition.description)}
+                          </p>
+                          <p
+                            className="text-[14px] leading-relaxed"
+                            style={{
+                              fontFamily: "'DM Sans', sans-serif",
+                              fontStyle: 'italic',
+                              color: '#4a5568',
+                            }}
+                          >
+                            {tUI(item.recognition.personalNote)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div
+                className="hub-card py-10 text-center"
+                style={{
+                  backgroundColor: '#FFFDF5',
+                  border: '1px dashed #e5d9b6',
+                }}
+              >
+                <Sparkles
+                  size={28}
+                  className="mx-auto mb-3"
+                  style={{ color: '#d4960a' }}
+                />
+                <p
+                  className="text-[15px] font-medium mb-1"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    color: '#1e2749',
+                  }}
+                >
+                  {tUI('Your first Field Note is closer than you think')}
+                </p>
+                <p
+                  className="text-[13px] text-gray-400"
+                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  {tUI(
+                    'Keep exploring tools and using Moment Mode to earn recognitions.'
+                  )}
+                </p>
+              </div>
+            )}
+          </section>
+
+          {/* In Progress */}
+          {recognitionData && recognitionData.progress.length > 0 && (
+            <section>
+              <h2
+                className="text-lg font-semibold mb-4"
+                style={{
+                  fontFamily: "'Source Serif 4', Georgia, serif",
+                  color: '#1e2749',
+                }}
+              >
+                {tUI('In Progress')}
+              </h2>
+              <div className="space-y-3">
+                {recognitionData.progress.map((item) => {
+                  const IconComponent = getIcon(item.recognition.icon);
+                  const percentage = Math.round(
+                    (item.current / item.recognition.threshold) * 100
+                  );
+                  return (
+                    <div
+                      key={item.recognition.id}
+                      className="hub-card"
+                      style={{ borderLeft: '4px solid #e5e7eb' }}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#f9fafb' }}
+                        >
+                          <IconComponent
+                            size={18}
+                            style={{ color: '#9ca3af' }}
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3
+                            className="font-medium text-[15px] mb-1"
+                            style={{
+                              fontFamily: "'DM Sans', sans-serif",
+                              color: '#1e2749',
+                            }}
+                          >
+                            {tUI(item.recognition.title)}
+                          </h3>
+                          <p
+                            className="text-[13px] text-gray-500 mb-3"
+                            style={{ fontFamily: "'DM Sans', sans-serif" }}
+                          >
+                            {tUI(item.recognition.description)}
+                          </p>
+                          {/* Progress bar */}
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="flex-1 h-2 rounded-full overflow-hidden"
+                              style={{ backgroundColor: '#f3f4f6' }}
+                            >
+                              <div
+                                className="h-full rounded-full transition-all"
+                                style={{
+                                  width: `${percentage}%`,
+                                  backgroundColor: '#ffba06',
+                                }}
+                              />
+                            </div>
+                            <span
+                              className="text-[12px] text-gray-400 flex-shrink-0"
+                              style={{ fontFamily: "'DM Sans', sans-serif" }}
+                            >
+                              {item.current}/{item.recognition.threshold}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════
+          Delete Confirmation Modal (always available)
+         ════════════════════════════════════════════════════════════════════ */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl">
@@ -595,13 +1557,15 @@ export default function ProfileSettingsPage() {
                 color: '#2B3A67',
               }}
             >
-              Delete your account?
+              {tUI('Delete your account?')}
             </h3>
             <p
               className="text-gray-600 mb-6"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              This will permanently delete your profile, progress, and certificates. This action cannot be undone.
+              {tUI(
+                'This will permanently delete your profile, progress, and certificates. This action cannot be undone.'
+              )}
             </p>
             <div className="flex gap-3">
               <button
@@ -612,7 +1576,7 @@ export default function ProfileSettingsPage() {
                   fontFamily: "'DM Sans', sans-serif",
                 }}
               >
-                Cancel
+                {tUI('Cancel')}
               </button>
               <button
                 onClick={handleDeleteAccount}
@@ -623,35 +1587,12 @@ export default function ProfileSettingsPage() {
                   fontFamily: "'DM Sans', sans-serif",
                 }}
               >
-                Delete account
+                {tUI('Delete account')}
               </button>
             </div>
           </div>
         </div>
       )}
-
-      {/* Take the Tour */}
-      <div className="hub-card mb-6">
-        <h2
-          className="font-semibold mb-2"
-          style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67', fontSize: '16px' }}
-        >
-          Learning Hub Tour
-        </h2>
-        <p
-          className="text-sm mb-4"
-          style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}
-        >
-          Take a guided tour of the Hub features anytime. See what is new and discover tools you might have missed.
-        </p>
-        <Link
-          href="/hub?tour=start"
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-opacity hover:opacity-90"
-          style={{ backgroundColor: '#ffba06', color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}
-        >
-          Take the tour
-        </Link>
-      </div>
     </div>
   );
 }
