@@ -1061,24 +1061,11 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     className="flex flex-row overflow-hidden bg-white transition-shadow hover:shadow-md"
                     style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '12px' }}
                   >
-                    {/* Left: colored placeholder */}
+                    {/* Left: colored block */}
                     <div
-                      className="w-[100px] flex-shrink-0 flex flex-col justify-center px-3"
-                      style={{ backgroundColor: '#FAFAF5' }}
-                    >
-                      <span
-                        className="text-xs font-bold leading-tight"
-                        style={{ color: '#1e2749', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}
-                      >
-                        {qw.title}
-                      </span>
-                      <span
-                        className="text-[9px] mt-1 uppercase tracking-wider"
-                        style={{ color: '#9CA3AF' }}
-                      >
-                        {'download'}
-                      </span>
-                    </div>
+                      className="w-[80px] flex-shrink-0"
+                      style={{ backgroundColor: `${qwColor}25` }}
+                    />
                     {/* Right: details */}
                     <div className="p-3 flex-1 flex flex-col justify-center min-w-0">
                       <span
