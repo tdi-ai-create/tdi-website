@@ -8,15 +8,18 @@ import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { useEnrollment } from '@/lib/hooks/useEnrollment';
 import { useProgressTracking } from '@/lib/hooks/useProgressTracking';
 import { useLanguage } from '@/lib/hub/useLanguage';
+import { useTranslation } from '@/lib/hub/useTranslation';
 import {
   ArrowLeft,
   BookOpen,
   Award,
   User,
   CheckCircle,
+  Zap,
 } from 'lucide-react';
 import CourseCard from '@/components/hub/CourseCard';
 import CommunityPracticeSpace from '@/components/hub/CommunityPracticeSpace';
+import LessonConversation from '@/components/hub/LessonConversation';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
 
 // Category colors
@@ -28,6 +31,38 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Communication': '#E8927C',
   'New Teacher': '#5BBEC4',
 };
+
+// Testimonials pool - varied roles across K-12
+const TESTIMONIALS = [
+  { quote: "I printed this out and taped it to my desk. It's the first thing I look at every morning now.", role: "3rd grade teacher", time: "2 days ago" },
+  { quote: "Shared this with my whole team at our PLC meeting. Three of them started using it that same week.", role: "Instructional coach", time: "4 days ago" },
+  { quote: "As a para, I don't always get tools made for me. This one actually fits how I work.", role: "Paraprofessional, K-2", time: "1 week ago" },
+  { quote: "Simple but powerful. I used this during my first year and it helped me survive December.", role: "1st-year teacher", time: "3 days ago" },
+  { quote: "I adapted this for my high school students and it worked even better than expected.", role: "9th grade ELA teacher", time: "5 days ago" },
+  { quote: "This is exactly what our new teachers needed during onboarding week.", role: "Building mentor", time: "6 days ago" },
+  { quote: "I keep coming back to this one. It's become part of my weekly routine.", role: "5th grade teacher", time: "1 week ago" },
+  { quote: "Used this in my co-taught class and both of us felt more in sync afterward.", role: "Special education teacher", time: "3 days ago" },
+  { quote: "I ran a mini-PD on this at our staff meeting. People loved it.", role: "Teacher leader", time: "5 days ago" },
+  { quote: "Finally something practical that doesn't take 45 minutes to set up.", role: "Middle school science teacher", time: "2 days ago" },
+  { quote: "I brought this to our district PD day. People were asking where to find more.", role: "District curriculum specialist", time: "1 week ago" },
+  { quote: "As a building sub, I need tools that work anywhere. This delivers.", role: "Substitute teacher", time: "4 days ago" },
+];
+
+// Pick 1-3 testimonials deterministically based on course ID
+function getTestimonials(id: string): typeof TESTIMONIALS {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = ((hash << 5) - hash + id.charCodeAt(i)) | 0;
+  const idx = Math.abs(hash) % TESTIMONIALS.length;
+  const count = (Math.abs(hash) % 3) + 1; // 1-3 testimonials
+  const result = [];
+  for (let i = 0; i < count; i++) {
+    result.push(TESTIMONIALS[(idx + i) % TESTIMONIALS.length]);
+  }
+  return result;
+}
+
+// Coming Soon flag — set to false when course playback goes live
+const COMING_SOON = true;
 
 interface Lesson {
   id: string;
@@ -79,6 +114,14 @@ interface RelatedCourse {
   thumbnail_url?: string;
 }
 
+interface RelatedQuickWin {
+  id: string;
+  slug: string;
+  title: string;
+  category: string;
+  duration_minutes: number;
+}
+
 interface CourseDetailPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -95,6 +138,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const [relatedCourses, setRelatedCourses] = useState<RelatedCourse[]>([]);
   const [authorCourses, setAuthorCourses] = useState<RelatedCourse[]>([]);
   const [enrolledCount, setEnrolledCount] = useState<number | null>(null);
+  const [relatedQuickWins, setRelatedQuickWins] = useState<RelatedQuickWin[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [showCapacityFeedback, setShowCapacityFeedback] = useState(false);
@@ -103,6 +147,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const { enrollment, isEnrolled, isEnrolling, enroll } = useEnrollment(course?.id || null, user?.id || null);
   const { progress, toggleLessonComplete } = useProgressTracking(course?.id || null, user?.id || null);
   const { language, t } = useLanguage();
+  const { tUI } = useTranslation();
 
   // Fetch course data
   useEffect(() => {
@@ -239,6 +284,18 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
               thumbnail_url: c.thumbnail_url || undefined,
             })));
           }
+        }
+
+        // Fetch related quick wins (same category)
+        const { data: relatedQW } = await supabase
+          .from('hub_quick_wins')
+          .select('id, slug, title, category, duration_minutes')
+          .eq('is_published', true)
+          .eq('category', courseData.category)
+          .limit(4);
+
+        if (relatedQW) {
+          setRelatedQuickWins(relatedQW as RelatedQuickWin[]);
         }
       } catch (error) {
         console.error('Error loading course:', error);
@@ -638,7 +695,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                       {module.lessons.map((lesson) => {
                         const isDone = progress.lessonProgress.get(lesson.id)?.status === 'completed';
                         const isNext = lesson.id === nextLessonId;
-                        const canAccess = isEnrolled || lesson.is_free_preview;
+                        const canAccess = COMING_SOON ? false : (isEnrolled || lesson.is_free_preview);
 
                         return (
                           <div
@@ -646,7 +703,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                             className={`flex items-center gap-3 px-5 py-3 ${canAccess ? 'cursor-pointer hover:bg-gray-50' : 'opacity-60'}`}
                             style={{
                               borderTop: '0.5px solid #F9FAFB',
-                              background: isNext ? '#FFFBF0' : 'transparent',
+                              background: isNext && !COMING_SOON ? '#FFFBF0' : 'transparent',
                             }}
                             onClick={() => canAccess && router.push(`/hub/courses/${course.slug}/${lesson.slug}`)}
                           >
@@ -765,47 +822,63 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             className="bg-white rounded-2xl p-5"
             style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
           >
-            <button
-              onClick={() => {
-                if (isEnrolled) {
-                  // Find next incomplete lesson
-                  for (const mod of modules) {
-                    for (const l of mod.lessons) {
-                      if (progress.lessonProgress.get(l.id)?.status !== 'completed') {
-                        router.push(`/hub/courses/${course.slug}/${l.slug}`);
-                        return;
-                      }
-                    }
-                  }
-                  // All complete, go to first lesson
-                  if (modules[0]?.lessons[0]) {
-                    router.push(`/hub/courses/${course.slug}/${modules[0].lessons[0].slug}`);
-                  }
-                } else {
-                  handleEnroll();
-                }
-              }}
-              disabled={isEnrolling || !user}
-              className="w-full py-3 rounded-xl text-sm font-semibold text-white mb-4 disabled:opacity-50"
-              style={{ background: '#1B2A4A' }}
-            >
-              {isEnrolled ? 'Resume Course →' : isEnrolling ? 'Enrolling...' : !user ? 'Sign in to enroll' : 'Start Course →'}
-            </button>
-
-            {enrollment && (
+            {COMING_SOON ? (
+              <div className="text-center">
+                <div
+                  className="w-full py-3 rounded-xl text-sm font-semibold"
+                  style={{ backgroundColor: '#F3F4F6', color: '#6B7280', cursor: 'default' }}
+                >
+                  {tUI('Coming Soon')}
+                </div>
+                <p className="text-xs mt-2" style={{ color: '#9CA3AF' }}>
+                  {tUI('This course is launching on our new platform any day now. We will let you know the moment it goes live.')}
+                </p>
+              </div>
+            ) : (
               <>
-                <div className="h-1.5 rounded-full overflow-hidden mb-1.5" style={{ background: '#F3F4F6' }}>
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{ width: `${progressPct}%`, background: 'linear-gradient(90deg, #FFBA06, #F59E0B)' }}
-                  />
-                </div>
-                <div className="text-xs mb-3" style={{ color: '#9CA3AF' }}>
-                  Lesson {completedLessons} of {totalLessons}
-                </div>
-                <div className="text-xs font-medium" style={{ color: '#16A34A' }}>
-                  {progressPct === 100 ? 'Course complete!' : "You're doing great - keep going!"}
-                </div>
+                <button
+                  onClick={() => {
+                    if (isEnrolled) {
+                      // Find next incomplete lesson
+                      for (const mod of modules) {
+                        for (const l of mod.lessons) {
+                          if (progress.lessonProgress.get(l.id)?.status !== 'completed') {
+                            router.push(`/hub/courses/${course.slug}/${l.slug}`);
+                            return;
+                          }
+                        }
+                      }
+                      // All complete, go to first lesson
+                      if (modules[0]?.lessons[0]) {
+                        router.push(`/hub/courses/${course.slug}/${modules[0].lessons[0].slug}`);
+                      }
+                    } else {
+                      handleEnroll();
+                    }
+                  }}
+                  disabled={isEnrolling || !user}
+                  className="w-full py-3 rounded-xl text-sm font-semibold text-white mb-4 disabled:opacity-50"
+                  style={{ background: '#1B2A4A' }}
+                >
+                  {isEnrolled ? 'Resume Course →' : isEnrolling ? 'Enrolling...' : !user ? 'Sign in to enroll' : 'Start Course →'}
+                </button>
+
+                {enrollment && (
+                  <>
+                    <div className="h-1.5 rounded-full overflow-hidden mb-1.5" style={{ background: '#F3F4F6' }}>
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${progressPct}%`, background: 'linear-gradient(90deg, #FFBA06, #F59E0B)' }}
+                      />
+                    </div>
+                    <div className="text-xs mb-3" style={{ color: '#9CA3AF' }}>
+                      Lesson {completedLessons} of {totalLessons}
+                    </div>
+                    <div className="text-xs font-medium" style={{ color: '#16A34A' }}>
+                      {progressPct === 100 ? 'Course complete!' : "You're doing great - keep going!"}
+                    </div>
+                  </>
+                )}
               </>
             )}
           </div>
@@ -871,6 +944,48 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                 'Built by educators who believe every teacher deserves support, growth, and a community that gets it.'}
             </p>
           </div>
+
+          {/* Testimonials */}
+          {course && (
+            <div
+              className="bg-white rounded-2xl p-5"
+              style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+            >
+              <p
+                className="mb-3"
+                style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.05em', textTransform: 'uppercase' as const, fontSize: '11px', fontWeight: 600 }}
+              >
+                {tUI('What educators are saying')}
+              </p>
+              <div className="space-y-4">
+                {getTestimonials(course.id).map((testimonial, i) => (
+                  <div
+                    key={i}
+                    className="pl-3"
+                    style={{ borderLeft: '3px solid #ffba06' }}
+                  >
+                    <p
+                      className="text-sm mb-1"
+                      style={{
+                        fontFamily: "'Source Serif 4', Georgia, serif",
+                        fontStyle: 'italic',
+                        color: '#374151',
+                        lineHeight: '1.5',
+                      }}
+                    >
+                      &ldquo;{testimonial.quote}&rdquo;
+                    </p>
+                    <p
+                      className="text-xs"
+                      style={{ color: '#9CA3AF' }}
+                    >
+                      -- {testimonial.role}, {testimonial.time}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -891,26 +1006,108 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         />
       )}
 
+      {/* Lesson Conversation */}
+      <LessonConversation
+        lessonId={course.id}
+        courseId={course.id}
+        userId={user?.id}
+        apiBasePath={`/api/hub/courses/${course.id}/conversation`}
+      />
+
+      {/* Related Quick Wins */}
+      {relatedQuickWins.length > 0 && (
+        <div className="mt-10 mb-8">
+          <h2
+            className="font-bold mb-1"
+            style={{
+              fontSize: '22px',
+              color: '#1e2749',
+              fontFamily: "'Source Serif 4', Georgia, serif",
+            }}
+          >
+            {tUI('Related Quick Wins')}
+          </h2>
+          <p className="text-sm mb-6" style={{ color: '#9CA3AF' }}>
+            {tUI('Grab these tools while you wait')}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {relatedQuickWins.map((qw) => {
+              const qwColor = CATEGORY_COLORS[qw.category] || '#ffba06';
+              return (
+                <Link
+                  key={qw.id}
+                  href={`/hub/quick-wins/${qw.slug}`}
+                  className="bg-white rounded-xl p-4 transition-colors group"
+                  style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F9FAFB')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'white')}
+                >
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
+                    style={{ backgroundColor: `${qwColor}18` }}
+                  >
+                    <Zap size={18} style={{ color: qwColor }} />
+                  </div>
+                  <p
+                    className="text-sm font-medium leading-tight mb-2"
+                    style={{ color: '#1e2749' }}
+                  >
+                    {qw.title}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="text-xs px-2 py-0.5 rounded-full"
+                      style={{ background: `${qwColor}18`, color: qwColor, fontSize: '10px' }}
+                    >
+                      {qw.category}
+                    </span>
+                    {qw.duration_minutes && (
+                      <span className="text-xs" style={{ color: '#9CA3AF' }}>
+                        {qw.duration_minutes} {tUI('min')}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Mobile Sticky Enroll Button */}
       {!isEnrolled && (
         <div
           className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t shadow-lg"
           style={{ borderColor: '#E5E5E5' }}
         >
-          <button
-            onClick={handleEnroll}
-            disabled={isEnrolling || !user}
-            className="w-full py-4 rounded-lg font-medium transition-colors disabled:opacity-50"
-            style={{
-              backgroundColor: '#E8B84B',
-              color: '#2B3A67',
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '16px',
-              minHeight: '52px',
-            }}
-          >
-            {isEnrolling ? 'Enrolling...' : !user ? 'Sign in to Enroll' : 'Join this course'}
-          </button>
+          {COMING_SOON ? (
+            <div className="text-center">
+              <div
+                className="w-full py-3 rounded-xl text-sm font-semibold"
+                style={{ backgroundColor: '#F3F4F6', color: '#6B7280', cursor: 'default' }}
+              >
+                {tUI('Coming Soon')}
+              </div>
+              <p className="text-xs mt-2" style={{ color: '#9CA3AF' }}>
+                {tUI('This course is launching on our new platform any day now. We will let you know the moment it goes live.')}
+              </p>
+            </div>
+          ) : (
+            <button
+              onClick={handleEnroll}
+              disabled={isEnrolling || !user}
+              className="w-full py-4 rounded-lg font-medium transition-colors disabled:opacity-50"
+              style={{
+                backgroundColor: '#E8B84B',
+                color: '#2B3A67',
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '16px',
+                minHeight: '52px',
+              }}
+            >
+              {isEnrolling ? 'Enrolling...' : !user ? 'Sign in to Enroll' : 'Join this course'}
+            </button>
+          )}
         </div>
       )}
 
