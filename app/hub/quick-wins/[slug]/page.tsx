@@ -221,6 +221,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   // Sidebar state
   const [isSaved, setIsSaved] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [recommendations, setRecommendations] = useState<QuickWin[]>([]);
   const [moreQuickWins, setMoreQuickWins] = useState<QuickWin[]>([]);
 
@@ -422,14 +423,42 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
     setIsSaved(true);
   };
 
-  const handleShareLink = async () => {
+  const handleShareLink = () => {
+    setShowShareModal(true);
+  };
+
+  const copyToClipboard = async (text: string) => {
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      await navigator.clipboard.writeText(text);
       setLinkCopied(true);
       setTimeout(() => setLinkCopied(false), 2000);
     } catch {
-      // Fallback - do nothing
+      // Fallback
     }
+  };
+
+  // Rotating share messages
+  const getShareMessages = () => {
+    if (!quickWin) return { short: '', medium: '', long: '' };
+    const url = typeof window !== 'undefined' ? window.location.href : '';
+    const title = quickWin.title;
+    const shorts = [
+      `Found this amazing teacher tool: "${title}" -- grab it free`,
+      `This 5-min resource is a game changer: "${title}"`,
+      `Every teacher needs this in their toolkit: "${title}"`,
+      `Just downloaded "${title}" and wow. Sharing because you need this too`,
+      `Teacher friends -- stop what you are doing and get "${title}"`,
+    ];
+    const mediums = [
+      `I just found "${title}" on Teachers Deserve It and it is exactly the kind of tool I wish I had years ago. Takes 5 minutes, zero prep. ${url}`,
+      `If you are a teacher who needs a quick win today, download "${title}". It is free, practical, and actually useful. ${url}`,
+      `Sharing this because every educator I know could use it: "${title}" from Teachers Deserve It. ${url}`,
+      `My favorite kind of PD -- something I can actually use tomorrow morning. "${title}" ${url}`,
+    ];
+    // Pick deterministically based on title length
+    const idx = title.length % shorts.length;
+    const midx = title.length % mediums.length;
+    return { short: shorts[idx], medium: mediums[midx], url };
   };
 
   const handleMarkDone = async () => {
@@ -1130,6 +1159,126 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         )}
       </div>
 
+      {/* ─── SHARE MODAL ─────────────────────────────────────────────── */}
+      {showShareModal && quickWin && (() => {
+        const msgs = getShareMessages();
+        const url = typeof window !== 'undefined' ? window.location.href : '';
+        const encodedMsg = encodeURIComponent(msgs.medium);
+        const encodedUrl = encodeURIComponent(url);
+        const encodedShort = encodeURIComponent(msgs.short);
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/50" onClick={() => setShowShareModal(false)} />
+            <div
+              className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {/* Header */}
+              <div className="p-5 pb-3" style={{ background: '#1e2749' }}>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-base font-bold text-white">Share this tool</h3>
+                  <button
+                    onClick={() => setShowShareModal(false)}
+                    className="text-white/60 hover:text-white text-lg leading-none"
+                  >
+                    x
+                  </button>
+                </div>
+                <p className="text-sm text-white/60">Help another educator find something great</p>
+              </div>
+
+              {/* Pre-written message */}
+              <div className="p-5">
+                <div
+                  className="p-4 rounded-xl mb-4 text-sm leading-relaxed"
+                  style={{ backgroundColor: '#FAFAF5', color: '#374151', border: '1px solid #E5E7EB' }}
+                >
+                  {msgs.medium}
+                </div>
+
+                <button
+                  onClick={() => copyToClipboard(msgs.medium)}
+                  className="w-full py-2.5 rounded-lg text-sm font-medium mb-4 transition-colors"
+                  style={{
+                    backgroundColor: linkCopied ? '#D1FAE5' : '#F3F4F6',
+                    color: linkCopied ? '#065F46' : '#374151',
+                  }}
+                >
+                  {linkCopied ? 'Copied to clipboard!' : 'Copy message + link'}
+                </button>
+
+                {/* Share channels */}
+                <p className="text-xs font-semibold mb-3 uppercase tracking-wider" style={{ color: '#9CA3AF' }}>
+                  Or share directly
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {/* Email */}
+                  <a
+                    href={`mailto:?subject=${encodeURIComponent('Check out this teacher tool: ' + quickWin.title)}&body=${encodedMsg}`}
+                    className="flex items-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+                    style={{ border: '1px solid #E5E7EB', color: '#374151' }}
+                  >
+                    <span style={{ fontSize: '16px' }}>@</span>
+                    Email a colleague
+                  </a>
+                  {/* Text */}
+                  <a
+                    href={`sms:?body=${encodedMsg}`}
+                    className="flex items-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+                    style={{ border: '1px solid #E5E7EB', color: '#374151' }}
+                  >
+                    <span style={{ fontSize: '16px' }}>+</span>
+                    Text a friend
+                  </a>
+                  {/* Facebook */}
+                  <a
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedShort}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+                    style={{ border: '1px solid #E5E7EB', color: '#374151' }}
+                  >
+                    <span style={{ fontSize: '16px', color: '#1877F2' }}>f</span>
+                    Facebook
+                  </a>
+                  {/* X/Twitter */}
+                  <a
+                    href={`https://twitter.com/intent/tweet?text=${encodedShort}&url=${encodedUrl}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+                    style={{ border: '1px solid #E5E7EB', color: '#374151' }}
+                  >
+                    <span style={{ fontSize: '16px' }}>X</span>
+                    X / Twitter
+                  </a>
+                  {/* LinkedIn */}
+                  <a
+                    href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+                    style={{ border: '1px solid #E5E7EB', color: '#374151' }}
+                  >
+                    <span style={{ fontSize: '16px', color: '#0A66C2' }}>in</span>
+                    LinkedIn
+                  </a>
+                  {/* Copy link only */}
+                  <button
+                    onClick={() => copyToClipboard(url)}
+                    className="flex items-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+                    style={{ border: '1px solid #E5E7EB', color: '#374151' }}
+                  >
+                    <span style={{ fontSize: '16px' }}>~</span>
+                    Link only
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
