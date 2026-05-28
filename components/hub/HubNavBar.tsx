@@ -202,6 +202,7 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
         <div className="hidden md:flex items-center gap-4">
           {/* Language toggle */}
           <div
+            data-tour="language-toggle"
             className="flex items-center rounded-lg overflow-hidden"
             style={{ border: '1px solid rgba(255,255,255,0.15)' }}
           >
@@ -235,6 +236,7 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
 
           {/* I need a moment button */}
           <button
+            data-tour="moment-mode"
             onClick={() => setMomentModeOpen(true)}
             className="transition-opacity hover:opacity-80"
             style={{

@@ -1,55 +1,211 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
-import { driver, type DriveStep, type Config, type PopoverDOM, type Driver as DriverInstance } from 'driver.js';
-import 'driver.js/dist/driver.css';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { X } from 'lucide-react';
 import { useHub } from '@/components/hub/HubContext';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import {
-  TOUR_STOPS,
   PROGRESSIVE_DISCLOSURE_PROMPT,
-  CONTINUATION_PROMPTS,
 } from '@/lib/tour-copy';
 
 interface OnboardingTourProps {
   onComplete: (stopsSeen: number) => void;
 }
 
-/**
- * Number of mandatory stops. After this many, the user gets a
- * progressive-disclosure prompt before continuing to optional stops.
- */
+/* ------------------------------------------------------------------ */
+/*  Tour step definition                                               */
+/* ------------------------------------------------------------------ */
+
+interface TourStep {
+  title: string;
+  body: string;
+  /** URL path the target element lives on */
+  page: string;
+  /** CSS selector for the element to highlight (null = centered popover) */
+  selector: string | null;
+}
+
 const MANDATORY_COUNT = 5;
 
-/**
- * CSS selectors (or null for popover-only) for each tour stop, indexed by stop id (1-based).
- */
-const STOP_SELECTORS: Record<number, string | null> = {
-  1: 'a[href="/hub/quick-wins"]',
-  2: null, // Community section -- popover only
-  3: '[data-tour="lift-filter"]',
-  4: '[data-tour="moment-mode"]',
-  5: null, // Desi -- placeholder, popover only
-  6: 'a[href="/hub/certificates"]',
-  7: '[data-tour="gift-element"]',
-  8: '[data-tour="vibe-check"]',
-  9: null, // Transformation Tracker -- popover only
-  10: '[data-tour="favorites"]',
-  11: '[data-tour="language-toggle"]',
-  12: 'a[href="/hub/certificates"]',
-};
+const TOUR_STEPS: TourStep[] = [
+  {
+    title: 'Grab something useful right now',
+    body: 'Quick Wins are short, practical resources built for real school days. No course enrollment, no setup. Just something you can use this week.',
+    page: '/hub',
+    selector: 'a[href="/hub/quick-wins"]',
+  },
+  {
+    title: 'Learn at your own pace',
+    body: 'You are not alone in this. Connect with other educators who get it -- share ideas, ask questions, celebrate wins.',
+    page: '/hub',
+    selector: 'a[href="/hub/courses"]',
+  },
+  {
+    title: 'The LIFT Filter',
+    body: 'Every resource is tagged by what it helps with: Leadership, Instruction, Family engagement, or Teacher wellness. Find what you need fast.',
+    page: '/hub/quick-wins',
+    selector: '[data-tour="lift-filter"]',
+  },
+  {
+    title: 'Moment Mode',
+    body: 'Having a rough day? This is your reset button. Breathing exercises, affirmations, and gentle tools -- right when you need them.',
+    page: '/hub/quick-wins',
+    selector: '[data-tour="moment-mode"]',
+  },
+  {
+    title: 'Multilingual Support',
+    body: 'Toggle between English and Spanish. The whole Hub works in both languages.',
+    page: '/hub/quick-wins',
+    selector: '[data-tour="language-toggle"]',
+  },
+  // --- optional stops (6-8) ---
+  {
+    title: 'The Gift',
+    body: 'A 24-hour All-Access pass, on us. Use it when you are ready. No strings, no credit card.',
+    page: '/hub',
+    selector: '[data-tour="gift-element"]',
+  },
+  {
+    title: 'Our Story',
+    body: 'Learn about the team behind TDI, our mission, and how we support educators beyond the Hub.',
+    page: '/hub',
+    selector: 'a[href="/hub/our-story"]',
+  },
+  {
+    title: 'Certificates',
+    body: 'Finish a course, get a certificate. Real PD hours you can submit to your district.',
+    page: '/hub',
+    selector: 'a[href="/hub/certificates"]',
+  },
+];
+
+const TOTAL_STEPS = TOUR_STEPS.length;
+
+/* ------------------------------------------------------------------ */
+/*  Positioning helpers                                                */
+/* ------------------------------------------------------------------ */
+
+interface Rect {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+  bottom: number;
+  right: number;
+}
+
+const PAD = 8;
+const RADIUS = 8;
+const TOOLTIP_GAP = 12;
+const TOOLTIP_MAX_W = 320;
+
+type Side = 'top' | 'bottom' | 'left' | 'right';
+
+function bestSide(rect: Rect): Side {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const spaceBelow = vh - rect.bottom;
+  const spaceAbove = rect.top;
+  const spaceRight = vw - rect.right;
+  const spaceLeft = rect.left;
+
+  // Prefer below, then above, then right, then left
+  if (spaceBelow >= 200) return 'bottom';
+  if (spaceAbove >= 200) return 'top';
+  if (spaceRight >= TOOLTIP_MAX_W + 40) return 'right';
+  if (spaceLeft >= TOOLTIP_MAX_W + 40) return 'left';
+  return spaceBelow >= spaceAbove ? 'bottom' : 'top';
+}
+
+function tooltipPosition(rect: Rect, side: Side): { top: number; left: number } {
+  switch (side) {
+    case 'bottom':
+      return {
+        top: rect.bottom + PAD + TOOLTIP_GAP,
+        left: Math.max(16, Math.min(rect.left + rect.width / 2 - TOOLTIP_MAX_W / 2, window.innerWidth - TOOLTIP_MAX_W - 16)),
+      };
+    case 'top':
+      return {
+        top: rect.top - PAD - TOOLTIP_GAP, // will be adjusted via transform
+        left: Math.max(16, Math.min(rect.left + rect.width / 2 - TOOLTIP_MAX_W / 2, window.innerWidth - TOOLTIP_MAX_W - 16)),
+      };
+    case 'right':
+      return {
+        top: Math.max(16, rect.top + rect.height / 2 - 80),
+        left: rect.right + PAD + TOOLTIP_GAP,
+      };
+    case 'left':
+      return {
+        top: Math.max(16, rect.top + rect.height / 2 - 80),
+        left: rect.left - PAD - TOOLTIP_GAP - TOOLTIP_MAX_W,
+      };
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Arrow SVG                                                          */
+/* ------------------------------------------------------------------ */
+
+function Arrow({ side }: { side: Side }) {
+  const size = 10;
+  const style: React.CSSProperties = { position: 'absolute', width: size * 2, height: size };
+
+  switch (side) {
+    case 'bottom':
+      return (
+        <svg style={{ ...style, top: -size + 1, left: '50%', transform: 'translateX(-50%)' }} viewBox="0 0 20 10">
+          <polygon points="10,0 20,10 0,10" fill="white" />
+        </svg>
+      );
+    case 'top':
+      return (
+        <svg style={{ ...style, bottom: -size + 1, left: '50%', transform: 'translateX(-50%) rotate(180deg)' }} viewBox="0 0 20 10">
+          <polygon points="10,0 20,10 0,10" fill="white" />
+        </svg>
+      );
+    case 'right':
+      return (
+        <svg style={{ ...style, left: -size + 1, top: '30%', width: size, height: size * 2, transform: 'rotate(-90deg)' }} viewBox="0 0 20 10">
+          <polygon points="10,0 20,10 0,10" fill="white" />
+        </svg>
+      );
+    case 'left':
+      return (
+        <svg style={{ ...style, right: -size + 1, top: '30%', width: size, height: size * 2, transform: 'rotate(90deg)' }} viewBox="0 0 20 10">
+          <polygon points="10,0 20,10 0,10" fill="white" />
+        </svg>
+      );
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Component                                                          */
+/* ------------------------------------------------------------------ */
 
 export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
   const { user } = useHub();
   const { tUI } = useTranslation();
-  const driverRef = useRef<DriverInstance | null>(null);
-  const stopsSeen = useRef(0);
-  const hasRun = useRef(false);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const [stepIndex, setStepIndex] = useState(0);
+  const [targetRect, setTargetRect] = useState<Rect | null>(null);
+  const [navigating, setNavigating] = useState(false);
+  const [showDisclosure, setShowDisclosure] = useState(false);
+  const [active, setActive] = useState(true);
+
+  const hasLoggedRef = useRef(false);
+
+  const step = TOUR_STEPS[stepIndex] as TourStep | undefined;
+
+  /* ---------- log completion ---------- */
 
   const logCompletion = useCallback(
     async (count: number) => {
-      if (!user?.id) return;
+      if (!user?.id || hasLoggedRef.current) return;
+      hasLoggedRef.current = true;
       const supabase = getSupabase();
       await supabase.from('hub_activity_log').insert({
         user_id: user.id,
@@ -60,386 +216,488 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
     [user?.id],
   );
 
-  const completeTour = useCallback(
+  const endTour = useCallback(
     (count: number) => {
-      stopsSeen.current = count;
+      setActive(false);
       logCompletion(count);
       onComplete(count);
     },
     [logCompletion, onComplete],
   );
 
-  /**
-   * Build Driver.js steps. Only includes steps whose selectors actually
-   * resolve to a visible DOM element, falling back to popover-only for
-   * selectors that are absent.
-   */
-  const buildSteps = useCallback((): DriveStep[] => {
-    return TOUR_STOPS.map((stop) => {
-      const selector = STOP_SELECTORS[stop.id];
-      const element =
-        selector && document.querySelector(selector) ? selector : undefined;
+  /* ---------- find & measure target ---------- */
 
-      const step: DriveStep = {
-        element,
-        popover: {
-          title: tUI(stop.title),
-          description: tUI(stop.description),
-          side: element ? 'bottom' : 'over' as any,
-          align: 'center',
-          showButtons: ['next', 'close'],
-          nextBtnText: stop.id < TOUR_STOPS.length ? tUI('Next') : tUI('Done'),
-          popoverClass: 'tdi-tour-popover',
-        },
-      };
-
-      return step;
-    });
-  }, [tUI]);
-
-  useEffect(() => {
-    if (hasRun.current) return;
-    hasRun.current = true;
-
-    // Build all steps then split into mandatory + optional
-    const allSteps = buildSteps();
-    const mandatorySteps = allSteps.slice(0, MANDATORY_COUNT);
-    const optionalSteps = allSteps.slice(MANDATORY_COUNT);
-
-    /**
-     * Start the optional portion of the tour from a given index within
-     * the optional steps array.
-     */
-    function startOptionalTour(fromIndex: number) {
-      const remaining = optionalSteps.slice(fromIndex);
-      if (remaining.length === 0) {
-        completeTour(MANDATORY_COUNT + fromIndex);
-        return;
-      }
-
-      // For each optional step, inject an onDeselected hook that shows
-      // a continuation prompt before advancing to the next optional stop.
-      const stepsWithPrompts: DriveStep[] = remaining.map((step, idx) => {
-        const absoluteIdx = MANDATORY_COUNT + fromIndex + idx + 1; // 1-based stop number that just completed
-        return {
-          ...step,
-          popover: {
-            ...step.popover,
-            nextBtnText:
-              idx < remaining.length - 1 ? tUI('Next') : tUI('Done'),
-          },
-        };
-      });
-
-      const optDriver = driver({
-        animate: true,
-        allowClose: true,
-        overlayColor: '#1e2749',
-        overlayOpacity: 0.75,
-        stagePadding: 12,
-        stageRadius: 12,
-        popoverOffset: 14,
-        showButtons: ['next', 'close'],
-        popoverClass: 'tdi-tour-popover',
-        steps: stepsWithPrompts,
-        onCloseClick: () => {
-          const seen = MANDATORY_COUNT + fromIndex + (optDriver.getActiveIndex() ?? 0) + 1;
-          optDriver.destroy();
-          completeTour(seen);
-        },
-        onDestroyed: () => {
-          const idx = optDriver.getActiveIndex();
-          const seen = MANDATORY_COUNT + fromIndex + (idx !== undefined ? idx + 1 : remaining.length);
-          // Check if we finished all optional steps
-          if (idx !== undefined && idx >= remaining.length - 1) {
-            completeTour(TOUR_STOPS.length);
-          }
-        },
-        onNextClick: (element, step, opts) => {
-          const currentIdx = optDriver.getActiveIndex() ?? 0;
-          const absoluteStopNum = MANDATORY_COUNT + fromIndex + currentIdx + 1;
-          const prompt = CONTINUATION_PROMPTS[absoluteStopNum];
-
-          if (prompt && currentIdx < remaining.length - 1) {
-            // Show continuation prompt
-            optDriver.destroy();
-            showContinuationPrompt(
-              prompt,
-              () => startOptionalTour(fromIndex + currentIdx + 1),
-              () => completeTour(absoluteStopNum),
-            );
-          } else {
-            optDriver.moveNext();
-          }
-        },
-      });
-
-      optDriver.drive();
+  const measureTarget = useCallback(() => {
+    if (!step?.selector) {
+      setTargetRect(null);
+      return;
     }
-
-    /**
-     * Show a centered prompt overlay asking if the user wants to continue.
-     */
-    function showContinuationPrompt(
-      prompt: { text: string; continueLabel: string; skipLabel: string },
-      onContinue: () => void,
-      onSkip: () => void,
-    ) {
-      const overlay = document.createElement('div');
-      overlay.className = 'tdi-tour-continuation-overlay';
-      overlay.innerHTML = `
-        <div class="tdi-tour-continuation-card">
-          <p class="tdi-tour-continuation-text">${tUI(prompt.text)}</p>
-          <div class="tdi-tour-continuation-buttons">
-            <button class="tdi-tour-btn-continue">${tUI(prompt.continueLabel)}</button>
-            <button class="tdi-tour-btn-skip">${tUI(prompt.skipLabel)}</button>
-          </div>
-        </div>
-      `;
-
-      document.body.appendChild(overlay);
-
-      const continueBtn = overlay.querySelector('.tdi-tour-btn-continue');
-      const skipBtn = overlay.querySelector('.tdi-tour-btn-skip');
-
-      continueBtn?.addEventListener('click', () => {
-        overlay.remove();
-        onContinue();
-      });
-
-      skipBtn?.addEventListener('click', () => {
-        overlay.remove();
-        onSkip();
-      });
+    const el = document.querySelector(step.selector);
+    if (!el) {
+      setTargetRect(null);
+      return;
     }
-
-    // Build the mandatory driver
-    const mandatoryDriver = driver({
-      animate: true,
-      allowClose: true,
-      overlayColor: '#1e2749',
-      overlayOpacity: 0.75,
-      stagePadding: 12,
-      stageRadius: 12,
-      popoverOffset: 14,
-      showButtons: ['next', 'close'],
-      popoverClass: 'tdi-tour-popover',
-      steps: mandatorySteps,
-      onCloseClick: () => {
-        const seen = (mandatoryDriver.getActiveIndex() ?? 0) + 1;
-        mandatoryDriver.destroy();
-        completeTour(seen);
-      },
-      onNextClick: (element, step, opts) => {
-        const currentIdx = mandatoryDriver.getActiveIndex() ?? 0;
-
-        if (currentIdx >= MANDATORY_COUNT - 1) {
-          // Last mandatory step -- show progressive disclosure prompt
-          mandatoryDriver.destroy();
-
-          if (optionalSteps.length > 0) {
-            showContinuationPrompt(
-              {
-                text: PROGRESSIVE_DISCLOSURE_PROMPT.title + ' ' + PROGRESSIVE_DISCLOSURE_PROMPT.description,
-                continueLabel: PROGRESSIVE_DISCLOSURE_PROMPT.continueLabel,
-                skipLabel: PROGRESSIVE_DISCLOSURE_PROMPT.skipLabel,
-              },
-              () => startOptionalTour(0),
-              () => completeTour(MANDATORY_COUNT),
-            );
-          } else {
-            completeTour(MANDATORY_COUNT);
-          }
-        } else {
-          mandatoryDriver.moveNext();
-        }
-      },
+    const r = el.getBoundingClientRect();
+    setTargetRect({
+      top: r.top,
+      left: r.left,
+      width: r.width,
+      height: r.height,
+      bottom: r.bottom,
+      right: r.right,
     });
 
-    driverRef.current = mandatoryDriver;
-    mandatoryDriver.drive();
+    // Scroll element into view if needed
+    if (r.top < 0 || r.bottom > window.innerHeight) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Re-measure after scroll
+      requestAnimationFrame(() => {
+        const r2 = el.getBoundingClientRect();
+        setTargetRect({
+          top: r2.top,
+          left: r2.left,
+          width: r2.width,
+          height: r2.height,
+          bottom: r2.bottom,
+          right: r2.right,
+        });
+      });
+    }
+  }, [step]);
 
-    return () => {
-      mandatoryDriver.destroy();
-    };
-  }, [buildSteps, completeTour, tUI]);
+  /* ---------- navigate if needed, then measure ---------- */
 
-  // Inject tour styles
   useEffect(() => {
-    const styleId = 'tdi-tour-styles';
-    if (document.getElementById(styleId)) return;
+    if (!active || !step) return;
 
-    const style = document.createElement('style');
-    style.id = styleId;
-    style.textContent = `
-      .tdi-tour-popover .driver-popover {
-        background: white !important;
-        border-radius: 16px !important;
-        box-shadow: 0 20px 60px rgba(30, 39, 73, 0.25) !important;
-        max-width: 340px !important;
-        padding: 0 !important;
-        border: none !important;
-      }
+    // Normalise paths for comparison
+    const currentPath = pathname.replace(/\/$/, '') || '/hub';
+    const targetPath = step.page.replace(/\/$/, '') || '/hub';
 
-      .tdi-tour-popover .driver-popover-title {
-        font-family: 'Source Serif 4', serif !important;
-        font-size: 18px !important;
-        font-weight: 700 !important;
-        color: #1e2749 !important;
-        padding: 20px 20px 4px !important;
-        margin: 0 !important;
-      }
+    if (currentPath !== targetPath) {
+      setNavigating(true);
+      router.push(step.page);
+    } else {
+      // Already on the right page -- try to find the element
+      // Use a short delay to let the DOM settle (esp. after navigation)
+      const timer = setTimeout(() => {
+        setNavigating(false);
+        measureTarget();
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [active, step, pathname, router, measureTarget]);
 
-      .tdi-tour-popover .driver-popover-description {
-        font-family: 'DM Sans', sans-serif !important;
-        font-size: 14px !important;
-        line-height: 1.6 !important;
-        color: #6B7280 !important;
-        padding: 0 20px 16px !important;
-        margin: 0 !important;
-      }
+  /* ---------- after navigation, wait for target page ---------- */
 
-      .tdi-tour-popover .driver-popover-footer {
-        padding: 0 20px 16px !important;
-        border-top: none !important;
-      }
+  useEffect(() => {
+    if (!navigating || !active || !step) return;
 
-      .tdi-tour-popover .driver-popover-next-btn {
-        background: #ffba06 !important;
-        color: #1e2749 !important;
-        border: none !important;
-        border-radius: 10px !important;
-        padding: 8px 20px !important;
-        font-size: 13px !important;
-        font-weight: 600 !important;
-        font-family: 'DM Sans', sans-serif !important;
-        cursor: pointer !important;
-        text-shadow: none !important;
-      }
+    const currentPath = pathname.replace(/\/$/, '') || '/hub';
+    const targetPath = step.page.replace(/\/$/, '') || '/hub';
 
-      .tdi-tour-popover .driver-popover-next-btn:hover {
-        background: #e5a805 !important;
-      }
+    if (currentPath === targetPath) {
+      // Page has loaded -- wait a moment for DOM to populate then measure
+      const timer = setTimeout(() => {
+        setNavigating(false);
+        measureTarget();
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [pathname, navigating, active, step, measureTarget]);
 
-      .tdi-tour-popover .driver-popover-close-btn {
-        color: #9CA3AF !important;
-        font-size: 12px !important;
-      }
+  /* ---------- re-measure on scroll / resize ---------- */
 
-      .tdi-tour-popover .driver-popover-prev-btn {
-        display: none !important;
-      }
+  useEffect(() => {
+    if (!active || navigating) return;
 
-      .tdi-tour-popover .driver-popover-arrow {
-        border: none !important;
-      }
-
-      .tdi-tour-popover .driver-popover-arrow-side-bottom {
-        border-bottom-color: white !important;
-      }
-
-      .tdi-tour-popover .driver-popover-arrow-side-top {
-        border-top-color: white !important;
-      }
-
-      .tdi-tour-popover .driver-popover-arrow-side-left {
-        border-left-color: white !important;
-      }
-
-      .tdi-tour-popover .driver-popover-arrow-side-right {
-        border-right-color: white !important;
-      }
-
-      /* Skip tour button (shown as the close button text) */
-      .tdi-tour-popover .driver-popover-close-btn::after {
-        content: 'Skip tour';
-        font-size: 11px;
-        font-family: 'DM Sans', sans-serif;
-        color: #9CA3AF;
-        margin-left: 4px;
-      }
-
-      /* Continuation prompt overlay */
-      .tdi-tour-continuation-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 1000010;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(30, 39, 73, 0.8);
-        animation: tdi-fade-in 0.2s ease-out;
-      }
-
-      .tdi-tour-continuation-card {
-        background: white;
-        border-radius: 20px;
-        padding: 32px;
-        max-width: 360px;
-        width: 90%;
-        text-align: center;
-        box-shadow: 0 20px 60px rgba(30, 39, 73, 0.3);
-      }
-
-      .tdi-tour-continuation-text {
-        font-family: 'Source Serif 4', serif;
-        font-size: 18px;
-        font-weight: 600;
-        color: #1e2749;
-        margin: 0 0 24px;
-        line-height: 1.5;
-      }
-
-      .tdi-tour-continuation-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .tdi-tour-btn-continue {
-        background: #ffba06;
-        color: #1e2749;
-        border: none;
-        border-radius: 12px;
-        padding: 12px 24px;
-        font-size: 14px;
-        font-weight: 600;
-        font-family: 'DM Sans', sans-serif;
-        cursor: pointer;
-        transition: background 0.15s;
-      }
-
-      .tdi-tour-btn-continue:hover {
-        background: #e5a805;
-      }
-
-      .tdi-tour-btn-skip {
-        background: transparent;
-        color: #9CA3AF;
-        border: none;
-        padding: 10px 24px;
-        font-size: 13px;
-        font-family: 'DM Sans', sans-serif;
-        cursor: pointer;
-        transition: color 0.15s;
-      }
-
-      .tdi-tour-btn-skip:hover {
-        color: #6B7280;
-      }
-
-      @keyframes tdi-fade-in {
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
-    `;
-
-    document.head.appendChild(style);
-
+    const handler = () => measureTarget();
+    window.addEventListener('resize', handler);
+    window.addEventListener('scroll', handler, true);
     return () => {
-      style.remove();
+      window.removeEventListener('resize', handler);
+      window.removeEventListener('scroll', handler, true);
     };
+  }, [active, navigating, measureTarget]);
+
+  /* ---------- retry measurement if selector not found initially ---------- */
+
+  useEffect(() => {
+    if (!active || navigating || !step?.selector || targetRect) return;
+
+    // Retry up to 10 times (2.5 seconds total)
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      measureTarget();
+      if (attempts >= 10) clearInterval(interval);
+    }, 250);
+
+    return () => clearInterval(interval);
+  }, [active, navigating, step, targetRect, measureTarget]);
+
+  /* ---------- step navigation ---------- */
+
+  const goNext = useCallback(() => {
+    const nextIndex = stepIndex + 1;
+
+    // After mandatory stops, show progressive disclosure
+    if (nextIndex === MANDATORY_COUNT && !showDisclosure) {
+      setShowDisclosure(true);
+      return;
+    }
+
+    if (nextIndex >= TOTAL_STEPS) {
+      endTour(TOTAL_STEPS);
+      return;
+    }
+
+    setTargetRect(null);
+    setStepIndex(nextIndex);
+  }, [stepIndex, showDisclosure, endTour]);
+
+  const handleDisclosureContinue = useCallback(() => {
+    setShowDisclosure(false);
+    setTargetRect(null);
+    setStepIndex(MANDATORY_COUNT);
   }, []);
 
-  return null;
+  const handleDisclosureSkip = useCallback(() => {
+    setShowDisclosure(false);
+    endTour(MANDATORY_COUNT);
+  }, [endTour]);
+
+  const handleSkip = useCallback(() => {
+    endTour(stepIndex + 1);
+  }, [stepIndex, endTour]);
+
+  /* ---------- bail if inactive ---------- */
+
+  if (!active || !step) return null;
+
+  /* ---------- progressive disclosure overlay ---------- */
+
+  if (showDisclosure) {
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 1000010,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(30, 39, 73, 0.8)',
+          animation: 'tdi-tour-fadein 0.2s ease-out',
+        }}
+      >
+        <div
+          style={{
+            background: 'white',
+            borderRadius: 20,
+            padding: 32,
+            maxWidth: 360,
+            width: '90%',
+            textAlign: 'center',
+            boxShadow: '0 20px 60px rgba(30, 39, 73, 0.3)',
+          }}
+        >
+          <p
+            style={{
+              fontFamily: "'Source Serif 4', serif",
+              fontSize: 18,
+              fontWeight: 600,
+              color: '#1e2749',
+              margin: '0 0 8px',
+              lineHeight: 1.5,
+            }}
+          >
+            {tUI(PROGRESSIVE_DISCLOSURE_PROMPT.title)}
+          </p>
+          <p
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: 14,
+              color: '#6B7280',
+              margin: '0 0 24px',
+              lineHeight: 1.5,
+            }}
+          >
+            {tUI('Three features still ahead.')}
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <button
+              onClick={handleDisclosureContinue}
+              style={{
+                background: '#ffba06',
+                color: '#1e2749',
+                border: 'none',
+                borderRadius: 12,
+                padding: '12px 24px',
+                fontSize: 14,
+                fontWeight: 600,
+                fontFamily: "'DM Sans', sans-serif",
+                cursor: 'pointer',
+              }}
+            >
+              {tUI(PROGRESSIVE_DISCLOSURE_PROMPT.continueLabel)}
+            </button>
+            <button
+              onClick={handleDisclosureSkip}
+              style={{
+                background: 'transparent',
+                color: '#9CA3AF',
+                border: 'none',
+                padding: '10px 24px',
+                fontSize: 13,
+                fontFamily: "'DM Sans', sans-serif",
+                cursor: 'pointer',
+              }}
+            >
+              {tUI(PROGRESSIVE_DISCLOSURE_PROMPT.skipLabel)}
+            </button>
+          </div>
+        </div>
+        <style>{`
+          @keyframes tdi-tour-fadein {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  /* ---------- loading state while navigating ---------- */
+
+  if (navigating) {
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 1000010,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(30, 39, 73, 0.75)',
+        }}
+      >
+        <div
+          style={{
+            width: 40,
+            height: 40,
+            border: '3px solid rgba(255,255,255,0.2)',
+            borderTopColor: '#ffba06',
+            borderRadius: '50%',
+            animation: 'tdi-tour-spin 0.8s linear infinite',
+          }}
+        />
+        <style>{`
+          @keyframes tdi-tour-spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  /* ---------- compute spotlight + tooltip layout ---------- */
+
+  const hasTarget = targetRect !== null;
+  const side: Side = hasTarget ? bestSide(targetRect!) : 'bottom';
+  const tipPos = hasTarget
+    ? tooltipPosition(targetRect!, side)
+    : {
+        top: window.innerHeight / 2,
+        left: Math.max(16, window.innerWidth / 2 - TOOLTIP_MAX_W / 2),
+      };
+
+  // For 'top' side, the tooltip renders above and we use translateY(-100%)
+  const tipTransform = side === 'top' && hasTarget ? 'translateY(-100%)' : undefined;
+
+  // Box-shadow spotlight: a huge spread creates the overlay, with a transparent
+  // "hole" where the target element is.
+  const spotlightStyle: React.CSSProperties = hasTarget
+    ? {
+        position: 'fixed',
+        top: targetRect!.top - PAD,
+        left: targetRect!.left - PAD,
+        width: targetRect!.width + PAD * 2,
+        height: targetRect!.height + PAD * 2,
+        borderRadius: RADIUS,
+        boxShadow: '0 0 0 9999px rgba(30, 39, 73, 0.75)',
+        zIndex: 1000010,
+        pointerEvents: 'none',
+        transition: 'all 0.3s ease',
+      }
+    : {
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(30, 39, 73, 0.75)',
+        zIndex: 1000010,
+        pointerEvents: 'none',
+      };
+
+  return (
+    <>
+      {/* Click-blocker behind spotlight */}
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 1000009,
+        }}
+        onClick={handleSkip}
+      />
+
+      {/* Spotlight hole */}
+      <div style={spotlightStyle} />
+
+      {/* Tooltip card */}
+      <div
+        style={{
+          position: 'fixed',
+          top: tipPos.top,
+          left: tipPos.left,
+          maxWidth: TOOLTIP_MAX_W,
+          width: TOOLTIP_MAX_W,
+          zIndex: 1000011,
+          transform: tipTransform,
+          animation: 'tdi-tour-fadein 0.2s ease-out',
+        }}
+      >
+        <div
+          style={{
+            position: 'relative',
+            background: 'white',
+            borderRadius: 16,
+            boxShadow: '0 20px 60px rgba(30, 39, 73, 0.25)',
+            overflow: 'visible',
+          }}
+        >
+          {/* Arrow */}
+          {hasTarget && <Arrow side={side} />}
+
+          {/* Close / skip button */}
+          <button
+            onClick={handleSkip}
+            style={{
+              position: 'absolute',
+              top: 12,
+              right: 12,
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#9CA3AF',
+              padding: 4,
+              lineHeight: 1,
+            }}
+            aria-label="Skip tour"
+          >
+            <X size={16} />
+          </button>
+
+          {/* Content */}
+          <div style={{ padding: '20px 20px 16px' }}>
+            <h3
+              style={{
+                fontFamily: "'Source Serif 4', serif",
+                fontSize: 15,
+                fontWeight: 600,
+                color: '#1e2749',
+                margin: '0 0 6px',
+                paddingRight: 24,
+              }}
+            >
+              {tUI(step.title)}
+            </h3>
+            <p
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 14,
+                lineHeight: 1.6,
+                color: '#6B7280',
+                margin: 0,
+              }}
+            >
+              {tUI(step.body)}
+            </p>
+          </div>
+
+          {/* Footer */}
+          <div
+            style={{
+              padding: '0 20px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 11,
+                color: '#9CA3AF',
+              }}
+            >
+              {stepIndex + 1} of {TOTAL_STEPS}
+            </span>
+            <button
+              onClick={goNext}
+              style={{
+                background: '#ffba06',
+                color: '#1e2749',
+                border: 'none',
+                borderRadius: 10,
+                padding: '8px 20px',
+                fontSize: 13,
+                fontWeight: 600,
+                fontFamily: "'DM Sans', sans-serif",
+                cursor: 'pointer',
+              }}
+            >
+              {stepIndex >= TOTAL_STEPS - 1 ? tUI('Done') : tUI('Next')}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Skip tour link below tooltip */}
+      <div
+        style={{
+          position: 'fixed',
+          top: (tipTransform ? tipPos.top : tipPos.top) + (tipTransform ? -8 : 0),
+          left: tipPos.left,
+          width: TOOLTIP_MAX_W,
+          zIndex: 1000011,
+          textAlign: 'center',
+          marginTop: tipTransform ? undefined : 8,
+          transform: tipTransform ? 'translateY(-100%) translateY(-48px)' : undefined,
+        }}
+      >
+        <button
+          onClick={handleSkip}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'rgba(255,255,255,0.5)',
+            fontSize: 12,
+            fontFamily: "'DM Sans', sans-serif",
+            cursor: 'pointer',
+            padding: '4px 8px',
+          }}
+        >
+          {tUI('Skip tour')}
+        </button>
+      </div>
+
+      <style>{`
+        @keyframes tdi-tour-fadein {
+          from { opacity: 0; transform: translateY(4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+    </>
+  );
 }

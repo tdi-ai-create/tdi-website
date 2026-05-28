@@ -239,7 +239,7 @@ export default function QuickWinsPage() {
         </div>
 
         {/* Lift Filter Row */}
-        <div className="flex items-center gap-2 mb-6 flex-wrap">
+        <div data-tour="lift-filter" className="flex items-center gap-2 mb-6 flex-wrap">
           <span
             className="text-[11px] font-bold tracking-wider flex-shrink-0"
             style={{
