@@ -91,7 +91,7 @@ export const TOUR_STOPS: TourStop[] = [
  */
 export const PROGRESSIVE_DISCLOSURE_PROMPT = {
   title: 'There is more in here, if you want it.',
-  description: 'Seven features still ahead.',
+  description: 'Six features still ahead.',
   continueLabel: 'Show me',
   skipLabel: "I'm good, thanks",
 };

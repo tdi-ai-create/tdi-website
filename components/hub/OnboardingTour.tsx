@@ -71,13 +71,7 @@ const TOUR_STEPS_CONFIG: TourStep[] = [
     body: TOUR_STOPS[5].description,
     selector: 'a[href="/hub/certificates"]',
   },
-  // 7. The Gift
-  {
-    title: TOUR_STOPS[6].title,
-    body: TOUR_STOPS[6].description,
-    selector: '[data-tour="gift-element"]',
-  },
-  // 8. Vibe Check
+  // 7. Vibe Check (Gift Element deferred to post-launch)
   {
     title: TOUR_STOPS[7].title,
     body: TOUR_STOPS[7].description,

@@ -1155,8 +1155,7 @@ export default function HubDashboard() {
 
         {/* ===== RIGHT COLUMN (SIDEBAR) ===== */}
         <div className="space-y-4">
-          {/* 1. Gift Element */}
-          <GiftElement />
+          {/* Gift Element -- deferred to post-launch for polish */}
 
           {/* 2. TDI Tip -- enhanced */}
           <div
