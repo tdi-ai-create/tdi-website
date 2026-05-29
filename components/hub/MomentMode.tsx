@@ -100,6 +100,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   const [breathPhase, setBreathPhase] = useState<BreathPhase>('inhale');
   const [breathCycle, setBreathCycle] = useState(1);
   const breathCycleRef = useRef(1);
+  const breathPhaseRef = useRef<BreathPhase>('inhale');
   const [phaseTimer, setPhaseTimer] = useState(BREATH_DURATION);
   const breathingRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -224,39 +225,48 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
     };
   }, [isOpen, handleEscape, hasIncremented, setMomentModeActive]);
 
-  // Box breathing timer
+  // Box breathing timer - uses refs to avoid tearing down interval on each phase change
   useEffect(() => {
-    if (state === 'pause' && breathPhase !== 'complete') {
-      breathingRef.current = setInterval(() => {
-        setPhaseTimer((prev) => {
-          if (prev <= 1) {
-            // Move to next phase
-            setBreathPhase((currentPhase) => {
-              if (currentPhase === 'inhale') return 'hold1';
-              if (currentPhase === 'hold1') return 'exhale';
-              if (currentPhase === 'exhale') return 'hold2';
-              if (currentPhase === 'hold2') {
-                // End of cycle - use ref for accurate cycle count
-                if (breathCycleRef.current >= TOTAL_CYCLES) {
-                  return 'complete';
-                }
-                breathCycleRef.current += 1;
-                setBreathCycle(breathCycleRef.current);
-                return 'inhale';
-              }
-              return currentPhase;
-            });
-            return BREATH_DURATION;
+    if (state !== 'pause') return;
+    if (breathPhaseRef.current === 'complete') return;
+
+    breathingRef.current = setInterval(() => {
+      setPhaseTimer((prev) => {
+        if (prev <= 1) {
+          // Move to next phase using ref for accurate state
+          const currentPhase = breathPhaseRef.current;
+          let nextPhase: BreathPhase = currentPhase;
+
+          if (currentPhase === 'inhale') nextPhase = 'hold1';
+          else if (currentPhase === 'hold1') nextPhase = 'exhale';
+          else if (currentPhase === 'exhale') nextPhase = 'hold2';
+          else if (currentPhase === 'hold2') {
+            if (breathCycleRef.current >= TOTAL_CYCLES) {
+              nextPhase = 'complete';
+            } else {
+              breathCycleRef.current += 1;
+              setBreathCycle(breathCycleRef.current);
+              nextPhase = 'inhale';
+            }
           }
-          return prev - 1;
-        });
-      }, 1000);
-    }
+
+          breathPhaseRef.current = nextPhase;
+          setBreathPhase(nextPhase);
+
+          if (nextPhase === 'complete') {
+            if (breathingRef.current) clearInterval(breathingRef.current);
+          }
+
+          return BREATH_DURATION;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
     return () => {
       if (breathingRef.current) clearInterval(breathingRef.current);
     };
-  }, [state, breathPhase]);
+  }, [state]);
 
   const handleClose = () => {
     // Log moment mode completed when closing after meaningful use (30+ seconds)
@@ -297,6 +307,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
 
   const resetBreathing = () => {
     setBreathPhase('inhale');
+    breathPhaseRef.current = 'inhale';
     setBreathCycle(1);
     breathCycleRef.current = 1;
     setPhaseTimer(BREATH_DURATION);

@@ -944,7 +944,7 @@ export default function HubDashboard() {
 
           {/* Saved - only show if teacher has bookmarked anything */}
           {savedCourses.length > 0 && (
-            <div>
+            <div data-tour="favorites">
               <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
                 {tUI('Saved')}
               </div>
@@ -1070,7 +1070,7 @@ export default function HubDashboard() {
 
           {/* Feature 5: Community Highlights */}
           {communityHighlights.length > 0 && (
-            <div>
+            <div data-tour="community-highlights">
               <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
                 {tUI('Community Highlights')}
               </div>

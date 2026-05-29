@@ -6,7 +6,9 @@ import { useHub } from '@/components/hub/HubContext';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import {
+  TOUR_STOPS,
   PROGRESSIVE_DISCLOSURE_PROMPT,
+  CONTINUATION_PROMPTS,
 } from '@/lib/tour-copy';
 
 interface OnboardingTourProps {
@@ -20,67 +22,94 @@ interface OnboardingTourProps {
 interface TourStep {
   title: string;
   body: string;
-  /** URL path the target element lives on (used only for display) */
-  page: string;
   /** CSS selector for the element to highlight (null = centered popover) */
   selector: string | null;
 }
 
 const MANDATORY_COUNT = 5;
 
-const TOUR_STEPS: TourStep[] = [
+/**
+ * 12 stops matching tour-copy.ts exactly, in the approved order.
+ * Selectors target nav-bar or dashboard elements on /hub.
+ * null = centered popover (element not on dashboard).
+ */
+const TOUR_STEPS_CONFIG: TourStep[] = [
+  // 1. Quick Wins
   {
-    title: 'Grab something useful right now',
-    body: 'Quick Wins are short, practical resources built for real school days. No course enrollment, no setup. Just something you can use this week.',
-    page: '/hub',
+    title: TOUR_STOPS[0].title,
+    body: TOUR_STOPS[0].description,
     selector: 'a[href="/hub/quick-wins"]',
   },
+  // 2. Community
   {
-    title: 'Learn at your own pace',
-    body: 'Courses are self-paced professional development built by real educators. Explore the catalog and start when you are ready.',
-    page: '/hub',
-    selector: 'a[href="/hub/courses"]',
+    title: TOUR_STOPS[1].title,
+    body: TOUR_STOPS[1].description,
+    selector: '[data-tour="community-highlights"]',
   },
+  // 3. The LIFT Filter
   {
-    title: 'No one is watching',
-    body: 'Moment Mode is a private wellness pause. Breathing exercises, affirmations, and gentle tools. Nothing is tracked. It is here for the moments when you need to step away.',
-    page: '/hub',
+    title: TOUR_STOPS[2].title,
+    body: TOUR_STOPS[2].description,
+    selector: null, // LIFT filter lives on /hub/quick-wins, not dashboard
+  },
+  // 4. Moment Mode
+  {
+    title: TOUR_STOPS[3].title,
+    body: TOUR_STOPS[3].description,
     selector: '[data-tour="moment-mode"]',
   },
+  // 5. Meet Desi
   {
-    title: 'Your achievements',
-    body: 'Earn Field Notes as you explore, contribute, and grow. Certificates, recognitions, and milestones -- all yours.',
-    page: '/hub',
+    title: TOUR_STOPS[4].title,
+    body: TOUR_STOPS[4].description,
+    selector: null, // Desi is available across hub pages
+  },
+  // --- progressive disclosure break after stop 5 ---
+  // 6. Field Notes
+  {
+    title: TOUR_STOPS[5].title,
+    body: TOUR_STOPS[5].description,
     selector: 'a[href="/hub/certificates"]',
   },
+  // 7. The Gift
   {
-    title: 'Also available in Spanish',
-    body: 'Toggle between English and Spanish. The whole Hub works in both languages.',
-    page: '/hub',
-    selector: '[data-tour="language-toggle"]',
-  },
-  // --- optional stops (6-8) ---
-  {
-    title: 'The team behind this',
-    body: 'Learn about TDI, our mission, how we support educators beyond the Hub, and our approved PD status in all 50 states.',
-    page: '/hub',
-    selector: 'a[href="/hub/our-story"]',
-  },
-  {
-    title: 'Something is waiting for you',
-    body: 'A 24-hour All-Access pass, on us. Use it when you are ready. No strings, no credit card.',
-    page: '/hub',
+    title: TOUR_STOPS[6].title,
+    body: TOUR_STOPS[6].description,
     selector: '[data-tour="gift-element"]',
   },
+  // 8. Vibe Check
   {
-    title: 'Become a creator',
-    body: 'Have expertise to share? Apply to create courses and tools for the TDI community. Your knowledge can help thousands of educators.',
-    page: '/hub',
-    selector: 'a[href="https://www.teachersdeserveit.com/create-with-us"]',
+    title: TOUR_STOPS[7].title,
+    body: TOUR_STOPS[7].description,
+    selector: null, // Vibe Check appears as a slide-up, not a fixed element
+  },
+  // 9. Transformation Tracker
+  {
+    title: TOUR_STOPS[8].title,
+    body: TOUR_STOPS[8].description,
+    selector: 'a[href="/hub/transformation"]',
+  },
+  // 10. Favorites
+  {
+    title: TOUR_STOPS[9].title,
+    body: TOUR_STOPS[9].description,
+    selector: '[data-tour="favorites"]',
+  },
+  // 11. Multilingual Support
+  {
+    title: TOUR_STOPS[10].title,
+    body: TOUR_STOPS[10].description,
+    selector: '[data-tour="language-toggle"]',
+  },
+  // 12. Certificates
+  {
+    title: TOUR_STOPS[11].title,
+    body: TOUR_STOPS[11].description,
+    selector: 'a[href="/hub/certificates"]',
   },
 ];
 
-const TOTAL_STEPS = TOUR_STEPS.length;
+const TOTAL_STEPS = TOUR_STEPS_CONFIG.length;
 
 /* ------------------------------------------------------------------ */
 /*  Positioning helpers                                                */
@@ -110,7 +139,6 @@ function bestSide(rect: Rect): Side {
   const spaceRight = vw - rect.right;
   const spaceLeft = rect.left;
 
-  // Prefer below, then above, then right, then left
   if (spaceBelow >= 200) return 'bottom';
   if (spaceAbove >= 200) return 'top';
   if (spaceRight >= TOOLTIP_MAX_W + 40) return 'right';
@@ -127,7 +155,7 @@ function tooltipPosition(rect: Rect, side: Side): { top: number; left: number } 
       };
     case 'top':
       return {
-        top: rect.top - PAD - TOOLTIP_GAP, // will be adjusted via transform
+        top: rect.top - PAD - TOOLTIP_GAP,
         left: Math.max(16, Math.min(rect.left + rect.width / 2 - TOOLTIP_MAX_W / 2, window.innerWidth - TOOLTIP_MAX_W - 16)),
       };
     case 'right':
@@ -190,11 +218,12 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
   const [stepIndex, setStepIndex] = useState(0);
   const [targetRect, setTargetRect] = useState<Rect | null>(null);
   const [showDisclosure, setShowDisclosure] = useState(false);
+  const [showContinuation, setShowContinuation] = useState<number | null>(null);
   const [active, setActive] = useState(true);
 
   const hasLoggedRef = useRef(false);
 
-  const step = TOUR_STEPS[stepIndex] as TourStep | undefined;
+  const step = TOUR_STEPS_CONFIG[stepIndex] as TourStep | undefined;
 
   /* ---------- log completion ---------- */
 
@@ -230,7 +259,6 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
     }
     const el = document.querySelector(step.selector);
     if (!el) {
-      // Element not found (user may have navigated away) -- show centered fallback
       setTargetRect(null);
       return;
     }
@@ -244,10 +272,8 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
       right: r.right,
     });
 
-    // Scroll element into view if needed
     if (r.top < 0 || r.bottom > window.innerHeight) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Re-measure after scroll
       requestAnimationFrame(() => {
         const r2 = el.getBoundingClientRect();
         setTargetRect({
@@ -267,7 +293,6 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
   useEffect(() => {
     if (!active || !step) return;
 
-    // Short delay to let the DOM settle
     const timer = setTimeout(() => {
       measureTarget();
     }, 150);
@@ -293,7 +318,6 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
   useEffect(() => {
     if (!active || !step?.selector || targetRect) return;
 
-    // Retry up to 10 times (2.5 seconds total)
     let attempts = 0;
     const interval = setInterval(() => {
       attempts++;
@@ -306,13 +330,30 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
 
   /* ---------- step navigation ---------- */
 
-  const goNext = useCallback(() => {
-    const nextIndex = stepIndex + 1;
+  // Use refs to avoid stale closure issues
+  const stepIndexRef = useRef(stepIndex);
+  stepIndexRef.current = stepIndex;
 
-    // After mandatory stops, show progressive disclosure
-    if (nextIndex === MANDATORY_COUNT && !showDisclosure) {
+  const showDisclosureRef = useRef(showDisclosure);
+  showDisclosureRef.current = showDisclosure;
+
+  const goNext = useCallback(() => {
+    const currentStep = stepIndexRef.current;
+    const nextIndex = currentStep + 1;
+
+    // After mandatory stops (stop 5), show the main progressive disclosure
+    if (nextIndex === MANDATORY_COUNT && !showDisclosureRef.current) {
       setShowDisclosure(true);
       return;
+    }
+
+    // After each optional stop (6-11), show continuation prompt
+    if (currentStep >= MANDATORY_COUNT && currentStep < TOTAL_STEPS - 1) {
+      const stopNumber = currentStep + 1; // 1-indexed
+      if (CONTINUATION_PROMPTS[stopNumber]) {
+        setShowContinuation(stopNumber);
+        return;
+      }
     }
 
     if (nextIndex >= TOTAL_STEPS) {
@@ -322,7 +363,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
 
     setTargetRect(null);
     setStepIndex(nextIndex);
-  }, [stepIndex, showDisclosure, endTour]);
+  }, [endTour]);
 
   const handleDisclosureContinue = useCallback(() => {
     setShowDisclosure(false);
@@ -335,15 +376,32 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
     endTour(MANDATORY_COUNT);
   }, [endTour]);
 
+  const handleContinuationContinue = useCallback(() => {
+    const stopNum = showContinuation;
+    setShowContinuation(null);
+    if (stopNum !== null) {
+      setTargetRect(null);
+      setStepIndex(stopNum); // stopNum is 1-indexed, which equals the next 0-indexed step
+    }
+  }, [showContinuation]);
+
+  const handleContinuationSkip = useCallback(() => {
+    const stopNum = showContinuation;
+    setShowContinuation(null);
+    if (stopNum !== null) {
+      endTour(stopNum);
+    }
+  }, [showContinuation, endTour]);
+
   const handleSkip = useCallback(() => {
-    endTour(stepIndex + 1);
-  }, [stepIndex, endTour]);
+    endTour(stepIndexRef.current + 1);
+  }, [endTour]);
 
   /* ---------- bail if inactive ---------- */
 
   if (!active || !step) return null;
 
-  /* ---------- progressive disclosure overlay ---------- */
+  /* ---------- progressive disclosure overlay (after stop 5) ---------- */
 
   if (showDisclosure) {
     return (
@@ -391,7 +449,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
               lineHeight: 1.5,
             }}
           >
-            {tUI('Three features still ahead.')}
+            {tUI(PROGRESSIVE_DISCLOSURE_PROMPT.description)}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <button
@@ -436,6 +494,89 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
     );
   }
 
+  /* ---------- continuation prompts between optional stops ---------- */
+
+  if (showContinuation !== null && CONTINUATION_PROMPTS[showContinuation]) {
+    const prompt = CONTINUATION_PROMPTS[showContinuation];
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 1000010,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(30, 39, 73, 0.8)',
+          animation: 'tdi-tour-fadein 0.2s ease-out',
+        }}
+      >
+        <div
+          style={{
+            background: 'white',
+            borderRadius: 20,
+            padding: 32,
+            maxWidth: 360,
+            width: '90%',
+            textAlign: 'center',
+            boxShadow: '0 20px 60px rgba(30, 39, 73, 0.3)',
+          }}
+        >
+          <p
+            style={{
+              fontFamily: "'Source Serif 4', serif",
+              fontSize: 18,
+              fontWeight: 600,
+              color: '#1e2749',
+              margin: '0 0 24px',
+              lineHeight: 1.5,
+            }}
+          >
+            {tUI(prompt.text)}
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <button
+              onClick={handleContinuationContinue}
+              style={{
+                background: '#ffba06',
+                color: '#1e2749',
+                border: 'none',
+                borderRadius: 12,
+                padding: '12px 24px',
+                fontSize: 14,
+                fontWeight: 600,
+                fontFamily: "'DM Sans', sans-serif",
+                cursor: 'pointer',
+              }}
+            >
+              {tUI(prompt.continueLabel)}
+            </button>
+            <button
+              onClick={handleContinuationSkip}
+              style={{
+                background: 'transparent',
+                color: '#9CA3AF',
+                border: 'none',
+                padding: '10px 24px',
+                fontSize: 13,
+                fontFamily: "'DM Sans', sans-serif",
+                cursor: 'pointer',
+              }}
+            >
+              {tUI(prompt.skipLabel)}
+            </button>
+          </div>
+        </div>
+        <style>{`
+          @keyframes tdi-tour-fadein {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
   /* ---------- compute spotlight + tooltip layout ---------- */
 
   const hasTarget = targetRect !== null;
@@ -447,11 +588,8 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
         left: Math.max(16, window.innerWidth / 2 - TOOLTIP_MAX_W / 2),
       };
 
-  // For 'top' side, the tooltip renders above and we use translateY(-100%)
   const tipTransform = side === 'top' && hasTarget ? 'translateY(-100%)' : undefined;
 
-  // Box-shadow spotlight: a huge spread creates the overlay, with a transparent
-  // "hole" where the target element is.
   const spotlightStyle: React.CSSProperties = hasTarget
     ? {
         position: 'fixed',
@@ -475,7 +613,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
 
   return (
     <>
-      {/* Full-screen click blocker -- prevents ALL interaction with the page behind the tour */}
+      {/* Full-screen click blocker */}
       <div
         style={{
           position: 'fixed',
@@ -491,7 +629,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
       {/* Spotlight hole */}
       <div style={spotlightStyle} />
 
-      {/* Clickable area over the highlighted element -- clicking advances the tour */}
+      {/* Clickable area over the highlighted element */}
       {hasTarget && targetRect && (
         <div
           style={{
