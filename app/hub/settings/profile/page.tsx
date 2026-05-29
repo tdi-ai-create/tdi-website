@@ -956,59 +956,60 @@ export default function ProfileSettingsPage() {
          ════════════════════════════════════════════════════════════════════ */}
       {activeTab === 'goals' && (
         <div className="space-y-6">
-          <div
-            className="rounded-2xl overflow-hidden"
-            style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
-          >
-            <div className="px-6 pt-6 pb-4" style={{ borderBottom: '1px solid #F3F4F6' }}>
-              <h2 className="text-sm font-semibold mb-1" style={{ color: '#1B2A4A' }}>
-                {tUI('What do you want from this experience?')}
-                {savedField === 'goals' && (
-                  <span className="ml-2 text-xs text-green-600 font-normal">
-                    <Check size={14} className="inline" /> {tUI('Saved')}
-                  </span>
-                )}
-              </h2>
-              <p className="text-xs" style={{ color: '#9CA3AF' }}>
-                {tUI('Pick the areas that matter most to you. These shape everything we recommend.')}
-              </p>
-            </div>
-            <div className="bg-white px-6 py-5">
-              <div className="grid grid-cols-3 md:grid-cols-4 gap-2.5 mb-5">
-                {GRID_GOALS.map((goal) => {
-                  const isSelected = selectedGoals.includes(goal.value);
-                  return (
-                    <button
-                      key={goal.value}
-                      onClick={() => toggleGoal(goal.value)}
-                      className="p-3 rounded-xl transition-all focus:outline-none flex flex-col items-center justify-center text-center"
-                      style={{
-                        backgroundColor: isSelected ? '#FFF8E7' : '#FAFAF8',
-                        border: isSelected ? '2px solid #E8B84B' : '1.5px solid #E9E7E2',
-                        minHeight: '80px',
-                      }}
-                    >
-                      <div className="mb-1.5" style={{ color: isSelected ? '#D97706' : '#1B2A4A' }}>
-                        {GoalIconMap[goal.value]}
-                      </div>
-                      <p className="font-medium text-[10px] leading-tight" style={{ color: '#1B2A4A' }}>
-                        {tUI(goal.label)}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-              {hasGoalsChanged && (
-                <button
-                  onClick={handleSaveGoals}
-                  disabled={isSaving}
-                  className="text-xs font-semibold px-5 py-2.5 rounded-lg disabled:opacity-50"
-                  style={{ backgroundColor: '#FFBA06', color: '#1B2A4A' }}
-                >
-                  {isSaving ? tUI('Saving...') : tUI('Update goals')}
-                </button>
+          {/* Goals selector */}
+          <div>
+            <p className="text-sm mb-6" style={{ color: '#6B7280', lineHeight: 1.6 }}>
+              {tUI('Pick what matters. We will shape everything around it.')}
+              {savedField === 'goals' && (
+                <span className="ml-2 text-xs text-green-600"><Check size={12} className="inline" /> {tUI('Saved')}</span>
               )}
+            </p>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
+              {GRID_GOALS.map((goal) => {
+                const isSelected = selectedGoals.includes(goal.value);
+                return (
+                  <button
+                    key={goal.value}
+                    onClick={() => toggleGoal(goal.value)}
+                    className="group relative p-5 rounded-2xl transition-all focus:outline-none text-left"
+                    style={{
+                      backgroundColor: isSelected ? '#1B2A4A' : 'white',
+                      border: isSelected ? '1px solid #1B2A4A' : '1px solid rgba(27,42,74,0.08)',
+                      boxShadow: isSelected
+                        ? '0 4px 16px rgba(27,42,74,0.15)'
+                        : '0 1px 3px rgba(27,42,74,0.04)',
+                    }}
+                  >
+                    {isSelected && (
+                      <div className="absolute top-3 right-3">
+                        <Check size={14} style={{ color: '#FFBA06' }} />
+                      </div>
+                    )}
+                    <div className="mb-2" style={{ color: isSelected ? '#FFBA06' : '#9CA3AF' }}>
+                      {GoalIconMap[goal.value]}
+                    </div>
+                    <p
+                      className="text-sm font-medium leading-snug"
+                      style={{ color: isSelected ? 'white' : '#1B2A4A' }}
+                    >
+                      {tUI(goal.label)}
+                    </p>
+                  </button>
+                );
+              })}
             </div>
+
+            {hasGoalsChanged && (
+              <button
+                onClick={handleSaveGoals}
+                disabled={isSaving}
+                className="text-sm font-semibold px-6 py-3 rounded-xl disabled:opacity-50 transition-opacity hover:opacity-90"
+                style={{ backgroundColor: '#FFBA06', color: '#1B2A4A' }}
+              >
+                {isSaving ? tUI('Saving...') : tUI('Update goals')}
+              </button>
+              )}
           </div>
 
           {goalRecommendations.length > 0 && (
