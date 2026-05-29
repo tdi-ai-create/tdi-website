@@ -65,11 +65,11 @@ const TOUR_STEPS_CONFIG: TourStep[] = [
     selector: '[data-tour="desi-chat"]',
   },
   // --- progressive disclosure break after stop 5 ---
-  // 6. Field Notes -- points to Your Progress card on dashboard
+  // 6. Field Notes -- points to celebration card on dashboard
   {
     title: TOUR_STOPS[5].title,
     body: TOUR_STOPS[5].description,
-    selector: '[data-tour="transformation-tracker"]',
+    selector: '[data-tour="field-notes"]',
   },
   // 7. Vibe Check (Gift Element deferred to post-launch)
   {
@@ -95,12 +95,7 @@ const TOUR_STEPS_CONFIG: TourStep[] = [
     body: TOUR_STOPS[10].description,
     selector: '[data-tour="language-toggle"]',
   },
-  // 12. Certificates -- points to Your Progress card
-  {
-    title: TOUR_STOPS[11].title,
-    body: TOUR_STOPS[11].description,
-    selector: '[data-tour="transformation-tracker"]',
-  },
+  // Certificates removed -- same card as Transformation Tracker
 ];
 
 const TOTAL_STEPS = TOUR_STEPS_CONFIG.length;

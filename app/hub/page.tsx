@@ -1194,6 +1194,7 @@ export default function HubDashboard() {
           {/* First Field Note -- Hub Pioneer celebration */}
           {fieldNotesCount > 0 && (
             <div
+              data-tour="field-notes"
               className="rounded-2xl overflow-hidden"
               style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 100%)', boxShadow: '0 4px 20px rgba(27,42,74,0.15)' }}
             >
