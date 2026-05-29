@@ -710,161 +710,140 @@ export default function ProfileSettingsPage() {
          ════════════════════════════════════════════════════════════════════ */}
       {activeTab === 'profile' && (
         <div className="space-y-6">
-          {/* Avatar */}
-          <div className="hub-card">
-            <h2
-              className="font-semibold mb-6"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '16px',
-                color: '#2B3A67',
-              }}
-            >
-              {tUI('Your Avatar')}
-              {savedField === 'avatar' && (
-                <span className="ml-2 text-sm text-green-600 font-normal">
-                  <Check size={16} className="inline" /> {tUI('Saved')}
-                </span>
-              )}
-            </h2>
+          {/* Personalize Your Space -- consolidated card */}
+          <div
+            className="bg-white rounded-2xl overflow-hidden"
+            style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
+          >
+            <div className="px-6 pt-6 pb-4" style={{ borderBottom: '1px solid #F3F4F6' }}>
+              <h2
+                className="text-sm font-semibold mb-1"
+                style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}
+              >
+                {tUI('Personalize your space')}
+              </h2>
+              <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                {tUI('Make this hub feel like yours. Choose your look, set your name, pick your role.')}
+              </p>
+            </div>
 
-            <div className="flex items-center gap-6 mb-4">
-              <AvatarDisplay
-                size={96}
-                avatarId={
-                  isAvatarPickerOpen ? selectedAvatarId : profile?.avatar_id
-                }
-                avatarUrl={
-                  isAvatarPickerOpen ? uploadedAvatarUrl : profile?.avatar_url
-                }
-                displayName={profile?.display_name}
-              />
-              <div>
-                {!isAvatarPickerOpen ? (
-                  <button
-                    onClick={() => setIsAvatarPickerOpen(true)}
-                    className="text-sm font-medium px-4 py-2 rounded-lg border-2 transition-colors hover:bg-[#FFF8E7]"
-                    style={{
-                      borderColor: '#E8B84B',
-                      color: '#2B3A67',
-                      fontFamily: "'DM Sans', sans-serif",
-                    }}
-                  >
-                    {tUI('Change avatar')}
-                  </button>
-                ) : (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleSaveAvatar}
-                      disabled={!hasAvatarChanged || isSaving}
-                      className="text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
-                      style={{
-                        backgroundColor: '#E8B84B',
-                        color: '#2B3A67',
-                        fontFamily: "'DM Sans', sans-serif",
-                      }}
-                    >
-                      {isSaving ? tUI('Saving...') : tUI('Save')}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setIsAvatarPickerOpen(false);
-                        setSelectedAvatarId(profile?.avatar_id || null);
-                        setUploadedAvatarUrl(profile?.avatar_url || null);
-                      }}
-                      className="text-sm font-medium px-4 py-2 rounded-lg border transition-colors hover:bg-gray-50"
-                      style={{
-                        borderColor: '#E5E5E5',
-                        color: '#6B7280',
-                        fontFamily: "'DM Sans', sans-serif",
-                      }}
-                    >
-                      {tUI('Cancel')}
-                    </button>
+            {/* Avatar section */}
+            <div className="px-6 py-5" style={{ borderBottom: '1px solid #F3F4F6' }}>
+              <div className="flex items-center gap-5">
+                <div className="flex-shrink-0">
+                  <div className="rounded-full p-0.5" style={{ border: '2px solid rgba(232,184,75,0.3)' }}>
+                    <AvatarDisplay
+                      size={96}
+                      avatarId={isAvatarPickerOpen ? selectedAvatarId : profile?.avatar_id}
+                      avatarUrl={isAvatarPickerOpen ? uploadedAvatarUrl : profile?.avatar_url}
+                      displayName={profile?.display_name}
+                    />
                   </div>
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-semibold mb-1" style={{ color: '#1B2A4A' }}>
+                    {tUI('Your Avatar')}
+                    {savedField === 'avatar' && (
+                      <span className="ml-2 text-xs text-green-600 font-normal">
+                        <Check size={14} className="inline" /> {tUI('Saved')}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs mb-3" style={{ color: '#9CA3AF' }}>
+                    {tUI('This is how you appear in the community.')}
+                  </p>
+                  {!isAvatarPickerOpen ? (
+                    <button
+                      onClick={() => setIsAvatarPickerOpen(true)}
+                      className="text-xs font-semibold px-4 py-2 rounded-lg transition-colors hover:bg-[#FFF8E7]"
+                      style={{ border: '1.5px solid #E8B84B', color: '#2B3A67' }}
+                    >
+                      {tUI('Change avatar')}
+                    </button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleSaveAvatar}
+                        disabled={!hasAvatarChanged || isSaving}
+                        className="text-xs font-semibold px-4 py-2 rounded-lg disabled:opacity-50"
+                        style={{ backgroundColor: '#E8B84B', color: '#2B3A67' }}
+                      >
+                        {isSaving ? tUI('Saving...') : tUI('Save')}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsAvatarPickerOpen(false);
+                          setSelectedAvatarId(profile?.avatar_id || null);
+                          setUploadedAvatarUrl(profile?.avatar_url || null);
+                        }}
+                        className="text-xs font-medium px-4 py-2 rounded-lg border transition-colors hover:bg-gray-50"
+                        style={{ borderColor: '#E5E5E5', color: '#6B7280' }}
+                      >
+                        {tUI('Cancel')}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+              {isAvatarPickerOpen && (
+                <div className="mt-5 pt-5 border-t border-gray-100">
+                  <AvatarPicker
+                    selectedAvatarId={selectedAvatarId}
+                    uploadedAvatarUrl={uploadedAvatarUrl}
+                    onSelect={handleAvatarSelect}
+                    onUpload={handleAvatarUpload}
+                    onClearUpload={handleAvatarClear}
+                    size="settings"
+                    isUploading={isUploading}
+                    onFileSelect={handleAvatarFileSelect}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Display Name */}
+            <div className="px-6 py-5" style={{ borderBottom: '1px solid #F3F4F6' }}>
+              <div className="text-sm font-semibold mb-3" style={{ color: '#1B2A4A' }}>
+                {tUI('Display Name')}
+                {savedField === 'name' && (
+                  <span className="ml-2 text-xs text-green-600 font-normal">
+                    <Check size={14} className="inline" /> {tUI('Saved')}
+                  </span>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder={tUI('Your name')}
+                  className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#E8B84B] transition-colors"
+                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                />
+                {hasNameChanged && (
+                  <button
+                    onClick={handleSaveName}
+                    disabled={isSaving}
+                    className="text-xs font-semibold px-4 py-2 rounded-lg disabled:opacity-50"
+                    style={{ backgroundColor: '#E8B84B', color: '#2B3A67' }}
+                  >
+                    {isSaving ? tUI('Saving...') : tUI('Save')}
+                  </button>
                 )}
               </div>
             </div>
 
-            {isAvatarPickerOpen && (
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <AvatarPicker
-                  selectedAvatarId={selectedAvatarId}
-                  uploadedAvatarUrl={uploadedAvatarUrl}
-                  onSelect={handleAvatarSelect}
-                  onUpload={handleAvatarUpload}
-                  onClearUpload={handleAvatarClear}
-                  size="settings"
-                  isUploading={isUploading}
-                  onFileSelect={handleAvatarFileSelect}
-                />
+            {/* Role Selector */}
+            <div className="px-6 py-5">
+              <div className="text-sm font-semibold mb-3" style={{ color: '#1B2A4A' }}>
+                {tUI('Your Role')}
+                {savedField === 'role' && (
+                  <span className="ml-2 text-xs text-green-600 font-normal">
+                    <Check size={14} className="inline" /> {tUI('Saved')}
+                  </span>
+                )}
               </div>
-            )}
-          </div>
-
-          {/* Display Name */}
-          <div className="hub-card">
-            <h2
-              className="font-semibold mb-4"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '16px',
-                color: '#2B3A67',
-              }}
-            >
-              {tUI('Display Name')}
-              {savedField === 'name' && (
-                <span className="ml-2 text-sm text-green-600 font-normal">
-                  <Check size={16} className="inline" /> {tUI('Saved')}
-                </span>
-              )}
-            </h2>
-
-            <div className="flex gap-3">
-              <input
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder={tUI('Your name')}
-                className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#E8B84B] transition-colors"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
-              />
-              {hasNameChanged && (
-                <button
-                  onClick={handleSaveName}
-                  disabled={isSaving}
-                  className="text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
-                  style={{
-                    backgroundColor: '#E8B84B',
-                    color: '#2B3A67',
-                    fontFamily: "'DM Sans', sans-serif",
-                  }}
-                >
-                  {isSaving ? tUI('Saving...') : tUI('Save')}
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Role Selector */}
-          <div className="hub-card">
-            <h2
-              className="font-semibold mb-4"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '16px',
-                color: '#2B3A67',
-              }}
-            >
-              {tUI('Your Role')}
-              {savedField === 'role' && (
-                <span className="ml-2 text-sm text-green-600 font-normal">
-                  <Check size={16} className="inline" /> {tUI('Saved')}
-                </span>
-              )}
-            </h2>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {ROLES.map((role) => {
                 const isSelected = selectedRole === role.value;
                 return (
@@ -898,6 +877,7 @@ export default function ProfileSettingsPage() {
                   </button>
                 );
               })}
+              </div>
             </div>
           </div>
 
