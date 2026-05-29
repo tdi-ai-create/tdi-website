@@ -235,8 +235,16 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
     [user?.id],
   );
 
+  const prevTargetElRef = useRef<Element | null>(null);
+
   const endTour = useCallback(
     (count: number) => {
+      // Clean up any elevated target element
+      if (prevTargetElRef.current) {
+        (prevTargetElRef.current as HTMLElement).style.removeProperty('z-index');
+        (prevTargetElRef.current as HTMLElement).style.removeProperty('position');
+        prevTargetElRef.current = null;
+      }
       setActive(false);
       logCompletion(count);
       onComplete(count);
@@ -247,6 +255,13 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
   /* ---------- find & measure target ---------- */
 
   const measureTarget = useCallback(() => {
+    // Reset previous target's z-index
+    if (prevTargetElRef.current) {
+      (prevTargetElRef.current as HTMLElement).style.removeProperty('z-index');
+      (prevTargetElRef.current as HTMLElement).style.removeProperty('position');
+      prevTargetElRef.current = null;
+    }
+
     if (!step?.selector) {
       setTargetRect(null);
       return;
@@ -256,6 +271,16 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
       setTargetRect(null);
       return;
     }
+
+    // Elevate the target element above the overlay so it's visible
+    const htmlEl = el as HTMLElement;
+    const computedPos = window.getComputedStyle(htmlEl).position;
+    if (computedPos === 'static') {
+      htmlEl.style.position = 'relative';
+    }
+    htmlEl.style.zIndex = '1000011';
+    prevTargetElRef.current = el;
+
     const r = el.getBoundingClientRect();
     setTargetRect({
       top: r.top,
