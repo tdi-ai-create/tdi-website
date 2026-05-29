@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, Heart, Shield, Building } from 'lucide-react';
+import { Menu, Heart, Shield, Building, Search } from 'lucide-react';
 import AvatarDisplay from './AvatarDisplay';
 import HubMobileNav from './HubMobileNav';
 import MomentMode from './MomentMode';
@@ -201,6 +201,16 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
 
         {/* Right Side - Desktop */}
         <div className="hidden md:flex items-center gap-4">
+          {/* Search */}
+          <Link
+            href="/hub/search"
+            className="p-2 transition-colors hover:opacity-80"
+            style={{ color: 'rgba(255,255,255,0.45)' }}
+            aria-label="Search"
+          >
+            <Search size={18} />
+          </Link>
+
           {/* Language toggle */}
           <div
             data-tour="language-toggle"
@@ -271,7 +281,16 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
         </div>
 
         {/* Mobile Right Side */}
-        <div className="flex md:hidden items-center gap-3 ml-auto">
+        <div className="flex md:hidden items-center gap-2 ml-auto">
+          {/* Search */}
+          <Link
+            href="/hub/search"
+            className="p-2 text-white/70 hover:text-white transition-colors"
+            aria-label="Search"
+          >
+            <Search size={20} />
+          </Link>
+
           {/* Moment Mode Icon */}
           <button
             onClick={() => setMomentModeOpen(true)}
