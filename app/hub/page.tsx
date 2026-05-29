@@ -31,6 +31,15 @@ import {
   Target,
 } from 'lucide-react';
 
+// Shared category colors -- used across all QW card instances
+const CATEGORY_COLORS: Record<string, string> = {
+  'Stress Relief': '#E0F4FF',
+  'Time Savers': '#FEF3C7',
+  'Classroom Tools': '#E8F5E9',
+  'Communication': '#F3E8FF',
+  'Self-Care': '#FCE7F3',
+};
+
 // Daily motivational messages - picks based on day of week
 const DAILY_MESSAGES = [
   'You showed up today. That matters.',
@@ -586,35 +595,44 @@ export default function HubDashboard() {
   if (isLoading) {
     return (
       <div style={{ background: '#F0EEE9', minHeight: '100vh' }}>
-        {/* Welcome Banner Skeleton - Full width */}
         <div
           className="animate-pulse"
           style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)' }}
         >
-          <div className="max-w-5xl mx-auto px-4 md:px-6 py-8">
-            <div className="h-6 bg-white/20 rounded w-24 mb-3" />
-            <div className="h-8 bg-white/20 rounded w-64 mb-2" />
-            <div className="h-5 bg-white/10 rounded w-48" />
+          <div className="max-w-5xl mx-auto px-4 md:px-6 py-10">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-white/20" />
+              <div>
+                <div className="h-8 bg-white/20 rounded w-64 mb-2" />
+                <div className="h-5 bg-white/10 rounded w-48" />
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Content Skeleton */}
-        <div className="max-w-5xl mx-auto px-4 md:px-6 py-6">
-          <div className="grid lg:grid-cols-[1fr_340px] gap-6">
-            <div className="space-y-6">
-              <div className="bg-white rounded-2xl p-6 animate-pulse" style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}>
-                <div className="h-4 bg-gray-200 rounded w-32 mb-4" />
-                <div className="h-20 bg-gray-100 rounded" />
+        <div className="max-w-5xl mx-auto px-4 md:px-6 py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+            {[1,2,3,4].map(i => (
+              <div key={i} className="text-center animate-pulse">
+                <div className="h-8 bg-gray-200 rounded w-16 mx-auto mb-2" />
+                <div className="h-3 bg-gray-100 rounded w-24 mx-auto" />
               </div>
-              <div className="bg-white rounded-2xl p-6 animate-pulse" style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}>
-                <div className="h-4 bg-gray-200 rounded w-24 mb-4" />
+            ))}
+          </div>
+          <div className="grid lg:grid-cols-[1fr_380px] gap-8">
+            <div className="space-y-8">
+              <div className="bg-white rounded-2xl p-6 animate-pulse" style={{ border: '1px solid rgba(27,42,74,0.06)' }}>
+                <div className="h-4 bg-gray-200 rounded w-48 mb-4" />
+                <div className="h-24 bg-gray-100 rounded" />
+              </div>
+              <div className="bg-white rounded-2xl p-6 animate-pulse" style={{ border: '1px solid rgba(27,42,74,0.06)' }}>
+                <div className="h-4 bg-gray-200 rounded w-32 mb-4" />
                 <div className="h-16 bg-gray-100 rounded" />
               </div>
             </div>
             <div className="space-y-4">
-              <div className="rounded-2xl h-32 animate-pulse" style={{ background: '#1B2A4A' }} />
-              <div className="bg-white rounded-2xl h-24 animate-pulse" style={{ border: '0.5px solid rgba(0,0,0,0.06)' }} />
-              <div className="bg-white rounded-2xl h-36 animate-pulse" style={{ border: '0.5px solid rgba(0,0,0,0.06)' }} />
+              <div className="rounded-2xl h-36 animate-pulse" style={{ background: '#1B2A4A' }} />
+              <div className="bg-white rounded-2xl h-28 animate-pulse" style={{ border: '1px solid rgba(27,42,74,0.06)' }} />
+              <div className="bg-white rounded-2xl h-40 animate-pulse" style={{ border: '1px solid rgba(27,42,74,0.06)' }} />
             </div>
           </div>
         </div>
@@ -624,18 +642,17 @@ export default function HubDashboard() {
 
   return (
     <div style={{ background: '#F0EEE9', minHeight: '100vh' }}>
-      {/* Welcome Hero - Full width */}
+      {/* ============ HERO ============ */}
       <section
-        className="relative text-white overflow-hidden"
+        className="relative text-white"
         style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)' }}
       >
-        {/* Decorative circles - purely visual */}
         <div className="absolute rounded-full pointer-events-none"
           style={{ right: '-50px', top: '-70px', width: '260px', height: '260px', background: 'rgba(255,186,6,0.07)' }} />
         <div className="absolute rounded-full pointer-events-none"
           style={{ right: '50px', bottom: '-90px', width: '180px', height: '180px', background: 'rgba(56,97,140,0.5)' }} />
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-6 py-8">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-6 py-10">
           {/* Role tag */}
           {profile?.role && (
             <div
@@ -651,110 +668,257 @@ export default function HubDashboard() {
             </div>
           )}
 
-          {/* Name */}
-          <h1 className="text-3xl font-bold text-white mb-1" style={{ letterSpacing: '-0.3px' }}>
-            Welcome back, {firstName}
-          </h1>
+          {/* Avatar + Name */}
+          <div className="flex items-center gap-4 mb-2">
+            <AvatarDisplay
+              size={48}
+              avatarId={profile?.avatar_id}
+              avatarUrl={profile?.avatar_url}
+              displayName={profile?.display_name}
+            />
+            <div>
+              <h1
+                className="text-3xl font-bold text-white"
+                style={{ letterSpacing: '-0.3px', fontFamily: "'Source Serif 4', Georgia, serif" }}
+              >
+                Welcome back, {firstName}
+              </h1>
+              {/* Gold accent line */}
+              <div
+                style={{ width: '60px', height: '2px', background: 'rgba(255,186,6,0.4)', marginTop: '6px' }}
+              />
+            </div>
+          </div>
 
-          {/* Daily message */}
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>{dailyMessage}</p>
+          {/* Daily message -- italic, Source Serif */}
+          <p
+            style={{
+              color: 'rgba(255,255,255,0.65)',
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontStyle: 'italic',
+              fontSize: '15px',
+              marginTop: '8px',
+            }}
+          >
+            {dailyMessage}
+          </p>
         </div>
       </section>
 
-      {/* Main Content - Constrained width */}
-      <div className="max-w-5xl mx-auto px-4 md:px-6 py-6">
-        {/* Tour welcome overlay -- full screen, demands attention */}
-        {tourChecked && !tourCompleted && !showTour && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{ background: 'linear-gradient(135deg, rgba(30,39,73,0.95) 0%, rgba(56,97,140,0.92) 100%)' }}
-          >
-            <div className="text-center max-w-md">
-              <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6"
-                style={{ backgroundColor: 'rgba(255,186,6,0.15)' }}
-              >
-                <span style={{ fontSize: '28px', color: '#ffba06' }}>&#10024;</span>
-              </div>
-              <h2
-                className="text-2xl font-bold text-white mb-3"
-                style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
-              >
-                {tUI('Welcome to the new Learning Hub')}
-              </h2>
-              <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.7)', lineHeight: '1.7' }}>
-                {tUI('We built something new for you. A quick tour will show you the highlights -- it takes about 60 seconds and you can skip anytime.')}
-              </p>
-              <div className="flex flex-col gap-3 items-center">
-                <button
-                  onClick={() => setShowTour(true)}
-                  className="px-8 py-3 rounded-xl text-sm font-bold transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-                >
-                  {tUI('Show me around')}
-                </button>
-                <button
-                  onClick={() => setTourCompleted(true)}
-                  className="text-xs transition-colors"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
-                >
-                  {tUI('Skip for now')}
-                </button>
-              </div>
+      {/* ============ STATUS BAR ============ */}
+      <div className="max-w-5xl mx-auto px-4 md:px-6 py-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+          <div className="text-center">
+            <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: '28px', fontWeight: 700, color: '#1B2A4A' }}>
+              {personalStats?.toolsExplored || 0}
+            </div>
+            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>
+              {tUI('tools explored')}
             </div>
           </div>
-        )}
+          <div className="text-center">
+            <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: '28px', fontWeight: 700, color: '#1B2A4A' }}>
+              ~{personalStats?.hoursSaved || 0}
+            </div>
+            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>
+              {tUI('hours reclaimed')}
+            </div>
+          </div>
+          <div className="text-center">
+            <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: '28px', fontWeight: 700, color: '#1B2A4A' }}>
+              {certificateCount + fieldNotesCount}
+            </div>
+            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>
+              {tUI('achievements earned')}
+            </div>
+          </div>
+          <div className="text-center">
+            <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: '28px', fontWeight: 700, color: '#1B2A4A' }}>
+              432
+            </div>
+            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>
+              {tUI('educators')}
+            </div>
+          </div>
+        </div>
+      </div>
 
-        {/* Main Grid - Left column (main) + Right column (sidebar) */}
-        <div className="grid lg:grid-cols-[1fr_340px] gap-6">
-        {/* Left Column - Main Content */}
-        <div className="space-y-6">
-          {/* Feature 1: Personal Stats Card */}
-          {personalStats && personalStats.toolsExplored > 0 && (
+      {/* Tour welcome overlay */}
+      {tourChecked && !tourCompleted && !showTour && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'linear-gradient(135deg, rgba(30,39,73,0.95) 0%, rgba(56,97,140,0.92) 100%)' }}
+        >
+          <div className="text-center max-w-md">
             <div
-              className="bg-white rounded-2xl p-5"
-              style={{ border: '0.5px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
+              className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6"
+              style={{ backgroundColor: 'rgba(255,186,6,0.15)' }}
             >
-              <div className="grid grid-cols-2 gap-6 text-center">
-                <div>
-                  <div className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif" }}>
-                    {personalStats.toolsExplored}
-                  </div>
-                  <div className="text-xs mt-1" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
-                    {tUI('tools explored this month')}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif" }}>
-                    ~{personalStats.hoursSaved}
-                  </div>
-                  <div className="text-xs mt-1" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
-                    {tUI('hours saved')}
-                  </div>
+              <span style={{ fontSize: '28px', color: '#ffba06' }}>&#10024;</span>
+            </div>
+            <h2
+              className="text-2xl font-bold text-white mb-3"
+              style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
+            >
+              {tUI('Welcome to the new Learning Hub')}
+            </h2>
+            <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.7)', lineHeight: '1.7' }}>
+              {tUI('We built something new for you. A quick tour will show you the highlights -- it takes about 60 seconds and you can skip anytime.')}
+            </p>
+            <div className="flex flex-col gap-3 items-center">
+              <button
+                onClick={() => setShowTour(true)}
+                className="px-8 py-3 rounded-xl text-sm font-bold transition-opacity hover:opacity-90"
+                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+              >
+                {tUI('Show me around')}
+              </button>
+              <button
+                onClick={() => setTourCompleted(true)}
+                className="text-xs transition-colors"
+                style={{ color: 'rgba(255,255,255,0.4)' }}
+              >
+                {tUI('Skip for now')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ MAIN GRID ============ */}
+      <div className="max-w-5xl mx-auto px-4 md:px-6 pb-8">
+        <div className="grid lg:grid-cols-[1fr_380px] gap-8">
+
+        {/* ===== LEFT COLUMN ===== */}
+        <div className="space-y-8">
+
+          {/* A. Goal + Next Step (or Today's Pick for new users) */}
+          {(userGoal || featuredQuickWin) && (
+            <div
+              className="bg-white rounded-2xl overflow-hidden"
+              style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
+            >
+              {/* Gold left border accent */}
+              <div className="flex">
+                <div style={{ width: '4px', background: '#FFBA06', flexShrink: 0 }} />
+                <div className="flex-1 p-6">
+                  {userGoal ? (
+                    <>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Target size={14} style={{ color: '#D97706' }} />
+                        <span className="text-xs font-semibold" style={{ color: '#D97706' }}>
+                          {tUI('Your goal')}
+                        </span>
+                      </div>
+                      <p
+                        className="mb-4"
+                        style={{
+                          fontFamily: "'Source Serif 4', Georgia, serif",
+                          fontSize: '16px',
+                          fontWeight: 600,
+                          color: '#1B2A4A',
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {tUI('You said you wanted to')} &ldquo;{userGoal.text}&rdquo;
+                      </p>
+                      {(userGoal.quickWin || featuredQuickWin) && (() => {
+                        const qw = userGoal.quickWin || featuredQuickWin!;
+                        const categoryBg = CATEGORY_COLORS[qw.category] || '#F3F4F6';
+                        return (
+                          <div
+                            className="rounded-xl p-4"
+                            style={{ background: '#FAFAF8', border: '1px solid #E9E7E2' }}
+                          >
+                            <div className="text-xs font-semibold mb-1" style={{ color: '#9CA3AF' }}>
+                              {tUI('Your next step')}
+                            </div>
+                            <span
+                              className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-1.5"
+                              style={{ background: categoryBg, color: '#1e2749', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                            >
+                              {qw.category}
+                            </span>
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>{qw.title}</div>
+                                <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{qw.duration_minutes} min</div>
+                              </div>
+                              <Link
+                                href={`/hub/quick-wins/${qw.slug}`}
+                                className="flex-shrink-0 text-xs font-semibold rounded-lg px-5 py-2 whitespace-nowrap"
+                                style={{ background: '#FFBA06', color: '#1e2749' }}
+                              >
+                                {tUI('Try it')}
+                              </Link>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </>
+                  ) : featuredQuickWin && (
+                    <>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Lightbulb size={14} style={{ color: '#D97706' }} />
+                        <span className="text-xs font-semibold" style={{ color: '#D97706' }}>
+                          {profile?.role
+                            ? tUI(`Picked for ${roleLabel.toLowerCase()}s`)
+                            : tUI("Today's pick for you")}
+                        </span>
+                      </div>
+                      <span
+                        className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-2"
+                        style={{ background: CATEGORY_COLORS[featuredQuickWin.category] || '#F3F4F6', color: '#1e2749', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                      >
+                        {featuredQuickWin.category}
+                      </span>
+                      <div
+                        className="text-lg font-semibold mb-1"
+                        style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif" }}
+                      >
+                        {featuredQuickWin.title}
+                      </div>
+                      {featuredQuickWin.description && (
+                        <p className="text-sm mb-3" style={{ color: '#6B7280', lineHeight: '1.5' }}>
+                          {featuredQuickWin.description.slice(0, 120)}{featuredQuickWin.description.length > 120 ? '...' : ''}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-3">
+                        <Link
+                          href={`/hub/quick-wins/${featuredQuickWin.slug}`}
+                          className="text-sm font-semibold rounded-lg px-5 py-2 whitespace-nowrap"
+                          style={{ background: '#FFBA06', color: '#1e2749' }}
+                        >
+                          {tUI('Try it')}
+                        </Link>
+                        <span className="text-xs" style={{ color: '#9CA3AF' }}>
+                          {featuredQuickWin.duration_minutes} min
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
           )}
 
-          {/* Continue Learning / Where to Start Section */}
-          <div>
-            <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-              {enrollments.length > 0 ? tUI('Continue Learning') : tUI('Where to Start')}
-            </div>
-            <div
-              className="bg-white rounded-2xl mb-4"
-              style={{ border: '0.5px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
-            >
-              {enrollments.length > 0 ? (
+          {/* B. Continue Learning (max 2 enrollments) */}
+          {enrollments.length > 0 && (
+            <div>
+              <div className="text-sm font-semibold mb-3" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
+                {tUI('Pick up where you left off')}
+              </div>
+              <div
+                className="bg-white rounded-2xl"
+                style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
+              >
                 <div className="divide-y" style={{ borderColor: '#F3F4F6' }}>
-                  {enrollments.map((enrollment, index) => {
+                  {enrollments.slice(0, 2).map((enrollment, index) => {
                     const iconColors = ['#E0F4FF', '#E8F5E9', '#FEF3C7'];
                     const iconBg = iconColors[index % iconColors.length];
+                    const pct = enrollment.progress_percentage || 0;
                     return (
-                      <div
-                        key={enrollment.id}
-                        className="p-4 flex items-center gap-4"
-                      >
+                      <div key={enrollment.id} className="p-5 flex items-center gap-4">
                         <div
                           className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
                           style={{ background: iconBg }}
@@ -762,22 +926,32 @@ export default function HubDashboard() {
                           <BookOpen size={20} style={{ color: '#1B2A4A' }} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
+                          <div className="text-sm font-semibold" style={{ color: '#1B2A4A', fontSize: '15px' }}>
                             {enrollment.course?.title}
                           </div>
                           <div className="text-xs" style={{ color: '#9CA3AF' }}>
                             {enrollment.lessons_completed} of {enrollment.total_lessons} lessons
                           </div>
-                          {/* Progress bar */}
-                          <div className="h-1.5 rounded-full mt-2" style={{ background: '#F3F4F6' }}>
-                            <div
-                              style={{ background: '#FFBA06', height: '100%', borderRadius: '3px', width: `${enrollment.progress_percentage}%` }}
-                            />
+                          <div className="flex items-center gap-2 mt-2">
+                            <div className="flex-1 h-2 rounded-full" style={{ background: '#F3F4F6' }}>
+                              <div
+                                className="h-full rounded-full"
+                                style={{
+                                  width: `${pct}%`,
+                                  background: pct >= 75
+                                    ? 'linear-gradient(90deg, #FFBA06, #F59E0B)'
+                                    : '#FFBA06',
+                                }}
+                              />
+                            </div>
+                            <span className="text-xs font-bold" style={{ color: pct >= 75 ? '#D97706' : '#9CA3AF', minWidth: '32px', textAlign: 'right' }}>
+                              {pct}%
+                            </span>
                           </div>
                         </div>
                         <Link
                           href={`/hub/courses/${enrollment.course?.slug}`}
-                          className="ml-auto flex-shrink-0 text-xs font-semibold text-white rounded-lg px-4 py-1.5 whitespace-nowrap"
+                          className="ml-2 flex-shrink-0 text-xs font-semibold text-white rounded-lg px-4 py-2 whitespace-nowrap"
                           style={{ background: '#1B2A4A' }}
                         >
                           {tUI('Resume')}
@@ -786,313 +960,119 @@ export default function HubDashboard() {
                     );
                   })}
                 </div>
-              ) : (
-                <div className="p-6">
-                  {/* Where to Start - new user experience with Featured Quick Win */}
-                  <h2
-                    className="font-semibold mb-1"
-                    style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif", fontSize: '20px' }}
-                  >
-                    {tUI('Your first 5 minutes start here')}
-                  </h2>
-                  <p className="text-sm mb-5" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>
-                    {tUI('Pick a quick win to try right now, or dive into a full course. No pressure, no deadlines.')}
-                  </p>
-
-                  {/* Feature 3: Today's Pick Hero Card */}
-                  {featuredQuickWin && (() => {
-                    const categoryColors: Record<string, string> = {
-                      'Stress Relief': '#E0F4FF',
-                      'Time Savers': '#FEF3C7',
-                      'Classroom Tools': '#E8F5E9',
-                      'Communication': '#F3E8FF',
-                      'Self-Care': '#FCE7F3',
-                    };
-                    const categoryBg = categoryColors[featuredQuickWin.category] || '#F3F4F6';
-                    const pickLabel = profile?.role
-                      ? `Picked for ${roleLabel.toLowerCase()}s`
-                      : "Today's pick for you";
-                    return (
-                      <div
-                        className="rounded-xl p-5 mb-4"
-                        style={{ background: 'linear-gradient(135deg, #FAFAF8 0%, #FFF8E7 100%)', border: '1px solid #E9E7E2' }}
-                      >
-                        <div className="flex items-center gap-2 mb-2">
-                          <Lightbulb size={14} style={{ color: '#D97706' }} />
-                          <span className="text-xs font-semibold" style={{ color: '#D97706' }}>
-                            {tUI(pickLabel)}
-                          </span>
-                        </div>
-                        <span
-                          className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-2"
-                          style={{ background: categoryBg, color: '#1e2749', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-                        >
-                          {featuredQuickWin.category}
-                        </span>
-                        <div
-                          className="text-lg font-semibold mb-1"
-                          style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif" }}
-                        >
-                          {featuredQuickWin.title}
-                        </div>
-                        {featuredQuickWin.description && (
-                          <p className="text-sm mb-3" style={{ color: '#6B7280', lineHeight: '1.5' }}>
-                            {featuredQuickWin.description.slice(0, 120)}{featuredQuickWin.description.length > 120 ? '...' : ''}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-3">
-                          <Link
-                            href={`/hub/quick-wins/${featuredQuickWin.slug}`}
-                            className="text-sm font-semibold rounded-lg px-5 py-2 whitespace-nowrap"
-                            style={{ background: '#FFBA06', color: '#1e2749' }}
-                          >
-                            {tUI('Try it')}
-                          </Link>
-                          <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                            {featuredQuickWin.duration_minutes} min
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  {/* 2 more quick wins in smaller cards */}
-                  {quickWins.length > 0 && (
-                    <div className="space-y-2.5 mb-5">
-                      {quickWins.map((qw) => {
-                        const categoryColors: Record<string, string> = {
-                          'Stress Relief': '#E0F4FF',
-                          'Time Savers': '#FEF3C7',
-                          'Classroom Tools': '#E8F5E9',
-                          'Communication': '#F3E8FF',
-                          'Self-Care': '#FCE7F3',
-                        };
-                        const categoryBg = categoryColors[qw.category] || '#F3F4F6';
-                        return (
-                          <div
-                            key={qw.id}
-                            className="flex items-center gap-3 rounded-xl overflow-hidden"
-                            style={{ border: '0.5px solid #E9E7E2', background: '#FAFAF8' }}
-                          >
-                            <div
-                              className="w-1.5 self-stretch flex-shrink-0"
-                              style={{ background: categoryBg }}
-                            />
-                            <div className="flex-1 py-3 pr-3 flex items-center gap-3">
-                              <div className="flex-1 min-w-0">
-                                <span
-                                  className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-1"
-                                  style={{ background: categoryBg, color: '#1e2749', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-                                >
-                                  {qw.category}
-                                </span>
-                                <div className="text-sm font-semibold" style={{ color: '#1e2749' }}>
-                                  {qw.title}
-                                </div>
-                                <div className="text-xs" style={{ color: '#9CA3AF' }}>
-                                  {qw.duration_minutes} min
-                                </div>
-                              </div>
-                              <Link
-                                href={`/hub/quick-wins/${qw.slug}`}
-                                className="flex-shrink-0 text-xs font-semibold rounded-lg px-4 py-1.5 whitespace-nowrap"
-                                style={{ background: '#FFBA06', color: '#1e2749' }}
-                              >
-                                {tUI('Try it')}
-                              </Link>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {/* Browse Courses button */}
-                  <Link
-                    href="/hub/courses"
-                    className="block w-full text-center text-sm font-semibold rounded-lg px-4 py-2.5 mb-3"
-                    style={{ background: '#1e2749', color: 'white' }}
-                  >
-                    {tUI('Browse Courses')}
-                  </Link>
-
-                  {/* Explore Quick Wins link */}
-                  <Link
-                    href="/hub/quick-wins"
-                    className="block text-center text-sm font-medium hover:underline"
-                    style={{ color: '#38618C' }}
-                  >
-                    {tUI('Or explore all Quick Wins')}
-                  </Link>
-                </div>
-              )}
-            </div>
-            {enrollments.length > 0 && (
+              </div>
               <Link
                 href="/hub/courses"
-                className="inline-flex items-center gap-2 text-sm font-medium hover:underline"
-                style={{
-                  color: '#1B2A4A',
-                  fontFamily: "'DM Sans', sans-serif",
-                }}
+                className="inline-flex items-center gap-2 text-sm font-medium hover:underline mt-3"
+                style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}
               >
                 {tUI('View all courses')}
                 <ArrowRight size={14} />
               </Link>
-            )}
-          </div>
-
-          {/* Saved - only show if teacher has bookmarked anything */}
-          {savedCourses.length > 0 && (
-            <div data-tour="favorites">
-              <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-                {tUI('Saved')}
-              </div>
-              <div className="grid grid-cols-1 gap-2 mb-4">
-                {savedCourses.slice(0, 3).map(course => (
-                  <div
-                    key={course.id}
-                    className="bg-white rounded-xl flex items-center gap-3 px-4 py-3 cursor-pointer hover:shadow-sm transition-shadow"
-                    style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
-                    onClick={() => router.push(`/hub/courses/${course.slug}`)}
-                  >
-                    <Heart size={14} style={{ color: '#E53935', fill: '#E53935', flexShrink: 0 }} />
-                    <span className="text-sm font-medium flex-1" style={{ color: '#1B2A4A' }}>{course.title}</span>
-                    <span className="text-xs" style={{ color: '#9CA3AF' }}>{course.category}</span>
-                  </div>
-                ))}
-              </div>
-              {savedCourses.length > 3 && (
-                <Link href="/hub/courses?filter=Saved" className="text-xs font-semibold" style={{ color: '#38618C' }}>
-                  View all {savedCourses.length} saved →
-                </Link>
-              )}
             </div>
           )}
 
-          {/* Recommended for You Section */}
+          {/* New user: Browse buttons (only when no enrollments, no goal) */}
+          {enrollments.length === 0 && !userGoal && (
+            <div className="flex gap-3">
+              <Link
+                href="/hub/courses"
+                className="flex-1 text-center text-sm font-semibold rounded-xl px-4 py-3"
+                style={{ background: '#1B2A4A', color: 'white' }}
+              >
+                {tUI('Browse Courses')}
+              </Link>
+              <Link
+                href="/hub/quick-wins"
+                className="flex-1 text-center text-sm font-semibold rounded-xl px-4 py-3"
+                style={{ background: 'white', color: '#1B2A4A', border: '1px solid rgba(27,42,74,0.12)' }}
+              >
+                {tUI('Explore Quick Wins')}
+              </Link>
+            </div>
+          )}
+
+          {/* C. Curated for You */}
           {showRecommendations && recommendations.length > 0 && (
             <div>
-              <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-                {tUI('Recommended for You')}
+              <div className="text-sm font-semibold mb-3" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>
+                {tUI('Curated for you')}
               </div>
-              <div className="space-y-2.5 mb-4">
-                {recommendations.map((course) => (
+              <div className="space-y-2.5">
+                {recommendations.slice(0, 2).map((course) => (
                   <Link
                     key={course.id}
                     href={`/hub/courses/${course.slug}`}
-                    className="rounded-xl p-4 cursor-pointer flex justify-between items-start gap-3 hover:shadow-md transition-shadow"
-                    style={{ background: '#F0F6FF', border: '0.5px solid #C8DEFF' }}
+                    className="bg-white rounded-xl p-4 flex justify-between items-center gap-3 hover:shadow-md transition-shadow block"
+                    style={{ border: '1px solid rgba(27,42,74,0.06)', borderLeft: '3px solid rgba(56,97,140,0.3)' }}
                   >
                     <div>
-                      <div className="text-sm font-semibold mb-0.5" style={{ color: '#1B2A4A' }}>{course.title}</div>
+                      <div className="text-sm font-semibold mb-0.5" style={{ color: '#1B2A4A', fontSize: '15px' }}>{course.title}</div>
                       <div className="text-xs" style={{ color: '#6B7280' }}>{course.reason || tUI('Popular with educators')}</div>
                     </div>
-                    <div className="text-base font-semibold flex-shrink-0 mt-1" style={{ color: '#38618C' }}>→</div>
+                    <ArrowRight size={16} style={{ color: '#38618C', flexShrink: 0 }} />
                   </Link>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Quick Wins Section */}
-          <div>
-            <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-              {tUI('Quick Wins')}
-            </div>
-            {quickWins.length > 0 ? (
-              <div className="space-y-2.5 mb-4">
-                {quickWins.map((qw) => {
-                  const categoryColors: Record<string, string> = {
-                    'Stress Relief': '#E0F4FF',
-                    'Time Savers': '#FEF3C7',
-                    'Classroom Tools': '#E8F5E9',
-                    'Communication': '#F3E8FF',
-                    'Self-Care': '#FCE7F3',
-                  };
-                  const categoryBg = categoryColors[qw.category] || '#F3F4F6';
-                  return (
-                    <div
-                      key={qw.id}
-                      className="flex items-center gap-3 rounded-xl overflow-hidden"
-                      style={{ background: '#FAFAF8', border: '0.5px solid #E9E7E2' }}
-                    >
-                      <div
-                        className="w-1.5 self-stretch flex-shrink-0"
-                        style={{ background: categoryBg }}
-                      />
-                      <div className="flex-1 py-3 pr-3 flex items-center gap-3">
-                        <div className="flex-1 min-w-0">
-                          <span
-                            className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-1"
-                            style={{ background: categoryBg, color: '#1e2749', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-                          >
-                            {qw.category}
-                          </span>
-                          <div className="text-sm font-semibold leading-snug" style={{ color: '#1B2A4A' }}>
-                            {qw.title}
-                          </div>
-                          <div className="text-xs" style={{ color: '#9CA3AF' }}>
-                            {qw.duration_minutes} min
-                          </div>
-                        </div>
-                        <Link
-                          href={`/hub/quick-wins/${qw.slug}`}
-                          className="flex-shrink-0 text-xs font-semibold rounded-lg px-4 py-1.5 whitespace-nowrap"
-                          style={{ background: '#1B2A4A', color: 'white' }}
-                        >
-                          {tUI('Try it now')}
-                        </Link>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div
-                className="rounded-xl p-6 text-center mb-4"
-                style={{ background: '#FAFAF8', border: '0.5px solid #E9E7E2' }}
-              >
-                <p className="text-sm" style={{ color: '#9CA3AF' }}>
-                  {tUI('Quick Wins are loading...')}
-                </p>
-              </div>
-            )}
-            <Link
-              href="/hub/quick-wins"
-              className="inline-flex items-center gap-2 text-sm font-medium hover:underline"
-              style={{ color: '#1B2A4A' }}
-            >
-              {tUI('View all Quick Wins')}
-              <ArrowRight size={14} />
-            </Link>
-          </div>
-
-          {/* Feature 5: Community Highlights */}
-          {communityHighlights.length > 0 && (
+          {/* D. Your Community */}
+          {(communityHighlights.length > 0 || (communityPulse && communityPulse.exploring > 0)) && (
             <div data-tour="community-highlights">
-              <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-                {tUI('Community Highlights')}
+              <div className="text-sm font-semibold mb-3" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>
+                {tUI('Your community')}
               </div>
               <div
-                className="bg-white rounded-2xl divide-y"
-                style={{ border: '0.5px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
+                className="bg-white rounded-2xl"
+                style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
               >
-                {communityHighlights.map((highlight, idx) => {
+                {/* Presence strip */}
+                {communityPulse && communityPulse.exploring > 0 && (
+                  <div
+                    className="px-5 py-3 flex items-center gap-3"
+                    style={{ borderBottom: '1px solid #F3F4F6' }}
+                  >
+                    {/* Animated presence dots */}
+                    <div className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full" style={{ background: '#22C55E', animation: 'pulse 2s ease-in-out infinite' }} />
+                      <span className="w-2 h-2 rounded-full" style={{ background: '#FFBA06', animation: 'pulse 2s ease-in-out infinite 0.5s' }} />
+                      <span className="w-2 h-2 rounded-full" style={{ background: '#38618C', animation: 'pulse 2s ease-in-out infinite 1s' }} />
+                    </div>
+                    <span className="text-xs" style={{ color: '#6B7280' }}>
+                      {communityPulse.exploring} {tUI('educators exploring today')}
+                      {communityPulse.shared > 0 && ` · ${communityPulse.shared} ${tUI('shared')}`}
+                    </span>
+                  </div>
+                )}
+
+                {/* Highlights */}
+                {communityHighlights.slice(0, 2).map((highlight, idx) => {
                   const statusColors: Record<string, { bg: string; text: string }> = {
                     'Tried it': { bg: '#E8F5E9', text: '#2E7D32' },
                     'Adapted it': { bg: '#E0F4FF', text: '#1565C0' },
                   };
                   const statusStyle = statusColors[highlight.status] || { bg: '#F3F4F6', text: '#6B7280' };
+                  // Generate initials for warmth
+                  const initials = ['MK', 'JR', 'AL', 'TS', 'KH'][idx % 5];
+                  const initialsColors = ['#7C9CBF', '#E8B84B', '#6BA368', '#9B7CB8', '#E8927C'];
                   return (
-                    <div key={idx} className="px-4 py-3 flex items-start gap-3">
-                      <span
-                        className="inline-block text-xs font-bold px-2 py-0.5 rounded flex-shrink-0 mt-0.5"
-                        style={{ background: statusStyle.bg, color: statusStyle.text, fontSize: '10px' }}
+                    <div key={idx} className="px-5 py-3.5 flex items-start gap-3" style={idx < communityHighlights.slice(0, 2).length - 1 ? { borderBottom: '1px solid #F3F4F6' } : {}}>
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold text-white"
+                        style={{ background: initialsColors[idx % 5] }}
                       >
-                        {highlight.status}
-                      </span>
+                        {initials}
+                      </div>
                       <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span
+                            className="inline-block text-xs font-bold px-2 py-0.5 rounded"
+                            style={{ background: statusStyle.bg, color: statusStyle.text, fontSize: '10px' }}
+                          >
+                            {highlight.status}
+                          </span>
+                        </div>
                         <p className="text-sm" style={{ color: '#4B5563' }}>
                           {highlight.body}
                         </p>
@@ -1112,176 +1092,218 @@ export default function HubDashboard() {
               </div>
             </div>
           )}
-
-          {/* Feature 6: Goals Reminder */}
-          {userGoal && (
-            <div
-              className="rounded-2xl p-5"
-              style={{ background: 'linear-gradient(135deg, #F0F6FF 0%, #FAFAF8 100%)', border: '0.5px solid #C8DEFF' }}
-            >
-              <div className="flex items-start gap-3">
-                <div
-                  className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{ background: '#E0F4FF' }}
-                >
-                  <Target size={16} style={{ color: '#1565C0' }} />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium mb-1" style={{ color: '#1e2749' }}>
-                    {tUI('You said you wanted to')} &ldquo;{userGoal.text}&rdquo;
-                  </p>
-                  {userGoal.quickWin && (
-                    <Link
-                      href={`/hub/quick-wins/${userGoal.quickWin.slug}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold hover:underline"
-                      style={{ color: '#38618C' }}
-                    >
-                      {tUI('Try')}: {userGoal.quickWin.title}
-                      <ArrowRight size={12} />
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Right Column - Sidebar */}
+        {/* ===== RIGHT COLUMN (SIDEBAR) ===== */}
         <div className="space-y-4">
-          {/* Feature 7: Gift Element moved to top of sidebar */}
+          {/* 1. Gift Element */}
           <GiftElement />
 
-          {/* TDI Tip */}
-          <div className="rounded-2xl p-5 mb-4" style={{ background: '#1B2A4A' }}>
+          {/* 2. TDI Tip -- enhanced */}
+          <div
+            className="rounded-2xl p-6"
+            style={{ background: '#1B2A4A', borderTop: '2px solid #FFBA06' }}
+          >
             <div
-              className="text-xs font-bold tracking-widest uppercase mb-2"
+              className="text-xs font-bold tracking-widest uppercase mb-3"
               style={{ color: '#FFBA06', letterSpacing: '0.1em' }}
             >
               {tUI('TDI Tip')}
             </div>
-            <div className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.8)' }}>
-              {tip}
-            </div>
+            <p
+              className="leading-relaxed mb-4"
+              style={{
+                color: 'rgba(255,255,255,0.85)',
+                fontFamily: "'Source Serif 4', Georgia, serif",
+                fontStyle: 'italic',
+                fontSize: '14px',
+                lineHeight: 1.7,
+              }}
+            >
+              &ldquo;{tip}&rdquo;
+            </p>
             <button
               onClick={() => setShowCelebrateModal(true)}
-              className="flex items-center gap-2 text-sm font-medium transition-colors"
-              style={{ color: 'rgba(255,255,255,0.6)' }}
+              className="flex items-center gap-2 text-xs font-semibold rounded-full px-4 py-2 transition-opacity hover:opacity-80"
+              style={{ background: 'rgba(255,186,6,0.15)', color: '#FFBA06', border: '1px solid rgba(255,186,6,0.3)' }}
             >
-              <Share2 size={14} />
+              <Share2 size={12} />
               {tUI('Share your wins')}
             </button>
           </div>
 
-          {/* Achievements Widget */}
+          {/* 3. Your Progress -- merged Achievements + Tracker */}
           <div
-            className="bg-white rounded-2xl p-5 mb-4"
-            style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+            className="bg-white rounded-2xl p-5"
+            style={{ border: '1px solid rgba(27,42,74,0.08)' }}
           >
-            <div className="flex items-center gap-3.5 mb-3">
+            {/* Achievements section */}
+            <div className="flex items-center gap-3.5 mb-4">
               <div
                 className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
                 style={{ background: '#FEF3C7' }}
               >
                 <Award size={20} style={{ color: '#D97706' }} />
               </div>
-              <div>
+              <div className="flex-1">
                 <div className="text-xl font-bold" style={{ color: '#1B2A4A' }}>{certificateCount + fieldNotesCount}</div>
                 <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{tUI('Achievements earned')}</div>
               </div>
-              <Link href="/hub/certificates" className="ml-auto text-xs font-semibold" style={{ color: '#38618C' }}>
+              <Link href="/hub/certificates" className="text-xs font-semibold" style={{ color: '#38618C' }}>
                 {tUI('View all')} →
               </Link>
             </div>
             {(certificateCount > 0 || fieldNotesCount > 0) && (
-              <div className="flex gap-4 text-xs" style={{ color: '#6B7280' }}>
+              <div className="flex gap-4 text-xs mb-4" style={{ color: '#6B7280' }}>
                 {certificateCount > 0 && <span>{certificateCount} {tUI('Certificates')}</span>}
                 {fieldNotesCount > 0 && <span>{fieldNotesCount} {tUI('Field Notes')}</span>}
               </div>
             )}
+
+            {/* Tracker progress */}
+            {trackerEligibility && (
+              <>
+                <div style={{ borderTop: '1px solid #F3F4F6', marginBottom: '16px' }} />
+                {trackerEligibility.isEligible ? (
+                  <Link
+                    href="/hub/transformation"
+                    className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                  >
+                    <div
+                      className="w-9 h-9 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: '#FFF8E7' }}
+                    >
+                      <TrendingUp size={16} style={{ color: '#FFBA06' }} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>{tUI('Growth Dashboard')}</div>
+                      <div className="text-xs" style={{ color: '#9CA3AF' }}>{tUI('View your progress')}</div>
+                    </div>
+                    <ArrowRight size={14} style={{ color: '#38618C' }} />
+                  </Link>
+                ) : (
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="text-xs font-semibold" style={{ color: '#1B2A4A' }}>{tUI('Growth Dashboard')}</div>
+                      <div
+                        className="text-xs font-bold px-2 py-0.5 rounded"
+                        style={{ background: '#F3F4F6', color: '#6B7280', fontSize: '10px' }}
+                      >
+                        {tUI('Locked')}
+                      </div>
+                    </div>
+                    <p className="text-xs mb-3" style={{ color: '#9CA3AF' }}>
+                      {tUI('Complete 1 course and 2 check-ins to unlock.')}
+                    </p>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2.5">
+                        <div className="text-xs w-14 flex-shrink-0" style={{ color: '#6B7280' }}>{tUI('Courses')}</div>
+                        <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
+                          <div
+                            className="h-full rounded-full"
+                            style={{ width: `${Math.min(100, (trackerEligibility.completedCourses / trackerEligibility.requiredCourses) * 100)}%`, background: '#FFBA06' }}
+                          />
+                        </div>
+                        <div className="text-xs font-semibold w-7 text-right" style={{ color: '#1B2A4A' }}>
+                          {trackerEligibility.completedCourses}/{trackerEligibility.requiredCourses}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2.5">
+                        <div className="text-xs w-14 flex-shrink-0" style={{ color: '#6B7280' }}>{tUI('Check-ins')}</div>
+                        <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
+                          <div
+                            className="h-full rounded-full"
+                            style={{ width: `${Math.min(100, (trackerEligibility.totalAssessments / trackerEligibility.requiredAssessments) * 100)}%`, background: '#4ecdc4' }}
+                          />
+                        </div>
+                        <div className="text-xs font-semibold w-7 text-right" style={{ color: '#1B2A4A' }}>
+                          {trackerEligibility.totalAssessments}/{trackerEligibility.requiredAssessments}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
-          {/* Transformation Tracker - shown when not eligible */}
-          {trackerEligibility && !trackerEligibility.isEligible && (
+          {/* 4. Quick Wins Explorer */}
+          {quickWins.length > 0 && (
             <div
-              className="bg-white rounded-2xl p-5 mb-4"
-              style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+              className="rounded-2xl p-5"
+              style={{ background: '#FAFAF8', border: '1px solid rgba(27,42,74,0.08)' }}
             >
-              <div className="flex items-center justify-between mb-3.5">
-                <div className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>{tUI('Your Transformation Tracker')}</div>
-                <div
-                  className="text-xs font-bold px-2 py-0.5 rounded"
-                  style={{ background: '#F3F4F6', color: '#6B7280', fontSize: '10px' }}
-                >
-                  {tUI('Locked')}
-                </div>
+              <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
+                {tUI('Quick Wins')}
               </div>
-              <p className="text-xs mb-4" style={{ color: '#9CA3AF' }}>
-                {tUI('Complete 1 course and 2 check-ins to unlock your growth dashboard.')}
-              </p>
               <div className="space-y-2.5">
-                <div className="flex items-center gap-2.5">
-                  <div className="text-xs w-16 flex-shrink-0" style={{ color: '#6B7280' }}>{tUI('Courses')}</div>
-                  <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
-                    <div
-                      className="h-full rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min(100, (trackerEligibility.completedCourses / trackerEligibility.requiredCourses) * 100)}%`, background: '#FFBA06' }}
-                    />
-                  </div>
-                  <div className="text-xs font-semibold w-7 text-right" style={{ color: '#1B2A4A' }}>
-                    {trackerEligibility.completedCourses}/{trackerEligibility.requiredCourses}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <div className="text-xs w-16 flex-shrink-0" style={{ color: '#6B7280' }}>{tUI('Check-ins')}</div>
-                  <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
-                    <div
-                      className="h-full rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min(100, (trackerEligibility.totalAssessments / trackerEligibility.requiredAssessments) * 100)}%`, background: '#4ecdc4' }}
-                    />
-                  </div>
-                  <div className="text-xs font-semibold w-7 text-right" style={{ color: '#1B2A4A' }}>
-                    {trackerEligibility.totalAssessments}/{trackerEligibility.requiredAssessments}
-                  </div>
-                </div>
+                {quickWins.map((qw) => {
+                  const categoryBg = CATEGORY_COLORS[qw.category] || '#F3F4F6';
+                  return (
+                    <Link
+                      key={qw.id}
+                      href={`/hub/quick-wins/${qw.slug}`}
+                      className="block bg-white rounded-xl p-3.5 hover:shadow-sm transition-shadow"
+                      style={{ border: '1px solid #E9E7E2' }}
+                    >
+                      <span
+                        className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-1.5"
+                        style={{ background: categoryBg, color: '#1e2749', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                      >
+                        {qw.category}
+                      </span>
+                      <div className="text-sm font-semibold leading-snug" style={{ color: '#1B2A4A' }}>
+                        {qw.title}
+                      </div>
+                      <div className="text-xs mt-1" style={{ color: '#9CA3AF' }}>{qw.duration_minutes} min</div>
+                    </Link>
+                  );
+                })}
               </div>
+              <Link
+                href="/hub/quick-wins"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold mt-3 hover:underline"
+                style={{ color: '#38618C' }}
+              >
+                {tUI('Explore all Quick Wins')}
+                <ArrowRight size={12} />
+              </Link>
             </div>
           )}
 
-          {/* Transformation Tracker Link - shown when eligible */}
-          {trackerEligibility && trackerEligibility.isEligible && (
-            <Link
-              href="/hub/transformation"
-              className="bg-white rounded-2xl p-5 block hover:shadow-md transition-shadow mb-4"
-              style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+          {/* 5. Saved Courses (moved from left) */}
+          {savedCourses.length > 0 && (
+            <div
+              data-tour="favorites"
+              className="bg-white rounded-2xl p-5"
+              style={{ border: '1px solid rgba(27,42,74,0.08)' }}
             >
-              <div className="flex items-center justify-between mb-3.5">
-                <div className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>{tUI('Your Transformation Tracker')}</div>
-                <div
-                  className="text-xs font-bold px-2 py-0.5 rounded"
-                  style={{ background: '#FEF3C7', color: '#854F0B', fontSize: '10px' }}
-                >
-                  {tUI('Building')}
-                </div>
+              <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
+                {tUI('Saved')}
               </div>
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: '#FFF8E7' }}
-                >
-                  <TrendingUp size={18} style={{ color: '#FFBA06' }} />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium" style={{ color: '#1B2A4A' }}>
-                    {tUI('View your progress and milestones')}
-                  </p>
-                </div>
-                <ArrowRight size={16} style={{ color: '#38618C' }} />
+              <div className="space-y-2">
+                {savedCourses.slice(0, 3).map(course => (
+                  <div
+                    key={course.id}
+                    className="flex items-center gap-3 py-2 cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => router.push(`/hub/courses/${course.slug}`)}
+                  >
+                    <Heart size={12} style={{ color: '#E53935', fill: '#E53935', flexShrink: 0 }} />
+                    <span className="text-sm font-medium flex-1 truncate" style={{ color: '#1B2A4A' }}>{course.title}</span>
+                  </div>
+                ))}
               </div>
-            </Link>
+              {savedCourses.length > 3 && (
+                <Link href="/hub/courses?filter=Saved" className="text-xs font-semibold mt-2 inline-block" style={{ color: '#38618C' }}>
+                  {tUI('View all')} {savedCourses.length} {tUI('saved')} →
+                </Link>
+              )}
+            </div>
           )}
         </div>
       </div>
     </div>
+
     {/* Celebrate & Share Modal */}
     {showCelebrateModal && (
       <div
