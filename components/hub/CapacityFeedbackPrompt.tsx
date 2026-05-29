@@ -30,7 +30,6 @@ export default function CapacityFeedbackPrompt({
   const [isDone, setIsDone] = useState(false);
 
   const borderColor = CAPACITY_COLORS[officialCapacity] || '#E8B84B';
-  const capacityLabel = officialCapacity.charAt(0).toUpperCase() + officialCapacity.slice(1);
 
   const dismiss = () => {
     setIsAnimatingOut(true);
@@ -80,23 +79,17 @@ export default function CapacityFeedbackPrompt({
         ) : (
           <>
             <p
-              className="font-medium pr-6 mb-0.5"
+              className="font-medium pr-6 mb-3"
               style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '14px', color: '#2B3A67' }}
             >
-              We rated this <strong>{capacityLabel} Lift</strong>.
-            </p>
-            <p
-              className="mb-3 text-xs"
-              style={{ fontFamily: "'DM Sans', sans-serif", color: '#9CA3AF' }}
-            >
-              How did it feel?
+              Quick check — how did this lift feel?
             </p>
 
             <div className="flex flex-col gap-1.5">
               {[
-                { value: 'lower_than_rated' as const, label: 'Lower than rated' },
-                { value: 'about_right' as const, label: 'About right' },
-                { value: 'higher_than_rated' as const, label: 'Higher than rated' },
+                { value: 'lower_than_rated' as const, label: 'Lighter than expected' },
+                { value: 'about_right' as const, label: 'Right where I thought' },
+                { value: 'higher_than_rated' as const, label: 'Heavier than expected' },
               ].map((opt) => (
                 <button
                   key={opt.value}
