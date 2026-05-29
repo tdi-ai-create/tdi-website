@@ -197,6 +197,14 @@ interface CommunityHighlight {
   quickWinSlug: string;
 }
 
+interface CommunitySummary {
+  resourceTitle: string;
+  resourceSlug: string;
+  teacherCount: number;
+  bars: { label: string; count: number; color: string }[];
+  conversations: { status: string; body: string; role: string; time: string; helpful: number }[];
+}
+
 interface SavedCourse {
   id: string;
   slug: string;
@@ -230,6 +238,7 @@ export default function HubDashboard() {
   const [communityPulse, setCommunityPulse] = useState<CommunityPulse | null>(null);
   const [featuredQuickWin, setFeaturedQuickWin] = useState<QuickWin | null>(null);
   const [communityHighlights, setCommunityHighlights] = useState<CommunityHighlight[]>([]);
+  const [communitySummary, setCommunitySummary] = useState<CommunitySummary | null>(null);
   const [userGoal, setUserGoal] = useState<{ text: string; quickWin: QuickWin | null } | null>(null);
 
   const firstName = profile?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Teacher';
@@ -464,16 +473,98 @@ export default function HubDashboard() {
             shared: sharedTodayResult.count || 0,
           });
 
-          // Community highlights - enrich with quick win titles
+          // Community summary - find the most active resource and build rich data
           if (highlightsResult.data && highlightsResult.data.length > 0) {
+            // Find the quick_win_id with the most responses
+            const countByQW: Record<string, number> = {};
+            highlightsResult.data.forEach((r: { quick_win_id: string }) => {
+              countByQW[r.quick_win_id] = (countByQW[r.quick_win_id] || 0) + 1;
+            });
+            // But we only have 3 rows. Fetch more for the top resource.
+            const topQWId = Object.entries(countByQW).sort((a, b) => b[1] - a[1])[0]?.[0];
+
+            if (topQWId) {
+              // Fetch all responses for this resource + resource title
+              const [allResponsesResult, resourceResult] = await Promise.all([
+                supabase
+                  .from('quick_win_responses')
+                  .select('contribution_type, body')
+                  .eq('quick_win_id', topQWId)
+                  .order('created_at', { ascending: false })
+                  .limit(20),
+                supabase
+                  .from('hub_quick_wins')
+                  .select('title, slug')
+                  .eq('id', topQWId)
+                  .single(),
+              ]);
+
+              const responses = allResponsesResult.data || [];
+              const resource = resourceResult.data;
+
+              if (resource && responses.length > 0) {
+                // Build bar chart data
+                const typeCounts: Record<string, number> = {};
+                responses.forEach((r: { contribution_type: string }) => {
+                  const label = r.contribution_type === 'tried_it' ? 'Tried it'
+                    : r.contribution_type === 'adapted_it' ? 'Adapted it'
+                    : r.contribution_type === 'still_trying' ? 'Still trying'
+                    : r.contribution_type === 'got_stuck' ? 'Got stuck'
+                    : r.contribution_type === 'didnt_land' ? "Didn't land"
+                    : r.contribution_type.replace(/_/g, ' ');
+                  typeCounts[label] = (typeCounts[label] || 0) + 1;
+                });
+
+                const barOrder = ['Tried it', 'Adapted it', 'Still trying', 'Got stuck', "Didn't land"];
+                const barColors: Record<string, string> = {
+                  'Tried it': '#4A9A8B',
+                  'Adapted it': '#D4A843',
+                  'Still trying': '#7C9CBF',
+                  'Got stuck': '#9CA3AF',
+                  "Didn't land": '#9CA3AF',
+                };
+
+                const bars = barOrder.map(label => ({
+                  label,
+                  count: typeCounts[label] || 0,
+                  color: barColors[label] || '#9CA3AF',
+                }));
+                const maxCount = Math.max(...bars.map(b => b.count), 1);
+
+                // Build conversation cards (top 2 with body text)
+                const withBody = responses.filter((r: { body: string | null }) => r.body && r.body.trim().length > 10);
+                const roles = ['Teacher', 'Instructional Coach', '3rd Grade Teacher', 'Teacher Leader', 'Middle School Teacher'];
+                const times = ['4d ago', '1w ago', '2d ago', '5d ago', '3d ago'];
+                const helpfuls = [12, 7, 3, 9, 5];
+
+                const conversations = withBody.slice(0, 2).map((r: { contribution_type: string; body: string }, i: number) => ({
+                  status: r.contribution_type === 'tried_it' ? 'Tried it'
+                    : r.contribution_type === 'adapted_it' ? 'Adapted it'
+                    : r.contribution_type === 'still_trying' ? 'Still trying'
+                    : r.contribution_type.replace(/_/g, ' '),
+                  body: (r.body || '').slice(0, 200) + ((r.body || '').length > 200 ? '...' : ''),
+                  role: roles[i % roles.length],
+                  time: times[i % times.length],
+                  helpful: helpfuls[i % helpfuls.length],
+                }));
+
+                setCommunitySummary({
+                  resourceTitle: resource.title,
+                  resourceSlug: resource.slug,
+                  teacherCount: responses.length,
+                  bars: bars.map(b => ({ ...b, count: b.count, color: b.color })),
+                  conversations,
+                });
+              }
+            }
+
+            // Keep old highlights as fallback
             const qwIds = [...new Set(highlightsResult.data.map((r: { quick_win_id: string }) => r.quick_win_id))];
             const { data: qwTitles } = await supabase
               .from('hub_quick_wins')
               .select('id, title, slug')
               .in('id', qwIds);
-
             const titleMap = new Map((qwTitles || []).map((q: { id: string; title: string; slug: string }) => [q.id, { title: q.title, slug: q.slug }]));
-
             setCommunityHighlights(
               highlightsResult.data.map((r: { contribution_type: string; body: string; quick_win_id: string }) => {
                 const qw = titleMap.get(r.quick_win_id) || { title: 'Quick Win', slug: '' };
@@ -1077,104 +1168,127 @@ export default function HubDashboard() {
             </div>
           )}
 
-          {/* D. Your Community -- rich conversation cards */}
-          {communityHighlights.length > 0 && (
+          {/* D. What Educators Are Saying -- bar chart + conversation cards */}
+          {communitySummary && (
             <div data-tour="community-highlights">
               <div className="text-sm font-semibold mb-3" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>
                 {tUI('What educators are saying')}
               </div>
 
-              {/* Resource header -- show the resource name */}
-              {communityHighlights[0]?.quickWinTitle && (
-                <div className="flex items-center justify-between mb-3">
-                  <Link
-                    href={`/hub/quick-wins/${communityHighlights[0].quickWinSlug}`}
-                    className="text-sm font-semibold hover:underline"
-                    style={{ color: '#1B2A4A' }}
-                  >
-                    {communityHighlights[0].quickWinTitle}
-                  </Link>
-                  <div className="flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full" style={{ background: '#22C55E' }} />
-                    <span className="text-xs" style={{ color: '#9CA3AF' }}>{tUI('Active')}</span>
+              <div
+                className="bg-white rounded-2xl overflow-hidden"
+                style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
+              >
+                {/* Bar chart header */}
+                <div className="p-5" style={{ borderBottom: '1px solid #F3F4F6' }}>
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
+                      {tUI('What teachers are doing with this resource')}
+                    </h3>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full" style={{ background: '#22C55E' }} />
+                      <span className="text-xs" style={{ color: '#9CA3AF' }}>{tUI('Active')}</span>
+                    </div>
                   </div>
-                </div>
-              )}
+                  <Link
+                    href={`/hub/quick-wins/${communitySummary.resourceSlug}`}
+                    className="text-xs font-medium hover:underline"
+                    style={{ color: '#38618C' }}
+                  >
+                    {communitySummary.resourceTitle}
+                  </Link>
+                  <p className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>
+                    {communitySummary.teacherCount} {tUI('teachers in the conversation')}
+                  </p>
 
-              {/* Conversation cards -- styled like the detail page */}
-              <div className="space-y-3">
-                {communityHighlights.slice(0, 2).map((highlight, idx) => {
-                  const borderColors: Record<string, string> = {
-                    'Tried it': '#4A9A8B',
-                    'Adapted it': '#D4A843',
-                    'Still trying': '#7C9CBF',
-                  };
-                  const statusColors: Record<string, { bg: string; text: string }> = {
-                    'Tried it': { bg: '#E8F5E9', text: '#2E7D32' },
-                    'Adapted it': { bg: '#FEF3C7', text: '#92400E' },
-                    'Still trying': { bg: '#E0F4FF', text: '#1565C0' },
-                  };
-                  const borderColor = borderColors[highlight.status] || '#D1D5DB';
-                  const statusStyle = statusColors[highlight.status] || { bg: '#F3F4F6', text: '#6B7280' };
-                  const roles = ['Teacher', 'Instructional Coach', 'Teacher Leader', '3rd Grade Teacher', 'Middle School Teacher'];
-                  const times = ['4d ago', '1w ago', '2d ago', '5d ago', '3d ago'];
-                  const helpfulCounts = [12, 7, 3, 9, 5];
-
-                  return (
-                    <div
-                      key={idx}
-                      className="bg-white rounded-xl overflow-hidden"
-                      style={{
-                        borderLeft: `4px solid ${borderColor}`,
-                        border: '1px solid rgba(27,42,74,0.06)',
-                        borderLeftWidth: '4px',
-                        borderLeftColor: borderColor,
-                        boxShadow: '0 1px 3px rgba(27,42,74,0.04)',
-                      }}
-                    >
-                      <div className="p-4">
-                        {/* Status + role + time */}
-                        <div className="flex items-center gap-2 mb-2">
-                          <span
-                            className="text-xs font-bold px-2 py-0.5 rounded"
-                            style={{ background: statusStyle.bg, color: statusStyle.text, fontSize: '10px' }}
-                          >
-                            {highlight.status}
+                  {/* Horizontal bar chart */}
+                  <div className="mt-4 space-y-2">
+                    {communitySummary.bars.map((bar) => {
+                      const maxCount = Math.max(...communitySummary.bars.map(b => b.count), 1);
+                      const pct = bar.count > 0 ? Math.max((bar.count / maxCount) * 100, 8) : 0;
+                      return (
+                        <div key={bar.label} className="flex items-center gap-3">
+                          <span className="text-xs w-20 text-right flex-shrink-0" style={{ color: '#6B7280' }}>
+                            {bar.label}
                           </span>
-                          <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                            {roles[idx % roles.length]} &middot; {times[idx % times.length]}
+                          <div className="flex-1 h-3 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
+                            {bar.count > 0 && (
+                              <div
+                                className="h-full rounded-full"
+                                style={{ width: `${pct}%`, background: bar.color }}
+                              />
+                            )}
+                          </div>
+                          <span className="text-xs font-semibold w-5 text-right" style={{ color: '#1B2A4A' }}>
+                            {bar.count}
                           </span>
                         </div>
+                      );
+                    })}
+                  </div>
+                </div>
 
-                        {/* Full body text */}
-                        <p
-                          className="text-sm leading-relaxed mb-2"
-                          style={{ color: '#374151', lineHeight: 1.6 }}
+                {/* Conversation cards */}
+                {communitySummary.conversations.length > 0 && (
+                  <div className="p-5 space-y-3">
+                    {communitySummary.conversations.map((conv, idx) => {
+                      const borderColors: Record<string, string> = {
+                        'Tried it': '#4A9A8B',
+                        'Adapted it': '#D4A843',
+                        'Still trying': '#7C9CBF',
+                      };
+                      const statusColors: Record<string, { bg: string; text: string }> = {
+                        'Tried it': { bg: '#E8F5E9', text: '#2E7D32' },
+                        'Adapted it': { bg: '#FEF3C7', text: '#92400E' },
+                        'Still trying': { bg: '#E0F4FF', text: '#1565C0' },
+                      };
+                      const borderColor = borderColors[conv.status] || '#D1D5DB';
+                      const statusStyle = statusColors[conv.status] || { bg: '#F3F4F6', text: '#6B7280' };
+
+                      return (
+                        <div
+                          key={idx}
+                          className="rounded-xl p-4"
+                          style={{
+                            background: '#FAFAF8',
+                            borderLeft: `4px solid ${borderColor}`,
+                          }}
                         >
-                          {highlight.body}
-                        </p>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span
+                              className="text-xs font-bold px-2 py-0.5 rounded"
+                              style={{ background: statusStyle.bg, color: statusStyle.text, fontSize: '10px' }}
+                            >
+                              {conv.status}
+                            </span>
+                            <span className="text-xs" style={{ color: '#9CA3AF' }}>
+                              {conv.role} &middot; {conv.time}
+                            </span>
+                          </div>
+                          <p className="text-sm leading-relaxed mb-2" style={{ color: '#374151', lineHeight: 1.6 }}>
+                            {conv.body}
+                          </p>
+                          <span className="text-xs" style={{ color: '#9CA3AF' }}>
+                            {tUI('Helpful')} ({conv.helpful})
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
 
-                        {/* Helpful count */}
-                        <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                          {tUI('Helpful')} ({helpfulCounts[idx % helpfulCounts.length]})
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+                {/* Expand to see more */}
+                <div className="px-5 pb-4">
+                  <Link
+                    href={`/hub/quick-wins/${communitySummary.resourceSlug}`}
+                    className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold transition-colors hover:bg-gray-50"
+                    style={{ color: '#38618C', border: '1px solid rgba(27,42,74,0.1)' }}
+                  >
+                    {tUI('Expand to see more')}
+                    <ArrowRight size={14} />
+                  </Link>
+                </div>
               </div>
-
-              {/* Expand link */}
-              {communityHighlights[0]?.quickWinSlug && (
-                <Link
-                  href={`/hub/quick-wins/${communityHighlights[0].quickWinSlug}`}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold mt-3 hover:underline"
-                  style={{ color: '#38618C' }}
-                >
-                  {tUI('See the full conversation')}
-                  <ArrowRight size={12} />
-                </Link>
-              )}
             </div>
           )}
         </div>
