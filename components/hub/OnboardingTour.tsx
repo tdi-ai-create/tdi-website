@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
 import { X } from 'lucide-react';
 import { useHub } from '@/components/hub/HubContext';
 import { useTranslation } from '@/lib/hub/useTranslation';
@@ -21,7 +20,7 @@ interface OnboardingTourProps {
 interface TourStep {
   title: string;
   body: string;
-  /** URL path the target element lives on */
+  /** URL path the target element lives on (used only for display) */
   page: string;
   /** CSS selector for the element to highlight (null = centered popover) */
   selector: string | null;
@@ -38,46 +37,46 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     title: 'Learn at your own pace',
-    body: 'You are not alone in this. Connect with other educators who get it -- share ideas, ask questions, celebrate wins.',
+    body: 'Courses are self-paced professional development built by real educators. Explore the catalog and start when you are ready.',
     page: '/hub',
     selector: 'a[href="/hub/courses"]',
   },
   {
-    title: 'The LIFT Filter',
-    body: 'Every resource is tagged by what it helps with: Leadership, Instruction, Family engagement, or Teacher wellness. Find what you need fast.',
-    page: '/hub/quick-wins',
-    selector: '[data-tour="lift-filter"]',
-  },
-  {
-    title: 'Moment Mode',
-    body: 'Having a rough day? This is your reset button. Breathing exercises, affirmations, and gentle tools -- right when you need them.',
-    page: '/hub/quick-wins',
+    title: 'No one is watching',
+    body: 'Moment Mode is a private wellness pause. Breathing exercises, affirmations, and gentle tools. Nothing is tracked. It is here for the moments when you need to step away.',
+    page: '/hub',
     selector: '[data-tour="moment-mode"]',
   },
   {
-    title: 'Multilingual Support',
+    title: 'Your achievements',
+    body: 'Earn Field Notes as you explore, contribute, and grow. Certificates, recognitions, and milestones -- all yours.',
+    page: '/hub',
+    selector: 'a[href="/hub/certificates"]',
+  },
+  {
+    title: 'Also available in Spanish',
     body: 'Toggle between English and Spanish. The whole Hub works in both languages.',
-    page: '/hub/quick-wins',
+    page: '/hub',
     selector: '[data-tour="language-toggle"]',
   },
   // --- optional stops (6-8) ---
   {
-    title: 'The Gift',
+    title: 'The team behind this',
+    body: 'Learn about TDI, our mission, how we support educators beyond the Hub, and our approved PD status in all 50 states.',
+    page: '/hub',
+    selector: 'a[href="/hub/our-story"]',
+  },
+  {
+    title: 'Something is waiting for you',
     body: 'A 24-hour All-Access pass, on us. Use it when you are ready. No strings, no credit card.',
     page: '/hub',
     selector: '[data-tour="gift-element"]',
   },
   {
-    title: 'Our Story',
-    body: 'Learn about the team behind TDI, our mission, and how we support educators beyond the Hub.',
+    title: 'Become a creator',
+    body: 'Have expertise to share? Apply to create courses and tools for the TDI community. Your knowledge can help thousands of educators.',
     page: '/hub',
-    selector: 'a[href="/hub/our-story"]',
-  },
-  {
-    title: 'Certificates',
-    body: 'Finish a course, get a certificate. Real PD hours you can submit to your district.',
-    page: '/hub',
-    selector: 'a[href="/hub/certificates"]',
+    selector: 'a[href="https://www.teachersdeserveit.com/create-with-us"]',
   },
 ];
 
@@ -187,12 +186,9 @@ function Arrow({ side }: { side: Side }) {
 export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
   const { user } = useHub();
   const { tUI } = useTranslation();
-  const router = useRouter();
-  const pathname = usePathname();
 
   const [stepIndex, setStepIndex] = useState(0);
   const [targetRect, setTargetRect] = useState<Rect | null>(null);
-  const [navigating, setNavigating] = useState(false);
   const [showDisclosure, setShowDisclosure] = useState(false);
   const [active, setActive] = useState(true);
 
@@ -234,6 +230,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
     }
     const el = document.querySelector(step.selector);
     if (!el) {
+      // Element not found (user may have navigated away) -- show centered fallback
       setTargetRect(null);
       return;
     }
@@ -265,51 +262,22 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
     }
   }, [step]);
 
-  /* ---------- navigate if needed, then measure ---------- */
+  /* ---------- measure target on step change ---------- */
 
   useEffect(() => {
     if (!active || !step) return;
 
-    // Normalise paths for comparison
-    const currentPath = pathname.replace(/\/$/, '') || '/hub';
-    const targetPath = step.page.replace(/\/$/, '') || '/hub';
-
-    if (currentPath !== targetPath) {
-      setNavigating(true);
-      router.push(step.page);
-    } else {
-      // Already on the right page -- try to find the element
-      // Use a short delay to let the DOM settle (esp. after navigation)
-      const timer = setTimeout(() => {
-        setNavigating(false);
-        measureTarget();
-      }, 150);
-      return () => clearTimeout(timer);
-    }
-  }, [active, step, pathname, router, measureTarget]);
-
-  /* ---------- after navigation, wait for target page ---------- */
-
-  useEffect(() => {
-    if (!navigating || !active || !step) return;
-
-    const currentPath = pathname.replace(/\/$/, '') || '/hub';
-    const targetPath = step.page.replace(/\/$/, '') || '/hub';
-
-    if (currentPath === targetPath) {
-      // Page has loaded -- wait a moment for DOM to populate then measure
-      const timer = setTimeout(() => {
-        setNavigating(false);
-        measureTarget();
-      }, 600);
-      return () => clearTimeout(timer);
-    }
-  }, [pathname, navigating, active, step, measureTarget]);
+    // Short delay to let the DOM settle
+    const timer = setTimeout(() => {
+      measureTarget();
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [active, step, measureTarget]);
 
   /* ---------- re-measure on scroll / resize ---------- */
 
   useEffect(() => {
-    if (!active || navigating) return;
+    if (!active) return;
 
     const handler = () => measureTarget();
     window.addEventListener('resize', handler);
@@ -318,12 +286,12 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
       window.removeEventListener('resize', handler);
       window.removeEventListener('scroll', handler, true);
     };
-  }, [active, navigating, measureTarget]);
+  }, [active, measureTarget]);
 
   /* ---------- retry measurement if selector not found initially ---------- */
 
   useEffect(() => {
-    if (!active || navigating || !step?.selector || targetRect) return;
+    if (!active || !step?.selector || targetRect) return;
 
     // Retry up to 10 times (2.5 seconds total)
     let attempts = 0;
@@ -334,7 +302,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
     }, 250);
 
     return () => clearInterval(interval);
-  }, [active, navigating, step, targetRect, measureTarget]);
+  }, [active, step, targetRect, measureTarget]);
 
   /* ---------- step navigation ---------- */
 
@@ -462,40 +430,6 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
           @keyframes tdi-tour-fadein {
             from { opacity: 0; }
             to { opacity: 1; }
-          }
-        `}</style>
-      </div>
-    );
-  }
-
-  /* ---------- loading state while navigating ---------- */
-
-  if (navigating) {
-    return (
-      <div
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 1000010,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'rgba(30, 39, 73, 0.75)',
-        }}
-      >
-        <div
-          style={{
-            width: 40,
-            height: 40,
-            border: '3px solid rgba(255,255,255,0.2)',
-            borderTopColor: '#ffba06',
-            borderRadius: '50%',
-            animation: 'tdi-tour-spin 0.8s linear infinite',
-          }}
-        />
-        <style>{`
-          @keyframes tdi-tour-spin {
-            to { transform: rotate(360deg); }
           }
         `}</style>
       </div>
