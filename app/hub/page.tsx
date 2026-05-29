@@ -1341,38 +1341,39 @@ export default function HubDashboard() {
             </div>
           )}
 
-          {/* 5. LIFT Key */}
+          {/* 5. LIFT Key -- effort level filter */}
           <div
             data-tour="lift-filter"
-            className="bg-white rounded-2xl p-5"
+            className="rounded-2xl overflow-hidden"
             style={{ border: '1px solid rgba(27,42,74,0.08)' }}
           >
-            <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-              {tUI('The LIFT Framework')}
+            <div className="px-5 pt-5 pb-3" style={{ background: '#1B2A4A' }}>
+              <div className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#FFBA06', letterSpacing: '0.08em' }}>
+                {tUI('LIFT')}
+              </div>
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
+                {tUI('How much brain power and time a resource takes to put into action.')}
+              </p>
             </div>
-            <p className="text-xs mb-3" style={{ color: '#6B7280', lineHeight: 1.5 }}>
-              {tUI('Every resource is tagged by what it helps with.')}
-            </p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="bg-white px-5 py-4 space-y-2.5">
               {[
-                { letter: 'L', label: 'Leadership', color: '#9B7CB8', bg: '#F3E8FF' },
-                { letter: 'I', label: 'Instruction', color: '#6BA368', bg: '#E8F5E9' },
-                { letter: 'F', label: 'Family', color: '#E8927C', bg: '#FEF3C7' },
-                { letter: 'T', label: 'Teacher Wellness', color: '#7C9CBF', bg: '#E0F4FF' },
+                { level: 'Low', desc: 'Grab and go. Sentence starters, one-page downloads.', color: '#6BA368', bg: '#E8F5E9' },
+                { level: 'Medium', desc: 'Some prep needed. Reflection downloads, structured activities.', color: '#D4A843', bg: '#FEF3C7' },
+                { level: 'High', desc: 'Sustained effort. Courses, multi-week guides.', color: '#C0392B', bg: '#FEE2E2' },
               ].map((item) => (
                 <div
-                  key={item.letter}
-                  className="flex items-center gap-2.5 rounded-lg px-3 py-2"
+                  key={item.level}
+                  className="flex items-start gap-3 rounded-lg px-3 py-2.5"
                   style={{ background: item.bg }}
                 >
                   <span
-                    className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold text-white"
-                    style={{ background: item.color }}
+                    className="text-xs font-bold px-2 py-0.5 rounded mt-0.5 flex-shrink-0"
+                    style={{ background: item.color, color: 'white', fontSize: '10px' }}
                   >
-                    {item.letter}
+                    {item.level.toUpperCase()}
                   </span>
-                  <span className="text-xs font-medium" style={{ color: '#1B2A4A' }}>
-                    {tUI(item.label)}
+                  <span className="text-xs" style={{ color: '#4B5563', lineHeight: 1.4 }}>
+                    {tUI(item.desc)}
                   </span>
                 </div>
               ))}
