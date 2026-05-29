@@ -341,10 +341,10 @@ export default function CourseCatalogPage() {
               <Info size={13} style={{ color: '#9CA3AF', cursor: 'help' }} />
               <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-72 p-3 rounded-lg text-left normal-case tracking-normal pointer-events-none opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity z-50"
                 style={{ background: '#1B2A4A', color: 'white', fontSize: 12, fontWeight: 400, lineHeight: 1.5, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-                <strong style={{ display: 'block', marginBottom: 6, fontSize: 13 }}>Lift = how much brain power and time a resource takes to put into action.</strong>
-                <span style={{ display: 'block', marginBottom: 4 }}><strong>Low lift</strong> — Grab and go. Sentence starters, one-page downloads, quick reference cards.</span>
-                <span style={{ display: 'block', marginBottom: 4 }}><strong>Medium lift</strong> — Some prep needed. Reflection downloads, structured activities. 15-30 min to plan.</span>
-                <span style={{ display: 'block' }}><strong>High lift</strong> — Sustained effort. Courses, multi-week guides, full curriculum frameworks.</span>
+                <strong style={{ display: 'block', marginBottom: 6, fontSize: 13 }}>Lift = how action-ready a resource is.</strong>
+                <span style={{ display: 'block', marginBottom: 4 }}><strong>Low lift</strong> — Grab and go. Open it, use it, done.</span>
+                <span style={{ display: 'block', marginBottom: 4 }}><strong>Medium lift</strong> — A planning period. A few moments to think, then implement.</span>
+                <span style={{ display: 'block' }}><strong>High lift</strong> — Grab a coffee. Deeper reflection and planning, then action.</span>
               </span>
             </span>
           </span>

@@ -1379,14 +1379,14 @@ export default function HubDashboard() {
                 {tUI('LIFT')}
               </div>
               <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
-                {tUI('How much brain power and time a resource takes to put into action.')}
+                {tUI('How action-ready a resource is. Everything here is built for implementation.')}
               </p>
             </div>
             <div className="bg-white px-5 py-4 space-y-2.5">
               {[
-                { level: 'Low', desc: 'Grab and go. Sentence starters, one-page downloads.', color: '#6BA368', bg: '#E8F5E9' },
-                { level: 'Medium', desc: 'Some prep needed. Reflection downloads, structured activities.', color: '#D4A843', bg: '#FEF3C7' },
-                { level: 'High', desc: 'Sustained effort. Courses, multi-week guides.', color: '#C0392B', bg: '#FEE2E2' },
+                { level: 'Low', desc: 'Grab and go. Open it, use it, done.', color: '#6BA368', bg: '#E8F5E9' },
+                { level: 'Medium', desc: 'A planning period. A few moments to think, then implement.', color: '#D4A843', bg: '#FEF3C7' },
+                { level: 'High', desc: 'Grab a coffee. Deeper reflection and planning, then action.', color: '#C0392B', bg: '#FEE2E2' },
               ].map((item) => (
                 <div
                   key={item.level}
