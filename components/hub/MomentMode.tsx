@@ -96,12 +96,13 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   const sessionStartRef = useRef<Date | null>(null);
   const hasLoggedOpenRef = useRef(false);
 
-  // Box breathing state
+  // Box breathing state -- all managed via refs so the interval callback stays stable
   const [breathPhase, setBreathPhase] = useState<BreathPhase>('inhale');
   const [breathCycle, setBreathCycle] = useState(1);
+  const [phaseTimer, setPhaseTimer] = useState(BREATH_DURATION);
   const breathCycleRef = useRef(1);
   const breathPhaseRef = useRef<BreathPhase>('inhale');
-  const [phaseTimer, setPhaseTimer] = useState(BREATH_DURATION);
+  const phaseTimerRef = useRef(BREATH_DURATION);
   const breathingRef = useRef<NodeJS.Timeout | null>(null);
 
   // Gentle tools state
@@ -225,42 +226,45 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
     };
   }, [isOpen, handleEscape, hasIncremented, setMomentModeActive]);
 
-  // Box breathing timer - uses refs to avoid tearing down interval on each phase change
+  // Box breathing timer -- refs for everything so no nested state setters
   useEffect(() => {
     if (state !== 'pause') return;
     if (breathPhaseRef.current === 'complete') return;
 
     breathingRef.current = setInterval(() => {
-      setPhaseTimer((prev) => {
-        if (prev <= 1) {
-          // Move to next phase using ref for accurate state
-          const currentPhase = breathPhaseRef.current;
-          let nextPhase: BreathPhase = currentPhase;
+      phaseTimerRef.current -= 1;
 
-          if (currentPhase === 'inhale') nextPhase = 'hold1';
-          else if (currentPhase === 'hold1') nextPhase = 'exhale';
-          else if (currentPhase === 'exhale') nextPhase = 'hold2';
-          else if (currentPhase === 'hold2') {
-            if (breathCycleRef.current >= TOTAL_CYCLES) {
-              nextPhase = 'complete';
-            } else {
-              breathCycleRef.current += 1;
-              setBreathCycle(breathCycleRef.current);
-              nextPhase = 'inhale';
-            }
+      if (phaseTimerRef.current <= 0) {
+        // Advance to the next phase
+        const currentPhase = breathPhaseRef.current;
+        let nextPhase: BreathPhase = currentPhase;
+
+        if (currentPhase === 'inhale') nextPhase = 'hold1';
+        else if (currentPhase === 'hold1') nextPhase = 'exhale';
+        else if (currentPhase === 'exhale') nextPhase = 'hold2';
+        else if (currentPhase === 'hold2') {
+          if (breathCycleRef.current >= TOTAL_CYCLES) {
+            nextPhase = 'complete';
+          } else {
+            breathCycleRef.current += 1;
+            nextPhase = 'inhale';
           }
-
-          breathPhaseRef.current = nextPhase;
-          setBreathPhase(nextPhase);
-
-          if (nextPhase === 'complete') {
-            if (breathingRef.current) clearInterval(breathingRef.current);
-          }
-
-          return BREATH_DURATION;
         }
-        return prev - 1;
-      });
+
+        breathPhaseRef.current = nextPhase;
+        phaseTimerRef.current = BREATH_DURATION;
+
+        // Sync React state for rendering (all at top level, not nested)
+        setBreathPhase(nextPhase);
+        setBreathCycle(breathCycleRef.current);
+        setPhaseTimer(BREATH_DURATION);
+
+        if (nextPhase === 'complete') {
+          if (breathingRef.current) clearInterval(breathingRef.current);
+        }
+      } else {
+        setPhaseTimer(phaseTimerRef.current);
+      }
     }, 1000);
 
     return () => {
@@ -306,12 +310,13 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   };
 
   const resetBreathing = () => {
-    setBreathPhase('inhale');
-    breathPhaseRef.current = 'inhale';
-    setBreathCycle(1);
-    breathCycleRef.current = 1;
-    setPhaseTimer(BREATH_DURATION);
     if (breathingRef.current) clearInterval(breathingRef.current);
+    breathPhaseRef.current = 'inhale';
+    breathCycleRef.current = 1;
+    phaseTimerRef.current = BREATH_DURATION;
+    setBreathPhase('inhale');
+    setBreathCycle(1);
+    setPhaseTimer(BREATH_DURATION);
   };
 
   const handleNeedMoreTime = () => {
