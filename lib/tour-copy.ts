@@ -28,7 +28,7 @@ export const TOUR_STOPS: TourStop[] = [
     id: 3,
     title: 'The LIFT Filter',
     description:
-      'Every resource is tagged by what it helps with: Leadership, Instruction, Family engagement, or Teacher wellness. Find what you need fast.',
+      'Every resource is tagged by how action-ready it is. Low lift is grab and go. Medium takes a planning period. High means grab a coffee. Everything here is built for implementation.',
   },
   {
     id: 4,
