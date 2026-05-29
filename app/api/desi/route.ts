@@ -1,6 +1,12 @@
 // Desi API v2 - March 2026
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import {
+  getHubCourses,
+  getHubQuickWins,
+  getHubCategories,
+  getHubMembershipTiers,
+} from '@/lib/desi/hub-knowledge'
 
 const SYSTEM_PROMPT = `You are Desi, the warm and knowledgeable guide for Teachers Deserve It (TDI). You help educators and school leaders visiting teachersdeserveit.com get fast, accurate answers.
 
@@ -102,12 +108,12 @@ WHAT HAPPENS DURING AN ON-CAMPUS VISIT:
 - Love Notes are what teachers remember months later - not slides, not data
 
 THE LEARNING HUB:
-- 100+ hours of practical, classroom-ready content
-- Courses for teachers, paras, coaches, and admins
-- Downloadable tools, templates, and resources
-- New content added regularly
-- Accessible at tdi.thinkific.com
-- Popular courses: The Differentiation Fix, Calm Classrooms Not Chaos, Communication that Clicks, Building Strong Teacher-Para Partnerships, Teachers Deserve Their Time Back
+- The TDI Learning Hub is LIVE and open for signups today at https://www.teachersdeserveit.com/hub
+- It offers on-demand PD courses, bite-sized Quick Wins, and resources for educators.
+- Membership tiers: Free, Essentials ($5/mo), Professional ($10/mo), All-Access ($25/mo).
+- When a visitor asks what courses, topics, resources, or pricing the Hub offers, call the get_hub_content tool to pull LIVE published content rather than guessing. Never invent course titles.
+- Encourage interested visitors to sign up at the /hub link. Be warm, never pushy - lead with the value, not the upsell.
+- If you cannot retrieve live content for any reason, describe the Hub in general terms and share the /hub link.
 - TDI partners average 65% strategy implementation rate vs 10% industry average
 - IGNITE: pilot group gets access. ACCELERATE and SUSTAIN: all staff gets access.
 
@@ -327,6 +333,44 @@ When someone asks who TDI is, what you do, or why you exist - lead with the WHY,
 Example response to "What is TDI?":
 "TDI started when a group of educators got tired of watching great teachers burn out and leave. We came together to build something different - PD that actually respects your time and shows up in your classroom. Want to know what that looks like?"`
 
+const hubTools: Anthropic.Tool[] = [
+  {
+    name: 'get_hub_content',
+    description:
+      'Look up LIVE published Learning Hub content to answer visitor questions about courses, quick wins, topics/categories, or membership pricing. Use whenever a visitor asks what courses or resources the Hub offers, what topics are covered, or what membership costs.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        kind: {
+          type: 'string',
+          enum: ['courses', 'quick_wins', 'categories', 'membership'],
+          description: 'Which type of Hub info to fetch.',
+        },
+        category: {
+          type: 'string',
+          description: 'Optional topic/category filter, e.g. "classroom management", "wellness".',
+        },
+      },
+      required: ['kind'],
+    },
+  },
+]
+
+async function runHubTool(input: { kind: string; category?: string }) {
+  switch (input.kind) {
+    case 'courses':
+      return (await getHubCourses(input.category)) ?? []
+    case 'quick_wins':
+      return (await getHubQuickWins(input.category)) ?? []
+    case 'categories':
+      return (await getHubCategories()) ?? []
+    case 'membership':
+      return getHubMembershipTiers()
+    default:
+      return []
+  }
+}
+
 export async function POST(request: NextRequest) {
   console.log('Desi API called, key exists:', !!process.env.ANTHROPIC_API_KEY)
 
@@ -344,22 +388,60 @@ export async function POST(request: NextRequest) {
       apiKey: process.env.ANTHROPIC_API_KEY,
     })
 
-    const response = await client.messages.create({
+    const formattedMessages = messages.map((m: { role: string; content: string }) => ({
+      role: m.role as 'user' | 'assistant',
+      content: m.content,
+    }))
+
+    let response = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 250,
       system: SYSTEM_PROMPT,
-      messages: messages.map((m: { role: string; content: string }) => ({
-        role: m.role as 'user' | 'assistant',
-        content: m.content,
-      })),
+      messages: formattedMessages,
+      tools: hubTools,
     })
 
-    const content = response.content[0]
-    if (content.type !== 'text') {
+    // Tool-use loop: allow up to 2 round-trips
+    let loopCount = 0
+    while (response.stop_reason === 'tool_use' && loopCount < 2) {
+      loopCount++
+      const toolUseBlocks = response.content.filter(
+        (block): block is Anthropic.ToolUseBlock => block.type === 'tool_use'
+      )
+
+      const toolResults: Anthropic.ToolResultBlockParam[] = []
+      for (const toolUse of toolUseBlocks) {
+        const result = await runHubTool(toolUse.input as { kind: string; category?: string })
+        toolResults.push({
+          type: 'tool_result',
+          tool_use_id: toolUse.id,
+          content: JSON.stringify(result),
+        })
+      }
+
+      formattedMessages.push(
+        { role: 'assistant' as const, content: response.content },
+        { role: 'user' as const, content: toolResults }
+      )
+
+      response = await client.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 250,
+        system: SYSTEM_PROMPT,
+        messages: formattedMessages,
+        tools: hubTools,
+      })
+    }
+
+    const textBlock = response.content.find(
+      (block): block is Anthropic.TextBlock => block.type === 'text'
+    )
+
+    if (!textBlock) {
       return NextResponse.json({ message: '', showContactForm: false })
     }
 
-    const text = content.text
+    const text = textBlock.text
     const showContactForm = text.includes('[SHOW_CONTACT_FORM]') || text.includes('[COLLECT_TICKET]')
     const cleanText = text
       .replace('[SHOW_CONTACT_FORM]', '')
