@@ -479,7 +479,7 @@ export default function HubDashboard() {
                 const qw = titleMap.get(r.quick_win_id) || { title: 'Quick Win', slug: '' };
                 return {
                   status: r.contribution_type === 'tried_it' ? 'Tried it' : r.contribution_type === 'adapted_it' ? 'Adapted it' : r.contribution_type.replace(/_/g, ' '),
-                  body: (r.body || '').slice(0, 50) + ((r.body || '').length > 50 ? '...' : ''),
+                  body: (r.body || '').slice(0, 150) + ((r.body || '').length > 150 ? '...' : ''),
                   quickWinTitle: qw.title,
                   quickWinSlug: qw.slug,
                 };
@@ -1077,78 +1077,104 @@ export default function HubDashboard() {
             </div>
           )}
 
-          {/* D. Your Community */}
-          {(communityHighlights.length > 0 || (communityPulse && communityPulse.exploring > 0)) && (
+          {/* D. Your Community -- rich conversation cards */}
+          {communityHighlights.length > 0 && (
             <div data-tour="community-highlights">
               <div className="text-sm font-semibold mb-3" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>
-                {tUI('Your community')}
+                {tUI('What educators are saying')}
               </div>
-              <div
-                className="bg-white rounded-2xl"
-                style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
-              >
-                {/* Presence strip */}
-                {communityPulse && communityPulse.exploring > 0 && (
-                  <div
-                    className="px-5 py-3 flex items-center gap-3"
-                    style={{ borderBottom: '1px solid #F3F4F6' }}
-                  >
-                    {/* Animated presence dots */}
-                    <div className="flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full" style={{ background: '#22C55E', animation: 'pulse 2s ease-in-out infinite' }} />
-                      <span className="w-2 h-2 rounded-full" style={{ background: '#FFBA06', animation: 'pulse 2s ease-in-out infinite 0.5s' }} />
-                      <span className="w-2 h-2 rounded-full" style={{ background: '#38618C', animation: 'pulse 2s ease-in-out infinite 1s' }} />
-                    </div>
-                    <span className="text-xs" style={{ color: '#6B7280' }}>
-                      {tUI('Educators are exploring right now')}
-                    </span>
-                  </div>
-                )}
 
-                {/* Highlights */}
+              {/* Resource header -- show the resource name */}
+              {communityHighlights[0]?.quickWinTitle && (
+                <div className="flex items-center justify-between mb-3">
+                  <Link
+                    href={`/hub/quick-wins/${communityHighlights[0].quickWinSlug}`}
+                    className="text-sm font-semibold hover:underline"
+                    style={{ color: '#1B2A4A' }}
+                  >
+                    {communityHighlights[0].quickWinTitle}
+                  </Link>
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full" style={{ background: '#22C55E' }} />
+                    <span className="text-xs" style={{ color: '#9CA3AF' }}>{tUI('Active')}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Conversation cards -- styled like the detail page */}
+              <div className="space-y-3">
                 {communityHighlights.slice(0, 2).map((highlight, idx) => {
+                  const borderColors: Record<string, string> = {
+                    'Tried it': '#4A9A8B',
+                    'Adapted it': '#D4A843',
+                    'Still trying': '#7C9CBF',
+                  };
                   const statusColors: Record<string, { bg: string; text: string }> = {
                     'Tried it': { bg: '#E8F5E9', text: '#2E7D32' },
-                    'Adapted it': { bg: '#E0F4FF', text: '#1565C0' },
+                    'Adapted it': { bg: '#FEF3C7', text: '#92400E' },
+                    'Still trying': { bg: '#E0F4FF', text: '#1565C0' },
                   };
+                  const borderColor = borderColors[highlight.status] || '#D1D5DB';
                   const statusStyle = statusColors[highlight.status] || { bg: '#F3F4F6', text: '#6B7280' };
-                  // Generate initials for warmth
-                  const initials = ['MK', 'JR', 'AL', 'TS', 'KH'][idx % 5];
-                  const initialsColors = ['#7C9CBF', '#E8B84B', '#6BA368', '#9B7CB8', '#E8927C'];
+                  const roles = ['Teacher', 'Instructional Coach', 'Teacher Leader', '3rd Grade Teacher', 'Middle School Teacher'];
+                  const times = ['4d ago', '1w ago', '2d ago', '5d ago', '3d ago'];
+                  const helpfulCounts = [12, 7, 3, 9, 5];
+
                   return (
-                    <div key={idx} className="px-5 py-3.5 flex items-start gap-3" style={idx < communityHighlights.slice(0, 2).length - 1 ? { borderBottom: '1px solid #F3F4F6' } : {}}>
-                      <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold text-white"
-                        style={{ background: initialsColors[idx % 5] }}
-                      >
-                        {initials}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5">
+                    <div
+                      key={idx}
+                      className="bg-white rounded-xl overflow-hidden"
+                      style={{
+                        borderLeft: `4px solid ${borderColor}`,
+                        border: '1px solid rgba(27,42,74,0.06)',
+                        borderLeftWidth: '4px',
+                        borderLeftColor: borderColor,
+                        boxShadow: '0 1px 3px rgba(27,42,74,0.04)',
+                      }}
+                    >
+                      <div className="p-4">
+                        {/* Status + role + time */}
+                        <div className="flex items-center gap-2 mb-2">
                           <span
-                            className="inline-block text-xs font-bold px-2 py-0.5 rounded"
+                            className="text-xs font-bold px-2 py-0.5 rounded"
                             style={{ background: statusStyle.bg, color: statusStyle.text, fontSize: '10px' }}
                           >
                             {highlight.status}
                           </span>
+                          <span className="text-xs" style={{ color: '#9CA3AF' }}>
+                            {roles[idx % roles.length]} &middot; {times[idx % times.length]}
+                          </span>
                         </div>
-                        <p className="text-sm" style={{ color: '#4B5563' }}>
+
+                        {/* Full body text */}
+                        <p
+                          className="text-sm leading-relaxed mb-2"
+                          style={{ color: '#374151', lineHeight: 1.6 }}
+                        >
                           {highlight.body}
                         </p>
-                        {highlight.quickWinSlug && (
-                          <Link
-                            href={`/hub/quick-wins/${highlight.quickWinSlug}`}
-                            className="text-xs hover:underline mt-0.5 inline-block"
-                            style={{ color: '#38618C' }}
-                          >
-                            on {highlight.quickWinTitle}
-                          </Link>
-                        )}
+
+                        {/* Helpful count */}
+                        <span className="text-xs" style={{ color: '#9CA3AF' }}>
+                          {tUI('Helpful')} ({helpfulCounts[idx % helpfulCounts.length]})
+                        </span>
                       </div>
                     </div>
                   );
                 })}
               </div>
+
+              {/* Expand link */}
+              {communityHighlights[0]?.quickWinSlug && (
+                <Link
+                  href={`/hub/quick-wins/${communityHighlights[0].quickWinSlug}`}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold mt-3 hover:underline"
+                  style={{ color: '#38618C' }}
+                >
+                  {tUI('See the full conversation')}
+                  <ArrowRight size={12} />
+                </Link>
+              )}
             </div>
           )}
         </div>
