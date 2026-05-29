@@ -40,6 +40,15 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Self-Care': '#FCE7F3',
 };
 
+// Deeper category accent colors for gradient blocks
+const CATEGORY_ACCENTS: Record<string, string> = {
+  'Stress Relief': '#7C9CBF',
+  'Time Savers': '#D4A843',
+  'Classroom Tools': '#6BA368',
+  'Communication': '#9B7CB8',
+  'Self-Care': '#D4789C',
+};
+
 // Daily motivational messages - picks based on day of week
 const DAILY_MESSAGES = [
   'You showed up today. That matters.',
@@ -167,6 +176,7 @@ interface QuickWin {
   description?: string;
   duration_minutes: number;
   category: string;
+  thumbnail_url?: string;
 }
 
 interface PersonalStats {
@@ -295,7 +305,7 @@ export default function HubDashboard() {
         // Fetch ALL published quick wins for deterministic daily pick + role filtering
         const { data: allQuickWinData } = await supabase
           .from('hub_quick_wins')
-          .select('id, slug, title, description, duration_minutes, category')
+          .select('id, slug, title, description, duration_minutes, category, thumbnail_url')
           .eq('is_published', true);
 
         if (allQuickWinData && allQuickWinData.length > 0) {
@@ -306,6 +316,7 @@ export default function HubDashboard() {
             description: qw.description || undefined,
             duration_minutes: qw.duration_minutes || 5,
             category: qw.category || 'Classroom Tools',
+            thumbnail_url: qw.thumbnail_url || undefined,
           }));
 
           // Role-specific filtering (Feature 4)
@@ -497,6 +508,7 @@ export default function HubDashboard() {
                   title: matchingQW.title,
                   duration_minutes: matchingQW.duration_minutes || 5,
                   category: matchingQW.category || 'Classroom Tools',
+                  thumbnail_url: matchingQW.thumbnail_url || undefined,
                 },
               });
             } else {
@@ -510,6 +522,7 @@ export default function HubDashboard() {
                   title: randomQW.title,
                   duration_minutes: randomQW.duration_minutes || 5,
                   category: randomQW.category || 'Classroom Tools',
+                  thumbnail_url: randomQW.thumbnail_url || undefined,
                 } : null,
               });
             }
@@ -825,32 +838,45 @@ export default function HubDashboard() {
                       {(userGoal.quickWin || featuredQuickWin) && (() => {
                         const qw = userGoal.quickWin || featuredQuickWin!;
                         const categoryBg = CATEGORY_COLORS[qw.category] || '#F3F4F6';
+                        const accentColor = CATEGORY_ACCENTS[qw.category] || '#7C9CBF';
                         return (
                           <div
-                            className="rounded-xl p-4"
-                            style={{ background: '#FAFAF8', border: '1px solid #E9E7E2' }}
+                            className="rounded-xl overflow-hidden flex"
+                            style={{ border: '1px solid #E9E7E2' }}
                           >
-                            <div className="text-xs font-semibold mb-1" style={{ color: '#9CA3AF' }}>
-                              {tUI('Your next step')}
+                            {/* Thumbnail or gradient block */}
+                            <div className="w-24 flex-shrink-0 relative" style={{
+                              background: qw.thumbnail_url ? undefined : `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}cc 100%)`,
+                            }}>
+                              {qw.thumbnail_url ? (
+                                <img src={qw.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <BookOpen size={24} style={{ color: 'rgba(255,255,255,0.6)' }} />
+                                </div>
+                              )}
                             </div>
-                            <span
-                              className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-1.5"
-                              style={{ background: categoryBg, color: '#1e2749', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-                            >
-                              {qw.category}
-                            </span>
-                            <div className="flex items-center justify-between gap-3">
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>{qw.title}</div>
-                                <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{qw.duration_minutes} min</div>
+                            <div className="flex-1 p-4" style={{ background: '#FAFAF8' }}>
+                              <div className="text-xs font-semibold mb-1" style={{ color: '#9CA3AF' }}>
+                                {tUI('Your next step')}
                               </div>
-                              <Link
-                                href={`/hub/quick-wins/${qw.slug}`}
-                                className="flex-shrink-0 text-xs font-semibold rounded-lg px-5 py-2 whitespace-nowrap"
-                                style={{ background: '#FFBA06', color: '#1e2749' }}
+                              <span
+                                className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-1.5"
+                                style={{ background: categoryBg, color: '#1e2749', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
                               >
-                                {tUI('Try it')}
-                              </Link>
+                                {qw.category}
+                              </span>
+                              <div className="text-sm font-semibold mb-1" style={{ color: '#1B2A4A' }}>{qw.title}</div>
+                              <div className="flex items-center justify-between gap-3">
+                                <span className="text-xs" style={{ color: '#9CA3AF' }}>{qw.duration_minutes} min</span>
+                                <Link
+                                  href={`/hub/quick-wins/${qw.slug}`}
+                                  className="flex-shrink-0 text-xs font-semibold rounded-lg px-4 py-1.5 whitespace-nowrap"
+                                  style={{ background: '#FFBA06', color: '#1e2749' }}
+                                >
+                                  {tUI('Try it')}
+                                </Link>
+                              </div>
                             </div>
                           </div>
                         );
@@ -999,20 +1025,37 @@ export default function HubDashboard() {
                 {tUI('Curated for you')}
               </div>
               <div className="space-y-2.5">
-                {recommendations.slice(0, 2).map((course) => (
-                  <Link
-                    key={course.id}
-                    href={`/hub/courses/${course.slug}`}
-                    className="bg-white rounded-xl p-4 flex justify-between items-center gap-3 hover:shadow-md transition-shadow block"
-                    style={{ border: '1px solid rgba(27,42,74,0.06)', borderLeft: '3px solid rgba(56,97,140,0.3)' }}
-                  >
-                    <div>
-                      <div className="text-sm font-semibold mb-0.5" style={{ color: '#1B2A4A', fontSize: '15px' }}>{course.title}</div>
-                      <div className="text-xs" style={{ color: '#6B7280' }}>{course.reason || tUI('Popular with educators')}</div>
-                    </div>
-                    <ArrowRight size={16} style={{ color: '#38618C', flexShrink: 0 }} />
-                  </Link>
-                ))}
+                {recommendations.slice(0, 2).map((course) => {
+                  const catAccent = CATEGORY_ACCENTS[course.category] || '#38618C';
+                  return (
+                    <Link
+                      key={course.id}
+                      href={`/hub/courses/${course.slug}`}
+                      className="bg-white rounded-xl overflow-hidden flex hover:shadow-md transition-shadow block"
+                      style={{ border: '1px solid rgba(27,42,74,0.06)' }}
+                    >
+                      {/* Thumbnail or colored block */}
+                      <div className="w-20 flex-shrink-0" style={{
+                        background: course.thumbnail_url ? undefined : `linear-gradient(135deg, ${catAccent} 0%, ${catAccent}99 100%)`,
+                      }}>
+                        {course.thumbnail_url ? (
+                          <img src={course.thumbnail_url} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'top' }} />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center min-h-[72px]">
+                            <BookOpen size={20} style={{ color: 'rgba(255,255,255,0.5)' }} />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 p-4 flex justify-between items-center gap-3">
+                        <div>
+                          <div className="text-sm font-semibold mb-0.5" style={{ color: '#1B2A4A', fontSize: '15px' }}>{course.title}</div>
+                          <div className="text-xs" style={{ color: '#6B7280' }}>{course.reason || tUI('Popular with educators')}</div>
+                        </div>
+                        <ArrowRight size={16} style={{ color: '#38618C', flexShrink: 0 }} />
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -1238,23 +1281,34 @@ export default function HubDashboard() {
               <div className="space-y-2.5">
                 {quickWins.map((qw) => {
                   const categoryBg = CATEGORY_COLORS[qw.category] || '#F3F4F6';
+                  const accentColor = CATEGORY_ACCENTS[qw.category] || '#7C9CBF';
                   return (
                     <Link
                       key={qw.id}
                       href={`/hub/quick-wins/${qw.slug}`}
-                      className="block bg-white rounded-xl p-3.5 hover:shadow-sm transition-shadow"
+                      className="block bg-white rounded-xl overflow-hidden hover:shadow-sm transition-shadow"
                       style={{ border: '1px solid #E9E7E2' }}
                     >
-                      <span
-                        className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-1.5"
-                        style={{ background: categoryBg, color: '#1e2749', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-                      >
-                        {qw.category}
-                      </span>
-                      <div className="text-sm font-semibold leading-snug" style={{ color: '#1B2A4A' }}>
-                        {qw.title}
+                      {/* Thumbnail strip or gradient */}
+                      {qw.thumbnail_url ? (
+                        <div className="w-full h-20 overflow-hidden">
+                          <img src={qw.thumbnail_url} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'top' }} />
+                        </div>
+                      ) : (
+                        <div className="w-full h-2.5" style={{ background: `linear-gradient(90deg, ${accentColor}, ${accentColor}88)` }} />
+                      )}
+                      <div className="p-3.5">
+                        <span
+                          className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-1.5"
+                          style={{ background: categoryBg, color: '#1e2749', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                        >
+                          {qw.category}
+                        </span>
+                        <div className="text-sm font-semibold leading-snug" style={{ color: '#1B2A4A' }}>
+                          {qw.title}
+                        </div>
+                        <div className="text-xs mt-1" style={{ color: '#9CA3AF' }}>{qw.duration_minutes} min</div>
                       </div>
-                      <div className="text-xs mt-1" style={{ color: '#9CA3AF' }}>{qw.duration_minutes} min</div>
                     </Link>
                   );
                 })}
