@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
             <p style="font-size: 28px; font-weight: bold; color: #0F6E56; margin: 0; letter-spacing: 2px; font-family: monospace;">Free Month</p>
           </div>
 
-          <a href="https://tdi.thinkific.com/bundles/AllAccess" style="display: inline-block; background: #1D9E75; color: white; padding: 14px 32px; border-radius: 4px; text-decoration: none; font-family: sans-serif; font-weight: bold; font-size: 15px; margin-bottom: 32px;">
+          <a href="https://www.teachersdeserveit.com/hub" style="display: inline-block; background: #1D9E75; color: white; padding: 14px 32px; border-radius: 4px; text-decoration: none; font-family: sans-serif; font-weight: bold; font-size: 15px; margin-bottom: 32px;">
             Redeem Your Free Month
           </a>
 

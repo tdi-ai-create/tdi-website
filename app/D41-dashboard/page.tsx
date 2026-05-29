@@ -798,7 +798,7 @@ export default function D41Dashboard() {
               </div>
 
               <a
-                href="https://tdi.thinkific.com"
+                href="https://www.teachersdeserveit.com/hub"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-4 inline-flex items-center gap-2 bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#2589db] transition-all"
@@ -816,7 +816,7 @@ export default function D41Dashboard() {
                   <p className="text-sm opacity-90">Your team has unlimited access to 32+ courses</p>
                 </div>
                 <a
-                  href="https://tdi.thinkific.com"
+                  href="https://www.teachersdeserveit.com/hub"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-white text-[#38618C] px-6 py-3 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors flex items-center gap-2"
@@ -840,7 +840,7 @@ export default function D41Dashboard() {
                 {paraCourses.filter(c => c.recommended).map((course, index) => (
                   <a
                     key={index}
-                    href="https://tdi.thinkific.com"
+                    href="https://www.teachersdeserveit.com/hub"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block bg-gray-50 hover:bg-[#35A7FF]/10 rounded-lg p-4 transition-all group"
@@ -875,7 +875,7 @@ export default function D41Dashboard() {
                 {paraCourses.filter(c => !c.recommended).map((course, index) => (
                   <a
                     key={index}
-                    href="https://tdi.thinkific.com"
+                    href="https://www.teachersdeserveit.com/hub"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block bg-gray-50 hover:bg-[#35A7FF]/10 rounded-lg p-4 transition-all group"
@@ -897,7 +897,7 @@ export default function D41Dashboard() {
 
                 <div className="text-center pt-4">
                   <a
-                    href="https://tdi.thinkific.com"
+                    href="https://www.teachersdeserveit.com/hub"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-[#35A7FF] hover:underline text-sm font-medium"

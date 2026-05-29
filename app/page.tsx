@@ -357,7 +357,7 @@ export default function Home() {
               <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.6 }}>
                 Or{' '}
                 <a
-                  href="https://tdi.thinkific.com"
+                  href="https://www.teachersdeserveit.com/hub"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline"

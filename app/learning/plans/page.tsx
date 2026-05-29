@@ -89,7 +89,7 @@ const TIERS = [
   },
 ]
 
-const FREE_DOWNLOADS_URL = 'https://tdi.thinkific.com/collections/downloads'
+const FREE_DOWNLOADS_URL = 'https://www.teachersdeserveit.com/hub'
 
 export default function PlansPage() {
   const [name, setName] = useState('')
@@ -496,7 +496,7 @@ export default function PlansPage() {
             {[
               {
                 q: "I'm signing up before the new Hub launches. What do I get right now?",
-                a: "When you sign up today, you get immediate access to our current platform at tdi.thinkific.com using a free month code we send you on your thank-you page. Your new Hub login is delivered to your inbox the moment we launch in June 2026."
+                a: "When you sign up today, you get immediate access to our current platform at www.teachersdeserveit.com/hub using a free month code we send you on your thank-you page. Your new Hub login is delivered to your inbox the moment we launch in June 2026."
               },
               {
                 q: "How is this different from free PD I can find on YouTube?",

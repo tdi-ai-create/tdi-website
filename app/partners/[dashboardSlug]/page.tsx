@@ -1793,7 +1793,7 @@ export default function PartnerDashboard() {
                     </div>
                   </div>
 
-                  <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer"
+                  <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-xs text-[#4ecdc4] font-medium hover:underline mt-4">
                     <BookOpen className="w-3.5 h-3.5" /> Open Learning Hub →
                   </a>
@@ -1886,7 +1886,7 @@ export default function PartnerDashboard() {
                   </div>
                 </div>
 
-                <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer"
+                <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-xs text-[#4ecdc4] font-medium hover:underline mt-4">
                   <BookOpen className="w-3.5 h-3.5" /> Open Learning Hub →
                 </a>
@@ -2593,7 +2593,7 @@ export default function PartnerDashboard() {
               <div className="mt-6 pt-6 border-t border-white/10">
                 <div className="flex flex-wrap justify-center gap-4 text-sm">
                   <a
-                    href="https://tdi.thinkific.com"
+                    href="https://www.teachersdeserveit.com/hub"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-white/60 hover:text-white transition-colors flex items-center gap-1"

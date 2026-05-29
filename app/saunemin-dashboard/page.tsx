@@ -1422,19 +1422,19 @@ export default function SauneminDashboard() {
                 Based on November observations, here are Hub resources specifically relevant for Saunemin&apos;s para team:
               </p>
               <div className="grid sm:grid-cols-2 gap-3">
-                <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors">
+                <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors">
                   <div className="font-semibold text-sm">SpEd Para Toolkit</div>
                   <div className="text-xs text-white/70 mt-1">Push-in support, misconception catches, real-time reteaching (Cindy)</div>
                 </a>
-                <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors">
+                <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors">
                   <div className="font-semibold text-sm">Effective Small-Group Instruction</div>
                   <div className="text-xs text-white/70 mt-1">Questioning strategies and structure (Grace, Haylie)</div>
                 </a>
-                <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors">
+                <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors">
                   <div className="font-semibold text-sm">Pre-K Para Toolkit</div>
                   <div className="text-xs text-white/70 mt-1">Early childhood strategies and transitions (Chris, Lisa)</div>
                 </a>
-                <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors">
+                <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors">
                   <div className="font-semibold text-sm">PA Quick Wins Menu</div>
                   <div className="text-xs text-white/70 mt-1">High-impact moves across any classroom (Peyton, Karissa)</div>
                 </a>

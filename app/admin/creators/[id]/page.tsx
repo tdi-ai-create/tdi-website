@@ -2457,7 +2457,7 @@ export default function AdminCreatorDetailPage() {
                   type="url"
                   value={publishFormData.courseUrl}
                   onChange={(e) => setPublishFormData({ ...publishFormData, courseUrl: e.target.value })}
-                  placeholder="https://tdi.thinkific.com/courses/..."
+                  placeholder="https://www.teachersdeserveit.com/hub"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent"
                 />
               </div>

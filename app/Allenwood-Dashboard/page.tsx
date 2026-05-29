@@ -1847,19 +1847,19 @@ export default function AllenwoodDashboard() {
                   </h4>
 
                   <div className="grid md:grid-cols-3 gap-3">
-                    <a href="https://tdi.thinkific.com/collections/downloads" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
+                    <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
                       <FileText className="w-5 h-5 text-green-500 mb-2" />
                       <p className="text-gray-900 font-medium text-sm">The Sentence Starter Guide</p>
                       <p className="text-gray-500 text-xs mt-1">We saw teachers using calm, clear phrasing. This takes it further.</p>
                     </a>
 
-                    <a href="https://tdi.thinkific.com/collections/downloads" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
+                    <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
                       <FileText className="w-5 h-5 text-green-500 mb-2" />
                       <p className="text-gray-900 font-medium text-sm">No-Hands-Up Help Systems</p>
                       <p className="text-gray-500 text-xs mt-1">Perfect for classrooms managing multiple adults and student needs.</p>
                     </a>
 
-                    <a href="https://tdi.thinkific.com/collections/downloads" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
+                    <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
                       <FileText className="w-5 h-5 text-green-500 mb-2" />
                       <p className="text-gray-900 font-medium text-sm">Daily Support Cheat Sheet</p>
                       <p className="text-gray-500 text-xs mt-1">Great for para consistency across all rooms.</p>
@@ -1876,7 +1876,7 @@ export default function AllenwoodDashboard() {
                   </h4>
 
                   <div className="space-y-3">
-                    <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="text-gray-900 font-medium">K-2 Station Rotation Routines</p>
@@ -1886,7 +1886,7 @@ export default function AllenwoodDashboard() {
                       </div>
                     </a>
 
-                    <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="text-gray-900 font-medium">Your Class Runs Smoother When the Flow Makes Sense</p>
@@ -1896,7 +1896,7 @@ export default function AllenwoodDashboard() {
                       </div>
                     </a>
 
-                    <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="text-gray-900 font-medium">Classroom Management Toolkit</p>
@@ -1906,7 +1906,7 @@ export default function AllenwoodDashboard() {
                       </div>
                     </a>
 
-                    <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="text-gray-900 font-medium">Building Strong Teacher-Para Partnerships</p>
@@ -1919,7 +1919,7 @@ export default function AllenwoodDashboard() {
                 </div>
 
                 {/* Autism Bundle */}
-                <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="block bg-purple-50 border border-purple-200 rounded-xl p-5 mb-4 hover:border-purple-400 transition-colors">
+                <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer" className="block bg-purple-50 border border-purple-200 rounded-xl p-5 mb-4 hover:border-purple-400 transition-colors">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
                       <Sparkles className="w-6 h-6 text-purple-500" />
@@ -1937,7 +1937,7 @@ export default function AllenwoodDashboard() {
                 </a>
 
                 {/* Real Inclusion */}
-                <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="block bg-blue-50 border border-blue-200 rounded-xl p-5 hover:border-blue-400 transition-colors">
+                <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer" className="block bg-blue-50 border border-blue-200 rounded-xl p-5 hover:border-blue-400 transition-colors">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
                       <Users className="w-6 h-6 text-blue-500" />

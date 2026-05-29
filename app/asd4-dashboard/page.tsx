@@ -217,12 +217,12 @@ export default function ASD4Dashboard() {
           },
           {
             title: "Learning Hub Course Guide",
-            url: "https://tdi.thinkific.com/products/digital_downloads/CourseGuide",
+            url: "https://www.teachersdeserveit.com/hub",
             description: "All current content available in the Learning Hub"
           },
           {
             title: "Back from Break Toolbox: 3 High-Leverage Moves",
-            url: "https://tdi.thinkific.com/products/digital_downloads/new-digital-download-84",
+            url: "https://www.teachersdeserveit.com/hub",
             description: "Practical re-entry strategies for paras returning from break"
           }
         ]
@@ -1045,7 +1045,7 @@ I noticed you haven't had a chance to log into the TDI Learning Hub yet -  no wo
 This isn't like typical PD -  it's short, practical stuff you can actually use. No 3-hour sessions, no sitting and listening. Just strategies from real educators.
 
 Here's how to get in:
-1. Go to: tdi.thinkific.com
+1. Go to: www.teachersdeserveit.com/hub
 2. Log in with your @asd4.org email
 3. Try "Paraprofessional Foundations" -  it's a quick win
 
@@ -1067,7 +1067,7 @@ Quick check-in -  some of you haven't had a chance to log into the TDI Learning 
 I know "professional development" can feel like one more thing on your plate. But this one's different -  short, practical strategies you can actually use. No sitting through hours of slides.
 
 Here's how to get in:
-1. Go to: tdi.thinkific.com
+1. Go to: www.teachersdeserveit.com/hub
 2. Log in with your @asd4.org email
 3. Start with "Paraprofessional Foundations" -  it's a good first step
 
@@ -1451,8 +1451,8 @@ Thank you for setting the example. It matters more than you know.`;
           note: '76 paraprofessionals across three session blocks explored para-specific strategies and identified their go-to classroom moves.',
           resources: [
             { title: 'Para Game Tools', url: 'https://www.teachersdeserveit.com/paragametools' },
-            { title: 'Learning Hub Course Guide', url: 'https://tdi.thinkific.com/products/digital_downloads/CourseGuide' },
-            { title: 'Back from Break Toolbox: 3 High-Leverage Moves', url: 'https://tdi.thinkific.com/products/digital_downloads/new-digital-download-84' },
+            { title: 'Learning Hub Course Guide', url: 'https://www.teachersdeserveit.com/hub' },
+            { title: 'Back from Break Toolbox: 3 High-Leverage Moves', url: 'https://www.teachersdeserveit.com/hub' },
           ],
         },
       ],

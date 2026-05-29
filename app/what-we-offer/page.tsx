@@ -51,7 +51,7 @@ export default function WhatWeOfferPage() {
             <p className="text-xl mb-8" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
               On-demand courses, practical strategies, and a community of 100,000+ educators. All built by teachers who've been in your shoes.
             </p>
-            <Button href="https://tdi.thinkific.com" external>
+            <Button href="https://www.teachersdeserveit.com/hub" external>
               Explore the Learning Hub
             </Button>
           </div>
@@ -131,10 +131,10 @@ export default function WhatWeOfferPage() {
           <div className="text-center">
             <h2 className="mb-8">Ready to Explore?</h2>
             <div className="flex flex-wrap justify-center gap-4">
-              <Button href="https://tdi.thinkific.com/collections/downloads" external>
+              <Button href="https://www.teachersdeserveit.com/hub" external>
                 Start with Free Tools
               </Button>
-              <Button href="https://tdi.thinkific.com" external variant="secondary">
+              <Button href="https://www.teachersdeserveit.com/hub" external variant="secondary">
                 Browse All Courses
               </Button>
             </div>

@@ -149,7 +149,7 @@ function ThankYouContent() {
         </div>
 
         <a
-          href="https://tdi.thinkific.com/bundles/AllAccess"
+          href="https://www.teachersdeserveit.com/hub"
           target="_blank"
           rel="noopener noreferrer"
           style={{

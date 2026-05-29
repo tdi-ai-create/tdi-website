@@ -79,7 +79,7 @@ export function CoursesSection() {
 
           {/* Featured: Course Guide - Always Displayed */}
           <a
-            href="https://tdi.thinkific.com/products/digital_downloads/CourseGuide"
+            href="https://www.teachersdeserveit.com/hub"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-white rounded-xl overflow-hidden shadow-sm hover-card group relative"

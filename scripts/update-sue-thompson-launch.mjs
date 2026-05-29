@@ -58,7 +58,7 @@ async function main() {
   console.log('\n2. Updating course_url and discount_code...');
 
   const updates = {
-    course_url: 'https://tdi.thinkific.com/products/courses/Thompson1',
+    course_url: 'https://www.teachersdeserveit.com/hub',
     current_phase: 'launch'
   };
 
@@ -197,7 +197,7 @@ async function main() {
   // 6. Add creator note
   console.log('\n6. Adding creator note...');
 
-  const noteContent = `Course is LIVE! Published at https://tdi.thinkific.com/products/courses/Thompson1 — Discount code: Thompson. Blog option remains open as optional marketing support.`;
+  const noteContent = `Course is LIVE! Published at https://www.teachersdeserveit.com/hub — Discount code: Thompson. Blog option remains open as optional marketing support.`;
 
   const { error: noteError } = await supabase
     .from('creator_notes')

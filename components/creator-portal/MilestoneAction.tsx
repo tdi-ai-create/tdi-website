@@ -1225,7 +1225,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                       <div className="flex items-center justify-between mb-1">
                         <p className="font-medium text-[#1e2749] text-sm">Quick Tool (Download)</p>
                         <a
-                          href="https://tdi.thinkific.com/products/digital_downloads/new-digital-download-67"
+                          href="https://www.teachersdeserveit.com/hub"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-[10px] text-[#80a4ed] hover:text-[#1e2749] flex items-center gap-1"
@@ -1243,7 +1243,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                       <div className="flex items-center justify-between mb-1">
                         <p className="font-medium text-[#1e2749] text-sm">Learning Hub Course</p>
                         <a
-                          href="https://tdi.thinkific.com/products/courses/new-course-21"
+                          href="https://www.teachersdeserveit.com/hub"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-[10px] text-[#80a4ed] hover:text-[#1e2749] flex items-center gap-1"

@@ -45,7 +45,7 @@ See how a TDI blog post connects with educators through storytelling and practic
 
 See what a finished TDI digital download looks like - the design, format, and level of polish:
 
-[View Download Example](https://tdi.thinkific.com/products/digital_downloads/new-digital-download-67)
+[View Download Example](https://www.teachersdeserveit.com/hub)
 
 **What to notice:**
 - Professional design and branding
@@ -59,7 +59,7 @@ See what a finished TDI digital download looks like - the design, format, and le
 
 Explore a complete TDI course to see the full learning experience - modules, lessons, downloads, and production quality:
 
-[View Course Example](https://tdi.thinkific.com/products/courses/new-course-21)
+[View Course Example](https://www.teachersdeserveit.com/hub)
 
 **To access the full course for free:** Use code **"Free Month"** at checkout
 

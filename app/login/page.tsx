@@ -50,7 +50,7 @@ export default function LoginPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {/* Card 1: Learning Hub */}
             <a
-              href="https://tdi.thinkific.com/"
+              href="https://www.teachersdeserveit.com/hub"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 ease-in-out cursor-pointer border-t-4 border-[#4ecdc4] p-6 md:p-8 flex flex-col"

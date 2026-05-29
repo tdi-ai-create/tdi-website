@@ -79,7 +79,7 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
+                  <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Learning Hub
                   </a>
                 </li>

@@ -2137,7 +2137,7 @@ export default function StPeterChanelDashboard() {
 
                 {/* Time Management */}
                 <a
-                  href="https://tdi.thinkific.com"
+                  href="https://www.teachersdeserveit.com/hub"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-white rounded-xl p-5 border border-gray-200 hover:border-[#35A7FF] hover:shadow-md transition-all group"
@@ -2154,7 +2154,7 @@ export default function StPeterChanelDashboard() {
 
                 {/* Classroom Routines */}
                 <a
-                  href="https://tdi.thinkific.com"
+                  href="https://www.teachersdeserveit.com/hub"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-white rounded-xl p-5 border border-gray-200 hover:border-[#35A7FF] hover:shadow-md transition-all group"
@@ -2171,7 +2171,7 @@ export default function StPeterChanelDashboard() {
 
                 {/* Engagement Strategies */}
                 <a
-                  href="https://tdi.thinkific.com"
+                  href="https://www.teachersdeserveit.com/hub"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-white rounded-xl p-5 border border-gray-200 hover:border-[#35A7FF] hover:shadow-md transition-all group"
@@ -2237,7 +2237,7 @@ export default function StPeterChanelDashboard() {
 
               <div className="text-center mt-6">
                 <a
-                  href="https://tdi.thinkific.com"
+                  href="https://www.teachersdeserveit.com/hub"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-[#38618C] hover:text-[#35A7FF] font-medium transition-colors"

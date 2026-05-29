@@ -152,7 +152,7 @@ function PartnerLoginContent() {
                       { href: '/join', label: 'Join the Movement' },
                       { href: '/for-schools', label: 'For Schools' },
                       { href: '/how-we-partner', label: 'How We Partner' },
-                      { href: 'https://tdi.thinkific.com', label: 'Learning Hub', external: true },
+                      { href: 'https://www.teachersdeserveit.com/hub', label: 'Learning Hub', external: true },
                       { href: '/about', label: 'About' },
                       { href: '/contact', label: 'Contact' },
                       { href: 'https://raehughart.substack.com', label: 'Blog', external: true },

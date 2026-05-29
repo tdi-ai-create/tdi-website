@@ -352,7 +352,7 @@ function ResultsScreen({
           {language === 'es' ? 'Más Juegos de Práctica' : 'More Practice Games'}
         </a>
         <a
-          href="https://tdi.thinkific.com"
+          href="https://www.teachersdeserveit.com/hub"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 rounded-xl py-3 px-6 font-medium transition-all hover:brightness-110"

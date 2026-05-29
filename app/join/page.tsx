@@ -204,7 +204,7 @@ export default function JoinPage() {
             </a>
 
             <a
-              href="https://tdi.thinkific.com/collections/downloads"
+              href="https://www.teachersdeserveit.com/hub"
               target="_blank"
               rel="noopener noreferrer"
               style={{ display: 'block', padding: 28, background: '#ffffff', borderRadius: 12, borderTop: '3px solid #ffba06', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }}
@@ -267,7 +267,7 @@ export default function JoinPage() {
             </a>
 
             <a
-              href="https://tdi.thinkific.com"
+              href="https://www.teachersdeserveit.com/hub"
               target="_blank"
               rel="noopener noreferrer"
               style={{ display: 'block', padding: 32, background: '#ffffff', borderRadius: 12, border: '1px solid #E5E7EB', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s' }}

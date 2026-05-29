@@ -62,7 +62,7 @@ function ThankYouContent() {
             <ol className="space-y-3 text-gray-700">
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-100 text-teal-700 text-sm font-bold flex items-center justify-center">1</span>
-                <span>Head to <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener" className="text-teal-600 font-semibold underline">tdi.thinkific.com</a></span>
+                <span>Head to <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener" className="text-teal-600 font-semibold underline">www.teachersdeserveit.com/hub</a></span>
               </li>
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-100 text-teal-700 text-sm font-bold flex items-center justify-center">2</span>
@@ -77,7 +77,7 @@ function ThankYouContent() {
 
           <div className="text-center">
             <a
-              href="https://tdi.thinkific.com/"
+              href="https://www.teachersdeserveit.com/hub"
               target="_blank"
               rel="noopener"
               className="inline-block px-8 py-4 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 transition"
