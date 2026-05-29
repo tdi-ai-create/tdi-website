@@ -39,6 +39,7 @@ import {
   Share2,
   ExternalLink,
   ChevronRight,
+  ArrowRight,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -955,129 +956,91 @@ export default function ProfileSettingsPage() {
          ════════════════════════════════════════════════════════════════════ */}
       {activeTab === 'goals' && (
         <div className="space-y-6">
-          <div className="hub-card">
-            <h2
-              className="font-semibold mb-2"
-              style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                fontSize: '18px',
-                color: '#1e2749',
-              }}
-            >
-              {tUI('Your Goals')}
-              {savedField === 'goals' && (
-                <span className="ml-2 text-sm text-green-600 font-normal">
-                  <Check size={16} className="inline" /> {tUI('Saved')}
-                </span>
-              )}
-            </h2>
-            <p
-              className="text-sm text-gray-500 mb-5"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
-              {tUI(
-                'Select the areas where you want to grow. These shape your recommendations.'
-              )}
-            </p>
-
-            <div className="grid grid-cols-3 md:grid-cols-4 gap-2 mb-4">
-              {GRID_GOALS.map((goal) => {
-                const isSelected = selectedGoals.includes(goal.value);
-                return (
-                  <button
-                    key={goal.value}
-                    onClick={() => toggleGoal(goal.value)}
-                    className="p-2 rounded-lg transition-all focus:outline-none flex flex-col items-center justify-center text-center"
-                    style={{
-                      backgroundColor: isSelected ? '#FFF8E7' : '#FFFFFF',
-                      border: isSelected
-                        ? '2px solid #E8B84B'
-                        : '1.5px solid #E5E7EB',
-                      minHeight: '80px',
-                    }}
-                  >
-                    <div
-                      className="mb-1"
-                      style={{ color: isSelected ? '#E8B84B' : '#2B3A67' }}
-                    >
-                      {GoalIconMap[goal.value]}
-                    </div>
-                    <p
-                      className="font-medium text-[10px] leading-tight"
+          <div
+            className="rounded-2xl overflow-hidden"
+            style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
+          >
+            <div className="px-6 pt-6 pb-4" style={{ borderBottom: '1px solid #F3F4F6' }}>
+              <h2 className="text-sm font-semibold mb-1" style={{ color: '#1B2A4A' }}>
+                {tUI('What do you want from this experience?')}
+                {savedField === 'goals' && (
+                  <span className="ml-2 text-xs text-green-600 font-normal">
+                    <Check size={14} className="inline" /> {tUI('Saved')}
+                  </span>
+                )}
+              </h2>
+              <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                {tUI('Pick the areas that matter most to you. These shape everything we recommend.')}
+              </p>
+            </div>
+            <div className="bg-white px-6 py-5">
+              <div className="grid grid-cols-3 md:grid-cols-4 gap-2.5 mb-5">
+                {GRID_GOALS.map((goal) => {
+                  const isSelected = selectedGoals.includes(goal.value);
+                  return (
+                    <button
+                      key={goal.value}
+                      onClick={() => toggleGoal(goal.value)}
+                      className="p-3 rounded-xl transition-all focus:outline-none flex flex-col items-center justify-center text-center"
                       style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        color: '#2B3A67',
+                        backgroundColor: isSelected ? '#FFF8E7' : '#FAFAF8',
+                        border: isSelected ? '2px solid #E8B84B' : '1.5px solid #E9E7E2',
+                        minHeight: '80px',
                       }}
                     >
-                      {tUI(goal.label)}
-                    </p>
-                  </button>
-                );
-              })}
+                      <div className="mb-1.5" style={{ color: isSelected ? '#D97706' : '#1B2A4A' }}>
+                        {GoalIconMap[goal.value]}
+                      </div>
+                      <p className="font-medium text-[10px] leading-tight" style={{ color: '#1B2A4A' }}>
+                        {tUI(goal.label)}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+              {hasGoalsChanged && (
+                <button
+                  onClick={handleSaveGoals}
+                  disabled={isSaving}
+                  className="text-xs font-semibold px-5 py-2.5 rounded-lg disabled:opacity-50"
+                  style={{ backgroundColor: '#FFBA06', color: '#1B2A4A' }}
+                >
+                  {isSaving ? tUI('Saving...') : tUI('Update goals')}
+                </button>
+              )}
             </div>
-
-            {hasGoalsChanged && (
-              <button
-                onClick={handleSaveGoals}
-                disabled={isSaving}
-                className="text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
-                style={{
-                  backgroundColor: '#E8B84B',
-                  color: '#2B3A67',
-                  fontFamily: "'DM Sans', sans-serif",
-                }}
-              >
-                {isSaving ? tUI('Saving...') : tUI('Update goals')}
-              </button>
-            )}
           </div>
 
-          {/* Recommendations based on goals */}
           {goalRecommendations.length > 0 && (
-            <div className="hub-card">
-              <h2
-                className="font-semibold mb-4"
-                style={{
-                  fontFamily: "'Source Serif 4', Georgia, serif",
-                  fontSize: '18px',
-                  color: '#1e2749',
-                }}
-              >
-                {tUI('Based on your goals, we recommend:')}
-              </h2>
-              <div className="space-y-3">
+            <div
+              className="bg-white rounded-2xl"
+              style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
+            >
+              <div className="px-6 py-4" style={{ borderBottom: '1px solid #F3F4F6' }}>
+                <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
+                  {tUI('Based on your goals, we recommend')}
+                </h3>
+              </div>
+              <div>
                 {goalRecommendations.map((rec, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-3 p-3 rounded-lg"
-                    style={{ backgroundColor: '#FFFDF5', border: '1px solid #f0e6c8' }}
+                    className="px-6 py-4 flex items-center gap-4"
+                    style={i < goalRecommendations.length - 1 ? { borderBottom: '1px solid #F3F4F6' } : {}}
                   >
                     <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                      className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                       style={{ backgroundColor: '#FFF8E7' }}
                     >
-                      <Lightbulb size={16} style={{ color: '#d4960a' }} />
+                      <Lightbulb size={18} style={{ color: '#D97706' }} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p
-                        className="font-medium text-sm"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          color: '#1e2749',
-                        }}
-                      >
-                        {rec.title}
-                      </p>
-                      <p
-                        className="text-xs text-gray-400"
-                        style={{ fontFamily: "'DM Sans', sans-serif" }}
-                      >
-                        {tUI(
-                          GRID_GOALS.find((g) => g.value === rec.goal)?.label || ''
-                        )}
+                      <p className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>{rec.title}</p>
+                      <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                        {tUI(GRID_GOALS.find((g) => g.value === rec.goal)?.label || '')}
                       </p>
                     </div>
-                    <ChevronRight size={16} className="text-gray-300" />
+                    <ArrowRight size={16} style={{ color: '#38618C' }} />
                   </div>
                 ))}
               </div>
@@ -1091,91 +1054,59 @@ export default function ProfileSettingsPage() {
          ════════════════════════════════════════════════════════════════════ */}
       {activeTab === 'stats' && (
         <div className="space-y-6">
-          {/* Stats Grid */}
+          {/* Stats Grid -- navy accent cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              {
-                label: 'Tools explored',
-                value: statsData?.toolsExplored ?? 0,
-              },
-              {
-                label: 'Hours reclaimed',
-                value: `~${statsData?.hoursSaved ?? '0'}`,
-              },
-              {
-                label: 'Community contributions',
-                value: statsData?.communityContributions ?? 0,
-              },
-              { label: 'Days active', value: statsData?.daysActive ?? 0 },
+              { label: 'Tools explored', value: statsData?.toolsExplored ?? 0, accent: '#FFBA06' },
+              { label: 'Hours reclaimed', value: `~${statsData?.hoursSaved ?? '0'}`, accent: '#4A9A8B' },
+              { label: 'Contributions', value: statsData?.communityContributions ?? 0, accent: '#7C9CBF' },
+              { label: 'Days active', value: statsData?.daysActive ?? 0, accent: '#9B7CB8' },
             ].map((stat) => (
               <div
                 key={stat.label}
-                className="hub-card text-center py-6"
+                className="rounded-2xl text-center py-6 px-4"
+                style={{
+                  background: 'white',
+                  border: '1px solid rgba(27,42,74,0.06)',
+                  boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)',
+                  borderTop: `3px solid ${stat.accent}`,
+                }}
               >
-                <p
-                  className="font-bold text-3xl mb-1"
-                  style={{
-                    fontFamily: "'Source Serif 4', Georgia, serif",
-                    color: '#1e2749',
-                  }}
-                >
+                <p className="font-bold text-3xl mb-1" style={{ fontFamily: "'Source Serif 4', serif", color: '#1B2A4A' }}>
                   {stat.value}
                 </p>
-                <p
-                  className="text-xs text-gray-500"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  {tUI(stat.label)}
-                </p>
+                <p className="text-xs" style={{ color: '#9CA3AF' }}>{tUI(stat.label)}</p>
               </div>
             ))}
           </div>
 
           {/* Recent Activity */}
-          <div className="hub-card">
-            <h2
-              className="font-semibold mb-4"
-              style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                fontSize: '18px',
-                color: '#1e2749',
-              }}
-            >
-              {tUI('Your recent activity')}
-            </h2>
-
+          <div
+            className="bg-white rounded-2xl"
+            style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
+          >
+            <div className="px-6 py-4" style={{ borderBottom: '1px solid #F3F4F6' }}>
+              <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
+                {tUI('Recent Activity')}
+              </h3>
+            </div>
             {statsData && statsData.recentActivity.length > 0 ? (
-              <div className="space-y-3">
-                {statsData.recentActivity.map((entry) => (
+              <div>
+                {statsData.recentActivity.map((entry, idx) => (
                   <div
                     key={entry.id}
-                    className="flex items-center justify-between py-2 border-b border-gray-50 last:border-b-0"
+                    className="px-6 py-3.5 flex items-center justify-between"
+                    style={idx < statsData.recentActivity.length - 1 ? { borderBottom: '1px solid #F3F4F6' } : {}}
                   >
-                    <p
-                      className="text-sm"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        color: '#1e2749',
-                      }}
-                    >
-                      {humanizeAction(entry.action)}
-                    </p>
-                    <p
-                      className="text-xs text-gray-400 flex-shrink-0 ml-4"
-                      style={{ fontFamily: "'DM Sans', sans-serif" }}
-                    >
-                      {formatRelativeDate(entry.created_at)}
-                    </p>
+                    <p className="text-sm" style={{ color: '#1B2A4A' }}>{humanizeAction(entry.action)}</p>
+                    <p className="text-xs flex-shrink-0 ml-4" style={{ color: '#9CA3AF' }}>{formatRelativeDate(entry.created_at)}</p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p
-                className="text-sm text-gray-400"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
-              >
-                {tUI('No activity yet. Start exploring to see your stats grow.')}
-              </p>
+              <div className="px-6 py-10 text-center">
+                <p className="text-sm" style={{ color: '#9CA3AF' }}>{tUI('No activity yet. Start exploring to see your stats grow.')}</p>
+              </div>
             )}
           </div>
         </div>
@@ -1291,104 +1222,67 @@ export default function ProfileSettingsPage() {
          ════════════════════════════════════════════════════════════════════ */}
       {activeTab === 'library' && (
         <div className="space-y-6">
-          <div className="hub-card">
-            <h2
-              className="font-semibold mb-4"
-              style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                fontSize: '18px',
-                color: '#1e2749',
-              }}
-            >
-              {tUI('Your Library')}
-            </h2>
+          <div
+            className="bg-white rounded-2xl overflow-hidden"
+            style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
+          >
+            <div className="px-6 py-4" style={{ borderBottom: '1px solid #F3F4F6' }}>
+              <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
+                {tUI('Your Library')}
+              </h3>
+              <p className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>
+                {tUI('Everything you have saved lives here.')}
+              </p>
+            </div>
 
             {favorites.length > 0 ? (
-              <div className="space-y-3">
-                {favorites.map((fav) => (
-                  <div
-                    key={fav.id}
-                    className="flex items-center gap-4 p-3 rounded-lg border border-gray-100 hover:border-[#E8B84B] transition-colors"
-                  >
+              <div>
+                {favorites.map((fav, idx) => {
+                  const isCourse = fav.content_type === 'course';
+                  return (
                     <div
-                      className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-                      style={{
-                        backgroundColor:
-                          fav.content_type === 'course' ? '#EEF2FF' : '#FFF8E7',
-                      }}
+                      key={fav.id}
+                      className="px-6 py-4 flex items-center gap-4"
+                      style={idx < favorites.length - 1 ? { borderBottom: '1px solid #F3F4F6' } : {}}
                     >
-                      {fav.content_type === 'course' ? (
-                        <BookOpen size={18} style={{ color: '#4F46E5' }} />
-                      ) : (
-                        <Lightbulb size={18} style={{ color: '#d4960a' }} />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className="font-medium text-sm truncate"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          color: '#1e2749',
-                        }}
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: isCourse ? '#EEF2FF' : '#FFF8E7' }}
                       >
-                        {fav.title || tUI('Untitled')}
-                      </p>
-                      <p
-                        className="text-xs text-gray-400"
-                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                        {isCourse ? (
+                          <BookOpen size={18} style={{ color: '#4F46E5' }} />
+                        ) : (
+                          <Lightbulb size={18} style={{ color: '#D97706' }} />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold truncate" style={{ color: '#1B2A4A' }}>
+                          {fav.title || tUI('Untitled')}
+                        </p>
+                        <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                          {isCourse ? tUI('Course') : tUI('Quick Win')}
+                          {fav.category ? ` · ${fav.category}` : ''}
+                        </p>
+                      </div>
+                      <Link
+                        href={isCourse ? `/hub/courses` : `/hub/quick-wins`}
+                        className="text-xs font-semibold px-3 py-1.5 rounded-lg hover:opacity-80"
+                        style={{ backgroundColor: '#1B2A4A', color: 'white' }}
                       >
-                        {fav.category || fav.content_type === 'course'
-                          ? tUI('Course')
-                          : tUI('Quick Win')}
-                      </p>
+                        {tUI('Open')}
+                      </Link>
                     </div>
-                    <Link
-                      href={
-                        fav.content_type === 'course'
-                          ? `/hub/courses`
-                          : `/hub/quick-wins`
-                      }
-                      className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors hover:bg-[#FFF8E7]"
-                      style={{
-                        color: '#2B3A67',
-                        border: '1px solid #E5E7EB',
-                        fontFamily: "'DM Sans', sans-serif",
-                      }}
-                    >
-                      {tUI('View')}
-                    </Link>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
-              <div
-                className="py-8 text-center rounded-lg"
-                style={{
-                  backgroundColor: '#FFFDF5',
-                  border: '1px dashed #e5d9b6',
-                }}
-              >
-                <Bookmark
-                  size={28}
-                  className="mx-auto mb-3"
-                  style={{ color: '#d4960a' }}
-                />
-                <p
-                  className="text-[15px] font-medium mb-1"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    color: '#1e2749',
-                  }}
-                >
+              <div className="px-6 py-10 text-center">
+                <Heart size={28} className="mx-auto mb-3" style={{ color: '#D97706' }} />
+                <p className="text-sm font-medium mb-1" style={{ color: '#1B2A4A' }}>
                   {tUI('Your library is empty')}
                 </p>
-                <p
-                  className="text-[13px] text-gray-400"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  {tUI(
-                    'Save tools you love by clicking the heart icon on any Quick Win or Course.'
-                  )}
+                <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                  {tUI('Heart any course or quick win to save it here.')}
                 </p>
               </div>
             )}
@@ -1400,194 +1294,123 @@ export default function ProfileSettingsPage() {
           TAB: Recognitions
          ════════════════════════════════════════════════════════════════════ */}
       {activeTab === 'recognitions' && (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Earned */}
-          <section>
-            <h2
-              className="text-lg font-semibold mb-4"
-              style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                color: '#1e2749',
-              }}
-            >
-              {tUI('Earned')}
-            </h2>
+          <div
+            className="bg-white rounded-2xl overflow-hidden"
+            style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
+          >
+            <div className="px-6 py-4" style={{ borderBottom: '1px solid #F3F4F6' }}>
+              <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
+                {tUI('Field Notes Earned')}
+              </h3>
+              <p className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>
+                {tUI('Proof that you showed up and did the work.')}
+              </p>
+            </div>
 
             {recognitionData && recognitionData.earned.length > 0 ? (
-              <div className="space-y-4">
-                {recognitionData.earned.map((item) => {
+              <div>
+                {recognitionData.earned.map((item, idx) => {
                   const IconComponent = getIcon(item.recognition.icon);
                   return (
                     <div
                       key={item.recognition.id}
-                      className="hub-card relative overflow-hidden"
-                      style={{ borderLeft: '4px solid #ffba06' }}
+                      className="px-6 py-5 flex items-start gap-4"
+                      style={{
+                        borderBottom: idx < recognitionData.earned.length - 1 ? '1px solid #F3F4F6' : undefined,
+                        borderLeft: '4px solid #FFBA06',
+                        background: 'linear-gradient(90deg, #FFFDF5 0%, white 40%)',
+                      }}
                     >
                       <div
-                        className="absolute top-0 right-0 w-24 h-24 opacity-[0.04] rounded-bl-full"
-                        style={{ backgroundColor: '#ffba06' }}
-                      />
-                      <div className="flex items-start gap-4">
-                        <div
-                          className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: '#FFF8E7' }}
-                        >
-                          <IconComponent
-                            size={22}
-                            style={{ color: '#d4960a' }}
-                          />
+                        className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: '#FFF8E7' }}
+                      >
+                        <IconComponent size={22} style={{ color: '#D97706' }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
+                            {tUI(item.recognition.title)}
+                          </h4>
+                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#FFBA06' }} />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3
-                              className="font-semibold"
-                              style={{
-                                fontFamily: "'DM Sans', sans-serif",
-                                fontSize: '16px',
-                                color: '#1e2749',
-                              }}
-                            >
-                              {tUI(item.recognition.title)}
-                            </h3>
-                            <span
-                              className="inline-block w-2 h-2 rounded-full"
-                              style={{ backgroundColor: '#ffba06' }}
-                            />
-                          </div>
-                          <p
-                            className="text-[14px] text-gray-600 mb-2"
-                            style={{ fontFamily: "'DM Sans', sans-serif" }}
-                          >
-                            {tUI(item.recognition.description)}
-                          </p>
-                          <p
-                            className="text-[14px] leading-relaxed"
-                            style={{
-                              fontFamily: "'DM Sans', sans-serif",
-                              fontStyle: 'italic',
-                              color: '#4a5568',
-                            }}
-                          >
-                            {tUI(item.recognition.personalNote)}
-                          </p>
-                        </div>
+                        <p className="text-xs mb-2" style={{ color: '#6B7280' }}>
+                          {tUI(item.recognition.description)}
+                        </p>
+                        <p className="text-xs leading-relaxed" style={{ color: '#4a5568', fontStyle: 'italic' }}>
+                          {tUI(item.recognition.personalNote)}
+                        </p>
                       </div>
                     </div>
                   );
                 })}
               </div>
             ) : (
-              <div
-                className="hub-card py-10 text-center"
-                style={{
-                  backgroundColor: '#FFFDF5',
-                  border: '1px dashed #e5d9b6',
-                }}
-              >
-                <Sparkles
-                  size={28}
-                  className="mx-auto mb-3"
-                  style={{ color: '#d4960a' }}
-                />
-                <p
-                  className="text-[15px] font-medium mb-1"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    color: '#1e2749',
-                  }}
-                >
+              <div className="px-6 py-10 text-center">
+                <Award size={28} className="mx-auto mb-3" style={{ color: '#D97706' }} />
+                <p className="text-sm font-medium mb-1" style={{ color: '#1B2A4A' }}>
                   {tUI('Your first Field Note is closer than you think')}
                 </p>
-                <p
-                  className="text-[13px] text-gray-400"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  {tUI(
-                    'Keep exploring tools and using Moment Mode to earn recognitions.'
-                  )}
+                <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                  {tUI('Keep exploring tools and using Moment Mode to earn recognitions.')}
                 </p>
               </div>
             )}
-          </section>
+          </div>
 
           {/* In Progress */}
           {recognitionData && recognitionData.progress.length > 0 && (
-            <section>
-              <h2
-                className="text-lg font-semibold mb-4"
-                style={{
-                  fontFamily: "'Source Serif 4', Georgia, serif",
-                  color: '#1e2749',
-                }}
-              >
-                {tUI('In Progress')}
-              </h2>
-              <div className="space-y-3">
-                {recognitionData.progress.map((item) => {
+            <div
+              className="bg-white rounded-2xl overflow-hidden"
+              style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
+            >
+              <div className="px-6 py-4" style={{ borderBottom: '1px solid #F3F4F6' }}>
+                <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
+                  {tUI('In Progress')}
+                </h3>
+              </div>
+              <div>
+                {recognitionData.progress.map((item, idx) => {
                   const IconComponent = getIcon(item.recognition.icon);
-                  const percentage = Math.round(
-                    (item.current / item.recognition.threshold) * 100
-                  );
+                  const percentage = Math.round((item.current / item.recognition.threshold) * 100);
                   return (
                     <div
                       key={item.recognition.id}
-                      className="hub-card"
-                      style={{ borderLeft: '4px solid #e5e7eb' }}
+                      className="px-6 py-4 flex items-start gap-4"
+                      style={idx < recognitionData.progress.length - 1 ? { borderBottom: '1px solid #F3F4F6' } : {}}
                     >
-                      <div className="flex items-start gap-4">
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: '#f9fafb' }}
-                        >
-                          <IconComponent
-                            size={18}
-                            style={{ color: '#9ca3af' }}
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3
-                            className="font-medium text-[15px] mb-1"
-                            style={{
-                              fontFamily: "'DM Sans', sans-serif",
-                              color: '#1e2749',
-                            }}
-                          >
-                            {tUI(item.recognition.title)}
-                          </h3>
-                          <p
-                            className="text-[13px] text-gray-500 mb-3"
-                            style={{ fontFamily: "'DM Sans', sans-serif" }}
-                          >
-                            {tUI(item.recognition.description)}
-                          </p>
-                          {/* Progress bar */}
-                          <div className="flex items-center gap-3">
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: '#F3F4F6' }}
+                      >
+                        <IconComponent size={18} style={{ color: '#9CA3AF' }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-medium mb-1" style={{ color: '#1B2A4A' }}>
+                          {tUI(item.recognition.title)}
+                        </h4>
+                        <p className="text-xs mb-3" style={{ color: '#9CA3AF' }}>
+                          {tUI(item.recognition.description)}
+                        </p>
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#F3F4F6' }}>
                             <div
-                              className="flex-1 h-2 rounded-full overflow-hidden"
-                              style={{ backgroundColor: '#f3f4f6' }}
-                            >
-                              <div
-                                className="h-full rounded-full transition-all"
-                                style={{
-                                  width: `${percentage}%`,
-                                  backgroundColor: '#ffba06',
-                                }}
-                              />
-                            </div>
-                            <span
-                              className="text-[12px] text-gray-400 flex-shrink-0"
-                              style={{ fontFamily: "'DM Sans', sans-serif" }}
-                            >
-                              {item.current}/{item.recognition.threshold}
-                            </span>
+                              className="h-full rounded-full"
+                              style={{ width: `${percentage}%`, backgroundColor: '#FFBA06' }}
+                            />
                           </div>
+                          <span className="text-xs font-semibold" style={{ color: '#1B2A4A' }}>
+                            {item.current}/{item.recognition.threshold}
+                          </span>
                         </div>
                       </div>
                     </div>
                   );
                 })}
               </div>
-            </section>
+            </div>
           )}
         </div>
       )}
