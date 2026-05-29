@@ -560,74 +560,150 @@ export default function ProfileSettingsPage() {
 
   // ── Render ────────────────────────────────────────────────────────────
 
+  // Computed profile stats for hero
+  const memberSince = profile?.created_at
+    ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    : null;
+  const roleLabels: Record<string, string> = {
+    classroom_teacher: 'Classroom Teacher',
+    para: 'Paraprofessional',
+    coach: 'Instructional Coach',
+    school_leader: 'School Leader',
+    district_staff: 'District Staff',
+    other: 'Educator',
+  };
+  const heroRoleLabel = profile?.role ? roleLabels[profile.role] || 'Educator' : 'Educator';
+  const heroName = profile?.display_name || user?.email?.split('@')[0] || 'Teacher';
+
   return (
-    <div className="p-4 md:p-8 max-w-3xl mx-auto">
-      {/* Header */}
-      <div className="mb-6">
-        <h1
-          className="font-bold mb-1"
-          style={{
-            fontFamily: "'Source Serif 4', Georgia, serif",
-            fontSize: '28px',
-            color: '#1e2749',
-          }}
-        >
-          {tUI('My Growth')}
-        </h1>
-        <p
-          className="text-gray-500 text-[15px]"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
-        >
-          {tUI('Your journey, your way. Everything here is yours.')}
-        </p>
+    <div>
+      {/* ════ Profile Hero Banner ════ */}
+      <div
+        className="relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)' }}
+      >
+        {/* Decorative elements */}
+        <div className="absolute rounded-full pointer-events-none"
+          style={{ right: '-40px', top: '-60px', width: '220px', height: '220px', background: 'rgba(255,186,6,0.07)' }} />
+        <div className="absolute rounded-full pointer-events-none"
+          style={{ right: '80px', bottom: '-80px', width: '160px', height: '160px', background: 'rgba(56,97,140,0.4)' }} />
+
+        <div className="relative z-10 max-w-3xl mx-auto px-4 md:px-8 py-10">
+          <div className="flex items-center gap-5">
+            {/* Large avatar */}
+            <div className="flex-shrink-0">
+              <div
+                className="rounded-full p-1"
+                style={{ border: '2px solid rgba(255,186,6,0.4)' }}
+              >
+                <AvatarDisplay
+                  size={96}
+                  avatarId={profile?.avatar_id}
+                  avatarUrl={profile?.avatar_url}
+                  displayName={profile?.display_name}
+                />
+              </div>
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <h1
+                className="text-2xl font-bold text-white mb-1"
+                style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
+              >
+                {heroName}
+              </h1>
+              {/* Role badge + member since */}
+              <div className="flex items-center gap-3 flex-wrap">
+                <span
+                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold"
+                  style={{
+                    background: 'rgba(255,186,6,0.15)',
+                    border: '1px solid rgba(255,186,6,0.3)',
+                    color: '#FFBA06',
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  {heroRoleLabel}
+                </span>
+                {memberSince && (
+                  <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                    {tUI('Member since')} {memberSince}
+                  </span>
+                )}
+              </div>
+              {/* Quick stats row */}
+              {statsData && (
+                <div className="flex items-center gap-5 mt-3">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-white">{statsData.toolsExplored}</div>
+                    <div className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>{tUI('tools')}</div>
+                  </div>
+                  <div style={{ width: '1px', height: '24px', background: 'rgba(255,255,255,0.15)' }} />
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-white">{statsData.daysActive}</div>
+                    <div className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>{tUI('days active')}</div>
+                  </div>
+                  <div style={{ width: '1px', height: '24px', background: 'rgba(255,255,255,0.15)' }} />
+                  <div className="text-center">
+                    <div className="text-lg font-bold" style={{ color: '#FFBA06' }}>
+                      {recognitionData ? recognitionData.earned.length : 0}
+                    </div>
+                    <div className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>{tUI('field notes')}</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Settings-level tabs: still show Profile + Notifications */}
-      <div className="flex gap-2 mb-6 border-b border-gray-200 pb-1">
-        <Link
-          href="/hub/settings/profile"
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors"
-          style={{
-            borderColor: '#E8B84B',
-            color: '#2B3A67',
-            fontFamily: "'DM Sans', sans-serif",
-          }}
-        >
-          <User size={18} />
-          {tUI('Profile')}
-        </Link>
-        <Link
-          href="/hub/settings/notifications"
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition-colors"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
-        >
-          <Bell size={18} />
-          {tUI('Notifications')}
-        </Link>
-      </div>
+      <div className="max-w-3xl mx-auto px-4 md:px-8 py-6">
+        {/* Settings-level tabs */}
+        <div className="flex gap-2 mb-6 border-b border-gray-200 pb-1">
+          <Link
+            href="/hub/settings/profile"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors"
+            style={{
+              borderColor: '#E8B84B',
+              color: '#2B3A67',
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            <User size={18} />
+            {tUI('Profile')}
+          </Link>
+          <Link
+            href="/hub/settings/notifications"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition-colors"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            <Bell size={18} />
+            {tUI('Notifications')}
+          </Link>
+        </div>
 
-      {/* Growth Tab Pills */}
-      <div className="flex flex-wrap gap-2 mb-8">
-        {TAB_CONFIG.map((tab) => {
-          const isActive = activeTab === tab.id;
-          const Icon = tab.icon;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all"
-              style={{
-                backgroundColor: isActive ? '#1e2749' : '#f3f4f6',
-                color: isActive ? '#ffffff' : '#6B7280',
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
-              <Icon size={16} />
-              {tUI(tab.label)}
-            </button>
-          );
-        })}
-      </div>
+        {/* Growth Tab Pills */}
+        <div className="flex flex-wrap gap-2 mb-8">
+          {TAB_CONFIG.map((tab) => {
+            const isActive = activeTab === tab.id;
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all"
+                style={{
+                  backgroundColor: isActive ? '#1e2749' : '#f3f4f6',
+                  color: isActive ? '#ffffff' : '#6B7280',
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                <Icon size={16} />
+                {tUI(tab.label)}
+              </button>
+            );
+          })}
+        </div>
 
       {/* ════════════════════════════════════════════════════════════════════
           TAB: Profile
@@ -1546,6 +1622,7 @@ export default function ProfileSettingsPage() {
       {/* ════════════════════════════════════════════════════════════════════
           Delete Confirmation Modal (always available)
          ════════════════════════════════════════════════════════════════════ */}
+      </div>
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl">
