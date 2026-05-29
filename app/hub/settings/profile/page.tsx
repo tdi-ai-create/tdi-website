@@ -1186,110 +1186,103 @@ export default function ProfileSettingsPage() {
          ════════════════════════════════════════════════════════════════════ */}
       {activeTab === 'wellbeing' && (
         <div className="space-y-6">
-          <div className="hub-card">
-            <h2
-              className="font-semibold mb-4"
-              style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                fontSize: '18px',
-                color: '#1e2749',
-              }}
-            >
-              {tUI('Vibe Check History')}
-            </h2>
+          {/* Dimension overview */}
+          <div
+            className="rounded-2xl overflow-hidden"
+            style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
+          >
+            <div className="px-6 py-5" style={{ background: 'linear-gradient(135deg, #FFF8E7 0%, #FAFAF8 100%)' }}>
+              <h2 className="text-sm font-semibold mb-1" style={{ color: '#1B2A4A' }}>
+                {tUI('Your Wellbeing Over Time')}
+              </h2>
+              <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                {tUI('We check in across 5 dimensions. This data is completely private -- only you can see it.')}
+              </p>
+            </div>
+            <div className="bg-white px-6 py-4 flex flex-wrap gap-2">
+              {[
+                { label: 'Mood', color: '#DC2626', bg: '#FEE2E2' },
+                { label: 'Energy', color: '#D97706', bg: '#FEF3C7' },
+                { label: 'Belonging', color: '#7C3AED', bg: '#F3E8FF' },
+                { label: 'Purpose', color: '#0891B2', bg: '#E0F4FF' },
+                { label: 'Needs', color: '#16A34A', bg: '#D1FAE5' },
+              ].map((dim) => (
+                <div
+                  key={dim.label}
+                  className="flex items-center gap-1.5 rounded-full px-3 py-1.5"
+                  style={{ background: dim.bg }}
+                >
+                  <span className="w-2 h-2 rounded-full" style={{ background: dim.color }} />
+                  <span className="text-xs font-medium" style={{ color: dim.color }}>{tUI(dim.label)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* History */}
+          <div
+            className="bg-white rounded-2xl"
+            style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
+          >
+            <div className="px-6 py-4" style={{ borderBottom: '1px solid #F3F4F6' }}>
+              <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
+                {tUI('Recent Check-ins')}
+              </h3>
+            </div>
 
             {checkIns.length > 0 ? (
-              <div className="space-y-3">
-                {checkIns.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="flex items-start gap-4 p-3 rounded-lg"
-                    style={{ backgroundColor: '#fafafa' }}
-                  >
-                    {/* Score indicator */}
+              <div>
+                {checkIns.map((entry, idx) => {
+                  const scoreConfig = entry.score <= 2
+                    ? { label: 'Tough day', bg: '#FEE2E2', color: '#991B1B', border: '#EF4444' }
+                    : entry.score <= 3
+                    ? { label: 'Hanging in there', bg: '#FEF3C7', color: '#92400E', border: '#D97706' }
+                    : { label: 'Feeling good', bg: '#D1FAE5', color: '#065F46', border: '#16A34A' };
+                  return (
                     <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm"
-                      style={{
-                        backgroundColor:
-                          entry.score <= 2
-                            ? '#FEE2E2'
-                            : entry.score <= 3
-                            ? '#FEF3C7'
-                            : '#D1FAE5',
-                        color:
-                          entry.score <= 2
-                            ? '#991B1B'
-                            : entry.score <= 3
-                            ? '#92400E'
-                            : '#065F46',
-                        fontFamily: "'DM Sans', sans-serif",
-                      }}
+                      key={entry.id}
+                      className="px-6 py-4 flex items-center gap-4"
+                      style={idx < checkIns.length - 1 ? { borderBottom: '1px solid #F3F4F6' } : {}}
                     >
-                      {entry.score}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className="text-sm font-medium mb-0.5"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          color: '#1e2749',
-                        }}
+                      <div
+                        className="w-3 h-3 rounded-full flex-shrink-0"
+                        style={{ background: scoreConfig.border }}
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="text-xs font-bold px-2 py-0.5 rounded"
+                            style={{ background: scoreConfig.bg, color: scoreConfig.color, fontSize: '10px' }}
+                          >
+                            {tUI(scoreConfig.label)}
+                          </span>
+                          <span className="text-xs" style={{ color: '#9CA3AF' }}>
+                            {formatDate(entry.created_at)}
+                          </span>
+                        </div>
+                      </div>
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold"
+                        style={{ background: scoreConfig.bg, color: scoreConfig.color }}
                       >
-                        {entry.score <= 2
-                          ? tUI('Tough day')
-                          : entry.score <= 3
-                          ? tUI('Hanging in there')
-                          : tUI('Feeling good')}
-                      </p>
-                      <p
-                        className="text-xs text-gray-400"
-                        style={{ fontFamily: "'DM Sans', sans-serif" }}
-                      >
-                        {formatDate(entry.created_at)}
-                      </p>
+                        {entry.score}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
-              <div
-                className="py-8 text-center rounded-lg"
-                style={{
-                  backgroundColor: '#FFFDF5',
-                  border: '1px dashed #e5d9b6',
-                }}
-              >
-                <Smile
-                  size={28}
-                  className="mx-auto mb-3"
-                  style={{ color: '#d4960a' }}
-                />
-                <p
-                  className="text-[15px] font-medium mb-1"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    color: '#1e2749',
-                  }}
-                >
-                  {tUI('You have not done a Vibe Check yet.')}
+              <div className="px-6 py-10 text-center">
+                <Heart size={28} className="mx-auto mb-3" style={{ color: '#D97706' }} />
+                <p className="text-sm font-medium mb-1" style={{ color: '#1e2749' }}>
+                  {tUI('No check-ins yet')}
                 </p>
-                <p
-                  className="text-[13px] text-gray-400"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  {tUI('Try one from the dashboard.')}
+                <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                  {tUI('Vibe Checks pop up randomly as you explore. Just answer when you see one.')}
                 </p>
               </div>
             )}
           </div>
-
-          {/* Privacy note */}
-          <p
-            className="text-xs text-gray-400 text-center"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
-          >
-            {tUI('This data is completely private. Only you can see it.')}
-          </p>
         </div>
       )}
 

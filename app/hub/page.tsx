@@ -1495,7 +1495,7 @@ export default function HubDashboard() {
                 {tUI('Curated for you')}
               </div>
               <div className="space-y-2.5">
-                {recommendations.slice(0, 2).map((course) => {
+                {recommendations.slice(0, 1).map((course) => {
                   const catAccent = CATEGORY_ACCENTS[course.category] || '#38618C';
                   return (
                     <Link
