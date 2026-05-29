@@ -522,13 +522,14 @@ ${displayName}</div>
           <div class="toolkit-section">
             <h2>Ways to Use This Certificate</h2>
             <ul>
-              <li data-icon="\u{1F5BC}">Print and frame for your classroom or office</li>
-              <li data-icon="\u{1F4C2}">Add to your professional evaluation portfolio</li>
-              <li data-icon="\u{1F4CB}">Submit for PD recertification hours</li>
-              <li data-icon="\u{1F310}">Share on LinkedIn or professional networks</li>
-              <li data-icon="\u{1F4C4}">Include in your annual review documentation</li>
-              <li data-icon="\u{2709}">Forward to your principal using the email template above</li>
-              <li data-icon="\u{2B50}">Add to your resume under Professional Development</li>
+              <li data-icon="\u{1F5BC}">Click print right now and hang it in the room you spend the most time in with students or often take parent meetings. Let this be a quiet reminder you are qualified, hard working, and high achieving. It will take 2 minutes and you will never have to think of it again.</li>
+              <li data-icon="\u{1F4C2}">Drop this into your professional evaluation portfolio before your next review cycle. When your admin asks what PD you have done, you will already have the answer ready.</li>
+              <li data-icon="\u{1F4CB}">Submit this for PD recertification hours with your district. Use the template above to make the ask easy -- most districts accept self-directed PD when it is documented.</li>
+              <li data-icon="\u{1F310}">Post this on LinkedIn with a sentence about what you learned. Other educators in your network need to see that investing in yourself is worth it.</li>
+              <li data-icon="\u{1F4C4}">Screenshot this and paste it into your annual review documentation. When you sit down for that conversation, you want receipts -- this is one of them.</li>
+              <li data-icon="\u{2709}">Forward this to your principal using the email template above. It takes 30 seconds and it puts your growth on their radar in a way that feels professional, not performative.</li>
+              <li data-icon="\u{2B50}">Add this to the Professional Development section of your resume. Every course you finish here is real PD -- treat it that way.</li>
+              <li data-icon="\u{1F49B}">Add it to a "Feel Good Folder" for the tough days when you need a reminder of how amazing you are and how important you are to this field.</li>
             </ul>
           </div>
 
