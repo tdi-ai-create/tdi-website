@@ -58,7 +58,7 @@ export const TOUR_STOPS: TourStop[] = [
     id: 8,
     title: 'Vibe Check',
     description:
-      'A quick pulse on how you are doing. Not an evaluation -- just a mirror. Track your energy over time.',
+      'Quick prompts that pop up randomly while you explore. Our team sends them because we care how you are doing. Always easy to answer, always private.',
   },
   {
     id: 9,

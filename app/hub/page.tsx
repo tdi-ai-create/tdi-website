@@ -1392,7 +1392,7 @@ export default function HubDashboard() {
                 {tUI('Vibe Check')}
               </div>
               <p className="text-xs" style={{ color: '#6B7280', lineHeight: 1.5 }}>
-                {tUI('Random wellness prompts that check in on 5 dimensions. Private, never shared.')}
+                {tUI('Quick prompts that pop up randomly while you explore. Our team sends them because we genuinely care how you are doing. They are always easy to answer and completely private.')}
               </p>
             </div>
             {/* 5 dimension pills -- horizontal scroll on mobile */}
