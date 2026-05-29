@@ -1024,10 +1024,11 @@ export default function ProfileSettingsPage() {
               </div>
               <div>
                 {goalRecommendations.map((rec, i) => (
-                  <div
+                  <Link
                     key={i}
-                    className="px-6 py-4 flex items-center gap-4"
-                    style={i < goalRecommendations.length - 1 ? { borderBottom: '1px solid #F3F4F6' } : {}}
+                    href={`/hub/quick-wins?q=${encodeURIComponent(rec.title)}`}
+                    className="px-6 py-4 flex items-center gap-4 hover:bg-gray-50 transition-colors"
+                    style={i < goalRecommendations.length - 1 ? { borderBottom: '1px solid #F3F4F6', display: 'flex' } : { display: 'flex' }}
                   >
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
@@ -1042,7 +1043,7 @@ export default function ProfileSettingsPage() {
                       </p>
                     </div>
                     <ArrowRight size={16} style={{ color: '#38618C' }} />
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
