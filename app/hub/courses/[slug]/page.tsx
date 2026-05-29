@@ -676,7 +676,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                           courseTitle: course.title,
                           courseSlug: course.slug,
                           userEmail: user?.email,
-                          userName: profile?.display_name,
+                          userName: user?.email?.split('@')[0] || 'Educator',
                         }),
                       });
                     } catch {}

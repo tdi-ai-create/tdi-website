@@ -598,7 +598,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         </Link>
 
         <div
-          className="relative overflow-hidden mb-8"
+          className="relative mb-8"
           style={{
             backgroundColor: '#1e2749',
             borderRadius: '20px',
