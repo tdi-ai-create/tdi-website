@@ -35,6 +35,7 @@ const BASE_NAV_ITEMS: NavItem[] = [
   { href: '/hub/certificates', label: 'Achievements', exact: false },
   { href: '/hub/our-story', label: 'Our Story', exact: false },
   { href: 'https://raehughart.substack.com/', label: 'Blog', exact: false, external: true },
+  { href: 'https://www.teachersdeserveit.com/create-with-us', label: 'Apply to Create', exact: false, external: true },
 ];
 
 export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps) {

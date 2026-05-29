@@ -18,7 +18,6 @@ import {
   Zap,
 } from 'lucide-react';
 import CourseCard from '@/components/hub/CourseCard';
-import CommunityPracticeSpace from '@/components/hub/CommunityPracticeSpace';
 import LessonConversation from '@/components/hub/LessonConversation';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
 
@@ -136,6 +135,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const [modules, setModules] = useState<Module[]>([]);
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
   const [relatedCourses, setRelatedCourses] = useState<RelatedCourse[]>([]);
+  const [notified, setNotified] = useState(false);
   const [authorCourses, setAuthorCourses] = useState<RelatedCourse[]>([]);
   const [enrolledCount, setEnrolledCount] = useState<number | null>(null);
   const [relatedQuickWins, setRelatedQuickWins] = useState<RelatedQuickWin[]>([]);
@@ -542,7 +542,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                     textTransform: 'uppercase',
                   }}
                 >
-                  {course.category}
+                  {course.category.replace(/-/g, ' ').replace(/&/g, '&').replace(/\b\w/g, c => c.toUpperCase())}
                 </div>
               )}
 
@@ -629,141 +629,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             )}
           </section>
 
-          {/* Course Content / Lesson List */}
-          <div className="mb-6">
-            <h2
-              className="text-xs font-bold tracking-widest uppercase mb-3"
-              style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}
-            >
-              Course Content
-            </h2>
-
-            {modules.length === 0 ? (
-              <div
-                className="bg-white rounded-2xl p-8 text-center"
-                style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
-              >
-                <p className="text-gray-500 text-sm">No lessons available yet.</p>
-              </div>
-            ) : (
-              <div>
-                {modules.map((module, moduleIndex) => {
-                  const moduleIsComplete = module.lessons.every(
-                    (l) => progress.lessonProgress.get(l.id)?.status === 'completed'
-                  );
-
-                  // Find next lesson
-                  const findNextLessonId = () => {
-                    for (const mod of modules) {
-                      for (const l of mod.lessons) {
-                        if (progress.lessonProgress.get(l.id)?.status !== 'completed') {
-                          return l.id;
-                        }
-                      }
-                    }
-                    return null;
-                  };
-                  const nextLessonId = findNextLessonId();
-
-                  return (
-                    <div
-                      key={module.id}
-                      className="bg-white rounded-2xl overflow-hidden mb-3"
-                      style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
-                    >
-                      {/* Module header */}
-                      <div className="flex items-center justify-between px-5 py-3.5">
-                        <div className="flex items-center gap-3">
-                          {/* Module number badge */}
-                          <div
-                            className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0"
-                            style={{
-                              background: moduleIsComplete ? '#DCFCE7' : '#F3F4F6',
-                              color: moduleIsComplete ? '#16A34A' : '#6B7280',
-                            }}
-                          >
-                            {moduleIndex + 1}
-                          </div>
-                          <span className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>{module.title}</span>
-                        </div>
-                        <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                          {module.lessons.length} lessons
-                        </span>
-                      </div>
-
-                      {/* Lesson rows */}
-                      {module.lessons.map((lesson) => {
-                        const isDone = progress.lessonProgress.get(lesson.id)?.status === 'completed';
-                        const isNext = lesson.id === nextLessonId;
-                        const canAccess = COMING_SOON ? false : (isEnrolled || lesson.is_free_preview);
-
-                        return (
-                          <div
-                            key={lesson.id}
-                            className={`flex items-center gap-3 px-5 py-3 ${canAccess ? 'cursor-pointer hover:bg-gray-50' : 'opacity-60'}`}
-                            style={{
-                              borderTop: '0.5px solid #F9FAFB',
-                              background: isNext && !COMING_SOON ? '#FFFBF0' : 'transparent',
-                            }}
-                            onClick={() => canAccess && router.push(`/hub/courses/${course.slug}/${lesson.slug}`)}
-                          >
-                            {/* Status dot */}
-                            <div
-                              className="w-[18px] h-[18px] rounded-full flex items-center justify-center flex-shrink-0"
-                              style={{
-                                border: isDone ? 'none' : isNext ? '1.5px solid #FFBA06' : '1.5px solid #E5E7EB',
-                                background: isDone ? '#16A34A' : isNext ? 'rgba(255,186,6,0.1)' : 'transparent',
-                              }}
-                            >
-                              {isDone && (
-                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3">
-                                  <path d="M20 6L9 17l-5-5"/>
-                                </svg>
-                              )}
-                              {isNext && !isDone && (
-                                <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#FFBA06' }} />
-                              )}
-                            </div>
-
-                            {/* Title */}
-                            <div
-                              className="flex-1 text-sm"
-                              style={{ color: isDone ? '#9CA3AF' : '#374151', fontWeight: isNext ? 600 : 400 }}
-                            >
-                              {lesson.title}
-                              {lesson.is_free_preview && (
-                                <span
-                                  className="ml-2 text-[10px] font-medium px-2 py-0.5 rounded-full"
-                                  style={{ backgroundColor: '#D1FAE5', color: '#059669' }}
-                                >
-                                  Free Preview
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Up next badge or time */}
-                            {isNext && !isDone ? (
-                              <span
-                                className="text-xs font-semibold px-2 py-0.5 rounded"
-                                style={{ background: '#FFFBF0', color: '#D97706' }}
-                              >
-                                Up next
-                              </span>
-                            ) : (
-                              <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                                {lesson.estimated_minutes} min
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
           {/* More from this instructor */}
           {authorCourses.length > 0 && (
             <div className="mt-8">
@@ -789,30 +654,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             </div>
           )}
 
-          {/* Related courses */}
-          {relatedCourses.length > 0 && (
-            <div className="mt-8">
-              <h2
-                className="font-semibold mb-4"
-                style={{
-                  fontFamily: "'Source Serif 4', Georgia, serif",
-                  fontSize: '20px',
-                  color: '#2B3A67',
-                }}
-              >
-                Related Courses
-              </h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {relatedCourses.map((c) => (
-                  <CourseCard
-                    key={c.id}
-                    course={c}
-                    enrollment={null}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Sidebar */}
@@ -824,14 +665,33 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           >
             {COMING_SOON ? (
               <div className="text-center">
-                <div
-                  className="w-full py-3 rounded-xl text-sm font-semibold"
-                  style={{ backgroundColor: '#F3F4F6', color: '#6B7280', cursor: 'default' }}
+                <button
+                  onClick={async () => {
+                    if (notified) return;
+                    try {
+                      await fetch('/api/hub/notify-course-interest', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          courseTitle: course.title,
+                          courseSlug: course.slug,
+                          userEmail: user?.email,
+                          userName: profile?.display_name,
+                        }),
+                      });
+                    } catch {}
+                    setNotified(true);
+                  }}
+                  className="w-full py-3 rounded-xl text-sm font-semibold transition-colors"
+                  style={notified
+                    ? { backgroundColor: '#D1FAE5', color: '#065F46' }
+                    : { backgroundColor: '#ffba06', color: '#1e2749' }
+                  }
                 >
-                  {tUI('Coming Soon')}
-                </div>
+                  {notified ? tUI('We will notify you!') : tUI('Notify me when this launches')}
+                </button>
                 <p className="text-xs mt-2" style={{ color: '#9CA3AF' }}>
-                  {tUI('This course is launching on our new platform any day now. We will let you know the moment it goes live.')}
+                  {tUI('This course is launching any day now.')}
                 </p>
               </div>
             ) : (
@@ -907,31 +767,22 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             className="bg-white rounded-2xl p-5"
             style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
           >
-            <h3 className="text-sm font-semibold mb-4" style={{ color: '#1B2A4A' }}>
+            <h3 className="text-sm font-semibold mb-4 whitespace-nowrap" style={{ color: '#1B2A4A', fontSize: '14px' }}>
               Meet Your Instructor
             </h3>
 
             <div className="flex gap-3">
               <div className="flex-shrink-0">
-                {course.author_avatar_url ? (
-                  <img
-                    src={course.author_avatar_url}
-                    alt={course.author_name || 'Instructor'}
-                    className="w-[50px] h-[50px] rounded-full object-cover"
-                  />
-                ) : (
-                  <div
-                    className="w-[50px] h-[50px] rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: '#F3F4F6' }}
-                  >
-                    <User size={20} style={{ color: '#9CA3AF' }} />
-                  </div>
-                )}
+                <img
+                  src={course.author_avatar_url || '/team/rae-hughart.jpg'}
+                  alt={course.author_name || 'Teachers Deserve It Team'}
+                  className="w-[50px] h-[50px] rounded-full object-cover"
+                />
               </div>
 
               <div className="flex-1 min-w-0">
                 <h4 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
-                  {course.author_name || 'Teachers Deserve It Team'}
+                  {(course.author_name === 'Teachers Deserve It Team' || !course.author_name) ? <>{tUI('Teachers Deserve It')}<br />{tUI('Team')}</> : course.author_name}
                 </h4>
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>
                   {course.author_name ? 'Educator & Course Creator' : 'Educators supporting teachers'}
@@ -994,17 +845,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         className="my-10 border-none border-t-2 border-dashed relative"
         style={{ borderColor: 'rgba(255,186,6,0.3)' }}
       />
-
-      {/* Community Practice Space */}
-      {process.env.NEXT_PUBLIC_PRACTICE_SPACE_ENABLED === 'true' && (
-        <CommunityPracticeSpace
-          courseId={course.id}
-          modules={modules}
-          lessons={modules.flatMap(m => m.lessons)}
-          isEnrolled={isEnrolled}
-          onEnroll={handleEnroll}
-        />
-      )}
 
       {/* Lesson Conversation */}
       <LessonConversation
@@ -1070,6 +910,34 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                 </Link>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* Related Courses */}
+      {relatedCourses.length > 0 && (
+        <div className="mt-10 mb-8">
+          <h2
+            className="font-bold mb-1"
+            style={{
+              fontSize: '22px',
+              color: '#1e2749',
+              fontFamily: "'Source Serif 4', Georgia, serif",
+            }}
+          >
+            {tUI('Related Courses')}
+          </h2>
+          <p className="text-sm mb-6" style={{ color: '#9CA3AF' }}>
+            {tUI('More courses in this category')}
+          </p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {relatedCourses.map((c) => (
+              <CourseCard
+                key={c.id}
+                course={c}
+                enrollment={null}
+              />
+            ))}
           </div>
         </div>
       )}
