@@ -1144,47 +1144,7 @@ export default function HubDashboard() {
             </div>
           )}
 
-          {/* C. Curated for You */}
-          {showRecommendations && recommendations.length > 0 && (
-            <div>
-              <div className="text-sm font-semibold mb-3" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>
-                {tUI('Curated for you')}
-              </div>
-              <div className="space-y-2.5">
-                {recommendations.slice(0, 1).map((course) => {
-                  const catAccent = CATEGORY_ACCENTS[course.category] || '#38618C';
-                  return (
-                    <Link
-                      key={course.id}
-                      href={`/hub/courses/${course.slug}`}
-                      className="bg-white rounded-xl overflow-hidden flex hover:shadow-md transition-shadow block"
-                      style={{ border: '1px solid rgba(27,42,74,0.06)' }}
-                    >
-                      {/* Thumbnail or colored block */}
-                      <div className="w-20 flex-shrink-0" style={{
-                        background: course.thumbnail_url ? undefined : `linear-gradient(135deg, ${catAccent} 0%, ${catAccent}99 100%)`,
-                      }}>
-                        {course.thumbnail_url ? (
-                          <img src={course.thumbnail_url} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'top' }} />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center min-h-[72px]">
-                            <BookOpen size={20} style={{ color: 'rgba(255,255,255,0.5)' }} />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 p-4 flex justify-between items-center gap-3">
-                        <div>
-                          <div className="text-sm font-semibold mb-0.5" style={{ color: '#1B2A4A', fontSize: '15px' }}>{course.title}</div>
-                          <div className="text-xs" style={{ color: '#6B7280' }}>{course.reason || tUI('Popular with educators')}</div>
-                        </div>
-                        <ArrowRight size={16} style={{ color: '#38618C', flexShrink: 0 }} />
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+          {/* Curated for You moved to sidebar */}
 
           {/* Saved (moved from sidebar) */}
           <div
@@ -1523,6 +1483,47 @@ export default function HubDashboard() {
               </>
             )}
           </div>
+
+          {/* Curated for You */}
+          {showRecommendations && recommendations.length > 0 && (
+            <div
+              className="bg-white rounded-2xl p-5"
+              style={{ border: '1px solid rgba(27,42,74,0.08)' }}
+            >
+              <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
+                {tUI('Curated for you')}
+              </div>
+              <div className="space-y-2.5">
+                {recommendations.slice(0, 2).map((course) => {
+                  const catAccent = CATEGORY_ACCENTS[course.category] || '#38618C';
+                  return (
+                    <Link
+                      key={course.id}
+                      href={`/hub/courses/${course.slug}`}
+                      className="rounded-xl overflow-hidden flex hover:shadow-sm transition-shadow block"
+                      style={{ border: '1px solid #E9E7E2' }}
+                    >
+                      <div className="w-16 flex-shrink-0" style={{
+                        background: course.thumbnail_url ? undefined : `linear-gradient(135deg, ${catAccent} 0%, ${catAccent}99 100%)`,
+                      }}>
+                        {course.thumbnail_url ? (
+                          <img src={course.thumbnail_url} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'top' }} />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center min-h-[60px]">
+                            <BookOpen size={16} style={{ color: 'rgba(255,255,255,0.5)' }} />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 p-3">
+                        <div className="text-sm font-semibold leading-snug mb-0.5" style={{ color: '#1B2A4A' }}>{course.title}</div>
+                        <div className="text-xs" style={{ color: '#9CA3AF' }}>{course.reason || tUI('Popular with educators')}</div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* 4. Quick Wins Explorer */}
           {quickWins.length > 0 && (
