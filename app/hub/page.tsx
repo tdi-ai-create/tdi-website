@@ -734,10 +734,10 @@ export default function HubDashboard() {
           </div>
           <div className="text-center">
             <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: '28px', fontWeight: 700, color: '#1B2A4A' }}>
-              432
+              50
             </div>
             <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>
-              {tUI('educators')}
+              {tUI('states represented')}
             </div>
           </div>
         </div>
@@ -1040,8 +1040,7 @@ export default function HubDashboard() {
                       <span className="w-2 h-2 rounded-full" style={{ background: '#38618C', animation: 'pulse 2s ease-in-out infinite 1s' }} />
                     </div>
                     <span className="text-xs" style={{ color: '#6B7280' }}>
-                      {communityPulse.exploring} {tUI('educators exploring today')}
-                      {communityPulse.shared > 0 && ` · ${communityPulse.shared} ${tUI('shared')}`}
+                      {tUI('Educators are exploring right now')}
                     </span>
                   </div>
                 )}
