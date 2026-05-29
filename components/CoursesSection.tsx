@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react';
 
 interface Course {
-  id: number;
-  name: string;
+  id: string;
+  title: string;
   description: string;
-  course_card_image_url: string;
+  thumbnail_url: string | null;
   slug: string;
+  category: string;
+  access_tier: string;
 }
 
 export function CoursesSection() {
@@ -32,8 +34,6 @@ export function CoursesSection() {
 
     fetchCourses();
   }, []);
-
-  const subdomain = process.env.NEXT_PUBLIC_THINKIFIC_SUBDOMAIN || 'tdi';
 
   if (loading) {
     return (
@@ -76,54 +76,18 @@ export function CoursesSection() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-
-          {/* Featured: Course Guide - Always Displayed */}
-          <a
-            href="https://www.teachersdeserveit.com/hub"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-white rounded-xl overflow-hidden shadow-sm hover-card group relative"
-            style={{ textDecoration: 'none' }}
-          >
-            {/* Featured Badge */}
-            <div
-              className="absolute top-3 right-3 z-10 px-3 py-1 rounded-full text-xs font-bold"
-              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-            >
-              Updated Monthly
-            </div>
-            <div className="relative h-40 overflow-hidden">
-              <img
-                src="/images/course-guide.webp"
-                alt="Learning Hub Course Guide"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-            </div>
-            <div className="p-4">
-              <h3 className="font-bold text-lg mb-2 line-clamp-2" style={{ color: '#1e2749' }}>
-                Learning Hub Course Guide
-              </h3>
-              <p className="text-sm line-clamp-2" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Your complete guide to everything available in the TDI Learning Hub. Updated monthly.
-              </p>
-            </div>
-          </a>
-
-          {/* Random Courses */}
           {courses.map((course) => (
             <a
               key={course.id}
-              href={`https://${subdomain}.thinkific.com/courses/${course.slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={`/hub/courses/${course.slug}`}
               className="bg-white rounded-xl overflow-hidden shadow-sm hover-card group"
               style={{ textDecoration: 'none' }}
             >
               <div className="relative h-40 overflow-hidden">
-                {course.course_card_image_url ? (
+                {course.thumbnail_url ? (
                   <img
-                    src={course.course_card_image_url}
-                    alt={course.name}
+                    src={course.thumbnail_url}
+                    alt={course.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 ) : (
@@ -139,7 +103,7 @@ export function CoursesSection() {
               </div>
               <div className="p-4">
                 <h3 className="font-bold text-lg mb-2 line-clamp-2" style={{ color: '#1e2749' }}>
-                  {course.name}
+                  {course.title}
                 </h3>
                 <p
                   className="text-sm line-clamp-2"
@@ -154,9 +118,7 @@ export function CoursesSection() {
 
         <div className="text-center mt-10">
           <a
-            href={`https://${subdomain}.thinkific.com`}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/hub"
             className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover-glow"
             style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
           >

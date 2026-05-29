@@ -1,41 +1,30 @@
 import { NextResponse } from 'next/server';
+import { hubClient } from '@/lib/desi/hub-client';
 
 export async function GET() {
-  const apiKey = process.env.THINKIFIC_API_KEY;
-  const subdomain = process.env.THINKIFIC_SUBDOMAIN;
-
-  if (!apiKey || !subdomain) {
+  if (!hubClient) {
     return NextResponse.json(
-      { error: 'API credentials not configured' },
+      { error: 'Hub not configured' },
       { status: 500 }
     );
   }
 
   try {
-    const response = await fetch(
-      `https://api.thinkific.com/api/public/v1/courses`,
-      {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        next: { revalidate: 3600 },
-      }
-    );
+    const { data, error } = await hubClient
+      .from('hub_courses')
+      .select('id, title, slug, description, category, thumbnail_url, access_tier')
+      .eq('is_published', true)
+      .order('title', { ascending: true })
+      .limit(20);
 
-    if (!response.ok) {
-      throw new Error(`Thinkific API error: ${response.status}`);
-    }
+    if (error) throw error;
 
-    const data = await response.json();
+    // Shuffle and pick 5 to rotate what visitors see
+    const shuffled = (data ?? []).sort(() => Math.random() - 0.5).slice(0, 5);
 
-    const publishedCourses = data.items
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 5);
-
-    return NextResponse.json(publishedCourses);
+    return NextResponse.json(shuffled);
   } catch (error) {
-    console.error('Error fetching courses:', error);
+    console.error('Error fetching hub courses:', error);
     return NextResponse.json(
       { error: 'Failed to fetch courses' },
       { status: 500 }
