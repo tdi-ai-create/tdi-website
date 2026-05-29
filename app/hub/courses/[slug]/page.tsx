@@ -563,7 +563,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                 className="flex gap-0 pt-5"
                 style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}
               >
-                {course.pd_hours && (
+                {course.pd_hours != null && course.pd_hours > 0 && (
                   <div className="pr-6" style={{ borderRight: '1px solid rgba(255,255,255,0.08)' }}>
                     <div className="text-xl font-bold" style={{ color: '#FFBA06' }}>{course.pd_hours}</div>
                     <div className="text-xs font-bold tracking-widest uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>PD Hours</div>
@@ -744,7 +744,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           </div>
 
           {/* PD Hours badge */}
-          {course.pd_hours && (
+          {course.pd_hours != null && course.pd_hours > 0 && (
             <div
               className="rounded-xl p-4 flex items-center gap-3"
               style={{ background: '#FEF3C7' }}
@@ -901,7 +901,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                     >
                       {qw.category}
                     </span>
-                    {qw.duration_minutes && (
+                    {qw.duration_minutes != null && qw.duration_minutes > 0 && (
                       <span className="text-xs" style={{ color: '#9CA3AF' }}>
                         {qw.duration_minutes} {tUI('min')}
                       </span>
