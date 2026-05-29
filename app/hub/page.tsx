@@ -1289,6 +1289,7 @@ export default function HubDashboard() {
           {/* 4. Quick Wins Explorer */}
           {quickWins.length > 0 && (
             <div
+              data-tour="quick-wins"
               className="rounded-2xl p-5"
               style={{ background: '#FAFAF8', border: '1px solid rgba(27,42,74,0.08)' }}
             >

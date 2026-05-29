@@ -34,11 +34,11 @@ const MANDATORY_COUNT = 5;
  * null = centered popover (element not on dashboard).
  */
 const TOUR_STEPS_CONFIG: TourStep[] = [
-  // 1. Quick Wins
+  // 1. Quick Wins -- points to sidebar explorer section
   {
     title: TOUR_STOPS[0].title,
     body: TOUR_STOPS[0].description,
-    selector: 'a[href="/hub/quick-wins"]',
+    selector: '[data-tour="quick-wins"]',
   },
   // 2. Community
   {

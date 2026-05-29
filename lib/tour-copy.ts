@@ -16,7 +16,7 @@ export const TOUR_STOPS: TourStop[] = [
     id: 1,
     title: 'Quick Wins',
     description:
-      'Five-minute tools you can download and use today. No prep, no fluff -- just things that actually help.',
+      'Five-minute tools you can download and use today. No prep, no fluff -- just things that actually help. You can always find Quick Wins and Courses in the navigation bar at the top.',
   },
   {
     id: 2,
