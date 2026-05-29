@@ -5,53 +5,40 @@ import { X } from 'lucide-react';
 import { useHub } from '@/components/hub/HubContext';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
-
-/* ------------------------------------------------------------------ */
-/*  Wellbeing dimensions                                               */
-/* ------------------------------------------------------------------ */
-
-interface WellbeingDimension {
-  key: string;
-  prompt: string;
-}
-
-const DIMENSIONS: WellbeingDimension[] = [
-  { key: 'belonging', prompt: 'Right now, I feel like I belong in my school community.' },
-  { key: 'purpose', prompt: 'Today, I feel connected to why I became an educator.' },
-  { key: 'energy', prompt: 'My energy level right now feels...' },
-  { key: 'connection', prompt: 'I feel supported by the people around me.' },
-  { key: 'growth', prompt: 'I am learning and growing in my practice.' },
-];
-
-/** Colored dots for the 1-5 scale */
-const SCORE_COLORS = ['#EF4444', '#F97316', '#EAB308', '#22C55E', '#16A34A'];
+import { useMomentMode } from './MomentModeContext';
+import {
+  CHECK_IN_QUESTIONS,
+  getNextQuestion,
+  scoreResponse,
+  type CheckInQuestion,
+  type CheckInOption,
+} from '@/lib/hub/checkInQuestions';
 
 /** Random interval between 5-20 minutes in ms */
 function randomInterval(): number {
   return 300000 + Math.floor(Math.random() * 900000);
 }
 
-/* ------------------------------------------------------------------ */
-/*  Component                                                          */
-/* ------------------------------------------------------------------ */
-
 export default function WellbeingPopup() {
   const { user } = useHub();
   const { tUI } = useTranslation();
+  const { isMomentModeActive: momentModeActive } = useMomentMode();
 
   const [visible, setVisible] = useState(false);
-  const [dimension, setDimension] = useState<WellbeingDimension>(DIMENSIONS[0]);
+  const [question, setQuestion] = useState<CheckInQuestion>(CHECK_IN_QUESTIONS[0]);
   const [thanking, setThanking] = useState(false);
+  const [selectedWords, setSelectedWords] = useState<string[]>([]);
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const dimensionIndexRef = useRef(0);
+  const lastQuestionIdRef = useRef<string | null>(null);
 
-  /* ---------- pick next dimension (rotate) ---------- */
+  /* ---------- pick next question ---------- */
 
-  const pickNextDimension = useCallback(() => {
-    const idx = dimensionIndexRef.current % DIMENSIONS.length;
-    dimensionIndexRef.current = idx + 1;
-    setDimension(DIMENSIONS[idx]);
+  const pickNext = useCallback(() => {
+    const next = getNextQuestion(lastQuestionIdRef.current);
+    lastQuestionIdRef.current = next.id;
+    setQuestion(next);
+    setSelectedWords([]);
   }, []);
 
   /* ---------- schedule next popup ---------- */
@@ -59,13 +46,15 @@ export default function WellbeingPopup() {
   const scheduleNext = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
-      pickNextDimension();
+      if (momentModeActive) {
+        scheduleNext();
+        return;
+      }
+      pickNext();
       setThanking(false);
       setVisible(true);
     }, randomInterval());
-  }, [pickNextDimension]);
-
-  /* ---------- mount / unmount ---------- */
+  }, [pickNext, momentModeActive]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -75,41 +64,56 @@ export default function WellbeingPopup() {
     };
   }, [user?.id, scheduleNext]);
 
-  /* ---------- handle score ---------- */
+  /* ---------- handle response ---------- */
 
-  const handleScore = useCallback(
-    async (score: number) => {
+  const handleResponse = useCallback(
+    async (value: string | number) => {
       setThanking(true);
 
-      // Log to hub_activity_log
       if (user?.id) {
         try {
           const supabase = getSupabase();
+          const score = scoreResponse(question, value);
           await supabase.from('hub_activity_log').insert({
             user_id: user.id,
             action: 'wellbeing_check',
             metadata: {
-              dimension: dimension.key,
+              question_id: question.id,
+              category: question.category,
+              response_type: question.responseType,
+              value,
               score,
               responded_at: new Date().toISOString(),
             },
           });
         } catch {
-          // Silent fail -- wellbeing checks are non-critical
+          // Silent fail
         }
       }
 
-      // Show thank you briefly, then dismiss
       setTimeout(() => {
         setVisible(false);
         setThanking(false);
         scheduleNext();
       }, 1500);
     },
-    [user?.id, dimension, scheduleNext],
+    [user?.id, question, scheduleNext],
   );
 
-  /* ---------- dismiss without logging ---------- */
+  const handleWordToggle = (val: string) => {
+    const max = question.maxSelect || 3;
+    setSelectedWords(prev => {
+      if (prev.includes(val)) return prev.filter(w => w !== val);
+      if (prev.length >= max) return prev;
+      return [...prev, val];
+    });
+  };
+
+  const handleWordSubmit = () => {
+    if (selectedWords.length > 0) {
+      handleResponse(selectedWords.join(','));
+    }
+  };
 
   const handleDismiss = useCallback(() => {
     setVisible(false);
@@ -117,9 +121,194 @@ export default function WellbeingPopup() {
     scheduleNext();
   }, [scheduleNext]);
 
-  /* ---------- render ---------- */
-
   if (!visible) return null;
+
+  /* ---------- render question by type ---------- */
+
+  const renderQuestion = () => {
+    const opts = question.options || [];
+
+    switch (question.responseType) {
+      case 'color_scale':
+        return (
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {opts.map((opt) => (
+              <button
+                key={String(opt.value)}
+                onClick={() => handleResponse(opt.value)}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: 20,
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  background: opt.color || '#E5E7EB',
+                  color: opt.textColor || '#fff',
+                  transition: 'transform 0.15s',
+                }}
+                onMouseEnter={e => { (e.target as HTMLElement).style.transform = 'scale(1.08)'; }}
+                onMouseLeave={e => { (e.target as HTMLElement).style.transform = 'scale(1)'; }}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        );
+
+      case 'emoji_tap':
+        return (
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+            {opts.map((opt) => (
+              <button
+                key={String(opt.value)}
+                onClick={() => handleResponse(opt.value)}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 4,
+                  padding: '8px 10px',
+                  borderRadius: 12,
+                  border: '1px solid #E5E7EB',
+                  background: 'white',
+                  cursor: 'pointer',
+                  fontSize: 11,
+                  color: '#6B7280',
+                  transition: 'all 0.15s',
+                  minWidth: 52,
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#FFBA06'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#E5E7EB'; }}
+              >
+                <span style={{ fontSize: 20 }}>{opt.emoji}</span>
+                <span>{opt.label}</span>
+              </button>
+            ))}
+          </div>
+        );
+
+      case 'word_cloud':
+        return (
+          <>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+              {opts.map((opt) => {
+                const selected = selectedWords.includes(String(opt.value));
+                return (
+                  <button
+                    key={String(opt.value)}
+                    onClick={() => handleWordToggle(String(opt.value))}
+                    style={{
+                      padding: '5px 12px',
+                      borderRadius: 20,
+                      border: selected ? '2px solid #1B2A4A' : '1px solid #E5E7EB',
+                      background: selected ? '#1B2A4A' : 'white',
+                      color: selected ? 'white' : '#4B5563',
+                      cursor: 'pointer',
+                      fontSize: 11,
+                      fontWeight: 500,
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+            {question.hint && (
+              <p style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 8 }}>{tUI(question.hint)}</p>
+            )}
+            {selectedWords.length > 0 && (
+              <button
+                onClick={handleWordSubmit}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: 10,
+                  border: 'none',
+                  background: '#FFBA06',
+                  color: '#1B2A4A',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                {tUI('Submit')}
+              </button>
+            )}
+          </>
+        );
+
+      case 'fill_blank':
+        return (
+          <>
+            {question.blankPrefix && (
+              <p style={{ fontSize: 13, color: '#1B2A4A', marginBottom: 10, fontWeight: 500 }}>
+                {tUI(question.blankPrefix)} <span style={{ borderBottom: '2px solid #FFBA06', padding: '0 16px' }}>____</span>{question.blankSuffix || ''}
+              </p>
+            )}
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {opts.map((opt) => (
+                <button
+                  key={String(opt.value)}
+                  onClick={() => handleResponse(opt.value)}
+                  style={{
+                    padding: '5px 12px',
+                    borderRadius: 8,
+                    border: '1px solid #E5E7EB',
+                    background: 'white',
+                    color: '#4B5563',
+                    cursor: 'pointer',
+                    fontSize: 12,
+                    transition: 'all 0.15s',
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#FFBA06'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#E5E7EB'; }}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </>
+        );
+
+      case 'two_choice':
+        return (
+          <div style={{ display: 'flex', gap: 8 }}>
+            {opts.map((opt) => (
+              <button
+                key={String(opt.value)}
+                onClick={() => handleResponse(opt.value)}
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '12px 8px',
+                  borderRadius: 12,
+                  border: '1px solid #E5E7EB',
+                  background: 'white',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  color: '#1B2A4A',
+                  fontWeight: 500,
+                  transition: 'all 0.15s',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#FFBA06'; (e.currentTarget as HTMLElement).style.background = '#FFFDF5'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#E5E7EB'; (e.currentTarget as HTMLElement).style.background = 'white'; }}
+              >
+                {opt.emoji && <span style={{ fontSize: 24 }}>{opt.emoji}</span>}
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <div
@@ -127,7 +316,7 @@ export default function WellbeingPopup() {
         position: 'fixed',
         bottom: 24,
         right: 24,
-        width: 280,
+        width: 300,
         background: 'white',
         borderRadius: 16,
         boxShadow: '0 4px 24px rgba(30, 39, 73, 0.12)',
@@ -152,7 +341,6 @@ export default function WellbeingPopup() {
         </p>
       ) : (
         <>
-          {/* Close button */}
           <button
             onClick={handleDismiss}
             style={{
@@ -171,61 +359,21 @@ export default function WellbeingPopup() {
             <X size={14} />
           </button>
 
-          {/* Prompt */}
           <p
             style={{
-              fontSize: 13,
+              fontSize: 14,
               lineHeight: 1.5,
               color: '#1e2749',
-              margin: '0 0 16px',
+              margin: '0 0 14px',
               paddingRight: 20,
+              fontWeight: 500,
             }}
           >
-            {tUI(dimension.prompt)}
+            {tUI(question.question)}
           </p>
 
-          {/* Score dots */}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: 8,
-            }}
-          >
-            {SCORE_COLORS.map((color, i) => (
-              <button
-                key={i}
-                onClick={() => handleScore(i + 1)}
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: '50%',
-                  background: color,
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'transform 0.15s ease',
-                }}
-                onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.transform = 'scale(1.15)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLElement).style.transform = 'scale(1)';
-                }}
-                aria-label={`Score ${i + 1}`}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </div>
+          {renderQuestion()}
 
-          {/* Not now link */}
           <div style={{ textAlign: 'center', marginTop: 12 }}>
             <button
               onClick={handleDismiss}
@@ -235,7 +383,6 @@ export default function WellbeingPopup() {
                 color: '#9CA3AF',
                 fontSize: 11,
                 cursor: 'pointer',
-                fontFamily: "'DM Sans', sans-serif",
               }}
             >
               {tUI('Not now')}
