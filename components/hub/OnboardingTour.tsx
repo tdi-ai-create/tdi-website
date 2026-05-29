@@ -65,11 +65,11 @@ const TOUR_STEPS_CONFIG: TourStep[] = [
     selector: '[data-tour="desi-chat"]',
   },
   // --- progressive disclosure break after stop 5 ---
-  // 6. Field Notes
+  // 6. Field Notes -- points to Your Progress card on dashboard
   {
     title: TOUR_STOPS[5].title,
     body: TOUR_STOPS[5].description,
-    selector: 'a[href="/hub/certificates"]',
+    selector: '[data-tour="transformation-tracker"]',
   },
   // 7. Vibe Check (Gift Element deferred to post-launch)
   {
@@ -95,11 +95,11 @@ const TOUR_STEPS_CONFIG: TourStep[] = [
     body: TOUR_STOPS[10].description,
     selector: '[data-tour="language-toggle"]',
   },
-  // 12. Certificates
+  // 12. Certificates -- points to Your Progress card
   {
     title: TOUR_STOPS[11].title,
     body: TOUR_STOPS[11].description,
-    selector: 'a[href="/hub/certificates"]',
+    selector: '[data-tour="transformation-tracker"]',
   },
 ];
 
@@ -364,15 +364,6 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
     if (nextIndex === MANDATORY_COUNT && !showDisclosureRef.current) {
       setShowDisclosure(true);
       return;
-    }
-
-    // After each optional stop (6-11), show continuation prompt
-    if (currentStep >= MANDATORY_COUNT && currentStep < TOTAL_STEPS - 1) {
-      const stopNumber = currentStep + 1; // 1-indexed
-      if (CONTINUATION_PROMPTS[stopNumber]) {
-        setShowContinuation(stopNumber);
-        return;
-      }
     }
 
     if (nextIndex >= TOTAL_STEPS) {
