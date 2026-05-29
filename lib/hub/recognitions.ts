@@ -13,6 +13,16 @@ export interface Recognition {
 
 export const RECOGNITIONS: Recognition[] = [
   {
+    id: 'hub_pioneer',
+    title: 'Hub Pioneer',
+    description: 'You joined the new Learning Hub',
+    personalNote: 'You are one of the first educators to explore this space. That says everything about who you are.',
+    category: 'showing_up',
+    threshold: 1,
+    action: 'hub_login',
+    icon: 'Star',
+  },
+  {
     id: 'first_tool',
     title: 'First Step',
     description: 'You downloaded your first tool',

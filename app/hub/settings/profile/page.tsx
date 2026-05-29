@@ -1099,7 +1099,7 @@ export default function ProfileSettingsPage() {
                 value: statsData?.toolsExplored ?? 0,
               },
               {
-                label: 'Hours saved',
+                label: 'Hours reclaimed',
                 value: `~${statsData?.hoursSaved ?? '0'}`,
               },
               {

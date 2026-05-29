@@ -262,6 +262,24 @@ export default function HubDashboard() {
       const supabase = getSupabase();
       setIsLoading(true);
 
+      // Log hub_login (once per day for Hub Pioneer recognition)
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const { data: existingLogin } = await supabase
+        .from('hub_activity_log')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('action', 'hub_login')
+        .gte('created_at', todayStr + 'T00:00:00Z')
+        .limit(1)
+        .maybeSingle();
+      if (!existingLogin) {
+        await supabase.from('hub_activity_log').insert({
+          user_id: user.id,
+          action: 'hub_login',
+          metadata: { date: todayStr },
+        });
+      }
+
       try {
         // Fetch enrollments with course data
         const { data: enrollmentData } = await supabase
@@ -1212,6 +1230,41 @@ export default function HubDashboard() {
               </p>
             )}
           </div>
+
+          {/* First Field Note -- Hub Pioneer celebration */}
+          {fieldNotesCount > 0 && (
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 100%)', boxShadow: '0 4px 20px rgba(27,42,74,0.15)' }}
+            >
+              <div className="p-6 flex items-center gap-5">
+                <div
+                  className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(255,186,6,0.15)' }}
+                >
+                  <Award size={28} style={{ color: '#FFBA06' }} />
+                </div>
+                <div className="flex-1">
+                  <div className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: '#FFBA06', letterSpacing: '0.08em' }}>
+                    {tUI('Your first Field Note')}
+                  </div>
+                  <p className="text-sm font-semibold text-white mb-1">
+                    {tUI('Hub Pioneer')}
+                  </p>
+                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)', fontStyle: 'italic', lineHeight: 1.5 }}>
+                    {tUI('You are one of the first educators to explore this space. That says everything about who you are.')}
+                  </p>
+                </div>
+                <Link
+                  href="/hub/certificates"
+                  className="flex-shrink-0 text-xs font-semibold px-4 py-2 rounded-lg"
+                  style={{ background: '#FFBA06', color: '#1B2A4A' }}
+                >
+                  {tUI('View all')}
+                </Link>
+              </div>
+            </div>
+          )}
 
           {/* D. What Educators Are Saying -- bar chart + conversation cards */}
           {communitySummary && (
