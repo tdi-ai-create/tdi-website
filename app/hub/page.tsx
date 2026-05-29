@@ -1176,6 +1176,7 @@ export default function HubDashboard() {
 
           {/* 3. Your Progress -- merged Achievements + Tracker */}
           <div
+            data-tour="transformation-tracker"
             className="bg-white rounded-2xl p-5"
             style={{ border: '1px solid rgba(27,42,74,0.08)' }}
           >
@@ -1324,35 +1325,146 @@ export default function HubDashboard() {
             </div>
           )}
 
-          {/* 5. Saved Courses (moved from left) */}
-          {savedCourses.length > 0 && (
-            <div
-              data-tour="favorites"
-              className="bg-white rounded-2xl p-5"
-              style={{ border: '1px solid rgba(27,42,74,0.08)' }}
-            >
-              <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-                {tUI('Saved')}
-              </div>
-              <div className="space-y-2">
-                {savedCourses.slice(0, 3).map(course => (
-                  <div
-                    key={course.id}
-                    className="flex items-center gap-3 py-2 cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={() => router.push(`/hub/courses/${course.slug}`)}
-                  >
-                    <Heart size={12} style={{ color: '#E53935', fill: '#E53935', flexShrink: 0 }} />
-                    <span className="text-sm font-medium flex-1 truncate" style={{ color: '#1B2A4A' }}>{course.title}</span>
-                  </div>
-                ))}
-              </div>
-              {savedCourses.length > 3 && (
-                <Link href="/hub/courses?filter=Saved" className="text-xs font-semibold mt-2 inline-block" style={{ color: '#38618C' }}>
-                  {tUI('View all')} {savedCourses.length} {tUI('saved')} →
-                </Link>
-              )}
+          {/* 5. LIFT Key */}
+          <div
+            data-tour="lift-filter"
+            className="bg-white rounded-2xl p-5"
+            style={{ border: '1px solid rgba(27,42,74,0.08)' }}
+          >
+            <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
+              {tUI('The LIFT Framework')}
             </div>
-          )}
+            <p className="text-xs mb-3" style={{ color: '#6B7280', lineHeight: 1.5 }}>
+              {tUI('Every resource is tagged by what it helps with.')}
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { letter: 'L', label: 'Leadership', color: '#9B7CB8', bg: '#F3E8FF' },
+                { letter: 'I', label: 'Instruction', color: '#6BA368', bg: '#E8F5E9' },
+                { letter: 'F', label: 'Family', color: '#E8927C', bg: '#FEF3C7' },
+                { letter: 'T', label: 'Teacher Wellness', color: '#7C9CBF', bg: '#E0F4FF' },
+              ].map((item) => (
+                <div
+                  key={item.letter}
+                  className="flex items-center gap-2.5 rounded-lg px-3 py-2"
+                  style={{ background: item.bg }}
+                >
+                  <span
+                    className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold text-white"
+                    style={{ background: item.color }}
+                  >
+                    {item.letter}
+                  </span>
+                  <span className="text-xs font-medium" style={{ color: '#1B2A4A' }}>
+                    {tUI(item.label)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 6. Vibe Check -- 5 dimensions explainer */}
+          <div
+            data-tour="vibe-check"
+            className="rounded-2xl overflow-hidden"
+            style={{ border: '1px solid rgba(27,42,74,0.08)' }}
+          >
+            {/* Header */}
+            <div className="px-5 pt-5 pb-3" style={{ background: 'linear-gradient(135deg, #FFF8E7 0%, #FAFAF8 100%)' }}>
+              <div className="text-xs font-bold tracking-widest uppercase mb-1.5" style={{ color: '#D97706', letterSpacing: '0.08em' }}>
+                {tUI('Vibe Check')}
+              </div>
+              <p className="text-xs" style={{ color: '#6B7280', lineHeight: 1.5 }}>
+                {tUI('Random wellness prompts that check in on 5 dimensions. Private, never shared.')}
+              </p>
+            </div>
+            {/* 5 dimension pills -- horizontal scroll on mobile */}
+            <div
+              className="px-5 py-3 flex gap-2 overflow-x-auto"
+              style={{ background: 'white', borderTop: '1px solid #F3F4F6' }}
+            >
+              {[
+                { label: 'Mood', color: '#DC2626', bg: '#FEE2E2' },
+                { label: 'Energy', color: '#D97706', bg: '#FEF3C7' },
+                { label: 'Belonging', color: '#7C3AED', bg: '#F3E8FF' },
+                { label: 'Purpose', color: '#0891B2', bg: '#E0F4FF' },
+                { label: 'Needs', color: '#16A34A', bg: '#D1FAE5' },
+              ].map((dim) => (
+                <div
+                  key={dim.label}
+                  className="flex items-center gap-1.5 rounded-full px-3 py-1.5 flex-shrink-0"
+                  style={{ background: dim.bg }}
+                >
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: dim.color }} />
+                  <span className="text-xs font-medium whitespace-nowrap" style={{ color: dim.color }}>
+                    {tUI(dim.label)}
+                  </span>
+                </div>
+              ))}
+            </div>
+            {/* Sample questions */}
+            <div className="px-5 pb-4 pt-2 space-y-2" style={{ background: 'white' }}>
+              {[
+                'How are you feeling right now?',
+                'Do you have the energy to finish the day strong?',
+                'How connected do you feel to your school community?',
+              ].map((q, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-2.5 rounded-lg px-3 py-2"
+                  style={{ background: '#FAFAF8', border: '1px solid #F3F4F6' }}
+                >
+                  <span className="text-xs" style={{ color: '#6B7280', fontStyle: 'italic' }}>
+                    &ldquo;{tUI(q)}&rdquo;
+                  </span>
+                </div>
+              ))}
+              <Link
+                href="/hub/settings/profile"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold mt-1"
+                style={{ color: '#D97706' }}
+              >
+                {tUI('View your history')}
+                <ArrowRight size={12} />
+              </Link>
+            </div>
+          </div>
+
+          {/* 7. Saved Courses / Favorites */}
+          <div
+            data-tour="favorites"
+            className="bg-white rounded-2xl p-5"
+            style={{ border: '1px solid rgba(27,42,74,0.08)' }}
+          >
+            <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
+              {tUI('Saved')}
+            </div>
+            {savedCourses.length > 0 ? (
+              <>
+                <div className="space-y-2">
+                  {savedCourses.slice(0, 3).map(course => (
+                    <div
+                      key={course.id}
+                      className="flex items-center gap-3 py-2 cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => router.push(`/hub/courses/${course.slug}`)}
+                    >
+                      <Heart size={12} style={{ color: '#E53935', fill: '#E53935', flexShrink: 0 }} />
+                      <span className="text-sm font-medium flex-1 truncate" style={{ color: '#1B2A4A' }}>{course.title}</span>
+                    </div>
+                  ))}
+                </div>
+                {savedCourses.length > 3 && (
+                  <Link href="/hub/courses?filter=Saved" className="text-xs font-semibold mt-2 inline-block" style={{ color: '#38618C' }}>
+                    {tUI('View all')} {savedCourses.length} {tUI('saved')} →
+                  </Link>
+                )}
+              </>
+            ) : (
+              <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                {tUI('Heart any course or quick win to save it here.')}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>

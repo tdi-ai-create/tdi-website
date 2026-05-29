@@ -203,6 +203,7 @@ ${transcript}
 
       {/* Chat Button */}
       <button
+        data-tour="desi-chat"
         style={{
           position: 'fixed',
           bottom: '24px',

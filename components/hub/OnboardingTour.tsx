@@ -50,7 +50,7 @@ const TOUR_STEPS_CONFIG: TourStep[] = [
   {
     title: TOUR_STOPS[2].title,
     body: TOUR_STOPS[2].description,
-    selector: null, // LIFT filter lives on /hub/quick-wins, not dashboard
+    selector: '[data-tour="lift-filter"]',
   },
   // 4. Moment Mode
   {
@@ -62,7 +62,7 @@ const TOUR_STEPS_CONFIG: TourStep[] = [
   {
     title: TOUR_STOPS[4].title,
     body: TOUR_STOPS[4].description,
-    selector: null, // Desi is available across hub pages
+    selector: '[data-tour="desi-chat"]',
   },
   // --- progressive disclosure break after stop 5 ---
   // 6. Field Notes
@@ -81,13 +81,13 @@ const TOUR_STEPS_CONFIG: TourStep[] = [
   {
     title: TOUR_STOPS[7].title,
     body: TOUR_STOPS[7].description,
-    selector: null, // Vibe Check appears as a slide-up, not a fixed element
+    selector: '[data-tour="vibe-check"]',
   },
   // 9. Transformation Tracker
   {
     title: TOUR_STOPS[8].title,
     body: TOUR_STOPS[8].description,
-    selector: 'a[href="/hub/transformation"]',
+    selector: '[data-tour="transformation-tracker"]',
   },
   // 10. Favorites
   {
