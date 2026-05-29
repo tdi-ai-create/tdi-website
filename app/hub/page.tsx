@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
@@ -207,7 +207,7 @@ interface SavedCourse {
 export default function HubDashboard() {
   const router = useRouter();
   const { profile, user } = useHub();
-  const { favorites } = useFavorites();
+  const { favorites, toggleFavorite } = useFavorites();
   const { tUI } = useTranslation();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [quickWins, setQuickWins] = useState<QuickWin[]>([]);
@@ -541,9 +541,17 @@ export default function HubDashboard() {
     loadDashboardData();
   }, [user?.id]);
 
-  // Load saved courses when favorites change
+  // Auto-favorite a quick win for new users who have no favorites
+  const hasAutoFavRef = useRef(false);
   useEffect(() => {
-    async function loadSavedCourses() {
+    if (!user?.id || hasAutoFavRef.current || favorites.size > 0 || !featuredQuickWin) return;
+    hasAutoFavRef.current = true;
+    toggleFavorite(featuredQuickWin.id, 'quick_win');
+  }, [user?.id, favorites.size, featuredQuickWin, toggleFavorite]);
+
+  // Load saved items (courses + quick wins) when favorites change
+  useEffect(() => {
+    async function loadSavedItems() {
       if (favorites.size === 0) {
         setSavedCourses([]);
         return;
@@ -552,18 +560,27 @@ export default function HubDashboard() {
       const supabase = getSupabase();
       const favoriteIds = Array.from(favorites);
 
-      const { data } = await supabase
-        .from('hub_courses')
-        .select('id, slug, title, category')
-        .in('id', favoriteIds)
-        .eq('is_published', true);
+      const [courseResult, qwResult] = await Promise.all([
+        supabase
+          .from('hub_courses')
+          .select('id, slug, title, category')
+          .in('id', favoriteIds)
+          .eq('is_published', true),
+        supabase
+          .from('hub_quick_wins')
+          .select('id, slug, title, category')
+          .in('id', favoriteIds)
+          .eq('is_published', true),
+      ]);
 
-      if (data) {
-        setSavedCourses(data);
-      }
+      const items: SavedCourse[] = [
+        ...(qwResult.data || []).map(qw => ({ ...qw, type: 'quick_win' as const })),
+        ...(courseResult.data || []),
+      ];
+      setSavedCourses(items);
     }
 
-    loadSavedCourses();
+    loadSavedItems();
   }, [favorites]);
 
   // Check if user needs the onboarding tour (or if ?tour=start was passed)
@@ -1442,16 +1459,25 @@ export default function HubDashboard() {
             {savedCourses.length > 0 ? (
               <>
                 <div className="space-y-2">
-                  {savedCourses.slice(0, 3).map(course => (
-                    <div
-                      key={course.id}
-                      className="flex items-center gap-3 py-2 cursor-pointer hover:opacity-80 transition-opacity"
-                      onClick={() => router.push(`/hub/courses/${course.slug}`)}
-                    >
-                      <Heart size={12} style={{ color: '#E53935', fill: '#E53935', flexShrink: 0 }} />
-                      <span className="text-sm font-medium flex-1 truncate" style={{ color: '#1B2A4A' }}>{course.title}</span>
-                    </div>
-                  ))}
+                  {savedCourses.slice(0, 3).map(item => {
+                    const isQW = 'type' in item && (item as any).type === 'quick_win';
+                    const href = isQW ? `/hub/quick-wins/${item.slug}` : `/hub/courses/${item.slug}`;
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-3 py-2 cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => router.push(href)}
+                      >
+                        <Heart size={12} style={{ color: '#E53935', fill: '#E53935', flexShrink: 0 }} />
+                        <span className="text-sm font-medium flex-1 truncate" style={{ color: '#1B2A4A' }}>{item.title}</span>
+                        {isQW && (
+                          <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: '#E8F5E9', color: '#2E7D32', fontSize: '9px' }}>
+                            {tUI('Tool')}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
                 {savedCourses.length > 3 && (
                   <Link href="/hub/courses?filter=Saved" className="text-xs font-semibold mt-2 inline-block" style={{ color: '#38618C' }}>
