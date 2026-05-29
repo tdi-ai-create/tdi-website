@@ -710,12 +710,12 @@ export default function HubDashboard() {
         {/* Left Column - Main Content */}
         <div className="space-y-6">
           {/* Feature 1: Personal Stats Card */}
-          {personalStats && (personalStats.toolsExplored > 0 || personalStats.communitySize > 0) && (
+          {personalStats && personalStats.toolsExplored > 0 && (
             <div
               className="bg-white rounded-2xl p-5"
               style={{ border: '0.5px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
             >
-              <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="grid grid-cols-2 gap-6 text-center">
                 <div>
                   <div className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif" }}>
                     {personalStats.toolsExplored}
@@ -730,14 +730,6 @@ export default function HubDashboard() {
                   </div>
                   <div className="text-xs mt-1" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
                     {tUI('hours saved')}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif" }}>
-                    {personalStats.communitySize}
-                  </div>
-                  <div className="text-xs mt-1" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
-                    {tUI('educators joined this week')}
                   </div>
                 </div>
               </div>
@@ -1158,39 +1150,6 @@ export default function HubDashboard() {
         <div className="space-y-4">
           {/* Feature 7: Gift Element moved to top of sidebar */}
           <GiftElement />
-
-          {/* Feature 2: Community Pulse */}
-          {communityPulse && (communityPulse.exploring > 0 || communityPulse.shared > 0) && (
-            <div
-              className="bg-white rounded-2xl p-4"
-              style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
-            >
-              <div className="space-y-2.5">
-                {communityPulse.exploring > 0 && (
-                  <div className="flex items-center gap-2.5">
-                    <span
-                      className="w-2 h-2 rounded-full flex-shrink-0"
-                      style={{ background: '#4ADE80', boxShadow: '0 0 6px rgba(74,222,128,0.4)' }}
-                    />
-                    <span className="text-xs" style={{ color: '#6B7280' }}>
-                      <strong style={{ color: '#1e2749' }}>{communityPulse.exploring}</strong> {tUI('educators explored tools today')}
-                    </span>
-                  </div>
-                )}
-                {communityPulse.shared > 0 && (
-                  <div className="flex items-center gap-2.5">
-                    <span
-                      className="w-2 h-2 rounded-full flex-shrink-0"
-                      style={{ background: '#4ADE80', boxShadow: '0 0 6px rgba(74,222,128,0.4)' }}
-                    />
-                    <span className="text-xs" style={{ color: '#6B7280' }}>
-                      <strong style={{ color: '#1e2749' }}>{communityPulse.shared}</strong> {tUI('shared their experience')}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* TDI Tip */}
           <div className="rounded-2xl p-5 mb-4" style={{ background: '#1B2A4A' }}>
