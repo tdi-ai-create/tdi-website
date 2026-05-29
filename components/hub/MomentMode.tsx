@@ -96,12 +96,12 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   const sessionStartRef = useRef<Date | null>(null);
   const hasLoggedOpenRef = useRef(false);
 
-  // Box breathing state -- single elapsed-time approach, no intervals
+  // Box breathing state -- setTimeout chain, no effects
   const [breathPhase, setBreathPhase] = useState<BreathPhase>('inhale');
   const [breathCycle, setBreathCycle] = useState(1);
   const [phaseTimer, setPhaseTimer] = useState(BREATH_DURATION);
-  const breathStartRef = useRef<number | null>(null);
-  const breathRafRef = useRef<number | null>(null);
+  const breathTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const breathCountdownRef = useRef<NodeJS.Timeout | null>(null);
 
   // Gentle tools state
   const [gentleTools, setGentleTools] = useState<any[]>([]);
@@ -224,51 +224,50 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
     };
   }, [isOpen, handleEscape, hasIncremented, setMomentModeActive]);
 
-  // Box breathing -- pure elapsed-time calculation via requestAnimationFrame.
-  // No intervals, no refs for phase/cycle/timer. Just one timestamp and math.
-  useEffect(() => {
-    if (state !== 'pause') return;
+  // Start the breathing exercise -- pure setTimeout chain, no useEffect
+  const startBreathing = useCallback(() => {
+    // Clear any existing timers
+    if (breathTimeoutRef.current) clearTimeout(breathTimeoutRef.current);
+    if (breathCountdownRef.current) clearInterval(breathCountdownRef.current);
 
-    breathStartRef.current = Date.now();
-    let cancelled = false;
+    const phases: BreathPhase[] = ['inhale', 'hold1', 'exhale', 'hold2'];
+    let phaseIdx = 0;
+    let cycle = 1;
 
-    function tick() {
-      if (cancelled) return;
-      const elapsed = (Date.now() - breathStartRef.current!) / 1000; // seconds since start
-      const phaseDuration = BREATH_DURATION; // 4 seconds per phase
-      const phasesPerCycle = 4; // inhale, hold1, exhale, hold2
-      const totalPhases = TOTAL_CYCLES * phasesPerCycle; // 24 phases total
-      const currentPhaseIndex = Math.min(Math.floor(elapsed / phaseDuration), totalPhases);
+    setBreathPhase('inhale');
+    setBreathCycle(1);
+    setPhaseTimer(BREATH_DURATION);
 
-      if (currentPhaseIndex >= totalPhases) {
-        // All cycles done
-        setBreathPhase('complete');
-        setBreathCycle(TOTAL_CYCLES);
-        setPhaseTimer(0);
-        return; // stop the loop
-      }
+    // Countdown timer that ticks every second
+    breathCountdownRef.current = setInterval(() => {
+      setPhaseTimer(prev => (prev > 1 ? prev - 1 : BREATH_DURATION));
+    }, 1000);
 
-      const currentCycle = Math.floor(currentPhaseIndex / phasesPerCycle) + 1;
-      const phaseInCycle = currentPhaseIndex % phasesPerCycle;
-      const phases: BreathPhase[] = ['inhale', 'hold1', 'exhale', 'hold2'];
-      const phase = phases[phaseInCycle];
-      const timeIntoPhase = elapsed - (currentPhaseIndex * phaseDuration);
-      const remaining = Math.ceil(phaseDuration - timeIntoPhase);
-
-      setBreathPhase(phase);
-      setBreathCycle(currentCycle);
-      setPhaseTimer(remaining);
-
-      breathRafRef.current = requestAnimationFrame(tick);
+    // Phase advancement chain
+    function scheduleNextPhase() {
+      breathTimeoutRef.current = setTimeout(() => {
+        phaseIdx++;
+        if (phaseIdx >= 4) {
+          phaseIdx = 0;
+          cycle++;
+          if (cycle > TOTAL_CYCLES) {
+            // Done
+            if (breathCountdownRef.current) clearInterval(breathCountdownRef.current);
+            setBreathPhase('complete');
+            setBreathCycle(TOTAL_CYCLES);
+            setPhaseTimer(0);
+            return;
+          }
+        }
+        setBreathPhase(phases[phaseIdx]);
+        setBreathCycle(cycle);
+        setPhaseTimer(BREATH_DURATION);
+        scheduleNextPhase();
+      }, BREATH_DURATION * 1000);
     }
 
-    breathRafRef.current = requestAnimationFrame(tick);
-
-    return () => {
-      cancelled = true;
-      if (breathRafRef.current) cancelAnimationFrame(breathRafRef.current);
-    };
-  }, [state]);
+    scheduleNextPhase();
+  }, []);
 
   const handleClose = () => {
     // Log moment mode completed when closing after meaningful use (30+ seconds)
@@ -308,8 +307,8 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   };
 
   const resetBreathing = () => {
-    if (breathRafRef.current) cancelAnimationFrame(breathRafRef.current);
-    breathStartRef.current = null;
+    if (breathTimeoutRef.current) clearTimeout(breathTimeoutRef.current);
+    if (breathCountdownRef.current) clearInterval(breathCountdownRef.current);
     setBreathPhase('inhale');
     setBreathCycle(1);
     setPhaseTimer(BREATH_DURATION);
@@ -541,8 +540,8 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
             <div className="space-y-3">
               <button
                 onClick={() => {
-                  resetBreathing();
                   setState('pause');
+                  startBreathing();
                   if (user?.id) {
                     const supabase = getSupabase();
                     void supabase.from('hub_activity_log').insert({
