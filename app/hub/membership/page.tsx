@@ -428,15 +428,6 @@ export default function MembershipPage() {
 
           <div>
             <h3 className="font-semibold text-gray-900 mb-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              Is there a discount for annual billing?
-            </h3>
-            <p className="text-gray-600 text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              Annual plans are coming soon with 2 months free! Stay tuned.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>
               Does my school or district qualify for group access?
             </h3>
             <p className="text-gray-600 text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>

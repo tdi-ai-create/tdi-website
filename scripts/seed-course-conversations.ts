@@ -1,17 +1,23 @@
 /**
  * Seed course_responses with varied community posts across all published courses.
- * Run with: HUB_KEY="..." npx tsx scripts/seed-course-conversations.ts
+ * Run with: npx tsx scripts/seed-course-conversations.ts
  *
- * Uses the same fake persona UUIDs and body text pools as the quick win seed.
+ * Prerequisites: FK constraint on user_id must be dropped first.
+ * Uses the Hub Supabase project.
  */
 
+import { config } from 'dotenv';
+config({ path: '.env.local' });
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://asdwpkcsbcnpknklchdq.supabase.co';
-const supabaseKey = process.env.HUB_KEY!;
+// Use Hub project - try Hub URL first, fall back to main
+const supabaseUrl = process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+console.log('Using Supabase URL:', supabaseUrl?.substring(0, 30) + '...');
 
 if (!supabaseKey) {
-  console.error('Missing HUB_KEY env var. Run with: HUB_KEY="..." npx tsx scripts/seed-course-conversations.ts');
+  console.error('Missing Supabase service key. Add LEARNING_HUB_SUPABASE_SERVICE_KEY to .env.local');
   process.exit(1);
 }
 

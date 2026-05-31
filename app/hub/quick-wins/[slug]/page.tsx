@@ -238,15 +238,12 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
       setIsLoading(true);
 
       try {
-        console.log('[QuickWinDetail] Fetching quick win with slug:', slug);
         const { data, error } = await supabase
           .from('hub_quick_wins')
           .select('*')
           .eq('slug', slug)
           .eq('is_published', true)
           .single();
-
-        console.log('[QuickWinDetail] Result:', { data, error });
 
         if (error || !data) {
           console.error('Error fetching quick win:', error);

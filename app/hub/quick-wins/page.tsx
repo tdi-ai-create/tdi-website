@@ -54,14 +54,11 @@ export default function QuickWinsPage() {
 
     try {
       // Fetch all published quick wins from hub_quick_wins table
-      console.log('[QuickWins] Fetching from hub_quick_wins...');
       const { data, error } = await supabase
         .from('hub_quick_wins')
         .select('*')
         .eq('is_published', true)
         .order('created_at', { ascending: false });
-
-      console.log('[QuickWins] Result:', { data, error, count: data?.length });
 
       if (error) {
         console.error('[QuickWins] Query error:', error);

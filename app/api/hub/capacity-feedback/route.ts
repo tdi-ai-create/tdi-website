@@ -31,7 +31,11 @@ export async function POST(request: NextRequest) {
     }
 
     // HMAC of user_id with stable secret — pseudonymous, joinable to educator segments (Rodrigo spec)
-    const secret = process.env.CAPACITY_FEEDBACK_HMAC_SECRET || 'tdi-capacity-feedback-hmac-2026';
+    const secret = process.env.CAPACITY_FEEDBACK_HMAC_SECRET;
+    if (!secret) {
+      console.error('[capacity-feedback] CAPACITY_FEEDBACK_HMAC_SECRET is not set');
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
     const educatorKey = crypto.createHmac('sha256', secret).update(userId).digest('hex');
 
     const { error } = await supabase.from('capacity_feedback').insert({

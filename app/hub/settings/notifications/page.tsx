@@ -83,7 +83,7 @@ export default function NotificationSettingsPage() {
         }
       } catch (error) {
         // No preferences exist yet, use defaults
-        console.log('No notification preferences found, using defaults');
+        // No preferences exist yet, use defaults
       } finally {
         setIsLoading(false);
       }

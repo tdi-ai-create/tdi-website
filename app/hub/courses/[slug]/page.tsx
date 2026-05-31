@@ -157,15 +157,12 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
       try {
         // Fetch course
-        console.log('[CourseDetail] Fetching course with slug:', slug);
         const { data: courseData, error: courseError } = await supabase
           .from('hub_courses')
           .select('*')
           .eq('slug', slug)
           .eq('is_published', true)
           .single();
-
-        console.log('[CourseDetail] Course result:', { courseData, courseError });
 
         if (courseError || !courseData) {
           console.error('Error fetching course:', courseError);
@@ -183,24 +180,18 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           .catch(() => {});
 
         // Fetch modules with lessons
-        console.log('[CourseDetail] Fetching modules for course_id:', courseData.id);
         const { data: modulesData, error: modulesError } = await supabase
           .from('hub_modules')
           .select('id, title, sort_order')
           .eq('course_id', courseData.id)
           .order('sort_order', { ascending: true });
 
-        console.log('[CourseDetail] Modules result:', { modulesData, modulesError });
-
         // Fetch lessons
-        console.log('[CourseDetail] Fetching lessons for course_id:', courseData.id);
         const { data: lessonsData, error: lessonsError } = await supabase
           .from('hub_lessons')
           .select('id, slug, title, description, estimated_minutes, content_type, is_free_preview, is_quick_win, sort_order, module_id')
           .eq('course_id', courseData.id)
           .order('sort_order', { ascending: true });
-
-        console.log('[CourseDetail] Lessons result:', { lessonsData, lessonsError, count: lessonsData?.length });
 
         // Group lessons by module
         const moduleMap = new Map<string, Module>();
@@ -244,7 +235,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           }
         }
 
-        console.log('[CourseDetail] Final modules:', finalModules);
         setModules(finalModules);
 
         // Expand all modules by default
@@ -348,9 +338,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   }, [language, course?.id]);
 
   const handleEnroll = async () => {
-    console.log('[CourseDetailPage] handleEnroll called');
     const success = await enroll();
-    console.log('[CourseDetailPage] enroll result:', success);
     if (success) {
       const newCount = (enrolledCount ?? 0) + 1;
       setEnrolledCount(newCount);
