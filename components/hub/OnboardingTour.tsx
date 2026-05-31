@@ -665,41 +665,8 @@ export default function OnboardingTour({ onComplete, resumeFromStep }: Onboardin
 
   return (
     <>
-      {/* Full-screen click blocker */}
-      <div
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 1000009,
-          background: 'transparent',
-          cursor: 'default',
-        }}
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-      />
-
-      {/* Spotlight hole */}
+      {/* Spotlight hole -- pointer-events: none so clicks pass through to the page */}
       <div style={spotlightStyle} />
-
-      {/* Clickable area over the highlighted element */}
-      {hasTarget && targetRect && (
-        <div
-          style={{
-            position: 'fixed',
-            top: targetRect.top - PAD,
-            left: targetRect.left - PAD,
-            width: targetRect.width + PAD * 2,
-            height: targetRect.height + PAD * 2,
-            borderRadius: RADIUS,
-            zIndex: 1000012,
-            cursor: 'pointer',
-            background: 'transparent',
-            transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-          }}
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); goNext(); }}
-          onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-        />
-      )}
 
       {/* Tooltip card */}
       <div
