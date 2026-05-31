@@ -11,8 +11,11 @@ import {
   CONTINUATION_PROMPTS,
 } from '@/lib/tour-copy';
 
+const TOUR_STORAGE_KEY = 'tdi-hub-tour-step';
+
 interface OnboardingTourProps {
   onComplete: (stopsSeen: number) => void;
+  resumeFromStep?: number;
 }
 
 /* ------------------------------------------------------------------ */
@@ -200,19 +203,32 @@ function Arrow({ side }: { side: Side }) {
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 
-export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
+export default function OnboardingTour({ onComplete, resumeFromStep }: OnboardingTourProps) {
   const { user } = useHub();
   const { tUI } = useTranslation();
 
-  const [stepIndex, setStepIndex] = useState(0);
+  const initialStep = resumeFromStep ?? 0;
+  const [stepIndex, setStepIndex] = useState(initialStep);
   const [targetRect, setTargetRect] = useState<Rect | null>(null);
   const [showDisclosure, setShowDisclosure] = useState(false);
   const [showContinuation, setShowContinuation] = useState<number | null>(null);
   const [active, setActive] = useState(true);
 
+  // Transition state for smooth step changes
+  const [transitioning, setTransitioning] = useState(false);
+  const [tooltipVisible, setTooltipVisible] = useState(true);
+
   const hasLoggedRef = useRef(false);
 
   const step = TOUR_STEPS_CONFIG[stepIndex] as TourStep | undefined;
+
+  /* ---------- persist progress to localStorage ---------- */
+
+  useEffect(() => {
+    if (active) {
+      try { localStorage.setItem(TOUR_STORAGE_KEY, String(stepIndex)); } catch {}
+    }
+  }, [stepIndex, active]);
 
   /* ---------- log completion ---------- */
 
@@ -226,6 +242,10 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
         action: 'tour_completed',
         metadata: { stops_seen: count },
       });
+      // Clear saved progress once fully complete
+      if (count >= TOTAL_STEPS) {
+        try { localStorage.removeItem(TOUR_STORAGE_KEY); } catch {}
+      }
     },
     [user?.id],
   );
@@ -309,7 +329,9 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
 
     const timer = setTimeout(() => {
       measureTarget();
-    }, 150);
+      // Fade tooltip back in after spotlight has moved
+      setTimeout(() => setTooltipVisible(true), 150);
+    }, 200);
     return () => clearTimeout(timer);
   }, [active, step, measureTarget]);
 
@@ -366,14 +388,24 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
       return;
     }
 
-    setTargetRect(null);
-    setStepIndex(nextIndex);
+    // Smooth transition: fade out tooltip, move spotlight, fade in tooltip
+    setTransitioning(true);
+    setTooltipVisible(false);
+    setTimeout(() => {
+      setTargetRect(null);
+      setStepIndex(nextIndex);
+      setTransitioning(false);
+    }, 300);
   }, [endTour]);
 
   const handleDisclosureContinue = useCallback(() => {
     setShowDisclosure(false);
     setTargetRect(null);
-    setStepIndex(MANDATORY_COUNT);
+    setTooltipVisible(false);
+    setTimeout(() => {
+      setStepIndex(MANDATORY_COUNT);
+      setTooltipVisible(true);
+    }, 200);
   }, []);
 
   const handleDisclosureSkip = useCallback(() => {
@@ -386,7 +418,11 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
     setShowContinuation(null);
     if (stopNum !== null) {
       setTargetRect(null);
-      setStepIndex(stopNum); // stopNum is 1-indexed, which equals the next 0-indexed step
+      setTooltipVisible(false);
+      setTimeout(() => {
+        setStepIndex(stopNum);
+        setTooltipVisible(true);
+      }, 200);
     }
   }, [showContinuation]);
 
@@ -419,7 +455,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
           alignItems: 'center',
           justifyContent: 'center',
           background: 'rgba(30, 39, 73, 0.8)',
-          animation: 'tdi-tour-fadein 0.2s ease-out',
+          animation: 'tdi-tour-fadein 0.4s ease-out',
         }}
       >
         <div
@@ -431,6 +467,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
             width: '90%',
             textAlign: 'center',
             boxShadow: '0 20px 60px rgba(30, 39, 73, 0.3)',
+            animation: 'tdi-tour-scalein 0.4s ease-out',
           }}
         >
           <p
@@ -494,6 +531,10 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
             from { opacity: 0; }
             to { opacity: 1; }
           }
+          @keyframes tdi-tour-scalein {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+          }
         `}</style>
       </div>
     );
@@ -513,7 +554,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
           alignItems: 'center',
           justifyContent: 'center',
           background: 'rgba(30, 39, 73, 0.8)',
-          animation: 'tdi-tour-fadein 0.2s ease-out',
+          animation: 'tdi-tour-fadein 0.4s ease-out',
         }}
       >
         <div
@@ -525,6 +566,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
             width: '90%',
             textAlign: 'center',
             boxShadow: '0 20px 60px rgba(30, 39, 73, 0.3)',
+            animation: 'tdi-tour-scalein 0.4s ease-out',
           }}
         >
           <p
@@ -577,6 +619,10 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
             from { opacity: 0; }
             to { opacity: 1; }
           }
+          @keyframes tdi-tour-scalein {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+          }
         `}</style>
       </div>
     );
@@ -606,7 +652,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
         boxShadow: '0 0 0 9999px rgba(30, 39, 73, 0.75)',
         zIndex: 1000010,
         pointerEvents: 'none',
-        transition: 'all 0.3s ease',
+        transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
       }
     : {
         position: 'fixed',
@@ -614,6 +660,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
         background: 'rgba(30, 39, 73, 0.75)',
         zIndex: 1000010,
         pointerEvents: 'none',
+        transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
       };
 
   return (
@@ -647,6 +694,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
             zIndex: 1000012,
             cursor: 'pointer',
             background: 'transparent',
+            transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); goNext(); }}
           onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
@@ -663,7 +711,8 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
           width: TOOLTIP_MAX_W,
           zIndex: 1000011,
           transform: tipTransform,
-          animation: 'tdi-tour-fadein 0.2s ease-out',
+          opacity: tooltipVisible && !transitioning ? 1 : 0,
+          transition: 'opacity 0.3s ease, top 0.5s cubic-bezier(0.4, 0, 0.2, 1), left 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
         <div
@@ -773,6 +822,8 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
           textAlign: 'center',
           marginTop: tipTransform ? undefined : 8,
           transform: tipTransform ? 'translateY(-100%) translateY(-48px)' : undefined,
+          opacity: tooltipVisible && !transitioning ? 1 : 0,
+          transition: 'opacity 0.3s ease',
         }}
       >
         <button
@@ -793,8 +844,12 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
 
       <style>{`
         @keyframes tdi-tour-fadein {
-          from { opacity: 0; transform: translateY(4px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes tdi-tour-scalein {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
         }
       `}</style>
     </>

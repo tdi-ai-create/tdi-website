@@ -234,6 +234,7 @@ export default function HubDashboard() {
   const [showTour, setShowTour] = useState(false);
   const [tourChecked, setTourChecked] = useState(false);
   const [tourCompleted, setTourCompleted] = useState(false);
+  const [tourResumeStep, setTourResumeStep] = useState(0);
   const [personalStats, setPersonalStats] = useState<PersonalStats | null>(null);
   const [communityPulse, setCommunityPulse] = useState<CommunityPulse | null>(null);
   const [featuredQuickWin, setFeaturedQuickWin] = useState<QuickWin | null>(null);
@@ -700,6 +701,7 @@ export default function HubDashboard() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('tour') === 'start') {
       setTourChecked(true);
+      setTourResumeStep(0);
       setShowTour(true);
       // Clean up the URL
       window.history.replaceState({}, '', '/hub');
@@ -710,16 +712,32 @@ export default function HubDashboard() {
       const supabase = getSupabase();
       const { data } = await supabase
         .from('hub_activity_log')
-        .select('id')
+        .select('id, metadata')
         .eq('user_id', user!.id)
         .eq('action', 'tour_completed')
+        .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
 
       setTourChecked(true);
-      if (data) {
+
+      // Check if they completed ALL 10 steps
+      const stopsSeen = (data?.metadata as Record<string, unknown>)?.stops_seen as number | undefined;
+      if (data && stopsSeen && stopsSeen >= 10) {
         setTourCompleted(true);
+        return;
       }
+
+      // Check localStorage for in-progress tour step
+      try {
+        const saved = localStorage.getItem('tdi-hub-tour-step');
+        if (saved !== null) {
+          const savedStep = parseInt(saved, 10);
+          if (!isNaN(savedStep) && savedStep > 0 && savedStep < 10) {
+            setTourResumeStep(savedStep);
+          }
+        }
+      } catch {}
     }
 
     checkTourStatus();
@@ -727,7 +745,10 @@ export default function HubDashboard() {
 
   const handleTourComplete = useCallback((stopsSeen: number) => {
     setShowTour(false);
-    setTourCompleted(true);
+    if (stopsSeen >= 10) {
+      setTourCompleted(true);
+      try { localStorage.removeItem('tdi-hub-tour-step'); } catch {}
+    }
   }, []);
 
   // Loading skeleton
@@ -899,10 +920,13 @@ export default function HubDashboard() {
               className="text-2xl font-bold text-white mb-3"
               style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
             >
-              {tUI('Welcome to the new Learning Hub')}
+              {tUI(tourResumeStep > 0 ? 'Ready to pick up where you left off?' : 'Welcome to the new Learning Hub')}
             </h2>
             <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.7)', lineHeight: '1.7' }}>
-              {tUI('We built something new for you. A quick tour will show you the highlights -- it takes about 60 seconds and you can skip anytime.')}
+              {tUI(tourResumeStep > 0
+                ? `You made it through step ${tourResumeStep} of 10. Want to continue the tour from where you stopped?`
+                : 'We built something new for you. A quick tour will show you the highlights -- it takes about 60 seconds and you can skip anytime.'
+              )}
             </p>
             <div className="flex flex-col gap-3 items-center">
               <button
@@ -910,10 +934,13 @@ export default function HubDashboard() {
                 className="px-8 py-3 rounded-xl text-sm font-bold transition-opacity hover:opacity-90"
                 style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
               >
-                {tUI('Show me around')}
+                {tUI(tourResumeStep > 0 ? 'Continue the tour' : 'Show me around')}
               </button>
               <button
-                onClick={() => setTourCompleted(true)}
+                onClick={() => {
+                  setTourCompleted(true);
+                  try { localStorage.removeItem('tdi-hub-tour-step'); } catch {}
+                }}
                 className="text-xs transition-colors"
                 style={{ color: 'rgba(255,255,255,0.4)' }}
               >
@@ -1851,7 +1878,7 @@ export default function HubDashboard() {
         </div>
       </div>
     )}
-    {showTour && <OnboardingTour onComplete={handleTourComplete} />}
+    {showTour && <OnboardingTour onComplete={handleTourComplete} resumeFromStep={tourResumeStep} />}
     </div>
   );
 }
