@@ -18,7 +18,7 @@ import {
   Zap,
 } from 'lucide-react';
 import CourseCard from '@/components/hub/CourseCard';
-import LessonConversation from '@/components/hub/LessonConversation';
+import CommunityTabs from '@/components/hub/CommunityTabs';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
 
 // Category colors
@@ -834,12 +834,12 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         style={{ borderColor: 'rgba(255,186,6,0.3)' }}
       />
 
-      {/* Lesson Conversation */}
-      <LessonConversation
-        lessonId={course.id}
-        courseId={course.id}
+      {/* Community: Conversation + Q&A tabs */}
+      <CommunityTabs
+        contentId={course.id}
         userId={user?.id}
-        apiBasePath={`/api/hub/courses/${course.id}/conversation`}
+        conversationApiPath={`/api/hub/courses/${course.id}/conversation`}
+        qaApiPath={`/api/hub/courses/${course.id}/qa`}
       />
 
       {/* Related Quick Wins */}

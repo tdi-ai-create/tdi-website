@@ -8,6 +8,7 @@ import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { useProgressTracking } from '@/lib/hooks/useProgressTracking';
 import LessonContent from '@/components/hub/LessonContent';
 import LessonConversation from '@/components/hub/LessonConversation';
+import LessonQA from '@/components/hub/LessonQA';
 import CourseCompletionModal from '@/components/hub/CourseCompletionModal';
 import {
   ArrowLeft,
@@ -71,7 +72,7 @@ export default function LessonPage({ params }: LessonPageProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [hasTranscript, setHasTranscript] = useState(false);
   const [hasTranscriptEs, setHasTranscriptEs] = useState(false);
-  const [activeTab, setActiveTab] = useState<'lesson' | 'conversation'>('lesson');
+  const [activeTab, setActiveTab] = useState<'lesson' | 'conversation' | 'qa'>('lesson');
 
   // Quiz state
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
@@ -369,6 +370,19 @@ export default function LessonPage({ params }: LessonPageProps) {
                 <MessageCircle size={16} />
                 Conversation
               </button>
+              <button
+                onClick={() => setActiveTab('qa')}
+                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors relative"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: activeTab === 'qa' ? '#1B2A4A' : '#9CA3AF',
+                  borderBottom: activeTab === 'qa' ? '2px solid #E8B84B' : '2px solid transparent',
+                  marginBottom: '-1px',
+                }}
+              >
+                <MessageCircle size={16} />
+                Q&A
+              </button>
             </div>
 
             {/* ── LESSON TAB ── */}
@@ -587,6 +601,15 @@ export default function LessonPage({ params }: LessonPageProps) {
                 lessonId={currentLesson.id}
                 courseId={course.id}
                 userId={user?.id || null}
+              />
+            )}
+
+            {/* ── Q&A TAB ── */}
+            {activeTab === 'qa' && (
+              <LessonQA
+                contentId={currentLesson.id}
+                userId={user?.id || null}
+                apiBasePath={`/api/hub/lessons/${currentLesson.id}/qa`}
               />
             )}
           </div>

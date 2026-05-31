@@ -22,7 +22,7 @@ import {
   Info,
 } from 'lucide-react';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
-import LessonConversation from '@/components/hub/LessonConversation';
+import CommunityTabs from '@/components/hub/CommunityTabs';
 
 // ─── Breathing Exercise Component ───────────────────────────────────────────
 
@@ -964,12 +964,12 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               </div>
             )}
 
-            {/* ─── COMMUNITY CONVERSATION ───────────────────────────── */}
-            <LessonConversation
-              lessonId={quickWin.id}
-              courseId={quickWin.id}
+            {/* ─── COMMUNITY ───────────────────────────────────────── */}
+            <CommunityTabs
+              contentId={quickWin.id}
               userId={user?.id}
-              apiBasePath={`/api/hub/quick-wins/${quickWin.id}/conversation`}
+              conversationApiPath={`/api/hub/quick-wins/${quickWin.id}/conversation`}
+              qaApiPath={`/api/hub/quick-wins/${quickWin.id}/qa`}
             />
           </div>
 
