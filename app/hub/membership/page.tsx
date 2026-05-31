@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useHub } from '@/components/hub/HubContext';
 import { useMembership, MembershipTier, getShortTierLabel, getTierBadgeColors } from '@/lib/hub/use-membership';
-import { Check, Sparkles, Crown, Zap, Loader2 } from 'lucide-react';
+import { Check, Sparkles, Crown, Zap, Loader2, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
@@ -95,6 +95,89 @@ const PRICING_TIERS: PricingTier[] = [
     buttonText: 'Upgrade',
   },
 ];
+
+const MEMBERSHIP_FAQ = [
+  {
+    q: 'Can I cancel anytime?',
+    a: 'Yes! You can cancel your subscription at any time from your account settings. You will keep access to your current tier until the end of your billing period.',
+  },
+  {
+    q: 'Can I switch between tiers?',
+    a: 'Absolutely. You can upgrade or downgrade at any time. When you upgrade, you get immediate access to the new tier. When you downgrade, the change takes effect at the end of your current billing period.',
+  },
+  {
+    q: 'What happens to my progress if I change plans?',
+    a: 'Your course progress, completed quick wins, certificates, and community contributions are all tied to your account - not your tier. Nothing is lost if you switch plans or even take a break.',
+  },
+  {
+    q: "What's included in the free rotating content?",
+    a: 'Each week, we rotate different quick wins and resources to be available for free. This gives you a chance to experience the Hub before upgrading. Your free account also includes community access and your personal dashboard.',
+  },
+  {
+    q: 'Do courses count toward PD credit hours?',
+    a: 'Yes. Each course lists its estimated PD hours. When you complete a course, you receive a certificate that documents the hours for your records or district PD requirements.',
+  },
+  {
+    q: 'Do I earn certificates?',
+    a: 'You earn a certificate for every course you complete. Certificates include the course title, PD hours, and your completion date. You can download and share them from your profile.',
+  },
+  {
+    q: 'Does my school or district qualify for group access?',
+    a: 'Yes! We partner with schools and districts to provide Hub access for all staff as part of a TDI partnership.',
+  },
+];
+
+function MembershipFAQ() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  return (
+    <div className="bg-gray-50 rounded-2xl p-6 md:p-8">
+      <h2
+        className="text-xl font-bold text-gray-900 mb-5"
+        style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
+      >
+        Frequently Asked Questions
+      </h2>
+      <div className="space-y-0">
+        {MEMBERSHIP_FAQ.map((item, i) => {
+          const isOpen = openIndex === i;
+          return (
+            <div key={i} style={{ borderBottom: i < MEMBERSHIP_FAQ.length - 1 ? '1px solid #E5E7EB' : 'none' }}>
+              <button
+                onClick={() => setOpenIndex(isOpen ? null : i)}
+                className="w-full flex items-center justify-between py-4 text-left"
+                style={{ fontFamily: "'DM Sans', sans-serif" }}
+              >
+                <span className="font-semibold text-gray-900 text-sm pr-4">{item.q}</span>
+                <ChevronDown
+                  size={16}
+                  className="flex-shrink-0 text-gray-400 transition-transform"
+                  style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                />
+              </button>
+              {isOpen && (
+                <p
+                  className="text-gray-600 text-sm pb-4 leading-relaxed"
+                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  {item.a}
+                  {item.q.includes('school or district') && (
+                    <>
+                      {' '}
+                      <Link href="/for-schools" className="text-blue-600 hover:underline">
+                        Learn more about district partnerships
+                      </Link>
+                    </>
+                  )}
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default function MembershipPage() {
   const { user } = useHub();
@@ -398,47 +481,8 @@ export default function MembershipPage() {
         })}
       </div>
 
-      {/* FAQ or Info section */}
-      <div className="bg-gray-50 rounded-2xl p-6 md:p-8">
-        <h2
-          className="text-xl font-bold text-gray-900 mb-4"
-          style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
-        >
-          Frequently Asked Questions
-        </h2>
-
-        <div className="space-y-4">
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              Can I cancel anytime?
-            </h3>
-            <p className="text-gray-600 text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              Yes! You can cancel your subscription at any time. You&apos;ll keep access until the end of your billing period.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              What&apos;s included in the free rotating content?
-            </h3>
-            <p className="text-gray-600 text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              Each week, we rotate different quick wins and resources to be available for free. This gives you a taste of our content before upgrading.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              Does my school or district qualify for group access?
-            </h3>
-            <p className="text-gray-600 text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              Yes! We partner with schools and districts to provide access for all teachers.{' '}
-              <Link href="/for-schools" className="text-blue-600 hover:underline">
-                Learn more about district partnerships
-              </Link>
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* FAQ section */}
+      <MembershipFAQ />
 
       {/* Back link */}
       <div className="mt-8 text-center">

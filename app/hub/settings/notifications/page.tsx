@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useHub } from '@/components/hub/HubContext';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
-import { User, Bell, Mail, Clock, Eye, Users, Check } from 'lucide-react';
+import { User, Bell, Mail, Clock, Eye, Users, Check, HelpCircle } from 'lucide-react';
 
 interface NotificationPreferences {
   id?: string;
@@ -205,6 +205,13 @@ export default function NotificationSettingsPage() {
           >
             <Bell size={18} />
             Notifications
+          </Link>
+          <Link
+            href="/hub/settings/help"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            <HelpCircle size={18} />
+            Help & FAQ
           </Link>
         </div>
 

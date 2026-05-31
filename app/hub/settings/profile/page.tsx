@@ -40,6 +40,7 @@ import {
   ExternalLink,
   ChevronRight,
   ArrowRight,
+  HelpCircle,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -680,6 +681,14 @@ export default function ProfileSettingsPage() {
           >
             <Bell size={18} />
             {tUI('Notifications')}
+          </Link>
+          <Link
+            href="/hub/settings/help"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition-colors"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            <HelpCircle size={18} />
+            {tUI('Help & FAQ')}
           </Link>
         </div>
 
