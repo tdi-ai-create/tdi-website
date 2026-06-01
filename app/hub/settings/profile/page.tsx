@@ -188,7 +188,7 @@ const TAB_CONFIG: { id: GrowthTab; label: string; icon: LucideIcon }[] = [
   { id: 'profile', label: 'Profile', icon: User },
   { id: 'goals', label: 'Goals', icon: Target },
   { id: 'stats', label: 'My Stats', icon: BarChart3 },
-  { id: 'wellbeing', label: 'Wellbeing', icon: Heart },
+  { id: 'wellbeing', label: 'Vibe Check', icon: Heart },
   { id: 'library', label: 'Library', icon: BookOpen },
   { id: 'recognitions', label: 'Recognitions', icon: Award },
 ];
@@ -309,13 +309,14 @@ export default function ProfileSettingsPage() {
           .from('quick_win_responses')
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id),
-        // Vibe Check history
+        // Vibe Check history (from activity log)
         supabase
-          .from('hub_assessments')
-          .select('id, score, responses, created_at')
+          .from('hub_activity_log')
+          .select('id, metadata, created_at')
           .eq('user_id', user.id)
-          .eq('type', 'daily_check_in')
-          .order('created_at', { ascending: false }),
+          .eq('action', 'wellbeing_check')
+          .order('created_at', { ascending: false })
+          .limit(30),
         // Favorites with content info
         supabase
           .from('hub_favorites')
@@ -345,7 +346,14 @@ export default function ProfileSettingsPage() {
         recentActivity: (recentResult.data || []) as ActivityEntry[],
       });
 
-      setCheckIns((checkInResult.data || []) as CheckInEntry[]);
+      // Map activity log entries to CheckInEntry format
+      const rawCheckIns = (checkInResult.data || []) as { id: string; metadata: Record<string, unknown> | null; created_at: string }[];
+      setCheckIns(rawCheckIns.map(entry => ({
+        id: entry.id,
+        score: (entry.metadata?.score as number) || (entry.metadata?.value as number) || 3,
+        responses: (entry.metadata as Record<string, string>) || null,
+        created_at: entry.created_at,
+      })));
 
       // Enrich favorites with titles
       const rawFavorites = (favoritesResult.data || []) as FavoriteEntry[];
@@ -1135,7 +1143,7 @@ export default function ProfileSettingsPage() {
           >
             <div className="px-6 py-5" style={{ background: 'linear-gradient(135deg, #FFF8E7 0%, #FAFAF8 100%)' }}>
               <h2 className="text-sm font-semibold mb-1" style={{ color: '#1B2A4A' }}>
-                {tUI('Your Wellbeing Over Time')}
+                {tUI('Your Vibe Check History')}
               </h2>
               <p className="text-xs" style={{ color: '#9CA3AF' }}>
                 {tUI('We check in across 5 dimensions. This data is completely private -- only you can see it.')}
@@ -1175,11 +1183,14 @@ export default function ProfileSettingsPage() {
             {checkIns.length > 0 ? (
               <div>
                 {checkIns.map((entry, idx) => {
-                  const scoreConfig = entry.score <= 2
-                    ? { label: 'Tough day', bg: '#FEE2E2', color: '#991B1B', border: '#EF4444' }
-                    : entry.score <= 3
-                    ? { label: 'Hanging in there', bg: '#FEF3C7', color: '#92400E', border: '#D97706' }
-                    : { label: 'Feeling good', bg: '#D1FAE5', color: '#065F46', border: '#16A34A' };
+                  const scoreConfigs: Record<number, { label: string; bg: string; color: string; border: string }> = {
+                    1: { label: 'Tough day', bg: '#FEE2E2', color: '#991B1B', border: '#EF4444' },
+                    2: { label: 'Hanging in there', bg: '#FEF3C7', color: '#92400E', border: '#F59E0B' },
+                    3: { label: 'Okay', bg: '#FEF9C3', color: '#854D0E', border: '#D97706' },
+                    4: { label: 'Good day', bg: '#DCFCE7', color: '#166534', border: '#22C55E' },
+                    5: { label: 'Great day', bg: '#D1FAE5', color: '#065F46', border: '#16A34A' },
+                  };
+                  const scoreConfig = scoreConfigs[entry.score] || scoreConfigs[3];
                   return (
                     <div
                       key={entry.id}
@@ -1192,6 +1203,14 @@ export default function ProfileSettingsPage() {
                       />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
+                          {entry.responses?.category && (
+                            <span
+                              className="text-xs font-medium px-2 py-0.5 rounded capitalize"
+                              style={{ background: '#F3F4F6', color: '#6B7280', fontSize: '10px' }}
+                            >
+                              {entry.responses.category}
+                            </span>
+                          )}
                           <span
                             className="text-xs font-bold px-2 py-0.5 rounded"
                             style={{ background: scoreConfig.bg, color: scoreConfig.color, fontSize: '10px' }}
