@@ -956,20 +956,24 @@ ${displayName}</div>
                       >
                         {tUI(item.recognition.personalNote)}
                       </p>
-                      <div className="flex flex-wrap items-center gap-3">
-                        <span
-                          className="text-[12px] text-gray-400"
-                          style={{ fontFamily: "'DM Sans', sans-serif" }}
-                        >
-                          {tUI('Earned')} {formatDate(item.earnedAt)}
-                        </span>
+                      <div
+                        className="text-[12px] text-gray-400 mb-3"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        {tUI('Earned')} {formatDate(item.earnedAt)}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
                         <button
                           onClick={() => handlePrint(item.recognition)}
-                          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
-                          style={{ fontFamily: "'DM Sans', sans-serif" }}
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all hover:opacity-90"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            backgroundColor: '#1B2A4A',
+                            color: 'white',
+                          }}
                         >
                           <Printer size={14} />
-                          {tUI('Print')}
+                          {tUI('Print Certificate')}
                         </button>
                         <button
                           onClick={() => {
@@ -977,11 +981,15 @@ ${displayName}</div>
                             setShareTitle('Share this win');
                             setShareOpen(true);
                           }}
-                          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
-                          style={{ fontFamily: "'DM Sans', sans-serif" }}
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all hover:opacity-90"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            backgroundColor: '#E8B84B',
+                            color: '#1B2A4A',
+                          }}
                         >
                           <Share2 size={14} />
-                          {tUI('Share')}
+                          {tUI('Share This Win')}
                         </button>
                       </div>
                     </div>
