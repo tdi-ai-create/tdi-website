@@ -858,13 +858,11 @@ export default function ProfileSettingsPage() {
                 <div className="mt-5 pt-5 border-t border-gray-100">
                   <AvatarPicker
                     selectedAvatarId={selectedAvatarId}
-                    uploadedAvatarUrl={uploadedAvatarUrl}
+                    uploadedAvatarUrl={null}
                     onSelect={handleAvatarSelect}
-                    onUpload={handleAvatarUpload}
-                    onClearUpload={handleAvatarClear}
+                    onUpload={() => {}}
+                    onClearUpload={() => {}}
                     size="settings"
-                    isUploading={isUploading}
-                    onFileSelect={handleAvatarFileSelect}
                   />
                 </div>
               )}
