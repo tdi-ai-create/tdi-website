@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
       try {
         await resend.emails.send({
           from: 'Teachers Deserve It <noreply@teachersdeserveit.com>',
-          to: ['rae@teachersdeserveit.com'],
+          to: ['hello@teachersdeserveit.com'],
           subject: `[Hub Report] ${contentLabel} reported`,
           html: `
             <div style="font-family: -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
