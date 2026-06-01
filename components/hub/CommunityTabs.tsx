@@ -8,11 +8,12 @@ import LessonQA from './LessonQA'
 interface CommunityTabsProps {
   contentId: string
   userId?: string | null
+  isAdmin?: boolean
   conversationApiPath: string
   qaApiPath: string
 }
 
-export default function CommunityTabs({ contentId, userId, conversationApiPath, qaApiPath }: CommunityTabsProps) {
+export default function CommunityTabs({ contentId, userId, isAdmin, conversationApiPath, qaApiPath }: CommunityTabsProps) {
   const [activeTab, setActiveTab] = useState<'conversation' | 'qa'>('conversation')
 
   return (
@@ -51,6 +52,7 @@ export default function CommunityTabs({ contentId, userId, conversationApiPath, 
           lessonId={contentId}
           courseId={contentId}
           userId={userId || null}
+          isAdmin={isAdmin}
           apiBasePath={conversationApiPath}
         />
       )}
@@ -59,6 +61,7 @@ export default function CommunityTabs({ contentId, userId, conversationApiPath, 
         <LessonQA
           contentId={contentId}
           userId={userId || null}
+          isAdmin={isAdmin}
           apiBasePath={qaApiPath}
         />
       )}

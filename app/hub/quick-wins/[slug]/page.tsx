@@ -968,6 +968,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
             <CommunityTabs
               contentId={quickWin.id}
               userId={user?.id}
+              isAdmin={!!user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')}
               conversationApiPath={`/api/hub/quick-wins/${quickWin.id}/conversation`}
               qaApiPath={`/api/hub/quick-wins/${quickWin.id}/qa`}
             />

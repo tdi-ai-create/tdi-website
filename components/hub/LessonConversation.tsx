@@ -1,12 +1,19 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { MessageCircle, X, ThumbsUp, Flag } from 'lucide-react'
+import { MessageCircle, X, ThumbsUp, Flag, Bookmark, Pin, ChevronDown, Send } from 'lucide-react'
 import { useTranslation } from '@/lib/hub/useTranslation'
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 
 export type ContributionType = 'tried_it' | 'adapted_it' | 'still_trying' | 'got_stuck' | 'didnt_land'
+
+interface ConversationReply {
+  id: string
+  body: string
+  posted_at: string
+  author: { name: string; role: string | null }
+}
 
 interface ConversationPost {
   id: string
@@ -15,6 +22,8 @@ interface ConversationPost {
   body: string
   helpful_count: number
   posted_at: string
+  is_pinned?: boolean
+  replies?: ConversationReply[]
   author: {
     name: string
     role: string | null
@@ -162,13 +171,20 @@ function FilterChips({
 
 // ─── POST CARD ──────────────────────────────────────────────────────────────
 
-function PostCard({ post, userId, tUI }: { post: ConversationPost; userId?: string | null; tUI: (s: string) => string }) {
+function PostCard({ post, userId, isAdmin, onRefresh, tUI }: { post: ConversationPost; userId?: string | null; isAdmin?: boolean; onRefresh?: () => void; tUI: (s: string) => string }) {
   const config = getTypeConfig(post.contribution_type)
   const [helpfulCount, setHelpfulCount] = useState(post.helpful_count)
   const [isHelpful, setIsHelpful] = useState(false)
   const [toggling, setToggling] = useState(false)
   const [reported, setReported] = useState(false)
   const [showReportConfirm, setShowReportConfirm] = useState(false)
+  const [bookmarked, setBookmarked] = useState(false)
+  const [pinned, setPinned] = useState(post.is_pinned || false)
+  const [showReplyInput, setShowReplyInput] = useState(false)
+  const [replyText, setReplyText] = useState('')
+  const [replies, setReplies] = useState<ConversationReply[]>(post.replies || [])
+  const [showReplies, setShowReplies] = useState(false)
+  const [postingReply, setPostingReply] = useState(false)
 
   const timeAgo = getTimeAgo(post.posted_at)
 
@@ -191,6 +207,41 @@ function PostCard({ post, userId, tUI }: { post: ConversationPost; userId?: stri
     }
   }
 
+  const toggleBookmark = async () => {
+    if (!userId) return
+    try {
+      const res = await fetch('/api/hub/community/bookmark', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: userId,
+          content_type: 'conversation_post',
+          content_id: post.id,
+          title: post.title || post.body.slice(0, 80),
+        }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setBookmarked(data.bookmarked)
+      }
+    } catch { /* silent */ }
+  }
+
+  const togglePin = async () => {
+    if (!userId || !isAdmin) return
+    try {
+      const res = await fetch('/api/hub/community/pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content_type: 'conversation_post', content_id: post.id, user_id: userId }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setPinned(data.pinned)
+      }
+    } catch { /* silent */ }
+  }
+
   const handleReport = async () => {
     if (!userId) return
     try {
@@ -201,8 +252,32 @@ function PostCard({ post, userId, tUI }: { post: ConversationPost; userId?: stri
       })
       setReported(true)
       setShowReportConfirm(false)
-    } catch {
-      // Silent fail
+    } catch { /* silent */ }
+  }
+
+  const handlePostReply = async () => {
+    if (!replyText.trim() || !userId || postingReply) return
+    setPostingReply(true)
+    try {
+      const res = await fetch('/api/hub/community/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content_type: 'conversation_post',
+          parent_id: post.id,
+          user_id: userId,
+          body: replyText.trim(),
+        }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setReplies(prev => [...prev, data])
+        setReplyText('')
+        setShowReplyInput(false)
+        setShowReplies(true)
+      }
+    } finally {
+      setPostingReply(false)
     }
   }
 
@@ -210,14 +285,25 @@ function PostCard({ post, userId, tUI }: { post: ConversationPost; userId?: stri
 
   return (
     <div
-      className="bg-white rounded-xl border border-gray-100 overflow-hidden"
-      style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+      className="bg-white rounded-xl border overflow-hidden"
+      style={{
+        boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+        borderColor: pinned ? '#E8B84B' : 'rgba(243,244,246,1)',
+      }}
     >
       <div className="flex">
         {/* Accent bar */}
         <div className="w-1 flex-shrink-0" style={{ backgroundColor: config.color }} />
 
         <div className="flex-1 p-5">
+          {/* Pinned indicator */}
+          {pinned && (
+            <div className="flex items-center gap-1 mb-2">
+              <Pin size={11} style={{ color: '#E8B84B' }} />
+              <span className="text-xs font-medium" style={{ color: '#E8B84B' }}>{tUI('Pinned')}</span>
+            </div>
+          )}
+
           {/* Tag */}
           <span
             className="inline-block text-xs font-medium px-2 py-0.5 rounded mb-2"
@@ -247,32 +333,69 @@ function PostCard({ post, userId, tUI }: { post: ConversationPost; userId?: stri
           </p>
 
           {/* Actions */}
-          <div className="flex items-center gap-4 mt-4">
+          <div className="flex items-center gap-3 mt-4">
             <button
               onClick={toggleHelpful}
               disabled={!userId || toggling}
               className="flex items-center gap-1.5 text-xs transition-colors disabled:opacity-50"
-              style={{
-                color: isHelpful ? '#2A9D8F' : '#9CA3AF',
-                fontWeight: isHelpful ? 600 : 400,
-              }}
+              style={{ color: isHelpful ? '#2A9D8F' : '#9CA3AF', fontWeight: isHelpful ? 600 : 400 }}
             >
               <ThumbsUp size={14} fill={isHelpful ? '#2A9D8F' : 'none'} />
               {helpfulCount > 0 && helpfulCount}
             </button>
 
             {userId && (
-              <div className="relative">
+              <button
+                onClick={() => setShowReplyInput(!showReplyInput)}
+                className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <MessageCircle size={13} />
+                {tUI('Reply')}
+              </button>
+            )}
+
+            {replies.length > 0 && (
+              <button
+                onClick={() => setShowReplies(!showReplies)}
+                className="text-xs font-medium transition-colors"
+                style={{ color: '#2B3A67' }}
+              >
+                {showReplies ? tUI('Hide replies') : `${replies.length} ${replies.length === 1 ? tUI('reply') : tUI('replies')}`}
+              </button>
+            )}
+
+            {userId && (
+              <button
+                onClick={toggleBookmark}
+                className="flex items-center text-xs transition-colors"
+                style={{ color: bookmarked ? '#E8B84B' : '#D1D5DB' }}
+              >
+                <Bookmark size={13} fill={bookmarked ? '#E8B84B' : 'none'} />
+              </button>
+            )}
+
+            {isAdmin && (
+              <button
+                onClick={togglePin}
+                className="flex items-center gap-1 text-xs transition-colors"
+                style={{ color: pinned ? '#E8B84B' : '#D1D5DB' }}
+              >
+                <Pin size={12} />
+              </button>
+            )}
+
+            {userId && (
+              <div className="relative ml-auto">
                 {showReportConfirm ? (
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-400">{tUI('Report this post?')}</span>
+                    <span className="text-xs text-gray-400">{tUI('Report?')}</span>
                     <button onClick={handleReport} className="text-xs font-medium text-red-500 hover:text-red-700">{tUI('Yes')}</button>
                     <button onClick={() => setShowReportConfirm(false)} className="text-xs font-medium text-gray-400 hover:text-gray-600">{tUI('No')}</button>
                   </div>
                 ) : (
                   <button
                     onClick={() => setShowReportConfirm(true)}
-                    className="flex items-center gap-1 text-xs text-gray-300 hover:text-gray-500 transition-colors"
+                    className="text-xs text-gray-300 hover:text-gray-500 transition-colors"
                   >
                     <Flag size={12} />
                   </button>
@@ -280,6 +403,49 @@ function PostCard({ post, userId, tUI }: { post: ConversationPost; userId?: stri
               </div>
             )}
           </div>
+
+          {/* Replies */}
+          {showReplies && replies.length > 0 && (
+            <div className="mt-4 pt-3 space-y-3" style={{ borderTop: '1px solid #F3F4F6' }}>
+              {replies.map(r => (
+                <div key={r.id} className="flex gap-2 ml-4">
+                  <div className="w-0.5 rounded-full flex-shrink-0" style={{ background: '#E8B84B' }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-gray-400 mb-1">
+                      <span className="font-medium text-gray-600">{r.author.name}</span>
+                      {r.author.role && <span> · {formatRole(r.author.role)}</span>}
+                      <span> · {getTimeAgo(r.posted_at)}</span>
+                    </p>
+                    <p className="text-sm text-gray-700 leading-relaxed">{r.body}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Reply input */}
+          {showReplyInput && (
+            <div className="mt-3 pt-3 flex gap-2" style={{ borderTop: '1px solid #F3F4F6' }}>
+              <input
+                type="text"
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handlePostReply() }}
+                placeholder={tUI('Add a reply...')}
+                className="flex-1 px-3 py-2 rounded-lg text-sm outline-none"
+                style={{ border: '1px solid #E5E7EB' }}
+                autoFocus
+              />
+              <button
+                onClick={handlePostReply}
+                disabled={postingReply || !replyText.trim()}
+                className="px-3 py-2 rounded-lg text-sm font-semibold transition-opacity"
+                style={{ background: '#E8B84B', color: '#1B2A4A', opacity: postingReply || !replyText.trim() ? 0.5 : 1 }}
+              >
+                <Send size={14} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -482,10 +648,13 @@ function ConversationEmptyState({ onShare, tUI }: { onShare: () => void; tUI: (s
 
 // ─── MAIN CONVERSATION COMPONENT ────────────────────────────────────────────
 
+const INITIAL_VISIBLE_POSTS = 5
+
 interface LessonConversationProps {
   lessonId: string
   courseId: string
   userId?: string | null
+  isAdmin?: boolean
   apiBasePath?: string
 }
 
@@ -493,6 +662,7 @@ export default function LessonConversation({
   lessonId,
   courseId,
   userId,
+  isAdmin,
   apiBasePath,
 }: LessonConversationProps) {
   const { tUI } = useTranslation()
@@ -502,6 +672,7 @@ export default function LessonConversation({
   const [activeFilter, setActiveFilter] = useState<ContributionType | null>(null)
   const [showCompose, setShowCompose] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_POSTS)
 
   const fetchConversation = useCallback(async (typeFilter?: ContributionType | null) => {
     try {
@@ -631,7 +802,45 @@ export default function LessonConversation({
             {tUI('No posts match this filter.')}
           </p>
         ) : (
-          data!.posts.map(post => <PostCard key={post.id} post={post} userId={userId} tUI={tUI} />)
+          <>
+            {/* Sort pinned posts to top */}
+            {[...data!.posts]
+              .sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0))
+              .slice(0, visibleCount)
+              .map(post => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  userId={userId}
+                  isAdmin={isAdmin}
+                  onRefresh={() => fetchConversation(activeFilter)}
+                  tUI={tUI}
+                />
+              ))}
+
+            {/* See more / Show less */}
+            {data!.posts.length > INITIAL_VISIBLE_POSTS && (
+              <div className="text-center pt-2">
+                {visibleCount < data!.posts.length ? (
+                  <button
+                    onClick={() => setVisibleCount(prev => prev + INITIAL_VISIBLE_POSTS)}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+                    style={{ color: '#2B3A67' }}
+                  >
+                    <ChevronDown size={16} />
+                    {tUI('See more')} ({data!.posts.length - visibleCount} {tUI('remaining')})
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setVisibleCount(INITIAL_VISIBLE_POSTS)}
+                    className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {tUI('Show less')}
+                  </button>
+                )}
+              </div>
+            )}
+          </>
         )}
       </div>
 

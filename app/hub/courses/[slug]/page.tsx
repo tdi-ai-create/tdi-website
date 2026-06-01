@@ -838,6 +838,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
       <CommunityTabs
         contentId={course.id}
         userId={user?.id}
+        isAdmin={!!user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')}
         conversationApiPath={`/api/hub/courses/${course.id}/conversation`}
         qaApiPath={`/api/hub/courses/${course.id}/qa`}
       />

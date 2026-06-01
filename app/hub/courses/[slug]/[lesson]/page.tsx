@@ -601,6 +601,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                 lessonId={currentLesson.id}
                 courseId={course.id}
                 userId={user?.id || null}
+                isAdmin={!!user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')}
               />
             )}
 
@@ -609,6 +610,7 @@ export default function LessonPage({ params }: LessonPageProps) {
               <LessonQA
                 contentId={currentLesson.id}
                 userId={user?.id || null}
+                isAdmin={!!user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')}
                 apiBasePath={`/api/hub/lessons/${currentLesson.id}/qa`}
               />
             )}

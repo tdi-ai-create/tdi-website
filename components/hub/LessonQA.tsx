@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { MessageCircle, Send, ChevronDown, ChevronUp, ThumbsUp, Flag } from 'lucide-react'
+import { MessageCircle, Send, ChevronDown, ChevronUp, ThumbsUp, Flag, Bookmark, Pin } from 'lucide-react'
 import { useTranslation } from '@/lib/hub/useTranslation'
 
 interface Author {
@@ -23,6 +23,7 @@ interface QAQuestion {
   body: string
   helpful_count: number
   posted_at: string
+  is_pinned?: boolean
   author: Author
   replies: QAReply[]
 }
@@ -33,9 +34,12 @@ interface QAData {
   questions: QAQuestion[]
 }
 
+const INITIAL_VISIBLE_QUESTIONS = 5
+
 interface LessonQAProps {
   contentId: string
   userId?: string | null
+  isAdmin?: boolean
   apiBasePath: string
 }
 
@@ -153,7 +157,59 @@ function QAReportButton({ postId, userId, tUI }: { postId: string; userId?: stri
   )
 }
 
-export default function LessonQA({ contentId, userId, apiBasePath }: LessonQAProps) {
+function QABookmarkButton({ postId, userId, title }: { postId: string; userId?: string | null; title: string }) {
+  const [bookmarked, setBookmarked] = useState(false)
+
+  const toggle = async () => {
+    if (!userId) return
+    try {
+      const res = await fetch('/api/hub/community/bookmark', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId, content_type: 'qa_post', content_id: postId, title }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setBookmarked(data.bookmarked)
+      }
+    } catch { /* silent */ }
+  }
+
+  if (!userId) return null
+
+  return (
+    <button onClick={toggle} className="flex items-center text-xs transition-colors" style={{ color: bookmarked ? '#E8B84B' : '#D1D5DB' }}>
+      <Bookmark size={13} fill={bookmarked ? '#E8B84B' : 'none'} />
+    </button>
+  )
+}
+
+function QAPinButton({ postId, userId, pinned: initialPinned }: { postId: string; userId?: string | null; pinned: boolean }) {
+  const [pinned, setPinned] = useState(initialPinned)
+
+  const toggle = async () => {
+    if (!userId) return
+    try {
+      const res = await fetch('/api/hub/community/pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content_type: 'qa_post', content_id: postId, user_id: userId }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setPinned(data.pinned)
+      }
+    } catch { /* silent */ }
+  }
+
+  return (
+    <button onClick={toggle} className="flex items-center text-xs transition-colors" style={{ color: pinned ? '#E8B84B' : '#D1D5DB' }}>
+      <Pin size={12} />
+    </button>
+  )
+}
+
+export default function LessonQA({ contentId, userId, isAdmin, apiBasePath }: LessonQAProps) {
   const { tUI } = useTranslation()
   const [data, setData] = useState<QAData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -162,6 +218,7 @@ export default function LessonQA({ contentId, userId, apiBasePath }: LessonQAPro
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
   const [replyText, setReplyText] = useState('')
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set())
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_QUESTIONS)
 
   const fetchData = useCallback(async () => {
     try {
@@ -308,7 +365,10 @@ export default function LessonQA({ contentId, userId, apiBasePath }: LessonQAPro
       {/* Questions list */}
       {questions.length > 0 && (
         <div className="space-y-4">
-          {questions.map((q) => {
+          {[...questions]
+            .sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0))
+            .slice(0, visibleCount)
+            .map((q) => {
             const hasReplies = q.replies.length > 0
             const isExpanded = expandedReplies.has(q.id)
 
@@ -316,10 +376,19 @@ export default function LessonQA({ contentId, userId, apiBasePath }: LessonQAPro
               <div
                 key={q.id}
                 className="bg-white rounded-xl overflow-hidden"
-                style={{ border: '0.5px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+                style={{
+                  border: q.is_pinned ? '1px solid #E8B84B' : '0.5px solid rgba(0,0,0,0.06)',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                }}
               >
                 {/* Question */}
                 <div className="p-5">
+                  {q.is_pinned && (
+                    <div className="flex items-center gap-1 mb-2">
+                      <Pin size={11} style={{ color: '#E8B84B' }} />
+                      <span className="text-xs font-medium" style={{ color: '#E8B84B' }}>{tUI('Pinned')}</span>
+                    </div>
+                  )}
                   <div className="flex gap-3 mb-3">
                     <AuthorAvatar name={q.author.name} />
                     <div className="flex-1 min-w-0">
@@ -363,6 +432,8 @@ export default function LessonQA({ contentId, userId, apiBasePath }: LessonQAPro
                         {tUI('Reply')}
                       </button>
                     )}
+                    <QABookmarkButton postId={q.id} userId={userId} title={q.body.slice(0, 80)} />
+                    {isAdmin && <QAPinButton postId={q.id} userId={userId} pinned={q.is_pinned || false} />}
                     {userId && <QAReportButton postId={q.id} userId={userId} tUI={tUI} />}
                   </div>
                 </div>
@@ -437,6 +508,30 @@ export default function LessonQA({ contentId, userId, apiBasePath }: LessonQAPro
               </div>
             )
           })}
+
+          {/* See more / Show less */}
+          {questions.length > INITIAL_VISIBLE_QUESTIONS && (
+            <div className="text-center pt-2">
+              {visibleCount < questions.length ? (
+                <button
+                  onClick={() => setVisibleCount(prev => prev + INITIAL_VISIBLE_QUESTIONS)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+                  style={{ color: '#2B3A67', fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  <ChevronDown size={16} />
+                  {tUI('See more')} ({questions.length - visibleCount} {tUI('remaining')})
+                </button>
+              ) : (
+                <button
+                  onClick={() => setVisibleCount(INITIAL_VISIBLE_QUESTIONS)}
+                  className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  {tUI('Show less')}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
