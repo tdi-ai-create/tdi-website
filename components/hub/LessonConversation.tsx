@@ -256,6 +256,7 @@ function PostCard({ post, userId, isAdmin, onRefresh, tUI }: { post: Conversatio
   }
 
   const handlePostReply = async () => {
+    console.log('[Reply Debug]', { replyText, userId, postingReply, postId: post.id })
     if (!replyText.trim() || !userId || postingReply) return
     setPostingReply(true)
     try {
@@ -269,13 +270,17 @@ function PostCard({ post, userId, isAdmin, onRefresh, tUI }: { post: Conversatio
           body: replyText.trim(),
         }),
       })
+      const data = await res.json()
       if (res.ok) {
-        const data = await res.json()
         setReplies(prev => [...prev, data])
         setReplyText('')
         setShowReplyInput(false)
         setShowReplies(true)
+      } else {
+        console.error('Reply failed:', data)
       }
+    } catch (err) {
+      console.error('Reply error:', err)
     } finally {
       setPostingReply(false)
     }
