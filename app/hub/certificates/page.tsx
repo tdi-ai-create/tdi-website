@@ -689,98 +689,71 @@ ${displayName}</div>
           boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
         }}
       >
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {/* Recognitions earned */}
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <Trophy size={18} style={{ color: '#ffba06' }} />
-              <span
-                className="font-bold"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '28px',
-                  color: '#ffba06',
-                }}
-              >
-                {earnedCount}
-              </span>
-            </div>
-            <p
-              className="text-[13px]"
-              style={{ fontFamily: "'DM Sans', sans-serif", color: '#6b7280' }}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            {
+              icon: <Trophy size={20} />,
+              value: earnedCount,
+              label: 'Recognitions earned',
+              detail: 'Field Notes you have earned by using tools, sharing with the community, and showing up consistently.',
+              accent: '#ffba06',
+            },
+            {
+              icon: <Compass size={20} />,
+              value: toolsExplored,
+              label: 'Tools explored',
+              detail: 'Quick Wins and resources you have opened and explored. Every tool you try builds your toolkit.',
+              accent: '#1e2749',
+            },
+            {
+              icon: <Timer size={20} />,
+              value: `${hoursSaved} hrs`,
+              label: 'Hours saved',
+              detail: 'Estimated planning time saved based on the tools you have used. Each tool saves roughly 5 minutes of prep.',
+              accent: '#2A9D8F',
+            },
+            {
+              icon: <Activity size={20} />,
+              value: daysActive,
+              label: 'Days active',
+              detail: 'Unique days you logged in and explored the Hub. Consistency is what builds real growth.',
+              accent: '#7C3AED',
+            },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="group relative text-center rounded-xl p-5 cursor-default transition-all hover:shadow-md"
+              style={{
+                backgroundColor: '#FAFAF8',
+                border: '1px solid #F3F4F6',
+              }}
             >
-              {tUI('Recognitions earned')}
-            </p>
-          </div>
-
-          {/* Tools explored */}
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <Compass size={18} style={{ color: '#1e2749' }} />
-              <span
-                className="font-bold"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '28px',
-                  color: '#1e2749',
-                }}
+              <div className="flex items-center justify-center gap-2 mb-2" style={{ color: stat.accent }}>
+                {stat.icon}
+                <span
+                  className="font-bold"
+                  style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '28px', color: stat.accent }}
+                >
+                  {stat.value}
+                </span>
+              </div>
+              <p
+                className="text-[13px] font-medium"
+                style={{ fontFamily: "'DM Sans', sans-serif", color: '#6b7280' }}
               >
-                {toolsExplored}
-              </span>
-            </div>
-            <p
-              className="text-[13px]"
-              style={{ fontFamily: "'DM Sans', sans-serif", color: '#6b7280' }}
-            >
-              {tUI('Tools explored')}
-            </p>
-          </div>
-
-          {/* Hours saved */}
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <Timer size={18} style={{ color: '#1e2749' }} />
-              <span
-                className="font-bold"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '28px',
-                  color: '#1e2749',
-                }}
+                {tUI(stat.label)}
+              </p>
+              {/* Hover detail */}
+              <div
+                className="absolute inset-0 rounded-xl p-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ backgroundColor: 'rgba(27, 42, 74, 0.95)' }}
               >
-                {hoursSaved} hrs
-              </span>
+                <p className="text-xs text-center leading-relaxed" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: "'DM Sans', sans-serif" }}>
+                  {tUI(stat.detail)}
+                </p>
+              </div>
             </div>
-            <p
-              className="text-[13px]"
-              style={{ fontFamily: "'DM Sans', sans-serif", color: '#6b7280' }}
-            >
-              {tUI('Hours saved')}
-            </p>
-          </div>
-
-          {/* Days active */}
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <Activity size={18} style={{ color: '#1e2749' }} />
-              <span
-                className="font-bold"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '28px',
-                  color: '#1e2749',
-                }}
-              >
-                {daysActive}
-              </span>
-            </div>
-            <p
-              className="text-[13px]"
-              style={{ fontFamily: "'DM Sans', sans-serif", color: '#6b7280' }}
-            >
-              {tUI('Days active')}
-            </p>
-          </div>
+          ))}
         </div>
       </div>
 
@@ -1039,7 +1012,7 @@ ${displayName}</div>
               </div>
               <div className="flex items-start gap-3">
                 <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold" style={{ backgroundColor: '#FFF8E7', color: '#d4960a' }}>3</span>
-                <span>{tUI('Reference your state requirements at your Department of Education website')}</span>
+                <span>{tUI('Reference your state requirements at your Department of Education website.')} <Link href="/hub/our-story" className="font-medium underline" style={{ color: '#E8B84B' }}>{tUI('Find your state link')}</Link></span>
               </div>
               <div className="flex items-start gap-3">
                 <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold" style={{ backgroundColor: '#FFF8E7', color: '#d4960a' }}>4</span>
