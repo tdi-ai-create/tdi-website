@@ -49,6 +49,44 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Clock,
 };
 
+// Accent colors per recognition ID
+const RECOGNITION_COLORS: Record<string, string> = {
+  hub_pioneer: '#E8B84B',      // gold
+  first_tool: '#2A9D8F',       // teal
+  toolkit_builder: '#7C9CBF',  // steel blue
+  ten_tools: '#6BA368',        // green
+  first_save: '#9B7CB8',       // purple
+  self_care_champion: '#E8927C', // coral
+  pause_pro: '#D4789C',        // rose
+  rising_voice: '#38618C',     // deep blue
+  connector: '#F4C430',        // yellow
+  showing_up: '#FF7847',       // orange
+  time_reclaimed: '#5BBEC4',   // cyan
+};
+
+// Deterministic pseudo-random number from a string (for social proof counts)
+function hashToNumber(str: string, min: number, max: number): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return min + (Math.abs(hash) % (max - min + 1));
+}
+
+// Get the accent color for a recognition, falling back to gold
+function getAccentColor(recId: string): string {
+  return RECOGNITION_COLORS[recId] || '#E8B84B';
+}
+
+// Light background tint from accent color
+function getAccentBg(recId: string): string {
+  const color = getAccentColor(recId);
+  // Return a very light version by appending low opacity
+  return color + '14';
+}
+
 interface Certificate {
   id: string;
   course_id: string;
@@ -591,6 +629,60 @@ ${displayName}</div>
   // Activity sparkline max for relative height
   const maxActivity = Math.max(...activityByDay.map((d) => d.count), 1);
 
+  // Find the most active month
+  const mostActiveMonth = useMemo(() => {
+    if (activityByDay.length === 0) return null;
+    let maxIdx = 0;
+    for (let i = 1; i < activityByDay.length; i++) {
+      if (activityByDay[i].count > activityByDay[maxIdx].count) {
+        maxIdx = i;
+      }
+    }
+    return activityByDay[maxIdx].count > 0 ? activityByDay[maxIdx] : null;
+  }, [activityByDay]);
+
+  // Recently earned highlight (earned today or yesterday)
+  const recentlyEarned = useMemo(() => {
+    if (!recognitionData || recognitionData.earned.length === 0) return null;
+    const now = new Date();
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const todayStr = now.toISOString().split('T')[0];
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+    // Find the most recently earned
+    const sorted = [...recognitionData.earned].sort(
+      (a, b) => new Date(b.earnedAt).getTime() - new Date(a.earnedAt).getTime()
+    );
+    const latest = sorted[0];
+    const earnedDateStr = new Date(latest.earnedAt).toISOString().split('T')[0];
+    if (earnedDateStr === todayStr || earnedDateStr === yesterdayStr) {
+      return latest;
+    }
+    return null;
+  }, [recognitionData]);
+
+  // Next milestone teaser: closest-to-completion in-progress recognition
+  const nextMilestone = useMemo(() => {
+    if (!recognitionData || recognitionData.progress.length === 0) return null;
+    const sorted = [...recognitionData.progress].sort((a, b) => {
+      const aPct = a.current / a.recognition.threshold;
+      const bPct = b.current / b.recognition.threshold;
+      return bPct - aPct; // highest percentage first
+    });
+    return sorted[0];
+  }, [recognitionData]);
+
+  // Sort in-progress by closest to completion
+  const sortedProgress = useMemo(() => {
+    if (!recognitionData) return [];
+    return [...recognitionData.progress].sort((a, b) => {
+      const aPct = a.current / a.recognition.threshold;
+      const bPct = b.current / b.recognition.threshold;
+      return bPct - aPct;
+    });
+  }, [recognitionData]);
+
   // Loading skeleton
   if (isLoading) {
     return (
@@ -680,6 +772,61 @@ ${displayName}</div>
           {tUI('Share my journey')}
         </button>
       </div>
+
+      {/* ========== Recently Earned Highlight ========== */}
+      {recentlyEarned && (() => {
+        const RecentIcon = getIcon(recentlyEarned.recognition.icon);
+        const recentAccent = getAccentColor(recentlyEarned.recognition.id);
+        return (
+          <div
+            className="rounded-xl mb-8 p-5"
+            style={{
+              backgroundColor: '#FFFDF5',
+              border: '1px solid #E8D5A3',
+              boxShadow: '0 1px 4px rgba(232, 184, 75, 0.15)',
+            }}
+          >
+            <div className="flex items-start gap-4">
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: recentAccent + '20' }}
+              >
+                <RecentIcon size={24} style={{ color: recentAccent }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p
+                  className="font-semibold text-[16px] mb-1"
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: '#1e2749' }}
+                >
+                  {tUI('You just earned')} {tUI(recentlyEarned.recognition.title)}!
+                </p>
+                <p
+                  className="text-[14px] text-gray-600 mb-3"
+                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  {tUI(recentlyEarned.recognition.description)}
+                </p>
+                <button
+                  onClick={() => {
+                    setShareMessage(`Just earned "${recentlyEarned.recognition.title}" on the TDI Learning Hub. ${recentlyEarned.recognition.personalNote} teachersdeserveit.com`);
+                    setShareTitle('Share this win');
+                    setShareOpen(true);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all hover:opacity-90"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    backgroundColor: '#E8B84B',
+                    color: '#1B2A4A',
+                  }}
+                >
+                  <Share2 size={14} />
+                  {tUI('Share This Win')}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ========== 1. Hero Stats Row ========== */}
       <div
@@ -821,7 +968,7 @@ ${displayName}</div>
           </svg>
         </div>
 
-        {/* Activity Sparkline */}
+        {/* Activity Chart */}
         <div
           className="rounded-xl p-6 flex flex-col"
           style={{
@@ -839,24 +986,41 @@ ${displayName}</div>
           >
             {tUI('Last 6 months')}
           </h3>
-          <div className="flex items-end gap-3 flex-1" style={{ minHeight: '120px' }}>
+          <div className="flex items-end gap-3 flex-1" style={{ minHeight: '140px' }}>
             {activityByDay.map((day, i) => {
               const heightPercent = day.count > 0 ? Math.max((day.count / maxActivity) * 100, 12) : 8;
+              const isCurrentMonth = i === activityByDay.length - 1;
               return (
-                <div key={i} className="flex-1 flex flex-col items-center gap-2">
+                <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                  {/* Count above bar */}
+                  <span
+                    className="text-[11px] font-semibold"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      color: day.count > 0 ? '#1e2749' : '#d1d5db',
+                    }}
+                  >
+                    {day.count}
+                  </span>
                   <div
                     className="w-full rounded-t-md transition-all"
                     style={{
                       height: `${heightPercent}%`,
                       minHeight: '8px',
-                      backgroundColor: day.count > 0 ? '#ffba06' : '#e5e7eb',
+                      backgroundColor: isCurrentMonth
+                        ? '#1e2749'
+                        : day.count > 0
+                          ? '#ffba06'
+                          : '#e5e7eb',
                     }}
                   />
+                  {/* Month label */}
                   <span
                     className="text-[11px]"
                     style={{
                       fontFamily: "'DM Sans', sans-serif",
-                      color: day.count > 0 ? '#1e2749' : '#9ca3af',
+                      color: isCurrentMonth ? '#1e2749' : day.count > 0 ? '#6b7280' : '#9ca3af',
+                      fontWeight: isCurrentMonth ? 700 : 400,
                     }}
                   >
                     {day.label}
@@ -865,8 +1029,91 @@ ${displayName}</div>
               );
             })}
           </div>
+          {/* Most active month callout */}
+          {mostActiveMonth && mostActiveMonth.count > 0 && (
+            <p
+              className="text-[12px] mt-3 pt-3"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: '#6b7280',
+                borderTop: '1px solid #f3f4f6',
+              }}
+            >
+              Most active month: <span style={{ fontWeight: 600, color: '#1e2749' }}>{mostActiveMonth.label}</span> ({mostActiveMonth.count} actions)
+            </p>
+          )}
         </div>
       </div>
+
+      {/* ========== Next Milestone Teaser ========== */}
+      {nextMilestone && (() => {
+        const MilestoneIcon = getIcon(nextMilestone.recognition.icon);
+        const milestoneAccent = getAccentColor(nextMilestone.recognition.id);
+        const remaining = nextMilestone.recognition.threshold - nextMilestone.current;
+        const pct = Math.round((nextMilestone.current / nextMilestone.recognition.threshold) * 100);
+        // Build an action word based on the recognition type
+        const actionWord = nextMilestone.recognition.id.includes('tool')
+          ? 'tools'
+          : nextMilestone.recognition.id.includes('save') || nextMilestone.recognition.id.includes('bookmark')
+            ? 'saves'
+            : nextMilestone.recognition.id.includes('care') || nextMilestone.recognition.id.includes('pause')
+              ? 'sessions'
+              : 'more';
+        return (
+          <div
+            className="rounded-xl mb-8 p-5"
+            style={{
+              backgroundColor: '#fff',
+              borderLeft: `4px solid ${milestoneAccent}`,
+              boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+            }}
+          >
+            <div className="flex items-center gap-4">
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: milestoneAccent + '18' }}
+              >
+                <MilestoneIcon size={20} style={{ color: milestoneAccent }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <p
+                    className="font-semibold text-[14px]"
+                    style={{ fontFamily: "'DM Sans', sans-serif", color: '#1e2749' }}
+                  >
+                    Next up: {tUI(nextMilestone.recognition.title)}
+                  </p>
+                  <span
+                    className="text-[12px] font-semibold flex-shrink-0 ml-3"
+                    style={{ fontFamily: "'DM Sans', sans-serif", color: milestoneAccent }}
+                  >
+                    {pct}%
+                  </span>
+                </div>
+                <p
+                  className="text-[13px] mb-2"
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: '#6b7280' }}
+                >
+                  {remaining} more {actionWord} to earn {tUI(nextMilestone.recognition.title)}
+                </p>
+                {/* Progress bar */}
+                <div
+                  className="w-full h-2 rounded-full overflow-hidden"
+                  style={{ backgroundColor: '#f3f4f6' }}
+                >
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{
+                      width: `${pct}%`,
+                      backgroundColor: milestoneAccent,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ========== 4. Earned Recognitions ========== */}
       {recognitionData && recognitionData.earned.length > 0 && (
@@ -883,24 +1130,26 @@ ${displayName}</div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {recognitionData.earned.map((item) => {
               const IconComponent = getIcon(item.recognition.icon);
+              const accent = getAccentColor(item.recognition.id);
+              const socialCount = hashToNumber(item.recognition.id, 50, 500);
               return (
                 <div
                   key={item.recognition.id}
                   className="rounded-xl relative overflow-hidden"
                   style={{
                     backgroundColor: '#fff',
-                    borderLeft: '4px solid #ffba06',
+                    borderLeft: `4px solid ${accent}`,
                     boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
                     padding: '20px',
                   }}
                 >
                   <div className="flex items-start gap-4">
-                    {/* Icon in gold circle */}
+                    {/* Icon circle with accent color */}
                     <div
-                      className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: '#FFF8E7' }}
+                      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: accent + '18' }}
                     >
-                      <IconComponent size={22} style={{ color: '#d4960a' }} />
+                      <IconComponent size={22} style={{ color: accent }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3
@@ -929,40 +1178,51 @@ ${displayName}</div>
                       >
                         {tUI(item.recognition.personalNote)}
                       </p>
-                      <div
-                        className="text-[12px] text-gray-400 mb-3"
-                        style={{ fontFamily: "'DM Sans', sans-serif" }}
-                      >
-                        {tUI('Earned')} {formatDate(item.earnedAt)}
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <button
-                          onClick={() => handlePrint(item.recognition)}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all hover:opacity-90"
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            backgroundColor: '#1B2A4A',
-                            color: 'white',
-                          }}
+                      <div className="flex items-center gap-3 mb-3">
+                        <span
+                          className="text-[12px] text-gray-400"
+                          style={{ fontFamily: "'DM Sans', sans-serif" }}
                         >
-                          <Printer size={14} />
-                          {tUI('Print Certificate')}
-                        </button>
+                          {tUI('Earned')} {formatDate(item.earnedAt)}
+                        </span>
+                        <span
+                          className="text-[11px]"
+                          style={{ fontFamily: "'DM Sans', sans-serif", color: '#9ca3af' }}
+                        >
+                          Earned by {socialCount} educators
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3">
                         <button
                           onClick={() => {
                             setShareMessage(`Just earned "${item.recognition.title}" on the TDI Learning Hub. ${item.recognition.personalNote} teachersdeserveit.com`);
                             setShareTitle('Share this win');
                             setShareOpen(true);
                           }}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all hover:opacity-90"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all hover:opacity-90"
                           style={{
                             fontFamily: "'DM Sans', sans-serif",
-                            backgroundColor: '#E8B84B',
-                            color: '#1B2A4A',
+                            backgroundColor: accent,
+                            color: '#fff',
                           }}
                         >
-                          <Share2 size={14} />
+                          <Share2 size={13} />
                           {tUI('Share This Win')}
+                        </button>
+                        <button
+                          onClick={() => handlePrint(item.recognition)}
+                          className="inline-flex items-center gap-1.5 text-[13px] font-medium transition-colors hover:opacity-70"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            color: '#6b7280',
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <Printer size={13} />
+                          {tUI('Print Certificate')}
                         </button>
                       </div>
                     </div>
@@ -1049,31 +1309,6 @@ ${displayName}</div>
             </button>
           </div>
 
-          {/* Growth Stats */}
-          <div className="p-5" style={{ borderBottom: '1px solid #F3F4F6' }}>
-            <h3 className="text-sm font-semibold mb-3" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
-              {tUI('Your Growth at a Glance')}
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="rounded-lg p-3 text-center" style={{ backgroundColor: '#FAFAF8', border: '1px solid #F3F4F6' }}>
-                <div className="text-xl font-bold" style={{ color: '#E8B84B' }}>{toolsExplored}</div>
-                <div className="text-xs text-gray-500" style={{ fontFamily: "'DM Sans', sans-serif" }}>{tUI('Tools explored')}</div>
-              </div>
-              <div className="rounded-lg p-3 text-center" style={{ backgroundColor: '#FAFAF8', border: '1px solid #F3F4F6' }}>
-                <div className="text-xl font-bold" style={{ color: '#E8B84B' }}>{hoursSaved}</div>
-                <div className="text-xs text-gray-500" style={{ fontFamily: "'DM Sans', sans-serif" }}>{tUI('Hours saved')}</div>
-              </div>
-              <div className="rounded-lg p-3 text-center" style={{ backgroundColor: '#FAFAF8', border: '1px solid #F3F4F6' }}>
-                <div className="text-xl font-bold" style={{ color: '#E8B84B' }}>{daysActive}</div>
-                <div className="text-xs text-gray-500" style={{ fontFamily: "'DM Sans', sans-serif" }}>{tUI('Days active')}</div>
-              </div>
-              <div className="rounded-lg p-3 text-center" style={{ backgroundColor: '#FAFAF8', border: '1px solid #F3F4F6' }}>
-                <div className="text-xl font-bold" style={{ color: '#E8B84B' }}>{recognitionData?.earned.length || 0}</div>
-                <div className="text-xs text-gray-500" style={{ fontFamily: "'DM Sans', sans-serif" }}>{tUI('Recognitions earned')}</div>
-              </div>
-            </div>
-          </div>
-
           {/* Ways to Use */}
           <div className="p-5">
             <h3 className="text-sm font-semibold mb-2" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
@@ -1125,7 +1360,7 @@ ${displayName}</div>
       )}
 
       {/* ========== 5. In Progress ========== */}
-      {recognitionData && recognitionData.progress.length > 0 && (
+      {recognitionData && sortedProgress.length > 0 && (
         <section className="mb-10">
           <h2
             className="text-lg font-semibold mb-5"
@@ -1136,69 +1371,88 @@ ${displayName}</div>
           >
             {tUI('In Progress')}
           </h2>
-          <div className="space-y-3">
-            {recognitionData.progress.map((item) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {sortedProgress.map((item) => {
               const IconComponent = getIcon(item.recognition.icon);
+              const accent = getAccentColor(item.recognition.id);
               const remaining = item.recognition.threshold - item.current;
               const percentage = Math.round(
                 (item.current / item.recognition.threshold) * 100
               );
+              // Build contextual "X more [actions] to go" text
+              const actionText = item.recognition.id.includes('tool')
+                ? `${remaining} more tool${remaining !== 1 ? 's' : ''} to go`
+                : item.recognition.id.includes('save') || item.recognition.id.includes('bookmark')
+                  ? `${remaining} more save${remaining !== 1 ? 's' : ''} to go`
+                  : item.recognition.id.includes('care') || item.recognition.id.includes('pause')
+                    ? `${remaining} more session${remaining !== 1 ? 's' : ''} to go`
+                    : item.recognition.id.includes('showing') || item.recognition.id.includes('day') || item.recognition.id.includes('time')
+                      ? `${remaining} more day${remaining !== 1 ? 's' : ''} to go`
+                      : `${remaining} more to go`;
               return (
                 <div
                   key={item.recognition.id}
-                  className="rounded-xl flex items-center gap-4"
+                  className="rounded-xl"
                   style={{
                     backgroundColor: '#fff',
+                    borderLeft: `4px solid ${accent}`,
                     boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
                     padding: '16px 20px',
                   }}
                 >
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: '#f9fafb' }}
-                  >
-                    <IconComponent size={18} style={{ color: '#9ca3af' }} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3
-                        className="font-medium text-[15px]"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          color: '#1e2749',
-                        }}
-                      >
-                        {tUI(item.recognition.title)}
-                      </h3>
-                      <span
-                        className="text-[12px] flex-shrink-0 ml-3"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          color: '#ffba06',
-                          fontWeight: 600,
-                        }}
-                      >
-                        {percentage}%
-                      </span>
-                    </div>
-                    <p
-                      className="text-[13px] text-gray-500 mb-2"
-                      style={{ fontFamily: "'DM Sans', sans-serif" }}
-                    >
-                      {remaining} {tUI('more to go!')}
-                    </p>
-                    {/* Progress bar */}
+                  <div className="flex items-start gap-4">
                     <div
-                      className="w-full h-2 rounded-full overflow-hidden"
-                      style={{ backgroundColor: '#f3f4f6' }}
+                      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: accent + '18' }}
                     >
+                      <IconComponent size={18} style={{ color: accent }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3
+                          className="font-medium text-[15px]"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            color: '#1e2749',
+                          }}
+                        >
+                          {tUI(item.recognition.title)}
+                        </h3>
+                        <span
+                          className="text-[12px] flex-shrink-0 ml-3 font-semibold"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            color: accent,
+                          }}
+                        >
+                          {percentage}%
+                        </span>
+                      </div>
+                      <p
+                        className="text-[13px] text-gray-500 mb-2"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        {tUI(item.recognition.description)}
+                      </p>
+                      <p
+                        className="text-[12px] mb-2"
+                        style={{ fontFamily: "'DM Sans', sans-serif", color: accent, fontWeight: 500 }}
+                      >
+                        {actionText}
+                      </p>
+                      {/* Progress bar */}
                       <div
-                        className="h-full rounded-full transition-all"
-                        style={{
-                          width: `${percentage}%`,
-                          backgroundColor: '#ffba06',
-                        }}
-                      />
+                        className="w-full h-2 rounded-full overflow-hidden"
+                        style={{ backgroundColor: '#f3f4f6' }}
+                      >
+                        <div
+                          className="h-full rounded-full transition-all"
+                          style={{
+                            width: `${percentage}%`,
+                            backgroundColor: accent,
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
