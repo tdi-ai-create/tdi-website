@@ -258,6 +258,11 @@ export default function ProfileSettingsPage() {
   const [recognitionData, setRecognitionData] = useState<RecognitionResult | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
 
+  // AI Insights
+  const [growthInsight, setGrowthInsight] = useState<string | null>(null);
+  const [vibeInsight, setVibeInsight] = useState<string | null>(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+
   // ── Initialize profile state ─────────────────────────────────────────
   useEffect(() => {
     if (profile) {
@@ -401,6 +406,56 @@ export default function ProfileSettingsPage() {
 
     loadData();
   }, [user?.id, dataLoaded]);
+
+  // ── Fetch AI insights when switching tabs ──────────────────────────────
+  useEffect(() => {
+    if (activeTab === 'growth' && !growthInsight && statsData && !insightsLoading) {
+      setInsightsLoading(true);
+      fetch('/api/hub/insights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tab: 'growth',
+          data: {
+            toolsExplored: statsData.toolsExplored,
+            hoursSaved: statsData.hoursSaved,
+            daysActive: statsData.daysActive,
+            communityContributions: statsData.communityContributions,
+            recognitionsEarned: recognitionData?.earned.length || 0,
+            goals: selectedGoals,
+          },
+        }),
+      })
+        .then(r => r.json())
+        .then(r => { if (r.insight) setGrowthInsight(r.insight); })
+        .catch(() => {})
+        .finally(() => setInsightsLoading(false));
+    }
+    if (activeTab === 'vibe_check' && !vibeInsight && checkIns.length > 0 && !insightsLoading) {
+      setInsightsLoading(true);
+      const dimensions = new Set(checkIns.map(c => c.responses?.category).filter(Boolean));
+      fetch('/api/hub/insights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tab: 'vibe_check',
+          data: {
+            checkIns: checkIns.slice(0, 10).map(c => ({
+              score: c.score,
+              category: c.responses?.category || 'mood',
+              date: new Date(c.created_at).toISOString().split('T')[0],
+            })),
+            totalCheckIns: checkIns.length,
+            dimensionsChecked: Array.from(dimensions),
+          },
+        }),
+      })
+        .then(r => r.json())
+        .then(r => { if (r.insight) setVibeInsight(r.insight); })
+        .catch(() => {})
+        .finally(() => setInsightsLoading(false));
+    }
+  }, [activeTab, statsData, checkIns, growthInsight, vibeInsight, insightsLoading, recognitionData, selectedGoals]);
 
   // ── Derived state ─────────────────────────────────────────────────────
 
@@ -1062,6 +1117,37 @@ export default function ProfileSettingsPage() {
             </div>
           )}
 
+          {/* ── AI Growth Insight ── */}
+          {(growthInsight || insightsLoading) && (
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)',
+                boxShadow: '0 4px 16px rgba(27,42,74,0.15)',
+              }}
+            >
+              <div className="px-6 py-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles size={16} style={{ color: '#E8B84B' }} />
+                  <span className="text-xs font-semibold tracking-wide uppercase" style={{ color: '#E8B84B', fontFamily: "'DM Sans', sans-serif" }}>
+                    {tUI('AI Insight')}
+                  </span>
+                </div>
+                {insightsLoading && !growthInsight ? (
+                  <div className="space-y-2">
+                    <div className="h-3 bg-white/10 rounded w-full animate-pulse" />
+                    <div className="h-3 bg-white/10 rounded w-4/5 animate-pulse" />
+                    <div className="h-3 bg-white/10 rounded w-3/5 animate-pulse" />
+                  </div>
+                ) : (
+                  <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: 'rgba(255,255,255,0.85)', fontFamily: "'DM Sans', sans-serif" }}>
+                    {growthInsight}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* ── Stats Section ── */}
           {/* Stats Grid -- navy accent cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -1213,6 +1299,86 @@ export default function ProfileSettingsPage() {
          ════════════════════════════════════════════════════════════════════ */}
       {activeTab === 'vibe_check' && (
         <div className="space-y-6">
+          {/* ── AI Vibe Insight ── */}
+          {(vibeInsight || (insightsLoading && checkIns.length > 0)) && (
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)',
+                boxShadow: '0 4px 16px rgba(27,42,74,0.15)',
+              }}
+            >
+              <div className="px-6 py-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles size={16} style={{ color: '#E8B84B' }} />
+                  <span className="text-xs font-semibold tracking-wide uppercase" style={{ color: '#E8B84B', fontFamily: "'DM Sans', sans-serif" }}>
+                    {tUI('AI Insight')}
+                  </span>
+                </div>
+                {insightsLoading && !vibeInsight ? (
+                  <div className="space-y-2">
+                    <div className="h-3 bg-white/10 rounded w-full animate-pulse" />
+                    <div className="h-3 bg-white/10 rounded w-4/5 animate-pulse" />
+                    <div className="h-3 bg-white/10 rounded w-3/5 animate-pulse" />
+                  </div>
+                ) : (
+                  <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: 'rgba(255,255,255,0.85)', fontFamily: "'DM Sans', sans-serif" }}>
+                    {vibeInsight}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Dimension score visualization */}
+          {checkIns.length > 0 && (() => {
+            const dimScores: Record<string, { total: number; count: number; color: string }> = {
+              mood: { total: 0, count: 0, color: '#DC2626' },
+              energy: { total: 0, count: 0, color: '#D97706' },
+              belonging: { total: 0, count: 0, color: '#7C3AED' },
+              purpose: { total: 0, count: 0, color: '#0891B2' },
+              needs: { total: 0, count: 0, color: '#16A34A' },
+            };
+            checkIns.forEach(c => {
+              const cat = (c.responses?.category as string) || 'mood';
+              if (dimScores[cat]) {
+                dimScores[cat].total += c.score;
+                dimScores[cat].count++;
+              }
+            });
+            return (
+              <div
+                className="bg-white rounded-2xl p-6"
+                style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04)' }}
+              >
+                <h3 className="text-sm font-semibold mb-4" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
+                  {tUI('Your Averages by Dimension')}
+                </h3>
+                <div className="space-y-3">
+                  {Object.entries(dimScores).map(([dim, data]) => {
+                    const avg = data.count > 0 ? data.total / data.count : 0;
+                    const pct = (avg / 5) * 100;
+                    return (
+                      <div key={dim} className="flex items-center gap-3">
+                        <span className="text-xs font-medium capitalize w-20 text-right" style={{ color: '#6B7280' }}>{dim}</span>
+                        <div className="flex-1 h-3 rounded-full overflow-hidden" style={{ backgroundColor: '#F3F4F6' }}>
+                          <div
+                            className="h-full rounded-full transition-all"
+                            style={{ width: data.count > 0 ? `${pct}%` : '0%', backgroundColor: data.color, opacity: data.count > 0 ? 1 : 0.2 }}
+                          />
+                        </div>
+                        <span className="text-xs font-semibold w-8" style={{ color: data.count > 0 ? '#1B2A4A' : '#D1D5DB' }}>
+                          {data.count > 0 ? avg.toFixed(1) : '--'}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="text-xs mt-3" style={{ color: '#9CA3AF' }}>{tUI('Scale: 1 (tough) to 5 (great). Dimensions without check-ins show as empty.')}</p>
+              </div>
+            );
+          })()}
+
           {/* Dimension overview */}
           <div
             className="rounded-2xl overflow-hidden"
