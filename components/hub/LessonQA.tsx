@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { MessageCircle, Send, ChevronDown, ChevronUp } from 'lucide-react'
+import { MessageCircle, Send, ChevronDown, ChevronUp, ThumbsUp, Flag } from 'lucide-react'
 import { useTranslation } from '@/lib/hub/useTranslation'
 
 interface Author {
@@ -72,6 +72,84 @@ function AuthorAvatar({ name }: { name: string }) {
     >
       {name.charAt(0).toUpperCase()}
     </div>
+  )
+}
+
+function QAHelpfulButton({ postId, initialCount, userId, tUI }: { postId: string; initialCount: number; userId?: string | null; tUI: (s: string) => string }) {
+  const [count, setCount] = useState(initialCount)
+  const [marked, setMarked] = useState(false)
+  const [toggling, setToggling] = useState(false)
+
+  const toggle = async () => {
+    if (!userId || toggling) return
+    setToggling(true)
+    try {
+      const res = await fetch('/api/hub/community/helpful', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content_type: 'qa_post', content_id: postId, user_id: userId }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setMarked(data.marked)
+        setCount(data.helpful_count)
+      }
+    } finally {
+      setToggling(false)
+    }
+  }
+
+  return (
+    <button
+      onClick={toggle}
+      disabled={!userId || toggling}
+      className="flex items-center gap-1 text-xs transition-colors disabled:opacity-50"
+      style={{ color: marked ? '#2A9D8F' : '#9CA3AF', fontWeight: marked ? 600 : 400 }}
+    >
+      <ThumbsUp size={13} fill={marked ? '#2A9D8F' : 'none'} />
+      {count > 0 && count}
+    </button>
+  )
+}
+
+function QAReportButton({ postId, userId, tUI }: { postId: string; userId?: string | null; tUI: (s: string) => string }) {
+  const [reported, setReported] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+
+  const handleReport = async () => {
+    if (!userId) return
+    try {
+      await fetch('/api/hub/community/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content_type: 'qa_post', content_id: postId, reporter_id: userId }),
+      })
+      setReported(true)
+      setShowConfirm(false)
+    } catch {
+      // Silent fail
+    }
+  }
+
+  if (reported) return <span className="text-xs text-gray-400">{tUI('Reported')}</span>
+
+  if (showConfirm) {
+    return (
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-gray-400">{tUI('Report?')}</span>
+        <button onClick={handleReport} className="text-xs font-medium text-red-500 hover:text-red-700">{tUI('Yes')}</button>
+        <button onClick={() => setShowConfirm(false)} className="text-xs font-medium text-gray-400 hover:text-gray-600">{tUI('No')}</button>
+      </div>
+    )
+  }
+
+  return (
+    <button
+      onClick={() => setShowConfirm(true)}
+      className="flex items-center gap-1 text-xs text-gray-300 hover:text-gray-500 transition-colors"
+    >
+      <Flag size={12} />
+    </button>
   )
 }
 
@@ -265,6 +343,7 @@ export default function LessonQA({ contentId, userId, apiBasePath }: LessonQAPro
 
                   {/* Actions row */}
                   <div className="flex items-center gap-4 mt-3">
+                    <QAHelpfulButton postId={q.id} initialCount={q.helpful_count} userId={userId} tUI={tUI} />
                     {hasReplies && (
                       <button
                         onClick={() => toggleReplies(q.id)}
@@ -284,6 +363,7 @@ export default function LessonQA({ contentId, userId, apiBasePath }: LessonQAPro
                         {tUI('Reply')}
                       </button>
                     )}
+                    {userId && <QAReportButton postId={q.id} userId={userId} tUI={tUI} />}
                   </div>
                 </div>
 
@@ -313,6 +393,10 @@ export default function LessonQA({ contentId, userId, apiBasePath }: LessonQAPro
                             <p className="text-sm leading-relaxed" style={{ color: '#374151', fontFamily: "'DM Sans', sans-serif" }}>
                               {r.body}
                             </p>
+                            <div className="flex items-center gap-3 mt-2">
+                              <QAHelpfulButton postId={r.id} initialCount={r.helpful_count} userId={userId} tUI={tUI} />
+                              {userId && <QAReportButton postId={r.id} userId={userId} tUI={tUI} />}
+                            </div>
                           </div>
                         </div>
                       </div>

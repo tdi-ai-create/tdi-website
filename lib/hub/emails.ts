@@ -323,9 +323,58 @@ ${ctaButton('Continue learning', 'https://www.teachersdeserveit.com/hub')}
 // MAIN GENERATOR FUNCTION
 // ============================================
 
-export type EmailType = 'welcome' | 'nudge' | 'digest';
+export interface ReplyNotificationEmailData {
+  displayName: string;
+  originalPostSnippet: string;
+  replyAuthorName: string;
+  replySnippet: string;
+  contentUrl: string;
+  contentLabel: string; // e.g. "your Q&A question" or "your conversation post"
+}
 
-export type EmailData = WelcomeEmailData | NudgeEmailData | DigestEmailData;
+export function generateReplyNotificationEmail(data: ReplyNotificationEmailData): string {
+  const content = `
+<h1 style="margin: 0 0 24px 0; font-size: 24px; font-weight: 600; color: ${COLORS.textDark};">
+  Someone responded to ${data.contentLabel}
+</h1>
+<p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.6; color: ${COLORS.textDark};">
+  Hi ${data.displayName},
+</p>
+<p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6; color: ${COLORS.textDark};">
+  <strong>${data.replyAuthorName}</strong> replied to ${data.contentLabel} in the Learning Hub.
+</p>
+
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin: 16px 0;">
+  <tr>
+    <td style="padding: 16px; background-color: ${COLORS.lightGray}; border-radius: 8px; border-left: 3px solid #D1D5DB;">
+      <p style="margin: 0; font-size: 13px; color: ${COLORS.textMuted}; font-weight: 600;">Your post:</p>
+      <p style="margin: 6px 0 0; font-size: 14px; color: ${COLORS.textDark}; line-height: 1.5;">${data.originalPostSnippet}</p>
+    </td>
+  </tr>
+</table>
+
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin: 16px 0;">
+  <tr>
+    <td style="padding: 16px; background-color: #FFF8E7; border-radius: 8px; border-left: 3px solid ${COLORS.gold};">
+      <p style="margin: 0; font-size: 13px; color: ${COLORS.navy}; font-weight: 600;">${data.replyAuthorName} replied:</p>
+      <p style="margin: 6px 0 0; font-size: 14px; color: ${COLORS.textDark}; line-height: 1.5;">${data.replySnippet}</p>
+    </td>
+  </tr>
+</table>
+
+${ctaButton('View the conversation', data.contentUrl)}
+
+<p style="margin: 24px 0 0 0; font-size: 14px; color: ${COLORS.textMuted}; font-style: italic;">
+  Your community is growing. Every reply is proof that teachers are learning from each other.
+</p>
+  `.trim();
+
+  return emailWrapper(content);
+}
+
+export type EmailType = 'welcome' | 'nudge' | 'digest' | 'reply_notification';
+
+export type EmailData = WelcomeEmailData | NudgeEmailData | DigestEmailData | ReplyNotificationEmailData;
 
 export function generateEmailHTML(type: EmailType, data: EmailData): string {
   switch (type) {
@@ -335,6 +384,8 @@ export function generateEmailHTML(type: EmailType, data: EmailData): string {
       return generateNudgeEmail(data as NudgeEmailData);
     case 'digest':
       return generateDigestEmail(data as DigestEmailData);
+    case 'reply_notification':
+      return generateReplyNotificationEmail(data as ReplyNotificationEmailData);
     default:
       throw new Error(`Unknown email type: ${type}`);
   }
@@ -352,16 +403,26 @@ export function getEmailSubject(type: EmailType): string {
       return 'Your PD hours are waiting';
     case 'digest':
       return 'Your monthly Learning Hub update';
+    case 'reply_notification':
+      return 'Someone replied to your post in the Learning Hub';
     default:
       return 'Teachers Deserve It Learning Hub';
   }
 }
 
 // Sample data for previews
-export const sampleEmailData = {
+export const sampleEmailData: Record<EmailType, EmailData> = {
   welcome: {
     displayName: 'Sarah',
   } as WelcomeEmailData,
+  reply_notification: {
+    displayName: 'Sarah',
+    originalPostSnippet: 'How do you handle the timing if your periods are only 40 minutes?',
+    replyAuthorName: 'Ms. Johnson',
+    replySnippet: 'I break it into two 20-minute segments and it actually works better that way!',
+    contentUrl: 'https://www.teachersdeserveit.com/hub',
+    contentLabel: 'your Q&A question',
+  } as ReplyNotificationEmailData,
   nudge: {
     displayName: 'Sarah',
     courseCount: 12,

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { MessageCircle, HelpCircle, X } from 'lucide-react'
+import { MessageCircle, X, ThumbsUp, Flag } from 'lucide-react'
 import { useTranslation } from '@/lib/hub/useTranslation'
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
@@ -162,11 +162,51 @@ function FilterChips({
 
 // ─── POST CARD ──────────────────────────────────────────────────────────────
 
-function PostCard({ post, tUI }: { post: ConversationPost; tUI: (s: string) => string }) {
+function PostCard({ post, userId, tUI }: { post: ConversationPost; userId?: string | null; tUI: (s: string) => string }) {
   const config = getTypeConfig(post.contribution_type)
-  const [showTooltip, setShowTooltip] = useState(false)
+  const [helpfulCount, setHelpfulCount] = useState(post.helpful_count)
+  const [isHelpful, setIsHelpful] = useState(false)
+  const [toggling, setToggling] = useState(false)
+  const [reported, setReported] = useState(false)
+  const [showReportConfirm, setShowReportConfirm] = useState(false)
 
   const timeAgo = getTimeAgo(post.posted_at)
+
+  const toggleHelpful = async () => {
+    if (!userId || toggling) return
+    setToggling(true)
+    try {
+      const res = await fetch('/api/hub/community/helpful', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content_type: 'conversation_post', content_id: post.id, user_id: userId }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setIsHelpful(data.marked)
+        setHelpfulCount(data.helpful_count)
+      }
+    } finally {
+      setToggling(false)
+    }
+  }
+
+  const handleReport = async () => {
+    if (!userId) return
+    try {
+      await fetch('/api/hub/community/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content_type: 'conversation_post', content_id: post.id, reporter_id: userId }),
+      })
+      setReported(true)
+      setShowReportConfirm(false)
+    } catch {
+      // Silent fail
+    }
+  }
+
+  if (reported) return null
 
   return (
     <div
@@ -208,21 +248,37 @@ function PostCard({ post, tUI }: { post: ConversationPost; tUI: (s: string) => s
 
           {/* Actions */}
           <div className="flex items-center gap-4 mt-4">
-            <div className="relative">
-              <button
-                className="text-xs text-gray-400 hover:text-gray-600 transition-colors flex items-center gap-1"
-                onMouseEnter={() => setShowTooltip(true)}
-                onMouseLeave={() => setShowTooltip(false)}
-              >
-                {tUI('Helpful')} ({post.helpful_count})
-                <HelpCircle size={12} className="opacity-50" />
-              </button>
-              {showTooltip && (
-                <div className="absolute bottom-full left-0 mb-2 w-56 p-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg z-10">
-                  &ldquo;Helpful&rdquo; means another teacher learned something from this story. It&rsquo;s a signal to others, not a rating of the post.
-                </div>
-              )}
-            </div>
+            <button
+              onClick={toggleHelpful}
+              disabled={!userId || toggling}
+              className="flex items-center gap-1.5 text-xs transition-colors disabled:opacity-50"
+              style={{
+                color: isHelpful ? '#2A9D8F' : '#9CA3AF',
+                fontWeight: isHelpful ? 600 : 400,
+              }}
+            >
+              <ThumbsUp size={14} fill={isHelpful ? '#2A9D8F' : 'none'} />
+              {helpfulCount > 0 && helpfulCount}
+            </button>
+
+            {userId && (
+              <div className="relative">
+                {showReportConfirm ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400">{tUI('Report this post?')}</span>
+                    <button onClick={handleReport} className="text-xs font-medium text-red-500 hover:text-red-700">{tUI('Yes')}</button>
+                    <button onClick={() => setShowReportConfirm(false)} className="text-xs font-medium text-gray-400 hover:text-gray-600">{tUI('No')}</button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowReportConfirm(true)}
+                    className="flex items-center gap-1 text-xs text-gray-300 hover:text-gray-500 transition-colors"
+                  >
+                    <Flag size={12} />
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -575,7 +631,7 @@ export default function LessonConversation({
             {tUI('No posts match this filter.')}
           </p>
         ) : (
-          data!.posts.map(post => <PostCard key={post.id} post={post} tUI={tUI} />)
+          data!.posts.map(post => <PostCard key={post.id} post={post} userId={userId} tUI={tUI} />)
         )}
       </div>
 

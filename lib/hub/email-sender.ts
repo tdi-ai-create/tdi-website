@@ -7,6 +7,7 @@ import {
   type WelcomeEmailData,
   type NudgeEmailData,
   type DigestEmailData,
+  type ReplyNotificationEmailData,
 } from './emails';
 
 // Initialize Resend with API key (will be null if not configured)
@@ -56,7 +57,7 @@ async function recordEmailSent(userId: string, emailType: EmailType): Promise<vo
 async function sendEmail(
   toEmail: string,
   emailType: EmailType,
-  data: WelcomeEmailData | NudgeEmailData | DigestEmailData
+  data: WelcomeEmailData | NudgeEmailData | DigestEmailData | ReplyNotificationEmailData
 ): Promise<{ success: boolean; error?: string }> {
   if (!resend) {
     console.warn('Resend not configured - RESEND_API_KEY missing');
@@ -150,6 +151,36 @@ export async function sendDigestEmail(
     await recordEmailSent(userId, 'digest');
   }
 
+  return result.success;
+}
+
+// Send reply notification email
+export async function sendReplyNotificationEmail(
+  userId: string,
+  email: string,
+  data: ReplyNotificationEmailData
+): Promise<boolean> {
+  // Check if user has community_replies enabled
+  const supabase = getSupabase();
+  try {
+    const { data: prefs } = await supabase
+      .from('hub_notification_preferences')
+      .select('community_replies, email_frequency')
+      .eq('user_id', userId)
+      .single();
+
+    // If user explicitly disabled community replies, or set essentials_only, skip
+    if (prefs?.community_replies === false || prefs?.email_frequency === 'essentials_only') {
+      return false;
+    }
+  } catch {
+    // No prefs row = defaults = notifications on
+  }
+
+  const result = await sendEmail(email, 'reply_notification', data);
+  if (result.success) {
+    await recordEmailSent(userId, 'reply_notification');
+  }
   return result.success;
 }
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { sendReplyNotificationEmail } from '@/lib/hub/email-sender'
 
 const supabase = createClient(
   process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -128,6 +129,46 @@ export async function handleQAPost(contentType: string, contentId: string, reque
       .select('display_name, role, avatar_url')
       .eq('id', user_id)
       .single()
+
+    // If this is a reply, notify the original poster (fire and forget)
+    if (parent_id) {
+      void (async () => {
+        try {
+          // Get the parent post to find the original author
+          const { data: parentPost } = await supabase
+            .from('hub_qa_posts')
+            .select('user_id, body')
+            .eq('id', parent_id)
+            .single()
+
+          if (parentPost && parentPost.user_id !== user_id) {
+            // Get the original poster's email
+            const { data: originalAuthor } = await supabase
+              .from('hub_profiles')
+              .select('display_name, email')
+              .eq('id', parentPost.user_id)
+              .single()
+
+            if (originalAuthor?.email) {
+              await sendReplyNotificationEmail(
+                parentPost.user_id,
+                originalAuthor.email,
+                {
+                  displayName: originalAuthor.display_name || 'there',
+                  originalPostSnippet: parentPost.body.slice(0, 200) + (parentPost.body.length > 200 ? '...' : ''),
+                  replyAuthorName: profile?.display_name || 'A teacher',
+                  replySnippet: body.trim().slice(0, 200) + (body.trim().length > 200 ? '...' : ''),
+                  contentUrl: `https://www.teachersdeserveit.com/hub`,
+                  contentLabel: 'your Q&A question',
+                }
+              )
+            }
+          }
+        } catch (notifErr) {
+          console.error('Failed to send reply notification:', notifErr)
+        }
+      })()
+    }
 
     return NextResponse.json({
       id: data.id,

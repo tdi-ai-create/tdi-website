@@ -4,13 +4,14 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useHub } from '@/components/hub/HubContext';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
-import { User, Bell, Mail, Clock, Eye, Users, Check, HelpCircle } from 'lucide-react';
+import { User, Bell, Mail, Clock, Eye, Users, Check, HelpCircle, MessageCircle } from 'lucide-react';
 
 interface NotificationPreferences {
   id?: string;
   email_frequency: 'welcome_nudge_monthly' | 'essentials_only';
   show_popups: boolean;
   show_activity: boolean;
+  community_replies: boolean;
   preferred_learning_day: string | null;
   preferred_learning_time: string | null;
   quiet_hours_enabled: boolean;
@@ -22,6 +23,7 @@ const DEFAULT_PREFERENCES: NotificationPreferences = {
   email_frequency: 'welcome_nudge_monthly',
   show_popups: true,
   show_activity: true,
+  community_replies: true,
   preferred_learning_day: null,
   preferred_learning_time: null,
   quiet_hours_enabled: true,
@@ -74,6 +76,7 @@ export default function NotificationSettingsPage() {
             email_frequency: data.email_frequency || 'welcome_nudge_monthly',
             show_popups: data.show_popups ?? true,
             show_activity: data.show_activity ?? true,
+            community_replies: data.community_replies ?? true,
             preferred_learning_day: data.preferred_learning_day || null,
             preferred_learning_time: data.preferred_learning_time || null,
             quiet_hours_enabled: data.quiet_hours_enabled ?? true,
@@ -272,6 +275,27 @@ export default function NotificationSettingsPage() {
                   <p className="text-xs" style={{ color: '#9CA3AF' }}>Display community stats and updates</p>
                 </div>
                 <Toggle enabled={preferences.show_activity} onChange={(value) => savePreference('show_activity', value)} disabled={isSaving} />
+              </div>
+            </div>
+          </div>
+
+          {/* Community Notifications */}
+          <div className="px-6 py-5" style={{ borderBottom: '1px solid #F3F4F6' }}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#E1F5EE' }}>
+                <MessageCircle size={18} style={{ color: '#2A9D8F' }} />
+              </div>
+              <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>Community</h3>
+            </div>
+            <div className="space-y-4 ml-12">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium" style={{ color: '#1B2A4A' }}>
+                    Reply notifications {savedField === 'community_replies' && <Check size={12} className="inline ml-1 text-green-600" />}
+                  </p>
+                  <p className="text-xs" style={{ color: '#9CA3AF' }}>Get emailed when someone replies to your question or post</p>
+                </div>
+                <Toggle enabled={preferences.community_replies} onChange={(value) => savePreference('community_replies', value)} disabled={isSaving} />
               </div>
             </div>
           </div>
