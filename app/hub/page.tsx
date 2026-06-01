@@ -8,11 +8,12 @@ import { useFavorites } from '@/lib/hub/useFavorites';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import AvatarDisplay from '@/components/hub/AvatarDisplay';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
-import { checkTrackerEligibility, type TrackerEligibility } from '@/lib/hub/transformation';
+import { checkTrackerEligibility, getLearningStats, type TrackerEligibility } from '@/lib/hub/transformation';
 import { getRecommendations, hasCompletedOnboarding, type RecommendedCourse } from '@/lib/hub/recommendations';
 import { checkRecognitions } from '@/lib/hub/recognitions';
 import dynamic from 'next/dynamic';
 import GiftElement from '@/components/hub/GiftElement';
+import CommunityBookmarks from '@/components/hub/CommunityBookmarks';
 
 const OnboardingTour = dynamic(() => import('@/components/hub/OnboardingTour'), { ssr: false });
 import {
@@ -223,6 +224,7 @@ export default function HubDashboard() {
   const [tip, setTip] = useState<string>(FALLBACK_TIPS[0]);
   const [certificateCount, setCertificateCount] = useState<number>(0);
   const [fieldNotesCount, setFieldNotesCount] = useState<number>(0);
+  const [currentStreak, setCurrentStreak] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const [trackerEligibility, setTrackerEligibility] = useState<TrackerEligibility | null>(null);
   const [recommendations, setRecommendations] = useState<RecommendedCourse[]>([]);
@@ -401,9 +403,13 @@ export default function HubDashboard() {
           setTip(FALLBACK_TIPS[tipIndex]);
         }
 
-        // Check tracker eligibility
-        const eligibility = await checkTrackerEligibility(user.id);
+        // Check tracker eligibility + streak
+        const [eligibility, learningStats] = await Promise.all([
+          checkTrackerEligibility(user.id),
+          getLearningStats(user.id),
+        ]);
         setTrackerEligibility(eligibility);
+        setCurrentStreak(learningStats.currentStreak);
 
         // Get recommendations if onboarding completed
         const onboardingDone = await hasCompletedOnboarding(user.id);
@@ -1221,6 +1227,9 @@ export default function HubDashboard() {
                 {tUI('Heart any course or quick win to save it here.')}
               </p>
             )}
+
+            {/* Community bookmarks */}
+            <CommunityBookmarks userId={user?.id} tUI={tUI} />
           </div>
 
           {/* First Field Note -- Hub Pioneer celebration */}
@@ -1421,12 +1430,36 @@ export default function HubDashboard() {
             </button>
           </div>
 
-          {/* 3. Your Progress -- merged Achievements + Tracker */}
+          {/* 3. Your Progress -- merged Achievements + Streak + Tracker */}
           <div
             data-tour="transformation-tracker"
             className="bg-white rounded-2xl p-5"
             style={{ border: '1px solid rgba(27,42,74,0.08)' }}
           >
+            {/* Streak */}
+            {currentStreak >= 2 && (
+              <>
+                <div className="flex items-center gap-3.5 mb-4">
+                  <div
+                    className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: '#FFF8E7' }}
+                  >
+                    <span style={{ fontSize: '20px' }}>&#9679;</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-xl font-bold" style={{ color: '#1B2A4A' }}>{currentStreak} {tUI('days')}</div>
+                    <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{tUI('Learning streak')}</div>
+                  </div>
+                </div>
+                <p className="text-xs mb-4" style={{ color: '#9CA3AF' }}>
+                  {currentStreak >= 7
+                    ? tUI("You've shown up consistently. That's what growth looks like.")
+                    : tUI("You're building momentum. Keep it going.")}
+                </p>
+                <div style={{ borderTop: '1px solid #F3F4F6', marginBottom: '16px' }} />
+              </>
+            )}
+
             {/* Achievements section */}
             <div className="flex items-center gap-3.5 mb-4">
               <div
