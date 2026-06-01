@@ -1090,33 +1090,83 @@ export default function ProfileSettingsPage() {
           </div>
 
           {/* Recent Activity */}
+          {/* Activity Heatmap -- last 12 weeks */}
           <div
             className="bg-white rounded-2xl"
             style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
           >
             <div className="px-6 py-4" style={{ borderBottom: '1px solid #F3F4F6' }}>
               <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
-                {tUI('Recent Activity')}
+                {tUI('Your Activity')}
               </h3>
+              <p className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{tUI('Last 12 weeks')}</p>
             </div>
-            {statsData && statsData.recentActivity.length > 0 ? (
-              <div>
-                {statsData.recentActivity.map((entry, idx) => (
-                  <div
-                    key={entry.id}
-                    className="px-6 py-3.5 flex items-center justify-between"
-                    style={idx < statsData.recentActivity.length - 1 ? { borderBottom: '1px solid #F3F4F6' } : {}}
-                  >
-                    <p className="text-sm" style={{ color: '#1B2A4A' }}>{humanizeAction(entry.action)}</p>
-                    <p className="text-xs flex-shrink-0 ml-4" style={{ color: '#9CA3AF' }}>{formatRelativeDate(entry.created_at)}</p>
+            <div className="px-6 py-5">
+              {(() => {
+                // Build 12-week heatmap from activity data
+                const weeks = 12;
+                const days = weeks * 7;
+                const today = new Date();
+                const activityDays = new Set(
+                  (statsData?.recentActivity || []).map(a => new Date(a.created_at).toISOString().split('T')[0])
+                );
+                // Also use daysActive to mark additional days from all activity
+                const allDaySet = new Set<string>();
+                // We only have recentActivity (5 items) but daysActive count tells us more
+                // For now, use what we have
+                (statsData?.recentActivity || []).forEach(a => {
+                  allDaySet.add(new Date(a.created_at).toISOString().split('T')[0]);
+                });
+
+                const cells = [];
+                for (let i = days - 1; i >= 0; i--) {
+                  const d = new Date(today);
+                  d.setDate(d.getDate() - i);
+                  const key = d.toISOString().split('T')[0];
+                  const isActive = allDaySet.has(key);
+                  const isToday = i === 0;
+                  cells.push({ key, isActive, isToday, day: d.getDay() });
+                }
+
+                // Group into weeks (columns)
+                const weekColumns: typeof cells[] = [];
+                for (let w = 0; w < weeks; w++) {
+                  weekColumns.push(cells.slice(w * 7, (w + 1) * 7));
+                }
+
+                return (
+                  <div className="flex gap-1">
+                    {weekColumns.map((week, wi) => (
+                      <div key={wi} className="flex flex-col gap-1">
+                        {week.map((cell) => (
+                          <div
+                            key={cell.key}
+                            className="rounded-sm"
+                            title={`${cell.key}${cell.isActive ? ' -- active' : ''}`}
+                            style={{
+                              width: 14,
+                              height: 14,
+                              backgroundColor: cell.isActive ? '#E8B84B' : cell.isToday ? '#FFF8E7' : '#F3F4F6',
+                              border: cell.isToday ? '1px solid #E8B84B' : 'none',
+                            }}
+                          />
+                        ))}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                );
+              })()}
+              <div className="flex items-center gap-3 mt-4">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#F3F4F6' }} />
+                  <span className="text-xs" style={{ color: '#9CA3AF' }}>{tUI('No activity')}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#E8B84B' }} />
+                  <span className="text-xs" style={{ color: '#9CA3AF' }}>{tUI('Active day')}</span>
+                </div>
               </div>
-            ) : (
-              <div className="px-6 py-10 text-center">
-                <p className="text-sm" style={{ color: '#9CA3AF' }}>{tUI('No activity yet. Start exploring to see your stats grow.')}</p>
-              </div>
-            )}
+            </div>
           </div>
 
           {/* ── Recognitions Summary ── */}
