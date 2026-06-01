@@ -14,11 +14,82 @@ import { Zap, Heart, Info } from 'lucide-react';
 const FILTER_CATEGORIES = [
   'All',
   'Saved',
+  'Practice Tools',
   'Stress Relief',
   'Time Savers',
   'Classroom Tools',
   'Communication',
   'Self-Care',
+];
+
+// Interactive practice tools (migrated from paragametools)
+const PRACTICE_TOOLS: QuickWin[] = [
+  {
+    id: 'practice-question-knockout',
+    slug: 'question-knockout',
+    title: 'Question Knockout',
+    description: 'Real scenarios. Questions only. Can you resist telling? Practice responding with ONLY questions.',
+    category: 'Practice Tools',
+    estimated_minutes: 15,
+    content_type: 'activity',
+    access_tier: 'essentials',
+    capacity: 'medium',
+  },
+  {
+    id: 'practice-tell-or-ask',
+    slug: 'tell-or-ask',
+    title: 'Tell or Ask?',
+    description: 'Is it really a question... or a command in disguise? Test your ear for the difference.',
+    category: 'Practice Tools',
+    estimated_minutes: 10,
+    content_type: 'activity',
+    access_tier: 'free',
+    capacity: 'low',
+  },
+  {
+    id: 'practice-feedback-level-up',
+    slug: 'feedback-level-up',
+    title: 'Feedback Level Up',
+    description: 'Rate feedback on a 1-4 scale. Can you spot the Level 2 trap?',
+    category: 'Practice Tools',
+    estimated_minutes: 12,
+    content_type: 'activity',
+    access_tier: 'essentials',
+    capacity: 'low',
+  },
+  {
+    id: 'practice-feedback-madlibs',
+    slug: 'feedback-madlibs',
+    title: 'Feedback Madlibs',
+    description: 'Learn the Notice, Name, Next Step formula through silly and real practice rounds.',
+    category: 'Practice Tools',
+    estimated_minutes: 10,
+    content_type: 'activity',
+    access_tier: 'essentials',
+    capacity: 'low',
+  },
+  {
+    id: 'practice-feedback-makeover',
+    slug: 'feedback-makeover',
+    title: 'Feedback Makeover',
+    description: 'Terrible feedback + real context. Race the clock to transform it.',
+    category: 'Practice Tools',
+    estimated_minutes: 15,
+    content_type: 'activity',
+    access_tier: 'essentials',
+    capacity: 'medium',
+  },
+  {
+    id: 'practice-whats-your-move',
+    slug: 'whats-your-move',
+    title: "What's Your Move?",
+    description: 'Real classroom scenarios with 3 choices. Pick the best response and see why.',
+    category: 'Practice Tools',
+    estimated_minutes: 10,
+    content_type: 'activity',
+    access_tier: 'free',
+    capacity: 'low',
+  },
 ];
 
 interface QuickWin {
@@ -122,8 +193,11 @@ export default function QuickWinsPage() {
     });
   }, [language, quickWins.length, isLoading, loadQuickWins]);
 
+  // Merge practice tools with database quick wins
+  const allQuickWins = [...quickWins, ...PRACTICE_TOOLS];
+
   // Filter quick wins by category and capacity
-  const filteredQuickWins = quickWins.filter((qw) => {
+  const filteredQuickWins = allQuickWins.filter((qw) => {
     const categoryMatch = (() => {
       if (activeFilter === 'All') return true;
       if (activeFilter === 'Saved') return isFavorite(qw.id);

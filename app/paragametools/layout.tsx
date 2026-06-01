@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Game Time | Para Workshop Tools',
-  description: 'Interactive training games for paraprofessionals',
+  title: 'Game Time | Practice Tools',
+  description: 'Interactive training games for educators',
   robots: {
     index: false,
     follow: false,

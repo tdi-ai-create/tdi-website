@@ -19,8 +19,13 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/gametools',
-        destination: '/paragametools',
+        destination: '/hub/quick-wins',
         permanent: true,
+      },
+      {
+        source: '/paragametools',
+        destination: '/hub/quick-wins',
+        permanent: false,
       },
       {
         source: '/blog',

@@ -155,9 +155,11 @@ export default function QuickWinCard({
         {/* Action */}
         {hasAccess ? (
           <Link
-            href={quickWin.course_slug
-              ? `/hub/courses/${quickWin.course_slug}/${quickWin.slug}`
-              : `/hub/quick-wins/${quickWin.slug}`}
+            href={quickWin.category === 'Practice Tools'
+              ? `/hub/practice/${quickWin.slug}`
+              : quickWin.course_slug
+                ? `/hub/courses/${quickWin.course_slug}/${quickWin.slug}`
+                : `/hub/quick-wins/${quickWin.slug}`}
             className="text-xs font-semibold rounded-lg py-2.5 block text-center transition-opacity hover:opacity-90"
             style={{
               backgroundColor: '#1B2A4A',

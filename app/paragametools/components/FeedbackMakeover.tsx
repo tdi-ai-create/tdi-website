@@ -136,7 +136,7 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
             style={{ backgroundColor: colorConfig.bg, border: `1px solid ${colorConfig.border}` }}
           >
             <p className="text-xs uppercase tracking-wide mb-2" style={{ color: colorConfig.accent }}>
-              {language === 'es' ? 'El para dijo:' : 'The para said:'}
+              {language === 'es' ? 'El educador dijo:' : 'The educator said:'}
             </p>
             <p className="text-xl md:text-2xl text-white italic text-center">
               "{current.bad[language]}"

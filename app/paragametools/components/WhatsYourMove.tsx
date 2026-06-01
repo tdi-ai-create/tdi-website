@@ -537,8 +537,8 @@ function Survey({ language, score }: { language: 'en' | 'es'; score: number }) {
         <ScaleQuestion
           question={
             language === 'es'
-              ? 'Desde enero, ¿te sientes más apoyado/a y valorado/a en tu rol como paraprofesional?'
-              : 'Since January, do you feel more supported and valued in your role as a paraprofessional?'
+              ? 'Desde enero, ¿te sientes más apoyado/a y valorado/a en tu rol como educador/a?'
+              : 'Since January, do you feel more supported and valued in your role as an educator?'
           }
           lowLabel={language === 'es' ? 'Igual que antes' : 'About the same'}
           highLabel={language === 'es' ? 'Mucho más apoyado/a' : 'Much more supported'}
@@ -562,8 +562,8 @@ function Survey({ language, score }: { language: 'en' | 'es'; score: number }) {
         <ScaleQuestion
           question={
             language === 'es'
-              ? '¿Qué tan probable es que continúes en tu rol como paraprofesional el próximo año escolar?'
-              : 'How likely are you to continue in your role as a paraprofessional next school year?'
+              ? '¿Qué tan probable es que continúes en tu rol como educador/a el próximo año escolar?'
+              : 'How likely are you to continue in your role as an educator next school year?'
           }
           lowLabel={language === 'es' ? 'Poco probable' : 'Unlikely'}
           highLabel={language === 'es' ? 'Definitivamente regresaré' : 'Definitely returning'}

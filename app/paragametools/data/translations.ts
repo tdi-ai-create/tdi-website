@@ -95,12 +95,12 @@ export const UI_TRANSLATIONS = {
   knockout_rules: {
     en: [
       'Partner up. One person plays the student scenario.',
-      'The other is the para - but you can ONLY ask questions.',
+      'The other is the educator - but you can ONLY ask questions.',
       "If you accidentally TELL... you're out!",
     ],
     es: [
       'Trabaja en parejas. Una persona actúa el escenario del estudiante.',
-      'El otro es el para - pero SOLO puede hacer preguntas.',
+      'El otro es el educador - pero SOLO puede hacer preguntas.',
       '¡Si accidentalmente DAS UNA RESPUESTA... estás fuera!',
     ],
   },
@@ -144,12 +144,12 @@ export const UI_TRANSLATIONS = {
   // Tell or Ask specific
   tellorask_rules: {
     en: [
-      "I'll show you something a para says to a student.",
+      "I'll show you something an educator says to a student.",
       'Your table decides: Is it a real question or a tell in disguise?',
       'Some of these are tricky!',
     ],
     es: [
-      'Te mostraré algo que un para le dice a un estudiante.',
+      'Te mostraré algo que un educador le dice a un estudiante.',
       'Tu mesa decide: ¿Es una pregunta real o una orden disfrazada?',
       '¡Algunas son difíciles!',
     ],
@@ -191,11 +191,11 @@ export const UI_TRANSLATIONS = {
   // Feedback Level Up specific
   levelup_rules: {
     en: [
-      "I'll show you a piece of feedback a para gave a student.",
+      "I'll show you a piece of feedback an educator gave a student.",
       'Your table holds up fingers: 1, 2, 3, or 4.',
     ],
     es: [
-      'Te mostraré una retroalimentación que un para dio a un estudiante.',
+      'Te mostraré una retroalimentación que un educador dio a un estudiante.',
       'Tu mesa levanta los dedos: 1, 2, 3 o 4.',
     ],
   },
