@@ -1001,6 +1001,125 @@ ${displayName}</div>
         </section>
       )}
 
+      {/* ========== PD Advocacy Toolkit (Standalone) ========== */}
+      <section className="mb-10">
+        <h2
+          className="text-lg font-semibold mb-5"
+          style={{ fontFamily: "'Source Serif 4', Georgia, serif", color: '#1e2749' }}
+        >
+          {tUI('Your PD Advocacy Toolkit')}
+        </h2>
+        <div
+          className="rounded-xl overflow-hidden"
+          style={{ backgroundColor: '#fff', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+        >
+          {/* What This Means */}
+          <div className="p-5" style={{ borderBottom: '1px solid #F3F4F6' }}>
+            <h3 className="text-sm font-semibold mb-2" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
+              {tUI('What Your Growth Means')}
+            </h3>
+            <p className="text-sm text-gray-600 leading-relaxed" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+              {tUI('Your work here documents real professional growth through the TDI Learning Hub. TDI is recognized for professional development in all 50 states. The tools you use, the courses you complete, and the community you contribute to -- it all counts. This toolkit helps you make sure others know it too.')}
+            </p>
+          </div>
+
+          {/* How to Submit */}
+          <div className="p-5" style={{ borderBottom: '1px solid #F3F4F6' }}>
+            <h3 className="text-sm font-semibold mb-2" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
+              {tUI('How to Submit for PD Credit')}
+            </h3>
+            <div className="space-y-2 text-sm text-gray-600" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+              <div className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold" style={{ backgroundColor: '#FFF8E7', color: '#d4960a' }}>1</span>
+                <span>{tUI('Print your certificate from any earned recognition above')}</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold" style={{ backgroundColor: '#FFF8E7', color: '#d4960a' }}>2</span>
+                <span>{tUI('Email or hand-deliver to your principal or PD coordinator')}</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold" style={{ backgroundColor: '#FFF8E7', color: '#d4960a' }}>3</span>
+                <span>{tUI('Reference your state requirements at your Department of Education website')}</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold" style={{ backgroundColor: '#FFF8E7', color: '#d4960a' }}>4</span>
+                <span>{tUI('Keep a copy in your professional portfolio')}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Sample Email */}
+          <div className="p-5" style={{ borderBottom: '1px solid #F3F4F6' }}>
+            <h3 className="text-sm font-semibold mb-2" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
+              {tUI('Sample Email to Your Admin')}
+            </h3>
+            <div
+              className="rounded-lg p-4 text-sm leading-relaxed"
+              style={{ backgroundColor: '#FAFAF8', fontFamily: "'DM Sans', sans-serif", color: '#374151', border: '1px solid #F3F4F6' }}
+            >
+              <p className="mb-2">{tUI('Dear [Principal/PD Coordinator],')}</p>
+              <p className="mb-2">{tUI('I completed professional development through Teachers Deserve It Learning Hub, an approved PD provider recognized in all 50 states. Attached is my certificate documenting this growth.')}</p>
+              <p className="mb-2">
+                {tUI('During this period, I explored')} {toolsExplored} {tUI('tools, completed self-directed professional learning, and saved an estimated')} {hoursSaved} {tUI('hours of planning time. I would be happy to share what I learned with our team if that would be helpful.')}
+              </p>
+              <p>{tUI('Thank you for supporting my professional growth.')}</p>
+            </div>
+            <button
+              onClick={() => {
+                const text = `Dear [Principal/PD Coordinator],\n\nI completed professional development through Teachers Deserve It Learning Hub, an approved PD provider recognized in all 50 states. Attached is my certificate documenting this growth.\n\nDuring this period, I explored ${toolsExplored} tools, completed self-directed professional learning, and saved an estimated ${hoursSaved} hours of planning time. I would be happy to share what I learned with our team if that would be helpful.\n\nThank you for supporting my professional growth.\n\n${profile?.display_name || ''}`;
+                navigator.clipboard.writeText(text).catch(() => {});
+              }}
+              className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all hover:opacity-90"
+              style={{ backgroundColor: '#F3F4F6', color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {tUI('Copy Email Template')}
+            </button>
+          </div>
+
+          {/* Growth Stats */}
+          <div className="p-5" style={{ borderBottom: '1px solid #F3F4F6' }}>
+            <h3 className="text-sm font-semibold mb-3" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
+              {tUI('Your Growth at a Glance')}
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="rounded-lg p-3 text-center" style={{ backgroundColor: '#FAFAF8', border: '1px solid #F3F4F6' }}>
+                <div className="text-xl font-bold" style={{ color: '#E8B84B' }}>{toolsExplored}</div>
+                <div className="text-xs text-gray-500" style={{ fontFamily: "'DM Sans', sans-serif" }}>{tUI('Tools explored')}</div>
+              </div>
+              <div className="rounded-lg p-3 text-center" style={{ backgroundColor: '#FAFAF8', border: '1px solid #F3F4F6' }}>
+                <div className="text-xl font-bold" style={{ color: '#E8B84B' }}>{hoursSaved}</div>
+                <div className="text-xs text-gray-500" style={{ fontFamily: "'DM Sans', sans-serif" }}>{tUI('Hours saved')}</div>
+              </div>
+              <div className="rounded-lg p-3 text-center" style={{ backgroundColor: '#FAFAF8', border: '1px solid #F3F4F6' }}>
+                <div className="text-xl font-bold" style={{ color: '#E8B84B' }}>{daysActive}</div>
+                <div className="text-xs text-gray-500" style={{ fontFamily: "'DM Sans', sans-serif" }}>{tUI('Days active')}</div>
+              </div>
+              <div className="rounded-lg p-3 text-center" style={{ backgroundColor: '#FAFAF8', border: '1px solid #F3F4F6' }}>
+                <div className="text-xl font-bold" style={{ color: '#E8B84B' }}>{recognitionData?.earned.length || 0}</div>
+                <div className="text-xs text-gray-500" style={{ fontFamily: "'DM Sans', sans-serif" }}>{tUI('Recognitions earned')}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Ways to Use */}
+          <div className="p-5">
+            <h3 className="text-sm font-semibold mb-2" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
+              {tUI('Ways to Use Your Certificates')}
+            </h3>
+            <div className="space-y-2 text-sm text-gray-600" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+              <p>Print and hang in your classroom as a reminder of your growth.</p>
+              <p>Add to your professional evaluation portfolio before your next review.</p>
+              <p>Submit for PD recertification hours with your district.</p>
+              <p>Post on LinkedIn to show other educators that investing in yourself matters.</p>
+              <p>Include in your annual review documentation.</p>
+              <p>Forward to your principal using the email template above.</p>
+              <p>Add to the Professional Development section of your resume.</p>
+              <p>Save in a feel-good folder for the tough days.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Empty state for no earned recognitions */}
       {recognitionData && recognitionData.earned.length === 0 && (
         <section className="mb-10">
