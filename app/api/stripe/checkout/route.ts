@@ -13,7 +13,7 @@ const PRICE_MAP: Record<string, string | undefined> = {
 
 export async function POST(req: Request) {
   try {
-    const { tier, email } = await req.json();
+    const { tier, email, trial_end } = await req.json();
 
     if (!tier || !PRICE_MAP[tier]) {
       return NextResponse.json(
@@ -33,7 +33,16 @@ export async function POST(req: Request) {
     const origin =
       req.headers.get('origin') ||
       process.env.NEXT_PUBLIC_SITE_URL ||
-      'https://teachersdeserveit.com';
+      'https://www.teachersdeserveit.com';
+
+    const subscriptionData: Stripe.Checkout.SessionCreateParams['subscription_data'] = {
+      metadata: { tier },
+    };
+
+    // Support trial period (e.g., summer free until September 1)
+    if (typeof trial_end === 'number') {
+      subscriptionData.trial_end = trial_end;
+    }
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
@@ -41,16 +50,12 @@ export async function POST(req: Request) {
       line_items: [{ price: priceId, quantity: 1 }],
       customer_email: email || undefined,
       allow_promotion_codes: true,
-      success_url: `${origin}/learning/plans/thank-you?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/learning/plans?canceled=true`,
+      success_url: `${origin}/hub?upgraded=true`,
+      cancel_url: `${origin}/hub/membership?canceled=true`,
       metadata: {
         tier,
       },
-      subscription_data: {
-        metadata: {
-          tier,
-        },
-      },
+      subscription_data: subscriptionData,
     });
 
     return NextResponse.json({ url: session.url });
