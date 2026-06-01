@@ -22,7 +22,7 @@ export default function HubWelcomePage() {
  Educators learn. Students benefit. Admins get the data. Memberships from $5/month with bulk pricing for schools and districts.
  </p>
  <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
- <Link href="/learning/plans" style={{ background: '#ffba06', color: '#1e2749', padding: '14px 28px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
+ <Link href="/hub" style={{ background: '#ffba06', color: '#1e2749', padding: '14px 28px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
  See Membership Plans
  </Link>
  <Link href="#features" style={{ background: 'transparent', color: 'white', padding: '14px 28px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.3)' }}>
@@ -86,7 +86,7 @@ export default function HubWelcomePage() {
  </div>
  </div>
  <div style={{ textAlign: 'center', marginTop: 48 }}>
- <Link href="/learning/plans" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '14px 32px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
+ <Link href="/hub" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '14px 32px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
  Join the Hub
  </Link>
  </div>
@@ -145,7 +145,7 @@ export default function HubWelcomePage() {
  Five honest contribution types replace star ratings. Real teachers. Real stories. No survey fatigue.
  </p>
  <div style={{ textAlign: 'center', marginTop: 48 }}>
- <Link href="/learning/plans" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '14px 32px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
+ <Link href="/hub" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '14px 32px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
  Join the Hub
  </Link>
  </div>
@@ -259,7 +259,7 @@ export default function HubWelcomePage() {
  That's over 7x the industry average of just 10% implementation in 180 days. The Hub is one piece of our research-backed approach to educator learning that actually transfers to the classroom.
  </p>
  <div style={{ textAlign: 'center', marginTop: 48 }}>
- <Link href="/learning/plans" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '14px 32px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
+ <Link href="/hub" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '14px 32px', borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
  Join the Hub
  </Link>
  </div>
@@ -428,7 +428,7 @@ export default function HubWelcomePage() {
  <li style={{ marginBottom: 8 }}>✓ Save favorites for later</li>
  <li style={{ marginBottom: 8 }}>✓ Track your PD hours</li>
  </ul>
- <Link href="/learning/plans" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#F3F4F6', color: '#1e2749', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
+ <Link href="/hub" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#F3F4F6', color: '#1e2749', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
  Get Started
  </Link>
  </div>
@@ -443,7 +443,7 @@ export default function HubWelcomePage() {
  <li style={{ marginBottom: 8 }}>✓ Download PDFs & templates</li>
  <li style={{ marginBottom: 8 }}>✓ Priority email support</li>
  </ul>
- <Link href="/learning/plans" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#1e2749', color: 'white', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
+ <Link href="/hub" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#1e2749', color: 'white', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
  Choose Essentials
  </Link>
  </div>
@@ -460,7 +460,7 @@ export default function HubWelcomePage() {
  <li style={{ marginBottom: 8 }}>✓ Early access to new courses</li>
  <li style={{ marginBottom: 8 }}>✓ Community discussion access</li>
  </ul>
- <Link href="/learning/plans" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#2A9D8F', color: 'white', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
+ <Link href="/hub" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#2A9D8F', color: 'white', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
  Choose Professional
  </Link>
  </div>
@@ -477,7 +477,7 @@ export default function HubWelcomePage() {
  <li style={{ marginBottom: 8 }}>✓ Direct creator access</li>
  <li style={{ marginBottom: 8 }}>✓ 1-on-1 coaching sessions</li>
  </ul>
- <Link href="/learning/plans" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#1e2749', color: 'white', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
+ <Link href="/hub" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#1e2749', color: 'white', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
  Choose All-Access
  </Link>
  </div>
@@ -577,7 +577,7 @@ export default function HubWelcomePage() {
  <p style={{ fontSize: 16, color: 'white', opacity: 0.85, margin: '0 0 32px 0' }}>
  Start free. Upgrade anytime. Join 100,000+ educators already making it work.
  </p>
- <Link href="/learning/plans" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '16px 32px', borderRadius: 8, fontWeight: 600, fontSize: 16, textDecoration: 'none' }}>
+ <Link href="/hub" style={{ display: 'inline-block', background: '#ffba06', color: '#1e2749', padding: '16px 32px', borderRadius: 8, fontWeight: 600, fontSize: 16, textDecoration: 'none' }}>
  See Membership Plans
  </Link>
  </div>

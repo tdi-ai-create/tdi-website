@@ -416,7 +416,26 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
     }
   };
 
-  const isCircleExpanded = breathPhase === 'inhale' || breathPhase === 'hold1';
+  // Box breathing: compute dot position as a percentage along the square perimeter
+  // Top-left (0,0) -> Top-right (1,0) = inhale
+  // Top-right (1,0) -> Bottom-right (1,1) = hold1
+  // Bottom-right (1,1) -> Bottom-left (0,1) = exhale
+  // Bottom-left (0,1) -> Top-left (0,0) = hold2
+  const getBoxDotPosition = (): { x: number; y: number } => {
+    const progress = 1 - phaseTimer / BREATH_DURATION; // 0 to 1 within phase
+    switch (breathPhase) {
+      case 'inhale':
+        return { x: progress * 100, y: 0 };
+      case 'hold1':
+        return { x: 100, y: progress * 100 };
+      case 'exhale':
+        return { x: (1 - progress) * 100, y: 100 };
+      case 'hold2':
+        return { x: 0, y: (1 - progress) * 100 };
+      default:
+        return { x: 0, y: 0 };
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -657,37 +676,95 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
 
             {breathPhase !== 'complete' ? (
               <>
-                {/* Breathing Circle with smooth animation */}
-                <div className="relative mx-auto mb-8" style={{ width: '200px', height: '200px' }}>
+                {/* Box Breathing Square */}
+                <div className="relative mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
+                  {/* The square border */}
                   <div
-                    className="absolute top-1/2 left-1/2 rounded-full flex items-center justify-center"
                     style={{
-                      width: isCircleExpanded ? '180px' : '120px',
-                      height: isCircleExpanded ? '180px' : '120px',
-                      transform: 'translate(-50%, -50%)',
-                      border: '2px solid white',
-                      backgroundColor: isCircleExpanded ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)',
-                      boxShadow: isCircleExpanded
-                        ? '0 0 40px rgba(255, 255, 255, 0.3), 0 0 80px rgba(255, 255, 255, 0.15)'
-                        : '0 0 20px rgba(255, 255, 255, 0.1)',
-                      transition: 'width 4s ease-in-out, height 4s ease-in-out, background-color 4s ease-in-out, box-shadow 4s ease-in-out',
+                      position: 'absolute',
+                      inset: 0,
+                      border: '2px solid rgba(255, 255, 255, 0.3)',
+                      borderRadius: '4px',
                     }}
+                  />
+
+                  {/* Corner labels */}
+                  <span className="box-breath-label" style={{ position: 'absolute', top: -24, left: 0 }}>
+                    Breathe in
+                  </span>
+                  <span className="box-breath-label" style={{ position: 'absolute', top: -24, right: 0, textAlign: 'right' }}>
+                    Hold
+                  </span>
+                  <span className="box-breath-label" style={{ position: 'absolute', bottom: -24, right: 0, textAlign: 'right' }}>
+                    Breathe out
+                  </span>
+                  <span className="box-breath-label" style={{ position: 'absolute', bottom: -24, left: 0 }}>
+                    Hold
+                  </span>
+
+                  {/* Trailing glow path */}
+                  <svg
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+                    viewBox="0 0 200 200"
+                    fill="none"
                   >
-                    <span
-                      key={breathPhase}
-                      className="text-center px-4 breath-text-fade"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: '17px',
-                        color: 'white',
-                        fontWeight: 500,
-                        letterSpacing: '0.02em',
-                      }}
-                    >
-                      {getBreathPhaseText()}
-                    </span>
-                  </div>
+                    {/* Active side highlight */}
+                    {breathPhase === 'inhale' && (
+                      <line x1="0" y1="0" x2={getBoxDotPosition().x * 2} y2="0" stroke="rgba(255,255,255,0.5)" strokeWidth="2" />
+                    )}
+                    {breathPhase === 'hold1' && (
+                      <>
+                        <line x1="0" y1="0" x2="200" y2="0" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
+                        <line x1="200" y1="0" x2="200" y2={getBoxDotPosition().y * 2} stroke="rgba(255,255,255,0.5)" strokeWidth="2" />
+                      </>
+                    )}
+                    {breathPhase === 'exhale' && (
+                      <>
+                        <line x1="0" y1="0" x2="200" y2="0" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
+                        <line x1="200" y1="0" x2="200" y2="200" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
+                        <line x1="200" y1="200" x2={getBoxDotPosition().x * 2} y2="200" stroke="rgba(255,255,255,0.5)" strokeWidth="2" />
+                      </>
+                    )}
+                    {breathPhase === 'hold2' && (
+                      <>
+                        <line x1="0" y1="0" x2="200" y2="0" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
+                        <line x1="200" y1="0" x2="200" y2="200" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
+                        <line x1="200" y1="200" x2="0" y2="200" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
+                        <line x1="0" y1="200" x2="0" y2={getBoxDotPosition().y * 2} stroke="rgba(255,255,255,0.5)" strokeWidth="2" />
+                      </>
+                    )}
+                  </svg>
+
+                  {/* Moving dot */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '50%',
+                      backgroundColor: '#E8B84B',
+                      boxShadow: '0 0 20px rgba(232, 184, 75, 0.6), 0 0 40px rgba(232, 184, 75, 0.3)',
+                      left: `${getBoxDotPosition().x}%`,
+                      top: `${getBoxDotPosition().y}%`,
+                      transform: 'translate(-50%, -50%)',
+                      transition: 'left 1s linear, top 1s linear',
+                    }}
+                  />
                 </div>
+
+                {/* Phase text */}
+                <p
+                  key={breathPhase}
+                  className="breath-text-fade mb-2"
+                  style={{
+                    fontFamily: "'Source Serif 4', Georgia, serif",
+                    fontSize: '20px',
+                    color: 'white',
+                    fontWeight: 500,
+                  }}
+                >
+                  {getBreathPhaseText()}
+                </p>
 
                 {/* Cycle Counter */}
                 <p
@@ -1241,6 +1318,13 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
         }
         .breath-completion-fade {
           animation: completionFadeIn 1s ease-out;
+        }
+        .box-breath-label {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 11px;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.45);
+          letter-spacing: 0.03em;
         }
         textarea::placeholder {
           color: rgba(255, 255, 255, 0.4);
