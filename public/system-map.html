@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TDI System Architecture -- How Everything Connects</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #F0EEE9; min-height: 100vh; padding: 40px 20px; color: #1B2A4A; }
+  h1 { text-align: center; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .subtitle { text-align: center; color: #6B7280; font-size: 14px; margin-bottom: 40px; }
+  .map { max-width: 1100px; margin: 0 auto; position: relative; }
+
+  /* Nodes */
+  .node { background: white; border-radius: 16px; padding: 24px; border: 2px solid #E5E7EB; position: relative; transition: all 0.2s ease; cursor: default; }
+  .node:hover { border-color: #E8B84B; box-shadow: 0 8px 24px rgba(30,39,73,0.1); transform: translateY(-2px); }
+  .node h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .node p { font-size: 13px; color: #6B7280; line-height: 1.5; }
+  .node .tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: 8px; }
+  .node .detail { font-size: 12px; color: #9CA3AF; margin-top: 12px; padding-top: 12px; border-top: 1px solid #F3F4F6; }
+  .node .detail li { margin-bottom: 4px; list-style: none; }
+  .node .detail li::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
+
+  .dot-gold::before { background: #E8B84B !important; }
+  .dot-green::before { background: #2A9D8F !important; }
+  .dot-blue::before { background: #7BB6D9 !important; }
+  .dot-coral::before { background: #E8927C !important; }
+
+  .tag-live { background: #ECFDF5; color: #059669; }
+  .tag-platform { background: #EEF2FF; color: #4F46E5; }
+  .tag-service { background: #FFF7ED; color: #C2410C; }
+  .tag-internal { background: #F3F4F6; color: #6B7280; }
+
+  /* Grid layout */
+  .row { display: grid; gap: 20px; margin-bottom: 20px; }
+  .row-1 { grid-template-columns: 1fr; max-width: 500px; margin-left: auto; margin-right: auto; }
+  .row-2 { grid-template-columns: 1fr 1fr; }
+  .row-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .row-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+  /* Flow arrows */
+  .flow-section { text-align: center; padding: 16px 0; }
+  .flow-label { display: inline-block; background: #1B2A4A; color: white; font-size: 11px; font-weight: 600; padding: 6px 16px; border-radius: 20px; letter-spacing: 0.5px; }
+  .arrow-down { text-align: center; padding: 8px 0; color: #D1D5DB; font-size: 20px; }
+
+  /* Section headers */
+  .section-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #9CA3AF; margin: 32px 0 16px; padding-left: 4px; }
+
+  /* Legend */
+  .legend { max-width: 1100px; margin: 40px auto 0; background: white; border-radius: 16px; padding: 24px; border: 1px solid #E5E7EB; }
+  .legend h3 { font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+  .legend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
+  .legend-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: #6B7280; }
+  .legend-arrow { color: #E8B84B; font-weight: 700; font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+  /* Connections visualization */
+  .connections { max-width: 1100px; margin: 32px auto; background: white; border-radius: 16px; padding: 24px; border: 1px solid #E5E7EB; }
+  .connections h3 { font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+  .flow-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #F9FAFB; font-size: 13px; }
+  .flow-row:last-child { border-bottom: none; }
+  .flow-from, .flow-to { font-weight: 600; color: #1B2A4A; min-width: 140px; }
+  .flow-arrow-inline { color: #E8B84B; font-weight: 700; }
+  .flow-desc { color: #6B7280; flex: 1; }
+
+  @media (max-width: 768px) {
+    .row-2, .row-3, .row-4 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<h1>TDI System Architecture</h1>
+<p class="subtitle">How everything connects -- updated June 1, 2026 (Launch Day)</p>
+
+<div class="map">
+
+  <!-- Top of funnel -->
+  <div class="section-header">Top of Funnel -- Where Educators Find Us</div>
+  <div class="row row-3">
+    <div class="node">
+      <h3>Substack</h3>
+      <p>Newsletter, community, paid subscriptions. 86,000 subscribers. The conversation.</p>
+      <span class="tag tag-platform">Platform</span>
+      <ul class="detail">
+        <li class="dot-gold">Free subscribers -- get free Hub account</li>
+        <li class="dot-gold">Paid $5/mo -- get Hub Essentials access</li>
+        <li class="dot-gold">Founding $10+/mo -- get Hub Professional access</li>
+        <li class="dot-green">Payments through shared Stripe account</li>
+      </ul>
+    </div>
+    <div class="node">
+      <h3>TDI Website</h3>
+      <p>teachersdeserveit.com -- marketing site, partnership info, Desi AI guide, Hub entry point.</p>
+      <span class="tag tag-live">Live</span>
+      <ul class="detail">
+        <li class="dot-gold">Desi pulls live Hub content via get_hub_content tool</li>
+        <li class="dot-gold">/hub routes to the Learning Hub</li>
+        <li class="dot-blue">Hosted on Vercel, code in tdi-website repo</li>
+      </ul>
+    </div>
+    <div class="node">
+      <h3>Social + Podcast</h3>
+      <p>Instagram, TikTok, Facebook, X, Apple Podcasts, Spotify. Drives awareness.</p>
+      <span class="tag tag-platform">Platform</span>
+      <ul class="detail">
+        <li class="dot-gold">Links to /hub and Substack</li>
+        <li class="dot-coral">No direct system integration</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="arrow-down">|</div>
+
+  <!-- Core product -->
+  <div class="section-header">Core Product -- The Learning Hub</div>
+  <div class="row row-1">
+    <div class="node" style="border-color: #E8B84B; border-width: 3px;">
+      <h3 style="font-size: 20px;">TDI Learning Hub</h3>
+      <p>teachersdeserveit.com/hub -- courses, Quick Wins, community, Q&A, PD tracking. The toolkit.</p>
+      <span class="tag tag-live">Live -- Launched June 1, 2026</span>
+      <ul class="detail">
+        <li class="dot-gold">3,172 user accounts (and growing)</li>
+        <li class="dot-gold">432 all_access (district partners)</li>
+        <li class="dot-gold">34 courses (essentials tier), 90 Quick Wins</li>
+        <li class="dot-gold">7 free rotating Quick Wins for free users</li>
+        <li class="dot-green">Membership tiers: Free, Essentials $5/mo, Professional $10/mo, All-Access $25/mo</li>
+        <li class="dot-blue">Database: Hub Supabase project (asdwpkcsbcnpknklchdq)</li>
+        <li class="dot-blue">Auth: Supabase Auth with magic link / Google OAuth</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="arrow-down">|</div>
+
+  <!-- Infrastructure -->
+  <div class="section-header">Infrastructure -- What Powers It</div>
+  <div class="row row-4">
+    <div class="node">
+      <h3>Hub Supabase</h3>
+      <p>Hub database. Users, courses, memberships, Q&A, activity logs.</p>
+      <span class="tag tag-service">Service</span>
+      <ul class="detail">
+        <li class="dot-blue">Project: asdwpkcsbcnpknklchdq</li>
+        <li class="dot-blue">hub_profiles, hub_courses, hub_quick_wins, hub_memberships, hub_qa_posts</li>
+        <li class="dot-coral">Separate from creator-portal Supabase</li>
+      </ul>
+    </div>
+    <div class="node">
+      <h3>Stripe</h3>
+      <p>Payments for both Substack subscriptions and Hub upgrades. Shared account.</p>
+      <span class="tag tag-service">Service</span>
+      <ul class="detail">
+        <li class="dot-green">Substack subs: $5-$150 (managed by Substack)</li>
+        <li class="dot-green">Hub upgrades: Essentials/Professional/All-Access</li>
+        <li class="dot-blue">Webhook creates hub_memberships on checkout</li>
+      </ul>
+    </div>
+    <div class="node">
+      <h3>Resend</h3>
+      <p>Email delivery. Welcome emails, launch emails, notifications.</p>
+      <span class="tag tag-service">Service</span>
+      <ul class="detail">
+        <li class="dot-green">From: noreply@teachersdeserveit.com</li>
+        <li class="dot-green">Welcome email triggers on first Hub login</li>
+        <li class="dot-blue">API key in Vercel as RESEND_API_KEY</li>
+      </ul>
+    </div>
+    <div class="node">
+      <h3>Vercel</h3>
+      <p>Hosting. Deploys from main branch of tdi-website repo.</p>
+      <span class="tag tag-service">Service</span>
+      <ul class="detail">
+        <li class="dot-blue">Production: teachersdeserveit.com</li>
+        <li class="dot-blue">Preview: per-branch URLs</li>
+        <li class="dot-coral">All env vars configured</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Internal tools -->
+  <div class="section-header">Internal Tools -- How We Manage</div>
+  <div class="row row-3">
+    <div class="node">
+      <h3>TDI Admin Portal</h3>
+      <p>/tdi-admin -- manage Hub content, users, enrollments, analytics.</p>
+      <span class="tag tag-internal">Internal</span>
+      <ul class="detail">
+        <li class="dot-coral">Currently shows 12 users (needs to connect to Hub Supabase)</li>
+        <li class="dot-blue">Operations: accounts, enrollments, reports</li>
+        <li class="dot-blue">Production: courses, Quick Wins, content</li>
+      </ul>
+    </div>
+    <div class="node">
+      <h3>Paperclip</h3>
+      <p>Project management. AI agents (Holly, Chris, Nora, Izzy) and human team.</p>
+      <span class="tag tag-internal">Internal</span>
+      <ul class="detail">
+        <li class="dot-blue">Projects: Learning Hub, Marketing, Creator Studio, etc.</li>
+        <li class="dot-blue">Agents manage tasks, drafts, and execution</li>
+        <li class="dot-green">Rae approves milestones</li>
+      </ul>
+    </div>
+    <div class="node">
+      <h3>Creator Portal</h3>
+      <p>Creator-portal Supabase. Legacy data, creator studio, partnership dashboards.</p>
+      <span class="tag tag-internal">Internal</span>
+      <ul class="detail">
+        <li class="dot-coral">Separate from Hub Supabase</li>
+        <li class="dot-blue">Still used for creator studio, sales pipeline, dashboards</li>
+        <li class="dot-blue">Desi's original connection (non-Hub queries)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Sunset -->
+  <div class="section-header">Sunset -- Decommissioned</div>
+  <div class="row row-2" style="max-width: 700px;">
+    <div class="node" style="opacity: 0.6; border-style: dashed;">
+      <h3>Thinkific (Sunset)</h3>
+      <p>tdi.thinkific.com -- former course platform. Plan canceled June 1.</p>
+      <span class="tag" style="background: #FEE2E2; color: #DC2626;">Decommissioned</span>
+      <ul class="detail">
+        <li class="dot-coral">Full-page redirect to teachersdeserveit.com/hub</li>
+        <li class="dot-coral">Free plan until Aug 1 for content access</li>
+        <li class="dot-coral">434 users migrated, 4 subscriptions canceled</li>
+      </ul>
+    </div>
+    <div class="node" style="opacity: 0.6; border-style: dashed;">
+      <h3>TDI Vault (Sunset)</h3>
+      <p>Former standalone resource collection for paid Substack subscribers.</p>
+      <span class="tag" style="background: #FEE2E2; color: #DC2626;">Migrated to Hub</span>
+      <ul class="detail">
+        <li class="dot-coral">Content now lives in Hub Essentials tier</li>
+        <li class="dot-coral">Substack references updated to point to /hub</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Data flows -->
+<div class="connections">
+  <h3>Data Flows -- How Information Moves</h3>
+  <div class="flow-row">
+    <span class="flow-from">New Substack sub</span>
+    <span class="flow-arrow-inline">--></span>
+    <span class="flow-to">Hub account</span>
+    <span class="flow-desc">Weekly sync (Chris building by June 6) or self-signup via /hub</span>
+  </div>
+  <div class="flow-row">
+    <span class="flow-from">Hub upgrade click</span>
+    <span class="flow-arrow-inline">--></span>
+    <span class="flow-to">Stripe checkout</span>
+    <span class="flow-desc">/api/stripe/checkout creates session, redirects to Stripe, returns to /hub/membership?success=true</span>
+  </div>
+  <div class="flow-row">
+    <span class="flow-from">Stripe payment</span>
+    <span class="flow-arrow-inline">--></span>
+    <span class="flow-to">Hub membership</span>
+    <span class="flow-desc">Webhook at /api/stripe/webhook creates hub_memberships row with correct tier</span>
+  </div>
+  <div class="flow-row">
+    <span class="flow-from">First Hub login</span>
+    <span class="flow-arrow-inline">--></span>
+    <span class="flow-to">Welcome email</span>
+    <span class="flow-desc">HubAuthGuard fires POST /api/hub/emails/welcome via Resend (idempotent)</span>
+  </div>
+  <div class="flow-row">
+    <span class="flow-from">Q&A reply posted</span>
+    <span class="flow-arrow-inline">--></span>
+    <span class="flow-to">Email notification</span>
+    <span class="flow-desc">qa-handler.ts sends reply notification to original poster via Resend</span>
+  </div>
+  <div class="flow-row">
+    <span class="flow-from">Desi question</span>
+    <span class="flow-arrow-inline">--></span>
+    <span class="flow-to">Live Hub data</span>
+    <span class="flow-desc">get_hub_content tool queries hub_courses/hub_quick_wins via Hub Supabase client</span>
+  </div>
+  <div class="flow-row">
+    <span class="flow-from">Visitor on tdi.thinkific.com</span>
+    <span class="flow-arrow-inline">--></span>
+    <span class="flow-to">Redirect to /hub</span>
+    <span class="flow-desc">Footer script shows full-page overlay with "Visit the New Learning Hub" CTA</span>
+  </div>
+  <div class="flow-row">
+    <span class="flow-from">Course card on homepage</span>
+    <span class="flow-arrow-inline">--></span>
+    <span class="flow-to">Hub courses</span>
+    <span class="flow-desc">/api/courses queries hub_courses via Hub Supabase client, links to /hub/courses/:slug</span>
+  </div>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <h3>Membership Tier Mapping</h3>
+  <div class="legend-grid">
+    <div class="legend-item">
+      <span class="legend-arrow">--></span>
+      <span><strong>Free Substack subscriber</strong> = Free Hub account (7 rotating Quick Wins)</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-arrow">--></span>
+      <span><strong>Paid Substack $5/mo</strong> = Hub Essentials (full Quick Wins library)</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-arrow">--></span>
+      <span><strong>Founding Substack $10+/mo</strong> = Hub Professional (full course library)</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-arrow">--></span>
+      <span><strong>District partner</strong> = Hub All-Access (everything)</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-arrow">--></span>
+      <span><strong>Direct Hub upgrade</strong> = Essentials $5 / Professional $10 / All-Access $25 via Stripe</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-arrow">--></span>
+      <span><strong>Thinkific users</strong> = Migrated to Hub All-Access (district) or Free (leads)</span>
+    </div>
+  </div>
+</div>
+
+<p style="text-align: center; color: #9CA3AF; font-size: 12px; margin-top: 32px;">Last updated: June 1, 2026 -- TDI Learning Hub Launch Day</p>
+
+</body>
+</html>
