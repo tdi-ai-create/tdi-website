@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import UniversalShareModal from '@/components/hub/UniversalShareModal';
+import AchievementInsights from '@/components/hub/AchievementInsights';
 import {
   checkRecognitions,
   RECOGNITIONS,
@@ -1231,6 +1232,27 @@ ${displayName}</div>
               );
             })}
           </div>
+        </section>
+      )}
+
+      {/* ========== AI Growth Insights ========== */}
+      {!isLoading && (
+        <section className="mb-10">
+          <AchievementInsights
+            data={{
+              name: profile?.display_name || 'Educator',
+              role: profile?.role || 'Educator',
+              toolsExplored,
+              hoursSaved: String(hoursSaved),
+              daysActive,
+              recognitionsEarned: earnedCount,
+              earnedNames: recognitionData?.earned.map(e => e.recognition.title) || [],
+              topCategories: [],
+              communityPosts: 0,
+              coursesCompleted: certificates.length,
+              pdHours: certificates.reduce((sum, c) => sum + (c.pd_hours || 0), 0),
+            }}
+          />
         </section>
       )}
 
