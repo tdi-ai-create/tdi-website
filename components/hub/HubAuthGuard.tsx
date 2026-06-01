@@ -68,6 +68,19 @@ export default function HubAuthGuard({ children }: HubAuthGuardProps) {
 
         setProfile(userProfile);
 
+        // Trigger welcome email on first login (idempotent -- won't re-send)
+        if (currentUser.email) {
+          fetch('/api/hub/emails/welcome', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: currentUser.id,
+              email: currentUser.email,
+              displayName: userProfile?.display_name || null,
+            }),
+          }).catch(() => {}); // Fire and forget
+        }
+
         // Check if onboarding is complete
         // Skip onboarding for owner/admin roles and migrated users
         const skipRoles = ['owner', 'school_leader', 'district_staff'];
