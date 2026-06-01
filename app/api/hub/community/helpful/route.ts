@@ -27,26 +27,22 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (existing) {
-        // Remove helpful
         await supabase.from('hub_qa_post_helpfuls').delete().eq('id', existing.id)
-
-        // Decrement count
-        const { data: post } = await supabase.from('hub_qa_posts').select('helpful_count').eq('id', content_id).single()
-        const newCount = Math.max(0, (post?.helpful_count || 1) - 1)
-        await supabase.from('hub_qa_posts').update({ helpful_count: newCount }).eq('id', content_id)
-
-        return NextResponse.json({ marked: false, helpful_count: newCount })
       } else {
-        // Add helpful
         await supabase.from('hub_qa_post_helpfuls').insert({ post_id: content_id, user_id })
-
-        // Increment count
-        const { data: post } = await supabase.from('hub_qa_posts').select('helpful_count').eq('id', content_id).single()
-        const newCount = (post?.helpful_count || 0) + 1
-        await supabase.from('hub_qa_posts').update({ helpful_count: newCount }).eq('id', content_id)
-
-        return NextResponse.json({ marked: true, helpful_count: newCount })
       }
+
+      // Count actual rows to get the true count
+      const { count } = await supabase
+        .from('hub_qa_post_helpfuls')
+        .select('id', { count: 'exact', head: true })
+        .eq('post_id', content_id)
+
+      const newCount = count || 0
+      await supabase.from('hub_qa_posts').update({ helpful_count: newCount }).eq('id', content_id)
+
+      return NextResponse.json({ marked: !existing, helpful_count: newCount })
+
     } else if (content_type === 'conversation_post') {
       // Check if already marked
       const { data: existing } = await supabase
@@ -57,26 +53,22 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (existing) {
-        // Remove helpful
         await supabase.from('lesson_response_helpfuls').delete().eq('id', existing.id)
-
-        // Decrement count
-        const { data: post } = await supabase.from('lesson_responses').select('helpful_count').eq('id', content_id).single()
-        const newCount = Math.max(0, (post?.helpful_count || 1) - 1)
-        await supabase.from('lesson_responses').update({ helpful_count: newCount }).eq('id', content_id)
-
-        return NextResponse.json({ marked: false, helpful_count: newCount })
       } else {
-        // Add helpful
         await supabase.from('lesson_response_helpfuls').insert({ response_id: content_id, user_id })
-
-        // Increment count
-        const { data: post } = await supabase.from('lesson_responses').select('helpful_count').eq('id', content_id).single()
-        const newCount = (post?.helpful_count || 0) + 1
-        await supabase.from('lesson_responses').update({ helpful_count: newCount }).eq('id', content_id)
-
-        return NextResponse.json({ marked: true, helpful_count: newCount })
       }
+
+      // Count actual rows to get the true count
+      const { count } = await supabase
+        .from('lesson_response_helpfuls')
+        .select('id', { count: 'exact', head: true })
+        .eq('response_id', content_id)
+
+      const newCount = count || 0
+      await supabase.from('lesson_responses').update({ helpful_count: newCount }).eq('id', content_id)
+
+      return NextResponse.json({ marked: !existing, helpful_count: newCount })
+
     } else {
       return NextResponse.json({ error: 'Invalid content_type' }, { status: 400 })
     }
