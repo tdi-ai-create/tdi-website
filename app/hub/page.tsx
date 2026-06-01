@@ -733,7 +733,7 @@ export default function HubDashboard() {
         const saved = localStorage.getItem('tdi-hub-tour-step');
         if (saved !== null) {
           const savedStep = parseInt(saved, 10);
-          if (!isNaN(savedStep) && savedStep > 0 && savedStep < 10) {
+          if (!isNaN(savedStep) && savedStep >= 0 && savedStep < 10) {
             setTourResumeStep(savedStep);
           }
         }
@@ -748,6 +748,11 @@ export default function HubDashboard() {
     if (stopsSeen >= 10) {
       setTourCompleted(true);
       try { localStorage.removeItem('tdi-hub-tour-step'); } catch {}
+    } else {
+      // Tour ended without completing all steps -- reset tourChecked
+      // so the next time the dashboard mounts, it re-checks localStorage
+      // and shows the "Continue the tour" overlay
+      setTourChecked(false);
     }
   }, []);
 
