@@ -50,7 +50,7 @@ export async function POST(req: Request) {
       line_items: [{ price: priceId, quantity: 1 }],
       customer_email: email || undefined,
       allow_promotion_codes: true,
-      success_url: `${origin}/hub?upgraded=true`,
+      success_url: `${origin}/hub/membership?success=true`,
       cancel_url: `${origin}/hub/membership?canceled=true`,
       metadata: {
         tier,
