@@ -74,11 +74,10 @@ type GoalType =
 
 type GrowthTab =
   | 'profile'
-  | 'goals'
-  | 'stats'
-  | 'wellbeing'
+  | 'growth'
+  | 'vibe_check'
   | 'library'
-  | 'recognitions';
+  | 'wellbeing';
 
 interface ActivityEntry {
   id: string;
@@ -186,11 +185,8 @@ const ICON_MAP: Record<string, LucideIcon> = {
 
 const TAB_CONFIG: { id: GrowthTab; label: string; icon: LucideIcon }[] = [
   { id: 'profile', label: 'Profile', icon: User },
-  { id: 'goals', label: 'Goals', icon: Target },
-  { id: 'stats', label: 'My Stats', icon: BarChart3 },
-  { id: 'wellbeing', label: 'Vibe Check', icon: Heart },
-  { id: 'library', label: 'Library', icon: BookOpen },
-  { id: 'recognitions', label: 'Recognitions', icon: Award },
+  { id: 'growth', label: 'My Growth', icon: BarChart3 },
+  { id: 'vibe_check', label: 'Vibe Check', icon: Heart },
 ];
 
 // ── Helpers ────────────────────────────────────────────────────────────
@@ -969,9 +965,9 @@ export default function ProfileSettingsPage() {
       )}
 
       {/* ════════════════════════════════════════════════════════════════════
-          TAB: Goals
+          TAB: My Growth (Goals + Stats + Recognitions combined)
          ════════════════════════════════════════════════════════════════════ */}
-      {activeTab === 'goals' && (
+      {activeTab === 'growth' && (
         <div className="space-y-6">
           {/* Goals selector */}
           <div>
@@ -1065,14 +1061,8 @@ export default function ProfileSettingsPage() {
               </div>
             </div>
           )}
-        </div>
-      )}
 
-      {/* ════════════════════════════════════════════════════════════════════
-          TAB: My Stats
-         ════════════════════════════════════════════════════════════════════ */}
-      {activeTab === 'stats' && (
-        <div className="space-y-6">
+          {/* ── Stats Section ── */}
           {/* Stats Grid -- navy accent cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
@@ -1128,13 +1118,50 @@ export default function ProfileSettingsPage() {
               </div>
             )}
           </div>
+
+          {/* ── Recognitions Summary ── */}
+          {recognitionData && recognitionData.earned.length > 0 && (
+            <div
+              className="bg-white rounded-2xl overflow-hidden"
+              style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
+            >
+              <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid #F3F4F6' }}>
+                <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
+                  {tUI('Recognitions Earned')}
+                </h3>
+                <Link
+                  href="/hub/certificates"
+                  className="text-xs font-medium flex items-center gap-1 hover:opacity-80 transition-opacity"
+                  style={{ color: '#E8B84B' }}
+                >
+                  {tUI('View all')} <ArrowRight size={12} />
+                </Link>
+              </div>
+              <div className="px-6 py-4 flex items-center gap-4">
+                <div
+                  className="w-14 h-14 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: '#FFF8E7' }}
+                >
+                  <span className="text-xl font-bold" style={{ color: '#D97706' }}>{recognitionData.earned.length}</span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium" style={{ color: '#1B2A4A' }}>
+                    {recognitionData.earned.length} {recognitionData.earned.length === 1 ? tUI('Field Note earned') : tUI('Field Notes earned')}
+                  </p>
+                  <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                    {tUI('View your achievements, print certificates, and share your wins')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
       {/* ════════════════════════════════════════════════════════════════════
-          TAB: Wellbeing (Vibe Check History)
+          TAB: Vibe Check
          ════════════════════════════════════════════════════════════════════ */}
-      {activeTab === 'wellbeing' && (
+      {activeTab === 'vibe_check' && (
         <div className="space-y-6">
           {/* Dimension overview */}
           <div
@@ -1247,204 +1274,7 @@ export default function ProfileSettingsPage() {
         </div>
       )}
 
-      {/* ════════════════════════════════════════════════════════════════════
-          TAB: Library (Favorites)
-         ════════════════════════════════════════════════════════════════════ */}
-      {activeTab === 'library' && (
-        <div className="space-y-6">
-          <div
-            className="bg-white rounded-2xl overflow-hidden"
-            style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
-          >
-            <div className="px-6 py-4" style={{ borderBottom: '1px solid #F3F4F6' }}>
-              <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
-                {tUI('Your Library')}
-              </h3>
-              <p className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>
-                {tUI('Everything you have saved lives here.')}
-              </p>
-            </div>
-
-            {favorites.length > 0 ? (
-              <div>
-                {favorites.map((fav, idx) => {
-                  const isCourse = fav.content_type === 'course';
-                  return (
-                    <div
-                      key={fav.id}
-                      className="px-6 py-4 flex items-center gap-4"
-                      style={idx < favorites.length - 1 ? { borderBottom: '1px solid #F3F4F6' } : {}}
-                    >
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: isCourse ? '#EEF2FF' : '#FFF8E7' }}
-                      >
-                        {isCourse ? (
-                          <BookOpen size={18} style={{ color: '#4F46E5' }} />
-                        ) : (
-                          <Lightbulb size={18} style={{ color: '#D97706' }} />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold truncate" style={{ color: '#1B2A4A' }}>
-                          {fav.title || tUI('Untitled')}
-                        </p>
-                        <p className="text-xs" style={{ color: '#9CA3AF' }}>
-                          {isCourse ? tUI('Course') : tUI('Quick Win')}
-                          {fav.category ? ` · ${fav.category}` : ''}
-                        </p>
-                      </div>
-                      <Link
-                        href={isCourse ? `/hub/courses` : `/hub/quick-wins`}
-                        className="text-xs font-semibold px-3 py-1.5 rounded-lg hover:opacity-80"
-                        style={{ backgroundColor: '#1B2A4A', color: 'white' }}
-                      >
-                        {tUI('Open')}
-                      </Link>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="px-6 py-10 text-center">
-                <Heart size={28} className="mx-auto mb-3" style={{ color: '#D97706' }} />
-                <p className="text-sm font-medium mb-1" style={{ color: '#1B2A4A' }}>
-                  {tUI('Your library is empty')}
-                </p>
-                <p className="text-xs" style={{ color: '#9CA3AF' }}>
-                  {tUI('Heart any course or quick win to save it here.')}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ════════════════════════════════════════════════════════════════════
-          TAB: Recognitions
-         ════════════════════════════════════════════════════════════════════ */}
-      {activeTab === 'recognitions' && (
-        <div className="space-y-6">
-          {/* Earned */}
-          <div
-            className="bg-white rounded-2xl overflow-hidden"
-            style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
-          >
-            <div className="px-6 py-4" style={{ borderBottom: '1px solid #F3F4F6' }}>
-              <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
-                {tUI('Field Notes Earned')}
-              </h3>
-              <p className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>
-                {tUI('Proof that you showed up and did the work.')}
-              </p>
-            </div>
-
-            {recognitionData && recognitionData.earned.length > 0 ? (
-              <div>
-                {recognitionData.earned.map((item, idx) => {
-                  const IconComponent = getIcon(item.recognition.icon);
-                  return (
-                    <div
-                      key={item.recognition.id}
-                      className="px-6 py-5 flex items-start gap-4"
-                      style={{
-                        borderBottom: idx < recognitionData.earned.length - 1 ? '1px solid #F3F4F6' : undefined,
-                        borderLeft: '4px solid #FFBA06',
-                        background: 'linear-gradient(90deg, #FFFDF5 0%, white 40%)',
-                      }}
-                    >
-                      <div
-                        className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: '#FFF8E7' }}
-                      >
-                        <IconComponent size={22} style={{ color: '#D97706' }} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
-                            {tUI(item.recognition.title)}
-                          </h4>
-                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#FFBA06' }} />
-                        </div>
-                        <p className="text-xs mb-2" style={{ color: '#6B7280' }}>
-                          {tUI(item.recognition.description)}
-                        </p>
-                        <p className="text-xs leading-relaxed" style={{ color: '#4a5568', fontStyle: 'italic' }}>
-                          {tUI(item.recognition.personalNote)}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="px-6 py-10 text-center">
-                <Award size={28} className="mx-auto mb-3" style={{ color: '#D97706' }} />
-                <p className="text-sm font-medium mb-1" style={{ color: '#1B2A4A' }}>
-                  {tUI('Your first Field Note is closer than you think')}
-                </p>
-                <p className="text-xs" style={{ color: '#9CA3AF' }}>
-                  {tUI('Keep exploring tools and using Moment Mode to earn recognitions.')}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* In Progress */}
-          {recognitionData && recognitionData.progress.length > 0 && (
-            <div
-              className="bg-white rounded-2xl overflow-hidden"
-              style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
-            >
-              <div className="px-6 py-4" style={{ borderBottom: '1px solid #F3F4F6' }}>
-                <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
-                  {tUI('In Progress')}
-                </h3>
-              </div>
-              <div>
-                {recognitionData.progress.map((item, idx) => {
-                  const IconComponent = getIcon(item.recognition.icon);
-                  const percentage = Math.round((item.current / item.recognition.threshold) * 100);
-                  return (
-                    <div
-                      key={item.recognition.id}
-                      className="px-6 py-4 flex items-start gap-4"
-                      style={idx < recognitionData.progress.length - 1 ? { borderBottom: '1px solid #F3F4F6' } : {}}
-                    >
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: '#F3F4F6' }}
-                      >
-                        <IconComponent size={18} style={{ color: '#9CA3AF' }} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-medium mb-1" style={{ color: '#1B2A4A' }}>
-                          {tUI(item.recognition.title)}
-                        </h4>
-                        <p className="text-xs mb-3" style={{ color: '#9CA3AF' }}>
-                          {tUI(item.recognition.description)}
-                        </p>
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#F3F4F6' }}>
-                            <div
-                              className="h-full rounded-full"
-                              style={{ width: `${percentage}%`, backgroundColor: '#FFBA06' }}
-                            />
-                          </div>
-                          <span className="text-xs font-semibold" style={{ color: '#1B2A4A' }}>
-                            {item.current}/{item.recognition.threshold}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
+      
       {/* ════════════════════════════════════════════════════════════════════
           Delete Confirmation Modal (always available)
          ════════════════════════════════════════════════════════════════════ */}
