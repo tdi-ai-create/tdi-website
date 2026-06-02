@@ -50,6 +50,7 @@ export async function requireAdminAuth(): Promise<
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !serviceRoleKey) {
+      console.error('[Admin Auth] Missing env vars:', { hasUrl: !!supabaseUrl, hasKey: !!serviceRoleKey });
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 

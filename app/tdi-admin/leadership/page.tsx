@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission } from '@/lib/tdi-admin/permissions';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
+import { HorizontalBarChart, DonutChart, DonutLegend, ProgressRing, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts';
 import {
   Building2,
   School,
@@ -1136,11 +1137,7 @@ export default function LeadershipDashboardPage() {
 
             {/* Hub Engagement Data - Live from Learning Hub */}
             <div className="border-t border-gray-100 pt-6">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-2 h-2 rounded-full bg-amber-400" />
-                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400">Hub Engagement by School</h3>
-                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">LIVE</span>
-              </div>
+              <LiveSectionHeader title="Hub Engagement by School" subtitle="Active engagement rates, tools explored, and educator wellness by building" />
 
               {hubLoading ? (
                 <div className="flex items-center justify-center py-12">
@@ -1153,54 +1150,132 @@ export default function LeadershipDashboardPage() {
                   <p className="text-sm">No school data available yet. Educators need to add their school name in their Hub profile.</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-100">
-                        <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">School</th>
-                        <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">District</th>
-                        <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Educators</th>
-                        <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Active (30d)</th>
-                        <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Tools Explored</th>
-                        <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">PD Hours</th>
-                        <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Avg Vibe</th>
-                        <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Completions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-50">
-                      {hubSchools.map((school, idx) => (
-                        <tr key={idx} className="hover:bg-gray-50">
-                          <td className="px-4 py-3">
-                            <span className="font-medium" style={{ color: '#2B3A67' }}>{school.name}</span>
-                          </td>
-                          <td className="px-4 py-3 text-sm text-gray-500">{school.district || '--'}</td>
-                          <td className="px-4 py-3 text-center text-sm text-gray-700">{school.totalEducators}</td>
-                          <td className="px-4 py-3 text-center">
-                            <div className="flex items-center justify-center gap-2">
-                              <div className="w-12 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div className="h-full rounded-full" style={{ width: `${school.activeRate}%`, backgroundColor: school.activeRate >= 60 ? '#2A9D8F' : school.activeRate >= 30 ? '#EAB308' : '#EF4444' }} />
-                              </div>
-                              <span className="text-xs text-gray-500">{school.activeRate}%</span>
+                <>
+                  {/* Visual overview: active rate bar chart + aggregate donut */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    {/* Active rate by school - horizontal bar chart */}
+                    <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 p-5" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                      <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Active Rate by School (30 days)</p>
+                      <HorizontalBarChart
+                        data={hubSchools.slice(0, 12).map(s => ({
+                          label: s.name.length > 22 ? s.name.slice(0, 22) + '...' : s.name,
+                          value: s.activeRate,
+                          color: s.activeRate >= 60 ? '#2A9D8F' : s.activeRate >= 30 ? '#EAB308' : '#EF4444',
+                        }))}
+                        valueFormatter={(v) => `${v}%`}
+                      />
+                    </div>
+
+                    {/* Aggregate engagement donut */}
+                    <div className="bg-white rounded-xl border border-gray-100 p-5" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                      <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Aggregate Engagement</p>
+                      {(() => {
+                        const totalEds = hubSchools.reduce((s, h) => s + h.totalEducators, 0);
+                        const activeEds = hubSchools.reduce((s, h) => s + h.activeEducators, 0);
+                        const inactiveEds = totalEds - activeEds;
+                        return (
+                          <div className="flex flex-col items-center">
+                            <DonutChart
+                              data={[
+                                { name: 'Active (30d)', value: activeEds, color: '#2A9D8F' },
+                                { name: 'Inactive', value: inactiveEds, color: '#E5E7EB' },
+                              ]}
+                              size={160}
+                              innerRadius={48}
+                              outerRadius={68}
+                              centerValue={totalEds > 0 ? `${Math.round((activeEds / totalEds) * 100)}%` : '0%'}
+                              centerLabel="active"
+                            />
+                            <div className="mt-3 w-full">
+                              <DonutLegend data={[
+                                { name: 'Active (30d)', value: activeEds, color: '#2A9D8F' },
+                                { name: 'Inactive', value: inactiveEds, color: '#E5E7EB' },
+                              ]} />
                             </div>
-                          </td>
-                          <td className="px-4 py-3 text-center text-sm text-gray-700">{school.totalToolsViewed}</td>
-                          <td className="px-4 py-3 text-center text-sm text-gray-700">{school.totalPdHours > 0 ? school.totalPdHours.toFixed(1) : '--'}</td>
-                          <td className="px-4 py-3 text-center">
-                            {school.avgVibeScore !== null ? (
-                              <span className="inline-flex items-center gap-1 text-sm font-medium" style={{ color: school.avgVibeScore >= 4 ? '#2A9D8F' : school.avgVibeScore >= 3 ? '#EAB308' : '#EF4444' }}>
-                                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: school.avgVibeScore >= 4 ? '#2A9D8F' : school.avgVibeScore >= 3 ? '#EAB308' : '#EF4444' }} />
-                                {school.avgVibeScore}/5
-                              </span>
-                            ) : (
-                              <span className="text-sm text-gray-400">--</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-center text-sm text-gray-700">{school.totalCompletions || '--'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* Metrics row: PD Hours, Tools Explored, Vibe Scores, Completions */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    {(() => {
+                      const totalPd = hubSchools.reduce((s, h) => s + h.totalPdHours, 0);
+                      const totalTools = hubSchools.reduce((s, h) => s + h.totalToolsViewed, 0);
+                      const totalComps = hubSchools.reduce((s, h) => s + h.totalCompletions, 0);
+                      const vibeScores = hubSchools.filter(h => h.avgVibeScore !== null).map(h => h.avgVibeScore as number);
+                      const avgVibe = vibeScores.length > 0 ? +(vibeScores.reduce((s, v) => s + v, 0) / vibeScores.length).toFixed(1) : null;
+                      return (
+                        <>
+                          <div className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                            <ProgressRing value={totalPd} max={Math.max(totalPd * 1.5, 100)} size={44} color="#8B5CF6" />
+                            <div>
+                              <p className="text-lg font-bold" style={{ color: '#1e2749' }}>{totalPd.toFixed(0)}</p>
+                              <p className="text-[10px] text-gray-500">PD Hours Earned</p>
+                            </div>
+                          </div>
+                          <div className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                            <ProgressRing value={totalTools} max={Math.max(totalTools * 1.5, 100)} size={44} color="#EAB308" />
+                            <div>
+                              <p className="text-lg font-bold" style={{ color: '#1e2749' }}>{totalTools}</p>
+                              <p className="text-[10px] text-gray-500">Tools Explored</p>
+                            </div>
+                          </div>
+                          <div className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                            <ProgressRing value={totalComps} max={Math.max(totalComps * 1.5, 20)} size={44} color="#2563EB" />
+                            <div>
+                              <p className="text-lg font-bold" style={{ color: '#1e2749' }}>{totalComps}</p>
+                              <p className="text-[10px] text-gray-500">Completions</p>
+                            </div>
+                          </div>
+                          <div className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                            <ProgressRing value={avgVibe || 0} max={5} size={44} color={avgVibe && avgVibe >= 4 ? '#2A9D8F' : avgVibe && avgVibe >= 3 ? '#EAB308' : '#EF4444'} />
+                            <div>
+                              <p className="text-lg font-bold" style={{ color: '#1e2749' }}>{avgVibe !== null ? `${avgVibe}/5` : '--'}</p>
+                              <p className="text-[10px] text-gray-500">Avg Vibe Score</p>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+
+                  {/* School detail table (collapsible) */}
+                  <details className="bg-white rounded-xl border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                    <summary className="px-5 py-3 cursor-pointer text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-gray-600">
+                      View School Detail Table ({hubSchools.length} schools)
+                    </summary>
+                    <div className="overflow-x-auto px-2 pb-3">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-gray-100">
+                            <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">School</th>
+                            <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">District</th>
+                            <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">Educators</th>
+                            <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">Active %</th>
+                            <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">Tools</th>
+                            <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">PD Hrs</th>
+                            <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">Vibe</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                          {hubSchools.map((school, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50 text-sm">
+                              <td className="px-4 py-2 font-medium" style={{ color: '#2B3A67' }}>{school.name}</td>
+                              <td className="px-4 py-2 text-gray-500">{school.district || '--'}</td>
+                              <td className="px-4 py-2 text-center text-gray-700">{school.totalEducators}</td>
+                              <td className="px-4 py-2 text-center font-medium" style={{ color: school.activeRate >= 60 ? '#2A9D8F' : school.activeRate >= 30 ? '#EAB308' : '#EF4444' }}>{school.activeRate}%</td>
+                              <td className="px-4 py-2 text-center text-gray-700">{school.totalToolsViewed}</td>
+                              <td className="px-4 py-2 text-center text-gray-700">{school.totalPdHours > 0 ? school.totalPdHours.toFixed(1) : '--'}</td>
+                              <td className="px-4 py-2 text-center" style={{ color: school.avgVibeScore && school.avgVibeScore >= 4 ? '#2A9D8F' : school.avgVibeScore && school.avgVibeScore >= 3 ? '#EAB308' : '#9CA3AF' }}>{school.avgVibeScore !== null ? `${school.avgVibeScore}/5` : '--'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </details>
+                </>
               )}
             </div>
           </div>

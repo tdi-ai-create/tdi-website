@@ -16,6 +16,7 @@ import {
   TYPE_CARD_TITLE,
   TYPE_SMALL,
 } from '@/components/tdi-admin/ui/design-tokens'
+import { HorizontalBarChart, DonutChart, DonutLegend, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts'
 
 type ViewMode = 'kanban' | 'list'
 type PageTab = 'pipeline' | 'analytics' | 'trash' | 'invoices' | 'hub-leads'
@@ -749,7 +750,6 @@ export default function SalesPage() {
 
       {/* Hub Leads Tab */}
       {pageTab === 'hub-leads' && (() => {
-        // Load Hub leads data on first render of this tab
         if (!hubLeads && !hubLeadsLoading) {
           setHubLeadsLoading(true)
           fetch('/api/tdi-admin/hub-connections?section=sales')
@@ -790,82 +790,73 @@ export default function SalesPage() {
                   </div>
                 </div>
 
-                {/* Warm leads table */}
-                <div style={{ marginBottom: 32 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                    <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#10B981' }} />
-                    <h3 style={{ fontSize: 14, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Warm Leads from Hub</h3>
-                    <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 999, backgroundColor: '#D1FAE5', color: '#065F46' }}>LIVE</span>
+                {/* Charts row: warm leads bar + district donut */}
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, marginBottom: 24 }}>
+                  {/* Warm leads bar chart */}
+                  <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
+                    <LiveSectionHeader title="Warm Leads from Hub" subtitle="Schools with multiple free Hub users -- already exploring TDI tools" dotColor="#10B981" badgeColor="#D1FAE5" badgeTextColor="#065F46" />
+                    {hubLeads.warmLeads.length === 0 ? (
+                      <p style={{ textAlign: 'center', color: '#9CA3AF', padding: 24 }}>No warm leads yet.</p>
+                    ) : (
+                      <HorizontalBarChart
+                        data={hubLeads.warmLeads.slice(0, 15).map(l => ({
+                          label: l.domain.length > 25 ? l.domain.slice(0, 25) + '...' : l.domain,
+                          value: l.freeUsers,
+                          color: '#10B981',
+                        }))}
+                        valueFormatter={(v) => `${v} users`}
+                      />
+                    )}
                   </div>
-                  <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 12 }}>Schools with multiple free Hub users -- already exploring TDI tools</p>
 
-                  {hubLeads.warmLeads.length === 0 ? (
-                    <p style={{ textAlign: 'center', color: '#9CA3AF', padding: 24 }}>No warm leads yet. Free signups from education domains will appear here.</p>
-                  ) : (
-                    <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', overflow: 'hidden' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead>
-                          <tr style={{ borderBottom: '1px solid #F3F4F6' }}>
-                            <th style={{ textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Domain</th>
-                            <th style={{ textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>School</th>
-                            <th style={{ textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>District</th>
-                            <th style={{ textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>State</th>
-                            <th style={{ textAlign: 'center', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Free Users</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {hubLeads.warmLeads.map((lead, i) => (
-                            <tr key={i} style={{ borderBottom: '1px solid #F9FAFB' }}>
-                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 600, color: '#1e2749' }}>{lead.domain}</td>
-                              <td style={{ padding: '10px 16px', fontSize: 13, color: '#374151' }}>{lead.school || '--'}</td>
-                              <td style={{ padding: '10px 16px', fontSize: 13, color: '#6B7280' }}>{lead.district || '--'}</td>
-                              <td style={{ padding: '10px 16px', fontSize: 13, color: '#6B7280' }}>{lead.state || '--'}</td>
-                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 700, color: '#10B981', textAlign: 'center' }}>{lead.freeUsers}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
+                  {/* District adoption donut */}
+                  <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>District Adoption</p>
+                    {hubLeads.topDistricts.length === 0 ? (
+                      <p style={{ textAlign: 'center', color: '#9CA3AF', padding: 24, fontSize: 13 }}>No district data yet.</p>
+                    ) : (() => {
+                      const totalPaid = hubLeads.topDistricts.reduce((s, d) => s + d.paid, 0)
+                      const totalFree = hubLeads.topDistricts.reduce((s, d) => s + d.free, 0)
+                      return (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          <DonutChart
+                            data={[
+                              { name: 'Paid', value: totalPaid, color: '#10B981' },
+                              { name: 'Free', value: totalFree, color: '#E5E7EB' },
+                            ]}
+                            size={180}
+                            innerRadius={50}
+                            outerRadius={72}
+                            centerValue={hubLeads.topDistricts.reduce((s, d) => s + d.total, 0)}
+                            centerLabel="total users"
+                          />
+                          <div style={{ marginTop: 12, width: '100%' }}>
+                            <DonutLegend data={[
+                              { name: 'Paid Members', value: totalPaid, color: '#10B981' },
+                              { name: 'Free Users', value: totalFree, color: '#E5E7EB' },
+                            ]} />
+                          </div>
+                        </div>
+                      )
+                    })()}
+                  </div>
                 </div>
 
-                {/* District adoption table */}
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                    <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#8B5CF6' }} />
-                    <h3 style={{ fontSize: 14, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.05em' }}>District Adoption</h3>
+                {/* District detail bar chart */}
+                {hubLeads.topDistricts.length > 0 && (
+                  <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Users by District</p>
+                    <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 12 }}>Hub users grouped by district -- renewal evidence and upsell opportunities</p>
+                    <HorizontalBarChart
+                      data={hubLeads.topDistricts.slice(0, 15).map(d => ({
+                        label: d.name.length > 25 ? d.name.slice(0, 25) + '...' : d.name,
+                        value: d.total,
+                        color: '#8B5CF6',
+                      }))}
+                      valueFormatter={(v) => `${v} users`}
+                    />
                   </div>
-                  <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 12 }}>Hub users grouped by district -- renewal evidence and upsell opportunities</p>
-
-                  {hubLeads.topDistricts.length === 0 ? (
-                    <p style={{ textAlign: 'center', color: '#9CA3AF', padding: 24 }}>No district data yet.</p>
-                  ) : (
-                    <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', overflow: 'hidden' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead>
-                          <tr style={{ borderBottom: '1px solid #F3F4F6' }}>
-                            <th style={{ textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>District</th>
-                            <th style={{ textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>State</th>
-                            <th style={{ textAlign: 'center', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Users</th>
-                            <th style={{ textAlign: 'center', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Paid</th>
-                            <th style={{ textAlign: 'center', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Free</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {hubLeads.topDistricts.map((dist, i) => (
-                            <tr key={i} style={{ borderBottom: '1px solid #F9FAFB' }}>
-                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 600, color: '#1e2749' }}>{dist.name}</td>
-                              <td style={{ padding: '10px 16px', fontSize: 13, color: '#6B7280' }}>{dist.state || '--'}</td>
-                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 600, color: '#374151', textAlign: 'center' }}>{dist.total}</td>
-                              <td style={{ padding: '10px 16px', fontSize: 13, color: '#10B981', fontWeight: 600, textAlign: 'center' }}>{dist.paid}</td>
-                              <td style={{ padding: '10px 16px', fontSize: 13, color: '#6B7280', textAlign: 'center' }}>{dist.free}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
+                )}
               </>
             )}
           </div>

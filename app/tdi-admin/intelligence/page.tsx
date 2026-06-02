@@ -14,6 +14,7 @@ import {
   TYPE_SECTION_HEADER,
   TYPE_SMALL,
 } from '@/components/tdi-admin/ui/design-tokens'
+import { RiskBarChart, DonutChart, DonutLegend, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts'
 
 type Tab = 'analytics' | 'invoices' | 'renewals' | 'districts' | 'hub-fulfillment'
 
@@ -159,81 +160,61 @@ export default function OperationsPage() {
             <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF', fontSize: 13 }}>No data available</div>
           ) : (
             <>
-              {/* Summary cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+              {/* Summary row: cards + donut */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 250px', gap: 12, marginBottom: 24 }}>
                 <div style={{ background: 'white', borderRadius: 12, padding: 20, border: '1px solid #E5E7EB', textAlign: 'center' }}>
                   <p style={{ fontSize: 28, fontWeight: 700, color: '#F97316' }}>{hubOps.summary.totalPartnerUsers}</p>
-                  <p style={{ fontSize: 12, color: '#6B7280' }}>Provisioned Users</p>
-                  <p style={{ fontSize: 10, color: '#9CA3AF' }}>Partner/admin-assigned accounts</p>
+                  <p style={{ fontSize: 12, color: '#6B7280' }}>Provisioned</p>
                 </div>
                 <div style={{ background: 'white', borderRadius: 12, padding: 20, border: '1px solid #E5E7EB', textAlign: 'center' }}>
                   <p style={{ fontSize: 28, fontWeight: 700, color: '#2A9D8F' }}>{hubOps.summary.activePartnerUsers}</p>
                   <p style={{ fontSize: 12, color: '#6B7280' }}>Active (30d)</p>
-                  <p style={{ fontSize: 10, color: '#9CA3AF' }}>Used Hub in last 30 days</p>
-                </div>
-                <div style={{ background: 'white', borderRadius: 12, padding: 20, border: '1px solid #E5E7EB', textAlign: 'center' }}>
-                  <p style={{ fontSize: 28, fontWeight: 700, color: hubOps.summary.overallUsageRate >= 50 ? '#2A9D8F' : hubOps.summary.overallUsageRate >= 25 ? '#EAB308' : '#EF4444' }}>{hubOps.summary.overallUsageRate}%</p>
-                  <p style={{ fontSize: 12, color: '#6B7280' }}>Usage Rate</p>
-                  <p style={{ fontSize: 10, color: '#9CA3AF' }}>Active / provisioned</p>
                 </div>
                 <div style={{ background: 'white', borderRadius: 12, padding: 20, border: '1px solid #E5E7EB', textAlign: 'center' }}>
                   <p style={{ fontSize: 28, fontWeight: 700, color: '#2563EB' }}>{hubOps.summary.totalDistricts}</p>
                   <p style={{ fontSize: 12, color: '#6B7280' }}>Partner Districts</p>
-                  <p style={{ fontSize: 10, color: '#9CA3AF' }}>With Hub accounts</p>
+                </div>
+                <div style={{ background: 'white', borderRadius: 12, padding: 16, border: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <DonutChart
+                    data={[
+                      { name: 'Active', value: hubOps.summary.activePartnerUsers, color: '#2A9D8F' },
+                      { name: 'Inactive', value: hubOps.summary.totalPartnerUsers - hubOps.summary.activePartnerUsers, color: '#E5E7EB' },
+                    ]}
+                    size={120}
+                    innerRadius={34}
+                    outerRadius={50}
+                    centerValue={`${hubOps.summary.overallUsageRate}%`}
+                    centerLabel="usage"
+                  />
                 </div>
               </div>
 
-              {/* Fulfillment table */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#F97316' }} />
-                <span style={{ fontSize: 14, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contract Fulfillment by District</span>
-                <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 999, backgroundColor: '#FFF7ED', color: '#C2410C' }}>LIVE FROM HUB</span>
-              </div>
-              <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 16 }}>Hub access vs actual usage per partner district. Low usage may indicate underutilized partnerships before renewal.</p>
+              {/* Risk bar chart */}
+              <LiveSectionHeader title="Contract Fulfillment by District" subtitle="Hub access vs actual usage per partner district. Low usage may indicate underutilized partnerships before renewal." dotColor="#F97316" badgeColor="#FFF7ED" badgeTextColor="#C2410C" />
 
               {hubOps.partnerFulfillment.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF', fontSize: 13 }}>No partner fulfillment data. Partner memberships (source: district_partner or admin_assigned) will appear here.</div>
               ) : (
-                <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '1px solid #F3F4F6' }}>
-                        <th style={{ textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>District</th>
-                        <th style={{ textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>State</th>
-                        <th style={{ textAlign: 'center', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Provisioned</th>
-                        <th style={{ textAlign: 'center', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Active (30d)</th>
-                        <th style={{ textAlign: 'center', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Usage Rate</th>
-                        <th style={{ textAlign: 'center', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {hubOps.partnerFulfillment.map((d, i) => (
-                        <tr key={i} style={{ borderBottom: '1px solid #F9FAFB' }}>
-                          <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 600, color: '#1e2749' }}>{d.district}</td>
-                          <td style={{ padding: '10px 16px', fontSize: 13, color: '#6B7280' }}>{d.state || '--'}</td>
-                          <td style={{ padding: '10px 16px', fontSize: 13, color: '#374151', textAlign: 'center' }}>{d.provisioned}</td>
-                          <td style={{ padding: '10px 16px', fontSize: 13, color: '#374151', textAlign: 'center' }}>{d.active}</td>
-                          <td style={{ padding: '10px 16px', textAlign: 'center' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                              <div style={{ width: 48, height: 6, backgroundColor: '#F3F4F6', borderRadius: 3, overflow: 'hidden' }}>
-                                <div style={{ height: '100%', width: `${d.usageRate}%`, borderRadius: 3, backgroundColor: d.usageRate >= 50 ? '#2A9D8F' : d.usageRate >= 25 ? '#EAB308' : '#EF4444' }} />
-                              </div>
-                              <span style={{ fontSize: 12, fontWeight: 600, color: d.usageRate >= 50 ? '#2A9D8F' : d.usageRate >= 25 ? '#EAB308' : '#EF4444' }}>{d.usageRate}%</span>
-                            </div>
-                          </td>
-                          <td style={{ padding: '10px 16px', textAlign: 'center' }}>
-                            <span style={{
-                              fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 999, textTransform: 'uppercase',
-                              backgroundColor: d.usageRate >= 50 ? '#D1FAE5' : d.usageRate >= 25 ? '#FEF3C7' : '#FEE2E2',
-                              color: d.usageRate >= 50 ? '#065F46' : d.usageRate >= 25 ? '#92400E' : '#991B1B',
-                            }}>
-                              {d.usageRate >= 50 ? 'On Track' : d.usageRate >= 25 ? 'Monitor' : 'At Risk'}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
+                  <RiskBarChart
+                    data={hubOps.partnerFulfillment.map(d => ({
+                      label: d.district.length > 22 ? d.district.slice(0, 22) + '...' : d.district,
+                      value: d.usageRate,
+                      status: d.usageRate >= 50 ? 'success' as const : d.usageRate >= 25 ? 'warning' as const : 'danger' as const,
+                    }))}
+                  />
+                  <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 12 }}>
+                    {[
+                      { label: 'On Track (50%+)', color: '#2A9D8F' },
+                      { label: 'Monitor (25-49%)', color: '#EAB308' },
+                      { label: 'At Risk (<25%)', color: '#EF4444' },
+                    ].map(l => (
+                      <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <div style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: l.color }} />
+                        <span style={{ fontSize: 11, color: '#6B7280' }}>{l.label}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </>

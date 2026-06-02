@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Loader2, BarChart3 } from 'lucide-react';
+import { HorizontalBarChart, DonutChart, DonutLegend, TrendAreaChart, RadialGauge, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts';
 import { USChoroplethMap } from '@/components/tdi-admin/shared/USChoroplethMap';
 import { getSupabase } from '@/lib/supabase';
 import {
@@ -66,93 +67,85 @@ function HubIntelligenceSection() {
   if (loading) return <div className="bg-white rounded-xl border border-gray-100 p-6 text-center text-gray-400 text-sm">Loading Hub data...</div>;
   if (!data) return null;
 
-  // Build sparkline-style bars for signups by day
   const days = Object.entries(data.signupsByDay).sort((a, b) => a[0].localeCompare(b[0]));
-  const maxSignups = Math.max(...days.map(d => d[1]), 1);
+  const areaData = days.map(([day, count]) => ({ label: day.slice(5), value: count }));
+  const sourceEntries = Object.entries(data.membershipSources).sort((a, b) => b[1] - a[1]);
+  const totalMembers = sourceEntries.reduce((s, [, c]) => s + c, 0);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
-        <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#EAB308' }} />
-        <div style={{ fontSize: 14, fontWeight: 700, color: '#374151', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>Hub Intelligence</div>
-        <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 999, backgroundColor: '#FEF3C7', color: '#92400E' }}>LIVE FROM HUB</span>
-      </div>
+    <div className="space-y-4">
+      <LiveSectionHeader title="Hub Intelligence" subtitle="Live platform data powering marketing decisions" />
 
-      {/* Summary row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
-        <div style={{ padding: 16, borderRadius: 10, backgroundColor: '#F9FAFB' }}>
-          <p style={{ fontSize: 24, fontWeight: 700, color: '#2A9D8F' }}>{data.totalStates}</p>
-          <p style={{ fontSize: 11, color: '#6B7280' }}>States Reached</p>
+      {/* Summary cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+        <div style={{ background: 'white', borderRadius: 12, padding: 16, border: '1px solid #E5E7EB' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <RadialGauge value={data.totalStates} max={50} label="" size={52} color="#2A9D8F" />
+            <div>
+              <p style={{ fontSize: 20, fontWeight: 700, color: '#2A9D8F' }}>{data.totalStates}/50</p>
+              <p style={{ fontSize: 10, color: '#6B7280' }}>States Reached</p>
+            </div>
+          </div>
         </div>
-        <div style={{ padding: 16, borderRadius: 10, backgroundColor: '#F9FAFB' }}>
+        <div style={{ background: 'white', borderRadius: 12, padding: 16, border: '1px solid #E5E7EB' }}>
           <p style={{ fontSize: 24, fontWeight: 700, color: '#2563EB' }}>{data.communityEngagement.responses + data.communityEngagement.qaThreads}</p>
-          <p style={{ fontSize: 11, color: '#6B7280' }}>Community Posts</p>
+          <p style={{ fontSize: 10, color: '#6B7280' }}>Community Posts</p>
         </div>
-        <div style={{ padding: 16, borderRadius: 10, backgroundColor: '#F9FAFB' }}>
-          <p style={{ fontSize: 24, fontWeight: 700, color: '#8B5CF6' }}>{Object.values(data.membershipSources).reduce((s, c) => s + c, 0)}</p>
-          <p style={{ fontSize: 11, color: '#6B7280' }}>Paid Members</p>
+        <div style={{ background: 'white', borderRadius: 12, padding: 16, border: '1px solid #E5E7EB' }}>
+          <p style={{ fontSize: 24, fontWeight: 700, color: '#8B5CF6' }}>{totalMembers}</p>
+          <p style={{ fontSize: 10, color: '#6B7280' }}>Paid Members</p>
         </div>
-        <div style={{ padding: 16, borderRadius: 10, backgroundColor: '#F9FAFB' }}>
+        <div style={{ background: 'white', borderRadius: 12, padding: 16, border: '1px solid #E5E7EB' }}>
           <p style={{ fontSize: 24, fontWeight: 700, color: '#EAB308' }}>
             {Object.entries(data.membershipSources).find(([k]) => k === 'substack_perk')?.[1] || 0}
           </p>
-          <p style={{ fontSize: 11, color: '#6B7280' }}>Substack Perks</p>
+          <p style={{ fontSize: 10, color: '#6B7280' }}>Substack Perks</p>
         </div>
       </div>
 
-      {/* Two columns: signups chart + top content */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
-        {/* Signups trend */}
-        <div>
-          <p style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 8, textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>Hub Signups (30 days)</p>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 60 }}>
-            {days.map(([day, count]) => (
-              <div
-                key={day}
-                title={`${day}: ${count} signups`}
-                style={{
-                  flex: 1,
-                  height: `${Math.max((count / maxSignups) * 100, 4)}%`,
-                  backgroundColor: '#2A9D8F',
-                  borderRadius: '2px 2px 0 0',
-                  opacity: 0.7,
-                  minHeight: 2,
-                }}
+      {/* Charts: area chart + donut + bar */}
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
+        {/* Signup trend area chart */}
+        <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Hub Signups (30 days)</p>
+          <TrendAreaChart data={areaData} height={200} color="#2A9D8F" showGrid />
+        </div>
+
+        {/* Membership source donut */}
+        <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Membership Sources</p>
+          {sourceEntries.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <DonutChart
+                data={sourceEntries.map(([name, value]) => ({ name: name.replace(/_/g, ' '), value }))}
+                size={170}
+                innerRadius={46}
+                outerRadius={68}
+                centerValue={totalMembers}
+                centerLabel="total"
               />
-            ))}
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-            <span style={{ fontSize: 10, color: '#9CA3AF' }}>{days[0]?.[0]?.slice(5)}</span>
-            <span style={{ fontSize: 10, color: '#9CA3AF' }}>{days[days.length - 1]?.[0]?.slice(5)}</span>
-          </div>
-        </div>
-
-        {/* Top content */}
-        <div>
-          <p style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 8, textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>Top Hub Content</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {data.topContent.slice(0, 5).map((c, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 12, color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, maxWidth: '80%' }}>{c.title}</span>
-                <span style={{ fontSize: 11, fontWeight: 600, color: '#2A9D8F' }}>{c.views}</span>
+              <div style={{ marginTop: 12, width: '100%' }}>
+                <DonutLegend data={sourceEntries.map(([name, value]) => ({ name: name.replace(/_/g, ' '), value }))} />
               </div>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <p style={{ textAlign: 'center', color: '#9CA3AF', padding: 24, fontSize: 12 }}>No membership data</p>
+          )}
         </div>
       </div>
 
-      {/* Membership source breakdown */}
-      {Object.keys(data.membershipSources).length > 0 && (
-        <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #F3F4F6' }}>
-          <p style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 8, textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>Membership Sources</p>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' as const }}>
-            {Object.entries(data.membershipSources).sort((a, b) => b[1] - a[1]).map(([source, count]) => (
-              <div key={source} style={{ padding: '8px 14px', borderRadius: 8, backgroundColor: '#F9FAFB', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 16, fontWeight: 700, color: '#374151' }}>{count}</span>
-                <span style={{ fontSize: 11, color: '#6B7280' }}>{source.replace(/_/g, ' ')}</span>
-              </div>
-            ))}
-          </div>
+      {/* Top content bar chart */}
+      {data.topContent.length > 0 && (
+        <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Top Hub Content by Views</p>
+          <HorizontalBarChart
+            data={data.topContent.slice(0, 8).map(c => ({
+              label: c.title.length > 30 ? c.title.slice(0, 30) + '...' : c.title,
+              value: c.views,
+              color: '#2A9D8F',
+            }))}
+            valueFormatter={(v) => `${v} views`}
+          />
         </div>
       )}
     </div>

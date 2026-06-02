@@ -10,6 +10,7 @@ import {
   TYPE_PAGE_SUBTITLE,
   TYPE_SMALL,
 } from '@/components/tdi-admin/ui/design-tokens'
+import { RadialGauge, DonutChart, DonutLegend, ProgressRing, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts'
 
 // Impact Evidence from Hub
 function ImpactEvidence() {
@@ -35,71 +36,73 @@ function ImpactEvidence() {
   if (!impact) return null
 
   const m = impact.impactMetrics
+  const roleEntries = Object.entries(impact.roleBreakdown).sort((a, b) => b[1] - a[1])
 
   return (
-    <div style={{ background: 'white', borderRadius: 14, border: '1px solid rgba(139, 92, 246, 0.2)', padding: 24, marginBottom: 24 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-        <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#8B5CF6' }} />
-        <span style={{ fontSize: 14, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Impact Evidence</span>
-        <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 999, backgroundColor: '#EDE9FE', color: '#6D28D9' }}>LIVE FROM HUB</span>
-      </div>
-      <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 16 }}>Ready-to-use metrics for grant applications and impact reports</p>
+    <div style={{ marginBottom: 24 }}>
+      <LiveSectionHeader title="Impact Evidence" subtitle="Ready-to-use metrics for grant applications and impact reports" dotColor="#8B5CF6" badgeColor="#EDE9FE" badgeTextColor="#6D28D9" />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
-        <div style={{ padding: 14, borderRadius: 10, background: '#F9FAFB', textAlign: 'center' }}>
-          <p style={{ fontSize: 28, fontWeight: 700, color: '#8B5CF6' }}>{m.totalEducators.toLocaleString()}</p>
-          <p style={{ fontSize: 11, color: '#6B7280' }}>Total Educators</p>
+      {/* Gauges row: big visual indicators */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 20 }}>
+        <div style={{ background: 'white', borderRadius: 14, border: '1px solid rgba(139, 92, 246, 0.2)', padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <RadialGauge value={m.statesReached} max={50} label="of 50 states" size={120} color="#2A9D8F" />
         </div>
-        <div style={{ padding: 14, borderRadius: 10, background: '#F9FAFB', textAlign: 'center' }}>
-          <p style={{ fontSize: 28, fontWeight: 700, color: '#2A9D8F' }}>{m.statesReached}</p>
-          <p style={{ fontSize: 11, color: '#6B7280' }}>States Reached</p>
+        <div style={{ background: 'white', borderRadius: 14, border: '1px solid rgba(139, 92, 246, 0.2)', padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <RadialGauge value={m.totalEducators} max={Math.max(m.totalEducators * 1.3, 100)} label="educators" size={120} color="#8B5CF6" />
         </div>
-        <div style={{ padding: 14, borderRadius: 10, background: '#F9FAFB', textAlign: 'center' }}>
-          <p style={{ fontSize: 28, fontWeight: 700, color: '#EAB308' }}>{m.pdHoursDelivered.toFixed(0)}</p>
-          <p style={{ fontSize: 11, color: '#6B7280' }}>PD Hours Delivered</p>
+        <div style={{ background: 'white', borderRadius: 14, border: '1px solid rgba(139, 92, 246, 0.2)', padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <RadialGauge value={Math.round(m.pdHoursDelivered)} max={Math.max(m.pdHoursDelivered * 1.3, 100)} label="PD hours" size={120} color="#EAB308" />
         </div>
-        <div style={{ padding: 14, borderRadius: 10, background: '#F9FAFB', textAlign: 'center' }}>
-          <p style={{ fontSize: 28, fontWeight: 700, color: '#2563EB' }}>{m.certificatesEarned}</p>
-          <p style={{ fontSize: 11, color: '#6B7280' }}>Certificates Earned</p>
+        <div style={{ background: 'white', borderRadius: 14, border: '1px solid rgba(139, 92, 246, 0.2)', padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <RadialGauge value={m.certificatesEarned} max={Math.max(m.certificatesEarned * 1.3, 50)} label="certificates" size={120} color="#2563EB" />
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
-        <div style={{ padding: 14, borderRadius: 10, background: '#F9FAFB', textAlign: 'center' }}>
-          <p style={{ fontSize: 20, fontWeight: 700, color: '#374151' }}>{m.toolsAvailable}</p>
-          <p style={{ fontSize: 11, color: '#6B7280' }}>Tools Available</p>
-        </div>
-        <div style={{ padding: 14, borderRadius: 10, background: '#F9FAFB', textAlign: 'center' }}>
-          <p style={{ fontSize: 20, fontWeight: 700, color: '#374151' }}>{m.totalEnrollments}</p>
-          <p style={{ fontSize: 11, color: '#6B7280' }}>Course Enrollments</p>
-        </div>
-        <div style={{ padding: 14, borderRadius: 10, background: '#F9FAFB', textAlign: 'center' }}>
-          <p style={{ fontSize: 20, fontWeight: 700, color: '#374151' }}>{m.courseCompletions}</p>
-          <p style={{ fontSize: 11, color: '#6B7280' }}>Course Completions</p>
-        </div>
-        <div style={{ padding: 14, borderRadius: 10, background: '#F9FAFB', textAlign: 'center' }}>
-          <p style={{ fontSize: 20, fontWeight: 700, color: '#374151' }}>{m.communityContributions}</p>
-          <p style={{ fontSize: 11, color: '#6B7280' }}>Community Posts</p>
-        </div>
+      {/* Secondary metrics with progress rings */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
+        {[
+          { label: 'Tools Available', value: m.toolsAvailable, color: '#EC4899' },
+          { label: 'Course Enrollments', value: m.totalEnrollments, color: '#F97316' },
+          { label: 'Course Completions', value: m.courseCompletions, color: '#10B981' },
+          { label: 'Community Posts', value: m.communityContributions, color: '#6366F1' },
+        ].map((item, i) => (
+          <div key={i} style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <ProgressRing value={item.value} max={Math.max(item.value * 1.3, 20)} size={40} color={item.color} />
+            <div>
+              <p style={{ fontSize: 18, fontWeight: 700, color: '#1e2749' }}>{item.value}</p>
+              <p style={{ fontSize: 10, color: '#6B7280' }}>{item.label}</p>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Role breakdown + states */}
+      {/* Role donut + states list */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-        <div>
-          <p style={{ fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Educator Roles Served</p>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {Object.entries(impact.roleBreakdown).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([role, count]) => (
-              <span key={role} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, background: '#F3F4F6', color: '#374151' }}>
-                {role}: {count}
+        <div style={{ background: 'white', borderRadius: 14, border: '1px solid rgba(139, 92, 246, 0.2)', padding: 20 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>Educator Roles Served</p>
+          {roleEntries.length > 0 ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <DonutChart
+                data={roleEntries.slice(0, 6).map(([name, value]) => ({ name, value }))}
+                size={140}
+                innerRadius={38}
+                outerRadius={58}
+                centerValue={m.totalEducators}
+                centerLabel="total"
+              />
+              <DonutLegend data={roleEntries.slice(0, 6).map(([name, value]) => ({ name, value }))} />
+            </div>
+          ) : <p style={{ color: '#9CA3AF', fontSize: 12 }}>No role data</p>}
+        </div>
+        <div style={{ background: 'white', borderRadius: 14, border: '1px solid rgba(139, 92, 246, 0.2)', padding: 20 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>States Served ({impact.statesServed.length})</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+            {impact.statesServed.map(state => (
+              <span key={state} style={{ fontSize: 11, padding: '3px 8px', borderRadius: 4, background: '#EDE9FE', color: '#6D28D9', fontWeight: 500 }}>
+                {state}
               </span>
             ))}
           </div>
-        </div>
-        <div>
-          <p style={{ fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>States Served ({impact.statesServed.length})</p>
-          <p style={{ fontSize: 11, color: '#6B7280', lineHeight: 1.6 }}>
-            {impact.statesServed.join(', ')}
-          </p>
         </div>
       </div>
     </div>
