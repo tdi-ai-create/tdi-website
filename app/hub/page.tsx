@@ -16,6 +16,8 @@ import GiftElement from '@/components/hub/GiftElement';
 import CommunityBookmarks from '@/components/hub/CommunityBookmarks';
 import DashboardInsight from '@/components/hub/DashboardInsight';
 import AchievementInsights from '@/components/hub/AchievementInsights';
+import PolaroidCard from '@/components/hub/PolaroidCard';
+import type { PolaroidSlot } from '@/components/hub/PolaroidCard';
 
 const OnboardingTour = dynamic(() => import('@/components/hub/OnboardingTour'), { ssr: false });
 import {
@@ -245,6 +247,9 @@ export default function HubDashboard() {
   const [communityHighlights, setCommunityHighlights] = useState<CommunityHighlight[]>([]);
   const [communitySummary, setCommunitySummary] = useState<CommunitySummary | null>(null);
   const [userGoal, setUserGoal] = useState<{ text: string; quickWin: QuickWin | null } | null>(null);
+  const [polaroids, setPolaroids] = useState<Record<string, { image_url: string; caption: string | null }>>({});
+  const [aiInsight, setAiInsight] = useState<string | null>(null);
+  const [aiInsightLoading, setAiInsightLoading] = useState(false);
 
   const firstName = profile?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Teacher';
   const dailyMessage = DAILY_MESSAGES[new Date().getDay()];
@@ -657,6 +662,37 @@ export default function HubDashboard() {
     }
 
     loadDashboardData();
+
+    // Load polaroids (non-blocking)
+    async function loadPolaroids() {
+      if (!user?.id) return;
+      const supabase = getSupabase();
+      const { data } = await supabase
+        .from('hub_polaroids')
+        .select('slot, image_url, caption')
+        .eq('user_id', user.id);
+      if (data) {
+        const map: Record<string, { image_url: string; caption: string | null }> = {};
+        data.forEach((p: { slot: string; image_url: string; caption: string | null }) => { map[p.slot] = p; });
+        setPolaroids(map);
+      }
+    }
+    loadPolaroids().catch(() => {});
+
+    // Load a compact AI insight (non-blocking)
+    async function loadAiInsight() {
+      setAiInsightLoading(true);
+      try {
+        const res = await fetch('/api/hub/insights', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tab: 'growth', data: { toolsExplored: 0, hoursSaved: 0, daysActive: 0, communityContributions: 0, recognitionsEarned: 0, goals: [] } }),
+        });
+        const result = await res.json();
+        if (result.insight) setAiInsight(result.insight);
+      } catch {} finally { setAiInsightLoading(false); }
+    }
+    loadAiInsight();
   }, [user?.id]);
 
   // Auto-favorite a quick win for new users who have no favorites
@@ -971,6 +1007,19 @@ export default function HubDashboard() {
         {/* ===== LEFT COLUMN ===== */}
         <div className="space-y-8">
 
+          {/* Polaroid "love" + Goal card row */}
+          <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+            {user?.id && (
+              <PolaroidCard
+                slot="love"
+                imageUrl={polaroids.love?.image_url}
+                caption={polaroids.love?.caption}
+                userId={user.id}
+                onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
+                width={155}
+              />
+            )}
+            <div style={{ flex: 1 }}>
           {/* A. Goal + Next Step (or Today's Pick for new users) */}
           {(userGoal || featuredQuickWin) && (
             <div
@@ -1093,6 +1142,22 @@ export default function HubDashboard() {
               </div>
             </div>
           )}
+
+            </div>
+          </div>
+
+          {/* TDI Tip (navy accent) */}
+          <div
+            className="rounded-2xl p-5"
+            style={{ background: '#1B2A4A', borderTop: '2px solid #E8B84B' }}
+          >
+            <div className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: '#E8B84B', letterSpacing: '0.1em' }}>
+              {tUI('TDI Tip')}
+            </div>
+            <p style={{ fontFamily: "'Source Serif 4', serif", fontStyle: 'italic', fontSize: 15, color: 'rgba(255,255,255,0.85)', lineHeight: 1.6 }}>
+              &ldquo;{tip}&rdquo;
+            </p>
+          </div>
 
           {/* B. Continue Learning (max 2 enrollments) */}
           {enrollments.length > 0 && (
@@ -1270,7 +1335,41 @@ export default function HubDashboard() {
             </div>
           )}
 
-          {/* Community preview + AI Growth Insights moved to respective pages */}
+          {/* AI Growth Insight (compact) */}
+          {(aiInsight || aiInsightLoading) && (
+            <div
+              className="rounded-2xl p-5"
+              style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #263554 100%)', borderLeft: '3px solid #E8B84B' }}
+            >
+              <div className="flex items-center gap-1.5 mb-2">
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8B84B', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+                <span style={{ fontSize: 10, fontWeight: 700, color: '#E8B84B', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                  AI Growth Insight
+                </span>
+              </div>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', lineHeight: 1.6, margin: 0 }}>
+                {aiInsightLoading ? 'Generating your personalized insight...' : aiInsight}
+              </p>
+              <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
+            </div>
+          )}
+
+          {/* Polaroid "goal" + Community Bookmarks */}
+          <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+            {user?.id && (
+              <PolaroidCard
+                slot="goal"
+                imageUrl={polaroids.goal?.image_url}
+                caption={polaroids.goal?.caption}
+                userId={user.id}
+                onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
+                width={150}
+              />
+            )}
+            <div style={{ flex: 1 }}>
+              <CommunityBookmarks userId={user?.id} tUI={tUI} />
+            </div>
+          </div>
         </div>
 
         {/* ===== RIGHT COLUMN (SIDEBAR) ===== */}
@@ -1468,6 +1567,20 @@ export default function HubDashboard() {
                   );
                 })}
               </div>
+            </div>
+          )}
+
+          {/* Polaroid "proud" */}
+          {user?.id && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', paddingRight: 12 }}>
+              <PolaroidCard
+                slot="proud"
+                imageUrl={polaroids.proud?.image_url}
+                caption={polaroids.proud?.caption}
+                userId={user.id}
+                onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
+                width={155}
+              />
             </div>
           )}
 
