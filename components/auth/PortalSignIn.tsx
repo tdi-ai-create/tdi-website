@@ -42,6 +42,8 @@ export interface PortalSignInProps {
   /** Shown in top-left back link.  Pass null to hide. */
   backHref?: string | null;
   backLabel?: string;
+  /** Compact mode -- removes min-h-screen and centering for embedding in other pages */
+  compact?: boolean;
   /** Optional Supabase client getter. Hub passes its own client; others use Creator Portal default. */
   getSupabaseClient?: () => SupabaseClient;
 }
@@ -72,6 +74,7 @@ export default function PortalSignIn({
   googleRedirectTo,
   forgotPasswordRedirectTo,
   backHref = '/',
+  compact = false,
   backLabel = 'Back to site',
   getSupabaseClient,
 }: PortalSignInProps) {
@@ -249,8 +252,8 @@ export default function PortalSignIn({
   const showBothMethods = methods.emailPassword && methods.magicLink;
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#FAFAF8' }}>
-      {backHref !== null && (
+    <div className={compact ? 'flex flex-col' : 'min-h-screen flex flex-col'} style={{ backgroundColor: compact ? 'transparent' : '#FAFAF8' }}>
+      {backHref !== null && !compact && (
         <header className="p-4">
           <Link
             href={backHref}
@@ -263,8 +266,9 @@ export default function PortalSignIn({
         </header>
       )}
 
-      <main className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-[420px]">
+      <main className={compact ? 'p-0' : 'flex-1 flex items-center justify-center p-4'}>
+        <div className="w-full max-w-[420px]" style={compact ? { margin: '0 auto' } : {}}>
+          {!compact && (
           <div className="text-center mb-8">
             <h1
               className="font-bold mb-2"
@@ -278,6 +282,7 @@ export default function PortalSignIn({
               </p>
             )}
           </div>
+          )}
 
           <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
             {successMessage ? (

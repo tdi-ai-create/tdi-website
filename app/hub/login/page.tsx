@@ -73,11 +73,11 @@ export default function HubLoginPage() {
           <div style={{ maxWidth: 500, margin: '0 auto', textAlign: 'center' }}>
             <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1e2749', margin: '0 0 4px' }}>Sign in to the Hub</h2>
             <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 16 }}>Free account. No credit card required.</p>
-            <div className="portal-sign-in-wrapper">
             <PortalSignIn
               portalTitle=""
               portalSubtitle=""
               backHref={null}
+              compact
               methods={{ google: true, emailPassword: true, magicLink: true, signUp: true }}
               onSuccess={handleSuccess}
               getSupabaseClient={getHubSupabase}
@@ -85,7 +85,6 @@ export default function HubLoginPage() {
               googleRedirectTo={typeof window !== 'undefined' ? window.location.origin + '/hub' : '/hub'}
               forgotPasswordRedirectTo={typeof window !== 'undefined' ? window.location.origin + '/hub/settings/profile' : '/hub/settings/profile'}
             />
-            </div>
             <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 8 }}>100,000+ educators across all 50 states</p>
           </div>
         </section>
@@ -175,12 +174,6 @@ export default function HubLoginPage() {
         </section>
       </div>
 
-      {/* Collapse PortalSignIn internal dead space */}
-      <style>{`
-        .portal-sign-in-wrapper > div:first-child { padding-top: 0 !important; margin-top: -16px !important; }
-        .portal-sign-in-wrapper header, .portal-sign-in-wrapper [class*="back"] { display: none !important; }
-        .portal-sign-in-wrapper > div { box-shadow: none !important; }
-      `}</style>
     </>
   );
 }
