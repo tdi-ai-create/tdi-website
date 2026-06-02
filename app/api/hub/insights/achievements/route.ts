@@ -92,6 +92,16 @@ Generate ONLY one personalized reflection question based on their recent activit
       messages: [{ role: 'user', content: prompt }],
     })
 
+    // Log AI usage
+    const { logAIUsage } = await import('@/lib/ai-usage')
+    logAIUsage({
+      endpoint: 'achievements',
+      model: 'claude-sonnet-4-20250514',
+      inputTokens: response.usage?.input_tokens || 0,
+      outputTokens: response.usage?.output_tokens || 0,
+      metadata: { type },
+    })
+
     const text = response.content[0]
     if (text.type !== 'text') {
       return NextResponse.json({ insight: '' })

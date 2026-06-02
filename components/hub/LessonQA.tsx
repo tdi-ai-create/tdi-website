@@ -8,6 +8,7 @@ interface Author {
   name: string
   role: string | null
   avatar_url: string | null
+  educator_type?: string | null
 }
 
 interface QAReply {
@@ -396,6 +397,11 @@ export default function LessonQA({ contentId, userId, isAdmin, apiBasePath }: Le
                         <span className="text-sm font-semibold" style={{ color: '#2B3A67', fontFamily: "'DM Sans', sans-serif" }}>
                           {q.author.name}
                         </span>
+                        {q.author.educator_type && (
+                          <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ backgroundColor: '#FEF3C7', color: '#92400E' }}>
+                            The {q.author.educator_type}
+                          </span>
+                        )}
                         {q.author.role && (
                           <span className="text-xs" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
                             {q.author.role}
@@ -453,6 +459,11 @@ export default function LessonQA({ contentId, userId, isAdmin, apiBasePath }: Le
                               <span className="text-sm font-semibold" style={{ color: '#2B3A67', fontFamily: "'DM Sans', sans-serif" }}>
                                 {r.author.name}
                               </span>
+                              {r.author.educator_type && (
+                                <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ backgroundColor: '#FEF3C7', color: '#92400E' }}>
+                                  The {r.author.educator_type}
+                                </span>
+                              )}
                               {r.author.role && (
                                 <span className="text-xs" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
                                   {r.author.role}

@@ -129,6 +129,15 @@ export async function enrichLead(input: CreateLeadInput): Promise<{
       ],
     });
 
+    // Log AI usage
+    import('@/lib/ai-usage').then(({ logAIUsage }) => logAIUsage({
+      endpoint: 'lead_enrich',
+      model: 'claude-sonnet-4-20250514',
+      inputTokens: response.usage?.input_tokens || 0,
+      outputTokens: response.usage?.output_tokens || 0,
+      metadata: { input_type: 'lead_enrich' },
+    })).catch(() => {});
+
     // Extract the final text block (after web search results)
     const textBlocks = response.content.filter(
       (block: any) => block.type === 'text'

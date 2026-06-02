@@ -46,11 +46,11 @@ export async function handleQAGet(contentType: string, contentId: string) {
       ]),
     ]
 
-    let profileMap: Record<string, { name: string; role: string | null; avatar_url: string | null }> = {}
+    let profileMap: Record<string, { name: string; role: string | null; avatar_url: string | null; educator_type: string | null }> = {}
     if (allUserIds.length > 0) {
       const { data: profiles } = await supabase
         .from('hub_profiles')
-        .select('id, display_name, role, avatar_url')
+        .select('id, display_name, role, avatar_url, educator_type')
         .in('id', allUserIds)
 
       if (profiles) {
@@ -59,6 +59,7 @@ export async function handleQAGet(contentType: string, contentId: string) {
             name: p.display_name || 'Teacher',
             role: p.role,
             avatar_url: p.avatar_url,
+            educator_type: p.educator_type || null,
           }
         }
       }

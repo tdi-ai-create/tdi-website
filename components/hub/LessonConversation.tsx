@@ -12,7 +12,7 @@ interface ConversationReply {
   id: string
   body: string
   posted_at: string
-  author: { name: string; role: string | null }
+  author: { name: string; role: string | null; educator_type?: string | null }
 }
 
 interface ConversationPost {
@@ -28,6 +28,7 @@ interface ConversationPost {
     name: string
     role: string | null
     avatar_url: string | null
+    educator_type?: string | null
   }
 }
 
@@ -328,6 +329,11 @@ function PostCard({ post, userId, isAdmin, onRefresh, tUI }: { post: Conversatio
           {/* Author line */}
           <p className="text-xs text-gray-400 mb-3">
             {post.author.name}
+            {post.author.educator_type && (
+              <span className="ml-1 inline-block px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ backgroundColor: '#FEF3C7', color: '#92400E' }}>
+                The {post.author.educator_type}
+              </span>
+            )}
             {post.author.role && <span> · {formatRole(post.author.role)}</span>}
             <span> · {timeAgo}</span>
           </p>
@@ -418,6 +424,11 @@ function PostCard({ post, userId, isAdmin, onRefresh, tUI }: { post: Conversatio
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-gray-400 mb-1">
                       <span className="font-medium text-gray-600">{r.author.name}</span>
+                      {r.author.educator_type && (
+                        <span className="ml-1 inline-block px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ backgroundColor: '#FEF3C7', color: '#92400E' }}>
+                          The {r.author.educator_type}
+                        </span>
+                      )}
                       {r.author.role && <span> · {formatRole(r.author.role)}</span>}
                       <span> · {getTimeAgo(r.posted_at)}</span>
                     </p>

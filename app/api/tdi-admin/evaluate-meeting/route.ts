@@ -177,6 +177,15 @@ export async function POST(request: NextRequest) {
       ],
     })
 
+    // Log AI usage
+    import('@/lib/ai-usage').then(({ logAIUsage }) => logAIUsage({
+      endpoint: 'meeting_eval',
+      model: 'claude-sonnet-4-20250514',
+      inputTokens: message.usage?.input_tokens || 0,
+      outputTokens: message.usage?.output_tokens || 0,
+      metadata: { wordCount },
+    })).catch(() => {});
+
     // Extract text response
     const responseText = message.content
       .filter((block): block is Anthropic.TextBlock => block.type === 'text')

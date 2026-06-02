@@ -50,6 +50,16 @@ Keep it under 100 words total. Be honest and caring, not clinical.`
       messages: [{ role: 'user', content: prompt }],
     })
 
+    // Log AI usage
+    const { logAIUsage } = await import('@/lib/ai-usage')
+    logAIUsage({
+      endpoint: 'insights',
+      model: 'claude-sonnet-4-20250514',
+      inputTokens: response.usage?.input_tokens || 0,
+      outputTokens: response.usage?.output_tokens || 0,
+      metadata: { tab },
+    })
+
     const text = response.content[0]
     if (text.type !== 'text') {
       return NextResponse.json({ insight: '' })

@@ -110,6 +110,15 @@ export async function POST(
         ]
       })
 
+      // Log AI usage
+      import('@/lib/ai-usage').then(({ logAIUsage }) => logAIUsage({
+        endpoint: 'leadership_extract',
+        model: 'claude-sonnet-4-20250514',
+        inputTokens: response.usage?.input_tokens || 0,
+        outputTokens: response.usage?.output_tokens || 0,
+        metadata: { fileType: 'pdf' },
+      })).catch(() => {});
+
       const textContent = response.content.find(c => c.type === 'text')
       if (textContent && textContent.type === 'text') {
         try {

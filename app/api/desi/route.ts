@@ -437,6 +437,16 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    // Log AI usage (fire-and-forget)
+    const { logAIUsage } = await import('@/lib/ai-usage')
+    logAIUsage({
+      endpoint: 'desi',
+      model: 'claude-sonnet-4-20250514',
+      inputTokens: response.usage?.input_tokens || 0,
+      outputTokens: response.usage?.output_tokens || 0,
+      metadata: { tool_use_rounds: loopCount },
+    })
+
     const textBlock = response.content.find(
       (block): block is Anthropic.TextBlock => block.type === 'text'
     )
