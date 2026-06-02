@@ -72,7 +72,7 @@ export default function HubLoginPage() {
 
         {/* ═══ SIGN IN ═══ */}
         <section style={{ padding: '40px 16px 48px', backgroundColor: '#F9FAFB' }}>
-          <div style={{ maxWidth: 500, margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
             <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1e2749', margin: '0 0 4px' }}>{tUI('Sign in to the Hub')}</h2>
             <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 16 }}>{tUI('Free account. No credit card required.')}</p>
             <PortalSignIn
@@ -80,6 +80,7 @@ export default function HubLoginPage() {
               portalSubtitle=""
               backHref={null}
               compact
+              horizontal
               methods={{ google: true, emailPassword: true, magicLink: true, signUp: true }}
               onSuccess={handleSuccess}
               getSupabaseClient={getHubSupabase}

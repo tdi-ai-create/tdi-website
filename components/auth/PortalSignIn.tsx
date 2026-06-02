@@ -44,6 +44,8 @@ export interface PortalSignInProps {
   backLabel?: string;
   /** Compact mode -- removes min-h-screen and centering for embedding in other pages */
   compact?: boolean;
+  /** Horizontal layout -- Google on left, email form on right with vertical divider */
+  horizontal?: boolean;
   /** Optional Supabase client getter. Hub passes its own client; others use Creator Portal default. */
   getSupabaseClient?: () => SupabaseClient;
 }
@@ -75,6 +77,7 @@ export default function PortalSignIn({
   forgotPasswordRedirectTo,
   backHref = '/',
   compact = false,
+  horizontal = false,
   backLabel = 'Back to site',
   getSupabaseClient,
 }: PortalSignInProps) {
@@ -267,7 +270,7 @@ export default function PortalSignIn({
       )}
 
       <main className={compact ? 'p-0' : 'flex-1 flex items-center justify-center p-4'}>
-        <div className="w-full max-w-[420px]" style={compact ? { margin: '0 auto' } : {}}>
+        <div className={`w-full ${horizontal ? 'max-w-[660px]' : 'max-w-[420px]'}`} style={compact ? { margin: '0 auto' } : {}}>
           {!compact && (
           <div className="text-center mb-8">
             <h1
@@ -284,7 +287,7 @@ export default function PortalSignIn({
           </div>
           )}
 
-          <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+          <div className={`bg-white rounded-xl shadow-sm border border-gray-100 ${horizontal ? 'p-0' : 'p-8'}`}>
             {successMessage ? (
               <div className="text-center py-4">
                 <div
@@ -305,15 +308,15 @@ export default function PortalSignIn({
                 </button>
               </div>
             ) : view === 'main' || view === 'signup' ? (
-              <>
+              <div className={horizontal ? 'flex' : ''}>
                 {/* Google */}
                 {methods.google && (
-                  <>
+                  <div className={horizontal ? 'flex flex-col items-center justify-center px-8 py-8' : ''} style={horizontal ? { minWidth: 220, borderRight: '1px solid #E5E7EB' } : {}}>
                     <button
                       onClick={handleGoogleSignIn}
                       disabled={isLoading}
-                      className="w-full flex items-center justify-center gap-3 px-4 rounded-lg border transition-colors disabled:opacity-50"
-                      style={{ height: '48px', borderRadius: '8px', backgroundColor: 'white', borderColor: '#E5E7EB' }}
+                      className={`flex items-center justify-center gap-3 px-4 rounded-lg border transition-colors disabled:opacity-50 ${horizontal ? '' : 'w-full'}`}
+                      style={{ height: '48px', borderRadius: '8px', backgroundColor: 'white', borderColor: '#E5E7EB', ...(horizontal ? { width: 200 } : {}) }}
                       onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F9FAFB')}
                       onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'white')}
                     >
@@ -322,8 +325,13 @@ export default function PortalSignIn({
                         Continue with Google
                       </span>
                     </button>
+                    {horizontal && (
+                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: '#9CA3AF', marginTop: 10, textAlign: 'center' }}>
+                        Recommended for school accounts
+                      </p>
+                    )}
 
-                    {(methods.emailPassword || methods.magicLink) && (
+                    {!horizontal && (methods.emailPassword || methods.magicLink) && (
                       <div className="relative my-6">
                         <div className="absolute inset-0 flex items-center">
                           <div className="w-full border-t" style={{ borderColor: '#E5E7EB' }} />
@@ -338,8 +346,9 @@ export default function PortalSignIn({
                         </div>
                       </div>
                     )}
-                  </>
+                  </div>
                 )}
+                <div className={horizontal ? 'flex-1 px-8 py-8' : ''}>
 
                 {/* Method toggle — only shown when both email+password AND magic link are enabled */}
                 {showBothMethods && (
@@ -542,7 +551,8 @@ export default function PortalSignIn({
                     </button>
                   </form>
                 )}
-              </>
+              </div>
+            </div>
             ) : view === 'forgot' ? (
               <>
                 <h2
