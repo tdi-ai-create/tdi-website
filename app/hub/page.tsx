@@ -1016,7 +1016,7 @@ export default function HubDashboard() {
                 caption={polaroids.love?.caption}
                 userId={user.id}
                 onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
-                width={155}
+                width={210}
               />
             )}
             <div style={{ flex: 1 }}>
@@ -1363,7 +1363,7 @@ export default function HubDashboard() {
                 caption={polaroids.goal?.caption}
                 userId={user.id}
                 onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
-                width={150}
+                width={200}
               />
             )}
             <div style={{ flex: 1 }}>
@@ -1579,7 +1579,7 @@ export default function HubDashboard() {
                 caption={polaroids.proud?.caption}
                 userId={user.id}
                 onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
-                width={155}
+                width={210}
               />
             </div>
           )}
