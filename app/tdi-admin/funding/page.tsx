@@ -5,6 +5,11 @@ import { AlertBar } from './components/AlertBar'
 import { PhaseTabs } from './components/PhaseTabs'
 import { PursuitCard } from './components/PursuitCard'
 import { PursuitDetailPanel } from './components/PursuitDetailPanel'
+import {
+  TYPE_PAGE_TITLE,
+  TYPE_PAGE_SUBTITLE,
+  TYPE_SMALL,
+} from '@/components/tdi-admin/ui/design-tokens'
 
 export default function FundingPage() {
   const [data, setData] = useState<any>(null)
@@ -27,7 +32,7 @@ export default function FundingPage() {
   if (loading) {
     return (
       <div style={{ padding: '24px 32px', fontFamily: "'DM Sans', sans-serif" }}>
-        <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Funding</h1>
+        <h1 style={{ ...TYPE_PAGE_TITLE, margin: 0 }}>Funding</h1>
         <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[...Array(3)].map((_, i) => (
             <div key={i} style={{ height: 64, background: '#F3F4F6', borderRadius: 12 }} />
@@ -40,7 +45,7 @@ export default function FundingPage() {
   if (error || !data) {
     return (
       <div style={{ padding: '24px 32px', fontFamily: "'DM Sans', sans-serif" }}>
-        <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Funding</h1>
+        <h1 style={{ ...TYPE_PAGE_TITLE, margin: 0 }}>Funding</h1>
         <div style={{ marginTop: 24, background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 12, padding: '16px 20px', color: '#991B1B', fontSize: 13 }}>
           Failed to load funding data{error ? `: ${error}` : ''}
         </div>
@@ -58,8 +63,8 @@ export default function FundingPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Funding</h1>
-          <p style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>
+          <h1 style={{ ...TYPE_PAGE_TITLE, margin: 0 }}>Funding</h1>
+          <p style={{ ...TYPE_PAGE_SUBTITLE, marginTop: 4 }}>
             Grant Pursuits &middot; Federal, State, Foundation
           </p>
         </div>

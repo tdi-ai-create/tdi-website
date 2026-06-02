@@ -4,7 +4,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Loader2, BarChart3 } from 'lucide-react';
 import { USChoroplethMap } from '@/components/tdi-admin/shared/USChoroplethMap';
 import { getSupabase } from '@/lib/supabase';
-import { ADMIN_TYPOGRAPHY, PORTAL_TOKENS } from '@/components/tdi-admin/ui/design-tokens';
+import {
+  ADMIN_TYPOGRAPHY,
+  PORTAL_TOKENS,
+  TYPE_PAGE_TITLE,
+  TYPE_PAGE_SUBTITLE,
+  TYPE_SECTION_HEADER,
+  TYPE_SMALL,
+} from '@/components/tdi-admin/ui/design-tokens';
 import { FunnelCards } from '@/components/admin/cmo/FunnelCards';
 import { TikTokTable } from '@/components/admin/cmo/TikTokTable';
 import { SubstackTable } from '@/components/admin/cmo/SubstackTable';
@@ -125,7 +132,7 @@ export default function CMODashboardPage() {
       <div className="flex items-center justify-center py-32">
         <div className="max-w-md text-center p-8 bg-white rounded-2xl shadow-sm border border-gray-100">
           <BarChart3 size={40} className="text-teal-400 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: ADMIN_TYPOGRAPHY.fontFamily.heading }}>
+          <h2 className="mb-2" style={TYPE_SECTION_HEADER}>
             CMO Dashboard — Provisioning
           </h2>
           <p className="text-gray-500 text-sm mb-4" style={{ fontFamily: ADMIN_TYPOGRAPHY.fontFamily.body }}>
@@ -158,10 +165,7 @@ export default function CMODashboardPage() {
         <div style={{ marginBottom: 8 }}>
           <h1
             style={{
-              fontSize: 28,
-              fontWeight: 800,
-              color: '#2B3A67',
-              fontFamily: "'Source Serif 4', Georgia, serif",
+              ...TYPE_PAGE_TITLE,
               margin: 0,
               display: 'inline-block',
               borderBottom: '3px solid #2A9D8F',
@@ -170,7 +174,7 @@ export default function CMODashboardPage() {
           >
             CMO Dashboard
           </h1>
-          <p style={{ fontSize: 13, color: '#6B7280', marginTop: 8, fontFamily: "'DM Sans', sans-serif" }}>
+          <p style={{ ...TYPE_PAGE_SUBTITLE, marginTop: 8 }}>
             Attract → Warm → Convert · weekly marketing funnel
           </p>
         </div>
@@ -221,8 +225,8 @@ export default function CMODashboardPage() {
         {/* Audience Geography */}
         <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
           <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Audience Geography</div>
-            <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>Substack subscriber distribution · 50 states, 101 countries</div>
+            <div style={TYPE_SECTION_HEADER}>Audience Geography</div>
+            <div style={{ ...TYPE_SMALL, marginTop: 2 }}>Substack subscriber distribution · 50 states, 101 countries</div>
           </div>
           <USChoroplethMap
             byState={{

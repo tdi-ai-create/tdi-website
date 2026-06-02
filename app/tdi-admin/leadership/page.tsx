@@ -28,6 +28,15 @@ import {
   ExternalLink,
   ListTodo,
 } from 'lucide-react';
+import {
+  TYPE_PAGE_TITLE,
+  TYPE_PAGE_SUBTITLE,
+  TYPE_SECTION_HEADER,
+  TYPE_CARD_TITLE,
+  TYPE_STAT_VALUE,
+  TYPE_STAT_LABEL,
+  TYPE_TABLE_HEADER,
+} from '@/components/tdi-admin/ui/design-tokens';
 
 // Leadership theme colors
 const theme = PORTAL_THEMES.leadership;
@@ -396,22 +405,14 @@ export default function LeadershipDashboardPage() {
             <Building2 size={32} style={{ color: '#DC2626' }} />
           </div>
           <h1
-            className="font-bold mb-3"
-            style={{
-              fontFamily: "'Source Serif 4', Georgia, serif",
-              fontSize: '24px',
-              color: '#2B3A67',
-            }}
+            className="mb-3"
+            style={TYPE_PAGE_TITLE}
           >
             Access Restricted
           </h1>
           <p
             className="mb-6"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '15px',
-              color: '#6B7280',
-            }}
+            style={TYPE_PAGE_SUBTITLE}
           >
             You don&apos;t have permission to access the Lead Dashboard.
             Contact your administrator to request access.
@@ -470,7 +471,7 @@ export default function LeadershipDashboardPage() {
       <div className="px-6 py-6">
         {/* Page Header */}
         <div className="mb-6">
-          <h1 className="font-extrabold" style={{ fontSize: 28, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Lead Dashboard</h1>
+          <h1 style={TYPE_PAGE_TITLE}>Lead Dashboard</h1>
           <p className="text-sm text-gray-500 mt-1">
             Manage school partnerships, reports, action items, and billing.
           </p>
@@ -488,7 +489,7 @@ export default function LeadershipDashboardPage() {
               <div>
                 <p
                   className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontSize: 28, fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
+                  style={{ ...TYPE_STAT_VALUE, color: theme.accent }}
                 >
                   {stats.activeCount}
                 </p>
@@ -514,7 +515,7 @@ export default function LeadershipDashboardPage() {
               <div>
                 <p
                   className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontSize: 28, fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
+                  style={{ ...TYPE_STAT_VALUE, color: theme.accent }}
                 >
                   {stats.totalEducators}
                 </p>
@@ -540,7 +541,7 @@ export default function LeadershipDashboardPage() {
               <div>
                 <p
                   className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontSize: 28, fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
+                  style={{ ...TYPE_STAT_VALUE, color: theme.accent }}
                 >
                   {stats.pendingSetup}
                 </p>
@@ -566,7 +567,7 @@ export default function LeadershipDashboardPage() {
               <div>
                 <p
                   className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ fontSize: 28, fontFamily: "'DM Sans', sans-serif", color: theme.accent }}
+                  style={{ ...TYPE_STAT_VALUE, color: theme.accent }}
                 >
                   {stats.awaitingAccept}
                 </p>
@@ -919,11 +920,7 @@ export default function LeadershipDashboardPage() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2
-                  className="text-lg font-semibold"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    color: '#2B3A67',
-                  }}
+                  style={TYPE_SECTION_HEADER}
                 >
                   Active Partner Dashboards
                 </h2>
@@ -1029,11 +1026,7 @@ export default function LeadershipDashboardPage() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2
-                  className="text-lg font-semibold"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    color: '#2B3A67',
-                  }}
+                  style={TYPE_SECTION_HEADER}
                 >
                   School Reports
                 </h2>
@@ -1189,11 +1182,7 @@ export default function LeadershipDashboardPage() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2
-                  className="text-lg font-semibold"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    color: '#2B3A67',
-                  }}
+                  style={TYPE_SECTION_HEADER}
                 >
                   Action Items
                 </h2>
@@ -1302,11 +1291,7 @@ export default function LeadershipDashboardPage() {
           <div className="p-6">
             <div className="mb-6">
               <h2
-                className="text-lg font-semibold"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  color: '#2B3A67',
-                }}
+                style={TYPE_SECTION_HEADER}
               >
                 Onboarding Pipeline
               </h2>
@@ -1354,7 +1339,7 @@ export default function LeadershipDashboardPage() {
                     <div
                       className={`w-16 h-16 rounded-full mx-auto mb-2 flex items-center justify-center ${stage.color}`}
                     >
-                      <span className="font-bold" style={{ fontSize: 28 }}>{stage.count}</span>
+                      <span style={TYPE_STAT_VALUE}>{stage.count}</span>
                     </div>
                     <p className="text-sm font-medium text-gray-700">
                       {stage.label}
@@ -1479,11 +1464,7 @@ export default function LeadershipDashboardPage() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2
-                  className="text-lg font-semibold"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    color: '#2B3A67',
-                  }}
+                  style={TYPE_SECTION_HEADER}
                 >
                   Billing & Contracts
                 </h2>

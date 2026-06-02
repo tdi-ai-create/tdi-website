@@ -9,6 +9,13 @@ import { KanbanColumn } from './components/KanbanColumn'
 import { SalesCard, type SalesCardOpp } from './components/SalesCard'
 import AddLeadModal from '@/components/sales/AddLeadModal'
 import { OpportunityDetailPanel, type FullOpportunity } from './components/OpportunityDetailPanel'
+import {
+  TYPE_PAGE_TITLE,
+  TYPE_PAGE_SUBTITLE,
+  TYPE_STAT_VALUE,
+  TYPE_CARD_TITLE,
+  TYPE_SMALL,
+} from '@/components/tdi-admin/ui/design-tokens'
 
 type ViewMode = 'kanban' | 'list'
 type PageTab = 'pipeline' | 'analytics' | 'trash' | 'invoices'
@@ -654,9 +661,9 @@ export default function SalesPage() {
       {/* Header row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#2B3A67', margin: 0, fontFamily: "'Source Serif 4', Georgia, serif" }}>Sales</h1>
+          <h1 style={{ ...TYPE_PAGE_TITLE, margin: 0 }}>Sales</h1>
           {lastSynced && (
-            <p style={{ fontSize: 12, color: '#9CA3AF', margin: '4px 0 0' }}>
+            <p style={{ ...TYPE_SMALL, margin: '4px 0 0' }}>
               Last loaded {lastSynced.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
             </p>
           )}
@@ -1040,7 +1047,7 @@ export default function SalesPage() {
             background: 'white', borderRadius: 16, padding: 24, width: 420,
             boxShadow: '0 20px 60px rgba(0,0,0,0.2)', zIndex: 401,
           }}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 4px' }}>Add Note</h3>
+            <h3 style={{ ...TYPE_CARD_TITLE, margin: '0 0 4px' }}>Add Note</h3>
             <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 16px' }}>{noteModal.name}</p>
             <textarea
               value={noteText}
@@ -1086,7 +1093,7 @@ export default function SalesPage() {
             background: 'white', borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw',
             boxShadow: '0 12px 40px rgba(0,0,0,0.2)', zIndex: 151,
           }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: '#0a0f1e', marginBottom: 4 }}>Add Note</div>
+            <div style={{ ...TYPE_CARD_TITLE, color: '#0a0f1e', marginBottom: 4 }}>Add Note</div>
             <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 12 }}>
               {opportunities.find(o => o.supabase_id === quickNoteOppId)?.name || ''}
             </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { ADMIN_SHADOWS, ADMIN_TRANSITIONS } from './design-tokens';
+import { ADMIN_SHADOWS, ADMIN_TRANSITIONS, TYPE_CARD_TITLE, TYPE_PAGE_SUBTITLE, TYPE_BODY } from './design-tokens';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
@@ -83,17 +83,14 @@ export function AdminSectionCard({
         />
       </div>
       <h3
-        className="font-semibold text-lg mb-2"
-        style={{
-          fontFamily: "'DM Sans', sans-serif",
-          color: '#2B3A67',
-        }}
+        className="mb-2"
+        style={TYPE_CARD_TITLE}
       >
         {title}
       </h3>
       <p
-        className="text-sm text-gray-500 mb-4"
-        style={{ fontFamily: "'DM Sans', sans-serif" }}
+        className="mb-4"
+        style={TYPE_PAGE_SUBTITLE}
       >
         {description}
       </p>
@@ -101,8 +98,8 @@ export function AdminSectionCard({
         {features.map((feature, i) => (
           <li
             key={i}
-            className="flex items-center gap-2 text-sm text-gray-600"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
+            className="flex items-center gap-2 text-sm"
+            style={TYPE_BODY}
           >
             <div
               className="w-1.5 h-1.5 rounded-full"
@@ -129,20 +126,11 @@ export function AdminCardHeader({ title, subtitle, action }: AdminCardHeaderProp
   return (
     <div className="flex items-center justify-between mb-4">
       <div>
-        <h3
-          className="text-lg font-semibold"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            color: '#2B3A67',
-          }}
-        >
+        <h3 style={TYPE_CARD_TITLE}>
           {title}
         </h3>
         {subtitle && (
-          <p
-            className="text-sm text-gray-500"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
-          >
+          <p style={TYPE_PAGE_SUBTITLE}>
             {subtitle}
           </p>
         )}

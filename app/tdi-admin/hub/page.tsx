@@ -19,6 +19,16 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
+import {
+  TYPE_PAGE_TITLE,
+  TYPE_PAGE_SUBTITLE,
+  TYPE_SECTION_HEADER,
+  TYPE_WIDGET_LABEL,
+  TYPE_STAT_VALUE,
+  TYPE_STAT_LABEL,
+  TYPE_BODY,
+  TYPE_SMALL,
+} from '@/components/tdi-admin/ui/design-tokens';
 
 // ── User Search Component ─────────────────────────────────────────
 function UserSearchBar() {
@@ -101,7 +111,7 @@ function UserSearchBar() {
             </div>
           ) : (
             <div>
-              <div className="px-4 py-2 flex text-xs font-bold uppercase tracking-wider" style={{ color: '#9CA3AF', borderBottom: '1px solid #F3F4F6' }}>
+              <div className="px-4 py-2 flex" style={{ ...TYPE_WIDGET_LABEL, borderBottom: '1px solid #F3F4F6' }}>
                 <span className="flex-1">User</span>
                 <span className="w-24 text-center">Tier</span>
                 <span className="w-24 text-center">Source</span>
@@ -187,13 +197,13 @@ function StatCard({
       <div className="h-0.5 w-full" style={{ background: theme.accent }} />
       <div className="p-5">
         <p
-          className="font-bold mb-1"
-          style={{ color: theme.accent, fontSize: 28, fontFamily: "'DM Sans', sans-serif" }}
+          className="mb-1"
+          style={{ ...TYPE_STAT_VALUE, color: theme.accent }}
         >
           {typeof value === 'number' ? value.toLocaleString() : value}
         </p>
-        <p className="text-sm text-gray-500">{label}</p>
-        {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
+        <p style={TYPE_STAT_LABEL}>{label}</p>
+        {subtitle && <p className="mt-1" style={TYPE_SMALL}>{subtitle}</p>}
       </div>
     </div>
   );
@@ -313,8 +323,8 @@ export default function HubAdminPage() {
       <div className="px-6 py-6">
         {/* Page Header */}
         <div className="mb-6">
-          <h1 className="font-extrabold" style={{ fontSize: 28, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Learning Hub</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage enrollments, content, and analytics</p>
+          <h1 style={TYPE_PAGE_TITLE}>Learning Hub</h1>
+          <p className="mt-1" style={TYPE_PAGE_SUBTITLE}>Manage enrollments, content, and analytics</p>
         </div>
 
         {/* User Search */}
@@ -338,7 +348,7 @@ export default function HubAdminPage() {
 
         {/* Stats Overview */}
         <div className="mb-8">
-          <h2 className="font-bold mb-4" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Quick Stats</h2>
+          <h2 className="mb-4" style={TYPE_SECTION_HEADER}>Quick Stats</h2>
           {isLoading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
               {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -375,11 +385,11 @@ export default function HubAdminPage() {
         {/* Membership & Growth */}
         {stats && (stats.membershipByTier || stats.recentSignups) && (
           <div className="mb-8">
-            <h2 className="font-bold mb-4" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Membership & Growth</h2>
+            <h2 className="mb-4" style={TYPE_SECTION_HEADER}>Membership & Growth</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Signups */}
               <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Signups</h3>
+                <h3 className="mb-3" style={TYPE_WIDGET_LABEL}>Signups</h3>
                 <div className="flex items-baseline gap-3 mb-2">
                   <span className="text-3xl font-bold" style={{ color: '#E8B84B' }}>{stats.todaySignups || 0}</span>
                   <span className="text-sm" style={{ color: '#6B7280' }}>today</span>
@@ -392,7 +402,7 @@ export default function HubAdminPage() {
 
               {/* By Tier */}
               <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Active Memberships by Tier</h3>
+                <h3 className="mb-3" style={TYPE_WIDGET_LABEL}>Active Memberships by Tier</h3>
                 <div className="space-y-2">
                   {Object.entries(stats.membershipByTier || {}).map(([tier, count]) => (
                     <div key={tier} className="flex items-center justify-between">
@@ -408,7 +418,7 @@ export default function HubAdminPage() {
 
               {/* By Source */}
               <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Members by Source</h3>
+                <h3 className="mb-3" style={TYPE_WIDGET_LABEL}>Members by Source</h3>
                 <div className="space-y-2">
                   {Object.entries(stats.membershipBySource || {}).map(([source, count]) => (
                     <div key={source} className="flex items-center justify-between">
@@ -601,7 +611,7 @@ export default function HubAdminPage() {
 
         {/* Section Cards */}
         <div className="mb-8">
-          <h2 className="font-bold mb-4" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Manage</h2>
+          <h2 className="mb-4" style={TYPE_SECTION_HEADER}>Manage</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <SectionCard
               title="Operations"
@@ -634,13 +644,13 @@ export default function HubAdminPage() {
 
         {/* Support Triage */}
         <div className="mb-8">
-          <h2 className="font-bold mb-4" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Support Triage</h2>
+          <h2 className="mb-4" style={TYPE_SECTION_HEADER}>Support Triage</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Common Issues */}
             <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
               <div className="flex items-center gap-2 mb-3">
                 <AlertCircle size={16} style={{ color: '#E8B84B' }} />
-                <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#9CA3AF' }}>Common Issues</h3>
+                <h3 style={TYPE_WIDGET_LABEL}>Common Issues</h3>
               </div>
               <div className="space-y-3">
                 {[
@@ -663,7 +673,7 @@ export default function HubAdminPage() {
             <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
               <div className="flex items-center gap-2 mb-3">
                 <Zap size={16} style={{ color: '#E8B84B' }} />
-                <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#9CA3AF' }}>Quick Actions</h3>
+                <h3 style={TYPE_WIDGET_LABEL}>Quick Actions</h3>
               </div>
               <div className="space-y-2">
                 <Link
@@ -705,7 +715,7 @@ export default function HubAdminPage() {
             <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
               <div className="flex items-center gap-2 mb-3">
                 <Info size={16} style={{ color: '#E8B84B' }} />
-                <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#9CA3AF' }}>Escalation Guide</h3>
+                <h3 style={TYPE_WIDGET_LABEL}>Escalation Guide</h3>
               </div>
               <div className="space-y-3 text-xs leading-relaxed" style={{ color: '#6B7280' }}>
                 <div>
@@ -732,7 +742,7 @@ export default function HubAdminPage() {
         {/* CMO Dashboard Widget — owners only */}
         {isOwner && (
           <div className="mb-8">
-            <h2 className="text-sm font-semibold text-gray-900 mb-4">Executive</h2>
+            <h2 className="mb-4" style={TYPE_SECTION_HEADER}>Executive</h2>
             <Link
               href="/tdi-admin/cmo"
               className="flex items-center justify-between bg-white rounded-xl p-5 border border-gray-100 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:border-gray-200 transition-all duration-200 group"
@@ -760,7 +770,7 @@ export default function HubAdminPage() {
 
         {/* Quick Actions */}
         <div>
-          <h2 className="text-sm font-semibold text-gray-900 mb-4">Quick Actions</h2>
+          <h2 className="mb-4" style={TYPE_SECTION_HEADER}>Quick Actions</h2>
           <div className="flex flex-wrap gap-3">
             <Link
               href="/tdi-admin/hub/operations"

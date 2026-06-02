@@ -100,6 +100,9 @@ export const ADMIN_TYPOGRAPHY = {
     statValue: '28px',
     body: '14px',
     small: '12px',
+    widgetLabel: '12px',
+    subtitle: '14px',
+    tableHeader: '12px',
   },
   colors: {
     heading: '#2B3A67',
@@ -108,6 +111,89 @@ export const ADMIN_TYPOGRAPHY = {
     muted: '#9CA3AF',
   },
 } as const;
+
+// ── Reusable typography style objects ─────────────────────────────────
+// Spread these into `style={{ }}` props for consistent typography across all portal pages.
+
+/** Page title — h1 at the top of each portal section */
+export const TYPE_PAGE_TITLE: React.CSSProperties = {
+  fontSize: '28px',
+  fontWeight: 800,
+  fontFamily: "'Source Serif 4', Georgia, serif",
+  color: '#2B3A67',
+};
+
+/** Page subtitle — sits directly under the page title */
+export const TYPE_PAGE_SUBTITLE: React.CSSProperties = {
+  fontSize: '14px',
+  fontFamily: "'DM Sans', sans-serif",
+  color: '#6B7280',
+};
+
+/** Section header — h2 that separates major content blocks */
+export const TYPE_SECTION_HEADER: React.CSSProperties = {
+  fontSize: '18px',
+  fontWeight: 700,
+  fontFamily: "'Source Serif 4', Georgia, serif",
+  color: '#2B3A67',
+};
+
+/** Card title — h3 inside cards, panels, modals */
+export const TYPE_CARD_TITLE: React.CSSProperties = {
+  fontSize: '16px',
+  fontWeight: 600,
+  fontFamily: "'DM Sans', sans-serif",
+  color: '#2B3A67',
+};
+
+/** Widget label — small uppercase label above a data block (e.g. "SIGNUPS", "LIVE ACTIVITY") */
+export const TYPE_WIDGET_LABEL: React.CSSProperties = {
+  fontSize: '12px',
+  fontWeight: 700,
+  fontFamily: "'DM Sans', sans-serif",
+  color: '#9CA3AF',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.05em',
+};
+
+/** Stat value — large number in stat cards */
+export const TYPE_STAT_VALUE: React.CSSProperties = {
+  fontSize: '28px',
+  fontWeight: 700,
+  fontFamily: "'DM Sans', sans-serif",
+};
+
+/** Stat label — label under a stat value */
+export const TYPE_STAT_LABEL: React.CSSProperties = {
+  fontSize: '14px',
+  fontWeight: 500,
+  fontFamily: "'DM Sans', sans-serif",
+  color: '#6B7280',
+};
+
+/** Body text */
+export const TYPE_BODY: React.CSSProperties = {
+  fontSize: '14px',
+  fontFamily: "'DM Sans', sans-serif",
+  color: '#374151',
+};
+
+/** Small / caption text */
+export const TYPE_SMALL: React.CSSProperties = {
+  fontSize: '12px',
+  fontFamily: "'DM Sans', sans-serif",
+  color: '#9CA3AF',
+};
+
+/** Table header cells */
+export const TYPE_TABLE_HEADER: React.CSSProperties = {
+  fontSize: '12px',
+  fontWeight: 600,
+  fontFamily: "'DM Sans', sans-serif",
+  color: '#6B7280',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.05em',
+};
 
 export const ADMIN_SPACING = {
   page: {

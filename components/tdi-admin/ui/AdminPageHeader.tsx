@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { TYPE_PAGE_TITLE, TYPE_PAGE_SUBTITLE, TYPE_SECTION_HEADER } from './design-tokens';
 
 interface AdminPageHeaderProps {
   title: string;
@@ -39,11 +40,9 @@ export function AdminPageHeader({
       <div className="flex items-center justify-between">
         <div>
           <h1
-            className="font-bold mb-2"
+            className="mb-2"
             style={{
-              fontFamily: "'Source Serif 4', Georgia, serif",
-              fontSize: '28px',
-              color: '#2B3A67',
+              ...TYPE_PAGE_TITLE,
               borderLeft: `4px solid ${accentColor}`,
               paddingLeft: '16px',
             }}
@@ -52,8 +51,8 @@ export function AdminPageHeader({
           </h1>
           {subtitle && (
             <p
-              className="text-gray-500 pl-5"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
+              className="pl-5"
+              style={TYPE_PAGE_SUBTITLE}
             >
               {subtitle}
             </p>
@@ -82,21 +81,11 @@ export function AdminSectionHeader({
   return (
     <div className="flex items-center justify-between mb-4">
       <div>
-        <h2
-          className="font-semibold"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: '16px',
-            color: '#2B3A67',
-          }}
-        >
+        <h2 style={TYPE_SECTION_HEADER}>
           {title}
         </h2>
         {subtitle && (
-          <p
-            className="text-sm text-gray-500"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
-          >
+          <p style={TYPE_PAGE_SUBTITLE}>
             {subtitle}
           </p>
         )}

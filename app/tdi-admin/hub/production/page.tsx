@@ -44,6 +44,15 @@ import {
   RefreshCw,
   Sparkles,
 } from 'lucide-react';
+import {
+  TYPE_PAGE_TITLE,
+  TYPE_PAGE_SUBTITLE,
+  TYPE_SECTION_HEADER,
+  TYPE_CARD_TITLE,
+  TYPE_STAT_VALUE,
+  TYPE_STAT_LABEL,
+  TYPE_TABLE_HEADER,
+} from '@/components/tdi-admin/ui/design-tokens';
 
 // Tab configuration for top nav
 const HUB_TABS = [
@@ -212,7 +221,7 @@ function QuickWinsTab() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="font-semibold text-lg text-gray-900">
+              <h3 style={{ ...TYPE_SECTION_HEADER }}>
                 {editingQW ? 'Edit Quick Win' : 'Create Quick Win'}
               </h3>
               <button onClick={closeModal} className="p-1 rounded-lg hover:bg-gray-100">
@@ -367,13 +376,13 @@ function QuickWinsTab() {
         <table className="w-full">
           <thead className="bg-[#FAFAF8]">
             <tr>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Title</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Category</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Lift</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Type</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Duration</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Title</th>
+              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Category</th>
+              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Lift</th>
+              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Type</th>
+              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Duration</th>
+              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Status</th>
+              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -600,7 +609,7 @@ function CalendarTab() {
           <button onClick={prevMonth} className="p-2 rounded-lg hover:bg-gray-100">
             <ChevronDown size={20} className="rotate-90" />
           </button>
-          <h2 className="text-lg font-semibold" style={{ color: '#2B3A67' }}>
+          <h2 style={TYPE_SECTION_HEADER}>
             {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
           </h2>
           <button onClick={nextMonth} className="p-2 rounded-lg hover:bg-gray-100">
@@ -703,7 +712,7 @@ function FeedbackTab() {
               <Star size={24} style={{ color: theme.accent }} />
             </div>
             <div>
-              <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>4.6</p>
+              <p style={{ ...TYPE_STAT_VALUE, color: '#2B3A67' }}>4.6</p>
               <p className="text-sm text-gray-500">Average Rating</p>
             </div>
           </div>
@@ -714,7 +723,7 @@ function FeedbackTab() {
               <Users size={24} className="text-green-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>560</p>
+              <p style={{ ...TYPE_STAT_VALUE, color: '#2B3A67' }}>560</p>
               <p className="text-sm text-gray-500">Total Ratings</p>
             </div>
           </div>
@@ -725,7 +734,7 @@ function FeedbackTab() {
               <BookOpen size={24} className="text-blue-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>{courses.length}</p>
+              <p style={{ ...TYPE_STAT_VALUE, color: '#2B3A67' }}>{courses.length}</p>
               <p className="text-sm text-gray-500">Published Courses</p>
             </div>
           </div>
@@ -735,15 +744,15 @@ function FeedbackTab() {
       {/* Ratings Table */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-8">
         <div className="px-4 py-3 border-b border-gray-100">
-          <h3 className="font-semibold text-gray-900">Course Ratings Overview</h3>
+          <h3 style={TYPE_CARD_TITLE}>Course Ratings Overview</h3>
         </div>
         <table className="w-full">
           <thead className="bg-[#FAFAF8]">
             <tr>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Course</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Avg Rating</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase"># Ratings</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Trend</th>
+              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Course</th>
+              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Avg Rating</th>
+              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}># Ratings</th>
+              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Trend</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -773,7 +782,7 @@ function FeedbackTab() {
       {/* Satisfaction Breakdown */}
       <div className="grid md:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <h3 className="font-semibold text-gray-900 mb-4">Satisfaction Breakdown</h3>
+          <h3 className="mb-4" style={TYPE_CARD_TITLE}>Satisfaction Breakdown</h3>
           <div className="space-y-3">
             <div>
               <div className="flex justify-between text-sm mb-1">
@@ -806,7 +815,7 @@ function FeedbackTab() {
         </div>
 
         <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <h3 className="font-semibold text-gray-900 mb-4">Recent Feedback</h3>
+          <h3 className="mb-4" style={TYPE_CARD_TITLE}>Recent Feedback</h3>
           <div className="space-y-4">
             <div className="p-3 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
@@ -920,7 +929,7 @@ function FreeRotationTab() {
               <Sparkles size={24} className="text-green-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>{totalFreeRotating}</p>
+              <p style={{ ...TYPE_STAT_VALUE, color: '#2B3A67' }}>{totalFreeRotating}</p>
               <p className="text-sm text-gray-500">Currently Free</p>
             </div>
           </div>
@@ -931,7 +940,7 @@ function FreeRotationTab() {
               <BookOpen size={24} className="text-blue-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>{freeRotatingCourses.length}</p>
+              <p style={{ ...TYPE_STAT_VALUE, color: '#2B3A67' }}>{freeRotatingCourses.length}</p>
               <p className="text-sm text-gray-500">Free Courses</p>
             </div>
           </div>
@@ -942,7 +951,7 @@ function FreeRotationTab() {
               <Zap size={24} style={{ color: theme.accent }} />
             </div>
             <div>
-              <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>{freeRotatingQuickWins.length}</p>
+              <p style={{ ...TYPE_STAT_VALUE, color: '#2B3A67' }}>{freeRotatingQuickWins.length}</p>
               <p className="text-sm text-gray-500">Free Quick Wins</p>
             </div>
           </div>
@@ -964,7 +973,7 @@ function FreeRotationTab() {
       {/* Currently Free Section */}
       {totalFreeRotating > 0 && (
         <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <h3 className="mb-4 flex items-center gap-2" style={TYPE_SECTION_HEADER}>
             <Sparkles size={18} className="text-green-600" />
             Currently Free
           </h3>
@@ -1010,7 +1019,7 @@ function FreeRotationTab() {
       <div className="space-y-8">
         {/* Courses */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <h3 className="mb-4 flex items-center gap-2" style={TYPE_SECTION_HEADER}>
             <BookOpen size={18} className="text-blue-600" />
             Courses ({courses.length})
           </h3>
@@ -1018,10 +1027,10 @@ function FreeRotationTab() {
             <table className="w-full">
               <thead className="bg-[#FAFAF8]">
                 <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Course</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Access Tier</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Course</th>
+                  <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Access Tier</th>
+                  <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Status</th>
+                  <th className="text-right px-4 py-3" style={TYPE_TABLE_HEADER}>Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -1076,7 +1085,7 @@ function FreeRotationTab() {
 
         {/* Quick Wins */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <h3 className="mb-4 flex items-center gap-2" style={TYPE_SECTION_HEADER}>
             <Zap size={18} className="text-amber-600" />
             Quick Wins ({quickWins.length})
           </h3>
@@ -1084,10 +1093,10 @@ function FreeRotationTab() {
             <table className="w-full">
               <thead className="bg-[#FAFAF8]">
                 <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Quick Win</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Access Tier</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Quick Win</th>
+                  <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Access Tier</th>
+                  <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Status</th>
+                  <th className="text-right px-4 py-3" style={TYPE_TABLE_HEADER}>Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -1195,8 +1204,8 @@ export default function HubProductionPage() {
       <div className="px-6 py-6">
         {/* Page Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Production</h1>
-          <p className="text-sm text-gray-500 mt-1">Create and manage courses, Quick Wins, and content</p>
+          <h1 style={TYPE_PAGE_TITLE}>Production</h1>
+          <p className="mt-1" style={TYPE_PAGE_SUBTITLE}>Create and manage courses, Quick Wins, and content</p>
         </div>
           {/* Example Data Notice (subtle) */}
           {showExampleNotice && (

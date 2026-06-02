@@ -57,6 +57,16 @@ const TOPIC_ICON_MAP: Record<string, any> = {
   Target, HomeIcon, Laptop, Scale,
 };
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
+import {
+  TYPE_PAGE_TITLE,
+  TYPE_PAGE_SUBTITLE,
+  TYPE_SECTION_HEADER,
+  TYPE_CARD_TITLE,
+  TYPE_STAT_VALUE,
+  TYPE_STAT_LABEL,
+  TYPE_WIDGET_LABEL,
+  TYPE_TABLE_HEADER,
+} from '@/components/tdi-admin/ui/design-tokens';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
 import { copyToClipboard, formatEmailsForCopy } from '@/lib/tdi-admin/clipboard';
@@ -311,8 +321,8 @@ function StatCard({
         style={{ background: isActive ? '#1e2749' : 'transparent', transition: 'background 0.25s' }}
       />
 
-      <div className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-2">{label}</div>
-      <div className="font-bold text-gray-900 tracking-tight leading-none mb-2" style={{ fontSize: 28 }}>{value}</div>
+      <div className="mb-2" style={TYPE_WIDGET_LABEL}>{label}</div>
+      <div className="leading-none mb-2" style={{ ...TYPE_STAT_VALUE, color: '#111827' }}>{value}</div>
 
       {/* Status indicator */}
       <StatusIndicator status={status} />
@@ -397,7 +407,7 @@ function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
 
       {/* Pipeline Forecast Bar Chart */}
       <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] mb-5">
-        <h3 className="text-lg font-semibold mb-1 text-gray-900">
+        <h3 className="mb-1" style={TYPE_CARD_TITLE}>
           Pipeline Forecast
         </h3>
         <p className="text-sm text-gray-500 mb-4">Projected content launches by month</p>
@@ -425,7 +435,7 @@ function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
 
       {/* Detail List — Grouped by Month */}
       <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-        <h3 className="text-lg font-semibold mb-4 text-gray-900">
+        <h3 className="mb-4" style={TYPE_CARD_TITLE}>
           Monthly Detail
         </h3>
         <div className="space-y-1">
@@ -500,7 +510,7 @@ function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
                   <CalendarDays className="w-5 h-5" style={{ color: '#374151' }} />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">No Projected Date</h2>
+                  <h2 style={TYPE_CARD_TITLE}>No Projected Date</h2>
                   <p className="text-sm text-gray-500">{data.noProjectedDate.length} creator{data.noProjectedDate.length !== 1 ? 's' : ''}</p>
                 </div>
               </div>
@@ -551,7 +561,7 @@ function ProjectedPublishingPipeline({ data }: { data: PipelineData }) {
                   <Clock className="w-5 h-5" style={{ color: '#374151' }} />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Past Projected Date</h2>
+                  <h2 style={TYPE_CARD_TITLE}>Past Projected Date</h2>
                   <p className="text-sm text-gray-500">These creators may need a check-in</p>
                 </div>
               </div>
@@ -820,8 +830,8 @@ function AffiliateTab() {
             className="bg-white rounded-xl p-5 border border-gray-100"
             style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
           >
-            <div className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-2">{card.label}</div>
-            <div className="font-bold text-gray-900 tracking-tight" style={{ fontSize: 28 }}>
+            <div className="mb-2" style={TYPE_WIDGET_LABEL}>{card.label}</div>
+            <div style={{ ...TYPE_STAT_VALUE, color: '#111827' }}>
               {card.format(card.value)}
             </div>
             <div className="text-xs text-gray-400 mt-1">{formatPeriodLabel(period)}</div>
@@ -832,7 +842,7 @@ function AffiliateTab() {
       {/* Section 2: Monthly Payouts */}
       <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          <h3 style={TYPE_CARD_TITLE}>
             Monthly Payouts
           </h3>
           <div className="flex items-center gap-2">
@@ -862,12 +872,12 @@ function AffiliateTab() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/80">
-                  <th className="text-left py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Period</th>
-                  <th className="text-right py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Payout</th>
-                  <th className="text-right py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Conv.</th>
-                  <th className="text-left py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Status</th>
-                  <th className="text-left py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Generated</th>
-                  <th className="text-right py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Actions</th>
+                  <th className="text-left py-2.5 px-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Period</th>
+                  <th className="text-right py-2.5 px-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Payout</th>
+                  <th className="text-right py-2.5 px-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Conv.</th>
+                  <th className="text-left py-2.5 px-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Status</th>
+                  <th className="text-left py-2.5 px-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Generated</th>
+                  <th className="text-right py-2.5 px-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -934,14 +944,14 @@ function AffiliateTab() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/80">
-                  <th className="text-left py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Creator</th>
-                  <th className="text-left py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide hidden md:table-cell">Slug</th>
-                  <th className="text-right py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Clicks</th>
-                  <th className="text-right py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide hidden md:table-cell">Signups</th>
-                  <th className="text-right py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Conv.</th>
-                  <th className="text-right py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Earned</th>
-                  <th className="text-right py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide hidden lg:table-cell">Lifetime</th>
-                  <th className="text-left py-2.5 px-3 font-medium text-gray-500 text-xs uppercase tracking-wide hidden lg:table-cell">Last Active</th>
+                  <th className="text-left py-2.5 px-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Creator</th>
+                  <th className="text-left py-2.5 px-3 font-semibold text-gray-500 text-xs uppercase tracking-wider hidden md:table-cell">Slug</th>
+                  <th className="text-right py-2.5 px-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Clicks</th>
+                  <th className="text-right py-2.5 px-3 font-semibold text-gray-500 text-xs uppercase tracking-wider hidden md:table-cell">Signups</th>
+                  <th className="text-right py-2.5 px-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Conv.</th>
+                  <th className="text-right py-2.5 px-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Earned</th>
+                  <th className="text-right py-2.5 px-3 font-semibold text-gray-500 text-xs uppercase tracking-wider hidden lg:table-cell">Lifetime</th>
+                  <th className="text-left py-2.5 px-3 font-semibold text-gray-500 text-xs uppercase tracking-wider hidden lg:table-cell">Last Active</th>
                 </tr>
               </thead>
               <tbody>
@@ -995,7 +1005,7 @@ function AffiliateTab() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
             <div className="p-6 border-b border-gray-100">
-              <h3 className="text-lg font-semibold text-gray-900">Mark Batch as Paid</h3>
+              <h3 style={TYPE_CARD_TITLE}>Mark Batch as Paid</h3>
               <p className="text-sm text-gray-500 mt-1">
                 {formatPeriodLabel(markPaidBatch.period)} &middot; {formatCents(markPaidBatch.totalPayoutCents)} to {markPaidBatch.creators.length} creator(s)
               </p>
@@ -1062,7 +1072,7 @@ function AffiliateTab() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">{drillDownCreator.name}</h3>
+                <h3 style={TYPE_CARD_TITLE}>{drillDownCreator.name}</h3>
                 <p className="text-sm text-gray-500 mt-0.5">
                   <code className="bg-gray-50 px-1.5 py-0.5 rounded text-xs">{drillDownCreator.slug}</code>
                   <span className="mx-2">&middot;</span>
@@ -1795,12 +1805,8 @@ export default function CreatorStudioPage() {
             <Palette size={32} style={{ color: '#DC2626' }} />
           </div>
           <h1
-            className="font-bold mb-3"
-            style={{
-              fontFamily: "'Source Serif 4', Georgia, serif",
-              fontSize: '24px',
-              color: '#2B3A67',
-            }}
+            className="mb-3"
+            style={TYPE_PAGE_TITLE}
           >
             Access Restricted
           </h1>
@@ -1959,7 +1965,7 @@ export default function CreatorStudioPage() {
       <div className="px-6 py-6">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="font-extrabold" style={{ fontSize: 28, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Creator Studio</h1>
+          <h1 style={TYPE_PAGE_TITLE}>Creator Studio</h1>
           {canEdit && (
             <button
               onClick={() => setShowAddModal(true)}
@@ -2027,7 +2033,7 @@ export default function CreatorStudioPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
             {/* Pipeline Funnel */}
             <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-              <h2 className="font-bold mb-4" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>
+              <h2 className="mb-4" style={TYPE_SECTION_HEADER}>
                 Creator Pipeline
               </h2>
               <div className="space-y-3">
@@ -2086,7 +2092,7 @@ export default function CreatorStudioPage() {
             {/* Closest to Launch */}
             <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold flex items-center gap-2" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>
+                <h3 className="flex items-center gap-2" style={TYPE_SECTION_HEADER}>
                   <Trophy className="w-5 h-5 text-gray-600" />
                   Closest to Launch
                 </h3>
@@ -2180,7 +2186,7 @@ export default function CreatorStudioPage() {
                 return (
                   <>
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-bold flex items-center gap-2" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>
+                      <h3 className="flex items-center gap-2" style={TYPE_SECTION_HEADER}>
                         <CalendarDays className="w-5 h-5 text-blue-500" />
                         Scheduled for Launch
                       </h3>
@@ -2267,7 +2273,7 @@ export default function CreatorStudioPage() {
                 return (
                   <>
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-bold flex items-center gap-2" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>
+                      <h3 className="flex items-center gap-2" style={TYPE_SECTION_HEADER}>
                         <Globe className="w-5 h-5 text-yellow-500" />
                         Recently Published
                       </h3>
@@ -2337,7 +2343,7 @@ export default function CreatorStudioPage() {
               style={{ borderLeftColor: '#6B7280' }}
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
+                <h3 className="flex items-center gap-2" style={TYPE_CARD_TITLE}>
                   <AlertTriangle className="w-5 h-5 text-gray-600" />
                   Needs Your Attention
                   {needsAttentionCount > 0 && (
@@ -2446,7 +2452,7 @@ export default function CreatorStudioPage() {
                 style={{ borderLeftColor: '#1e2749' }}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
+                  <h3 className="flex items-center gap-2" style={TYPE_CARD_TITLE}>
                     <UserCheck className="w-5 h-5" style={{ color: '#1e2749' }} />
                     Followed Up by Team
                     <span className="text-xs font-normal text-gray-500">({stats.followedUp})</span>
@@ -2531,7 +2537,7 @@ export default function CreatorStudioPage() {
 
             {/* Content Paths */}
             <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">
+              <h3 className="mb-4" style={TYPE_CARD_TITLE}>
                 Content Paths
               </h3>
               <div className="grid grid-cols-2 gap-2">
@@ -2555,7 +2561,7 @@ export default function CreatorStudioPage() {
                         <IconComponent className="w-5 h-5" style={{ color: path.color }} />
                       </div>
                       <div>
-                        <p className="font-bold leading-none" style={{ fontSize: 28, color: theme.accent }}>{path.count}</p>
+                        <p className="leading-none" style={{ ...TYPE_STAT_VALUE, color: theme.accent }}>{path.count}</p>
                         <p className="text-sm text-gray-500">{path.label}</p>
                       </div>
                     </button>
@@ -2568,7 +2574,7 @@ export default function CreatorStudioPage() {
           {/* Geographic Distribution */}
           {locationData && (
             <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] mb-5">
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
+              <h2 className="mb-4 flex items-center gap-2" style={TYPE_CARD_TITLE}>
                 <MapPin className="w-5 h-5" style={{ color: '#1e2749' }} />
                 Geographic Distribution
               </h2>
@@ -2622,13 +2628,13 @@ export default function CreatorStudioPage() {
                   <div className="pt-4 border-t border-gray-100">
                     <div className="grid grid-cols-2 gap-3">
                       <div className="rounded-lg p-3 text-center" style={{ backgroundColor: theme.accentLight }}>
-                        <p className="font-bold" style={{ fontSize: 28, color: theme.accent }}>
+                        <p style={{ ...TYPE_STAT_VALUE, color: theme.accent }}>
                           {locationData.creatorsWithLocation}
                         </p>
                         <p className="text-xs text-gray-600">With Location</p>
                       </div>
                       <div className="bg-gray-50 rounded-lg p-3 text-center">
-                        <p className="font-bold text-gray-400" style={{ fontSize: 28 }}>
+                        <p style={{ ...TYPE_STAT_VALUE, color: '#9CA3AF' }}>
                           {locationData.noLocationCount}
                         </p>
                         <p className="text-xs text-gray-500">Not Shared</p>
@@ -2642,7 +2648,7 @@ export default function CreatorStudioPage() {
 
           {/* Recent Activity */}
           <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-            <h3 className="text-lg font-semibold mb-4 text-gray-900">
+            <h3 className="mb-4" style={TYPE_CARD_TITLE}>
               Recent Activity
             </h3>
             {recentActivity.length === 0 ? (
@@ -2681,7 +2687,7 @@ export default function CreatorStudioPage() {
 
           {/* Admin Tools */}
           <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] mt-5">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
+            <h3 className="mb-4 flex items-center gap-2" style={TYPE_CARD_TITLE}>
               <Settings className="w-5 h-5 text-gray-500" />
               Admin Tools
             </h3>
@@ -3252,7 +3258,7 @@ export default function CreatorStudioPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                   {/* A. Creator Velocity — Average Time Per Phase */}
                   <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                    <h3 className="mb-4" style={TYPE_CARD_TITLE}>
                       Creator Velocity
                     </h3>
                     <p className="text-sm text-gray-500 mb-4">Average days spent in each phase</p>
@@ -3281,7 +3287,7 @@ export default function CreatorStudioPage() {
 
                   {/* B. Bottleneck Report */}
                   <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                    <h3 className="mb-4" style={TYPE_CARD_TITLE}>
                       Bottleneck Report
                     </h3>
                     <p className="text-sm text-gray-500 mb-4">Milestones where creators get stuck</p>
@@ -3328,7 +3334,7 @@ export default function CreatorStudioPage() {
 
                   {/* C. Content Path Breakdown */}
                   <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                    <h3 className="mb-4" style={TYPE_CARD_TITLE}>
                       Content Path Breakdown
                     </h3>
                     <div className="flex items-center gap-6">
@@ -3370,7 +3376,7 @@ export default function CreatorStudioPage() {
 
                   {/* Content Path Trends */}
                   <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                    <h3 className="mb-4" style={TYPE_CARD_TITLE}>
                       New Creators Over Time
                     </h3>
                     <div className="h-[200px]">
@@ -3391,7 +3397,7 @@ export default function CreatorStudioPage() {
 
                   {/* D. Creator Activity Heatmap */}
                   <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-                    <h3 className="text-lg font-semibold mb-2 text-gray-900">
+                    <h3 className="mb-2" style={TYPE_CARD_TITLE}>
                       Creator Activity Heatmap
                     </h3>
                     <p className="text-sm text-gray-500 mb-4">Recent activity by creator (sorted by most dormant)</p>
@@ -3448,7 +3454,7 @@ export default function CreatorStudioPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                   {/* E. Time from Intake to Launch */}
                   <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                    <h3 className="mb-4" style={TYPE_CARD_TITLE}>
                       Time to Launch
                     </h3>
                     <p className="text-sm text-gray-500 mb-4">Total journey time for launched creators</p>
@@ -3485,7 +3491,7 @@ export default function CreatorStudioPage() {
 
                   {/* F. Completion Funnel */}
                   <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                    <h3 className="mb-4" style={TYPE_CARD_TITLE}>
                       Completion Funnel
                     </h3>
                     <p className="text-sm text-gray-500 mb-4">Creator progression through phases</p>
@@ -3522,7 +3528,7 @@ export default function CreatorStudioPage() {
                   <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <h3 className="flex items-center gap-2" style={TYPE_CARD_TITLE}>
                           Stalled Creator Alerts
                           {analyticsData.stalledCreators.length > 0 && (
                             <span className="text-sm font-normal px-2 py-0.5 rounded-full bg-amber-100 text-gray-700">
@@ -3648,7 +3654,7 @@ export default function CreatorStudioPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                   {/* H. Content Published Per Month */}
                   <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                    <h3 className="mb-4" style={TYPE_CARD_TITLE}>
                       Content Published Per Month
                     </h3>
                     <div className="h-[280px]">
@@ -3674,7 +3680,7 @@ export default function CreatorStudioPage() {
 
                   {/* I. Geographic Distribution */}
                   <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                    <h3 className="mb-4" style={TYPE_CARD_TITLE}>
                       Geographic Distribution
                     </h3>
                     {!analyticsData.geographicDistribution.hasData ? (
@@ -3709,11 +3715,11 @@ export default function CreatorStudioPage() {
                         </div>
                         <div className="space-y-3">
                           <div className="bg-slate-50 rounded-xl p-4 text-center">
-                            <p className="font-bold" style={{ fontSize: 28, color: '#1e2749' }}>{analyticsData.geographicDistribution.withState}</p>
+                            <p style={{ ...TYPE_STAT_VALUE, color: '#1e2749' }}>{analyticsData.geographicDistribution.withState}</p>
                             <p className="text-sm text-gray-600">With Location</p>
                           </div>
                           <div className="bg-gray-50 rounded-xl p-4 text-center">
-                            <p className="font-bold text-gray-400" style={{ fontSize: 28 }}>{analyticsData.geographicDistribution.withoutState}</p>
+                            <p style={{ ...TYPE_STAT_VALUE, color: '#9CA3AF' }}>{analyticsData.geographicDistribution.withoutState}</p>
                             <p className="text-sm text-gray-500">Not Shared</p>
                           </div>
                         </div>
@@ -3743,7 +3749,7 @@ export default function CreatorStudioPage() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                     {/* K. Real-time Activity Feed */}
                     <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-                      <h3 className="text-lg font-semibold mb-1 text-gray-900">Recent Activity</h3>
+                      <h3 className="mb-1" style={TYPE_CARD_TITLE}>Recent Activity</h3>
                       <p className="text-sm text-gray-500 mb-4">Latest milestone completions from the event log</p>
                       <div className="space-y-2 max-h-[320px] overflow-y-auto">
                         {analyticsData.realtimeActivityFeed?.slice(0, 20).map((event) => (
@@ -3774,7 +3780,7 @@ export default function CreatorStudioPage() {
 
                     {/* L. Self-Complete vs Admin-Advance Ratio */}
                     <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-                      <h3 className="text-lg font-semibold mb-1 text-gray-900">Self-Complete Ratio</h3>
+                      <h3 className="mb-1" style={TYPE_CARD_TITLE}>Self-Complete Ratio</h3>
                       <p className="text-sm text-gray-500 mb-4">Creator-driven vs admin-driven completions per content path</p>
                       <div className="space-y-4">
                         {analyticsData.selfCompleteRatio?.filter(r => r.total > 0).map((row) => (
@@ -3816,7 +3822,7 @@ export default function CreatorStudioPage() {
 
                     {/* M. Event Engagement Heatmap */}
                     <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-                      <h3 className="text-lg font-semibold mb-1 text-gray-900">Engagement Frequency</h3>
+                      <h3 className="mb-1" style={TYPE_CARD_TITLE}>Engagement Frequency</h3>
                       <p className="text-sm text-gray-500 mb-4">Based on event count (last 30 days), not just last-touch date</p>
                       <div className="flex gap-3 mb-3 flex-wrap">
                         {[
@@ -3855,7 +3861,7 @@ export default function CreatorStudioPage() {
 
                     {/* N. Event Funnel Analysis */}
                     <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-                      <h3 className="text-lg font-semibold mb-1 text-gray-900">Event Funnel</h3>
+                      <h3 className="mb-1" style={TYPE_CARD_TITLE}>Event Funnel</h3>
                       <p className="text-sm text-gray-500 mb-4">Phase-by-phase reach based on event timestamps</p>
                       <div className="space-y-3">
                         {analyticsData.eventFunnelAnalysis?.map((stage, index, arr) => {
@@ -4065,7 +4071,7 @@ export default function CreatorStudioPage() {
                 <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FCE7F3' }}>
                   <MessageCircle className="w-5 h-5" style={{ color: '#1e2749' }} />
                 </div>
-                <h2 className="text-lg font-semibold text-gray-900">Mark as Followed Up</h2>
+                <h2 style={TYPE_CARD_TITLE}>Mark as Followed Up</h2>
               </div>
               <button
                 onClick={() => {

@@ -78,6 +78,17 @@ import {
   Heart,
   Info,
 } from 'lucide-react';
+import {
+  TYPE_PAGE_TITLE,
+  TYPE_PAGE_SUBTITLE,
+  TYPE_SECTION_HEADER,
+  TYPE_WIDGET_LABEL,
+  TYPE_STAT_VALUE,
+  TYPE_STAT_LABEL,
+  TYPE_CARD_TITLE,
+  TYPE_TABLE_HEADER,
+  TYPE_SMALL,
+} from '@/components/tdi-admin/ui/design-tokens';
 
 // Tab configuration for top nav
 const HUB_TABS = [
@@ -102,18 +113,12 @@ function StatCard({ label, value, icon: Icon, trend }: { label: string; value: s
       <div className="flex items-center justify-between">
         <div>
           <p
-            className="text-[28px] font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              color: theme.accent,
-            }}
+            className="mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+            style={{ ...TYPE_STAT_VALUE, color: theme.accent }}
           >
             {value}
           </p>
-          <p
-            className="text-sm text-gray-500 font-medium"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
-          >
+          <p style={TYPE_STAT_LABEL}>
             {label}
           </p>
         </div>
@@ -157,8 +162,8 @@ function TabButton({ active, onClick, children, disabled }: { active: boolean; o
 function TableHeader({ children, sortable, sorted, onSort }: { children: React.ReactNode; sortable?: boolean; sorted?: 'asc' | 'desc' | null; onSort?: () => void }) {
   return (
     <th
-      className={`text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${sortable ? 'cursor-pointer hover:text-gray-700' : ''}`}
-      style={{ backgroundColor: theme.accentLight }}
+      className={`text-left px-4 py-3 ${sortable ? 'cursor-pointer hover:text-gray-700' : ''}`}
+      style={{ ...TYPE_TABLE_HEADER, backgroundColor: theme.accentLight }}
       onClick={sortable ? onSort : undefined}
     >
       <div className="flex items-center gap-1">
@@ -957,7 +962,7 @@ function ReportsTab() {
               selectedReport === report.id ? 'border-[#00B5AD] shadow-sm' : 'border-gray-200 hover:border-[#00B5AD] hover:shadow-sm'
             }`}
           >
-            <h3 className="font-semibold text-gray-900 mb-2" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+            <h3 className="mb-2" style={TYPE_CARD_TITLE}>
               {report.title}
             </h3>
             <p className="text-sm text-gray-500 mb-4">{report.description}</p>
@@ -995,7 +1000,7 @@ function ReportsTab() {
       {selectedReport && reportData && (
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-gray-900">
+            <h3 style={TYPE_CARD_TITLE}>
               Report Preview: {reports.find(r => r.id === selectedReport)?.title}
             </h3>
             <button
@@ -1012,12 +1017,12 @@ function ReportsTab() {
           {selectedReport === 'user-summary' && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="p-4 bg-gray-50 rounded-lg">
-                <p className="text-2xl font-bold text-[#2B3A67]">{reportData.stats?.totalUsers || 0}</p>
+                <p style={{ ...TYPE_STAT_VALUE, color: '#2B3A67' }}>{reportData.stats?.totalUsers || 0}</p>
                 <p className="text-sm text-gray-500">Total Users</p>
               </div>
               {(reportData.roleDistribution || []).slice(0, 3).map((r: any) => (
                 <div key={r.role} className="p-4 bg-gray-50 rounded-lg">
-                  <p className="text-2xl font-bold text-[#2B3A67]">{r.count}</p>
+                  <p style={{ ...TYPE_STAT_VALUE, color: '#2B3A67' }}>{r.count}</p>
                   <p className="text-sm text-gray-500">{r.role}s</p>
                 </div>
               ))}
@@ -1074,15 +1079,15 @@ function ReportsTab() {
             <div>
               <div className="grid grid-cols-3 gap-4 mb-4">
                 <div className="p-4 bg-red-50 rounded-lg">
-                  <p className="text-2xl font-bold text-red-600">{reportData.stats?.avgStressInitial || 'N/A'}</p>
+                  <p style={{ ...TYPE_STAT_VALUE, color: '#EF4444' }}>{reportData.stats?.avgStressInitial || 'N/A'}</p>
                   <p className="text-sm text-gray-500">Avg Initial Stress</p>
                 </div>
                 <div className="p-4 bg-green-50 rounded-lg">
-                  <p className="text-2xl font-bold text-green-600">{reportData.stats?.avgStressCurrent || 'N/A'}</p>
+                  <p style={{ ...TYPE_STAT_VALUE, color: '#16A34A' }}>{reportData.stats?.avgStressCurrent || 'N/A'}</p>
                   <p className="text-sm text-gray-500">Avg Current Stress</p>
                 </div>
                 <div className="p-4 bg-blue-50 rounded-lg">
-                  <p className="text-2xl font-bold text-blue-600">{reportData.stats?.improvementRate || 0}%</p>
+                  <p style={{ ...TYPE_STAT_VALUE, color: '#2563EB' }}>{reportData.stats?.improvementRate || 0}%</p>
                   <p className="text-sm text-gray-500">Improved</p>
                 </div>
               </div>
@@ -1314,7 +1319,7 @@ function AnalyticsReportsTab() {
       <div className="grid md:grid-cols-3 gap-6 mb-6">
         {/* Enrollments Chart */}
         <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <h3 className="font-semibold text-gray-900 mb-4 text-sm">Enrollments Over Time</h3>
+          <h3 className="mb-4" style={TYPE_CARD_TITLE}>Enrollments Over Time</h3>
           <div className="h-40">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={analytics?.enrollmentsTimeSeries || []}>
@@ -1330,7 +1335,7 @@ function AnalyticsReportsTab() {
 
         {/* Completions Chart */}
         <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <h3 className="font-semibold text-gray-900 mb-4 text-sm">Completions Over Time</h3>
+          <h3 className="mb-4" style={TYPE_CARD_TITLE}>Completions Over Time</h3>
           <div className="h-40">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={analytics?.completionsTimeSeries || []}>
@@ -1346,7 +1351,7 @@ function AnalyticsReportsTab() {
 
         {/* PD Hours Chart */}
         <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <h3 className="font-semibold text-gray-900 mb-4 text-sm">PD Hours Awarded</h3>
+          <h3 className="mb-4" style={TYPE_CARD_TITLE}>PD Hours Awarded</h3>
           <div className="h-40">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={analytics?.pdTimeSeries || []}>
@@ -1446,7 +1451,7 @@ function AnalyticsReportsTab() {
       {/* Data Table with Export Buttons */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
-          <h3 className="font-semibold text-gray-900">Course Performance</h3>
+          <h3 style={TYPE_CARD_TITLE}>Course Performance</h3>
           <div className="flex gap-2">
             <button
               onClick={exportCSV}
@@ -1530,7 +1535,7 @@ function AnalyticsReportsTab() {
       <div className="mt-6 bg-gradient-to-r from-[#2B3A67] to-[#3d4f7a] rounded-lg p-5 text-white">
         <div className="flex items-center gap-2 mb-3">
           <Lightbulb size={18} />
-          <h3 className="font-semibold">AI Insights</h3>
+          <h3 style={TYPE_CARD_TITLE}>AI Insights</h3>
           {activeFilterCount > 0 && <span className="ml-2 px-2 py-0.5 bg-white/20 rounded text-xs">Filtered View</span>}
         </div>
         <div className="grid md:grid-cols-3 gap-4 text-sm text-white/90">
@@ -1751,7 +1756,7 @@ function AnalyticsTab() {
       <div className="bg-gradient-to-r from-[#2B3A67] to-[#3d4f7a] rounded-lg p-5 text-white mb-8">
         <div className="flex items-center gap-2 mb-3">
           <Lightbulb size={18} />
-          <h3 className="font-semibold">AI Insights</h3>
+          <h3 style={TYPE_CARD_TITLE}>AI Insights</h3>
           {activeFilterCount > 0 && (
             <span className="ml-2 px-2 py-0.5 bg-white/20 rounded text-xs">Filtered View</span>
           )}
@@ -1839,7 +1844,7 @@ function AnalyticsTab() {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Enrollments Over Time */}
             <div className="bg-white rounded-lg border border-gray-200 p-5">
-              <h3 className="font-semibold text-gray-900 mb-4">Enrollments Over Time</h3>
+              <h3 className="mb-4" style={TYPE_CARD_TITLE}>Enrollments Over Time</h3>
               <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={analytics?.enrollmentsTimeSeries || []}>
@@ -1855,7 +1860,7 @@ function AnalyticsTab() {
 
             {/* Completions Over Time */}
             <div className="bg-white rounded-lg border border-gray-200 p-5">
-              <h3 className="font-semibold text-gray-900 mb-4">Completions Over Time</h3>
+              <h3 className="mb-4" style={TYPE_CARD_TITLE}>Completions Over Time</h3>
               <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={analytics?.completionsTimeSeries || []}>
@@ -1871,7 +1876,7 @@ function AnalyticsTab() {
 
             {/* PD Hours Over Time */}
             <div className="bg-white rounded-lg border border-gray-200 p-5">
-              <h3 className="font-semibold text-gray-900 mb-4">PD Hours Awarded Over Time</h3>
+              <h3 className="mb-4" style={TYPE_CARD_TITLE}>PD Hours Awarded Over Time</h3>
               <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={analytics?.pdTimeSeries || []}>
@@ -1887,7 +1892,7 @@ function AnalyticsTab() {
 
             {/* Monthly Active Users */}
             <div className="bg-white rounded-lg border border-gray-200 p-5">
-              <h3 className="font-semibold text-gray-900 mb-4">Monthly Active Users</h3>
+              <h3 className="mb-4" style={TYPE_CARD_TITLE}>Monthly Active Users</h3>
               <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={analytics?.mauTimeSeries || []}>
@@ -1904,7 +1909,7 @@ function AnalyticsTab() {
 
           {/* Goal Alignment */}
           <div className="bg-white rounded-lg border border-gray-200 p-5">
-            <h3 className="font-semibold text-gray-900 mb-4">User Goals Distribution</h3>
+            <h3 className="mb-4" style={TYPE_CARD_TITLE}>User Goals Distribution</h3>
             {analytics?.goalAlignment?.length > 0 ? (
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -1935,7 +1940,7 @@ function AnalyticsTab() {
         <div className="space-y-8">
           {/* Top Courses by Enrollment */}
           <div className="bg-white rounded-lg border border-gray-200 p-5">
-            <h3 className="font-semibold text-gray-900 mb-4">Top Courses by Enrollment</h3>
+            <h3 className="mb-4" style={TYPE_CARD_TITLE}>Top Courses by Enrollment</h3>
             {analytics?.topCourses?.length > 0 ? (
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
@@ -1962,7 +1967,7 @@ function AnalyticsTab() {
 
           {/* Course Completion Rates */}
           <div className="bg-white rounded-lg border border-gray-200 p-5">
-            <h3 className="font-semibold text-gray-900 mb-4">Course Completion Rates</h3>
+            <h3 className="mb-4" style={TYPE_CARD_TITLE}>Course Completion Rates</h3>
             {analytics?.courseCompletionRates?.length > 0 ? (
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
@@ -1990,7 +1995,7 @@ function AnalyticsTab() {
           {/* Course Details Table */}
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <div className="p-5 border-b border-gray-100">
-              <h3 className="font-semibold text-gray-900">Course Performance Details</h3>
+              <h3 style={TYPE_CARD_TITLE}>Course Performance Details</h3>
             </div>
             <table className="w-full">
               <thead className="bg-[#FAFAF8]">
@@ -2030,7 +2035,7 @@ function AnalyticsTab() {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Role Distribution */}
             <div className="bg-white rounded-lg border border-gray-200 p-5">
-              <h3 className="font-semibold text-gray-900 mb-4">Role Distribution</h3>
+              <h3 className="mb-4" style={TYPE_CARD_TITLE}>Role Distribution</h3>
               {analytics?.roleDistribution?.length > 0 ? (
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
@@ -2060,7 +2065,7 @@ function AnalyticsTab() {
 
             {/* Grade Level Distribution */}
             <div className="bg-white rounded-lg border border-gray-200 p-5">
-              <h3 className="font-semibold text-gray-900 mb-4">Grade Level Distribution</h3>
+              <h3 className="mb-4" style={TYPE_CARD_TITLE}>Grade Level Distribution</h3>
               {analytics?.gradeDistribution?.length > 0 ? (
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
@@ -2080,7 +2085,7 @@ function AnalyticsTab() {
 
             {/* Experience Distribution */}
             <div className="bg-white rounded-lg border border-gray-200 p-5">
-              <h3 className="font-semibold text-gray-900 mb-4">Years of Experience</h3>
+              <h3 className="mb-4" style={TYPE_CARD_TITLE}>Years of Experience</h3>
               {analytics?.experienceDistribution?.length > 0 ? (
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
@@ -2100,7 +2105,7 @@ function AnalyticsTab() {
 
             {/* Gender Distribution */}
             <div className="bg-white rounded-lg border border-gray-200 p-5">
-              <h3 className="font-semibold text-gray-900 mb-4">Gender Distribution</h3>
+              <h3 className="mb-4" style={TYPE_CARD_TITLE}>Gender Distribution</h3>
               {analytics?.genderDistribution?.length > 0 ? (
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
@@ -2132,7 +2137,7 @@ function AnalyticsTab() {
           {/* Geographic Distribution - Interactive US Map */}
           <div className="bg-white rounded-lg border border-gray-200 p-5">
             <div className="mb-4">
-              <h3 className="font-semibold text-gray-900">Geographic Distribution</h3>
+              <h3 style={TYPE_CARD_TITLE}>Geographic Distribution</h3>
               <p className="text-sm text-gray-500">
                 Users located across {analytics?.totalStatesWithUsers || analytics?.stateDistribution?.length || 0} states
                 {filters.state && <span className="ml-2 text-[#00B5AD]">(filtered to {filters.state})</span>}
@@ -2186,7 +2191,7 @@ function AnalyticsTab() {
 
           {/* Language Distribution */}
           <div className="bg-white rounded-lg border border-gray-200 p-5">
-            <h3 className="font-semibold text-gray-900 mb-4">Language Preferences</h3>
+            <h3 className="mb-4" style={TYPE_CARD_TITLE}>Language Preferences</h3>
             {analytics?.languageDistribution?.length > 0 ? (
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="h-48">
@@ -2235,29 +2240,29 @@ function AnalyticsTab() {
           <div className="grid md:grid-cols-4 gap-4">
             <div className="bg-white rounded-lg border border-gray-200 p-5">
               <p className="text-sm text-gray-500 mb-1">Average Initial Stress</p>
-              <p className="text-2xl font-bold" style={{ color: '#EF4444' }}>{stats.avgStressInitial || 'N/A'}</p>
+              <p style={{ ...TYPE_STAT_VALUE, color: '#EF4444' }}>{stats.avgStressInitial || 'N/A'}</p>
               <p className="text-xs text-gray-400">Scale: 1-10</p>
             </div>
             <div className="bg-white rounded-lg border border-gray-200 p-5">
               <p className="text-sm text-gray-500 mb-1">Average Current Stress</p>
-              <p className="text-2xl font-bold" style={{ color: '#16A34A' }}>{stats.avgStressCurrent || 'N/A'}</p>
+              <p style={{ ...TYPE_STAT_VALUE, color: '#16A34A' }}>{stats.avgStressCurrent || 'N/A'}</p>
               <p className="text-xs text-gray-400">Scale: 1-10</p>
             </div>
             <div className="bg-white rounded-lg border border-gray-200 p-5">
               <p className="text-sm text-gray-500 mb-1">Users Improved</p>
-              <p className="text-2xl font-bold" style={{ color: '#00B5AD' }}>{stats.improvementRate || 0}%</p>
+              <p style={{ ...TYPE_STAT_VALUE, color: '#00B5AD' }}>{stats.improvementRate || 0}%</p>
               <p className="text-xs text-gray-400">Lower stress score</p>
             </div>
             <div className="bg-white rounded-lg border border-gray-200 p-5">
               <p className="text-sm text-gray-500 mb-1">Avg Reduction</p>
-              <p className="text-2xl font-bold" style={{ color: '#E8927C' }}>{insights.avgStressReduction || 0}</p>
+              <p style={{ ...TYPE_STAT_VALUE, color: '#E8927C' }}>{insights.avgStressReduction || 0}</p>
               <p className="text-xs text-gray-400">Points improved</p>
             </div>
           </div>
 
           {/* Stress by Role */}
           <div className="bg-white rounded-lg border border-gray-200 p-5">
-            <h3 className="font-semibold text-gray-900 mb-4">Stress Comparison by Role</h3>
+            <h3 className="mb-4" style={TYPE_CARD_TITLE}>Stress Comparison by Role</h3>
             {analytics?.stressRoleComparison?.length > 0 ? (
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -2279,7 +2284,7 @@ function AnalyticsTab() {
 
           {/* Stress Trends Over Time */}
           <div className="bg-white rounded-lg border border-gray-200 p-5">
-            <h3 className="font-semibold text-gray-900 mb-4">Stress Check-in Trends</h3>
+            <h3 className="mb-4" style={TYPE_CARD_TITLE}>Stress Check-in Trends</h3>
             {analytics?.stressTimeSeries?.length > 0 ? (
               <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
@@ -2305,7 +2310,7 @@ function AnalyticsTab() {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Activity by Day of Week */}
             <div className="bg-white rounded-lg border border-gray-200 p-5">
-              <h3 className="font-semibold text-gray-900 mb-4">Activity by Day of Week</h3>
+              <h3 className="mb-4" style={TYPE_CARD_TITLE}>Activity by Day of Week</h3>
               {analytics?.activityByDay?.length > 0 ? (
                 <div className="h-48">
                   <ResponsiveContainer width="100%" height="100%">
@@ -2329,7 +2334,7 @@ function AnalyticsTab() {
 
             {/* Activity by Hour */}
             <div className="bg-white rounded-lg border border-gray-200 p-5">
-              <h3 className="font-semibold text-gray-900 mb-4">Activity by Hour</h3>
+              <h3 className="mb-4" style={TYPE_CARD_TITLE}>Activity by Hour</h3>
               {analytics?.activityByHour?.length > 0 ? (
                 <div className="h-48">
                   <ResponsiveContainer width="100%" height="100%">
@@ -2354,7 +2359,7 @@ function AnalyticsTab() {
 
           {/* Monthly Active Users Trend */}
           <div className="bg-white rounded-lg border border-gray-200 p-5">
-            <h3 className="font-semibold text-gray-900 mb-4">Monthly Active Users</h3>
+            <h3 className="mb-4" style={TYPE_CARD_TITLE}>Monthly Active Users</h3>
             {analytics?.mauTimeSeries?.length > 0 ? (
               <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
@@ -2374,7 +2379,7 @@ function AnalyticsTab() {
 
           {/* Peak Times Summary */}
           <div className="bg-gradient-to-r from-[#00B5AD]/10 to-[#007A75]/10 rounded-lg p-5 border border-[#00B5AD]/20">
-            <h3 className="font-semibold text-gray-900 mb-3">Peak Activity Summary</h3>
+            <h3 className="mb-3" style={TYPE_CARD_TITLE}>Peak Activity Summary</h3>
             <div className="grid md:grid-cols-3 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Peak Day</p>
@@ -2444,7 +2449,7 @@ function TipsTab() {
     <div className="grid md:grid-cols-2 gap-6">
       {/* TDI Tips */}
       <div className="bg-white rounded-lg border border-gray-200 p-5">
-        <h3 className="font-semibold text-gray-900 mb-4">TDI Tips</h3>
+        <h3 className="mb-4" style={TYPE_CARD_TITLE}>TDI Tips</h3>
 
         {/* Add Tip Form */}
         <div className="mb-4 p-3 bg-gray-50 rounded-lg">
@@ -2513,7 +2518,7 @@ function TipsTab() {
 
       {/* PD Requests */}
       <div className="bg-white rounded-lg border border-gray-200 p-5">
-        <h3 className="font-semibold text-gray-900 mb-4">PD Requests</h3>
+        <h3 className="mb-4" style={TYPE_CARD_TITLE}>PD Requests</h3>
 
         <div className="space-y-3 max-h-[500px] overflow-y-auto">
           {requests.length === 0 ? (
@@ -2601,7 +2606,7 @@ function EmailsTab() {
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h3 className="font-semibold text-gray-900">{currentTemplate.name}</h3>
+            <h3 style={TYPE_CARD_TITLE}>{currentTemplate.name}</h3>
             <p className="text-sm text-gray-500">{currentTemplate.preview}</p>
           </div>
           <Eye size={20} className="text-gray-400" />
@@ -2621,7 +2626,7 @@ function EmailsTab() {
 
       {/* Send Test */}
       <div className="bg-white rounded-lg border border-gray-200 p-5">
-        <h3 className="font-semibold text-gray-900 mb-3">Send Test Email</h3>
+        <h3 className="mb-3" style={TYPE_CARD_TITLE}>Send Test Email</h3>
         <div className="flex gap-3">
           <input
             type="email"
@@ -2642,7 +2647,7 @@ function EmailsTab() {
 
       {/* Send History */}
       <div className="mt-6 bg-white rounded-lg border border-gray-200 p-5">
-        <h3 className="font-semibold text-gray-900 mb-3">Send History</h3>
+        <h3 className="mb-3" style={TYPE_CARD_TITLE}>Send History</h3>
         <p className="text-sm text-gray-500">Email send history will appear here once connected to Resend.</p>
       </div>
     </div>
@@ -2702,8 +2707,8 @@ export default function HubOperationsPage() {
       <div className="px-6 py-6">
         {/* Page Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Operations</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage accounts, enrollments, reports, and analytics</p>
+          <h1 style={TYPE_PAGE_TITLE}>Operations</h1>
+          <p className="mt-1" style={TYPE_PAGE_SUBTITLE}>Manage accounts, enrollments, reports, and analytics</p>
         </div>
           {/* Example Data Notice (subtle) */}
           {showExampleNotice && (
