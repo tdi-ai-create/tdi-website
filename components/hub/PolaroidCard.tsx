@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react';
 import { Upload, Share2 } from 'lucide-react';
-import { getHubSupabase } from '@/lib/supabase-hub';
 
 export type PolaroidSlot = 'love' | 'proud' | 'goal';
 
@@ -57,42 +56,19 @@ export default function PolaroidCard({
 
     setUploading(true);
     try {
-      const supabase = getHubSupabase();
-      const ext = file.name.split('.').pop();
-      const filePath = `${userId}/${slot}.${ext}`;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('slot', slot);
 
-      // Upload to storage
-      const { error: uploadError } = await supabase.storage
-        .from('polaroids')
-        .upload(filePath, file, { upsert: true });
+      const res = await fetch('/api/hub/polaroids', { method: 'POST', body: formData });
+      const result = await res.json();
 
-      if (uploadError) {
-        console.error('Polaroid upload error:', uploadError);
-        setUploading(false);
-        return;
+      if (res.ok && result.image_url) {
+        setCurrentImage(result.image_url);
+        onUpdate?.(slot, result.image_url);
+      } else {
+        console.error('Polaroid upload failed:', result.error);
       }
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('polaroids')
-        .getPublicUrl(filePath);
-
-      // Bust cache with timestamp
-      const url = `${publicUrl}?t=${Date.now()}`;
-
-      // Upsert to database
-      await supabase
-        .from('hub_polaroids')
-        .upsert({
-          user_id: userId,
-          slot,
-          image_url: url,
-          caption: caption || SLOT_CAPTIONS[slot],
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id,slot' });
-
-      setCurrentImage(url);
-      onUpdate?.(slot, url);
     } catch (err) {
       console.error('Polaroid upload failed:', err);
     } finally {

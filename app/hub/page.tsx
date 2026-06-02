@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
@@ -18,6 +18,22 @@ import DashboardInsight from '@/components/hub/DashboardInsight';
 import AchievementInsights from '@/components/hub/AchievementInsights';
 import PolaroidCard from '@/components/hub/PolaroidCard';
 import type { PolaroidSlot } from '@/components/hub/PolaroidCard';
+import SortableDashboardSection from '@/components/hub/SortableDashboardSection';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 
 const OnboardingTour = dynamic(() => import('@/components/hub/OnboardingTour'), { ssr: false });
 import {
@@ -250,6 +266,56 @@ export default function HubDashboard() {
   const [polaroids, setPolaroids] = useState<Record<string, { image_url: string; caption: string | null }>>({});
   const [aiInsight, setAiInsight] = useState<string | null>(null);
   const [aiInsightLoading, setAiInsightLoading] = useState(false);
+
+  // Draggable section order
+  const DEFAULT_LEFT_ORDER = ['goal', 'tdi-tip', 'continue-learning', 'saved', 'ai-insight', 'bookmarks'];
+  const DEFAULT_RIGHT_ORDER = ['progress', 'curated', 'quick-wins'];
+
+  const [leftOrder, setLeftOrder] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return DEFAULT_LEFT_ORDER;
+    try {
+      const saved = localStorage.getItem('tdi-hub-left-order');
+      return saved ? JSON.parse(saved) : DEFAULT_LEFT_ORDER;
+    } catch { return DEFAULT_LEFT_ORDER; }
+  });
+  const [rightOrder, setRightOrder] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return DEFAULT_RIGHT_ORDER;
+    try {
+      const saved = localStorage.getItem('tdi-hub-right-order');
+      return saved ? JSON.parse(saved) : DEFAULT_RIGHT_ORDER;
+    } catch { return DEFAULT_RIGHT_ORDER; }
+  });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const handleLeftDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setLeftOrder(prev => {
+        const oldIndex = prev.indexOf(String(active.id));
+        const newIndex = prev.indexOf(String(over.id));
+        const next = arrayMove(prev, oldIndex, newIndex);
+        try { localStorage.setItem('tdi-hub-left-order', JSON.stringify(next)); } catch {}
+        return next;
+      });
+    }
+  }, []);
+
+  const handleRightDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setRightOrder(prev => {
+        const oldIndex = prev.indexOf(String(active.id));
+        const newIndex = prev.indexOf(String(over.id));
+        const next = arrayMove(prev, oldIndex, newIndex);
+        try { localStorage.setItem('tdi-hub-right-order', JSON.stringify(next)); } catch {}
+        return next;
+      });
+    }
+  }, []);
 
   const firstName = profile?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Teacher';
   const dailyMessage = DAILY_MESSAGES[new Date().getDay()];
@@ -663,21 +729,11 @@ export default function HubDashboard() {
 
     loadDashboardData();
 
-    // Load polaroids (non-blocking)
-    async function loadPolaroids() {
-      if (!user?.id) return;
-      const supabase = getSupabase();
-      const { data } = await supabase
-        .from('hub_polaroids')
-        .select('slot, image_url, caption')
-        .eq('user_id', user.id);
-      if (data) {
-        const map: Record<string, { image_url: string; caption: string | null }> = {};
-        data.forEach((p: { slot: string; image_url: string; caption: string | null }) => { map[p.slot] = p; });
-        setPolaroids(map);
-      }
-    }
-    loadPolaroids().catch(() => {});
+    // Load polaroids via API (non-blocking)
+    fetch('/api/hub/polaroids')
+      .then(r => r.json())
+      .then(data => { if (data.polaroids) setPolaroids(data.polaroids); })
+      .catch(() => {});
 
     // Load a compact AI insight (non-blocking)
     async function loadAiInsight() {
@@ -1001,25 +1057,70 @@ export default function HubDashboard() {
       )}
 
       {/* ============ MAIN GRID ============ */}
-      <div className="max-w-5xl mx-auto px-4 md:px-6 pb-8">
+      <div className="max-w-5xl mx-auto px-4 md:px-6 pb-8" style={{ position: 'relative' }}>
+
+        {/* ═══ FLOATING POLAROIDS ═══ */}
+        <div className="hidden lg:block">
+          {user?.id && (
+            <>
+              {/* "Love" -- top left, overlapping stats/goal area */}
+              <div style={{ position: 'absolute', top: -30, left: -20, zIndex: 10, transform: 'rotate(-4deg)' }}>
+                <PolaroidCard
+                  slot="love"
+                  imageUrl={polaroids.love?.image_url}
+                  caption={polaroids.love?.caption}
+                  userId={user.id}
+                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
+                  width={190}
+                />
+              </div>
+              {/* "Proud" -- right side, mid-page */}
+              <div style={{ position: 'absolute', top: 340, right: -15, zIndex: 10, transform: 'rotate(3deg)' }}>
+                <PolaroidCard
+                  slot="proud"
+                  imageUrl={polaroids.proud?.image_url}
+                  caption={polaroids.proud?.caption}
+                  userId={user.id}
+                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
+                  width={180}
+                />
+              </div>
+              {/* "Goal" -- bottom left */}
+              <div style={{ position: 'absolute', bottom: 120, left: -10, zIndex: 10, transform: 'rotate(-2deg)' }}>
+                <PolaroidCard
+                  slot="goal"
+                  imageUrl={polaroids.goal?.image_url}
+                  caption={polaroids.goal?.caption}
+                  userId={user.id}
+                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
+                  width={175}
+                />
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Mobile: horizontal scroll row */}
+        <div className="lg:hidden flex gap-4 overflow-x-auto pb-4 -mx-2 px-2" style={{ scrollSnapType: 'x mandatory' }}>
+          {user?.id && (['love', 'proud', 'goal'] as const).map(slot => (
+            <div key={slot} style={{ scrollSnapAlign: 'start', flexShrink: 0 }}>
+              <PolaroidCard
+                slot={slot}
+                imageUrl={polaroids[slot]?.image_url}
+                caption={polaroids[slot]?.caption}
+                userId={user.id}
+                onUpdate={(s, url) => setPolaroids(prev => ({ ...prev, [s]: { image_url: url, caption: null } }))}
+                width={160}
+              />
+            </div>
+          ))}
+        </div>
+
         <div className="grid lg:grid-cols-[1fr_380px] gap-8">
 
         {/* ===== LEFT COLUMN ===== */}
         <div className="space-y-8">
 
-          {/* Polaroid "love" + Goal card row */}
-          <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-            {user?.id && (
-              <PolaroidCard
-                slot="love"
-                imageUrl={polaroids.love?.image_url}
-                caption={polaroids.love?.caption}
-                userId={user.id}
-                onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
-                width={210}
-              />
-            )}
-            <div style={{ flex: 1 }}>
           {/* A. Goal + Next Step (or Today's Pick for new users) */}
           {(userGoal || featuredQuickWin) && (
             <div
@@ -1142,9 +1243,6 @@ export default function HubDashboard() {
               </div>
             </div>
           )}
-
-            </div>
-          </div>
 
           {/* TDI Tip (navy accent) */}
           <div
@@ -1348,28 +1446,16 @@ export default function HubDashboard() {
                 </span>
               </div>
               <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', lineHeight: 1.6, margin: 0 }}>
-                {aiInsightLoading ? 'Generating your personalized insight...' : aiInsight}
+                {aiInsightLoading ? 'Generating your personalized insight...' : (
+                  aiInsight && aiInsight.length > 200 ? aiInsight.slice(0, 200).trim() + '...' : aiInsight
+                )}
               </p>
               <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
             </div>
           )}
 
-          {/* Polaroid "goal" + Community Bookmarks */}
-          <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-            {user?.id && (
-              <PolaroidCard
-                slot="goal"
-                imageUrl={polaroids.goal?.image_url}
-                caption={polaroids.goal?.caption}
-                userId={user.id}
-                onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
-                width={200}
-              />
-            )}
-            <div style={{ flex: 1 }}>
-              <CommunityBookmarks userId={user?.id} tUI={tUI} />
-            </div>
-          </div>
+          {/* Community Bookmarks */}
+          <CommunityBookmarks userId={user?.id} tUI={tUI} />
         </div>
 
         {/* ===== RIGHT COLUMN (SIDEBAR) ===== */}
@@ -1567,20 +1653,6 @@ export default function HubDashboard() {
                   );
                 })}
               </div>
-            </div>
-          )}
-
-          {/* Polaroid "proud" */}
-          {user?.id && (
-            <div style={{ display: 'flex', justifyContent: 'flex-end', paddingRight: 12 }}>
-              <PolaroidCard
-                slot="proud"
-                imageUrl={polaroids.proud?.image_url}
-                caption={polaroids.proud?.caption}
-                userId={user.id}
-                onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
-                width={210}
-              />
             </div>
           )}
 
