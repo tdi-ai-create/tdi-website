@@ -204,6 +204,104 @@ export async function GET() {
       freeUsers: (usersResult.count || 0) - Object.values(membershipByTier).reduce((s, c) => s + c, 0),
       paidUsers: Object.values(membershipByTier).reduce((s, c) => s + c, 0),
 
+      // Engagement funnel
+      engagementFunnel: await (async () => {
+        // Users who explored at least 1 tool
+        const { count: explored } = await supabase
+          .from('hub_activity_log')
+          .select('user_id', { count: 'exact', head: true })
+          .eq('action', 'quick_win_viewed');
+        // Unique users who explored
+        const { data: uniqueExplorers } = await supabase
+          .from('hub_activity_log')
+          .select('user_id')
+          .eq('action', 'quick_win_viewed')
+          .limit(50000);
+        const uniqueExplorerCount = new Set((uniqueExplorers || []).map((u: { user_id: string }) => u.user_id)).size;
+        // Users who came back (2+ unique days)
+        const { data: allActivity } = await supabase
+          .from('hub_activity_log')
+          .select('user_id, created_at')
+          .limit(50000);
+        const userDays: Record<string, Set<string>> = {};
+        (allActivity || []).forEach((a: { user_id: string; created_at: string }) => {
+          if (!userDays[a.user_id]) userDays[a.user_id] = new Set();
+          userDays[a.user_id].add(new Date(a.created_at).toISOString().split('T')[0]);
+        });
+        const returningUsers = Object.values(userDays).filter(days => days.size >= 2).length;
+        // Users who upgraded (have a membership)
+        const upgradedUsers = Object.values(membershipByTier).reduce((s, c) => s + c, 0);
+
+        return {
+          totalUsers: usersResult.count || 0,
+          exploredTool: uniqueExplorerCount,
+          returnedAgain: returningUsers,
+          upgraded: upgradedUsers,
+        };
+      })(),
+
+      // Active users (last 7 days)
+      activeUsers7d: await (async () => {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const { data } = await supabase
+          .from('hub_activity_log')
+          .select('user_id')
+          .gte('created_at', sevenDaysAgo.toISOString())
+          .limit(50000);
+        return new Set((data || []).map((d: { user_id: string }) => d.user_id)).size;
+      })(),
+
+      // School/district grouping
+      schoolBreakdown: await (async () => {
+        const { data } = await supabase
+          .from('hub_profiles')
+          .select('school_name, district, state')
+          .not('school_name', 'is', null)
+          .limit(5000);
+        const schools: Record<string, { count: number; district: string; state: string }> = {};
+        (data || []).forEach((p: { school_name: string | null; district: string | null; state: string | null }) => {
+          if (p.school_name) {
+            const key = p.school_name;
+            if (!schools[key]) schools[key] = { count: 0, district: p.district || '', state: p.state || '' };
+            schools[key].count++;
+          }
+        });
+        return Object.entries(schools)
+          .sort((a, b) => b[1].count - a[1].count)
+          .slice(0, 20)
+          .map(([name, data]) => ({ name, ...data }));
+      })(),
+
+      // State breakdown
+      stateBreakdown: await (async () => {
+        const { data } = await supabase
+          .from('hub_profiles')
+          .select('state')
+          .not('state', 'is', null)
+          .limit(50000);
+        const states: Record<string, number> = {};
+        (data || []).forEach((p: { state: string | null }) => {
+          if (p.state) states[p.state] = (states[p.state] || 0) + 1;
+        });
+        return states;
+      })(),
+
+      // Category breakdown (which categories get most activity)
+      categoryBreakdown: await (async () => {
+        const { data } = await supabase
+          .from('hub_activity_log')
+          .select('metadata')
+          .eq('action', 'quick_win_viewed')
+          .limit(10000);
+        const cats: Record<string, number> = {};
+        (data || []).forEach((entry: { metadata: Record<string, unknown> | null }) => {
+          const cat = entry.metadata?.category as string;
+          if (cat) cats[cat] = (cats[cat] || 0) + 1;
+        });
+        return cats;
+      })(),
+
       // Content engagement
       totalQAQuestions: await supabase
         .from('hub_qa_posts')

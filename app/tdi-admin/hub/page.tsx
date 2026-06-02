@@ -176,6 +176,11 @@ interface HubStats {
   totalQAQuestions?: number;
   totalQAReplies?: number;
   totalConversationPosts?: number;
+  engagementFunnel?: { totalUsers: number; exploredTool: number; returnedAgain: number; upgraded: number };
+  activeUsers7d?: number;
+  categoryBreakdown?: Record<string, number>;
+  schoolBreakdown?: { name: string; count: number; district: string; state: string }[];
+  stateBreakdown?: Record<string, number>;
 }
 
 // Modern Stat Card Component - simplified without icon circles
@@ -503,6 +508,131 @@ export default function HubAdminPage() {
                     );
                   })}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Engagement Funnel + Active Users */}
+        {stats && stats.engagementFunnel && (
+          <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Funnel */}
+            <div className="md:col-span-2 bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <h3 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: '#9CA3AF' }}>Engagement Funnel</h3>
+              <div className="space-y-3">
+                {[
+                  { label: 'Total Users', value: stats.engagementFunnel.totalUsers, color: '#E8B84B', pct: 100 },
+                  { label: 'Explored a Tool', value: stats.engagementFunnel.exploredTool, color: '#2A9D8F', pct: stats.engagementFunnel.totalUsers > 0 ? (stats.engagementFunnel.exploredTool / stats.engagementFunnel.totalUsers) * 100 : 0 },
+                  { label: 'Came Back (2+ days)', value: stats.engagementFunnel.returnedAgain, color: '#7C3AED', pct: stats.engagementFunnel.totalUsers > 0 ? (stats.engagementFunnel.returnedAgain / stats.engagementFunnel.totalUsers) * 100 : 0 },
+                  { label: 'Has Membership', value: stats.engagementFunnel.upgraded, color: '#1B2A4A', pct: stats.engagementFunnel.totalUsers > 0 ? (stats.engagementFunnel.upgraded / stats.engagementFunnel.totalUsers) * 100 : 0 },
+                ].map((step) => (
+                  <div key={step.label}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm" style={{ color: '#374151' }}>{step.label}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold" style={{ color: step.color }}>{step.value.toLocaleString()}</span>
+                        <span className="text-xs" style={{ color: '#9CA3AF' }}>{step.pct.toFixed(1)}%</span>
+                      </div>
+                    </div>
+                    <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: '#F3F4F6' }}>
+                      <div className="h-full rounded-full transition-all" style={{ width: `${Math.max(step.pct, 0.5)}%`, backgroundColor: step.color }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Active Users + Category */}
+            <div className="space-y-4">
+              {/* Active Users */}
+              <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Active Users (7 Days)</h3>
+                <div className="flex items-center gap-4">
+                  <div className="relative" style={{ width: 80, height: 80 }}>
+                    <svg width="80" height="80" viewBox="0 0 80 80">
+                      <circle cx="40" cy="40" r="32" fill="none" stroke="#F3F4F6" strokeWidth="8" />
+                      <circle cx="40" cy="40" r="32" fill="none" stroke="#E8B84B" strokeWidth="8" strokeLinecap="round"
+                        strokeDasharray={`${((stats.activeUsers7d || 0) / Math.max(stats.totalUsers, 1)) * 201} 201`}
+                        transform="rotate(-90 40 40)" />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-sm font-bold" style={{ color: '#1B2A4A' }}>{stats.activeUsers7d || 0}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold" style={{ color: '#1B2A4A' }}>{stats.totalUsers > 0 ? (((stats.activeUsers7d || 0) / stats.totalUsers) * 100).toFixed(1) : 0}%</p>
+                    <p className="text-xs" style={{ color: '#9CA3AF' }}>of total users active</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Category Breakdown */}
+              {stats.categoryBreakdown && Object.keys(stats.categoryBreakdown).length > 0 && (
+                <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                  <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Popular Categories</h3>
+                  <div className="space-y-2">
+                    {Object.entries(stats.categoryBreakdown)
+                      .sort((a, b) => (b[1] as number) - (a[1] as number))
+                      .slice(0, 5)
+                      .map(([cat, count]) => {
+                        const total = Object.values(stats.categoryBreakdown!).reduce((s, c) => s + (c as number), 0);
+                        const pct = total > 0 ? ((count as number) / total) * 100 : 0;
+                        return (
+                          <div key={cat}>
+                            <div className="flex items-center justify-between mb-0.5">
+                              <span className="text-xs" style={{ color: '#374151' }}>{cat}</span>
+                              <span className="text-xs font-semibold" style={{ color: '#1B2A4A' }}>{count as number}</span>
+                            </div>
+                            <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#F3F4F6' }}>
+                              <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: '#E8B84B' }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Schools & Districts */}
+        {stats && stats.schoolBreakdown && stats.schoolBreakdown.length > 0 && (
+          <div className="mb-8">
+            <h2 className="font-bold mb-4" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Schools & Districts</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Schools list */}
+              <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Top Schools</h3>
+                <div className="space-y-2">
+                  {stats.schoolBreakdown.slice(0, 10).map((school, i) => (
+                    <div key={i} className="flex items-center justify-between py-1" style={{ borderBottom: i < 9 ? '1px solid #F3F4F6' : 'none' }}>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate" style={{ color: '#1B2A4A' }}>{school.name}</p>
+                        {school.district && <p className="text-xs truncate" style={{ color: '#9CA3AF' }}>{school.district}{school.state ? `, ${school.state}` : ''}</p>}
+                      </div>
+                      <span className="text-sm font-bold ml-3" style={{ color: '#E8B84B' }}>{school.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* States list */}
+              {stats.stateBreakdown && Object.keys(stats.stateBreakdown).length > 0 && (
+                <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                  <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Users by State</h3>
+                  <div className="space-y-2">
+                    {Object.entries(stats.stateBreakdown)
+                      .sort((a, b) => (b[1] as number) - (a[1] as number))
+                      .slice(0, 10)
+                      .map(([state, count], i) => (
+                        <div key={state} className="flex items-center justify-between py-1" style={{ borderBottom: i < 9 ? '1px solid #F3F4F6' : 'none' }}>
+                          <span className="text-sm" style={{ color: '#374151' }}>{state}</span>
+                          <span className="text-sm font-bold" style={{ color: '#1B2A4A' }}>{count as number}</span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
