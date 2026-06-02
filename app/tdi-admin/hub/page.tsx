@@ -163,6 +163,9 @@ interface HubStats {
   roleBreakdown?: Record<string, number>;
   freeUsers?: number;
   paidUsers?: number;
+  totalQAQuestions?: number;
+  totalQAReplies?: number;
+  totalConversationPosts?: number;
 }
 
 // Modern Stat Card Component - simplified without icon circles
@@ -496,7 +499,7 @@ export default function HubAdminPage() {
 
         {/* Content Performance & Activity */}
         {stats && (
-          <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Top Quick Wins */}
             <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
               <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Most Explored Quick Wins</h3>
@@ -555,6 +558,43 @@ export default function HubAdminPage() {
               ) : (
                 <p className="text-sm" style={{ color: '#9CA3AF' }}>No activity yet</p>
               )}
+            </div>
+
+            {/* Community Engagement */}
+            <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <h3 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: '#9CA3AF' }}>Community Engagement</h3>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm" style={{ color: '#374151' }}>Q&A Questions</span>
+                    <span className="text-lg font-bold" style={{ color: '#E8B84B' }}>{stats.totalQAQuestions || 0}</span>
+                  </div>
+                  <div className="h-2 rounded-full" style={{ backgroundColor: '#FFF8E7' }}>
+                    <div className="h-full rounded-full" style={{ width: `${Math.min(((stats.totalQAQuestions || 0) / 100) * 100, 100)}%`, backgroundColor: '#E8B84B' }} />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm" style={{ color: '#374151' }}>Q&A Replies</span>
+                    <span className="text-lg font-bold" style={{ color: '#2A9D8F' }}>{stats.totalQAReplies || 0}</span>
+                  </div>
+                  <div className="h-2 rounded-full" style={{ backgroundColor: '#D1FAE5' }}>
+                    <div className="h-full rounded-full" style={{ width: `${Math.min(((stats.totalQAReplies || 0) / 200) * 100, 100)}%`, backgroundColor: '#2A9D8F' }} />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm" style={{ color: '#374151' }}>Conversation Posts</span>
+                    <span className="text-lg font-bold" style={{ color: '#7C3AED' }}>{stats.totalConversationPosts || 0}</span>
+                  </div>
+                  <div className="h-2 rounded-full" style={{ backgroundColor: '#F3E8FF' }}>
+                    <div className="h-full rounded-full" style={{ width: `${Math.min(((stats.totalConversationPosts || 0) / 500) * 100, 100)}%`, backgroundColor: '#7C3AED' }} />
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs mt-3 pt-3" style={{ color: '#9CA3AF', borderTop: '1px solid #F3F4F6' }}>
+                {((stats.totalQAQuestions || 0) + (stats.totalQAReplies || 0) + (stats.totalConversationPosts || 0)).toLocaleString()} total community interactions
+              </p>
             </div>
           </div>
         )}

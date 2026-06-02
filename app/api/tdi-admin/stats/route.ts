@@ -200,9 +200,25 @@ export async function GET() {
       recentActivity: recentActivity || [],
       growthChart,
       roleBreakdown,
-      // Quick summary numbers for the team
+      // Quick summary numbers
       freeUsers: (usersResult.count || 0) - Object.values(membershipByTier).reduce((s, c) => s + c, 0),
       paidUsers: Object.values(membershipByTier).reduce((s, c) => s + c, 0),
+
+      // Content engagement
+      totalQAQuestions: await supabase
+        .from('hub_qa_posts')
+        .select('id', { count: 'exact', head: true })
+        .is('parent_id', null)
+        .then(r => r.count || 0),
+      totalQAReplies: await supabase
+        .from('hub_qa_posts')
+        .select('id', { count: 'exact', head: true })
+        .not('parent_id', 'is', null)
+        .then(r => r.count || 0),
+      totalConversationPosts: await supabase
+        .from('quick_win_responses')
+        .select('id', { count: 'exact', head: true })
+        .then(r => r.count || 0),
     });
   } catch (error) {
     console.error('[Admin Stats API] Error:', error);
