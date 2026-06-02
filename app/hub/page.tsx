@@ -1056,56 +1056,6 @@ export default function HubDashboard() {
         </div>
       )}
 
-      {/* ═══ POLAROID SHELF ═══ */}
-      {user?.id && (
-        <div className="max-w-5xl mx-auto px-4 md:px-6 mb-6">
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              gap: 0,
-              padding: '12px 0 8px',
-              overflow: 'visible',
-            }}
-          >
-            {/* Love -- tilted left, slightly overlapping center */}
-            <div style={{ transform: 'rotate(-5deg) translateX(18px)', zIndex: 2 }}>
-              <PolaroidCard
-                slot="love"
-                imageUrl={polaroids.love?.image_url}
-                caption={polaroids.love?.caption}
-                userId={user.id}
-                onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
-                width={185}
-              />
-            </div>
-            {/* Proud -- center, straight, slightly raised */}
-            <div style={{ transform: 'rotate(1deg) translateY(-12px)', zIndex: 3 }}>
-              <PolaroidCard
-                slot="proud"
-                imageUrl={polaroids.proud?.image_url}
-                caption={polaroids.proud?.caption}
-                userId={user.id}
-                onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
-                width={195}
-              />
-            </div>
-            {/* Goal -- tilted right, slightly overlapping center */}
-            <div style={{ transform: 'rotate(4deg) translateX(-18px)', zIndex: 2 }}>
-              <PolaroidCard
-                slot="goal"
-                imageUrl={polaroids.goal?.image_url}
-                caption={polaroids.goal?.caption}
-                userId={user.id}
-                onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
-                width={185}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* ============ MAIN GRID ============ */}
       <div className="max-w-5xl mx-auto px-4 md:px-6 pb-8">
 
@@ -1249,6 +1199,22 @@ export default function HubDashboard() {
               &ldquo;{tip}&rdquo;
             </p>
           </div>
+
+          {/* Polaroid: something you love */}
+          {user?.id && (
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <div style={{ transform: 'rotate(-3deg)' }}>
+                <PolaroidCard
+                  slot="love"
+                  imageUrl={polaroids.love?.image_url}
+                  caption={polaroids.love?.caption}
+                  userId={user.id}
+                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
+                  width={150}
+                />
+              </div>
+            </div>
+          )}
 
           {/* B. Continue Learning (max 2 enrollments) */}
           {enrollments.length > 0 && (
@@ -1449,6 +1415,22 @@ export default function HubDashboard() {
 
           {/* Community Bookmarks */}
           <CommunityBookmarks userId={user?.id} tUI={tUI} />
+
+          {/* Polaroid: a goal in life */}
+          {user?.id && (
+            <div style={{ display: 'flex', justifyContent: 'flex-start', paddingLeft: 20 }}>
+              <div style={{ transform: 'rotate(2deg)' }}>
+                <PolaroidCard
+                  slot="goal"
+                  imageUrl={polaroids.goal?.image_url}
+                  caption={polaroids.goal?.caption}
+                  userId={user.id}
+                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
+                  width={150}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ===== RIGHT COLUMN (SIDEBAR) ===== */}
@@ -1607,6 +1589,22 @@ export default function HubDashboard() {
               </>
             )}
           </div>
+
+          {/* Polaroid: something you're proud of */}
+          {user?.id && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', paddingRight: 8 }}>
+              <div style={{ transform: 'rotate(-2deg)' }}>
+                <PolaroidCard
+                  slot="proud"
+                  imageUrl={polaroids.proud?.image_url}
+                  caption={polaroids.proud?.caption}
+                  userId={user.id}
+                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
+                  width={150}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Curated for You */}
           {showRecommendations && recommendations.length > 0 && (

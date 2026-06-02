@@ -97,7 +97,7 @@ export default function PolaroidCard({
       <div
         style={{
           background: 'white',
-          padding: `${width * 0.05}px ${width * 0.05}px ${width * 0.28}px`,
+          padding: `${width * 0.05}px ${width * 0.05}px 36px`,
           borderRadius: 3,
           boxShadow: hovering
             ? '0 4px 16px rgba(0,0,0,0.12), 0 12px 32px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(0,0,0,0.04)'
@@ -182,12 +182,15 @@ export default function PolaroidCard({
         <div
           style={{
             textAlign: 'center',
-            paddingTop: width * 0.04,
+            paddingTop: 6,
             fontFamily: "'Caveat', cursive",
-            fontSize: Math.max(18, width * 0.14),
+            fontSize: 18,
             color: '#4B5563',
             fontWeight: 600,
             lineHeight: 1.1,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
           }}
         >
           {caption || SLOT_CAPTIONS[slot]}
@@ -202,8 +205,8 @@ export default function PolaroidCard({
             }}
             style={{
               position: 'absolute',
-              bottom: width * 0.24,
-              right: width * 0.08,
+              bottom: 40,
+              right: 12,
               width: 26,
               height: 26,
               borderRadius: '50%',
@@ -230,8 +233,8 @@ export default function PolaroidCard({
             }}
             style={{
               position: 'absolute',
-              bottom: width * 0.24,
-              left: width * 0.08,
+              bottom: 40,
+              left: 12,
               width: 26,
               height: 26,
               borderRadius: '50%',
