@@ -5,11 +5,7 @@ import { X } from 'lucide-react';
 import { useHub } from '@/components/hub/HubContext';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
-import {
-  TOUR_STOPS,
-  PROGRESSIVE_DISCLOSURE_PROMPT,
-  CONTINUATION_PROMPTS,
-} from '@/lib/tour-copy';
+import { TOUR_STOPS } from '@/lib/tour-copy';
 
 const TOUR_STORAGE_KEY = 'tdi-hub-tour-step';
 
@@ -67,38 +63,17 @@ const TOUR_STEPS_CONFIG: TourStep[] = [
     body: TOUR_STOPS[4].description,
     selector: '[data-tour="desi-chat"]',
   },
-  // --- progressive disclosure break after stop 5 ---
-  // 6. Field Notes -- points to celebration card on dashboard
-  {
-    title: TOUR_STOPS[5].title,
-    body: TOUR_STOPS[5].description,
-    selector: '[data-tour="field-notes"]',
-  },
-  // 7. Vibe Check (Gift Element deferred to post-launch)
-  {
-    title: TOUR_STOPS[7].title,
-    body: TOUR_STOPS[7].description,
-    selector: '[data-tour="vibe-check"]',
-  },
-  // 9. Transformation Tracker
-  {
-    title: TOUR_STOPS[8].title,
-    body: TOUR_STOPS[8].description,
-    selector: '[data-tour="transformation-tracker"]',
-  },
-  // 10. Favorites
-  {
-    title: TOUR_STOPS[9].title,
-    body: TOUR_STOPS[9].description,
-    selector: '[data-tour="favorites"]',
-  },
-  // 11. Multilingual Support
-  {
-    title: TOUR_STOPS[10].title,
-    body: TOUR_STOPS[10].description,
-    selector: '[data-tour="language-toggle"]',
-  },
-  // Certificates removed -- same card as Transformation Tracker
+  // Stops 6-12 removed from tooltip tour -- shown in scrollable summary card instead
+];
+
+/** Features shown in the post-tour scrollable card */
+const MORE_FEATURES = [
+  { title: TOUR_STOPS[5].title, description: TOUR_STOPS[5].description },   // Field Notes
+  { title: TOUR_STOPS[7].title, description: TOUR_STOPS[7].description },   // Vibe Check
+  { title: TOUR_STOPS[8].title, description: TOUR_STOPS[8].description },   // Transformation Tracker
+  { title: TOUR_STOPS[9].title, description: TOUR_STOPS[9].description },   // Favorites
+  { title: TOUR_STOPS[10].title, description: TOUR_STOPS[10].description }, // Multilingual
+  { title: TOUR_STOPS[11].title, description: TOUR_STOPS[11].description }, // Certificates
 ];
 
 const TOTAL_STEPS = TOUR_STEPS_CONFIG.length;
@@ -211,7 +186,6 @@ export default function OnboardingTour({ onComplete, resumeFromStep }: Onboardin
   const [stepIndex, setStepIndex] = useState(initialStep);
   const [targetRect, setTargetRect] = useState<Rect | null>(null);
   const [showDisclosure, setShowDisclosure] = useState(false);
-  const [showContinuation, setShowContinuation] = useState<number | null>(null);
   const [active, setActive] = useState(true);
 
   // Transition state for smooth step changes
@@ -398,41 +372,10 @@ export default function OnboardingTour({ onComplete, resumeFromStep }: Onboardin
     }, 300);
   }, [endTour]);
 
-  const handleDisclosureContinue = useCallback(() => {
-    setShowDisclosure(false);
-    setTargetRect(null);
-    setTooltipVisible(false);
-    setTimeout(() => {
-      setStepIndex(MANDATORY_COUNT);
-      setTooltipVisible(true);
-    }, 200);
-  }, []);
-
-  const handleDisclosureSkip = useCallback(() => {
+  const handleDisclosureDismiss = useCallback(() => {
     setShowDisclosure(false);
     endTour(MANDATORY_COUNT);
   }, [endTour]);
-
-  const handleContinuationContinue = useCallback(() => {
-    const stopNum = showContinuation;
-    setShowContinuation(null);
-    if (stopNum !== null) {
-      setTargetRect(null);
-      setTooltipVisible(false);
-      setTimeout(() => {
-        setStepIndex(stopNum);
-        setTooltipVisible(true);
-      }, 200);
-    }
-  }, [showContinuation]);
-
-  const handleContinuationSkip = useCallback(() => {
-    const stopNum = showContinuation;
-    setShowContinuation(null);
-    if (stopNum !== null) {
-      endTour(stopNum);
-    }
-  }, [showContinuation, endTour]);
 
   const handleSkip = useCallback(() => {
     endTour(stepIndexRef.current + 1);
@@ -442,7 +385,7 @@ export default function OnboardingTour({ onComplete, resumeFromStep }: Onboardin
 
   if (!active || !step) return null;
 
-  /* ---------- progressive disclosure overlay (after stop 5) ---------- */
+  /* ---------- scrollable "more features" card (after 5 highlighted stops) ---------- */
 
   if (showDisclosure) {
     return (
@@ -462,10 +405,12 @@ export default function OnboardingTour({ onComplete, resumeFromStep }: Onboardin
           style={{
             background: 'white',
             borderRadius: 20,
-            padding: 32,
-            maxWidth: 360,
-            width: '90%',
-            textAlign: 'center',
+            padding: '28px 24px',
+            maxWidth: 400,
+            width: '92%',
+            maxHeight: '80vh',
+            display: 'flex',
+            flexDirection: 'column',
             boxShadow: '0 20px 60px rgba(30, 39, 73, 0.3)',
             animation: 'tdi-tour-scalein 0.4s ease-out',
           }}
@@ -473,146 +418,86 @@ export default function OnboardingTour({ onComplete, resumeFromStep }: Onboardin
           <p
             style={{
               fontFamily: "'Source Serif 4', serif",
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: 600,
               color: '#1e2749',
-              margin: '0 0 8px',
-              lineHeight: 1.5,
+              margin: '0 0 4px',
+              textAlign: 'center',
             }}
           >
-            {tUI(PROGRESSIVE_DISCLOSURE_PROMPT.title)}
+            A few more things worth knowing
           </p>
           <p
             style={{
               fontFamily: "'DM Sans', sans-serif",
-              fontSize: 14,
-              color: '#6B7280',
-              margin: '0 0 24px',
-              lineHeight: 1.5,
+              fontSize: 13,
+              color: '#9CA3AF',
+              margin: '0 0 20px',
+              textAlign: 'center',
             }}
           >
-            {tUI(PROGRESSIVE_DISCLOSURE_PROMPT.description)}
+            Scroll through when you are ready, or jump straight in.
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <button
-              onClick={handleDisclosureContinue}
-              style={{
-                background: '#ffba06',
-                color: '#1e2749',
-                border: 'none',
-                borderRadius: 12,
-                padding: '12px 24px',
-                fontSize: 14,
-                fontWeight: 600,
-                fontFamily: "'DM Sans', sans-serif",
-                cursor: 'pointer',
-              }}
-            >
-              {tUI(PROGRESSIVE_DISCLOSURE_PROMPT.continueLabel)}
-            </button>
-            <button
-              onClick={handleDisclosureSkip}
-              style={{
-                background: 'transparent',
-                color: '#9CA3AF',
-                border: 'none',
-                padding: '10px 24px',
-                fontSize: 13,
-                fontFamily: "'DM Sans', sans-serif",
-                cursor: 'pointer',
-              }}
-            >
-              {tUI(PROGRESSIVE_DISCLOSURE_PROMPT.skipLabel)}
-            </button>
+
+          {/* Scrollable feature list */}
+          <div style={{ overflowY: 'auto', flex: 1, paddingRight: 4 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {MORE_FEATURES.map((feature, i) => (
+                <div
+                  key={i}
+                  style={{
+                    padding: '14px 16px',
+                    borderRadius: 12,
+                    backgroundColor: '#F9FAFB',
+                    borderLeft: '3px solid #E8B84B',
+                  }}
+                >
+                  <p
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: '#1e2749',
+                      margin: '0 0 4px',
+                    }}
+                  >
+                    {tUI(feature.title)}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: 13,
+                      color: '#6B7280',
+                      margin: 0,
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {tUI(feature.description)}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-        <style>{`
-          @keyframes tdi-tour-fadein {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          @keyframes tdi-tour-scalein {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-          }
-        `}</style>
-      </div>
-    );
-  }
 
-  /* ---------- continuation prompts between optional stops ---------- */
-
-  if (showContinuation !== null && CONTINUATION_PROMPTS[showContinuation]) {
-    const prompt = CONTINUATION_PROMPTS[showContinuation];
-    return (
-      <div
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 1000010,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'rgba(30, 39, 73, 0.8)',
-          animation: 'tdi-tour-fadein 0.4s ease-out',
-        }}
-      >
-        <div
-          style={{
-            background: 'white',
-            borderRadius: 20,
-            padding: 32,
-            maxWidth: 360,
-            width: '90%',
-            textAlign: 'center',
-            boxShadow: '0 20px 60px rgba(30, 39, 73, 0.3)',
-            animation: 'tdi-tour-scalein 0.4s ease-out',
-          }}
-        >
-          <p
+          {/* Dismiss button */}
+          <button
+            onClick={handleDisclosureDismiss}
             style={{
-              fontFamily: "'Source Serif 4', serif",
-              fontSize: 18,
-              fontWeight: 600,
+              background: '#ffba06',
               color: '#1e2749',
-              margin: '0 0 24px',
-              lineHeight: 1.5,
+              border: 'none',
+              borderRadius: 12,
+              padding: '12px 24px',
+              fontSize: 14,
+              fontWeight: 600,
+              fontFamily: "'DM Sans', sans-serif",
+              cursor: 'pointer',
+              marginTop: 16,
+              width: '100%',
             }}
           >
-            {tUI(prompt.text)}
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <button
-              onClick={handleContinuationContinue}
-              style={{
-                background: '#ffba06',
-                color: '#1e2749',
-                border: 'none',
-                borderRadius: 12,
-                padding: '12px 24px',
-                fontSize: 14,
-                fontWeight: 600,
-                fontFamily: "'DM Sans', sans-serif",
-                cursor: 'pointer',
-              }}
-            >
-              {tUI(prompt.continueLabel)}
-            </button>
-            <button
-              onClick={handleContinuationSkip}
-              style={{
-                background: 'transparent',
-                color: '#9CA3AF',
-                border: 'none',
-                padding: '10px 24px',
-                fontSize: 13,
-                fontFamily: "'DM Sans', sans-serif",
-                cursor: 'pointer',
-              }}
-            >
-              {tUI(prompt.skipLabel)}
-            </button>
-          </div>
+            Got it -- let me explore
+          </button>
         </div>
         <style>{`
           @keyframes tdi-tour-fadein {
@@ -756,7 +641,7 @@ export default function OnboardingTour({ onComplete, resumeFromStep }: Onboardin
                 color: '#9CA3AF',
               }}
             >
-              {stepIndex + 1} of {TOTAL_STEPS}
+              {stepIndex + 1} of {MANDATORY_COUNT}
             </span>
             <button
               onClick={goNext}
