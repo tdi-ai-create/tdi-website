@@ -43,7 +43,7 @@ export default function AdminBanner() {
       className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center"
       style={{
         height: BANNER_H,
-        background: '#E8B84B',
+        background: '#F0C238',
         fontFamily: "'DM Sans', sans-serif",
       }}
     >
