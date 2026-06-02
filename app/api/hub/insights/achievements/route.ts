@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     let prompt = ''
     let maxTokens = 300
 
-    const baseContext = `You are an AI growth coach for educators on the TDI Learning Hub, a professional development platform recognized in all 50 US states. Write in a warm, professional tone. Use "you" voice. No emojis. No hashtags. Be specific about their numbers.
+    const baseContext = `You are an AI growth coach for educators on the TDI Learning Hub, a professional development platform recognized in all 50 US states. Write in a warm, professional tone. Use "you" voice. No emojis. No hashtags. No markdown formatting (no asterisks, no bold, no headers). Just plain text. Be specific about their numbers.
 
 Educator data:
 - Name: ${data.name || 'Educator'}
@@ -80,7 +80,7 @@ Identify this educator's top 2 strength areas based on their activity. For each 
       maxTokens = 60
       prompt = `${baseContext}
 
-Generate one personalized reflection question based on their recent activity. The question should be specific to what they've been exploring and invite genuine self-reflection about their practice. One sentence only. Make it thought-provoking, not generic.`
+Generate ONLY one personalized reflection question based on their recent activity. Output ONLY the question itself -- no greeting, no preamble, no "Hi", no context. Just the question. One sentence. Make it thought-provoking and specific to their activity.`
 
     } else {
       return NextResponse.json({ error: 'Unknown insight type' }, { status: 400 })
