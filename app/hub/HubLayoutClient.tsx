@@ -69,7 +69,7 @@ function HubLayoutInner({ children }: { children: React.ReactNode }) {
       {showNav && (
         <HubNavBar profile={profile} userEmail={user?.email} userId={user?.id} />
       )}
-      <main className="flex-1" style={showNav ? { paddingTop: 'calc(60px + var(--admin-banner-height, 0px))' } : undefined}>
+      <main className={`flex-1 ${showNav ? 'pt-[60px]' : ''}`}>
         {children}
       </main>
       {showNav && <HubFooter />}
