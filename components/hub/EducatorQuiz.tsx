@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ChevronRight, Share2, RotateCcw } from 'lucide-react'
+import UniversalShareModal from './UniversalShareModal'
 
 // ── Types ──────────────────────────────────────────────────────
 
@@ -141,6 +142,7 @@ export default function EducatorQuiz({ onComplete }: EducatorQuizProps) {
   const [result, setResult] = useState<EducatorResult | null>(null)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [transitioning, setTransitioning] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
 
   const handleAnswer = (answer: QuizAnswer, answerIdx: number) => {
     if (transitioning) return
@@ -206,26 +208,22 @@ export default function EducatorQuiz({ onComplete }: EducatorQuizProps) {
           </p>
           <div className="flex flex-wrap gap-2">
             <button
-              onClick={async () => {
-                const text = `I just took the TDI Educator Quiz and I am "${result.title}" -- ${result.subtitle} What kind of educator are you? teachersdeserveit.com/hub`
-                try {
-                  if (navigator.share) {
-                    await navigator.share({ title: 'My Educator Type', text })
-                  } else {
-                    await navigator.clipboard.writeText(text)
-                    const btn = document.activeElement as HTMLButtonElement
-                    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share My Result' }, 2000) }
-                  }
-                } catch {
-                  // Silent fail
-                }
-              }}
+              onClick={() => setShareOpen(true)}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all hover:opacity-90"
               style={{ backgroundColor: result.color, color: 'white', fontFamily: "'DM Sans', sans-serif" }}
             >
               <Share2 size={14} />
               Share My Result
             </button>
+            {shareOpen && (
+              <UniversalShareModal
+                isOpen={shareOpen}
+                onClose={() => setShareOpen(false)}
+                title="Share your educator type"
+                subtitle="Let other educators find out what kind they are"
+                message={`I just took the TDI Educator Quiz and I am "${result.title}" -- ${result.subtitle} What kind of educator are you? Find out at teachersdeserveit.com/hub`}
+              />
+            )}
             <button
               onClick={restart}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all hover:bg-gray-100"
