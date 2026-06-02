@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Sparkles, FileText, Mail, Target, Eye, MessageCircle, ChevronDown, Copy, Check, RefreshCw } from 'lucide-react'
+import { useTranslation } from '@/lib/hub/useTranslation'
 
 interface InsightData {
   name: string
@@ -68,6 +69,7 @@ function InsightCard({
   section: InsightSection
   data: InsightData
 }) {
+  const { tUI } = useTranslation()
   const [insight, setInsight] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [expanded, setExpanded] = useState(false)
@@ -83,10 +85,10 @@ function InsightCard({
       })
       if (res.ok) {
         const result = await res.json()
-        setInsight(result.insight || 'No insights available right now.')
+        setInsight(result.insight || tUI('No insights available right now.'))
       }
     } catch {
-      setInsight('Unable to generate insight right now.')
+      setInsight(tUI('Unable to generate insight right now.'))
     } finally {
       setLoading(false)
     }
@@ -118,10 +120,10 @@ function InsightCard({
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
-            {section.title}
+            {tUI(section.title)}
           </p>
           <p className="text-xs" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
-            {section.description}
+            {tUI(section.description)}
           </p>
         </div>
         <ChevronDown
@@ -140,7 +142,7 @@ function InsightCard({
             <div className="py-4 flex items-center gap-2">
               <div className="w-4 h-4 rounded-full border-2 border-gray-200 border-t-gray-500 animate-spin" />
               <span className="text-xs" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
-                Analyzing your journey...
+                {tUI('Analyzing your journey...')}
               </span>
             </div>
           ) : (
@@ -157,7 +159,7 @@ function InsightCard({
                 style={{ color: section.accentColor }}
               >
                 <RefreshCw size={12} />
-                Regenerate
+                {tUI('Regenerate')}
               </button>
             </div>
           )}
@@ -184,6 +186,7 @@ function GeneratorCard({
   data: InsightData
   buttonLabel: string
 }) {
+  const { tUI } = useTranslation()
   const [content, setContent] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -202,7 +205,7 @@ function GeneratorCard({
         setContent(result.insight || '')
       }
     } catch {
-      setContent('Unable to generate right now. Please try again.')
+      setContent(tUI('Unable to generate right now. Please try again.'))
     } finally {
       setLoading(false)
     }
@@ -230,10 +233,10 @@ function GeneratorCard({
         </div>
         <div>
           <p className="text-sm font-semibold" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
-            {title}
+            {tUI(title)}
           </p>
           <p className="text-xs mt-0.5" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
-            {description}
+            {tUI(description)}
           </p>
         </div>
       </div>
@@ -249,7 +252,7 @@ function GeneratorCard({
             fontFamily: "'DM Sans', sans-serif",
           }}
         >
-          {loading ? 'Generating...' : buttonLabel}
+          {loading ? tUI('Generating...') : tUI(buttonLabel)}
         </button>
       ) : (
         <div>
@@ -277,7 +280,7 @@ function GeneratorCard({
               }}
             >
               {copied ? <Check size={12} /> : <Copy size={12} />}
-              {copied ? 'Copied' : 'Copy to clipboard'}
+              {copied ? tUI('Copied') : tUI('Copy to clipboard')}
             </button>
             <button
               onClick={generate}
@@ -286,7 +289,7 @@ function GeneratorCard({
               style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}
             >
               <RefreshCw size={12} />
-              Regenerate
+              {tUI('Regenerate')}
             </button>
           </div>
         </div>
@@ -296,6 +299,7 @@ function GeneratorCard({
 }
 
 export default function AchievementInsights({ data }: { data: InsightData }) {
+  const { tUI } = useTranslation()
   return (
     <div>
       {/* Section Header */}
@@ -305,11 +309,11 @@ export default function AchievementInsights({ data }: { data: InsightData }) {
           className="text-xl font-bold"
           style={{ fontFamily: "'Source Serif 4', Georgia, serif", color: '#1B2A4A' }}
         >
-          AI Growth Insights
+          {tUI('AI Growth Insights')}
         </h2>
       </div>
       <p className="text-sm mb-6" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
-        Powered by AI, personalized to your journey. Click any section to explore.
+        {tUI('Powered by AI, personalized to your journey. Click any section to explore.')}
       </p>
 
       {/* Quick Insight Cards */}

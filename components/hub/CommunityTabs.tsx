@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { MessageCircle } from 'lucide-react'
+import { useTranslation } from '@/lib/hub/useTranslation'
 import LessonConversation from './LessonConversation'
 import LessonQA from './LessonQA'
 
@@ -14,6 +15,7 @@ interface CommunityTabsProps {
 }
 
 export default function CommunityTabs({ contentId, userId, isAdmin, conversationApiPath, qaApiPath }: CommunityTabsProps) {
+  const { tUI } = useTranslation()
   const [activeTab, setActiveTab] = useState<'conversation' | 'qa'>('conversation')
 
   return (
@@ -30,7 +32,7 @@ export default function CommunityTabs({ contentId, userId, isAdmin, conversation
           }}
         >
           <MessageCircle size={16} />
-          Conversation
+          {tUI('Conversation')}
         </button>
         <button
           onClick={() => setActiveTab('qa')}
@@ -43,7 +45,7 @@ export default function CommunityTabs({ contentId, userId, isAdmin, conversation
           }}
         >
           <MessageCircle size={16} />
-          Q&A
+          {tUI('Q&A')}
         </button>
       </div>
 

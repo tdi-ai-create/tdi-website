@@ -1,6 +1,7 @@
 'use client';
 
 import { Star } from 'lucide-react';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 interface PracticeNote {
   id: string;
@@ -61,6 +62,8 @@ export default function PracticeNoteCard({
   isEnrolled,
   onEnroll,
 }: PracticeNoteCardProps) {
+  const { tUI } = useTranslation();
+
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase();
   };
@@ -76,11 +79,11 @@ export default function PracticeNoteCard({
     const now = new Date();
     const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
 
-    if (diffInDays === 0) return 'Today';
-    if (diffInDays === 1) return '1 day ago';
-    if (diffInDays < 7) return `${diffInDays} days ago`;
-    if (diffInDays < 14) return '1 week ago';
-    if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
+    if (diffInDays === 0) return tUI('Today');
+    if (diffInDays === 1) return tUI('1 day ago');
+    if (diffInDays < 7) return `${diffInDays} ${tUI('days ago')}`;
+    if (diffInDays < 14) return tUI('1 week ago');
+    if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} ${tUI('weeks ago')}`;
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
@@ -107,7 +110,7 @@ export default function PracticeNoteCard({
       {/* Admin: hidden indicator */}
       {isAdmin && note.is_hidden && (
         <div className="mb-3 text-xs font-semibold px-2.5 py-1 rounded-md inline-block" style={{ backgroundColor: '#FEE2E2', color: '#DC2626' }}>
-          Hidden from public
+          {tUI('Hidden from public')}
         </div>
       )}
 
@@ -149,15 +152,15 @@ export default function PracticeNoteCard({
             className="w-1.5 h-1.5 rounded-full"
             style={{ backgroundColor: '#5BBEC4' }}
           />
-          {note.module && `Module: ${note.module.title}`}
-          {!note.module && note.lesson && `Lesson: ${note.lesson.title}`}
+          {note.module && `${tUI('Module')}: ${note.module.title}`}
+          {!note.module && note.lesson && `${tUI('Lesson')}: ${note.lesson.title}`}
         </div>
       )}
 
       {/* Body */}
       <div className="mb-4">
         <div className="text-xs font-semibold uppercase mb-1" style={{ color: '#9CA3AF', letterSpacing: '0.04em' }}>
-          What I tried
+          {tUI('What I tried')}
         </div>
         <div className="text-sm leading-relaxed mb-2.5" style={{ color: '#374151' }}>
           {note.what_i_tried}
@@ -166,7 +169,7 @@ export default function PracticeNoteCard({
         {note.what_i_changed && (
           <>
             <div className="text-xs font-semibold uppercase mb-1" style={{ color: '#9CA3AF', letterSpacing: '0.04em' }}>
-              What I changed
+              {tUI('What I changed')}
             </div>
             <div className="text-sm leading-relaxed mb-2.5" style={{ color: '#374151' }}>
               {note.what_i_changed}
@@ -177,7 +180,7 @@ export default function PracticeNoteCard({
         {note.what_happened && (
           <>
             <div className="text-xs font-semibold uppercase mb-1" style={{ color: '#9CA3AF', letterSpacing: '0.04em' }}>
-              What happened
+              {tUI('What happened')}
             </div>
             <div className="text-sm leading-relaxed" style={{ color: '#374151' }}>
               {note.what_happened}
@@ -219,7 +222,7 @@ export default function PracticeNoteCard({
           } ${!currentUserId ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
         >
           <Star size={14} fill={isMarkedHelpful ? '#D97706' : 'none'} />
-          This helped me · {note.helpful_count}
+          {tUI('This helped me')} · {note.helpful_count}
         </button>
 
         {isAdmin && (
@@ -232,7 +235,7 @@ export default function PracticeNoteCard({
               backgroundColor: note.is_hidden ? '#F0FDF4' : '#FEF2F2',
             }}
           >
-            {note.is_hidden ? 'Unhide' : 'Hide'}
+            {note.is_hidden ? tUI('Unhide') : tUI('Hide')}
           </button>
         )}
       </div>

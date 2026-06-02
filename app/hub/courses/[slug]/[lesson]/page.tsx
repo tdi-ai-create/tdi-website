@@ -10,6 +10,7 @@ import LessonContent from '@/components/hub/LessonContent';
 import LessonConversation from '@/components/hub/LessonConversation';
 import LessonQA from '@/components/hub/LessonQA';
 import CourseCompletionModal from '@/components/hub/CourseCompletionModal';
+import { useTranslation } from '@/lib/hub/useTranslation';
 import {
   ArrowLeft,
   ArrowRight,
@@ -62,6 +63,7 @@ export default function LessonPage({ params }: LessonPageProps) {
   const { slug, lesson: lessonSlug } = resolvedParams;
   const router = useRouter();
   const { user } = useHub();
+  const { tUI } = useTranslation();
 
   const [course, setCourse] = useState<Course | null>(null);
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
@@ -170,7 +172,7 @@ export default function LessonPage({ params }: LessonPageProps) {
           if (finalModules.length === 0) {
             finalModules = [{
               id: 'default',
-              title: 'Course Content',
+              title: tUI('Course Content'),
               sort_order: 0,
               lessons: unassignedLessons,
             }];
@@ -305,7 +307,7 @@ export default function LessonPage({ params }: LessonPageProps) {
               >
                 <li>
                   <Link href="/hub/courses" className="text-gray-500 hover:text-gray-700">
-                    Courses
+                    {tUI('Courses')}
                   </Link>
                 </li>
                 <li className="text-gray-400">&gt;</li>
@@ -329,7 +331,7 @@ export default function LessonPage({ params }: LessonPageProps) {
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
               <ArrowLeft size={16} />
-              Back to course
+              {tUI('Back to course')}
             </Link>
 
             {/* Mobile sidebar toggle */}
@@ -339,7 +341,7 @@ export default function LessonPage({ params }: LessonPageProps) {
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
               <Menu size={18} />
-              Course outline
+              {tUI('Course outline')}
             </button>
 
             {/* Lesson / Conversation tabs */}
@@ -355,7 +357,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                 }}
               >
                 <BookOpen size={16} />
-                Lesson
+                {tUI('Lesson')}
               </button>
               <button
                 onClick={() => setActiveTab('conversation')}
@@ -368,7 +370,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                 }}
               >
                 <MessageCircle size={16} />
-                Conversation
+                {tUI('Conversation')}
               </button>
               <button
                 onClick={() => setActiveTab('qa')}
@@ -381,7 +383,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                 }}
               >
                 <MessageCircle size={16} />
-                Q&A
+                {tUI('Q&A')}
               </button>
             </div>
 
@@ -404,7 +406,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                   className="text-gray-500"
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
-                  Video player coming soon
+                  {tUI('Video player coming soon')}
                 </p>
               </div>
             )}
@@ -414,7 +416,7 @@ export default function LessonPage({ params }: LessonPageProps) {
               {currentLesson.title}
             </h1>
             <div className="flex items-center gap-3 text-xs mb-5" style={{ color: '#9CA3AF' }}>
-              <span>{currentLesson.estimated_minutes} min</span>
+              <span>{currentLesson.estimated_minutes} {tUI('min')}</span>
               {currentLesson.content_type && <><span>·</span><span>{currentLesson.content_type}</span></>}
             </div>
 
@@ -489,7 +491,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                       color: isComplete ? '#065F46' : '#374151',
                     }}
                   >
-                    {isComplete ? 'Lesson completed!' : 'I have completed this lesson'}
+                    {isComplete ? tUI('Lesson completed!') : tUI('I have completed this lesson')}
                   </span>
                 </label>
               </div>
@@ -512,7 +514,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                 aria-disabled={!prevLesson}
               >
                 <ArrowLeft size={16} />
-                Previous Lesson
+                {tUI('Previous Lesson')}
               </Link>
 
               {/* Lesson counter */}
@@ -520,7 +522,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                 className="text-sm text-gray-500 order-first sm:order-none"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
               >
-                Lesson {currentIndex + 1} of {allLessons.length}
+                {tUI('Lesson')} {currentIndex + 1} {tUI('of')} {allLessons.length}
               </span>
 
               {/* Next button or Complete Course */}
@@ -535,7 +537,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                     fontSize: '14px',
                   }}
                 >
-                  Complete Course
+                  {tUI('Complete Course')}
                   <Check size={16} />
                 </button>
               ) : (
@@ -549,7 +551,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                   style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '14px' }}
                   aria-disabled={!nextLesson}
                 >
-                  Next Lesson
+                  {tUI('Next Lesson')}
                   <ArrowRight size={16} />
                 </Link>
               )}
@@ -562,7 +564,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                 style={{ borderTop: '0.5px solid #F3F4F6' }}
               >
                 <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-                  Download Transcript
+                  {tUI('Download Transcript')}
                 </span>
                 {hasTranscript && (
                   <a
@@ -574,7 +576,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
                     </svg>
-                    English
+                    {tUI('English')}
                   </a>
                 )}
                 {hasTranscriptEs && (
@@ -620,7 +622,7 @@ export default function LessonPage({ params }: LessonPageProps) {
           <div className="hidden lg:block p-6" style={{ borderLeft: '0.5px solid #F3F4F6' }}>
             <div className="sticky top-4">
               <h3 className="text-sm font-semibold mb-4" style={{ color: '#1B2A4A' }}>
-                Course Outline
+                {tUI('Course Outline')}
               </h3>
               <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 10rem)' }}>
                 {modules.map((module) => (
@@ -689,7 +691,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                       color: '#2B3A67',
                     }}
                   >
-                    Course Outline
+                    {tUI('Course Outline')}
                   </h3>
                   <button
                     onClick={() => setSidebarOpen(false)}

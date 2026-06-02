@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useHub } from '@/components/hub/HubContext';
+import { useTranslation } from '@/lib/hub/useTranslation';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import {
   Send,
@@ -58,6 +59,7 @@ interface PopularRequest {
 
 export default function RequestCenterPage() {
   const { user } = useHub();
+  const { tUI } = useTranslation();
   const [requestType, setRequestType] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -235,13 +237,13 @@ export default function RequestCenterPage() {
             color: '#2B3A67',
           }}
         >
-          Request Center
+          {tUI('Request Center')}
         </h1>
         <p
           className="text-gray-500"
           style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '14px' }}
         >
-          Tell us what professional development you need. We listen.
+          {tUI('Tell us what professional development you need. We listen.')}
         </p>
       </div>
 
@@ -255,7 +257,7 @@ export default function RequestCenterPage() {
             color: '#2B3A67',
           }}
         >
-          Submit a Request
+          {tUI('Submit a Request')}
         </h2>
 
         {/* Throttle Message */}
@@ -269,7 +271,7 @@ export default function RequestCenterPage() {
               className="text-sm text-amber-800"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              You have submitted 3 requests this week. You can submit more next week.
+              {tUI('You have submitted 3 requests this week. You can submit more next week.')}
             </p>
           </div>
         )}
@@ -294,20 +296,20 @@ export default function RequestCenterPage() {
                 color: '#2B3A67',
               }}
             >
-              Request submitted!
+              {tUI('Request submitted!')}
             </p>
             <p
               className="text-sm text-gray-600 mb-4"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              We review every request.
+              {tUI('We review every request.')}
             </p>
             <button
               onClick={resetForm}
               className="text-sm font-medium hover:underline"
               style={{ color: '#E8B84B', fontFamily: "'DM Sans', sans-serif" }}
             >
-              Submit another
+              {tUI('Submit another')}
             </button>
           </div>
         ) : (
@@ -319,14 +321,14 @@ export default function RequestCenterPage() {
                 className="block text-sm font-medium mb-1.5"
                 style={{ fontFamily: "'DM Sans', sans-serif", color: '#374151' }}
               >
-                What PD topic do you need? <span className="text-red-500">*</span>
+                {tUI('What PD topic do you need?')} <span className="text-red-500">*</span>
               </label>
               <input
                 id="title"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g., Classroom management for large groups"
+                placeholder={tUI('e.g., Classroom management for large groups')}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#E8B84B] transition-colors"
                 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '14px' }}
                 maxLength={100}
@@ -341,7 +343,7 @@ export default function RequestCenterPage() {
                 className="block text-sm font-medium mb-1.5"
                 style={{ fontFamily: "'DM Sans', sans-serif", color: '#374151' }}
               >
-                Type <span className="text-red-500">*</span>
+                {tUI('Type')} <span className="text-red-500">*</span>
               </label>
               <select
                 id="type"
@@ -351,10 +353,10 @@ export default function RequestCenterPage() {
                 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '14px' }}
                 disabled={isThrottled}
               >
-                <option value="">Select type...</option>
+                <option value="">{tUI('Select type...')}</option>
                 {REQUEST_TYPES.map((type) => (
                   <option key={type.value} value={type.value}>
-                    {type.label}
+                    {tUI(type.label)}
                   </option>
                 ))}
               </select>
@@ -367,7 +369,7 @@ export default function RequestCenterPage() {
                 className="block text-sm font-medium mb-1.5"
                 style={{ fontFamily: "'DM Sans', sans-serif", color: '#374151' }}
               >
-                Priority
+                {tUI('Priority')}
               </label>
               <select
                 id="priority"
@@ -377,10 +379,10 @@ export default function RequestCenterPage() {
                 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '14px' }}
                 disabled={isThrottled}
               >
-                <option value="">Select priority...</option>
+                <option value="">{tUI('Select priority...')}</option>
                 {PRIORITY_LEVELS.map((level) => (
                   <option key={level.value} value={level.value}>
-                    {level.label}
+                    {tUI(level.label)}
                   </option>
                 ))}
               </select>
@@ -393,13 +395,13 @@ export default function RequestCenterPage() {
                 className="block text-sm font-medium mb-1.5"
                 style={{ fontFamily: "'DM Sans', sans-serif", color: '#374151' }}
               >
-                Tell us more <span className="text-gray-400 font-normal">(optional)</span>
+                {tUI('Tell us more')} <span className="text-gray-400 font-normal">({tUI('optional')})</span>
               </label>
               <textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value.slice(0, 500))}
-                placeholder="Any additional details about what you need..."
+                placeholder={tUI('Any additional details about what you need...')}
                 rows={3}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#E8B84B] transition-colors resize-none"
                 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '14px' }}
@@ -428,12 +430,12 @@ export default function RequestCenterPage() {
               {isSubmitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                  Submitting...
+                  {tUI('Submitting...')}
                 </>
               ) : (
                 <>
                   <Send size={18} />
-                  Submit Request
+                  {tUI('Submit Request')}
                 </>
               )}
             </button>
@@ -451,7 +453,7 @@ export default function RequestCenterPage() {
             color: '#2B3A67',
           }}
         >
-          Your Requests
+          {tUI('Your Requests')}
         </h2>
 
         {isLoadingPrevious ? (
@@ -475,7 +477,7 @@ export default function RequestCenterPage() {
               className="text-gray-500"
               style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '14px' }}
             >
-              No requests yet. Tell us what you need!
+              {tUI('No requests yet. Tell us what you need!')}
             </p>
           </div>
         ) : (
@@ -509,7 +511,7 @@ export default function RequestCenterPage() {
                             fontFamily: "'DM Sans', sans-serif",
                           }}
                         >
-                          {getRequestTypeLabel(request.metadata.request_type)}
+                          {tUI(getRequestTypeLabel(request.metadata.request_type))}
                         </span>
                         {request.metadata.priority && (
                           <span
@@ -520,7 +522,7 @@ export default function RequestCenterPage() {
                               fontFamily: "'DM Sans', sans-serif",
                             }}
                           >
-                            {getPriorityLabel(request.metadata.priority)}
+                            {tUI(getPriorityLabel(request.metadata.priority))}
                           </span>
                         )}
                         <span
@@ -531,7 +533,7 @@ export default function RequestCenterPage() {
                             fontFamily: "'DM Sans', sans-serif",
                           }}
                         >
-                          {statusStyle.label}
+                          {tUI(statusStyle.label)}
                         </span>
                       </div>
                       <p
@@ -546,12 +548,12 @@ export default function RequestCenterPage() {
                           className="text-sm mt-2"
                           style={{ fontFamily: "'DM Sans', sans-serif" }}
                         >
-                          This became:{' '}
+                          {tUI('This became:')}{' '}
                           <Link
                             href={request.metadata.completed_link}
                             className="text-[#E8B84B] hover:underline font-medium"
                           >
-                            View resource →
+                            {tUI('View resource')} →
                           </Link>
                         </p>
                       )}
@@ -576,7 +578,7 @@ export default function RequestCenterPage() {
             }}
           >
             <TrendingUp size={20} style={{ color: '#E8B84B' }} />
-            Popular Requests
+            {tUI('Popular Requests')}
           </h2>
           <div
             className="rounded-lg p-4"
@@ -599,7 +601,7 @@ export default function RequestCenterPage() {
                     style={{ fontFamily: "'DM Sans', sans-serif", color: '#6B7280' }}
                   >
                     <Users size={12} />
-                    {req.count} teachers requested
+                    {req.count} {tUI('teachers requested')}
                   </span>
                 </div>
               ))}
@@ -616,7 +618,7 @@ export default function RequestCenterPage() {
           style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '14px' }}
         >
           <ArrowLeft size={16} />
-          Back to Dashboard
+          {tUI('Back to Dashboard')}
         </Link>
       </div>
 
@@ -630,7 +632,7 @@ export default function RequestCenterPage() {
           className="text-sm text-gray-600"
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
-          We read every request and use your feedback to prioritize what we build next.
+          {tUI('We read every request and use your feedback to prioritize what we build next.')}
         </p>
       </div>
     </div>

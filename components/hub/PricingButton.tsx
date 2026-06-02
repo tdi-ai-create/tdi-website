@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 interface PricingButtonProps {
   tier: 'essentials' | 'professional' | 'all_access';
@@ -8,6 +9,7 @@ interface PricingButtonProps {
 }
 
 export function PricingButton({ tier, label, className }: PricingButtonProps) {
+  const { tUI } = useTranslation();
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
@@ -36,7 +38,7 @@ export function PricingButton({ tier, label, className }: PricingButtonProps) {
       disabled={loading}
       className={className ?? 'px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50'}
     >
-      {loading ? 'Loading...' : label}
+      {loading ? tUI('Loading...') : tUI(label)}
     </button>
   );
 }

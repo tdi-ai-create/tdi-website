@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { LucideIcon } from 'lucide-react';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 interface StatsWidgetProps {
   count: number;
@@ -18,6 +19,7 @@ export default function StatsWidget({
   linkText,
   linkHref,
 }: StatsWidgetProps) {
+  const { tUI } = useTranslation();
   return (
     <div className="hub-card">
       <div className="flex items-center gap-3 mb-2">
@@ -43,7 +45,7 @@ export default function StatsWidget({
         className="text-sm text-gray-600 mb-3"
         style={{ fontFamily: "'DM Sans', sans-serif" }}
       >
-        {label}
+        {tUI(label)}
       </p>
       {linkText && linkHref && (
         <Link
@@ -54,7 +56,7 @@ export default function StatsWidget({
             fontFamily: "'DM Sans', sans-serif",
           }}
         >
-          {linkText}
+          {tUI(linkText)}
         </Link>
       )}
     </div>

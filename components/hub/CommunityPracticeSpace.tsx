@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useHub } from '@/components/hub/HubContext';
+import { useTranslation } from '@/lib/hub/useTranslation';
 import PracticeNoteCard from './PracticeNoteCard';
 
 interface Module {
@@ -36,6 +37,7 @@ export default function CommunityPracticeSpace({
   onEnroll,
 }: CommunityPracticeSpaceProps) {
   const { user } = useHub();
+  const { tUI } = useTranslation();
   const [notes, setNotes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -215,15 +217,15 @@ export default function CommunityPracticeSpace({
             className="text-2xl font-bold mb-1"
             style={{ fontFamily: "'Source Serif 4', Georgia, serif", color: '#1B2A4A' }}
           >
-            From the Practice
+            {tUI('From the Practice')}
           </h2>
           <p className="text-sm" style={{ color: '#6B7280' }}>
-            How educators like you are making this work in real classrooms
+            {tUI('How educators like you are making this work in real classrooms')}
           </p>
         </div>
         <div className="flex gap-5 text-sm" style={{ color: '#6B7280' }}>
-          <span><strong style={{ color: '#1B2A4A' }}>{totalNotes}</strong> practice notes</span>
-          <span><strong style={{ color: '#1B2A4A' }}>{uniqueEducators}</strong> educators sharing</span>
+          <span><strong style={{ color: '#1B2A4A' }}>{totalNotes}</strong> {tUI('practice notes')}</span>
+          <span><strong style={{ color: '#1B2A4A' }}>{uniqueEducators}</strong> {tUI('educators sharing')}</span>
         </div>
       </div>
 
@@ -239,15 +241,15 @@ export default function CommunityPracticeSpace({
               className="text-lg font-semibold mb-1"
               style={{ fontFamily: "'Source Serif 4', Georgia, serif", color: '#1B2A4A' }}
             >
-              Share Your Practice
+              {tUI('Share Your Practice')}
             </h3>
             <p className="text-sm mb-5" style={{ color: '#6B7280' }}>
-              Tell other educators how you used or adapted something from this course. Not a review — just what you tried and what happened. Your note might be exactly what someone else needs.
+              {tUI('Tell other educators how you used or adapted something from this course. Not a review — just what you tried and what happened. Your note might be exactly what someone else needs.')}
             </p>
 
             <div className="mb-4">
               <label className="block text-xs font-semibold mb-1.5" style={{ color: '#6B7280' }}>
-                Which part of the course does this relate to?
+                {tUI('Which part of the course does this relate to?')}
               </label>
               <select
                 value={selectedSection}
@@ -255,7 +257,7 @@ export default function CommunityPracticeSpace({
                 className="w-full px-3.5 py-2.5 text-sm border rounded-lg"
                 style={{ borderColor: '#E5E7EB', backgroundColor: '#FAFAFA', color: '#374151' }}
               >
-                <option value="">Select a module or lesson (optional)</option>
+                <option value="">{tUI('Select a module or lesson (optional)')}</option>
                 {modules.map(module => {
                   const moduleLessons = lessons.filter(l => l.module_id === module.id);
                   return (
@@ -278,12 +280,12 @@ export default function CommunityPracticeSpace({
             >
               <div className="mb-3">
                 <label className="block text-sm font-semibold mb-1" style={{ color: '#1B2A4A' }}>
-                  What I tried <span className="font-normal text-xs" style={{ color: '#9CA3AF' }}>(required)</span>
+                  {tUI('What I tried')} <span className="font-normal text-xs" style={{ color: '#9CA3AF' }}>({tUI('required')})</span>
                 </label>
                 <textarea
                   value={whatITried}
                   onChange={(e) => setWhatITried(e.target.value)}
-                  placeholder="What did you do with this content? E.g., 'I used the morning routine checklist with my 3rd graders...'"
+                  placeholder={tUI("What did you do with this content? E.g., 'I used the morning routine checklist with my 3rd graders...'")}
                   className="w-full px-3 py-2.5 text-sm border rounded-lg resize-vertical"
                   style={{ borderColor: '#E5E7EB', backgroundColor: '#fff', minHeight: '60px' }}
                   required
@@ -292,12 +294,12 @@ export default function CommunityPracticeSpace({
 
               <div className="mb-3">
                 <label className="block text-sm font-semibold mb-1" style={{ color: '#1B2A4A' }}>
-                  What I changed <span className="font-normal text-xs" style={{ color: '#9CA3AF' }}>(optional)</span>
+                  {tUI('What I changed')} <span className="font-normal text-xs" style={{ color: '#9CA3AF' }}>({tUI('optional')})</span>
                 </label>
                 <textarea
                   value={whatIChanged}
                   onChange={(e) => setWhatIChanged(e.target.value)}
-                  placeholder="Did you adapt or skip anything? E.g., 'I skipped Section 2 because my class already does breathing exercises...'"
+                  placeholder={tUI("Did you adapt or skip anything? E.g., 'I skipped Section 2 because my class already does breathing exercises...'")}
                   className="w-full px-3 py-2.5 text-sm border rounded-lg resize-vertical"
                   style={{ borderColor: '#E5E7EB', backgroundColor: '#fff', minHeight: '60px' }}
                 />
@@ -305,12 +307,12 @@ export default function CommunityPracticeSpace({
 
               <div>
                 <label className="block text-sm font-semibold mb-1" style={{ color: '#1B2A4A' }}>
-                  What happened <span className="font-normal text-xs" style={{ color: '#9CA3AF' }}>(optional)</span>
+                  {tUI('What happened')} <span className="font-normal text-xs" style={{ color: '#9CA3AF' }}>({tUI('optional')})</span>
                 </label>
                 <textarea
                   value={whatHappened}
                   onChange={(e) => setWhatHappened(e.target.value)}
-                  placeholder="What was the result? E.g., 'My students were noticeably calmer after recess for the rest of the week...'"
+                  placeholder={tUI("What was the result? E.g., 'My students were noticeably calmer after recess for the rest of the week...'")}
                   className="w-full px-3 py-2.5 text-sm border rounded-lg resize-vertical"
                   style={{ borderColor: '#E5E7EB', backgroundColor: '#fff', minHeight: '60px' }}
                 />
@@ -319,7 +321,7 @@ export default function CommunityPracticeSpace({
 
             <div className="mb-5">
               <label className="block text-xs font-semibold mb-1.5" style={{ color: '#6B7280' }}>
-                Tags (select all that apply)
+                {tUI('Tags (select all that apply)')}
               </label>
               <div className="flex flex-wrap gap-1.5">
                 {[...GRADE_TAGS, ...ADAPTATION_TAGS].map(tag => (
@@ -341,7 +343,7 @@ export default function CommunityPracticeSpace({
 
             <div className="flex items-center justify-between">
               <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                Your name will appear with your note. You can edit or delete anytime.
+                {tUI('Your name will appear with your note. You can edit or delete anytime.')}
               </span>
               <button
                 type="submit"
@@ -354,7 +356,7 @@ export default function CommunityPracticeSpace({
                   cursor: !whatITried.trim() || isSubmitting ? 'not-allowed' : 'pointer',
                 }}
               >
-                {isSubmitting ? 'Sharing...' : 'Share Practice Note'}
+                {isSubmitting ? tUI('Sharing...') : tUI('Share Practice Note')}
               </button>
             </div>
           </form>
@@ -365,10 +367,10 @@ export default function CommunityPracticeSpace({
           >
             <div>
               <div className="text-sm font-semibold mb-0.5" style={{ color: '#1B2A4A' }}>
-                This is where educators help each other.
+                {tUI('This is where educators help each other.')}
               </div>
               <div className="text-xs" style={{ color: '#9CA3AF' }}>
-                Enroll to share what worked for you — and help other educators figure it out too.
+                {tUI('Enroll to share what worked for you — and help other educators figure it out too.')}
               </div>
             </div>
             <button
@@ -376,7 +378,7 @@ export default function CommunityPracticeSpace({
               className="px-5 py-2 text-sm font-semibold rounded-lg flex-shrink-0"
               style={{ backgroundColor: '#E8B84B', color: '#2B3A67' }}
             >
-              Post a note
+              {tUI('Post a note')}
             </button>
           </div>
         )
@@ -396,7 +398,7 @@ export default function CommunityPracticeSpace({
                 : 'bg-transparent text-[#6B7280] hover:bg-[#F9FAFB]'
             }`}
           >
-            All Notes
+            {tUI('All Notes')}
           </button>
           {user && (
             <button
@@ -407,7 +409,7 @@ export default function CommunityPracticeSpace({
                   : 'bg-transparent text-[#6B7280] hover:bg-[#F9FAFB]'
               }`}
             >
-              My Notes
+              {tUI('My Notes')}
             </button>
           )}
         </div>
@@ -416,7 +418,7 @@ export default function CommunityPracticeSpace({
       {/* Notes feed */}
       {isLoading ? (
         <div className="text-center py-12 text-[#9CA3AF]">
-          Loading practice notes...
+          {tUI('Loading practice notes...')}
         </div>
       ) : notes.length === 0 ? (
         <div
@@ -425,10 +427,10 @@ export default function CommunityPracticeSpace({
         >
           <div className="text-4xl mb-3" style={{ color: '#E5E7EB' }}>📝</div>
           <h4 className="text-base font-semibold mb-1" style={{ color: '#1B2A4A' }}>
-            No notes yet
+            {tUI('No notes yet')}
           </h4>
           <p className="text-sm" style={{ color: '#9CA3AF' }}>
-            Be the first educator to share what worked — and help the ones who come after you.
+            {tUI('Be the first educator to share what worked — and help the ones who come after you.')}
           </p>
         </div>
       ) : (
@@ -461,7 +463,7 @@ export default function CommunityPracticeSpace({
                   cursor: isLoadingMore ? 'not-allowed' : 'pointer',
                 }}
               >
-                {isLoadingMore ? 'Loading...' : `Load More Practice Notes (${total - notes.length} remaining)`}
+                {isLoadingMore ? tUI('Loading...') : `${tUI('Load More Practice Notes')} (${total - notes.length} ${tUI('remaining')})`}
               </button>
             </div>
           )}
