@@ -1056,65 +1056,58 @@ export default function HubDashboard() {
         </div>
       )}
 
-      {/* ============ MAIN GRID ============ */}
-      <div className="max-w-5xl mx-auto px-4 md:px-6 pb-8" style={{ position: 'relative' }}>
-
-        {/* ═══ FLOATING POLAROIDS ═══ */}
-        <div className="hidden lg:block">
-          {user?.id && (
-            <>
-              {/* "Love" -- top left, overlapping stats/goal area */}
-              <div style={{ position: 'absolute', top: -30, left: -20, zIndex: 10, transform: 'rotate(-4deg)' }}>
-                <PolaroidCard
-                  slot="love"
-                  imageUrl={polaroids.love?.image_url}
-                  caption={polaroids.love?.caption}
-                  userId={user.id}
-                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
-                  width={190}
-                />
-              </div>
-              {/* "Proud" -- right side, mid-page */}
-              <div style={{ position: 'absolute', top: 340, right: -15, zIndex: 10, transform: 'rotate(3deg)' }}>
-                <PolaroidCard
-                  slot="proud"
-                  imageUrl={polaroids.proud?.image_url}
-                  caption={polaroids.proud?.caption}
-                  userId={user.id}
-                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
-                  width={180}
-                />
-              </div>
-              {/* "Goal" -- bottom left */}
-              <div style={{ position: 'absolute', bottom: 120, left: -10, zIndex: 10, transform: 'rotate(-2deg)' }}>
-                <PolaroidCard
-                  slot="goal"
-                  imageUrl={polaroids.goal?.image_url}
-                  caption={polaroids.goal?.caption}
-                  userId={user.id}
-                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
-                  width={175}
-                />
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Mobile: horizontal scroll row */}
-        <div className="lg:hidden flex gap-4 overflow-x-auto pb-4 -mx-2 px-2" style={{ scrollSnapType: 'x mandatory' }}>
-          {user?.id && (['love', 'proud', 'goal'] as const).map(slot => (
-            <div key={slot} style={{ scrollSnapAlign: 'start', flexShrink: 0 }}>
+      {/* ═══ POLAROID SHELF ═══ */}
+      {user?.id && (
+        <div className="max-w-5xl mx-auto px-4 md:px-6 mb-6">
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              gap: 0,
+              padding: '12px 0 8px',
+              overflow: 'visible',
+            }}
+          >
+            {/* Love -- tilted left, slightly overlapping center */}
+            <div style={{ transform: 'rotate(-5deg) translateX(18px)', zIndex: 2 }}>
               <PolaroidCard
-                slot={slot}
-                imageUrl={polaroids[slot]?.image_url}
-                caption={polaroids[slot]?.caption}
+                slot="love"
+                imageUrl={polaroids.love?.image_url}
+                caption={polaroids.love?.caption}
                 userId={user.id}
-                onUpdate={(s, url) => setPolaroids(prev => ({ ...prev, [s]: { image_url: url, caption: null } }))}
-                width={160}
+                onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
+                width={185}
               />
             </div>
-          ))}
+            {/* Proud -- center, straight, slightly raised */}
+            <div style={{ transform: 'rotate(1deg) translateY(-12px)', zIndex: 3 }}>
+              <PolaroidCard
+                slot="proud"
+                imageUrl={polaroids.proud?.image_url}
+                caption={polaroids.proud?.caption}
+                userId={user.id}
+                onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
+                width={195}
+              />
+            </div>
+            {/* Goal -- tilted right, slightly overlapping center */}
+            <div style={{ transform: 'rotate(4deg) translateX(-18px)', zIndex: 2 }}>
+              <PolaroidCard
+                slot="goal"
+                imageUrl={polaroids.goal?.image_url}
+                caption={polaroids.goal?.caption}
+                userId={user.id}
+                onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
+                width={185}
+              />
+            </div>
+          </div>
         </div>
+      )}
+
+      {/* ============ MAIN GRID ============ */}
+      <div className="max-w-5xl mx-auto px-4 md:px-6 pb-8">
 
         <div className="grid lg:grid-cols-[1fr_380px] gap-8">
 
@@ -1447,7 +1440,7 @@ export default function HubDashboard() {
               </div>
               <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', lineHeight: 1.6, margin: 0 }}>
                 {aiInsightLoading ? 'Generating your personalized insight...' : (
-                  aiInsight && aiInsight.length > 200 ? aiInsight.slice(0, 200).trim() + '...' : aiInsight
+                  aiInsight && aiInsight.length > 150 ? aiInsight.slice(0, 150).trim() + '...' : aiInsight
                 )}
               </p>
               <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
