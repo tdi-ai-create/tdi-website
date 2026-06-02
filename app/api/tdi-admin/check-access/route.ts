@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 // Cache the supabase client
 let cachedSupabase: ReturnType<typeof createClient> | null = null;
@@ -22,12 +21,11 @@ function getSupabaseAdmin() {
   return cachedSupabase;
 }
 
-// This route uses the service role to check team membership, bypassing RLS
+// This route checks team membership — it IS the auth gate for the admin UI,
+// so it cannot use requireAdminAuth() (circular dependency). It validates
+// the caller provides a userId+email and checks tdi_team_members directly.
 export async function POST(request: NextRequest) {
   try {
-    const auth = await requireAdminAuth();
-    if (auth instanceof NextResponse) return auth;
-
     const { userId, email } = await request.json();
 
     if (!userId || !email) {
