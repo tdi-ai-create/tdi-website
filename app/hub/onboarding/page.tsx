@@ -95,7 +95,6 @@ export default function OnboardingPage() {
   const [stressScore, setStressScore] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
-  const [communityCount, setCommunityCount] = useState<number | null>(null);
 
   // User state
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -122,16 +121,6 @@ export default function OnboardingPage() {
       setStep(newStep);
       setIsTransitioning(false);
       window.scrollTo({ top: 0, behavior: 'instant' });
-      if (newStep === 5 && communityCount === null) {
-        fetch('/api/hub/community-count')
-          .then((r) => r.json())
-          .then((data) => {
-            if (typeof data.count === 'number' && data.count > 0) {
-              setCommunityCount(data.count);
-            }
-          })
-          .catch(() => {});
-      }
     }, 150);
   };
 
@@ -1465,9 +1454,7 @@ export default function OnboardingPage() {
               color: 'white',
             }}
           >
-            {communityCount !== null
-              ? `You're in. So are ${communityCount.toLocaleString()}+ other educators.`
-              : "You're in. So are thousands of other educators."}
+            You&apos;re in. Welcome to the community.
           </h1>
 
           <p
