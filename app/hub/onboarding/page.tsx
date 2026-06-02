@@ -28,7 +28,7 @@ import AvatarPicker from '@/components/hub/AvatarPicker';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { getCurrentUser } from '@/lib/hub-auth';
 
-type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5;
+type OnboardingStep = 1 | 2 | 3 | 4 | 5; // Only 1 and 2 are active; rest kept for dead code in disabled blocks
 
 type Role = 'classroom_teacher' | 'para' | 'coach' | 'school_leader' | 'district_staff' | 'other';
 
@@ -82,7 +82,7 @@ const ALL_INDIVIDUAL_GOALS: GoalType[] = GRID_GOALS.map(g => g.value);
 export default function OnboardingPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [step, setStep] = useState<OnboardingStep>(0);
+  const [step, setStep] = useState<OnboardingStep>(1);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const storyRef = useRef<HTMLDivElement>(null);
@@ -311,12 +311,12 @@ export default function OnboardingPage() {
     <div
       className="flex gap-2 mb-8"
       role="progressbar"
-      aria-label={`Step ${currentStep} of 4`}
+      aria-label={`Step ${currentStep} of 2`}
       aria-valuenow={currentStep}
       aria-valuemin={1}
-      aria-valuemax={4}
+      aria-valuemax={2}
     >
-      {[1, 2, 3, 4].map((s) => (
+      {[1, 2].map((s) => (
         <div
           key={s}
           className="h-1 flex-1 rounded-full transition-colors duration-300"
@@ -334,8 +334,8 @@ export default function OnboardingPage() {
         isTransitioning ? 'opacity-0' : 'opacity-100'
       }`}
     >
-      {/* Step 0: Welcome - Full scrollable experience */}
-      {step === 0 && (
+      {/* Step 0 removed -- users go straight to role selection */}
+      {false && (
         <div className="scroll-smooth">
           {/* Section A: Hero */}
           <section
@@ -1151,15 +1151,16 @@ export default function OnboardingPage() {
               </button>
               {selectedGoals.length > 0 && (
                 <button
-                  onClick={() => goToStep(3)}
-                  className="flex-1 py-4 rounded-lg font-semibold transition-all"
+                  onClick={handleComplete}
+                  disabled={isSaving}
+                  className="flex-1 py-4 rounded-lg font-semibold transition-all disabled:opacity-50"
                   style={{
                     backgroundColor: '#E8B84B',
                     color: '#2B3A67',
                     fontFamily: "'DM Sans', sans-serif",
                   }}
                 >
-                  Next
+                  {isSaving ? 'Setting up...' : 'Let\'s Go'}
                 </button>
               )}
             </div>
@@ -1167,8 +1168,8 @@ export default function OnboardingPage() {
         </div>
       )}
 
-      {/* Step 3: Pick Your Avatar */}
-      {step === 3 && (
+      {/* Steps 3-5 removed -- after goals, handleComplete saves and redirects to dashboard */}
+      {false && (
         <div
           className="min-h-screen p-6 md:p-8 relative"
           style={{ backgroundColor: '#FFFFFF' }}
@@ -1266,8 +1267,8 @@ export default function OnboardingPage() {
         </div>
       )}
 
-      {/* Step 4: Quick Check-In */}
-      {step === 4 && (
+      {/* Step 4: removed */}
+      {false && (
         <div
           className="min-h-screen p-6 md:p-8 relative"
           style={{ backgroundColor: '#FFFFFF' }}
@@ -1432,8 +1433,8 @@ export default function OnboardingPage() {
         </div>
       )}
 
-      {/* Step 5: Ready (Completion) */}
-      {step === 5 && (
+      {/* Step 5: removed */}
+      {false && (
         <div
           className="min-h-screen flex flex-col items-center justify-center p-6 text-center"
           style={{ backgroundColor: '#2B3A67' }}
