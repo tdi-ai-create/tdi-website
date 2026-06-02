@@ -95,8 +95,8 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
   return (
     <>
       <nav
-        className="fixed top-0 left-0 right-0 z-40 h-[54px] flex items-center px-4 md:px-6"
-        style={{ backgroundColor: '#1B2A4A' }}
+        className="fixed left-0 right-0 z-40 h-[54px] flex items-center px-4 md:px-6"
+        style={{ backgroundColor: '#1B2A4A', top: 'var(--admin-banner-h, 0px)' }}
       >
         {/* Logo + Learning Hub Label */}
         <Link

@@ -5,12 +5,11 @@ import Link from 'next/link';
 import { useHub } from './HubContext';
 import { ArrowLeft } from 'lucide-react';
 
+const BANNER_H = 28;
+
 /**
- * Shows a slim banner above the Hub nav for admin team members
- * with a link back to the TDI Admin Portal.
- *
- * Uses a non-fixed div in the document flow. The parent layout
- * places this before the nav, so it naturally sits above it.
+ * Slim gold banner pinned above the Hub nav for admin team members.
+ * Sets --admin-banner-h on <html> so the nav can offset itself.
  */
 export default function AdminBanner() {
   const { user } = useHub();
@@ -25,17 +24,25 @@ export default function AdminBanner() {
       body: JSON.stringify({ userId: user.id, email: user.email }),
     })
       .then((r) => {
-        if (r.ok) setIsAdmin(true);
+        if (r.ok) {
+          setIsAdmin(true);
+          document.documentElement.style.setProperty('--admin-banner-h', `${BANNER_H}px`);
+        }
       })
       .catch(() => {});
+
+    return () => {
+      document.documentElement.style.removeProperty('--admin-banner-h');
+    };
   }, [user?.id, user?.email]);
 
   if (!isAdmin) return null;
 
   return (
     <div
-      className="w-full flex items-center justify-center py-1.5 px-4"
+      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center"
       style={{
+        height: BANNER_H,
         background: '#E8B84B',
         fontFamily: "'DM Sans', sans-serif",
       }}
