@@ -37,6 +37,14 @@ export interface ContentAccess {
   is_free_rotating?: boolean;
 }
 
+export interface ActiveTierOverride {
+  user_id: string;
+  tier_granted: MembershipTier;
+  granted_by_mechanic: string;
+  granted_at: string;
+  expires_at: string;
+}
+
 /**
  * Check if a user's membership tier grants access to a piece of content.
  *
@@ -48,7 +56,8 @@ export interface ContentAccess {
  */
 export function canAccessContent(
   membership: UserMembership | null,
-  content: ContentAccess
+  content: ContentAccess,
+  overrides?: ActiveTierOverride[] | null
 ): boolean {
   // Free rotating content is accessible to everyone
   if (content.is_free_rotating) return true;
@@ -56,11 +65,7 @@ export function canAccessContent(
   // Content marked as free_rotating tier is also accessible
   if (content.access_tier === 'free_rotating') return true;
 
-  // No membership = free tier
-  const userTier = membership?.status === 'active' ? membership.tier : 'free';
-
-  // District partners always get all_access
-  const effectiveTier = membership?.source === 'district_partner' ? 'all_access' : userTier;
+  const effectiveTier = getEffectiveTier(membership, overrides);
 
   const userLevel = TIER_LEVELS[effectiveTier] ?? 0;
   const contentLevel = TIER_LEVELS[content.access_tier] ?? 3; // default to highest if unknown
@@ -71,10 +76,31 @@ export function canAccessContent(
 /**
  * Get the effective tier for a user, accounting for source
  */
-export function getEffectiveTier(membership: UserMembership | null): MembershipTier {
-  if (!membership || membership.status !== 'active') return 'free';
-  if (membership.source === 'district_partner') return 'all_access';
-  return membership.tier;
+export function getEffectiveTier(
+  membership: UserMembership | null,
+  overrides?: ActiveTierOverride[] | null
+): MembershipTier {
+  // Base tier from membership
+  let baseTier: MembershipTier = 'free';
+  if (membership?.status === 'active') {
+    if (membership.source === 'district_partner') return 'all_access';
+    baseTier = membership.tier;
+  }
+
+  // Check for unexpired tier overrides -- take the highest
+  if (overrides && overrides.length > 0) {
+    const now = new Date().getTime();
+    for (const override of overrides) {
+      if (new Date(override.expires_at).getTime() > now) {
+        const overrideLevel = TIER_LEVELS[override.tier_granted] ?? 0;
+        if (overrideLevel > (TIER_LEVELS[baseTier] ?? 0)) {
+          baseTier = override.tier_granted;
+        }
+      }
+    }
+  }
+
+  return baseTier;
 }
 
 /**

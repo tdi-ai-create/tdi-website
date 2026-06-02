@@ -6,6 +6,7 @@ import { getCurrentUser } from '@/lib/hub-auth';
 import {
   UserMembership,
   MembershipTier,
+  ActiveTierOverride,
   getEffectiveTier,
   canAccessContent,
   ContentAccess
@@ -13,6 +14,7 @@ import {
 
 export interface UseMembershipResult {
   membership: UserMembership | null;
+  overrides: ActiveTierOverride[] | null;
   effectiveTier: MembershipTier;
   isLoading: boolean;
   error: Error | null;
@@ -33,6 +35,7 @@ export interface UseMembershipResult {
  */
 export function useMembership(): UseMembershipResult {
   const [membership, setMembership] = useState<UserMembership | null>(null);
+  const [overrides, setOverrides] = useState<ActiveTierOverride[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -44,36 +47,53 @@ export function useMembership(): UseMembershipResult {
       const user = await getCurrentUser();
 
       if (!user) {
-        // No user logged in = free tier
         setMembership(null);
+        setOverrides(null);
         return;
       }
 
       const supabase = getSupabase();
-      const { data, error: fetchError } = await supabase
-        .from('hub_memberships')
-        .select('tier, source, status, org_id')
-        .eq('user_id', user.id)
-        .single();
 
-      if (fetchError) {
-        // PGRST116 = no rows found, which is fine (user has no membership = free)
-        if (fetchError.code === 'PGRST116') {
+      // Fetch membership and active tier overrides in parallel
+      const [membershipResult, overridesResult] = await Promise.all([
+        supabase
+          .from('hub_memberships')
+          .select('tier, source, status, org_id')
+          .eq('user_id', user.id)
+          .single(),
+        supabase
+          .from('active_tier_overrides')
+          .select('user_id, tier_granted, granted_by_mechanic, granted_at, expires_at')
+          .eq('user_id', user.id)
+          .gt('expires_at', new Date().toISOString()),
+      ]);
+
+      // Process membership
+      if (membershipResult.error) {
+        if (membershipResult.error.code === 'PGRST116') {
           setMembership(null);
         } else {
-          throw new Error(fetchError.message);
+          throw new Error(membershipResult.error.message);
         }
-      } else if (data) {
+      } else if (membershipResult.data) {
         setMembership({
-          tier: data.tier as MembershipTier,
-          source: data.source as UserMembership['source'],
-          status: data.status as UserMembership['status'],
-          org_id: data.org_id,
+          tier: membershipResult.data.tier as MembershipTier,
+          source: membershipResult.data.source as UserMembership['source'],
+          status: membershipResult.data.status as UserMembership['status'],
+          org_id: membershipResult.data.org_id,
         });
+      }
+
+      // Process overrides (table may not exist yet -- treat errors as empty)
+      if (overridesResult.error) {
+        setOverrides(null);
+      } else {
+        setOverrides((overridesResult.data as ActiveTierOverride[]) || null);
       }
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch membership'));
       setMembership(null);
+      setOverrides(null);
     } finally {
       setIsLoading(false);
     }
@@ -83,15 +103,16 @@ export function useMembership(): UseMembershipResult {
     fetchMembership();
   }, [fetchMembership]);
 
-  const effectiveTier = getEffectiveTier(membership);
+  const effectiveTier = getEffectiveTier(membership, overrides);
 
   const canAccess = useCallback(
-    (content: ContentAccess) => canAccessContent(membership, content),
-    [membership]
+    (content: ContentAccess) => canAccessContent(membership, content, overrides),
+    [membership, overrides]
   );
 
   return {
     membership,
+    overrides,
     effectiveTier,
     isLoading,
     error,
@@ -104,26 +125,40 @@ export function useMembership(): UseMembershipResult {
  * Server-side function to get user membership.
  * Use in API routes and server components.
  */
-export async function getMembership(userId: string): Promise<UserMembership | null> {
+export async function getMembership(userId: string): Promise<{
+  membership: UserMembership | null;
+  overrides: ActiveTierOverride[] | null;
+}> {
   const { getServiceSupabase } = await import('@/lib/supabase');
   const supabase = getServiceSupabase();
 
-  const { data, error } = await supabase
-    .from('hub_memberships')
-    .select('tier, source, status, org_id')
-    .eq('user_id', userId)
-    .single();
+  const [membershipResult, overridesResult] = await Promise.all([
+    supabase
+      .from('hub_memberships')
+      .select('tier, source, status, org_id')
+      .eq('user_id', userId)
+      .single(),
+    supabase
+      .from('active_tier_overrides')
+      .select('user_id, tier_granted, granted_by_mechanic, granted_at, expires_at')
+      .eq('user_id', userId)
+      .gt('expires_at', new Date().toISOString()),
+  ]);
 
-  if (error || !data) {
-    return null;
-  }
+  const membership = membershipResult.data
+    ? {
+        tier: membershipResult.data.tier as MembershipTier,
+        source: membershipResult.data.source as UserMembership['source'],
+        status: membershipResult.data.status as UserMembership['status'],
+        org_id: membershipResult.data.org_id,
+      }
+    : null;
 
-  return {
-    tier: data.tier as MembershipTier,
-    source: data.source as UserMembership['source'],
-    status: data.status as UserMembership['status'],
-    org_id: data.org_id,
-  };
+  const overrides = overridesResult.error
+    ? null
+    : (overridesResult.data as ActiveTierOverride[]) || null;
+
+  return { membership, overrides };
 }
 
 // Re-export useful types and functions from membership-access
@@ -132,6 +167,7 @@ export {
   type MembershipTier,
   type ContentAccess,
   type ContentAccessTier,
+  type ActiveTierOverride,
   canAccessContent,
   getEffectiveTier,
   getTierLabel,

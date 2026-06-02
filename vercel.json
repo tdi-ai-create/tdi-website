@@ -15,6 +15,10 @@
     {
       "path": "/api/cron/pause-check-ins",
       "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/cron/expire-tier-overrides",
+      "schedule": "0 * * * *"
     }
   ]
 }
