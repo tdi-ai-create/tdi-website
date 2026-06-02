@@ -1234,8 +1234,8 @@ export default function HubDashboard() {
             <CommunityBookmarks userId={user?.id} tUI={tUI} />
           </div>
 
-          {/* First Field Note -- Hub Pioneer celebration */}
-          {fieldNotesCount > 0 && (
+          {/* Hub Pioneer card removed -- tour-specific */}
+          {false && fieldNotesCount > 0 && (
             <div
               data-tour="field-notes"
               className="rounded-2xl overflow-hidden"
@@ -1270,154 +1270,15 @@ export default function HubDashboard() {
             </div>
           )}
 
-          {/* D. What Educators Are Saying -- bar chart + conversation cards */}
-          {communitySummary && (
-            <div data-tour="community-highlights">
-              <div className="text-sm font-semibold mb-3" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>
-                {tUI('What educators are saying')}
-              </div>
-
-              <div
-                className="bg-white rounded-2xl overflow-hidden"
-                style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
-              >
-                {/* Bar chart header */}
-                <div className="p-5" style={{ borderBottom: '1px solid #F3F4F6' }}>
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
-                      {tUI('What teachers are doing with this resource')}
-                    </h3>
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full" style={{ background: '#22C55E' }} />
-                      <span className="text-xs" style={{ color: '#9CA3AF' }}>{tUI('Active')}</span>
-                    </div>
-                  </div>
-                  <Link
-                    href={`/hub/quick-wins/${communitySummary.resourceSlug}`}
-                    className="text-xs font-medium hover:underline"
-                    style={{ color: '#38618C' }}
-                  >
-                    {communitySummary.resourceTitle}
-                  </Link>
-                  <p className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>
-                    {communitySummary.teacherCount} {tUI('teachers in the conversation')}
-                  </p>
-
-                  {/* Horizontal bar chart */}
-                  <div className="mt-4 space-y-2">
-                    {communitySummary.bars.map((bar) => {
-                      const maxCount = Math.max(...communitySummary.bars.map(b => b.count), 1);
-                      const pct = bar.count > 0 ? Math.max((bar.count / maxCount) * 100, 8) : 0;
-                      return (
-                        <div key={bar.label} className="flex items-center gap-3">
-                          <span className="text-xs w-20 text-right flex-shrink-0" style={{ color: '#6B7280' }}>
-                            {bar.label}
-                          </span>
-                          <div className="flex-1 h-3 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
-                            {bar.count > 0 && (
-                              <div
-                                className="h-full rounded-full"
-                                style={{ width: `${pct}%`, background: bar.color }}
-                              />
-                            )}
-                          </div>
-                          <span className="text-xs font-semibold w-5 text-right" style={{ color: '#1B2A4A' }}>
-                            {bar.count}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Conversation cards */}
-                {communitySummary.conversations.length > 0 && (
-                  <div className="p-5 space-y-3">
-                    {communitySummary.conversations.map((conv, idx) => {
-                      const borderColors: Record<string, string> = {
-                        'Tried it': '#4A9A8B',
-                        'Adapted it': '#D4A843',
-                        'Still trying': '#7C9CBF',
-                      };
-                      const statusColors: Record<string, { bg: string; text: string }> = {
-                        'Tried it': { bg: '#E8F5E9', text: '#2E7D32' },
-                        'Adapted it': { bg: '#FEF3C7', text: '#92400E' },
-                        'Still trying': { bg: '#E0F4FF', text: '#1565C0' },
-                      };
-                      const borderColor = borderColors[conv.status] || '#D1D5DB';
-                      const statusStyle = statusColors[conv.status] || { bg: '#F3F4F6', text: '#6B7280' };
-
-                      return (
-                        <div
-                          key={idx}
-                          className="rounded-xl p-4"
-                          style={{
-                            background: '#FAFAF8',
-                            borderLeft: `4px solid ${borderColor}`,
-                          }}
-                        >
-                          <div className="flex items-center gap-2 mb-2">
-                            <span
-                              className="text-xs font-bold px-2 py-0.5 rounded"
-                              style={{ background: statusStyle.bg, color: statusStyle.text, fontSize: '10px' }}
-                            >
-                              {conv.status}
-                            </span>
-                            <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                              {conv.role} &middot; {conv.time}
-                            </span>
-                          </div>
-                          <p className="text-sm leading-relaxed mb-2" style={{ color: '#374151', lineHeight: 1.6 }}>
-                            {conv.body}
-                          </p>
-                          <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                            {tUI('Helpful')} ({conv.helpful})
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* Expand to see more */}
-                <div className="px-5 pb-4">
-                  <Link
-                    href={`/hub/quick-wins/${communitySummary.resourceSlug}`}
-                    className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold transition-colors hover:bg-gray-50"
-                    style={{ color: '#38618C', border: '1px solid rgba(27,42,74,0.1)' }}
-                  >
-                    {tUI('Expand to see more')}
-                    <ArrowRight size={14} />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* AI Growth Insights -- expandable accordion */}
-          <AchievementInsights
-            data={{
-              name: profile?.display_name || 'Educator',
-              role: profile?.role || 'Educator',
-              toolsExplored: personalStats?.toolsExplored ?? 0,
-              hoursSaved: String(personalStats?.hoursSaved ?? '0'),
-              daysActive: currentStreak,
-              recognitionsEarned: certificateCount + fieldNotesCount,
-              earnedNames: [],
-              topCategories: [],
-              communityPosts: 0,
-              coursesCompleted: 0,
-              pdHours: 0,
-            }}
-          />
+          {/* Community preview + AI Growth Insights moved to respective pages */}
         </div>
 
         {/* ===== RIGHT COLUMN (SIDEBAR) ===== */}
         <div className="space-y-4">
           {/* Gift Element -- deferred to post-launch for polish */}
 
-          {/* 2. TDI Tip -- enhanced */}
-          <div
+          {/* TDI Tip removed -- low signal for dashboard */}
+          {false && <div
             className="rounded-2xl p-6"
             style={{ background: '#1B2A4A', borderTop: '2px solid #FFBA06' }}
           >
@@ -1447,7 +1308,7 @@ export default function HubDashboard() {
               <Share2 size={12} />
               {tUI('Share your wins')}
             </button>
-          </div>
+          </div>}
 
           {/* 3. Your Progress -- merged Achievements + Streak + Tracker */}
           <div
@@ -1666,52 +1527,14 @@ export default function HubDashboard() {
             </div>
           )}
 
-          {/* 5. LIFT Key -- effort level filter */}
-          <div
-            data-tour="lift-filter"
-            className="rounded-2xl overflow-hidden"
-            style={{ border: '1px solid rgba(27,42,74,0.08)' }}
-          >
-            <div className="px-5 pt-5 pb-3" style={{ background: '#1B2A4A' }}>
-              <div className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#FFBA06', letterSpacing: '0.08em' }}>
-                {tUI('LIFT')}
-              </div>
-              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
-                {tUI('How action-ready a resource is. Everything here is built for implementation.')}
-              </p>
-            </div>
-            <div className="bg-white px-5 py-4 space-y-2.5">
-              {[
-                { level: 'Low', desc: 'Grab and go. Open it, use it, done.', color: '#6BA368', bg: '#E8F5E9' },
-                { level: 'Medium', desc: 'A planning period. A few moments to think, then implement.', color: '#D4A843', bg: '#FEF3C7' },
-                { level: 'High', desc: 'Grab a coffee. Deeper reflection and planning, then action.', color: '#C0392B', bg: '#FEE2E2' },
-              ].map((item) => (
-                <div
-                  key={item.level}
-                  className="flex items-start gap-3 rounded-lg px-3 py-2.5"
-                  style={{ background: item.bg }}
-                >
-                  <span
-                    className="text-xs font-bold px-2 py-0.5 rounded mt-0.5 flex-shrink-0"
-                    style={{ background: item.color, color: 'white', fontSize: '10px' }}
-                  >
-                    {item.level.toUpperCase()}
-                  </span>
-                  <span className="text-xs" style={{ color: '#4B5563', lineHeight: 1.4 }}>
-                    {tUI(item.desc)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Sidebar end -- Vibe Check + Saved moved out */}
+          {/* LIFT + Vibe Check moved to tour card and Profile settings */}
         </div>
       </div>
     </div>
 
-    {/* Vibe Check -- full width below the grid */}
-    <div className="max-w-5xl mx-auto px-4 md:px-6 pb-8">
+    {/* Vibe Check moved to Profile settings */}
+    {false && (
+      <div className="max-w-5xl mx-auto px-4 md:px-6 pb-8">
       <div
         data-tour="vibe-check"
         className="rounded-2xl overflow-hidden"
@@ -1776,6 +1599,7 @@ export default function HubDashboard() {
         </div>
       </div>
     </div>
+    )}
 
     {/* Celebrate & Share Modal */}
     {showCelebrateModal && (

@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { X } from 'lucide-react';
+import { useState, useCallback, useRef } from 'react';
 import { useHub } from '@/components/hub/HubContext';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
@@ -14,684 +13,194 @@ interface OnboardingTourProps {
   resumeFromStep?: number;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Tour step definition                                               */
-/* ------------------------------------------------------------------ */
+/** All features shown in a single wide scrollable card */
+const ALL_FEATURES = TOUR_STOPS.map(stop => ({ title: stop.title, description: stop.description }));
 
-interface TourStep {
-  title: string;
-  body: string;
-  /** CSS selector for the element to highlight (null = centered popover) */
-  selector: string | null;
-}
+const FEATURE_ICONS: Record<string, string> = {
+  'Quick Wins': 'M13 10V3L4 14h7v7l9-11h-7z',
+  'Community': 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z',
+  'The LIFT Filter': 'M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z',
+  'Moment Mode': 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
+  'Meet Desi': 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',
+  'Field Notes': 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
+  'The Gift': 'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7',
+  'Vibe Check': 'M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+  'Transformation Tracker': 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+  'Favorites': 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
+  'Multilingual Support': 'M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129',
+  'Certificates': 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z',
+};
 
-const MANDATORY_COUNT = 5;
+const FEATURE_COLORS = ['#E8B84B', '#2A9D8F', '#F97316', '#EC4899', '#8B5CF6', '#2563EB', '#10B981', '#EF4444', '#0891B2', '#D97706', '#6366F1', '#14B8A6'];
 
-/**
- * 12 stops matching tour-copy.ts exactly, in the approved order.
- * Selectors target nav-bar or dashboard elements on /hub.
- * null = centered popover (element not on dashboard).
- */
-const TOUR_STEPS_CONFIG: TourStep[] = [
-  // 1. Quick Wins -- points to sidebar explorer section
-  {
-    title: TOUR_STOPS[0].title,
-    body: TOUR_STOPS[0].description,
-    selector: '[data-tour="quick-wins"]',
-  },
-  // 2. Community
-  {
-    title: TOUR_STOPS[1].title,
-    body: TOUR_STOPS[1].description,
-    selector: '[data-tour="community-highlights"]',
-  },
-  // 3. The LIFT Filter
-  {
-    title: TOUR_STOPS[2].title,
-    body: TOUR_STOPS[2].description,
-    selector: '[data-tour="lift-filter"]',
-  },
-  // 4. Moment Mode
-  {
-    title: TOUR_STOPS[3].title,
-    body: TOUR_STOPS[3].description,
-    selector: '[data-tour="moment-mode"]',
-  },
-  // 5. Meet Desi
-  {
-    title: TOUR_STOPS[4].title,
-    body: TOUR_STOPS[4].description,
-    selector: '[data-tour="desi-chat"]',
-  },
-  // Stops 6-12 removed from tooltip tour -- shown in scrollable summary card instead
-];
-
-/** Features shown in the post-tour scrollable card */
-const MORE_FEATURES = [
-  { title: TOUR_STOPS[5].title, description: TOUR_STOPS[5].description },   // Field Notes
-  { title: TOUR_STOPS[7].title, description: TOUR_STOPS[7].description },   // Vibe Check
-  { title: TOUR_STOPS[8].title, description: TOUR_STOPS[8].description },   // Transformation Tracker
-  { title: TOUR_STOPS[9].title, description: TOUR_STOPS[9].description },   // Favorites
-  { title: TOUR_STOPS[10].title, description: TOUR_STOPS[10].description }, // Multilingual
-  { title: TOUR_STOPS[11].title, description: TOUR_STOPS[11].description }, // Certificates
-];
-
-const TOTAL_STEPS = TOUR_STEPS_CONFIG.length;
-
-/* ------------------------------------------------------------------ */
-/*  Positioning helpers                                                */
-/* ------------------------------------------------------------------ */
-
-interface Rect {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
-  bottom: number;
-  right: number;
-}
-
-const PAD = 8;
-const RADIUS = 8;
-const TOOLTIP_GAP = 12;
-const TOOLTIP_MAX_W = 320;
-
-type Side = 'top' | 'bottom' | 'left' | 'right';
-
-function bestSide(rect: Rect): Side {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  const spaceBelow = vh - rect.bottom;
-  const spaceAbove = rect.top;
-  const spaceRight = vw - rect.right;
-  const spaceLeft = rect.left;
-
-  if (spaceBelow >= 200) return 'bottom';
-  if (spaceAbove >= 200) return 'top';
-  if (spaceRight >= TOOLTIP_MAX_W + 40) return 'right';
-  if (spaceLeft >= TOOLTIP_MAX_W + 40) return 'left';
-  return spaceBelow >= spaceAbove ? 'bottom' : 'top';
-}
-
-function tooltipPosition(rect: Rect, side: Side): { top: number; left: number } {
-  switch (side) {
-    case 'bottom':
-      return {
-        top: rect.bottom + PAD + TOOLTIP_GAP,
-        left: Math.max(16, Math.min(rect.left + rect.width / 2 - TOOLTIP_MAX_W / 2, window.innerWidth - TOOLTIP_MAX_W - 16)),
-      };
-    case 'top':
-      return {
-        top: rect.top - PAD - TOOLTIP_GAP,
-        left: Math.max(16, Math.min(rect.left + rect.width / 2 - TOOLTIP_MAX_W / 2, window.innerWidth - TOOLTIP_MAX_W - 16)),
-      };
-    case 'right':
-      return {
-        top: Math.max(16, rect.top + rect.height / 2 - 80),
-        left: rect.right + PAD + TOOLTIP_GAP,
-      };
-    case 'left':
-      return {
-        top: Math.max(16, rect.top + rect.height / 2 - 80),
-        left: rect.left - PAD - TOOLTIP_GAP - TOOLTIP_MAX_W,
-      };
-  }
-}
-
-/* ------------------------------------------------------------------ */
-/*  Arrow SVG                                                          */
-/* ------------------------------------------------------------------ */
-
-function Arrow({ side }: { side: Side }) {
-  const size = 10;
-  const style: React.CSSProperties = { position: 'absolute', width: size * 2, height: size };
-
-  switch (side) {
-    case 'bottom':
-      return (
-        <svg style={{ ...style, top: -size + 1, left: '50%', transform: 'translateX(-50%)' }} viewBox="0 0 20 10">
-          <polygon points="10,0 20,10 0,10" fill="white" />
-        </svg>
-      );
-    case 'top':
-      return (
-        <svg style={{ ...style, bottom: -size + 1, left: '50%', transform: 'translateX(-50%) rotate(180deg)' }} viewBox="0 0 20 10">
-          <polygon points="10,0 20,10 0,10" fill="white" />
-        </svg>
-      );
-    case 'right':
-      return (
-        <svg style={{ ...style, left: -size + 1, top: '30%', width: size, height: size * 2, transform: 'rotate(-90deg)' }} viewBox="0 0 20 10">
-          <polygon points="10,0 20,10 0,10" fill="white" />
-        </svg>
-      );
-    case 'left':
-      return (
-        <svg style={{ ...style, right: -size + 1, top: '30%', width: size, height: size * 2, transform: 'rotate(90deg)' }} viewBox="0 0 20 10">
-          <polygon points="10,0 20,10 0,10" fill="white" />
-        </svg>
-      );
-  }
-}
-
-/* ------------------------------------------------------------------ */
-/*  Component                                                          */
-/* ------------------------------------------------------------------ */
-
-export default function OnboardingTour({ onComplete, resumeFromStep }: OnboardingTourProps) {
+export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
   const { user } = useHub();
   const { tUI } = useTranslation();
-
-  const initialStep = resumeFromStep ?? 0;
-  const [stepIndex, setStepIndex] = useState(initialStep);
-  const [targetRect, setTargetRect] = useState<Rect | null>(null);
-  const [showDisclosure, setShowDisclosure] = useState(false);
-  const [active, setActive] = useState(true);
-
-  // Transition state for smooth step changes
-  const [transitioning, setTransitioning] = useState(false);
-  const [tooltipVisible, setTooltipVisible] = useState(true);
-
+  const [dismissed, setDismissed] = useState(false);
   const hasLoggedRef = useRef(false);
 
-  const step = TOUR_STEPS_CONFIG[stepIndex] as TourStep | undefined;
-
-  /* ---------- persist progress to localStorage ---------- */
-
-  useEffect(() => {
-    if (active) {
-      try { localStorage.setItem(TOUR_STORAGE_KEY, String(stepIndex)); } catch {}
-    }
-  }, [stepIndex, active]);
-
-  /* ---------- log completion ---------- */
-
-  const logCompletion = useCallback(
-    async (count: number) => {
-      if (!user?.id || hasLoggedRef.current) return;
-      hasLoggedRef.current = true;
-      const supabase = getSupabase();
-      await supabase.from('hub_activity_log').insert({
-        user_id: user.id,
-        action: 'tour_completed',
-        metadata: { stops_seen: count },
-      });
-      // Clear saved progress once fully complete
-      if (count >= TOTAL_STEPS) {
-        try { localStorage.removeItem(TOUR_STORAGE_KEY); } catch {}
-      }
-    },
-    [user?.id],
-  );
-
-  const prevTargetElRef = useRef<Element | null>(null);
-
-  const endTour = useCallback(
-    (count: number) => {
-      // Clean up any elevated target element
-      if (prevTargetElRef.current) {
-        (prevTargetElRef.current as HTMLElement).style.removeProperty('z-index');
-        (prevTargetElRef.current as HTMLElement).style.removeProperty('position');
-        prevTargetElRef.current = null;
-      }
-      setActive(false);
-      logCompletion(count);
-      onComplete(count);
-    },
-    [logCompletion, onComplete],
-  );
-
-  /* ---------- find & measure target ---------- */
-
-  const measureTarget = useCallback(() => {
-    // Reset previous target's z-index
-    if (prevTargetElRef.current) {
-      (prevTargetElRef.current as HTMLElement).style.removeProperty('z-index');
-      (prevTargetElRef.current as HTMLElement).style.removeProperty('position');
-      prevTargetElRef.current = null;
-    }
-
-    if (!step?.selector) {
-      setTargetRect(null);
-      return;
-    }
-    const el = document.querySelector(step.selector);
-    if (!el) {
-      setTargetRect(null);
-      return;
-    }
-
-    // Elevate the target element above the overlay so it's visible
-    const htmlEl = el as HTMLElement;
-    const computedPos = window.getComputedStyle(htmlEl).position;
-    if (computedPos === 'static') {
-      htmlEl.style.position = 'relative';
-    }
-    htmlEl.style.zIndex = '1000011';
-    prevTargetElRef.current = el;
-
-    const r = el.getBoundingClientRect();
-    setTargetRect({
-      top: r.top,
-      left: r.left,
-      width: r.width,
-      height: r.height,
-      bottom: r.bottom,
-      right: r.right,
+  const logCompletion = useCallback(async () => {
+    if (!user?.id || hasLoggedRef.current) return;
+    hasLoggedRef.current = true;
+    const supabase = getSupabase();
+    await supabase.from('hub_activity_log').insert({
+      user_id: user.id,
+      action: 'tour_completed',
+      metadata: { type: 'feature_card' },
     });
+    try { localStorage.removeItem(TOUR_STORAGE_KEY); } catch {}
+  }, [user?.id]);
 
-    if (r.top < 0 || r.bottom > window.innerHeight) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      requestAnimationFrame(() => {
-        const r2 = el.getBoundingClientRect();
-        setTargetRect({
-          top: r2.top,
-          left: r2.left,
-          width: r2.width,
-          height: r2.height,
-          bottom: r2.bottom,
-          right: r2.right,
-        });
-      });
-    }
-  }, [step]);
+  const handleDismiss = useCallback(() => {
+    setDismissed(true);
+    logCompletion();
+    onComplete(ALL_FEATURES.length);
+  }, [logCompletion, onComplete]);
 
-  /* ---------- measure target on step change ---------- */
+  if (dismissed) return null;
 
-  useEffect(() => {
-    if (!active || !step) return;
-
-    const timer = setTimeout(() => {
-      measureTarget();
-      // Fade tooltip back in after spotlight has moved
-      setTimeout(() => setTooltipVisible(true), 150);
-    }, 200);
-    return () => clearTimeout(timer);
-  }, [active, step, measureTarget]);
-
-  /* ---------- re-measure on scroll / resize ---------- */
-
-  useEffect(() => {
-    if (!active) return;
-
-    const handler = () => measureTarget();
-    window.addEventListener('resize', handler);
-    window.addEventListener('scroll', handler, true);
-    return () => {
-      window.removeEventListener('resize', handler);
-      window.removeEventListener('scroll', handler, true);
-    };
-  }, [active, measureTarget]);
-
-  /* ---------- retry measurement if selector not found initially ---------- */
-
-  useEffect(() => {
-    if (!active || !step?.selector || targetRect) return;
-
-    let attempts = 0;
-    const interval = setInterval(() => {
-      attempts++;
-      measureTarget();
-      if (attempts >= 10) clearInterval(interval);
-    }, 250);
-
-    return () => clearInterval(interval);
-  }, [active, step, targetRect, measureTarget]);
-
-  /* ---------- step navigation ---------- */
-
-  // Use refs to avoid stale closure issues
-  const stepIndexRef = useRef(stepIndex);
-  stepIndexRef.current = stepIndex;
-
-  const showDisclosureRef = useRef(showDisclosure);
-  showDisclosureRef.current = showDisclosure;
-
-  const goNext = useCallback(() => {
-    const currentStep = stepIndexRef.current;
-    const nextIndex = currentStep + 1;
-
-    // After mandatory stops (stop 5), show the main progressive disclosure
-    if (nextIndex === MANDATORY_COUNT && !showDisclosureRef.current) {
-      setShowDisclosure(true);
-      return;
-    }
-
-    if (nextIndex >= TOTAL_STEPS) {
-      endTour(TOTAL_STEPS);
-      return;
-    }
-
-    // Smooth transition: fade out tooltip, move spotlight, fade in tooltip
-    setTransitioning(true);
-    setTooltipVisible(false);
-    setTimeout(() => {
-      setTargetRect(null);
-      setStepIndex(nextIndex);
-      setTransitioning(false);
-    }, 300);
-  }, [endTour]);
-
-  const handleDisclosureDismiss = useCallback(() => {
-    setShowDisclosure(false);
-    endTour(MANDATORY_COUNT);
-  }, [endTour]);
-
-  const handleSkip = useCallback(() => {
-    endTour(stepIndexRef.current + 1);
-  }, [endTour]);
-
-  /* ---------- bail if inactive ---------- */
-
-  if (!active || !step) return null;
-
-  /* ---------- scrollable "more features" card (after 5 highlighted stops) ---------- */
-
-  if (showDisclosure) {
-    return (
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 1000010,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(30, 39, 73, 0.85)',
+        animation: 'tdi-tour-fadein 0.4s ease-out',
+      }}
+    >
       <div
         style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 1000010,
+          background: 'white',
+          borderRadius: 24,
+          maxWidth: 740,
+          width: '94%',
+          maxHeight: '85vh',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'rgba(30, 39, 73, 0.8)',
-          animation: 'tdi-tour-fadein 0.4s ease-out',
+          flexDirection: 'column',
+          boxShadow: '0 24px 80px rgba(30, 39, 73, 0.35)',
+          animation: 'tdi-tour-scalein 0.4s ease-out',
+          overflow: 'hidden',
         }}
       >
-        <div
-          style={{
-            background: 'white',
-            borderRadius: 20,
-            padding: '28px 24px',
-            maxWidth: 400,
-            width: '92%',
-            maxHeight: '80vh',
-            display: 'flex',
-            flexDirection: 'column',
-            boxShadow: '0 20px 60px rgba(30, 39, 73, 0.3)',
-            animation: 'tdi-tour-scalein 0.4s ease-out',
-          }}
-        >
+        {/* Header */}
+        <div style={{ padding: '28px 32px 0', textAlign: 'center' }}>
           <p
             style={{
               fontFamily: "'Source Serif 4', serif",
-              fontSize: 20,
-              fontWeight: 600,
+              fontSize: 24,
+              fontWeight: 700,
               color: '#1e2749',
-              margin: '0 0 4px',
-              textAlign: 'center',
+              margin: '0 0 6px',
             }}
           >
-            A few more things worth knowing
+            {tUI("Here's what you can do in the Hub")}
           </p>
           <p
             style={{
               fontFamily: "'DM Sans', sans-serif",
-              fontSize: 13,
+              fontSize: 14,
               color: '#9CA3AF',
-              margin: '0 0 20px',
-              textAlign: 'center',
+              margin: '0 0 24px',
             }}
           >
-            Scroll through when you are ready, or jump straight in.
+            {tUI('Scroll through or jump straight in. You can always find these in the nav.')}
           </p>
+        </div>
 
-          {/* Scrollable feature list */}
-          <div style={{ overflowY: 'auto', flex: 1, paddingRight: 4 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {MORE_FEATURES.map((feature, i) => (
+        {/* Scrollable feature grid */}
+        <div style={{ overflowY: 'auto', flex: 1, padding: '0 28px 8px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+            {ALL_FEATURES.map((feature, i) => {
+              const iconPath = FEATURE_ICONS[feature.title];
+              const color = FEATURE_COLORS[i % FEATURE_COLORS.length];
+              return (
                 <div
                   key={i}
                   style={{
-                    padding: '14px 16px',
-                    borderRadius: 12,
-                    backgroundColor: '#F9FAFB',
-                    borderLeft: '3px solid #E8B84B',
+                    padding: 18,
+                    borderRadius: 16,
+                    backgroundColor: '#FAFBFC',
+                    border: '1px solid #F3F4F6',
+                    display: 'flex',
+                    gap: 14,
+                    alignItems: 'flex-start',
                   }}
                 >
-                  <p
+                  <div
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: '#1e2749',
-                      margin: '0 0 4px',
+                      width: 42,
+                      height: 42,
+                      borderRadius: 11,
+                      backgroundColor: `${color}15`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
                     }}
                   >
-                    {tUI(feature.title)}
-                  </p>
-                  <p
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: 13,
-                      color: '#6B7280',
-                      margin: 0,
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {tUI(feature.description)}
-                  </p>
+                    {iconPath ? (
+                      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                        <path d={iconPath} />
+                      </svg>
+                    ) : (
+                      <div style={{ width: 20, height: 20, borderRadius: '50%', backgroundColor: color, opacity: 0.3 }} />
+                    )}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: '#1e2749',
+                        margin: '0 0 3px',
+                      }}
+                    >
+                      {tUI(feature.title)}
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: 12,
+                        color: '#6B7280',
+                        margin: 0,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {tUI(feature.description)}
+                    </p>
+                  </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
+        </div>
 
-          {/* Dismiss button */}
+        {/* Footer */}
+        <div style={{ padding: '16px 28px 24px', textAlign: 'center' }}>
           <button
-            onClick={handleDisclosureDismiss}
+            onClick={handleDismiss}
             style={{
-              background: '#ffba06',
+              background: '#E8B84B',
               color: '#1e2749',
               border: 'none',
               borderRadius: 12,
-              padding: '12px 24px',
-              fontSize: 14,
+              padding: '14px 40px',
+              fontSize: 15,
               fontWeight: 600,
               fontFamily: "'DM Sans', sans-serif",
               cursor: 'pointer',
-              marginTop: 16,
               width: '100%',
+              maxWidth: 340,
             }}
           >
-            Got it -- let me explore
+            {tUI("Got it -- let me explore")}
           </button>
         </div>
-        <style>{`
-          @keyframes tdi-tour-fadein {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          @keyframes tdi-tour-scalein {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-          }
-        `}</style>
-      </div>
-    );
-  }
-
-  /* ---------- compute spotlight + tooltip layout ---------- */
-
-  const hasTarget = targetRect !== null;
-  const side: Side = hasTarget ? bestSide(targetRect!) : 'bottom';
-  const tipPos = hasTarget
-    ? tooltipPosition(targetRect!, side)
-    : {
-        top: window.innerHeight / 2,
-        left: Math.max(16, window.innerWidth / 2 - TOOLTIP_MAX_W / 2),
-      };
-
-  const tipTransform = side === 'top' && hasTarget ? 'translateY(-100%)' : undefined;
-
-  const spotlightStyle: React.CSSProperties = hasTarget
-    ? {
-        position: 'fixed',
-        top: targetRect!.top - PAD,
-        left: targetRect!.left - PAD,
-        width: targetRect!.width + PAD * 2,
-        height: targetRect!.height + PAD * 2,
-        borderRadius: RADIUS,
-        boxShadow: '0 0 0 9999px rgba(30, 39, 73, 0.75)',
-        zIndex: 1000010,
-        pointerEvents: 'none',
-        transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-      }
-    : {
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(30, 39, 73, 0.75)',
-        zIndex: 1000010,
-        pointerEvents: 'none',
-        transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-      };
-
-  return (
-    <>
-      {/* Spotlight hole -- pointer-events: none so clicks pass through to the page */}
-      <div style={spotlightStyle} />
-
-      {/* Tooltip card */}
-      <div
-        style={{
-          position: 'fixed',
-          top: tipPos.top,
-          left: tipPos.left,
-          maxWidth: TOOLTIP_MAX_W,
-          width: TOOLTIP_MAX_W,
-          zIndex: 1000011,
-          transform: tipTransform,
-          opacity: tooltipVisible && !transitioning ? 1 : 0,
-          transition: 'opacity 0.3s ease, top 0.5s cubic-bezier(0.4, 0, 0.2, 1), left 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-        }}
-      >
-        <div
-          style={{
-            position: 'relative',
-            background: 'white',
-            borderRadius: 16,
-            boxShadow: '0 20px 60px rgba(30, 39, 73, 0.25)',
-            overflow: 'visible',
-          }}
-        >
-          {/* Arrow */}
-          {hasTarget && <Arrow side={side} />}
-
-          {/* Close / skip button */}
-          <button
-            onClick={handleSkip}
-            style={{
-              position: 'absolute',
-              top: 12,
-              right: 12,
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: '#9CA3AF',
-              padding: 4,
-              lineHeight: 1,
-            }}
-            aria-label="Skip tour"
-          >
-            <X size={16} />
-          </button>
-
-          {/* Content */}
-          <div style={{ padding: '20px 20px 16px' }}>
-            <h3
-              style={{
-                fontFamily: "'Source Serif 4', serif",
-                fontSize: 15,
-                fontWeight: 600,
-                color: '#1e2749',
-                margin: '0 0 6px',
-                paddingRight: 24,
-              }}
-            >
-              {tUI(step.title)}
-            </h3>
-            <p
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: 14,
-                lineHeight: 1.6,
-                color: '#6B7280',
-                margin: 0,
-              }}
-            >
-              {tUI(step.body)}
-            </p>
-          </div>
-
-          {/* Footer */}
-          <div
-            style={{
-              padding: '0 20px 16px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <span
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: 11,
-                color: '#9CA3AF',
-              }}
-            >
-              {stepIndex + 1} of {MANDATORY_COUNT}
-            </span>
-            <button
-              onClick={goNext}
-              style={{
-                background: '#ffba06',
-                color: '#1e2749',
-                border: 'none',
-                borderRadius: 10,
-                padding: '8px 20px',
-                fontSize: 13,
-                fontWeight: 600,
-                fontFamily: "'DM Sans', sans-serif",
-                cursor: 'pointer',
-              }}
-            >
-              {stepIndex >= TOTAL_STEPS - 1 ? tUI('Done') : tUI('Next')}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Skip tour link below tooltip */}
-      <div
-        style={{
-          position: 'fixed',
-          top: (tipTransform ? tipPos.top : tipPos.top) + (tipTransform ? -8 : 0),
-          left: tipPos.left,
-          width: TOOLTIP_MAX_W,
-          zIndex: 1000011,
-          textAlign: 'center',
-          marginTop: tipTransform ? undefined : 8,
-          transform: tipTransform ? 'translateY(-100%) translateY(-48px)' : undefined,
-          opacity: tooltipVisible && !transitioning ? 1 : 0,
-          transition: 'opacity 0.3s ease',
-        }}
-      >
-        <button
-          onClick={handleSkip}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: 'rgba(255,255,255,0.5)',
-            fontSize: 12,
-            fontFamily: "'DM Sans', sans-serif",
-            cursor: 'pointer',
-            padding: '4px 8px',
-          }}
-        >
-          {tUI('Skip tour')}
-        </button>
       </div>
 
       <style>{`
@@ -704,6 +213,6 @@ export default function OnboardingTour({ onComplete, resumeFromStep }: Onboardin
           to { opacity: 1; transform: scale(1); }
         }
       `}</style>
-    </>
+    </div>
   );
 }

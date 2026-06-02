@@ -12,6 +12,7 @@ import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 const CheckInSlideUp = dynamic(() => import('@/components/hub/CheckInSlideUp'), { ssr: false });
 const WellbeingPopup = dynamic(() => import('@/components/hub/WellbeingPopup'), { ssr: false });
 const AdminBanner = dynamic(() => import('@/components/hub/AdminBanner'), { ssr: false });
+const AddToHomeScreen = dynamic(() => import('@/components/hub/AddToHomeScreen'), { ssr: false });
 
 // Routes that should NOT show the Hub nav bar
 const NO_NAV_ROUTES = ['/hub/login', '/hub/verify', '/hub/onboarding'];
@@ -77,6 +78,7 @@ function HubLayoutInner({ children }: { children: React.ReactNode }) {
         <CheckInSlideUp onDismiss={() => setShowCheckIn(false)} />
       )}
       <WellbeingPopup />
+      <AddToHomeScreen />
     </div>
   );
 }
