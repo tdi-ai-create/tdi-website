@@ -38,16 +38,16 @@ const CONNECTIONS: Connection[] = [
   { from: 'Learning Hub', to: 'Operations', data: 'Contract fulfillment: Hub access vs actual usage per partner district', impact: 'Identify underutilized partnerships before renewal conversations', status: 'live' },
 
   // Sales -> Hub
-  { from: 'Sales', to: 'Learning Hub', data: 'New partner signed -- auto-provision all_access for their staff', impact: 'Zero manual setup when a deal closes', status: 'planned' },
+  { from: 'Sales', to: 'Learning Hub', data: 'Deal signed -- "Provision Hub Access" button creates all_access account', impact: 'One-click provisioning when a deal closes', status: 'live' },
 
   // Leadership -> Hub
-  { from: 'Leadership Dashboard', to: 'Learning Hub', data: 'School champion recommendations for their educators', impact: 'Principals can recommend specific tools to their team', status: 'planned' },
+  { from: 'Leadership Dashboard', to: 'Learning Hub', data: 'Principals recommend Quick Wins and courses to their team', impact: 'Leaders can push specific tools to their educators', status: 'live' },
 
   // Substack -> Hub
   { from: 'Substack', to: 'Learning Hub', data: 'New subscriber auto-creates free Hub account', impact: 'Every Substack subscriber has a Hub account ready', status: 'building' },
 
   // Hub -> Substack
-  { from: 'Learning Hub', to: 'Substack', data: 'Hub paid members get Substack paid access', impact: 'Two-way perks between platforms', status: 'planned' },
+  { from: 'Learning Hub', to: 'Substack', data: 'Hub paid members get Substack paid access', impact: 'Two-way perks between platforms (requires manual Substack grant -- no API available)', status: 'planned' },
 ];
 
 const NODES = [

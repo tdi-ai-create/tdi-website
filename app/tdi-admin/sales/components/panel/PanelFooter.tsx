@@ -15,6 +15,40 @@ interface Props {
 export function PanelFooter({ opp, onPatch, onClose, showToast }: Props) {
   const [showLostModal, setShowLostModal] = useState(false)
   const [lostReason, setLostReason] = useState('Not a fit')
+  const [provisioning, setProvisioning] = useState(false)
+  const [provisioned, setProvisioned] = useState(false)
+
+  async function provisionHubAccess() {
+    if (!opp.contact_email) {
+      showToast('No contact email on this deal', 'error')
+      return
+    }
+    setProvisioning(true)
+    try {
+      const res = await fetch('/api/hub/provision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: opp.contact_email,
+          name: opp.contact_name || opp.name,
+          tier: 'all_access',
+          source: 'sales_deal',
+          dealId: opp.id,
+        }),
+      })
+      const result = await res.json()
+      if (res.ok) {
+        showToast(`Hub All-Access provisioned for ${opp.contact_email}`, 'success')
+        setProvisioned(true)
+      } else {
+        showToast(result.error || 'Provisioning failed', 'error')
+      }
+    } catch {
+      showToast('Provisioning failed', 'error')
+    } finally {
+      setProvisioning(false)
+    }
+  }
 
   async function markWon() {
     await onPatch({ stage: 'paid' })
@@ -33,6 +67,28 @@ export function PanelFooter({ opp, onPatch, onClose, showToast }: Props) {
 
   return (
     <>
+      {/* Provision Hub Access -- shows on signed/paid deals */}
+      {(opp.stage === 'signed' || opp.stage === 'paid') && !provisioned && (
+        <div className="border-t border-gray-100 px-5 py-3">
+          <button
+            onClick={provisionHubAccess}
+            disabled={provisioning}
+            className="w-full text-sm py-2.5 rounded-xl font-medium transition-colors disabled:opacity-50"
+            style={{ background: '#E8B84B', color: '#1e2749' }}
+          >
+            {provisioning ? 'Provisioning...' : 'Provision Hub All-Access'}
+          </button>
+          <p className="text-[10px] text-center mt-1.5" style={{ color: '#9CA3AF' }}>
+            Creates a Hub account with All-Access for {String(opp.contact_email || 'contact')}
+          </p>
+        </div>
+      )}
+      {provisioned && (
+        <div className="border-t border-gray-100 px-5 py-3 text-center">
+          <p className="text-xs font-medium" style={{ color: '#2A9D8F' }}>Hub All-Access provisioned</p>
+        </div>
+      )}
+
       <div className="border-t border-gray-100 px-5 py-3 flex items-center gap-3">
         {opp.stage !== 'paid' && (
           <button
