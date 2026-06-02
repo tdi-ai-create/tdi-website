@@ -271,7 +271,7 @@ export default function QuickWinsPage() {
               color: '#6B7280',
             }}
           >
-            {quickWins.length} {tUI('quick wins')} · {tUI('Short, practical tools you can use right now')}
+            {quickWins.length + PRACTICE_TOOLS.length} {tUI('quick wins')} · {tUI('Short, practical tools you can use right now')}
           </p>
         </div>
 
