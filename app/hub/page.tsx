@@ -14,6 +14,7 @@ import { checkRecognitions } from '@/lib/hub/recognitions';
 import dynamic from 'next/dynamic';
 import GiftElement from '@/components/hub/GiftElement';
 import CommunityBookmarks from '@/components/hub/CommunityBookmarks';
+import DashboardInsight from '@/components/hub/DashboardInsight';
 
 const OnboardingTour = dynamic(() => import('@/components/hub/OnboardingTour'), { ssr: false });
 import {
@@ -1549,6 +1550,15 @@ export default function HubDashboard() {
               </>
             )}
           </div>
+
+          {/* AI Reflection */}
+          <DashboardInsight
+            userId={user?.id}
+            toolsExplored={personalStats?.toolsExplored || 0}
+            hoursSaved={String(personalStats?.hoursSaved || '0')}
+            daysActive={currentStreak}
+            recognitionsEarned={certificateCount + fieldNotesCount}
+          />
 
           {/* Curated for You */}
           {showRecommendations && recommendations.length > 0 && (
