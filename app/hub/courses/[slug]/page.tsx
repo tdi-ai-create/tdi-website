@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import CourseCard from '@/components/hub/CourseCard';
 import CommunityTabs from '@/components/hub/CommunityTabs';
+import AchievementInsights from '@/components/hub/AchievementInsights';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
 
 // Category colors
@@ -842,6 +843,25 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         conversationApiPath={`/api/hub/courses/${course.id}/conversation`}
         qaApiPath={`/api/hub/courses/${course.id}/qa`}
       />
+
+      {/* AI Growth Insights */}
+      <div className="mt-8">
+        <AchievementInsights
+          data={{
+            name: user?.user_metadata?.display_name || 'Educator',
+            role: 'Educator',
+            toolsExplored: 0,
+            hoursSaved: '0',
+            daysActive: 0,
+            recognitionsEarned: 0,
+            earnedNames: [],
+            topCategories: [course.category || ''],
+            communityPosts: 0,
+            coursesCompleted: 0,
+            pdHours: course.pd_hours || 0,
+          }}
+        />
+      </div>
 
       {/* Related Quick Wins */}
       {relatedQuickWins.length > 0 && (

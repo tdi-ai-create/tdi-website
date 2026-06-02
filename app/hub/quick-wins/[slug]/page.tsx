@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
 import CommunityTabs from '@/components/hub/CommunityTabs';
+import AchievementInsights from '@/components/hub/AchievementInsights';
 
 // ─── Breathing Exercise Component ───────────────────────────────────────────
 
@@ -972,6 +973,25 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               conversationApiPath={`/api/hub/quick-wins/${quickWin.id}/conversation`}
               qaApiPath={`/api/hub/quick-wins/${quickWin.id}/qa`}
             />
+
+            {/* AI Growth Insights */}
+            <div className="mt-8">
+              <AchievementInsights
+                data={{
+                  name: user?.user_metadata?.display_name || 'Educator',
+                  role: 'Educator',
+                  toolsExplored: 0,
+                  hoursSaved: '0',
+                  daysActive: 0,
+                  recognitionsEarned: 0,
+                  earnedNames: [],
+                  topCategories: [quickWin.category || ''],
+                  communityPosts: 0,
+                  coursesCompleted: 0,
+                  pdHours: 0,
+                }}
+              />
+            </div>
           </div>
 
           {/* ─── RIGHT COLUMN SIDEBAR ────────────────────────────────── */}
