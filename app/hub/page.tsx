@@ -1202,23 +1202,6 @@ export default function HubDashboard() {
             </p>
           </div>
 
-          {/* Polaroid: something you love */}
-          {user?.id && (
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <div style={{ transform: 'rotate(-3deg)' }}>
-                <PolaroidCard
-                  slot="love"
-                  imageUrl={polaroids.love?.image_url}
-                  caption={polaroids.love?.caption}
-                  pinColor={polaroids.love?.pin_color}
-                  userId={user.id}
-                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { ...prev[slot], image_url: url } }))}
-                  width={150}
-                />
-              </div>
-            </div>
-          )}
-
           {/* B. Continue Learning (max 2 enrollments) */}
           {enrollments.length > 0 && (
             <div>
@@ -1419,22 +1402,6 @@ export default function HubDashboard() {
           {/* Community Bookmarks */}
           <CommunityBookmarks userId={user?.id} tUI={tUI} />
 
-          {/* Polaroid: a goal in life */}
-          {user?.id && (
-            <div style={{ display: 'flex', justifyContent: 'flex-start', paddingLeft: 20 }}>
-              <div style={{ transform: 'rotate(2deg)' }}>
-                <PolaroidCard
-                  slot="goal"
-                  imageUrl={polaroids.goal?.image_url}
-                  caption={polaroids.goal?.caption}
-                  pinColor={polaroids.goal?.pin_color}
-                  userId={user.id}
-                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { ...prev[slot], image_url: url } }))}
-                  width={150}
-                />
-              </div>
-            </div>
-          )}
         </div>
 
         {/* ===== RIGHT COLUMN (SIDEBAR) ===== */}
@@ -1593,23 +1560,6 @@ export default function HubDashboard() {
               </>
             )}
           </div>
-
-          {/* Polaroid: something you're proud of */}
-          {user?.id && (
-            <div style={{ display: 'flex', justifyContent: 'flex-end', paddingRight: 8 }}>
-              <div style={{ transform: 'rotate(-2deg)' }}>
-                <PolaroidCard
-                  slot="proud"
-                  imageUrl={polaroids.proud?.image_url}
-                  caption={polaroids.proud?.caption}
-                  pinColor={polaroids.proud?.pin_color}
-                  userId={user.id}
-                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { ...prev[slot], image_url: url } }))}
-                  width={150}
-                />
-              </div>
-            </div>
-          )}
 
           {/* Curated for You */}
           {showRecommendations && recommendations.length > 0 && (
