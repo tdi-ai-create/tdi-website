@@ -140,15 +140,14 @@ export default function HubAdminPage() {
   const { teamMember, permissions, isOwner } = useTDIAdmin();
   const [stats, setStats] = useState<HubStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [hasExampleData, setHasExampleData] = useState(false);
-  const [showExampleNotice, setShowExampleNotice] = useState(true);
+  const [showExampleNotice] = useState(false);
 
   useEffect(() => {
     async function loadStats() {
       try {
         const data = await getAdminStats();
         setStats(data);
-        setHasExampleData((data?.totalUsers || 0) >= 100);
+        // Data is real now -- no example data flag needed
       } catch (error) {
         console.error('Error loading stats:', error);
       } finally {
@@ -193,9 +192,20 @@ export default function HubAdminPage() {
           <p className="text-sm text-gray-500 mt-1">Manage enrollments, content, and analytics</p>
         </div>
 
-        {/* Example Data Notice (subtle) */}
-        {hasExampleData && showExampleNotice && (
-          <ExampleDataNotice onDismiss={() => setShowExampleNotice(false)} />
+        {/* Launch Status Banner */}
+        {!showExampleNotice && stats && (stats.todaySignups || 0) > 0 && (
+          <div
+            className="rounded-xl p-4 mb-6 flex items-center gap-3"
+            style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #38618C 100%)' }}
+          >
+            <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#2A9D8F' }} />
+            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: "'DM Sans', sans-serif" }}>
+              <span className="font-bold" style={{ color: '#E8B84B' }}>{stats.todaySignups}</span> new signups today
+              {(stats.recentSignups || 0) > (stats.todaySignups || 0) && (
+                <span> -- <span className="font-bold" style={{ color: '#E8B84B' }}>{stats.recentSignups}</span> this week</span>
+              )}
+            </p>
+          </div>
         )}
 
         {/* Stats Overview */}
@@ -222,9 +232,9 @@ export default function HubAdminPage() {
               <StatCard label="Certificates" value={stats.totalCertificates || 0} />
               <StatCard label="PD Hours" value={stats.totalPdHours || 0} />
               <StatCard
-                label="Avg Stress"
+                label="Avg Vibe"
                 value={stats.avgStressScore || '-'}
-                subtitle="1=great, 5=rough"
+                subtitle="1=tough, 5=great"
               />
             </div>
           ) : (
