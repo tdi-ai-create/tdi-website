@@ -39,6 +39,8 @@ interface HubStats {
   todaySignups?: number;
   topQuickWins?: { title: string; views: number }[];
   recentActivity?: { action: string; user_id: string; created_at: string }[];
+  growthChart?: { date: string; count: number }[];
+  roleBreakdown?: Record<string, number>;
 }
 
 // Modern Stat Card Component - simplified without icon circles
@@ -278,6 +280,78 @@ export default function HubAdminPage() {
                     <p className="text-sm" style={{ color: '#9CA3AF' }}>No membership sources yet</p>
                   )}
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* User Growth Chart + Role Breakdown */}
+        {stats && (
+          <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Growth Chart -- last 30 days */}
+            <div className="md:col-span-2 bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <h3 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: '#9CA3AF' }}>User Growth (Last 30 Days)</h3>
+              <div className="flex items-end gap-[3px]" style={{ height: 120 }}>
+                {(stats.growthChart || []).map((day, i) => {
+                  const maxCount = Math.max(...(stats.growthChart || []).map(d => d.count), 1);
+                  const heightPct = (day.count / maxCount) * 100;
+                  const isToday = i === (stats.growthChart || []).length - 1;
+                  const dateLabel = new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                  return (
+                    <div
+                      key={day.date}
+                      className="flex-1 rounded-t-sm transition-all"
+                      title={`${dateLabel}: ${day.count} signups`}
+                      style={{
+                        height: `${Math.max(heightPct, 2)}%`,
+                        minHeight: 2,
+                        backgroundColor: isToday ? '#1B2A4A' : day.count > 0 ? '#E8B84B' : '#F3F4F6',
+                        cursor: 'default',
+                      }}
+                    />
+                  );
+                })}
+              </div>
+              <div className="flex justify-between mt-2">
+                <span className="text-[10px]" style={{ color: '#9CA3AF' }}>30 days ago</span>
+                <span className="text-[10px] font-semibold" style={{ color: '#1B2A4A' }}>Today</span>
+              </div>
+            </div>
+
+            {/* Role Breakdown */}
+            <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Users by Role</h3>
+              <div className="space-y-2">
+                {Object.entries(stats.roleBreakdown || {})
+                  .sort((a, b) => (b[1] as number) - (a[1] as number))
+                  .slice(0, 6)
+                  .map(([role, count]) => {
+                    const total = Object.values(stats.roleBreakdown || {}).reduce((s, c) => s + (c as number), 0);
+                    const pct = total > 0 ? ((count as number) / total) * 100 : 0;
+                    const roleLabels: Record<string, string> = {
+                      classroom_teacher: 'Classroom Teacher',
+                      para: 'Paraprofessional',
+                      coach: 'Instructional Coach',
+                      school_leader: 'School Leader',
+                      district_staff: 'District Staff',
+                      other: 'Other',
+                      unknown: 'Not Set',
+                    };
+                    return (
+                      <div key={role}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs" style={{ color: '#374151' }}>{roleLabels[role] || role}</span>
+                          <span className="text-xs font-semibold" style={{ color: '#1B2A4A' }}>{count as number}</span>
+                        </div>
+                        <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#F3F4F6' }}>
+                          <div
+                            className="h-full rounded-full"
+                            style={{ width: `${pct}%`, backgroundColor: '#E8B84B' }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           </div>

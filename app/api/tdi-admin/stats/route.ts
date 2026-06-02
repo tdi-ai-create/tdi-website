@@ -150,6 +150,41 @@ export async function GET() {
       .order('created_at', { ascending: false })
       .limit(10);
 
+    // Signups by day (last 30 days) for growth chart
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const { data: signupsByDayData } = await supabase
+      .from('hub_profiles')
+      .select('created_at')
+      .gte('created_at', thirtyDaysAgo.toISOString());
+
+    const signupsByDay: Record<string, number> = {};
+    (signupsByDayData || []).forEach((p: { created_at: string }) => {
+      const day = new Date(p.created_at).toISOString().split('T')[0];
+      signupsByDay[day] = (signupsByDay[day] || 0) + 1;
+    });
+
+    // Fill in zeros for days with no signups
+    const growthChart: { date: string; count: number }[] = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().split('T')[0];
+      growthChart.push({ date: key, count: signupsByDay[key] || 0 });
+    }
+
+    // Get role breakdown
+    const { data: roleData } = await supabase
+      .from('hub_profiles')
+      .select('role')
+      .limit(20000);
+
+    const roleBreakdown: Record<string, number> = {};
+    (roleData || []).forEach((p: { role: string | null }) => {
+      const role = p.role || 'unknown';
+      roleBreakdown[role] = (roleBreakdown[role] || 0) + 1;
+    });
+
     return NextResponse.json({
       totalUsers: usersResult.count || 0,
       totalEnrollments: enrollmentsResult.count || 0,
@@ -163,6 +198,8 @@ export async function GET() {
       todaySignups: todaySignups || 0,
       topQuickWins,
       recentActivity: recentActivity || [],
+      growthChart,
+      roleBreakdown,
     });
   } catch (error) {
     console.error('[Admin Stats API] Error:', error);
