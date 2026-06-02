@@ -17,6 +17,7 @@ import {
   Search,
   User,
   AlertCircle,
+  Eye,
 } from 'lucide-react';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import {
@@ -327,9 +328,25 @@ export default function HubAdminPage() {
       {/* Page Content */}
       <div className="px-6 py-6">
         {/* Page Header */}
-        <div className="mb-6">
-          <h1 style={TYPE_PAGE_TITLE}>Learning Hub</h1>
-          <p className="mt-1" style={TYPE_PAGE_SUBTITLE}>Manage enrollments, content, and analytics</p>
+        <div className="mb-6 flex items-start justify-between">
+          <div>
+            <h1 style={TYPE_PAGE_TITLE}>Learning Hub</h1>
+            <p className="mt-1" style={TYPE_PAGE_SUBTITLE}>Manage enrollments, content, and analytics</p>
+          </div>
+          <Link
+            href="/hub"
+            target="_blank"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all hover:shadow-sm border"
+            style={{
+              color: '#1B2A4A',
+              borderColor: '#E5E7EB',
+              backgroundColor: 'white',
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            <Eye size={16} style={{ color: '#6B7280' }} />
+            See the Hub as a Learner
+          </Link>
         </div>
 
         {/* User Search */}
