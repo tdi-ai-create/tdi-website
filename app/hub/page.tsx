@@ -15,6 +15,7 @@ import dynamic from 'next/dynamic';
 import GiftElement from '@/components/hub/GiftElement';
 import CommunityBookmarks from '@/components/hub/CommunityBookmarks';
 import DashboardInsight from '@/components/hub/DashboardInsight';
+import AchievementInsights from '@/components/hub/AchievementInsights';
 
 const OnboardingTour = dynamic(() => import('@/components/hub/OnboardingTour'), { ssr: false });
 import {
@@ -1392,6 +1393,23 @@ export default function HubDashboard() {
               </div>
             </div>
           )}
+
+          {/* AI Growth Insights -- expandable accordion */}
+          <AchievementInsights
+            data={{
+              name: profile?.display_name || 'Educator',
+              role: profile?.role || 'Educator',
+              toolsExplored: personalStats?.toolsExplored ?? 0,
+              hoursSaved: String(personalStats?.hoursSaved ?? '0'),
+              daysActive: currentStreak,
+              recognitionsEarned: certificateCount + fieldNotesCount,
+              earnedNames: [],
+              topCategories: [],
+              communityPosts: 0,
+              coursesCompleted: 0,
+              pdHours: 0,
+            }}
+          />
         </div>
 
         {/* ===== RIGHT COLUMN (SIDEBAR) ===== */}
@@ -1550,15 +1568,6 @@ export default function HubDashboard() {
               </>
             )}
           </div>
-
-          {/* AI Reflection */}
-          <DashboardInsight
-            userId={user?.id}
-            toolsExplored={personalStats?.toolsExplored || 0}
-            hoursSaved={String(personalStats?.hoursSaved || '0')}
-            daysActive={currentStreak}
-            recognitionsEarned={certificateCount + fieldNotesCount}
-          />
 
           {/* Curated for You */}
           {showRecommendations && recommendations.length > 0 && (
