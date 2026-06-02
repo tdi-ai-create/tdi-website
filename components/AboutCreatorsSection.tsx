@@ -77,6 +77,30 @@ export default function AboutCreatorsSection() {
         {creators.map(creator => (
           <CreatorCircle key={creator.id} creator={creator} />
         ))}
+
+        {/* "YOU?" CTA card */}
+        <a
+          href="/create-with-us"
+          style={{
+            textAlign: 'center',
+            textDecoration: 'none',
+            cursor: 'pointer',
+            transition: 'transform 0.2s ease',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
+        >
+          <div style={{
+            width: 64, height: 64, borderRadius: '50%', margin: '0 auto 8px',
+            background: 'linear-gradient(135deg, #FFF8E7 0%, #FEF3C7 100%)',
+            border: '2px dashed #E8B84B',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <span style={{ fontSize: 24, fontWeight: 700, color: '#E8B84B' }}>+</span>
+          </div>
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#E8B84B', margin: '0 0 2px 0' }}>YOU?</p>
+          <p style={{ fontSize: 10, color: '#6B7280', margin: 0, lineHeight: 1.3 }}>Apply to become a creator</p>
+        </a>
       </div>
     </section>
   )
