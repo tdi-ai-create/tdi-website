@@ -14,7 +14,127 @@ import {
   Download,
   Info,
   X,
+  Search,
+  User,
+  AlertCircle,
 } from 'lucide-react';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
+
+// ── User Search Component ─────────────────────────────────────────
+function UserSearchBar() {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<{ id: string; email: string; display_name: string | null; role: string | null; created_at: string; tier?: string; source?: string }[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const handleSearch = async () => {
+    if (!query.trim() || query.trim().length < 2) return;
+    setSearching(true);
+    setHasSearched(true);
+    try {
+      const supabase = getSupabase();
+      const q = query.trim().toLowerCase();
+
+      // Search by email or display name
+      const { data: profiles } = await supabase
+        .from('hub_profiles')
+        .select('id, email, display_name, role, created_at')
+        .or(`email.ilike.%${q}%,display_name.ilike.%${q}%`)
+        .limit(10);
+
+      // Get memberships for found users
+      const userIds = (profiles || []).map(p => p.id);
+      let membershipMap: Record<string, { tier: string; source: string }> = {};
+      if (userIds.length > 0) {
+        const { data: mems } = await supabase
+          .from('hub_memberships')
+          .select('user_id, tier, source')
+          .in('user_id', userIds);
+        (mems || []).forEach((m: { user_id: string; tier: string; source: string }) => {
+          membershipMap[m.user_id] = { tier: m.tier, source: m.source };
+        });
+      }
+
+      setResults((profiles || []).map(p => ({
+        ...p,
+        tier: membershipMap[p.id]?.tier || 'free',
+        source: membershipMap[p.id]?.source || '--',
+      })));
+    } catch {
+      setResults([]);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  return (
+    <div className="mb-6">
+      <div className="flex gap-2">
+        <div className="flex-1 relative">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9CA3AF' }} />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+            placeholder="Search users by email or name..."
+            className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#E8B84B] transition-colors"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          />
+        </div>
+        <button
+          onClick={handleSearch}
+          disabled={searching || query.trim().length < 2}
+          className="px-4 py-2.5 rounded-xl text-sm font-medium transition-all hover:opacity-90 disabled:opacity-50"
+          style={{ backgroundColor: '#1B2A4A', color: 'white', fontFamily: "'DM Sans', sans-serif" }}
+        >
+          {searching ? 'Searching...' : 'Search'}
+        </button>
+      </div>
+
+      {/* Results */}
+      {hasSearched && (
+        <div className="mt-3 bg-white rounded-xl border border-gray-100 overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+          {results.length === 0 ? (
+            <div className="px-4 py-6 text-center">
+              <p className="text-sm" style={{ color: '#9CA3AF' }}>No users found for "{query}"</p>
+            </div>
+          ) : (
+            <div>
+              <div className="px-4 py-2 flex text-xs font-bold uppercase tracking-wider" style={{ color: '#9CA3AF', borderBottom: '1px solid #F3F4F6' }}>
+                <span className="flex-1">User</span>
+                <span className="w-24 text-center">Tier</span>
+                <span className="w-24 text-center">Source</span>
+                <span className="w-24 text-right">Joined</span>
+              </div>
+              {results.map((user) => (
+                <div key={user.id} className="px-4 py-3 flex items-center hover:bg-gray-50 transition-colors" style={{ borderBottom: '1px solid #F3F4F6' }}>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate" style={{ color: '#1B2A4A' }}>{user.display_name || 'No name'}</p>
+                    <p className="text-xs truncate" style={{ color: '#6B7280' }}>{user.email}</p>
+                  </div>
+                  <span
+                    className="w-24 text-center text-xs font-semibold px-2 py-0.5 rounded-full capitalize"
+                    style={{
+                      backgroundColor: user.tier === 'all_access' ? '#FFF8E7' : user.tier === 'free' ? '#F3F4F6' : '#E0F4FF',
+                      color: user.tier === 'all_access' ? '#D97706' : user.tier === 'free' ? '#6B7280' : '#0891B2',
+                    }}
+                  >
+                    {user.tier?.replace('_', ' ')}
+                  </span>
+                  <span className="w-24 text-center text-xs capitalize" style={{ color: '#9CA3AF' }}>{user.source?.replace('_', ' ')}</span>
+                  <span className="w-24 text-right text-xs" style={{ color: '#9CA3AF' }}>
+                    {new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // Hub theme colors
 const theme = PORTAL_THEMES.hub;
@@ -191,6 +311,9 @@ export default function HubAdminPage() {
           <h1 className="font-extrabold" style={{ fontSize: 28, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Learning Hub</h1>
           <p className="text-sm text-gray-500 mt-1">Manage enrollments, content, and analytics</p>
         </div>
+
+        {/* User Search */}
+        <UserSearchBar />
 
         {/* Launch Status Banner */}
         {!showExampleNotice && stats && (stats.todaySignups || 0) > 0 && (
@@ -462,6 +585,103 @@ export default function HubAdminPage() {
               ]}
               href="/tdi-admin/hub/production"
             />
+          </div>
+        </div>
+
+        {/* Support Triage */}
+        <div className="mb-8">
+          <h2 className="font-bold mb-4" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Support Triage</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Common Issues */}
+            <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <div className="flex items-center gap-2 mb-3">
+                <AlertCircle size={16} style={{ color: '#E8B84B' }} />
+                <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#9CA3AF' }}>Common Issues</h3>
+              </div>
+              <div className="space-y-3">
+                {[
+                  { issue: 'Cannot log in', action: 'Check if email exists in user search above. If yes, send password reset. If no, create account manually in Operations > Accounts.' },
+                  { issue: 'Content not loading', action: 'Check their membership tier. Free users only see rotating content. Verify their access_tier matches their membership.' },
+                  { issue: 'Wrong membership tier', action: 'Go to Operations > Accounts, find the user, and update their hub_membership row. Source should match how they got access.' },
+                ].map((item, i) => (
+                  <details key={i} className="group">
+                    <summary className="text-sm font-medium cursor-pointer list-none flex items-center justify-between" style={{ color: '#1B2A4A' }}>
+                      {item.issue}
+                      <ChevronRight size={14} className="group-open:rotate-90 transition-transform" style={{ color: '#9CA3AF' }} />
+                    </summary>
+                    <p className="text-xs mt-2 leading-relaxed" style={{ color: '#6B7280' }}>{item.action}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <div className="flex items-center gap-2 mb-3">
+                <Zap size={16} style={{ color: '#E8B84B' }} />
+                <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#9CA3AF' }}>Quick Actions</h3>
+              </div>
+              <div className="space-y-2">
+                <Link
+                  href="/tdi-admin/hub/operations"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+                  style={{ color: '#374151' }}
+                >
+                  <User size={14} style={{ color: '#9CA3AF' }} />
+                  Manage user accounts
+                </Link>
+                <Link
+                  href="/tdi-admin/hub/production"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+                  style={{ color: '#374151' }}
+                >
+                  <FileText size={14} style={{ color: '#9CA3AF' }} />
+                  Manage content
+                </Link>
+                <Link
+                  href="/tdi-admin/hub/operations"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+                  style={{ color: '#374151' }}
+                >
+                  <Mail size={14} style={{ color: '#9CA3AF' }} />
+                  Send bulk email
+                </Link>
+                <Link
+                  href="/tdi-admin/hub/operations"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+                  style={{ color: '#374151' }}
+                >
+                  <Download size={14} style={{ color: '#9CA3AF' }} />
+                  Export user data
+                </Link>
+              </div>
+            </div>
+
+            {/* Escalation Guide */}
+            <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <div className="flex items-center gap-2 mb-3">
+                <Info size={16} style={{ color: '#E8B84B' }} />
+                <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#9CA3AF' }}>Escalation Guide</h3>
+              </div>
+              <div className="space-y-3 text-xs leading-relaxed" style={{ color: '#6B7280' }}>
+                <div>
+                  <p className="font-semibold mb-1" style={{ color: '#1B2A4A' }}>Billing / Stripe issues</p>
+                  <p>Escalate to Omar. Check Stripe dashboard for subscription status. Do not issue refunds without approval.</p>
+                </div>
+                <div>
+                  <p className="font-semibold mb-1" style={{ color: '#1B2A4A' }}>Content requests / creator issues</p>
+                  <p>Route to CreatorStudio@teachersdeserveit.com. Holly can triage content-specific requests.</p>
+                </div>
+                <div>
+                  <p className="font-semibold mb-1" style={{ color: '#1B2A4A' }}>Technical bugs</p>
+                  <p>Create a Paperclip issue in the Learning Hub project. Tag with priority. Include screenshots and user email.</p>
+                </div>
+                <div>
+                  <p className="font-semibold mb-1" style={{ color: '#1B2A4A' }}>Partnership / district questions</p>
+                  <p>Route to Jim Ford. If urgent, escalate to Rae directly.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
