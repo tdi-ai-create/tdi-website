@@ -61,11 +61,11 @@ export async function GET() {
     const pdData = pdHoursResult.data as { pd_hours: number }[] | null;
     const totalPdHours = pdData?.reduce((sum, c) => sum + (c.pd_hours || 0), 0) || 0;
 
-    // Get stress scores from activity log (stress_checkin actions)
+    // Get vibe check scores from activity log
     const { data: stressData } = await supabase
       .from('hub_activity_log')
       .select('user_id, metadata')
-      .eq('action', 'stress_checkin')
+      .eq('action', 'wellbeing_check')
       .order('created_at', { ascending: false })
       .limit(500);
 
@@ -82,6 +82,36 @@ export async function GET() {
       ? (scores.reduce((sum, s) => sum + s, 0) / scores.length).toFixed(1)
       : 'N/A';
 
+    // Get membership breakdown
+    const { data: membershipData } = await supabase
+      .from('hub_memberships')
+      .select('tier, source, status');
+
+    const membershipByTier: Record<string, number> = {};
+    const membershipBySource: Record<string, number> = {};
+    (membershipData || []).forEach((m: { tier: string; source: string; status: string }) => {
+      if (m.status === 'active') {
+        membershipByTier[m.tier] = (membershipByTier[m.tier] || 0) + 1;
+        membershipBySource[m.source] = (membershipBySource[m.source] || 0) + 1;
+      }
+    });
+
+    // Get signups in last 7 days
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const { count: recentSignups } = await supabase
+      .from('hub_profiles')
+      .select('id', { count: 'exact', head: true })
+      .gte('created_at', weekAgo.toISOString());
+
+    // Get signups today
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const { count: todaySignups } = await supabase
+      .from('hub_profiles')
+      .select('id', { count: 'exact', head: true })
+      .gte('created_at', todayStart.toISOString());
+
     return NextResponse.json({
       totalUsers: usersResult.count || 0,
       totalEnrollments: enrollmentsResult.count || 0,
@@ -89,6 +119,10 @@ export async function GET() {
       totalCertificates: certificatesResult.count || 0,
       totalPdHours,
       avgStressScore,
+      membershipByTier,
+      membershipBySource,
+      recentSignups: recentSignups || 0,
+      todaySignups: todaySignups || 0,
     });
   } catch (error) {
     console.error('[Admin Stats API] Error:', error);

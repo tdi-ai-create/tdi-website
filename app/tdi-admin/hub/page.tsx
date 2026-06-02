@@ -33,6 +33,10 @@ interface HubStats {
   totalCertificates: number;
   totalPdHours: number;
   avgStressScore: number | null;
+  membershipByTier?: Record<string, number>;
+  membershipBySource?: Record<string, number>;
+  recentSignups?: number;
+  todaySignups?: number;
 }
 
 // Modern Stat Card Component - simplified without icon circles
@@ -223,6 +227,59 @@ export default function HubAdminPage() {
             <p className="text-gray-500">Unable to load stats.</p>
           )}
         </div>
+
+        {/* Membership & Growth */}
+        {stats && (stats.membershipByTier || stats.recentSignups) && (
+          <div className="mb-8">
+            <h2 className="font-bold mb-4" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Membership & Growth</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Signups */}
+              <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Signups</h3>
+                <div className="flex items-baseline gap-3 mb-2">
+                  <span className="text-3xl font-bold" style={{ color: '#E8B84B' }}>{stats.todaySignups || 0}</span>
+                  <span className="text-sm" style={{ color: '#6B7280' }}>today</span>
+                </div>
+                <div className="flex items-baseline gap-3">
+                  <span className="text-xl font-bold" style={{ color: '#1B2A4A' }}>{stats.recentSignups || 0}</span>
+                  <span className="text-sm" style={{ color: '#6B7280' }}>this week</span>
+                </div>
+              </div>
+
+              {/* By Tier */}
+              <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Active Memberships by Tier</h3>
+                <div className="space-y-2">
+                  {Object.entries(stats.membershipByTier || {}).map(([tier, count]) => (
+                    <div key={tier} className="flex items-center justify-between">
+                      <span className="text-sm capitalize" style={{ color: '#374151' }}>{tier.replace('_', ' ')}</span>
+                      <span className="text-sm font-bold" style={{ color: '#1B2A4A' }}>{count as number}</span>
+                    </div>
+                  ))}
+                  {Object.keys(stats.membershipByTier || {}).length === 0 && (
+                    <p className="text-sm" style={{ color: '#9CA3AF' }}>No active memberships yet</p>
+                  )}
+                </div>
+              </div>
+
+              {/* By Source */}
+              <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Members by Source</h3>
+                <div className="space-y-2">
+                  {Object.entries(stats.membershipBySource || {}).map(([source, count]) => (
+                    <div key={source} className="flex items-center justify-between">
+                      <span className="text-sm capitalize" style={{ color: '#374151' }}>{source.replace('_', ' ')}</span>
+                      <span className="text-sm font-bold" style={{ color: '#1B2A4A' }}>{count as number}</span>
+                    </div>
+                  ))}
+                  {Object.keys(stats.membershipBySource || {}).length === 0 && (
+                    <p className="text-sm" style={{ color: '#9CA3AF' }}>No membership sources yet</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Section Cards */}
         <div className="mb-8">
