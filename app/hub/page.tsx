@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
@@ -10,32 +10,18 @@ import AvatarDisplay from '@/components/hub/AvatarDisplay';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { checkTrackerEligibility, getLearningStats, type TrackerEligibility } from '@/lib/hub/transformation';
 import { getRecommendations, hasCompletedOnboarding, type RecommendedCourse } from '@/lib/hub/recommendations';
-import { checkRecognitions } from '@/lib/hub/recognitions';
+import { checkRecognitions, RECOGNITIONS, type Recognition } from '@/lib/hub/recognitions';
 import dynamic from 'next/dynamic';
 import GiftElement from '@/components/hub/GiftElement';
 import CommunityBookmarks from '@/components/hub/CommunityBookmarks';
 import DashboardInsight from '@/components/hub/DashboardInsight';
 import AchievementInsights from '@/components/hub/AchievementInsights';
-import PolaroidCard from '@/components/hub/PolaroidCard';
-import type { PolaroidSlot } from '@/components/hub/PolaroidCard';
-import SortableDashboardSection from '@/components/hub/SortableDashboardSection';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+// PolaroidCard shelved for now
+// import SortableDashboardSection from '@/components/hub/SortableDashboardSection';
+// dnd-kit imports shelved for draggable sections feature
 
 const OnboardingTour = dynamic(() => import('@/components/hub/OnboardingTour'), { ssr: false });
+const RecognitionCelebration = dynamic(() => import('@/components/hub/RecognitionCelebration'), { ssr: false });
 import {
   BookOpen,
   Award,
@@ -263,59 +249,10 @@ export default function HubDashboard() {
   const [communityHighlights, setCommunityHighlights] = useState<CommunityHighlight[]>([]);
   const [communitySummary, setCommunitySummary] = useState<CommunitySummary | null>(null);
   const [userGoal, setUserGoal] = useState<{ text: string; quickWin: QuickWin | null } | null>(null);
-  const [polaroids, setPolaroids] = useState<Record<string, { image_url: string; caption: string | null; pin_color?: string | null }>>({});
   const [aiInsight, setAiInsight] = useState<string | null>(null);
   const [aiInsightLoading, setAiInsightLoading] = useState(false);
+  const [newRecognition, setNewRecognition] = useState<Recognition | null>(null);
 
-  // Draggable section order
-  const DEFAULT_LEFT_ORDER = ['goal', 'tdi-tip', 'continue-learning', 'saved', 'ai-insight', 'bookmarks'];
-  const DEFAULT_RIGHT_ORDER = ['progress', 'curated', 'quick-wins'];
-
-  const [leftOrder, setLeftOrder] = useState<string[]>(() => {
-    if (typeof window === 'undefined') return DEFAULT_LEFT_ORDER;
-    try {
-      const saved = localStorage.getItem('tdi-hub-left-order');
-      return saved ? JSON.parse(saved) : DEFAULT_LEFT_ORDER;
-    } catch { return DEFAULT_LEFT_ORDER; }
-  });
-  const [rightOrder, setRightOrder] = useState<string[]>(() => {
-    if (typeof window === 'undefined') return DEFAULT_RIGHT_ORDER;
-    try {
-      const saved = localStorage.getItem('tdi-hub-right-order');
-      return saved ? JSON.parse(saved) : DEFAULT_RIGHT_ORDER;
-    } catch { return DEFAULT_RIGHT_ORDER; }
-  });
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
-  );
-
-  const handleLeftDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      setLeftOrder(prev => {
-        const oldIndex = prev.indexOf(String(active.id));
-        const newIndex = prev.indexOf(String(over.id));
-        const next = arrayMove(prev, oldIndex, newIndex);
-        try { localStorage.setItem('tdi-hub-left-order', JSON.stringify(next)); } catch {}
-        return next;
-      });
-    }
-  }, []);
-
-  const handleRightDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      setRightOrder(prev => {
-        const oldIndex = prev.indexOf(String(active.id));
-        const newIndex = prev.indexOf(String(over.id));
-        const next = arrayMove(prev, oldIndex, newIndex);
-        try { localStorage.setItem('tdi-hub-right-order', JSON.stringify(next)); } catch {}
-        return next;
-      });
-    }
-  }, []);
 
   const firstName = profile?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Teacher';
   const dailyMessage = DAILY_MESSAGES[new Date().getDay()];
@@ -502,12 +439,41 @@ export default function HubDashboard() {
 
         setCertificateCount(certCount || 0);
 
-        // Check Field Notes (recognitions)
+        // Check Field Notes (recognitions) + detect new ones
         try {
           const recResult = await checkRecognitions(user.id, supabase);
           setFieldNotesCount(recResult.earned.length);
+
+          // Compare against persisted earned recognitions to find new ones
+          const earnedRes = await fetch(`/api/hub/recognitions?userId=${user.id}`);
+          const { earned: previouslyEarned } = await earnedRes.json();
+          const previousTypes = new Set((previouslyEarned || []).map((e: { recognition_type: string }) => e.recognition_type));
+          const currentEarnedTypes = recResult.earned.map(e => e.recognition.id);
+          const brandNew = currentEarnedTypes.filter((t: string) => !previousTypes.has(t));
+
+          if (brandNew.length > 0) {
+            // Persist all newly earned recognitions
+            await fetch('/api/hub/recognitions', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: user.id, newRecognitions: brandNew }),
+            });
+
+            // Show celebration for the first new one
+            const celebrateRec = RECOGNITIONS.find(r => r.id === brandNew[0]);
+            if (celebrateRec) {
+              setNewRecognition(celebrateRec);
+            }
+          } else if (previouslyEarned.length === 0 && currentEarnedTypes.length > 0) {
+            // First time -- persist all existing earned (backfill)
+            await fetch('/api/hub/recognitions', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: user.id, newRecognitions: currentEarnedTypes }),
+            });
+          }
         } catch {
-          // Silent fail
+          // Silent fail -- recognition check is non-critical
         }
 
         // --- New dashboard enrichment queries (Features 1, 2, 5, 6) ---
@@ -728,14 +694,6 @@ export default function HubDashboard() {
     }
 
     loadDashboardData();
-
-    // Load polaroids via API (non-blocking)
-    if (user?.id) {
-      fetch(`/api/hub/polaroids?userId=${user.id}`)
-        .then(r => r.json())
-        .then(data => { if (data.polaroids) setPolaroids(data.polaroids); })
-        .catch(() => {});
-    }
 
     // Load a compact AI insight (non-blocking)
     async function loadAiInsight() {
@@ -1730,6 +1688,24 @@ export default function HubDashboard() {
         </div>
       </div>
     </div>
+    )}
+
+    {/* Recognition Celebration */}
+    {newRecognition && (
+      <RecognitionCelebration
+        recognition={newRecognition}
+        onDismiss={() => {
+          // Mark as seen
+          if (user?.id) {
+            fetch('/api/hub/recognitions', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: user.id, markSeen: [newRecognition.id] }),
+            }).catch(() => {});
+          }
+          setNewRecognition(null);
+        }}
+      />
     )}
 
     {/* Celebrate & Share Modal */}

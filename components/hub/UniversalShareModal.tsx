@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, Copy, Check } from 'lucide-react';
 import { useTranslation } from '@/lib/hub/useTranslation';
+import { useHub } from '@/components/hub/HubContext';
+import { getHubSupabase } from '@/lib/supabase-hub';
 
 interface UniversalShareModalProps {
   isOpen: boolean;
@@ -28,6 +30,23 @@ export default function UniversalShareModal({
 
   const encodedMessage = encodeURIComponent(message);
   const encodedSubject = encodeURIComponent(emailSubject);
+
+  const { user } = useHub();
+  const loggedRef = useRef(false);
+
+  // Log share_used action once when modal opens
+  useEffect(() => {
+    if (isOpen && user?.id && !loggedRef.current) {
+      loggedRef.current = true;
+      const supabase = getHubSupabase();
+      supabase.from('hub_activity_log').insert({
+        user_id: user.id,
+        action: 'share_used',
+        metadata: { title },
+      }).then(() => {});
+    }
+    if (!isOpen) loggedRef.current = false;
+  }, [isOpen, user?.id, title]);
 
   const handleCopy = async () => {
     try {

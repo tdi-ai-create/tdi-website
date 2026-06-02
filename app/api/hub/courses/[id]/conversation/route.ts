@@ -143,6 +143,13 @@ export async function POST(
 
     if (error) throw error
 
+    // Log community post for recognition tracking
+    supabase.from('hub_activity_log').insert({
+      user_id,
+      action: 'quick_win_experience',
+      metadata: { course_id: id, contribution_type },
+    }).then(() => {})
+
     // Get author profile
     const { data: profile } = await supabase
       .from('hub_profiles')
