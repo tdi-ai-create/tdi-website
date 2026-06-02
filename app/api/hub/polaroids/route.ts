@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { getCurrentUser } from '@/lib/hub-auth';
 
 // Hub Supabase with service role (bypasses RLS)
 function getHubAdmin() {
@@ -11,20 +10,20 @@ function getHubAdmin() {
 }
 
 // GET -- load user's polaroids
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ polaroids: {} });
+    const userId = request.nextUrl.searchParams.get('userId');
+    if (!userId) return NextResponse.json({ polaroids: {} });
 
     const hub = getHubAdmin();
     const { data } = await hub
       .from('hub_polaroids')
-      .select('slot, image_url, caption')
-      .eq('user_id', user.id);
+      .select('slot, image_url, caption, pin_color')
+      .eq('user_id', userId);
 
-    const map: Record<string, { image_url: string; caption: string | null }> = {};
-    (data || []).forEach((p: { slot: string; image_url: string; caption: string | null }) => {
-      map[p.slot] = { image_url: p.image_url, caption: p.caption };
+    const map: Record<string, { image_url: string; caption: string | null; pin_color: string | null }> = {};
+    (data || []).forEach((p: { slot: string; image_url: string; caption: string | null; pin_color?: string | null }) => {
+      map[p.slot] = { image_url: p.image_url, caption: p.caption, pin_color: p.pin_color || null };
     });
 
     return NextResponse.json({ polaroids: map });
@@ -37,22 +36,20 @@ export async function GET() {
 // POST -- upload a polaroid photo
 export async function POST(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
     const slot = formData.get('slot') as string | null;
+    const userId = formData.get('userId') as string | null;
 
-    if (!file || !slot || !['love', 'proud', 'goal'].includes(slot)) {
-      return NextResponse.json({ error: 'Missing file or invalid slot' }, { status: 400 });
+    if (!file || !slot || !userId || !['love', 'proud', 'goal'].includes(slot)) {
+      return NextResponse.json({ error: 'Missing file, slot, or userId' }, { status: 400 });
     }
 
     const hub = getHubAdmin();
 
     // Upload to storage
     const ext = file.name.split('.').pop() || 'jpg';
-    const filePath = `${user.id}/${slot}.${ext}`;
+    const filePath = `${userId}/${slot}.${ext}`;
     const buffer = Buffer.from(await file.arrayBuffer());
 
     const { error: uploadError } = await hub.storage
@@ -64,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     if (uploadError) {
       console.error('[Polaroids] Storage upload error:', uploadError);
-      return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
+      return NextResponse.json({ error: 'Upload failed: ' + uploadError.message }, { status: 500 });
     }
 
     // Get public URL
@@ -78,7 +75,7 @@ export async function POST(request: NextRequest) {
     const { error: dbError } = await hub
       .from('hub_polaroids')
       .upsert({
-        user_id: user.id,
+        user_id: userId,
         slot,
         image_url: imageUrl,
         caption: null,
@@ -87,12 +84,40 @@ export async function POST(request: NextRequest) {
 
     if (dbError) {
       console.error('[Polaroids] DB upsert error:', dbError);
-      return NextResponse.json({ error: 'Failed to save' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to save: ' + dbError.message }, { status: 500 });
     }
 
     return NextResponse.json({ image_url: imageUrl });
   } catch (error) {
     console.error('[Polaroids POST]', error);
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+  }
+}
+
+// PATCH -- update pin color
+export async function PATCH(request: NextRequest) {
+  try {
+    const { userId, slot, pinColor } = await request.json();
+
+    if (!userId || !slot || !pinColor) {
+      return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+    }
+
+    const hub = getHubAdmin();
+    const { error } = await hub
+      .from('hub_polaroids')
+      .update({ pin_color: pinColor, updated_at: new Date().toISOString() })
+      .eq('user_id', userId)
+      .eq('slot', slot);
+
+    if (error) {
+      console.error('[Polaroids] Pin color update error:', error);
+      return NextResponse.json({ error: 'Update failed' }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('[Polaroids PATCH]', error);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

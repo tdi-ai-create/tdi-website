@@ -263,7 +263,7 @@ export default function HubDashboard() {
   const [communityHighlights, setCommunityHighlights] = useState<CommunityHighlight[]>([]);
   const [communitySummary, setCommunitySummary] = useState<CommunitySummary | null>(null);
   const [userGoal, setUserGoal] = useState<{ text: string; quickWin: QuickWin | null } | null>(null);
-  const [polaroids, setPolaroids] = useState<Record<string, { image_url: string; caption: string | null }>>({});
+  const [polaroids, setPolaroids] = useState<Record<string, { image_url: string; caption: string | null; pin_color?: string | null }>>({});
   const [aiInsight, setAiInsight] = useState<string | null>(null);
   const [aiInsightLoading, setAiInsightLoading] = useState(false);
 
@@ -730,10 +730,12 @@ export default function HubDashboard() {
     loadDashboardData();
 
     // Load polaroids via API (non-blocking)
-    fetch('/api/hub/polaroids')
-      .then(r => r.json())
-      .then(data => { if (data.polaroids) setPolaroids(data.polaroids); })
-      .catch(() => {});
+    if (user?.id) {
+      fetch(`/api/hub/polaroids?userId=${user.id}`)
+        .then(r => r.json())
+        .then(data => { if (data.polaroids) setPolaroids(data.polaroids); })
+        .catch(() => {});
+    }
 
     // Load a compact AI insight (non-blocking)
     async function loadAiInsight() {
@@ -1208,8 +1210,9 @@ export default function HubDashboard() {
                   slot="love"
                   imageUrl={polaroids.love?.image_url}
                   caption={polaroids.love?.caption}
+                  pinColor={polaroids.love?.pin_color}
                   userId={user.id}
-                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
+                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { ...prev[slot], image_url: url } }))}
                   width={150}
                 />
               </div>
@@ -1424,8 +1427,9 @@ export default function HubDashboard() {
                   slot="goal"
                   imageUrl={polaroids.goal?.image_url}
                   caption={polaroids.goal?.caption}
+                  pinColor={polaroids.goal?.pin_color}
                   userId={user.id}
-                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
+                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { ...prev[slot], image_url: url } }))}
                   width={150}
                 />
               </div>
@@ -1598,8 +1602,9 @@ export default function HubDashboard() {
                   slot="proud"
                   imageUrl={polaroids.proud?.image_url}
                   caption={polaroids.proud?.caption}
+                  pinColor={polaroids.proud?.pin_color}
                   userId={user.id}
-                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { image_url: url, caption: null } }))}
+                  onUpdate={(slot, url) => setPolaroids(prev => ({ ...prev, [slot]: { ...prev[slot], image_url: url } }))}
                   width={150}
                 />
               </div>
