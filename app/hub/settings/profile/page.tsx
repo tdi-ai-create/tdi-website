@@ -311,12 +311,12 @@ export default function ProfileSettingsPage() {
           .from('quick_win_responses')
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id),
-        // Vibe Check history (from activity log)
+        // Vibe Check history (from assessments table)
         supabase
-          .from('hub_activity_log')
-          .select('id, metadata, created_at')
+          .from('hub_assessments')
+          .select('id, question_category, stress_score, responses, created_at')
           .eq('user_id', user.id)
-          .eq('action', 'wellbeing_check')
+          .eq('type', 'daily_check_in')
           .order('created_at', { ascending: false })
           .limit(30),
         // Favorites with content info
@@ -348,12 +348,15 @@ export default function ProfileSettingsPage() {
         recentActivity: (recentResult.data || []) as ActivityEntry[],
       });
 
-      // Map activity log entries to CheckInEntry format
-      const rawCheckIns = (checkInResult.data || []) as { id: string; metadata: Record<string, unknown> | null; created_at: string }[];
+      // Map assessment entries to CheckInEntry format
+      const rawCheckIns = (checkInResult.data || []) as { id: string; question_category: string | null; stress_score: number | null; responses: Record<string, unknown> | null; created_at: string }[];
       setCheckIns(rawCheckIns.map(entry => ({
         id: entry.id,
-        score: (entry.metadata?.score as number) || (entry.metadata?.value as number) || 3,
-        responses: (entry.metadata as Record<string, string>) || null,
+        score: entry.stress_score || 3,
+        responses: {
+          category: entry.question_category || (entry.responses?.category as string) || 'mood',
+          ...(entry.responses as Record<string, string> || {}),
+        },
         created_at: entry.created_at,
       })));
 

@@ -89,6 +89,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
         : null,
       responses: {
         question_id: question.id,
+        category: question.category,
         selected: selectedValues,
       },
     })
@@ -112,7 +113,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
       response_type: question.responseType,
       stress_score: value,
       response_text: String(value),
-      responses: { question_id: question.id, selected: [value] },
+      responses: { question_id: question.id, category: question.category, selected: [value] },
     })
 
     setIsDone(true)
