@@ -25,6 +25,10 @@ import {
   Compass,
   Timer,
   Activity,
+  FileText,
+  Mail,
+  BookOpen,
+  Briefcase,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import UniversalShareModal from '@/components/hub/UniversalShareModal';
@@ -1333,18 +1337,29 @@ ${displayName}</div>
 
           {/* Ways to Use */}
           <div className="p-5">
-            <h3 className="text-sm font-semibold mb-2" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
+            <h3 className="text-sm font-semibold mb-3" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
               {tUI('Ways to Use Your Certificates')}
             </h3>
-            <div className="space-y-2 text-sm text-gray-600" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              <p>Print and hang in your classroom as a reminder of your growth.</p>
-              <p>Add to your professional evaluation portfolio before your next review.</p>
-              <p>Submit for PD recertification hours with your district.</p>
-              <p>Post on LinkedIn to show other educators that investing in yourself matters.</p>
-              <p>Include in your annual review documentation.</p>
-              <p>Forward to your principal using the email template above.</p>
-              <p>Add to the Professional Development section of your resume.</p>
-              <p>Save in a feel-good folder for the tough days.</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {[
+                { icon: <Printer size={16} />, label: 'Print and hang in your classroom', color: '#DC2626' },
+                { icon: <BookOpen size={16} />, label: 'Add to your evaluation portfolio', color: '#7C3AED' },
+                { icon: <Award size={16} />, label: 'Submit for PD recertification hours', color: '#E8B84B' },
+                { icon: <ExternalLink size={16} />, label: 'Post on LinkedIn', color: '#0891B2' },
+                { icon: <FileText size={16} />, label: 'Include in annual review docs', color: '#2A9D8F' },
+                { icon: <Mail size={16} />, label: 'Forward to your principal', color: '#D97706' },
+                { icon: <Briefcase size={16} />, label: 'Add to your resume PD section', color: '#1B2A4A' },
+                { icon: <Heart size={16} />, label: 'Save for the tough days', color: '#EC4899' },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-lg p-3 text-center transition-all hover:shadow-sm"
+                  style={{ backgroundColor: '#FAFAF8', border: '1px solid #F3F4F6' }}
+                >
+                  <div className="flex justify-center mb-2" style={{ color: item.color }}>{item.icon}</div>
+                  <p className="text-xs leading-snug" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>{tUI(item.label)}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
