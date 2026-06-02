@@ -112,6 +112,44 @@ export async function GET() {
       .select('id', { count: 'exact', head: true })
       .gte('created_at', todayStart.toISOString());
 
+    // Get top 5 most explored quick wins
+    const { data: topQWData } = await supabase
+      .from('hub_activity_log')
+      .select('metadata')
+      .eq('action', 'quick_win_viewed')
+      .limit(5000);
+
+    const qwCounts: Record<string, number> = {};
+    (topQWData || []).forEach((entry: { metadata: Record<string, unknown> | null }) => {
+      const id = entry.metadata?.quick_win_id as string || entry.metadata?.content_id as string;
+      if (id) qwCounts[id] = (qwCounts[id] || 0) + 1;
+    });
+    const topQuickWinIds = Object.entries(qwCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    let topQuickWins: { title: string; views: number }[] = [];
+    if (topQuickWinIds.length > 0) {
+      const { data: qwNames } = await supabase
+        .from('hub_quick_wins')
+        .select('id, title')
+        .in('id', topQuickWinIds.map(q => q[0]));
+
+      const nameMap: Record<string, string> = {};
+      (qwNames || []).forEach((qw: { id: string; title: string }) => { nameMap[qw.id] = qw.title; });
+      topQuickWins = topQuickWinIds.map(([id, count]) => ({
+        title: nameMap[id] || id,
+        views: count,
+      }));
+    }
+
+    // Recent activity (last 10 actions)
+    const { data: recentActivity } = await supabase
+      .from('hub_activity_log')
+      .select('action, user_id, created_at')
+      .order('created_at', { ascending: false })
+      .limit(10);
+
     return NextResponse.json({
       totalUsers: usersResult.count || 0,
       totalEnrollments: enrollmentsResult.count || 0,
@@ -123,6 +161,8 @@ export async function GET() {
       membershipBySource,
       recentSignups: recentSignups || 0,
       todaySignups: todaySignups || 0,
+      topQuickWins,
+      recentActivity: recentActivity || [],
     });
   } catch (error) {
     console.error('[Admin Stats API] Error:', error);
