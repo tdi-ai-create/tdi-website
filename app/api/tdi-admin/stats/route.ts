@@ -200,6 +200,9 @@ export async function GET() {
       recentActivity: recentActivity || [],
       growthChart,
       roleBreakdown,
+      // Quick summary numbers for the team
+      freeUsers: (usersResult.count || 0) - Object.values(membershipByTier).reduce((s, c) => s + c, 0),
+      paidUsers: Object.values(membershipByTier).reduce((s, c) => s + c, 0),
     });
   } catch (error) {
     console.error('[Admin Stats API] Error:', error);

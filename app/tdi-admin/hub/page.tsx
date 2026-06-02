@@ -161,6 +161,8 @@ interface HubStats {
   recentActivity?: { action: string; user_id: string; created_at: string }[];
   growthChart?: { date: string; count: number }[];
   roleBreakdown?: Record<string, number>;
+  freeUsers?: number;
+  paidUsers?: number;
 }
 
 // Modern Stat Card Component - simplified without icon circles
@@ -348,8 +350,10 @@ export default function HubAdminPage() {
               ))}
             </div>
           ) : stats ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
               <StatCard label="Total Users" value={stats.totalUsers || 0} />
+              <StatCard label="Free Users" value={stats.freeUsers || 0} />
+              <StatCard label="Paid / District" value={stats.paidUsers || 0} />
               <StatCard label="Enrollments" value={stats.totalEnrollments || 0} />
               <StatCard label="Completions" value={stats.totalCompletions || 0} />
               <StatCard label="Certificates" value={stats.totalCertificates || 0} />
