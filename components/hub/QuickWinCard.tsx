@@ -155,7 +155,7 @@ export default function QuickWinCard({
         {/* Action */}
         {hasAccess ? (
           <Link
-            href={quickWin.category === 'Practice Tools'
+            href={quickWin.category === 'Games'
               ? `/hub/practice/${quickWin.slug}`
               : quickWin.course_slug
                 ? `/hub/courses/${quickWin.course_slug}/${quickWin.slug}`
