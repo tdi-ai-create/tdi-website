@@ -971,6 +971,26 @@ ${displayName}</div>
               {tUI('Field Notes earned')}
             </text>
           </svg>
+          {recognitionData && recognitionData.progress.length > 0 && (
+            <div className="w-full mt-4 pt-4" style={{ borderTop: '1px solid #F3F4F6' }}>
+              <p className="text-xs font-semibold mb-2 text-center" style={{ color: '#9CA3AF' }}>{tUI('Still to earn')}</p>
+              <div className="flex flex-wrap justify-center gap-1.5">
+                {recognitionData.progress.slice(0, 4).map((item) => {
+                  const pct = Math.round((item.current / item.recognition.threshold) * 100);
+                  return (
+                    <div
+                      key={item.recognition.id}
+                      className="px-2.5 py-1 rounded-full text-center"
+                      title={`${item.current}/${item.recognition.threshold} -- ${pct}% there`}
+                      style={{ backgroundColor: '#F3F4F6', fontSize: '10px', color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                      {tUI(item.recognition.title)} ({pct}%)
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Activity Chart */}
