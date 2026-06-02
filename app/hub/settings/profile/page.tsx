@@ -6,6 +6,7 @@ import { useHub } from '@/components/hub/HubContext';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import AvatarDisplay from '@/components/hub/AvatarDisplay';
 import AvatarPicker from '@/components/hub/AvatarPicker';
+import AchievementInsights from '@/components/hub/AchievementInsights';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { signOut, updateHubProfile } from '@/lib/hub-auth';
 import {
@@ -948,6 +949,54 @@ export default function ProfileSettingsPage() {
             </div>
           </div>
 
+          {/* About You -- optional info cards */}
+          <div
+            className="bg-white rounded-2xl overflow-hidden"
+            style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
+          >
+            <div className="px-6 pt-6 pb-4" style={{ borderBottom: '1px solid #F3F4F6' }}>
+              <h2 className="text-sm font-semibold mb-1" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
+                {tUI('About You')}
+              </h2>
+              <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                {tUI('Optional -- helps us personalize your experience and connect you with the right resources.')}
+              </p>
+            </div>
+
+            {[
+              { key: 'school_name', label: 'School', placeholder: 'Your school name' },
+              { key: 'district', label: 'District', placeholder: 'Your school district' },
+              { key: 'state', label: 'State', placeholder: 'Your state (e.g., Illinois)' },
+              { key: 'years_in_education', label: 'Years in Education', placeholder: 'e.g., 7' },
+              { key: 'grade_band', label: 'Grade Band', placeholder: 'e.g., K-2, 3-5, 6-8, 9-12' },
+              { key: 'proud_of', label: 'Something you are proud of this year', placeholder: 'One thing that went well...' },
+              { key: 'pet_names', label: 'Pet names (we love pets)', placeholder: 'e.g., Luna and Biscuit' },
+            ].map((field, idx) => (
+              <div
+                key={field.key}
+                className="px-6 py-4 flex items-center gap-4"
+                style={idx < 6 ? { borderBottom: '1px solid #F3F4F6' } : {}}
+              >
+                <label className="text-sm font-medium w-48 flex-shrink-0" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
+                  {tUI(field.label)}
+                </label>
+                <input
+                  type="text"
+                  placeholder={tUI(field.placeholder)}
+                  defaultValue={(profile as unknown as Record<string, unknown>)?.[field.key] as string || ''}
+                  onBlur={async (e) => {
+                    const value = e.target.value.trim();
+                    if (!user?.id) return;
+                    const supabase = getSupabase();
+                    await supabase.from('hub_profiles').update({ [field.key]: value }).eq('id', user.id);
+                  }}
+                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#E8B84B] transition-colors"
+                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                />
+              </div>
+            ))}
+          </div>
+
           {/* Take the Tour */}
           <div className="hub-card">
             <h2
@@ -1145,6 +1194,23 @@ export default function ProfileSettingsPage() {
               </div>
             </div>
           )}
+
+          {/* ── AI Growth Insights (full suite) ── */}
+          <AchievementInsights
+            data={{
+              name: profile?.display_name || 'Educator',
+              role: profile?.role || 'Educator',
+              toolsExplored: statsData?.toolsExplored ?? 0,
+              hoursSaved: String(statsData?.hoursSaved ?? '0'),
+              daysActive: statsData?.daysActive ?? 0,
+              recognitionsEarned: recognitionData?.earned?.length ?? 0,
+              earnedNames: recognitionData?.earned?.map((e: { recognition: { title: string } }) => e.recognition.title) ?? [],
+              topCategories: [],
+              communityPosts: statsData?.communityContributions ?? 0,
+              coursesCompleted: 0,
+              pdHours: 0,
+            }}
+          />
 
           {/* ── Stats Section ── */}
           {/* Stats Grid -- navy accent cards */}
