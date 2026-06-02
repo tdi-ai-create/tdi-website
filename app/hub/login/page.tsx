@@ -54,7 +54,7 @@ export default function HubLoginPage() {
       <div style={{ visibility: showPage ? 'visible' : 'hidden', opacity: showPage ? 1 : 0, transition: 'opacity 300ms ease-in', backgroundColor: '#ffffff' }}>
 
         {/* ═══ HERO ═══ */}
-        <section style={{ backgroundColor: '#1e2749', padding: '80px 16px 60px' }}>
+        <section style={{ backgroundColor: '#1e2749', padding: '56px 16px 48px' }}>
           <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
             <span style={{ display: 'inline-block', padding: '6px 14px', background: 'rgba(255,186,6,0.15)', color: '#ffba06', borderRadius: 999, fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 20 }}>
               The TDI Learning Hub
@@ -69,10 +69,11 @@ export default function HubLoginPage() {
         </section>
 
         {/* ═══ SIGN IN ═══ */}
-        <section style={{ padding: '60px 16px', backgroundColor: '#F9FAFB' }}>
+        <section style={{ padding: '40px 16px 48px', backgroundColor: '#F9FAFB' }}>
           <div style={{ maxWidth: 500, margin: '0 auto', textAlign: 'center' }}>
             <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1e2749', margin: '0 0 4px' }}>Sign in to the Hub</h2>
-            <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 24 }}>Free account. No credit card required.</p>
+            <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 16 }}>Free account. No credit card required.</p>
+            <div className="portal-sign-in-wrapper">
             <PortalSignIn
               portalTitle=""
               portalSubtitle=""
@@ -84,6 +85,7 @@ export default function HubLoginPage() {
               googleRedirectTo={typeof window !== 'undefined' ? window.location.origin + '/hub' : '/hub'}
               forgotPasswordRedirectTo={typeof window !== 'undefined' ? window.location.origin + '/hub/settings/profile' : '/hub/settings/profile'}
             />
+            </div>
             <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 8 }}>100,000+ educators across all 50 states</p>
           </div>
         </section>
@@ -172,6 +174,13 @@ export default function HubLoginPage() {
           </button>
         </section>
       </div>
+
+      {/* Collapse PortalSignIn internal dead space */}
+      <style>{`
+        .portal-sign-in-wrapper > div:first-child { padding-top: 0 !important; margin-top: -16px !important; }
+        .portal-sign-in-wrapper header, .portal-sign-in-wrapper [class*="back"] { display: none !important; }
+        .portal-sign-in-wrapper > div { box-shadow: none !important; }
+      `}</style>
     </>
   );
 }
