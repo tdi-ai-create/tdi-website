@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from '@/lib/hub/useTranslation';
 import {
   Share2,
   Link2,
@@ -64,6 +65,7 @@ export default function ShareMenu({
   buttonVariant = 'secondary',
   buttonSize = 'md',
 }: ShareMenuProps) {
+  const { tUI } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState<CopiedType>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -236,13 +238,13 @@ export default function ShareMenu({
   const getCopiedMessage = () => {
     switch (copied) {
       case 'link':
-        return 'Copied!';
+        return tUI('Copied!');
       case 'text':
-        return 'Copied!';
+        return tUI('Copied!');
       case 'instagram':
-        return 'Copied! Paste into your Instagram caption';
+        return tUI('Copied! Paste into your Instagram caption');
       case 'tiktok':
-        return 'Copied! Paste into your TikTok caption';
+        return tUI('Copied! Paste into your TikTok caption');
       default:
         return '';
     }
@@ -256,7 +258,7 @@ export default function ShareMenu({
         className={`flex items-center rounded-lg transition-colors ${buttonClasses[buttonVariant]} ${sizeClasses[buttonSize]}`}
       >
         <Share2 size={buttonSize === 'sm' ? 14 : 16} />
-        <span>Share</span>
+        <span>{tUI('Share')}</span>
         <ChevronDown
           size={14}
           className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -277,7 +279,7 @@ export default function ShareMenu({
               ) : (
                 <Link2 size={16} className="text-gray-400" />
               )}
-              <span>{copied === 'link' ? 'Copied!' : 'Copy link'}</span>
+              <span>{copied === 'link' ? tUI('Copied!') : tUI('Copy link')}</span>
             </button>
           )}
 
@@ -292,7 +294,7 @@ export default function ShareMenu({
               ) : (
                 <Copy size={16} className="text-gray-400" />
               )}
-              <span>{copied === 'text' ? 'Copied!' : 'Copy text'}</span>
+              <span>{copied === 'text' ? tUI('Copied!') : tUI('Copy text')}</span>
             </button>
           )}
 
@@ -305,7 +307,7 @@ export default function ShareMenu({
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
           >
             <FacebookIcon size={16} className="text-[#1877F2]" />
-            <span>Share on Facebook</span>
+            <span>{tUI('Share on Facebook')}</span>
           </button>
 
           {/* Twitter/X */}
@@ -314,7 +316,7 @@ export default function ShareMenu({
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
           >
             <Twitter size={16} className="text-gray-700" />
-            <span>Share on X</span>
+            <span>{tUI('Share on X')}</span>
           </button>
 
           {/* LinkedIn */}
@@ -323,7 +325,7 @@ export default function ShareMenu({
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
           >
             <Linkedin size={16} className="text-[#0A66C2]" />
-            <span>Share on LinkedIn</span>
+            <span>{tUI('Share on LinkedIn')}</span>
           </button>
 
           {/* Instagram */}
@@ -337,7 +339,7 @@ export default function ShareMenu({
               <InstagramIcon size={16} className="text-[#E4405F]" />
             )}
             <span className="flex-1 text-left">
-              {copied === 'instagram' ? 'Copied! Paste into caption' : 'Copy for Instagram'}
+              {copied === 'instagram' ? tUI('Copied! Paste into caption') : tUI('Copy for Instagram')}
             </span>
           </button>
 
@@ -352,7 +354,7 @@ export default function ShareMenu({
               <TikTokIcon size={16} className="text-gray-900" />
             )}
             <span className="flex-1 text-left">
-              {copied === 'tiktok' ? 'Copied! Paste into caption' : 'Copy for TikTok'}
+              {copied === 'tiktok' ? tUI('Copied! Paste into caption') : tUI('Copy for TikTok')}
             </span>
           </button>
 
@@ -362,7 +364,7 @@ export default function ShareMenu({
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
           >
             <BlueskyIcon size={16} className="text-[#0085FF]" />
-            <span>Share on Bluesky</span>
+            <span>{tUI('Share on Bluesky')}</span>
           </button>
 
           {/* Pinterest */}
@@ -371,7 +373,7 @@ export default function ShareMenu({
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
           >
             <PinterestIcon size={16} className="text-[#E60023]" />
-            <span>Share on Pinterest</span>
+            <span>{tUI('Share on Pinterest')}</span>
           </button>
 
           {/* Divider */}
@@ -383,7 +385,7 @@ export default function ShareMenu({
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
           >
             <Mail size={16} className="text-gray-400" />
-            <span>Send via email</span>
+            <span>{tUI('Send via email')}</span>
           </button>
         </div>
       )}

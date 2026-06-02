@@ -16,6 +16,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { getCurrentUser } from '@/lib/hub-auth';
+import { useTranslation } from '@/lib/hub/useTranslation';
 import {
   isChampion,
   getChampionOrganization,
@@ -71,6 +72,7 @@ function StatCard({
 
 export default function ChampionPage() {
   const router = useRouter();
+  const { tUI } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [organizationId, setOrganizationId] = useState<string | null>(null);
@@ -215,11 +217,10 @@ export default function ChampionPage() {
         <div className="max-w-4xl mx-auto px-4 py-12 text-center">
           <Users size={48} className="mx-auto text-gray-400 mb-4" />
           <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-            No Organization Linked
+            {tUI('No Organization Linked')}
           </h1>
           <p className="text-gray-600">
-            Your account is not linked to a school organization yet. Please
-            contact support to set up your school dashboard.
+            {tUI('Your account is not linked to a school organization yet. Please contact support to set up your school dashboard.')}
           </p>
         </div>
       </div>
@@ -231,9 +232,9 @@ export default function ChampionPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-[#2B3A67]">School Dashboard</h1>
+          <h1 className="text-2xl font-bold text-[#2B3A67]">{tUI('School Dashboard')}</h1>
           <p className="text-gray-600 mt-1">
-            See who on your team has enrolled. Individual progress is private.
+            {tUI('See who on your team has enrolled. Individual progress is private.')}
           </p>
         </div>
 
@@ -242,25 +243,25 @@ export default function ChampionPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <StatCard
               icon={Users}
-              label="Total team members"
+              label={tUI('Total team members')}
               value={stats.totalMembers}
               color="#2B3A67"
             />
             <StatCard
               icon={UserCheck}
-              label="Enrolled"
+              label={tUI('Enrolled')}
               value={stats.enrolled}
               color="#22C55E"
             />
             <StatCard
               icon={UserX}
-              label="Not yet enrolled"
+              label={tUI('Not yet enrolled')}
               value={stats.notEnrolled}
               color="#EAB308"
             />
             <StatCard
               icon={Award}
-              label="Completed 1+ course"
+              label={tUI('Completed 1+ course')}
               value={stats.completedAtLeastOne}
               color="#8B5CF6"
             />
@@ -271,7 +272,7 @@ export default function ChampionPage() {
         <div className="bg-white rounded-xl border border-gray-200 mb-8">
           <div className="p-4 border-b border-gray-200">
             <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Team Members</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{tUI('Team Members')}</h2>
 
               {/* Search */}
               <div className="relative">
@@ -281,7 +282,7 @@ export default function ChampionPage() {
                 />
                 <input
                   type="text"
-                  placeholder="Search by name or email..."
+                  placeholder={tUI('Search by name or email...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full sm:w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2B3A67]/20 focus:border-[#2B3A67]"
@@ -300,24 +301,24 @@ export default function ChampionPage() {
                       onClick={() => handleSort('name')}
                       className="flex items-center gap-1 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
                     >
-                      Name
+                      {tUI('Name')}
                       <ArrowUpDown size={14} />
                     </button>
                   </th>
                   <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Email
+                    {tUI('Email')}
                   </th>
                   <th className="text-left py-3 px-4">
                     <button
                       onClick={() => handleSort('status')}
                       className="flex items-center gap-1 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
                     >
-                      Status
+                      {tUI('Status')}
                       <ArrowUpDown size={14} />
                     </button>
                   </th>
                   <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Courses Enrolled
+                    {tUI('Courses Enrolled')}
                   </th>
                 </tr>
               </thead>
@@ -326,7 +327,7 @@ export default function ChampionPage() {
                   <tr key={member.id} className="hover:bg-gray-50">
                     <td className="py-3 px-4">
                       <span className="font-medium text-gray-900">
-                        {member.display_name || 'Unnamed'}
+                        {member.display_name || tUI('Unnamed')}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-gray-600">{member.email}</td>
@@ -334,12 +335,12 @@ export default function ChampionPage() {
                       {member.is_enrolled ? (
                         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
                           <UserCheck size={12} />
-                          Enrolled
+                          {tUI('Enrolled')}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
                           <UserX size={12} />
-                          Not Enrolled
+                          {tUI('Not Enrolled')}
                         </span>
                       )}
                     </td>
@@ -354,7 +355,7 @@ export default function ChampionPage() {
                       colSpan={4}
                       className="py-8 text-center text-gray-500"
                     >
-                      No team members found
+                      {tUI('No team members found')}
                     </td>
                   </tr>
                 )}
@@ -369,11 +370,10 @@ export default function ChampionPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900">
-                  Recommended by School
+                  {tUI('Recommended by School')}
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Courses you recommend will show a badge in your
-                  team&apos;s catalog
+                  {tUI("Courses you recommend will show a badge in your team's catalog")}
                 </p>
               </div>
 
@@ -385,7 +385,7 @@ export default function ChampionPage() {
                   disabled={availableCourses.length === 0}
                 >
                   <Plus size={16} />
-                  Add Course
+                  {tUI('Add Course')}
                   <ChevronDown
                     size={14}
                     className={`transition-transform ${courseDropdownOpen ? 'rotate-180' : ''}`}
@@ -404,7 +404,7 @@ export default function ChampionPage() {
                           {course.title}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
-                          {course.category} &bull; {course.pd_hours} PD hours
+                          {course.category} &bull; {course.pd_hours} {tUI('PD hours')}
                         </div>
                       </button>
                     ))}
@@ -429,14 +429,14 @@ export default function ChampionPage() {
                           {course.title}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {course.category} &bull; {course.pd_hours} PD hours
+                          {course.category} &bull; {course.pd_hours} {tUI('PD hours')}
                         </div>
                       </div>
                     </div>
                     <button
                       onClick={() => handleRemoveRecommendation(course.id)}
                       className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Remove recommendation"
+                      title={tUI('Remove recommendation')}
                     >
                       <X size={18} />
                     </button>
@@ -445,8 +445,7 @@ export default function ChampionPage() {
               </div>
             ) : (
               <p className="text-gray-500 text-center py-8">
-                No courses recommended yet. Add courses to help guide your
-                team&apos;s learning.
+                {tUI("No courses recommended yet. Add courses to help guide your team's learning.")}
               </p>
             )}
           </div>
@@ -460,12 +459,10 @@ export default function ChampionPage() {
             </div>
             <div>
               <h3 className="font-semibold text-[#2B3A67] mb-1">
-                Teacher Privacy
+                {tUI('Teacher Privacy')}
               </h3>
               <p className="text-sm text-gray-600">
-                Individual progress, assessment scores, and check-in data are
-                never visible to school administrators. You can only see
-                enrollment status.
+                {tUI('Individual progress, assessment scores, and check-in data are never visible to school administrators. You can only see enrollment status.')}
               </p>
             </div>
           </div>

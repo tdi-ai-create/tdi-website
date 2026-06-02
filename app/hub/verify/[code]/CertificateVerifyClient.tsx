@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getCertificateByCode, formatCertificateDate } from '@/lib/certificate';
 import { Award, CheckCircle, XCircle, Download } from 'lucide-react';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 interface CertificateData {
   id: string;
@@ -21,6 +22,7 @@ interface CertificateVerifyClientProps {
 }
 
 export default function CertificateVerifyClient({ code }: CertificateVerifyClientProps) {
+  const { tUI } = useTranslation();
   const [certificate, setCertificate] = useState<CertificateData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -58,7 +60,7 @@ export default function CertificateVerifyClient({ code }: CertificateVerifyClien
         <div className="text-center">
           <div className="w-16 h-16 rounded-full bg-gray-100 animate-pulse mx-auto mb-4" />
           <p className="text-gray-500" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-            Verifying certificate...
+            {tUI('Verifying certificate...')}
           </p>
         </div>
       </div>
@@ -84,14 +86,14 @@ export default function CertificateVerifyClient({ code }: CertificateVerifyClien
               color: '#2B3A67',
             }}
           >
-            Certificate Not Found
+            {tUI('Certificate Not Found')}
           </h1>
           <p
             className="text-gray-500 mb-6"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
-            We couldn&apos;t find a certificate with the code <span className="font-mono font-medium">{code}</span>.
-            Please check the verification code and try again.
+            {tUI("We couldn't find a certificate with the code")} <span className="font-mono font-medium">{code}</span>.
+            {' '}{tUI('Please check the verification code and try again.')}
           </p>
           <Link
             href="/hub"
@@ -102,7 +104,7 @@ export default function CertificateVerifyClient({ code }: CertificateVerifyClien
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
-            Go to Learning Hub
+            {tUI('Go to Learning Hub')}
           </Link>
         </div>
       </div>
@@ -129,13 +131,13 @@ export default function CertificateVerifyClient({ code }: CertificateVerifyClien
               color: '#2B3A67',
             }}
           >
-            Certificate Verified
+            {tUI('Certificate Verified')}
           </h1>
           <p
             className="text-gray-500"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
-            This is an authentic certificate issued by The Teacher Development Initiative.
+            {tUI('This is an authentic certificate issued by The Teacher Development Initiative.')}
           </p>
         </div>
 
@@ -168,7 +170,7 @@ export default function CertificateVerifyClient({ code }: CertificateVerifyClien
                   className="text-sm text-gray-500 mb-1"
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
-                  This certifies that
+                  {tUI('This certifies that')}
                 </p>
                 <h2
                   className="font-bold"
@@ -187,7 +189,7 @@ export default function CertificateVerifyClient({ code }: CertificateVerifyClien
                   className="text-sm text-gray-500 mb-1"
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
-                  has successfully completed
+                  {tUI('has successfully completed')}
                 </p>
                 <h3
                   className="font-semibold"
@@ -211,7 +213,7 @@ export default function CertificateVerifyClient({ code }: CertificateVerifyClien
                     fontFamily: "'DM Sans', sans-serif",
                   }}
                 >
-                  {certificate.pd_hours} Professional Development Hour{certificate.pd_hours !== 1 ? 's' : ''}
+                  {certificate.pd_hours} {certificate.pd_hours !== 1 ? tUI('Professional Development Hours') : tUI('Professional Development Hour')}
                 </span>
               </div>
 
@@ -220,14 +222,14 @@ export default function CertificateVerifyClient({ code }: CertificateVerifyClien
                 className="text-sm text-gray-500 pt-2"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
               >
-                Issued on {formatCertificateDate(certificate.issued_at)}
+                {tUI('Issued on')} {formatCertificateDate(certificate.issued_at)}
               </p>
 
               {/* Verification Code */}
               <p
                 className="text-xs text-gray-400 font-mono pt-4"
               >
-                Verification Code: {certificate.verification_code}
+                {tUI('Verification Code:')} {certificate.verification_code}
               </p>
             </div>
           </div>
@@ -248,7 +250,7 @@ export default function CertificateVerifyClient({ code }: CertificateVerifyClien
               }}
             >
               <Download size={16} />
-              Download Certificate
+              {tUI('Download Certificate')}
             </a>
           </div>
         </div>
@@ -259,7 +261,7 @@ export default function CertificateVerifyClient({ code }: CertificateVerifyClien
             className="text-sm text-gray-400"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
-            Verified by
+            {tUI('Verified by')}
           </p>
           <p
             className="font-bold mt-1"
@@ -269,7 +271,7 @@ export default function CertificateVerifyClient({ code }: CertificateVerifyClien
               color: '#2B3A67',
             }}
           >
-            The Teacher Development Initiative
+            {tUI('The Teacher Development Initiative')}
           </p>
           <p
             className="text-xs text-gray-400 mt-1"

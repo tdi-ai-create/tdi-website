@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Award, Download, Share2, X } from 'lucide-react';
 import ShareMenu from './ShareMenu';
+import { useTranslation } from '@/lib/hub/useTranslation';
 import confetti from 'canvas-confetti';
 
 interface CourseCompletionModalProps {
@@ -25,6 +26,7 @@ export default function CourseCompletionModal({
 }: CourseCompletionModalProps) {
   const hasConfetti = useRef(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const { tUI } = useTranslation();
 
   // Trigger confetti on mount
   useEffect(() => {
@@ -108,7 +110,7 @@ export default function CourseCompletionModal({
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors z-10"
-          aria-label="Close celebration"
+          aria-label={tUI("Close celebration")}
         >
           <X size={20} />
         </button>
@@ -138,7 +140,7 @@ export default function CourseCompletionModal({
               color: '#2B3A67',
             }}
           >
-            Congratulations!
+            {tUI("Congratulations!")}
           </h2>
 
           <p
@@ -149,7 +151,7 @@ export default function CourseCompletionModal({
               color: '#4B5563',
             }}
           >
-            You completed
+            {tUI("You completed")}
           </p>
 
           <p
@@ -179,7 +181,7 @@ export default function CourseCompletionModal({
                 color: '#2B3A67',
               }}
             >
-              You earned {pdHours} PD hour{pdHours !== 1 ? 's' : ''}!
+              {tUI(`You earned ${pdHours} PD hour${pdHours !== 1 ? 's' : ''}!`)}
             </span>
           </div>
 
@@ -192,7 +194,7 @@ export default function CourseCompletionModal({
               className="text-xs text-gray-500 mb-1"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              Certificate Verification Code
+              {tUI("Certificate Verification Code")}
             </p>
             <p
               className="font-mono font-semibold"
@@ -220,7 +222,7 @@ export default function CourseCompletionModal({
               }}
             >
               <Download size={18} />
-              Download Certificate
+              {tUI("Download Certificate")}
             </Link>
 
             {/* Share Achievement */}
@@ -242,7 +244,7 @@ export default function CourseCompletionModal({
                 color: '#6B7280',
               }}
             >
-              Back to Dashboard
+              {tUI("Back to Dashboard")}
             </Link>
           </div>
         </div>
@@ -259,7 +261,7 @@ export default function CourseCompletionModal({
               color: '#6B7280',
             }}
           >
-            Teachers rarely get celebrated. You deserve this. 💛
+            {tUI("Teachers rarely get celebrated. You deserve this.")} 💛
           </p>
         </div>
       </div>

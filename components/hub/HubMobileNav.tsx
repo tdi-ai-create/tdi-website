@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { X, Heart, Shield, Building } from 'lucide-react';
 import AvatarDisplay from './AvatarDisplay';
+import { useTranslation } from '@/lib/hub/useTranslation';
 import type { HubProfile } from '@/lib/hub-auth';
 import type { Language } from '@/lib/hub/useLanguage';
 
@@ -37,6 +38,7 @@ export default function HubMobileNav({
   onSetLanguage,
 }: HubMobileNavProps) {
   const pathname = usePathname();
+  const { tUI } = useTranslation();
 
   const isActive = (href: string, exact: boolean) => {
     if (exact) {
@@ -71,7 +73,7 @@ export default function HubMobileNav({
       <button
         onClick={onClose}
         className="absolute top-4 right-4 p-2 text-white/70 hover:text-white transition-colors"
-        aria-label="Close menu"
+        aria-label={tUI("Close menu")}
       >
         <X size={24} />
       </button>
@@ -201,7 +203,7 @@ export default function HubMobileNav({
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
           <Heart size={20} />
-          I need a moment
+          {tUI("I need a moment")}
         </button>
       </div>
     </div>

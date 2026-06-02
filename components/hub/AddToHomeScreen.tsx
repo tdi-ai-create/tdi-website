@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 const DISMISSED_KEY = 'tdi-hub-a2hs-dismissed';
 
@@ -10,6 +11,7 @@ const DISMISSED_KEY = 'tdi-hub-a2hs-dismissed';
  * Shows once after 3+ visits, dismissible, remembers dismissal.
  */
 export default function AddToHomeScreen() {
+  const { tUI } = useTranslation();
   const [show, setShow] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
 
@@ -85,12 +87,12 @@ export default function AddToHomeScreen() {
       {/* Text */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600, color: 'white', margin: '0 0 2px' }}>
-          Add the Hub to your home screen
+          {tUI('Add the Hub to your home screen')}
         </p>
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: 1.4 }}>
           {isIOS
-            ? 'Tap the share button, then "Add to Home Screen"'
-            : 'Quick access between classes -- no app store needed'}
+            ? tUI('Tap the share button, then "Add to Home Screen"')
+            : tUI('Quick access between classes -- no app store needed')}
         </p>
       </div>
 

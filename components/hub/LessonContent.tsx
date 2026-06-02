@@ -17,6 +17,7 @@ import {
   checkMultipleChoiceAnswer,
   checkTrueFalseAnswer,
 } from '@/lib/hub/quiz';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 interface LessonContentProps {
   lessonId: string;
@@ -39,6 +40,7 @@ export default function LessonContent({
   onComplete,
   isCompleted,
 }: LessonContentProps) {
+  const { tUI } = useTranslation();
   const [responses, setResponses] = useState<Record<string, QuizResponse>>(userResponses);
   const [currentAnswers, setCurrentAnswers] = useState<Record<string, string>>({});
   const [showResults, setShowResults] = useState<Record<string, boolean>>({});
@@ -378,8 +380,8 @@ export default function LessonContent({
     return (
       <div className="space-y-4">
         <div className="flex gap-4">
-          {renderButton('true', 'True')}
-          {renderButton('false', 'False')}
+          {renderButton('true', tUI('True'))}
+          {renderButton('false', tUI('False'))}
         </div>
 
         {answered && question.explanation && (
@@ -418,7 +420,7 @@ export default function LessonContent({
               className="text-sm font-medium text-green-700"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              Reflection saved
+              {tUI("Reflection saved")}
             </span>
           </div>
           <p
@@ -438,7 +440,7 @@ export default function LessonContent({
           onChange={(e) =>
             setCurrentAnswers((prev) => ({ ...prev, [question.id]: e.target.value }))
           }
-          placeholder="Write your reflection here..."
+          placeholder={tUI("Write your reflection here...")}
           className="w-full p-4 border rounded-lg resize-none focus:outline-none focus:border-[#E8B84B]"
           style={{
             minHeight: '150px',
@@ -451,9 +453,9 @@ export default function LessonContent({
             className="text-xs text-gray-400"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
-            {currentText.length}/50 characters minimum
+            {currentText.length}/50 {tUI("characters minimum")}
             {currentText.length >= 50 && (
-              <span className="text-green-600 ml-2">Ready to submit</span>
+              <span className="text-green-600 ml-2">{tUI("Ready to submit")}</span>
             )}
           </p>
           <button
@@ -466,7 +468,7 @@ export default function LessonContent({
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
-            {isSubmitting ? 'Saving...' : 'Save Reflection'}
+            {isSubmitting ? tUI('Saving...') : tUI('Save Reflection')}
           </button>
         </div>
         <p
@@ -474,7 +476,7 @@ export default function LessonContent({
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
           <Lock size={12} />
-          This is just for you. We will never share your reflections.
+          {tUI("This is just for you. We will never share your reflections.")}
         </p>
       </div>
     );
@@ -499,7 +501,7 @@ export default function LessonContent({
               className="font-medium text-green-700"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              Action step completed!
+              {tUI("Action step completed!")}
             </span>
           </div>
           {savedNotes && (
@@ -507,7 +509,7 @@ export default function LessonContent({
               className="mt-2 text-sm text-green-700 italic"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              Your notes: &quot;{savedNotes}&quot;
+              {tUI("Your notes:")} &quot;{savedNotes}&quot;
             </p>
           )}
         </div>
@@ -527,7 +529,7 @@ export default function LessonContent({
               color: '#2B3A67',
             }}
           >
-            Your Action Step:
+            {tUI("Your Action Step:")}
           </p>
           <p
             className="text-gray-700"
@@ -542,7 +544,7 @@ export default function LessonContent({
           onChange={(e) =>
             setCurrentAnswers((prev) => ({ ...prev, [question.id]: e.target.value }))
           }
-          placeholder="Optional: Add notes about how this went..."
+          placeholder={tUI("Optional: Add notes about how this went...")}
           className="w-full p-4 border rounded-lg resize-none focus:outline-none focus:border-[#E8B84B]"
           style={{
             minHeight: '100px',
@@ -562,7 +564,7 @@ export default function LessonContent({
           }}
         >
           <Check size={18} />
-          {isSubmitting ? 'Saving...' : 'I completed this action step'}
+          {isSubmitting ? tUI('Saving...') : tUI('I completed this action step')}
         </button>
       </div>
     );
@@ -596,7 +598,7 @@ export default function LessonContent({
                 color: '#2B3A67',
               }}
             >
-              Key Takeaways
+              {tUI("Key Takeaways")}
             </h4>
             <ul className="space-y-2">
               {takeaways.map((item, index) => (
@@ -627,7 +629,7 @@ export default function LessonContent({
               className="font-medium text-green-700"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              Checkpoint complete!
+              {tUI("Checkpoint complete!")}
             </p>
           </div>
         ) : (
@@ -641,7 +643,7 @@ export default function LessonContent({
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
-            {isSubmitting ? 'Saving...' : 'Ready to continue'}
+            {isSubmitting ? tUI('Saving...') : tUI('Ready to continue')}
             <ArrowRight size={18} />
           </button>
         )}
@@ -683,7 +685,7 @@ export default function LessonContent({
             className="text-xs text-gray-400 mb-2"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
-            Question {index + 1} of {questions.length}
+            {tUI("Question")} {index + 1} {tUI("of")} {questions.length}
           </p>
         )}
         {showQuestionText && (
@@ -736,7 +738,7 @@ export default function LessonContent({
             className="text-gray-500"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
-            Video content coming soon
+            {tUI("Video content coming soon")}
           </p>
         </div>
 
@@ -752,7 +754,7 @@ export default function LessonContent({
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
-            {isMarking ? 'Saving...' : 'Mark as complete'}
+            {isMarking ? tUI('Saving...') : tUI('Mark as complete')}
             <Check size={18} />
           </button>
         )}
@@ -767,7 +769,7 @@ export default function LessonContent({
               className="font-medium text-green-700"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              Lesson completed!
+              {tUI("Lesson completed!")}
             </p>
           </div>
         )}
@@ -818,7 +820,7 @@ export default function LessonContent({
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
-            {isMarking ? 'Saving...' : 'Mark as complete'}
+            {isMarking ? tUI('Saving...') : tUI('Mark as complete')}
             <Check size={18} />
           </button>
         )}
@@ -833,7 +835,7 @@ export default function LessonContent({
             className="font-medium text-green-700"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
-            Lesson completed!
+            {tUI("Lesson completed!")}
           </p>
         </div>
       )}

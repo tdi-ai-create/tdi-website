@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useHub } from '@/components/hub/HubContext';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { User, Bell, Mail, Clock, Eye, Users, Check, HelpCircle, MessageCircle } from 'lucide-react';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 interface NotificationPreferences {
   id?: string;
@@ -51,6 +52,7 @@ const TIMES = [
 
 export default function NotificationSettingsPage() {
   const { user } = useHub();
+  const { tUI } = useTranslation();
   const [preferences, setPreferences] = useState<NotificationPreferences>(DEFAULT_PREFERENCES);
   const [isSaving, setIsSaving] = useState(false);
   const [savedField, setSavedField] = useState<string | null>(null);
@@ -183,10 +185,10 @@ export default function NotificationSettingsPage() {
       <div style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)' }}>
         <div className="max-w-2xl mx-auto px-4 md:px-8 py-8">
           <h1 className="text-2xl font-bold text-white mb-1" style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}>
-            Preferences
+            {tUI('Preferences')}
           </h1>
           <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
-            Control how and when we reach out. Your space, your rules.
+            {tUI('Control how and when we reach out. Your space, your rules.')}
           </p>
         </div>
       </div>
@@ -199,7 +201,7 @@ export default function NotificationSettingsPage() {
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition-colors"
           >
             <User size={18} />
-            Profile
+            {tUI('Profile')}
           </Link>
           <Link
             href="/hub/settings/notifications"
@@ -207,14 +209,14 @@ export default function NotificationSettingsPage() {
             style={{ borderColor: '#E8B84B', color: '#1B2A4A' }}
           >
             <Bell size={18} />
-            Notifications
+            {tUI('Notifications')}
           </Link>
           <Link
             href="/hub/settings/help"
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition-colors"
           >
             <HelpCircle size={18} />
-            Help & FAQ
+            {tUI('Help & FAQ')}
           </Link>
         </div>
 
@@ -231,20 +233,20 @@ export default function NotificationSettingsPage() {
               </div>
               <div>
                 <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
-                  Email Preferences
-                  {savedField === 'email_frequency' && <span className="ml-2 text-xs text-green-600"><Check size={12} className="inline" /> Saved</span>}
+                  {tUI('Email Preferences')}
+                  {savedField === 'email_frequency' && <span className="ml-2 text-xs text-green-600"><Check size={12} className="inline" /> {tUI('Saved')}</span>}
                 </h3>
-                <p className="text-xs" style={{ color: '#9CA3AF' }}>How often we send you updates</p>
+                <p className="text-xs" style={{ color: '#9CA3AF' }}>{tUI('How often we send you updates')}</p>
               </div>
             </div>
             <div className="space-y-2 ml-12">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input type="radio" name="email_frequency" checked={preferences.email_frequency === 'welcome_nudge_monthly'} onChange={() => savePreference('email_frequency', 'welcome_nudge_monthly')} className="w-4 h-4" style={{ accentColor: '#FFBA06' }} />
-                <span className="text-sm" style={{ color: '#1B2A4A' }}>Welcome nudges + monthly digest</span>
+                <span className="text-sm" style={{ color: '#1B2A4A' }}>{tUI('Welcome nudges + monthly digest')}</span>
               </label>
               <label className="flex items-center gap-3 cursor-pointer">
                 <input type="radio" name="email_frequency" checked={preferences.email_frequency === 'essentials_only'} onChange={() => savePreference('email_frequency', 'essentials_only')} className="w-4 h-4" style={{ accentColor: '#FFBA06' }} />
-                <span className="text-sm" style={{ color: '#1B2A4A' }}>Essentials only (account + certificates)</span>
+                <span className="text-sm" style={{ color: '#1B2A4A' }}>{tUI('Essentials only (account + certificates)')}</span>
               </label>
             </div>
           </div>
@@ -255,24 +257,24 @@ export default function NotificationSettingsPage() {
               <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#E0F4FF' }}>
                 <Eye size={18} style={{ color: '#0891B2' }} />
               </div>
-              <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>Hub Experience</h3>
+              <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>{tUI('Hub Experience')}</h3>
             </div>
             <div className="space-y-4 ml-12">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium" style={{ color: '#1B2A4A' }}>
-                    Live activity popups {savedField === 'show_popups' && <Check size={12} className="inline ml-1 text-green-600" />}
+                    {tUI('Live activity popups')} {savedField === 'show_popups' && <Check size={12} className="inline ml-1 text-green-600" />}
                   </p>
-                  <p className="text-xs" style={{ color: '#9CA3AF' }}>See what other educators are doing</p>
+                  <p className="text-xs" style={{ color: '#9CA3AF' }}>{tUI('See what other educators are doing')}</p>
                 </div>
                 <Toggle enabled={preferences.show_popups} onChange={(value) => savePreference('show_popups', value)} disabled={isSaving} />
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium" style={{ color: '#1B2A4A' }}>
-                    Community activity {savedField === 'show_activity' && <Check size={12} className="inline ml-1 text-green-600" />}
+                    {tUI('Community activity')} {savedField === 'show_activity' && <Check size={12} className="inline ml-1 text-green-600" />}
                   </p>
-                  <p className="text-xs" style={{ color: '#9CA3AF' }}>Display community stats and updates</p>
+                  <p className="text-xs" style={{ color: '#9CA3AF' }}>{tUI('Display community stats and updates')}</p>
                 </div>
                 <Toggle enabled={preferences.show_activity} onChange={(value) => savePreference('show_activity', value)} disabled={isSaving} />
               </div>
@@ -285,15 +287,15 @@ export default function NotificationSettingsPage() {
               <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#E1F5EE' }}>
                 <MessageCircle size={18} style={{ color: '#2A9D8F' }} />
               </div>
-              <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>Community</h3>
+              <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>{tUI('Community')}</h3>
             </div>
             <div className="space-y-4 ml-12">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium" style={{ color: '#1B2A4A' }}>
-                    Reply notifications {savedField === 'community_replies' && <Check size={12} className="inline ml-1 text-green-600" />}
+                    {tUI('Reply notifications')} {savedField === 'community_replies' && <Check size={12} className="inline ml-1 text-green-600" />}
                   </p>
-                  <p className="text-xs" style={{ color: '#9CA3AF' }}>Get emailed when someone replies to your question or post</p>
+                  <p className="text-xs" style={{ color: '#9CA3AF' }}>{tUI('Get emailed when someone replies to your question or post')}</p>
                 </div>
                 <Toggle enabled={preferences.community_replies} onChange={(value) => savePreference('community_replies', value)} disabled={isSaving} />
               </div>
@@ -307,27 +309,27 @@ export default function NotificationSettingsPage() {
                 <Users size={18} style={{ color: '#7C3AED' }} />
               </div>
               <div>
-                <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>Learning Schedule</h3>
-                <p className="text-xs" style={{ color: '#9CA3AF' }}>Help us send reminders at the right time</p>
+                <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>{tUI('Learning Schedule')}</h3>
+                <p className="text-xs" style={{ color: '#9CA3AF' }}>{tUI('Help us send reminders at the right time')}</p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4 ml-12">
               <div>
                 <label className="block text-xs font-medium mb-1" style={{ color: '#6B7280' }}>
-                  Best day {savedField === 'preferred_learning_day' && <Check size={10} className="inline ml-1 text-green-600" />}
+                  {tUI('Best day')} {savedField === 'preferred_learning_day' && <Check size={10} className="inline ml-1 text-green-600" />}
                 </label>
                 <select value={preferences.preferred_learning_day || ''} onChange={(e) => savePreference('preferred_learning_day', e.target.value || null)}
                   className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none" style={{ borderColor: '#E9E7E2', background: '#FAFAF8' }}>
-                  {DAYS.map((day) => <option key={day.value} value={day.value}>{day.label}</option>)}
+                  {DAYS.map((day) => <option key={day.value} value={day.value}>{tUI(day.label)}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-xs font-medium mb-1" style={{ color: '#6B7280' }}>
-                  Best time {savedField === 'preferred_learning_time' && <Check size={10} className="inline ml-1 text-green-600" />}
+                  {tUI('Best time')} {savedField === 'preferred_learning_time' && <Check size={10} className="inline ml-1 text-green-600" />}
                 </label>
                 <select value={preferences.preferred_learning_time || ''} onChange={(e) => savePreference('preferred_learning_time', e.target.value || null)}
                   className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none" style={{ borderColor: '#E9E7E2', background: '#FAFAF8' }}>
-                  {TIMES.map((time) => <option key={time.value} value={time.value}>{time.label}</option>)}
+                  {TIMES.map((time) => <option key={time.value} value={time.value}>{tUI(time.label)}</option>)}
                 </select>
               </div>
             </div>
@@ -342,9 +344,9 @@ export default function NotificationSettingsPage() {
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
-                    Quiet Hours {savedField === 'quiet_hours_enabled' && <Check size={12} className="inline ml-1 text-green-600" />}
+                    {tUI('Quiet Hours')} {savedField === 'quiet_hours_enabled' && <Check size={12} className="inline ml-1 text-green-600" />}
                   </h3>
-                  <p className="text-xs" style={{ color: '#9CA3AF' }}>No notifications during school hours</p>
+                  <p className="text-xs" style={{ color: '#9CA3AF' }}>{tUI('No notifications during school hours')}</p>
                 </div>
               </div>
               <Toggle enabled={preferences.quiet_hours_enabled} onChange={(value) => savePreference('quiet_hours_enabled', value)} disabled={isSaving} />
@@ -353,14 +355,14 @@ export default function NotificationSettingsPage() {
               <div className="grid grid-cols-2 gap-4 ml-12 pt-3" style={{ borderTop: '1px solid #F3F4F6' }}>
                 <div>
                   <label className="block text-xs font-medium mb-1" style={{ color: '#6B7280' }}>
-                    Start {savedField === 'quiet_hours_start' && <Check size={10} className="inline ml-1 text-green-600" />}
+                    {tUI('Start')} {savedField === 'quiet_hours_start' && <Check size={10} className="inline ml-1 text-green-600" />}
                   </label>
                   <input type="time" value={preferences.quiet_hours_start} onChange={(e) => savePreference('quiet_hours_start', e.target.value)}
                     className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none" style={{ borderColor: '#E9E7E2', background: '#FAFAF8' }} />
                 </div>
                 <div>
                   <label className="block text-xs font-medium mb-1" style={{ color: '#6B7280' }}>
-                    End {savedField === 'quiet_hours_end' && <Check size={10} className="inline ml-1 text-green-600" />}
+                    {tUI('End')} {savedField === 'quiet_hours_end' && <Check size={10} className="inline ml-1 text-green-600" />}
                   </label>
                   <input type="time" value={preferences.quiet_hours_end} onChange={(e) => savePreference('quiet_hours_end', e.target.value)}
                     className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none" style={{ borderColor: '#E9E7E2', background: '#FAFAF8' }} />

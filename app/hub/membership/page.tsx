@@ -6,6 +6,7 @@ import { useMembership, MembershipTier, getShortTierLabel, getTierBadgeColors } 
 import { Check, Sparkles, Crown, Zap, Loader2, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 interface TierFeature {
   text: string;
@@ -129,6 +130,7 @@ const MEMBERSHIP_FAQ = [
 
 function MembershipFAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const { tUI } = useTranslation();
 
   return (
     <div className="bg-gray-50 rounded-2xl p-6 md:p-8">
@@ -136,7 +138,7 @@ function MembershipFAQ() {
         className="text-xl font-bold text-gray-900 mb-5"
         style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
       >
-        Frequently Asked Questions
+        {tUI('Frequently Asked Questions')}
       </h2>
       <div className="space-y-0">
         {MEMBERSHIP_FAQ.map((item, i) => {
@@ -148,7 +150,7 @@ function MembershipFAQ() {
                 className="w-full flex items-center justify-between py-4 text-left"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
               >
-                <span className="font-semibold text-gray-900 text-sm pr-4">{item.q}</span>
+                <span className="font-semibold text-gray-900 text-sm pr-4">{tUI(item.q)}</span>
                 <ChevronDown
                   size={16}
                   className="flex-shrink-0 text-gray-400 transition-transform"
@@ -160,12 +162,12 @@ function MembershipFAQ() {
                   className="text-gray-600 text-sm pb-4 leading-relaxed"
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
-                  {item.a}
+                  {tUI(item.a)}
                   {item.q.includes('school or district') && (
                     <>
                       {' '}
                       <Link href="/for-schools" className="text-blue-600 hover:underline">
-                        Learn more about district partnerships
+                        {tUI('Learn more about district partnerships')}
                       </Link>
                     </>
                   )}
@@ -185,6 +187,7 @@ export default function MembershipPage() {
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
   const searchParams = useSearchParams();
+  const { tUI } = useTranslation();
 
   const isDistrictUser = membership?.source === 'district_partner';
   const isStripeUser = membership?.source === 'stripe' && membership?.status === 'active';
@@ -204,10 +207,10 @@ export default function MembershipPage() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        alert(data.error || 'Failed to start checkout');
+        alert(data.error || tUI('Failed to start checkout'));
       }
     } catch {
-      alert('Something went wrong. Please try again.');
+      alert(tUI('Something went wrong. Please try again.'));
     } finally {
       setCheckoutLoading(null);
     }
@@ -223,10 +226,10 @@ export default function MembershipPage() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        alert(data.error || 'Failed to open subscription management');
+        alert(data.error || tUI('Failed to open subscription management'));
       }
     } catch {
-      alert('Something went wrong. Please try again.');
+      alert(tUI('Something went wrong. Please try again.'));
     } finally {
       setPortalLoading(false);
     }
@@ -249,13 +252,13 @@ export default function MembershipPage() {
             color: '#2B3A67',
           }}
         >
-          Membership Plans
+          {tUI('Membership Plans')}
         </h1>
         <p
           className="text-gray-500 text-lg max-w-xl mx-auto"
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
-          Choose the plan that fits your needs. Upgrade anytime.
+          {tUI('Choose the plan that fits your needs. Upgrade anytime.')}
         </p>
       </div>
 
@@ -263,14 +266,14 @@ export default function MembershipPage() {
       {showSuccess && (
         <div className="mb-8 p-4 rounded-xl bg-green-50 border border-green-100">
           <p className="font-semibold text-green-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-            Payment successful! Your membership has been upgraded.
+            {tUI('Payment successful! Your membership has been upgraded.')}
           </p>
         </div>
       )}
       {showCanceled && (
         <div className="mb-8 p-4 rounded-xl bg-yellow-50 border border-yellow-100">
           <p className="font-semibold text-yellow-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-            Checkout was canceled. No charges were made.
+            {tUI('Checkout was canceled. No charges were made.')}
           </p>
         </div>
       )}
@@ -281,20 +284,20 @@ export default function MembershipPage() {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <p className="text-sm text-blue-600 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                Your current plan
+                {tUI('Your current plan')}
               </p>
               <p className="text-xl font-semibold text-blue-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                 {getShortTierLabel(effectiveTier)}
                 {isDistrictUser && (
                   <span className="ml-2 text-sm font-normal text-blue-600">
-                    (provided by your district)
+                    {tUI('(provided by your district)')}
                   </span>
                 )}
               </p>
             </div>
             <div className="flex items-center gap-3">
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${getTierBadgeColors(effectiveTier)}`}>
-                {membership?.status === 'active' ? 'Active' : membership?.status || 'Free'}
+                {membership?.status === 'active' ? tUI('Active') : membership?.status || tUI('Free')}
               </span>
               {isStripeUser && (
                 <button
@@ -304,9 +307,9 @@ export default function MembershipPage() {
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
                   {portalLoading ? (
-                    <span className="flex items-center gap-1.5"><Loader2 className="w-3 h-3 animate-spin" /> Loading...</span>
+                    <span className="flex items-center gap-1.5"><Loader2 className="w-3 h-3 animate-spin" /> {tUI('Loading...')}</span>
                   ) : (
-                    'Manage Subscription'
+                    tUI('Manage Subscription')
                   )}
                 </button>
               )}
@@ -324,10 +327,10 @@ export default function MembershipPage() {
             </div>
             <div>
               <p className="font-semibold text-green-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                District Partner Access
+                {tUI('District Partner Access')}
               </p>
               <p className="text-sm text-green-700 mt-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                Your district has provided you with All-Access membership. You have full access to all content, courses, and resources at no cost to you.
+                {tUI('Your district has provided you with All-Access membership. You have full access to all content, courses, and resources at no cost to you.')}
               </p>
             </div>
           </div>
@@ -353,7 +356,7 @@ export default function MembershipPage() {
               {tier.highlight && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <span className="px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full">
-                    Most Popular
+                    {tUI('Most Popular')}
                   </span>
                 </div>
               )}
@@ -362,7 +365,7 @@ export default function MembershipPage() {
               {isCurrentTier && (
                 <div className="absolute -top-3 right-4">
                   <span className="px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-full">
-                    Current
+                    {tUI('Current')}
                   </span>
                 </div>
               )}
@@ -381,7 +384,7 @@ export default function MembershipPage() {
                 className="text-xl font-bold text-gray-900 mb-1"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
               >
-                {tier.name}
+                {tUI(tier.name)}
               </h3>
 
               {/* Price */}
@@ -389,10 +392,10 @@ export default function MembershipPage() {
                 {tier.price !== null ? (
                   <div className="flex items-baseline">
                     <span className="text-3xl font-bold text-gray-900">${tier.price}</span>
-                    <span className="text-gray-500 ml-1">{tier.period}</span>
+                    <span className="text-gray-500 ml-1">{tUI(tier.period)}</span>
                   </div>
                 ) : (
-                  <span className="text-3xl font-bold text-gray-900">Free</span>
+                  <span className="text-3xl font-bold text-gray-900">{tUI('Free')}</span>
                 )}
               </div>
 
@@ -401,7 +404,7 @@ export default function MembershipPage() {
                 className="text-sm text-gray-500 mb-6"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
               >
-                {tier.description}
+                {tUI(tier.description)}
               </p>
 
               {/* Features */}
@@ -427,7 +430,7 @@ export default function MembershipPage() {
                       }`}
                       style={{ fontFamily: "'DM Sans', sans-serif" }}
                     >
-                      {feature.text}
+                      {tUI(feature.text)}
                     </span>
                   </li>
                 ))}
@@ -440,7 +443,7 @@ export default function MembershipPage() {
                   className="w-full py-3 px-4 rounded-lg font-medium text-gray-500 bg-gray-100 cursor-not-allowed"
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
-                  Current Plan
+                  {tUI('Current Plan')}
                 </button>
               ) : isDistrictUser ? (
                 <button
@@ -448,7 +451,7 @@ export default function MembershipPage() {
                   className="w-full py-3 px-4 rounded-lg font-medium text-gray-400 bg-gray-50 border border-gray-200 cursor-not-allowed"
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
-                  District Access
+                  {tUI('District Access')}
                 </button>
               ) : isUpgrade ? (
                 <button
@@ -462,9 +465,9 @@ export default function MembershipPage() {
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
                   {checkoutLoading === tier.id ? (
-                    <span className="flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Processing...</span>
+                    <span className="flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> {tUI('Processing...')}</span>
                   ) : (
-                    tier.buttonText
+                    tUI(tier.buttonText)
                   )}
                 </button>
               ) : (
@@ -473,7 +476,7 @@ export default function MembershipPage() {
                   className="w-full py-3 px-4 rounded-lg font-medium text-gray-400 bg-gray-50 border border-gray-200 cursor-not-allowed"
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
-                  Included
+                  {tUI('Included')}
                 </button>
               )}
             </div>
@@ -491,7 +494,7 @@ export default function MembershipPage() {
           className="text-gray-500 hover:text-gray-700 text-sm"
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
-          &larr; Back to Hub
+          &larr; {tUI('Back to Hub')}
         </Link>
       </div>
     </div>

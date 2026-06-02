@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { useHub } from './HubContext';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 const CAPACITY_COLORS: Record<string, string> = {
   low: '#6BA368',
@@ -26,6 +27,7 @@ export default function CapacityFeedbackPrompt({
   onDismiss,
 }: CapacityFeedbackPromptProps) {
   const { user } = useHub();
+  const { tUI } = useTranslation();
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const [isDone, setIsDone] = useState(false);
 
@@ -74,7 +76,7 @@ export default function CapacityFeedbackPrompt({
             className="font-medium text-center py-1"
             style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67', fontSize: '14px' }}
           >
-            Thanks for the feedback!
+            {tUI("Thanks for the feedback!")}
           </p>
         ) : (
           <>
@@ -82,14 +84,14 @@ export default function CapacityFeedbackPrompt({
               className="font-medium pr-6 mb-3"
               style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '14px', color: '#2B3A67' }}
             >
-              Quick check — how did this lift feel?
+              {tUI("Quick check — how did this lift feel?")}
             </p>
 
             <div className="flex flex-col gap-1.5">
               {[
-                { value: 'lower_than_rated' as const, label: 'Lighter than expected' },
-                { value: 'about_right' as const, label: 'Right where I thought' },
-                { value: 'higher_than_rated' as const, label: 'Heavier than expected' },
+                { value: 'lower_than_rated' as const, label: tUI('Lighter than expected') },
+                { value: 'about_right' as const, label: tUI('Right where I thought') },
+                { value: 'higher_than_rated' as const, label: tUI('Heavier than expected') },
               ].map((opt) => (
                 <button
                   key={opt.value}
@@ -121,7 +123,7 @@ export default function CapacityFeedbackPrompt({
                 className="text-xs text-gray-400 hover:text-gray-600"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
               >
-                Skip
+                {tUI("Skip")}
               </button>
             </div>
           </>

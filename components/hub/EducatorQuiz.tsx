@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ChevronRight, Share2, RotateCcw } from 'lucide-react'
 import UniversalShareModal from './UniversalShareModal'
+import { useTranslation } from '@/lib/hub/useTranslation'
 
 // ── Types ──────────────────────────────────────────────────────
 
@@ -135,6 +136,7 @@ interface EducatorQuizProps {
 }
 
 export default function EducatorQuiz({ onComplete }: EducatorQuizProps) {
+  const { tUI } = useTranslation()
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [scores, setScores] = useState<Record<EducatorType, number>>({
     architect: 0, connector: 0, innovator: 0, anchor: 0, spark: 0, strategist: 0,
@@ -193,7 +195,7 @@ export default function EducatorQuiz({ onComplete }: EducatorQuizProps) {
             </span>
           </div>
           <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: result.color, fontFamily: "'DM Sans', sans-serif" }}>
-            You are
+            {tUI('You are')}
           </p>
           <h2 className="text-2xl font-bold mb-2" style={{ color: result.color, fontFamily: "'Source Serif 4', serif" }}>
             {result.title}
@@ -213,7 +215,7 @@ export default function EducatorQuiz({ onComplete }: EducatorQuizProps) {
               style={{ backgroundColor: result.color, color: 'white', fontFamily: "'DM Sans', sans-serif" }}
             >
               <Share2 size={14} />
-              Share My Result
+              {tUI('Share My Result')}
             </button>
             {shareOpen && (
               <UniversalShareModal
@@ -230,7 +232,7 @@ export default function EducatorQuiz({ onComplete }: EducatorQuizProps) {
               style={{ backgroundColor: '#F3F4F6', color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}
             >
               <RotateCcw size={14} />
-              Take It Again
+              {tUI('Take It Again')}
             </button>
           </div>
         </div>
@@ -262,7 +264,7 @@ export default function EducatorQuiz({ onComplete }: EducatorQuizProps) {
       <div className="bg-white p-6">
         {/* Question counter */}
         <p className="text-xs font-medium mb-4" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
-          Question {currentQuestion + 1} of {QUESTIONS.length}
+          {tUI('Question')} {currentQuestion + 1} {tUI('of')} {QUESTIONS.length}
         </p>
 
         {/* Question */}

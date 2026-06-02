@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Check, Lock, Sparkles, Heart } from 'lucide-react';
 import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 // Category colors - elevated design
 const CATEGORY_COLORS: Record<string, { bar: string; bg: string; text: string }> = {
@@ -20,10 +21,10 @@ const CATEGORY_COLORS: Record<string, { bar: string; bg: string; text: string }>
   'new-teacher': { bar: '#5BBEC4', bg: '#E1F5EE', text: '#085041' },
 };
 
-const CAPACITY_STYLES: Record<string, { color: string; label: string }> = {
-  low:    { color: '#6BA368', label: 'Low Lift' },
-  medium: { color: '#E8B84B', label: 'Medium Lift' },
-  high:   { color: '#E8927C', label: 'High Lift' },
+const CAPACITY_STYLES: Record<string, { color: string; labelKey: string }> = {
+  low:    { color: '#6BA368', labelKey: 'Low Lift' },
+  medium: { color: '#E8B84B', labelKey: 'Medium Lift' },
+  high:   { color: '#E8927C', labelKey: 'High Lift' },
 };
 
 interface CourseCardProps {
@@ -62,6 +63,8 @@ export default function CourseCard({
   displayTitle,
   displayDescription,
 }: CourseCardProps) {
+  const { tUI } = useTranslation();
+
   // Use display props if provided, otherwise fall back to course data
   const title = displayTitle || course.title;
   const description = displayDescription || course.description;
@@ -119,7 +122,7 @@ export default function CourseCard({
               className="text-gray-400 text-sm"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              Course thumbnail
+              {tUI("Course thumbnail")}
             </span>
           </div>
         )}
@@ -127,12 +130,12 @@ export default function CourseCard({
         {isFreeRotating ? (
           <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-500 text-white shadow-sm">
             <Sparkles size={12} />
-            Free This Week
+            {tUI("Free This Week")}
           </span>
         ) : !hasAccess && course.access_tier && course.access_tier !== 'free_rotating' ? (
           <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-700 text-white shadow-sm">
             <Lock size={12} />
-            {course.access_tier === 'essentials' ? 'Essentials' : course.access_tier === 'professional' ? 'Pro' : 'All-Access'}
+            {course.access_tier === 'essentials' ? tUI('Essentials') : course.access_tier === 'professional' ? tUI('Pro') : tUI('All-Access')}
           </span>
         ) : null}
       </div>
@@ -147,7 +150,7 @@ export default function CourseCard({
             border: 'none',
             cursor: 'pointer',
           }}
-          aria-label={isFavorited ? 'Remove from saved' : 'Save course'}
+          aria-label={isFavorited ? tUI('Remove from saved') : tUI('Save course')}
         >
           <Heart
             size={14}
@@ -211,7 +214,7 @@ export default function CourseCard({
                 fontFamily: "'DM Sans', sans-serif",
               }}
             >
-              {CAPACITY_STYLES[course.capacity].label}
+              {tUI(CAPACITY_STYLES[course.capacity].labelKey)}
             </span>
           )}
           {course.estimated_minutes > 0 && (
@@ -219,7 +222,7 @@ export default function CourseCard({
               className="text-[11px]"
               style={{ fontFamily: "'DM Sans', sans-serif", color: '#9CA3AF' }}
             >
-              ~{course.estimated_minutes} min
+              ~{course.estimated_minutes} {tUI("min")}
             </span>
           )}
         </div>
@@ -239,7 +242,7 @@ export default function CourseCard({
             }}
           >
             <Check size={18} />
-            <span className="font-medium">Completed</span>
+            <span className="font-medium">{tUI("Completed")}</span>
           </div>
         ) : true ? (
           /* Explore course -- detail page has Coming Soon for actual enrollment */
@@ -253,7 +256,7 @@ export default function CourseCard({
               fontSize: '14px',
             }}
           >
-            Explore Course
+            {tUI("Explore Course")}
           </Link>
         ) : isEnrolled ? (
           <div className="space-y-2">
@@ -280,7 +283,7 @@ export default function CourseCard({
                 fontSize: '14px',
               }}
             >
-              Continue ({progress}%)
+              {tUI("Continue")} ({progress}%)
             </Link>
           </div>
         ) : !hasAccess ? (
@@ -296,7 +299,7 @@ export default function CourseCard({
             }}
           >
             <Lock size={14} />
-            Upgrade to Access
+            {tUI("Upgrade to Access")}
           </Link>
         ) : (
           <button
@@ -310,7 +313,7 @@ export default function CourseCard({
               fontSize: '14px',
             }}
           >
-            {isEnrolling ? 'Enrolling...' : 'Enroll'}
+            {isEnrolling ? tUI('Enrolling...') : tUI('Enroll')}
           </button>
         )}
       </div>

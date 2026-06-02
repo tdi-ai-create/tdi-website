@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useMembership, ContentAccess, getShortTierLabel, getTierPricing, getRequiredTierLabel } from '@/lib/hub/use-membership';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 interface ContentGateProps {
   content: ContentAccess;
@@ -28,6 +29,7 @@ export function ContentGate({
   className = '',
 }: ContentGateProps) {
   const { canAccess, effectiveTier, isLoading } = useMembership();
+  const { tUI } = useTranslation();
 
   // While loading, show a subtle placeholder
   if (isLoading) {
@@ -81,17 +83,17 @@ export function ContentGate({
           </div>
 
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {requiredTier} Content
+            {tUI(`${requiredTier} Content`)}
           </h3>
 
           <p className="text-gray-600 text-sm mb-4">
             {upgradeMessage ||
-              `This content requires a ${requiredTier} membership. Upgrade to unlock full access.`}
+              tUI(`This content requires a ${requiredTier} membership. Upgrade to unlock full access.`)}
           </p>
 
           {/* Current tier badge */}
           <div className="text-xs text-gray-500 mb-4">
-            Your current plan: <span className="font-medium">{getShortTierLabel(effectiveTier)}</span>
+            {tUI("Your current plan:")} <span className="font-medium">{getShortTierLabel(effectiveTier)}</span>
           </div>
 
           {/* Upgrade button */}
@@ -99,7 +101,7 @@ export function ContentGate({
             href="/hub/membership"
             className="inline-flex items-center justify-center px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
           >
-            {pricing ? `Upgrade for $${pricing.price}/mo` : 'View Plans'}
+            {pricing ? tUI(`Upgrade for $${pricing.price}/mo`) : tUI('View Plans')}
           </Link>
         </div>
       </div>
@@ -144,6 +146,7 @@ export function TierBadge({
   className?: string;
 }) {
   const { canAccess } = useMembership();
+  const { tUI } = useTranslation();
   const hasAccess = canAccess(content);
   const tierLabel = getShortTierLabel(content.access_tier as 'essentials' | 'professional' | 'all_access');
 
@@ -167,7 +170,7 @@ export function TierBadge({
               clipRule="evenodd"
             />
           </svg>
-          Free This Week
+          {tUI("Free This Week")}
         </>
       ) : !hasAccess ? (
         <>
@@ -191,6 +194,8 @@ export function TierBadge({
  * Free rotating badge - highlights content that's currently free
  */
 export function FreeRotatingBadge({ className = '' }: { className?: string }) {
+  const { tUI } = useTranslation();
+
   return (
     <span
       className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 ${className}`}
@@ -202,7 +207,7 @@ export function FreeRotatingBadge({ className = '' }: { className?: string }) {
           clipRule="evenodd"
         />
       </svg>
-      Free This Week
+      {tUI("Free This Week")}
     </span>
   );
 }

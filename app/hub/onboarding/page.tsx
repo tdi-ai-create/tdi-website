@@ -27,6 +27,7 @@ import Link from 'next/link';
 import AvatarPicker from '@/components/hub/AvatarPicker';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { getCurrentUser } from '@/lib/hub-auth';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 type OnboardingStep = 1 | 2 | 3 | 4 | 5; // Only 1 and 2 are active; rest kept for dead code in disabled blocks
 
@@ -34,7 +35,7 @@ type Role = 'classroom_teacher' | 'para' | 'coach' | 'school_leader' | 'district
 
 type GoalType = 'reduce_stress' | 'save_time' | 'classroom_management' | 'find_joy' | 'team_growth' | 'role_support' | 'stop_bringing_work_home' | 'feel_like_myself' | 'make_it_to_summer' | 'better_parent_communication' | 'fresh_ideas' | 'figure_out_whats_next' | 'all_of_the_above';
 
-const ROLES: { value: Role; label: string; subtitle: string }[] = [
+const ROLES_DATA: { value: Role; label: string; subtitle: string }[] = [
   { value: 'classroom_teacher', label: 'Classroom Teacher', subtitle: 'Any grade, any subject' },
   { value: 'para', label: 'Paraprofessional', subtitle: 'Support staff, aides' },
   { value: 'coach', label: 'Instructional Coach', subtitle: 'PD lead, mentor' },
@@ -61,7 +62,7 @@ const GoalIconMap: Record<GoalType, React.ReactNode> = {
 };
 
 // Grid goals (12 cards in 4x3 layout, excluding all_of_the_above)
-const GRID_GOALS: { value: GoalType; label: string }[] = [
+const GRID_GOALS_DATA: { value: GoalType; label: string }[] = [
   { value: 'reduce_stress', label: 'Manage my stress' },
   { value: 'save_time', label: 'Get my time back' },
   { value: 'classroom_management', label: 'Classroom management' },
@@ -77,11 +78,12 @@ const GRID_GOALS: { value: GoalType; label: string }[] = [
 ];
 
 // All goals except "all_of_the_above" for the select-all behavior
-const ALL_INDIVIDUAL_GOALS: GoalType[] = GRID_GOALS.map(g => g.value);
+const ALL_INDIVIDUAL_GOALS: GoalType[] = GRID_GOALS_DATA.map(g => g.value);
 
 export default function OnboardingPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { tUI } = useTranslation();
   const [step, setStep] = useState<OnboardingStep>(1);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -311,7 +313,7 @@ export default function OnboardingPage() {
     <div
       className="flex gap-2 mb-8"
       role="progressbar"
-      aria-label={`Step ${currentStep} of 2`}
+      aria-label={tUI(`Step ${currentStep} of 2`)}
       aria-valuenow={currentStep}
       aria-valuemin={1}
       aria-valuemax={2}
@@ -940,7 +942,7 @@ export default function OnboardingPage() {
             }}
           >
             <ArrowLeft size={14} />
-            Back to TeachersDeserveIt.com
+            {tUI('Back to TeachersDeserveIt.com')}
           </Link>
 
           <div className="max-w-lg mx-auto pt-8">
@@ -954,14 +956,14 @@ export default function OnboardingPage() {
                 color: '#2B3A67',
               }}
             >
-              What's your role?
+              {tUI("What's your role?")}
             </h1>
 
             <p
               className="text-gray-500 mb-1"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              This helps us suggest the right stuff. You can change it later.
+              {tUI('This helps us suggest the right stuff. You can change it later.')}
             </p>
 
             <p
@@ -973,11 +975,11 @@ export default function OnboardingPage() {
                 marginTop: '4px',
               }}
             >
-              Wear multiple hats? Pick the one that fits most days. You can update this anytime in Settings.
+              {tUI('Wear multiple hats? Pick the one that fits most days. You can update this anytime in Settings.')}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
-              {ROLES.map((role) => {
+              {ROLES_DATA.map((role) => {
                 const isSelected = selectedRole === role.value;
                 return (
                   <button
@@ -997,13 +999,13 @@ export default function OnboardingPage() {
                         color: '#2B3A67',
                       }}
                     >
-                      {role.label}
+                      {tUI(role.label)}
                     </p>
                     <p
                       className="text-sm text-gray-500"
                       style={{ fontFamily: "'DM Sans', sans-serif" }}
                     >
-                      {role.subtitle}
+                      {tUI(role.subtitle)}
                     </p>
                   </button>
                 );
@@ -1020,7 +1022,7 @@ export default function OnboardingPage() {
                   fontFamily: "'DM Sans', sans-serif",
                 }}
               >
-                Next
+                {tUI('Next')}
               </button>
             )}
           </div>
@@ -1044,7 +1046,7 @@ export default function OnboardingPage() {
             }}
           >
             <ArrowLeft size={14} />
-            Back to TeachersDeserveIt.com
+            {tUI('Back to TeachersDeserveIt.com')}
           </Link>
 
           <div className="max-w-2xl mx-auto pt-8">
@@ -1058,14 +1060,14 @@ export default function OnboardingPage() {
                 color: '#2B3A67',
               }}
             >
-              What matters most to you right now?
+              {tUI('What matters most to you right now?')}
             </h1>
 
             <p
               className="text-gray-500 mb-8"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              Pick as many as you want. These shape your suggestions.
+              {tUI('Pick as many as you want. These shape your suggestions.')}
             </p>
 
             {/* 4x3 Grid of goal cards */}
@@ -1075,7 +1077,7 @@ export default function OnboardingPage() {
                 gridAutoRows: '1fr',
               }}
             >
-              {GRID_GOALS.map((goal) => {
+              {GRID_GOALS_DATA.map((goal) => {
                 const isSelected = selectedGoals.includes(goal.value);
                 return (
                   <button
@@ -1102,7 +1104,7 @@ export default function OnboardingPage() {
                         color: '#2B3A67',
                       }}
                     >
-                      {goal.label}
+                      {tUI(goal.label)}
                     </p>
                   </button>
                 );
@@ -1132,7 +1134,7 @@ export default function OnboardingPage() {
                   color: '#2B3A67',
                 }}
               >
-                Honestly? All of the above
+                {tUI('Honestly? All of the above')}
               </p>
             </button>
 
@@ -1147,7 +1149,7 @@ export default function OnboardingPage() {
                   fontFamily: "'DM Sans', sans-serif",
                 }}
               >
-                Back
+                {tUI('Back')}
               </button>
               {selectedGoals.length > 0 && (
                 <button
@@ -1160,7 +1162,7 @@ export default function OnboardingPage() {
                     fontFamily: "'DM Sans', sans-serif",
                   }}
                 >
-                  {isSaving ? 'Setting up...' : 'Let\'s Go'}
+                  {isSaving ? tUI('Setting up...') : tUI("Let's Go")}
                 </button>
               )}
             </div>

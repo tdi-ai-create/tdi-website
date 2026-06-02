@@ -37,6 +37,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 // Icon map for milestones
 const milestoneIcons: Record<string, React.ElementType> = {
@@ -50,6 +51,7 @@ const milestoneIcons: Record<string, React.ElementType> = {
 export default function TransformationTrackerPage() {
   const router = useRouter();
   const { user } = useHub();
+  const { tUI } = useTranslation();
   const [eligibility, setEligibility] = useState<TrackerEligibility | null>(null);
   const [stressData, setStressData] = useState<StressDataPoint[]>([]);
   const [learningStats, setLearningStats] = useState<LearningStats | null>(null);
@@ -131,13 +133,13 @@ export default function TransformationTrackerPage() {
             color: '#2B3A67',
           }}
         >
-          Your Growth Journey
+          {tUI('Your Growth Journey')}
         </h1>
         <p
           className="text-gray-500 text-[14px]"
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
-          This is private. Only you can see this.
+          {tUI('This is private. Only you can see this.')}
         </p>
       </div>
 
@@ -158,7 +160,7 @@ export default function TransformationTrackerPage() {
               color: '#2B3A67',
             }}
           >
-            Stress Over Time
+            {tUI('Stress Over Time')}
           </h2>
         </div>
 
@@ -187,7 +189,7 @@ export default function TransformationTrackerPage() {
                     fontSize: '14px',
                   }}
                   labelStyle={{ color: '#2B3A67', fontWeight: 'bold' }}
-                  formatter={(value: number) => [`Stress Level: ${value}`, '']}
+                  formatter={(value: number) => [tUI(`Stress Level: ${value}`), '']}
                 />
                 <Line
                   type="monotone"
@@ -209,10 +211,10 @@ export default function TransformationTrackerPage() {
               className="text-gray-500 text-center"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              Keep checking in to see your trend.
+              {tUI('Keep checking in to see your trend.')}
               <br />
               <span className="text-sm text-gray-400">
-                ({stressData.length}/3 check-ins recorded)
+                {tUI(`${stressData.length}/3 check-ins recorded`)}
               </span>
             </p>
           </div>
@@ -241,7 +243,7 @@ export default function TransformationTrackerPage() {
             className="text-sm text-gray-500"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
-            Courses Completed
+            {tUI('Courses Completed')}
           </p>
         </div>
 
@@ -265,7 +267,7 @@ export default function TransformationTrackerPage() {
             className="text-sm text-gray-500"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
-            PD Hours Earned
+            {tUI('PD Hours Earned')}
           </p>
         </div>
 
@@ -289,7 +291,7 @@ export default function TransformationTrackerPage() {
             className="text-sm text-gray-500"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
-            Day Streak
+            {tUI('Day Streak')}
           </p>
         </div>
       </div>
@@ -312,7 +314,7 @@ export default function TransformationTrackerPage() {
                 color: '#2B3A67',
               }}
             >
-              Goals Progress
+              {tUI('Goals Progress')}
             </h2>
           </div>
 
@@ -368,7 +370,7 @@ export default function TransformationTrackerPage() {
                       className="text-sm text-gray-500"
                       style={{ fontFamily: "'DM Sans', sans-serif" }}
                     >
-                      {goal.coursesCompleted} course{goal.coursesCompleted !== 1 ? 's' : ''} completed
+                      {goal.coursesCompleted === 1 ? tUI('1 course completed') : tUI(`${goal.coursesCompleted} courses completed`)}
                     </p>
                   </div>
                 </div>
@@ -395,7 +397,7 @@ export default function TransformationTrackerPage() {
               color: '#2B3A67',
             }}
           >
-            Milestones
+            {tUI('Milestones')}
           </h2>
         </div>
 

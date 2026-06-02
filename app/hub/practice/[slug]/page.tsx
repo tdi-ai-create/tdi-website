@@ -13,6 +13,7 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub'
 import { useEffect } from 'react'
+import { useTranslation } from '@/lib/hub/useTranslation'
 
 const PRACTICE_TOOLS: Record<string, {
   component: React.ComponentType<{ onBack: () => void }>
@@ -55,6 +56,7 @@ export default function PracticeToolPage() {
   const params = useParams()
   const router = useRouter()
   const { user } = useHub()
+  const { tUI } = useTranslation()
   const slug = params.slug as string
   const tool = PRACTICE_TOOLS[slug]
 
@@ -74,9 +76,9 @@ export default function PracticeToolPage() {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#F9FAFB' }}>
         <div className="text-center">
-          <p className="text-lg font-semibold mb-2" style={{ color: '#1B2A4A' }}>Practice tool not found</p>
+          <p className="text-lg font-semibold mb-2" style={{ color: '#1B2A4A' }}>{tUI('Practice tool not found')}</p>
           <Link href="/hub/quick-wins" className="text-sm font-medium" style={{ color: '#38618C' }}>
-            Back to Quick Wins
+            {tUI('Back to Quick Wins')}
           </Link>
         </div>
       </div>
@@ -97,10 +99,10 @@ export default function PracticeToolPage() {
               style={{ color: 'rgba(255,255,255,0.6)' }}
             >
               <ArrowLeft size={16} />
-              Back to Quick Wins
+              {tUI('Back to Quick Wins')}
             </button>
             <span style={{ color: 'rgba(255,255,255,0.3)' }}>/</span>
-            <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>{tool.title}</span>
+            <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>{tUI(tool.title)}</span>
           </div>
         </div>
 

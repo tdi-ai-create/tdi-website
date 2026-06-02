@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Star, Send } from 'lucide-react';
+import { useTranslation } from '@/lib/hub/useTranslation';
 import { useHub } from './HubContext';
 import { useMomentMode } from './MomentModeContext';
 import {
@@ -23,6 +24,7 @@ interface FeedbackPromptProps {
 }
 
 export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
+  const { tUI } = useTranslation();
   const { user } = useHub();
   const { isMomentModeActive } = useMomentMode();
 
@@ -137,7 +139,7 @@ export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
               className="font-medium"
               style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
             >
-              Thank you for your feedback!
+              {tUI('Thank you for your feedback!')}
             </p>
           </div>
         ) : feedbackType === 'course_feedback' ? (
@@ -147,7 +149,7 @@ export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
               className="font-medium mb-3 pr-6"
               style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '15px', color: '#2B3A67' }}
             >
-              How was that lesson?
+              {tUI('How was that lesson?')}
             </p>
             <div className="flex gap-1 mb-4">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -171,7 +173,7 @@ export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Any thoughts? (optional)"
+              placeholder={tUI('Any thoughts? (optional)')}
               rows={2}
               className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg resize-none focus:outline-none focus:border-[#E8B84B]"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
@@ -183,7 +185,7 @@ export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
                 className="text-sm text-gray-400 hover:text-gray-600"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
               >
-                Skip
+                {tUI('Skip')}
               </button>
               <button
                 onClick={handleSubmit}
@@ -195,7 +197,7 @@ export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
                   fontFamily: "'DM Sans', sans-serif",
                 }}
               >
-                {isSubmitting ? 'Sending...' : <><Send size={14} /> Send</>}
+                {isSubmitting ? tUI('Sending...') : <><Send size={14} /> {tUI('Send')}</>}
               </button>
             </div>
           </>
@@ -206,13 +208,13 @@ export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
               className="font-medium mb-4 pr-6"
               style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '15px', color: '#2B3A67' }}
             >
-              How is your Hub experience so far?
+              {tUI('How is your Hub experience so far?')}
             </p>
             <div className="flex justify-center gap-4 mb-4">
               {[
-                { value: 'great' as const, emoji: '😊', label: 'Great' },
-                { value: 'ok' as const, emoji: '😐', label: 'OK' },
-                { value: 'needs_work' as const, emoji: '😕', label: 'Needs work' },
+                { value: 'great' as const, emoji: '😊', label: tUI('Great') },
+                { value: 'ok' as const, emoji: '😐', label: tUI('OK') },
+                { value: 'needs_work' as const, emoji: '😕', label: tUI('Needs work') },
               ].map((option) => (
                 <button
                   key={option.value}
@@ -238,7 +240,7 @@ export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                placeholder="Tell us more (optional)"
+                placeholder={tUI('Tell us more (optional)')}
                 rows={2}
                 className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg resize-none focus:outline-none focus:border-[#E8B84B] mb-3"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
@@ -251,7 +253,7 @@ export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
                 className="text-sm text-gray-400 hover:text-gray-600"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
               >
-                Not now
+                {tUI('Not now')}
               </button>
               {satisfaction && (
                 <button
@@ -264,7 +266,7 @@ export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
                     fontFamily: "'DM Sans', sans-serif",
                   }}
                 >
-                  {isSubmitting ? 'Sending...' : <><Send size={14} /> Send</>}
+                  {isSubmitting ? tUI('Sending...') : <><Send size={14} /> {tUI('Send')}</>}
                 </button>
               )}
             </div>
@@ -276,12 +278,12 @@ export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
               className="font-medium mb-3 pr-6"
               style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '15px', color: '#2B3A67' }}
             >
-              What would make the Hub better for you?
+              {tUI('What would make the Hub better for you?')}
             </p>
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Share your ideas..."
+              placeholder={tUI('Share your ideas...')}
               rows={3}
               className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg resize-none focus:outline-none focus:border-[#E8B84B]"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
@@ -293,7 +295,7 @@ export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
                 className="text-sm text-gray-400 hover:text-gray-600"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
               >
-                Maybe later
+                {tUI('Maybe later')}
               </button>
               <button
                 onClick={handleSubmit}
@@ -305,7 +307,7 @@ export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
                   fontFamily: "'DM Sans', sans-serif",
                 }}
               >
-                {isSubmitting ? 'Sending...' : <><Send size={14} /> Submit</>}
+                {isSubmitting ? tUI('Sending...') : <><Send size={14} /> {tUI('Submit')}</>}
               </button>
             </div>
           </>

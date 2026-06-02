@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Sparkles, ArrowRight } from 'lucide-react'
+import { useTranslation } from '@/lib/hub/useTranslation'
 
 interface DashboardInsightProps {
   userId?: string | null
@@ -19,6 +20,7 @@ export default function DashboardInsight({
   daysActive,
   recognitionsEarned,
 }: DashboardInsightProps) {
+  const { tUI } = useTranslation()
   const [insight, setInsight] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -69,7 +71,7 @@ export default function DashboardInsight({
             className="text-xs font-semibold tracking-wide uppercase"
             style={{ color: '#E8B84B', fontFamily: "'DM Sans', sans-serif" }}
           >
-            AI Reflection
+            {tUI('AI Reflection')}
           </span>
         </div>
 
@@ -92,7 +94,7 @@ export default function DashboardInsight({
           className="flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-80"
           style={{ color: '#E8B84B', fontFamily: "'DM Sans', sans-serif" }}
         >
-          View full growth insights
+          {tUI('View full growth insights')}
           <ArrowRight size={12} />
         </Link>
       </div>

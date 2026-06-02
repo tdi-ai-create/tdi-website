@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { Upload, Share2, Palette } from 'lucide-react';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 export type PolaroidSlot = 'love' | 'proud' | 'goal';
 
@@ -54,6 +55,7 @@ export default function PolaroidCard({
   onShare,
   width = 150,
 }: PolaroidCardProps) {
+  const { tUI } = useTranslation();
   const [uploading, setUploading] = useState(false);
   const [currentImage, setCurrentImage] = useState(imageUrl || null);
   const [currentPinColor, setCurrentPinColor] = useState(pinColor || 'gold');
@@ -205,7 +207,7 @@ export default function PolaroidCard({
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           ) : uploading ? (
-            <div style={{ fontSize: 12, color: '#9CA3AF' }}>Uploading...</div>
+            <div style={{ fontSize: 12, color: '#9CA3AF' }}>{tUI('Uploading...')}</div>
           ) : (
             <>
               <div
@@ -218,7 +220,7 @@ export default function PolaroidCard({
                 <Upload size={13} style={{ color: '#E8B84B' }} />
               </div>
               <div style={{ fontSize: 11, color: '#9CA3AF', textAlign: 'center', padding: '0 4px' }}>
-                {SLOT_PROMPTS[slot]}
+                {tUI(SLOT_PROMPTS[slot])}
               </div>
               <div
                 style={{
@@ -228,7 +230,7 @@ export default function PolaroidCard({
                   padding: '3px 12px', borderRadius: 6,
                 }}
               >
-                upload yours
+                {tUI('upload yours')}
               </div>
             </>
           )}
@@ -243,7 +245,7 @@ export default function PolaroidCard({
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}
         >
-          {caption || SLOT_CAPTIONS[slot]}
+          {caption || tUI(SLOT_CAPTIONS[slot])}
         </div>
 
         {/* Hover action buttons (filled state only) */}

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { X } from 'lucide-react';
 import type { Recognition } from '@/lib/hub/recognitions';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 interface RecognitionCelebrationProps {
   recognition: Recognition;
@@ -17,6 +18,7 @@ const CATEGORY_COLORS: Record<string, { bg: string; accent: string; glow: string
 };
 
 export default function RecognitionCelebration({ recognition, onDismiss }: RecognitionCelebrationProps) {
+  const { tUI } = useTranslation();
   const [visible, setVisible] = useState(false);
   const colors = CATEGORY_COLORS[recognition.category] || CATEGORY_COLORS.growth;
 
@@ -100,7 +102,7 @@ export default function RecognitionCelebration({ recognition, onDismiss }: Recog
               marginBottom: 6,
             }}
           >
-            Field Note Earned
+            {tUI('Field Note Earned')}
           </p>
           <h2
             style={{
@@ -147,7 +149,7 @@ export default function RecognitionCelebration({ recognition, onDismiss }: Recog
               margin: 0,
             }}
           >
-            -- The TDI Team
+            {tUI('-- The TDI Team')}
           </p>
         </div>
 
@@ -171,7 +173,7 @@ export default function RecognitionCelebration({ recognition, onDismiss }: Recog
             }}
             onClick={handleDismiss}
           >
-            View your Field Notes
+            {tUI('View your Field Notes')}
           </Link>
           <button
             onClick={handleDismiss}
@@ -187,7 +189,7 @@ export default function RecognitionCelebration({ recognition, onDismiss }: Recog
               cursor: 'pointer',
             }}
           >
-            Later
+            {tUI('Later')}
           </button>
         </div>
       </div>

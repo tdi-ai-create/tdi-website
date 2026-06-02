@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useTranslation } from '@/lib/hub/useTranslation';
 
 const FOOTER_LINKS = [
   { href: '/', label: 'TeachersDeserveIt.com' },
@@ -7,6 +10,7 @@ const FOOTER_LINKS = [
 ];
 
 export default function HubFooter() {
+  const { tUI } = useTranslation();
   return (
     <footer style={{ backgroundColor: '#2B3A67' }}>
       <div
@@ -20,7 +24,7 @@ export default function HubFooter() {
             className="text-[13px]"
             style={{ color: 'rgba(255, 255, 255, 0.6)' }}
           >
-            Teachers Deserve It Learning Hub
+            {tUI("Teachers Deserve It Learning Hub")}
           </span>
 
           {/* Right: Links */}
@@ -38,7 +42,7 @@ export default function HubFooter() {
                     e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)';
                   }}
                 >
-                  {link.label}
+                  {tUI(link.label)}
                 </Link>
                 {index < FOOTER_LINKS.length - 1 && (
                   <span
@@ -58,7 +62,7 @@ export default function HubFooter() {
           className="mt-4 text-center text-[12px]"
           style={{ color: 'rgba(255, 255, 255, 0.4)' }}
         >
-          © 2026 Teachers Deserve It. All rights reserved.
+          {tUI("© 2026 Teachers Deserve It. All rights reserved.")}
         </div>
       </div>
     </footer>
