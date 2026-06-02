@@ -7,6 +7,7 @@ import { useTranslation } from '@/lib/hub/useTranslation';
 import AvatarDisplay from '@/components/hub/AvatarDisplay';
 import AvatarPicker from '@/components/hub/AvatarPicker';
 import AchievementInsights from '@/components/hub/AchievementInsights';
+import EducatorQuiz from '@/components/hub/EducatorQuiz';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { signOut, updateHubProfile } from '@/lib/hub-auth';
 import {
@@ -998,6 +999,29 @@ export default function ProfileSettingsPage() {
                 />
               </div>
             ))}
+          </div>
+
+          {/* Educator Quiz */}
+          <div>
+            <h2
+              className="font-semibold mb-3"
+              style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67', fontSize: '16px' }}
+            >
+              {tUI('What Kind of Educator Are You?')}
+            </h2>
+            <p
+              className="text-sm mb-4"
+              style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {tUI('5 quick questions. No wrong answers. Just a fun way to see what drives you.')}
+            </p>
+            <EducatorQuiz
+              onComplete={async (result) => {
+                if (!user?.id) return;
+                const supabase = getSupabase();
+                await supabase.from('hub_profiles').update({ educator_type: result }).eq('id', user.id);
+              }}
+            />
           </div>
 
           {/* Take the Tour */}
