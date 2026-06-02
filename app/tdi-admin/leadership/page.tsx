@@ -267,6 +267,14 @@ export default function LeadershipDashboardPage() {
   const [actionItems, setActionItems] = useState<ActionItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Hub connection data for School Reports
+  const [hubSchools, setHubSchools] = useState<{
+    name: string; district: string; state: string;
+    totalEducators: number; activeEducators: number; activeRate: number;
+    avgVibeScore: number | null; totalPdHours: number; totalToolsViewed: number; totalCompletions: number;
+  }[]>([]);
+  const [hubLoading, setHubLoading] = useState(false);
+
   // Filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
@@ -325,12 +333,35 @@ export default function LeadershipDashboardPage() {
     }
   }, [teamMember?.email]);
 
+  // Load Hub school data for reports tab
+  const loadHubData = useCallback(async () => {
+    setHubLoading(true);
+    try {
+      const res = await fetch('/api/tdi-admin/hub-connections?section=leadership');
+      if (res.ok) {
+        const data = await res.json();
+        setHubSchools(data.schools || []);
+      }
+    } catch (error) {
+      console.error('Failed to load Hub data:', error);
+    } finally {
+      setHubLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (hasAccess) {
       loadPartnerships();
       loadActionItems();
     }
   }, [hasAccess, loadPartnerships, loadActionItems]);
+
+  // Load Hub data when reports tab is first opened
+  useEffect(() => {
+    if (activeTab === 'reports' && hubSchools.length === 0 && !hubLoading) {
+      loadHubData();
+    }
+  }, [activeTab, hubSchools.length, hubLoading, loadHubData]);
 
   // Filter partnerships
   useEffect(() => {
@@ -1025,17 +1056,21 @@ export default function LeadershipDashboardPage() {
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2
-                  style={TYPE_SECTION_HEADER}
-                >
-                  School Reports
-                </h2>
+                <h2 style={TYPE_SECTION_HEADER}>School Reports</h2>
                 <p className="text-sm text-gray-500">
-                  Hub engagement and progress data by partnership
+                  Live Hub engagement and progress data by school
                 </p>
               </div>
+              <button
+                onClick={loadHubData}
+                className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700"
+              >
+                <RefreshCw className={`w-4 h-4 ${hubLoading ? 'animate-spin' : ''}`} />
+                Refresh
+              </button>
             </div>
 
+            {/* Partnership contract table */}
             {isLoading ? (
               <div className="flex items-center justify-center py-16">
                 <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
@@ -1046,124 +1081,49 @@ export default function LeadershipDashboardPage() {
                 <p>No active partnerships to report on yet.</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto mb-8">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">Contract Usage</h3>
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-100">
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
-                        Organization
-                      </th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
-                        Educators
-                      </th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
-                        Hub Login %
-                      </th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
-                        Sessions Used
-                      </th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
-                        Contract Period
-                      </th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
-                        Actions
-                      </th>
+                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Organization</th>
+                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Educators</th>
+                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Sessions Used</th>
+                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Contract Period</th>
+                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {activePartnerships.map((partnership) => {
-                      // Calculate usage percentage
-                      const totalSessions =
-                        (partnership.virtual_sessions_total || 0) +
-                        (partnership.observation_days_total || 0) +
-                        (partnership.executive_sessions_total || 0);
-                      const usedSessions =
-                        (partnership.virtual_sessions_used || 0) +
-                        (partnership.observation_days_used || 0) +
-                        (partnership.executive_sessions_used || 0);
-                      const usagePercent =
-                        totalSessions > 0
-                          ? Math.round((usedSessions / totalSessions) * 100)
-                          : 0;
+                      const totalSessions = (partnership.virtual_sessions_total || 0) + (partnership.observation_days_total || 0) + (partnership.executive_sessions_total || 0);
+                      const usedSessions = (partnership.virtual_sessions_used || 0) + (partnership.observation_days_used || 0) + (partnership.executive_sessions_used || 0);
+                      const usagePercent = totalSessions > 0 ? Math.round((usedSessions / totalSessions) * 100) : 0;
 
                       return (
                         <tr key={partnership.id} className="hover:bg-gray-50">
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-3">
-                              <div
-                                className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                  partnership.partnership_type === 'district'
-                                    ? 'bg-purple-100 text-purple-600'
-                                    : 'bg-blue-100 text-blue-600'
-                                }`}
-                              >
-                                {partnership.partnership_type === 'district' ? (
-                                  <Building2 className="w-4 h-4" />
-                                ) : (
-                                  <School className="w-4 h-4" />
-                                )}
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${partnership.partnership_type === 'district' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}`}>
+                                {partnership.partnership_type === 'district' ? <Building2 className="w-4 h-4" /> : <School className="w-4 h-4" />}
                               </div>
-                              <span
-                                className="font-medium"
-                                style={{ color: '#2B3A67' }}
-                              >
-                                {partnership.org_name || partnership.contact_name}
-                              </span>
+                              <span className="font-medium" style={{ color: '#2B3A67' }}>{partnership.org_name || partnership.contact_name}</span>
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-gray-600">
-                            {partnership.staff_count ?? 0}
-                          </td>
+                          <td className="px-4 py-3 text-gray-600">{partnership.staff_count ?? 0}</td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
                               <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-green-500 rounded-full"
-                                  style={{ width: '0%' }}
-                                />
+                                <div className="h-full bg-amber-500 rounded-full" style={{ width: `${usagePercent}%` }} />
                               </div>
-                              <span className="text-sm text-gray-500">--</span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-2">
-                              <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-amber-500 rounded-full"
-                                  style={{ width: `${usagePercent}%` }}
-                                />
-                              </div>
-                              <span className="text-sm text-gray-500">
-                                {usedSessions}/{totalSessions}
-                              </span>
+                              <span className="text-sm text-gray-500">{usedSessions}/{totalSessions}</span>
                             </div>
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-600">
-                            {partnership.contract_start
-                              ? new Date(
-                                  partnership.contract_start
-                                ).toLocaleDateString('en-US', {
-                                  month: 'short',
-                                  year: 'numeric',
-                                })
-                              : '--'}{' '}
-                            -{' '}
-                            {partnership.contract_end
-                              ? new Date(
-                                  partnership.contract_end
-                                ).toLocaleDateString('en-US', {
-                                  month: 'short',
-                                  year: 'numeric',
-                                })
-                              : '--'}
+                            {partnership.contract_start ? new Date(partnership.contract_start).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '--'} - {partnership.contract_end ? new Date(partnership.contract_end).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '--'}
                           </td>
                           <td className="px-4 py-3">
-                            <Link
-                              href={`/tdi-admin/leadership/${partnership.id}`}
-                              className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
-                            >
-                              Full Report
-                              <ChevronRight className="w-3 h-3" />
+                            <Link href={`/tdi-admin/leadership/${partnership.id}`} className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                              Full Report <ChevronRight className="w-3 h-3" />
                             </Link>
                           </td>
                         </tr>
@@ -1173,6 +1133,76 @@ export default function LeadershipDashboardPage() {
                 </table>
               </div>
             )}
+
+            {/* Hub Engagement Data - Live from Learning Hub */}
+            <div className="border-t border-gray-100 pt-6">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-2 h-2 rounded-full bg-amber-400" />
+                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400">Hub Engagement by School</h3>
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">LIVE</span>
+              </div>
+
+              {hubLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-6 h-6 animate-spin text-amber-500" />
+                  <span className="ml-2 text-sm text-gray-500">Loading Hub data...</span>
+                </div>
+              ) : hubSchools.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <Users className="w-10 h-10 mx-auto mb-3 text-gray-300" />
+                  <p className="text-sm">No school data available yet. Educators need to add their school name in their Hub profile.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-100">
+                        <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">School</th>
+                        <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">District</th>
+                        <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Educators</th>
+                        <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Active (30d)</th>
+                        <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Tools Explored</th>
+                        <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">PD Hours</th>
+                        <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Avg Vibe</th>
+                        <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Completions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {hubSchools.map((school, idx) => (
+                        <tr key={idx} className="hover:bg-gray-50">
+                          <td className="px-4 py-3">
+                            <span className="font-medium" style={{ color: '#2B3A67' }}>{school.name}</span>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-500">{school.district || '--'}</td>
+                          <td className="px-4 py-3 text-center text-sm text-gray-700">{school.totalEducators}</td>
+                          <td className="px-4 py-3 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <div className="w-12 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div className="h-full rounded-full" style={{ width: `${school.activeRate}%`, backgroundColor: school.activeRate >= 60 ? '#2A9D8F' : school.activeRate >= 30 ? '#EAB308' : '#EF4444' }} />
+                              </div>
+                              <span className="text-xs text-gray-500">{school.activeRate}%</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-center text-sm text-gray-700">{school.totalToolsViewed}</td>
+                          <td className="px-4 py-3 text-center text-sm text-gray-700">{school.totalPdHours > 0 ? school.totalPdHours.toFixed(1) : '--'}</td>
+                          <td className="px-4 py-3 text-center">
+                            {school.avgVibeScore !== null ? (
+                              <span className="inline-flex items-center gap-1 text-sm font-medium" style={{ color: school.avgVibeScore >= 4 ? '#2A9D8F' : school.avgVibeScore >= 3 ? '#EAB308' : '#EF4444' }}>
+                                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: school.avgVibeScore >= 4 ? '#2A9D8F' : school.avgVibeScore >= 3 ? '#EAB308' : '#EF4444' }} />
+                                {school.avgVibeScore}/5
+                              </span>
+                            ) : (
+                              <span className="text-sm text-gray-400">--</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-center text-sm text-gray-700">{school.totalCompletions || '--'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
         )}
 

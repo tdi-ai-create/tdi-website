@@ -1318,6 +1318,15 @@ export default function CreatorStudioPage() {
   } | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
+  // Hub content impact data
+  const [hubCreatorData, setHubCreatorData] = useState<{
+    topContent: { id: string; title: string; category: string; creator: string; views: number; communityResponses: number; qaThreads: number; impactScore: number }[];
+    categoryPerformance: Record<string, { views: number; responses: number; qaThreads: number; contentCount: number }>;
+    contentRequests: { request: unknown; date: string }[];
+    totalContent: number;
+  } | null>(null);
+  const [hubCreatorLoading, setHubCreatorLoading] = useState(false);
+
   // Follow-up modal state
   const [showFollowUpModal, setShowFollowUpModal] = useState(false);
   const [selectedCreatorForFollowUp, setSelectedCreatorForFollowUp] = useState<{ id: string; name: string } | null>(null);
@@ -1370,6 +1379,18 @@ export default function CreatorStudioPage() {
       setIsLoading(false);
     }
   }, [hasAccess, loadDashboardData]);
+
+  // Load Hub content data when analytics tab is active
+  useEffect(() => {
+    if (activeTab === 'analytics' && !hubCreatorData && !hubCreatorLoading) {
+      setHubCreatorLoading(true);
+      fetch('/api/tdi-admin/hub-connections?section=creators')
+        .then(res => res.json())
+        .then(data => setHubCreatorData(data))
+        .catch(() => {})
+        .finally(() => setHubCreatorLoading(false));
+    }
+  }, [activeTab, hubCreatorData, hubCreatorLoading]);
 
   // Load analytics data when analytics tab is active
   useEffect(() => {
@@ -3179,6 +3200,75 @@ export default function CreatorStudioPage() {
                 <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#1e2749' }} />
                 <p className="text-gray-600">Loading analytics data...</p>
               </div>
+            </div>
+          )}
+
+          {/* Hub Content Impact */}
+          {hubCreatorData && (
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#EAB308' }} />
+                <h2 className="text-xl font-semibold text-gray-900">Hub Content Impact</h2>
+                <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 999, backgroundColor: '#FEF3C7', color: '#92400E' }}>LIVE FROM HUB</span>
+              </div>
+              <p className="text-sm text-gray-500 mb-4">How creator content performs on the Learning Hub -- views, community engagement, and Q&A activity</p>
+
+              {/* Category performance summary */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                {Object.entries(hubCreatorData.categoryPerformance)
+                  .sort((a, b) => b[1].views - a[1].views)
+                  .slice(0, 8)
+                  .map(([cat, perf]) => (
+                    <div key={cat} style={{ padding: 14, borderRadius: 10, backgroundColor: '#F9FAFB' }}>
+                      <p style={{ fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>{cat}</p>
+                      <p style={{ fontSize: 20, fontWeight: 700, color: '#1e2749' }}>{perf.views}</p>
+                      <p style={{ fontSize: 10, color: '#9CA3AF' }}>{perf.contentCount} tools / {perf.responses} responses / {perf.qaThreads} Q&A</p>
+                    </div>
+                  ))
+                }
+              </div>
+
+              {/* Top content by impact */}
+              <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">Top Content by Impact Score</h3>
+              <div className="space-y-2 mb-6">
+                {hubCreatorData.topContent.slice(0, 10).map((c, i) => {
+                  const maxScore = hubCreatorData.topContent[0]?.impactScore || 1;
+                  return (
+                    <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: '#9CA3AF', width: 20, textAlign: 'right' }}>#{i + 1}</span>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+                          <span style={{ fontSize: 13, fontWeight: 500, color: '#374151' }}>{c.title}</span>
+                          <span style={{ fontSize: 11, color: '#6B7280' }}>{c.views} views / {c.communityResponses} posts / {c.qaThreads} Q&A</span>
+                        </div>
+                        <div style={{ height: 4, backgroundColor: '#F3F4F6', borderRadius: 2, overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${(c.impactScore / maxScore) * 100}%`, backgroundColor: '#EAB308', borderRadius: 2 }} />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Content requests */}
+              {hubCreatorData.contentRequests.length > 0 && (
+                <>
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">Educator Content Requests</h3>
+                  <div className="space-y-2">
+                    {hubCreatorData.contentRequests.map((req, i) => (
+                      <div key={i} style={{ padding: '10px 14px', borderRadius: 8, backgroundColor: '#FFFBEB', border: '1px solid #FEF3C7' }}>
+                        <p style={{ fontSize: 13, color: '#374151' }}>{String(req.request)}</p>
+                        <p style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>{new Date(req.date).toLocaleDateString()}</p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+          {hubCreatorLoading && (
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] text-center text-gray-400 text-sm">
+              Loading Hub content data...
             </div>
           )}
 

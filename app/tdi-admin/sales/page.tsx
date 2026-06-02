@@ -18,7 +18,7 @@ import {
 } from '@/components/tdi-admin/ui/design-tokens'
 
 type ViewMode = 'kanban' | 'list'
-type PageTab = 'pipeline' | 'analytics' | 'trash' | 'invoices'
+type PageTab = 'pipeline' | 'analytics' | 'trash' | 'invoices' | 'hub-leads'
 
 interface SalesOpportunity {
   id: string
@@ -172,6 +172,15 @@ export default function SalesPage() {
   const [quickNoteOppId, setQuickNoteOppId] = useState<string | null>(null)
   const [quickNoteText, setQuickNoteText] = useState('')
   const [savingQuickNote, setSavingQuickNote] = useState(false)
+
+  // Hub leads data
+  const [hubLeads, setHubLeads] = useState<{
+    warmLeads: { domain: string; freeUsers: number; school: string; district: string; state: string; sampleEmails: string[] }[];
+    topDistricts: { name: string; paid: number; free: number; total: number; state: string }[];
+    recentSignups: number;
+    totalFreeUsers: number;
+  } | null>(null)
+  const [hubLeadsLoading, setHubLeadsLoading] = useState(false)
 
   // Filter state
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(EMPTY_FILTERS)
@@ -715,6 +724,7 @@ export default function SalesPage() {
         {([
           { id: 'pipeline' as PageTab, label: 'Pipeline' },
           { id: 'analytics' as PageTab, label: 'Analytics' },
+          { id: 'hub-leads' as PageTab, label: 'Hub Leads' },
           ...(outstandingInvoices.length > 0 ? [{ id: 'invoices' as PageTab, label: `Outstanding Invoices (${outstandingInvoices.length})` }] : []),
           ...(trashedOpps.length > 0 ? [{ id: 'trash' as PageTab, label: `Trash (${trashedOpps.length})` }] : []),
         ]).map(tab => (
@@ -736,6 +746,131 @@ export default function SalesPage() {
 
       {/* Analytics Tab */}
       {pageTab === 'analytics' && <AnalyticsTab opportunities={activeOpps.map(o => ({ value: o.value, probability: o.probability, stage: o.stage, name: o.name }))} />}
+
+      {/* Hub Leads Tab */}
+      {pageTab === 'hub-leads' && (() => {
+        // Load Hub leads data on first render of this tab
+        if (!hubLeads && !hubLeadsLoading) {
+          setHubLeadsLoading(true)
+          fetch('/api/tdi-admin/hub-connections?section=sales')
+            .then(r => r.json())
+            .then(data => { setHubLeads(data); setHubLeadsLoading(false) })
+            .catch(() => setHubLeadsLoading(false))
+        }
+
+        return (
+          <div>
+            {hubLeadsLoading ? (
+              <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF' }}>Loading Hub data...</div>
+            ) : !hubLeads ? (
+              <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF' }}>No data available</div>
+            ) : (
+              <>
+                {/* Summary cards */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+                  <div style={{ background: 'white', borderRadius: 12, padding: 20, border: '1px solid #E5E7EB' }}>
+                    <p style={{ fontSize: 28, fontWeight: 700, color: '#10B981' }}>{hubLeads.warmLeads.length}</p>
+                    <p style={{ fontSize: 12, color: '#6B7280' }}>Warm Leads</p>
+                    <p style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>Schools with 2+ free Hub users</p>
+                  </div>
+                  <div style={{ background: 'white', borderRadius: 12, padding: 20, border: '1px solid #E5E7EB' }}>
+                    <p style={{ fontSize: 28, fontWeight: 700, color: '#2563EB' }}>{hubLeads.totalFreeUsers.toLocaleString()}</p>
+                    <p style={{ fontSize: 12, color: '#6B7280' }}>Free Users</p>
+                    <p style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>Potential conversion pool</p>
+                  </div>
+                  <div style={{ background: 'white', borderRadius: 12, padding: 20, border: '1px solid #E5E7EB' }}>
+                    <p style={{ fontSize: 28, fontWeight: 700, color: '#F59E0B' }}>{hubLeads.recentSignups}</p>
+                    <p style={{ fontSize: 12, color: '#6B7280' }}>Signups This Week</p>
+                    <p style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>New free accounts (7d)</p>
+                  </div>
+                  <div style={{ background: 'white', borderRadius: 12, padding: 20, border: '1px solid #E5E7EB' }}>
+                    <p style={{ fontSize: 28, fontWeight: 700, color: '#8B5CF6' }}>{hubLeads.topDistricts.length}</p>
+                    <p style={{ fontSize: 12, color: '#6B7280' }}>Active Districts</p>
+                    <p style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>Districts with Hub users</p>
+                  </div>
+                </div>
+
+                {/* Warm leads table */}
+                <div style={{ marginBottom: 32 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#10B981' }} />
+                    <h3 style={{ fontSize: 14, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Warm Leads from Hub</h3>
+                    <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 999, backgroundColor: '#D1FAE5', color: '#065F46' }}>LIVE</span>
+                  </div>
+                  <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 12 }}>Schools with multiple free Hub users -- already exploring TDI tools</p>
+
+                  {hubLeads.warmLeads.length === 0 ? (
+                    <p style={{ textAlign: 'center', color: '#9CA3AF', padding: 24 }}>No warm leads yet. Free signups from education domains will appear here.</p>
+                  ) : (
+                    <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', overflow: 'hidden' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <thead>
+                          <tr style={{ borderBottom: '1px solid #F3F4F6' }}>
+                            <th style={{ textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Domain</th>
+                            <th style={{ textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>School</th>
+                            <th style={{ textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>District</th>
+                            <th style={{ textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>State</th>
+                            <th style={{ textAlign: 'center', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Free Users</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {hubLeads.warmLeads.map((lead, i) => (
+                            <tr key={i} style={{ borderBottom: '1px solid #F9FAFB' }}>
+                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 600, color: '#1e2749' }}>{lead.domain}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, color: '#374151' }}>{lead.school || '--'}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, color: '#6B7280' }}>{lead.district || '--'}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, color: '#6B7280' }}>{lead.state || '--'}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 700, color: '#10B981', textAlign: 'center' }}>{lead.freeUsers}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* District adoption table */}
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#8B5CF6' }} />
+                    <h3 style={{ fontSize: 14, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.05em' }}>District Adoption</h3>
+                  </div>
+                  <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 12 }}>Hub users grouped by district -- renewal evidence and upsell opportunities</p>
+
+                  {hubLeads.topDistricts.length === 0 ? (
+                    <p style={{ textAlign: 'center', color: '#9CA3AF', padding: 24 }}>No district data yet.</p>
+                  ) : (
+                    <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', overflow: 'hidden' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <thead>
+                          <tr style={{ borderBottom: '1px solid #F3F4F6' }}>
+                            <th style={{ textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>District</th>
+                            <th style={{ textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>State</th>
+                            <th style={{ textAlign: 'center', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Users</th>
+                            <th style={{ textAlign: 'center', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Paid</th>
+                            <th style={{ textAlign: 'center', padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Free</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {hubLeads.topDistricts.map((dist, i) => (
+                            <tr key={i} style={{ borderBottom: '1px solid #F9FAFB' }}>
+                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 600, color: '#1e2749' }}>{dist.name}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, color: '#6B7280' }}>{dist.state || '--'}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 600, color: '#374151', textAlign: 'center' }}>{dist.total}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, color: '#10B981', fontWeight: 600, textAlign: 'center' }}>{dist.paid}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, color: '#6B7280', textAlign: 'center' }}>{dist.free}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        )
+      })()}
 
       {/* Pipeline Tab */}
       {pageTab === 'pipeline' && (
