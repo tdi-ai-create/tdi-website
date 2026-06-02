@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import Anthropic from '@anthropic-ai/sdk'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 
 const TDI_EVALUATION_PROMPT = `You are an expert sales and customer success analyst for Teachers Deserve It (TDI), an education wellness company. Your role is to evaluate meeting transcripts to help TDI improve district relationships and increase renewal rates.
 
@@ -126,6 +127,9 @@ IMPORTANT:
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const { meetingId, districtId, transcript } = await request.json()
 
     if (!transcript || transcript.trim().length < 50) {

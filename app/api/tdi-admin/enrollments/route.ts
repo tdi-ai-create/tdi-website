@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 let cachedSupabase: ReturnType<typeof createClient> | null = null;
 
@@ -23,6 +24,9 @@ function getSupabaseAdmin() {
 // GET - Fetch all enrollments with user and course data (bypasses RLS)
 export async function GET() {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const supabase = getSupabaseAdmin();
 
     const { data, error } = await supabase

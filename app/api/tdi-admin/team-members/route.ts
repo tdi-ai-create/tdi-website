@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 // Cache the supabase admin client
 let cachedSupabase: ReturnType<typeof createClient> | null = null;
@@ -24,6 +25,9 @@ function getSupabaseAdmin() {
 // GET - Fetch all team members
 export async function GET() {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const supabase = getSupabaseAdmin();
 
     const { data, error } = await supabase
@@ -46,6 +50,9 @@ export async function GET() {
 // POST - Add a new team member
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const { email, displayName, role, permissions } = await request.json();
 
     if (!email || !displayName) {
@@ -93,6 +100,9 @@ export async function POST(request: NextRequest) {
 // PATCH - Update a team member
 export async function PATCH(request: NextRequest) {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const { id, permissions, is_active, role } = await request.json();
 
     if (!id) {

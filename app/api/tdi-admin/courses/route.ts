@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 /**
  * Generate a URL-friendly slug from a title
@@ -19,6 +20,9 @@ function generateSlug(title: string): string {
  */
 export async function GET(request: Request) {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const supabase = getServiceSupabase();
     const { searchParams } = new URL(request.url);
 
@@ -113,6 +117,9 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const supabase = getServiceSupabase();
     const body = await request.json();
 

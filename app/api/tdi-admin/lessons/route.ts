@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 /**
  * POST /api/tdi-admin/lessons
@@ -7,6 +8,9 @@ import { getServiceSupabase } from '@/lib/supabase';
  */
 export async function POST(request: Request) {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const supabase = getServiceSupabase();
     const body = await request.json();
 
@@ -69,6 +73,9 @@ export async function POST(request: Request) {
  */
 export async function PATCH(request: Request) {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const supabase = getServiceSupabase();
     const body = await request.json();
 
@@ -134,6 +141,9 @@ export async function PATCH(request: Request) {
  */
 export async function DELETE(request: Request) {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const supabase = getServiceSupabase();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');

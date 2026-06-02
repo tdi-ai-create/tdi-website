@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 /**
  * Generate a URL-friendly slug from a title
@@ -22,6 +23,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const supabase = getServiceSupabase();
     const { id } = await params;
 
@@ -82,6 +86,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const supabase = getServiceSupabase();
     const { id } = await params;
     const body = await request.json();
@@ -184,6 +191,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const supabase = getServiceSupabase();
     const { id } = await params;
 

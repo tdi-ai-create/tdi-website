@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 let cachedSupabase: ReturnType<typeof createClient> | null = null;
 
@@ -65,6 +66,9 @@ interface Profile {
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const supabase = getSupabaseAdmin();
     const { searchParams } = new URL(request.url);
 

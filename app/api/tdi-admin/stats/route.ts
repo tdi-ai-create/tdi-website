@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 // Cache the supabase admin client
 let cachedSupabase: ReturnType<typeof createClient> | null = null;
@@ -24,6 +25,9 @@ function getSupabaseAdmin() {
 // GET - Fetch admin stats (bypasses RLS)
 export async function GET() {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const supabase = getSupabaseAdmin();
 
     const [
