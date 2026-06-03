@@ -16,6 +16,8 @@ import GiftElement from '@/components/hub/GiftElement';
 import CommunityBookmarks from '@/components/hub/CommunityBookmarks';
 import DashboardInsight from '@/components/hub/DashboardInsight';
 import AchievementInsights from '@/components/hub/AchievementInsights';
+import { QuizResultBadge } from '@/components/hub/QuizEngine';
+import { ALL_QUIZZES } from '@/lib/hub/quizConfigs';
 // PolaroidCard shelved for now
 // import SortableDashboardSection from '@/components/hub/SortableDashboardSection';
 // dnd-kit imports shelved for draggable sections feature
@@ -245,6 +247,7 @@ export default function HubDashboard() {
   const [tourResumeStep, setTourResumeStep] = useState(0);
   const [personalStats, setPersonalStats] = useState<PersonalStats | null>(null);
   const [communityPulse, setCommunityPulse] = useState<CommunityPulse | null>(null);
+  const [dashboardQuizResults, setDashboardQuizResults] = useState<Record<string, string>>({});
   const [featuredQuickWin, setFeaturedQuickWin] = useState<QuickWin | null>(null);
   const [communityHighlights, setCommunityHighlights] = useState<CommunityHighlight[]>([]);
   const [communitySummary, setCommunitySummary] = useState<CommunitySummary | null>(null);
@@ -430,6 +433,19 @@ export default function HubDashboard() {
             setShowRecommendations(true);
           }
         }
+
+        // Fetch quiz results for dashboard recommendations
+        const { data: quizRows } = await supabase
+          .from('hub_quiz_results')
+          .select('quiz_type, result_key')
+          .eq('user_id', user.id);
+        const qResults: Record<string, string> = {};
+        const educatorType = (profile as unknown as Record<string, unknown>)?.educator_type as string | null;
+        if (educatorType) qResults['educator_type'] = educatorType;
+        if (quizRows) {
+          for (const row of quizRows) qResults[row.quiz_type] = row.result_key;
+        }
+        setDashboardQuizResults(qResults);
 
         // Fetch certificate count
         const { count: certCount } = await supabase
@@ -1559,6 +1575,69 @@ export default function HubDashboard() {
               </div>
             </div>
           )}
+
+          {/* Discover More About Yourself -- quiz recommendations */}
+          {(() => {
+            const untaken = ALL_QUIZZES.filter(q => !dashboardQuizResults[q.id]);
+            const taken = ALL_QUIZZES.filter(q => dashboardQuizResults[q.id]);
+            if (untaken.length === 0 && taken.length === 0) return null;
+            // Show up to 2 untaken quizzes + 1 latest result
+            const showUntaken = untaken.slice(0, 2);
+            const showTaken = taken.slice(0, 1);
+            return (
+              <div
+                className="rounded-2xl p-5"
+                style={{ background: '#FAFAF8', border: '1px solid rgba(27,42,74,0.08)' }}
+              >
+                <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
+                  {tUI('Know Yourself')}
+                </div>
+                <div className="space-y-2.5">
+                  {/* Show latest quiz result */}
+                  {showTaken.map(quiz => (
+                    <QuizResultBadge key={quiz.id} quiz={quiz} resultKey={dashboardQuizResults[quiz.id]} compact />
+                  ))}
+                  {/* Untaken quiz invites */}
+                  {showUntaken.map(quiz => (
+                    <Link
+                      key={quiz.id}
+                      href="/hub/settings/profile?tab=educator_profile"
+                      className="block bg-white rounded-xl p-3 hover:shadow-sm transition-shadow"
+                      style={{ border: '1px solid #E9E7E2' }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#F3F4F6' }}
+                        >
+                          <span className="text-sm" style={{ color: '#9CA3AF' }}>?</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
+                            {quiz.title}
+                          </div>
+                          <div className="text-xs" style={{ color: '#9CA3AF' }}>
+                            {quiz.questionCount} {tUI('questions')} &middot; {quiz.durationLabel}
+                          </div>
+                        </div>
+                        <ArrowRight size={14} style={{ color: '#D1D5DB' }} />
+                      </div>
+                    </Link>
+                  ))}
+                  {/* Link to see all */}
+                  {(untaken.length > 2 || taken.length > 1) && (
+                    <Link
+                      href="/hub/settings/profile?tab=educator_profile"
+                      className="block text-center text-xs font-medium py-2 transition-colors hover:text-gray-700"
+                      style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                      {tUI('See all quizzes')} &rarr;
+                    </Link>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* 4. Quick Wins Explorer */}
           {quickWins.length > 0 && (

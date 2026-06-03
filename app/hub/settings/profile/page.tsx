@@ -8,6 +8,9 @@ import AvatarDisplay from '@/components/hub/AvatarDisplay';
 import AvatarPicker from '@/components/hub/AvatarPicker';
 import AchievementInsights from '@/components/hub/AchievementInsights';
 import EducatorQuiz from '@/components/hub/EducatorQuiz';
+import QuizEngine, { QuizResultBadge, QuizInviteCard } from '@/components/hub/QuizEngine';
+import { ALL_QUIZZES, getQuizById } from '@/lib/hub/quizConfigs';
+import type { QuizConfig } from '@/lib/hub/quizConfigs';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { signOut, updateHubProfile } from '@/lib/hub-auth';
 import {
@@ -43,6 +46,7 @@ import {
   ChevronRight,
   ArrowRight,
   HelpCircle,
+  Sparkle,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -78,6 +82,7 @@ type GrowthTab =
   | 'profile'
   | 'growth'
   | 'vibe_check'
+  | 'educator_profile'
   | 'library'
   | 'wellbeing';
 
@@ -187,6 +192,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
 
 const TAB_CONFIG: { id: GrowthTab; label: string; icon: LucideIcon }[] = [
   { id: 'profile', label: 'Profile', icon: User },
+  { id: 'educator_profile', label: 'My Educator Profile', icon: Sparkle },
   { id: 'growth', label: 'My Growth', icon: BarChart3 },
   { id: 'vibe_check', label: 'Vibe Check', icon: Heart },
 ];
@@ -241,6 +247,15 @@ export default function ProfileSettingsPage() {
   // Active tab
   const [activeTab, setActiveTab] = useState<GrowthTab>('profile');
 
+  // Respect ?tab= query param on initial load
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab') as GrowthTab | null;
+    if (tab && ['profile', 'educator_profile', 'growth', 'vibe_check'].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, []);
+
   // Profile state
   const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
   const [displayName, setDisplayName] = useState('');
@@ -260,6 +275,11 @@ export default function ProfileSettingsPage() {
   const [favorites, setFavorites] = useState<FavoriteEntry[]>([]);
   const [recognitionData, setRecognitionData] = useState<RecognitionResult | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
+
+  // Quiz system
+  const [quizResults, setQuizResults] = useState<Record<string, string>>({});
+  const [activeQuiz, setActiveQuiz] = useState<QuizConfig | null>(null);
+  const [quizResultsLoaded, setQuizResultsLoaded] = useState(false);
 
   // AI Insights
   const [growthInsight, setGrowthInsight] = useState<string | null>(null);
@@ -412,6 +432,52 @@ export default function ProfileSettingsPage() {
 
     loadData();
   }, [user?.id, dataLoaded]);
+
+  // ── Load quiz results ──────────────────────────────────────────────────
+  useEffect(() => {
+    if (!user?.id || quizResultsLoaded) return;
+    const loadQuizResults = async () => {
+      const supabase = getSupabase();
+      // Load from unified quiz_results table
+      const { data: rows } = await supabase
+        .from('hub_quiz_results')
+        .select('quiz_type, result_key')
+        .eq('user_id', user.id);
+      const results: Record<string, string> = {};
+      // Also include the legacy educator_type from hub_profiles
+      const educatorType = (profile as unknown as Record<string, unknown>)?.educator_type as string | null;
+      if (educatorType) {
+        results['educator_type'] = educatorType;
+      }
+      if (rows) {
+        for (const row of rows) {
+          results[row.quiz_type] = row.result_key;
+        }
+      }
+      setQuizResults(results);
+      setQuizResultsLoaded(true);
+    };
+    loadQuizResults();
+  }, [user?.id, quizResultsLoaded, profile]);
+
+  // ── Save quiz result helper ─────────────────────────────────────────
+  const handleQuizComplete = async (quizId: string, resultKey: string) => {
+    if (!user?.id) return;
+    const supabase = getSupabase();
+    // Upsert into hub_quiz_results
+    await supabase
+      .from('hub_quiz_results')
+      .upsert(
+        { user_id: user.id, quiz_type: quizId, result_key: resultKey, taken_at: new Date().toISOString() },
+        { onConflict: 'user_id,quiz_type' }
+      );
+    // Also keep educator_type in hub_profiles for backward compat
+    if (quizId === 'educator_type') {
+      await supabase.from('hub_profiles').update({ educator_type: resultKey }).eq('id', user.id);
+    }
+    setQuizResults(prev => ({ ...prev, [quizId]: resultKey }));
+    setActiveQuiz(null);
+  };
 
   // ── Fetch AI insights when switching tabs ──────────────────────────────
   useEffect(() => {
@@ -1143,6 +1209,106 @@ export default function ProfileSettingsPage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════
+          TAB: My Educator Profile (Quiz results collection)
+         ════════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'educator_profile' && (
+        <div className="space-y-6">
+          {/* Active quiz (full-screen quiz experience) */}
+          {activeQuiz ? (
+            <div>
+              <button
+                onClick={() => setActiveQuiz(null)}
+                className="text-xs font-medium mb-4 transition-colors hover:text-gray-700"
+                style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}
+              >
+                &larr; {tUI('Back to quizzes')}
+              </button>
+              <QuizEngine
+                quiz={activeQuiz}
+                onComplete={(resultKey) => handleQuizComplete(activeQuiz.id, resultKey)}
+              />
+            </div>
+          ) : (
+            <>
+              {/* Intro */}
+              <div>
+                <p className="text-sm mb-1" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>
+                  {tUI('A growing portrait of who you are as an educator. Take quizzes, collect your results, and get personalized recommendations.')}
+                </p>
+              </div>
+
+              {/* Completed quiz results */}
+              {Object.keys(quizResults).length > 0 && (
+                <div>
+                  <h3
+                    className="text-sm font-semibold mb-3"
+                    style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    {tUI('Your Results')}
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {ALL_QUIZZES
+                      .filter(q => quizResults[q.id])
+                      .map(quiz => (
+                        <div key={quiz.id} className="relative group">
+                          <QuizResultBadge quiz={quiz} resultKey={quizResults[quiz.id]} />
+                          <button
+                            onClick={() => setActiveQuiz(quiz)}
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded-md"
+                            style={{ backgroundColor: 'rgba(255,255,255,0.9)', color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}
+                          >
+                            {tUI('Retake')}
+                          </button>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Untaken quizzes */}
+              {ALL_QUIZZES.filter(q => !quizResults[q.id]).length > 0 && (
+                <div>
+                  <h3
+                    className="text-sm font-semibold mb-3"
+                    style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    {Object.keys(quizResults).length > 0 ? tUI('Discover More') : tUI('Get Started')}
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {ALL_QUIZZES
+                      .filter(q => !quizResults[q.id])
+                      .map(quiz => (
+                        <QuizInviteCard
+                          key={quiz.id}
+                          quiz={quiz}
+                          onStart={() => setActiveQuiz(quiz)}
+                        />
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* All done state */}
+              {ALL_QUIZZES.every(q => quizResults[q.id]) && (
+                <div
+                  className="rounded-2xl p-6 text-center"
+                  style={{ backgroundColor: '#FAFAF8', border: '1px solid rgba(27,42,74,0.06)' }}
+                >
+                  <Sparkles size={24} className="mx-auto mb-3" style={{ color: '#E8B84B' }} />
+                  <p className="text-sm font-medium mb-1" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
+                    {tUI('You have taken every quiz!')}
+                  </p>
+                  <p className="text-xs" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
+                    {tUI('Check back later -- we are always adding new ones.')}
+                  </p>
+                </div>
+              )}
+            </>
+          )}
         </div>
       )}
 
