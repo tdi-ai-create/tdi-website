@@ -2407,6 +2407,7 @@ function TipsTab() {
   const [requests, setRequests] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [newTip, setNewTip] = useState('');
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [newTipCategory, setNewTipCategory] = useState('general');
 
   useEffect(() => {
@@ -2431,9 +2432,9 @@ function TipsTab() {
   };
 
   const handleDeleteTip = async (tipId: string) => {
-    if (!confirm('Delete this tip?')) return;
     await deleteTip(tipId);
     setTips(tips.filter(t => t.id !== tipId));
+    setPendingDeleteId(null);
   };
 
   const handleStatusChange = async (tipId: string, status: string) => {
@@ -2504,7 +2505,7 @@ function TipsTab() {
                     <option value="rejected">Rejected</option>
                   </select>
                   <button
-                    onClick={() => handleDeleteTip(tip.id)}
+                    onClick={() => setPendingDeleteId(tip.id)}
                     className="text-red-500 hover:text-red-700"
                   >
                     <Trash2 size={14} />
@@ -2554,6 +2555,30 @@ function TipsTab() {
           )}
         </div>
       </div>
+
+      {/* Delete confirmation modal */}
+      {pendingDeleteId && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+            <h3 className="font-semibold text-gray-900">Delete this tip?</h3>
+            <p className="text-sm text-gray-600">This action cannot be undone.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setPendingDeleteId(null)}
+                className="flex-1 text-sm border border-gray-200 text-gray-600 py-2.5 rounded-xl hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteTip(pendingDeleteId)}
+                className="flex-1 text-sm bg-red-600 text-white py-2.5 rounded-xl hover:bg-red-700 font-medium"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
