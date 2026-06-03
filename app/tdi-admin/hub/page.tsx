@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { USChoroplethMap } from '@/components/tdi-admin/shared/USChoroplethMap';
+import { ALL_QUIZZES, getQuizById } from '@/lib/hub/quizConfigs';
 import { TrendAreaChart, HorizontalBarChart, DonutChart, DonutLegend } from '@/components/tdi-admin/hub-charts/HubCharts';
 import {
   TYPE_PAGE_TITLE,
@@ -323,13 +324,42 @@ export default function HubAdminPage() {
   const [stats, setStats] = useState<HubStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showExampleNotice] = useState(false);
+  const [quizInsights, setQuizInsights] = useState<{ quizType: string; resultKey: string; count: number }[]>([]);
+  const [quizTotalUsers, setQuizTotalUsers] = useState(0);
 
   useEffect(() => {
     async function loadStats() {
       try {
         const data = await getAdminStats();
         setStats(data);
-        // Data is real now -- no example data flag needed
+
+        // Load quiz analytics
+        const supabase = getSupabase();
+        const { data: quizData } = await supabase
+          .from('hub_quiz_results')
+          .select('quiz_type, result_key');
+        if (quizData) {
+          // Count by quiz_type + result_key
+          const counts: Record<string, number> = {};
+          const uniqueUsers = new Set<string>();
+          for (const row of quizData) {
+            const key = `${row.quiz_type}::${row.result_key}`;
+            counts[key] = (counts[key] || 0) + 1;
+          }
+          // Count unique users
+          const { count: userCount } = await supabase
+            .from('hub_quiz_results')
+            .select('user_id', { count: 'exact', head: true });
+          setQuizTotalUsers(userCount || 0);
+          setQuizInsights(
+            Object.entries(counts)
+              .map(([key, count]) => {
+                const [quizType, resultKey] = key.split('::');
+                return { quizType, resultKey, count };
+              })
+              .sort((a, b) => b.count - a.count)
+          );
+        }
       } catch (error) {
         console.error('Error loading stats:', error);
       } finally {
@@ -800,6 +830,68 @@ export default function HubAdminPage() {
                   </div>
                 );
               })()}
+            </div>
+          </div>
+        )}
+
+        {/* Quiz Insights */}
+        {quizInsights.length > 0 && (
+          <div className="mb-8">
+            <h2 className="mb-4" style={TYPE_SECTION_HEADER}>Quiz Insights</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Summary card */}
+              <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                <p style={TYPE_WIDGET_LABEL}>Overview</p>
+                <div className="mt-3 space-y-3">
+                  <div className="flex justify-between items-baseline">
+                    <span style={TYPE_BODY}>Total quiz completions</span>
+                    <span style={TYPE_STAT_VALUE}>{quizInsights.reduce((s, q) => s + q.count, 0)}</span>
+                  </div>
+                  <div className="flex justify-between items-baseline">
+                    <span style={TYPE_BODY}>Unique quizzers</span>
+                    <span style={TYPE_STAT_VALUE}>{quizTotalUsers}</span>
+                  </div>
+                  <div className="flex justify-between items-baseline">
+                    <span style={TYPE_BODY}>Quizzes available</span>
+                    <span style={TYPE_STAT_VALUE}>{ALL_QUIZZES.length}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Per-quiz breakdown cards */}
+              {ALL_QUIZZES.map(quiz => {
+                const results = quizInsights.filter(q => q.quizType === quiz.id);
+                const total = results.reduce((s, r) => s + r.count, 0);
+                if (total === 0) return null;
+                return (
+                  <div key={quiz.id} className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: quiz.accentColor }} />
+                      <p style={TYPE_WIDGET_LABEL}>{quiz.shortTitle}</p>
+                      <span className="ml-auto text-xs font-semibold" style={{ color: '#6B7280' }}>{total} taken</span>
+                    </div>
+                    <div className="space-y-2">
+                      {results
+                        .sort((a, b) => b.count - a.count)
+                        .map(r => {
+                          const resultConfig = quiz.results[r.resultKey];
+                          const pct = Math.round((r.count / total) * 100);
+                          return (
+                            <div key={r.resultKey}>
+                              <div className="flex justify-between text-xs mb-1">
+                                <span style={{ color: '#374151' }}>{resultConfig?.title || r.resultKey}</span>
+                                <span style={{ color: '#9CA3AF' }}>{pct}% ({r.count})</span>
+                              </div>
+                              <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#F3F4F6' }}>
+                                <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: resultConfig?.color || quiz.accentColor }} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
