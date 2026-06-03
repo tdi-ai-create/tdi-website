@@ -11,6 +11,7 @@ import { useFavorites } from '@/lib/hub/useFavorites';
 import { useLanguage } from '@/lib/hub/useLanguage';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import { BookOpen, CheckCircle, AlertCircle, Heart, Info } from 'lucide-react';
+import QuizNudge from '@/components/hub/QuizNudge';
 
 // Filter categories
 const FILTER_CATEGORIES = [
@@ -276,6 +277,7 @@ export default function CourseCatalogPage() {
       )}
 
       <div className="max-w-6xl mx-auto">
+        <QuizNudge />
         {/* Header */}
         <div className="mb-8">
           <h1

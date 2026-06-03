@@ -8,15 +8,13 @@ import { useFavorites } from '@/lib/hub/useFavorites';
 import { useMembership, type ContentAccess } from '@/lib/hub/use-membership';
 import { useLanguage } from '@/lib/hub/useLanguage';
 import { useTranslation } from '@/lib/hub/useTranslation';
-import { Zap, Heart, Info, Sparkle } from 'lucide-react';
-import Link from 'next/link';
-import { ALL_QUIZZES } from '@/lib/hub/quizConfigs';
+import { Zap, Heart, Info } from 'lucide-react';
+import QuizNudge from '@/components/hub/QuizNudge';
 
 // Filter categories for Quick Wins
 const FILTER_CATEGORIES = [
   'All',
   'Saved',
-  'Know Yourself',
   'Games',
   'Stress Relief',
   'Time Savers',
@@ -294,6 +292,7 @@ export default function QuickWinsPage() {
       style={{ backgroundColor: '#F0EEE9', minHeight: 'calc(100vh - 54px)' }}
     >
       <div className="max-w-6xl mx-auto">
+        <QuizNudge />
         {/* Header */}
         <div className="mb-8">
           <h1
@@ -395,67 +394,8 @@ export default function QuickWinsPage() {
           ))}
         </div>
 
-        {/* Quiz cards for "Know Yourself" category */}
-        {(activeFilter === 'Know Yourself' || activeFilter === 'All') && (
-          <div className={activeFilter === 'Know Yourself' ? '' : 'mb-3'}>
-            {activeFilter === 'Know Yourself' && (
-              <p className="text-sm mb-4" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>
-                {tUI('Quick quizzes that help you learn about yourself as an educator.')}
-              </p>
-            )}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {ALL_QUIZZES.map(quiz => (
-                <Link
-                  key={quiz.id}
-                  href={`/hub/settings/profile?tab=educator_profile`}
-                  className="block rounded-2xl overflow-hidden hover:shadow-md transition-shadow"
-                  style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
-                >
-                  {/* Gradient header */}
-                  <div
-                    className="px-4 py-3"
-                    style={{ background: quiz.accentGradient }}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
-                      >
-                        <span className="text-sm font-bold text-white" style={{ fontFamily: "'Source Serif 4', serif" }}>?</span>
-                      </div>
-                      <span className="text-xs font-semibold text-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                        {tUI('Know Yourself')}
-                      </span>
-                    </div>
-                  </div>
-                  {/* Body */}
-                  <div className="bg-white p-4">
-                    <h3
-                      className="text-sm font-bold mb-1 leading-snug"
-                      style={{ color: '#1B2A4A', fontFamily: "'Source Serif 4', serif" }}
-                    >
-                      {quiz.title}
-                    </h3>
-                    <p className="text-xs mb-3 line-clamp-2" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>
-                      {quiz.description}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: quiz.accentBg, color: quiz.accentColor }}>
-                        {quiz.durationLabel}
-                      </span>
-                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F3F4F6', color: '#6B7280' }}>
-                        {quiz.questionCount} {tUI('questions')}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Quick Wins Grid or Empty State */}
-        {activeFilter !== 'Know Yourself' && filteredQuickWins.length > 0 ? (
+        {filteredQuickWins.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             {filteredQuickWins.map((qw) => (
               <QuickWinCard
@@ -469,7 +409,7 @@ export default function QuickWinsPage() {
               />
             ))}
           </div>
-        ) : activeFilter !== 'Know Yourself' && quickWins.length === 0 ? (
+        ) : quickWins.length === 0 ? (
           <div
             className="rounded-2xl py-16"
             style={{ backgroundColor: 'white', border: '0.5px solid rgba(0,0,0,0.06)' }}
@@ -481,7 +421,7 @@ export default function QuickWinsPage() {
               description={tUI('3-5 minute tools for busy teachers. No prep required.')}
             />
           </div>
-        ) : activeFilter !== 'Know Yourself' ? (
+        ) : filteredQuickWins.length === 0 ? (
           <div
             className="rounded-2xl py-12 text-center"
             style={{ backgroundColor: 'white', border: '0.5px solid rgba(0,0,0,0.06)' }}
