@@ -8,6 +8,7 @@ import { MADLIBS_SCENARIOS, MADLIBS_SILLY_ROUNDS, SILLY_ROUND_PROMPTS } from '..
 import { COLORS, shuffle } from '../data/gameConfig';
 import { useLanguage } from '../context/LanguageContext';
 import { UI_TRANSLATIONS } from '../data/translations';
+import { useGameTracking } from '@/lib/hub/useGameTracking';
 
 type Screen = 'intro' | 'play' | 'done';
 
@@ -33,6 +34,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
   // Real feedback inputs for practice rounds
   const [realInputs, setRealInputs] = useState({ notice: '', name: '', nextStep: '' });
 
+  const { logCompletion } = useGameTracking();
   const { language } = useLanguage();
   const t = UI_TRANSLATIONS;
 
@@ -96,6 +98,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
       }, 200);
     } else {
       setScreen('done');
+      logCompletion({ tool: 'feedback-madlibs', totalRounds: scenarios.length });
     }
   };
 

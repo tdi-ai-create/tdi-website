@@ -8,6 +8,7 @@ import { KNOCKOUT_SCENARIOS, KNOCKOUT_TIMER_SECONDS, KNOCKOUT_ROUNDS } from '../
 import { COLORS, shuffleAndPick } from '../data/gameConfig';
 import { useLanguage } from '../context/LanguageContext';
 import { UI_TRANSLATIONS } from '../data/translations';
+import { useGameTracking } from '@/lib/hub/useGameTracking';
 
 type Screen = 'intro' | 'play' | 'done';
 
@@ -24,6 +25,7 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
   const [switches, setSwitches] = useState(0);
   const [showBuzzerEffect, setShowBuzzerEffect] = useState(false);
 
+  const { logCompletion } = useGameTracking();
   const { language } = useLanguage();
   const t = UI_TRANSLATIONS;
 
@@ -58,6 +60,7 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
       }, 200);
     } else {
       setScreen('done');
+      logCompletion({ tool: 'question-knockout', totalRounds: scenarios.length });
     }
   };
 

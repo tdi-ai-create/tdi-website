@@ -8,6 +8,7 @@ import { FEEDBACK_LEVELS, LEVEL_INFO } from '../data/feedbackLevels';
 import { COLORS, shuffle } from '../data/gameConfig';
 import { useLanguage } from '../context/LanguageContext';
 import { UI_TRANSLATIONS } from '../data/translations';
+import { useGameTracking } from '@/lib/hub/useGameTracking';
 
 type Screen = 'intro' | 'play' | 'done';
 
@@ -21,10 +22,12 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
   const [revealed, setRevealed] = useState(false);
   const [userGuess, setUserGuess] = useState<number | null>(null);
   const [streak, setStreak] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [trapCount, setTrapCount] = useState(0);
   const [showTrapMessage, setShowTrapMessage] = useState(false);
 
+  const { logCompletion } = useGameTracking();
   const { language } = useLanguage();
   const t = UI_TRANSLATIONS;
 
@@ -53,6 +56,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
 
     if (isCorrect) {
       setStreak((prev) => prev + 1);
+      setCorrectCount((prev) => prev + 1);
     } else {
       setStreak(0);
     }
@@ -78,6 +82,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
       }, 200);
     } else {
       setScreen('done');
+      logCompletion({ tool: 'feedback-level-up', score: correctCount, totalRounds: feedbacks.length, streak });
     }
   };
 

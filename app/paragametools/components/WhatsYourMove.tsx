@@ -7,6 +7,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { SCENARIOS, SCENARIO_COUNT } from '../data/whatsYourMove';
 import { GameWrapper } from './GameWrapper';
 import { ConfettiBurst } from './ConfettiBurst';
+import { useGameTracking } from '@/lib/hub/useGameTracking';
 
 // ── Toggle: set to false to hide survey for general community use ──
 const SURVEY_ACTIVE = true;
@@ -33,6 +34,7 @@ interface SurveyResponse {
 // ─── Main component ───
 export function WhatsYourMove({ onBack }: { onBack: () => void }) {
   const { language } = useLanguage();
+  const { logCompletion } = useGameTracking();
   const [screen, setScreen] = useState<Screen>('intro');
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -51,6 +53,7 @@ export function WhatsYourMove({ onBack }: { onBack: () => void }) {
   const handleNext = () => {
     if (isLast) {
       setScreen('results');
+      logCompletion({ tool: 'whats-your-move', score, totalRounds: SCENARIO_COUNT });
     } else {
       setCurrent((c) => c + 1);
       setSelected(null);

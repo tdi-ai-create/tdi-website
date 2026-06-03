@@ -8,6 +8,7 @@ import { FEEDBACK_MAKEOVERS, MAKEOVER_TIMER_SECONDS } from '../data/makeovers';
 import { COLORS, shuffle } from '../data/gameConfig';
 import { useLanguage } from '../context/LanguageContext';
 import { UI_TRANSLATIONS } from '../data/translations';
+import { useGameTracking } from '@/lib/hub/useGameTracking';
 
 type Screen = 'intro' | 'play' | 'done';
 
@@ -26,6 +27,7 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
   const [showBeforeAfter, setShowBeforeAfter] = useState(false);
   const [savedMakeovers, setSavedMakeovers] = useState<{ bad: string; after: string }[]>([]);
 
+  const { logCompletion } = useGameTracking();
   const { language } = useLanguage();
   const t = UI_TRANSLATIONS;
 
@@ -65,6 +67,7 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
       }, 200);
     } else {
       setScreen('done');
+      logCompletion({ tool: 'feedback-makeover', totalRounds: makeovers.length });
     }
   };
 

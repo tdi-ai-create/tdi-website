@@ -8,6 +8,7 @@ import { TELL_OR_ASK_STATEMENTS, TELL_OR_ASK_ROUNDS } from '../data/tellOrAsk';
 import { COLORS, shuffleAndPick } from '../data/gameConfig';
 import { useLanguage } from '../context/LanguageContext';
 import { UI_TRANSLATIONS } from '../data/translations';
+import { useGameTracking } from '@/lib/hub/useGameTracking';
 
 type Screen = 'intro' | 'play' | 'done';
 
@@ -21,9 +22,11 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
   const [revealed, setRevealed] = useState(false);
   const [userGuess, setUserGuess] = useState<'TELL' | 'ASK' | null>(null);
   const [streak, setStreak] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [confidence, setConfidence] = useState<number | null>(null);
 
+  const { logCompletion } = useGameTracking();
   const { language } = useLanguage();
   const t = UI_TRANSLATIONS;
 
@@ -49,6 +52,7 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
     const isCorrect = guess === statements[currentRound].type;
     if (isCorrect) {
       setStreak((prev) => prev + 1);
+      setCorrectCount((prev) => prev + 1);
     } else {
       setStreak(0);
     }
@@ -66,6 +70,7 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
       }, 200);
     } else {
       setScreen('done');
+      logCompletion({ tool: 'tell-or-ask', score: correctCount, totalRounds: statements.length, streak });
     }
   };
 
