@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { USChoroplethMap } from '@/components/tdi-admin/shared/USChoroplethMap';
+import { TrendAreaChart, HorizontalBarChart, DonutChart, DonutLegend } from '@/components/tdi-admin/hub-charts/HubCharts';
 import {
   TYPE_PAGE_TITLE,
   TYPE_PAGE_SUBTITLE,
@@ -463,69 +464,46 @@ export default function HubAdminPage() {
           <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Growth Chart -- last 30 days */}
             <div className="md:col-span-2 bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-              <h3 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: '#9CA3AF' }}>User Growth (Last 30 Days)</h3>
-              <div className="flex items-end gap-[3px]" style={{ height: 120 }}>
-                {(stats.growthChart || []).map((day, i) => {
-                  const maxCount = Math.max(...(stats.growthChart || []).map(d => d.count), 1);
-                  const heightPct = (day.count / maxCount) * 100;
-                  const isToday = i === (stats.growthChart || []).length - 1;
-                  const dateLabel = new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                  return (
-                    <div
-                      key={day.date}
-                      className="flex-1 rounded-t-sm transition-all"
-                      title={`${dateLabel}: ${day.count} signups`}
-                      style={{
-                        height: `${Math.max(heightPct, 2)}%`,
-                        minHeight: 2,
-                        backgroundColor: isToday ? '#1B2A4A' : day.count > 0 ? '#E8B84B' : '#F3F4F6',
-                        cursor: 'default',
-                      }}
-                    />
-                  );
-                })}
-              </div>
-              <div className="flex justify-between mt-2">
-                <span className="text-[10px]" style={{ color: '#9CA3AF' }}>30 days ago</span>
-                <span className="text-[10px] font-semibold" style={{ color: '#1B2A4A' }}>Today</span>
-              </div>
+              <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#9CA3AF' }}>User Growth (Last 30 Days)</h3>
+              <TrendAreaChart
+                data={(stats.growthChart || []).map(d => ({
+                  label: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                  value: d.count,
+                }))}
+                height={160}
+                color="#E8B84B"
+                showGrid
+              />
             </div>
 
             {/* Role Breakdown */}
             <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-              <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Users by Role</h3>
-              <div className="space-y-2">
-                {Object.entries(stats.roleBreakdown || {})
-                  .sort((a, b) => (b[1] as number) - (a[1] as number))
-                  .slice(0, 6)
-                  .map(([role, count]) => {
-                    const total = Object.values(stats.roleBreakdown || {}).reduce((s, c) => s + (c as number), 0);
-                    const pct = total > 0 ? ((count as number) / total) * 100 : 0;
-                    const roleLabels: Record<string, string> = {
-                      classroom_teacher: 'Classroom Teacher',
-                      para: 'Paraprofessional',
-                      coach: 'Instructional Coach',
-                      school_leader: 'School Leader',
-                      district_staff: 'District Staff',
-                      other: 'Other',
-                      unknown: 'Not Set',
-                    };
-                    return (
-                      <div key={role}>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs" style={{ color: '#374151' }}>{roleLabels[role] || role}</span>
-                          <span className="text-xs font-semibold" style={{ color: '#1B2A4A' }}>{count as number}</span>
-                        </div>
-                        <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#F3F4F6' }}>
-                          <div
-                            className="h-full rounded-full"
-                            style={{ width: `${pct}%`, backgroundColor: '#E8B84B' }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
+              <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#9CA3AF' }}>Users by Role</h3>
+              {(() => {
+                const roleLabels: Record<string, string> = {
+                  classroom_teacher: 'Teacher',
+                  para: 'Para',
+                  coach: 'Coach',
+                  school_leader: 'Leader',
+                  district_staff: 'District',
+                  other: 'Other',
+                  unknown: 'Not Set',
+                };
+                const roleColors = ['#E8B84B', '#2A9D8F', '#8B5CF6', '#F97316', '#2563EB', '#EC4899', '#6B7280'];
+                return (
+                  <HorizontalBarChart
+                    data={Object.entries(stats.roleBreakdown || {})
+                      .sort((a, b) => (b[1] as number) - (a[1] as number))
+                      .slice(0, 7)
+                      .map(([role, count], i) => ({
+                        label: roleLabels[role] || role,
+                        value: count as number,
+                        color: roleColors[i % roleColors.length],
+                      }))}
+                    valueFormatter={(v) => v.toLocaleString()}
+                  />
+                );
+              })()}
             </div>
           </div>
         )}
@@ -599,27 +577,18 @@ export default function HubAdminPage() {
               {/* Category Breakdown */}
               {stats.categoryBreakdown && Object.keys(stats.categoryBreakdown).length > 0 && (
                 <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                  <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Popular Categories</h3>
-                  <div className="space-y-2">
-                    {Object.entries(stats.categoryBreakdown)
+                  <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#9CA3AF' }}>Popular Categories</h3>
+                  <HorizontalBarChart
+                    data={Object.entries(stats.categoryBreakdown)
                       .sort((a, b) => (b[1] as number) - (a[1] as number))
-                      .slice(0, 5)
-                      .map(([cat, count]) => {
-                        const total = Object.values(stats.categoryBreakdown!).reduce((s, c) => s + (c as number), 0);
-                        const pct = total > 0 ? ((count as number) / total) * 100 : 0;
-                        return (
-                          <div key={cat}>
-                            <div className="flex items-center justify-between mb-0.5">
-                              <span className="text-xs" style={{ color: '#374151' }}>{cat}</span>
-                              <span className="text-xs font-semibold" style={{ color: '#1B2A4A' }}>{count as number}</span>
-                            </div>
-                            <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#F3F4F6' }}>
-                              <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: '#E8B84B' }} />
-                            </div>
-                          </div>
-                        );
-                      })}
-                  </div>
+                      .slice(0, 8)
+                      .map(([cat, count]) => ({
+                        label: cat.length > 18 ? cat.slice(0, 18) + '...' : cat,
+                        value: count as number,
+                        color: '#E8B84B',
+                      }))}
+                    valueFormatter={(v) => `${v} views`}
+                  />
                 </div>
               )}
             </div>
@@ -631,20 +600,17 @@ export default function HubAdminPage() {
           <div className="mb-8">
             <h2 className="font-bold mb-4" style={{ fontSize: 18, color: '#2B3A67', fontFamily: "'Source Serif 4', Georgia, serif" }}>Schools & Districts</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Schools list */}
+              {/* Schools bar chart */}
               <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Top Schools</h3>
-                <div className="space-y-2">
-                  {stats.schoolBreakdown.slice(0, 10).map((school, i) => (
-                    <div key={i} className="flex items-center justify-between py-1" style={{ borderBottom: i < 9 ? '1px solid #F3F4F6' : 'none' }}>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate" style={{ color: '#1B2A4A' }}>{school.name}</p>
-                        {school.district && <p className="text-xs truncate" style={{ color: '#9CA3AF' }}>{school.district}{school.state ? `, ${school.state}` : ''}</p>}
-                      </div>
-                      <span className="text-sm font-bold ml-3" style={{ color: '#E8B84B' }}>{school.count}</span>
-                    </div>
-                  ))}
-                </div>
+                <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#9CA3AF' }}>Top Schools</h3>
+                <HorizontalBarChart
+                  data={stats.schoolBreakdown.slice(0, 10).map(school => ({
+                    label: school.name.length > 20 ? school.name.slice(0, 20) + '...' : school.name,
+                    value: school.count,
+                    color: '#2A9D8F',
+                  }))}
+                  valueFormatter={(v) => `${v} users`}
+                />
               </div>
 
               {/* Geographic Map */}
@@ -737,39 +703,30 @@ export default function HubAdminPage() {
 
             {/* Community Engagement */}
             <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-              <h3 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: '#9CA3AF' }}>Community Engagement</h3>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm" style={{ color: '#374151' }}>Q&A Questions</span>
-                    <span className="text-lg font-bold" style={{ color: '#E8B84B' }}>{stats.totalQAQuestions || 0}</span>
+              <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Community Engagement</h3>
+              {(() => {
+                const communityData = [
+                  { name: 'Q&A Questions', value: stats.totalQAQuestions || 0, color: '#E8B84B' },
+                  { name: 'Q&A Replies', value: stats.totalQAReplies || 0, color: '#2A9D8F' },
+                  { name: 'Conversations', value: stats.totalConversationPosts || 0, color: '#8B5CF6' },
+                ];
+                const total = communityData.reduce((s, d) => s + d.value, 0);
+                return (
+                  <div className="flex flex-col items-center">
+                    <DonutChart
+                      data={communityData}
+                      size={150}
+                      innerRadius={42}
+                      outerRadius={62}
+                      centerValue={total}
+                      centerLabel="total"
+                    />
+                    <div className="mt-3 w-full">
+                      <DonutLegend data={communityData} />
+                    </div>
                   </div>
-                  <div className="h-2 rounded-full" style={{ backgroundColor: '#FFF8E7' }}>
-                    <div className="h-full rounded-full" style={{ width: `${Math.min(((stats.totalQAQuestions || 0) / Math.max(stats.totalQAQuestions || 1, stats.totalQAReplies || 1, stats.totalConversationPosts || 1)) * 100, 100)}%`, backgroundColor: '#E8B84B' }} />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm" style={{ color: '#374151' }}>Q&A Replies</span>
-                    <span className="text-lg font-bold" style={{ color: '#2A9D8F' }}>{stats.totalQAReplies || 0}</span>
-                  </div>
-                  <div className="h-2 rounded-full" style={{ backgroundColor: '#D1FAE5' }}>
-                    <div className="h-full rounded-full" style={{ width: `${Math.min(((stats.totalQAReplies || 0) / Math.max(stats.totalQAQuestions || 1, stats.totalQAReplies || 1, stats.totalConversationPosts || 1)) * 100, 100)}%`, backgroundColor: '#2A9D8F' }} />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm" style={{ color: '#374151' }}>Conversation Posts</span>
-                    <span className="text-lg font-bold" style={{ color: '#7C3AED' }}>{stats.totalConversationPosts || 0}</span>
-                  </div>
-                  <div className="h-2 rounded-full" style={{ backgroundColor: '#F3E8FF' }}>
-                    <div className="h-full rounded-full" style={{ width: `${Math.min(((stats.totalConversationPosts || 0) / Math.max(stats.totalQAQuestions || 1, stats.totalQAReplies || 1, stats.totalConversationPosts || 1)) * 100, 100)}%`, backgroundColor: '#7C3AED' }} />
-                  </div>
-                </div>
-              </div>
-              <p className="text-xs mt-3 pt-3" style={{ color: '#9CA3AF', borderTop: '1px solid #F3F4F6' }}>
-                {((stats.totalQAQuestions || 0) + (stats.totalQAReplies || 0) + (stats.totalConversationPosts || 0)).toLocaleString()} total community interactions
-              </p>
+                );
+              })()}
             </div>
           </div>
         )}
