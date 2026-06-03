@@ -1352,6 +1352,65 @@ export default function HubDashboard() {
             </div>
           )}
 
+          {/* Know Yourself -- quiz recommendations */}
+          {(() => {
+            const untaken = ALL_QUIZZES.filter(q => !dashboardQuizResults[q.id]);
+            const taken = ALL_QUIZZES.filter(q => dashboardQuizResults[q.id]);
+            if (untaken.length === 0 && taken.length === 0) return null;
+            const showUntaken = untaken.slice(0, 2);
+            const showTaken = taken.slice(0, 1);
+            return (
+              <div
+                className="bg-white rounded-2xl p-5"
+                style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
+              >
+                <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
+                  {tUI('Know Yourself')}
+                </div>
+                <div className="space-y-2.5">
+                  {showTaken.map(quiz => (
+                    <QuizResultBadge key={quiz.id} quiz={quiz} resultKey={dashboardQuizResults[quiz.id]} compact />
+                  ))}
+                  {showUntaken.map(quiz => (
+                    <Link
+                      key={quiz.id}
+                      href="/hub/settings/profile?tab=educator_profile"
+                      className="block rounded-xl overflow-hidden hover:shadow-sm transition-shadow"
+                      style={{ border: '1px solid #E9E7E2' }}
+                    >
+                      <div className="flex items-center">
+                        <div
+                          className="w-12 flex-shrink-0 flex items-center justify-center self-stretch"
+                          style={{ background: quiz.accentGradient }}
+                        >
+                          <span className="text-sm font-bold text-white" style={{ fontFamily: "'Source Serif 4', serif" }}>?</span>
+                        </div>
+                        <div className="flex-1 min-w-0 p-3">
+                          <div className="text-sm font-medium" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
+                            {quiz.title}
+                          </div>
+                          <div className="text-xs" style={{ color: '#9CA3AF' }}>
+                            {quiz.questionCount} {tUI('questions')} &middot; {quiz.durationLabel}
+                          </div>
+                        </div>
+                        <ArrowRight size={14} className="mr-3" style={{ color: quiz.accentColor }} />
+                      </div>
+                    </Link>
+                  ))}
+                  {(untaken.length > 2 || taken.length > 1) && (
+                    <Link
+                      href="/hub/settings/profile?tab=educator_profile"
+                      className="block text-center text-xs font-medium py-2 transition-colors hover:text-gray-700"
+                      style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                      {tUI('See all quizzes')} &rarr;
+                    </Link>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
           {/* AI Growth Insight (compact) */}
           {(aiInsight || aiInsightLoading) && (
             <div
@@ -1575,69 +1634,6 @@ export default function HubDashboard() {
               </div>
             </div>
           )}
-
-          {/* Discover More About Yourself -- quiz recommendations */}
-          {(() => {
-            const untaken = ALL_QUIZZES.filter(q => !dashboardQuizResults[q.id]);
-            const taken = ALL_QUIZZES.filter(q => dashboardQuizResults[q.id]);
-            if (untaken.length === 0 && taken.length === 0) return null;
-            // Show up to 2 untaken quizzes + 1 latest result
-            const showUntaken = untaken.slice(0, 2);
-            const showTaken = taken.slice(0, 1);
-            return (
-              <div
-                className="rounded-2xl p-5"
-                style={{ background: '#FAFAF8', border: '1px solid rgba(27,42,74,0.08)' }}
-              >
-                <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-                  {tUI('Know Yourself')}
-                </div>
-                <div className="space-y-2.5">
-                  {/* Show latest quiz result */}
-                  {showTaken.map(quiz => (
-                    <QuizResultBadge key={quiz.id} quiz={quiz} resultKey={dashboardQuizResults[quiz.id]} compact />
-                  ))}
-                  {/* Untaken quiz invites */}
-                  {showUntaken.map(quiz => (
-                    <Link
-                      key={quiz.id}
-                      href="/hub/settings/profile?tab=educator_profile"
-                      className="block rounded-xl overflow-hidden hover:shadow-sm transition-shadow"
-                      style={{ border: '1px solid #E9E7E2' }}
-                    >
-                      <div className="flex items-center">
-                        <div
-                          className="w-12 flex-shrink-0 flex items-center justify-center self-stretch"
-                          style={{ background: quiz.accentGradient }}
-                        >
-                          <span className="text-sm font-bold text-white" style={{ fontFamily: "'Source Serif 4', serif" }}>?</span>
-                        </div>
-                        <div className="flex-1 min-w-0 p-3">
-                          <div className="text-sm font-medium" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
-                            {quiz.title}
-                          </div>
-                          <div className="text-xs" style={{ color: '#9CA3AF' }}>
-                            {quiz.questionCount} {tUI('questions')} &middot; {quiz.durationLabel}
-                          </div>
-                        </div>
-                        <ArrowRight size={14} className="mr-3" style={{ color: quiz.accentColor }} />
-                      </div>
-                    </Link>
-                  ))}
-                  {/* Link to see all */}
-                  {(untaken.length > 2 || taken.length > 1) && (
-                    <Link
-                      href="/hub/settings/profile?tab=educator_profile"
-                      className="block text-center text-xs font-medium py-2 transition-colors hover:text-gray-700"
-                      style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}
-                    >
-                      {tUI('See all quizzes')} &rarr;
-                    </Link>
-                  )}
-                </div>
-              </div>
-            );
-          })()}
 
           {/* 4. Quick Wins Explorer */}
           {quickWins.length > 0 && (
