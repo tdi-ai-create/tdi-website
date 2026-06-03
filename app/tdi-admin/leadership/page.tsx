@@ -354,15 +354,21 @@ export default function LeadershipDashboardPage() {
     if (hasAccess) {
       loadPartnerships();
       loadActionItems();
+      loadHubData(); // Load Hub data upfront so Partnerships tab can show metrics
     }
-  }, [hasAccess, loadPartnerships, loadActionItems]);
+  }, [hasAccess, loadPartnerships, loadActionItems, loadHubData]);
 
-  // Load Hub data when reports tab is first opened
-  useEffect(() => {
-    if (activeTab === 'reports' && hubSchools.length === 0 && !hubLoading) {
-      loadHubData();
-    }
-  }, [activeTab, hubSchools.length, hubLoading, loadHubData]);
+  // Build Hub school lookup map for matching partnerships to Hub data
+  const hubSchoolMap = new Map<string, typeof hubSchools[0]>();
+  hubSchools.forEach(school => {
+    hubSchoolMap.set(school.name.toLowerCase(), school);
+    if (school.district) hubSchoolMap.set(school.district.toLowerCase(), school);
+  });
+
+  const getHubMetrics = (partnership: Partnership) => {
+    const orgName = (partnership.org_name || partnership.contact_name || '').toLowerCase();
+    return hubSchoolMap.get(orgName) || null;
+  };
 
   // Filter partnerships
   useEffect(() => {
@@ -768,6 +774,9 @@ export default function LeadershipDashboardPage() {
                       <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
                         Portal Access
                       </th>
+                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3 hidden lg:table-cell">
+                        Hub Activity
+                      </th>
                       <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
                         Actions
                       </th>
@@ -879,6 +888,28 @@ export default function LeadershipDashboardPage() {
                               contactName={partnership.contact_name}
                               userEmail={teamMember?.email || ''}
                             />
+                          </td>
+
+                          {/* Hub Activity */}
+                          <td className="px-4 py-3 hidden lg:table-cell">
+                            {(() => {
+                              const hub = getHubMetrics(partnership);
+                              if (!hub) return <span className="text-xs text-gray-400">No Hub data</span>;
+                              return (
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-1.5">
+                                    <div className="w-8 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                      <div className="h-full rounded-full" style={{ width: `${hub.activeRate}%`, backgroundColor: hub.activeRate >= 60 ? '#2A9D8F' : hub.activeRate >= 30 ? '#EAB308' : '#EF4444' }} />
+                                    </div>
+                                    <span className="text-[10px] font-medium" style={{ color: hub.activeRate >= 60 ? '#2A9D8F' : hub.activeRate >= 30 ? '#EAB308' : '#EF4444' }}>{hub.activeRate}%</span>
+                                  </div>
+                                  <p className="text-[10px] text-gray-500">{hub.totalToolsViewed} tools / {hub.totalPdHours > 0 ? hub.totalPdHours.toFixed(0) + ' PD hrs' : '0 PD hrs'}</p>
+                                  {hub.avgVibeScore !== null && (
+                                    <p className="text-[10px]" style={{ color: hub.avgVibeScore >= 4 ? '#2A9D8F' : hub.avgVibeScore >= 3 ? '#EAB308' : '#EF4444' }}>Vibe: {hub.avgVibeScore}/5</p>
+                                  )}
+                                </div>
+                              );
+                            })()}
                           </td>
 
                           {/* Actions */}
