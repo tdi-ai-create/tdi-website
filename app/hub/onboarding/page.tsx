@@ -25,6 +25,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import AvatarPicker from '@/components/hub/AvatarPicker';
+import QuizEngine from '@/components/hub/QuizEngine';
+import { educatorTypeQuiz } from '@/lib/hub/quizConfigs';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { getCurrentUser } from '@/lib/hub-auth';
 import { useTranslation } from '@/lib/hub/useTranslation';
@@ -97,6 +99,8 @@ export default function OnboardingPage() {
   const [stressScore, setStressScore] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [showQuizInvite, setShowQuizInvite] = useState(false);
+  const [showQuizActive, setShowQuizActive] = useState(false);
 
   // User state
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -271,12 +275,27 @@ export default function OnboardingPage() {
         }).catch(err => console.error('Welcome email error:', err));
       }
 
-      // Redirect to dashboard
-      router.push('/hub');
+      // Show quiz invite before redirecting
+      setShowQuizInvite(true);
+      setIsSaving(false);
     } catch (err) {
       console.error('Onboarding save error:', err);
       setIsSaving(false);
     }
+  };
+
+  const handleQuizComplete = async (resultKey: string) => {
+    if (!userId) return;
+    const supabase = getSupabase();
+    await supabase
+      .from('hub_quiz_results')
+      .upsert(
+        { user_id: userId, quiz_type: 'educator_type', result_key: resultKey, taken_at: new Date().toISOString() },
+        { onConflict: 'user_id,quiz_type' }
+      );
+    await supabase.from('hub_profiles').update({ educator_type: resultKey }).eq('id', userId);
+    // Brief pause to let them see their result, then redirect
+    setTimeout(() => router.push('/hub'), 3000);
   };
 
   const toggleGoal = (goal: GoalType) => {
@@ -1166,6 +1185,57 @@ export default function OnboardingPage() {
                 </button>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quiz Invite -- shows after onboarding saves, before redirect */}
+      {showQuizInvite && !showQuizActive && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #F0EEE9 0%, #E8E4DD 100%)' }}>
+          <div className="max-w-md w-full text-center">
+            <div
+              className="w-16 h-16 rounded-full mx-auto mb-5 flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #38618C 100%)' }}
+            >
+              <span className="text-2xl font-bold text-white" style={{ fontFamily: "'Source Serif 4', serif" }}>?</span>
+            </div>
+            <h2
+              className="text-xl font-bold mb-2"
+              style={{ color: '#1B2A4A', fontFamily: "'Source Serif 4', serif" }}
+            >
+              {tUI('One more thing...')}
+            </h2>
+            <p className="text-sm mb-6" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6 }}>
+              {tUI('Take a quick 2-minute quiz to discover what kind of educator you are. It helps us personalize your experience -- and it is actually fun.')}
+            </p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => setShowQuizActive(true)}
+                className="w-full px-5 py-3 rounded-xl text-sm font-bold transition-opacity hover:opacity-90"
+                style={{ backgroundColor: '#E8B84B', color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}
+              >
+                {tUI('Sure, let\'s do it')}
+              </button>
+              <button
+                onClick={() => router.push('/hub')}
+                className="w-full px-5 py-3 rounded-xl text-sm font-medium transition-colors hover:text-gray-700"
+                style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}
+              >
+                {tUI('Skip for now')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quiz Active -- full quiz experience */}
+      {showQuizInvite && showQuizActive && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto" style={{ background: 'linear-gradient(135deg, #F0EEE9 0%, #E8E4DD 100%)' }}>
+          <div className="max-w-lg w-full my-8">
+            <QuizEngine
+              quiz={educatorTypeQuiz}
+              onComplete={handleQuizComplete}
+            />
           </div>
         </div>
       )}
