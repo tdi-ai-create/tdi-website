@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ChevronRight, Share2, RotateCcw, ArrowRight } from 'lucide-react'
 import UniversalShareModal from './UniversalShareModal'
 import { useTranslation } from '@/lib/hub/useTranslation'
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub'
+import { getQuizRecommendations } from '@/lib/hub/quizRecommendations'
 import type { QuizConfig, QuizResult } from '@/lib/hub/quizConfigs'
 
 // ── Component ──────────────────────────────────────────────────────────
@@ -26,6 +28,25 @@ export default function QuizEngine({ quiz, onComplete }: QuizEngineProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [transitioning, setTransitioning] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
+  const [recommendedQW, setRecommendedQW] = useState<{ id: string; slug: string; title: string; category: string }[]>([])
+
+  // Fetch recommended Quick Wins when result is determined
+  useEffect(() => {
+    if (!result) return
+    const rec = getQuizRecommendations(quiz.id, result.key)
+    if (!rec || rec.categories.length === 0) return
+    const fetchQW = async () => {
+      const supabase = getSupabase()
+      const { data } = await supabase
+        .from('hub_quick_wins')
+        .select('id, slug, title, category')
+        .eq('is_published', true)
+        .in('category', rec.categories)
+        .limit(3)
+      if (data) setRecommendedQW(data)
+    }
+    fetchQW()
+  }, [result, quiz.id])
 
   const handleAnswer = (answerTypes: string[], answerIdx: number) => {
     if (transitioning) return
@@ -100,6 +121,40 @@ export default function QuizEngine({ quiz, onComplete }: QuizEngineProps) {
               <ArrowRight size={16} />
             </Link>
           )}
+          {/* Recommended Quick Wins */}
+          {recommendedQW.length > 0 && (() => {
+            const rec = getQuizRecommendations(quiz.id, result.key)
+            return (
+              <div className="mb-5 p-4 rounded-xl" style={{ backgroundColor: '#FAFAF8', border: '1px solid rgba(27,42,74,0.06)' }}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>
+                  {tUI('Recommended for you')}
+                </p>
+                {rec && (
+                  <p className="text-xs mb-3" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>
+                    {rec.message}
+                  </p>
+                )}
+                <div className="space-y-2">
+                  {recommendedQW.map(qw => (
+                    <Link
+                      key={qw.id}
+                      href={`/hub/quick-wins/${qw.slug}`}
+                      className="flex items-center gap-3 p-2.5 rounded-lg bg-white hover:shadow-sm transition-shadow"
+                      style={{ border: '1px solid rgba(27,42,74,0.06)' }}
+                    >
+                      <div className="w-2 h-8 rounded-full flex-shrink-0" style={{ backgroundColor: result.color }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate" style={{ color: '#1B2A4A' }}>{qw.title}</p>
+                        <p className="text-xs" style={{ color: '#9CA3AF' }}>{qw.category}</p>
+                      </div>
+                      <ChevronRight size={14} style={{ color: '#D1D5DB' }} />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )
+          })()}
+
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setShareOpen(true)}
