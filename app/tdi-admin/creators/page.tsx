@@ -1592,6 +1592,32 @@ export default function CreatorStudioPage() {
     await handleCopyEmails(selectedEmails, 'bulk');
   };
 
+  // Handle bulk mark followed up
+  const [isBulkFollowingUp, setIsBulkFollowingUp] = useState(false);
+  const handleBulkFollowUp = async () => {
+    if (selectedCreatorIds.size === 0) return;
+    setIsBulkFollowingUp(true);
+    const selectedIds = Array.from(selectedCreatorIds);
+    let successCount = 0;
+    for (const creatorId of selectedIds) {
+      try {
+        const response = await fetch('/api/admin/mark-followed-up', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ creatorId, adminEmail }),
+        });
+        const result = await response.json();
+        if (result.success) successCount++;
+      } catch (error) {
+        console.error(`Error following up creator ${creatorId}:`, error);
+      }
+    }
+    setIsBulkFollowingUp(false);
+    setSelectedCreatorIds(new Set());
+    loadDashboardData();
+    showToast(`Marked ${successCount} creator${successCount !== 1 ? 's' : ''} as followed up`);
+  };
+
   // Handle bulk delete for selected creators
   const handleBulkDelete = async () => {
     if (selectedCreatorIds.size === 0) return;
@@ -1912,6 +1938,36 @@ export default function CreatorStudioPage() {
     (c: EnrichedCreator) => c.waitingOn === 'tdi' || (c.post_launch_notes && c.post_launch_notes.trim() !== '')
   ).length;
 
+  // Compute priority data for "Today's Priorities" banner
+  const now = new Date();
+  const pendingReviews = dashboardData.creators.filter((c: EnrichedCreator) => c.waitingOn === 'tdi');
+  const pendingReviewsWithWait = pendingReviews.map((c: EnrichedCreator) => {
+    const daysWaiting = Math.floor((now.getTime() - new Date(c.lastActivityDate).getTime()) / (1000 * 60 * 60 * 24));
+    return { ...c, daysWaiting };
+  }).sort((a, b) => b.daysWaiting - a.daysWaiting);
+
+  const stalledCreators = dashboardData.creators.filter((c: EnrichedCreator) => c.isStalled && c.waitingOn === 'stalled');
+  const stalledBySeverity = {
+    critical: stalledCreators.filter(c => {
+      const days = Math.floor((now.getTime() - new Date(c.lastActivityDate).getTime()) / (1000 * 60 * 60 * 24));
+      return days >= 60;
+    }).length,
+    serious: stalledCreators.filter(c => {
+      const days = Math.floor((now.getTime() - new Date(c.lastActivityDate).getTime()) / (1000 * 60 * 60 * 24));
+      return days >= 30 && days < 60;
+    }).length,
+    mild: stalledCreators.filter(c => {
+      const days = Math.floor((now.getTime() - new Date(c.lastActivityDate).getTime()) / (1000 * 60 * 60 * 24));
+      return days >= 14 && days < 30;
+    }).length,
+  };
+
+  const followedUpApproachingRestall = dashboardData.creators.filter((c: EnrichedCreator) => {
+    if (c.waitingOn !== 'followed_up' || !c.last_followed_up_at) return false;
+    const daysSinceFollowUp = Math.floor((now.getTime() - new Date(c.last_followed_up_at).getTime()) / (1000 * 60 * 60 * 24));
+    return daysSinceFollowUp >= 11; // 3 days before 14-day re-stall
+  });
+
   // Compute creators that have been followed up
   const followedUpCreators = dashboardData.creators
     .filter((c: EnrichedCreator) => c.waitingOn === 'followed_up')
@@ -2005,6 +2061,122 @@ export default function CreatorStudioPage() {
       {/* DASHBOARD TAB */}
       {activeTab === 'dashboard' && (
         <div>
+          {/* Today's Priorities Banner */}
+          {(pendingReviewsWithWait.length > 0 || stalledCreators.length > 0 || followedUpApproachingRestall.length > 0) && (
+            <div className="mb-5 bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
+              <div className="px-5 py-3 border-b border-gray-100" style={{ backgroundColor: '#fafbfc' }}>
+                <h2 className="text-sm font-semibold tracking-wide uppercase" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>
+                  Today&apos;s Priorities
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+                {/* Pending Reviews */}
+                <button
+                  onClick={() => handleStatCardClick('waitingOnTDI')}
+                  className="flex items-start gap-3 p-4 hover:bg-slate-50 transition-colors text-left w-full"
+                >
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    pendingReviewsWithWait.length > 0
+                      ? pendingReviewsWithWait.some(c => c.daysWaiting >= 5) ? 'bg-red-100' : pendingReviewsWithWait.some(c => c.daysWaiting >= 2) ? 'bg-amber-100' : 'bg-green-100'
+                      : 'bg-gray-100'
+                  }`}>
+                    <FileText className={`w-4.5 h-4.5 ${
+                      pendingReviewsWithWait.length > 0
+                        ? pendingReviewsWithWait.some(c => c.daysWaiting >= 5) ? 'text-red-600' : pendingReviewsWithWait.some(c => c.daysWaiting >= 2) ? 'text-amber-600' : 'text-green-600'
+                        : 'text-gray-400'
+                    }`} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>{pendingReviewsWithWait.length}</span>
+                      <span className="text-sm text-gray-500">pending review{pendingReviewsWithWait.length !== 1 ? 's' : ''}</span>
+                    </div>
+                    {pendingReviewsWithWait.length > 0 && (
+                      <div className="mt-1 space-y-0.5">
+                        {pendingReviewsWithWait.slice(0, 3).map(c => (
+                          <p key={c.id} className="text-xs text-gray-500 truncate flex items-center gap-1.5">
+                            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                              c.daysWaiting >= 5 ? 'bg-red-500' : c.daysWaiting >= 2 ? 'bg-amber-500' : 'bg-green-500'
+                            }`} />
+                            {c.name}
+                            <span className={`font-medium ${
+                              c.daysWaiting >= 5 ? 'text-red-600' : c.daysWaiting >= 2 ? 'text-amber-600' : 'text-green-600'
+                            }`}>
+                              {c.daysWaiting}d
+                            </span>
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </button>
+
+                {/* Stalled Creators */}
+                <button
+                  onClick={() => handleStatCardClick('stalled')}
+                  className="flex items-start gap-3 p-4 hover:bg-slate-50 transition-colors text-left w-full"
+                >
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    stalledBySeverity.critical > 0 ? 'bg-red-100' : stalledBySeverity.serious > 0 ? 'bg-amber-100' : stalledCreators.length > 0 ? 'bg-yellow-100' : 'bg-gray-100'
+                  }`}>
+                    <Hourglass className={`w-4.5 h-4.5 ${
+                      stalledBySeverity.critical > 0 ? 'text-red-600' : stalledBySeverity.serious > 0 ? 'text-amber-600' : stalledCreators.length > 0 ? 'text-yellow-600' : 'text-gray-400'
+                    }`} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>{stalledCreators.length}</span>
+                      <span className="text-sm text-gray-500">need outreach</span>
+                    </div>
+                    {stalledCreators.length > 0 && (
+                      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
+                        {stalledBySeverity.critical > 0 && (
+                          <span className="text-xs font-medium text-red-600">{stalledBySeverity.critical} critical (60d+)</span>
+                        )}
+                        {stalledBySeverity.serious > 0 && (
+                          <span className="text-xs font-medium text-amber-600">{stalledBySeverity.serious} serious (30d+)</span>
+                        )}
+                        {stalledBySeverity.mild > 0 && (
+                          <span className="text-xs font-medium text-yellow-600">{stalledBySeverity.mild} mild (14d+)</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </button>
+
+                {/* Follow-up Check-ins */}
+                <button
+                  onClick={() => handleStatCardClick('followedUp')}
+                  className="flex items-start gap-3 p-4 hover:bg-slate-50 transition-colors text-left w-full"
+                >
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    followedUpApproachingRestall.length > 0 ? 'bg-orange-100' : 'bg-gray-100'
+                  }`}>
+                    <UserCheck className={`w-4.5 h-4.5 ${
+                      followedUpApproachingRestall.length > 0 ? 'text-orange-600' : 'text-gray-400'
+                    }`} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>{followedUpApproachingRestall.length}</span>
+                      <span className="text-sm text-gray-500">re-stalling soon</span>
+                    </div>
+                    {followedUpApproachingRestall.length > 0 && (
+                      <p className="mt-1 text-xs text-orange-600 font-medium">
+                        Followed up but no creator activity -- check in again
+                      </p>
+                    )}
+                    {followedUpApproachingRestall.length === 0 && stats.followedUp > 0 && (
+                      <p className="mt-1 text-xs text-gray-400">
+                        {stats.followedUp} followed up, all within window
+                      </p>
+                    )}
+                  </div>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Stat Cards */}
           <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
             <StatCard
@@ -2446,11 +2618,15 @@ export default function CreatorStudioPage() {
                           <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 flex-shrink-0">
                             Published
                           </span>
-                        ) : (
-                          <p className="text-xs font-medium flex-shrink-0" style={{ color: theme.accent }}>
-                            {getRelativeTime(creator.lastActivityDate)}
-                          </p>
-                        )}
+                        ) : (() => {
+                          const daysWaiting = Math.floor((now.getTime() - new Date(creator.lastActivityDate).getTime()) / (1000 * 60 * 60 * 24));
+                          const slaColor = daysWaiting >= 5 ? 'bg-red-100 text-red-700' : daysWaiting >= 2 ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700';
+                          return (
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${slaColor}`}>
+                              {daysWaiting}d waiting
+                            </span>
+                          );
+                        })()}
                       </Link>
                     );
                   })}
@@ -3171,6 +3347,18 @@ export default function CreatorStudioPage() {
                   Copy Emails
                 </>
               )}
+            </button>
+            <button
+              onClick={handleBulkFollowUp}
+              disabled={isBulkFollowingUp}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border border-green-200 text-gray-700 hover:bg-green-50 disabled:opacity-50"
+            >
+              {isBulkFollowingUp ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <UserCheck className="w-4 h-4" />
+              )}
+              Mark Followed Up
             </button>
             <button
               onClick={() => setShowBulkDeleteModal(true)}
