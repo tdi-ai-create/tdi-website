@@ -1301,6 +1301,149 @@ export default function ExampleDashboard() {
               </div>
             </div>
 
+            {/* ─── HUB INTELLIGENCE ─── */}
+            <div className="bg-white rounded-2xl p-5 md:p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(232,184,75,0.12)' }}>
+                  <Sparkles className="w-5 h-5" style={{ color: '#E8B84B' }} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold" style={{ color: '#1e2749' }}>Learning Hub Activity</h3>
+                  <p className="text-xs text-gray-500">What your team is doing on the TDI Learning Hub this month</p>
+                </div>
+              </div>
+
+              {/* Core metrics */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
+                <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
+                  <p className="text-2xl font-bold" style={{ color: '#E8B84B' }}>87%</p>
+                  <p className="text-xs text-gray-500 mt-1">of your team logged in this month</p>
+                </div>
+                <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
+                  <p className="text-2xl font-bold" style={{ color: '#2A9D8F' }}>342</p>
+                  <p className="text-xs text-gray-500 mt-1">tools explored by your educators</p>
+                </div>
+                <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
+                  <p className="text-2xl font-bold" style={{ color: '#2563EB' }}>189</p>
+                  <p className="text-xs text-gray-500 mt-1">active in the last 7 days</p>
+                </div>
+                <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
+                  <p className="text-2xl font-bold" style={{ color: '#2A9D8F' }}>4.2/5</p>
+                  <p className="text-xs text-gray-500 mt-1">avg team wellness score</p>
+                </div>
+              </div>
+
+              {/* Rich intelligence */}
+              <div className="space-y-4 pt-4" style={{ borderTop: '1px solid #F3F4F6' }}>
+
+                {/* Popular tools */}
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Popular in Your District</p>
+                  <div className="flex flex-wrap gap-2">
+                    {['Calm Response Scripts', 'Lesson Flow Checklist', 'The Shift Kit', 'Parent Communication Templates', 'De-escalation Quick Card'].map((tool, i) => (
+                      <span key={i} className="text-xs px-3 py-1.5 rounded-full" style={{ background: '#FFF8E7', color: '#92400E' }}>
+                        {tool}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Educator quiz */}
+                <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F9FAFB' }}>
+                  <span className="text-lg">&#9734;</span>
+                  <div>
+                    <p className="text-sm font-medium" style={{ color: '#1e2749' }}>
+                      Your district&apos;s most common educator type: <strong>The Connector</strong>
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      42 Connectors, 38 Architects, 31 Sparks, 28 Anchors, 25 Innovators, 23 Strategists
+                    </p>
+                  </div>
+                </div>
+
+                {/* Community engagement */}
+                <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F0FDF4' }}>
+                  <span className="text-lg">&#128172;</span>
+                  <p className="text-sm" style={{ color: '#374151' }}>
+                    Your team contributed <strong>89 posts</strong> and engaged in <strong>34 Q&A threads</strong> -- helping other educators across the country.
+                  </p>
+                </div>
+
+                {/* Anonymized teacher quote */}
+                <div className="p-4 rounded-xl" style={{ background: '#FFFBEB', borderLeft: '3px solid #E8B84B' }}>
+                  <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">From Your Team</p>
+                  <p className="text-sm italic" style={{ color: '#374151', lineHeight: 1.6 }}>
+                    &ldquo;I tried the shift technique with my kids on Monday and was shocked. We went from losing 8-10 minutes between subjects to being seated and ready in under 2.&rdquo;
+                  </p>
+                  <p className="text-[10px] text-gray-400 mt-1">-- An educator at Crescendo Middle</p>
+                </div>
+
+                {/* Field Notes */}
+                <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F9FAFB' }}>
+                  <span className="text-lg">&#127942;</span>
+                  <p className="text-sm" style={{ color: '#374151' }}>
+                    Your team earned <strong>127 Field Notes</strong> -- recognitions for showing up and doing the work.
+                  </p>
+                </div>
+
+                {/* Wellness outreach */}
+                <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#EFF6FF' }}>
+                  <span className="text-lg">&#128153;</span>
+                  <p className="text-sm" style={{ color: '#374151' }}>
+                    TDI personally reached out to <strong>7</strong> team members this month for a wellness check-in.
+                  </p>
+                </div>
+
+                {/* PD requests */}
+                <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F9FAFB' }}>
+                  <span className="text-lg">&#128161;</span>
+                  <p className="text-sm" style={{ color: '#374151' }}>
+                    Your educators submitted <strong>4 PD content requests</strong> this month -- shaping what TDI builds next.
+                  </p>
+                </div>
+
+                {/* Course completions */}
+                <p className="text-xs text-gray-500 pt-3" style={{ borderTop: '1px solid #F3F4F6' }}>
+                  38 courses completed by your team -- PD credit they can show you. 94.5 PD hours earned district-wide.
+                </p>
+              </div>
+            </div>
+
+            {/* ─── AI PARTNERSHIP INSIGHT ─── */}
+            <div
+              className="rounded-2xl p-5"
+              style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #263554 100%)', borderLeft: '3px solid #E8B84B' }}
+            >
+              <div className="flex items-center gap-1.5 mb-2">
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8B84B', display: 'inline-block' }} />
+                <span style={{ fontSize: 10, fontWeight: 700, color: '#E8B84B', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                  AI Partnership Insight
+                </span>
+              </div>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, margin: 0 }}>
+                Motown District 360 is in strong shape heading into Phase 2. With 87% Hub engagement and 342 tools explored this month, your educators are actively building their practice. Crescendo Middle is your standout building with 72% course completion -- consider celebrating this win at your next leadership meeting to build momentum across the other 5 schools.
+              </p>
+            </div>
+
+            {/* ─── BROADER COMMUNITY TESTIMONIAL ─── */}
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">From the TDI Community (100,000+ educators)</p>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="p-4 rounded-xl bg-gray-50" style={{ borderLeft: '3px solid #4ecdc4' }}>
+                  <p className="text-sm italic text-gray-600" style={{ lineHeight: 1.6 }}>
+                    &ldquo;The Quick Wins are the first PD resource I have actually used more than once. Practical, fast, and built for people who do not have time for a 3-hour webinar.&rdquo;
+                  </p>
+                  <p className="text-xs text-gray-400 mt-2">-- Instructional coach, K-5</p>
+                </div>
+                <div className="p-4 rounded-xl bg-gray-50" style={{ borderLeft: '3px solid #E8B84B' }}>
+                  <p className="text-sm italic text-gray-600" style={{ lineHeight: 1.6 }}>
+                    &ldquo;I printed my certificate, added it to my portfolio, and used the email template to send it to my principal. She was impressed.&rdquo;
+                  </p>
+                  <p className="text-xs text-gray-400 mt-2">-- Paraprofessional, 2nd year</p>
+                </div>
+              </div>
+            </div>
+
             {/* ─── ZONE 2A: DONE / IN PROGRESS / COMING SOON ─── */}
             <div>
               <h3 className="text-base font-bold text-[#1e2749] mb-4">Partnership Timeline</h3>
