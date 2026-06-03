@@ -254,6 +254,7 @@ export default function HubDashboard() {
   const [userGoal, setUserGoal] = useState<{ text: string; quickWin: QuickWin | null } | null>(null);
   const [aiInsight, setAiInsight] = useState<string | null>(null);
   const [aiInsightLoading, setAiInsightLoading] = useState(false);
+  const [aiInsightExpanded, setAiInsightExpanded] = useState(false);
   const [newRecognition, setNewRecognition] = useState<Recognition | null>(null);
 
 
@@ -1411,7 +1412,7 @@ export default function HubDashboard() {
             );
           })()}
 
-          {/* AI Growth Insight (compact) */}
+          {/* AI Growth Insight */}
           {(aiInsight || aiInsightLoading) && (
             <div
               className="rounded-2xl p-5"
@@ -1425,9 +1426,20 @@ export default function HubDashboard() {
               </div>
               <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', lineHeight: 1.6, margin: 0 }}>
                 {aiInsightLoading ? 'Generating your personalized insight...' : (
-                  aiInsight && aiInsight.length > 150 ? aiInsight.slice(0, 150).trim() + '...' : aiInsight
+                  aiInsight && !aiInsightExpanded && aiInsight.length > 150
+                    ? aiInsight.slice(0, 150).trim() + '...'
+                    : aiInsight
                 )}
               </p>
+              {aiInsight && aiInsight.length > 150 && (
+                <button
+                  onClick={() => setAiInsightExpanded(!aiInsightExpanded)}
+                  className="mt-2 text-xs font-medium transition-colors hover:opacity-80"
+                  style={{ color: '#E8B84B', fontFamily: "'DM Sans', sans-serif", background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                >
+                  {aiInsightExpanded ? 'Show less' : 'Read more'}
+                </button>
+              )}
               <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
             </div>
           )}
