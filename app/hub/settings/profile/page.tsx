@@ -7,7 +7,6 @@ import { useTranslation } from '@/lib/hub/useTranslation';
 import AvatarDisplay from '@/components/hub/AvatarDisplay';
 import AvatarPicker from '@/components/hub/AvatarPicker';
 import AchievementInsights from '@/components/hub/AchievementInsights';
-import EducatorQuiz from '@/components/hub/EducatorQuiz';
 import QuizEngine, { QuizResultBadge, QuizInviteCard } from '@/components/hub/QuizEngine';
 import { ALL_QUIZZES, getQuizById } from '@/lib/hub/quizConfigs';
 import type { QuizConfig } from '@/lib/hub/quizConfigs';
@@ -266,7 +265,6 @@ export default function ProfileSettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showQuizRetake, setShowQuizRetake] = useState(false);
   const [savedField, setSavedField] = useState<string | null>(null);
 
   // Data for other tabs
@@ -815,6 +813,15 @@ export default function ProfileSettingsPage() {
                     </div>
                     <div className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>{tUI('field notes')}</div>
                   </div>
+                  {Object.keys(quizResults).length > 0 && (
+                    <>
+                      <div style={{ width: '1px', height: '24px', background: 'rgba(255,255,255,0.15)' }} />
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-white">{Object.keys(quizResults).length}</div>
+                        <div className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>{tUI('discoveries')}</div>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -1100,80 +1107,33 @@ export default function ProfileSettingsPage() {
             ))}
           </div>
 
-          {/* Educator Quiz */}
-          <div>
-            <h2
-              className="font-semibold mb-3"
-              style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67', fontSize: '16px' }}
+          {/* Educator Profile Teaser */}
+          <button
+            onClick={() => setActiveTab('educator_profile')}
+            className="w-full text-left rounded-2xl overflow-hidden transition-all hover:shadow-md"
+            style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04)' }}
+          >
+            <div
+              className="px-5 py-4 flex items-center justify-between"
+              style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #38618C 100%)' }}
             >
-              {tUI('What Kind of Educator Are You?')}
-            </h2>
-            {/* Show saved result badge if they've taken it */}
-            {(profile as unknown as Record<string, unknown>)?.educator_type && !showQuizRetake ? (
-              <div>
-                <div
-                  className="rounded-2xl p-5 flex items-center gap-4 mb-3"
-                  style={{
-                    backgroundColor: {
-                      architect: '#E8EDF4', connector: '#D1FAE5', innovator: '#F3E8FF',
-                      anchor: '#FEE2E2', spark: '#FEF3C7', strategist: '#E0F4FF',
-                    }[(profile as unknown as Record<string, unknown>).educator_type as string] || '#F3F4F6',
-                    border: '1px solid rgba(27,42,74,0.06)',
-                  }}
-                >
-                  <div
-                    className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{
-                      backgroundColor: {
-                        architect: '#1B2A4A', connector: '#2A9D8F', innovator: '#7C3AED',
-                        anchor: '#DC2626', spark: '#D97706', strategist: '#0891B2',
-                      }[(profile as unknown as Record<string, unknown>).educator_type as string] || '#1B2A4A',
-                    }}
-                  >
-                    <span className="text-xl font-bold text-white" style={{ fontFamily: "'Source Serif 4', serif" }}>
-                      {((profile as unknown as Record<string, unknown>).educator_type as string)?.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider mb-0.5" style={{ color: '#9CA3AF' }}>You are</p>
-                    <p className="text-lg font-bold capitalize" style={{
-                      color: {
-                        architect: '#1B2A4A', connector: '#2A9D8F', innovator: '#7C3AED',
-                        anchor: '#DC2626', spark: '#D97706', strategist: '#0891B2',
-                      }[(profile as unknown as Record<string, unknown>).educator_type as string] || '#1B2A4A',
-                      fontFamily: "'Source Serif 4', serif",
-                    }}>
-                      The {(profile as unknown as Record<string, unknown>).educator_type as string}
-                    </p>
-                  </div>
+              <div className="flex items-center gap-3">
+                <Sparkle size={18} style={{ color: '#E8B84B' }} />
+                <div>
+                  <p className="text-sm font-semibold text-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                    {tUI('My Educator Profile')}
+                  </p>
+                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: "'DM Sans', sans-serif" }}>
+                    {Object.keys(quizResults).length > 0
+                      ? `${Object.keys(quizResults).length} ${tUI('quizzes completed')}`
+                      : tUI('Take fun quizzes and discover your educator identity')
+                    }
+                  </p>
                 </div>
-                <button
-                  onClick={() => setShowQuizRetake(true)}
-                  className="text-xs font-medium transition-colors hover:text-gray-700"
-                  style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  {tUI('Take the quiz again')}
-                </button>
               </div>
-            ) : (
-              <>
-                <p
-                  className="text-sm mb-4"
-                  style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  {tUI('5 quick questions. No wrong answers. Just a fun way to see what drives you.')}
-                </p>
-                <EducatorQuiz
-                  onComplete={async (result) => {
-                    if (!user?.id) return;
-                    const supabase = getSupabase();
-                    await supabase.from('hub_profiles').update({ educator_type: result }).eq('id', user.id);
-                    setShowQuizRetake(false);
-                  }}
-                />
-              </>
-            )}
-          </div>
+              <ChevronRight size={18} style={{ color: 'rgba(255,255,255,0.5)' }} />
+            </div>
+          </button>
 
           {/* Take the Tour */}
           <div className="hub-card">
