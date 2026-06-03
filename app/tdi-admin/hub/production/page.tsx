@@ -545,59 +545,76 @@ function MediaTab() {
   );
 }
 
-// CONTENT CALENDAR TAB
+// CONTENT CALENDAR TAB -- pulls real data from courses + quick wins
 function CalendarTab() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [contentItems, setContentItems] = useState<{ date: string; type: 'course' | 'quick-win'; title: string }[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      const supabase = getSupabase();
+      const [{ data: courses }, { data: quickWins }] = await Promise.all([
+        supabase.from('hub_courses').select('title, created_at, is_published').order('created_at', { ascending: false }).limit(100),
+        supabase.from('hub_quick_wins').select('title, created_at, is_published').order('created_at', { ascending: false }).limit(200),
+      ]);
+
+      const items: { date: string; type: 'course' | 'quick-win'; title: string }[] = [];
+      (courses || []).forEach((c: { title: string; created_at: string }) => {
+        items.push({ date: c.created_at.split('T')[0], type: 'course', title: c.title });
+      });
+      (quickWins || []).forEach((qw: { title: string; created_at: string }) => {
+        items.push({ date: qw.created_at.split('T')[0], type: 'quick-win', title: qw.title });
+      });
+      setContentItems(items);
+      setIsLoading(false);
+    }
+    load();
+  }, []);
 
   const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
-
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  // Mock scheduled content
-  const scheduled: Record<number, { type: 'course' | 'quick-win' | 'download'; title: string }[]> = {
-    5: [{ type: 'course', title: 'New Course Launch' }],
-    12: [{ type: 'quick-win', title: 'Quick Win: Morning Routine' }],
-    18: [{ type: 'course', title: 'Course Update' }, { type: 'download', title: 'Resource Pack' }],
-    25: [{ type: 'quick-win', title: 'Quick Win: Stress Relief' }],
-  };
+  const typeColors: Record<string, string> = { course: 'bg-blue-500', 'quick-win': 'bg-[#00B5AD]' };
 
-  const typeColors: Record<string, string> = {
-    course: 'bg-blue-500',
-    'quick-win': 'bg-[#00B5AD]',
-    download: 'bg-green-500',
-  };
+  // Group content by day for current month
+  const monthKey = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
+  const byDay: Record<number, typeof contentItems> = {};
+  contentItems.forEach(item => {
+    if (item.date.startsWith(monthKey)) {
+      const day = parseInt(item.date.split('-')[2]);
+      if (!byDay[day]) byDay[day] = [];
+      byDay[day].push(item);
+    }
+  });
 
-  const prevMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
-  };
-
-  const nextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
-  };
+  if (isLoading) {
+    return <div className="py-12 text-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: theme.accent }}></div><p className="text-gray-400 mt-3 text-sm">Loading calendar...</p></div>;
+  }
 
   const days = [];
   for (let i = 0; i < firstDayOfMonth; i++) {
     days.push(<div key={`empty-${i}`} className="h-24 bg-gray-50" />);
   }
   for (let day = 1; day <= daysInMonth; day++) {
-    const daySchedule = scheduled[day] || [];
+    const dayItems = byDay[day] || [];
     const isToday = new Date().getDate() === day && new Date().getMonth() === currentMonth.getMonth() && new Date().getFullYear() === currentMonth.getFullYear();
 
     days.push(
-      <div
-        key={day}
-        className={`h-24 border border-gray-100 p-1 ${isToday ? 'bg-blue-50' : 'bg-white'} hover:bg-gray-50 cursor-pointer`}
-      >
+      <div key={day} className={`h-24 border border-gray-100 p-1 ${isToday ? 'bg-blue-50' : 'bg-white'} hover:bg-gray-50`}>
         <span className={`text-sm font-medium ${isToday ? 'text-blue-600' : 'text-gray-600'}`}>{day}</span>
-        <div className="mt-1 space-y-0.5">
-          {daySchedule.map((item, i) => (
+        <div className="mt-1 space-y-0.5 overflow-hidden" style={{ maxHeight: 56 }}>
+          {dayItems.slice(0, 3).map((item, i) => (
             <div key={i} className="flex items-center gap-1">
-              <div className={`w-2 h-2 rounded-full ${typeColors[item.type]}`} />
-              <span className="text-xs text-gray-600 truncate">{item.title}</span>
+              <div className={`w-2 h-2 rounded-full flex-shrink-0 ${typeColors[item.type]}`} />
+              <span className="text-[10px] text-gray-600 truncate">{item.title}</span>
             </div>
           ))}
+          {dayItems.length > 3 && (
+            <span className="text-[10px] text-gray-400">+{dayItems.length - 3} more</span>
+          )}
         </div>
       </div>
     );
@@ -605,56 +622,29 @@ function CalendarTab() {
 
   return (
     <div>
-      {/* Calendar Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          <button onClick={prevMonth} className="p-2 rounded-lg hover:bg-gray-100">
+          <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))} className="p-2 rounded-lg hover:bg-gray-100">
             <ChevronDown size={20} className="rotate-90" />
           </button>
-          <h2 style={TYPE_SECTION_HEADER}>
-            {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-          </h2>
-          <button onClick={nextMonth} className="p-2 rounded-lg hover:bg-gray-100">
+          <h2 style={TYPE_SECTION_HEADER}>{monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}</h2>
+          <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))} className="p-2 rounded-lg hover:bg-gray-100">
             <ChevronDown size={20} className="-rotate-90" />
           </button>
         </div>
-        <button
-          className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2"
-          style={{ backgroundColor: theme.accent }}
-        >
-          <Plus size={16} />
-          Schedule Content
-        </button>
+        <span className="text-xs text-gray-400">{contentItems.length} items total</span>
       </div>
 
-      {/* Legend */}
       <div className="flex gap-4 mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-blue-500" />
-          <span className="text-sm text-gray-600">Courses</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-[#00B5AD]" />
-          <span className="text-sm text-gray-600">Quick Wins</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-green-500" />
-          <span className="text-sm text-gray-600">Downloads</span>
-        </div>
+        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-blue-500" /><span className="text-sm text-gray-600">Courses</span></div>
+        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#00B5AD]" /><span className="text-sm text-gray-600">Quick Wins</span></div>
       </div>
 
-      {/* Calendar Grid */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div className="grid grid-cols-7 bg-[#FAFAF8]">
-          {dayNames.map((day) => (
-            <div key={day} className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-              {day}
-            </div>
-          ))}
+          {dayNames.map((d) => (<div key={d} className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase">{d}</div>))}
         </div>
-        <div className="grid grid-cols-7">
-          {days}
-        </div>
+        <div className="grid grid-cols-7">{days}</div>
       </div>
     </div>
   );
