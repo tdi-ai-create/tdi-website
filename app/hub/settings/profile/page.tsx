@@ -8,6 +8,7 @@ import AvatarDisplay from '@/components/hub/AvatarDisplay';
 import AvatarPicker from '@/components/hub/AvatarPicker';
 import AchievementInsights from '@/components/hub/AchievementInsights';
 import QuizEngine, { QuizResultBadge, QuizInviteCard } from '@/components/hub/QuizEngine';
+import ShareableProfileCard from '@/components/hub/ShareableProfileCard';
 import { ALL_QUIZZES, getQuizById } from '@/lib/hub/quizConfigs';
 import type { QuizConfig } from '@/lib/hub/quizConfigs';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
@@ -1267,12 +1268,18 @@ export default function ProfileSettingsPage() {
               {/* Completed quiz results */}
               {Object.keys(quizResults).length > 0 && (
                 <div>
-                  <h3
-                    className="text-sm font-semibold mb-3"
-                    style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}
-                  >
-                    {tUI('Your Results')}
-                  </h3>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3
+                      className="text-sm font-semibold"
+                      style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                      {tUI('Your Results')}
+                    </h3>
+                    <ShareableProfileCard
+                      quizResults={quizResults}
+                      displayName={displayName || 'Educator'}
+                    />
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {ALL_QUIZZES
                       .filter(q => quizResults[q.id])
