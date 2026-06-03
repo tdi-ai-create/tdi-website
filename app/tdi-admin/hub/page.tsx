@@ -689,16 +689,17 @@ export default function HubAdminPage() {
               {stats.stateBreakdown && Object.keys(stats.stateBreakdown).length > 0 && (
                 <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                   <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>
-                    Hub Users by State ({Object.keys(stats.stateBreakdown).length} states)
+                    Activity by State ({Object.keys(stats.stateBreakdown).length} states)
                   </h3>
                   <USChoroplethMap
                     byState={Object.fromEntries(
                       Object.entries(stats.stateBreakdown).map(([state, count]) => [
                         state,
-                        { count: count as number, value: count as number, label: 'educators' }
+                        { count: count as number, value: count as number, label: 'educators', isCurrency: false }
                       ])
                     )}
                     valueLabel="educators"
+                    isCurrency={false}
                     accentColor="#E8B84B"
                   />
                 </div>

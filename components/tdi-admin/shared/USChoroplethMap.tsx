@@ -38,12 +38,14 @@ export function USChoroplethMap({
   subtitle = 'Distribution by state',
   valueLabel = 'pipeline',
   accentColor = '#10B981',
+  isCurrency = true,
 }: {
   byState: Record<string, MapStateData>
   title?: string
   subtitle?: string
   valueLabel?: string
   accentColor?: string
+  isCurrency?: boolean
 }) {
   const [hoveredState, setHoveredState] = useState<string | null>(null)
   const [stateFeatures, setStateFeatures] = useState<StateFeature[]>([])
@@ -150,11 +152,13 @@ export function USChoroplethMap({
             {hoveredData ? (
               <>
                 <div style={{ fontSize: 22, fontWeight: 800, color: '#0a0f1e', marginTop: 4 }}>
-                  {hoveredData.value >= 1000
-                    ? `$${(hoveredData.value / 1000).toFixed(0)}K`
-                    : hoveredData.value > 0
-                    ? `$${hoveredData.value.toLocaleString()}`
-                    : String(hoveredData.value)
+                  {isCurrency
+                    ? (hoveredData.value >= 1000
+                      ? `$${(hoveredData.value / 1000).toFixed(0)}K`
+                      : hoveredData.value > 0
+                      ? `$${hoveredData.value.toLocaleString()}`
+                      : String(hoveredData.value))
+                    : hoveredData.value.toLocaleString()
                   }
                 </div>
                 <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
@@ -171,12 +175,12 @@ export function USChoroplethMap({
 
       {/* Legend */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, marginTop: 16 }}>
-        <span style={{ fontSize: 10, color: '#6B7280', marginRight: 4 }}>$0</span>
+        <span style={{ fontSize: 10, color: '#6B7280', marginRight: 4 }}>{isCurrency ? '$0' : '0'}</span>
         {['#F1F5F9', '#D1FAE5', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669'].map((c, i) => (
           <div key={i} style={{ width: 28, height: 10, background: c, borderRadius: 2 }} />
         ))}
         <span style={{ fontSize: 10, color: '#6B7280', marginLeft: 4 }}>
-          ${(maxValue / 1000).toFixed(0)}K+
+          {isCurrency ? `$${(maxValue / 1000).toFixed(0)}K+` : `${maxValue.toLocaleString()}+`}
         </span>
       </div>
 
@@ -184,7 +188,7 @@ export function USChoroplethMap({
       {sorted.length > 0 && (
         <div style={{ marginTop: 20 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>
-            Top States by Value
+            {isCurrency ? 'Top States by Value' : 'Top States'}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8 }}>
             {sorted.slice(0, 10).map(([state, data]) => (
@@ -200,7 +204,10 @@ export function USChoroplethMap({
               >
                 <div style={{ fontSize: 13, fontWeight: 700, color: '#0a0f1e' }}>{state}</div>
                 <div style={{ fontSize: 16, fontWeight: 800, color: '#0a0f1e' }}>
-                  ${(data.value / 1000).toFixed(0)}K
+                  {isCurrency
+                    ? `$${(data.value / 1000).toFixed(0)}K`
+                    : data.value.toLocaleString()
+                  }
                 </div>
                 <div style={{ fontSize: 10, color: '#6B7280' }}>
                   {data.count} {data.label || valueLabel}
