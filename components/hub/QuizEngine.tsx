@@ -272,15 +272,15 @@ export function QuizInviteCard({ quiz, onStart, compact }: QuizInviteCardProps) 
         onClick={onStart}
         className="w-full text-left rounded-xl p-3 flex items-center gap-3 transition-all hover:shadow-md"
         style={{
-          backgroundColor: '#FAFAF8',
+          backgroundColor: quiz.accentBg,
           border: '1px solid rgba(27,42,74,0.06)',
         }}
       >
         <div
           className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ backgroundColor: '#F3F4F6' }}
+          style={{ backgroundColor: quiz.accentColor }}
         >
-          <span className="text-sm" style={{ color: '#9CA3AF' }}>?</span>
+          <span className="text-sm font-bold text-white" style={{ fontFamily: "'Source Serif 4', serif" }}>?</span>
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium truncate" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
@@ -288,37 +288,51 @@ export function QuizInviteCard({ quiz, onStart, compact }: QuizInviteCardProps) 
           </p>
           <p className="text-xs" style={{ color: '#9CA3AF' }}>{quiz.durationLabel}</p>
         </div>
-        <ChevronRight size={16} style={{ color: '#D1D5DB' }} />
+        <ChevronRight size={16} style={{ color: quiz.accentColor }} />
       </button>
     )
   }
 
   return (
     <div
-      className="rounded-2xl overflow-hidden transition-all hover:shadow-md"
+      className="rounded-2xl overflow-hidden transition-all hover:shadow-md cursor-pointer"
       style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 2px 8px rgba(27,42,74,0.06)' }}
+      onClick={onStart}
     >
-      <div className="bg-white p-5">
-        <div className="flex items-start justify-between mb-3">
+      {/* Colored gradient header strip */}
+      <div
+        className="px-5 py-4"
+        style={{ background: quiz.accentGradient }}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+          >
+            <span className="text-lg font-bold text-white" style={{ fontFamily: "'Source Serif 4', serif" }}>?</span>
+          </div>
           <div>
             <h3
-              className="text-base font-bold mb-1"
-              style={{ color: '#1B2A4A', fontFamily: "'Source Serif 4', serif" }}
+              className="text-base font-bold text-white leading-snug"
+              style={{ fontFamily: "'Source Serif 4', serif" }}
             >
               {quiz.title}
             </h3>
-            <p className="text-xs" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
+            <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.7)', fontFamily: "'DM Sans', sans-serif" }}>
               {quiz.questionCount} questions {'\u00B7'} {quiz.durationLabel}
             </p>
           </div>
         </div>
-        <p className="text-sm mb-4" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>
+      </div>
+      {/* Body */}
+      <div className="bg-white px-5 py-4">
+        <p className="text-sm mb-3" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>
           {quiz.description}
         </p>
         <button
-          onClick={onStart}
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
-          style={{ backgroundColor: '#ffba06', color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}
+          onClick={(e) => { e.stopPropagation(); onStart(); }}
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:opacity-90"
+          style={{ backgroundColor: quiz.accentColor, color: 'white', fontFamily: "'DM Sans', sans-serif" }}
         >
           {quiz.category === 'needs' ? 'Check In' : 'Take the Quiz'}
           <ChevronRight size={14} />

@@ -1602,17 +1602,17 @@ export default function HubDashboard() {
                     <Link
                       key={quiz.id}
                       href="/hub/settings/profile?tab=educator_profile"
-                      className="block bg-white rounded-xl p-3 hover:shadow-sm transition-shadow"
+                      className="block rounded-xl overflow-hidden hover:shadow-sm transition-shadow"
                       style={{ border: '1px solid #E9E7E2' }}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center">
                         <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: '#F3F4F6' }}
+                          className="w-12 flex-shrink-0 flex items-center justify-center self-stretch"
+                          style={{ background: quiz.accentGradient }}
                         >
-                          <span className="text-sm" style={{ color: '#9CA3AF' }}>?</span>
+                          <span className="text-sm font-bold text-white" style={{ fontFamily: "'Source Serif 4', serif" }}>?</span>
                         </div>
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 p-3">
                           <div className="text-sm font-medium" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
                             {quiz.title}
                           </div>
@@ -1620,7 +1620,7 @@ export default function HubDashboard() {
                             {quiz.questionCount} {tUI('questions')} &middot; {quiz.durationLabel}
                           </div>
                         </div>
-                        <ArrowRight size={14} style={{ color: '#D1D5DB' }} />
+                        <ArrowRight size={14} className="mr-3" style={{ color: quiz.accentColor }} />
                       </div>
                     </Link>
                   ))}

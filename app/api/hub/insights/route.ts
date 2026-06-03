@@ -5,15 +5,19 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 export async function POST(request: NextRequest) {
   try {
-    const { tab, data } = await request.json()
+    const { tab, data, context } = await request.json()
 
-    if (!tab || !data) {
+    if (!tab || (!data && !context)) {
       return NextResponse.json({ error: 'Missing tab or data' }, { status: 400 })
     }
 
     let prompt = ''
 
-    if (tab === 'growth') {
+    if (tab === 'educator_profile') {
+      prompt = `You are a warm, encouraging AI coach for educators on the TDI Learning Hub. ${context}
+
+Keep it under 100 words total. No emojis. No bullet points. Write in short paragraphs. Be real, not cheesy.`
+    } else if (tab === 'growth') {
       prompt = `You are a warm, encouraging AI coach for educators on the TDI Learning Hub. Based on this educator's data, write 2-3 short personalized insights. Be specific about their numbers. Use "you" voice. No emojis. No bullet points. Write in short paragraphs (1-2 sentences each). End with one thoughtful question they could reflect on.
 
 Data:

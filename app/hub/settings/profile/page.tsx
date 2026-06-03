@@ -284,6 +284,8 @@ export default function ProfileSettingsPage() {
   // AI Insights
   const [growthInsight, setGrowthInsight] = useState<string | null>(null);
   const [vibeInsight, setVibeInsight] = useState<string | null>(null);
+  const [educatorSnapshot, setEducatorSnapshot] = useState<string | null>(null);
+  const [snapshotLoading, setSnapshotLoading] = useState(false);
   const [insightsLoading, setInsightsLoading] = useState(false);
 
   // ── Initialize profile state ─────────────────────────────────────────
@@ -478,6 +480,36 @@ export default function ProfileSettingsPage() {
     setQuizResults(prev => ({ ...prev, [quizId]: resultKey }));
     setActiveQuiz(null);
   };
+
+  // ── Fetch educator snapshot when quiz results change ──────────────────
+  useEffect(() => {
+    const resultCount = Object.keys(quizResults).length;
+    if (activeTab !== 'educator_profile' || resultCount < 2 || educatorSnapshot || snapshotLoading) return;
+    setSnapshotLoading(true);
+    // Build a summary of quiz results for the AI
+    const resultSummary = Object.entries(quizResults).map(([quizId, resultKey]) => {
+      const quiz = getQuizById(quizId);
+      if (!quiz) return null;
+      const result = quiz.results[resultKey];
+      if (!result) return null;
+      return `${quiz.shortTitle}: ${result.title} -- ${result.subtitle}`;
+    }).filter(Boolean).join('\n');
+
+    fetch('/api/hub/insights', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tab: 'educator_profile',
+        context: `This educator has completed ${resultCount} self-discovery quizzes. Here are their results:\n${resultSummary}\n\nWrite a warm, personal 3-4 sentence insight that weaves these results together into a cohesive portrait. Address them as "you". Do not list the results back -- synthesize them into something meaningful. Focus on their strengths and what makes their combination unique. Keep it encouraging and specific.`,
+      }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.insight) setEducatorSnapshot(data.insight);
+      })
+      .catch(() => {})
+      .finally(() => setSnapshotLoading(false));
+  }, [activeTab, quizResults, educatorSnapshot, snapshotLoading]);
 
   // ── Fetch AI insights when switching tabs ──────────────────────────────
   useEffect(() => {
@@ -1240,6 +1272,37 @@ export default function ProfileSettingsPage() {
                   {tUI('A growing portrait of who you are as an educator. Take quizzes, collect your results, and get personalized recommendations.')}
                 </p>
               </div>
+
+              {/* AI Educator Snapshot */}
+              {(educatorSnapshot || (snapshotLoading && Object.keys(quizResults).length >= 2)) && (
+                <div
+                  className="rounded-2xl overflow-hidden"
+                  style={{
+                    background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)',
+                    boxShadow: '0 4px 16px rgba(27,42,74,0.15)',
+                  }}
+                >
+                  <div className="px-6 py-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Sparkles size={16} style={{ color: '#E8B84B' }} />
+                      <span className="text-xs font-semibold tracking-wide uppercase" style={{ color: '#E8B84B', fontFamily: "'DM Sans', sans-serif" }}>
+                        {tUI('Your Educator Snapshot')}
+                      </span>
+                    </div>
+                    {snapshotLoading && !educatorSnapshot ? (
+                      <div className="space-y-2">
+                        <div className="h-3 bg-white/10 rounded w-full animate-pulse" />
+                        <div className="h-3 bg-white/10 rounded w-4/5 animate-pulse" />
+                        <div className="h-3 bg-white/10 rounded w-3/5 animate-pulse" />
+                      </div>
+                    ) : (
+                      <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: 'rgba(255,255,255,0.85)', fontFamily: "'DM Sans', sans-serif" }}>
+                        {educatorSnapshot}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Completed quiz results */}
               {Object.keys(quizResults).length > 0 && (

@@ -30,6 +30,9 @@ export interface QuizConfig {
   questionCount: number
   durationLabel: string        // e.g. "2 min"
   category: 'identity' | 'needs' | 'fun'
+  accentColor: string          // primary color for card visuals
+  accentBg: string             // light background tint for cards
+  accentGradient: string       // gradient for card header strips
   results: Record<string, QuizResult>
   questions: QuizQuestion[]
   shareMessage: (resultTitle: string, resultSubtitle: string) => string
@@ -45,6 +48,9 @@ export const educatorTypeQuiz: QuizConfig = {
   questionCount: 5,
   durationLabel: '2 min',
   category: 'identity',
+  accentColor: '#1B2A4A',
+  accentBg: '#E8EDF4',
+  accentGradient: 'linear-gradient(135deg, #1B2A4A 0%, #38618C 100%)',
   results: {
     architect: {
       key: 'architect',
@@ -162,6 +168,9 @@ export const superpowerQuiz: QuizConfig = {
   questionCount: 5,
   durationLabel: '2 min',
   category: 'identity',
+  accentColor: '#D97706',
+  accentBg: '#FEF3C7',
+  accentGradient: 'linear-gradient(135deg, #D97706 0%, #F59E0B 100%)',
   results: {
     calm_force: {
       key: 'calm_force',
@@ -270,6 +279,9 @@ export const growthStyleQuiz: QuizConfig = {
   questionCount: 5,
   durationLabel: '2 min',
   category: 'identity',
+  accentColor: '#059669',
+  accentBg: '#D1FAE5',
+  accentGradient: 'linear-gradient(135deg, #059669 0%, #34D399 100%)',
   results: {
     deep_diver: {
       key: 'deep_diver',
@@ -378,6 +390,9 @@ export const techComfortQuiz: QuizConfig = {
   questionCount: 5,
   durationLabel: '2 min',
   category: 'identity',
+  accentColor: '#7C3AED',
+  accentBg: '#F3E8FF',
+  accentGradient: 'linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%)',
   results: {
     analog_heart: {
       key: 'analog_heart',
@@ -477,6 +492,9 @@ export const classroomNeedsQuiz: QuizConfig = {
   questionCount: 5,
   durationLabel: '2 min',
   category: 'needs',
+  accentColor: '#2563EB',
+  accentBg: '#DBEAFE',
+  accentGradient: 'linear-gradient(135deg, #2563EB 0%, #60A5FA 100%)',
   results: {
     engagement_boost: {
       key: 'engagement_boost',
@@ -585,6 +603,9 @@ export const careerSeasonQuiz: QuizConfig = {
   questionCount: 5,
   durationLabel: '2 min',
   category: 'identity',
+  accentColor: '#DC2626',
+  accentBg: '#FEE2E2',
+  accentGradient: 'linear-gradient(135deg, #DC2626 0%, #F87171 100%)',
   results: {
     spring: {
       key: 'spring',
@@ -684,6 +705,9 @@ export const energyDrainQuiz: QuizConfig = {
   questionCount: 5,
   durationLabel: '2 min',
   category: 'needs',
+  accentColor: '#0891B2',
+  accentBg: '#E0F4FF',
+  accentGradient: 'linear-gradient(135deg, #0891B2 0%, #22D3EE 100%)',
   results: {
     overcommitted: {
       key: 'overcommitted',

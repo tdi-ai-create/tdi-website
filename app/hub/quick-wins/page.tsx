@@ -375,16 +375,28 @@ export default function QuickWinsPage() {
                 <Link
                   key={quiz.id}
                   href={`/hub/settings/profile?tab=educator_profile`}
-                  className="block bg-white rounded-2xl overflow-hidden hover:shadow-md transition-shadow"
+                  className="block rounded-2xl overflow-hidden hover:shadow-md transition-shadow"
                   style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
                 >
-                  <div className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Sparkle size={14} style={{ color: '#E8B84B' }} />
-                      <span className="text-[10px] font-bold tracking-wider uppercase" style={{ color: '#9CA3AF' }}>
+                  {/* Gradient header */}
+                  <div
+                    className="px-4 py-3"
+                    style={{ background: quiz.accentGradient }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+                      >
+                        <span className="text-sm font-bold text-white" style={{ fontFamily: "'Source Serif 4', serif" }}>?</span>
+                      </div>
+                      <span className="text-xs font-semibold text-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                         {tUI('Know Yourself')}
                       </span>
                     </div>
+                  </div>
+                  {/* Body */}
+                  <div className="bg-white p-4">
                     <h3
                       className="text-sm font-bold mb-1 leading-snug"
                       style={{ color: '#1B2A4A', fontFamily: "'Source Serif 4', serif" }}
@@ -395,7 +407,7 @@ export default function QuickWinsPage() {
                       {quiz.description}
                     </p>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: '#FEF3C7', color: '#92400E' }}>
+                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: quiz.accentBg, color: quiz.accentColor }}>
                         {quiz.durationLabel}
                       </span>
                       <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F3F4F6', color: '#6B7280' }}>
