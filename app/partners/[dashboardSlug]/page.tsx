@@ -1335,6 +1335,56 @@ export default function PartnerDashboard() {
               </div>
             </div>
 
+            {/* Hub Activity -- What your teachers are doing on the Hub */}
+            {hubStats && hubStats.has_real_data && (
+              <div
+                className="bg-white rounded-2xl p-5 md:p-6"
+                style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.04)' }}
+              >
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(232,184,75,0.12)' }}>
+                    <Sparkles className="w-5 h-5" style={{ color: '#E8B84B' }} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold" style={{ color: '#1B2A4A' }}>Learning Hub Activity</h3>
+                    <p className="text-xs text-gray-500">What your team is doing on the TDI Learning Hub this month</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
+                    <p className="text-2xl font-bold" style={{ color: '#E8B84B' }}>{hubStats.hub_login_pct ?? 0}%</p>
+                    <p className="text-xs text-gray-500 mt-1">of your team logged in this month</p>
+                  </div>
+                  <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
+                    <p className="text-2xl font-bold" style={{ color: '#2A9D8F' }}>{hubStats.quick_wins_completed ?? 0}</p>
+                    <p className="text-xs text-gray-500 mt-1">tools explored by your educators</p>
+                  </div>
+                  <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
+                    <p className="text-2xl font-bold" style={{ color: '#2563EB' }}>{hubStats.active_users_7d ?? 0}</p>
+                    <p className="text-xs text-gray-500 mt-1">active in the last 7 days</p>
+                  </div>
+                  <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
+                    {hubStats.mood_avg_7d !== null ? (
+                      <>
+                        <p className="text-2xl font-bold" style={{ color: hubStats.mood_avg_7d >= 4 ? '#2A9D8F' : hubStats.mood_avg_7d >= 3 ? '#EAB308' : '#EF4444' }}>{hubStats.mood_avg_7d}/5</p>
+                        <p className="text-xs text-gray-500 mt-1">avg team wellness score</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-2xl font-bold" style={{ color: '#8B5CF6' }}>{hubStats.moment_mode_uses_7d ?? 0}</p>
+                        <p className="text-xs text-gray-500 mt-1">wellness resets this week</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+                {hubStats.course_completions && hubStats.course_completions > 0 && (
+                  <p className="text-xs text-gray-500 mt-4 pt-3" style={{ borderTop: '1px solid #F3F4F6' }}>
+                    {hubStats.course_completions} course{hubStats.course_completions !== 1 ? 's' : ''} completed by your team -- PD credit they can show you.
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Three-Column Timeline - Done / In Progress / Coming Soon */}
             {timelineEvents.length > 0 && (
               <div
