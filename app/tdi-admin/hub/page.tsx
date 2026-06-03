@@ -20,6 +20,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
+import { USChoroplethMap } from '@/components/tdi-admin/shared/USChoroplethMap';
 import {
   TYPE_PAGE_TITLE,
   TYPE_PAGE_SUBTITLE,
@@ -177,7 +178,7 @@ interface HubStats {
   totalQAQuestions?: number;
   totalQAReplies?: number;
   totalConversationPosts?: number;
-  engagementFunnel?: { totalUsers: number; exploredTool: number; returnedAgain: number; upgraded: number };
+  engagementFunnel?: { totalUsers: number; organicUsers?: number; exploredTool: number; returnedAgain: number; upgraded: number };
   activeUsers7d?: number;
   categoryBreakdown?: Record<string, number>;
   schoolBreakdown?: { name: string; count: number; district: string; state: string }[];
@@ -534,28 +535,41 @@ export default function HubAdminPage() {
           <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Funnel */}
             <div className="md:col-span-2 bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-              <h3 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: '#9CA3AF' }}>Engagement Funnel</h3>
-              <div className="space-y-3">
-                {[
-                  { label: 'Total Users', value: stats.engagementFunnel.totalUsers, color: '#E8B84B', pct: 100 },
-                  { label: 'Explored a Tool', value: stats.engagementFunnel.exploredTool, color: '#2A9D8F', pct: stats.engagementFunnel.totalUsers > 0 ? (stats.engagementFunnel.exploredTool / stats.engagementFunnel.totalUsers) * 100 : 0 },
-                  { label: 'Came Back (2+ days)', value: stats.engagementFunnel.returnedAgain, color: '#7C3AED', pct: stats.engagementFunnel.totalUsers > 0 ? (stats.engagementFunnel.returnedAgain / stats.engagementFunnel.totalUsers) * 100 : 0 },
-                  { label: 'Has Membership', value: stats.engagementFunnel.upgraded, color: '#1B2A4A', pct: stats.engagementFunnel.totalUsers > 0 ? (stats.engagementFunnel.upgraded / stats.engagementFunnel.totalUsers) * 100 : 0 },
-                ].map((step) => (
-                  <div key={step.label}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm" style={{ color: '#374151' }}>{step.label}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold" style={{ color: step.color }}>{step.value.toLocaleString()}</span>
-                        <span className="text-xs" style={{ color: '#9CA3AF' }}>{step.pct.toFixed(1)}%</span>
-                      </div>
-                    </div>
-                    <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: '#F3F4F6' }}>
-                      <div className="h-full rounded-full transition-all" style={{ width: `${Math.max(step.pct, 0.5)}%`, backgroundColor: step.color }} />
-                    </div>
-                  </div>
-                ))}
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#9CA3AF' }}>Active User Engagement</h3>
+                <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F3F4F6', color: '#6B7280' }}>
+                  {stats.engagementFunnel.organicUsers?.toLocaleString() || '0'} of {stats.engagementFunnel.totalUsers.toLocaleString()} have logged in
+                </span>
               </div>
+              {(() => {
+                const organic = stats.engagementFunnel.organicUsers || 1;
+                return (
+                  <div className="space-y-3">
+                    {[
+                      { label: 'Logged In (Organic Users)', value: organic, color: '#E8B84B', pct: 100 },
+                      { label: 'Explored a Tool', value: stats.engagementFunnel.exploredTool, color: '#2A9D8F', pct: (stats.engagementFunnel.exploredTool / organic) * 100 },
+                      { label: 'Came Back (2+ days)', value: stats.engagementFunnel.returnedAgain, color: '#7C3AED', pct: (stats.engagementFunnel.returnedAgain / organic) * 100 },
+                      { label: 'Has Membership', value: stats.engagementFunnel.upgraded, color: '#1B2A4A', pct: (stats.engagementFunnel.upgraded / organic) * 100 },
+                    ].map((step) => (
+                      <div key={step.label}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm" style={{ color: '#374151' }}>{step.label}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold" style={{ color: step.color }}>{step.value.toLocaleString()}</span>
+                            <span className="text-xs" style={{ color: '#9CA3AF' }}>{step.pct.toFixed(1)}%</span>
+                          </div>
+                        </div>
+                        <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: '#F3F4F6' }}>
+                          <div className="h-full rounded-full transition-all" style={{ width: `${Math.max(step.pct, 0.5)}%`, backgroundColor: step.color }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+              <p className="text-[10px] mt-3 pt-2" style={{ color: '#9CA3AF', borderTop: '1px solid #F3F4F6' }}>
+                Percentages based on {stats.engagementFunnel.organicUsers?.toLocaleString() || '0'} organic users (logged in at least once), not {stats.engagementFunnel.totalUsers.toLocaleString()} total accounts (includes bulk imports)
+              </p>
             </div>
 
             {/* Active Users + Category */}
@@ -633,21 +647,22 @@ export default function HubAdminPage() {
                 </div>
               </div>
 
-              {/* States list */}
+              {/* Geographic Map */}
               {stats.stateBreakdown && Object.keys(stats.stateBreakdown).length > 0 && (
                 <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                  <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Users by State</h3>
-                  <div className="space-y-2">
-                    {Object.entries(stats.stateBreakdown)
-                      .sort((a, b) => (b[1] as number) - (a[1] as number))
-                      .slice(0, 10)
-                      .map(([state, count], i) => (
-                        <div key={state} className="flex items-center justify-between py-1" style={{ borderBottom: i < 9 ? '1px solid #F3F4F6' : 'none' }}>
-                          <span className="text-sm" style={{ color: '#374151' }}>{state}</span>
-                          <span className="text-sm font-bold" style={{ color: '#1B2A4A' }}>{count as number}</span>
-                        </div>
-                      ))}
-                  </div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>
+                    Hub Users by State ({Object.keys(stats.stateBreakdown).length} states)
+                  </h3>
+                  <USChoroplethMap
+                    byState={Object.fromEntries(
+                      Object.entries(stats.stateBreakdown).map(([state, count]) => [
+                        state,
+                        { count: count as number, value: count as number, label: 'educators' }
+                      ])
+                    )}
+                    valueLabel="educators"
+                    accentColor="#E8B84B"
+                  />
                 </div>
               )}
             </div>
@@ -679,7 +694,10 @@ export default function HubAdminPage() {
 
             {/* Live Activity Feed */}
             <div className="bg-white rounded-xl p-5 border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-              <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>Live Activity</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#9CA3AF' }}>Recent Activity</h3>
+                <button onClick={() => window.location.reload()} className="text-[10px] text-gray-400 hover:text-gray-600 transition-colors">Refresh</button>
+              </div>
               {(stats.recentActivity || []).length > 0 ? (
                 <div className="space-y-2">
                   {(stats.recentActivity || []).slice(0, 8).map((entry, i) => {
@@ -727,7 +745,7 @@ export default function HubAdminPage() {
                     <span className="text-lg font-bold" style={{ color: '#E8B84B' }}>{stats.totalQAQuestions || 0}</span>
                   </div>
                   <div className="h-2 rounded-full" style={{ backgroundColor: '#FFF8E7' }}>
-                    <div className="h-full rounded-full" style={{ width: `${Math.min(((stats.totalQAQuestions || 0) / 100) * 100, 100)}%`, backgroundColor: '#E8B84B' }} />
+                    <div className="h-full rounded-full" style={{ width: `${Math.min(((stats.totalQAQuestions || 0) / Math.max(stats.totalQAQuestions || 1, stats.totalQAReplies || 1, stats.totalConversationPosts || 1)) * 100, 100)}%`, backgroundColor: '#E8B84B' }} />
                   </div>
                 </div>
                 <div>
@@ -736,7 +754,7 @@ export default function HubAdminPage() {
                     <span className="text-lg font-bold" style={{ color: '#2A9D8F' }}>{stats.totalQAReplies || 0}</span>
                   </div>
                   <div className="h-2 rounded-full" style={{ backgroundColor: '#D1FAE5' }}>
-                    <div className="h-full rounded-full" style={{ width: `${Math.min(((stats.totalQAReplies || 0) / 200) * 100, 100)}%`, backgroundColor: '#2A9D8F' }} />
+                    <div className="h-full rounded-full" style={{ width: `${Math.min(((stats.totalQAReplies || 0) / Math.max(stats.totalQAQuestions || 1, stats.totalQAReplies || 1, stats.totalConversationPosts || 1)) * 100, 100)}%`, backgroundColor: '#2A9D8F' }} />
                   </div>
                 </div>
                 <div>
@@ -745,7 +763,7 @@ export default function HubAdminPage() {
                     <span className="text-lg font-bold" style={{ color: '#7C3AED' }}>{stats.totalConversationPosts || 0}</span>
                   </div>
                   <div className="h-2 rounded-full" style={{ backgroundColor: '#F3E8FF' }}>
-                    <div className="h-full rounded-full" style={{ width: `${Math.min(((stats.totalConversationPosts || 0) / 500) * 100, 100)}%`, backgroundColor: '#7C3AED' }} />
+                    <div className="h-full rounded-full" style={{ width: `${Math.min(((stats.totalConversationPosts || 0) / Math.max(stats.totalQAQuestions || 1, stats.totalQAReplies || 1, stats.totalConversationPosts || 1)) * 100, 100)}%`, backgroundColor: '#7C3AED' }} />
                   </div>
                 </div>
               </div>
@@ -915,82 +933,7 @@ export default function HubAdminPage() {
           </div>
         )}
 
-        {/* Quick Actions */}
-        <div>
-          <h2 className="mb-4" style={TYPE_SECTION_HEADER}>Quick Actions</h2>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/tdi-admin/hub/operations"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
-              style={{
-                color: theme.accent,
-                borderColor: theme.accent,
-                backgroundColor: 'transparent',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-            >
-              <BarChart3 size={16} />
-              View Analytics
-            </Link>
-            <Link
-              href="/tdi-admin/hub/production"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
-              style={{
-                color: theme.accent,
-                borderColor: theme.accent,
-                backgroundColor: 'transparent',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-            >
-              <FileText size={16} />
-              Manage Courses
-            </Link>
-            <Link
-              href="/tdi-admin/hub/production"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
-              style={{
-                color: theme.accent,
-                borderColor: theme.accent,
-                backgroundColor: 'transparent',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-            >
-              <Zap size={16} />
-              Quick Wins
-            </Link>
-            <Link
-              href="/tdi-admin/hub/operations"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
-              style={{
-                color: theme.accent,
-                borderColor: theme.accent,
-                backgroundColor: 'transparent',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-            >
-              <Download size={16} />
-              Export Reports
-            </Link>
-            <Link
-              href="/tdi-admin/hub/operations"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border hover:shadow-sm"
-              style={{
-                color: theme.accent,
-                borderColor: theme.accent,
-                backgroundColor: 'transparent',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.accentLight)}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-            >
-              <Mail size={16} />
-              Email Management
-            </Link>
-          </div>
-        </div>
+        {/* Quick Actions removed -- duplicated by Manage section cards above */}
       </div>
     </div>
   );

@@ -243,8 +243,12 @@ export async function GET() {
         // Users who upgraded (have a membership)
         const upgradedUsers = Object.values(membershipByTier).reduce((s, c) => s + c, 0);
 
+        // Organic users = unique users with any activity (actually logged in)
+        const organicUsers = Object.keys(userDays).length;
+
         return {
           totalUsers: usersResult.count || 0,
+          organicUsers,
           exploredTool: uniqueExplorerCount,
           returnedAgain: returningUsers,
           upgraded: upgradedUsers,
