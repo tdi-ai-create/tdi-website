@@ -1156,8 +1156,8 @@ export default function HubProductionPage() {
           <h1 style={TYPE_PAGE_TITLE}>Production</h1>
           <p className="mt-1" style={TYPE_PAGE_SUBTITLE}>Create and manage courses, Quick Wins, and content</p>
         </div>
-          {/* Example Data Notice (subtle) */}
-          {showExampleNotice && (
+          {/* Example data banner removed -- we're live now */}
+          {false && showExampleNotice && (
             <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-amber-50 border border-amber-200 mb-6">
               <Info size={16} className="text-amber-600 flex-shrink-0" />
               <p className="text-sm text-amber-700 flex-1">

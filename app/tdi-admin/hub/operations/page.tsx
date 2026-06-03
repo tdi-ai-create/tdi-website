@@ -199,6 +199,8 @@ function AccountsTab() {
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [page, setPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkAction, setBulkAction] = useState<string | null>(null);
   const perPage = 50;
 
   useEffect(() => {
@@ -253,12 +255,63 @@ function AccountsTab() {
     link.click();
   };
 
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === paginatedData.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(paginatedData.map(a => a.id)));
+    }
+  };
+
+  const exportSelectedCSV = () => {
+    const selected = accounts.filter(a => selectedIds.has(a.id));
+    let csv = 'Name,Email,Role,School,State,Joined,Status\n';
+    selected.forEach(a => {
+      const onboarding = a.onboarding_data as { school_name?: string; state?: string } | null;
+      csv += `"${a.display_name || ''}","${a.email || ''}",${a.role || 'teacher'},"${onboarding?.school_name || ''}","${onboarding?.state || ''}",${new Date(a.created_at).toLocaleDateString()},${a.onboarding_completed ? 'Active' : 'Onboarding'}\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `selected-accounts-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    setBulkAction(null);
+  };
+
   if (isLoading) {
     return <div className="py-12 text-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: theme.accent }}></div><p className="text-gray-400 mt-3 text-sm">Loading accounts...</p></div>;
   }
 
   return (
     <div>
+      {/* Bulk Action Bar */}
+      {selectedIds.size > 0 && (
+        <div className="mb-4 flex items-center gap-3 px-4 py-3 rounded-xl" style={{ backgroundColor: '#1e2749' }}>
+          <span className="text-sm font-medium text-white">{selectedIds.size} selected</span>
+          <div className="flex-1" />
+          <button
+            onClick={exportSelectedCSV}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 text-white hover:bg-white/20 transition-colors flex items-center gap-1.5"
+          >
+            <Download size={13} /> Export Selected
+          </button>
+          <button
+            onClick={() => setSelectedIds(new Set())}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/60 hover:text-white transition-colors"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+
       {/* Filter Bar */}
       <div className="flex flex-wrap gap-3 mb-4">
         <div className="relative flex-1 min-w-[200px]">
@@ -313,6 +366,14 @@ function AccountsTab() {
         <table className="w-full">
           <thead className="bg-[#FAFAF8]">
             <tr>
+              <th className="px-3 py-3 w-10">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.size === paginatedData.length && paginatedData.length > 0}
+                  onChange={toggleSelectAll}
+                  className="rounded border-gray-300"
+                />
+              </th>
               <TableHeader sortable>Name</TableHeader>
               <TableHeader>Role</TableHeader>
               <TableHeader>Grade Level</TableHeader>
@@ -324,15 +385,24 @@ function AccountsTab() {
           <tbody className="divide-y divide-gray-100">
             {paginatedData.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-8 text-center text-gray-500">No accounts found</td>
+                <td colSpan={7} className="py-8 text-center text-gray-500">No accounts found</td>
               </tr>
             ) : (
               paginatedData.map((account, i) => {
                 const onboarding = account.onboarding_data as { school_name?: string; grade_level?: string } | null;
                 const schoolName = onboarding?.school_name || '-';
                 const gradeLevel = onboarding?.grade_level || '-';
+                const isSelected = selectedIds.has(account.id);
                 return (
-                  <tr key={account.id} className={i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAF8]'}>
+                  <tr key={account.id} className={`${isSelected ? 'bg-blue-50' : i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAF8]'}`}>
+                    <td className="px-3 py-3">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleSelect(account.id)}
+                        className="rounded border-gray-300"
+                      />
+                    </td>
                     <td className="px-4 py-3 text-sm font-medium text-gray-900">{account.display_name || 'No name'}</td>
                     <td className="px-4 py-3 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -2587,6 +2657,34 @@ function TipsTab() {
 function EmailsTab() {
   const [selectedTemplate, setSelectedTemplate] = useState('welcome');
   const [testEmail, setTestEmail] = useState('');
+  const [sending, setSending] = useState(false);
+  const [sendResult, setSendResult] = useState<string | null>(null);
+  const [sendHistory, setSendHistory] = useState<{ template: string; to: string; success: boolean; time: string }[]>([]);
+
+  const handleSendTest = async () => {
+    if (!testEmail) return;
+    setSending(true);
+    setSendResult(null);
+    try {
+      const res = await fetch('/api/tdi-admin/hub-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: testEmail, template: selectedTemplate }),
+      });
+      const result = await res.json();
+      if (res.ok) {
+        setSendResult('Test email sent successfully!');
+        setSendHistory(prev => [{ template: selectedTemplate, to: testEmail, success: true, time: new Date().toLocaleTimeString() }, ...prev]);
+      } else {
+        setSendResult(`Failed: ${result.error}`);
+        setSendHistory(prev => [{ template: selectedTemplate, to: testEmail, success: false, time: new Date().toLocaleTimeString() }, ...prev]);
+      }
+    } catch {
+      setSendResult('Failed to send');
+    } finally {
+      setSending(false);
+    }
+  };
 
   const templates = {
     welcome: {
@@ -2661,19 +2759,43 @@ function EmailsTab() {
             className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
           />
           <button
-            className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2"
+            onClick={handleSendTest}
+            disabled={!testEmail || sending}
+            className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2 disabled:opacity-50"
             style={{ backgroundColor: theme.accent }}
           >
             <Send size={16} />
-            Send Test
+            {sending ? 'Sending...' : 'Send Test'}
           </button>
         </div>
+        {sendResult && (
+          <p className={`text-xs mt-2 ${sendResult.includes('success') ? 'text-green-600' : 'text-red-600'}`}>{sendResult}</p>
+        )}
       </div>
 
       {/* Send History */}
       <div className="mt-6 bg-white rounded-lg border border-gray-200 p-5">
         <h3 className="mb-3" style={TYPE_CARD_TITLE}>Send History</h3>
-        <p className="text-sm text-gray-500">Email send history will appear here once connected to Resend.</p>
+        {sendHistory.length === 0 ? (
+          <p className="text-sm text-gray-500">No emails sent yet from this tab.</p>
+        ) : (
+          <div className="space-y-2">
+            {sendHistory.map((entry, i) => (
+              <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{entry.template}</p>
+                  <p className="text-xs text-gray-500">{entry.to}</p>
+                </div>
+                <div className="text-right">
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${entry.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    {entry.success ? 'Sent' : 'Failed'}
+                  </span>
+                  <p className="text-xs text-gray-400 mt-0.5">{entry.time}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -2735,8 +2857,8 @@ export default function HubOperationsPage() {
           <h1 style={TYPE_PAGE_TITLE}>Operations</h1>
           <p className="mt-1" style={TYPE_PAGE_SUBTITLE}>Manage accounts, enrollments, reports, and analytics</p>
         </div>
-          {/* Example Data Notice (subtle) */}
-          {showExampleNotice && (
+          {/* Example data banner removed -- we're live now */}
+          {false && showExampleNotice && (
             <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-amber-50 border border-amber-200 mb-6">
               <Info size={16} className="text-amber-600 flex-shrink-0" />
               <p className="text-sm text-amber-700 flex-1">
