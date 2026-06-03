@@ -26,6 +26,8 @@ const TIMES: Record<GameId, string> = {
   madlibs: '10 min',
   makeover: '15 min',
   whatsyourmove: '~8 min',
+  classroomshuffle: '~10 min',
+  prioritize: '~10 min',
 };
 
 interface HomeScreenProps {
@@ -85,7 +87,7 @@ export function HomeScreen({ onSelectGame, onFacilitatorMode }: HomeScreenProps)
       <div className="flex flex-col gap-6 w-full max-w-[600px]">
         {GAME_CARDS.map((game, index) => {
           const colorConfig = COLORS[game.color];
-          const gameTranslations = games[game.id];
+          const gameTranslations = (games as Record<string, typeof games[keyof typeof games]>)[game.id];
           return (
             <div
               key={game.id}

@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Target, Zap, TrendingUp, Smile, Wrench, Crosshair, Award, Check, X } from 'lucide-react';
+import { ArrowLeft, Target, Zap, TrendingUp, Smile, Wrench, Crosshair, Award, Check, X, Shuffle, ListOrdered } from 'lucide-react';
 import { COLORS, type GameId } from '../data/gameConfig';
 import { ConfettiBurst } from './ConfettiBurst';
 import { useLanguage } from '../context/LanguageContext';
@@ -14,6 +14,8 @@ export const GAME_ICONS = {
   madlibs: Smile,
   makeover: Wrench,
   whatsyourmove: Crosshair,
+  classroomshuffle: Shuffle,
+  prioritize: ListOrdered,
 } as const;
 
 interface GameWrapperProps {

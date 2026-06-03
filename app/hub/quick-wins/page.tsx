@@ -99,6 +99,28 @@ const PRACTICE_TOOLS: QuickWin[] = [
     access_tier: 'free',
     capacity: 'low',
   },
+  {
+    id: 'practice-classroom-shuffle',
+    slug: 'classroom-shuffle',
+    title: 'Classroom Scenario Shuffle',
+    description: '8 real classroom situations. Pick the best response. Learn why it works.',
+    category: 'Games',
+    estimated_minutes: 10,
+    content_type: 'activity',
+    access_tier: 'free',
+    capacity: 'low',
+  },
+  {
+    id: 'practice-prioritize-this',
+    slug: 'prioritize-this',
+    title: 'Prioritize This',
+    description: 'Rank 4 tasks by priority. See how experienced educators would handle it.',
+    category: 'Games',
+    estimated_minutes: 10,
+    content_type: 'activity',
+    access_tier: 'free',
+    capacity: 'medium',
+  },
 ];
 
 interface QuickWin {

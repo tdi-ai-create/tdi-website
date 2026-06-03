@@ -52,4 +52,6 @@ export const TIPS_BY_GAME = {
   madlibs: MADLIBS_TIPS,
   makeover: MAKEOVER_TIPS,
   whatsyourmove: [] as string[],
+  classroomshuffle: [] as string[],
+  prioritize: [] as string[],
 } as const;

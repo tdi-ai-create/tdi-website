@@ -4,14 +4,16 @@ import { Target, Zap, TrendingUp, Smile, Wrench, Crosshair, ArrowLeft, Monitor, 
 import { GAMES, COLORS, type GameId } from '../data/gameConfig';
 
 // Icon map for home screen
-const GAME_ICONS = {
+const GAME_ICONS: Record<string, typeof Target> = {
   knockout: Target,
   tellorask: Zap,
   levelup: TrendingUp,
   madlibs: Smile,
   makeover: Wrench,
   whatsyourmove: Crosshair,
-} as const;
+  classroomshuffle: Target,
+  prioritize: TrendingUp,
+};
 
 interface FacilitatorHomeProps {
   onSelectGame: (gameId: GameId) => void;

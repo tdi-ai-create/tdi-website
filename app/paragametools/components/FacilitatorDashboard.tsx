@@ -22,14 +22,16 @@ import { GAMES, COLORS, type GameId } from '../data/gameConfig';
 import { TIPS_BY_GAME } from '../data/tips';
 import { GROUP_MOMENTS_BY_GAME } from '../data/groupMoments';
 
-const GAME_ICONS = {
+const GAME_ICONS: Record<GameId, typeof Target> = {
   knockout: Target,
   tellorask: Zap,
   levelup: TrendingUp,
   madlibs: Smile,
   makeover: Wrench,
   whatsyourmove: Crosshair,
-} as const;
+  classroomshuffle: Target,
+  prioritize: TrendingUp,
+};
 
 interface FacilitatorDashboardProps {
   gameId: GameId;

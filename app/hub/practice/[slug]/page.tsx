@@ -9,6 +9,8 @@ import { FeedbackLevelUp } from '@/app/paragametools/components/FeedbackLevelUp'
 import { FeedbackMadlibs } from '@/app/paragametools/components/FeedbackMadlibs'
 import { FeedbackMakeover } from '@/app/paragametools/components/FeedbackMakeover'
 import { WhatsYourMove } from '@/app/paragametools/components/WhatsYourMove'
+import { ClassroomShuffle } from '@/app/paragametools/components/ClassroomShuffle'
+import { PrioritizeThis } from '@/app/paragametools/components/PrioritizeThis'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub'
@@ -48,6 +50,16 @@ const PRACTICE_TOOLS: Record<string, {
   'whats-your-move': {
     component: WhatsYourMove,
     title: "What's Your Move?",
+    category: 'Classroom Scenarios',
+  },
+  'classroom-shuffle': {
+    component: ClassroomShuffle,
+    title: 'Classroom Scenario Shuffle',
+    category: 'Classroom Scenarios',
+  },
+  'prioritize-this': {
+    component: PrioritizeThis,
+    title: 'Prioritize This',
     category: 'Classroom Scenarios',
   },
 }

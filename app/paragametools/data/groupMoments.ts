@@ -42,4 +42,6 @@ export const GROUP_MOMENTS_BY_GAME = {
   madlibs: MADLIBS_GROUP_MOMENTS,
   makeover: MAKEOVER_GROUP_MOMENTS,
   whatsyourmove: [] as string[],
+  classroomshuffle: [] as string[],
+  prioritize: [] as string[],
 } as const;
