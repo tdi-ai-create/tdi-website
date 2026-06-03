@@ -297,6 +297,33 @@ function AccountsTab() {
         <div className="mb-4 flex items-center gap-3 px-4 py-3 rounded-xl" style={{ backgroundColor: '#1e2749' }}>
           <span className="text-sm font-medium text-white">{selectedIds.size} selected</span>
           <div className="flex-1" />
+          <select
+            value={bulkAction || ''}
+            onChange={async (e) => {
+              const tier = e.target.value;
+              if (!tier) return;
+              const ids = Array.from(selectedIds);
+              try {
+                for (const id of ids) {
+                  await fetch('/api/hub/provision', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: accounts.find(a => a.id === id)?.email || '', name: '', tier, source: 'admin_assigned' }),
+                  });
+                }
+                alert(`Updated ${ids.length} users to ${tier}`);
+                setSelectedIds(new Set());
+              } catch { alert('Failed to update tiers'); }
+              e.target.value = '';
+            }}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 text-white border border-white/20"
+          >
+            <option value="">Change Tier...</option>
+            <option value="free">Free</option>
+            <option value="essentials">Essentials</option>
+            <option value="professional">Professional</option>
+            <option value="all_access">All-Access</option>
+          </select>
           <button
             onClick={exportSelectedCSV}
             className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 text-white hover:bg-white/20 transition-colors flex items-center gap-1.5"

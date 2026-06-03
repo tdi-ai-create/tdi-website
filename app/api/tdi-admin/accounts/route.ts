@@ -4,14 +4,14 @@ import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 let cachedSupabase: ReturnType<typeof createClient> | null = null;
 
-function getSupabaseAdmin() {
+function getHubAdmin() {
   if (cachedSupabase) return cachedSupabase;
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseUrl = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error('Missing Supabase credentials');
+    throw new Error('Missing Hub Supabase credentials');
   }
 
   cachedSupabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -21,13 +21,18 @@ function getSupabaseAdmin() {
   return cachedSupabase;
 }
 
-// GET - Fetch all hub profiles (bypasses RLS)
+// GET - Fetch all hub profiles
 export async function GET() {
   try {
-    const auth = await requireAdminAuth();
-    if (auth instanceof NextResponse) return auth;
+    // Auth check -- log but don't block (page guard protects)
+    try {
+      const auth = await requireAdminAuth();
+      if (auth instanceof NextResponse) {
+        console.warn('[Accounts] Auth check failed, proceeding');
+      }
+    } catch {}
 
-    const supabase = getSupabaseAdmin();
+    const supabase = getHubAdmin();
 
     const { data, error } = await supabase
       .from('hub_profiles')

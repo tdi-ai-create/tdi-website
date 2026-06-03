@@ -512,34 +512,16 @@ function MediaTab() {
         <p className="text-xs text-gray-400">Supports videos, images, and PDFs</p>
       </div>
 
-      {/* Media Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        {mockMedia.map((file) => {
-          const TypeIcon = typeIcons[file.type] || File;
-          return (
-            <div key={file.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-              <div className="aspect-square bg-gray-50 flex items-center justify-center">
-                <TypeIcon size={32} className="text-gray-400" />
-              </div>
-              <div className="p-3">
-                <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
-                <div className="flex items-center justify-between mt-1">
-                  <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${typeColors[file.type]}`}>
-                    {file.type}
-                  </span>
-                  <span className="text-xs text-gray-400">{file.size}</span>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Placeholder Note */}
-      <div className="mt-8 p-4 rounded-lg border border-amber-200 bg-amber-50">
-        <p className="text-sm text-amber-800">
-          <strong>Note:</strong> Full media upload functionality will be enabled once Mux/Cloudflare integration is complete.
+      {/* Empty state -- no uploads yet */}
+      <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+        <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
+          <Image size={28} className="text-gray-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">No media uploaded yet</h3>
+        <p className="text-sm text-gray-500 max-w-md mx-auto mb-4">
+          Upload PDFs, images, and other files for your courses and Quick Wins. Video hosting coming soon.
         </p>
+        <p className="text-xs text-gray-400">Supabase Storage integration -- drag and drop or click Upload Files above</p>
       </div>
     </div>
   );
