@@ -1621,6 +1621,126 @@ export default function ExampleDashboard() {
               </div>
             </div>
 
+            {/* ─── QUICK ACCESS BAR ─── */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <a
+                href="https://teachersdeserveit.com/hub"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-[#E8B84B]/30 transition-all group"
+              >
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#FFF8E7' }}>
+                  <BookOpen className="w-5 h-5" style={{ color: '#E8B84B' }} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>Open the Hub</p>
+                  <p className="text-[10px] text-gray-500">See what your teachers see</p>
+                </div>
+              </a>
+              <a
+                href="https://calendly.com/raehughart"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-[#4ecdc4]/30 transition-all group"
+              >
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#E0F7F6' }}>
+                  <Calendar className="w-5 h-5" style={{ color: '#2A9D8F' }} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>Schedule with TDI</p>
+                  <p className="text-[10px] text-gray-500">Book a check-in or session</p>
+                </div>
+              </a>
+              <a
+                href="https://teachersdeserveit.com/hub/quick-wins"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-[#8B5CF6]/30 transition-all group"
+              >
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#EDE9FE' }}>
+                  <Sparkles className="w-5 h-5" style={{ color: '#8B5CF6' }} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>Browse Quick Wins</p>
+                  <p className="text-[10px] text-gray-500">Tools your team can use today</p>
+                </div>
+              </a>
+              <a
+                href="https://teachersdeserveit.com/hub/courses"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-[#2563EB]/30 transition-all group"
+              >
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#DBEAFE' }}>
+                  <GraduationCap className="w-5 h-5" style={{ color: '#2563EB' }} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>PD Courses</p>
+                  <p className="text-[10px] text-gray-500">Full course library</p>
+                </div>
+              </a>
+            </div>
+
+            {/* ─── SEASONAL LEADERSHIP TIP ─── */}
+            <div
+              className="rounded-2xl p-5 md:p-6"
+              style={{ background: 'linear-gradient(135deg, #1e2749 0%, #2d3a5c 50%, #38618C 100%)' }}
+            >
+              <div className="flex flex-col md:flex-row md:items-center gap-4">
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                    <Calendar className="w-6 h-6 text-[#FFBA06]" />
+                  </div>
+                  <div>
+                    <p className="text-white/50 text-[10px] uppercase tracking-wider">June Leadership Strategy</p>
+                    <p className="text-white font-bold text-base">End-of-Year Teacher Appreciation</p>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <p className="text-white/70 text-sm leading-relaxed">
+                    Your team has worked hard this year. Before summer break, consider three things: (1) a personal handwritten note to each educator highlighting something specific you noticed, (2) a 5-minute staff meeting shout-out for Hub engagement, and (3) sharing their PD certificate count with the school board. These small moments carry teachers through the summer.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* ─── LEADERSHIP FAQ ─── */}
+            <div className="bg-white rounded-2xl p-5 md:p-6 shadow-sm border border-gray-100">
+              <h3 className="text-base font-bold mb-4" style={{ color: '#1e2749' }}>Common Questions from Principals</h3>
+              <div className="space-y-3">
+                {[
+                  {
+                    q: 'How do I know if my teachers are actually using the Hub?',
+                    a: 'Check the Hub Activity section above -- it shows login %, tools explored, and active users in real time. You can also see which tools are most popular in your building. If engagement drops, TDI will flag it and help re-engage your team.',
+                  },
+                  {
+                    q: 'What should I say to teachers who have not logged in yet?',
+                    a: 'Keep it simple: "We have a free resource for you -- the TDI Learning Hub has 5-minute tools you can use Monday morning. Your account is already set up at teachersdeserveit.com/hub." No pressure, just an invitation.',
+                  },
+                  {
+                    q: 'How do I use this data for my school improvement plan?',
+                    a: 'The Hub Activity section shows PD hours earned, tools explored, and community engagement -- all metrics that map directly to professional development goals. The AI insight at the top gives you a ready-made talking point for board presentations.',
+                  },
+                  {
+                    q: 'Can my teachers earn PD credit through the Hub?',
+                    a: 'Yes. When educators complete courses on the Hub, they earn PD certificates with tracked hours. These are printable and shareable -- many teachers include them in their professional portfolios.',
+                  },
+                  {
+                    q: 'What happens if a teacher is struggling? Does TDI know?',
+                    a: 'If an educator logs multiple tough days on their private Vibe Check, TDI sends a personal wellness email -- just a warm check-in, no details shared with anyone. You will see "TDI reached out to X team members" on your dashboard. Names are never shared.',
+                  },
+                ].map((faq, i) => (
+                  <details key={i} className="group">
+                    <summary className="flex items-center gap-3 cursor-pointer py-2 text-sm font-medium" style={{ color: '#1e2749' }}>
+                      <ChevronDown className="w-4 h-4 text-gray-400 transition-transform group-open:rotate-180" />
+                      {faq.q}
+                    </summary>
+                    <p className="text-sm text-gray-600 ml-7 pb-2 leading-relaxed">{faq.a}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+
           </div>
         )}
 

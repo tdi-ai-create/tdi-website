@@ -3667,6 +3667,87 @@ export default function PartnerDashboard() {
                 </>
               );
             })()}
+            {/* Quick Access Bar */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <a href="https://teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#FFF8E7' }}>
+                  <BookOpen className="w-5 h-5" style={{ color: '#E8B84B' }} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>Open the Hub</p>
+                  <p className="text-[10px] text-gray-500">See what your teachers see</p>
+                </div>
+              </a>
+              <a href="https://calendly.com/raehughart" target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#E0F7F6' }}>
+                  <CalendarDays className="w-5 h-5" style={{ color: '#2A9D8F' }} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>Schedule with TDI</p>
+                  <p className="text-[10px] text-gray-500">Book a check-in or session</p>
+                </div>
+              </a>
+              <a href="https://teachersdeserveit.com/hub/quick-wins" target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#EDE9FE' }}>
+                  <Sparkles className="w-5 h-5" style={{ color: '#8B5CF6' }} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>Browse Quick Wins</p>
+                  <p className="text-[10px] text-gray-500">Tools your team can use today</p>
+                </div>
+              </a>
+              <a href="https://teachersdeserveit.com/hub/courses" target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#DBEAFE' }}>
+                  <GraduationCap className="w-5 h-5" style={{ color: '#2563EB' }} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>PD Courses</p>
+                  <p className="text-[10px] text-gray-500">Full course library</p>
+                </div>
+              </a>
+            </div>
+
+            {/* Seasonal Leadership Tip */}
+            <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, #1e2749 0%, #2d3a5c 50%, #38618C 100%)' }}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                  <CalendarDays className="w-5 h-5 text-[#FFBA06]" />
+                </div>
+                <div>
+                  <p className="text-white/50 text-[10px] uppercase tracking-wider">June Leadership Strategy</p>
+                  <p className="text-white font-bold text-sm">End-of-Year Teacher Appreciation</p>
+                </div>
+              </div>
+              <p className="text-white/70 text-sm leading-relaxed">
+                Your team has worked hard this year. Before summer break: (1) a personal note to each educator highlighting something you noticed, (2) a 5-minute staff meeting shout-out for Hub engagement, and (3) share their PD certificate count with the board.
+              </p>
+            </div>
+
+            {/* FAQ */}
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <h3 className="text-base font-bold mb-4" style={{ color: '#1e2749' }}>Common Questions</h3>
+              <div className="space-y-3">
+                {[
+                  { q: 'How do I know if my teachers are using the Hub?', a: 'Check the Hub Activity section above -- login %, tools explored, and active users update in real time.' },
+                  { q: 'What should I say to teachers who have not logged in?', a: '"We have a free resource for you -- 5-minute tools at teachersdeserveit.com/hub. Your account is ready."' },
+                  { q: 'Can my teachers earn PD credit?', a: 'Yes. Courses earn PD certificates with tracked hours -- printable and shareable.' },
+                  { q: 'What if a teacher is struggling?', a: 'TDI sends a private wellness check-in. You will see the count on your dashboard but never individual names.' },
+                ].map((faq, i) => (
+                  <details key={i} className="group">
+                    <summary className="flex items-center gap-3 cursor-pointer py-2 text-sm font-medium" style={{ color: '#1e2749' }}>
+                      <ChevronDown className="w-4 h-4 text-gray-400 transition-transform group-open:rotate-180" />
+                      {faq.q}
+                    </summary>
+                    <p className="text-sm text-gray-600 ml-7 pb-2 leading-relaxed">{faq.a}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+
           </div>
         )}
 
