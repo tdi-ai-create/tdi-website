@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronRight, Share2, RotateCcw } from 'lucide-react'
+import Link from 'next/link'
+import { ChevronRight, Share2, RotateCcw, ArrowRight } from 'lucide-react'
 import UniversalShareModal from './UniversalShareModal'
 import { useTranslation } from '@/lib/hub/useTranslation'
 import type { QuizConfig, QuizResult } from '@/lib/hub/quizConfigs'
@@ -89,6 +90,16 @@ export default function QuizEngine({ quiz, onComplete }: QuizEngineProps) {
           <p className="text-sm leading-relaxed mb-6" style={{ color: '#374151', fontFamily: "'DM Sans', sans-serif" }}>
             {result.description}
           </p>
+          {result.ctaLabel && result.ctaLink && (
+            <Link
+              href={result.ctaLink}
+              className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl text-sm font-bold transition-all hover:opacity-90 mb-4"
+              style={{ backgroundColor: result.color, color: 'white', fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {result.ctaLabel}
+              <ArrowRight size={16} />
+            </Link>
+          )}
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setShareOpen(true)}

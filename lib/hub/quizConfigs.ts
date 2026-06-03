@@ -20,6 +20,8 @@ export interface QuizResult {
   color: string
   bg: string
   icon: string  // single character displayed in the result badge
+  ctaLabel?: string    // optional call-to-action button text
+  ctaLink?: string     // optional call-to-action URL
 }
 
 export interface QuizConfig {
@@ -806,6 +808,123 @@ export const energyDrainQuiz: QuizConfig = {
     `I just did TDI's energy check-in and discovered "${title}" -- ${subtitle} Check yours at teachersdeserveit.com/hub`,
 }
 
+// ── 8. Should I Become a TDI Creator? ─────────────────────────────────
+
+export const creatorQuiz: QuizConfig = {
+  id: 'creator_ready',
+  title: 'Should I Become a TDI Creator?',
+  shortTitle: 'Creator Ready?',
+  description: 'Curious about creating content for educators? Find out if it is your next move.',
+  questionCount: 5,
+  durationLabel: '2 min',
+  category: 'fun',
+  accentColor: '#E8B84B',
+  accentBg: '#FFF8E7',
+  accentGradient: 'linear-gradient(135deg, #E8B84B 0%, #F59E0B 50%, #D97706 100%)',
+  results: {
+    born_creator: {
+      key: 'born_creator',
+      title: 'Born Creator',
+      subtitle: 'You were made for this.',
+      description: 'You have the expertise, the passion, and the voice. You are already the person your colleagues come to for ideas and resources. The only thing missing is a platform -- and TDI has one waiting for you. Seriously. Apply.',
+      color: '#D97706',
+      bg: '#FEF3C7',
+      icon: 'B',
+      ctaLabel: 'Apply to Create',
+      ctaLink: '/hub/champion',
+    },
+    hidden_expert: {
+      key: 'hidden_expert',
+      title: 'The Hidden Expert',
+      subtitle: 'You know more than you think.',
+      description: 'You probably do not think of yourself as a "content creator" -- but you have been creating things for years. Lesson plans, systems, strategies that work. The stuff in your Google Drive could genuinely help thousands of teachers. You just need someone to say: it is time.',
+      color: '#7C3AED',
+      bg: '#F3E8FF',
+      icon: 'H',
+      ctaLabel: 'Learn More About Creating',
+      ctaLink: '/hub/champion',
+    },
+    collaborator_creator: {
+      key: 'collaborator_creator',
+      title: 'The Collaborator',
+      subtitle: 'You create best with others.',
+      description: 'Solo content creation is not your thing -- and that is totally fine. You shine when you are co-building, brainstorming, or supporting someone else\'s vision. TDI has collaborative creator opportunities too. If you have a partner in mind, even better.',
+      color: '#DB2777',
+      bg: '#FCE7F3',
+      icon: 'C',
+      ctaLabel: 'Explore Creator Options',
+      ctaLink: '/hub/champion',
+    },
+    future_creator: {
+      key: 'future_creator',
+      title: 'Future Creator',
+      subtitle: 'Not yet -- but soon.',
+      description: 'You are still building your toolkit and that is a great place to be. Keep exploring, keep learning, keep collecting ideas. When you are ready to share what you know, TDI will be here. In the meantime, keep taking courses and trying tools -- your future content is being shaped right now.',
+      color: '#059669',
+      bg: '#D1FAE5',
+      icon: 'F',
+    },
+    cheerleader: {
+      key: 'cheerleader',
+      title: 'The Biggest Fan',
+      subtitle: 'You lift up other creators.',
+      description: 'Creating is not calling your name right now -- but sharing, recommending, and championing great content absolutely is. You are the person who tells every teacher you know about the thing that changed your practice. That role matters more than you know. Keep sharing.',
+      color: '#2563EB',
+      bg: '#DBEAFE',
+      icon: 'F',
+    },
+  },
+  questions: [
+    {
+      question: 'A colleague says "How do you do that?" Your reaction?',
+      answers: [
+        { text: 'I pull up my template and walk them through it step by step', types: ['born_creator', 'hidden_expert'] },
+        { text: 'I suggest we sit down together and figure out a version that works for them', types: ['collaborator_creator'] },
+        { text: 'I share the resource that helped me learn it in the first place', types: ['cheerleader'] },
+        { text: 'I am flattered but honestly still figuring it out myself', types: ['future_creator'] },
+      ],
+    },
+    {
+      question: 'What is on your computer right now?',
+      answers: [
+        { text: 'Folders full of templates, lesson plans, and systems I built myself', types: ['born_creator', 'hidden_expert'] },
+        { text: 'Shared docs from projects I have built with teammates', types: ['collaborator_creator'] },
+        { text: 'A bookmarks folder of amazing things other people made', types: ['cheerleader'] },
+        { text: 'Honestly kind of a mess -- I am still figuring out my workflow', types: ['future_creator'] },
+      ],
+    },
+    {
+      question: 'Someone says "You should make a course about that." You think...',
+      answers: [
+        { text: 'I have actually thought about that -- I even have an outline started', types: ['born_creator'] },
+        { text: 'Maybe? I have never thought of myself as a "course creator" but I do know this stuff', types: ['hidden_expert'] },
+        { text: 'Only if I could do it with someone -- I would not want to do it alone', types: ['collaborator_creator'] },
+        { text: 'That is really nice but I do not think I am there yet', types: ['future_creator'] },
+      ],
+    },
+    {
+      question: 'When you find something that works in your classroom, you...',
+      answers: [
+        { text: 'Document it so I can share it or use it again', types: ['born_creator'] },
+        { text: 'Mention it casually but I do not think to package it up', types: ['hidden_expert'] },
+        { text: 'Immediately text my team and say "you have to try this"', types: ['collaborator_creator', 'cheerleader'] },
+        { text: 'Feel good about it but move on to the next challenge', types: ['future_creator'] },
+      ],
+    },
+    {
+      question: 'What excites you most about the idea of creating for TDI?',
+      answers: [
+        { text: 'Reaching thousands of teachers with something I built', types: ['born_creator'] },
+        { text: 'Finally sharing the stuff that has been sitting in my drive for years', types: ['hidden_expert'] },
+        { text: 'Working with other passionate educators on something meaningful', types: ['collaborator_creator'] },
+        { text: 'Honestly I am more excited about learning from other creators right now', types: ['future_creator', 'cheerleader'] },
+      ],
+    },
+  ],
+  shareMessage: (title, subtitle) =>
+    `I took TDI's Creator Quiz and got "${title}" -- ${subtitle} Should you become a TDI creator? Find out at teachersdeserveit.com/hub`,
+}
+
 // ── All Quizzes Registry ──────────────────────────────────────────────
 
 export const ALL_QUIZZES: QuizConfig[] = [
@@ -816,6 +935,7 @@ export const ALL_QUIZZES: QuizConfig[] = [
   classroomNeedsQuiz,
   careerSeasonQuiz,
   energyDrainQuiz,
+  creatorQuiz,
 ]
 
 export function getQuizById(id: string): QuizConfig | undefined {
