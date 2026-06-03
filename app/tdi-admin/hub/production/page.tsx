@@ -213,7 +213,7 @@ function QuickWinsTab() {
   const isModalOpen = showCreateForm || !!editingQW;
 
   if (isLoading) {
-    return <div className="py-8 text-center text-gray-500">Loading Quick Wins...</div>;
+    return <div className="py-12 text-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: theme.accent }}></div><p className="text-gray-400 mt-3 text-sm">Loading Quick Wins...</p></div>;
   }
 
   return (
@@ -714,7 +714,7 @@ function FeedbackTab() {
   }, []);
 
   if (isLoading) {
-    return <div className="py-8 text-center text-gray-500">Loading feedback data...</div>;
+    return <div className="py-12 text-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: theme.accent }}></div><p className="text-gray-400 mt-3 text-sm">Loading feedback data...</p></div>;
   }
 
   return (
@@ -875,7 +875,7 @@ function FreeRotationTab() {
   };
 
   if (isLoading) {
-    return <div className="py-8 text-center text-gray-500">Loading content...</div>;
+    return <div className="py-12 text-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: theme.accent }}></div><p className="text-gray-400 mt-3 text-sm">Loading content...</p></div>;
   }
 
   return (

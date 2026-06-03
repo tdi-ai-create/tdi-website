@@ -254,7 +254,7 @@ function AccountsTab() {
   };
 
   if (isLoading) {
-    return <div className="py-8 text-center text-gray-500">Loading accounts...</div>;
+    return <div className="py-12 text-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: theme.accent }}></div><p className="text-gray-400 mt-3 text-sm">Loading accounts...</p></div>;
   }
 
   return (
@@ -475,7 +475,7 @@ function EnrollmentsTab() {
   };
 
   if (isLoading) {
-    return <div className="py-8 text-center text-gray-500">Loading enrollments...</div>;
+    return <div className="py-12 text-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: theme.accent }}></div><p className="text-gray-400 mt-3 text-sm">Loading enrollments...</p></div>;
   }
 
   return (
@@ -666,7 +666,7 @@ function CertificatesTab() {
   };
 
   if (isLoading) {
-    return <div className="py-8 text-center text-gray-500">Loading certificates...</div>;
+    return <div className="py-12 text-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: theme.accent }}></div><p className="text-gray-400 mt-3 text-sm">Loading certificates...</p></div>;
   }
 
   return (
@@ -2443,7 +2443,7 @@ function TipsTab() {
   };
 
   if (isLoading) {
-    return <div className="py-8 text-center text-gray-500">Loading tips & requests...</div>;
+    return <div className="py-12 text-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: theme.accent }}></div><p className="text-gray-400 mt-3 text-sm">Loading tips & requests...</p></div>;
   }
 
   return (
