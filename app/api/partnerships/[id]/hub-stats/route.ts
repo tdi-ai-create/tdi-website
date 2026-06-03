@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
+// Hub Supabase (where hub_activity_log, hub_profiles, etc. live)
+const hubSupabase = createClient(
+  process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+
+// Creator-portal Supabase (where partnerships, organizations, hub_org_members live)
+const portalSupabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
@@ -13,17 +20,41 @@ export async function GET(
   const { id: partnershipId } = await params
 
   try {
-    // Get all Hub users linked to this partnership
-    const { data: members, error: membersError } = await supabase
+    // Try to get Hub users linked to this partnership via hub_org_members
+    const { data: members } = await portalSupabase
       .from('hub_org_members')
       .select('user_id')
       .eq('partnership_id', partnershipId)
 
-    if (membersError) throw membersError
+    let userIds: string[] = (members || []).map(m => m.user_id)
 
-    // If no members yet, return null stats
-    // Dashboard will fall back to manually-entered values in partnerships table
-    if (!members || members.length === 0) {
+    // Fallback: if no org members linked, match by org name from partnership
+    if (userIds.length === 0) {
+      const { data: partnership } = await portalSupabase
+        .from('partnerships')
+        .select('contact_name')
+        .eq('id', partnershipId)
+        .single()
+
+      const { data: org } = await portalSupabase
+        .from('organizations')
+        .select('name')
+        .eq('partnership_id', partnershipId)
+        .single()
+
+      const orgName = org?.name || partnership?.contact_name || ''
+      if (orgName) {
+        const { data: profiles } = await hubSupabase
+          .from('hub_profiles')
+          .select('id')
+          .or(`school_name.ilike.%${orgName}%,district.ilike.%${orgName}%`)
+          .limit(200)
+
+        userIds = (profiles || []).map(p => p.id)
+      }
+    }
+
+    if (userIds.length === 0) {
       return NextResponse.json({
         has_real_data: false,
         member_count: 0,
@@ -37,8 +68,6 @@ export async function GET(
         moment_mode_uses_7d: null,
       })
     }
-
-    const userIds = members.map(m => m.user_id)
     const now = new Date()
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
@@ -56,29 +85,27 @@ export async function GET(
     ] = await Promise.all([
 
       // Logins this month (distinct users who had any activity)
-      supabase
+      hubSupabase
         .from('hub_activity_log')
         .select('user_id')
         .in('user_id', userIds)
-        .eq('is_example', false)
         .gte('created_at', startOfMonth),
 
       // Active users last 7 days
-      supabase
+      hubSupabase
         .from('hub_activity_log')
         .select('user_id')
         .in('user_id', userIds)
-        .eq('is_example', false)
         .gte('created_at', sevenDaysAgo),
 
       // Course completions (all time)
-      supabase
+      hubSupabase
         .from('hub_certificates')
         .select('id')
         .in('user_id', userIds),
 
       // Quick wins completed (all time)
-      supabase
+      hubSupabase
         .from('hub_activity_log')
         .select('id')
         .in('user_id', userIds)
@@ -86,16 +113,15 @@ export async function GET(
         .eq('is_example', false),
 
       // Moment mode uses last 7 days
-      supabase
+      hubSupabase
         .from('hub_activity_log')
         .select('id')
         .in('user_id', userIds)
         .eq('action', 'moment_mode_completed')
-        .eq('is_example', false)
         .gte('created_at', sevenDaysAgo),
 
       // Mood scores last 7 days (daily check-ins)
-      supabase
+      hubSupabase
         .from('hub_assessments')
         .select('stress_score')
         .in('user_id', userIds)
@@ -104,7 +130,7 @@ export async function GET(
         .not('stress_score', 'is', null),
 
       // Mood scores last 30 days
-      supabase
+      hubSupabase
         .from('hub_assessments')
         .select('stress_score')
         .in('user_id', userIds)
@@ -124,8 +150,8 @@ export async function GET(
     ).size
 
     // Calculate hub login percentage
-    const hubLoginPct = members.length > 0
-      ? Math.round((distinctLoginsThisMonth / members.length) * 100)
+    const hubLoginPct = userIds.length > 0
+      ? Math.round((distinctLoginsThisMonth / userIds.length) * 100)
       : null
 
     // Calculate mood averages
@@ -147,7 +173,7 @@ export async function GET(
 
     return NextResponse.json({
       has_real_data: hasRealData,
-      member_count: members.length,
+      member_count: userIds.length,
       logins_this_month: distinctLoginsThisMonth,
       active_users_7d: distinctActiveUsers7d,
       hub_login_pct: hubLoginPct,
