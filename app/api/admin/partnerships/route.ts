@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
     const enrichedPartnerships = partnershipsResult.map(p => ({
       ...p,
       org_name: orgMap.get(p.id) || null,
-      staff_count: staffCountMap.get(p.id) || 0,
+      staff_count: (p as any).staff_enrolled || staffCountMap.get(p.id) || 0,
     }));
 
     return NextResponse.json({
