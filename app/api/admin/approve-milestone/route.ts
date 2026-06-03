@@ -148,12 +148,13 @@ export async function POST(request: Request) {
       // Instead, recalculate which milestones can now be unlocked
       console.log('[approve-milestone] Out-of-order completion - recalculating unlocks');
 
-      // Get all milestones in order
+      // Get all milestones in order (join phases to sort by actual phase order, not alphabetical phase_id)
       const { data: allMilestones } = await supabase
         .from('milestones')
-        .select('id, phase_id, sort_order, name')
-        .order('phase_id')
-        .order('sort_order');
+        .select('id, phase_id, sort_order, name, phases!inner(sort_order)')
+        .lt('sort_order', 98)
+        .order('phases(sort_order)', { ascending: true })
+        .order('sort_order', { ascending: true });
 
       // Get all creator_milestones
       const { data: creatorMilestones } = await supabase
@@ -183,7 +184,7 @@ export async function POST(request: Request) {
             if (canUnlock) {
               console.log('[approve-milestone] Unlocking milestone:', ms.id);
               // Clear completion data when unlocking to ensure clean state
-              await supabase
+              const { error: oooUnlockError } = await supabase
                 .from('creator_milestones')
                 .update({
                   status: 'available',
@@ -193,6 +194,10 @@ export async function POST(request: Request) {
                 })
                 .eq('creator_id', creatorId)
                 .eq('milestone_id', ms.id);
+
+              if (oooUnlockError) {
+                console.error('[approve-milestone] Error in OOO unlock for:', ms.id, oooUnlockError);
+              }
 
               if (!nextMilestoneName) {
                 nextMilestoneName = ms.name || 'Next step';
@@ -302,7 +307,7 @@ export async function POST(request: Request) {
 
       if (nextMilestone) {
         // Clear completion data when unlocking to ensure clean state
-        await supabase
+        const { error: unlockError } = await supabase
           .from('creator_milestones')
           .update({
             status: 'available',
@@ -314,8 +319,16 @@ export async function POST(request: Request) {
           .eq('milestone_id', nextMilestone.id)
           .eq('status', 'locked');
 
+        if (unlockError) {
+          console.error('[approve-milestone] Error unlocking next milestone:', nextMilestone.id, unlockError);
+        } else {
+          console.log('[approve-milestone] Unlocked next milestone:', nextMilestone.id);
+        }
+
         // Use title or name, whichever exists
         nextMilestoneName = nextMilestone.title || nextMilestone.name || 'Next step';
+      } else {
+        console.warn('[approve-milestone] No next milestone found after:', milestoneId, 'in phase:', milestone?.phase_id);
       }
     }
 

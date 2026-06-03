@@ -90,7 +90,7 @@ export async function progressMilestone(
   }
 
   if (nextMilestone) {
-    await (supabase
+    const { error: unlockError } = await (supabase
       .from('creator_milestones') as any)
       .update({
         status: 'available',
@@ -102,9 +102,17 @@ export async function progressMilestone(
       .eq('milestone_id', nextMilestone.id)
       .eq('status', 'locked');
 
+    if (unlockError) {
+      console.error('[progressMilestone] Error unlocking next milestone:', nextMilestone.id, unlockError);
+    } else {
+      console.log('[progressMilestone] Unlocked next milestone:', nextMilestone.id);
+    }
+
     nextMilestoneName = (nextMilestone as { title?: string; name?: string }).title
       || (nextMilestone as { title?: string; name?: string }).name
       || null;
+  } else {
+    console.warn('[progressMilestone] No next milestone found after:', milestoneId);
   }
 
   return { nextMilestoneName, phaseId: milestone.phase_id };
