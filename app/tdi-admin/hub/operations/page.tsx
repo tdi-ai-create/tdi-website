@@ -46,7 +46,6 @@ import {
   Legend,
 } from 'recharts';
 import {
-  ArrowLeft,
   Users,
   BookOpen,
   Award,
@@ -56,7 +55,6 @@ import {
   Mail,
   Search,
   Download,
-  Upload,
   ChevronDown,
   ChevronUp,
   Check,

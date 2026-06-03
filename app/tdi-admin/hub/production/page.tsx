@@ -8,7 +8,6 @@ import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { CoursesTab } from '@/components/tdi-admin/hub/CoursesTab';
 import {
-  ArrowLeft,
   BookOpen,
   Zap,
   FolderOpen,
@@ -22,7 +21,6 @@ import {
   Edit2,
   Trash2,
   Copy,
-  Archive,
   Eye,
   EyeOff,
   Upload,
@@ -36,7 +34,6 @@ import {
   Users,
   TrendingUp,
   TrendingDown,
-  Minus,
   GripVertical,
   Check,
   X,
@@ -458,70 +455,23 @@ function QuickWinsTab() {
 
 // MEDIA LIBRARY TAB
 function MediaTab() {
-  const [filter, setFilter] = useState('all');
-
-  const mockMedia = [
-    { id: '1', name: 'intro-video.mp4', type: 'video', size: '45 MB', date: '2024-01-15' },
-    { id: '2', name: 'course-thumbnail.png', type: 'image', size: '1.2 MB', date: '2024-01-14' },
-    { id: '3', name: 'resource-guide.pdf', type: 'pdf', size: '2.5 MB', date: '2024-01-13' },
-  ];
-
-  const typeIcons: Record<string, React.ElementType> = {
-    video: Video,
-    image: Image,
-    pdf: FileText,
-  };
-
-  const typeColors: Record<string, string> = {
-    video: 'bg-purple-100 text-purple-700',
-    image: 'bg-green-100 text-green-700',
-    pdf: 'bg-red-100 text-red-700',
-  };
-
   return (
     <div>
-      {/* Filter Bar */}
-      <div className="flex flex-wrap gap-3 mb-6">
-        <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
-          {['all', 'videos', 'images', 'pdfs'].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                filter === f ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </button>
-          ))}
+      {/* Empty state */}
+      <div className="bg-white rounded-lg border border-gray-200 p-16 text-center">
+        <div className="w-20 h-20 rounded-full mx-auto mb-5 flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
+          <Image size={32} className="text-gray-400" />
         </div>
-        <div className="flex-1" />
-        <button
-          className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2"
-          style={{ backgroundColor: theme.accent }}
-        >
-          <Upload size={16} />
-          Upload Files
-        </button>
-      </div>
-
-      {/* Upload Zone */}
-      <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 mb-6 text-center hover:border-[#00B5AD] transition-colors cursor-pointer">
-        <Upload size={32} className="mx-auto mb-3 text-gray-400" />
-        <p className="text-sm text-gray-600 mb-1">Drag and drop files here, or click to browse</p>
-        <p className="text-xs text-gray-400">Supports videos, images, and PDFs</p>
-      </div>
-
-      {/* Empty state -- no uploads yet */}
-      <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-        <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
-          <Image size={28} className="text-gray-400" />
-        </div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">No media uploaded yet</h3>
-        <p className="text-sm text-gray-500 max-w-md mx-auto mb-4">
-          Upload PDFs, images, and other files for your courses and Quick Wins. Video hosting coming soon.
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Media Library</h3>
+        <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
+          Upload and manage PDFs, images, and other files for courses and Quick Wins. Files are stored in Supabase Storage.
         </p>
-        <p className="text-xs text-gray-400">Supabase Storage integration -- drag and drop or click Upload Files above</p>
+        <p className="text-xs text-gray-400 mb-6">Video hosting integration (Mux/Cloudflare) coming in a future update.</p>
+        <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 max-w-sm mx-auto hover:border-gray-300 transition-colors cursor-pointer">
+          <Upload size={24} className="mx-auto mb-2 text-gray-400" />
+          <p className="text-sm text-gray-500">Drag and drop files here</p>
+          <p className="text-xs text-gray-400 mt-1">PDF, PNG, JPG up to 10MB</p>
+        </div>
       </div>
     </div>
   );
