@@ -43,6 +43,8 @@ import {
   Info,
   RefreshCw,
   Sparkles,
+  BarChart3,
+  MessageSquare,
 } from 'lucide-react';
 import {
   TYPE_PAGE_TITLE,
@@ -660,43 +662,56 @@ function CalendarTab() {
 
 // FEEDBACK & RATINGS TAB
 function FeedbackTab() {
-  const [courses, setCourses] = useState<any[]>([]);
+  const [capacityData, setCapacityData] = useState<{ high: number; medium: number; low: number; total: number }>({ high: 0, medium: 0, low: 0, total: 0 });
+  const [contentRequests, setContentRequests] = useState<{ request: string; date: string }[]>([]);
+  const [vibeAvg, setVibeAvg] = useState<string>('--');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
+      try {
+        const res = await fetch('/api/tdi-admin/hub-connections?section=creators');
+        const data = await res.json();
+        setContentRequests((data.contentRequests || []).slice(0, 10));
+      } catch {}
+
+      // Get capacity feedback from hub_activity_log
       const supabase = getSupabase();
-      const { data } = await supabase
-        .from('hub_courses')
-        .select('id, title, slug')
-        .eq('is_published', true)
-        .order('title');
-      setCourses(data || []);
+      const { data: capacityEntries } = await supabase
+        .from('hub_activity_log')
+        .select('metadata')
+        .eq('action', 'capacity_feedback')
+        .limit(5000);
+
+      const counts = { high: 0, medium: 0, low: 0, total: 0 };
+      (capacityEntries || []).forEach((e: { metadata: Record<string, unknown> | null }) => {
+        const level = e.metadata?.capacity as string;
+        if (level === 'high') counts.high++;
+        else if (level === 'medium') counts.medium++;
+        else if (level === 'low') counts.low++;
+        counts.total++;
+      });
+      setCapacityData(counts);
+
+      // Get vibe check average
+      const { data: vibeData } = await supabase
+        .from('hub_activity_log')
+        .select('metadata')
+        .eq('action', 'wellbeing_check')
+        .order('created_at', { ascending: false })
+        .limit(500);
+
+      const scores = (vibeData || [])
+        .map((v: { metadata: { score?: number } }) => v.metadata?.score)
+        .filter((s): s is number => typeof s === 'number');
+      if (scores.length > 0) {
+        setVibeAvg((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1));
+      }
+
       setIsLoading(false);
     }
     load();
   }, []);
-
-  // Mock ratings data
-  const mockRatings = [
-    { course: 'Classroom Management Fundamentals', rating: 4.8, count: 156, trend: 'up' },
-    { course: 'Student Engagement Strategies', rating: 4.6, count: 89, trend: 'stable' },
-    { course: 'Teacher Wellbeing Essentials', rating: 4.9, count: 203, trend: 'up' },
-    { course: 'Effective Feedback Methods', rating: 4.2, count: 45, trend: 'down' },
-    { course: 'Inclusive Teaching Practices', rating: 4.5, count: 67, trend: 'stable' },
-  ];
-
-  const trendIcons: Record<string, React.ElementType> = {
-    up: TrendingUp,
-    down: TrendingDown,
-    stable: Minus,
-  };
-
-  const trendColors: Record<string, string> = {
-    up: 'text-green-500',
-    down: 'text-red-500',
-    stable: 'text-gray-400',
-  };
 
   if (isLoading) {
     return <div className="py-8 text-center text-gray-500">Loading feedback data...</div>;
@@ -709,139 +724,83 @@ function FeedbackTab() {
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#FFF8E7' }}>
-              <Star size={24} style={{ color: theme.accent }} />
+              <BarChart3 size={24} style={{ color: theme.accent }} />
             </div>
             <div>
-              <p style={{ ...TYPE_STAT_VALUE, color: '#2B3A67' }}>4.6</p>
-              <p className="text-sm text-gray-500">Average Rating</p>
+              <p style={{ ...TYPE_STAT_VALUE, color: '#2B3A67' }}>{capacityData.total}</p>
+              <p className="text-sm text-gray-500">Capacity Responses</p>
             </div>
           </div>
         </div>
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-green-50">
-              <Users size={24} className="text-green-600" />
+              <Star size={24} className="text-green-600" />
             </div>
             <div>
-              <p style={{ ...TYPE_STAT_VALUE, color: '#2B3A67' }}>560</p>
-              <p className="text-sm text-gray-500">Total Ratings</p>
+              <p style={{ ...TYPE_STAT_VALUE, color: '#2B3A67' }}>{vibeAvg}</p>
+              <p className="text-sm text-gray-500">Avg Vibe Score (1-5)</p>
             </div>
           </div>
         </div>
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-blue-50">
-              <BookOpen size={24} className="text-blue-600" />
+              <MessageSquare size={24} className="text-blue-600" />
             </div>
             <div>
-              <p style={{ ...TYPE_STAT_VALUE, color: '#2B3A67' }}>{courses.length}</p>
-              <p className="text-sm text-gray-500">Published Courses</p>
+              <p style={{ ...TYPE_STAT_VALUE, color: '#2B3A67' }}>{contentRequests.length}</p>
+              <p className="text-sm text-gray-500">Content Requests</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Ratings Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-8">
-        <div className="px-4 py-3 border-b border-gray-100">
-          <h3 style={TYPE_CARD_TITLE}>Course Ratings Overview</h3>
-        </div>
-        <table className="w-full">
-          <thead className="bg-[#FAFAF8]">
-            <tr>
-              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Course</th>
-              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Avg Rating</th>
-              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}># Ratings</th>
-              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Trend</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {mockRatings.map((item, i) => {
-              const TrendIcon = trendIcons[item.trend];
-              const isLowRated = item.rating < 3.0;
-              return (
-                <tr key={i} className={`${i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAF8]'} ${isLowRated ? 'bg-red-50' : ''}`}>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">{item.course}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1">
-                      <Star size={14} className="text-[#00B5AD] fill-[#00B5AD]" />
-                      <span className="text-sm font-medium text-gray-900">{item.rating}</span>
+      {/* Capacity Distribution */}
+      <div className="grid md:grid-cols-2 gap-6 mb-8">
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <h3 className="mb-4" style={TYPE_CARD_TITLE}>Educator Capacity Distribution</h3>
+          <p className="text-xs text-gray-500 mb-4">When educators interact with resources, we ask how much capacity they have. This shows the aggregate picture.</p>
+          {capacityData.total === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-4">No capacity feedback collected yet. Data appears as educators use the Hub.</p>
+          ) : (
+            <div className="space-y-3">
+              {[
+                { label: 'High capacity', value: capacityData.high, color: '#2A9D8F', bg: '#D1FAE5' },
+                { label: 'Medium capacity', value: capacityData.medium, color: '#E8B84B', bg: '#FEF3C7' },
+                { label: 'Low capacity', value: capacityData.low, color: '#EF4444', bg: '#FEE2E2' },
+              ].map((level) => {
+                const pct = capacityData.total > 0 ? (level.value / capacityData.total) * 100 : 0;
+                return (
+                  <div key={level.label}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-600">{level.label}</span>
+                      <span className="font-medium">{level.value} ({pct.toFixed(0)}%)</span>
                     </div>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{item.count}</td>
-                  <td className="px-4 py-3">
-                    <TrendIcon size={16} className={trendColors[item.trend]} />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Satisfaction Breakdown */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <h3 className="mb-4" style={TYPE_CARD_TITLE}>Satisfaction Breakdown</h3>
-          <div className="space-y-3">
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="text-gray-600">Great</span>
-                <span className="font-medium">72%</span>
-              </div>
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-full bg-green-500 rounded-full" style={{ width: '72%' }} />
-              </div>
+                    <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: level.bg }}>
+                      <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: level.color }} />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="text-gray-600">OK</span>
-                <span className="font-medium">21%</span>
-              </div>
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-full bg-[#00B5AD] rounded-full" style={{ width: '21%' }} />
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="text-gray-600">Needs Work</span>
-                <span className="font-medium">7%</span>
-              </div>
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-full bg-red-500 rounded-full" style={{ width: '7%' }} />
-              </div>
-            </div>
-          </div>
+          )}
         </div>
 
         <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <h3 className="mb-4" style={TYPE_CARD_TITLE}>Recent Feedback</h3>
-          <div className="space-y-4">
-            <div className="p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="flex">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} size={12} className={star <= 5 ? 'text-[#00B5AD] fill-[#00B5AD]' : 'text-gray-300'} />
-                  ))}
+          <h3 className="mb-4" style={TYPE_CARD_TITLE}>Content Requests from Educators</h3>
+          {contentRequests.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-4">No content requests yet.</p>
+          ) : (
+            <div className="space-y-3 max-h-[300px] overflow-y-auto">
+              {contentRequests.map((req, i) => (
+                <div key={i} className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600">{String(req.request)}</p>
+                  <p className="text-xs text-gray-400 mt-1">{new Date(req.date).toLocaleDateString()}</p>
                 </div>
-                <span className="text-xs text-gray-500">2 hours ago</span>
-              </div>
-              <p className="text-sm text-gray-600">&ldquo;Great strategies! Already using them in my classroom.&rdquo;</p>
-              <p className="text-xs text-gray-400 mt-1">Classroom Management Fundamentals</p>
+              ))}
             </div>
-            <div className="p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="flex">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} size={12} className={star <= 4 ? 'text-[#00B5AD] fill-[#00B5AD]' : 'text-gray-300'} />
-                  ))}
-                </div>
-                <span className="text-xs text-gray-500">1 day ago</span>
-              </div>
-              <p className="text-sm text-gray-600">&ldquo;Helpful content, would love more examples.&rdquo;</p>
-              <p className="text-xs text-gray-400 mt-1">Student Engagement Strategies</p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
