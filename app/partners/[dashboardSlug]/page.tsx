@@ -57,7 +57,12 @@ import {
   Handshake,
   Receipt,
 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { supabase } from '@/lib/supabase';
+
+const LeadershipQuiz = dynamic(() => import('@/components/dashboard/shared/LeadershipQuiz'), { ssr: false });
+const AICoachingCard = dynamic(() => import('@/components/dashboard/shared/AICoachingCard'), { ssr: false });
+const LeadershipToolkit = dynamic(() => import('@/components/dashboard/shared/LeadershipToolkit'), { ssr: false });
 import { getMetricStatus, statusColors, statusShapes, statusLabels, formatMetricValue, getMetricDescription } from '@/lib/metric-thresholds';
 import TDIPortalLoader from '@/components/TDIPortalLoader';
 import PilotNextYearTab from '@/components/dashboard/pilot/PilotNextYearTab';
@@ -3747,6 +3752,15 @@ export default function PartnerDashboard() {
                 ))}
               </div>
             </div>
+
+            {/* Leadership Quiz */}
+            <LeadershipQuiz />
+
+            {/* AI Coaching */}
+            <AICoachingCard />
+
+            {/* Leadership Toolkit */}
+            <LeadershipToolkit />
 
           </div>
         )}

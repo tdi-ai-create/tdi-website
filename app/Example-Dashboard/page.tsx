@@ -3,6 +3,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
+import dynamic from 'next/dynamic';
+
+const LeadershipQuiz = dynamic(() => import('@/components/dashboard/shared/LeadershipQuiz'), { ssr: false });
+const AICoachingCard = dynamic(() => import('@/components/dashboard/shared/AICoachingCard'), { ssr: false });
+const LeadershipToolkit = dynamic(() => import('@/components/dashboard/shared/LeadershipToolkit'), { ssr: false });
 import {
   Calendar,
   CheckCircle,
@@ -1740,6 +1745,15 @@ export default function ExampleDashboard() {
                 ))}
               </div>
             </div>
+
+            {/* ─── LEADERSHIP QUIZ ─── */}
+            <LeadershipQuiz />
+
+            {/* ─── AI COACHING ─── */}
+            <AICoachingCard />
+
+            {/* ─── LEADERSHIP TOOLKIT ─── */}
+            <LeadershipToolkit />
 
           </div>
         )}
