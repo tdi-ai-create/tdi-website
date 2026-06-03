@@ -184,35 +184,74 @@ interface HubStats {
   categoryBreakdown?: Record<string, number>;
   schoolBreakdown?: { name: string; count: number; district: string; state: string }[];
   stateBreakdown?: Record<string, number>;
+  previousWeek?: { signups: number; enrollments: number; completions: number; certificates: number };
 }
 
-// Modern Stat Card Component - simplified without icon circles
+// Modern Stat Card Component with trend indicator + hover tooltip
 function StatCard({
   label,
   value,
   subtitle,
+  trend,
+  hoverDetail,
 }: {
   label: string;
   value: number | string;
   subtitle?: string;
+  trend?: { current: number; previous: number };
+  hoverDetail?: string;
 }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  const trendPct = trend && trend.previous > 0
+    ? ((trend.current - trend.previous) / trend.previous) * 100
+    : null;
+  const trendUp = trendPct !== null && trendPct > 0;
+  const trendDown = trendPct !== null && trendPct < 0;
+
   return (
     <div
-      className="bg-white rounded-xl border border-gray-100 relative overflow-hidden"
+      className="bg-white rounded-xl border border-gray-100 relative overflow-hidden group"
       style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
     >
       {/* Accent top bar */}
       <div className="h-0.5 w-full" style={{ background: theme.accent }} />
       <div className="p-5">
-        <p
-          className="mb-1"
-          style={{ ...TYPE_STAT_VALUE, color: theme.accent }}
-        >
-          {typeof value === 'number' ? value.toLocaleString() : value}
-        </p>
+        <div className="flex items-baseline gap-2">
+          <p
+            className="mb-1"
+            style={{ ...TYPE_STAT_VALUE, color: theme.accent }}
+          >
+            {typeof value === 'number' ? value.toLocaleString() : value}
+          </p>
+          {trendPct !== null && Math.abs(trendPct) >= 0.1 && (
+            <span
+              className="text-[10px] font-semibold flex items-center gap-0.5"
+              style={{ color: trendUp ? '#2A9D8F' : trendDown ? '#EF4444' : '#9CA3AF' }}
+            >
+              {trendUp ? '\u2191' : trendDown ? '\u2193' : '\u2022'}
+              {Math.abs(trendPct).toFixed(0)}%
+            </span>
+          )}
+        </div>
         <p style={TYPE_STAT_LABEL}>{label}</p>
         {subtitle && <p className="mt-1" style={TYPE_SMALL}>{subtitle}</p>}
       </div>
+
+      {/* Hover tooltip */}
+      {hoverDetail && showTooltip && (
+        <div
+          className="absolute z-20 bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg text-xs max-w-[220px] text-center pointer-events-none"
+          style={{ backgroundColor: '#1e2749', color: 'white', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
+        >
+          {hoverDetail}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px">
+            <div style={{ width: 0, height: 0, borderLeft: '6px solid transparent', borderRight: '6px solid transparent', borderTop: '6px solid #1e2749' }} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -388,17 +427,50 @@ export default function HubAdminPage() {
             </div>
           ) : stats ? (
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-              <StatCard label="Total Users" value={stats.totalUsers || 0} />
-              <StatCard label="Free Users" value={stats.freeUsers || 0} />
-              <StatCard label="Paid / District" value={stats.paidUsers || 0} />
-              <StatCard label="Enrollments" value={stats.totalEnrollments || 0} />
-              <StatCard label="Completions" value={stats.totalCompletions || 0} />
-              <StatCard label="Certificates" value={stats.totalCertificates || 0} />
-              <StatCard label="PD Hours" value={stats.totalPdHours || 0} />
+              <StatCard
+                label="Total Users"
+                value={stats.totalUsers || 0}
+                trend={{ current: stats.recentSignups || 0, previous: stats.previousWeek?.signups || 0 }}
+                hoverDetail={`${(stats.recentSignups || 0).toLocaleString()} signups this week. ${(stats.todaySignups || 0).toLocaleString()} today.`}
+              />
+              <StatCard
+                label="Free Users"
+                value={stats.freeUsers || 0}
+                hoverDetail="Users without a paid membership. Includes imported Substack subscribers."
+              />
+              <StatCard
+                label="Paid / District"
+                value={stats.paidUsers || 0}
+                hoverDetail={Object.entries(stats.membershipByTier || {}).map(([t, c]) => `${t}: ${c}`).join(', ') || 'No memberships'}
+              />
+              <StatCard
+                label="Enrollments"
+                value={stats.totalEnrollments || 0}
+                trend={{ current: stats.totalEnrollments || 0, previous: (stats.totalEnrollments || 0) - (stats.previousWeek?.enrollments || 0) }}
+                hoverDetail="Total course enrollments across all users."
+              />
+              <StatCard
+                label="Completions"
+                value={stats.totalCompletions || 0}
+                trend={{ current: stats.totalCompletions || 0, previous: (stats.totalCompletions || 0) - (stats.previousWeek?.completions || 0) }}
+                hoverDetail="Courses completed with all lessons marked done."
+              />
+              <StatCard
+                label="Certificates"
+                value={stats.totalCertificates || 0}
+                trend={{ current: stats.totalCertificates || 0, previous: (stats.totalCertificates || 0) - (stats.previousWeek?.certificates || 0) }}
+                hoverDetail="PD certificates earned on course completion."
+              />
+              <StatCard
+                label="PD Hours"
+                value={stats.totalPdHours || 0}
+                hoverDetail="Total professional development hours earned across all certificates."
+              />
               <StatCard
                 label="Avg Vibe"
                 value={stats.avgStressScore || '-'}
                 subtitle="1=tough, 5=great"
+                hoverDetail="Average Vibe Check score from latest check-in per user. Private to each educator."
               />
             </div>
           ) : (

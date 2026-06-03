@@ -332,6 +332,33 @@ export async function GET() {
         .from('quick_win_responses')
         .select('id', { count: 'exact', head: true })
         .then(r => r.count || 0),
+
+      // Previous week comparison for trend indicators
+      previousWeek: await (async () => {
+        const twoWeeksAgo = new Date();
+        twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+        const [prevSignups, prevEnrollments, prevCompletions, prevCerts] = await Promise.all([
+          supabase.from('hub_profiles').select('id', { count: 'exact', head: true })
+            .gte('created_at', twoWeeksAgo.toISOString()).lt('created_at', oneWeekAgo.toISOString()),
+          supabase.from('hub_enrollments').select('id', { count: 'exact', head: true })
+            .gte('created_at', twoWeeksAgo.toISOString()).lt('created_at', oneWeekAgo.toISOString()),
+          supabase.from('hub_enrollments').select('id', { count: 'exact', head: true })
+            .eq('status', 'completed')
+            .gte('completed_at', twoWeeksAgo.toISOString()).lt('completed_at', oneWeekAgo.toISOString()),
+          supabase.from('hub_certificates').select('id', { count: 'exact', head: true })
+            .gte('issued_at', twoWeeksAgo.toISOString()).lt('issued_at', oneWeekAgo.toISOString()),
+        ]);
+
+        return {
+          signups: prevSignups.count || 0,
+          enrollments: prevEnrollments.count || 0,
+          completions: prevCompletions.count || 0,
+          certificates: prevCerts.count || 0,
+        };
+      })(),
     });
   } catch (error) {
     console.error('[Admin Stats API] Error:', error);
