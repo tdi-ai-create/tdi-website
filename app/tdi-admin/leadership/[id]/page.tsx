@@ -129,6 +129,10 @@ export default function AdminPartnershipDetailPage() {
     filename: string
   }>({ open: false, fileId: '', filename: '' })
 
+  // AI insight state
+  const [aiInsight, setAiInsight] = useState<string | null>(null)
+  const [aiInsightLoading, setAiInsightLoading] = useState(false)
+
   // UI state
   const [loading, setLoading] = useState(true)
   const [editMode, setEditMode] = useState(false)
@@ -246,6 +250,14 @@ export default function AdminPartnershipDetailPage() {
         if (refs) setReflections(refs)
         if (obsImpact) setObservationImpact(obsImpact)
       }).catch(err => console.error('Hub signal fetch error:', err))
+
+      // Fetch AI insight for this partnership (non-blocking)
+      setAiInsightLoading(true)
+      fetch(`/api/partnerships/${partnershipId}/ai-insight`)
+        .then(r => r.json())
+        .then(data => { if (data.insight) setAiInsight(data.insight) })
+        .catch(() => {})
+        .finally(() => setAiInsightLoading(false))
     } finally {
       setLoading(false)
     }
@@ -646,6 +658,25 @@ export default function AdminPartnershipDetailPage() {
             defaults={defaults}
           />
         </SectionHighlight>
+
+        {/* AI Partnership Insight */}
+        {(aiInsight || aiInsightLoading) && (
+          <div
+            className="rounded-xl p-5 mb-4"
+            style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #263554 100%)', borderLeft: '3px solid #E8B84B' }}
+          >
+            <div className="flex items-center gap-1.5 mb-2">
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8B84B', display: 'inline-block', animation: aiInsightLoading ? 'pulse 2s infinite' : 'none' }} />
+              <span style={{ fontSize: 10, fontWeight: 700, color: '#E8B84B', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                AI Partnership Insight
+              </span>
+            </div>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, margin: 0 }}>
+              {aiInsightLoading ? 'Generating insight for this partnership...' : aiInsight}
+            </p>
+            <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
+          </div>
+        )}
 
         {/* Edit mode - momentum fields */}
         {editMode && (
