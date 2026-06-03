@@ -44,4 +44,5 @@ export const GROUP_MOMENTS_BY_GAME = {
   whatsyourmove: [] as string[],
   classroomshuffle: [] as string[],
   prioritize: [] as string[],
+  energybudget: [] as string[],
 } as const;

@@ -11,6 +11,7 @@ import { FeedbackMakeover } from '@/app/paragametools/components/FeedbackMakeove
 import { WhatsYourMove } from '@/app/paragametools/components/WhatsYourMove'
 import { ClassroomShuffle } from '@/app/paragametools/components/ClassroomShuffle'
 import { PrioritizeThis } from '@/app/paragametools/components/PrioritizeThis'
+import { EnergyBudget } from '@/app/paragametools/components/EnergyBudget'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub'
@@ -61,6 +62,11 @@ const PRACTICE_TOOLS: Record<string, {
     component: PrioritizeThis,
     title: 'Prioritize This',
     category: 'Classroom Scenarios',
+  },
+  'energy-budget': {
+    component: EnergyBudget,
+    title: 'Energy Budget',
+    category: 'Self-Care',
   },
 }
 

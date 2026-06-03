@@ -28,6 +28,7 @@ const TIMES: Record<GameId, string> = {
   whatsyourmove: '~8 min',
   classroomshuffle: '~10 min',
   prioritize: '~10 min',
+  energybudget: '~10 min',
 };
 
 interface HomeScreenProps {

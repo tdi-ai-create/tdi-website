@@ -121,6 +121,17 @@ const PRACTICE_TOOLS: QuickWin[] = [
     access_tier: 'free',
     capacity: 'medium',
   },
+  {
+    id: 'practice-energy-budget',
+    slug: 'energy-budget',
+    title: 'Energy Budget',
+    description: 'You have 100 energy points. How do you spend your day? Compare with experienced educators.',
+    category: 'Games',
+    estimated_minutes: 10,
+    content_type: 'activity',
+    access_tier: 'free',
+    capacity: 'low',
+  },
 ];
 
 interface QuickWin {

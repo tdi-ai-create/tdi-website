@@ -31,6 +31,7 @@ const GAME_ICONS: Record<GameId, typeof Target> = {
   whatsyourmove: Crosshair,
   classroomshuffle: Target,
   prioritize: TrendingUp,
+  energybudget: Target,
 };
 
 interface FacilitatorDashboardProps {

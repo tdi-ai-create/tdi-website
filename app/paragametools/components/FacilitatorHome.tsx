@@ -13,6 +13,7 @@ const GAME_ICONS: Record<string, typeof Target> = {
   whatsyourmove: Crosshair,
   classroomshuffle: Target,
   prioritize: TrendingUp,
+  energybudget: Target,
 };
 
 interface FacilitatorHomeProps {
