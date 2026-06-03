@@ -372,6 +372,7 @@ export default function PartnerDashboard() {
   const [teacherQuotes, setTeacherQuotes] = useState<{ id: string; quote_text: string; teacher_role: string; session_type: string; created_at: string }[]>([]);
   const [suggestions, setSuggestions] = useState<TDISuggestion[]>([]);
   const [sessionRecords, setSessionRecords] = useState<SessionRecord[]>([]);
+  const [hubIntel, setHubIntel] = useState<Record<string, unknown> | null>(null);
   const [hubStats, setHubStats] = useState<{
     has_real_data: boolean
     member_count: number
@@ -560,7 +561,17 @@ export default function PartnerDashboard() {
         }
       } catch (hubError) {
         console.error('Error fetching hub stats:', hubError);
-        // Non-fatal - dashboard works without real-time Hub data
+      }
+
+      // Fetch Hub Intelligence (rich data for leadership view)
+      try {
+        const intelResponse = await fetch(`/api/partnerships/${partnershipId}/hub-intelligence`);
+        if (intelResponse.ok) {
+          const intelData = await intelResponse.json();
+          if (intelData.hasData) setHubIntel(intelData);
+        }
+      } catch (intelError) {
+        console.error('Error fetching hub intelligence:', intelError);
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -1350,7 +1361,9 @@ export default function PartnerDashboard() {
                     <p className="text-xs text-gray-500">What your team is doing on the TDI Learning Hub this month</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+                {/* Core metrics */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
                   <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
                     <p className="text-2xl font-bold" style={{ color: '#E8B84B' }}>{hubStats.hub_login_pct ?? 0}%</p>
                     <p className="text-xs text-gray-500 mt-1">of your team logged in this month</p>
@@ -1377,6 +1390,109 @@ export default function PartnerDashboard() {
                     )}
                   </div>
                 </div>
+
+                {/* Rich intelligence data */}
+                {hubIntel && (() => {
+                  const intel = hubIntel as {
+                    popularTools?: { title: string; views: number }[];
+                    mostCommonType?: { type: string; count: number } | null;
+                    quizBreakdown?: Record<string, number>;
+                    communityPostCount?: number;
+                    qaThreadCount?: number;
+                    communityHighlights?: { quote: string; type: string }[];
+                    fieldNotesEarned?: number;
+                    educatorsNeedingSupport?: number;
+                    testimonials?: string[];
+                  };
+                  return (
+                  <div className="space-y-4 pt-4" style={{ borderTop: '1px solid #F3F4F6' }}>
+
+                    {/* Popular tools in your building */}
+                    {(intel.popularTools as { title: string; views: number }[])?.length > 0 && (
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Popular in Your Building</p>
+                        <div className="flex flex-wrap gap-2">
+                          {(intel.popularTools as { title: string; views: number }[]).slice(0, 4).map((tool, i) => (
+                            <span key={i} className="text-xs px-3 py-1.5 rounded-full" style={{ background: '#FFF8E7', color: '#92400E' }}>
+                              {tool.title}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Educator quiz breakdown */}
+                    {intel.mostCommonType && (
+                      <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F9FAFB' }}>
+                        <span className="text-lg">&#9734;</span>
+                        <div>
+                          <p className="text-sm font-medium" style={{ color: '#1B2A4A' }}>
+                            Your building&apos;s most common educator type: <strong>The {(intel.mostCommonType as { type: string; count: number }).type}</strong>
+                          </p>
+                          {Object.keys(intel.quizBreakdown as Record<string, number>).length > 1 && (
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              {Object.entries(intel.quizBreakdown as Record<string, number>).map(([type, count]) => `${count} ${type}${(count as number) !== 1 ? 's' : ''}`).join(', ')}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Community engagement */}
+                    {((intel.communityPostCount as number) > 0 || (intel.qaThreadCount as number) > 0) && (
+                      <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F0FDF4' }}>
+                        <span className="text-lg">&#128172;</span>
+                        <p className="text-sm" style={{ color: '#374151' }}>
+                          Your team contributed <strong>{intel.communityPostCount as number} posts</strong> and engaged in <strong>{intel.qaThreadCount as number} Q&A threads</strong> -- helping other educators across the country.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Community highlight (anonymized) */}
+                    {(intel.communityHighlights as { quote: string; type: string }[])?.length > 0 && (
+                      <div className="p-4 rounded-xl" style={{ background: '#FFFBEB', borderLeft: '3px solid #E8B84B' }}>
+                        <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">From Your Team</p>
+                        <p className="text-sm italic" style={{ color: '#374151', lineHeight: 1.6 }}>
+                          &ldquo;{(intel.communityHighlights as { quote: string }[])[0].quote}&rdquo;
+                        </p>
+                        <p className="text-[10px] text-gray-400 mt-1">-- An educator in your building</p>
+                      </div>
+                    )}
+
+                    {/* Field Notes earned */}
+                    {(intel.fieldNotesEarned as number) > 0 && (
+                      <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F9FAFB' }}>
+                        <span className="text-lg">&#127942;</span>
+                        <p className="text-sm" style={{ color: '#374151' }}>
+                          Your team earned <strong>{intel.fieldNotesEarned as number} Field Notes</strong> -- recognitions for showing up and doing the work.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* TDI wellness outreach */}
+                    {(intel.educatorsNeedingSupport as number) > 0 && (
+                      <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#EFF6FF' }}>
+                        <span className="text-lg">&#128153;</span>
+                        <p className="text-sm" style={{ color: '#374151' }}>
+                          TDI personally reached out to <strong>{intel.educatorsNeedingSupport as number}</strong> team member{(intel.educatorsNeedingSupport as number) !== 1 ? 's' : ''} this week for a wellness check-in.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Broader community testimonial */}
+                    {(intel.testimonials as string[])?.length > 0 && (
+                      <div className="pt-3" style={{ borderTop: '1px solid #F3F4F6' }}>
+                        <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">From the TDI Community</p>
+                        <p className="text-sm italic text-gray-500" style={{ lineHeight: 1.6 }}>
+                          &ldquo;{(intel.testimonials as string[])[0]}&rdquo;
+                        </p>
+                        <p className="text-[10px] text-gray-400 mt-1">-- TDI Hub educator</p>
+                      </div>
+                    )}
+                  </div>
+                  );
+                })()}
+
                 {hubStats.course_completions && hubStats.course_completions > 0 && (
                   <p className="text-xs text-gray-500 mt-4 pt-3" style={{ borderTop: '1px solid #F3F4F6' }}>
                     {hubStats.course_completions} course{hubStats.course_completions !== 1 ? 's' : ''} completed by your team -- PD credit they can show you.
