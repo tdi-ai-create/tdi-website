@@ -63,7 +63,7 @@ function formatSubmissionData(data: SubmissionData): { label: string; timestamp:
     case 'preferences': {
       const prefs: string[] = [];
       if (data.wants_video_editing) prefs.push('Video editing');
-      if (data.wants_download_design) prefs.push('Quick Tool design');
+      prefs.push('Download design (team-built)');
       return {
         label: prefs.length > 0 ? `Selected: ${prefs.join(', ')}` : 'Preferences saved',
         timestamp: formatDate(data.submitted_at),

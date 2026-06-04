@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       display_order: 99,
       // Reset production preferences
       wants_video_editing: false,
-      wants_download_design: false,
+      wants_download_design: true, // always team-built from spec
       // Reset publish status
       publish_status: 'in_progress',
       scheduled_publish_date: null,

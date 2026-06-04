@@ -78,7 +78,7 @@ export async function POST(request: Request) {
         course_url: null,
         launch_date: null,
         wants_video_editing: false,
-        wants_download_design: false,
+        wants_download_design: true, // always team-built from spec
         active_project_id: newProject.id,
         updated_at: new Date().toISOString()
       })

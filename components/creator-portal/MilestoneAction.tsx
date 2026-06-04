@@ -219,7 +219,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
           submissionType: 'preferences',
           content: {
             wants_video_editing: wantsVideoEditing,
-            wants_download_design: wantsDownloadDesign
+            wants_download_design: true // always team-built from spec
           }
         }),
       });
@@ -477,7 +477,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
       exampleLabel: 'See recording tips'
     },
     course_guide_reviewed: {
-      tip: 'Choose whether you want TDI to edit your videos and design your downloads.',
+      tip: 'Let us know how you want to handle video editing. Our team handles all download design from your content spec.',
     },
     branding_confirmed: {
       tip: 'Review your course thumbnail, marketing graphics, and description copy.',
@@ -935,31 +935,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
 
               <div className="border-t border-gray-200 pt-4">
                 <p className="font-medium text-[#1e2749] mb-3">DOWNLOADS</p>
-                <p className="text-sm text-gray-600 mb-3">Do you want TDI to design your downloads?</p>
-                <div className="space-y-2">
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="download_design"
-                      checked={!wantsDownloadDesign}
-                      onChange={() => setWantsDownloadDesign(false)}
-                      disabled={isAdminPreview}
-                      className="mt-1"
-                    />
-                    <span className="text-sm">I&apos;ll design my own downloads</span>
-                  </label>
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="download_design"
-                      checked={wantsDownloadDesign}
-                      onChange={() => setWantsDownloadDesign(true)}
-                      disabled={isAdminPreview}
-                      className="mt-1"
-                    />
-                    <span className="text-sm">I&apos;d like TDI to design them (I&apos;ll draft content in a Google Doc)</span>
-                  </label>
-                </div>
+                <p className="text-sm text-gray-600">Our team designs all downloads from your content spec. You&apos;ll submit your content in a Google Doc and we&apos;ll handle the rest.</p>
               </div>
             </div>
 

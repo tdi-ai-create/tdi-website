@@ -257,8 +257,8 @@ export function CourseDetailsPanel({ creator }: CourseDetailsPanelProps) {
               <div className="flex-grow">
                 <p className="text-sm text-[#1e2749]">Quick Tool Design</p>
               </div>
-              <span className={`text-xs px-2 py-1 rounded-full ${creator.wants_download_design ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                {creator.wants_download_design ? 'TDI will design' : 'Self-designing'}
+              <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
+                TDI will design
               </span>
             </div>
           </div>

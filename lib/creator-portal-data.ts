@@ -45,6 +45,11 @@ export function getContextAwareMilestoneTitle(
       download: "Download Live!",
       course: "Course Launched",
     },
+    course_guide_reviewed: {
+      course: "Production preferences",
+      blog: "Production preferences",
+      download: "Production preferences",
+    },
   };
 
   const milestoneTitles = contextTitles[milestoneId];
