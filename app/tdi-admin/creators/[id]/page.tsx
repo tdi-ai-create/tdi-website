@@ -234,7 +234,20 @@ export default function TDIAdminCreatorDetailPage() {
   const adminEmail = teamMember?.email || '';
 
   const loadData = useCallback(async () => {
-    const data = await getCreatorDashboardData(creatorId);
+    // Use API route with service role to bypass RLS
+    let data = null;
+    try {
+      const res = await fetch(`/api/admin/creators/${creatorId}/data`);
+      if (res.ok) {
+        data = await res.json();
+      }
+    } catch (e) {
+      console.error('[tdi-admin] Error fetching creator data:', e);
+    }
+    // Fallback to client-side if API fails
+    if (!data) {
+      data = await getCreatorDashboardData(creatorId);
+    }
     if (data) {
       setDashboardData(data);
       setEditedDetails({
@@ -280,8 +293,13 @@ export default function TDIAdminCreatorDetailPage() {
       }
     }
 
-    const notes = await getCreatorNotes(creatorId, true);
-    setAllNotes(notes);
+    // Use notes from API response if available, fallback to client-side
+    if (data.notes) {
+      setAllNotes(data.notes);
+    } else {
+      const notes = await getCreatorNotes(creatorId, true);
+      setAllNotes(notes);
+    }
 
     // Load projected date history via API (bypasses RLS)
     try {
