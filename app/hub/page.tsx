@@ -256,6 +256,9 @@ export default function HubDashboard() {
   const [aiInsightLoading, setAiInsightLoading] = useState(false);
   const [aiInsightExpanded, setAiInsightExpanded] = useState(false);
   const [newRecognition, setNewRecognition] = useState<Recognition | null>(null);
+  const [likeYouRecs, setLikeYouRecs] = useState<{ id: string; slug: string; title: string; category: string }[]>([]);
+  const [likeYouCohortSize, setLikeYouCohortSize] = useState(0);
+  const [likeYouType, setLikeYouType] = useState<string | null>(null);
 
 
   const firstName = profile?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Teacher';
@@ -447,6 +450,20 @@ export default function HubDashboard() {
           for (const row of quizRows) qResults[row.quiz_type] = row.result_key;
         }
         setDashboardQuizResults(qResults);
+
+        // Fetch "Educators like you" recommendations
+        if (qResults['educator_type']) {
+          fetch(`/api/hub/quiz-recommendations?userId=${user.id}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data.recommendations?.length > 0) {
+                setLikeYouRecs(data.recommendations);
+                setLikeYouCohortSize(data.cohortSize || 0);
+                setLikeYouType(data.educatorType || null);
+              }
+            })
+            .catch(() => {});
+        }
 
         // Fetch certificate count
         const { count: certCount } = await supabase
@@ -1643,6 +1660,34 @@ export default function HubDashboard() {
                     </Link>
                   );
                 })}
+              </div>
+            </div>
+          )}
+
+          {/* Educators Like You */}
+          {likeYouRecs.length > 0 && likeYouType && (
+            <div
+              className="bg-white rounded-2xl p-5"
+              style={{ border: '1px solid rgba(27,42,74,0.08)' }}
+            >
+              <div className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
+                {tUI('Educators like you')}
+              </div>
+              <p className="text-xs mb-3" style={{ color: '#9CA3AF' }}>
+                {tUI('Popular with')} {likeYouCohortSize} {tUI('other')} {likeYouType}s
+              </p>
+              <div className="space-y-2.5">
+                {likeYouRecs.map(qw => (
+                  <Link
+                    key={qw.id}
+                    href={`/hub/quick-wins/${qw.slug}`}
+                    className="block bg-white rounded-xl p-3 hover:shadow-sm transition-shadow"
+                    style={{ border: '1px solid #E9E7E2' }}
+                  >
+                    <div className="text-sm font-medium" style={{ color: '#1B2A4A' }}>{qw.title}</div>
+                    <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{qw.category}</div>
+                  </Link>
+                ))}
               </div>
             </div>
           )}
