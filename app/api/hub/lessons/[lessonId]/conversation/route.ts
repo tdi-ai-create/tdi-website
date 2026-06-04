@@ -56,7 +56,8 @@ export async function GET(
         hub_profiles!inner (
           display_name,
           role,
-          avatar_url
+          avatar_url,
+          educator_type
         )
       `)
       .eq('lesson_id', lessonId)
@@ -81,6 +82,7 @@ export async function GET(
         name: post.hub_profiles?.display_name || 'Anonymous',
         role: post.hub_profiles?.role || null,
         avatar_url: post.hub_profiles?.avatar_url || null,
+        educator_type: post.hub_profiles?.educator_type || null,
       },
     }))
 
@@ -154,7 +156,8 @@ export async function POST(
         hub_profiles!inner (
           display_name,
           role,
-          avatar_url
+          avatar_url,
+          educator_type
         )
       `)
       .single()

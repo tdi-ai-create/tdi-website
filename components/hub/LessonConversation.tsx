@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { MessageCircle, X, ThumbsUp, Flag, Bookmark, Pin, ChevronDown, Send } from 'lucide-react'
 import { useTranslation } from '@/lib/hub/useTranslation'
+import EducatorBadge from '@/components/hub/EducatorBadge'
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 
@@ -330,9 +331,7 @@ function PostCard({ post, userId, isAdmin, onRefresh, tUI }: { post: Conversatio
           <p className="text-xs text-gray-400 mb-3">
             {post.author.name}
             {post.author.educator_type && (
-              <span className="ml-1 inline-block px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ backgroundColor: '#FEF3C7', color: '#92400E' }}>
-                The {post.author.educator_type}
-              </span>
+              <EducatorBadge educatorType={post.author.educator_type} />
             )}
             {post.author.role && <span> · {formatRole(post.author.role)}</span>}
             <span> · {timeAgo}</span>
@@ -425,9 +424,7 @@ function PostCard({ post, userId, isAdmin, onRefresh, tUI }: { post: Conversatio
                     <p className="text-xs text-gray-400 mb-1">
                       <span className="font-medium text-gray-600">{r.author.name}</span>
                       {r.author.educator_type && (
-                        <span className="ml-1 inline-block px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ backgroundColor: '#FEF3C7', color: '#92400E' }}>
-                          The {r.author.educator_type}
-                        </span>
+                        <EducatorBadge educatorType={r.author.educator_type} />
                       )}
                       {r.author.role && <span> · {formatRole(r.author.role)}</span>}
                       <span> · {getTimeAgo(r.posted_at)}</span>

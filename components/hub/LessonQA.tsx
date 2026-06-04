@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { MessageCircle, Send, ChevronDown, ChevronUp, ThumbsUp, Flag, Bookmark, Pin } from 'lucide-react'
 import { useTranslation } from '@/lib/hub/useTranslation'
+import EducatorBadge from '@/components/hub/EducatorBadge'
 
 interface Author {
   name: string
@@ -398,9 +399,7 @@ export default function LessonQA({ contentId, userId, isAdmin, apiBasePath }: Le
                           {q.author.name}
                         </span>
                         {q.author.educator_type && (
-                          <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ backgroundColor: '#FEF3C7', color: '#92400E' }}>
-                            The {q.author.educator_type}
-                          </span>
+                          <EducatorBadge educatorType={q.author.educator_type} />
                         )}
                         {q.author.role && (
                           <span className="text-xs" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
@@ -460,9 +459,7 @@ export default function LessonQA({ contentId, userId, isAdmin, apiBasePath }: Le
                                 {r.author.name}
                               </span>
                               {r.author.educator_type && (
-                                <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ backgroundColor: '#FEF3C7', color: '#92400E' }}>
-                                  The {r.author.educator_type}
-                                </span>
+                                <EducatorBadge educatorType={r.author.educator_type} />
                               )}
                               {r.author.role && (
                                 <span className="text-xs" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>

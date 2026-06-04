@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
     // Get reply author profile
     const { data: profile } = await supabase
       .from('hub_profiles')
-      .select('display_name, role')
+      .select('display_name, role, educator_type')
       .eq('id', user_id)
       .single()
 
@@ -130,6 +130,7 @@ export async function POST(request: NextRequest) {
       author: {
         name: profile?.display_name || 'Teacher',
         role: profile?.role || null,
+        educator_type: profile?.educator_type || null,
       },
     }, { status: 201 })
   } catch (err: unknown) {
