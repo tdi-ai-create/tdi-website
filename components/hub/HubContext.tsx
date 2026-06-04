@@ -17,7 +17,9 @@ const HubContext = createContext<HubContextValue | undefined>(undefined);
 export function useHub() {
   const context = useContext(HubContext);
   if (!context) {
-    throw new Error('useHub must be used within a HubProvider');
+    // Return safe defaults instead of throwing -- prevents white-screen crashes
+    // when components render briefly before HubProvider mounts
+    return { user: null, profile: null, isLoading: true } as HubContextValue;
   }
   return context;
 }
