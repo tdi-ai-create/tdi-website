@@ -31,6 +31,8 @@ export async function POST(request: Request) {
       email: email.toLowerCase(),
       name,
       current_phase: 'onboarding',
+      display_on_website: true,
+      website_display_name: name,
     };
 
     // Add intake responses if provided

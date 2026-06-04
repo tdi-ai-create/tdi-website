@@ -76,8 +76,8 @@ export async function POST(request: NextRequest) {
       // Keep location info
       state: currentCreator.state,
       location_prompt_dismissed: true,
-      // Keep website display info
-      display_on_website: false,
+      // Keep website display info (don't remove from site when starting new project)
+      display_on_website: currentCreator.display_on_website ?? true,
       website_display_name: currentCreator.website_display_name,
       website_title: currentCreator.website_title,
       website_bio: currentCreator.website_bio,
