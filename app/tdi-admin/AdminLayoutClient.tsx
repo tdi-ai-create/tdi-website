@@ -539,12 +539,16 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
 
         if (!isMounted) return;
 
-        if (!result || 'error' in result === false) {
+        if (!result) {
+          // Timeout — no response from Supabase
           router.replace('/tdi-admin/login');
           return;
         }
 
-        const { data: { user: currentUser }, error: userError } = result;
+        // Extract user from the response (handles both resolved shapes)
+        const resolved = result as { data?: { user?: User | null }; error?: unknown };
+        const currentUser = resolved?.data?.user;
+        const userError = resolved?.error;
 
         if (!currentUser || userError) {
           router.replace('/tdi-admin/login');

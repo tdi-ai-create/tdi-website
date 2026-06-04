@@ -36,6 +36,7 @@ export default function HubLoginPage() {
 
   const handleSuccess = async (trigger: 'google' | 'emailPassword' | 'magicLink' | 'signUp' | 'forgotPassword', _email: string, userId?: string): Promise<string | void> => {
     if (trigger === 'emailPassword') { router.push(decodeURIComponent(returnUrl)); return; }
+    if (trigger === 'google') { router.push(decodeURIComponent(returnUrl)); return; }
     if (trigger === 'signUp' && userId) { await attributePartnership(userId); return tUI('Check your email to confirm your account.'); }
   };
 
@@ -85,7 +86,7 @@ export default function HubLoginPage() {
               onSuccess={handleSuccess}
               getSupabaseClient={getHubSupabase}
               magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/hub/auth/callback?returnUrl=${encodeURIComponent(returnUrl)}` : '/hub/auth/callback'}
-              googleRedirectTo={typeof window !== 'undefined' ? window.location.origin + '/hub' : '/hub'}
+              googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/hub/auth/callback?returnUrl=${encodeURIComponent(returnUrl)}` : '/hub/auth/callback'}
               forgotPasswordRedirectTo={typeof window !== 'undefined' ? window.location.origin + '/hub/settings/profile' : '/hub/settings/profile'}
             />
             <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 8 }}>{tUI('100,000+ educators across all 50 states')}</p>

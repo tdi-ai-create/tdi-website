@@ -7,8 +7,9 @@ export async function GET(request: NextRequest) {
   const returnUrl = requestUrl.searchParams.get('returnUrl') || '/hub';
 
   if (code) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    // MUST use Hub Supabase — auth codes are issued by the Hub project
+    const supabaseUrl = process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseAnonKey) {
       return NextResponse.redirect(new URL('/hub/login?error=config', request.url));

@@ -186,7 +186,8 @@ export default function PortalSignIn({
     }
     try {
       const supabase = getSupabase();
-      const redirectTo = googleRedirectTo ?? (typeof window !== 'undefined' ? window.location.origin + '/hub' : '/hub');
+      // Signup email verification should go through the auth callback, not directly to /hub
+      const redirectTo = magicLinkRedirectTo ?? (typeof window !== 'undefined' ? `${window.location.origin}/hub/auth/callback` : '/hub/auth/callback');
       const { data: signUpData, error: authError } = await supabase.auth.signUp({
         email,
         password,

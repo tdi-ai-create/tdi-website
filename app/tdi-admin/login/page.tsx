@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getCurrentUser } from '@/lib/hub-auth';
 import { checkTeamAccess } from '@/lib/tdi-admin/permissions';
 import { getSupabase } from '@/lib/supabase';
 import PortalSignIn from '@/components/auth/PortalSignIn';
@@ -19,7 +18,9 @@ export default function TDIAdminLoginPage() {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const user = await getCurrentUser();
+        // Use Creator Portal Supabase — admin users auth against Creator Portal, NOT the Hub
+        const supabase = getSupabase();
+        const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           const teamMember = await checkTeamAccess(user.id, user.email || '');
           if (teamMember) {
