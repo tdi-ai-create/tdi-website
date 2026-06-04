@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leadership Dashboard Mockup -- Visual-First</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #F0EEE9; font-family: 'DM Sans', sans-serif; color: #1e2749; }
+
+  .page { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+  /* Hero */
+  .hero { background: linear-gradient(135deg, #1e2749, #2d3a5c, #38618C); border-radius: 20px; padding: 32px; color: white; margin-bottom: 20px; }
+  .hero h1 { font-family: 'Source Serif 4', serif; font-size: 28px; margin-bottom: 4px; }
+  .hero .sub { color: rgba(255,255,255,0.6); font-size: 13px; }
+  .hero .badge { display: inline-block; background: rgba(78,205,196,0.2); color: #4ecdc4; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; margin-top: 8px; }
+
+  /* AI Summary -- the hero section */
+  .ai-summary {
+    background: white; border-radius: 20px; padding: 28px; margin-bottom: 20px;
+    border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+  .ai-summary .label { font-size: 10px; font-weight: 700; color: #E8B84B; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .ai-summary .dot { width: 6px; height: 6px; border-radius: 50%; background: #E8B84B; }
+  .ai-summary p { font-family: 'Source Serif 4', serif; font-size: 17px; line-height: 1.7; color: #374151; }
+  .ai-summary .expand { font-size: 12px; color: #9CA3AF; margin-top: 12px; cursor: pointer; }
+  .ai-summary .expand:hover { color: #6B7280; }
+
+  /* Visual gauges row */
+  .gauges { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+  .gauge-card {
+    background: white; border-radius: 16px; padding: 20px; text-align: center;
+    border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  }
+  .gauge-ring {
+    width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 10px;
+    position: relative; display: flex; align-items: center; justify-content: center;
+  }
+  .gauge-ring svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+  .gauge-ring .value { font-size: 22px; font-weight: 700; position: relative; z-index: 1; }
+  .gauge-label { font-size: 11px; color: #6B7280; }
+
+  /* Health bar */
+  .health-bar {
+    background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 16px;
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .health-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .health-text { font-size: 14px; font-weight: 600; }
+  .health-sub { font-size: 12px; color: #6B7280; }
+  .health-bar-visual { flex: 1; height: 8px; background: #F3F4F6; border-radius: 4px; overflow: hidden; }
+  .health-bar-fill { height: 100%; border-radius: 4px; }
+
+  /* Two column */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+
+  /* Card */
+  .card {
+    background: white; border-radius: 16px; padding: 20px;
+    border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  }
+  .card-title { font-size: 11px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+
+  /* Tag pills */
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 12px; padding: 6px 14px; border-radius: 999px; background: #FFF8E7; color: #92400E; font-weight: 500; }
+
+  /* Donut small */
+  .mini-donut-row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .mini-donut-item { display: flex; align-items: center; gap: 8px; }
+  .mini-donut-item .count { font-size: 16px; font-weight: 700; }
+  .mini-donut-item .type-name { font-size: 12px; color: #6B7280; }
+  .mini-donut-item .dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  /* Quote */
+  .quote-card {
+    background: #FFFBEB; border-left: 3px solid #E8B84B; border-radius: 12px; padding: 16px;
+  }
+  .quote-card p { font-size: 14px; font-style: italic; color: #374151; line-height: 1.6; }
+  .quote-card .attr { font-size: 10px; color: #9CA3AF; margin-top: 6px; }
+
+  /* Quick actions */
+  .actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+  .action-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 16px 8px; border-radius: 14px; background: white;
+    border: 1px solid rgba(0,0,0,0.04); cursor: pointer;
+    transition: all 0.15s; text-decoration: none; color: #1e2749;
+  }
+  .action-btn:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px); }
+  .action-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .action-label { font-size: 11px; font-weight: 600; text-align: center; }
+
+  /* Collapsible sections */
+  .section-toggle {
+    background: white; border-radius: 14px; padding: 16px 20px; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .section-toggle:hover { background: #FAFBFC; }
+  .section-toggle .left { display: flex; align-items: center; gap: 10px; }
+  .section-toggle .icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .section-toggle .title { font-size: 14px; font-weight: 600; }
+  .section-toggle .preview { font-size: 12px; color: #6B7280; }
+  .section-toggle .arrow { font-size: 14px; color: #9CA3AF; transition: transform 0.2s; }
+
+  .mockup-label {
+    position: fixed; bottom: 16px; right: 16px; background: #1e2749; color: white;
+    padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 999;
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>Motown District 360</h1>
+    <div class="sub">Glenview, Illinois</div>
+    <div class="badge">Phase 2 -- ACCELERATE</div>
+  </div>
+
+  <!-- AI SUMMARY -- replaces the wall of data -->
+  <div class="ai-summary">
+    <div class="label"><span class="dot"></span> Partnership Intelligence</div>
+    <p>Your team is engaged. 87% of 255 educators logged into the Hub this month, exploring 342 tools across 6 buildings. Crescendo Middle is your standout at 72% course completion. Your educators' average wellness score is 4.2 out of 5 -- stronger than the national average. TDI reached out to 7 team members for wellness check-ins this week.</p>
+    <div class="expand">See detailed breakdown &#8595;</div>
+  </div>
+
+  <!-- VISUAL GAUGES -- the "at a glance" row -->
+  <div class="gauges">
+    <div class="gauge-card">
+      <div class="gauge-ring">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"/>
+          <circle cx="40" cy="40" r="34" fill="none" stroke="#E8B84B" stroke-width="6"
+            stroke-dasharray="${87 * 2.136} ${(100-87) * 2.136}" stroke-linecap="round"/>
+        </svg>
+        <span class="value" style="color: #E8B84B">87%</span>
+      </div>
+      <div class="gauge-label">Hub Engagement</div>
+    </div>
+    <div class="gauge-card">
+      <div class="gauge-ring">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"/>
+          <circle cx="40" cy="40" r="34" fill="none" stroke="#4ecdc4" stroke-width="6"
+            stroke-dasharray="${57 * 2.136} ${(100-57) * 2.136}" stroke-linecap="round"/>
+        </svg>
+        <span class="value" style="color: #4ecdc4">8/14</span>
+      </div>
+      <div class="gauge-label">Deliverables</div>
+    </div>
+    <div class="gauge-card">
+      <div class="gauge-ring">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"/>
+          <circle cx="40" cy="40" r="34" fill="none" stroke="#2A9D8F" stroke-width="6"
+            stroke-dasharray="${84 * 2.136} ${(100-84) * 2.136}" stroke-linecap="round"/>
+        </svg>
+        <span class="value" style="color: #2A9D8F">4.2</span>
+      </div>
+      <div class="gauge-label">Team Wellness</div>
+    </div>
+    <div class="gauge-card">
+      <div class="gauge-ring">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"/>
+          <circle cx="40" cy="40" r="34" fill="none" stroke="#1e2749" stroke-width="6"
+            stroke-dasharray="${67 * 2.136} ${(100-67) * 2.136}" stroke-linecap="round"/>
+        </svg>
+        <span class="value" style="color: #1e2749">2/3</span>
+      </div>
+      <div class="gauge-label">Current Phase</div>
+    </div>
+  </div>
+
+  <!-- PARTNERSHIP HEALTH -->
+  <div class="health-bar">
+    <div class="health-dot" style="background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.4);"></div>
+    <div>
+      <div class="health-text">Partnership Momentum: Strong</div>
+      <div class="health-sub">Hub above target | Observations on schedule | No blockers</div>
+    </div>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="actions">
+    <a href="#" class="action-btn">
+      <div class="action-icon" style="background: #FFF8E7;">&#128218;</div>
+      <span class="action-label">Open Hub</span>
+    </a>
+    <a href="#" class="action-btn">
+      <div class="action-icon" style="background: #E0F7F6;">&#128197;</div>
+      <span class="action-label">Schedule</span>
+    </a>
+    <a href="#" class="action-btn">
+      <div class="action-icon" style="background: #EDE9FE;">&#9733;</div>
+      <span class="action-label">Quiz</span>
+    </a>
+    <a href="#" class="action-btn">
+      <div class="action-icon" style="background: #DBEAFE;">&#128196;</div>
+      <span class="action-label">Tools</span>
+    </a>
+  </div>
+
+  <!-- TWO COLUMN: Popular Tools + Educator Types -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Popular in Your District</div>
+      <div class="tags">
+        <span class="tag">Calm Response Scripts</span>
+        <span class="tag">Lesson Flow Checklist</span>
+        <span class="tag">The Shift Kit</span>
+        <span class="tag">Parent Comms</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Your Team's Educator Types</div>
+      <div class="mini-donut-row">
+        <div class="mini-donut-item"><span class="dot" style="background: #E8B84B;"></span><span class="count">42</span><span class="type-name">Connectors</span></div>
+        <div class="mini-donut-item"><span class="dot" style="background: #2563EB;"></span><span class="count">38</span><span class="type-name">Architects</span></div>
+        <div class="mini-donut-item"><span class="dot" style="background: #EC4899;"></span><span class="count">31</span><span class="type-name">Sparks</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEACHER QUOTE -->
+  <div class="quote-card" style="margin-bottom: 20px;">
+    <p>&ldquo;I tried the shift technique with my kids on Monday and was shocked. We went from losing 8-10 minutes between subjects to being seated and ready in under 2.&rdquo;</p>
+    <div class="attr">-- An educator at Crescendo Middle</div>
+  </div>
+
+  <!-- EXPANDABLE SECTIONS (collapsed by default) -->
+  <div class="section-toggle">
+    <div class="left">
+      <div class="icon" style="background: #FFF8E7;">&#128200;</div>
+      <div>
+        <div class="title">Detailed Hub Activity</div>
+        <div class="preview">342 tools explored, 89 posts, 127 Field Notes earned</div>
+      </div>
+    </div>
+    <span class="arrow">&#9654;</span>
+  </div>
+
+  <div class="section-toggle">
+    <div class="left">
+      <div class="icon" style="background: #E0F7F6;">&#128197;</div>
+      <div>
+        <div class="title">Partnership Timeline</div>
+        <div class="preview">8 done, 4 in progress, 5 coming soon</div>
+      </div>
+    </div>
+    <span class="arrow">&#9654;</span>
+  </div>
+
+  <div class="section-toggle">
+    <div class="left">
+      <div class="icon" style="background: #EDE9FE;">&#127891;</div>
+      <div>
+        <div class="title">Leadership Tools & Quiz</div>
+        <div class="preview">Printable tools, conversation starters, leadership quiz</div>
+      </div>
+    </div>
+    <span class="arrow">&#9654;</span>
+  </div>
+
+  <div class="section-toggle">
+    <div class="left">
+      <div class="icon" style="background: #DBEAFE;">&#128172;</div>
+      <div>
+        <div class="title">Community & Testimonials</div>
+        <div class="preview">89 posts, 34 Q&A threads, broader TDI community quotes</div>
+      </div>
+    </div>
+    <span class="arrow">&#9654;</span>
+  </div>
+
+  <div class="section-toggle">
+    <div class="left">
+      <div class="icon" style="background: #FEE2E2;">&#10067;</div>
+      <div>
+        <div class="title">FAQ & Support</div>
+        <div class="preview">Common questions, seasonal tips, contact TDI</div>
+      </div>
+    </div>
+    <span class="arrow">&#9654;</span>
+  </div>
+
+</div>
+
+<div class="mockup-label">MOCKUP -- Visual-First Leadership Dashboard</div>
+
+</body>
+</html>

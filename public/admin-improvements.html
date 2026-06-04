@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Hub Improvements -- Workflow Map</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #F0EEE9; font-family: 'DM Sans', sans-serif; color: #1e2749; padding: 40px 20px; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { font-family: 'Source Serif 4', serif; font-size: 32px; margin-bottom: 8px; }
+  .subtitle { color: #6B7280; font-size: 15px; margin-bottom: 40px; }
+
+  .phase { margin-bottom: 40px; }
+  .phase-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .phase-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .phase-title { font-size: 18px; font-weight: 700; }
+  .phase-status { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .card { background: white; border-radius: 14px; padding: 20px; border: 1px solid #E5E7EB; position: relative; }
+  .card.done { border-left: 3px solid #2A9D8F; }
+  .card.next { border-left: 3px solid #E8B84B; }
+  .card.later { border-left: 3px solid #D1D5DB; }
+  .card-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .card-desc { font-size: 12px; color: #6B7280; line-height: 1.5; }
+  .card-badge { position: absolute; top: 12px; right: 12px; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+  .badge-done { background: #D1FAE5; color: #065F46; }
+  .badge-shipped { background: #DBEAFE; color: #1E40AF; }
+  .badge-next { background: #FEF3C7; color: #92400E; }
+  .badge-later { background: #F3F4F6; color: #6B7280; }
+
+  .tab-label { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; background: #F3F4F6; color: #6B7280; margin-bottom: 6px; }
+
+  .legend { display: flex; gap: 20px; margin-bottom: 32px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6B7280; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Admin Hub Portal -- Improvement Workflow</h1>
+<p class="subtitle">Visual map of all improvements across Overview, Operations, and Production tabs. June 3, 2026.</p>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background: #2A9D8F;"></div> Shipped today</div>
+  <div class="legend-item"><div class="legend-dot" style="background: #2563EB;"></div> Deploying now</div>
+  <div class="legend-item"><div class="legend-dot" style="background: #E8B84B;"></div> Building next</div>
+  <div class="legend-item"><div class="legend-dot" style="background: #D1D5DB;"></div> Planned (this week+)</div>
+</div>
+
+<!-- PHASE 1: Analytics Visuals -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-dot" style="background: #2A9D8F;"></div>
+    <span class="phase-title">Phase 1: Analytics Visuals (Overview Tab)</span>
+    <span class="phase-status" style="background: #D1FAE5; color: #065F46;">Shipped</span>
+  </div>
+  <div class="cards">
+    <div class="card done">
+      <span class="card-badge badge-done">Done</span>
+      <span class="tab-label">Overview</span>
+      <div class="card-title">Fix Engagement Funnel Denominators</div>
+      <div class="card-desc">Funnel now uses organic users (actually logged in) as denominator instead of 47K total (includes bulk imports). Shows "X of Y have logged in" context.</div>
+    </div>
+    <div class="card done">
+      <span class="card-badge badge-done">Done</span>
+      <span class="tab-label">Overview</span>
+      <div class="card-title">Recharts Upgrade -- All Charts</div>
+      <div class="card-desc">Growth chart (area), role breakdown (horizontal bar), community engagement (donut), categories (bar), schools (bar). All with hover tooltips.</div>
+    </div>
+    <div class="card done">
+      <span class="card-badge badge-done">Done</span>
+      <span class="tab-label">Overview</span>
+      <div class="card-title">US Choropleth Map</div>
+      <div class="card-desc">Replaced text-only state list with interactive US map showing Hub user distribution by state. Hover for details.</div>
+    </div>
+    <div class="card done">
+      <span class="card-badge badge-done">Done</span>
+      <span class="tab-label">Overview</span>
+      <div class="card-title">Trend Indicators on Stat Cards</div>
+      <div class="card-desc">Each of the 8 Quick Stats cards now shows a green up-arrow or red down-arrow with % change vs previous week.</div>
+    </div>
+    <div class="card done">
+      <span class="card-badge badge-done">Done</span>
+      <span class="tab-label">Overview</span>
+      <div class="card-title">Hover Tooltips on Stat Cards</div>
+      <div class="card-desc">Every stat card shows context on hover -- tier breakdowns, signups today/this week, metric explanations.</div>
+    </div>
+    <div class="card done">
+      <span class="card-badge badge-done">Done</span>
+      <span class="tab-label">Overview</span>
+      <div class="card-title">Quick Fixes</div>
+      <div class="card-desc">"Recent Activity" (not "Live"), dynamic progress bar maxes, removed duplicate Quick Actions nav bar.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 2: Operations -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-dot" style="background: #2563EB;"></div>
+    <span class="phase-title">Phase 2: Operations Functionality</span>
+    <span class="phase-status" style="background: #DBEAFE; color: #1E40AF;">In Progress</span>
+  </div>
+  <div class="cards">
+    <div class="card done">
+      <span class="card-badge badge-shipped">Shipped</span>
+      <span class="tab-label">Operations > Tips</span>
+      <div class="card-title">Custom Delete Confirmation Modal</div>
+      <div class="card-desc">Replaced native browser confirm() with styled modal for tip deletion. Consistent with admin portal design.</div>
+    </div>
+    <div class="card next">
+      <span class="card-badge badge-next">Next</span>
+      <span class="tab-label">Operations</span>
+      <div class="card-title">Standardize Loading/Empty States</div>
+      <div class="card-desc">Replace mixed Loading.../skeleton patterns with consistent AdminEmptyState component across all 6 tabs.</div>
+    </div>
+    <div class="card later">
+      <span class="card-badge badge-later">This Week</span>
+      <span class="tab-label">Operations > Accounts</span>
+      <div class="card-title">Bulk Actions</div>
+      <div class="card-desc">Checkbox column + bulk action bar. Select users and change tier, export to CSV, or send email to selection.</div>
+    </div>
+    <div class="card later">
+      <span class="card-badge badge-later">This Week</span>
+      <span class="tab-label">Operations > Emails</span>
+      <div class="card-title">Wire Emails to Resend API</div>
+      <div class="card-desc">Connect existing email template UI to Resend. Send test emails, view send history, template editor.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 3: Production -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-dot" style="background: #E8B84B;"></div>
+    <span class="phase-title">Phase 3: Production Functionality</span>
+    <span class="phase-status" style="background: #FEF3C7; color: #92400E;">Building</span>
+  </div>
+  <div class="cards">
+    <div class="card done">
+      <span class="card-badge badge-shipped">Shipped</span>
+      <span class="tab-label">Production > Feedback</span>
+      <div class="card-title">Real Capacity Feedback Data</div>
+      <div class="card-desc">Replaced fake 4.6 rating / 560 reviews with real data: capacity distribution (high/med/low), vibe scores, content requests from educators.</div>
+    </div>
+    <div class="card later">
+      <span class="card-badge badge-later">This Week</span>
+      <span class="tab-label">Production > Calendar</span>
+      <div class="card-title">Content Calendar -- Real Data</div>
+      <div class="card-desc">Replace mocked calendar with actual course/quick-win publish dates from the database.</div>
+    </div>
+    <div class="card later">
+      <span class="card-badge badge-later">Later</span>
+      <span class="tab-label">Production > Media</span>
+      <div class="card-title">Media Library -- Supabase Storage</div>
+      <div class="card-desc">Connect to Supabase Storage for PDF/image uploads. Video hosting deferred until Mux/Cloudflare integration.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 4: Team UX -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-dot" style="background: #8B5CF6;"></div>
+    <span class="phase-title">Phase 4: Team UX</span>
+    <span class="phase-status" style="background: #EDE9FE; color: #6D28D9;">Planned</span>
+  </div>
+  <div class="cards">
+    <div class="card done">
+      <span class="card-badge badge-done">Done</span>
+      <span class="tab-label">Overview</span>
+      <div class="card-title">Remove Duplicate Navigation</div>
+      <div class="card-desc">Removed Quick Actions button bar that duplicated the Manage section cards.</div>
+    </div>
+    <div class="card later">
+      <span class="card-badge badge-later">Later</span>
+      <span class="tab-label">All Tabs</span>
+      <div class="card-title">Admin Action Audit Log</div>
+      <div class="card-desc">Log who changed what (course published, tier changed, user edited) with timestamp and admin email. New audit tab.</div>
+    </div>
+    <div class="card later">
+      <span class="card-badge badge-later">Later</span>
+      <span class="tab-label">Operations</span>
+      <div class="card-title">Permission-Aware Tab States</div>
+      <div class="card-desc">Show disabled tabs with lock icon and tooltip explaining required permission instead of hiding them.</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div style="position: fixed; bottom: 16px; right: 16px; background: #1e2749; color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">
+  Admin Improvement Workflow -- June 3, 2026
+</div>
+
+</body>
+</html>

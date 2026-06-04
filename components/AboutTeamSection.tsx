@@ -13,7 +13,7 @@ const socialLinks: Record<string, { href: string; label: string; icon: typeof Li
     { href: 'https://raehughart.substack.com/', label: 'Rae Hughart on Substack', icon: BookOpen },
   ],
   'Kristin Williams': [
-    { href: 'https://www.linkedin.com/in/kristin-williams-aa126585/?skipRedirect=true', label: 'Kristin Williams on LinkedIn', icon: Linkedin },
+    { href: 'https://www.linkedin.com/in/she-is-kristin/', label: 'Kristin Williams on LinkedIn', icon: Linkedin },
   ],
   'Omar Garcia': [
     { href: 'https://www.linkedin.com/in/ogtaxstrategy/', label: 'Omar Garcia on LinkedIn', icon: Linkedin },

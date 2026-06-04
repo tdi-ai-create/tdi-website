@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Mockup v2 - TDI Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #F0EEE9; font-family: 'DM Sans', sans-serif; color: #1e2749; }
+  a { color: inherit; text-decoration: none; }
+
+  .dashboard { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #1e2749 0%, #2d3a5c 100%);
+    border-radius: 20px;
+    padding: 40px 36px;
+    color: white;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after { content: ''; position: absolute; top: -40px; right: -40px; width: 200px; height: 200px; border-radius: 50%; background: rgba(232,184,75,0.08); }
+  .hero .badge { display: inline-block; background: rgba(232,184,75,0.2); color: #E8B84B; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+  .hero h1 { font-family: 'Source Serif 4', serif; font-size: 32px; font-weight: 700; margin-bottom: 6px; }
+  .hero p { color: rgba(255,255,255,0.6); font-size: 14px; font-style: italic; }
+
+  /* Stats */
+  .stats { display: flex; gap: 16px; justify-content: center; margin: -20px 0 24px; position: relative; z-index: 2; }
+  .stat-card { background: white; border-radius: 14px; padding: 16px 24px; text-align: center; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 2px 8px rgba(0,0,0,0.04); flex: 1; }
+  .stat-card .value { font-size: 24px; font-weight: 700; color: #1e2749; }
+  .stat-card .label { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+
+  /* Grid */
+  .grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 20px; }
+  .left, .right { display: flex; flex-direction: column; gap: 16px; }
+
+  /* Cards */
+  .card { background: white; border-radius: 16px; padding: 20px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 1px 4px rgba(0,0,0,0.03); }
+  .card-title { font-size: 11px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+
+  /* Navy accent cards */
+  .navy-card {
+    background: #1B2A4A;
+    border-radius: 16px;
+    padding: 20px;
+    color: white;
+    border-top: 2px solid #E8B84B;
+  }
+  .navy-card .label { font-size: 10px; font-weight: 700; color: #E8B84B; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+  .navy-card p { color: rgba(255,255,255,0.7); font-size: 14px; line-height: 1.6; }
+  .navy-card .quote { font-family: 'Source Serif 4', serif; font-style: italic; font-size: 15px; color: rgba(255,255,255,0.85); line-height: 1.6; }
+
+  /* AI insight card */
+  .ai-card {
+    background: linear-gradient(135deg, #1B2A4A 0%, #263554 100%);
+    border-radius: 16px;
+    padding: 20px;
+    color: white;
+    border-left: 3px solid #E8B84B;
+  }
+  .ai-card .ai-label { font-size: 10px; font-weight: 700; color: #E8B84B; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .ai-card .ai-label .dot { width: 6px; height: 6px; border-radius: 50%; background: #E8B84B; animation: pulse 2s infinite; }
+  .ai-card p { color: rgba(255,255,255,0.8); font-size: 13px; line-height: 1.6; }
+  .ai-card .refresh { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 8px; cursor: pointer; }
+  .ai-card .refresh:hover { color: rgba(255,255,255,0.7); }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* Goal card */
+  .goal-card { background: linear-gradient(135deg, #FFF8E7 0%, #FFFDF5 100%); border: 1px solid rgba(232,184,75,0.2); }
+  .goal-label { font-size: 11px; font-weight: 600; color: #E8B84B; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* Quick win cards */
+  .qw-thumb { border-radius: 12px; height: 80px; margin-bottom: 8px; }
+  .qw-meta { font-size: 11px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; }
+  .qw-name { font-size: 14px; font-weight: 600; color: #1e2749; margin-top: 2px; }
+
+  /* ═══ POLAROID ═══ */
+  .polaroid {
+    display: inline-block;
+    background: white;
+    padding: 8px 8px 36px;
+    border-radius: 3px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.08), inset 0 0 0 1px rgba(0,0,0,0.04);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .polaroid:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12), 0 12px 32px rgba(0,0,0,0.1);
+  }
+  .polaroid .pin {
+    position: absolute; top: -8px; right: 14px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #F5D98A, #C9A030);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.4);
+    z-index: 2;
+  }
+  .polaroid .photo {
+    width: 100%; aspect-ratio: 1; border-radius: 2px; overflow: hidden;
+    background: #F3F4F6; display: flex; align-items: center; justify-content: center;
+  }
+  .polaroid .photo img { width: 100%; height: 100%; object-fit: cover; }
+  .polaroid .caption {
+    text-align: center; padding-top: 8px;
+    font-family: 'Caveat', cursive; font-size: 15px; color: #6B7280; font-weight: 500;
+  }
+  .polaroid .share-btn {
+    position: absolute; bottom: 40px; right: 12px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(30,39,73,0.7); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .polaroid:hover .share-btn { opacity: 1; }
+
+  /* Empty polaroid */
+  .polaroid.empty .photo {
+    background: linear-gradient(135deg, #F9FAFB, #F3F4F6);
+    flex-direction: column; gap: 6px;
+  }
+  .polaroid.empty .photo .icon {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(232,184,75,0.15);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .polaroid.empty .photo .prompt { font-size: 11px; color: #9CA3AF; }
+  .polaroid.empty .photo .upload-btn {
+    font-size: 10px; font-weight: 600; color: #E8B84B;
+    background: rgba(232,184,75,0.1); border: 1px dashed rgba(232,184,75,0.4);
+    padding: 3px 12px; border-radius: 6px; cursor: pointer;
+  }
+
+  /* Rotation variants */
+  .rot-l { transform: rotate(-3deg); }
+  .rot-r { transform: rotate(2.5deg); }
+  .rot-s { transform: rotate(-1.5deg); }
+  .rot-l:hover { transform: rotate(-3deg) scale(1.03); }
+  .rot-r:hover { transform: rotate(2.5deg) scale(1.03); }
+  .rot-s:hover { transform: rotate(-1.5deg) scale(1.03); }
+
+  .divider { height: 1px; background: rgba(0,0,0,0.06); margin: 4px 0; }
+
+  /* Mockup label */
+  .mockup-label {
+    position: fixed; bottom: 16px; right: 16px;
+    background: #1e2749; color: white; padding: 10px 20px; border-radius: 10px;
+    font-size: 13px; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    z-index: 999;
+  }
+</style>
+</head>
+<body>
+
+<div class="dashboard">
+
+  <!-- HERO -->
+  <div class="hero">
+    <span class="badge">Classroom Teacher</span>
+    <h1>Welcome back, Rae</h1>
+    <p>You are more than your to-do list.</p>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card"><div class="value">51</div><div class="label">tools explored</div></div>
+    <div class="stat-card"><div class="value">~4.3</div><div class="label">hours reclaimed</div></div>
+    <div class="stat-card"><div class="value">7</div><div class="label">achievements earned</div></div>
+    <div class="stat-card"><div class="value">50</div><div class="label">states represented</div></div>
+  </div>
+
+  <!-- GRID -->
+  <div class="grid">
+
+    <!-- ═══ LEFT COLUMN ═══ -->
+    <div class="left">
+
+      <!-- Polaroid 1 + Goal card row -->
+      <div style="display: flex; gap: 16px; align-items: flex-start;">
+        <div class="polaroid rot-l" style="width: 160px; flex-shrink: 0;">
+          <div class="pin"></div>
+          <div class="photo">
+            <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300&h=300&fit=crop&crop=face" alt="Something I love" />
+          </div>
+          <button class="share-btn"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg></button>
+          <div class="caption">something i love</div>
+        </div>
+        <div class="card goal-card" style="flex: 1;">
+          <div class="goal-label">Your goal</div>
+          <p style="font-size: 14px; color: #374151; margin-top: 8px;">You said you wanted to "stop_bringing_work_home"</p>
+          <div style="margin-top: 14px; display: flex; align-items: center; gap: 10px;">
+            <div style="width: 44px; height: 44px; border-radius: 10px; background: #E8B84B;"></div>
+            <div style="flex: 1;">
+              <div style="font-size: 10px; color: #9CA3AF;">Your next step</div>
+              <div style="font-size: 10px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em;">CLASSROOM TOOLS</div>
+              <div style="font-size: 14px; font-weight: 600;">Lesson Flow Checklist</div>
+            </div>
+            <div style="background: #E8B84B; color: #1e2749; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;">Try it</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TDI Tip (navy) -->
+      <div class="navy-card">
+        <div class="label">TDI Tip</div>
+        <p class="quote">"Five minutes of silence can change your entire afternoon."</p>
+        <div style="margin-top: 12px;">
+          <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(232,184,75,0.15); color: #E8B84B; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
+            Share your wins
+          </span>
+        </div>
+      </div>
+
+      <!-- Saved -->
+      <div class="card">
+        <div class="card-title">Saved</div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="color: #EF4444; font-size: 14px;">&#9829;</span>
+          <span style="font-size: 14px; font-weight: 500;">The Culture-First Leadership Framework</span>
+          <span style="margin-left: auto; font-size: 10px; color: #9CA3AF; background: #F3F4F6; padding: 2px 8px; border-radius: 4px;">Tool</span>
+        </div>
+      </div>
+
+      <!-- AI Insight (compact) -->
+      <div class="ai-card">
+        <div class="ai-label"><span class="dot"></span> AI Growth Insight</div>
+        <p>You've explored 51 tools in 7 days -- that's more than most educators do in a semester. Your pattern shows a preference for classroom management strategies. Have you considered pairing those with the wellness resources?</p>
+        <div class="refresh">Refresh insight</div>
+      </div>
+
+      <!-- Polaroid 3 + Community bookmarks -->
+      <div style="display: flex; gap: 16px; align-items: flex-start;">
+        <div class="polaroid empty rot-s" style="width: 150px; flex-shrink: 0;">
+          <div class="pin"></div>
+          <div class="photo">
+            <div class="icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#E8B84B" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg></div>
+            <div class="prompt">a goal in life</div>
+            <div class="upload-btn">upload yours</div>
+          </div>
+          <div class="caption">a goal in life</div>
+        </div>
+        <div class="card" style="flex: 1;">
+          <div class="card-title">Community Bookmarks</div>
+          <p style="font-size: 13px; color: #6B7280; line-height: 1.5;">3 educators bookmarked resources you might like</p>
+          <div style="margin-top: 10px; display: flex; gap: 6px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: #E8B84B;"></div>
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: #2A9D8F;"></div>
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: #8B5CF6;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ RIGHT COLUMN ═══ -->
+    <div class="right">
+
+      <!-- Progress / streak / achievements -->
+      <div class="card">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: #FFF8E7; display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 18px; color: #E8B84B;">&#9679;</span>
+          </div>
+          <div>
+            <div style="font-size: 20px; font-weight: 700;">7 days</div>
+            <div style="font-size: 11px; color: #9CA3AF;">Learning streak</div>
+          </div>
+        </div>
+        <p style="font-size: 12px; color: #9CA3AF; margin-bottom: 12px;">You've shown up consistently. That's what growth looks like.</p>
+        <div class="divider"></div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: #FFF8E7; display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#E8B84B" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+          </div>
+          <div>
+            <div style="font-size: 16px; font-weight: 700;">7 <span style="font-size: 12px; font-weight: 400; color: #9CA3AF;">Achievements earned</span></div>
+            <div style="font-size: 11px; color: #9CA3AF;">7 Field Notes</div>
+          </div>
+          <a href="#" style="margin-left: auto; font-size: 12px; font-weight: 600; color: #38618C;">View all &rarr;</a>
+        </div>
+        <div class="divider" style="margin-top: 10px;"></div>
+        <div style="margin-top: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span style="font-size: 13px; font-weight: 600;">Growth Dashboard</span>
+            <span style="font-size: 10px; color: #9CA3AF; background: #F3F4F6; padding: 2px 8px; border-radius: 4px;">Locked</span>
+          </div>
+          <p style="font-size: 11px; color: #9CA3AF; margin-bottom: 8px;">Complete 1 course and 2 check-ins to unlock.</p>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <span style="font-size: 12px; color: #6B7280; width: 55px;">Courses</span>
+            <div style="flex: 1; height: 6px; background: #F3F4F6; border-radius: 3px;"><div style="width: 0%; height: 100%; background: #E8B84B; border-radius: 3px;"></div></div>
+            <span style="font-size: 11px; color: #6B7280;">0/1</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 12px; color: #6B7280; width: 55px;">Check-ins</span>
+            <div style="flex: 1; height: 6px; background: #F3F4F6; border-radius: 3px;"><div style="width: 100%; height: 100%; background: #2A9D8F; border-radius: 3px;"></div></div>
+            <span style="font-size: 11px; color: #6B7280;">8/2</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Polaroid 2: Something you're proud of -->
+      <div style="display: flex; justify-content: flex-end; padding-right: 12px;">
+        <div class="polaroid empty rot-r" style="width: 155px;">
+          <div class="pin"></div>
+          <div class="photo">
+            <div class="icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#E8B84B" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg></div>
+            <div class="prompt">something you're proud of</div>
+            <div class="upload-btn">upload yours</div>
+          </div>
+          <div class="caption">something i'm proud of</div>
+        </div>
+      </div>
+
+      <!-- Curated For You -->
+      <div class="card">
+        <div class="card-title">Curated For You</div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <div style="width: 56px; height: 56px; border-radius: 10px; background: linear-gradient(135deg, #E8B84B, #D4A843);"></div>
+          <div>
+            <div style="font-size: 14px; font-weight: 600;">Book Club: Teachers Deserve It</div>
+            <div style="font-size: 12px; color: #9CA3AF;">Popular with teachers</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Wins -->
+      <div class="card">
+        <div class="card-title">Quick Wins</div>
+        <div class="qw-thumb" style="background: #E8B84B;"></div>
+        <div class="qw-meta">Classroom Tools</div>
+        <div class="qw-name">Lesson Flow Checklist</div>
+        <div style="font-size: 11px; color: #9CA3AF;">5 min</div>
+        <div style="height: 12px;"></div>
+        <div class="qw-thumb" style="background: #2A9D8F;"></div>
+        <div class="qw-meta">Classroom Tools</div>
+        <div class="qw-name">Autism Acceptance Month Guide</div>
+        <div style="font-size: 11px; color: #9CA3AF;">5 min</div>
+        <div style="margin-top: 12px;">
+          <a href="#" style="font-size: 12px; font-weight: 600; color: #38618C;">Explore all Quick Wins &rarr;</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="mockup-label">MOCKUP v2 -- Dashboard with Polaroids + AI + Tips</div>
+
+</body>
+</html>

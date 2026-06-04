@@ -21,6 +21,7 @@ const PUBLIC_ROUTES = ['/hub/verify'];
 // Routes that skip the onboarding redirect check
 const SKIP_ONBOARDING_CHECK_ROUTES = ['/hub/onboarding', '/hub/login', '/hub/auth'];
 
+// Cache-bust: v2 — HubProvider wraps loading state
 export default function HubAuthGuard({ children }: HubAuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
