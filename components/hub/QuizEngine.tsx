@@ -6,7 +6,7 @@ import { ChevronRight, Share2, RotateCcw, ArrowRight } from 'lucide-react'
 import UniversalShareModal from './UniversalShareModal'
 import { useTranslation } from '@/lib/hub/useTranslation'
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub'
-import { getQuizRecommendations } from '@/lib/hub/quizRecommendations'
+import { getQuizRecommendations, getCourseKeywords } from '@/lib/hub/quizRecommendations'
 import type { QuizConfig, QuizResult } from '@/lib/hub/quizConfigs'
 
 // ── Component ──────────────────────────────────────────────────────────
@@ -29,23 +29,42 @@ export default function QuizEngine({ quiz, onComplete }: QuizEngineProps) {
   const [transitioning, setTransitioning] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
   const [recommendedQW, setRecommendedQW] = useState<{ id: string; slug: string; title: string; category: string }[]>([])
+  const [recommendedCourses, setRecommendedCourses] = useState<{ id: string; slug: string; title: string; category: string }[]>([])
 
-  // Fetch recommended Quick Wins when result is determined
+  // Fetch recommended Quick Wins + Courses when result is determined
   useEffect(() => {
     if (!result) return
     const rec = getQuizRecommendations(quiz.id, result.key)
     if (!rec || rec.categories.length === 0) return
-    const fetchQW = async () => {
-      const supabase = getSupabase()
-      const { data } = await supabase
-        .from('hub_quick_wins')
+    const supabase = getSupabase()
+
+    // Fetch Quick Wins
+    supabase
+      .from('hub_quick_wins')
+      .select('id, slug, title, category')
+      .eq('is_published', true)
+      .in('category', rec.categories)
+      .limit(3)
+      .then(({ data }) => { if (data) setRecommendedQW(data) })
+
+    // Fetch Courses by keyword matching
+    const keywords = getCourseKeywords(quiz.id, result.key)
+    if (keywords.length > 0) {
+      supabase
+        .from('hub_courses')
         .select('id, slug, title, category')
         .eq('is_published', true)
-        .in('category', rec.categories)
-        .limit(3)
-      if (data) setRecommendedQW(data)
+        .limit(20)
+        .then(({ data }) => {
+          if (!data) return
+          // Filter courses whose title or category matches any keyword
+          const matches = data.filter(course => {
+            const text = `${course.title} ${course.category}`.toLowerCase()
+            return keywords.some(kw => text.includes(kw))
+          }).slice(0, 2)
+          setRecommendedCourses(matches)
+        })
     }
-    fetchQW()
   }, [result, quiz.id])
 
   const handleAnswer = (answerTypes: string[], answerIdx: number) => {
@@ -154,6 +173,32 @@ export default function QuizEngine({ quiz, onComplete }: QuizEngineProps) {
               </div>
             )
           })()}
+
+          {/* Recommended Courses */}
+          {recommendedCourses.length > 0 && (
+            <div className="mb-5 p-4 rounded-xl" style={{ backgroundColor: '#FAFAF8', border: '1px solid rgba(27,42,74,0.06)' }}>
+              <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>
+                {tUI('Courses for you')}
+              </p>
+              <div className="space-y-2">
+                {recommendedCourses.map(course => (
+                  <Link
+                    key={course.id}
+                    href={`/hub/courses/${course.slug}`}
+                    className="flex items-center gap-3 p-2.5 rounded-lg bg-white hover:shadow-sm transition-shadow"
+                    style={{ border: '1px solid rgba(27,42,74,0.06)' }}
+                  >
+                    <div className="w-2 h-8 rounded-full flex-shrink-0" style={{ backgroundColor: '#1B2A4A' }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate" style={{ color: '#1B2A4A' }}>{course.title}</p>
+                      <p className="text-xs" style={{ color: '#9CA3AF' }}>{course.category}</p>
+                    </div>
+                    <ChevronRight size={14} style={{ color: '#D1D5DB' }} />
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-2">
             <button

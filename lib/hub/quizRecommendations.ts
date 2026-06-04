@@ -7,6 +7,16 @@ export interface QuizRecommendation {
   message_es: string
 }
 
+// Maps QW categories to course-relevant search terms
+const CATEGORY_TO_COURSE_KEYWORDS: Record<string, string[]> = {
+  'Classroom Tools': ['classroom', 'management', 'teaching', 'instruction'],
+  'Stress Relief': ['stress', 'wellbeing', 'burnout', 'self-care', 'mindfulness'],
+  'Time Savers': ['productivity', 'efficiency', 'planning', 'time'],
+  'Communication': ['communication', 'parent', 'leadership', 'feedback', 'coaching'],
+  'Self-Care': ['self-care', 'wellbeing', 'burnout', 'balance', 'wellness'],
+  'Games': ['engagement', 'interactive', 'practice'],
+}
+
 // Each quiz result maps to relevant Quick Win categories + a reason
 export const RESULT_RECOMMENDATIONS: Record<string, Record<string, QuizRecommendation>> = {
   // Classroom Needs quiz
@@ -163,6 +173,27 @@ export function getAllRecommendations(quizResults: Record<string, string>): Quiz
     if (rec) recs.push(rec)
   }
   return recs
+}
+
+// Get course keywords for a specific quiz result
+export function getCourseKeywords(quizId: string, resultKey: string): string[] {
+  const rec = getQuizRecommendations(quizId, resultKey)
+  if (!rec) return []
+  const keywords = new Set<string>()
+  for (const cat of rec.categories) {
+    const kws = CATEGORY_TO_COURSE_KEYWORDS[cat]
+    if (kws) kws.forEach(k => keywords.add(k))
+  }
+  return Array.from(keywords)
+}
+
+// Get all course keywords across all quiz results
+export function getAllCourseKeywords(quizResults: Record<string, string>): string[] {
+  const keywords = new Set<string>()
+  for (const [quizId, resultKey] of Object.entries(quizResults)) {
+    getCourseKeywords(quizId, resultKey).forEach(k => keywords.add(k))
+  }
+  return Array.from(keywords)
 }
 
 // Get top recommended categories across all quiz results
