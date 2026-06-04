@@ -393,6 +393,18 @@ export default function PartnerDashboard() {
 
   // UI state
   const [activeTab, setActiveTab] = useState('overview');
+  const [overviewSections, setOverviewSections] = useState<Record<string, boolean>>({
+    'hub-detail': false,
+    'hub-activity': false,
+    'timeline': false,
+    'indicators': false,
+    'buildings': false,
+    'investment': false,
+    'actions': false,
+    'leadership': false,
+    'community': false,
+  });
+  const toggleOverviewSection = (key: string) => setOverviewSections(prev => ({ ...prev, [key]: !prev[key] }));
   const [blueprintSubTab, setBlueprintSubTab] = useState<'approach' | 'in-person' | 'learning-hub' | 'dashboard' | 'book' | 'results' | 'contract'>('approach');
   const [mobileExpandedBlueprint, setMobileExpandedBlueprint] = useState<string | null>('approach');
   const [showPausedItems, setShowPausedItems] = useState(false);
@@ -1262,26 +1274,171 @@ export default function PartnerDashboard() {
             aria-labelledby="tab-overview"
             className="space-y-6"
           >
-            {/* Rich Stat Cards - Elevated Design */}
-            <StatCards
-              staffTotal={staffStats.total}
-              staffHubLoggedIn={staffStats.hubLoggedIn}
-              partnershipType={partnership.partnership_type}
-              buildingCount={apiBuildings.length}
-              observationsUsed={partnership.observation_days_completed ?? 0}
-              observationsTotal={partnership.observation_days_total ?? 0}
-              phase={partnership.contract_phase}
-              pendingItemsCount={pendingItems.length}
-              onStaffClick={partnership.partnership_type === 'district' ? () => navigateToTab('schools', 'buildings-list') : undefined}
-              onObservationClick={() => navigateToTab('blueprint', 'contract-deliverables')}
-              onAttentionClick={() => scrollToSection('action-items')}
-              onPhaseClick={() => navigateToTab('our-partnership', 'phase-timeline')}
-              observationStatusText={getObservationText()}
-              observationStatusColor={getObservationColor()}
-              hubStats={hubStats}
-            />
+            {/* ─── AI SUMMARY ─── replaces data overload */}
+            {(() => {
+              const hubPct = hubStats?.hub_login_pct ?? (staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0);
+              const toolsExplored = hubStats?.quick_wins_completed ?? 0;
+              const wellnessScore = hubStats?.mood_avg_7d ?? null;
+              const totalDeliverables = (partnership.observation_days_total || 0) + (partnership.virtual_sessions_total || 0);
+              const completedDeliverables = (partnership.observation_days_completed || 0) + (partnership.virtual_sessions_completed || 0);
+              const phaseNum = partnership.contract_phase === 'IGNITE' ? 1 : partnership.contract_phase === 'ACCELERATE' ? 2 : 3;
 
-            {/* Partnership Momentum Bar */}
+              return (
+                <>
+                  {/* AI Summary Card */}
+                  <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+                    <div className="flex items-center gap-1.5 mb-3">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#E8B84B]" />
+                      <span className="text-[10px] font-bold text-[#E8B84B] uppercase tracking-widest">Partnership Intelligence</span>
+                    </div>
+                    <p className="text-base md:text-lg leading-relaxed text-gray-700" style={{ fontFamily: 'Georgia, serif' }}>
+                      {hubPct > 0 ? (
+                        <>Your team is {hubPct >= 70 ? 'engaged' : hubPct >= 40 ? 'building momentum' : 'getting started'}. {hubPct}% of {staffStats.total} educators logged into the Hub this month{toolsExplored > 0 ? `, exploring ${toolsExplored} tools` : ''}{partnership.partnership_type === 'district' ? ` across ${apiBuildings.length} buildings` : ''}. {completedDeliverables > 0 ? `${completedDeliverables} of ${totalDeliverables} deliverables are complete.` : ''} {wellnessScore ? `Your educators' average wellness score is ${wellnessScore} out of 5${wellnessScore >= 4 ? ' -- stronger than the national average' : ''}.` : ''}</>
+                      ) : (
+                        <>Your partnership is active with {staffStats.total} educators enrolled. {completedDeliverables} of {totalDeliverables} deliverables completed so far. As your team engages with the Hub, this summary will update with real-time insights.</>
+                      )}
+                    </p>
+                    <button
+                      onClick={() => toggleOverviewSection('hub-detail')}
+                      className="text-xs text-gray-400 hover:text-gray-600 mt-3 transition-colors"
+                    >
+                      {overviewSections['hub-detail'] ? 'Hide details \u2191' : 'See detailed breakdown \u2193'}
+                    </button>
+                    {overviewSections['hub-detail'] && (
+                      <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          <div className="rounded-xl p-3 bg-gray-50">
+                            <p className="text-xl font-bold" style={{ color: '#E8B84B' }}>{hubPct}%</p>
+                            <p className="text-[10px] text-gray-500 mt-0.5">team logged in</p>
+                          </div>
+                          <div className="rounded-xl p-3 bg-gray-50">
+                            <p className="text-xl font-bold" style={{ color: '#2A9D8F' }}>{toolsExplored}</p>
+                            <p className="text-[10px] text-gray-500 mt-0.5">tools explored</p>
+                          </div>
+                          <div className="rounded-xl p-3 bg-gray-50">
+                            <p className="text-xl font-bold" style={{ color: '#2563EB' }}>{hubStats?.active_users_7d ?? 0}</p>
+                            <p className="text-[10px] text-gray-500 mt-0.5">active this week</p>
+                          </div>
+                          <div className="rounded-xl p-3 bg-gray-50">
+                            <p className="text-xl font-bold" style={{ color: '#2A9D8F' }}>{wellnessScore ? `${wellnessScore}/5` : `${staffStats.hubLoggedIn}/${staffStats.total}`}</p>
+                            <p className="text-[10px] text-gray-500 mt-0.5">{wellnessScore ? 'wellness score' : 'staff logged in'}</p>
+                          </div>
+                        </div>
+                        {hubStats?.course_completions && hubStats.course_completions > 0 && (
+                          <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+                            <Award className="w-4 h-4 text-[#E8B84B] flex-shrink-0" />
+                            <p className="text-sm text-gray-600"><strong>{hubStats.course_completions}</strong> courses completed -- PD credit your team can show you.</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Visual Gauge Rings */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {[
+                      { value: hubPct, label: 'Hub Engagement', display: `${hubPct}%`, color: '#E8B84B', max: 100 },
+                      { value: totalDeliverables > 0 ? (completedDeliverables / totalDeliverables) * 100 : 0, label: 'Deliverables', display: `${completedDeliverables}/${totalDeliverables}`, color: '#4ecdc4', max: 100 },
+                      { value: wellnessScore ? (wellnessScore / 5) * 100 : (staffStats.total > 0 ? (staffStats.hubLoggedIn / staffStats.total) * 100 : 0), label: wellnessScore ? 'Team Wellness' : 'Staff Active', display: wellnessScore ? `${wellnessScore}` : `${staffStats.hubLoggedIn}`, color: '#2A9D8F', max: 100 },
+                      { value: (phaseNum / 3) * 100, label: 'Current Phase', display: `${phaseNum}/3`, color: '#1e2749', max: 100 },
+                    ].map((gauge, i) => (
+                      <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col items-center">
+                        <div className="relative w-20 h-20 mb-3">
+                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 80 80">
+                            <circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" strokeWidth="6" />
+                            <circle cx="40" cy="40" r="34" fill="none" stroke={gauge.color} strokeWidth="6"
+                              strokeDasharray={`${gauge.value * 2.136} ${(100 - gauge.value) * 2.136}`} strokeLinecap="round" />
+                          </svg>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-xl font-bold" style={{ color: gauge.color }}>{gauge.display}</span>
+                          </div>
+                        </div>
+                        <p className="text-[11px] text-gray-500 font-medium">{gauge.label}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Partnership Health */}
+                  <div className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center gap-4">
+                    {(() => {
+                      const momentum = totalDeliverables > 0
+                        ? Math.round(((completedDeliverables / totalDeliverables) * 100 + hubPct + (pendingItems.length === 0 ? 100 : Math.max(0, 100 - pendingItems.length * 10))) / 3)
+                        : 0;
+                      const status = momentum >= 70 ? 'Strong' : momentum >= 40 ? 'Building' : 'Getting Started';
+                      const dotColor = momentum >= 70 ? '#22c55e' : momentum >= 40 ? '#EAB308' : '#9CA3AF';
+                      return (
+                        <>
+                          <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: dotColor, boxShadow: `0 0 8px ${dotColor}60` }} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold text-[#1e2749]">Partnership Momentum: <span style={{ color: dotColor }}>{status}</span></p>
+                            <p className="text-xs text-gray-500 truncate">
+                              {hubPct > 0 ? `${hubPct}% Hub engagement` : 'Hub onboarding'} | {completedDeliverables}/{totalDeliverables} deliverables | {pendingItems.length} items pending
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => navigateToTab('blueprint', 'contract-deliverables')}
+                            className="text-xs font-medium text-[#4ecdc4] hover:underline flex-shrink-0 flex items-center gap-1"
+                          >
+                            Blueprint <ArrowRight className="w-3 h-3" />
+                          </button>
+                        </>
+                      );
+                    })()}
+                  </div>
+
+                  {/* Quick Actions */}
+                  <div className="grid grid-cols-4 gap-3">
+                    {[
+                      { href: 'https://teachersdeserveit.com/hub', icon: BookOpen, label: 'Open Hub', bg: '#FFF8E7', iconColor: '#E8B84B' },
+                      { href: 'https://calendly.com/raehughart', icon: CalendarDays, label: 'Schedule', bg: '#E0F7F6', iconColor: '#2A9D8F' },
+                      { href: '#', icon: Star, label: 'Quiz', bg: '#EDE9FE', iconColor: '#8B5CF6', onClick: () => toggleOverviewSection('leadership') },
+                      { href: '#', icon: FileText, label: 'Tools', bg: '#DBEAFE', iconColor: '#2563EB', onClick: () => toggleOverviewSection('leadership') },
+                    ].map((action, i) => {
+                      const Icon = action.icon;
+                      return (
+                        <a
+                          key={i}
+                          href={action.onClick ? undefined : action.href}
+                          target={action.onClick ? undefined : '_blank'}
+                          rel={action.onClick ? undefined : 'noopener noreferrer'}
+                          onClick={action.onClick ? (e: React.MouseEvent) => { e.preventDefault(); action.onClick?.(); } : undefined}
+                          className="flex flex-col items-center gap-2 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer"
+                        >
+                          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: action.bg }}>
+                            <Icon className="w-4 h-4" style={{ color: action.iconColor }} />
+                          </div>
+                          <span className="text-[11px] font-semibold text-[#1e2749]">{action.label}</span>
+                        </a>
+                      );
+                    })}
+                  </div>
+                </>
+              );
+            })()}
+
+            {/* ─── COLLAPSIBLE: Hub Intelligence ─── */}
+            {hubIntel && (
+              <>
+                <button
+                  onClick={() => toggleOverviewSection('hub-activity')}
+                  className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#FFF8E7' }}>
+                      <Sparkles className="w-4 h-4" style={{ color: '#E8B84B' }} />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-[#1e2749]">Hub Intelligence</p>
+                      <p className="text-xs text-gray-500">Popular tools, educator types, community activity, teacher quotes</p>
+                    </div>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${overviewSections['hub-activity'] ? 'rotate-180' : ''}`} />
+                </button>
+                {overviewSections['hub-activity'] && (
+                  <div className="-mt-4">
+
+            {/* Partnership Momentum Bar -- hidden, replaced by visual-first health bar above */}
+            <div className="hidden">
             <div
               className="rounded-2xl p-5 md:p-6"
               style={{
@@ -1350,8 +1507,9 @@ export default function PartnerDashboard() {
                 </button>
               </div>
             </div>
+            </div>{/* end hidden momentum bar */}
 
-            {/* Hub Activity -- What your teachers are doing on the Hub */}
+            {/* Hub Activity -- What your teachers are doing on the Hub (inside collapsible wrapper) */}
             {hubStats && hubStats.has_real_data && (
               <div
                 className="bg-white rounded-2xl p-5 md:p-6"
@@ -1505,6 +1663,35 @@ export default function PartnerDashboard() {
                 )}
               </div>
             )}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* ─── COLLAPSIBLE: Partnership Timeline ─── */}
+            {timelineEvents.length > 0 && (
+              <>
+                <button
+                  onClick={() => toggleOverviewSection('timeline')}
+                  className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#E0F7F6' }}>
+                      <CalendarDays className="w-4 h-4" style={{ color: '#2A9D8F' }} />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-[#1e2749]">Partnership Timeline</p>
+                      <p className="text-xs text-gray-500">
+                        {timelineEvents.filter(e => e.status === 'completed').length} done, {timelineEvents.filter(e => e.status === 'in_progress').length} in progress, {timelineEvents.filter(e => e.status === 'upcoming').length} coming
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${overviewSections['timeline'] ? 'rotate-180' : ''}`} />
+                </button>
+              </>
+            )}
+            {overviewSections['timeline'] && timelineEvents.length > 0 && (
+              <div className="-mt-4">
 
             {/* Three-Column Timeline - Done / In Progress / Coming Soon */}
             {timelineEvents.length > 0 && (
@@ -1654,6 +1841,28 @@ export default function PartnerDashboard() {
                 </div>
               </div>
             )}
+            {/* end original timeline conditional */}
+              </div>
+            )}
+
+            {/* ─── COLLAPSIBLE: Data & Indicators ─── wraps Leading Indicators + Building Spotlight + Investment */}
+            <button
+              onClick={() => toggleOverviewSection('indicators')}
+              className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#F3F4F6' }}>
+                  <BarChart3 className="w-4 h-4 text-[#38618C]" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-[#1e2749]">Data & Impact</p>
+                  <p className="text-xs text-gray-500">Leading indicators, building spotlight, investment numbers, teacher quotes</p>
+                </div>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${overviewSections['indicators'] ? 'rotate-180' : ''}`} />
+            </button>
+            {overviewSections['indicators'] && (
+              <div className="-mt-4 space-y-6">
 
             {/* Leading Indicators */}
             {(() => {
@@ -2153,6 +2362,29 @@ export default function PartnerDashboard() {
 
             {/* TDI Suggestions */}
             <TDISuggestions suggestions={suggestions} isAdminView={false} />
+
+              </div>
+            )}
+            {/* end Data & Impact collapsible */}
+
+            {/* ─── COLLAPSIBLE: Action Items ─── */}
+            <button
+              onClick={() => toggleOverviewSection('actions')}
+              className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#FEF3C7' }}>
+                  <AlertCircle className="w-4 h-4 text-amber-500" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-[#1e2749]">Next Steps & Actions</p>
+                  <p className="text-xs text-gray-500">{pendingItems.length} item{pendingItems.length !== 1 ? 's' : ''} need attention</p>
+                </div>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${overviewSections['actions'] ? 'rotate-180' : ''}`} />
+            </button>
+            {overviewSections['actions'] && (
+              <div className="-mt-4">
 
             {/* Action Items */}
             <div id="action-items" className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
@@ -2705,6 +2937,9 @@ export default function PartnerDashboard() {
                 )}
               </div>
             </div>
+              </div>
+            )}
+            {/* end Action Items collapsible */}
 
             {/* Overview Footer - Dark Navy */}
             <div
@@ -3672,7 +3907,52 @@ export default function PartnerDashboard() {
                 </>
               );
             })()}
-            {/* Quick Access Bar */}
+
+            {/* ─── COLLAPSIBLE: Leadership Tools ─── */}
+            <button
+              onClick={() => toggleOverviewSection('leadership')}
+              className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#EDE9FE' }}>
+                  <GraduationCap className="w-4 h-4" style={{ color: '#8B5CF6' }} />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-[#1e2749]">Leadership Tools & Quiz</p>
+                  <p className="text-xs text-gray-500">Printable tools, conversation starters, leadership style quiz</p>
+                </div>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${overviewSections['leadership'] ? 'rotate-180' : ''}`} />
+            </button>
+            {overviewSections['leadership'] && (
+              <div className="-mt-4 space-y-4">
+                <LeadershipQuiz />
+                <AICoachingCard />
+                <LeadershipToolkit />
+              </div>
+            )}
+
+            {/* ─── COLLAPSIBLE: Community & FAQ ─── */}
+            <button
+              onClick={() => toggleOverviewSection('community')}
+              className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#DBEAFE' }}>
+                  <Handshake className="w-4 h-4" style={{ color: '#2563EB' }} />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-[#1e2749]">Community, Tips & FAQ</p>
+                  <p className="text-xs text-gray-500">Seasonal tips, common questions, resources</p>
+                </div>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${overviewSections['community'] ? 'rotate-180' : ''}`} />
+            </button>
+            {overviewSections['community'] && (
+              <div className="-mt-4 space-y-4">
+
+            {/* Quick Access Bar -- hidden, replaced by quick actions above */}
+            <div className="hidden">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <a href="https://teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
@@ -3715,6 +3995,7 @@ export default function PartnerDashboard() {
                 </div>
               </a>
             </div>
+            </div>{/* end hidden quick access */}
 
             {/* Seasonal Leadership Tip */}
             <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, #1e2749 0%, #2d3a5c 50%, #38618C 100%)' }}>
@@ -3753,14 +4034,11 @@ export default function PartnerDashboard() {
               </div>
             </div>
 
-            {/* Leadership Quiz */}
-            <LeadershipQuiz />
+            {/* Leadership Quiz/Coaching/Toolkit moved to leadership collapsible above */}
 
-            {/* AI Coaching */}
-            <AICoachingCard />
-
-            {/* Leadership Toolkit */}
-            <LeadershipToolkit />
+              </div>
+            )}
+            {/* end Community collapsible */}
 
           </div>
         )}

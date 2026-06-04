@@ -246,7 +246,14 @@ export default function ExampleDashboard() {
 
   // Accordion state for collapsible sections
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    // Overview
+    // Overview - visual-first collapsible sections
+    'overview-hub-detail': false,
+    'overview-hub-full': false,
+    'overview-timeline': false,
+    'overview-actions': false,
+    'overview-leadership': false,
+    'overview-community': false,
+    // Overview - legacy
     'leading-indicators': true,
     'movement-involvement': false,
     'building-awards': true,
@@ -1199,561 +1206,426 @@ export default function ExampleDashboard() {
         {activeTab === 'overview' && (
           <div className="space-y-4 pb-16">
 
-            {/* ─── ZONE 1: PARTNERSHIP SNAPSHOT ─── */}
-            <div className="space-y-4">
-
-              {/* Stat Cards Row */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-                {/* Staff Enrolled */}
-                <button
-                  onClick={() => setActiveTab('progress')}
-                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#38618C]/20 transition-all group"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <Users className="w-5 h-5 text-[#38618C]" />
-                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#38618C] transition-colors" />
-                  </div>
-                  <div className="text-3xl font-bold text-[#38618C] mb-1">
-                    {overviewData.stats.educatorsEnrolled.value}/{overviewData.stats.educatorsEnrolled.total}
-                  </div>
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{overviewData.stats.educatorsEnrolled.label}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{overviewData.stats.educatorsEnrolled.sublabel}</p>
-                </button>
-
-                {/* Deliverables */}
-                <button
-                  onClick={() => setActiveTab('blueprint')}
-                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#38618C]/20 transition-all group"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <CheckCircle className="w-5 h-5 text-[#4ecdc4]" />
-                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#38618C] transition-colors" />
-                  </div>
-                  <div className="text-3xl font-bold text-[#4ecdc4] mb-1">
-                    {overviewData.stats.deliverables.completed}/{overviewData.stats.deliverables.total}
-                  </div>
-                  <div className="text-sm font-semibold text-[#1e2749] mb-0.5">{overviewData.stats.deliverables.label}</div>
-                  <div className="text-xs text-gray-500">{overviewData.stats.deliverables.sublabel}</div>
-                  {/* Mini progress bar */}
-                  <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#4ecdc4] rounded-full transition-all"
-                      style={{ width: `${(overviewData.stats.deliverables.completed / overviewData.stats.deliverables.total) * 100}%` }}
-                    />
-                  </div>
-                </button>
-
-                {/* Hub Engagement */}
-                <button
-                  onClick={() => setActiveTab('progress')}
-                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#38618C]/20 transition-all group"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <BookOpen className="w-5 h-5 text-[#38618C]" />
-                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#38618C] transition-colors" />
-                  </div>
-                  <div className="text-3xl font-bold text-[#38618C] mb-1">{overviewData.stats.hubEngagement.percent}%</div>
-                  <div className="text-sm font-semibold text-[#1e2749] mb-0.5">{overviewData.stats.hubEngagement.label}</div>
-                  <div className="text-xs text-gray-500">{overviewData.stats.hubEngagement.sublabel}</div>
-                  {/* Mini progress bar */}
-                  <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#38618C] rounded-full transition-all"
-                      style={{ width: `${overviewData.stats.hubEngagement.percent}%` }}
-                    />
-                  </div>
-                </button>
-
-                {/* Current Phase */}
-                <button
-                  onClick={() => setActiveTab('blueprint')}
-                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#38618C]/20 transition-all group"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <Target className="w-5 h-5 text-[#1e2749]" />
-                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#38618C] transition-colors" />
-                  </div>
-                  <div className="text-3xl font-bold text-[#1e2749] mb-0.5">Phase {overviewData.stats.phase.number}</div>
-                  <div className="text-sm font-semibold text-[#38618C] mb-0.5">{overviewData.stats.phase.name}</div>
-                  <div className="text-sm font-medium text-[#1e2749]">{overviewData.stats.phase.label}</div>
-                  <div className="text-xs text-gray-500">{overviewData.stats.phase.sublabel}</div>
-                  {/* Phase progress dots */}
-                  <div className="mt-3 flex gap-1.5">
-                    {Array.from({ length: overviewData.stats.phase.total }).map((_, i) => (
-                      <div
-                        key={i}
-                        className={`h-1.5 flex-1 rounded-full ${i < overviewData.stats.phase.number ? 'bg-[#1e2749]' : 'bg-gray-100'}`}
-                      />
-                    ))}
-                  </div>
-                </button>
+            {/* ─── AI SUMMARY ─── replaces wall of data cards */}
+            <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-1.5 mb-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E8B84B]" />
+                <span className="text-[10px] font-bold text-[#E8B84B] uppercase tracking-widest">Partnership Intelligence</span>
               </div>
+              <p className="text-base md:text-lg leading-relaxed text-gray-700" style={{ fontFamily: 'Georgia, serif' }}>
+                Your team is engaged. {overviewData.stats.hubEngagement.percent}% of {overviewData.stats.educatorsEnrolled.total} educators logged into the Hub this month, exploring 342 tools across {districtSchools.length} buildings. Crescendo Middle is your standout at 72% course completion. Your educators&apos; average wellness score is 4.2 out of 5 -- stronger than the national average. TDI reached out to 7 team members for wellness check-ins this week.
+              </p>
+              <button
+                onClick={() => setOpenSections(prev => ({ ...prev, 'overview-hub-detail': !prev['overview-hub-detail'] }))}
+                className="text-xs text-gray-400 hover:text-gray-600 mt-3 transition-colors"
+              >
+                {openSections['overview-hub-detail'] ? 'Hide details' : 'See detailed breakdown'} {openSections['overview-hub-detail'] ? '\u2191' : '\u2193'}
+              </button>
 
-              {/* Partnership Health Indicator */}
-              <div className="bg-white rounded-2xl px-6 py-4 shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center gap-3">
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-sm shadow-green-200" />
-                  <span className="text-sm font-bold text-[#1e2749]">Partnership Momentum:</span>
-                  <span className="text-sm font-bold text-green-600">{overviewData.health.status}</span>
+              {/* Expandable detail */}
+              {openSections['overview-hub-detail'] && (
+                <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="rounded-xl p-3" style={{ background: '#F9FAFB' }}>
+                      <p className="text-xl font-bold" style={{ color: '#E8B84B' }}>87%</p>
+                      <p className="text-[10px] text-gray-500 mt-0.5">team logged in</p>
+                    </div>
+                    <div className="rounded-xl p-3" style={{ background: '#F9FAFB' }}>
+                      <p className="text-xl font-bold" style={{ color: '#2A9D8F' }}>342</p>
+                      <p className="text-[10px] text-gray-500 mt-0.5">tools explored</p>
+                    </div>
+                    <div className="rounded-xl p-3" style={{ background: '#F9FAFB' }}>
+                      <p className="text-xl font-bold" style={{ color: '#2563EB' }}>189</p>
+                      <p className="text-[10px] text-gray-500 mt-0.5">active this week</p>
+                    </div>
+                    <div className="rounded-xl p-3" style={{ background: '#F9FAFB' }}>
+                      <p className="text-xl font-bold" style={{ color: '#2A9D8F' }}>4.2/5</p>
+                      <p className="text-[10px] text-gray-500 mt-0.5">wellness score</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F9FAFB' }}>
+                    <Award className="w-4 h-4 text-[#E8B84B] flex-shrink-0" />
+                    <p className="text-sm text-gray-600">Your team earned <strong>127 Field Notes</strong> and completed <strong>38 courses</strong> (94.5 PD hours).</p>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#EFF6FF' }}>
+                    <Heart className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                    <p className="text-sm text-gray-600">TDI personally reached out to <strong>7</strong> team members for wellness check-ins. Names are never shared.</p>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F0FDF4' }}>
+                    <MessageCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                    <p className="text-sm text-gray-600">Your team contributed <strong>89 posts</strong> and engaged in <strong>34 Q&A threads</strong>. <strong>4 PD content requests</strong> submitted.</p>
+                  </div>
                 </div>
-                <div className="hidden md:block w-px h-4 bg-gray-200" />
-                <div className="flex flex-wrap gap-x-4 gap-y-1">
-                  {overviewData.health.details.map((d, i) => (
-                    <span key={i} className="text-xs text-gray-500">{d}</span>
+              )}
+            </div>
+
+            {/* ─── VISUAL GAUGES ─── at-a-glance row */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                { value: overviewData.stats.hubEngagement.percent, label: 'Hub Engagement', display: `${overviewData.stats.hubEngagement.percent}%`, color: '#E8B84B', max: 100 },
+                { value: (overviewData.stats.deliverables.completed / overviewData.stats.deliverables.total) * 100, label: 'Deliverables', display: `${overviewData.stats.deliverables.completed}/${overviewData.stats.deliverables.total}`, color: '#4ecdc4', max: 100 },
+                { value: (4.2 / 5) * 100, label: 'Team Wellness', display: '4.2', color: '#2A9D8F', max: 100 },
+                { value: (overviewData.stats.phase.number / overviewData.stats.phase.total) * 100, label: 'Current Phase', display: `${overviewData.stats.phase.number}/${overviewData.stats.phase.total}`, color: '#1e2749', max: 100 },
+              ].map((gauge, i) => (
+                <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col items-center">
+                  <div className="relative w-20 h-20 mb-3">
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 80 80">
+                      <circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" strokeWidth="6" />
+                      <circle cx="40" cy="40" r="34" fill="none" stroke={gauge.color} strokeWidth="6"
+                        strokeDasharray={`${gauge.value * 2.136} ${(100 - gauge.value) * 2.136}`} strokeLinecap="round" />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-xl font-bold" style={{ color: gauge.color }}>{gauge.display}</span>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-gray-500 font-medium">{gauge.label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* ─── PARTNERSHIP HEALTH ─── */}
+            <div className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center gap-4">
+              <div className="w-3 h-3 rounded-full bg-green-500 flex-shrink-0" style={{ boxShadow: '0 0 8px rgba(34,197,94,0.4)' }} />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-[#1e2749]">Partnership Momentum: <span className="text-green-600">{overviewData.health.status}</span></p>
+                <p className="text-xs text-gray-500 truncate">Hub above target | Observations on schedule | No blockers</p>
+              </div>
+            </div>
+
+            {/* ─── QUICK ACTIONS ─── */}
+            <div className="grid grid-cols-4 gap-3">
+              {[
+                { href: 'https://teachersdeserveit.com/hub', icon: BookOpen, label: 'Open Hub', bg: '#FFF8E7', iconColor: '#E8B84B' },
+                { href: 'https://calendly.com/raehughart', icon: Calendar, label: 'Schedule', bg: '#E0F7F6', iconColor: '#2A9D8F' },
+                { href: '#', icon: Star, label: 'Quiz', bg: '#EDE9FE', iconColor: '#8B5CF6', onClick: () => setOpenSections(prev => ({ ...prev, 'overview-leadership': !prev['overview-leadership'] })) },
+                { href: '#', icon: FileText, label: 'Tools', bg: '#DBEAFE', iconColor: '#2563EB', onClick: () => setOpenSections(prev => ({ ...prev, 'overview-leadership': !prev['overview-leadership'] })) },
+              ].map((action, i) => {
+                const Icon = action.icon;
+                return (
+                  <a
+                    key={i}
+                    href={action.onClick ? undefined : action.href}
+                    target={action.onClick ? undefined : '_blank'}
+                    rel={action.onClick ? undefined : 'noopener noreferrer'}
+                    onClick={action.onClick ? (e) => { e.preventDefault(); action.onClick?.(); } : undefined}
+                    className="flex flex-col items-center gap-2 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer"
+                  >
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: action.bg }}>
+                      <Icon className="w-4 h-4" style={{ color: action.iconColor }} />
+                    </div>
+                    <span className="text-[11px] font-semibold text-[#1e2749]">{action.label}</span>
+                  </a>
+                );
+              })}
+            </div>
+
+            {/* ─── TWO COLUMN: Popular Tools + Educator Types ─── */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">Popular in Your District</p>
+                <div className="flex flex-wrap gap-2">
+                  {['Calm Response Scripts', 'Lesson Flow Checklist', 'The Shift Kit', 'Parent Comms'].map((tool, i) => (
+                    <span key={i} className="text-xs px-3 py-1.5 rounded-full font-medium" style={{ background: '#FFF8E7', color: '#92400E' }}>
+                      {tool}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">Your Team&apos;s Educator Types</p>
+                <div className="flex flex-wrap gap-4">
+                  {[
+                    { count: 42, name: 'Connectors', color: '#E8B84B' },
+                    { count: 38, name: 'Architects', color: '#2563EB' },
+                    { count: 31, name: 'Sparks', color: '#EC4899' },
+                  ].map((type, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded" style={{ background: type.color }} />
+                      <span className="text-base font-bold text-[#1e2749]">{type.count}</span>
+                      <span className="text-xs text-gray-500">{type.name}</span>
+                    </div>
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* ─── HUB INTELLIGENCE ─── */}
-            <div className="bg-white rounded-2xl p-5 md:p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(232,184,75,0.12)' }}>
-                  <Sparkles className="w-5 h-5" style={{ color: '#E8B84B' }} />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold" style={{ color: '#1e2749' }}>Learning Hub Activity</h3>
-                  <p className="text-xs text-gray-500">What your team is doing on the TDI Learning Hub this month</p>
-                </div>
-              </div>
-
-              {/* Core metrics */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
-                <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
-                  <p className="text-2xl font-bold" style={{ color: '#E8B84B' }}>87%</p>
-                  <p className="text-xs text-gray-500 mt-1">of your team logged in this month</p>
-                </div>
-                <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
-                  <p className="text-2xl font-bold" style={{ color: '#2A9D8F' }}>342</p>
-                  <p className="text-xs text-gray-500 mt-1">tools explored by your educators</p>
-                </div>
-                <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
-                  <p className="text-2xl font-bold" style={{ color: '#2563EB' }}>189</p>
-                  <p className="text-xs text-gray-500 mt-1">active in the last 7 days</p>
-                </div>
-                <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
-                  <p className="text-2xl font-bold" style={{ color: '#2A9D8F' }}>4.2/5</p>
-                  <p className="text-xs text-gray-500 mt-1">avg team wellness score</p>
-                </div>
-              </div>
-
-              {/* Rich intelligence */}
-              <div className="space-y-4 pt-4" style={{ borderTop: '1px solid #F3F4F6' }}>
-
-                {/* Popular tools */}
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Popular in Your District</p>
-                  <div className="flex flex-wrap gap-2">
-                    {['Calm Response Scripts', 'Lesson Flow Checklist', 'The Shift Kit', 'Parent Communication Templates', 'De-escalation Quick Card'].map((tool, i) => (
-                      <span key={i} className="text-xs px-3 py-1.5 rounded-full" style={{ background: '#FFF8E7', color: '#92400E' }}>
-                        {tool}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Educator quiz */}
-                <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F9FAFB' }}>
-                  <span className="text-lg">&#9734;</span>
-                  <div>
-                    <p className="text-sm font-medium" style={{ color: '#1e2749' }}>
-                      Your district&apos;s most common educator type: <strong>The Connector</strong>
-                    </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      42 Connectors, 38 Architects, 31 Sparks, 28 Anchors, 25 Innovators, 23 Strategists
-                    </p>
-                  </div>
-                </div>
-
-                {/* Community engagement */}
-                <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F0FDF4' }}>
-                  <span className="text-lg">&#128172;</span>
-                  <p className="text-sm" style={{ color: '#374151' }}>
-                    Your team contributed <strong>89 posts</strong> and engaged in <strong>34 Q&A threads</strong> -- helping other educators across the country.
-                  </p>
-                </div>
-
-                {/* Anonymized teacher quote */}
-                <div className="p-4 rounded-xl" style={{ background: '#FFFBEB', borderLeft: '3px solid #E8B84B' }}>
-                  <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">From Your Team</p>
-                  <p className="text-sm italic" style={{ color: '#374151', lineHeight: 1.6 }}>
-                    &ldquo;I tried the shift technique with my kids on Monday and was shocked. We went from losing 8-10 minutes between subjects to being seated and ready in under 2.&rdquo;
-                  </p>
-                  <p className="text-[10px] text-gray-400 mt-1">-- An educator at Crescendo Middle</p>
-                </div>
-
-                {/* Field Notes */}
-                <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F9FAFB' }}>
-                  <span className="text-lg">&#127942;</span>
-                  <p className="text-sm" style={{ color: '#374151' }}>
-                    Your team earned <strong>127 Field Notes</strong> -- recognitions for showing up and doing the work.
-                  </p>
-                </div>
-
-                {/* Wellness outreach */}
-                <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#EFF6FF' }}>
-                  <span className="text-lg">&#128153;</span>
-                  <p className="text-sm" style={{ color: '#374151' }}>
-                    TDI personally reached out to <strong>7</strong> team members this month for a wellness check-in.
-                  </p>
-                </div>
-
-                {/* PD requests */}
-                <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F9FAFB' }}>
-                  <span className="text-lg">&#128161;</span>
-                  <p className="text-sm" style={{ color: '#374151' }}>
-                    Your educators submitted <strong>4 PD content requests</strong> this month -- shaping what TDI builds next.
-                  </p>
-                </div>
-
-                {/* Course completions */}
-                <p className="text-xs text-gray-500 pt-3" style={{ borderTop: '1px solid #F3F4F6' }}>
-                  38 courses completed by your team -- PD credit they can show you. 94.5 PD hours earned district-wide.
-                </p>
-              </div>
-            </div>
-
-            {/* ─── AI PARTNERSHIP INSIGHT ─── */}
-            <div
-              className="rounded-2xl p-5"
-              style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #263554 100%)', borderLeft: '3px solid #E8B84B' }}
-            >
-              <div className="flex items-center gap-1.5 mb-2">
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8B84B', display: 'inline-block' }} />
-                <span style={{ fontSize: 10, fontWeight: 700, color: '#E8B84B', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                  AI Partnership Insight
-                </span>
-              </div>
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, margin: 0 }}>
-                Motown District 360 is in strong shape heading into Phase 2. With 87% Hub engagement and 342 tools explored this month, your educators are actively building their practice. Crescendo Middle is your standout building with 72% course completion -- consider celebrating this win at your next leadership meeting to build momentum across the other 5 schools.
+            {/* ─── TEACHER QUOTE ─── */}
+            <div className="rounded-2xl p-5" style={{ background: '#FFFBEB', borderLeft: '3px solid #E8B84B' }}>
+              <p className="text-sm italic text-gray-700" style={{ lineHeight: 1.7 }}>
+                &ldquo;I tried the shift technique with my kids on Monday and was shocked. We went from losing 8-10 minutes between subjects to being seated and ready in under 2.&rdquo;
               </p>
+              <p className="text-[10px] text-gray-400 mt-2">-- An educator at Crescendo Middle</p>
             </div>
 
-            {/* ─── BROADER COMMUNITY TESTIMONIAL ─── */}
-            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">From the TDI Community (100,000+ educators)</p>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-gray-50" style={{ borderLeft: '3px solid #4ecdc4' }}>
-                  <p className="text-sm italic text-gray-600" style={{ lineHeight: 1.6 }}>
-                    &ldquo;The Quick Wins are the first PD resource I have actually used more than once. Practical, fast, and built for people who do not have time for a 3-hour webinar.&rdquo;
-                  </p>
-                  <p className="text-xs text-gray-400 mt-2">-- Instructional coach, K-5</p>
+            {/* ─── EXPANDABLE SECTIONS ─── collapsed by default */}
+
+            {/* 1. Detailed Hub Activity */}
+            <button
+              onClick={() => setOpenSections(prev => ({ ...prev, 'overview-hub-full': !prev['overview-hub-full'] }))}
+              className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#FFF8E7' }}>
+                  <BarChart3 className="w-4 h-4" style={{ color: '#E8B84B' }} />
                 </div>
-                <div className="p-4 rounded-xl bg-gray-50" style={{ borderLeft: '3px solid #E8B84B' }}>
-                  <p className="text-sm italic text-gray-600" style={{ lineHeight: 1.6 }}>
-                    &ldquo;I printed my certificate, added it to my portfolio, and used the email template to send it to my principal. She was impressed.&rdquo;
-                  </p>
-                  <p className="text-xs text-gray-400 mt-2">-- Paraprofessional, 2nd year</p>
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-[#1e2749]">Investment & Impact</p>
+                  <p className="text-xs text-gray-500">${overviewData.investment.perEducator}/educator | {overviewData.investment.retentionStat} implementation | 9.8/10 retention</p>
                 </div>
               </div>
-            </div>
-
-            {/* ─── ZONE 2A: DONE / IN PROGRESS / COMING SOON ─── */}
-            <div>
-              <h3 className="text-base font-bold text-[#1e2749] mb-4">Partnership Timeline</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-                {/* Done */}
-                <div className="bg-green-50 rounded-2xl p-5 border border-green-100">
-                  <div className="flex items-center gap-2 mb-4">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                    <span className="text-sm font-bold text-green-700">Done</span>
-                    <span className="ml-auto text-xs text-green-600 font-medium bg-green-100 px-2 py-0.5 rounded-full">
-                      {overviewData.timeline.done.length} completed
-                    </span>
-                  </div>
-                  <div className="space-y-2.5">
-                    {overviewData.timeline.done.map((item, i) => (
-                      <div key={i} className="flex gap-2.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-400 mt-1.5 flex-shrink-0" />
-                        <div>
-                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
-                          <div className="text-xs text-gray-400 mt-0.5">{item.date}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* In Progress */}
-                <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-4 h-4 rounded-full border-2 border-amber-500 flex items-center justify-center">
-                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                    </div>
-                    <span className="text-sm font-bold text-amber-700">In Progress</span>
-                    <span className="ml-auto text-xs text-amber-600 font-medium bg-amber-100 px-2 py-0.5 rounded-full">
-                      {overviewData.timeline.inProgress.length} active
-                    </span>
-                  </div>
-                  <div className="space-y-2.5">
-                    {overviewData.timeline.inProgress.map((item, i) => (
-                      <div key={i} className="flex gap-2.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
-                        <div>
-                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
-                          <div className="text-xs text-gray-400 mt-0.5">{item.detail}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Coming Soon */}
-                <div className="bg-[#e8f5f5] rounded-2xl p-5 border border-[#38618C]/15">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Calendar className="w-4 h-4 text-[#38618C]" />
-                    <span className="text-sm font-bold text-[#38618C]">Coming Soon</span>
-                    <span className="ml-auto text-xs text-[#38618C] font-medium bg-[#38618C]/10 px-2 py-0.5 rounded-full">
-                      {overviewData.timeline.comingSoon.length} ahead
-                    </span>
-                  </div>
-                  <div className="space-y-2.5">
-                    {overviewData.timeline.comingSoon.map((item, i) => (
-                      <div key={i} className="flex gap-2.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#38618C]/50 mt-1.5 flex-shrink-0" />
-                        <div>
-                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
-                          <div className="text-xs text-gray-400 mt-0.5">{item.date}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* ─── ZONE 2B: YOUR INVESTMENT, BY THE NUMBERS ─── */}
-            <div>
-              <div className="bg-[#e8f5f5] rounded-2xl p-1 border border-[#38618C]/15">
-                <div className="px-5 pt-5 pb-3">
-                  <h3 className="text-base font-bold text-[#1e2749]">Your Investment, By The Numbers</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">What this partnership delivers - in impact and value</p>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#38618C]/10 rounded-xl overflow-hidden">
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${openSections['overview-hub-full'] ? 'rotate-180' : ''}`} />
+            </button>
+            {openSections['overview-hub-full'] && (
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 -mt-2">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                   {[
                     { value: overviewData.investment.perEducator, label: 'per educator', sub: overviewData.investment.perEducatorSublabel },
                     { value: overviewData.investment.implementationRate, label: 'retention intent', sub: overviewData.investment.implementationSublabel },
                     { value: overviewData.investment.coursesCompleted, label: 'avg stress score', sub: overviewData.investment.coursesCompletedSublabel },
                     { value: overviewData.investment.retentionStat, label: 'implementation', sub: overviewData.investment.retentionSublabel },
                   ].map((stat, i) => (
-                    <div key={i} className="bg-white px-5 py-4">
-                      <div className="text-2xl font-bold text-[#38618C] mb-0.5">{stat.value}</div>
-                      <div className="text-xs font-semibold text-[#1e2749] mb-1">{stat.label}</div>
-                      <div className="text-xs text-gray-400 leading-snug">{stat.sub}</div>
+                    <div key={i} className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
+                      <div className="text-xl font-bold text-[#38618C] mb-0.5">{stat.value}</div>
+                      <div className="text-xs font-semibold text-[#1e2749]">{stat.label}</div>
+                      <div className="text-[10px] text-gray-400 mt-0.5 leading-snug">{stat.sub}</div>
                     </div>
                   ))}
+                </div>
+                <div className="bg-[#FDF8E7] rounded-xl p-4 text-center border border-[#F5C542]/20">
+                  <p className="text-sm font-bold text-[#1e2749]">{overviewData.quickWin.line1}</p>
+                  <p className="text-xs text-gray-500 mt-1">{overviewData.quickWin.line2}</p>
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* ─── ZONE 2C: QUICK WIN COUNTER ─── */}
-            <div className="bg-[#FDF8E7] rounded-2xl p-6 border border-[#F5C542]/30 text-center">
-              <div className="text-3xl mb-2">🎉</div>
-              <div className="text-lg font-bold text-[#1e2749] mb-1">{overviewData.quickWin.line1}</div>
-              <div className="text-sm text-gray-500">{overviewData.quickWin.line2}</div>
-            </div>
-
-            {/* ─── ZONE 3: ACTIONS ─── */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-              {/* Your Next Steps */}
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                <h3 className="text-sm font-bold text-[#1e2749] mb-4 flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-amber-500" />
-                  Your Next Steps
-                </h3>
-                <div className="space-y-3">
-                  {overviewData.actions.nextToUnlock.map((item, i) => (
-                    <div key={i} className="bg-amber-50 rounded-xl p-4 border border-amber-100">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <div className="text-sm font-semibold text-[#1e2749] mb-0.5">{item.label}</div>
-                          <div className="text-xs text-gray-500 leading-snug">{item.detail}</div>
-                        </div>
-                      </div>
-                      {item.cta && (
-                        <a
-                          href={item.ctaHref}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#38618C] hover:underline"
-                        >
-                          {item.cta} <ArrowRight className="w-3 h-3" />
-                        </a>
-                      )}
-                    </div>
-                  ))}
-                  {overviewData.actions.tdiHandling.map((item, i) => (
-                    <div key={i} className="bg-blue-50 rounded-xl p-4 border border-blue-100">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <div className="text-sm font-semibold text-[#1e2749] mb-0.5">{item.label}</div>
-                          <div className="text-xs text-gray-500 leading-snug">{item.detail}</div>
-                        </div>
-                        <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full flex-shrink-0">
-                          TDI handling
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Already In Motion */}
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                <h3 className="text-sm font-bold text-[#1e2749] mb-4 flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-green-500" />
-                  Already In Motion
-                </h3>
-                <div className="space-y-3">
-                  {overviewData.actions.alreadyInMotion.map((item, i) => (
-                    <div key={i} className="flex items-center gap-3 bg-green-50 rounded-xl p-4 border border-green-100">
-                      <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                        <Calendar className="w-3.5 h-3.5 text-green-600" />
-                      </div>
-                      <div>
-                        <div className="text-sm font-semibold text-[#1e2749]">{item.label}</div>
-                        <div className="text-xs text-gray-500">{item.date}</div>
-                      </div>
-                      <span className="ml-auto text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full flex-shrink-0">
-                        Scheduled
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* ─── QUICK ACCESS BAR ─── */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <a
-                href="https://teachersdeserveit.com/hub"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-[#E8B84B]/30 transition-all group"
-              >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#FFF8E7' }}>
-                  <BookOpen className="w-5 h-5" style={{ color: '#E8B84B' }} />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>Open the Hub</p>
-                  <p className="text-[10px] text-gray-500">See what your teachers see</p>
-                </div>
-              </a>
-              <a
-                href="https://calendly.com/raehughart"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-[#4ecdc4]/30 transition-all group"
-              >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#E0F7F6' }}>
-                  <Calendar className="w-5 h-5" style={{ color: '#2A9D8F' }} />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>Schedule with TDI</p>
-                  <p className="text-[10px] text-gray-500">Book a check-in or session</p>
-                </div>
-              </a>
-              <a
-                href="https://teachersdeserveit.com/hub/quick-wins"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-[#8B5CF6]/30 transition-all group"
-              >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#EDE9FE' }}>
-                  <Sparkles className="w-5 h-5" style={{ color: '#8B5CF6' }} />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>Browse Quick Wins</p>
-                  <p className="text-[10px] text-gray-500">Tools your team can use today</p>
-                </div>
-              </a>
-              <a
-                href="https://teachersdeserveit.com/hub/courses"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-[#2563EB]/30 transition-all group"
-              >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#DBEAFE' }}>
-                  <GraduationCap className="w-5 h-5" style={{ color: '#2563EB' }} />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>PD Courses</p>
-                  <p className="text-[10px] text-gray-500">Full course library</p>
-                </div>
-              </a>
-            </div>
-
-            {/* ─── SEASONAL LEADERSHIP TIP ─── */}
-            <div
-              className="rounded-2xl p-5 md:p-6"
-              style={{ background: 'linear-gradient(135deg, #1e2749 0%, #2d3a5c 50%, #38618C 100%)' }}
+            {/* 2. Partnership Timeline */}
+            <button
+              onClick={() => setOpenSections(prev => ({ ...prev, 'overview-timeline': !prev['overview-timeline'] }))}
+              className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
             >
-              <div className="flex flex-col md:flex-row md:items-center gap-4">
-                <div className="flex items-center gap-3 flex-shrink-0">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.1)' }}>
-                    <Calendar className="w-6 h-6 text-[#FFBA06]" />
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#E0F7F6' }}>
+                  <Calendar className="w-4 h-4" style={{ color: '#2A9D8F' }} />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-[#1e2749]">Partnership Timeline</p>
+                  <p className="text-xs text-gray-500">{overviewData.timeline.done.length} done, {overviewData.timeline.inProgress.length} in progress, {overviewData.timeline.comingSoon.length} coming soon</p>
+                </div>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${openSections['overview-timeline'] ? 'rotate-180' : ''}`} />
+            </button>
+            {openSections['overview-timeline'] && (
+              <div className="-mt-2">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="bg-green-50 rounded-2xl p-4 border border-green-100">
+                    <div className="flex items-center gap-2 mb-3">
+                      <CheckCircle className="w-3.5 h-3.5 text-green-600" />
+                      <span className="text-xs font-bold text-green-700">Done ({overviewData.timeline.done.length})</span>
+                    </div>
+                    <div className="space-y-2">
+                      {overviewData.timeline.done.map((item, i) => (
+                        <div key={i} className="flex gap-2">
+                          <div className="w-1 h-1 rounded-full bg-green-400 mt-1.5 flex-shrink-0" />
+                          <div className="text-[11px] text-gray-600 leading-snug">{item.label} <span className="text-gray-400">({item.date})</span></div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-white/50 text-[10px] uppercase tracking-wider">June Leadership Strategy</p>
-                    <p className="text-white font-bold text-base">End-of-Year Teacher Appreciation</p>
+                  <div className="bg-amber-50 rounded-2xl p-4 border border-amber-100">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-3.5 h-3.5 rounded-full border-2 border-amber-500 flex items-center justify-center">
+                        <div className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" />
+                      </div>
+                      <span className="text-xs font-bold text-amber-700">Active ({overviewData.timeline.inProgress.length})</span>
+                    </div>
+                    <div className="space-y-2">
+                      {overviewData.timeline.inProgress.map((item, i) => (
+                        <div key={i} className="flex gap-2">
+                          <div className="w-1 h-1 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                          <div className="text-[11px] text-gray-600 leading-snug">{item.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="bg-[#e8f5f5] rounded-2xl p-4 border border-[#38618C]/10">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Calendar className="w-3.5 h-3.5 text-[#38618C]" />
+                      <span className="text-xs font-bold text-[#38618C]">Coming ({overviewData.timeline.comingSoon.length})</span>
+                    </div>
+                    <div className="space-y-2">
+                      {overviewData.timeline.comingSoon.map((item, i) => (
+                        <div key={i} className="flex gap-2">
+                          <div className="w-1 h-1 rounded-full bg-[#38618C]/40 mt-1.5 flex-shrink-0" />
+                          <div className="text-[11px] text-gray-600 leading-snug">{item.label} <span className="text-gray-400">({item.date})</span></div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div className="flex-1">
+              </div>
+            )}
+
+            {/* 3. Next Steps & Actions */}
+            <button
+              onClick={() => setOpenSections(prev => ({ ...prev, 'overview-actions': !prev['overview-actions'] }))}
+              className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#FEF3C7' }}>
+                  <AlertCircle className="w-4 h-4 text-amber-500" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-[#1e2749]">Next Steps & Actions</p>
+                  <p className="text-xs text-gray-500">{overviewData.actions.nextToUnlock.length} items need your attention | {overviewData.actions.alreadyInMotion.length} already in motion</p>
+                </div>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${openSections['overview-actions'] ? 'rotate-180' : ''}`} />
+            </button>
+            {openSections['overview-actions'] && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 -mt-2">
+                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                  <h4 className="text-xs font-bold text-amber-600 uppercase tracking-wider mb-3">Your Next Steps</h4>
+                  <div className="space-y-2">
+                    {overviewData.actions.nextToUnlock.map((item, i) => (
+                      <div key={i} className="bg-amber-50 rounded-xl p-3 border border-amber-100">
+                        <p className="text-xs font-semibold text-[#1e2749]">{item.label}</p>
+                        <p className="text-[10px] text-gray-500 mt-0.5">{item.detail}</p>
+                        {item.cta && (
+                          <a href={item.ctaHref} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-[#38618C] hover:underline">
+                            {item.cta} <ArrowRight className="w-2.5 h-2.5" />
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                    {overviewData.actions.tdiHandling.map((item, i) => (
+                      <div key={i} className="bg-blue-50 rounded-xl p-3 border border-blue-100">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-xs font-semibold text-[#1e2749]">{item.label}</p>
+                          <span className="text-[9px] font-medium bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full flex-shrink-0">TDI</span>
+                        </div>
+                        <p className="text-[10px] text-gray-500 mt-0.5">{item.detail}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                  <h4 className="text-xs font-bold text-green-600 uppercase tracking-wider mb-3">Already In Motion</h4>
+                  <div className="space-y-2">
+                    {overviewData.actions.alreadyInMotion.map((item, i) => (
+                      <div key={i} className="flex items-center gap-3 bg-green-50 rounded-xl p-3 border border-green-100">
+                        <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-3 h-3 text-green-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-[#1e2749]">{item.label}</p>
+                          <p className="text-[10px] text-gray-500">{item.date}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 4. Leadership Tools & Quiz */}
+            <button
+              onClick={() => setOpenSections(prev => ({ ...prev, 'overview-leadership': !prev['overview-leadership'] }))}
+              className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#EDE9FE' }}>
+                  <GraduationCap className="w-4 h-4" style={{ color: '#8B5CF6' }} />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-[#1e2749]">Leadership Tools & Quiz</p>
+                  <p className="text-xs text-gray-500">Printable tools, conversation starters, leadership style quiz</p>
+                </div>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${openSections['overview-leadership'] ? 'rotate-180' : ''}`} />
+            </button>
+            {openSections['overview-leadership'] && (
+              <div className="space-y-4 -mt-2">
+                <LeadershipQuiz />
+                <AICoachingCard />
+                <LeadershipToolkit />
+              </div>
+            )}
+
+            {/* 5. Community, Testimonials & FAQ */}
+            <button
+              onClick={() => setOpenSections(prev => ({ ...prev, 'overview-community': !prev['overview-community'] }))}
+              className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#DBEAFE' }}>
+                  <MessageSquare className="w-4 h-4" style={{ color: '#2563EB' }} />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-[#1e2749]">Community & FAQ</p>
+                  <p className="text-xs text-gray-500">Testimonials, seasonal tips, common questions</p>
+                </div>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${openSections['overview-community'] ? 'rotate-180' : ''}`} />
+            </button>
+            {openSections['overview-community'] && (
+              <div className="space-y-4 -mt-2">
+                {/* Community testimonials */}
+                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-3">From the TDI Community (100,000+ educators)</p>
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <div className="p-4 rounded-xl bg-gray-50" style={{ borderLeft: '3px solid #4ecdc4' }}>
+                      <p className="text-sm italic text-gray-600" style={{ lineHeight: 1.6 }}>
+                        &ldquo;The Quick Wins are the first PD resource I have actually used more than once. Practical, fast, and built for people who do not have time for a 3-hour webinar.&rdquo;
+                      </p>
+                      <p className="text-xs text-gray-400 mt-2">-- Instructional coach, K-5</p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-gray-50" style={{ borderLeft: '3px solid #E8B84B' }}>
+                      <p className="text-sm italic text-gray-600" style={{ lineHeight: 1.6 }}>
+                        &ldquo;I printed my certificate, added it to my portfolio, and used the email template to send it to my principal. She was impressed.&rdquo;
+                      </p>
+                      <p className="text-xs text-gray-400 mt-2">-- Paraprofessional, 2nd year</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Seasonal tip */}
+                <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, #1e2749 0%, #2d3a5c 50%, #38618C 100%)' }}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                      <Calendar className="w-5 h-5 text-[#FFBA06]" />
+                    </div>
+                    <div>
+                      <p className="text-white/50 text-[10px] uppercase tracking-wider">June Leadership Strategy</p>
+                      <p className="text-white font-bold text-sm">End-of-Year Teacher Appreciation</p>
+                    </div>
+                  </div>
                   <p className="text-white/70 text-sm leading-relaxed">
                     Your team has worked hard this year. Before summer break, consider three things: (1) a personal handwritten note to each educator highlighting something specific you noticed, (2) a 5-minute staff meeting shout-out for Hub engagement, and (3) sharing their PD certificate count with the school board. These small moments carry teachers through the summer.
                   </p>
                 </div>
+
+                {/* FAQ */}
+                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                  <h3 className="text-sm font-bold mb-3" style={{ color: '#1e2749' }}>Common Questions from Principals</h3>
+                  <div className="space-y-2">
+                    {[
+                      { q: 'How do I know if my teachers are actually using the Hub?', a: 'Check the Hub Activity section above -- it shows login %, tools explored, and active users in real time. If engagement drops, TDI will flag it and help re-engage your team.' },
+                      { q: 'What should I say to teachers who have not logged in yet?', a: 'Keep it simple: "We have a free resource for you -- the TDI Learning Hub has 5-minute tools you can use Monday morning. Your account is already set up."' },
+                      { q: 'Can my teachers earn PD credit through the Hub?', a: 'Yes. When educators complete courses, they earn PD certificates with tracked hours. Printable and shareable for professional portfolios.' },
+                      { q: 'What happens if a teacher is struggling?', a: 'If an educator logs multiple tough days on their private Vibe Check, TDI sends a personal wellness email. Names are never shared with you -- just a warm check-in.' },
+                    ].map((faq, i) => (
+                      <details key={i} className="group">
+                        <summary className="flex items-center gap-2 cursor-pointer py-1.5 text-xs font-medium text-[#1e2749]">
+                          <ChevronDown className="w-3 h-3 text-gray-400 transition-transform group-open:rotate-180" />
+                          {faq.q}
+                        </summary>
+                        <p className="text-xs text-gray-600 ml-5 pb-2 leading-relaxed">{faq.a}</p>
+                      </details>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-
-            {/* ─── LEADERSHIP FAQ ─── */}
-            <div className="bg-white rounded-2xl p-5 md:p-6 shadow-sm border border-gray-100">
-              <h3 className="text-base font-bold mb-4" style={{ color: '#1e2749' }}>Common Questions from Principals</h3>
-              <div className="space-y-3">
-                {[
-                  {
-                    q: 'How do I know if my teachers are actually using the Hub?',
-                    a: 'Check the Hub Activity section above -- it shows login %, tools explored, and active users in real time. You can also see which tools are most popular in your building. If engagement drops, TDI will flag it and help re-engage your team.',
-                  },
-                  {
-                    q: 'What should I say to teachers who have not logged in yet?',
-                    a: 'Keep it simple: "We have a free resource for you -- the TDI Learning Hub has 5-minute tools you can use Monday morning. Your account is already set up at teachersdeserveit.com/hub." No pressure, just an invitation.',
-                  },
-                  {
-                    q: 'How do I use this data for my school improvement plan?',
-                    a: 'The Hub Activity section shows PD hours earned, tools explored, and community engagement -- all metrics that map directly to professional development goals. The AI insight at the top gives you a ready-made talking point for board presentations.',
-                  },
-                  {
-                    q: 'Can my teachers earn PD credit through the Hub?',
-                    a: 'Yes. When educators complete courses on the Hub, they earn PD certificates with tracked hours. These are printable and shareable -- many teachers include them in their professional portfolios.',
-                  },
-                  {
-                    q: 'What happens if a teacher is struggling? Does TDI know?',
-                    a: 'If an educator logs multiple tough days on their private Vibe Check, TDI sends a personal wellness email -- just a warm check-in, no details shared with anyone. You will see "TDI reached out to X team members" on your dashboard. Names are never shared.',
-                  },
-                ].map((faq, i) => (
-                  <details key={i} className="group">
-                    <summary className="flex items-center gap-3 cursor-pointer py-2 text-sm font-medium" style={{ color: '#1e2749' }}>
-                      <ChevronDown className="w-4 h-4 text-gray-400 transition-transform group-open:rotate-180" />
-                      {faq.q}
-                    </summary>
-                    <p className="text-sm text-gray-600 ml-7 pb-2 leading-relaxed">{faq.a}</p>
-                  </details>
-                ))}
-              </div>
-            </div>
-
-            {/* ─── LEADERSHIP QUIZ ─── */}
-            <LeadershipQuiz />
-
-            {/* ─── AI COACHING ─── */}
-            <AICoachingCard />
-
-            {/* ─── LEADERSHIP TOOLKIT ─── */}
-            <LeadershipToolkit />
+            )}
 
           </div>
         )}

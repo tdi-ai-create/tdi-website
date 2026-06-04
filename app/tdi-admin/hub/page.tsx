@@ -204,9 +204,10 @@ function StatCard({
 }) {
   const [showTooltip, setShowTooltip] = useState(false);
 
-  const trendPct = trend && trend.previous > 0
+  const rawTrendPct = trend && trend.previous > 0
     ? ((trend.current - trend.previous) / trend.previous) * 100
     : null;
+  const trendPct = rawTrendPct !== null ? Math.max(-999, Math.min(999, rawTrendPct)) : null;
   const trendUp = trendPct !== null && trendPct > 0;
   const trendDown = trendPct !== null && trendPct < 0;
 
