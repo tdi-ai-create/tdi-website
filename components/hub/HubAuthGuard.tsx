@@ -100,38 +100,36 @@ export default function HubAuthGuard({ children }: HubAuthGuardProps) {
     checkAuth();
   }, [pathname, router, isPublicRoute, skipOnboardingCheck]);
 
-  // Show loading state
-  if (isLoading && !isPublicRoute) {
-    return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ backgroundColor: '#FAFAF8' }}
-      >
-        <div className="text-center">
-          <div
-            className="w-12 h-12 rounded-full mx-auto mb-4 animate-pulse"
-            style={{ backgroundColor: '#E8B84B' }}
-          />
-          <p
-            className="text-gray-500"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
-          >
-            Loading your Hub...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   // For public routes, render without provider wrapper
   if (isPublicRoute) {
     return <>{children}</>;
   }
 
-  // Render with context provider
+  // Always wrap in HubProvider so children can safely call useHub()
+  // even during loading state
   return (
     <HubProvider user={user} profile={profile} isLoading={isLoading}>
-      {children}
+      {isLoading ? (
+        <div
+          className="min-h-screen flex items-center justify-center"
+          style={{ backgroundColor: '#FAFAF8' }}
+        >
+          <div className="text-center">
+            <div
+              className="w-12 h-12 rounded-full mx-auto mb-4 animate-pulse"
+              style={{ backgroundColor: '#E8B84B' }}
+            />
+            <p
+              className="text-gray-500"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              Loading your Hub...
+            </p>
+          </div>
+        </div>
+      ) : (
+        children
+      )}
     </HubProvider>
   );
 }
