@@ -515,7 +515,30 @@ export async function getCreatorDashboardData(
   }
 
   // Get creator's milestone progress
-  const creatorMilestones = await getCreatorMilestones(creatorId);
+  let creatorMilestones = await getCreatorMilestones(creatorId);
+
+  // Auto-initialize milestones if creator has none (safety net for silent insert failures)
+  if (creatorMilestones.length === 0 && milestones.length > 0) {
+    console.log('[dashboard] Creator has 0 milestones, auto-initializing:', creatorId);
+    const serviceSupabase = getServiceSupabase();
+    const sortedMilestones = [...milestones].filter(m => !m.is_collapsed_into).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+    const milestoneRecords = sortedMilestones.map((milestone, index) => ({
+      creator_id: creatorId,
+      milestone_id: milestone.id,
+      status: index === 0 ? 'completed' : index === 1 ? 'available' : 'locked',
+      completed_at: index === 0 ? new Date().toISOString() : null,
+    }));
+    const { error: initError } = await serviceSupabase
+      .from('creator_milestones')
+      .upsert(milestoneRecords, { onConflict: 'creator_id,milestone_id', ignoreDuplicates: true });
+    if (initError) {
+      console.error('[dashboard] Auto-init milestones failed:', initError);
+    } else {
+      // Re-fetch after init
+      creatorMilestones = await getCreatorMilestones(creatorId);
+      console.log('[dashboard] Auto-initialized', milestoneRecords.length, 'milestones for creator:', creatorId);
+    }
+  }
 
   // Get visible notes
   const notes = await getCreatorNotes(creatorId, false);
