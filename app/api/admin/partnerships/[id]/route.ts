@@ -224,3 +224,7 @@ export async function PUT(
     );
   }
 }
+
+
+// PATCH is an alias for PUT -- both update partnership fields
+export const PATCH = PUT;

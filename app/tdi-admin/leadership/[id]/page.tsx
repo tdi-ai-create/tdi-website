@@ -1524,54 +1524,90 @@ export default function AdminPartnershipDetailPage() {
         {activeTab === 'billing' && (
           <>
             <div className="bg-white rounded-xl border border-gray-100 p-6 mb-4">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Billing & Contract</h2>
-              <p className="text-gray-600 mb-6">
-                Contract and billing details for this partnership.
-              </p>
-
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Partnership Type</p>
-                    <p className="font-medium text-[#1e2749] capitalize">{partnership.partnership_type || 'School'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Contract Period</p>
-                    <p className="font-medium text-[#1e2749]">
-                      {partnership.contract_start
-                        ? new Date(partnership.contract_start).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-                        : 'Not set'}{' '}
-                      —{' '}
-                      {partnership.contract_end
-                        ? new Date(partnership.contract_end).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-                        : 'Not set'}
-                    </p>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Current Phase</p>
-                    <span
-                      className="inline-block px-3 py-1 rounded-full text-sm font-medium"
-                      style={{ backgroundColor: '#4ecdc420', color: '#2D7D78' }}
-                    >
-                      {partnership.contract_phase || 'IGNITE'}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Staff Enrolled</p>
-                    <p className="font-medium text-[#1e2749]">{partnership.staff_enrolled || 0} educators</p>
-                  </div>
-                </div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-gray-900">Contract Details</h2>
+                <span className="text-xs text-gray-400">Click any field to edit</span>
               </div>
 
-              {/* Contact for billing questions */}
-              <div className="mt-6 pt-4 border-t border-gray-100">
-                <p className="text-sm text-gray-500">
-                  Questions about billing? Contact{' '}
-                  <a href="mailto:Rae@TeachersDeserveIt.com" className="text-violet-600 hover:underline">
-                    Rae@TeachersDeserveIt.com
-                  </a>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {[
+                  { label: 'Partnership Type', field: 'partnership_type', value: partnership.partnership_type || 'school', type: 'select', options: ['school', 'district'] },
+                  { label: 'Contract Phase', field: 'contract_phase', value: partnership.contract_phase || 'IGNITE', type: 'select', options: ['IGNITE', 'ACCELERATE', 'SUSTAIN'] },
+                  { label: 'Contract Start', field: 'contract_start', value: partnership.contract_start || '', type: 'date' },
+                  { label: 'Contract End', field: 'contract_end', value: partnership.contract_end || '', type: 'date' },
+                  { label: 'Staff Enrolled', field: 'staff_enrolled', value: partnership.staff_enrolled || 0, type: 'number' },
+                  { label: 'Building Count', field: 'building_count', value: partnership.building_count || 1, type: 'number' },
+                  { label: 'Observation Days (total)', field: 'observation_days_total', value: partnership.observation_days_total || 0, type: 'number' },
+                  { label: 'Virtual Sessions (total)', field: 'virtual_sessions_total', value: partnership.virtual_sessions_total || 0, type: 'number' },
+                  { label: 'Executive Sessions (total)', field: 'executive_sessions_total', value: partnership.executive_sessions_total || 0, type: 'number' },
+                  { label: 'Observation Days (used)', field: 'observation_days_used', value: (partnership as any).observation_days_used || 0, type: 'number' },
+                  { label: 'Virtual Sessions (used)', field: 'virtual_sessions_used', value: (partnership as any).virtual_sessions_used || 0, type: 'number' },
+                  { label: 'Executive Sessions (used)', field: 'executive_sessions_used', value: (partnership as any).executive_sessions_used || 0, type: 'number' },
+                ].map(item => (
+                  <div key={item.field} className="p-3 rounded-lg border border-gray-100 hover:border-gray-300 transition-colors">
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">{item.label}</p>
+                    {item.type === 'select' ? (
+                      <select
+                        defaultValue={String(item.value)}
+                        onChange={async (e) => {
+                          try {
+                            await fetch(`/api/admin/partnerships/${partnershipId}`, {
+                              method: 'PATCH',
+                              headers: { 'Content-Type': 'application/json', 'x-user-email': userEmail || '' },
+                              body: JSON.stringify({ [item.field]: e.target.value }),
+                            })
+                          } catch {}
+                        }}
+                        className="w-full text-sm font-medium text-[#1e2749] bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer capitalize"
+                      >
+                        {item.options?.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    ) : (
+                      <input
+                        type={item.type}
+                        defaultValue={String(item.value)}
+                        onBlur={async (e) => {
+                          const val = item.type === 'number' ? parseInt(e.target.value) || 0 : e.target.value;
+                          if (String(val) === String(item.value)) return;
+                          try {
+                            await fetch(`/api/admin/partnerships/${partnershipId}`, {
+                              method: 'PATCH',
+                              headers: { 'Content-Type': 'application/json', 'x-user-email': userEmail || '' },
+                              body: JSON.stringify({ [item.field]: val }),
+                            })
+                          } catch {}
+                        }}
+                        className="w-full text-sm font-medium text-[#1e2749] bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-blue-300 rounded px-1"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Resend welcome email + archive */}
+              <div className="mt-6 pt-4 border-t border-gray-100 flex items-center gap-3">
+                <button
+                  onClick={async () => {
+                    if (!confirm('Send welcome email to ' + partnership.contact_email + '?')) return;
+                    try {
+                      const res = await fetch('/api/admin/resend-welcome', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ creatorId: partnershipId }),
+                      });
+                      const data = await res.json();
+                      alert(data.success ? 'Welcome email sent!' : (data.error || 'Failed'));
+                    } catch { alert('Failed to send'); }
+                  }}
+                  className="text-xs font-medium px-3 py-2 rounded-lg bg-[#1e2749] text-white hover:bg-[#2d3a5c] transition-colors"
+                >
+                  Send welcome email
+                </button>
+                <a href={`mailto:${partnership.contact_email}`} className="text-xs font-medium px-3 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                  Email contact
+                </a>
+                <p className="text-xs text-gray-400 ml-auto">
+                  Questions? <a href="mailto:Rae@TeachersDeserveIt.com" className="text-violet-600 hover:underline">Rae@TeachersDeserveIt.com</a>
                 </p>
               </div>
             </div>
