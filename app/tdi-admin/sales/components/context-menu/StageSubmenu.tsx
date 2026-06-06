@@ -2,11 +2,11 @@
 
 const STAGE_OPTIONS = [
   { id: 'targeting', name: 'Targeting (5%)' },
-  { id: 'engaged', name: 'Engaged (10%)' },
-  { id: 'qualified', name: 'Qualified (30%)' },
-  { id: 'likely_yes', name: 'Likely Yes (50%)' },
-  { id: 'proposal_sent', name: 'Quote Sent (70%)' },
-  { id: 'signed', name: 'Signed (90%)' },
+  { id: 'engaged', name: 'Engaged (20%)' },
+  { id: 'qualified', name: 'Qualified (45%)' },
+  { id: 'likely_yes', name: 'Likely Yes (65%)' },
+  { id: 'proposal_sent', name: 'Quote Sent (80%)' },
+  { id: 'signed', name: 'Signed (95%)' },
   { id: 'paid', name: 'Paid (100%)' },
   { id: 'lost', name: 'Lost' },
 ]

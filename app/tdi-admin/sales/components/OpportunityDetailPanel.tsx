@@ -54,18 +54,18 @@ type TabId = 'notes' | 'contact' | 'details' | 'activity'
 const STAGE_OPTIONS = [
   { id: 'unassigned', name: 'Unassigned' },
   { id: 'targeting', name: 'Targeting (5%)' },
-  { id: 'engaged', name: 'Engaged (10%)' },
-  { id: 'qualified', name: 'Qualified (30%)' },
-  { id: 'likely_yes', name: 'Likely Yes (50%)' },
-  { id: 'proposal_sent', name: 'Quote Sent (70%)' },
-  { id: 'signed', name: 'Signed (90%)' },
+  { id: 'engaged', name: 'Engaged (20%)' },
+  { id: 'qualified', name: 'Qualified (45%)' },
+  { id: 'likely_yes', name: 'Likely Yes (65%)' },
+  { id: 'proposal_sent', name: 'Quote Sent (80%)' },
+  { id: 'signed', name: 'Signed (95%)' },
   { id: 'paid', name: 'Paid (100%)' },
   { id: 'lost', name: 'Lost' },
 ]
 
 const STAGE_PROBABILITY: Record<string, number> = {
-  unassigned: 0, targeting: 5, engaged: 10, qualified: 30,
-  likely_yes: 50, proposal_sent: 70, signed: 90, paid: 100, lost: 0,
+  unassigned: 0, targeting: 5, engaged: 20, qualified: 45,
+  likely_yes: 65, proposal_sent: 80, signed: 95, paid: 100, lost: 0,
 }
 
 interface Props {

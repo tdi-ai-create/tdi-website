@@ -11,11 +11,11 @@ interface Opportunity {
 
 const TIERS = [
   { prob: 5, label: 'Targeting', stages: ['targeting'] },
-  { prob: 10, label: 'Engaged', stages: ['engaged'] },
-  { prob: 30, label: 'Qualified', stages: ['qualified'] },
-  { prob: 50, label: 'Likely Yes', stages: ['likely_yes'] },
-  { prob: 70, label: 'Quote Sent', stages: ['proposal_sent'] },
-  { prob: 90, label: 'Signed', stages: ['signed'] },
+  { prob: 20, label: 'Engaged', stages: ['engaged'] },
+  { prob: 45, label: 'Qualified', stages: ['qualified'] },
+  { prob: 65, label: 'Likely Yes', stages: ['likely_yes'] },
+  { prob: 80, label: 'Quote Sent', stages: ['proposal_sent'] },
+  { prob: 95, label: 'Signed', stages: ['signed'] },
 ]
 
 export function FactoredCalculator({ opportunities }: { opportunities: Opportunity[] }) {
