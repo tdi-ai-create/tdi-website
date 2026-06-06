@@ -472,6 +472,37 @@ export default function SalesPage() {
       created_by: 'admin',
     })
 
+    // Mirror note to sibling signed opportunities (same school, split grant/non-grant)
+    const thisOpp = opportunities.find(o => o.supabase_id === quickNoteOppId)
+    if (thisOpp?.stage === 'signed') {
+      const baseName = thisOpp.name
+        .replace(/\s*-\s*(grant funded|non-grant)$/i, '')
+        .replace(/^\(renewal\)\s*/i, '')
+        .trim()
+      const siblings = opportunities.filter(o =>
+        o.supabase_id !== quickNoteOppId &&
+        o.stage === 'signed' &&
+        o.name.toLowerCase().includes(baseName.toLowerCase())
+      )
+      if (siblings.length) {
+        const mirrorInserts = siblings.map(s => ({
+          opportunity_id: s.supabase_id,
+          body: `[Mirrored] ${body}`,
+          created_at: now,
+          created_by: 'admin',
+        }))
+        await supabase.from('opportunity_notes').insert(mirrorInserts)
+        // Update local note state for siblings
+        setOppNotes(prev => {
+          const updated = { ...prev }
+          siblings.forEach(s => {
+            updated[s.supabase_id] = [{ body: `[Mirrored] ${body}`, created_at: now }, ...(prev[s.supabase_id] || [])]
+          })
+          return updated
+        })
+      }
+    }
+
     // Update local state
     setOppNotes(prev => ({
       ...prev,

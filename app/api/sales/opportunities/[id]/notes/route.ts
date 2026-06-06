@@ -52,5 +52,43 @@ export async function POST(
     description: `Note added (${safeType})`,
   }).then(() => {})
 
+  // Mirror note to sibling signed opportunities (same school, split grant/non-grant)
+  const { data: thisOpp } = await supabase
+    .from('sales_opportunities')
+    .select('name, stage')
+    .eq('id', id)
+    .single()
+
+  if (thisOpp?.stage === 'signed') {
+    // Find siblings: same base school name, also signed, different id
+    const baseName = thisOpp.name
+      .replace(/\s*-\s*(grant funded|non-grant)$/i, '')
+      .replace(/^\(renewal\)\s*/i, '')
+      .trim()
+
+    const { data: siblings } = await supabase
+      .from('sales_opportunities')
+      .select('id')
+      .eq('stage', 'signed')
+      .neq('id', id)
+      .ilike('name', `%${baseName}%`)
+
+    if (siblings?.length) {
+      const mirrorInserts = siblings.map(sib => ({
+        opportunity_id: sib.id,
+        author_email,
+        note_text: `[Mirrored] ${note_text.trim()}`,
+        note_type: safeType,
+      }))
+      await supabase.from('opportunity_notes').insert(mirrorInserts).then(() => {})
+      // Update last_activity_at on siblings
+      await supabase
+        .from('sales_opportunities')
+        .update({ last_activity_at: new Date().toISOString() })
+        .in('id', siblings.map(s => s.id))
+        .then(() => {})
+    }
+  }
+
   return NextResponse.json(data, { status: 201 })
 }
