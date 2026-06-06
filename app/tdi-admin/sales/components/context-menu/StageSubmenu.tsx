@@ -5,7 +5,7 @@ const STAGE_OPTIONS = [
   { id: 'engaged', name: 'Engaged (10%)' },
   { id: 'qualified', name: 'Qualified (30%)' },
   { id: 'likely_yes', name: 'Likely Yes (50%)' },
-  { id: 'proposal_sent', name: 'Proposal Sent (70%)' },
+  { id: 'proposal_sent', name: 'Quote Sent (70%)' },
   { id: 'signed', name: 'Signed (90%)' },
   { id: 'paid', name: 'Paid (100%)' },
   { id: 'lost', name: 'Lost' },

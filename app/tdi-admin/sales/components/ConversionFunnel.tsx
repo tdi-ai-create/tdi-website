@@ -5,7 +5,7 @@ const STAGE_LABELS: Record<string, string> = {
   engaged: 'Engaged (10%)',
   qualified: 'Qualified (30%)',
   likely_yes: 'Likely Yes (50%)',
-  proposal_sent: 'Proposal Sent (70%)',
+  proposal_sent: 'Quote Sent (70%)',
   signed: 'Signed (90%)',
   paid: 'Paid (100%)',
 }

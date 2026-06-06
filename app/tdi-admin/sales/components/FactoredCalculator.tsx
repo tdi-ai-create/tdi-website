@@ -14,7 +14,7 @@ const TIERS = [
   { prob: 10, label: 'Engaged', stages: ['engaged'] },
   { prob: 30, label: 'Qualified', stages: ['qualified'] },
   { prob: 50, label: 'Likely Yes', stages: ['likely_yes'] },
-  { prob: 70, label: 'Proposal Sent', stages: ['proposal_sent'] },
+  { prob: 70, label: 'Quote Sent', stages: ['proposal_sent'] },
   { prob: 90, label: 'Signed', stages: ['signed'] },
 ]
 

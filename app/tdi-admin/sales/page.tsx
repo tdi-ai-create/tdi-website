@@ -44,6 +44,7 @@ interface SalesOpportunity {
   on_jims_call_sheet: boolean | null
   payment_received: boolean | null
   invoice_sent_at: string | null
+  grant_support: boolean | null
   deleted_at: string | null
   deleted_by: string | null
   deletion_reason: string | null
@@ -82,6 +83,7 @@ interface Opportunity {
   schoolYear: string
   paymentReceived: boolean
   invoiceSentAt: string | null
+  grantSupport: boolean
   deleted_at: string | null
   deleted_by: string | null
   deletion_reason: string | null
@@ -99,7 +101,7 @@ const STAGE_DISPLAY: Record<string, string> = {
   engaged: 'Engaged (20%)',
   qualified: 'Qualified (45%)',
   likely_yes: 'Likely Yes (65%)',
-  proposal_sent: 'Proposal Sent (80%)',
+  proposal_sent: 'Quote Sent (80%)',
   signed: 'Signed (95%)',
   paid: 'Paid (100%)',
   lost: 'Lost',
@@ -107,7 +109,7 @@ const STAGE_DISPLAY: Record<string, string> = {
 
 const STAGE_PROBABILITY: Record<string, number> = {
   unassigned: 0, targeting: 5, engaged: 20, qualified: 45,
-  likely_yes: 65, proposal_sent: 80, signed: 95, paid: 100, lost: 0,
+  likely_yes: 65, proposal_sent: 80, signed: 95, signed_no_grant: 95, signed_with_grant: 95, paid: 100, lost: 0,
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -115,12 +117,14 @@ const STAGE_LABELS: Record<string, string> = {
   engaged: 'Engaged',
   qualified: 'Qualified',
   likely_yes: 'Likely Yes',
-  proposal_sent: 'Proposal Sent',
+  proposal_sent: 'Quote Sent',
   signed: 'Signed',
+  signed_no_grant: 'Signed (w/o Grant Support)',
+  signed_with_grant: 'Signed (w/ Grant Support)',
 }
 
 const DEFAULT_KANBAN_STAGES = ['qualified', 'likely_yes', 'proposal_sent']
-const ALL_ACTIVE_STAGES = ['targeting', 'engaged', 'qualified', 'likely_yes', 'proposal_sent', 'signed']
+const ALL_ACTIVE_STAGES = ['targeting', 'engaged', 'qualified', 'likely_yes', 'proposal_sent', 'signed_no_grant', 'signed_with_grant']
 
 function factoredRevenue(opp: Opportunity): number {
   return Math.round((opp.value || 0) * opp.probability / 100)
@@ -257,6 +261,7 @@ export default function SalesPage() {
         invoice_notes: row.invoice_notes,
         contract_year: row.contract_year,
         heat: row.heat || 'warm',
+        grantSupport: row.grant_support || false,
         onCallSheet: row.on_jims_call_sheet || false,
         schoolYear: normalizeSchoolYear(row.contract_year || row.school_year),
         paymentReceived: row.payment_received || false,
@@ -308,33 +313,51 @@ export default function SalesPage() {
   // Drag-and-drop: move opp to new stage
   async function handleStageDrop(oppId: string, toStage: string) {
     const opp = opportunities.find(o => o.supabase_id === oppId)
-    if (!opp || opp.stage === toStage) return
+    if (!opp) return
+
+    // Handle virtual signed columns
+    let actualStage = toStage
+    let grantSupport: boolean | undefined = undefined
+    if (toStage === 'signed_no_grant') {
+      actualStage = 'signed'
+      grantSupport = false
+    } else if (toStage === 'signed_with_grant') {
+      actualStage = 'signed'
+      grantSupport = true
+    }
+
+    if (opp.stage === actualStage && grantSupport === undefined) return
+    if (opp.stage === actualStage && opp.grantSupport === grantSupport) return
 
     const newProb = STAGE_PROBABILITY[toStage] ?? opp.probability
     const oldStage = opp.stage
+    const oldGrantSupport = opp.grantSupport
 
     // Optimistic update
     setOpportunities(prev => prev.map(o =>
       o.supabase_id === oppId
-        ? { ...o, stage: toStage, stageName: STAGE_DISPLAY[toStage] || toStage, probability: newProb }
+        ? { ...o, stage: actualStage, stageName: STAGE_DISPLAY[actualStage] || actualStage, probability: newProb, ...(grantSupport !== undefined ? { grantSupport } : {}) }
         : o
     ))
 
+    const updatePayload: any = { stage: actualStage, probability: newProb, updated_at: new Date().toISOString() }
+    if (grantSupport !== undefined) updatePayload.grant_support = grantSupport
+
     const { error: updateError } = await supabase
       .from('sales_opportunities')
-      .update({ stage: toStage, probability: newProb, updated_at: new Date().toISOString() })
+      .update(updatePayload)
       .eq('id', oppId)
 
     if (updateError) {
       // Revert
       setOpportunities(prev => prev.map(o =>
         o.supabase_id === oppId
-          ? { ...o, stage: oldStage, stageName: STAGE_DISPLAY[oldStage] || oldStage, probability: STAGE_PROBABILITY[oldStage] ?? opp.probability }
+          ? { ...o, stage: oldStage, stageName: STAGE_DISPLAY[oldStage] || oldStage, probability: STAGE_PROBABILITY[oldStage] ?? opp.probability, grantSupport: oldGrantSupport }
           : o
       ))
       showToastMsg('Failed to update stage', 'error')
     } else {
-      showToastMsg(`Moved to ${STAGE_DISPLAY[toStage] || toStage}`, 'success')
+      showToastMsg(`Moved to ${STAGE_LABELS[toStage] || STAGE_DISPLAY[actualStage] || actualStage}`, 'success')
     }
   }
 
@@ -910,7 +933,7 @@ export default function SalesPage() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                     <span style={{ fontSize: 12, color: '#6B7280' }}>
                       {showAllStages ? 'All stages' : '3 most active stages'}
-                      {!showAllStages && ' · Hidden: Targeting, Engaged, Signed'}
+                      {!showAllStages && ' · Hidden: Targeting, Engaged, Signed (both)'}
                     </span>
                     <button
                       onClick={() => setShowAllStages(!showAllStages)}
@@ -920,12 +943,18 @@ export default function SalesPage() {
                     </button>
                   </div>
                   <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 16 }}>
-                    {stagesToShow.map(stage => (
+                    {stagesToShow.map(stage => {
+                      const oppsForStage = stage === 'signed_no_grant'
+                        ? filtered.filter(o => o.stage === 'signed' && !o.grantSupport)
+                        : stage === 'signed_with_grant'
+                        ? filtered.filter(o => o.stage === 'signed' && o.grantSupport)
+                        : filtered.filter(o => o.stage === stage)
+                      return (
                       <KanbanColumn
                         key={stage}
                         stage={stage}
                         label={`${STAGE_LABELS[stage] || stage} (${STAGE_PROBABILITY[stage] || 0}%)`}
-                        opportunities={filtered.filter(o => o.stage === stage).map(toCardOpp)}
+                        opportunities={oppsForStage.map(toCardOpp)}
                         onCardClick={(opp) => setDetailPanelOppId(opp.id)}
                         onDrop={handleStageDrop}
                         onCardContextMenu={handleCardContextMenu}
@@ -934,7 +963,7 @@ export default function SalesPage() {
                         onAddNote={(oppId) => setQuickNoteOppId(oppId)}
                         getNoteForOpp={getLatestNoteForOpp}
                       />
-                    ))}
+                    )})}
                   </div>
                 </>
               )}

@@ -66,6 +66,20 @@ export function DetailsTab({ opp, onPatch, stageOptions }: Props) {
         </select>
       </FieldWrapper>
 
+      {o.stage === 'signed' && (
+        <FieldWrapper label="Grant Support">
+          <label className="flex items-center gap-2 cursor-pointer mt-1">
+            <input
+              type="checkbox"
+              checked={o.grant_support || false}
+              onChange={e => onPatch({ grant_support: e.target.checked } as any)}
+              className="rounded"
+            />
+            <span className="text-sm text-gray-600">Needs grant/funding team support</span>
+          </label>
+        </FieldWrapper>
+      )}
+
       <FieldWrapper label="Contact Only">
         <label className="flex items-center gap-2 cursor-pointer mt-1">
           <input

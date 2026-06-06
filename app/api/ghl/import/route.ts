@@ -49,6 +49,7 @@ export async function POST() {
       'qualified (30%)': 'qualified',
       'likely yes (50%)': 'likely_yes',
       'proposal sent (70%)': 'proposal_sent',
+      'quote sent (70%)': 'proposal_sent',
       'signed (90%)': 'signed',
       'paid (100%)': 'paid',
       'lost': 'lost',
