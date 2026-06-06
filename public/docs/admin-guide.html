@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TDI Admin Guide -- How Everything Works</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; background: #FAFBFC; line-height: 1.7; font-size: 15px; }
+  .page { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+  h2 { font-size: 20px; font-weight: 700; margin: 40px 0 12px; color: #1e2749; }
+  h3 { font-size: 15px; font-weight: 700; margin: 20px 0 6px; color: #374151; }
+  p { margin-bottom: 12px; }
+  .sub { color: #6B7280; font-size: 14px; margin-bottom: 28px; }
+  .updated { color: #9CA3AF; font-size: 11px; margin-bottom: 20px; }
+
+  .step { display: flex; gap: 16px; margin-bottom: 24px; }
+  .step-num { width: 36px; height: 36px; border-radius: 50%; background: #1e2749; color: white; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; flex-shrink: 0; }
+  .step-content { flex: 1; }
+  .step-content strong { color: #1e2749; }
+
+  .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 12px; border: 1px solid #E5E7EB; }
+  .card-highlight { border-left: 4px solid #E8B84B; }
+  .card-action { border-left: 4px solid #2A9D8F; }
+  .card-auto { border-left: 4px solid #8B5CF6; }
+  .card-warning { border-left: 4px solid #EF4444; background: #FEF2F2; }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; letter-spacing: 0.03em; }
+  .badge-you { background: #FEF3C7; color: #92400E; }
+  .badge-tdi { background: #DBEAFE; color: #1E40AF; }
+  .badge-auto { background: #EDE9FE; color: #6D28D9; }
+  .badge-system { background: #F3F4F6; color: #374151; }
+
+  .who { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .who-you { color: #D97706; }
+  .who-tdi { color: #2563EB; }
+  .who-auto { color: #7C3AED; }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 16px; font-size: 13px; }
+  th { text-align: left; padding: 8px 12px; background: #F9FAFB; border-bottom: 2px solid #E5E7EB; font-weight: 600; }
+  td { padding: 8px 12px; border-bottom: 1px solid #F3F4F6; }
+
+  .divider { border: none; border-top: 1px solid #E5E7EB; margin: 32px 0; }
+
+  .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+  @media (max-width: 600px) { .role-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>How the TDI Admin Portal Works</h1>
+<p class="sub">A top-level guide for the TDI team. What happens automatically, what you need to do, and where to find everything.</p>
+<p class="updated">Version 1.0 | June 2026 | Internal team reference</p>
+
+<!-- WHO DOES WHAT -->
+<h2>Who does what</h2>
+<div class="role-grid">
+  <div class="card">
+    <p class="who who-you">Rae</p>
+    <p style="font-size:13px;">Sales conversations, partnership relationships, KPI setting with principals, renewal conversations, final approvals. Everything flows through you but most of the heavy lifting is automated.</p>
+  </div>
+  <div class="card">
+    <p class="who who-tdi">Bella</p>
+    <p style="font-size:13px;">Creator Studio management. Adding creators, approving milestones, managing content pipeline. Gets CC'd on all creator emails.</p>
+  </div>
+  <div class="card">
+    <p class="who who-tdi">Omar</p>
+    <p style="font-size:13px;">Financial oversight. Invoicing, collections, grant tracking (when live). Funding tab is his home base.</p>
+  </div>
+  <div class="card">
+    <p class="who who-tdi">Kristin</p>
+    <p style="font-size:13px;">Marketing and content. GHL email marketing, social posts, Substack. CMO Dashboard is her view.</p>
+  </div>
+</div>
+
+<!-- THE LIFECYCLE -->
+<h2>The partnership lifecycle (your 5-step flow)</h2>
+
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-content">
+    <strong>Close the deal in Sales</strong>
+    <p>Track leads, schedule demos, send proposals. When the contract is signed, move the deal to "Signed" in the pipeline.</p>
+    <div class="card card-action">
+      <p class="who who-you">Your action</p>
+      <p>Click <strong>"Create Partnership + Dashboard"</strong> on the deal. Fill in staff count, observation days, sessions, contract dates. Hit Create.</p>
+    </div>
+    <div class="card card-auto">
+      <p class="who who-auto">System auto-does</p>
+      <p>Creates the Leadership Dashboard, provisions Hub access for the contact, sends a welcome email from you, creates 9 onboarding action items, logs everything. If grant-funded, also creates a funding pursuit with Plan A/B/C/D paths.</p>
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-content">
+    <strong>Onboard the school (Phase 0)</strong>
+    <p>The principal sees action items on their dashboard. They upload their roster, identify a champion, and schedule a kickoff.</p>
+    <div class="card card-highlight">
+      <p class="who who-you">What you watch for</p>
+      <p>You get an <strong>email notification</strong> when the principal uploads their roster. Go to the <strong>Internal tab</strong> and click <strong>"Provision Hub accounts for all staff"</strong> to create their Hub access.</p>
+    </div>
+    <div class="card card-auto">
+      <p class="who who-auto">System auto-does</p>
+      <p>Sends the principal reminders. Tracks which items are complete. Fires <strong>attention flags</strong> if the principal hasn't logged in by Day 7 or staff are below 50% by Day 14. You get emailed when flags fire.</p>
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-content">
+    <strong>Set KPIs together</strong>
+    <p>During your kickoff walkthrough, set 3-5 KPIs with the principal.</p>
+    <div class="card card-action">
+      <p class="who who-you">Your action</p>
+      <p>Go to <strong>Internal tab > Partnership KPIs</strong>. Click "Select KPIs." Pick from the curated menu (implementation-focused, with benchmarks). Set targets. Save.</p>
+    </div>
+    <div class="card card-auto">
+      <p class="who who-auto">System auto-does</p>
+      <p>The principal's dashboard gauge rings now show their KPIs instead of generic metrics. KPI values <strong>auto-update daily</strong> from Hub data (engagement, completions, field notes, PD hours). Survey-based KPIs (stress, retention) need manual update after surveys.</p>
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">4</div>
+  <div class="step-content">
+    <strong>Manage the partnership year-round</strong>
+    <p>The Internal tab is your command center. Notes, meetings, KPI tracking, grant status, exports, and call prep all live here.</p>
+    <div class="card card-action">
+      <p class="who who-you">Before every check-in</p>
+      <p>Click <strong>"Generate briefing"</strong> on the Internal tab. Opens a printable 1-page summary with engagement data, KPI progress, recent notes, and AI-suggested talking points.</p>
+    </div>
+    <div class="card card-action">
+      <p class="who who-you">After every check-in</p>
+      <p>Log the meeting on the Internal tab (date, type, attendees, summary, action items). These get referenced in your next briefing.</p>
+    </div>
+    <div class="card card-auto">
+      <p class="who who-auto">System auto-does</p>
+      <p>Every Monday, you get a <strong>weekly digest email</strong> with all partnerships: health status, Hub %, flags, pending items. The principal gets a <strong>monthly engagement email</strong> (AI-written in your voice) with their team's highlights and a link to their dashboard.</p>
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">5</div>
+  <div class="step-content">
+    <strong>Renew</strong>
+    <p>By Day 45, plant the Year 2 vision. By Day 80, check in on budget. By Day 90, deliver the impact report.</p>
+    <div class="card card-action">
+      <p class="who who-you">Your action</p>
+      <p>Use <strong>Export Reports</strong> on the Internal tab to generate a board summary, KPI standings, or full export. The AI Summary on the principal's dashboard is screenshot-ready for board presentations.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- WHAT HAPPENS AUTOMATICALLY -->
+<h2>What the system does without you</h2>
+<p>These run on autopilot. You do not need to trigger them.</p>
+<table>
+  <tr><th>What</th><th>When</th><th>You see</th></tr>
+  <tr><td>KPI values update from Hub data</td><td>Every day, 6 AM</td><td>Gauges on client dashboard show real progress</td></tr>
+  <tr><td>Attention flags check</td><td>Every day, 8 AM</td><td>Email if a partnership needs attention</td></tr>
+  <tr><td>Wellness outreach to struggling educators</td><td>Every day, 10 AM</td><td>"TDI reached out to X members" on dashboard</td></tr>
+  <tr><td>Weekly partnership digest</td><td>Monday, 7 AM</td><td>One email, all partnerships, health status</td></tr>
+  <tr><td>Monthly principal email</td><td>1st Monday</td><td>CC'd on each email sent to principals</td></tr>
+  <tr><td>Onboarding item auto-complete</td><td>When principal acts</td><td>Email notification when roster uploaded, etc.</td></tr>
+</table>
+
+<hr class="divider">
+
+<!-- WHAT YOU NEED TO DO -->
+<h2>What you DO need to do</h2>
+<table>
+  <tr><th>When</th><th>Action</th><th>Where</th></tr>
+  <tr><td>Deal signed</td><td>Click "Create Partnership + Dashboard"</td><td>Sales deal panel</td></tr>
+  <tr><td>Roster uploaded (you get email)</td><td>Click "Provision Hub accounts"</td><td>Internal tab</td></tr>
+  <tr><td>Kickoff walkthrough</td><td>Set 3-5 KPIs with principal</td><td>Internal tab > KPIs</td></tr>
+  <tr><td>Before any check-in</td><td>Click "Generate briefing"</td><td>Internal tab</td></tr>
+  <tr><td>After any check-in</td><td>Log the meeting</td><td>Internal tab > Meetings</td></tr>
+  <tr><td>Attention flag email</td><td>Follow up with principal</td><td>Direct call/email</td></tr>
+  <tr><td>After surveys</td><td>Update stress/retention KPI values</td><td>Internal tab > KPIs</td></tr>
+  <tr><td>Grant-funded school</td><td>Manage funding paths</td><td>Funding tab</td></tr>
+</table>
+
+<hr class="divider">
+
+<!-- WHERE TO FIND THINGS -->
+<h2>Where to find things</h2>
+<table>
+  <tr><th>I need to...</th><th>Go to</th></tr>
+  <tr><td>See all partnerships</td><td>Leadership Dashboard (main table)</td></tr>
+  <tr><td>See a specific school's data</td><td>Leadership > click "View" on any partnership</td></tr>
+  <tr><td>See what the principal sees</td><td>Leadership > click "Dashboard" on any partnership</td></tr>
+  <tr><td>Log notes or meetings</td><td>Partnership detail > Internal tab</td></tr>
+  <tr><td>Set or check KPIs</td><td>Partnership detail > Internal tab > KPIs</td></tr>
+  <tr><td>Export data for a board meeting</td><td>Partnership detail > Internal tab > Reports</td></tr>
+  <tr><td>Prep for a call</td><td>Partnership detail > Internal tab > Generate briefing</td></tr>
+  <tr><td>Provision Hub accounts</td><td>Partnership detail > Internal tab > Hub provisioning</td></tr>
+  <tr><td>Track grant funding</td><td>Funding tab (or Internal tab for per-partnership view)</td></tr>
+  <tr><td>Jump from a deal to its partnership</td><td>Sales deal > "Leadership" pill</td></tr>
+  <tr><td>Jump from a partnership to its deal</td><td>Leadership table > "Sales" button</td></tr>
+  <tr><td>See Hub engagement across schools</td><td>Learning Hub tab in admin portal</td></tr>
+  <tr><td>Manage creators</td><td>Creator Studio tab (Bella's domain)</td></tr>
+</table>
+
+<hr class="divider">
+
+<!-- WARNINGS -->
+<h2>Things to be careful about</h2>
+<div class="card card-warning">
+  <strong>Creating a partnership is permanent.</strong> The "Create Partnership" button generates a dashboard, provisions Hub access, sends a welcome email, and creates action items. Make sure the deal is actually signed before clicking.
+</div>
+<div class="card card-warning">
+  <strong>Batch provisioning creates real accounts.</strong> "Provision Hub accounts" creates All-Access Hub accounts for every person in the roster. Only run this after the roster is verified.
+</div>
+<div class="card card-warning">
+  <strong>KPIs show on the principal's dashboard.</strong> Once you set KPIs, the principal sees gauge rings tracking progress. Pick KPIs that TDI can actually move (use the implementation category, not just login metrics).
+</div>
+<div class="card card-warning">
+  <strong>Notes default to internal.</strong> Anything on the Internal tab is invisible to the principal. But if you mark a note as "shared with partner," it will be visible. Double-check before sharing.
+</div>
+
+<hr class="divider">
+
+<p style="color:#9CA3AF; font-size:12px; text-align:center;">
+  TDI Admin Guide v1.0 | June 2026 | For internal team use only.
+</p>
+
+</div>
+</body>
+</html>
