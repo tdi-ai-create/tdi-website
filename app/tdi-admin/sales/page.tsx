@@ -124,7 +124,7 @@ const STAGE_LABELS: Record<string, string> = {
 }
 
 const DEFAULT_KANBAN_STAGES = ['qualified', 'likely_yes', 'proposal_sent']
-const ALL_ACTIVE_STAGES = ['targeting', 'engaged', 'qualified', 'likely_yes', 'proposal_sent', 'signed_no_grant', 'signed_with_grant']
+const ALL_ACTIVE_STAGES = ['targeting', 'engaged', 'qualified', 'likely_yes', 'proposal_sent', 'signed_with_grant', 'signed_no_grant']
 
 function factoredRevenue(opp: Opportunity): number {
   return Math.round((opp.value || 0) * opp.probability / 100)

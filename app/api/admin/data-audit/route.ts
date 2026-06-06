@@ -63,8 +63,15 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
-    const auth = await requireAdminAuth();
-    if (auth instanceof NextResponse) return auth;
+    // Allow either admin auth OR service role key for CLI usage
+    const authHeader = request.headers.get('authorization');
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const isServiceAuth = authHeader === `Bearer ${serviceKey}`;
+
+    if (!isServiceAuth) {
+      const auth = await requireAdminAuth();
+      if (auth instanceof NextResponse) return auth;
+    }
 
     const { tables } = await request.json();
 
