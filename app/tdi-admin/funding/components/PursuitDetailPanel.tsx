@@ -55,6 +55,30 @@ function PanelContent({ data, onClose }: { data: any; onClose: () => void }) {
   const timeline = data.timeline || []
   const touchpoints = data.touchpoints || []
 
+  // Funding paths (Plan A/B/C/D)
+  const [paths, setPaths] = useState<{ plan: string; label: string; amount: number; status: string; deadline: string | null; contact: string; notes: string }[]>(() => {
+    try {
+      return typeof p.funding_paths === 'string' ? JSON.parse(p.funding_paths) : (p.funding_paths || [])
+    } catch { return [] }
+  })
+  const [editingPaths, setEditingPaths] = useState(false)
+  const [savingPaths, setSavingPaths] = useState(false)
+
+  const planColors: Record<string, string> = { A: '#0F766E', B: '#1B365D', C: '#7C3AED', D: '#B45309' }
+  const statusOptions = ['not_started', 'researching', 'pursuing', 'submitted', 'awarded', 'denied', 'on_hold']
+
+  const savePaths = async () => {
+    setSavingPaths(true)
+    try {
+      await fetch('/api/funding/pursuits', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pursuitId: p.id, funding_paths: paths }),
+      })
+      setEditingPaths(false)
+    } catch {} finally { setSavingPaths(false) }
+  }
+
   return (
     <div>
       {/* Header */}
@@ -96,6 +120,72 @@ function PanelContent({ data, onClose }: { data: any; onClose: () => void }) {
                   <span style={{ fontSize: 13, fontWeight: 700, color: '#0a0f1e' }}>${s.amount?.toLocaleString()}</span>
                 </div>
               ))}
+            </div>
+          </Section>
+        )}
+
+        {/* Funding Paths (Plan A/B/C/D) */}
+        {paths.length > 0 && (
+          <Section title={<span>Funding Paths <button onClick={() => setEditingPaths(!editingPaths)} style={{ fontSize: 10, color: '#6B7280', marginLeft: 8, cursor: 'pointer', background: 'none', border: 'none', textDecoration: 'underline' }}>{editingPaths ? 'cancel' : 'edit'}</button></span>}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {paths.map((path, i) => (
+                <div key={i} style={{ padding: '10px 14px', background: '#F9FAFB', borderRadius: 10, borderLeft: `4px solid ${planColors[path.plan] || '#6B7280'}` }}>
+                  {editingPaths ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                        <span style={{ fontWeight: 700, fontSize: 12, color: planColors[path.plan], width: 40 }}>Plan {path.plan}</span>
+                        <input value={path.label} onChange={e => { const u = [...paths]; u[i] = { ...u[i], label: e.target.value }; setPaths(u); }}
+                          style={{ flex: 1, fontSize: 13, padding: '4px 8px', border: '1px solid #E5E7EB', borderRadius: 6 }} placeholder="Path name" />
+                        <input type="number" value={path.amount || ''} onChange={e => { const u = [...paths]; u[i] = { ...u[i], amount: parseFloat(e.target.value) || 0 }; setPaths(u); }}
+                          style={{ width: 80, fontSize: 13, padding: '4px 8px', border: '1px solid #E5E7EB', borderRadius: 6 }} placeholder="$" />
+                      </div>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                        <select value={path.status} onChange={e => { const u = [...paths]; u[i] = { ...u[i], status: e.target.value }; setPaths(u); }}
+                          style={{ fontSize: 11, padding: '3px 6px', border: '1px solid #E5E7EB', borderRadius: 6 }}>
+                          {statusOptions.map(s => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
+                        </select>
+                        <input value={path.contact || ''} onChange={e => { const u = [...paths]; u[i] = { ...u[i], contact: e.target.value }; setPaths(u); }}
+                          style={{ flex: 1, fontSize: 11, padding: '3px 6px', border: '1px solid #E5E7EB', borderRadius: 6 }} placeholder="Contact name/email" />
+                        <input type="date" value={path.deadline || ''} onChange={e => { const u = [...paths]; u[i] = { ...u[i], deadline: e.target.value || null }; setPaths(u); }}
+                          style={{ fontSize: 11, padding: '3px 6px', border: '1px solid #E5E7EB', borderRadius: 6 }} />
+                      </div>
+                      <input value={path.notes || ''} onChange={e => { const u = [...paths]; u[i] = { ...u[i], notes: e.target.value }; setPaths(u); }}
+                        style={{ fontSize: 11, padding: '3px 6px', border: '1px solid #E5E7EB', borderRadius: 6 }} placeholder="Notes..." />
+                    </div>
+                  ) : (
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: '#0a0f1e' }}>
+                          <span style={{ color: planColors[path.plan], fontWeight: 700, marginRight: 6 }}>Plan {path.plan}</span>
+                          {path.label}
+                        </span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: '#0a0f1e' }}>{path.amount > 0 ? `$${path.amount.toLocaleString()}` : '--'}</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: 8, marginTop: 4, fontSize: 11, color: '#6B7280' }}>
+                        <span style={{ padding: '1px 6px', borderRadius: 4, background: path.status === 'awarded' ? '#D1FAE5' : path.status === 'denied' ? '#FEE2E2' : '#F3F4F6',
+                          color: path.status === 'awarded' ? '#065F46' : path.status === 'denied' ? '#991B1B' : '#374151' }}>
+                          {path.status.replace(/_/g, ' ')}
+                        </span>
+                        {path.contact && <span>Contact: {path.contact}</span>}
+                        {path.deadline && <span>Due: {new Date(path.deadline + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>}
+                      </div>
+                      {path.notes && <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>{path.notes}</p>}
+                    </div>
+                  )}
+                </div>
+              ))}
+              {editingPaths && (
+                <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                  <button onClick={savePaths} disabled={savingPaths}
+                    style={{ fontSize: 12, fontWeight: 600, padding: '6px 14px', borderRadius: 6, border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer', opacity: savingPaths ? 0.5 : 1 }}>
+                    {savingPaths ? 'Saving...' : 'Save paths'}
+                  </button>
+                  <button onClick={() => { const u = [...paths]; u.push({ plan: 'C', label: '', amount: 0, status: 'not_started', deadline: null, contact: '', notes: '' }); setPaths(u); }}
+                    style={{ fontSize: 12, padding: '6px 14px', borderRadius: 6, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>
+                    + Add path
+                  </button>
+                </div>
+              )}
             </div>
           </Section>
         )}
@@ -226,7 +316,7 @@ function PanelContent({ data, onClose }: { data: any; onClose: () => void }) {
   )
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: React.ReactNode; children: React.ReactNode }) {
   return (
     <div>
       <div style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 }}>

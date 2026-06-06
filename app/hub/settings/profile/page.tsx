@@ -261,6 +261,11 @@ export default function ProfileSettingsPage() {
   const [displayName, setDisplayName] = useState('');
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [selectedGoals, setSelectedGoals] = useState<GoalType[]>([]);
+  const [specificGoals, setSpecificGoals] = useState<{ text: string; category: string }[]>([]);
+  const [showSpecificGoals, setShowSpecificGoals] = useState(false);
+  const [savingSpecificGoals, setSavingSpecificGoals] = useState(false);
+  const [specificGoalsSaved, setSpecificGoalsSaved] = useState(false);
+  const [goalCheckInMessage, setGoalCheckInMessage] = useState('');
   const [selectedAvatarId, setSelectedAvatarId] = useState<string | null>(null);
   const [uploadedAvatarUrl, setUploadedAvatarUrl] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -509,6 +514,20 @@ export default function ProfileSettingsPage() {
       .catch(() => {})
       .finally(() => setSnapshotLoading(false));
   }, [activeTab, quizResults, educatorSnapshot, snapshotLoading]);
+
+  // ── Load specific goals when growth tab is active ──────────────────────
+  useEffect(() => {
+    if (activeTab !== 'growth' || !user?.email) return;
+    fetch(`/api/hub/goals?email=${encodeURIComponent(user.email)}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.goals?.length > 0) {
+          setSpecificGoals(d.goals.filter((g: { status: string }) => g.status === 'active').map((g: { goal_text: string; goal_type: string }) => ({ text: g.goal_text, category: g.goal_type })));
+        }
+        if (d.checkIn?.message) setGoalCheckInMessage(d.checkIn.message);
+      })
+      .catch(() => {});
+  }, [activeTab, user?.email]);
 
   // ── Fetch AI insights when switching tabs ──────────────────────────────
   useEffect(() => {
@@ -1631,6 +1650,110 @@ export default function ProfileSettingsPage() {
               </div>
             </div>
           )}
+
+          {/* Get Specific: Detailed Goal Setting */}
+          <div className="mt-8 pt-6" style={{ borderTop: '1px solid #E5E7EB' }}>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-base font-bold" style={{ color: '#1B2A4A' }}>Get specific</h3>
+                <p className="text-sm" style={{ color: '#6B7280' }}>Turn your focus areas into real, measurable goals for this year.</p>
+              </div>
+              <button
+                onClick={() => setShowSpecificGoals(!showSpecificGoals)}
+                className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
+                style={{ background: showSpecificGoals ? '#1B2A4A' : '#F3F4F6', color: showSpecificGoals ? 'white' : '#1B2A4A' }}
+              >
+                {showSpecificGoals ? 'Close' : specificGoals.length > 0 ? 'Edit goals' : 'Set my goals'}
+              </button>
+            </div>
+
+            {/* Show saved goals */}
+            {!showSpecificGoals && specificGoals.length > 0 && (
+              <div className="space-y-2">
+                {specificGoals.map((g, i) => (
+                  <div key={i} className="flex items-start gap-3 p-3 rounded-xl" style={{ background: '#F9FAFB' }}>
+                    <Target size={14} style={{ color: '#2A9D8F', marginTop: 2, flexShrink: 0 }} />
+                    <p className="text-sm" style={{ color: '#374151' }}>{g.text}</p>
+                  </div>
+                ))}
+                {specificGoalsSaved && (
+                  <p className="text-xs text-green-600 flex items-center gap-1"><Check size={12} /> Goals saved</p>
+                )}
+              </div>
+            )}
+
+            {/* Goal check-in prompt */}
+            {goalCheckInMessage && !showSpecificGoals && (
+              <div className="p-3 rounded-xl mt-3" style={{ background: '#FFF8E7', border: '1px solid #FDE68A' }}>
+                <p className="text-sm" style={{ color: '#92400E' }}>{goalCheckInMessage}</p>
+              </div>
+            )}
+
+            {/* Goal setting form */}
+            {showSpecificGoals && (
+              <div className="space-y-4">
+                {[
+                  { category: 'classroom', prompt: 'What is one strategy you want to consistently use in your classroom this year?', examples: ['Use the 2-minute transition technique daily', 'Start every class with a student check-in'] },
+                  { category: 'growth', prompt: 'What skill do you want to develop as an educator this year?', examples: ['Complete 2 PD courses on differentiation', 'Learn 3 new de-escalation strategies'] },
+                  { category: 'wellness', prompt: 'What will you do to protect your own well-being this year?', examples: ['Leave school by 4:30 PM 3 days a week', 'Use Moment Mode when I feel overwhelmed'] },
+                  { category: 'connection', prompt: 'How will you connect with colleagues or your community?', examples: ['Share one resource per month in the TDI community', 'Observe a colleague once per quarter'] },
+                  { category: 'impact', prompt: 'What student outcome do you want to see improve?', examples: ['Reduce transition time by 50%', 'Increase student participation in discussions'] },
+                ].slice(0, 5).map((prompt, i) => {
+                  const existing = specificGoals.find(g => g.category === prompt.category);
+                  return (
+                    <div key={i} className="p-4 rounded-xl" style={{ background: 'white', border: '1px solid #E5E7EB' }}>
+                      <p className="text-sm font-medium mb-2" style={{ color: '#1B2A4A' }}>{prompt.prompt}</p>
+                      <input
+                        type="text"
+                        placeholder={prompt.examples[0]}
+                        defaultValue={existing?.text || ''}
+                        onChange={(e) => {
+                          setSpecificGoals(prev => {
+                            const updated = prev.filter(g => g.category !== prompt.category);
+                            if (e.target.value.trim()) {
+                              updated.push({ text: e.target.value.trim(), category: prompt.category });
+                            }
+                            return updated;
+                          });
+                        }}
+                        className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+                        style={{ borderColor: '#E5E7EB' }}
+                      />
+                      <p className="text-[10px] mt-1" style={{ color: '#9CA3AF' }}>Example: {prompt.examples.join(' or ')}</p>
+                    </div>
+                  );
+                })}
+
+                <button
+                  onClick={async () => {
+                    if (specificGoals.length === 0) return;
+                    setSavingSpecificGoals(true);
+                    try {
+                      const res = await fetch('/api/hub/goals', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          email: user?.email,
+                          goals: specificGoals.map(g => ({ goalText: g.text, category: g.category })),
+                        }),
+                      });
+                      const data = await res.json();
+                      if (data.success) {
+                        setSpecificGoalsSaved(true);
+                        setShowSpecificGoals(false);
+                        setTimeout(() => setSpecificGoalsSaved(false), 3000);
+                      }
+                    } catch {} finally { setSavingSpecificGoals(false); }
+                  }}
+                  disabled={specificGoals.length === 0 || savingSpecificGoals}
+                  className="px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-colors disabled:opacity-50"
+                  style={{ background: '#1B2A4A' }}
+                >
+                  {savingSpecificGoals ? 'Saving...' : `Save ${specificGoals.length} goal${specificGoals.length !== 1 ? 's' : ''}`}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
