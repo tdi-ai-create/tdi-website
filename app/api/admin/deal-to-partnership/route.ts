@@ -413,6 +413,93 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // 10. If grant-funded deal, auto-create a funding pursuit
+    let grantPursuitCreated = false;
+    if (deal.grant_support || deal.stage === 'signed_with_grant') {
+      try {
+        const { error: grantError } = await supabase
+          .from('funding_pursuits')
+          .insert({
+            pursuit_name: `${deal.name} Funding`,
+            district_name: deal.name,
+            partnership_id: partnershipId,
+            sales_deal_id: dealId,
+            total_amount: deal.value || 0,
+            contract_gap: deal.value || 0,
+            buffer_amount: Math.round((deal.value || 0) * 0.15),
+            current_phase: 'intake',
+            implementation_date: contractStart || null,
+            funding_paths: JSON.stringify([
+              { plan: 'A', label: 'Title II-A', amount: 0, status: 'researching', deadline: null, contact: '', notes: 'Federal formula funds. Check district Title II officer.' },
+              { plan: 'A', label: 'IDEA / CEIS', amount: 0, status: 'researching', deadline: null, contact: '', notes: 'Special education funding path. Check IEP concentration.' },
+              { plan: 'B', label: 'State formula', amount: 0, status: 'not_started', deadline: null, contact: '', notes: 'State-level discretionary dollars.' },
+              { plan: 'C', label: 'Foundation/corporate', amount: 0, status: 'not_started', deadline: null, contact: '', notes: 'Competitive applications. Match school profile to funder mission.' },
+            ]),
+            school_profile: JSON.stringify({
+              state: deal.state || '',
+              city: deal.city || '',
+              staffCount: staffCount || 0,
+            }),
+            next_action_label: 'Build school profile and begin funder search',
+            next_action_urgency: 'info',
+            internal_notes: `Auto-created from Sales deal ${dealId}. Contract value: $${(deal.value || 0).toLocaleString()}. TDI responsible for finding, drafting, and tracking grant funding.`,
+          });
+
+        if (!grantError) {
+          grantPursuitCreated = true;
+          console.log('[deal-to-partnership] Grant pursuit created for:', deal.name);
+
+          // Add grant-specific action items
+          await supabase.from('action_items').insert([
+            {
+              partnership_id: partnershipId,
+              title: 'Grant: Build school funding profile',
+              description: 'Collect Title I status, FRL rate, IEP concentration, enrollment, geographic classification. This data drives eligibility for all funding paths.',
+              category: 'onboarding',
+              priority: 'high',
+              status: 'pending',
+              visible_to_partner: false,
+              sort_order: 20,
+            },
+            {
+              partnership_id: partnershipId,
+              title: 'Grant: Research and map funding paths (Plan A/B/C/D)',
+              description: 'Run federal, state, foundation, and direct funding searches. Map all eligible paths into the funding matrix.',
+              category: 'onboarding',
+              priority: 'high',
+              status: 'pending',
+              visible_to_partner: false,
+              sort_order: 21,
+            },
+            {
+              partnership_id: partnershipId,
+              title: 'Grant: Draft and submit narratives',
+              description: 'Write budget narratives for each funding path. Pass the completeness review. Prepare submission packet with forwarding emails.',
+              category: 'onboarding',
+              priority: 'high',
+              status: 'pending',
+              visible_to_partner: false,
+              sort_order: 22,
+            },
+            {
+              partnership_id: partnershipId,
+              title: 'Grant: Track submissions and follow up',
+              description: 'Monitor all submitted paths. Run follow-up cadence. Activate contingency paths if any are denied or stall.',
+              category: 'onboarding',
+              priority: 'medium',
+              status: 'pending',
+              visible_to_partner: false,
+              sort_order: 23,
+            },
+          ]);
+        } else {
+          console.error('[deal-to-partnership] Grant pursuit error:', grantError);
+        }
+      } catch (grantErr) {
+        console.error('[deal-to-partnership] Grant pursuit error:', grantErr);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       partnership: {
@@ -424,6 +511,7 @@ export async function POST(request: NextRequest) {
       actionItemsCreated: actionItems.length,
       hubProvisioned,
       welcomeEmailSent: emailSent,
+      grantPursuitCreated,
       dealId,
     });
   } catch (error) {

@@ -115,6 +115,9 @@ export default function FundingPage() {
   const [error, setError] = useState('')
   const [activePhase, setActivePhase] = useState('all')
   const [selectedPursuitId, setSelectedPursuitId] = useState<string | null>(null)
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [newPursuit, setNewPursuit] = useState({ districtName: '', totalAmount: '', implementationDate: '' })
+  const [addingPursuit, setAddingPursuit] = useState(false)
 
   useEffect(() => {
     fetch('/api/funding/dashboard')
@@ -167,7 +170,7 @@ export default function FundingPage() {
           </p>
         </div>
         <button
-          onClick={() => alert('Add Pursuit form ships in Phase B')}
+          onClick={() => setShowAddForm(!showAddForm)}
           style={{
             fontSize: 13, fontWeight: 700, padding: '10px 20px', borderRadius: 8,
             border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer',
@@ -176,6 +179,84 @@ export default function FundingPage() {
           + Add Pursuit
         </button>
       </div>
+
+      {/* Add Pursuit Form */}
+      {showAddForm && (
+        <div style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 12, padding: 24, marginBottom: 20 }}>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e2749', marginBottom: 16 }}>New funding pursuit</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 16 }}>
+            <div>
+              <label style={{ fontSize: 12, color: '#6B7280', fontWeight: 600, display: 'block', marginBottom: 4 }}>School/District name</label>
+              <input
+                type="text"
+                value={newPursuit.districtName}
+                onChange={e => setNewPursuit(p => ({ ...p, districtName: e.target.value }))}
+                placeholder="e.g. Allenwood Elementary"
+                style={{ width: '100%', padding: '8px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14 }}
+              />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, color: '#6B7280', fontWeight: 600, display: 'block', marginBottom: 4 }}>Contract amount ($)</label>
+              <input
+                type="number"
+                value={newPursuit.totalAmount}
+                onChange={e => setNewPursuit(p => ({ ...p, totalAmount: e.target.value }))}
+                placeholder="e.g. 56000"
+                style={{ width: '100%', padding: '8px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14 }}
+              />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, color: '#6B7280', fontWeight: 600, display: 'block', marginBottom: 4 }}>Implementation date</label>
+              <input
+                type="date"
+                value={newPursuit.implementationDate}
+                onChange={e => setNewPursuit(p => ({ ...p, implementationDate: e.target.value }))}
+                style={{ width: '100%', padding: '8px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14 }}
+              />
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={async () => {
+                if (!newPursuit.districtName) return
+                setAddingPursuit(true)
+                try {
+                  const res = await fetch('/api/funding/pursuits', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      districtName: newPursuit.districtName,
+                      totalAmount: parseFloat(newPursuit.totalAmount) || 0,
+                      contractGap: parseFloat(newPursuit.totalAmount) || 0,
+                      implementationDate: newPursuit.implementationDate || null,
+                    }),
+                  })
+                  const result = await res.json()
+                  if (result.success) {
+                    setShowAddForm(false)
+                    setNewPursuit({ districtName: '', totalAmount: '', implementationDate: '' })
+                    // Reload data
+                    window.location.reload()
+                  }
+                } catch {} finally { setAddingPursuit(false) }
+              }}
+              disabled={!newPursuit.districtName || addingPursuit}
+              style={{ fontSize: 13, fontWeight: 600, padding: '8px 20px', borderRadius: 8, border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer', opacity: !newPursuit.districtName || addingPursuit ? 0.5 : 1 }}
+            >
+              {addingPursuit ? 'Creating...' : 'Create pursuit'}
+            </button>
+            <button
+              onClick={() => setShowAddForm(false)}
+              style={{ fontSize: 13, padding: '8px 16px', borderRadius: 8, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}
+            >
+              Cancel
+            </button>
+          </div>
+          <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8 }}>
+            This creates a pursuit with default Plan A/B/C/D funding paths based on the TDI Funding Playbook. You can customize paths after creation.
+          </p>
+        </div>
+      )}
 
       {/* Impact Evidence from Hub */}
       <ImpactEvidence />
