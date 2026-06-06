@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { getSupabase } from '@/lib/supabase'
 import { AnalyticsTab } from './components/AnalyticsTab'
 import { StickyTopBar } from './components/StickyTopBar'
@@ -183,8 +184,12 @@ export default function SalesPage() {
   } | null>(null)
   const [hubLeadsLoading, setHubLeadsLoading] = useState(false)
 
+  // Read search param for cross-portal linking (e.g. from Leadership -> Sales)
+  const searchParams = useSearchParams()
+  const initialSearch = searchParams.get('search') || ''
+
   // Filter state
-  const [activeFilters, setActiveFilters] = useState<ActiveFilters>(EMPTY_FILTERS)
+  const [activeFilters, setActiveFilters] = useState<ActiveFilters>({ ...EMPTY_FILTERS, search: initialSearch })
   const [showAllStages, setShowAllStages] = useState(true)
   const [showCallSheetOnly, setShowCallSheetOnly] = useState(false)
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission } from '@/lib/tdi-admin/permissions';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
@@ -277,7 +278,8 @@ export default function LeadershipDashboardPage() {
   const [hubLoading, setHubLoading] = useState(false);
 
   // Filter state
-  const [searchQuery, setSearchQuery] = useState('');
+  const leadershipSearchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(leadershipSearchParams.get('search') || '');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterPhase, setFilterPhase] = useState<string>('all');
@@ -959,6 +961,12 @@ export default function LeadershipDashboardPage() {
                                   Dashboard
                                 </Link>
                               )}
+                              <Link
+                                href={`/tdi-admin/sales?search=${encodeURIComponent(partnership.org_name || partnership.contact_name || '')}`}
+                                className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+                              >
+                                Sales
+                              </Link>
                             </div>
                           </td>
                         </tr>

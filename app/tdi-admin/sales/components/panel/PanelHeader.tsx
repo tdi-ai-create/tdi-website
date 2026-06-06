@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import type { FullOpportunity } from '../OpportunityDetailPanel'
 
 const HEAT_OPTIONS = [
@@ -72,6 +73,18 @@ export function PanelHeader({ opp, onClose, onPatch }: Props) {
           {heat && (
             <span className="text-xs text-gray-600">{heat.emoji} {heat.label}</span>
           )}
+          <Link
+            href={`/tdi-admin/leadership?search=${encodeURIComponent(opp.name)}`}
+            className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 hover:bg-teal-100 transition-colors"
+          >
+            Leadership
+          </Link>
+          <Link
+            href={`/tdi-admin/hub?tab=schools&search=${encodeURIComponent(opp.name)}`}
+            className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors"
+          >
+            Hub Data
+          </Link>
         </div>
       </div>
       <div className="flex items-center gap-2 shrink-0">
