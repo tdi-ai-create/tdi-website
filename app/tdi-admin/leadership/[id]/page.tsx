@@ -1630,6 +1630,36 @@ export default function AdminPartnershipDetailPage() {
               </div>
             </div>
 
+            {/* Prepare for Call */}
+            <div className="bg-white rounded-xl border border-blue-200 p-5 mb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900">Prepare for call</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">One-click briefing with engagement data, KPIs, notes, and talking points.</p>
+                </div>
+                <button
+                  onClick={async () => {
+                    try {
+                      const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/briefing`)
+                      const data = await res.json()
+                      const w = window.open('', '_blank')
+                      if (!w) return
+                      const b = data.briefing
+                      const kpiRows = (data.kpis || []).map((k: { label: string; current: string; target: string; pct: number; status: string }) => `<tr><td style="padding:6px 10px;">${k.label}</td><td style="padding:6px 10px;font-weight:700;">${k.current}</td><td style="padding:6px 10px;">${k.target}</td><td style="padding:6px 10px;color:${k.status === 'at_risk' ? '#EF4444' : k.pct >= 70 ? '#22c55e' : '#EAB308'}">${k.pct}%</td></tr>`).join('')
+                      const tpList = (data.talkingPoints || []).map((t: string) => `<li style="margin-bottom:6px;">${t}</li>`).join('')
+                      const pendingList = (data.pendingItems || []).map((t: string) => `<li>${t}</li>`).join('')
+                      w.document.write(`<!DOCTYPE html><html><head><title>Briefing: ${b.orgName}</title><style>body{font-family:sans-serif;max-width:700px;margin:0 auto;padding:32px;color:#1e2749;font-size:14px;}h1{font-size:22px;margin:0;}h2{font-size:16px;margin:24px 0 8px;color:#374151;border-bottom:1px solid #E5E7EB;padding-bottom:4px;}table{width:100%;border-collapse:collapse;font-size:13px;}th{text-align:left;background:#F9FAFB;padding:8px 10px;font-weight:600;}td{padding:6px 10px;border-bottom:1px solid #F3F4F6;}.stat{display:inline-block;text-align:center;padding:12px 20px;background:#F9FAFB;border-radius:8px;margin-right:8px;}.stat-val{font-size:24px;font-weight:700;}.stat-label{font-size:10px;color:#6B7280;}@media print{body{padding:16px;}}</style></head><body><div style="display:flex;justify-content:space-between;"><div><h1>${b.orgName}</h1><p style="color:#6B7280;margin:4px 0;">${b.location || ''} | ${b.phase} | Day ${b.daysSinceStart || '?'}</p></div><div style="text-align:right;font-size:11px;color:#9CA3AF;">Generated ${new Date().toLocaleDateString()}<br>TDI Internal</div></div><div style="margin:16px 0;"><div class="stat"><div class="stat-val">${b.loginPct}%</div><div class="stat-label">Hub engagement</div></div><div class="stat"><div class="stat-val">${b.totalStaff}</div><div class="stat-label">Staff</div></div><div class="stat"><div class="stat-val">${b.observationsUsed}/${b.observationsTotal}</div><div class="stat-label">Observations</div></div><div class="stat"><div class="stat-val">${b.virtualSessionsUsed}/${b.virtualSessionsTotal}</div><div class="stat-label">Virtual</div></div></div>${kpiRows ? `<h2>KPI Progress</h2><table><thead><tr><th>KPI</th><th>Current</th><th>Target</th><th>Progress</th></tr></thead><tbody>${kpiRows}</tbody></table>` : ''}${tpList ? `<h2>Talking Points</h2><ul>${tpList}</ul>` : ''}${pendingList ? `<h2>Open Items</h2><ul>${pendingList}</ul>` : ''}${data.recentNotes?.length > 0 ? `<h2>Recent Notes</h2>${data.recentNotes.map((n: { type: string; content: string }) => `<p style="margin:8px 0;padding:8px;background:#F9FAFB;border-radius:6px;font-size:13px;"><strong style="color:#6B7280;text-transform:uppercase;font-size:10px;">${n.type}</strong><br>${n.content}</p>`).join('')}` : ''}</body></html>`)
+                      w.document.close()
+                    } catch { /* */ }
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-white rounded-lg"
+                  style={{ background: '#1e2749' }}
+                >
+                  Generate briefing
+                </button>
+              </div>
+            </div>
+
             {/* KPI Goal Setting */}
             <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
               <div className="flex items-center justify-between mb-4">

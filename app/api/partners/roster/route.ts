@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     // Verify partnership exists
     const { data: partnership } = await supabase
       .from('partnerships')
-      .select('id, status')
+      .select('id, status, contact_name')
       .eq('id', partnershipId)
       .single();
 
@@ -144,6 +144,19 @@ export async function POST(request: NextRequest) {
       action: 'roster_uploaded',
       details: { count: newStaff.length, skipped, total: totalCount },
     });
+
+    // Notify admin team
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+    fetch(`${baseUrl}/api/admin/notify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event: 'roster_uploaded',
+        partnershipName: partnership?.contact_name || 'A partnership',
+        urgency: 'action',
+        details: { 'Staff added': newStaff.length, 'Total roster': totalCount, 'Next step': 'Provision Hub accounts from the Internal tab' },
+      }),
+    }).catch(() => {}); // Fire and forget
 
     return NextResponse.json({
       success: true,

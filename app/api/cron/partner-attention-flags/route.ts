@@ -106,7 +106,7 @@ export async function GET(request: NextRequest) {
         flags.push(`Day ${daysSinceStart}: Active usage below 40% (${loginPct}%). Escalate with re-engagement plan.`);
       }
 
-      // Create concern notes for each flag
+      // Create concern notes for each flag + notify admin
       for (const flagContent of flags) {
         await supabase.from('partnership_notes').insert({
           partnership_id: p.id,
@@ -116,6 +116,22 @@ export async function GET(request: NextRequest) {
           visible_to_partner: false,
         });
         flagsCreated++;
+      }
+
+      // Send admin notification if any flags were created for this partnership
+      if (flags.length > 0) {
+        const isEscalation = flags.some(f => f.includes('STILL') || f.includes('red flag') || f.includes('Escalate'));
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+        fetch(`${baseUrl}/api/admin/notify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'attention_flag',
+            partnershipName: p.contact_name,
+            urgency: isEscalation ? 'urgent' : 'action',
+            details: { 'Flags': flags.length, 'Day': daysSinceStart, 'Summary': flags[0] },
+          }),
+        }).catch(() => {});
       }
     }
 

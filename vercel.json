@@ -27,6 +27,14 @@
     {
       "path": "/api/cron/partner-attention-flags",
       "schedule": "0 13 * * *"
+    },
+    {
+      "path": "/api/cron/update-kpis",
+      "schedule": "0 11 * * *"
+    },
+    {
+      "path": "/api/cron/weekly-digest",
+      "schedule": "0 12 * * 1"
     }
   ]
 }
