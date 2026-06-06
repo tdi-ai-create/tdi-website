@@ -132,6 +132,9 @@ interface ActionItem {
   paused_at?: string;
   paused_reason?: string;
   resurface_at?: string;
+  cta_label?: string;
+  cta_url?: string;
+  visible_to_partner?: boolean;
 }
 
 interface MetricSnapshot {
@@ -2774,6 +2777,123 @@ export default function PartnerDashboard() {
                                     Schedule Now
                                     <ExternalLink className="w-3 h-3" />
                                   </a>
+                                </div>
+                              );
+                            }
+
+                            // Onboarding: Upload staff roster - CSV paste or manual
+                            if (titleLower.includes('staff roster') || titleLower.includes('upload roster')) {
+                              if (!isFormExpanded) {
+                                return (
+                                  <div className="mt-3">
+                                    <button
+                                      onClick={() => setExpandedActionFormId(item.id)}
+                                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
+                                    >
+                                      <Upload className="w-4 h-4" />
+                                      Upload Roster
+                                    </button>
+                                  </div>
+                                );
+                              }
+                              return (
+                                <div className="mt-3 space-y-3">
+                                  <p className="text-xs text-gray-500">Paste CSV data (First Name, Last Name, Email, Role) or add staff one at a time.</p>
+                                  <textarea
+                                    placeholder={"First Name,Last Name,Email,Role\nJane,Smith,jane@school.edu,Teacher\nJohn,Doe,john@school.edu,Para"}
+                                    rows={5}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    id={`roster-csv-${item.id}`}
+                                  />
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={async () => {
+                                        const textarea = document.getElementById(`roster-csv-${item.id}`) as HTMLTextAreaElement;
+                                        if (!textarea?.value.trim()) return;
+                                        setSavingItemId(item.id);
+                                        try {
+                                          const res = await fetch('/api/partners/roster', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ partnershipId: partnership?.id, csv: textarea.value }),
+                                          });
+                                          const data = await res.json();
+                                          if (data.success) {
+                                            setToastMessage(data.message);
+                                            if (data.added > 0) {
+                                              setActionItems(prev => prev.map(ai => ai.id === item.id ? { ...ai, status: 'completed', completed_at: new Date().toISOString() } : ai));
+                                            }
+                                            setExpandedActionFormId(null);
+                                          } else {
+                                            setToastMessage(data.error || 'Upload failed');
+                                          }
+                                        } catch { setToastMessage('Upload failed'); }
+                                        finally { setSavingItemId(null); }
+                                      }}
+                                      disabled={isSaving}
+                                      className="px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center gap-2"
+                                    >
+                                      {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                                      Upload CSV
+                                    </button>
+                                    <button onClick={() => setExpandedActionFormId(null)} className="px-3 py-2 text-gray-500 hover:text-gray-700 text-sm">Cancel</button>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            // Onboarding: Schedule kickoff walkthrough
+                            if (titleLower.includes('kickoff') || titleLower.includes('walkthrough')) {
+                              return (
+                                <div className="mt-3">
+                                  <a
+                                    href={item.cta_url || 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone'}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
+                                  >
+                                    <Calendar className="w-4 h-4" />
+                                    {item.cta_label || 'Schedule Walkthrough'}
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                </div>
+                              );
+                            }
+
+                            // Onboarding: Distribute Hub access
+                            if (titleLower.includes('distribute') && titleLower.includes('hub')) {
+                              return (
+                                <div className="mt-3">
+                                  <p className="text-sm text-gray-600 mb-3">
+                                    Share this link with your staff: <strong>teachersdeserveit.com/hub</strong>. Every team member has an account ready. They log in with their school email.
+                                  </p>
+                                  <button
+                                    onClick={() => handleSaveActionData(item.id, 'confirmation', { confirmationMessage: 'Hub access distributed to staff' })}
+                                    disabled={isSaving}
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors disabled:opacity-50"
+                                  >
+                                    {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                                    I&apos;ve shared Hub access with my team
+                                  </button>
+                                </div>
+                              );
+                            }
+
+                            // Onboarding: Upload roster photos
+                            if (titleLower.includes('roster photo') || titleLower.includes('upload photo')) {
+                              return (
+                                <div className="mt-3">
+                                  <p className="text-sm text-gray-600 mb-3">
+                                    Share staff headshots with TDI so we can personalize Hub profiles. If photos are not available, teachers can upload their own after logging in.
+                                  </p>
+                                  <button
+                                    onClick={() => handleSaveActionData(item.id, 'confirmation', { confirmationMessage: 'Photos shared or skipped' })}
+                                    disabled={isSaving}
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors disabled:opacity-50"
+                                  >
+                                    {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                                    Done (or skip for now)
+                                  </button>
                                 </div>
                               );
                             }
