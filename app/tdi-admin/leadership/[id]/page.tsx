@@ -1765,6 +1765,56 @@ export default function AdminPartnershipDetailPage() {
               )}
             </div>
 
+            {/* Reports & Exports */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
+              <h3 className="text-sm font-bold text-gray-900 mb-2">Reports and exports</h3>
+              <p className="text-xs text-gray-500 mb-4">Generate and download reports for this partnership. If data is missing, you'll see what to do next.</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {[
+                  { type: 'roster', label: 'Staff roster', desc: 'Names, emails, Hub status' },
+                  { type: 'board_summary', label: 'Board summary', desc: 'AI-ready data for presentations' },
+                  { type: 'kpi_standings', label: 'KPI standings', desc: 'Current progress on all KPIs' },
+                  { type: 'engagement', label: 'Hub engagement', desc: 'Login rates, activity depth' },
+                  { type: 'courses', label: 'Course completions', desc: 'Enrollment and completion data' },
+                  { type: 'wellness', label: 'Wellness summary', desc: 'Anonymized team wellness' },
+                  { type: 'full_export', label: 'Full export', desc: 'Everything in one file' },
+                ].map(report => (
+                  <button
+                    key={report.type}
+                    onClick={async () => {
+                      try {
+                        const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/reports?type=${report.type}`)
+                        const data = await res.json()
+                        if (!data.hasData && data.emptyMessage) {
+                          // Show empty state with action
+                          const action = data.emptyAction || ''
+                          const doEmail = data.emailSubject && confirm(`${data.emptyMessage}\n\n${action}\n\nWould you like to send an email requesting this data?`)
+                          if (doEmail && data.emailSubject) {
+                            window.open(`mailto:${partnership?.contact_email || ''}?subject=${encodeURIComponent(data.emailSubject)}&body=${encodeURIComponent(data.emailBody || '')}`, '_blank')
+                          }
+                          return
+                        }
+                        // Download as JSON (can be opened in Excel or processed)
+                        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+                        const url = URL.createObjectURL(blob)
+                        const a = document.createElement('a')
+                        a.href = url
+                        a.download = `TDI-${report.type}-${new Date().toISOString().split('T')[0]}.json`
+                        a.click()
+                        URL.revokeObjectURL(url)
+                      } catch {
+                        alert('Failed to generate report')
+                      }
+                    }}
+                    className="text-left p-3 rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all"
+                  >
+                    <p className="text-xs font-semibold text-gray-900">{report.label}</p>
+                    <p className="text-[10px] text-gray-500 mt-0.5">{report.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Add Note Form */}
             <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
               <h3 className="text-sm font-bold text-gray-900 mb-3">Add a note</h3>
