@@ -50,11 +50,12 @@ export async function GET(
       .eq('partnership_id', partnershipId)
       .maybeSingle();
 
-    // Get action items
+    // Get action items (only partner-visible ones for the client dashboard)
     const { data: actionItems } = await supabase
       .from('action_items')
       .select('*')
       .eq('partnership_id', partnershipId)
+      .neq('visible_to_partner', false)
       .order('sort_order', { ascending: true });
 
     // Get staff login stats (for hub_login tracking)

@@ -104,79 +104,57 @@ export async function POST(request: NextRequest) {
     const slug = await getUniqueSlug(supabase, deal.name);
 
     // 4. Create partnership record
+    // Use correct column names from schema:
+    // observation_days_used (not _completed), virtual_sessions_used, executive_sessions_used
+    // staff_enrolled exists (migration 015), partnership_goal exists (migration 016)
+    // phone does NOT exist on partnerships (it's on organizations), so skip it
+    const partnershipInsert: Record<string, unknown> = {
+      partnership_type: partnershipType,
+      slug,
+      contact_name: deal.contact_name || deal.name,
+      contact_email: deal.contact_email,
+      contract_phase: contractPhase,
+      contract_start: contractStart || new Date().toISOString().split('T')[0],
+      contract_end: contractEnd || null,
+      building_count: buildingCount,
+      observation_days_total: observationDays,
+      observation_days_used: 0,
+      virtual_sessions_total: virtualSessions,
+      virtual_sessions_used: 0,
+      executive_sessions_total: executiveSessions,
+      executive_sessions_used: 0,
+      staff_enrolled: staffCount,
+      status: 'active',
+      partnership_goal: partnershipGoal || null,
+      sales_deal_id: dealId,
+      invite_sent_at: new Date().toISOString(),
+    };
+
     const { data: partnership, error: partnershipError } = await supabase
       .from('partnerships')
-      .insert({
-        partnership_type: partnershipType,
-        slug,
-        contact_name: deal.contact_name || deal.name,
-        contact_email: deal.contact_email,
-        phone: deal.contact_phone || null,
-        contract_phase: contractPhase,
-        contract_start: contractStart || new Date().toISOString().split('T')[0],
-        contract_end: contractEnd || null,
-        building_count: buildingCount,
-        observation_days_total: observationDays,
-        observation_days_completed: 0,
-        virtual_sessions_total: virtualSessions,
-        virtual_sessions_completed: 0,
-        executive_sessions_total: executiveSessions,
-        executive_sessions_completed: 0,
-        staff_enrolled: staffCount,
-        status: 'active',
-        org_name: deal.name,
-        partnership_goal: partnershipGoal || null,
-        sales_deal_id: dealId,
-        invite_sent_at: new Date().toISOString(),
-      })
+      .insert(partnershipInsert)
       .select()
       .single();
 
     if (partnershipError) {
       console.error('[deal-to-partnership] Error creating partnership:', partnershipError);
-      // If sales_deal_id column doesn't exist yet, try without it
-      if (partnershipError.message?.includes('sales_deal_id')) {
-        const { data: p2, error: p2Error } = await supabase
-          .from('partnerships')
-          .insert({
-            partnership_type: partnershipType,
-            slug,
-            contact_name: deal.contact_name || deal.name,
-            contact_email: deal.contact_email,
-            phone: deal.contact_phone || null,
-            contract_phase: contractPhase,
-            contract_start: contractStart || new Date().toISOString().split('T')[0],
-            contract_end: contractEnd || null,
-            building_count: buildingCount,
-            observation_days_total: observationDays,
-            observation_days_completed: 0,
-            virtual_sessions_total: virtualSessions,
-            virtual_sessions_completed: 0,
-            executive_sessions_total: executiveSessions,
-            executive_sessions_completed: 0,
-            staff_enrolled: staffCount,
-            status: 'active',
-            org_name: deal.name,
-            partnership_goal: partnershipGoal || null,
-            invite_sent_at: new Date().toISOString(),
-          })
-          .select()
-          .single();
-
-        if (p2Error) {
-          return NextResponse.json({ error: 'Failed to create partnership: ' + p2Error.message }, { status: 500 });
-        }
-        // Use fallback partnership
-        Object.assign(partnership || {}, p2);
-      } else {
-        return NextResponse.json({ error: 'Failed to create partnership: ' + partnershipError.message }, { status: 500 });
-      }
+      return NextResponse.json({ error: 'Failed to create partnership: ' + partnershipError.message }, { status: 500 });
     }
 
     const partnershipId = partnership?.id;
     if (!partnershipId) {
       return NextResponse.json({ error: 'Partnership created but ID missing' }, { status: 500 });
     }
+
+    // Also create the organization record so org_name appears in the admin view
+    await supabase.from('organizations').insert({
+      partnership_id: partnershipId,
+      name: deal.name,
+      org_type: partnershipType,
+      address_city: deal.city || null,
+      address_state: deal.state || null,
+      website: deal.website || null,
+    });
 
     console.log('[deal-to-partnership] Partnership created:', partnershipId, slug);
 
@@ -279,7 +257,7 @@ export async function POST(request: NextRequest) {
     ];
 
     const { error: itemsError } = await supabase
-      .from('partnership_action_items')
+      .from('action_items')
       .insert(actionItems);
 
     if (itemsError) {
