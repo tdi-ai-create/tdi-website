@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TDI Partnership Workflow -- Complete System Documentation</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif; color: #1e2749; background: #F8F9FA; line-height: 1.7; }
+  .page { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+  h2 { font-size: 22px; font-weight: 700; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
+  h3 { font-size: 16px; font-weight: 700; margin: 24px 0 8px; }
+  h4 { font-size: 14px; font-weight: 600; margin: 16px 0 6px; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { margin-bottom: 12px; font-size: 15px; }
+  ul, ol { margin: 8px 0 16px 24px; font-size: 15px; }
+  li { margin-bottom: 6px; }
+
+  .subtitle { color: #6B7280; font-size: 15px; margin-bottom: 32px; }
+  .updated { color: #9CA3AF; font-size: 12px; margin-bottom: 24px; }
+
+  .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 16px; border: 1px solid #E5E7EB; }
+  .card-navy { background: linear-gradient(135deg, #1e2749, #2d3a5c); color: white; border: none; }
+  .card-navy p { color: rgba(255,255,255,0.8); }
+  .card-amber { background: #FFFBEB; border-color: #FDE68A; }
+  .card-teal { background: #F0FDFA; border-color: #99F6E4; }
+  .card-red { background: #FEF2F2; border-color: #FECACA; }
+
+  .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .badge-navy { background: #1e2749; color: white; }
+  .badge-teal { background: #D1FAE5; color: #065F46; }
+  .badge-amber { background: #FEF3C7; color: #92400E; }
+  .badge-blue { background: #DBEAFE; color: #1E40AF; }
+  .badge-red { background: #FEE2E2; color: #991B1B; }
+  .badge-gray { background: #F3F4F6; color: #374151; }
+
+  .flow-step { display: flex; gap: 16px; margin-bottom: 20px; }
+  .flow-num { width: 32px; height: 32px; border-radius: 50%; background: #1e2749; color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+  .flow-content { flex: 1; }
+  .flow-content strong { color: #1e2749; }
+
+  .arrow { text-align: center; font-size: 24px; color: #D1D5DB; margin: 12px 0; }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 14px; }
+  th { text-align: left; padding: 10px 12px; background: #F9FAFB; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151; }
+  td { padding: 10px 12px; border-bottom: 1px solid #F3F4F6; }
+  tr:last-child td { border-bottom: none; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+  .toc { background: white; border-radius: 12px; padding: 20px 24px; margin-bottom: 32px; border: 1px solid #E5E7EB; }
+  .toc a { color: #2563EB; text-decoration: none; font-size: 14px; }
+  .toc a:hover { text-decoration: underline; }
+  .toc ul { list-style: none; margin: 0; padding: 0; }
+  .toc li { padding: 4px 0; }
+
+  code { background: #F3F4F6; padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'SF Mono', monospace; }
+  .url { font-size: 13px; color: #6B7280; word-break: break-all; }
+
+  .status-live { color: #059669; font-weight: 600; }
+  .status-pending { color: #D97706; font-weight: 600; }
+  .status-future { color: #6B7280; font-weight: 600; }
+
+  hr { border: none; border-top: 1px solid #E5E7EB; margin: 32px 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>TDI Partnership Workflow</h1>
+<p class="subtitle">Complete system documentation: Sales to Leadership to Operations to Hub</p>
+<p class="updated">Last updated: June 6, 2026 | Version 1.0</p>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+  <h4 style="margin-top:0">Contents</h4>
+  <ul>
+    <li><a href="#overview">1. System overview</a></li>
+    <li><a href="#deal-signed">2. Deal signed: the automation</a></li>
+    <li><a href="#phase0">3. Phase 0: Pre-launch onboarding</a></li>
+    <li><a href="#leadership">4. Leadership Dashboard (client-facing)</a></li>
+    <li><a href="#internal">5. Internal tab (TDI team only)</a></li>
+    <li><a href="#hub">6. Hub integration</a></li>
+    <li><a href="#cross-links">7. Cross-portal navigation</a></li>
+    <li><a href="#attention-flags">8. Partner attention flags</a></li>
+    <li><a href="#renewal">9. Renewal flow</a></li>
+    <li><a href="#database">10. Database tables</a></li>
+    <li><a href="#api">11. API endpoints</a></li>
+    <li><a href="#migrations">12. Required migrations</a></li>
+  </ul>
+</div>
+
+<!-- 1. OVERVIEW -->
+<h2 id="overview">1. System overview</h2>
+
+<div class="card card-navy">
+  <p style="font-size:17px; color:white; font-weight:600; margin-bottom:8px;">The lifecycle of a TDI partnership</p>
+  <p>Every school moves through one pipeline: Sales (close the deal) to Leadership (manage the partnership) to Hub (educator engagement). Operations sits behind Leadership as the internal documentation layer. The principal sees their Leadership Dashboard. Your team sees everything.</p>
+</div>
+
+<div class="flow-step">
+  <div class="flow-num">1</div>
+  <div class="flow-content"><strong>Sales</strong> -- Lead comes in, opportunity tracked, demos, proposal, contract signed</div>
+</div>
+<div class="arrow">&#8595;</div>
+<div class="flow-step">
+  <div class="flow-num">2</div>
+  <div class="flow-content"><strong>Deal signed (automation)</strong> -- One click creates partnership, dashboard, Hub access, onboarding items, welcome email</div>
+</div>
+<div class="arrow">&#8595;</div>
+<div class="flow-step">
+  <div class="flow-num">3</div>
+  <div class="flow-content"><strong>Phase 0: Pre-launch</strong> -- Roster collected, staff provisioned, login verified, kickoff scheduled</div>
+</div>
+<div class="arrow">&#8595;</div>
+<div class="flow-step">
+  <div class="flow-num">4</div>
+  <div class="flow-content"><strong>Phase 1-4: Active partnership</strong> -- Days 1-90 onboarding framework, ongoing Hub engagement, observation days, virtual sessions</div>
+</div>
+<div class="arrow">&#8595;</div>
+<div class="flow-step">
+  <div class="flow-num">5</div>
+  <div class="flow-content"><strong>Renewal</strong> -- AI summary, engagement data, ROI proof, Year 2 vision conversation</div>
+</div>
+
+<!-- 2. DEAL SIGNED -->
+<h2 id="deal-signed">2. Deal signed: the automation</h2>
+
+<p>When you mark a deal as <span class="badge badge-teal">Signed</span> or <span class="badge badge-teal">Paid</span> in the Sales pipeline, a "Create Partnership + Dashboard" button appears in the deal panel.</p>
+
+<h3>What the modal asks you to confirm</h3>
+<table>
+  <tr><th>Field</th><th>Pre-filled?</th><th>Default</th></tr>
+  <tr><td>School/district name</td><td>Yes (from deal)</td><td>--</td></tr>
+  <tr><td>Contact name + email</td><td>Yes (from deal)</td><td>--</td></tr>
+  <tr><td>Partnership type</td><td>No</td><td>School</td></tr>
+  <tr><td>Staff count (Hub memberships)</td><td>No</td><td>0</td></tr>
+  <tr><td>On-site observation days</td><td>No</td><td>2</td></tr>
+  <tr><td>Virtual sessions</td><td>No</td><td>4</td></tr>
+  <tr><td>Executive sessions</td><td>No</td><td>2</td></tr>
+  <tr><td>Contract start/end dates</td><td>No</td><td>Today / empty</td></tr>
+  <tr><td>Building count (districts)</td><td>No</td><td>1</td></tr>
+</table>
+
+<h3>What happens when you click "Create Partnership"</h3>
+<ol>
+  <li><strong>Partnership record created</strong> in Leadership with all contract details</li>
+  <li><strong>Organization record created</strong> with school name, city, state, website</li>
+  <li><strong>Dashboard generated</strong> at <code>/partners/[school-name-slug]</code></li>
+  <li><strong>9 onboarding action items created</strong> (5 partner-visible, 4 admin-only)</li>
+  <li><strong>Hub All-Access provisioned</strong> for the contact email</li>
+  <li><strong>Welcome email sent</strong> to the principal from Rae</li>
+  <li><strong>Sales deal linked</strong> to partnership via <code>sales_deal_id</code></li>
+  <li><strong>Activity logged</strong> with deal details</li>
+</ol>
+
+<p class="url">API: <code>POST /api/admin/deal-to-partnership</code></p>
+<p class="url">UI: Sales deal panel footer (PanelFooter.tsx)</p>
+
+<!-- 3. PHASE 0 -->
+<h2 id="phase0">3. Phase 0: Pre-launch onboarding</h2>
+
+<p>These action items are auto-created when the partnership is set up. The <span class="badge badge-navy">90 Days</span> tab on the admin partnership detail page tracks the activation readiness score.</p>
+
+<h4>Partner-visible items (principal sees these on their dashboard)</h4>
+<div class="card card-teal">
+<table>
+  <tr><th>Item</th><th>Priority</th></tr>
+  <tr><td>Upload staff roster</td><td><span class="badge badge-red">High</span></td></tr>
+  <tr><td>Upload roster photos</td><td><span class="badge badge-amber">Medium</span></td></tr>
+  <tr><td>Identify your staff champion</td><td><span class="badge badge-red">High</span></td></tr>
+  <tr><td>Schedule kickoff walkthrough (Calendly link)</td><td><span class="badge badge-red">High</span></td></tr>
+  <tr><td>Distribute Hub access to staff</td><td><span class="badge badge-amber">Medium</span></td></tr>
+</table>
+</div>
+
+<h4>Admin-only items (TDI team sees these, principal does not)</h4>
+<div class="card card-amber">
+<table>
+  <tr><th>Item</th><th>Priority</th></tr>
+  <tr><td>Provision staff Hub accounts from roster</td><td><span class="badge badge-red">High</span></td></tr>
+  <tr><td>Verify principal dashboard login</td><td><span class="badge badge-red">High</span></td></tr>
+  <tr><td>Prepare Day 1 Win insight</td><td><span class="badge badge-amber">Medium</span></td></tr>
+  <tr><td>Review Phase 0 gate (all green before kickoff)</td><td><span class="badge badge-red">High</span></td></tr>
+</table>
+</div>
+
+<div class="card card-red">
+  <strong>Phase 0 gate:</strong> No kickoff until all items above are green. The 90-day clock starts at contract signing, so Phase 0 runs against the clock.
+</div>
+
+<!-- 4. LEADERSHIP DASHBOARD -->
+<h2 id="leadership">4. Leadership Dashboard (client-facing)</h2>
+
+<p>Every partnership gets a client-facing dashboard at <code>/partners/[slug]</code>. This is what the principal sees.</p>
+
+<h3>What the principal sees (Overview tab)</h3>
+<ul>
+  <li><strong>AI Summary</strong> -- one paragraph describing their team's engagement</li>
+  <li><strong>4 gauge rings</strong> -- Hub Engagement %, Deliverables, Team Wellness, Phase</li>
+  <li><strong>Partnership Health bar</strong> -- Green/Amber/Red momentum status</li>
+  <li><strong>Quick Actions</strong> -- Open Hub, Schedule, Quiz, Tools</li>
+  <li><strong>Popular Tools + Educator Types</strong> -- what their team is using</li>
+  <li><strong>Teacher quote</strong> -- anonymous quote from their building</li>
+  <li><strong>Collapsible sections</strong> -- Hub Intelligence, Timeline, Data & Impact, Actions, Leadership Tools, Community & FAQ</li>
+</ul>
+
+<h3>Admin view (what you see at <code>/tdi-admin/leadership/[id]</code>)</h3>
+<p>Same partnership, but with admin tabs:</p>
+<table>
+  <tr><th>Tab</th><th>Purpose</th></tr>
+  <tr><td>Overview</td><td>Principal's dashboard view (preview what they see)</td></tr>
+  <tr><td>90 Days</td><td>Activation Readiness Score, onboarding checklist, staff engagement roster, login trends</td></tr>
+  <tr><td><strong>Internal</strong></td><td>TDI team notes, meeting logs, internal strategy (never visible to principal)</td></tr>
+  <tr><td>Our Partnership</td><td>Partnership goal, observations, surveys</td></tr>
+  <tr><td>Blueprint</td><td>Contract deliverables, schedule, what's included</td></tr>
+  <tr><td>Next Year</td><td>Renewal planning, Year 2 timeline</td></tr>
+  <tr><td>Team</td><td>TDI team contact info</td></tr>
+  <tr><td>Billing</td><td>Contract dates, phase, staff count</td></tr>
+</table>
+
+<!-- 5. INTERNAL TAB -->
+<h2 id="internal">5. Internal tab (TDI team only)</h2>
+
+<p>The Internal tab on the partnership detail page is where your team documents everything about the school. Nothing here is ever visible to the principal.</p>
+
+<h3>Notes</h3>
+<ul>
+  <li>Add notes with types: <span class="badge badge-gray">General</span> <span class="badge badge-blue">Strategy</span> <span class="badge badge-red">Concern</span> <span class="badge badge-teal">Win</span> <span class="badge badge-amber">Follow up</span></li>
+  <li>Timestamped and attributed to the author</li>
+  <li>Can be promoted to partner-visible with the <code>visible_to_partner</code> flag</li>
+</ul>
+
+<h3>Meetings</h3>
+<ul>
+  <li>Log meetings with: date, type, attendees, summary, action items</li>
+  <li>Meeting types: Check-in, Onboarding, Observation debrief, Renewal, Strategy, Escalation</li>
+  <li>Timestamped and attributed to who logged it</li>
+</ul>
+
+<p class="url">API: <code>GET/POST/PATCH/DELETE /api/tdi-admin/leadership/[id]/notes</code></p>
+<p class="url">API: <code>GET/POST/PATCH/DELETE /api/tdi-admin/leadership/[id]/meetings</code></p>
+
+<!-- 6. HUB INTEGRATION -->
+<h2 id="hub">6. Hub integration</h2>
+
+<p>The Hub is where educators spend their time. Hub data flows into the Leadership Dashboard automatically.</p>
+
+<h3>Data that flows from Hub to Leadership</h3>
+<table>
+  <tr><th>Metric</th><th>Source</th><th>Updates</th></tr>
+  <tr><td>Hub login %</td><td>hub_activity_log</td><td>Real-time</td></tr>
+  <tr><td>Tools explored</td><td>hub_activity_log (action: quick_win_viewed)</td><td>Real-time</td></tr>
+  <tr><td>Active users (7d)</td><td>hub_activity_log</td><td>Real-time</td></tr>
+  <tr><td>Team wellness score</td><td>hub_activity_log (action: wellbeing_check)</td><td>Real-time</td></tr>
+  <tr><td>Course completions</td><td>hub_enrollments</td><td>Real-time</td></tr>
+  <tr><td>PD hours earned</td><td>hub_enrollments + course durations</td><td>Real-time</td></tr>
+  <tr><td>Field Notes earned</td><td>hub_earned_recognitions</td><td>Real-time</td></tr>
+  <tr><td>Community posts</td><td>hub_community_posts</td><td>Real-time</td></tr>
+  <tr><td>Popular tools</td><td>hub_activity_log aggregation</td><td>Real-time</td></tr>
+  <tr><td>Educator types</td><td>hub_quiz_results</td><td>Real-time</td></tr>
+  <tr><td>Teacher quotes</td><td>quick_win_responses</td><td>Real-time</td></tr>
+</table>
+
+<h3>Hub matching</h3>
+<p>Schools are matched between Hub and Leadership using fuzzy name matching on <code>hub_profiles.school_name</code> vs <code>partnerships.org_name</code>. This happens in <code>/api/partnerships/[id]/hub-stats</code> and <code>/api/partnerships/[id]/hub-intelligence</code>.</p>
+
+<h3>Wellness trigger emails</h3>
+<p>A daily cron (<code>/api/cron/wellness-check</code>, 10 AM CT) scans for educators with 2+ negative vibe scores (<=2/5) in the last 7 days and sends a personal check-in email from Rae. Names are never shared with the principal. The dashboard shows "TDI reached out to X team members."</p>
+
+<!-- 7. CROSS-LINKS -->
+<h2 id="cross-links">7. Cross-portal navigation</h2>
+
+<div class="two-col">
+  <div class="card">
+    <h4 style="margin-top:0">From Leadership</h4>
+    <ul>
+      <li>"Sales" button on each partnership row -- jumps to Sales filtered by school name</li>
+      <li>"Dashboard" button -- opens the client-facing dashboard</li>
+      <li>"View" button -- opens admin detail page</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4 style="margin-top:0">From Sales</h4>
+    <ul>
+      <li>"Leadership" pill on deal panel -- jumps to Leadership filtered by school name</li>
+      <li>"Hub Data" pill on deal panel -- jumps to Hub admin filtered by school</li>
+      <li>"Create Partnership" button -- runs the deal-to-partnership automation</li>
+    </ul>
+  </div>
+</div>
+
+<p>Both Sales and Leadership pages read <code>?search=</code> URL parameters to pre-filter when arriving from cross-portal links.</p>
+
+<!-- 8. ATTENTION FLAGS -->
+<h2 id="attention-flags">8. Partner attention flags</h2>
+
+<p>Based on the First 90 Days framework (TEA-2130):</p>
+
+<table>
+  <tr><th>Signal</th><th>Threshold</th><th>When</th><th>Action</th></tr>
+  <tr><td>Principal not logged in</td><td>0 logins</td><td>Day 7</td><td>Direct call</td></tr>
+  <tr><td>Principal still not logged in</td><td>0 logins in 14 days</td><td>Day 21</td><td>Escalate</td></tr>
+  <tr><td>Staff below target</td><td>&lt; 50% logged in</td><td>Day 14</td><td>Re-engage via champion</td></tr>
+  <tr><td>Champion disengaged</td><td>0 logins in 7 days</td><td>After Day 7</td><td>Direct call to champion</td></tr>
+  <tr><td>30-Day Report not viewed</td><td>7 days after delivery</td><td>Day 37</td><td>Direct principal call</td></tr>
+  <tr><td>Active usage below floor</td><td>&lt; 40% staff active</td><td>Day 45+</td><td>Escalate with plan</td></tr>
+</table>
+
+<p><strong>Seasonal extensions:</strong> All principal-facing flag thresholds extend by 10 days during testing windows, winter break, first 2 weeks of school year, and spring break. Staff usage flags hold normal thresholds.</p>
+
+<!-- 9. RENEWAL -->
+<h2 id="renewal">9. Renewal flow</h2>
+
+<h3>Day 45: Plant the Year 2 vision</h3>
+<p>Not a renewal ask. A conversation about what growth looks like from here. Use the AI Summary + engagement data as talking points.</p>
+
+<h3>Day 80: Partnership continuation check-in</h3>
+<p>Confirm budget and discuss Year 2 priorities.</p>
+
+<h3>Day 90: Impact Report</h3>
+<p>Shareable with superintendent/board. Lead with one educator outcome, support with usage data. The Leadership Dashboard's AI Summary and gauge rings provide the data.</p>
+
+<h3>What you show in a renewal conversation</h3>
+<ul>
+  <li>The client-facing Leadership Dashboard (Example Dashboard for demos)</li>
+  <li>The Loom walkthrough video (scripted June 2026)</li>
+  <li>The Hub itself (live demo of what teachers use)</li>
+</ul>
+
+<!-- 10. DATABASE -->
+<h2 id="database">10. Database tables</h2>
+
+<h4>Creator Portal Supabase (partnerships, sales, team)</h4>
+<table>
+  <tr><th>Table</th><th>Purpose</th></tr>
+  <tr><td><code>partnerships</code></td><td>Core partnership records with contract details</td></tr>
+  <tr><td><code>organizations</code></td><td>School/district details (name, address, website)</td></tr>
+  <tr><td><code>buildings</code></td><td>Individual buildings within a district</td></tr>
+  <tr><td><code>staff_members</code></td><td>Staff roster per partnership</td></tr>
+  <tr><td><code>action_items</code></td><td>Onboarding + ongoing action items (visible_to_partner flag)</td></tr>
+  <tr><td><code>partnership_notes</code></td><td>Internal notes per partnership</td></tr>
+  <tr><td><code>partnership_meetings</code></td><td>Meeting logs per partnership</td></tr>
+  <tr><td><code>timeline_events</code></td><td>Done/In Progress/Coming Soon milestones</td></tr>
+  <tr><td><code>activity_log</code></td><td>Automated activity tracking</td></tr>
+  <tr><td><code>sales_opportunities</code></td><td>Sales pipeline deals</td></tr>
+  <tr><td><code>tdi_team_members</code></td><td>Admin portal team access</td></tr>
+</table>
+
+<h4>Hub Supabase (educator data)</h4>
+<table>
+  <tr><th>Table</th><th>Purpose</th></tr>
+  <tr><td><code>hub_profiles</code></td><td>Educator profiles with school_name for matching</td></tr>
+  <tr><td><code>hub_activity_log</code></td><td>All educator activity (logins, tool views, vibe checks)</td></tr>
+  <tr><td><code>hub_memberships</code></td><td>Tier and access level per educator</td></tr>
+  <tr><td><code>hub_enrollments</code></td><td>Course enrollments and completions</td></tr>
+  <tr><td><code>hub_earned_recognitions</code></td><td>Field Notes recognitions</td></tr>
+  <tr><td><code>hub_quiz_results</code></td><td>Educator type quiz results</td></tr>
+</table>
+
+<!-- 11. API ENDPOINTS -->
+<h2 id="api">11. API endpoints</h2>
+
+<h4>Deal to Partnership</h4>
+<table>
+  <tr><th>Endpoint</th><th>Method</th><th>Purpose</th></tr>
+  <tr><td><code>/api/admin/deal-to-partnership</code></td><td>POST</td><td>Create partnership from signed deal (the automation)</td></tr>
+</table>
+
+<h4>Partnership Management</h4>
+<table>
+  <tr><th>Endpoint</th><th>Method</th><th>Purpose</th></tr>
+  <tr><td><code>/api/admin/partnerships</code></td><td>GET/POST</td><td>List all / create partnership</td></tr>
+  <tr><td><code>/api/tdi-admin/leadership/[id]/action-items</code></td><td>GET/POST/PATCH/DELETE</td><td>Onboarding + action items</td></tr>
+  <tr><td><code>/api/tdi-admin/leadership/[id]/notes</code></td><td>GET/POST/PATCH/DELETE</td><td>Internal notes</td></tr>
+  <tr><td><code>/api/tdi-admin/leadership/[id]/meetings</code></td><td>GET/POST/PATCH/DELETE</td><td>Meeting logs</td></tr>
+</table>
+
+<h4>Hub Data for Leadership</h4>
+<table>
+  <tr><th>Endpoint</th><th>Method</th><th>Purpose</th></tr>
+  <tr><td><code>/api/partnerships/[id]/hub-stats</code></td><td>GET</td><td>Per-partnership Hub engagement data</td></tr>
+  <tr><td><code>/api/partnerships/[id]/hub-intelligence</code></td><td>GET</td><td>Popular tools, educator types, community, quotes</td></tr>
+  <tr><td><code>/api/partnerships/[id]/ai-insight</code></td><td>GET</td><td>AI-generated partnership summary</td></tr>
+</table>
+
+<h4>Client-Facing Dashboard</h4>
+<table>
+  <tr><th>Endpoint</th><th>Method</th><th>Purpose</th></tr>
+  <tr><td><code>/api/partners/dashboard/[partnershipId]</code></td><td>GET</td><td>All dashboard data (filtered by visible_to_partner)</td></tr>
+  <tr><td><code>/api/partners/action-items</code></td><td>PATCH</td><td>Principal updates action item status</td></tr>
+</table>
+
+<h4>Cross-Portal</h4>
+<table>
+  <tr><th>Endpoint</th><th>Method</th><th>Purpose</th></tr>
+  <tr><td><code>/api/tdi-admin/hub-connections?section=leadership</code></td><td>GET</td><td>Hub data aggregated for leadership view</td></tr>
+  <tr><td><code>/api/tdi-admin/hub-connections?section=sales</code></td><td>GET</td><td>Warm leads from Hub for sales</td></tr>
+  <tr><td><code>/api/tdi-admin/hub-connections?section=operations</code></td><td>GET</td><td>Hub fulfillment per district</td></tr>
+</table>
+
+<!-- 12. MIGRATIONS -->
+<h2 id="migrations">12. Required migrations</h2>
+
+<p>These must be run in the Creator Portal Supabase SQL Editor:</p>
+
+<div class="card card-amber">
+  <h4 style="margin-top:0">Migration 083: Action items + partnerships columns</h4>
+  <p>Adds <code>visible_to_partner</code>, <code>cta_label</code>, <code>cta_url</code>, <code>completed_by</code>, <code>resurface_at</code> to <code>action_items</code>. Adds <code>sales_deal_id</code> to <code>partnerships</code>.</p>
+  <p><span class="badge badge-teal">RUN</span> if not already applied</p>
+</div>
+
+<div class="card card-amber">
+  <h4 style="margin-top:0">Migration 084: Partnership notes + meetings</h4>
+  <p>Creates <code>partnership_notes</code> and <code>partnership_meetings</code> tables with RLS policies.</p>
+  <p><span class="badge badge-teal">RUN</span> if not already applied</p>
+</div>
+
+<hr>
+
+<p style="color: #9CA3AF; font-size: 13px; text-align: center;">
+  TDI Partnership Workflow Documentation v1.0 | Generated June 6, 2026
+  <br>For internal TDI team use. Do not share with partners.
+</p>
+
+</div>
+</body>
+</html>
