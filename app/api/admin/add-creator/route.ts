@@ -116,18 +116,19 @@ export async function POST(request: Request) {
     }
 
     // 5. Send "Application Accepted" welcome email to creator
+    let emailSent = false;
     const resendApiKey = process.env.RESEND_API_KEY;
     if (resendApiKey) {
       const firstName = name.split(' ')[0];
       try {
-        await fetch('https://api.resend.com/emails', {
+        const emailResponse = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${resendApiKey}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
+            from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
             to: [email.toLowerCase()],
             cc: ['creatorstudio@teachersdeserveit.com'],
             subject: `You've Been Selected as a TDI Creator!`,
@@ -194,9 +195,17 @@ export async function POST(request: Request) {
             `,
           }),
         });
-        console.log('[add-creator] Welcome email sent to:', email);
+        if (!emailResponse.ok) {
+          const emailErr = await emailResponse.text();
+          console.error('[add-creator] Welcome email failed:', emailResponse.status, emailErr);
+          emailSent = false;
+        } else {
+          console.log('[add-creator] Welcome email sent to:', email);
+          emailSent = true;
+        }
       } catch (emailError) {
         console.error('[add-creator] Welcome email error (non-fatal):', emailError);
+        emailSent = false;
       }
     }
 
@@ -211,6 +220,7 @@ export async function POST(request: Request) {
       },
       milestonesCreated: milestoneRecords.length,
       noteCreated: !!createdNote,
+      welcomeEmailSent: emailSent,
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
