@@ -64,6 +64,33 @@ function PanelContent({ data, onClose }: { data: any; onClose: () => void }) {
   const [editingPaths, setEditingPaths] = useState(false)
   const [savingPaths, setSavingPaths] = useState(false)
 
+  // Playbook state
+  const [playbook, setPlaybook] = useState<any>(null)
+  const [playbookLoading, setPlaybookLoading] = useState(false)
+  const [completingStep, setCompletingStep] = useState<string | null>(null)
+  const [stepNote, setStepNote] = useState('')
+
+  const loadPlaybook = () => {
+    if (playbookLoading) return
+    setPlaybookLoading(true)
+    fetch(`/api/funding/pursuits/${p.id}/playbook`)
+      .then(r => r.json())
+      .then(d => { setPlaybook(d); setPlaybookLoading(false) })
+      .catch(() => setPlaybookLoading(false))
+  }
+
+  const completeStep = async (stepId: string, note?: string) => {
+    setCompletingStep(stepId)
+    try {
+      await fetch(`/api/funding/pursuits/${p.id}/playbook`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stepId, action: 'complete', note }),
+      })
+      loadPlaybook()
+    } catch {} finally { setCompletingStep(null); setStepNote('') }
+  }
+
   const planColors: Record<string, string> = { A: '#0F766E', B: '#1B365D', C: '#7C3AED', D: '#B45309' }
   const statusOptions = ['not_started', 'researching', 'pursuing', 'submitted', 'awarded', 'denied', 'on_hold']
 
@@ -189,6 +216,93 @@ function PanelContent({ data, onClose }: { data: any; onClose: () => void }) {
             </div>
           </Section>
         )}
+
+        {/* Playbook - Interactive Guided Workflow */}
+        <Section title={<span>Funding Playbook <button onClick={loadPlaybook} style={{ fontSize: 10, color: '#6B7280', marginLeft: 8, cursor: 'pointer', background: 'none', border: 'none', textDecoration: 'underline' }}>{playbook ? 'refresh' : 'load steps'}</button></span>}>
+          {!playbook && !playbookLoading && (
+            <button onClick={loadPlaybook} style={{ width: '100%', padding: '12px 16px', borderRadius: 8, border: '1px solid #E5E7EB', background: 'white', fontSize: 13, color: '#6B7280', cursor: 'pointer' }}>
+              Load guided workflow steps
+            </button>
+          )}
+          {playbookLoading && <p style={{ color: '#9CA3AF', fontSize: 13, textAlign: 'center', padding: 12 }}>Loading...</p>}
+          {playbook && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {/* Progress bar */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <div style={{ flex: 1, height: 6, background: '#F3F4F6', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${playbook.progress.pct}%`, background: '#8B5CF6', borderRadius: 3, transition: 'width 0.3s' }} />
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#8B5CF6' }}>{playbook.progress.pct}%</span>
+              </div>
+
+              {/* Next step callout */}
+              {playbook.nextStep && (
+                <div style={{ padding: '10px 14px', background: '#F5F3FF', borderRadius: 8, border: '1px solid #DDD6FE', marginBottom: 8 }}>
+                  <p style={{ fontSize: 10, fontWeight: 700, color: '#7C3AED', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Next step</p>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#1e2749', marginBottom: 2 }}>{playbook.nextStep.title}</p>
+                  <p style={{ fontSize: 11, color: '#6B7280' }}>{playbook.nextStep.description}</p>
+                  {playbook.nextStep.dueDate && (
+                    <p style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>Due: {new Date(playbook.nextStep.dueDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Phase list */}
+              {playbook.phases.map((phase: any) => (
+                <details key={phase.phase} style={{ borderRadius: 8, border: '1px solid #E5E7EB', overflow: 'hidden' }}>
+                  <summary style={{ padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: '#374151', background: '#F9FAFB', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>{phase.phase}</span>
+                    <span style={{ fontSize: 10, color: '#9CA3AF' }}>
+                      {phase.steps.filter((s: any) => s.completed).length}/{phase.steps.length}
+                    </span>
+                  </summary>
+                  <div style={{ padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {phase.steps.map((step: any) => (
+                      <div key={step.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '6px 0', borderBottom: '1px solid #F3F4F6' }}>
+                        <button
+                          onClick={() => !step.completed && completeStep(step.id)}
+                          disabled={step.completed || completingStep === step.id}
+                          style={{
+                            width: 18, height: 18, borderRadius: 4, flexShrink: 0, marginTop: 1,
+                            border: step.completed ? 'none' : '2px solid #D1D5DB',
+                            background: step.completed ? '#8B5CF6' : 'white',
+                            color: 'white', fontSize: 10, cursor: step.completed ? 'default' : 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}
+                        >
+                          {step.completed ? '✓' : completingStep === step.id ? '...' : ''}
+                        </button>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontSize: 12, fontWeight: 500, color: step.completed ? '#9CA3AF' : step.isOverdue ? '#DC2626' : '#1e2749', textDecoration: step.completed ? 'line-through' : 'none' }}>
+                            {step.title}
+                          </p>
+                          <p style={{ fontSize: 10, color: '#9CA3AF', marginTop: 1 }}>
+                            {step.estimatedMinutes} min
+                            {step.dueDate && <> · due {new Date(step.dueDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</>}
+                            {step.isOverdue && <span style={{ color: '#DC2626', fontWeight: 600 }}> · overdue</span>}
+                          </p>
+                          {step.canDelegate && !step.completed && (
+                            <button
+                              onClick={() => {
+                                if (step.delegatePrompt) {
+                                  navigator.clipboard.writeText(step.delegatePrompt)
+                                  alert('Delegation prompt copied to clipboard. Paste it into Paperclip to assign to an AI agent.')
+                                }
+                              }}
+                              style={{ fontSize: 10, color: '#7C3AED', background: 'none', border: 'none', cursor: 'pointer', marginTop: 2, textDecoration: 'underline' }}
+                            >
+                              Copy prompt for Paperclip
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              ))}
+            </div>
+          )}
+        </Section>
 
         {/* Owners */}
         <Section title="Owners">
