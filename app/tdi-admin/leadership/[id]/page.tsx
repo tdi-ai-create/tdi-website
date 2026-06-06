@@ -35,6 +35,7 @@ import ObservationImpactScorecard from '@/components/dashboard/leadership/Observ
 const ADMIN_TABS = [
   { key: 'overview', label: 'Overview' },
   { key: '90-days', label: '90 Days' },
+  { key: 'internal', label: 'Internal' },
   { key: 'our-partnership', label: 'Our Partnership' },
   { key: 'blueprint', label: 'Blueprint' },
   { key: 'next-year', label: 'Next Year' },
@@ -146,6 +147,29 @@ export default function AdminPartnershipDetailPage() {
   })
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null)
+
+  // Internal tab state (notes + meetings)
+  const [internalNotes, setInternalNotes] = useState<{ id: string; content: string; author: string; note_type: string; visible_to_partner: boolean; created_at: string }[]>([])
+  const [internalMeetings, setInternalMeetings] = useState<{ id: string; meeting_date: string; meeting_type: string; attendees: string | null; summary: string | null; action_items: string | null; logged_by: string; created_at: string }[]>([])
+  const [newNoteContent, setNewNoteContent] = useState('')
+  const [newNoteType, setNewNoteType] = useState('general')
+  const [addingNote, setAddingNote] = useState(false)
+  const [showMeetingForm, setShowMeetingForm] = useState(false)
+  const [newMeeting, setNewMeeting] = useState({ date: '', type: 'check_in', attendees: '', summary: '', actionItems: '' })
+  const [addingMeeting, setAddingMeeting] = useState(false)
+
+  // Load internal notes/meetings when tab is active
+  useEffect(() => {
+    if (activeTab !== 'internal' || !partnershipId) return
+    fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`)
+      .then(r => r.json())
+      .then(d => { if (d.notes) setInternalNotes(d.notes) })
+      .catch(() => {})
+    fetch(`/api/tdi-admin/leadership/${partnershipId}/meetings`)
+      .then(r => r.json())
+      .then(d => { if (d.meetings) setInternalMeetings(d.meetings) })
+      .catch(() => {})
+  }, [activeTab, partnershipId])
 
   // Inline editing state for partnership goal
   const [editingField, setEditingField] = useState<string | null>(null)
@@ -1555,6 +1579,231 @@ export default function AdminPartnershipDetailPage() {
 
             {/* Row 4: Observation Impact Scorecard */}
             <ObservationImpactScorecard observations={observationImpact.observations} />
+          </>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════
+            INTERNAL TAB -- Notes, Meetings, Internal Strategy (TDI team only)
+            ═══════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'internal' && (
+          <>
+            <div className="mb-4 p-4 rounded-xl border border-amber-200 bg-amber-50">
+              <div className="flex items-start gap-2">
+                <span className="text-amber-500 text-lg flex-shrink-0">&#9671;</span>
+                <div>
+                  <p className="text-sm font-semibold text-amber-800 mb-1">Internal only</p>
+                  <p className="text-sm text-amber-700">This tab is visible to the TDI team only. Nothing here shows on the principal's dashboard.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Add Note Form */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
+              <h3 className="text-sm font-bold text-gray-900 mb-3">Add a note</h3>
+              <textarea
+                value={newNoteContent}
+                onChange={(e) => setNewNoteContent(e.target.value)}
+                placeholder="Log a note about this partnership..."
+                rows={3}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"
+              />
+              <div className="flex items-center gap-3 mt-3">
+                <select
+                  value={newNoteType}
+                  onChange={(e) => setNewNoteType(e.target.value)}
+                  className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                >
+                  <option value="general">General</option>
+                  <option value="strategy">Strategy</option>
+                  <option value="concern">Concern</option>
+                  <option value="win">Win</option>
+                  <option value="follow_up">Follow up</option>
+                </select>
+                <button
+                  onClick={async () => {
+                    if (!newNoteContent.trim()) return
+                    setAddingNote(true)
+                    try {
+                      const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ content: newNoteContent, noteType: newNoteType }),
+                      })
+                      const data = await res.json()
+                      if (data.success && data.note) {
+                        setInternalNotes(prev => [data.note, ...prev])
+                        setNewNoteContent('')
+                      }
+                    } catch {} finally { setAddingNote(false) }
+                  }}
+                  disabled={!newNoteContent.trim() || addingNote}
+                  className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50"
+                  style={{ background: '#1e2749' }}
+                >
+                  {addingNote ? 'Saving...' : 'Save note'}
+                </button>
+              </div>
+            </div>
+
+            {/* Notes List */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
+              <h3 className="text-sm font-bold text-gray-900 mb-3">Notes ({internalNotes.length})</h3>
+              {internalNotes.length === 0 ? (
+                <p className="text-sm text-gray-500">No notes yet. Add your first note above.</p>
+              ) : (
+                <div className="space-y-3">
+                  {internalNotes.map((note) => {
+                    const typeColors: Record<string, string> = {
+                      general: 'bg-gray-100 text-gray-700',
+                      strategy: 'bg-blue-100 text-blue-700',
+                      concern: 'bg-red-100 text-red-700',
+                      win: 'bg-green-100 text-green-700',
+                      follow_up: 'bg-amber-100 text-amber-700',
+                    }
+                    return (
+                      <div key={note.id} className="border border-gray-100 rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${typeColors[note.note_type] || typeColors.general}`}>
+                            {note.note_type}
+                          </span>
+                          <span className="text-[10px] text-gray-400">{note.author}</span>
+                          <span className="text-[10px] text-gray-400">
+                            {new Date(note.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                          </span>
+                          {note.visible_to_partner && (
+                            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-teal-100 text-teal-700">shared with partner</span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{note.content}</p>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Meetings */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-bold text-gray-900">Meetings ({internalMeetings.length})</h3>
+                <button
+                  onClick={() => setShowMeetingForm(!showMeetingForm)}
+                  className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
+                  style={{ background: '#1e274910', color: '#1e2749' }}
+                >
+                  {showMeetingForm ? 'Cancel' : '+ Log meeting'}
+                </button>
+              </div>
+
+              {showMeetingForm && (
+                <div className="border border-gray-200 rounded-lg p-4 mb-4 space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-gray-500 font-medium">Date</label>
+                      <input type="datetime-local" value={newMeeting.date} onChange={e => setNewMeeting(m => ({ ...m, date: e.target.value }))}
+                        className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500 font-medium">Type</label>
+                      <select value={newMeeting.type} onChange={e => setNewMeeting(m => ({ ...m, type: e.target.value }))}
+                        className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <option value="check_in">Check-in</option>
+                        <option value="onboarding">Onboarding</option>
+                        <option value="observation_debrief">Observation debrief</option>
+                        <option value="renewal">Renewal conversation</option>
+                        <option value="strategy">Strategy session</option>
+                        <option value="escalation">Escalation</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 font-medium">Attendees</label>
+                    <input type="text" value={newMeeting.attendees} onChange={e => setNewMeeting(m => ({ ...m, attendees: e.target.value }))}
+                      placeholder="Names of attendees"
+                      className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 font-medium">Summary</label>
+                    <textarea value={newMeeting.summary} onChange={e => setNewMeeting(m => ({ ...m, summary: e.target.value }))}
+                      placeholder="What was discussed?"
+                      rows={3}
+                      className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 font-medium">Action items</label>
+                    <textarea value={newMeeting.actionItems} onChange={e => setNewMeeting(m => ({ ...m, actionItems: e.target.value }))}
+                      placeholder="What needs to happen next?"
+                      rows={2}
+                      className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none" />
+                  </div>
+                  <button
+                    onClick={async () => {
+                      if (!newMeeting.date) return
+                      setAddingMeeting(true)
+                      try {
+                        const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/meetings`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            meetingDate: newMeeting.date,
+                            meetingType: newMeeting.type,
+                            attendees: newMeeting.attendees || null,
+                            summary: newMeeting.summary || null,
+                            actionItems: newMeeting.actionItems || null,
+                          }),
+                        })
+                        const data = await res.json()
+                        if (data.success && data.meeting) {
+                          setInternalMeetings(prev => [data.meeting, ...prev])
+                          setNewMeeting({ date: '', type: 'check_in', attendees: '', summary: '', actionItems: '' })
+                          setShowMeetingForm(false)
+                        }
+                      } catch {} finally { setAddingMeeting(false) }
+                    }}
+                    disabled={!newMeeting.date || addingMeeting}
+                    className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50"
+                    style={{ background: '#1e2749' }}
+                  >
+                    {addingMeeting ? 'Saving...' : 'Log meeting'}
+                  </button>
+                </div>
+              )}
+
+              {internalMeetings.length === 0 && !showMeetingForm ? (
+                <p className="text-sm text-gray-500">No meetings logged yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {internalMeetings.map((m) => {
+                    const typeLabels: Record<string, string> = {
+                      check_in: 'Check-in', onboarding: 'Onboarding', observation_debrief: 'Observation debrief',
+                      renewal: 'Renewal', strategy: 'Strategy', escalation: 'Escalation', other: 'Other',
+                    }
+                    return (
+                      <div key={m.id} className="border border-gray-100 rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
+                            {typeLabels[m.meeting_type] || m.meeting_type}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {new Date(m.meeting_date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                          </span>
+                          <span className="text-[10px] text-gray-400">logged by {m.logged_by}</span>
+                        </div>
+                        {m.attendees && <p className="text-xs text-gray-500 mb-1">Attendees: {m.attendees}</p>}
+                        {m.summary && <p className="text-sm text-gray-700 mb-1">{m.summary}</p>}
+                        {m.action_items && (
+                          <div className="mt-2 pt-2 border-t border-gray-100">
+                            <p className="text-xs font-medium text-gray-500 mb-1">Action items:</p>
+                            <p className="text-sm text-gray-700 whitespace-pre-wrap">{m.action_items}</p>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
           </>
         )}
 
