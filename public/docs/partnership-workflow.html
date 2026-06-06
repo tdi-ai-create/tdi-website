@@ -58,7 +58,7 @@
 
 <h1>TDI Partnership Workflow</h1>
 <p class="subtitle">Complete system documentation: Sales to Leadership to Operations to Hub to Funding</p>
-<p class="updated">Last updated: June 6, 2026 | Version 2.0</p>
+<p class="updated">Last updated: June 6, 2026 | Version 3.0</p>
 
 <div class="toc">
   <h4 style="margin-top:0">Contents</h4>
@@ -78,8 +78,11 @@
     <li><a href="#renewal">13. Renewal flow</a></li>
     <li><a href="#database">14. Database tables</a></li>
     <li><a href="#api">15. API endpoints</a></li>
-    <li><a href="#crons">16. Scheduled jobs (crons)</a></li>
-    <li><a href="#migrations">17. Required migrations</a></li>
+    <li><a href="#automation">16. Automation and AI</a></li>
+    <li><a href="#notifications">17. Notification system</a></li>
+    <li><a href="#guidance">18. Tooltips and guidance</a></li>
+    <li><a href="#crons">19. Scheduled jobs (crons)</a></li>
+    <li><a href="#migrations">20. Required migrations</a></li>
   </ul>
 </div>
 
@@ -379,6 +382,7 @@
   <tr><td><code>GET/POST/PATCH/DELETE /api/tdi-admin/leadership/[id]/meetings</code></td><td>Meeting logs</td></tr>
   <tr><td><code>GET/POST/PATCH /api/tdi-admin/leadership/[id]/kpis</code></td><td>KPI goal setting</td></tr>
   <tr><td><code>GET /api/tdi-admin/leadership/[id]/reports?type=</code></td><td>Export reports</td></tr>
+  <tr><td><code>GET /api/tdi-admin/leadership/[id]/briefing</code></td><td>Prepare for Call briefing</td></tr>
 </table>
 <h4>Partner-Facing</h4>
 <table>
@@ -406,17 +410,68 @@
 </table>
 
 <!-- 16 -->
-<h2 id="crons">16. Scheduled jobs (crons)</h2>
+<h2 id="automation">16. Automation and AI</h2>
+<p>The system runs on autopilot where possible. Here is what happens without anyone clicking anything:</p>
 <table>
-  <tr><th>Job</th><th>Schedule</th><th>What it does</th></tr>
-  <tr><td><code>/api/cron/partner-attention-flags</code></td><td>Daily 8 AM CT</td><td>Checks partnerships for onboarding risks, creates internal concern notes</td></tr>
-  <tr><td><code>/api/cron/wellness-check</code></td><td>Daily 10 AM CT</td><td>Scans for educators with negative vibe streaks, sends personal check-in</td></tr>
-  <tr><td><code>/api/cron/creator-reminders</code></td><td>Daily 9 AM</td><td>Creator milestone reminders</td></tr>
-  <tr><td><code>/api/cron/daily-alerts</code></td><td>Daily 1 PM</td><td>Admin alerts digest</td></tr>
+  <tr><th>What</th><th>When</th><th>How it works</th></tr>
+  <tr><td><strong>KPI values auto-update</strong></td><td>Daily</td><td>Cron pulls Hub engagement, course completions, field notes, PD hours and writes to partnership_kpis.current_value. KPIs at less than 50% of target flagged as at_risk.</td></tr>
+  <tr><td><strong>Attention flags</strong></td><td>Daily</td><td>Checks Day 7/14/21/45 thresholds for all partnerships in first 90 days. Creates internal concern notes + sends admin email.</td></tr>
+  <tr><td><strong>Wellness outreach</strong></td><td>Daily</td><td>Scans for educators with 2+ negative vibe scores in 7 days. Sends personal email from Rae. Names never shared with principal.</td></tr>
+  <tr><td><strong>Weekly digest</strong></td><td>Monday AM</td><td>Single email to Rae: all partnerships with health status, Hub %, flags, pending items. Color-coded summary.</td></tr>
+  <tr><td><strong>Monthly principal email</strong></td><td>First Monday</td><td>AI-written in Rae's voice (Claude API with fallback). Personalized with real Hub data. Links to their dashboard.</td></tr>
+  <tr><td><strong>Onboarding item auto-complete</strong></td><td>On action</td><td>When principal uploads roster, identifies champion, or distributes Hub access, the corresponding action item auto-completes with timestamp.</td></tr>
+</table>
+
+<h3>AI-powered features</h3>
+<table>
+  <tr><th>Feature</th><th>Where</th><th>What it does</th></tr>
+  <tr><td>Partnership AI Summary</td><td>Client dashboard (top)</td><td>Real-time paragraph summarizing engagement, written dynamically from Hub data</td></tr>
+  <tr><td>AI Partnership Insight</td><td>Admin detail page</td><td>Claude-generated 2-3 sentence insight per partnership</td></tr>
+  <tr><td>Monthly principal email</td><td>Email (automated)</td><td>Claude writes the email in Rae's voice with real data. Falls back to template.</td></tr>
+  <tr><td>Prepare for Call</td><td>Internal tab</td><td>Auto-generates talking points from KPI data, flags, and partnership stage</td></tr>
 </table>
 
 <!-- 17 -->
-<h2 id="migrations">17. Required migrations</h2>
+<h2 id="notifications">17. Notification system</h2>
+<p>Admin notifications via <code>POST /api/admin/notify</code>. Sends to Rae when partnership events occur.</p>
+<table>
+  <tr><th>Event</th><th>Urgency</th><th>Trigger</th></tr>
+  <tr><td>Roster uploaded</td><td><span class="badge badge-amber">Action</span></td><td>Principal uploads staff list</td></tr>
+  <tr><td>Attention flag</td><td><span class="badge badge-amber">Action</span> or <span class="badge badge-red">Urgent</span></td><td>Daily cron detects threshold breach</td></tr>
+  <tr><td>KPI at risk</td><td><span class="badge badge-amber">Action</span></td><td>Daily KPI cron detects below 50% of target</td></tr>
+  <tr><td>Champion identified</td><td><span class="badge badge-gray">Info</span></td><td>Principal submits champion form</td></tr>
+  <tr><td>Partnership created</td><td><span class="badge badge-gray">Info</span></td><td>Deal-to-partnership automation runs</td></tr>
+  <tr><td>Grant path awarded</td><td><span class="badge badge-teal">Info</span></td><td>Funding path status changed to awarded</td></tr>
+</table>
+
+<!-- 18 -->
+<h2 id="guidance">18. Tooltips and guidance</h2>
+<p>Reusable guidance components in <code>components/tdi-admin/ui/Guidance.tsx</code>:</p>
+<table>
+  <tr><th>Component</th><th>Purpose</th><th>Example</th></tr>
+  <tr><td><code>Tooltip</code></td><td>Hover/tap contextual help</td><td>Wrap any element with explanatory text</td></tr>
+  <tr><td><code>InfoDot</code></td><td>Small ? icon with tooltip</td><td>"Hub-connected KPIs update automatically every day"</td></tr>
+  <tr><td><code>ConnectionBadge</code></td><td>Shows data flow between systems</td><td>"Sales -> Leadership" with explanation</td></tr>
+  <tr><td><code>FirstTimeHint</code></td><td>Dismissable suggestion (persists)</td><td>"Welcome to the Internal tab. Here's what each section does..."</td></tr>
+  <tr><td><code>ConfirmAction</code></td><td>Wraps buttons with confirmation modal</td><td>"This will provision Hub accounts for 45 staff. Continue?"</td></tr>
+</table>
+<p>All guidance text is centralized in the <code>GUIDANCE</code> constant, organized by section (Sales, Leadership, Dashboard, Funding, Hub). Update text in one place, reflects everywhere.</p>
+
+<!-- 19 -->
+<h2 id="crons">19. Scheduled jobs (crons)</h2>
+<table>
+  <tr><th>Job</th><th>Schedule</th><th>What it does</th></tr>
+  <tr><td><code>/api/cron/update-kpis</code></td><td>Daily 6 AM CT</td><td>Auto-calculates KPI current values from Hub data. Flags at-risk KPIs.</td></tr>
+  <tr><td><code>/api/cron/partner-attention-flags</code></td><td>Daily 8 AM CT</td><td>Checks partnerships for onboarding risks. Creates concern notes + sends admin email.</td></tr>
+  <tr><td><code>/api/cron/creator-reminders</code></td><td>Daily 9 AM</td><td>Creator milestone reminders</td></tr>
+  <tr><td><code>/api/cron/wellness-check</code></td><td>Daily 10 AM CT</td><td>Educator wellness outreach for negative vibe streaks</td></tr>
+  <tr><td><code>/api/cron/daily-alerts</code></td><td>Daily 1 PM</td><td>Admin alerts digest</td></tr>
+  <tr><td><code>/api/cron/weekly-digest</code></td><td>Monday 7 AM CT</td><td>Rae's weekly partnership summary email</td></tr>
+  <tr><td><code>/api/cron/monthly-principal-email</code></td><td>1st Monday</td><td>AI-written engagement email to each principal</td></tr>
+</table>
+
+<!-- 20 -->
+<h2 id="migrations">20. Required migrations</h2>
 <div class="card card-amber">
   <h4 style="margin-top:0">Migration 083</h4>
   <p>Adds to <code>action_items</code>: visible_to_partner, cta_label, cta_url, completed_by, resurface_at. Adds <code>sales_deal_id</code> to partnerships.</p>
@@ -436,7 +491,7 @@
 
 <hr>
 <p style="color: #9CA3AF; font-size: 13px; text-align: center;">
-  TDI Partnership Workflow v2.0 | Generated June 6, 2026<br>
+  TDI Partnership Workflow v3.0 | Generated June 6, 2026<br>
   For internal TDI team use. Do not share with partners.
 </p>
 
