@@ -158,7 +158,16 @@ export default function AdminPartnershipDetailPage() {
   const [newMeeting, setNewMeeting] = useState({ date: '', type: 'check_in', attendees: '', summary: '', actionItems: '' })
   const [addingMeeting, setAddingMeeting] = useState(false)
 
-  // Load internal notes/meetings when tab is active
+  // KPI state
+  const [kpiMenu, setKpiMenu] = useState<{ key: string; label: string; unit: string; benchmarkLow: number; benchmarkHigh: number; benchmarkLabel: string; dataSource: string; howTdiDelivers: string; suggestedTarget: number; category: string }[]>([])
+  const [activeKpis, setActiveKpis] = useState<{ id: string; kpi_key: string; kpi_label: string; target_value: number; target_unit: string; current_value: number; benchmark_label: string; how_tdi_delivers: string; status: string }[]>([])
+  const [selectedKpiKeys, setSelectedKpiKeys] = useState<Set<string>>(new Set())
+  const [kpiTargets, setKpiTargets] = useState<Record<string, number>>({})
+  const [savingKpis, setSavingKpis] = useState(false)
+  const [provisioningRoster, setProvisioningRoster] = useState(false)
+  const [provisionResult, setProvisionResult] = useState('')
+
+  // Load internal notes/meetings/kpis when tab is active
   useEffect(() => {
     if (activeTab !== 'internal' || !partnershipId) return
     fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`)
@@ -168,6 +177,19 @@ export default function AdminPartnershipDetailPage() {
     fetch(`/api/tdi-admin/leadership/${partnershipId}/meetings`)
       .then(r => r.json())
       .then(d => { if (d.meetings) setInternalMeetings(d.meetings) })
+      .catch(() => {})
+    fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.menu) setKpiMenu(d.menu)
+        if (d.kpis) {
+          setActiveKpis(d.kpis)
+          setSelectedKpiKeys(new Set(d.kpis.map((k: { kpi_key: string }) => k.kpi_key)))
+          const targets: Record<string, number> = {}
+          d.kpis.forEach((k: { kpi_key: string; target_value: number }) => { targets[k.kpi_key] = k.target_value })
+          setKpiTargets(targets)
+        }
+      })
       .catch(() => {})
   }, [activeTab, partnershipId])
 
@@ -1595,6 +1617,152 @@ export default function AdminPartnershipDetailPage() {
                   <p className="text-sm text-amber-700">This tab is visible to the TDI team only. Nothing here shows on the principal's dashboard.</p>
                 </div>
               </div>
+            </div>
+
+            {/* KPI Goal Setting */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900">Partnership KPIs</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">Pick 3-5 implementation-focused KPIs. Each maps to your contract deliverables.</p>
+                </div>
+                {activeKpis.length > 0 && (
+                  <span className="text-xs font-medium px-2 py-1 rounded-full bg-teal-100 text-teal-700">{activeKpis.length} active</span>
+                )}
+              </div>
+
+              {/* Active KPIs display */}
+              {activeKpis.length > 0 && (
+                <div className="space-y-2 mb-4">
+                  {activeKpis.map(kpi => (
+                    <div key={kpi.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900">{kpi.kpi_label}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">{kpi.benchmark_label}</p>
+                      </div>
+                      <div className="text-right flex-shrink-0 ml-4">
+                        <p className="text-lg font-bold text-[#1e2749]">{kpi.target_value}{kpi.target_unit}</p>
+                        <p className="text-[10px] text-gray-400">target</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* KPI selector */}
+              {kpiMenu.length > 0 && (
+                <details className="group">
+                  <summary className="text-xs font-medium text-blue-600 cursor-pointer hover:underline">
+                    {activeKpis.length > 0 ? 'Change KPIs' : 'Select KPIs'}
+                  </summary>
+                  <div className="mt-3 space-y-2">
+                    {['implementation', 'wellness', 'baseline'].map(category => {
+                      const categoryKpis = kpiMenu.filter(k => k.category === category)
+                      if (categoryKpis.length === 0) return null
+                      const categoryLabels: Record<string, string> = { implementation: 'Implementation (strongest signals)', wellness: 'Wellness (team health)', baseline: 'Baseline (hygiene metrics)' }
+                      return (
+                        <div key={category}>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-3 mb-1">{categoryLabels[category]}</p>
+                          {categoryKpis.map(kpi => {
+                            const isSelected = selectedKpiKeys.has(kpi.key)
+                            return (
+                              <div key={kpi.key} className={`p-3 rounded-lg border transition-all cursor-pointer ${isSelected ? 'border-blue-300 bg-blue-50' : 'border-gray-100 hover:border-gray-200'}`}
+                                onClick={() => {
+                                  const next = new Set(selectedKpiKeys)
+                                  if (next.has(kpi.key)) { next.delete(kpi.key) } else if (next.size < 5) { next.add(kpi.key) }
+                                  setSelectedKpiKeys(next)
+                                  if (!kpiTargets[kpi.key]) setKpiTargets(prev => ({ ...prev, [kpi.key]: kpi.suggestedTarget }))
+                                }}>
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${isSelected ? 'border-blue-500 bg-blue-500' : 'border-gray-300'}`}>
+                                      {isSelected && <span className="text-white text-[10px]">&#10003;</span>}
+                                    </div>
+                                    <p className="text-sm font-medium text-gray-900">{kpi.label}</p>
+                                  </div>
+                                  {isSelected && (
+                                    <input
+                                      type="number"
+                                      value={kpiTargets[kpi.key] || ''}
+                                      onChange={(e) => { e.stopPropagation(); setKpiTargets(prev => ({ ...prev, [kpi.key]: parseFloat(e.target.value) || 0 })) }}
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="w-20 text-right text-sm font-bold border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                      placeholder="Target"
+                                    />
+                                  )}
+                                </div>
+                                <p className="text-[10px] text-gray-500 mt-1 ml-6">{kpi.benchmarkLabel}</p>
+                                {isSelected && (
+                                  <p className="text-[10px] text-blue-600 mt-1 ml-6">How TDI delivers: {kpi.howTdiDelivers.slice(0, 120)}...</p>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )
+                    })}
+                    <div className="flex items-center gap-3 mt-3">
+                      <button
+                        onClick={async () => {
+                          if (selectedKpiKeys.size === 0) return
+                          setSavingKpis(true)
+                          try {
+                            const selected = Array.from(selectedKpiKeys).map(key => ({ key, target: kpiTargets[key] || 0 }))
+                            const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ selectedKpis: selected }),
+                            })
+                            const data = await res.json()
+                            if (data.success) {
+                              // Reload KPIs
+                              const reload = await fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`)
+                              const reloadData = await reload.json()
+                              if (reloadData.kpis) setActiveKpis(reloadData.kpis)
+                            }
+                          } catch {} finally { setSavingKpis(false) }
+                        }}
+                        disabled={selectedKpiKeys.size === 0 || savingKpis}
+                        className="px-4 py-2 text-sm font-medium text-white rounded-lg disabled:opacity-50"
+                        style={{ background: '#1e2749' }}
+                      >
+                        {savingKpis ? 'Saving...' : `Save ${selectedKpiKeys.size} KPI${selectedKpiKeys.size !== 1 ? 's' : ''}`}
+                      </button>
+                      <span className="text-xs text-gray-400">{selectedKpiKeys.size}/5 selected</span>
+                    </div>
+                  </div>
+                </details>
+              )}
+            </div>
+
+            {/* Batch Provision Hub Accounts */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
+              <h3 className="text-sm font-bold text-gray-900 mb-2">Hub provisioning</h3>
+              <p className="text-xs text-gray-500 mb-3">Batch create Hub All-Access accounts for all staff in this partnership's roster who don't have one yet.</p>
+              <button
+                onClick={async () => {
+                  setProvisioningRoster(true)
+                  setProvisionResult('')
+                  try {
+                    const res = await fetch('/api/admin/provision-roster', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ partnershipId }),
+                    })
+                    const data = await res.json()
+                    setProvisionResult(data.message || data.error || 'Done')
+                  } catch { setProvisionResult('Failed') }
+                  finally { setProvisioningRoster(false) }
+                }}
+                disabled={provisioningRoster}
+                className="px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+                style={{ background: '#E8B84B', color: '#1e2749' }}
+              >
+                {provisioningRoster ? 'Provisioning...' : 'Provision Hub accounts for all staff'}
+              </button>
+              {provisionResult && (
+                <p className="text-xs text-gray-600 mt-2">{provisionResult}</p>
+              )}
             </div>
 
             {/* Add Note Form */}
