@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
+import { InfoDot, FirstTimeHint, GUIDANCE } from '@/components/tdi-admin/ui/Guidance'
 import { useTDIAdmin } from '@/lib/tdi-admin/context'
 import { hasAnySectionPermission } from '@/lib/tdi-admin/permissions'
 import { DashboardHeader } from '@/components/dashboard/shared/DashboardHeader'
@@ -1630,11 +1631,16 @@ export default function AdminPartnershipDetailPage() {
               </div>
             </div>
 
+            {/* First-time guidance */}
+            <FirstTimeHint id="internal-tab-intro">
+              <strong>Welcome to the Internal tab.</strong> This is your command center for this partnership. Set KPIs, log meetings, generate call briefings, track grants, export reports, and manage Hub provisioning. Everything here is invisible to the principal.
+            </FirstTimeHint>
+
             {/* Prepare for Call */}
             <div className="bg-white rounded-xl border border-blue-200 p-5 mb-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-gray-900">Prepare for call</h3>
+                  <h3 className="text-sm font-bold text-gray-900">Prepare for call <InfoDot text={GUIDANCE.leadership.prepareForCall} /></h3>
                   <p className="text-xs text-gray-500 mt-0.5">One-click briefing with engagement data, KPIs, notes, and talking points.</p>
                 </div>
                 <button
@@ -1664,7 +1670,7 @@ export default function AdminPartnershipDetailPage() {
             <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-sm font-bold text-gray-900">Partnership KPIs</h3>
+                  <h3 className="text-sm font-bold text-gray-900">Partnership KPIs <InfoDot text={GUIDANCE.leadership.kpiAutoUpdate} /></h3>
                   <p className="text-xs text-gray-500 mt-0.5">Pick 3-5 implementation-focused KPIs. Each maps to your contract deliverables.</p>
                 </div>
                 {activeKpis.length > 0 && (
@@ -1778,7 +1784,7 @@ export default function AdminPartnershipDetailPage() {
 
             {/* Batch Provision Hub Accounts */}
             <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-2">Hub provisioning</h3>
+              <h3 className="text-sm font-bold text-gray-900 mb-2">Hub provisioning <InfoDot text={GUIDANCE.leadership.batchProvision} /></h3>
               <p className="text-xs text-gray-500 mb-3">Batch create Hub All-Access accounts for all staff in this partnership's roster who don't have one yet.</p>
               <button
                 onClick={async () => {
@@ -1875,7 +1881,7 @@ export default function AdminPartnershipDetailPage() {
 
             {/* Reports & Exports */}
             <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-2">Reports and exports</h3>
+              <h3 className="text-sm font-bold text-gray-900 mb-2">Reports and exports <InfoDot text={GUIDANCE.leadership.exportReports} /></h3>
               <p className="text-xs text-gray-500 mb-4">Generate and download reports for this partnership. If data is missing, you'll see what to do next.</p>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {[
@@ -1925,7 +1931,7 @@ export default function AdminPartnershipDetailPage() {
 
             {/* Add Note Form */}
             <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-3">Add a note</h3>
+              <h3 className="text-sm font-bold text-gray-900 mb-3">Add a note <InfoDot text={GUIDANCE.leadership.notes} /></h3>
               <textarea
                 value={newNoteContent}
                 onChange={(e) => setNewNoteContent(e.target.value)}
