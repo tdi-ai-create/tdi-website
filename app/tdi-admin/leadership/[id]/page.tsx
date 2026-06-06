@@ -166,6 +166,7 @@ export default function AdminPartnershipDetailPage() {
   const [savingKpis, setSavingKpis] = useState(false)
   const [provisioningRoster, setProvisioningRoster] = useState(false)
   const [provisionResult, setProvisionResult] = useState('')
+  const [grantPursuits, setGrantPursuits] = useState<{ id: string; pursuit_name: string; current_phase: string; total_amount: number; total_awarded: number; funding_paths: string; contract_gap: number }[]>([])
 
   // Load internal notes/meetings/kpis when tab is active
   useEffect(() => {
@@ -177,6 +178,16 @@ export default function AdminPartnershipDetailPage() {
     fetch(`/api/tdi-admin/leadership/${partnershipId}/meetings`)
       .then(r => r.json())
       .then(d => { if (d.meetings) setInternalMeetings(d.meetings) })
+      .catch(() => {})
+    // Load grant pursuits linked to this partnership
+    fetch(`/api/funding/dashboard`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.pursuits) {
+          const linked = d.pursuits.filter((p: { partnership_id?: string }) => p.partnership_id === partnershipId)
+          setGrantPursuits(linked)
+        }
+      })
       .catch(() => {})
     fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`)
       .then(r => r.json())
@@ -1764,6 +1775,73 @@ export default function AdminPartnershipDetailPage() {
                 <p className="text-xs text-gray-600 mt-2">{provisionResult}</p>
               )}
             </div>
+
+            {/* Grant Tracking (if any pursuits linked) */}
+            {grantPursuits.length > 0 && (
+              <div className="bg-white rounded-xl border border-purple-200 p-5 mb-4">
+                <h3 className="text-sm font-bold text-gray-900 mb-3">Grant tracking</h3>
+                <div className="space-y-3">
+                  {grantPursuits.map(pursuit => {
+                    const phaseLabels: Record<string, string> = {
+                      intake: 'Intake', researching: 'Researching', strategy: 'Strategy', writing: 'Writing',
+                      in_review: 'In review', delivered: 'Delivered', submitted: 'Submitted',
+                      awaiting_decision: 'Awaiting decision', awarded: 'Awarded', denied: 'Denied', on_hold: 'On hold',
+                    }
+                    const phaseColors: Record<string, string> = {
+                      intake: 'bg-gray-100 text-gray-700', researching: 'bg-blue-100 text-blue-700',
+                      strategy: 'bg-purple-100 text-purple-700', writing: 'bg-amber-100 text-amber-700',
+                      in_review: 'bg-yellow-100 text-yellow-700', delivered: 'bg-teal-100 text-teal-700',
+                      submitted: 'bg-green-100 text-green-700', awaiting_decision: 'bg-orange-100 text-orange-700',
+                      awarded: 'bg-green-200 text-green-800', denied: 'bg-red-100 text-red-700',
+                      on_hold: 'bg-gray-100 text-gray-600',
+                    }
+                    let paths: { plan: string; label: string; amount: number; status: string }[] = []
+                    try { paths = typeof pursuit.funding_paths === 'string' ? JSON.parse(pursuit.funding_paths) : (pursuit.funding_paths || []) } catch {}
+
+                    return (
+                      <div key={pursuit.id} className="border border-purple-100 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900">{pursuit.pursuit_name}</p>
+                            <p className="text-xs text-gray-500">Gap: ${(pursuit.contract_gap || 0).toLocaleString()} | Total: ${(pursuit.total_amount || 0).toLocaleString()}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`text-[10px] font-medium px-2 py-1 rounded-full ${phaseColors[pursuit.current_phase] || 'bg-gray-100 text-gray-700'}`}>
+                              {phaseLabels[pursuit.current_phase] || pursuit.current_phase}
+                            </span>
+                            <a href="/tdi-admin/funding" className="text-[10px] text-purple-600 hover:underline">View in Funding</a>
+                          </div>
+                        </div>
+                        {paths.length > 0 && (
+                          <div className="space-y-1.5">
+                            {paths.map((path, i) => {
+                              const planColors: Record<string, string> = { A: '#0F766E', B: '#1B365D', C: '#7C3AED', D: '#B45309' }
+                              const statusIcons: Record<string, string> = {
+                                not_started: '\u25CB', researching: '\u25D4', pursuing: '\u25D0',
+                                submitted: '\u25CF', awarded: '\u2714', denied: '\u2718',
+                              }
+                              return (
+                                <div key={i} className="flex items-center gap-2 text-xs">
+                                  <span className="font-bold" style={{ color: planColors[path.plan] || '#6B7280', width: 28 }}>Plan {path.plan}</span>
+                                  <span className="flex-1 text-gray-700">{path.label}</span>
+                                  {path.amount > 0 && <span className="text-gray-500">${path.amount.toLocaleString()}</span>}
+                                  <span className="text-gray-400">{statusIcons[path.status] || '\u25CB'} {path.status}</span>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        )}
+                        {pursuit.total_awarded > 0 && (
+                          <div className="mt-2 pt-2 border-t border-purple-100">
+                            <p className="text-xs font-bold text-green-700">Awarded: ${pursuit.total_awarded.toLocaleString()}</p>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Reports & Exports */}
             <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">

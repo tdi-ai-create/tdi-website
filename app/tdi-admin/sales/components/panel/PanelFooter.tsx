@@ -119,7 +119,7 @@ export function PanelFooter({ opp, onPatch, onClose, showToast }: Props) {
   return (
     <>
       {/* Create Partnership -- shows on signed/paid deals that don't have a partnership yet */}
-      {(opp.stage === 'signed' || opp.stage === 'paid') && !partnershipCreated && (
+      {(opp.stage === 'signed' || opp.stage === 'signed_no_grant' || opp.stage === 'signed_with_grant' || opp.stage === 'paid') && !partnershipCreated && (
         <div className="border-t border-gray-100 px-5 py-3">
           <button
             onClick={() => setShowPartnershipModal(true)}
@@ -140,7 +140,7 @@ export function PanelFooter({ opp, onPatch, onClose, showToast }: Props) {
       )}
 
       {/* Legacy: Provision Hub Access only (for deals that already have a partnership) */}
-      {(opp.stage === 'signed' || opp.stage === 'paid') && partnershipCreated && !provisioned && (
+      {(opp.stage === 'signed' || opp.stage === 'signed_no_grant' || opp.stage === 'signed_with_grant' || opp.stage === 'paid') && partnershipCreated && !provisioned && (
         <div className="border-t border-gray-100 px-5 py-3">
           <button
             onClick={provisionHubAccess}
