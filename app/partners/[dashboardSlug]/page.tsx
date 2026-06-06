@@ -373,6 +373,7 @@ export default function PartnerDashboard() {
   const [partnership, setPartnership] = useState<Partnership | null>(null);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [actionItems, setActionItems] = useState<ActionItem[]>([]);
+  const [partnershipKpis, setPartnershipKpis] = useState<{ kpi_key: string; kpi_label: string; target_value: number; target_unit: string; current_value: number; benchmark_low: number; benchmark_high: number; how_tdi_delivers: string; status: string }[]>([]);
   const [staffStats, setStaffStats] = useState<StaffStats>({ total: 0, hubLoggedIn: 0 });
   const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
   const [apiBuildings, setApiBuildings] = useState<Building[]>([]);
@@ -569,6 +570,7 @@ export default function PartnerDashboard() {
           setTimelineEvents(data.timelineEvents || []);
           setTeacherQuotes(data.teacherQuotes || []);
           setSessionRecords(data.sessionRecords || []);
+          if (data.kpis) setPartnershipKpis(data.kpis);
         }
       }
 
@@ -1337,14 +1339,33 @@ export default function PartnerDashboard() {
                     )}
                   </div>
 
-                  {/* Visual Gauge Rings */}
+                  {/* Visual Gauge Rings -- KPI-driven when set, generic fallback */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {[
-                      { value: hubPct, label: 'Hub Engagement', display: `${hubPct}%`, color: '#E8B84B', max: 100 },
-                      { value: totalDeliverables > 0 ? (completedDeliverables / totalDeliverables) * 100 : 0, label: 'Deliverables', display: `${completedDeliverables}/${totalDeliverables}`, color: '#4ecdc4', max: 100 },
-                      { value: wellnessScore ? (wellnessScore / 5) * 100 : (staffStats.total > 0 ? (staffStats.hubLoggedIn / staffStats.total) * 100 : 0), label: wellnessScore ? 'Team Wellness' : 'Staff Active', display: wellnessScore ? `${wellnessScore}` : `${staffStats.hubLoggedIn}`, color: '#2A9D8F', max: 100 },
-                      { value: (phaseNum / 3) * 100, label: 'Current Phase', display: `${phaseNum}/3`, color: '#1e2749', max: 100 },
-                    ].map((gauge, i) => (
+                    {(partnershipKpis.length > 0
+                      ? partnershipKpis.slice(0, 4).map(kpi => {
+                          const kpiColors: Record<string, string> = {
+                            strategy_implementation: '#8B5CF6', classroom_application: '#2563EB',
+                            course_completion: '#4ecdc4', field_notes_earned: '#E8B84B',
+                            pd_hours_completed: '#F97316', team_wellness: '#2A9D8F',
+                            stress_reduction: '#EC4899', retention_intent: '#10B981',
+                            hub_engagement: '#E8B84B', custom_course_mandate: '#1e2749',
+                          }
+                          const pct = kpi.target_value > 0 ? Math.min((kpi.current_value / kpi.target_value) * 100, 100) : 0
+                          return {
+                            value: pct,
+                            label: kpi.kpi_label.length > 25 ? kpi.kpi_label.slice(0, 22) + '...' : kpi.kpi_label,
+                            display: `${kpi.current_value}${kpi.target_unit}`,
+                            color: kpiColors[kpi.kpi_key] || '#1e2749',
+                            max: 100,
+                          }
+                        })
+                      : [
+                          { value: hubPct, label: 'Hub Engagement', display: `${hubPct}%`, color: '#E8B84B', max: 100 },
+                          { value: totalDeliverables > 0 ? (completedDeliverables / totalDeliverables) * 100 : 0, label: 'Deliverables', display: `${completedDeliverables}/${totalDeliverables}`, color: '#4ecdc4', max: 100 },
+                          { value: wellnessScore ? (wellnessScore / 5) * 100 : (staffStats.total > 0 ? (staffStats.hubLoggedIn / staffStats.total) * 100 : 0), label: wellnessScore ? 'Team Wellness' : 'Staff Active', display: wellnessScore ? `${wellnessScore}` : `${staffStats.hubLoggedIn}`, color: '#2A9D8F', max: 100 },
+                          { value: (phaseNum / 3) * 100, label: 'Current Phase', display: `${phaseNum}/3`, color: '#1e2749', max: 100 },
+                        ]
+                    ).map((gauge, i) => (
                       <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col items-center">
                         <div className="relative w-20 h-20 mb-3">
                           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 80 80">

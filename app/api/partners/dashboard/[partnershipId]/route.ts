@@ -58,6 +58,14 @@ export async function GET(
       .neq('visible_to_partner', false)
       .order('sort_order', { ascending: true });
 
+    // Get partnership KPIs (if set)
+    const { data: kpis } = await supabase
+      .from('partnership_kpis')
+      .select('kpi_key, kpi_label, target_value, target_unit, current_value, benchmark_low, benchmark_high, benchmark_label, how_tdi_delivers, status')
+      .eq('partnership_id', partnershipId)
+      .eq('status', 'active')
+      .order('sort_order');
+
     // Get staff login stats (for hub_login tracking)
     const { data: staffMembers } = await supabase
       .from('staff_members')
@@ -136,6 +144,7 @@ export async function GET(
       timelineEvents: timelineEvents || [],
       teacherQuotes: teacherQuotes || [],
       sessionRecords: sessionRecords || [],
+      kpis: kpis || [],
     });
   } catch (error) {
     console.error('Error getting dashboard data:', error);
