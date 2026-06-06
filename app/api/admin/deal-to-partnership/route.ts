@@ -333,9 +333,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 9. Send welcome email to principal
-    let emailSent = false;
-    const resendApiKey = process.env.RESEND_API_KEY;
+    // 9. Welcome email is NOT auto-sent. Team lead must manually trigger
+    // via /api/admin/resend-welcome or from the Internal tab.
+    // This prevents emails going out before the team has reviewed the partnership setup.
+    const emailSent = false;
+    const _resendApiKey = process.env.RESEND_API_KEY; // kept for manual send
     if (resendApiKey && deal.contact_email) {
       const firstName = (deal.contact_name || deal.name).split(' ')[0];
       const dashboardUrl = `https://www.teachersdeserveit.com/partners/${slug}`;
