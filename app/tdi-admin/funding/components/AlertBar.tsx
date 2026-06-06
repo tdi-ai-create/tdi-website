@@ -12,9 +12,9 @@ interface Alerts {
 export function AlertBar({ alerts }: { alerts: Alerts }) {
   const segments = [
     {
-      label: 'What Olivia owes today',
-      value: alerts.olivia_actions,
-      sublabel: alerts.olivia_actions === 1 ? 'action item' : 'action items',
+      label: 'Action items pending',
+      value: alerts.olivia_actions + alerts.in_flight_count,
+      sublabel: 'across all pursuits',
       borderColor: '#F59E0B',
     },
     {

@@ -1,12 +1,10 @@
 'use client'
 
-const OWNER_COLORS: Record<string, { bg: string; initial: string; textColor?: string }> = {
-  'olivia@teachersdeserveit.com': { bg: '#8B5CF6', initial: 'O' },
-  'vanessa@teachersdeserveit.com': { bg: '#2A9D8F', initial: 'V' },
-  'marcus@teachersdeserveit.com': { bg: '#3B82F6', initial: 'M' },
-  'amara@teachersdeserveit.com': { bg: '#3B82F6', initial: 'A' },
-  'erin@teachersdeserveit.com': { bg: '#F4C430', initial: 'E', textColor: '#0a0f1e' },
-  'rae@teachersdeserveit.com': { bg: '#E76F51', initial: 'R' },
+const OWNER_COLORS: Record<string, { bg: string; initial: string; textColor?: string; name?: string }> = {
+  'rae@teachersdeserveit.com': { bg: '#E76F51', initial: 'R', name: 'Rae' },
+  'bella@teachersdeserveit.com': { bg: '#8B5CF6', initial: 'B', name: 'Bella' },
+  'omar@teachersdeserveit.com': { bg: '#2A9D8F', initial: 'O', name: 'Omar' },
+  'kristin@teachersdeserveit.com': { bg: '#3B82F6', initial: 'K', name: 'Kristin' },
 }
 
 export function OwnerAvatar({ email, size = 28 }: { email: string | null; size?: number }) {
@@ -39,5 +37,7 @@ export function OwnerAvatar({ email, size = 28 }: { email: string | null; size?:
 
 export function ownerName(email: string | null): string {
   if (!email) return 'Unassigned'
+  const config = OWNER_COLORS[email]
+  if (config?.name) return config.name
   return email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1)
 }
