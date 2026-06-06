@@ -86,7 +86,7 @@ export function DashboardHeader({
         }}
       />
 
-      <div className="relative max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-12">
+      <div className={`relative mx-auto px-4 md:px-6 ${isAdminView ? 'py-5 md:py-6' : 'py-8 md:py-12 max-w-5xl'}`}>
         {/* Admin controls */}
         {isAdminView && showAdminControls && (
           <div className="flex items-start justify-between mb-4">
@@ -124,7 +124,7 @@ export function DashboardHeader({
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{schoolName}</h1>
+              <h1 className={`${isAdminView ? 'text-xl md:text-2xl' : 'text-3xl md:text-4xl'} font-bold tracking-tight`}>{schoolName}</h1>
               {/* Partnership year badge */}
               {yearBadge && (
                 <span

@@ -127,6 +127,7 @@ export async function POST(request: NextRequest) {
       status: 'active',
       partnership_goal: partnershipGoal || null,
       sales_deal_id: dealId,
+      has_grant_support: deal.grant_support || deal.stage === 'signed_with_grant' || false,
       invite_sent_at: new Date().toISOString(),
     };
 
@@ -336,9 +337,9 @@ export async function POST(request: NextRequest) {
     // 9. Welcome email is NOT auto-sent. Team lead must manually trigger
     // via /api/admin/resend-welcome or from the Internal tab.
     // This prevents emails going out before the team has reviewed the partnership setup.
-    const emailSent = false;
-    const _resendApiKey = process.env.RESEND_API_KEY; // kept for manual send
-    if (resendApiKey && deal.contact_email) {
+    let emailSent = false;
+    // Email disabled -- team lead triggers manually via /api/admin/resend-welcome
+    if (false && deal.contact_email) {
       const firstName = (deal.contact_name || deal.name).split(' ')[0];
       const dashboardUrl = `https://www.teachersdeserveit.com/partners/${slug}`;
 
@@ -346,7 +347,7 @@ export async function POST(request: NextRequest) {
         const emailResponse = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${resendApiKey}`,
+            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({

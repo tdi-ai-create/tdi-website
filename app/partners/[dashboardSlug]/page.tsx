@@ -95,6 +95,11 @@ interface Partnership {
   status: string;
   org_name?: string | null;
   partnership_goal?: string | null;
+  has_grant_support?: boolean;
+  base_observation_days?: number | null;
+  base_virtual_sessions?: number | null;
+  base_executive_sessions?: number | null;
+  base_staff_enrolled?: number | null;
 }
 
 interface Organization {
@@ -3251,40 +3256,73 @@ export default function PartnerDashboard() {
               </div>
             </div>
 
-            {/* Partnership Includes card */}
+            {/* Partnership Includes card -- two-tier when grant-supported */}
             <div className="bg-white rounded-xl border border-gray-100 p-6"
               style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
               <h2 className="text-base font-semibold text-gray-900 mb-4">Your Partnership Includes</h2>
-              <div className="divide-y divide-gray-50">
-                {(partnership?.observation_days_total ?? 0) > 0 && (
-                  <div className="flex items-center justify-between py-2.5">
-                    <span className="text-sm text-gray-600">Observation Days</span>
-                    <span className="text-sm font-semibold text-gray-900">{partnership.observation_days_total}</span>
-                  </div>
-                )}
-                {(partnership?.virtual_sessions_total ?? 0) > 0 && (
-                  <div className="flex items-center justify-between py-2.5">
-                    <span className="text-sm text-gray-600">Virtual Sessions</span>
-                    <span className="text-sm font-semibold text-gray-900">{partnership.virtual_sessions_total}</span>
-                  </div>
-                )}
-                {(partnership?.executive_sessions_total ?? 0) > 0 && (
-                  <div className="flex items-center justify-between py-2.5">
-                    <span className="text-sm text-gray-600">Executive Sessions</span>
-                    <span className="text-sm font-semibold text-gray-900">{partnership.executive_sessions_total}</span>
-                  </div>
-                )}
-                {(partnership?.staff_enrolled ?? 0) > 0 && (
-                  <div className="flex items-center justify-between py-2.5">
-                    <span className="text-sm text-gray-600">Hub Memberships</span>
-                    <span className="text-sm font-semibold text-gray-900">{partnership.staff_enrolled}</span>
-                  </div>
-                )}
-                <div className="flex items-center justify-between py-2.5">
-                  <span className="text-sm text-gray-600">The TDI Book</span>
-                  <span className="text-sm font-semibold text-gray-900">1 per educator</span>
-                </div>
-              </div>
+
+              {/* Show base contract when grant-supported, otherwise show full contract */}
+              {(() => {
+                const isGrantSupported = partnership?.has_grant_support;
+                const showBase = isGrantSupported && partnership?.base_observation_days != null;
+
+                // Base contract numbers (guaranteed)
+                const obsDays = showBase ? partnership.base_observation_days! : (partnership?.observation_days_total ?? 0);
+                const virtSessions = showBase ? (partnership.base_virtual_sessions ?? partnership?.virtual_sessions_total ?? 0) : (partnership?.virtual_sessions_total ?? 0);
+                const execSessions = showBase ? (partnership.base_executive_sessions ?? partnership?.executive_sessions_total ?? 0) : (partnership?.executive_sessions_total ?? 0);
+                const staffCount = showBase ? (partnership.base_staff_enrolled ?? partnership?.staff_enrolled ?? 0) : (partnership?.staff_enrolled ?? 0);
+
+                return (
+                  <>
+                    <div className="divide-y divide-gray-50">
+                      {obsDays > 0 && (
+                        <div className="flex items-center justify-between py-2.5">
+                          <span className="text-sm text-gray-600">Observation Days</span>
+                          <span className="text-sm font-semibold text-gray-900">{obsDays}</span>
+                        </div>
+                      )}
+                      {virtSessions > 0 && (
+                        <div className="flex items-center justify-between py-2.5">
+                          <span className="text-sm text-gray-600">Virtual Sessions</span>
+                          <span className="text-sm font-semibold text-gray-900">{virtSessions}</span>
+                        </div>
+                      )}
+                      {execSessions > 0 && (
+                        <div className="flex items-center justify-between py-2.5">
+                          <span className="text-sm text-gray-600">Executive Sessions</span>
+                          <span className="text-sm font-semibold text-gray-900">{execSessions}</span>
+                        </div>
+                      )}
+                      {staffCount > 0 && (
+                        <div className="flex items-center justify-between py-2.5">
+                          <span className="text-sm text-gray-600">Hub Memberships</span>
+                          <span className="text-sm font-semibold text-gray-900">{staffCount}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between py-2.5">
+                        <span className="text-sm text-gray-600">The TDI Book</span>
+                        <span className="text-sm font-semibold text-gray-900">1 per educator</span>
+                      </div>
+                    </div>
+
+                    {/* Grant expansion note */}
+                    {isGrantSupported && (
+                      <div className="mt-4 p-4 rounded-xl" style={{ background: '#F5F3FF', border: '1px solid #DDD6FE' }}>
+                        <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: '#7C3AED' }}>Funding in progress</p>
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                          TDI is actively pursuing additional funding to expand your partnership.
+                          {showBase && (partnership?.observation_days_total ?? 0) > obsDays && (
+                            <> If awarded, your plan grows to include {partnership.observation_days_total} observation days, {partnership.virtual_sessions_total} virtual sessions, and {partnership.staff_enrolled} Hub memberships.</>
+                          )}
+                          {!showBase && (
+                            <> Our team handles the research, writing, and tracking. You will be updated as funding decisions are made.</>
+                          )}
+                        </p>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
 
             {/* Data privacy note */}

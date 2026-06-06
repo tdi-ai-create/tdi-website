@@ -34,9 +34,9 @@ import ObservationImpactScorecard from '@/components/dashboard/leadership/Observ
 
 // Tab configuration - mirrors principal dashboard
 const ADMIN_TABS = [
-  { key: 'overview', label: 'Overview' },
-  { key: '90-days', label: '90 Days' },
   { key: 'internal', label: 'Internal' },
+  { key: '90-days', label: '90 Days' },
+  { key: 'overview', label: 'Overview' },
   { key: 'our-partnership', label: 'Our Partnership' },
   { key: 'blueprint', label: 'Blueprint' },
   { key: 'next-year', label: 'Next Year' },
@@ -138,7 +138,7 @@ export default function AdminPartnershipDetailPage() {
   // UI state
   const [loading, setLoading] = useState(true)
   const [editMode, setEditMode] = useState(false)
-  const [activeTab, setActiveTab] = useState('overview')
+  const [activeTab, setActiveTab] = useState('internal')
   const [addEventOpen, setAddEventOpen] = useState(false)
   const [newEvent, setNewEvent] = useState({
     event_title: '',
