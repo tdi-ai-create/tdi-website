@@ -109,7 +109,7 @@ const STAGE_DISPLAY: Record<string, string> = {
 
 const STAGE_PROBABILITY: Record<string, number> = {
   unassigned: 0, targeting: 5, engaged: 20, qualified: 45,
-  likely_yes: 65, proposal_sent: 80, signed: 95, signed_no_grant: 95, signed_with_grant: 95, paid: 100, lost: 0,
+  likely_yes: 65, proposal_sent: 80, signed: 95, signed_no_grant: 95, signed_with_grant: 90, paid: 100, lost: 0,
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -120,7 +120,7 @@ const STAGE_LABELS: Record<string, string> = {
   proposal_sent: 'Quote Sent',
   signed: 'Signed',
   signed_no_grant: 'Signed (w/o Grant Support)',
-  signed_with_grant: 'Signed (w/ Grant Support)',
+  signed_with_grant: 'Signed (w/ Grant)',
 }
 
 const DEFAULT_KANBAN_STAGES = ['qualified', 'likely_yes', 'proposal_sent']
