@@ -100,7 +100,7 @@ export default function HubLoginPage() {
                 <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: 0 }}>-- {tUI('Instructional coach, K-5')}</p>
               </div>
 
-              <a href="/learning" style={{ fontSize: 13, color: '#2A9D8F', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <a href="/learning" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: '#2A9D8F', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                 {tUI('See everything the Hub offers')} <ArrowRight size={14} />
               </a>
             </div>
@@ -132,7 +132,7 @@ export default function HubLoginPage() {
               </p>
               {/* Mobile-only: show learn link (desktop has it on left panel) */}
               <p className="hub-login-mobile-link" style={{ textAlign: 'center', marginTop: 8 }}>
-                <a href="/learning" style={{ fontSize: 12, color: '#2A9D8F', fontWeight: 500, textDecoration: 'none' }}>
+                <a href="/learning" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#2A9D8F', fontWeight: 500, textDecoration: 'none' }}>
                   {tUI('New here? Learn what the Hub is')} &rarr;
                 </a>
               </p>
