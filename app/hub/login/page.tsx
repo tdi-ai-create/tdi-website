@@ -91,7 +91,7 @@ export default function HubLoginPage() {
             />
             <div style={{ marginTop: 14, textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 4 }}>
               <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{tUI('100,000+ educators across all 50 states')}</p>
-              <a href="/hub/our-story" style={{ fontSize: 12, color: '#2A9D8F', fontWeight: 500, textDecoration: 'none' }}>{tUI('New here? Learn what the Hub is')} &rarr;</a>
+              <a href="/learning" style={{ fontSize: 12, color: '#2A9D8F', fontWeight: 500, textDecoration: 'none' }}>{tUI('New here? Learn what the Hub is')} &rarr;</a>
             </div>
           </div>
         </section>
