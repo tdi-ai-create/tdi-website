@@ -283,7 +283,7 @@ export default function TDIAdminLoginPage() {
               magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/tdi-admin/login` : '/tdi-admin/login'}
               googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/tdi-admin` : '/tdi-admin'}
               forgotPasswordRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/tdi-admin/login` : '/tdi-admin/login'}
-              backHref="/"
+              backHref={null}
             />
           </div>
         </div>
