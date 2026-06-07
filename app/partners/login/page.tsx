@@ -138,11 +138,16 @@ function PartnerLoginContent() {
           </div>
         )}
 
+        {/* Portal banner */}
+        <div style={{ backgroundColor: '#8BA7D6', padding: '8px 16px', textAlign: 'center' }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: '#1e2749', letterSpacing: 0.5 }}>Sign in to Leadership Dashboard</span>
+        </div>
+
         <div className="flex flex-1" style={{ minHeight: 0 }}>
           {/* Left panel - value props */}
           <div
             className="partner-login-left flex-col justify-center px-12 py-16"
-            style={{ backgroundColor: '#3B5998' }}
+            style={{ backgroundColor: '#1e2749' }}
           >
             <div className="max-w-lg mx-auto">
               <span

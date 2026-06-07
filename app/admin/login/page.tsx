@@ -160,11 +160,16 @@ export default function AdminLoginPage() {
           }
         }
       `}</style>
-      <div className="min-h-screen flex" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+      {/* Portal banner */}
+      <div style={{ backgroundColor: '#AEA3CD', padding: '8px 16px', textAlign: 'center' }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: '#1e2749', letterSpacing: 0.5 }}>Sign in to TDI Admin</span>
+      </div>
+
+      <div className="flex" style={{ fontFamily: "'DM Sans', sans-serif", minHeight: 'calc(100vh - 36px)' }}>
         {/* Left Panel */}
         <div
           className="oldadmin-login-left w-1/2 flex-col justify-center px-16 py-12 relative overflow-hidden"
-          style={{ backgroundColor: '#5B4E8A' }}
+          style={{ backgroundColor: '#1e2749' }}
         >
           <div className="relative z-10 max-w-md">
             <span className="inline-block px-3 py-1 text-xs font-medium tracking-wider uppercase rounded-full mb-8" style={{ backgroundColor: 'rgba(255,255,255,0.12)', color: '#ffffff' }}>

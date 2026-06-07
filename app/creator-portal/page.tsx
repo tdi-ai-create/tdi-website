@@ -122,12 +122,17 @@ function CreatorPortalLoginContent({ onPendingRedirect }: CreatorPortalLoginCont
 
   return (
     <>
+      {/* Portal banner */}
+      <div style={{ backgroundColor: '#F0BDA8', padding: '8px 16px', textAlign: 'center' }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: '#1e2749', letterSpacing: 0.5 }}>Sign in to Creator Studio</span>
+      </div>
+
       {/* Split layout: pitch left, sign-in right */}
-      <div style={{ display: 'flex', minHeight: '100vh' }}>
+      <div style={{ display: 'flex', minHeight: 'calc(100vh - 36px)' }}>
 
         {/* LEFT: Navy pitch panel */}
         <div style={{
-          flex: '1 1 50%', backgroundColor: '#9B6B5A', padding: '48px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'center',
+          flex: '1 1 50%', backgroundColor: '#1e2749', padding: '48px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'center',
         }} className="creator-login-left">
           <div style={{ maxWidth: 480 }}>
             <span style={{ display: 'inline-block', padding: '5px 12px', background: 'rgba(255,255,255,0.15)', color: '#ffffff', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 20 }}>

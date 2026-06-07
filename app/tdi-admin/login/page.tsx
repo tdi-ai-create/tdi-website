@@ -145,7 +145,7 @@ export default function TDIAdminLoginPage() {
           flex-direction: column;
           justify-content: center;
           padding: 3rem;
-          background-color: #5B4E8A;
+          background-color: #1e2749;
           color: #ffffff;
         }
         .admin-login-right {
@@ -167,7 +167,12 @@ export default function TDIAdminLoginPage() {
           }
         }
       `}</style>
-      <div style={{ display: 'flex', minHeight: '100vh' }}>
+      {/* Portal banner */}
+      <div style={{ backgroundColor: '#AEA3CD', padding: '8px 16px', textAlign: 'center' }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: '#1e2749', letterSpacing: 0.5 }}>Sign in to TDI Admin</span>
+      </div>
+
+      <div style={{ display: 'flex', minHeight: 'calc(100vh - 36px)' }}>
         {/* Left Panel */}
         <div className="admin-login-left">
           <div style={{ maxWidth: '480px', margin: '0 auto' }}>

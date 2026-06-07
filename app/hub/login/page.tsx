@@ -56,8 +56,13 @@ export default function HubLoginPage() {
 
       <div style={{ visibility: showPage ? 'visible' : 'hidden', opacity: showPage ? 1 : 0, transition: 'opacity 300ms ease-in' }}>
 
+        {/* ═══ PORTAL BANNER ═══ */}
+        <div style={{ backgroundColor: '#2A9D8F', padding: '8px 16px', textAlign: 'center' }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: 'white', letterSpacing: 0.5 }}>{tUI('Sign in to the Learning Hub')}</span>
+        </div>
+
         {/* ═══ SPLIT LAYOUT: pitch left, sign-in right ═══ */}
-        <div style={{ display: 'flex', minHeight: '100vh' }}>
+        <div style={{ display: 'flex', minHeight: 'calc(100vh - 36px)' }}>
 
           {/* LEFT: Navy pitch panel */}
           <div style={{
