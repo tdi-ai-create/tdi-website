@@ -57,12 +57,12 @@ export default function HubLoginPage() {
       <div style={{ visibility: showPage ? 'visible' : 'hidden', opacity: showPage ? 1 : 0, transition: 'opacity 300ms ease-in', backgroundColor: '#ffffff' }}>
 
         {/* ═══ HERO ═══ */}
-        <section style={{ backgroundColor: '#1e2749', padding: '56px 16px 48px' }}>
+        <section style={{ backgroundColor: '#1e2749', padding: '32px 16px 24px' }}>
           <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
-            <span style={{ display: 'inline-block', padding: '6px 14px', background: 'rgba(255,186,6,0.15)', color: '#ffba06', borderRadius: 999, fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 20 }}>
+            <span style={{ display: 'inline-block', padding: '6px 14px', background: 'rgba(255,186,6,0.15)', color: '#ffba06', borderRadius: 999, fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 12 }}>
               {tUI('The TDI Learning Hub')}
             </span>
-            <h1 style={{ fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 700, color: 'white', margin: '0 0 16px 0', lineHeight: 1.15 }}>
+            <h1 style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 700, color: 'white', margin: '0 0 16px 0', lineHeight: 1.15 }}>
               {tUI('Professional Development That Actually Works')}
             </h1>
             <p style={{ fontSize: 18, color: 'white', opacity: 0.85, maxWidth: 700, margin: '0 auto', lineHeight: 1.6 }}>
@@ -72,7 +72,7 @@ export default function HubLoginPage() {
         </section>
 
         {/* ═══ SIGN IN ═══ */}
-        <section style={{ padding: '48px 16px 56px', backgroundColor: '#F9FAFB' }}>
+        <section style={{ padding: '24px 16px 28px', backgroundColor: '#F9FAFB' }}>
           <div style={{ maxWidth: 420, margin: '0 auto' }}>
             <PortalSignIn
               portalTitle="Sign in to the Hub"
@@ -90,7 +90,7 @@ export default function HubLoginPage() {
         </section>
 
         {/* ═══ PRICING ═══ */}
-        <section style={{ padding: '40px 16px 60px', backgroundColor: '#ffffff' }}>
+        <section style={{ padding: '20px 16px 28px', backgroundColor: '#ffffff' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <details style={{ textAlign: 'center' }}>
               <summary style={{ fontSize: 15, fontWeight: 600, color: '#2A9D8F', cursor: 'pointer', marginBottom: 32, listStyle: 'none', display: 'inline-block' }}>
@@ -148,9 +148,9 @@ export default function HubLoginPage() {
         </section>
 
         {/* ═══ TESTIMONIALS ═══ */}
-        <section style={{ padding: '60px 16px', backgroundColor: 'white' }}>
+        <section style={{ padding: '28px 16px', backgroundColor: 'white' }}>
           <div style={{ maxWidth: 900, margin: '0 auto' }}>
-            <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1e2749', textAlign: 'center', marginBottom: 32 }}>{tUI('What educators are saying')}</h2>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1e2749', textAlign: 'center', marginBottom: 20 }}>{tUI('What educators are saying')}</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
               {[
                 { quote: 'I used the Calm Response Scripts on a Monday and by Wednesday my transitions were cutting wasted time in half. My admin noticed before I even said anything.', role: 'Middle school teacher, Year 8' },
@@ -167,8 +167,8 @@ export default function HubLoginPage() {
         </section>
 
         {/* ═══ BOTTOM CTA ═══ */}
-        <section style={{ backgroundColor: '#1e2749', padding: '48px 16px', textAlign: 'center' }}>
-          <h2 style={{ fontSize: 28, fontWeight: 700, color: 'white', marginBottom: 8 }}>{tUI('Ready to explore?')}</h2>
+        <section style={{ backgroundColor: '#1e2749', padding: '28px 16px', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: 'white', marginBottom: 6 }}>{tUI('Ready to explore?')}</h2>
           <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.6)', marginBottom: 24 }}>{tUI('Create your free account in 30 seconds.')}</p>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
