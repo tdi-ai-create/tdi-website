@@ -39,13 +39,15 @@ export function HorizontalBarChart({
   height,
   color = COLORS.teal,
   valueFormatter,
+  tooltipLabel,
 }: {
   data: HBarItem[];
   height?: number;
   color?: string;
   valueFormatter?: (v: number) => string;
+  tooltipLabel?: string;
 }) {
-  const chartData = data.map(d => ({ name: d.label, value: d.value, fill: d.color || color }));
+  const chartData = data.map(d => ({ name: d.label, value: d.value, fill: d.color || color, suffix: d.suffix }));
   const h = height || Math.max(data.length * 36, 120);
 
   return (
@@ -61,8 +63,11 @@ export function HorizontalBarChart({
           tickLine={false}
         />
         <Tooltip
-          formatter={(value: number) => [valueFormatter ? valueFormatter(value) : value, '']}
-          contentStyle={{ borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 12 }}
+          formatter={(value: number, _name: string, props: { payload?: { suffix?: string } }) => {
+            const formatted = valueFormatter ? valueFormatter(value) : `${value.toLocaleString()}${props.payload?.suffix || ''}`;
+            return [formatted, tooltipLabel || ''];
+          }}
+          contentStyle={{ borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
         />
         <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
           {chartData.map((entry, i) => (
@@ -119,8 +124,8 @@ export function DonutChart({
             ))}
           </Pie>
           <Tooltip
-            formatter={(value: number, name: string) => [`${value} (${total > 0 ? ((value / total) * 100).toFixed(0) : 0}%)`, name]}
-            contentStyle={{ borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 12 }}
+            formatter={(value: number, name: string) => [`${value.toLocaleString()} (${total > 0 ? ((value / total) * 100).toFixed(0) : 0}%)`, name]}
+            contentStyle={{ borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
           />
         </PieChart>
       </ResponsiveContainer>
@@ -168,12 +173,14 @@ export function TrendAreaChart({
   color = COLORS.teal,
   showGrid = false,
   valueFormatter,
+  tooltipLabel = 'Value',
 }: {
   data: AreaPoint[];
   height?: number;
   color?: string;
   showGrid?: boolean;
   valueFormatter?: (v: number) => string;
+  tooltipLabel?: string;
 }) {
   return (
     <ResponsiveContainer width="100%" height={height}>
@@ -188,9 +195,9 @@ export function TrendAreaChart({
         />
         <YAxis hide />
         <Tooltip
-          formatter={(value: number) => [valueFormatter ? valueFormatter(value) : value, 'Signups']}
-          contentStyle={{ borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 12 }}
-          labelStyle={{ fontSize: 11, color: '#6B7280' }}
+          formatter={(value: number) => [valueFormatter ? valueFormatter(value) : value.toLocaleString(), tooltipLabel]}
+          contentStyle={{ borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+          labelStyle={{ fontSize: 11, color: '#6B7280', fontWeight: 600 }}
         />
         <defs>
           <linearGradient id={`areaGrad-${color.replace('#', '')}`} x1="0" y1="0" x2="0" y2="1">
@@ -296,9 +303,11 @@ export function ProgressRing({
 export function RiskBarChart({
   data,
   height,
+  tooltipLabel = 'Score',
 }: {
   data: { label: string; value: number; status: 'success' | 'warning' | 'danger' }[];
   height?: number;
+  tooltipLabel?: string;
 }) {
   const statusColors = { success: COLORS.teal, warning: COLORS.gold, danger: COLORS.red };
   const chartData = data.map(d => ({ name: d.label, value: d.value, fill: statusColors[d.status] }));
@@ -317,8 +326,8 @@ export function RiskBarChart({
           tickLine={false}
         />
         <Tooltip
-          formatter={(value: number) => [`${value}%`, 'Usage']}
-          contentStyle={{ borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 12 }}
+          formatter={(value: number) => [`${value}%`, tooltipLabel]}
+          contentStyle={{ borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
         />
         {/* Background zones */}
         <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={18} background={{ fill: '#F9FAFB', radius: 4 }}>
