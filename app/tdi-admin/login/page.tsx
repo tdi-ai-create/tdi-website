@@ -145,8 +145,8 @@ export default function TDIAdminLoginPage() {
           flex-direction: column;
           justify-content: center;
           padding: 3rem;
-          background-color: #AEA3CD;
-          color: #1e2749;
+          background-color: #5B4E8A;
+          color: #ffffff;
         }
         .admin-login-right {
           display: flex;
@@ -177,7 +177,7 @@ export default function TDIAdminLoginPage() {
                 padding: '6px 16px',
                 borderRadius: '9999px',
                 backgroundColor: 'rgba(30,39,73,0.12)',
-                color: '#1e2749',
+                color: '#ffffff',
                 fontSize: '12px',
                 fontWeight: 700,
                 letterSpacing: '0.05em',
@@ -196,7 +196,7 @@ export default function TDIAdminLoginPage() {
                 fontWeight: 700,
                 lineHeight: 1.2,
                 marginBottom: '16px',
-                color: '#1e2749',
+                color: '#ffffff',
               }}
             >
               Manage Everything in One Place
@@ -207,7 +207,7 @@ export default function TDIAdminLoginPage() {
                 fontFamily: "'DM Sans', sans-serif",
                 fontSize: '16px',
                 lineHeight: 1.6,
-                color: 'rgba(30,39,73,0.8)',
+                color: 'rgba(255,255,255,0.7)',
                 marginBottom: '40px',
               }}
             >
@@ -222,20 +222,20 @@ export default function TDIAdminLoginPage() {
                       width: '40px',
                       height: '40px',
                       borderRadius: '10px',
-                      backgroundColor: 'rgba(30,39,73,0.1)',
+                      backgroundColor: 'rgba(255,255,255,0.12)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
                     }}
                   >
-                    <prop.icon size={20} color="#1e2749" />
+                    <prop.icon size={20} color="#ffffff" />
                   </div>
                   <p
                     style={{
                       fontFamily: "'DM Sans', sans-serif",
                       fontSize: '15px',
-                      color: 'rgba(30,39,73,0.95)',
+                      color: 'rgba(255,255,255,0.9)',
                       lineHeight: 1.5,
                       paddingTop: '8px',
                     }}
@@ -257,7 +257,7 @@ export default function TDIAdminLoginPage() {
                   fontFamily: "'Source Serif 4', Georgia, serif",
                   fontSize: '24px',
                   fontWeight: 700,
-                  color: '#1e2749',
+                  color: '#ffffff',
                   marginBottom: '8px',
                 }}
               >

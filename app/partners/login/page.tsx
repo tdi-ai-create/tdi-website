@@ -142,21 +142,21 @@ function PartnerLoginContent() {
           {/* Left panel - value props */}
           <div
             className="partner-login-left flex-col justify-center px-12 py-16"
-            style={{ backgroundColor: '#8BA7D6' }}
+            style={{ backgroundColor: '#3B5998' }}
           >
             <div className="max-w-lg mx-auto">
               <span
                 className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase mb-6"
-                style={{ backgroundColor: 'rgba(30,39,73,0.12)', color: '#1e2749' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.12)', color: '#ffffff' }}
               >
                 TDI Leadership Dashboard
               </span>
 
-              <h1 className="text-3xl lg:text-4xl font-bold mb-4 leading-tight" style={{ color: '#1e2749' }}>
+              <h1 className="text-3xl lg:text-4xl font-bold mb-4 leading-tight" style={{ color: '#ffffff' }}>
                 Your School&apos;s PD Command Center
               </h1>
 
-              <p className="text-base mb-8" style={{ color: 'rgba(30,39,73,0.9)' }}>
+              <p className="text-base mb-8" style={{ color: 'rgba(255,255,255,0.8)' }}>
                 Track educator engagement, measure implementation, and prove your PD investment is working.
               </p>
 
@@ -170,11 +170,11 @@ function PartnerLoginContent() {
                   <div key={text} className="flex items-start gap-3">
                     <div
                       className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center mt-0.5"
-                      style={{ backgroundColor: 'rgba(30,39,73,0.1)' }}
+                      style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
                     >
-                      <Icon className="w-5 h-5" style={{ color: '#1e2749' }} />
+                      <Icon className="w-5 h-5" style={{ color: '#ffffff' }} />
                     </div>
-                    <p className="text-sm leading-relaxed" style={{ color: 'rgba(30,39,73,0.95)' }}>
+                    <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.9)' }}>
                       {text}
                     </p>
                   </div>
@@ -183,12 +183,12 @@ function PartnerLoginContent() {
 
               <div
                 className="rounded-xl p-5 mb-8"
-                style={{ backgroundColor: 'rgba(30,39,73,0.08)', borderLeft: '3px solid #1e2749' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderLeft: '3px solid #1e2749' }}
               >
-                <p className="text-sm italic leading-relaxed mb-3" style={{ color: 'rgba(30,39,73,0.9)' }}>
+                <p className="text-sm italic leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.8)' }}>
                   &ldquo;I used to guess whether PD was working. Now I can show my board exactly what our teachers are doing and how it&apos;s impacting our school.&rdquo;
                 </p>
-                <p className="text-xs font-medium" style={{ color: '#1e2749' }}>
+                <p className="text-xs font-medium" style={{ color: '#ffffff' }}>
                   -- Elementary principal, Year 2
                 </p>
               </div>
@@ -198,7 +198,7 @@ function PartnerLoginContent() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm font-medium hover:underline"
-                style={{ color: '#1e2749' }}
+                style={{ color: '#ffffff' }}
               >
                 Learn how TDI partners with schools &rarr;
               </a>

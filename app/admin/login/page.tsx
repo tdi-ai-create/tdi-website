@@ -164,48 +164,48 @@ export default function AdminLoginPage() {
         {/* Left Panel */}
         <div
           className="oldadmin-login-left w-1/2 flex-col justify-center px-16 py-12 relative overflow-hidden"
-          style={{ backgroundColor: '#AEA3CD' }}
+          style={{ backgroundColor: '#5B4E8A' }}
         >
           <div className="relative z-10 max-w-md">
-            <span className="inline-block px-3 py-1 text-xs font-medium tracking-wider uppercase rounded-full mb-8" style={{ backgroundColor: 'rgba(30,39,73,0.1)', color: '#1e2749' }}>
+            <span className="inline-block px-3 py-1 text-xs font-medium tracking-wider uppercase rounded-full mb-8" style={{ backgroundColor: 'rgba(255,255,255,0.12)', color: '#ffffff' }}>
               TDI Admin
             </span>
 
-            <h1 className="text-3xl font-bold mb-3 leading-tight" style={{ color: '#1e2749' }}>
+            <h1 className="text-3xl font-bold mb-3 leading-tight" style={{ color: '#ffffff' }}>
               Creator &amp; Partnership Admin
             </h1>
-            <p className="text-base mb-10" style={{ color: 'rgba(30,39,73,0.8)' }}>
+            <p className="text-base mb-10" style={{ color: 'rgba(255,255,255,0.7)' }}>
               Manage creator pipelines, partnership data, and survey responses.
             </p>
 
             <div className="space-y-6 mb-12">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(30,39,73,0.1)' }}>
-                  <Users className="w-5 h-5" style={{ color: '#1e2749' }} />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(255,255,255,0.12)' }}>
+                  <Users className="w-5 h-5" style={{ color: '#ffffff' }} />
                 </div>
-                <p className="text-sm leading-relaxed pt-2" style={{ color: 'rgba(30,39,73,0.95)' }}>
+                <p className="text-sm leading-relaxed pt-2" style={{ color: 'rgba(255,255,255,0.9)' }}>
                   Creator pipeline management and milestone tracking
                 </p>
               </div>
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(30,39,73,0.1)' }}>
-                  <FileText className="w-5 h-5" style={{ color: '#1e2749' }} />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(255,255,255,0.12)' }}>
+                  <FileText className="w-5 h-5" style={{ color: '#ffffff' }} />
                 </div>
-                <p className="text-sm leading-relaxed pt-2" style={{ color: 'rgba(30,39,73,0.95)' }}>
+                <p className="text-sm leading-relaxed pt-2" style={{ color: 'rgba(255,255,255,0.9)' }}>
                   Partnership survey administration
                 </p>
               </div>
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(30,39,73,0.1)' }}>
-                  <BarChart3 className="w-5 h-5" style={{ color: '#1e2749' }} />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(255,255,255,0.12)' }}>
+                  <BarChart3 className="w-5 h-5" style={{ color: '#ffffff' }} />
                 </div>
-                <p className="text-sm leading-relaxed pt-2" style={{ color: 'rgba(30,39,73,0.95)' }}>
+                <p className="text-sm leading-relaxed pt-2" style={{ color: 'rgba(255,255,255,0.9)' }}>
                   Content publishing and analytics
                 </p>
               </div>
             </div>
 
-            <p className="text-xs" style={{ color: 'rgba(30,39,73,0.65)' }}>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
               Requires a @teachersdeserveit.com account
             </p>
           </div>
