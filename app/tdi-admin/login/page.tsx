@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { LayoutDashboard, Users, BarChart3, Settings } from 'lucide-react';
 import { checkTeamAccess } from '@/lib/tdi-admin/permissions';
 import { getSupabase } from '@/lib/supabase';
 import PortalSignIn from '@/components/auth/PortalSignIn';
@@ -127,16 +128,166 @@ export default function TDIAdminLoginPage() {
     );
   }
 
+  const valueProps = [
+    { icon: LayoutDashboard, text: 'Creator Studio management with milestone tracking' },
+    { icon: Users, text: 'Partnership lifecycle from sales through renewal' },
+    { icon: BarChart3, text: 'Live Hub analytics and educator engagement data' },
+    { icon: Settings, text: 'Automated workflows, notifications, and reports' },
+  ];
+
   return (
-    <PortalSignIn
-      portalTitle="TDI Admin Portal"
-      portalSubtitle="Sign in to manage Teachers Deserve It"
-      methods={{ google: true, emailPassword: true, magicLink: true, signUp: false }}
-      onSuccess={handleSuccess}
-      magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/tdi-admin/login` : '/tdi-admin/login'}
-      googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/tdi-admin` : '/tdi-admin'}
-      forgotPasswordRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/tdi-admin/login` : '/tdi-admin/login'}
-      backHref="/"
-    />
+    <>
+      <style>{`
+        .admin-login-left {
+          display: flex;
+          width: 50%;
+          min-height: 100vh;
+          flex-direction: column;
+          justify-content: center;
+          padding: 3rem;
+          background-color: #1e2749;
+          color: #ffffff;
+        }
+        .admin-login-right {
+          display: flex;
+          width: 50%;
+          min-height: 100vh;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem;
+          background-color: #F9FAFB;
+        }
+        @media (max-width: 768px) {
+          .admin-login-left {
+            display: none;
+          }
+          .admin-login-right {
+            width: 100%;
+          }
+        }
+      `}</style>
+      <div style={{ display: 'flex', minHeight: '100vh' }}>
+        {/* Left Panel */}
+        <div className="admin-login-left">
+          <div style={{ maxWidth: '480px', margin: '0 auto' }}>
+            <span
+              style={{
+                display: 'inline-block',
+                padding: '6px 16px',
+                borderRadius: '9999px',
+                backgroundColor: '#ffba06',
+                color: '#1e2749',
+                fontSize: '12px',
+                fontWeight: 700,
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase' as const,
+                fontFamily: "'DM Sans', sans-serif",
+                marginBottom: '24px',
+              }}
+            >
+              TDI ADMIN PORTAL
+            </span>
+
+            <h1
+              style={{
+                fontFamily: "'Source Serif 4', Georgia, serif",
+                fontSize: '36px',
+                fontWeight: 700,
+                lineHeight: 1.2,
+                marginBottom: '16px',
+                color: '#ffffff',
+              }}
+            >
+              Manage Everything in One Place
+            </h1>
+
+            <p
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '16px',
+                lineHeight: 1.6,
+                color: 'rgba(255,255,255,0.7)',
+                marginBottom: '40px',
+              }}
+            >
+              Creators, partnerships, Hub analytics, sales pipeline, and funding -- all from your admin dashboard.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {valueProps.map((prop, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+                  <div
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '10px',
+                      backgroundColor: 'rgba(255,186,6,0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <prop.icon size={20} color="#ffba06" />
+                  </div>
+                  <p
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: '15px',
+                      color: 'rgba(255,255,255,0.85)',
+                      lineHeight: 1.5,
+                      paddingTop: '8px',
+                    }}
+                  >
+                    {prop.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Panel */}
+        <div className="admin-login-right">
+          <div style={{ width: '100%', maxWidth: '440px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <h2
+                style={{
+                  fontFamily: "'Source Serif 4', Georgia, serif",
+                  fontSize: '24px',
+                  fontWeight: 700,
+                  color: '#1e2749',
+                  marginBottom: '8px',
+                }}
+              >
+                TDI Admin Portal
+              </h2>
+              <p
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '14px',
+                  color: '#6B7280',
+                }}
+              >
+                Sign in to manage Teachers Deserve It
+              </p>
+            </div>
+
+            <PortalSignIn
+              compact
+              portalTitle="TDI Admin Portal"
+              portalSubtitle="Sign in to manage Teachers Deserve It"
+              methods={{ google: true, emailPassword: true, magicLink: true, signUp: false }}
+              onSuccess={handleSuccess}
+              magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/tdi-admin/login` : '/tdi-admin/login'}
+              googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/tdi-admin` : '/tdi-admin'}
+              forgotPasswordRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/tdi-admin/login` : '/tdi-admin/login'}
+              backHref="/"
+            />
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

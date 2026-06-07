@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { AlertCircle, RefreshCw, LogOut } from 'lucide-react';
+import { AlertCircle, RefreshCw, LogOut, Users, FileText, BarChart3 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import PortalSignIn from '@/components/auth/PortalSignIn';
 
@@ -142,16 +142,108 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <PortalSignIn
-      portalTitle="TDI Admin"
-      portalSubtitle="Sign in to access the admin dashboard"
-      methods={{ google: true, emailPassword: true, magicLink: true, signUp: false }}
-      onEmailPreCheck={handleEmailPreCheck}
-      onSuccess={handleSuccess}
-      magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/admin/login` : '/admin/login'}
-      googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/admin/login` : '/admin/login'}
-      forgotPasswordRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/admin/login` : '/admin/login'}
-      backHref="/"
-    />
+    <>
+      <style>{`
+        .oldadmin-login-left {
+          display: flex;
+        }
+        .oldadmin-login-right {
+          display: flex;
+        }
+        @media (max-width: 768px) {
+          .oldadmin-login-left {
+            display: none !important;
+          }
+          .oldadmin-login-right {
+            width: 100% !important;
+            min-width: 100% !important;
+          }
+        }
+      `}</style>
+      <div className="min-h-screen flex" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+        {/* Left Panel */}
+        <div
+          className="oldadmin-login-left w-1/2 flex-col justify-center px-16 py-12 relative overflow-hidden"
+          style={{ backgroundColor: '#1e2749' }}
+        >
+          {/* Subtle accent circles */}
+          <div
+            className="absolute top-[-80px] left-[-80px] w-64 h-64 rounded-full opacity-10"
+            style={{ backgroundColor: '#3b82f6' }}
+          />
+          <div
+            className="absolute bottom-[-60px] right-[-60px] w-48 h-48 rounded-full opacity-5"
+            style={{ backgroundColor: '#60a5fa' }}
+          />
+
+          <div className="relative z-10 max-w-md">
+            <span className="inline-block px-3 py-1 text-xs font-medium tracking-wider uppercase rounded-full bg-white/10 text-gray-300 mb-8">
+              TDI Admin
+            </span>
+
+            <h1 className="text-3xl font-bold text-white mb-3 leading-tight">
+              Creator &amp; Partnership Admin
+            </h1>
+            <p className="text-gray-400 text-base mb-10">
+              Manage creator pipelines, partnership data, and survey responses.
+            </p>
+
+            <div className="space-y-6 mb-12">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <Users className="w-5 h-5 text-blue-300" />
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed pt-2">
+                  Creator pipeline management and milestone tracking
+                </p>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <FileText className="w-5 h-5 text-blue-300" />
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed pt-2">
+                  Partnership survey administration
+                </p>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <BarChart3 className="w-5 h-5 text-blue-300" />
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed pt-2">
+                  Content publishing and analytics
+                </p>
+              </div>
+            </div>
+
+            <p className="text-gray-500 text-xs">
+              Requires a @teachersdeserveit.com account
+            </p>
+          </div>
+        </div>
+
+        {/* Right Panel */}
+        <div
+          className="oldadmin-login-right w-1/2 flex-col items-center justify-center px-8 py-12"
+          style={{ backgroundColor: '#F9FAFB' }}
+        >
+          <div className="w-full max-w-md mx-auto">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-[#1e2749] mb-1">TDI Admin</h2>
+              <p className="text-gray-500 text-sm">Sign in to access the admin dashboard</p>
+            </div>
+            <PortalSignIn
+              compact
+              methods={{ google: true, emailPassword: true, magicLink: true, signUp: false }}
+              onEmailPreCheck={handleEmailPreCheck}
+              onSuccess={handleSuccess}
+              magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/admin/login` : '/admin/login'}
+              googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/admin/login` : '/admin/login'}
+              forgotPasswordRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/admin/login` : '/admin/login'}
+              backHref="/"
+            />
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
