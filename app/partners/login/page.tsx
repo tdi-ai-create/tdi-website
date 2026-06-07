@@ -156,7 +156,7 @@ function PartnerLoginContent() {
                 Your School&apos;s PD Command Center
               </h1>
 
-              <p className="text-base mb-8" style={{ color: 'rgba(30,39,73,0.7)' }}>
+              <p className="text-base mb-8" style={{ color: 'rgba(30,39,73,0.9)' }}>
                 Track educator engagement, measure implementation, and prove your PD investment is working.
               </p>
 
@@ -174,7 +174,7 @@ function PartnerLoginContent() {
                     >
                       <Icon className="w-5 h-5" style={{ color: '#1e2749' }} />
                     </div>
-                    <p className="text-sm leading-relaxed" style={{ color: 'rgba(30,39,73,0.85)' }}>
+                    <p className="text-sm leading-relaxed" style={{ color: 'rgba(30,39,73,0.95)' }}>
                       {text}
                     </p>
                   </div>
@@ -185,7 +185,7 @@ function PartnerLoginContent() {
                 className="rounded-xl p-5 mb-8"
                 style={{ backgroundColor: 'rgba(30,39,73,0.08)', borderLeft: '3px solid #1e2749' }}
               >
-                <p className="text-sm italic leading-relaxed mb-3" style={{ color: 'rgba(30,39,73,0.8)' }}>
+                <p className="text-sm italic leading-relaxed mb-3" style={{ color: 'rgba(30,39,73,0.9)' }}>
                   &ldquo;I used to guess whether PD was working. Now I can show my board exactly what our teachers are doing and how it&apos;s impacting our school.&rdquo;
                 </p>
                 <p className="text-xs font-medium" style={{ color: '#1e2749' }}>

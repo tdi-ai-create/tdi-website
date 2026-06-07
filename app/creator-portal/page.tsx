@@ -138,7 +138,7 @@ function CreatorPortalLoginContent({ onPendingRedirect }: CreatorPortalLoginCont
               Build PD That Changes Classrooms
             </h1>
 
-            <p style={{ fontSize: 15, color: 'rgba(30,39,73,0.65)', lineHeight: 1.6, margin: '0 0 32px 0' }}>
+            <p style={{ fontSize: 15, color: 'rgba(30,39,73,0.8)', lineHeight: 1.6, margin: '0 0 32px 0' }}>
               Create content that reaches 100,000+ educators. We handle production, distribution, and support.
             </p>
 
@@ -151,7 +151,7 @@ function CreatorPortalLoginContent({ onPendingRedirect }: CreatorPortalLoginCont
                     <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(30,39,73,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       <Icon style={{ width: 18, height: 18, color: '#1e2749' }} />
                     </div>
-                    <p style={{ fontSize: 14, color: 'rgba(30,39,73,0.85)', lineHeight: 1.5, margin: 0 }}>{vp.text}</p>
+                    <p style={{ fontSize: 14, color: 'rgba(30,39,73,0.95)', lineHeight: 1.5, margin: 0 }}>{vp.text}</p>
                   </div>
                 );
               })}
@@ -159,10 +159,10 @@ function CreatorPortalLoginContent({ onPendingRedirect }: CreatorPortalLoginCont
 
             {/* Testimonial */}
             <div style={{ borderLeft: '3px solid #1e2749', paddingLeft: 16, marginBottom: 24 }}>
-              <p style={{ fontSize: 14, color: 'rgba(30,39,73,0.75)', lineHeight: 1.6, fontStyle: 'italic', margin: '0 0 8px 0' }}>
+              <p style={{ fontSize: 14, color: 'rgba(30,39,73,0.9)', lineHeight: 1.6, fontStyle: 'italic', margin: '0 0 8px 0' }}>
                 &ldquo;TDI made it easy to turn my classroom strategies into something thousands of teachers could use. The process was seamless.&rdquo;
               </p>
-              <p style={{ fontSize: 12, color: 'rgba(30,39,73,0.45)', margin: 0 }}>-- Content creator, Year 3</p>
+              <p style={{ fontSize: 12, color: 'rgba(30,39,73,0.6)', margin: 0 }}>-- Content creator, Year 3</p>
             </div>
 
             <a href="/create-with-us" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: '#1e2749', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>

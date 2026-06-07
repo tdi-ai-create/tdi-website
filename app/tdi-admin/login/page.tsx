@@ -207,7 +207,7 @@ export default function TDIAdminLoginPage() {
                 fontFamily: "'DM Sans', sans-serif",
                 fontSize: '16px',
                 lineHeight: 1.6,
-                color: 'rgba(30,39,73,0.65)',
+                color: 'rgba(30,39,73,0.8)',
                 marginBottom: '40px',
               }}
             >
@@ -235,7 +235,7 @@ export default function TDIAdminLoginPage() {
                     style={{
                       fontFamily: "'DM Sans', sans-serif",
                       fontSize: '15px',
-                      color: 'rgba(30,39,73,0.85)',
+                      color: 'rgba(30,39,73,0.95)',
                       lineHeight: 1.5,
                       paddingTop: '8px',
                     }}

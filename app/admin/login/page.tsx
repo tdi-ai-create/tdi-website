@@ -174,7 +174,7 @@ export default function AdminLoginPage() {
             <h1 className="text-3xl font-bold mb-3 leading-tight" style={{ color: '#1e2749' }}>
               Creator &amp; Partnership Admin
             </h1>
-            <p className="text-base mb-10" style={{ color: 'rgba(30,39,73,0.65)' }}>
+            <p className="text-base mb-10" style={{ color: 'rgba(30,39,73,0.8)' }}>
               Manage creator pipelines, partnership data, and survey responses.
             </p>
 
@@ -183,7 +183,7 @@ export default function AdminLoginPage() {
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(30,39,73,0.1)' }}>
                   <Users className="w-5 h-5" style={{ color: '#1e2749' }} />
                 </div>
-                <p className="text-sm leading-relaxed pt-2" style={{ color: 'rgba(30,39,73,0.85)' }}>
+                <p className="text-sm leading-relaxed pt-2" style={{ color: 'rgba(30,39,73,0.95)' }}>
                   Creator pipeline management and milestone tracking
                 </p>
               </div>
@@ -191,7 +191,7 @@ export default function AdminLoginPage() {
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(30,39,73,0.1)' }}>
                   <FileText className="w-5 h-5" style={{ color: '#1e2749' }} />
                 </div>
-                <p className="text-sm leading-relaxed pt-2" style={{ color: 'rgba(30,39,73,0.85)' }}>
+                <p className="text-sm leading-relaxed pt-2" style={{ color: 'rgba(30,39,73,0.95)' }}>
                   Partnership survey administration
                 </p>
               </div>
@@ -199,13 +199,13 @@ export default function AdminLoginPage() {
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(30,39,73,0.1)' }}>
                   <BarChart3 className="w-5 h-5" style={{ color: '#1e2749' }} />
                 </div>
-                <p className="text-sm leading-relaxed pt-2" style={{ color: 'rgba(30,39,73,0.85)' }}>
+                <p className="text-sm leading-relaxed pt-2" style={{ color: 'rgba(30,39,73,0.95)' }}>
                   Content publishing and analytics
                 </p>
               </div>
             </div>
 
-            <p className="text-xs" style={{ color: 'rgba(30,39,73,0.5)' }}>
+            <p className="text-xs" style={{ color: 'rgba(30,39,73,0.65)' }}>
               Requires a @teachersdeserveit.com account
             </p>
           </div>
