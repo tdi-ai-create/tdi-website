@@ -54,30 +54,34 @@ export default function HubLoginPage() {
         <div style={{ position: 'fixed', inset: 0, zIndex: 9998, background: 'linear-gradient(135deg, #2a9d8f, #1f7a6e)', transition: 'opacity 500ms ease-out', opacity: timerDone ? 0 : 1 }} />
       )}
 
-      <div style={{ visibility: showPage ? 'visible' : 'hidden', opacity: showPage ? 1 : 0, transition: 'opacity 300ms ease-in', backgroundColor: '#ffffff' }}>
+      <div style={{ visibility: showPage ? 'visible' : 'hidden', opacity: showPage ? 1 : 0, transition: 'opacity 300ms ease-in', backgroundColor: '#F9FAFB' }}>
 
-        {/* ═══ HERO ═══ */}
-        <section style={{ backgroundColor: '#1e2749', padding: '32px 16px 24px' }}>
+        {/* ═══ HERO + SIGN IN (overlapping card) ═══ */}
+        <section style={{ backgroundColor: '#1e2749', padding: '32px 16px 80px' }}>
           <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
             <span style={{ display: 'inline-block', padding: '6px 14px', background: 'rgba(255,186,6,0.15)', color: '#ffba06', borderRadius: 999, fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 12 }}>
               {tUI('The TDI Learning Hub')}
             </span>
-            <h1 style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 700, color: 'white', margin: '0 0 16px 0', lineHeight: 1.15 }}>
+            <h1 style={{ fontSize: 'clamp(24px, 3.5vw, 36px)', fontWeight: 700, color: 'white', margin: '0 0 8px 0', lineHeight: 1.2 }}>
               {tUI('Professional Development That Actually Works')}
             </h1>
-            <p style={{ fontSize: 18, color: 'white', opacity: 0.85, maxWidth: 700, margin: '0 auto', lineHeight: 1.6 }}>
+            <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.7)', maxWidth: 600, margin: '0 auto', lineHeight: 1.5 }}>
               {tUI('Tools you can use Monday morning. A community that gets it. PD credit you can prove.')}
             </p>
           </div>
         </section>
 
-        {/* ═══ SIGN IN ═══ */}
-        <section style={{ padding: '24px 16px 28px', backgroundColor: '#F9FAFB' }}>
+        <section style={{ padding: '0 16px 24px', marginTop: -56 }}>
           <div style={{ maxWidth: 420, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 16 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1e2749', margin: '0 0 4px' }}>{tUI('Sign in to the Hub')}</h2>
+              <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>{tUI('Free account. No credit card required.')}</p>
+            </div>
             <PortalSignIn
               portalTitle="Sign in to the Hub"
               portalSubtitle="Free account. No credit card required."
               backHref={null}
+              compact
               methods={{ google: true, emailPassword: true, magicLink: true, signUp: true }}
               onSuccess={handleSuccess}
               getSupabaseClient={getHubSupabase}
