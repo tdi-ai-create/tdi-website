@@ -15,17 +15,17 @@ export function MainSiteWrapper({ children }: MainSiteWrapperProps) {
   const pathname = usePathname();
   const isHubRoute = pathname?.startsWith('/hub');
   const isTDIAdminRoute = pathname?.startsWith('/tdi-admin');
+  const isAdminRoute = pathname?.startsWith('/admin');
   const isLoginPage = pathname === '/login';
   const isDashboardRoute = pathname?.toLowerCase().includes('-dashboard');
-  // Partner portal dashboard routes (exclude login/reset-password which have their own layouts)
-  const isPartnerDashboard = pathname?.startsWith('/partners/') &&
-    !pathname?.startsWith('/partners/login') &&
-    !pathname?.startsWith('/partners/reset-password');
+  const isCreatorPortal = pathname?.startsWith('/creator-portal');
+  // All partner routes have their own layouts
+  const isPartnerRoute = pathname?.startsWith('/partners/');
   // Client-facing quote signing pages
   const isInvoiceRoute = pathname?.startsWith('/invoice');
 
-  // Don't render main site chrome on Hub, TDI Admin, Login, Partner Dashboard, or Invoice routes
-  if (isHubRoute || isTDIAdminRoute || isLoginPage || isDashboardRoute || isPartnerDashboard || isInvoiceRoute) {
+  // Don't render main site chrome on portal routes
+  if (isHubRoute || isTDIAdminRoute || isAdminRoute || isLoginPage || isDashboardRoute || isCreatorPortal || isPartnerRoute || isInvoiceRoute) {
     return null;
   }
 
