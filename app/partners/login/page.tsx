@@ -217,13 +217,15 @@ function PartnerLoginContent() {
               </div>
 
               <PortalSignIn
+                portalTitle="Partner Dashboard"
+                portalSubtitle="Log in to your partner account"
                 compact
                 methods={{ google: true, emailPassword: true, magicLink: true, signUp: false }}
                 onSuccess={handleSuccess}
                 magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/partners/login` : '/partners/login'}
                 googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/partners/login` : '/partners/login'}
                 forgotPasswordRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/partners/reset-password` : '/partners/reset-password'}
-                backHref="/"
+                backHref={null}
               />
 
               <div className="partner-login-mobile-link">

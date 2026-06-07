@@ -232,6 +232,8 @@ export default function AdminLoginPage() {
               <p className="text-gray-500 text-sm">Sign in to access the admin dashboard</p>
             </div>
             <PortalSignIn
+              portalTitle="TDI Admin"
+              portalSubtitle="Sign in to access the admin dashboard"
               compact
               methods={{ google: true, emailPassword: true, magicLink: true, signUp: false }}
               onEmailPreCheck={handleEmailPreCheck}
@@ -239,7 +241,7 @@ export default function AdminLoginPage() {
               magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/admin/login` : '/admin/login'}
               googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/admin/login` : '/admin/login'}
               forgotPasswordRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/admin/login` : '/admin/login'}
-              backHref="/"
+              backHref={null}
             />
           </div>
         </div>

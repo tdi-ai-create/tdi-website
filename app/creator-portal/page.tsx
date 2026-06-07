@@ -189,7 +189,7 @@ function CreatorPortalLoginContent({ onPendingRedirect }: CreatorPortalLoginCont
               onSuccess={handleSuccess}
               magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/creator-portal` : '/creator-portal'}
               googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/creator-portal/auth/callback` : '/creator-portal/auth/callback'}
-              backHref="/"
+              backHref={null}
             />
             {/* Mobile-only: show learn link (desktop has it on left panel) */}
             <p className="creator-login-mobile-link" style={{ textAlign: 'center', marginTop: 12 }}>
