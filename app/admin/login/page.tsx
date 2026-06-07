@@ -164,58 +164,48 @@ export default function AdminLoginPage() {
         {/* Left Panel */}
         <div
           className="oldadmin-login-left w-1/2 flex-col justify-center px-16 py-12 relative overflow-hidden"
-          style={{ backgroundColor: '#1e2749' }}
+          style={{ backgroundColor: '#AEA3CD' }}
         >
-          {/* Subtle accent circles */}
-          <div
-            className="absolute top-[-80px] left-[-80px] w-64 h-64 rounded-full opacity-10"
-            style={{ backgroundColor: '#3b82f6' }}
-          />
-          <div
-            className="absolute bottom-[-60px] right-[-60px] w-48 h-48 rounded-full opacity-5"
-            style={{ backgroundColor: '#60a5fa' }}
-          />
-
           <div className="relative z-10 max-w-md">
-            <span className="inline-block px-3 py-1 text-xs font-medium tracking-wider uppercase rounded-full bg-white/10 text-gray-300 mb-8">
+            <span className="inline-block px-3 py-1 text-xs font-medium tracking-wider uppercase rounded-full mb-8" style={{ backgroundColor: 'rgba(30,39,73,0.1)', color: '#1e2749' }}>
               TDI Admin
             </span>
 
-            <h1 className="text-3xl font-bold text-white mb-3 leading-tight">
+            <h1 className="text-3xl font-bold mb-3 leading-tight" style={{ color: '#1e2749' }}>
               Creator &amp; Partnership Admin
             </h1>
-            <p className="text-gray-400 text-base mb-10">
+            <p className="text-base mb-10" style={{ color: 'rgba(30,39,73,0.65)' }}>
               Manage creator pipelines, partnership data, and survey responses.
             </p>
 
             <div className="space-y-6 mb-12">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                  <Users className="w-5 h-5 text-blue-300" />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(30,39,73,0.1)' }}>
+                  <Users className="w-5 h-5" style={{ color: '#1e2749' }} />
                 </div>
-                <p className="text-gray-300 text-sm leading-relaxed pt-2">
+                <p className="text-sm leading-relaxed pt-2" style={{ color: 'rgba(30,39,73,0.85)' }}>
                   Creator pipeline management and milestone tracking
                 </p>
               </div>
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                  <FileText className="w-5 h-5 text-blue-300" />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(30,39,73,0.1)' }}>
+                  <FileText className="w-5 h-5" style={{ color: '#1e2749' }} />
                 </div>
-                <p className="text-gray-300 text-sm leading-relaxed pt-2">
+                <p className="text-sm leading-relaxed pt-2" style={{ color: 'rgba(30,39,73,0.85)' }}>
                   Partnership survey administration
                 </p>
               </div>
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                  <BarChart3 className="w-5 h-5 text-blue-300" />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(30,39,73,0.1)' }}>
+                  <BarChart3 className="w-5 h-5" style={{ color: '#1e2749' }} />
                 </div>
-                <p className="text-gray-300 text-sm leading-relaxed pt-2">
+                <p className="text-sm leading-relaxed pt-2" style={{ color: 'rgba(30,39,73,0.85)' }}>
                   Content publishing and analytics
                 </p>
               </div>
             </div>
 
-            <p className="text-gray-500 text-xs">
+            <p className="text-xs" style={{ color: 'rgba(30,39,73,0.5)' }}>
               Requires a @teachersdeserveit.com account
             </p>
           </div>

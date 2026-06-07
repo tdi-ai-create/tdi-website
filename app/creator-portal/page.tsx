@@ -127,18 +127,18 @@ function CreatorPortalLoginContent({ onPendingRedirect }: CreatorPortalLoginCont
 
         {/* LEFT: Navy pitch panel */}
         <div style={{
-          flex: '1 1 50%', backgroundColor: '#1e2749', padding: '48px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'center',
+          flex: '1 1 50%', backgroundColor: '#F0BDA8', padding: '48px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'center',
         }} className="creator-login-left">
           <div style={{ maxWidth: 480 }}>
-            <span style={{ display: 'inline-block', padding: '5px 12px', background: 'rgba(255,186,6,0.15)', color: '#ffba06', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 20 }}>
+            <span style={{ display: 'inline-block', padding: '5px 12px', background: 'rgba(30,39,73,0.1)', color: '#1e2749', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 20 }}>
               TDI Creator Studio
             </span>
 
-            <h1 style={{ fontSize: 'clamp(28px, 3vw, 40px)', fontWeight: 700, color: 'white', margin: '0 0 12px 0', lineHeight: 1.15 }}>
+            <h1 style={{ fontSize: 'clamp(28px, 3vw, 40px)', fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0', lineHeight: 1.15 }}>
               Build PD That Changes Classrooms
             </h1>
 
-            <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.65)', lineHeight: 1.6, margin: '0 0 32px 0' }}>
+            <p style={{ fontSize: 15, color: 'rgba(30,39,73,0.65)', lineHeight: 1.6, margin: '0 0 32px 0' }}>
               Create content that reaches 100,000+ educators. We handle production, distribution, and support.
             </p>
 
@@ -148,24 +148,24 @@ function CreatorPortalLoginContent({ onPendingRedirect }: CreatorPortalLoginCont
                 const Icon = vp.icon;
                 return (
                   <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(255,186,6,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <Icon style={{ width: 18, height: 18, color: '#ffba06' }} />
+                    <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(30,39,73,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Icon style={{ width: 18, height: 18, color: '#1e2749' }} />
                     </div>
-                    <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', lineHeight: 1.5, margin: 0 }}>{vp.text}</p>
+                    <p style={{ fontSize: 14, color: 'rgba(30,39,73,0.85)', lineHeight: 1.5, margin: 0 }}>{vp.text}</p>
                   </div>
                 );
               })}
             </div>
 
             {/* Testimonial */}
-            <div style={{ borderLeft: '3px solid #ffba06', paddingLeft: 16, marginBottom: 24 }}>
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', lineHeight: 1.6, fontStyle: 'italic', margin: '0 0 8px 0' }}>
+            <div style={{ borderLeft: '3px solid #1e2749', paddingLeft: 16, marginBottom: 24 }}>
+              <p style={{ fontSize: 14, color: 'rgba(30,39,73,0.75)', lineHeight: 1.6, fontStyle: 'italic', margin: '0 0 8px 0' }}>
                 &ldquo;TDI made it easy to turn my classroom strategies into something thousands of teachers could use. The process was seamless.&rdquo;
               </p>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: 0 }}>-- Content creator, Year 3</p>
+              <p style={{ fontSize: 12, color: 'rgba(30,39,73,0.45)', margin: 0 }}>-- Content creator, Year 3</p>
             </div>
 
-            <a href="/create-with-us" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: '#ffba06', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <a href="/create-with-us" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: '#1e2749', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               Learn about creating with us <ArrowRight size={14} />
             </a>
           </div>

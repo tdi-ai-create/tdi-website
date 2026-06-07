@@ -145,8 +145,8 @@ export default function TDIAdminLoginPage() {
           flex-direction: column;
           justify-content: center;
           padding: 3rem;
-          background-color: #1e2749;
-          color: #ffffff;
+          background-color: #AEA3CD;
+          color: #1e2749;
         }
         .admin-login-right {
           display: flex;
@@ -176,7 +176,7 @@ export default function TDIAdminLoginPage() {
                 display: 'inline-block',
                 padding: '6px 16px',
                 borderRadius: '9999px',
-                backgroundColor: '#ffba06',
+                backgroundColor: 'rgba(30,39,73,0.12)',
                 color: '#1e2749',
                 fontSize: '12px',
                 fontWeight: 700,
@@ -196,7 +196,7 @@ export default function TDIAdminLoginPage() {
                 fontWeight: 700,
                 lineHeight: 1.2,
                 marginBottom: '16px',
-                color: '#ffffff',
+                color: '#1e2749',
               }}
             >
               Manage Everything in One Place
@@ -207,7 +207,7 @@ export default function TDIAdminLoginPage() {
                 fontFamily: "'DM Sans', sans-serif",
                 fontSize: '16px',
                 lineHeight: 1.6,
-                color: 'rgba(255,255,255,0.7)',
+                color: 'rgba(30,39,73,0.65)',
                 marginBottom: '40px',
               }}
             >
@@ -222,20 +222,20 @@ export default function TDIAdminLoginPage() {
                       width: '40px',
                       height: '40px',
                       borderRadius: '10px',
-                      backgroundColor: 'rgba(255,186,6,0.15)',
+                      backgroundColor: 'rgba(30,39,73,0.1)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
                     }}
                   >
-                    <prop.icon size={20} color="#ffba06" />
+                    <prop.icon size={20} color="#1e2749" />
                   </div>
                   <p
                     style={{
                       fontFamily: "'DM Sans', sans-serif",
                       fontSize: '15px',
-                      color: 'rgba(255,255,255,0.85)',
+                      color: 'rgba(30,39,73,0.85)',
                       lineHeight: 1.5,
                       paddingTop: '8px',
                     }}
