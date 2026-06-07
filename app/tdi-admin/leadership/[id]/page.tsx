@@ -23,7 +23,7 @@ import { TDISuggestions } from '@/components/dashboard/shared/TDISuggestions'
 import { STATIC_DEFAULTS } from '@/lib/dashboard/dashboardDefaults'
 import { generateSuggestions, type TDISuggestion } from '@/lib/dashboard/generateSuggestions'
 import { StaffRosterWithPhotos, StaffPhotoUpload, FindStaffSearch } from '@/components/tdi-admin/leadership/staff'
-import { ArrowLeft, Loader2, Building2, Upload, ExternalLink, Calendar, Mail, Phone, MessageCircle } from 'lucide-react'
+import { ArrowLeft, Loader2, Building2, Upload, ExternalLink, Calendar, Mail, Phone, MessageCircle, CheckCircle2, Circle, Clock, Eye, EyeOff, Trash2, Plus, ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 import OnboardingChecklist from '@/components/dashboard/leadership/OnboardingChecklist'
 import StaffEngagementRoster from '@/components/dashboard/leadership/StaffEngagementRoster'
@@ -158,6 +158,16 @@ export default function AdminPartnershipDetailPage() {
   const [showMeetingForm, setShowMeetingForm] = useState(false)
   const [newMeeting, setNewMeeting] = useState({ date: '', type: 'check_in', attendees: '', summary: '', actionItems: '' })
   const [addingMeeting, setAddingMeeting] = useState(false)
+
+  // Action items UI state
+  const [showAddAction, setShowAddAction] = useState(false)
+  const [newAction, setNewAction] = useState({ title: '', description: '', due_date: '', category: 'general', visible_to_partner: false })
+  const [savingAction, setSavingAction] = useState(false)
+  const [expandedActionId, setExpandedActionId] = useState<string | null>(null)
+  const [editingActionField, setEditingActionField] = useState<{ id: string; field: string } | null>(null)
+  const [editingActionValue, setEditingActionValue] = useState('')
+  const [showCompletedActions, setShowCompletedActions] = useState(false)
+  const [deletingActionId, setDeletingActionId] = useState<string | null>(null)
 
   // KPI state
   const [kpiMenu, setKpiMenu] = useState<{ key: string; label: string; unit: string; benchmarkLow: number; benchmarkHigh: number; benchmarkLabel: string; dataSource: string; howTdiDelivers: string; suggestedTarget: number; category: string }[]>([])
@@ -1700,6 +1710,336 @@ export default function AdminPartnershipDetailPage() {
                   Generate briefing
                 </button>
               </div>
+            </div>
+
+            {/* Action Items */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-bold text-gray-900">Action Items</h3>
+                  {actionItems.length > 0 && (
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{actionItems.filter(a => a.status !== 'completed').length} open</span>
+                  )}
+                </div>
+                <button
+                  onClick={() => setShowAddAction(!showAddAction)}
+                  className="flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg hover:bg-gray-50 transition"
+                  style={{ color: '#1e2749' }}
+                >
+                  <Plus size={14} />
+                  Add item
+                </button>
+              </div>
+
+              {/* Add action form */}
+              {showAddAction && (
+                <div className="border border-gray-200 rounded-lg p-3 mb-3 bg-gray-50">
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      placeholder="Title"
+                      value={newAction.title}
+                      onChange={e => setNewAction({ ...newAction, title: e.target.value })}
+                      className="w-full text-sm border border-gray-200 rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                    />
+                    <textarea
+                      placeholder="Description (optional)"
+                      value={newAction.description}
+                      onChange={e => setNewAction({ ...newAction, description: e.target.value })}
+                      className="w-full text-sm border border-gray-200 rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                      rows={2}
+                    />
+                    <div className="flex gap-2 items-center flex-wrap">
+                      <input
+                        type="date"
+                        value={newAction.due_date}
+                        onChange={e => setNewAction({ ...newAction, due_date: e.target.value })}
+                        className="text-xs border border-gray-200 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                      />
+                      <select
+                        value={newAction.category}
+                        onChange={e => setNewAction({ ...newAction, category: e.target.value })}
+                        className="text-xs border border-gray-200 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                      >
+                        <option value="general">General</option>
+                        <option value="onboarding">Onboarding</option>
+                        <option value="hub">Hub</option>
+                        <option value="coaching">Coaching</option>
+                        <option value="billing">Billing</option>
+                        <option value="follow_up">Follow-up</option>
+                      </select>
+                      <label className="flex items-center gap-1 text-xs text-gray-600 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newAction.visible_to_partner}
+                          onChange={e => setNewAction({ ...newAction, visible_to_partner: e.target.checked })}
+                          className="rounded border-gray-300"
+                        />
+                        Visible to partner
+                      </label>
+                    </div>
+                    <div className="flex gap-2 justify-end pt-1">
+                      <button
+                        onClick={() => { setShowAddAction(false); setNewAction({ title: '', description: '', due_date: '', category: 'general', visible_to_partner: false }) }}
+                        className="text-xs px-3 py-1.5 rounded-md text-gray-500 hover:bg-gray-100"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        disabled={!newAction.title.trim() || savingAction}
+                        onClick={async () => {
+                          setSavingAction(true)
+                          try {
+                            const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/action-items`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify(newAction),
+                            })
+                            if (res.ok) {
+                              const data = await res.json()
+                              setActionItems(prev => [data.item || data, ...prev])
+                              setNewAction({ title: '', description: '', due_date: '', category: 'general', visible_to_partner: false })
+                              setShowAddAction(false)
+                            }
+                          } catch { /* */ }
+                          setSavingAction(false)
+                        }}
+                        className="text-xs px-3 py-1.5 rounded-md text-white font-medium disabled:opacity-40"
+                        style={{ background: '#1e2749' }}
+                      >
+                        {savingAction ? 'Saving...' : 'Add'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Action items list */}
+              {actionItems.length === 0 && !showAddAction && (
+                <p className="text-xs text-gray-400 text-center py-4">No action items yet. Click &quot;Add item&quot; to create one.</p>
+              )}
+
+              {(() => {
+                const inProgress = actionItems.filter(a => a.status === 'in_progress')
+                const pending = actionItems.filter(a => a.status === 'pending')
+                const completed = actionItems.filter(a => a.status === 'completed')
+
+                const statusIcon = (status: string) => {
+                  if (status === 'completed') return <CheckCircle2 size={16} style={{ color: '#10B981' }} />
+                  if (status === 'in_progress') return <Clock size={16} style={{ color: '#EAB308' }} />
+                  return <Circle size={16} style={{ color: '#9CA3AF' }} />
+                }
+
+                const nextStatus = (s: string) => s === 'pending' ? 'in_progress' : s === 'in_progress' ? 'completed' : 'pending'
+
+                const categoryColors: Record<string, string> = {
+                  general: '#6B7280', onboarding: '#8B5CF6', hub: '#3B82F6',
+                  coaching: '#F59E0B', billing: '#EF4444', follow_up: '#10B981',
+                }
+
+                const updateItem = async (id: string, fields: Record<string, any>) => {
+                  try {
+                    const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/action-items`, {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ id, ...fields }),
+                    })
+                    if (res.ok) {
+                      setActionItems(prev => prev.map(a => a.id === id ? { ...a, ...fields } : a))
+                    }
+                  } catch { /* */ }
+                }
+
+                const deleteItem = async (id: string) => {
+                  try {
+                    const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/action-items`, {
+                      method: 'DELETE',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ id }),
+                    })
+                    if (res.ok) {
+                      setActionItems(prev => prev.filter(a => a.id !== id))
+                      setDeletingActionId(null)
+                    }
+                  } catch { /* */ }
+                }
+
+                const renderItem = (item: any) => (
+                  <div key={item.id} className="group flex items-start gap-2 py-2 px-2 rounded-lg hover:bg-gray-50 transition" style={{ borderBottom: '1px solid #F3F4F6' }}>
+                    {/* Status toggle */}
+                    <button
+                      onClick={() => updateItem(item.id, { status: nextStatus(item.status) })}
+                      className="mt-0.5 flex-shrink-0 hover:opacity-70"
+                      title={`Status: ${item.status} (click to change)`}
+                    >
+                      {statusIcon(item.status)}
+                    </button>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        {/* Title - inline edit */}
+                        {editingActionField?.id === item.id && editingActionField?.field === 'title' ? (
+                          <input
+                            autoFocus
+                            className="text-sm font-medium bg-white border border-blue-300 rounded px-1.5 py-0.5 flex-1"
+                            value={editingActionValue}
+                            onChange={e => setEditingActionValue(e.target.value)}
+                            onBlur={() => {
+                              if (editingActionValue.trim() && editingActionValue !== item.title) {
+                                updateItem(item.id, { title: editingActionValue })
+                              }
+                              setEditingActionField(null)
+                            }}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter') { (e.target as HTMLInputElement).blur() }
+                              if (e.key === 'Escape') { setEditingActionField(null) }
+                            }}
+                          />
+                        ) : (
+                          <span
+                            className="text-sm font-medium text-gray-900 cursor-pointer hover:text-blue-600 truncate"
+                            style={item.status === 'completed' ? { textDecoration: 'line-through', color: '#9CA3AF' } : {}}
+                            onClick={() => { setEditingActionField({ id: item.id, field: 'title' }); setEditingActionValue(item.title) }}
+                          >
+                            {item.title}
+                          </span>
+                        )}
+
+                        {/* Category badge */}
+                        <span
+                          className="text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0"
+                          style={{ background: (categoryColors[item.category] || '#6B7280') + '18', color: categoryColors[item.category] || '#6B7280' }}
+                        >
+                          {(item.category || 'general').replace('_', '-')}
+                        </span>
+                      </div>
+
+                      {/* Due date */}
+                      <div className="flex items-center gap-3 mt-0.5">
+                        {editingActionField?.id === item.id && editingActionField?.field === 'due_date' ? (
+                          <input
+                            autoFocus
+                            type="date"
+                            className="text-[11px] bg-white border border-blue-300 rounded px-1 py-0.5"
+                            value={editingActionValue}
+                            onChange={e => setEditingActionValue(e.target.value)}
+                            onBlur={() => {
+                              updateItem(item.id, { due_date: editingActionValue || null })
+                              setEditingActionField(null)
+                            }}
+                          />
+                        ) : (
+                          <span
+                            className="text-[11px] text-gray-400 cursor-pointer hover:text-blue-500"
+                            onClick={() => { setEditingActionField({ id: item.id, field: 'due_date' }); setEditingActionValue(item.due_date || '') }}
+                          >
+                            {item.due_date ? new Date(item.due_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'No due date'}
+                          </span>
+                        )}
+
+                        {/* Expand description toggle */}
+                        {item.description && (
+                          <button
+                            onClick={() => setExpandedActionId(expandedActionId === item.id ? null : item.id)}
+                            className="text-[11px] text-gray-400 hover:text-gray-600"
+                          >
+                            <ChevronDown size={12} style={{ transform: expandedActionId === item.id ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Expanded description */}
+                      {expandedActionId === item.id && (
+                        <div className="mt-1.5">
+                          {editingActionField?.id === item.id && editingActionField?.field === 'description' ? (
+                            <textarea
+                              autoFocus
+                              className="w-full text-xs bg-white border border-blue-300 rounded px-2 py-1"
+                              value={editingActionValue}
+                              rows={2}
+                              onChange={e => setEditingActionValue(e.target.value)}
+                              onBlur={() => {
+                                if (editingActionValue !== item.description) {
+                                  updateItem(item.id, { description: editingActionValue })
+                                }
+                                setEditingActionField(null)
+                              }}
+                            />
+                          ) : (
+                            <p
+                              className="text-xs text-gray-500 cursor-pointer hover:text-gray-700"
+                              onClick={() => { setEditingActionField({ id: item.id, field: 'description' }); setEditingActionValue(item.description || '') }}
+                            >
+                              {item.description || 'Click to add description'}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right side controls */}
+                    <div className="flex items-center gap-1 flex-shrink-0 mt-0.5">
+                      {/* Visibility toggle */}
+                      <button
+                        onClick={() => updateItem(item.id, { visible_to_partner: !item.visible_to_partner })}
+                        className="p-1 rounded hover:bg-gray-100"
+                        title={item.visible_to_partner ? 'Visible to partner' : 'Hidden from partner'}
+                      >
+                        {item.visible_to_partner ? <Eye size={14} style={{ color: '#3B82F6' }} /> : <EyeOff size={14} style={{ color: '#D1D5DB' }} />}
+                      </button>
+
+                      {/* Delete */}
+                      {deletingActionId === item.id ? (
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => deleteItem(item.id)} className="text-[10px] text-red-600 font-medium px-1.5 py-0.5 rounded bg-red-50 hover:bg-red-100">Delete</button>
+                          <button onClick={() => setDeletingActionId(null)} className="text-[10px] text-gray-500 px-1.5 py-0.5">Cancel</button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setDeletingActionId(item.id)}
+                          className="p-1 rounded hover:bg-red-50 opacity-0 group-hover:opacity-100 transition"
+                        >
+                          <Trash2 size={13} style={{ color: '#EF4444' }} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )
+
+                return (
+                  <div>
+                    {/* In Progress */}
+                    {inProgress.length > 0 && (
+                      <div className="mb-1">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1 px-2">In Progress</p>
+                        {inProgress.map(renderItem)}
+                      </div>
+                    )}
+
+                    {/* Pending */}
+                    {pending.length > 0 && (
+                      <div className="mb-1">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1 px-2">Pending</p>
+                        {pending.map(renderItem)}
+                      </div>
+                    )}
+
+                    {/* Completed - collapsed by default */}
+                    {completed.length > 0 && (
+                      <div className="mt-2">
+                        <button
+                          onClick={() => setShowCompletedActions(!showCompletedActions)}
+                          className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1 px-2 hover:text-gray-600"
+                        >
+                          <ChevronDown size={12} style={{ transform: showCompletedActions ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
+                          Completed ({completed.length})
+                        </button>
+                        {showCompletedActions && completed.map(renderItem)}
+                      </div>
+                    )}
+                  </div>
+                )
+              })()}
             </div>
 
             {/* KPI Goal Setting */}
