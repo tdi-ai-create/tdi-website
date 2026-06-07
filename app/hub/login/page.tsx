@@ -7,7 +7,7 @@ import { getHubSupabase } from '@/lib/supabase-hub';
 import TDIPortalLoader from '@/components/TDIPortalLoader';
 import PortalSignIn from '@/components/auth/PortalSignIn';
 import { attributePartnership } from '@/lib/hub/partnerships';
-import { Check, Crown, Sparkles, Zap, ArrowRight } from 'lucide-react';
+import { Check, BookOpen, Award, Users, MessageCircle, ArrowRight } from 'lucide-react';
 import { useTranslation } from '@/lib/hub/useTranslation';
 
 export default function HubLoginPage() {
@@ -40,11 +40,11 @@ export default function HubLoginPage() {
     if (trigger === 'signUp' && userId) { await attributePartnership(userId); return tUI('Check your email to confirm your account.'); }
   };
 
-  const TIERS = [
-    { name: 'Free', price: '$0', period: '', accent: '#6B7280', desc: 'Access rotating free content each week.', features: ['Rotating free content weekly', 'Save favorites for later', 'Track your PD hours', 'Community Q&A access'], highlight: false, icon: Sparkles },
-    { name: 'Essentials', price: '$5', period: '/mo', accent: '#185FA5', desc: 'Download individual quick wins and resources.', features: ['Everything in Free', 'All individual quick wins', 'Download PDFs & templates', 'Priority email support'], highlight: false, icon: Zap },
-    { name: 'Professional', price: '$10', period: '/mo', accent: '#2A9D8F', desc: 'Comprehensive resource packs for your classroom.', features: ['Everything in Essentials', 'Full course library', 'PD certificates', 'Community discussion access'], highlight: true, icon: Crown },
-    { name: 'All-Access', price: '$25', period: '/mo', accent: '#1e2749', desc: 'Unlock everything, including the full course library.', features: ['Everything in Professional', 'Full course library access', 'Earn PD certificates', 'Exclusive workshops'], highlight: false, icon: Crown },
+  const VALUE_PROPS = [
+    { icon: BookOpen, text: 'Ready-to-use classroom tools -- not theory, not fluff' },
+    { icon: Award, text: 'PD certificates that count toward your hours' },
+    { icon: Users, text: 'A community of 100,000+ educators who get it' },
+    { icon: MessageCircle, text: 'AI coaching that knows your classroom context' },
   ];
 
   return (
@@ -54,138 +54,101 @@ export default function HubLoginPage() {
         <div style={{ position: 'fixed', inset: 0, zIndex: 9998, background: 'linear-gradient(135deg, #2a9d8f, #1f7a6e)', transition: 'opacity 500ms ease-out', opacity: timerDone ? 0 : 1 }} />
       )}
 
-      <div style={{ visibility: showPage ? 'visible' : 'hidden', opacity: showPage ? 1 : 0, transition: 'opacity 300ms ease-in', backgroundColor: '#F9FAFB' }}>
+      <div style={{ visibility: showPage ? 'visible' : 'hidden', opacity: showPage ? 1 : 0, transition: 'opacity 300ms ease-in' }}>
 
-        {/* ═══ HERO + SIGN IN (overlapping card) ═══ */}
-        <section style={{ backgroundColor: '#1e2749', padding: '32px 16px 80px' }}>
-          <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
-            <span style={{ display: 'inline-block', padding: '6px 14px', background: 'rgba(255,186,6,0.15)', color: '#ffba06', borderRadius: 999, fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 12 }}>
-              {tUI('The TDI Learning Hub')}
-            </span>
-            <h1 style={{ fontSize: 'clamp(24px, 3.5vw, 36px)', fontWeight: 700, color: 'white', margin: '0 0 8px 0', lineHeight: 1.2 }}>
-              {tUI('Professional Development That Actually Works')}
-            </h1>
-            <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.7)', maxWidth: 600, margin: '0 auto', lineHeight: 1.5 }}>
-              {tUI('Tools you can use Monday morning. A community that gets it. PD credit you can prove.')}
-            </p>
-          </div>
-        </section>
+        {/* ═══ SPLIT LAYOUT: pitch left, sign-in right ═══ */}
+        <div style={{ display: 'flex', minHeight: '100vh' }}>
 
-        <section style={{ padding: '0 16px 24px', marginTop: -56 }}>
-          <div style={{ maxWidth: 420, margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: 16 }}>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1e2749', margin: '0 0 4px' }}>{tUI('Sign in to the Hub')}</h2>
-              <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>{tUI('Free account. No credit card required.')}</p>
-            </div>
-            <PortalSignIn
-              portalTitle="Sign in to the Hub"
-              portalSubtitle="Free account. No credit card required."
-              backHref={null}
-              compact
-              methods={{ google: true, emailPassword: true, magicLink: true, signUp: true }}
-              onSuccess={handleSuccess}
-              getSupabaseClient={getHubSupabase}
-              magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/hub/auth/callback?returnUrl=${encodeURIComponent(returnUrl)}` : '/hub/auth/callback'}
-              googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/hub/auth/callback?returnUrl=${encodeURIComponent(returnUrl)}` : '/hub/auth/callback'}
-              forgotPasswordRedirectTo={typeof window !== 'undefined' ? window.location.origin + '/hub/settings/profile' : '/hub/settings/profile'}
-            />
-            <div style={{ marginTop: 14, textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{tUI('100,000+ educators across all 50 states')}</p>
-              <a href="/learning" style={{ fontSize: 12, color: '#2A9D8F', fontWeight: 500, textDecoration: 'none' }}>{tUI('New here? Learn what the Hub is')} &rarr;</a>
-            </div>
-          </div>
-        </section>
+          {/* LEFT: Navy pitch panel */}
+          <div style={{
+            flex: '1 1 50%', backgroundColor: '#1e2749', padding: '48px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'center',
+            // Hide on mobile, show sign-in only
+          }} className="hub-login-left">
+            <div style={{ maxWidth: 480 }}>
+              <span style={{ display: 'inline-block', padding: '5px 12px', background: 'rgba(255,186,6,0.15)', color: '#ffba06', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 20 }}>
+                {tUI('The TDI Learning Hub')}
+              </span>
 
-        {/* ═══ PRICING ═══ */}
-        <section style={{ padding: '20px 16px 28px', backgroundColor: '#ffffff' }}>
-          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-            <details style={{ textAlign: 'center' }}>
-              <summary style={{ fontSize: 15, fontWeight: 600, color: '#2A9D8F', cursor: 'pointer', marginBottom: 32, listStyle: 'none', display: 'inline-block' }}>
-                {tUI('View membership plans')} &#8595;
-              </summary>
-              <div style={{ textAlign: 'center', marginBottom: 32 }}>
-                <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 700, color: '#1e2749', margin: '0 0 8px' }}>{tUI('Membership Plans')}</h2>
-                <p style={{ fontSize: 15, color: '#6B7280' }}>{tUI('Choose the plan that fits your needs. Upgrade anytime.')}</p>
+              <h1 style={{ fontSize: 'clamp(28px, 3vw, 40px)', fontWeight: 700, color: 'white', margin: '0 0 12px 0', lineHeight: 1.15 }}>
+                {tUI('Professional Development That Actually Works')}
+              </h1>
+
+              <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.65)', lineHeight: 1.6, margin: '0 0 32px 0' }}>
+                {tUI('Tools you can use Monday morning. A community that gets it. PD credit you can prove.')}
+              </p>
+
+              {/* Value props */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 36 }}>
+                {VALUE_PROPS.map((vp, i) => {
+                  const Icon = vp.icon;
+                  return (
+                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(42,157,143,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <Icon style={{ width: 18, height: 18, color: '#2A9D8F' }} />
+                      </div>
+                      <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', lineHeight: 1.5, margin: 0 }}>{tUI(vp.text)}</p>
+                    </div>
+                  );
+                })}
               </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginBottom: 32 }}>
-              {TIERS.map((tier) => {
-                const Icon = tier.icon;
-                return (
-                  <div key={tier.name} style={{ background: 'white', borderRadius: 16, padding: 28, border: tier.highlight ? `2px solid ${tier.accent}` : '0.5px solid #E5E7EB', position: 'relative', display: 'flex', flexDirection: 'column' }}>
-                    {tier.highlight && (
-                      <span style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: tier.accent, color: 'white', padding: '5px 14px', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase' }}>
-                        {tUI('Most Popular')}
-                      </span>
-                    )}
-                    <div style={{ width: 48, height: 48, borderRadius: 12, background: `${tier.accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-                      <Icon style={{ width: 24, height: 24, color: tier.accent }} />
-                    </div>
-                    <h3 style={{ fontSize: 22, fontWeight: 700, color: '#1e2749', margin: '0 0 4px 0' }}>{tUI(tier.name)}</h3>
-                    <div style={{ marginBottom: 12 }}>
-                      <span style={{ fontSize: 36, fontWeight: 700, color: '#1e2749' }}>{tier.price}</span>
-                      {tier.period && <span style={{ fontSize: 14, color: '#6B7280', marginLeft: 4 }}>{tier.period}</span>}
-                    </div>
-                    <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px 0', lineHeight: 1.5 }}>{tUI(tier.desc)}</p>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px 0', flexGrow: 1 }}>
-                      {tier.features.map((f, i) => (
-                        <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, color: '#1e2749', marginBottom: 10, lineHeight: 1.4 }}>
-                          <Check style={{ width: 16, height: 16, color: tier.accent, flexShrink: 0, marginTop: 2 }} />
-                          {tUI(f)}
-                        </li>
-                      ))}
-                    </ul>
-                    <button
-                      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                      style={{ width: '100%', padding: 12, background: tier.highlight ? tier.accent : 'white', color: tier.highlight ? 'white' : tier.accent, border: tier.highlight ? 'none' : `1px solid ${tier.accent}`, borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', textAlign: 'center' }}
-                    >
-                      {tier.name === 'Free' ? tUI('Get Started') : tUI(`Choose ${tier.name}`)}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
+              {/* Testimonial */}
+              <div style={{ borderLeft: '3px solid #E8B84B', paddingLeft: 16, marginBottom: 24 }}>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', lineHeight: 1.6, fontStyle: 'italic', margin: '0 0 8px 0' }}>
+                  &ldquo;{tUI('The Quick Wins are the first PD resource I have actually used more than once. Practical, fast, and built for people who do not have time for a 3-hour webinar.')}&rdquo;
+                </p>
+                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: 0 }}>-- {tUI('Instructional coach, K-5')}</p>
+              </div>
 
-            <p style={{ textAlign: 'center', fontSize: 14, color: '#6B7280' }}>
-              {tUI('Bulk pricing available for schools and districts.')}{' '}
-              <a href="/for-schools" style={{ color: '#2A9D8F', fontWeight: 600, textDecoration: 'none' }}>{tUI('See partnership options')} <ArrowRight size={14} style={{ display: 'inline', verticalAlign: 'middle' }} /></a>
-            </p>
-            </details>
-          </div>
-        </section>
-
-        {/* ═══ TESTIMONIALS ═══ */}
-        <section style={{ padding: '28px 16px', backgroundColor: 'white' }}>
-          <div style={{ maxWidth: 900, margin: '0 auto' }}>
-            <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1e2749', textAlign: 'center', marginBottom: 20 }}>{tUI('What educators are saying')}</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-              {[
-                { quote: 'I used the Calm Response Scripts on a Monday and by Wednesday my transitions were cutting wasted time in half. My admin noticed before I even said anything.', role: 'Middle school teacher, Year 8' },
-                { quote: 'The Quick Wins are the first PD resource I have actually used more than once. Practical, fast, and built for people who do not have time for a 3-hour webinar.', role: 'Instructional coach, K-5' },
-                { quote: 'I printed my certificate, added it to my portfolio, and used the email template to send it to my principal. She was impressed.', role: 'Paraprofessional, 2nd year' },
-              ].map((t, i) => (
-                <div key={i} style={{ background: '#F9FAFB', borderRadius: 16, padding: 24, borderLeft: '3px solid #E8B84B' }}>
-                  <p style={{ fontSize: 15, color: '#374151', lineHeight: 1.65, marginBottom: 12 }}>&ldquo;{tUI(t.quote)}&rdquo;</p>
-                  <p style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 500 }}>-- {tUI(t.role)}</p>
-                </div>
-              ))}
+              <a href="/learning" style={{ fontSize: 13, color: '#2A9D8F', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                {tUI('See everything the Hub offers')} <ArrowRight size={14} />
+              </a>
             </div>
           </div>
-        </section>
 
-        {/* ═══ BOTTOM CTA ═══ */}
-        <section style={{ backgroundColor: '#1e2749', padding: '28px 16px', textAlign: 'center' }}>
-          <h2 style={{ fontSize: 22, fontWeight: 700, color: 'white', marginBottom: 6 }}>{tUI('Ready to explore?')}</h2>
-          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.6)', marginBottom: 24 }}>{tUI('Create your free account in 30 seconds.')}</p>
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 32px', background: '#E8B84B', color: '#1e2749', borderRadius: 10, border: 'none', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}
-          >
-            {tUI('Sign in now')} <ArrowRight size={18} />
-          </button>
-        </section>
+          {/* RIGHT: Sign-in panel */}
+          <div style={{
+            flex: '1 1 50%', backgroundColor: '#F9FAFB', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '40px 24px',
+          }} className="hub-login-right">
+            <div style={{ width: '100%', maxWidth: 420 }}>
+              <PortalSignIn
+                portalTitle="Sign in to the Hub"
+                portalSubtitle="Free account. No credit card required."
+                backHref={null}
+                methods={{ google: true, emailPassword: true, magicLink: true, signUp: true }}
+                onSuccess={handleSuccess}
+                getSupabaseClient={getHubSupabase}
+                magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/hub/auth/callback?returnUrl=${encodeURIComponent(returnUrl)}` : '/hub/auth/callback'}
+                googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/hub/auth/callback?returnUrl=${encodeURIComponent(returnUrl)}` : '/hub/auth/callback'}
+                forgotPasswordRedirectTo={typeof window !== 'undefined' ? window.location.origin + '/hub/settings/profile' : '/hub/settings/profile'}
+              />
+              <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 16, textAlign: 'center' }}>
+                {tUI('100,000+ educators across all 50 states')}
+              </p>
+              {/* Mobile-only: show learn link (desktop has it on left panel) */}
+              <p className="hub-login-mobile-link" style={{ textAlign: 'center', marginTop: 8 }}>
+                <a href="/learning" style={{ fontSize: 12, color: '#2A9D8F', fontWeight: 500, textDecoration: 'none' }}>
+                  {tUI('New here? Learn what the Hub is')} &rarr;
+                </a>
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Responsive styles */}
+        <style>{`
+          @media (min-width: 769px) {
+            .hub-login-left { display: flex !important; }
+            .hub-login-mobile-link { display: none !important; }
+          }
+          @media (max-width: 768px) {
+            .hub-login-left { display: none !important; }
+            .hub-login-right { min-height: 100vh; }
+            .hub-login-mobile-link { display: block !important; }
+          }
+        `}</style>
       </div>
-
     </>
   );
 }
