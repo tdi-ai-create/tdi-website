@@ -111,10 +111,15 @@ export default function HubLoginPage() {
             flex: '1 1 50%', backgroundColor: '#F9FAFB', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '40px 24px',
           }} className="hub-login-right">
             <div style={{ width: '100%', maxWidth: 420 }}>
+              <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1e2749', margin: '0 0 4px', fontFamily: "'Source Serif 4', Georgia, serif" }}>{tUI('Sign in to the Hub')}</h2>
+                <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>{tUI('Free account. No credit card required.')}</p>
+              </div>
               <PortalSignIn
                 portalTitle="Sign in to the Hub"
                 portalSubtitle="Free account. No credit card required."
                 backHref={null}
+                compact
                 methods={{ google: true, emailPassword: true, magicLink: true, signUp: true }}
                 onSuccess={handleSuccess}
                 getSupabaseClient={getHubSupabase}
