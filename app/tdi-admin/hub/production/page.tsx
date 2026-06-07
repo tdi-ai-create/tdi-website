@@ -303,7 +303,7 @@ function QuickWinsTab() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Lift</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Effort Level</label>
                   <select
                     value={form.capacity}
                     onChange={(e) => setForm(f => ({ ...f, capacity: e.target.value }))}
@@ -377,7 +377,7 @@ function QuickWinsTab() {
             <tr>
               <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Title</th>
               <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Category</th>
-              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Lift</th>
+              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Effort Level</th>
               <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Type</th>
               <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Duration</th>
               <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Status</th>
@@ -437,7 +437,19 @@ function QuickWinsTab() {
                         <button onClick={() => openEdit(qw)} className="p-1.5 rounded hover:bg-gray-100" title="Edit">
                           <Edit2 size={14} />
                         </button>
-                        <button className="p-1.5 rounded hover:bg-gray-100 text-red-500" title="Delete">
+                        <button
+                          className="p-1.5 rounded hover:bg-gray-100 text-red-500"
+                          title="Delete"
+                          onClick={async () => {
+                            if (!confirm(`Delete "${qw.title}"? This cannot be undone.`)) return;
+                            try {
+                              const { error } = await getSupabase().from('hub_quick_wins').delete().eq('id', qw.id);
+                              if (!error) {
+                                setQuickWins((prev: any[]) => prev.filter((q: any) => q.id !== qw.id));
+                              }
+                            } catch {}
+                          }}
+                        >
                           <Trash2 size={14} />
                         </button>
                       </div>

@@ -94,7 +94,7 @@ export default function HubLoginPage() {
         </section>
 
         {/* ═══ PRICING ═══ */}
-        <section style={{ padding: '60px 16px', backgroundColor: '#F9FAFB' }}>
+        <section style={{ padding: '60px 16px', backgroundColor: '#ffffff' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 40 }}>
               <h2 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 700, color: '#1e2749', margin: '0 0 8px' }}>{tUI('Membership Plans')}</h2>
