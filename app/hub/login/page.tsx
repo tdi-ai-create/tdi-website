@@ -74,22 +74,17 @@ export default function HubLoginPage() {
         {/* ═══ SIGN IN ═══ */}
         <section style={{ padding: '48px 16px 56px', backgroundColor: '#F9FAFB' }}>
           <div style={{ maxWidth: 420, margin: '0 auto' }}>
-            <div style={{ background: 'white', borderRadius: 16, padding: '32px 28px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', border: '1px solid rgba(0,0,0,0.04)' }}>
-              <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1e2749', margin: '0 0 4px', textAlign: 'center' }}>{tUI('Sign in to the Hub')}</h2>
-              <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 20, textAlign: 'center' }}>{tUI('Free account. No credit card required.')}</p>
-              <PortalSignIn
-                portalTitle=""
-                portalSubtitle=""
-                backHref={null}
-                compact
-                methods={{ google: true, emailPassword: true, magicLink: true, signUp: true }}
-                onSuccess={handleSuccess}
-                getSupabaseClient={getHubSupabase}
-                magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/hub/auth/callback?returnUrl=${encodeURIComponent(returnUrl)}` : '/hub/auth/callback'}
-                googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/hub/auth/callback?returnUrl=${encodeURIComponent(returnUrl)}` : '/hub/auth/callback'}
-                forgotPasswordRedirectTo={typeof window !== 'undefined' ? window.location.origin + '/hub/settings/profile' : '/hub/settings/profile'}
-              />
-            </div>
+            <PortalSignIn
+              portalTitle="Sign in to the Hub"
+              portalSubtitle="Free account. No credit card required."
+              backHref={null}
+              methods={{ google: true, emailPassword: true, magicLink: true, signUp: true }}
+              onSuccess={handleSuccess}
+              getSupabaseClient={getHubSupabase}
+              magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/hub/auth/callback?returnUrl=${encodeURIComponent(returnUrl)}` : '/hub/auth/callback'}
+              googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/hub/auth/callback?returnUrl=${encodeURIComponent(returnUrl)}` : '/hub/auth/callback'}
+              forgotPasswordRedirectTo={typeof window !== 'undefined' ? window.location.origin + '/hub/settings/profile' : '/hub/settings/profile'}
+            />
             <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 12, textAlign: 'center' }}>{tUI('100,000+ educators across all 50 states')}</p>
           </div>
         </section>
