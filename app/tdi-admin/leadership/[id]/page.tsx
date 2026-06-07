@@ -479,6 +479,21 @@ export default function AdminPartnershipDetailPage() {
     }
   }
 
+  async function handleEditEvent(event: { id: string; event_title: string; event_date?: string; notes?: string }) {
+    if (!userEmail) return
+    const newTitle = prompt('Edit event title:', event.event_title)
+    if (newTitle === null || newTitle === event.event_title) return
+    setTimelineEvents(prev => prev.map(e => e.id === event.id ? { ...e, event_title: newTitle } : e))
+    const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/timeline`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-user-email': userEmail },
+      body: JSON.stringify({ event_id: event.id, event_title: newTitle }),
+    })
+    if (!res.ok) {
+      setTimelineEvents(prev => prev.map(e => e.id === event.id ? { ...e, event_title: event.event_title } : e))
+    }
+  }
+
   async function handleApplyExtracted(data: Record<string, any>) {
     // Apply each extracted field
     const updates: Promise<void>[] = []
@@ -958,6 +973,7 @@ export default function AdminPartnershipDetailPage() {
             events={timelineEvents}
             isAdminView={editMode}
             onAddEvent={() => setAddEventOpen(true)}
+            onEditEvent={handleEditEvent}
             onDeleteEvent={handleDeleteEvent}
             onMoveEvent={handleMoveEvent}
           />
@@ -1549,6 +1565,48 @@ export default function AdminPartnershipDetailPage() {
               </div>
             </div>
 
+            {/* Partnership Actions (edit mode only) */}
+            {editMode && (
+              <div className="bg-white rounded-xl border border-red-100 p-5 mb-4">
+                <h2 className="text-sm font-semibold text-gray-900 mb-3">Partnership Actions</h2>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={async () => {
+                      const newStatus = partnership?.status === 'active' ? 'paused' : 'active';
+                      const label = newStatus === 'paused' ? 'Pause' : 'Reactivate';
+                      if (!confirm(`${label} this partnership?`)) return;
+                      await handleFieldUpdate('status', newStatus);
+                    }}
+                    className="px-4 py-2 text-xs font-medium rounded-lg border transition-colors"
+                    style={{ borderColor: '#EAB308', color: '#92400E', background: '#FFFBEB' }}
+                  >
+                    {partnership?.status === 'active' ? 'Pause partnership' : 'Reactivate partnership'}
+                  </button>
+                  <button
+                    onClick={async () => {
+                      if (!confirm('Are you sure you want to permanently delete this partnership? This cannot be undone.')) return;
+                      if (!confirm('This will delete all action items, timeline events, notes, meetings, and KPIs. Type "delete" in the next prompt to confirm.')) return;
+                      const typed = prompt('Type "delete" to confirm:');
+                      if (typed !== 'delete') return;
+                      try {
+                        const res = await fetch(`/api/admin/partnerships/${partnershipId}/delete`, {
+                          method: 'DELETE',
+                          headers: { 'Content-Type': 'application/json', 'x-user-email': userEmail || '' },
+                        });
+                        if (res.ok) {
+                          window.location.href = '/tdi-admin/leadership';
+                        }
+                      } catch {}
+                    }}
+                    className="px-4 py-2 text-xs font-medium rounded-lg border transition-colors"
+                    style={{ borderColor: '#EF4444', color: '#991B1B', background: '#FEF2F2' }}
+                  >
+                    Delete partnership
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Staff Roster with Photos */}
             <StaffRosterWithPhotos
               partnershipId={partnershipId}
@@ -2101,18 +2159,48 @@ export default function AdminPartnershipDetailPage() {
               {/* Active KPIs display */}
               {activeKpis.length > 0 && (
                 <div className="space-y-2 mb-4">
-                  {activeKpis.map(kpi => (
-                    <div key={kpi.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900">{kpi.kpi_label}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">{kpi.benchmark_label}</p>
+                  {activeKpis.map(kpi => {
+                    const pct = kpi.target_value > 0 ? Math.min(Math.round((kpi.current_value / kpi.target_value) * 100), 100) : 0;
+                    const barColor = pct >= 70 ? '#10B981' : pct >= 40 ? '#EAB308' : '#EF4444';
+                    return (
+                    <div key={kpi.id} className="p-3 rounded-lg bg-gray-50 border border-gray-100">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900">{kpi.kpi_label}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{kpi.benchmark_label}</p>
+                        </div>
+                        <div className="text-right flex-shrink-0 ml-4">
+                          <div className="flex items-baseline gap-1.5">
+                            <button
+                              onClick={async () => {
+                                const val = prompt(`Override current value for "${kpi.kpi_label}":`, String(kpi.current_value));
+                                if (val === null) return;
+                                const num = parseFloat(val);
+                                if (isNaN(num)) return;
+                                try {
+                                  await fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`, {
+                                    method: 'PATCH',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ kpiId: kpi.id, currentValue: num }),
+                                  });
+                                  setActiveKpis(prev => prev.map(k => k.id === kpi.id ? { ...k, current_value: num } : k));
+                                } catch {}
+                              }}
+                              className="text-lg font-bold text-[#1e2749] hover:text-blue-600 cursor-pointer"
+                              title="Click to override current value"
+                            >{kpi.current_value}{kpi.target_unit}</button>
+                            <span className="text-xs text-gray-400">/</span>
+                            <span className="text-sm text-gray-500">{kpi.target_value}{kpi.target_unit}</span>
+                          </div>
+                          <p className="text-[10px] text-gray-400">{pct}% of target</p>
+                        </div>
                       </div>
-                      <div className="text-right flex-shrink-0 ml-4">
-                        <p className="text-lg font-bold text-[#1e2749]">{kpi.target_value}{kpi.target_unit}</p>
-                        <p className="text-[10px] text-gray-400">target</p>
+                      <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: barColor }} />
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 

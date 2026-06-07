@@ -1,6 +1,6 @@
 'use client'
 import { useState, useRef } from 'react'
-import { CheckCircle, Clock, Calendar, GripVertical, Plus, Trash2 } from 'lucide-react'
+import { CheckCircle, Clock, Calendar, GripVertical, Plus, Trash2, Pencil } from 'lucide-react'
 import { ExampleBanner } from './ExampleBanner'
 
 interface TimelineEvent {
@@ -34,6 +34,7 @@ function EventCard({
   event,
   color,
   isAdminView,
+  onEdit,
   onDelete,
   onMove,
   onDragStart,
@@ -41,6 +42,7 @@ function EventCard({
   event: TimelineEvent
   color: string
   isAdminView: boolean
+  onEdit?: (event: TimelineEvent) => void
   onDelete?: (id: string) => void
   onMove?: (id: string, newStatus: string) => void
   onDragStart?: (e: React.DragEvent, eventId: string) => void
@@ -103,6 +105,16 @@ function EventCard({
                 <option key={s} value={s}>{STATUS_LABELS[s]}</option>
               ))}
             </select>
+          )}
+          {/* Edit */}
+          {onEdit && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onEdit(event) }}
+              className="p-1 rounded hover:bg-blue-50 text-gray-300 hover:text-blue-400 transition-colors"
+              title="Edit event"
+            >
+              <Pencil size={12} />
+            </button>
           )}
           {/* Delete */}
           {onDelete && (
@@ -266,6 +278,7 @@ export function PartnershipTimeline({
                       event={event}
                       color={cfg.color}
                       isAdminView={isAdminView}
+                      onEdit={onEditEvent}
                       onDelete={onDeleteEvent}
                       onMove={onMoveEvent}
                       onDragStart={handleDragStart}
