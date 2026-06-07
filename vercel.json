@@ -38,7 +38,7 @@
     },
     {
       "path": "/api/cron/monthly-principal-email",
-      "schedule": "0 14 1-7 * 1"
+      "schedule": "0 14 1 * *"
     }
   ]
 }
