@@ -67,6 +67,12 @@ export async function PATCH(
       'phone',
       'partnership_goal',
       'year2_planning_notes',
+      'slug',
+      'building_count',
+      'partnership_type',
+      'obs_days_total',
+      'virtual_sessions_total',
+      'executive_sessions_total',
     ];
 
     // Organization table fields

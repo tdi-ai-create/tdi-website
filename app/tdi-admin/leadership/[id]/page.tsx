@@ -1493,14 +1493,58 @@ export default function AdminPartnershipDetailPage() {
                   )}
                 </div>
 
-                {/* Contract Dates */}
+                {/* Contract Start */}
                 <div>
                   <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                    Contract Period
+                    Contract Start
                   </label>
-                  <p className="text-sm text-gray-700">
-                    {partnership?.contract_start || 'Not set'} — {partnership?.contract_end || 'Not set'}
-                  </p>
+                  {editMode ? (
+                    <InlineEditField
+                      partnershipId={partnershipId}
+                      field="contract_start"
+                      value={partnership?.contract_start}
+                      type="date"
+                      onSaved={(v) => setPartnership((p: any) => ({ ...p, contract_start: v }))}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700">{partnership?.contract_start || 'Not set'}</p>
+                  )}
+                </div>
+
+                {/* Contract End */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                    Contract End
+                  </label>
+                  {editMode ? (
+                    <InlineEditField
+                      partnershipId={partnershipId}
+                      field="contract_end"
+                      value={partnership?.contract_end}
+                      type="date"
+                      onSaved={(v) => setPartnership((p: any) => ({ ...p, contract_end: v }))}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700">{partnership?.contract_end || 'Not set'}</p>
+                  )}
+                </div>
+
+                {/* Dashboard URL */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                    Dashboard URL
+                  </label>
+                  {editMode ? (
+                    <InlineEditField
+                      partnershipId={partnershipId}
+                      field="slug"
+                      value={partnership?.slug}
+                      type="text"
+                      onSaved={(v) => setPartnership((p: any) => ({ ...p, slug: v }))}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700">{partnership?.slug ? `/partners/${partnership.slug}` : 'Not set'}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -2369,7 +2413,7 @@ export default function AdminPartnershipDetailPage() {
                       follow_up: 'bg-amber-100 text-amber-700',
                     }
                     return (
-                      <div key={note.id} className="border border-gray-100 rounded-lg p-3">
+                      <div key={note.id} className="border border-gray-100 rounded-lg p-3 group">
                         <div className="flex items-center gap-2 mb-2">
                           <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${typeColors[note.note_type] || typeColors.general}`}>
                             {note.note_type}
@@ -2381,6 +2425,38 @@ export default function AdminPartnershipDetailPage() {
                           {note.visible_to_partner && (
                             <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-teal-100 text-teal-700">shared with partner</span>
                           )}
+                          <span className="ml-auto flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={async () => {
+                                const newContent = prompt('Edit note:', note.content)
+                                if (newContent && newContent !== note.content) {
+                                  try {
+                                    await fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`, {
+                                      method: 'PATCH',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ id: note.id, content: newContent }),
+                                    })
+                                    setInternalNotes(prev => prev.map(n => n.id === note.id ? { ...n, content: newContent } : n))
+                                  } catch {}
+                                }
+                              }}
+                              className="text-[10px] text-gray-400 hover:text-blue-600 px-1"
+                            >edit</button>
+                            <button
+                              onClick={async () => {
+                                if (!confirm('Delete this note?')) return
+                                try {
+                                  await fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`, {
+                                    method: 'DELETE',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ id: note.id }),
+                                  })
+                                  setInternalNotes(prev => prev.filter(n => n.id !== note.id))
+                                } catch {}
+                              }}
+                              className="text-[10px] text-gray-400 hover:text-red-600 px-1"
+                            >delete</button>
+                          </span>
                         </div>
                         <p className="text-sm text-gray-700 whitespace-pre-wrap">{note.content}</p>
                       </div>
