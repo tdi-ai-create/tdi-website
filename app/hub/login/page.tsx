@@ -89,7 +89,10 @@ export default function HubLoginPage() {
               googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/hub/auth/callback?returnUrl=${encodeURIComponent(returnUrl)}` : '/hub/auth/callback'}
               forgotPasswordRedirectTo={typeof window !== 'undefined' ? window.location.origin + '/hub/settings/profile' : '/hub/settings/profile'}
             />
-            <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 12, textAlign: 'center' }}>{tUI('100,000+ educators across all 50 states')}</p>
+            <div style={{ marginTop: 14, textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{tUI('100,000+ educators across all 50 states')}</p>
+              <a href="/hub/our-story" style={{ fontSize: 12, color: '#2A9D8F', fontWeight: 500, textDecoration: 'none' }}>{tUI('New here? Learn what the Hub is')} &rarr;</a>
+            </div>
           </div>
         </section>
 
