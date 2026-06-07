@@ -72,34 +72,39 @@ export default function HubLoginPage() {
         </section>
 
         {/* ═══ SIGN IN ═══ */}
-        <section style={{ padding: '40px 16px 48px', backgroundColor: '#F9FAFB' }}>
-          <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
-            <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1e2749', margin: '0 0 4px' }}>{tUI('Sign in to the Hub')}</h2>
-            <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 16 }}>{tUI('Free account. No credit card required.')}</p>
-            <PortalSignIn
-              portalTitle=""
-              portalSubtitle=""
-              backHref={null}
-              compact
-              horizontal
-              methods={{ google: true, emailPassword: true, magicLink: true, signUp: true }}
-              onSuccess={handleSuccess}
-              getSupabaseClient={getHubSupabase}
-              magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/hub/auth/callback?returnUrl=${encodeURIComponent(returnUrl)}` : '/hub/auth/callback'}
-              googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/hub/auth/callback?returnUrl=${encodeURIComponent(returnUrl)}` : '/hub/auth/callback'}
-              forgotPasswordRedirectTo={typeof window !== 'undefined' ? window.location.origin + '/hub/settings/profile' : '/hub/settings/profile'}
-            />
-            <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 8 }}>{tUI('100,000+ educators across all 50 states')}</p>
+        <section style={{ padding: '48px 16px 56px', backgroundColor: '#F9FAFB' }}>
+          <div style={{ maxWidth: 420, margin: '0 auto' }}>
+            <div style={{ background: 'white', borderRadius: 16, padding: '32px 28px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', border: '1px solid rgba(0,0,0,0.04)' }}>
+              <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1e2749', margin: '0 0 4px', textAlign: 'center' }}>{tUI('Sign in to the Hub')}</h2>
+              <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 20, textAlign: 'center' }}>{tUI('Free account. No credit card required.')}</p>
+              <PortalSignIn
+                portalTitle=""
+                portalSubtitle=""
+                backHref={null}
+                compact
+                methods={{ google: true, emailPassword: true, magicLink: true, signUp: true }}
+                onSuccess={handleSuccess}
+                getSupabaseClient={getHubSupabase}
+                magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/hub/auth/callback?returnUrl=${encodeURIComponent(returnUrl)}` : '/hub/auth/callback'}
+                googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/hub/auth/callback?returnUrl=${encodeURIComponent(returnUrl)}` : '/hub/auth/callback'}
+                forgotPasswordRedirectTo={typeof window !== 'undefined' ? window.location.origin + '/hub/settings/profile' : '/hub/settings/profile'}
+              />
+            </div>
+            <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 12, textAlign: 'center' }}>{tUI('100,000+ educators across all 50 states')}</p>
           </div>
         </section>
 
         {/* ═══ PRICING ═══ */}
-        <section style={{ padding: '60px 16px', backgroundColor: '#ffffff' }}>
+        <section style={{ padding: '40px 16px 60px', backgroundColor: '#ffffff' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: 40 }}>
-              <h2 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 700, color: '#1e2749', margin: '0 0 8px' }}>{tUI('Membership Plans')}</h2>
-              <p style={{ fontSize: 16, color: '#6B7280' }}>{tUI('Choose the plan that fits your needs. Upgrade anytime.')}</p>
-            </div>
+            <details style={{ textAlign: 'center' }}>
+              <summary style={{ fontSize: 15, fontWeight: 600, color: '#2A9D8F', cursor: 'pointer', marginBottom: 32, listStyle: 'none', display: 'inline-block' }}>
+                {tUI('View membership plans')} &#8595;
+              </summary>
+              <div style={{ textAlign: 'center', marginBottom: 32 }}>
+                <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 700, color: '#1e2749', margin: '0 0 8px' }}>{tUI('Membership Plans')}</h2>
+                <p style={{ fontSize: 15, color: '#6B7280' }}>{tUI('Choose the plan that fits your needs. Upgrade anytime.')}</p>
+              </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginBottom: 32 }}>
               {TIERS.map((tier) => {
@@ -143,6 +148,7 @@ export default function HubLoginPage() {
               {tUI('Bulk pricing available for schools and districts.')}{' '}
               <a href="/for-schools" style={{ color: '#2A9D8F', fontWeight: 600, textDecoration: 'none' }}>{tUI('See partnership options')} <ArrowRight size={14} style={{ display: 'inline', verticalAlign: 'middle' }} /></a>
             </p>
+            </details>
           </div>
         </section>
 
