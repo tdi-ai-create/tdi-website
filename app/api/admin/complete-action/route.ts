@@ -250,12 +250,19 @@ export async function POST(request: Request) {
     }
 
     if (nextMilestone) {
-      const { error: unlockError, count: unlockCount } = await supabase
+      // Unlock next milestone -- update any non-completed status to 'available'
+      // This handles cases where the milestone might be 'locked', 'available', or 'in_progress'
+      const { error: unlockError } = await supabase
         .from('creator_milestones')
-        .update({ status: 'available', updated_at: new Date().toISOString() })
+        .update({
+          status: 'available',
+          updated_at: new Date().toISOString(),
+          completed_at: null,
+          completed_by: null,
+        })
         .eq('creator_id', creatorId)
         .eq('milestone_id', nextMilestone.id)
-        .eq('status', 'locked');
+        .neq('status', 'completed');
 
       if (unlockError) {
         console.error('[admin/complete-action] Error unlocking next milestone:', unlockError);

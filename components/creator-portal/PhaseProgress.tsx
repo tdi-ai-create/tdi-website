@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import {
   Check,
@@ -217,6 +217,20 @@ function MilestoneItem({
   // Use context-aware title if available (e.g., "Post Published!" instead of "Course Launched" for blog creators)
   const milestoneTitle = getContextAwareMilestoneTitle(milestone.id, creator?.content_path) || rawMilestoneTitle;
 
+  // Memoize the milestone data object passed to MilestoneAction to prevent
+  // re-renders that reset form input state (fixes single-character typing bug)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const milestoneActionData = useMemo(() => ({
+    id: milestone.id,
+    title: milestoneTitle,
+    action_type: (milestone as any).action_type,
+    action_config: (milestone as any).action_config,
+    status: milestone.status,
+    awaiting_approval: milestone.awaiting_approval,
+    submitted_value: milestone.submitted_value,
+    team_status_message: (milestone as any).team_status_message,
+  }), [milestone.id, milestoneTitle, (milestone as any).action_type, milestone.status, milestone.awaiting_approval, milestone.submitted_value, (milestone as any).team_status_message]);
+
   // Check if milestone is optional (bonus)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isOptional = (milestone as any).metadata?.is_optional === true;
@@ -416,20 +430,8 @@ function MilestoneItem({
             {creatorId ? (
               /* New action system based on action_type */
               <MilestoneAction
-                milestone={{
-                  id: milestone.id,
-                  title: milestoneTitle,
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  action_type: (milestone as any).action_type,
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  action_config: (milestone as any).action_config,
-                  status: milestone.status,
-                  // Combined card feature
-                  awaiting_approval: milestone.awaiting_approval,
-                  submitted_value: milestone.submitted_value,
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  team_status_message: (milestone as any).team_status_message,
-                }}
+                key={milestone.id}
+                milestone={milestoneActionData}
                 creatorId={creatorId}
                 onComplete={onRefresh || (() => window.location.reload())}
                 isAdminPreview={isAdminPreview}
