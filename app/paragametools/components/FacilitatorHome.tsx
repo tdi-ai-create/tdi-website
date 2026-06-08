@@ -1,20 +1,8 @@
 'use client';
 
-import { Target, Zap, TrendingUp, Smile, Wrench, Crosshair, ArrowLeft, Monitor, Coffee } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowLeft, Monitor, Coffee } from 'lucide-react';
 import { GAMES, COLORS, type GameId } from '../data/gameConfig';
-
-// Icon map for home screen
-const GAME_ICONS: Record<string, typeof Target> = {
-  knockout: Target,
-  tellorask: Zap,
-  levelup: TrendingUp,
-  madlibs: Smile,
-  makeover: Wrench,
-  whatsyourmove: Crosshair,
-  classroomshuffle: Target,
-  prioritize: TrendingUp,
-  energybudget: Target,
-};
 
 interface FacilitatorHomeProps {
   onSelectGame: (gameId: GameId) => void;
@@ -57,12 +45,11 @@ export function FacilitatorHome({ onSelectGame, onPlayerMode, onSlangBreak }: Fa
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 w-full max-w-2xl">
         {GAMES.map((game, index) => {
           const colorConfig = COLORS[game.color];
-          const IconComponent = GAME_ICONS[game.id];
           return (
             <button
               key={game.id}
               onClick={() => onSelectGame(game.id)}
-              className="group relative p-6 rounded-2xl text-left transition-all duration-200 hover:-translate-y-1 animate-slide-up"
+              className="group relative rounded-2xl overflow-hidden text-left transition-all duration-200 hover:-translate-y-1 animate-slide-up"
               style={{
                 backgroundColor: colorConfig.bg,
                 border: `2px solid ${colorConfig.border}`,
@@ -77,32 +64,35 @@ export function FacilitatorHome({ onSelectGame, onPlayerMode, onSlangBreak }: Fa
                 e.currentTarget.style.boxShadow = 'none';
               }}
             >
-              <div className="flex items-start justify-between mb-3">
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: `${colorConfig.accent}20` }}
-                >
-                  <IconComponent size={24} style={{ color: colorConfig.accent }} />
-                </div>
+              <div className="relative w-full aspect-[5/2]">
+                <Image
+                  src={game.thumbnail}
+                  alt=""
+                  fill
+                  sizes="(max-width: 640px) 100vw, 320px"
+                  className="object-cover"
+                />
                 <span
-                  className="text-xs font-medium px-2 py-1 rounded-full"
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#8899aa' }}
+                  className="absolute top-2 right-2 text-xs font-medium px-2 py-1 rounded-full"
+                  style={{ backgroundColor: 'rgba(0, 0, 0, 0.45)', color: '#ffffff' }}
                 >
                   {game.duration} min
                 </span>
               </div>
-              <h2
-                className="text-xl md:text-2xl font-bold mb-2"
-                style={{ color: '#ffffff' }}
-              >
-                {game.title}
-              </h2>
-              <p
-                className="text-sm md:text-base"
-                style={{ color: '#8899aa' }}
-              >
-                {game.description}
-              </p>
+              <div className="p-6">
+                <h2
+                  className="text-xl md:text-2xl font-bold mb-2"
+                  style={{ color: '#ffffff' }}
+                >
+                  {game.title}
+                </h2>
+                <p
+                  className="text-sm md:text-base"
+                  style={{ color: '#8899aa' }}
+                >
+                  {game.description}
+                </p>
+              </div>
             </button>
           );
         })}
