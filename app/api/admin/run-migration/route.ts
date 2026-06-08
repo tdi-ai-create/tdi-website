@@ -18,8 +18,8 @@ export async function GET() {
 
     const results: { step: string; success: boolean; error?: string; data?: unknown }[] = [];
 
-    // ONE-TIME FIX: Unlock Jay Jackson's stuck "Finalize Outline" milestone
-    // and any other locked milestones that have completed milestones after them
+    // ONE-TIME FIX: Restore Jay Jackson's milestones that have completed_at back to completed status
+    // (previous migration over-unlocked them)
     {
       const jayId = 'a33904a3-40ff-4a7c-9fa5-fa4ca98b621a';
       const { data: jayMilestones } = await supabase
@@ -28,13 +28,14 @@ export async function GET() {
         .eq('creator_id', jayId);
 
       if (jayMilestones) {
-        const locked = jayMilestones.filter(m => m.status === 'locked');
-        for (const lm of locked) {
-          const { error: unlockErr } = await supabase
+        // Re-complete milestones that have completed_at but aren't marked completed
+        const needsRestore = jayMilestones.filter(m => m.completed_at && m.status !== 'completed');
+        for (const rm of needsRestore) {
+          const { error: restoreErr } = await supabase
             .from('creator_milestones')
-            .update({ status: 'available', updated_at: new Date().toISOString() })
-            .eq('id', lm.id);
-          results.push({ step: `unlock-jay-${lm.milestone_id}`, success: !unlockErr, error: unlockErr?.message });
+            .update({ status: 'completed', updated_at: new Date().toISOString() })
+            .eq('id', rm.id);
+          results.push({ step: `restore-jay-${rm.milestone_id}`, success: !restoreErr, error: restoreErr?.message });
         }
       }
     }
