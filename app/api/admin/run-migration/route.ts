@@ -18,6 +18,27 @@ export async function GET() {
 
     const results: { step: string; success: boolean; error?: string; data?: unknown }[] = [];
 
+    // ONE-TIME FIX: Unlock Jay Jackson's stuck "Finalize Outline" milestone
+    // and any other locked milestones that have completed milestones after them
+    {
+      const jayId = 'a33904a3-40ff-4a7c-9fa5-fa4ca98b621a';
+      const { data: jayMilestones } = await supabase
+        .from('creator_milestones')
+        .select('id, milestone_id, status, completed_at')
+        .eq('creator_id', jayId);
+
+      if (jayMilestones) {
+        const locked = jayMilestones.filter(m => m.status === 'locked');
+        for (const lm of locked) {
+          const { error: unlockErr } = await supabase
+            .from('creator_milestones')
+            .update({ status: 'available', updated_at: new Date().toISOString() })
+            .eq('id', lm.id);
+          results.push({ step: `unlock-jay-${lm.milestone_id}`, success: !unlockErr, error: unlockErr?.message });
+        }
+      }
+    }
+
     // Step 1: Check if columns exist, if not they need to be added via Supabase dashboard
     const { data: columns, error: columnsError } = await supabase
       .from('milestones')
