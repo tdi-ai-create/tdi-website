@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       heat: body.initial_heat || 'warm',
       notes: combinedNotes,
       stage: 'qualified',
-      type: 'new',
+      type: 'new_business',
       school_year: '2026-27',
     };
 
