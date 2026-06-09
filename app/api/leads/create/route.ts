@@ -17,26 +17,50 @@ export async function POST(req: NextRequest) {
 
     const supabase = getServiceSupabase();
 
-    const { data: lead, error: insertErr } = await supabase
+    // Build notes, including contact_role if provided (column may not exist yet)
+    const noteParts: string[] = [];
+    if (body.contact_role) noteParts.push(`Role: ${body.contact_role}`);
+    if (body.notes) noteParts.push(body.notes);
+    const combinedNotes = noteParts.length > 0 ? noteParts.join('\n') : null;
+
+    // Base insert fields — only columns confirmed in the production schema
+    const insertData: Record<string, unknown> = {
+      name: body.district_name,
+      contact_name: body.contact_name || null,
+      contact_email: body.contact_email || null,
+      contact_phone: body.contact_phone || null,
+      source: body.source,
+      value: body.estimated_deal_size || null,
+      heat: body.initial_heat || 'warm',
+      notes: combinedNotes,
+      stage: 'qualified',
+      type: 'new',
+      school_year: '2026-27',
+    };
+
+    // Try columns from migration 063 — they may not exist on production yet
+    const optionalColumns: Record<string, unknown> = {
+      contact_role: body.contact_role || null,
+      state_code: body.state_code || null,
+      enrichment_status: 'pending',
+    };
+
+    // First attempt: include all columns
+    let { data: lead, error: insertErr } = await supabase
       .from('sales_opportunities')
-      .insert({
-        name: body.district_name,
-        contact_name: body.contact_name || null,
-        contact_role: body.contact_role || null,
-        contact_email: body.contact_email || null,
-        contact_phone: body.contact_phone || null,
-        source: body.source,
-        state_code: body.state_code || null,
-        value: body.estimated_deal_size || null,
-        heat: body.initial_heat || 'warm',
-        notes: body.notes || null,
-        stage: 'qualified',
-        type: 'new',
-        school_year: '2026-27',
-        enrichment_status: 'pending',
-      })
+      .insert({ ...insertData, ...optionalColumns })
       .select()
       .single();
+
+    // If it fails due to missing columns, retry with only base columns
+    if (insertErr && insertErr.message?.includes('schema cache')) {
+      console.warn('Retrying insert without optional columns:', insertErr.message);
+      ({ data: lead, error: insertErr } = await supabase
+        .from('sales_opportunities')
+        .insert(insertData)
+        .select()
+        .single());
+    }
 
     if (insertErr) {
       console.error('Lead insert failed:', insertErr);
