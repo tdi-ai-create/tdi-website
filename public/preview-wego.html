@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WeGo D94 + TDI Partnership Preview</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; background: #F5F5F5; }
+
+  /* Nav */
+  .nav { background: #1e2749; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+  .nav-logo { color: white; font-weight: 800; font-size: 14px; letter-spacing: 1px; }
+  .nav-badge { background: rgba(78,205,196,0.2); color: #4ecdc4; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+
+  /* Hero */
+  .hero { background: linear-gradient(135deg, #1e2749 0%, #2d3a5c 50%, #38618C 100%); padding: 32px 0; color: white; }
+  .hero-inner { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+  .hero h1 { font-size: 24px; font-weight: 700; }
+  .hero .sub { color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 2px; }
+  .hero .phase { display: inline-block; margin-top: 8px; background: rgba(78,205,196,0.2); color: #4ecdc4; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+
+  /* Tabs */
+  .tabs { background: white; border-bottom: 1px solid #E5E7EB; position: sticky; top: 42px; z-index: 49; }
+  .tabs-inner { max-width: 900px; margin: 0 auto; padding: 0 24px; display: flex; gap: 4px; overflow-x: auto; }
+  .tab { padding: 12px 16px; font-size: 13px; font-weight: 500; color: #6B7280; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; background: none; border-top: none; border-left: none; border-right: none; }
+  .tab.active { color: #1e2749; font-weight: 700; border-bottom-color: #1e2749; }
+  .tab:hover { color: #1e2749; }
+
+  /* Content */
+  .content { max-width: 900px; margin: 0 auto; padding: 20px 24px 80px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Cards */
+  .card { background: white; border-radius: 14px; padding: 20px; margin-bottom: 14px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 1px 4px rgba(0,0,0,0.03); }
+  .card-navy { background: linear-gradient(135deg, #1e2749, #2d3a5c); color: white; border: none; }
+  .card-navy p { color: rgba(255,255,255,0.8); }
+  .card-teal { background: #F0FDFA; border-color: #99F6E4; }
+  .card-amber { background: #FFFBEB; border-left: 3px solid #E8B84B; }
+
+  .section-label { font-size: 10px; font-weight: 700; color: #E8B84B; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: #E8B84B; }
+
+  /* Gauges */
+  .gauges { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .gauge { background: white; border-radius: 14px; padding: 16px; text-align: center; border: 1px solid rgba(0,0,0,0.04); }
+  .gauge svg { width: 72px; height: 72px; margin: 0 auto 8px; display: block; }
+  .gauge .val { font-size: 18px; font-weight: 700; }
+  .gauge .lbl { font-size: 10px; color: #6B7280; }
+
+  /* Two col */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* Tags */
+  .tag { font-size: 11px; padding: 4px 12px; border-radius: 999px; background: #FFF8E7; color: #92400E; font-weight: 500; display: inline-block; margin: 2px; }
+
+  /* Quote */
+  .quote { background: #FFFBEB; border-left: 3px solid #E8B84B; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+  .quote p { font-size: 13px; font-style: italic; color: #374151; line-height: 1.6; }
+  .quote .attr { font-size: 10px; color: #9CA3AF; margin-top: 4px; }
+
+  /* Love Note */
+  .love-note { background: linear-gradient(135deg, #FDF2F8, #FCE7F3); border-radius: 14px; padding: 20px; margin-bottom: 12px; border: 1px solid #FBCFE8; }
+  .love-note .header { font-size: 10px; font-weight: 700; color: #EC4899; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .love-note p { font-size: 13px; color: #374151; line-height: 1.7; }
+  .love-note .sign { font-size: 12px; color: #9CA3AF; margin-top: 8px; font-style: italic; }
+
+  /* Vibe */
+  .vibe-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+  .vibe-label { font-size: 12px; color: #6B7280; width: 80px; flex-shrink: 0; }
+  .vibe-bar-bg { flex: 1; height: 8px; background: #F3F4F6; border-radius: 4px; overflow: hidden; }
+  .vibe-bar { height: 100%; border-radius: 4px; }
+  .vibe-val { font-size: 11px; font-weight: 600; width: 36px; text-align: right; flex-shrink: 0; }
+
+  /* Timeline */
+  .tl-item { display: flex; gap: 12px; margin-bottom: 16px; }
+  .tl-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .tl-content { flex: 1; }
+  .tl-title { font-size: 13px; font-weight: 600; color: #1e2749; }
+  .tl-sub { font-size: 11px; color: #9CA3AF; }
+
+  /* Report */
+  .report-mock { background: white; border: 1px solid #E5E7EB; border-radius: 10px; padding: 20px; }
+  .report-mock h4 { font-size: 11px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+  .report-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #F3F4F6; font-size: 13px; }
+  .report-row:last-child { border-bottom: none; }
+
+  /* CTA */
+  .cta { background: white; border: 2px solid #E8B84B; border-radius: 14px; padding: 28px; text-align: center; margin: 24px 0; }
+  .cta h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .cta p { font-size: 13px; color: #6B7280; margin-bottom: 16px; }
+  .cta a { display: inline-block; background: #1e2749; color: white; padding: 12px 28px; border-radius: 50px; font-weight: 700; font-size: 14px; text-decoration: none; }
+
+  .footer { text-align: center; padding: 20px; font-size: 10px; color: #9CA3AF; }
+
+  @media (max-width: 640px) { .gauges { grid-template-columns: repeat(2, 1fr); } .two-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <span class="nav-logo">TDI</span>
+  <span class="nav-badge">Year 2 Partnership Preview</span>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <h1>WeGo D94 | West Chicago, Illinois</h1>
+    <div class="sub">DuPage County | Multi-Building District | 19 Hub Members</div>
+    <div class="phase">Year 2: District-Wide Partnership</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tabs-inner">
+    <button class="tab active" onclick="showTab('overview')">Overview</button>
+    <button class="tab" onclick="showTab('hub')">The Hub Experience</button>
+    <button class="tab" onclick="showTab('observations')">Observations & Love Notes</button>
+    <button class="tab" onclick="showTab('wellness')">Wellness & Vibe Data</button>
+    <button class="tab" onclick="showTab('reports')">Board Reports</button>
+    <button class="tab" onclick="showTab('timeline')">Your Year</button>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- OVERVIEW TAB -->
+  <div id="tab-overview" class="tab-panel active">
+
+    <!-- AI Summary -->
+    <div class="card">
+      <div class="section-label"><span class="dot"></span> Partnership Intelligence</div>
+      <p style="font-family: Georgia, serif; font-size: 15px; line-height: 1.7; color: #374151;">
+        Juan, Year 1 proved that TDI works in WeGo D94. Now the question is not whether it works -- it is what happens when every building in the district is aligned around the same tools, the same coaching, and the same language. With 19 Hub members across multiple buildings, Year 2 is about going from pockets of impact to district-wide consistency. Every educator gets personalized support. Every building gets observation days. Leadership gets executive sessions to connect the dots across the district. Here is what we project for WeGo D94's renewal year, based on 100+ partner schools.
+      </p>
+    </div>
+
+    <!-- Gauges -->
+    <div class="gauges">
+      <div class="gauge">
+        <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"/><circle cx="40" cy="40" r="34" fill="none" stroke="#E8B84B" stroke-width="6" stroke-dasharray="171 43" stroke-linecap="round" transform="rotate(-90 40 40)"/></svg>
+        <div class="val" style="color:#E8B84B">80%</div>
+        <div class="lbl">Hub Engagement</div>
+      </div>
+      <div class="gauge">
+        <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"/><circle cx="40" cy="40" r="34" fill="none" stroke="#2A9D8F" stroke-width="6" stroke-dasharray="139 75" stroke-linecap="round" transform="rotate(-90 40 40)"/></svg>
+        <div class="val" style="color:#2A9D8F">65%</div>
+        <div class="lbl">Strategy Use</div>
+      </div>
+      <div class="gauge">
+        <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"/><circle cx="40" cy="40" r="34" fill="none" stroke="#4ecdc4" stroke-width="6" stroke-dasharray="179 35" stroke-linecap="round" transform="rotate(-90 40 40)"/></svg>
+        <div class="val" style="color:#4ecdc4">4.2/5</div>
+        <div class="lbl">Team Wellness</div>
+      </div>
+      <div class="gauge">
+        <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"/><circle cx="40" cy="40" r="34" fill="none" stroke="#8B5CF6" stroke-width="6" stroke-dasharray="128 86" stroke-linecap="round" transform="rotate(-90 40 40)"/></svg>
+        <div class="val" style="color:#8B5CF6">5.2/10</div>
+        <div class="lbl">Stress (vs 8.9 avg)</div>
+      </div>
+    </div>
+
+    <!-- What district-wide unlocks -->
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 12px;">What District-Wide Alignment Unlocks for WeGo D94</h3>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div style="background:#F9FAFB; border-radius:10px; padding:14px; border-left:3px solid #2A9D8F;">
+          <p style="font-size:13px; font-weight:600; color:#1e2749; margin-bottom:4px;">Cross-building consistency</p>
+          <p style="font-size:11px; color:#6B7280; line-height:1.5;">When every building in WeGo D94 works from the same tools and strategies, students get a consistent experience no matter which building they are in or which staff member they work with.</p>
+        </div>
+        <div style="background:#F9FAFB; border-radius:10px; padding:14px; border-left:3px solid #E8B84B;">
+          <p style="font-size:13px; font-weight:600; color:#1e2749; margin-bottom:4px;">Year 2 momentum</p>
+          <p style="font-size:11px; color:#6B7280; line-height:1.5;">Your team already knows the platform and the coaching model. Year 2 skips the onboarding curve and goes straight to deeper implementation and measurable growth.</p>
+        </div>
+        <div style="background:#F9FAFB; border-radius:10px; padding:14px; border-left:3px solid #8B5CF6;">
+          <p style="font-size:13px; font-weight:600; color:#1e2749; margin-bottom:4px;">Executive-level strategic support</p>
+          <p style="font-size:11px; color:#6B7280; line-height:1.5;">3 executive sessions give district leadership dedicated time to connect coaching data across buildings, align priorities, and plan strategically with TDI as a thought partner.</p>
+        </div>
+        <div style="background:#F9FAFB; border-radius:10px; padding:14px; border-left:3px solid #EC4899;">
+          <p style="font-size:13px; font-weight:600; color:#1e2749; margin-bottom:4px;">Shared vocabulary, district-wide</p>
+          <p style="font-size:11px; color:#6B7280; line-height:1.5;">40 TDI books across the district means every educator is reading the same material. That shared language shows up in PLCs, hallway conversations, and cross-building collaboration.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Investment -->
+    <div class="card" style="background: linear-gradient(135deg, #1e2749, #38618C); color: white; border: none;">
+      <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Your Investment, By The Numbers</h3>
+      <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+        <div style="text-align:center; padding:12px; background:rgba(255,255,255,0.08); border-radius:10px;">
+          <div style="font-size:22px; font-weight:700;">$2,983</div>
+          <div style="font-size:10px; color:rgba(255,255,255,0.5);">per educator</div>
+        </div>
+        <div style="text-align:center; padding:12px; background:rgba(255,255,255,0.08); border-radius:10px;">
+          <div style="font-size:22px; font-weight:700;">19</div>
+          <div style="font-size:10px; color:rgba(255,255,255,0.5);">Hub members</div>
+        </div>
+        <div style="text-align:center; padding:12px; background:rgba(255,255,255,0.08); border-radius:10px;">
+          <div style="font-size:22px; font-weight:700;">4+4+3</div>
+          <div style="font-size:10px; color:rgba(255,255,255,0.5);">obs / virtual / exec</div>
+        </div>
+        <div style="text-align:center; padding:12px; background:rgba(255,255,255,0.08); border-radius:10px;">
+          <div style="font-size:22px; font-weight:700;">12 mo</div>
+          <div style="font-size:10px; color:rgba(255,255,255,0.5);">partnership</div>
+        </div>
+      </div>
+      <div style="margin-top: 14px; padding: 12px; background:rgba(255,255,255,0.06); border-radius:10px;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; font-size: 11px; color: rgba(255,255,255,0.7);">
+          <div>Learning Hub (19 seats): $5,681</div>
+          <div>On-Campus Observations (x4 days): $36,000</div>
+          <div>Virtual Strategy Sessions (x4): $6,000</div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 6px;">
+          <div>Executive Impact Sessions (x3): $9,000</div>
+          <div>TDI Books (40 copies): Included</div>
+          <div style="font-weight:700; color:rgba(255,255,255,0.9);">Total: $56,681</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta">
+      <h3>19 educators. Multiple buildings. One aligned district.</h3>
+      <p>Year 1 proved it works. Year 2 is where district-wide transformation happens.</p>
+      <a href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone">Let's finalize the renewal</a>
+    </div>
+  </div>
+
+  <!-- HUB TAB -->
+  <div id="tab-hub" class="tab-panel">
+    <div class="card" style="background: linear-gradient(135deg, #2A9D8F, #1f7a6e); color: white; border: none;">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">19 memberships. Every building. Full access.</h3>
+      <p style="color: rgba(255,255,255,0.8); font-size: 14px; line-height: 1.6; margin-bottom: 16px;">Your team already knows the Hub from Year 1. Now 19 educators across WeGo D94 get full access -- same tools, same courses, same community. 100,000+ educators already use it. Try it yourself right now.</p>
+      <a href="https://www.teachersdeserveit.com/hub" style="display:inline-block; background:white; color:#1e2749; padding:12px 24px; border-radius:50px; font-weight:700; font-size:14px; text-decoration:none;">Open the Learning Hub</a>
+    </div>
+
+    <h3 style="font-size: 15px; font-weight: 700; margin: 20px 0 12px;">Tools Your Team Will Use Monday Morning</h3>
+    <div class="two-col">
+      <div class="card">
+        <p style="font-size:13px; font-weight:600; color:#1e2749; margin-bottom:6px;">Calm Response Scripts</p>
+        <p style="font-size:12px; color:#6B7280; line-height:1.5;">Pre-written responses for the 10 most common classroom disruptions. Print it, clip it, done.</p>
+        <span class="tag">5 min</span> <span class="tag">Downloadable PDF</span>
+      </div>
+      <div class="card">
+        <p style="font-size:13px; font-weight:600; color:#1e2749; margin-bottom:6px;">The Shift Kit</p>
+        <p style="font-size:12px; color:#6B7280; line-height:1.5;">A transition strategy that cuts lost time between subjects from 8-10 minutes to under 2.</p>
+        <span class="tag">5 min</span> <span class="tag">Classroom Strategy</span>
+      </div>
+      <div class="card">
+        <p style="font-size:13px; font-weight:600; color:#1e2749; margin-bottom:6px;">Lesson Flow Checklist</p>
+        <p style="font-size:12px; color:#6B7280; line-height:1.5;">A one-page planning tool that ensures every lesson has engagement, check-in, and closure built in.</p>
+        <span class="tag">5 min</span> <span class="tag">Planning Tool</span>
+      </div>
+      <div class="card">
+        <p style="font-size:13px; font-weight:600; color:#1e2749; margin-bottom:6px;">Parent Communication Templates</p>
+        <p style="font-size:12px; color:#6B7280; line-height:1.5;">Copy-paste email templates for the 8 most common parent conversations.</p>
+        <span class="tag">5 min</span> <span class="tag">Downloadable PDF</span>
+      </div>
+    </div>
+
+    <h3 style="font-size: 15px; font-weight: 700; margin: 20px 0 12px;">PD Courses with Certificates</h3>
+    <div class="card">
+      <p style="font-size:13px; color:#6B7280; line-height:1.6; margin-bottom:12px;">Your educators complete courses at their own pace and earn PD certificates with tracked hours. These are printable and shareable. Across multiple buildings, this gives every team member access to the same high-quality, self-paced professional development -- ensuring consistent growth district-wide regardless of building assignment.</p>
+      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+        <div style="background:#F9FAFB; border-radius:8px; padding:10px; text-align:center;">
+          <p style="font-size:12px; font-weight:600; color:#1e2749;">Social-Emotional Learning</p>
+          <p style="font-size:10px; color:#9CA3AF;">2.5 PD hours</p>
+        </div>
+        <div style="background:#F9FAFB; border-radius:8px; padding:10px; text-align:center;">
+          <p style="font-size:12px; font-weight:600; color:#1e2749;">Classroom Management Reset</p>
+          <p style="font-size:10px; color:#9CA3AF;">3 PD hours</p>
+        </div>
+        <div style="background:#F9FAFB; border-radius:8px; padding:10px; text-align:center;">
+          <p style="font-size:12px; font-weight:600; color:#1e2749;">Communication That Clicks</p>
+          <p style="font-size:10px; color:#9CA3AF;">2 PD hours</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">40 TDI Books -- District-Wide Shared Vocabulary</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6; margin-bottom:10px;">40 copies distributed across WeGo D94 buildings. Use them for book study, PLC discussion, or individual growth. When educators across multiple buildings read the same book and use the same Hub, you build a shared vocabulary that travels with staff and students between buildings, grade levels, and team meetings. These 40 copies are included at no additional cost as part of your renewal partnership.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">What Type of Educator Are You?</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6; margin-bottom:10px;">Your teachers take a 5-question quiz and discover their educator type: Connector, Architect, Spark, Strategist, Guardian, or Visionary. With 19 educators across multiple buildings, you can see your district's profile at a glance and build cross-building groupings that complement each other.</p>
+      <a href="https://www.teachersdeserveit.com/hub" style="font-size:13px; color:#2A9D8F; font-weight:600; text-decoration:none;">Take the quiz yourself &#8594;</a>
+    </div>
+
+    <div class="quote">
+      <p>"The Quick Wins are the first PD resource I have actually used more than once. Practical, fast, and built for people who do not have time for a 3-hour webinar."</p>
+      <div class="attr">Instructional coach, K-5</div>
+    </div>
+  </div>
+
+  <!-- OBSERVATIONS TAB -->
+  <div id="tab-observations" class="tab-panel">
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">4 Observation Days Across WeGo D94 Buildings</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6;">TDI coaches spend a full day in your buildings -- four times this year. In a multi-building district, we coordinate across locations to ensure every educator gets observed and every building gets attention. This is sustained, personal coaching where your team sees the same TDI faces come back, track their growth, and celebrate their progress across the entire district.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">4 Virtual Strategy Sessions</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6;">Between on-site visits, virtual sessions keep momentum going. These are targeted strategy sessions for your teaching staff -- reviewing data, troubleshooting challenges, and planning next steps. In a multi-building district, these sessions help ensure alignment between buildings without pulling staff out of classrooms.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">3 Executive Impact Sessions</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6;">Dedicated leadership sessions for Juan and the WeGo D94 leadership team. These are not coaching sessions for teachers -- they are strategic conversations about district-wide implementation patterns, cross-building data, and how to connect TDI coaching to your broader district goals. Think of these as your cabinet-level partnership meetings.</p>
+    </div>
+
+    <h3 style="font-size: 15px; font-weight: 700; margin: 20px 0 12px;">Example Love Note</h3>
+    <div class="love-note">
+      <div class="header">Love Note from TDI</div>
+      <p><strong>To: Mrs. Thompson, 5th Grade</strong></p>
+      <p>At 10:22 this morning, I watched you transition your class from reading groups back to whole-group instruction. You gave a quiet countdown, made eye contact with two students who were still settling, and had the entire room ready in under 45 seconds. No raised voice. No repeated directions. Just calm, practiced routine.</p>
+      <p>What stood out is that you did not rush the two students who needed an extra moment. You waited, gave a small nod, and they came along on their own. That is trust. Your students trust that you will give them the space to get there, and because of that trust, they get there faster.</p>
+      <p>One thing to try: during your next read-aloud, pause after a key moment and ask "What do you think happens next, and why?" Give 10 seconds of silent think time before taking responses. You might find that your quieter students start raising their hands.</p>
+      <div class="sign">With genuine respect, TDI Coaching Team</div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">After the Observation</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6; margin-bottom:12px;">Every Love Note is followed by a strategy session where we discuss what we saw and what to try next. Teachers tell us these are the most valuable 10 minutes of PD they get all year.</p>
+      <div class="quote" style="margin-bottom:0;">
+        <p>"I have been observed hundreds of times. This is the first time someone told me what I was doing RIGHT and gave me one specific thing to try. I cried in the best way."</p>
+        <div class="attr">7th grade science teacher, TDI partner school</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">Implementation Evidence</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6; margin-bottom:12px;">We do not just deliver PD. We come back and check if it worked. With four observation days plus four virtual sessions, your team gets continuous touchpoints where growth is tracked and celebrated across every building.</p>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div style="background:#F0FDF4; border-radius:10px; padding:14px;">
+          <p style="font-size:12px; font-weight:600; color:#065F46;">Before TDI</p>
+          <p style="font-size:12px; color:#6B7280; line-height:1.5;">10% strategy implementation rate (national average). Teachers attend PD, take notes, and go back to what they were already doing.</p>
+        </div>
+        <div style="background:#F0FDF4; border-radius:10px; padding:14px;">
+          <p style="font-size:12px; font-weight:600; color:#065F46;">After TDI (90 days)</p>
+          <p style="font-size:12px; color:#6B7280; line-height:1.5;">65% strategy implementation rate. Teachers use what they learned because the tools are practical and the follow-up is personal.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WELLNESS TAB -->
+  <div id="tab-wellness" class="tab-panel">
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">Vibe Check: What Your District's Wellness Data Would Look Like</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6; margin-bottom:16px;">Every educator does a private, 10-second daily check-in across 5 dimensions. Nobody sees individual responses. You see the team trend -- and in a multi-building district, you can see building-level patterns that help you allocate support where it is needed most.</p>
+
+      <div class="vibe-row"><span class="vibe-label">Energy</span><div class="vibe-bar-bg"><div class="vibe-bar" style="width:78%; background:#2A9D8F;"></div></div><span class="vibe-val" style="color:#2A9D8F;">3.9</span></div>
+      <div class="vibe-row"><span class="vibe-label">Stress</span><div class="vibe-bar-bg"><div class="vibe-bar" style="width:62%; background:#E8B84B;"></div></div><span class="vibe-val" style="color:#E8B84B;">3.1</span></div>
+      <div class="vibe-row"><span class="vibe-label">Connection</span><div class="vibe-bar-bg"><div class="vibe-bar" style="width:86%; background:#2A9D8F;"></div></div><span class="vibe-val" style="color:#2A9D8F;">4.3</span></div>
+      <div class="vibe-row"><span class="vibe-label">Purpose</span><div class="vibe-bar-bg"><div class="vibe-bar" style="width:88%; background:#2A9D8F;"></div></div><span class="vibe-val" style="color:#2A9D8F;">4.4</span></div>
+      <div class="vibe-row"><span class="vibe-label">Balance</span><div class="vibe-bar-bg"><div class="vibe-bar" style="width:72%; background:#E8B84B;"></div></div><span class="vibe-val" style="color:#E8B84B;">3.6</span></div>
+
+      <p style="font-size:11px; color:#9CA3AF; margin-top:12px;">Scale: 1 (struggling) to 5 (thriving). Data shown is from a real TDI partner district, anonymized.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">What Happens When Someone Is Struggling</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6; margin-bottom:12px;">If an educator logs multiple tough days in a row, TDI CEO Rae Hughart personally sends them a check-in email. Not a form. Not a survey. Just a "hey, I see you, this job is hard, I am in your corner" message.</p>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6;">Across multiple buildings, it is easy for an administrator to miss the early signs of burnout. This data gives district leadership visibility without requiring individual buildings to surface it themselves.</p>
+    </div>
+
+    <div class="card-amber card" style="border-radius: 14px;">
+      <p style="font-size:13px; color:#374151; line-height:1.6;"><strong>Industry context:</strong> The national average teacher stress level is 8.9 out of 10. TDI partner schools average 5.2 out of 10 after one year. Multi-building districts face additional coordination challenges that can compound stress when different buildings operate in silos. District-wide TDI helps create a unified support system.</p>
+    </div>
+
+    <div class="quote">
+      <p>"I did not realize how close to burnout I was until TDI's Vibe Check made me actually stop and think about it. The Moment Mode breathing exercise got me through a day I almost called in sick."</p>
+      <div class="attr">4th grade teacher, TDI partner school</div>
+    </div>
+  </div>
+
+  <!-- REPORTS TAB -->
+  <div id="tab-reports" class="tab-panel">
+    <div class="card-navy card" style="border-radius:14px;">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">What Your Board Sees in October</h3>
+      <p style="font-size:12px; color:rgba(255,255,255,0.5); margin-bottom:16px;">This is generated automatically from your dashboard. No slide deck needed. Screenshot it and send.</p>
+      <p style="font-size:14px; color:rgba(255,255,255,0.8); line-height:1.7;">"WeGo D94's 19 educators across multiple buildings have engaged with 150+ tools in the first 90 days of the renewed partnership. Strategy implementation is at 65%, more than 6x the national average. Team wellness is at 4.2 out of 5. TDI personally reached out to 4 team members for wellness check-ins this quarter. 22 PD certificates earned district-wide. Cross-building consistency has improved measurably since Year 1."</p>
+    </div>
+
+    <!-- Board Justification -->
+    <div class="card" style="border: 2px solid #1e2749; margin-top: 14px;">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 12px;">Board Justification: Why Renew for Year 2</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6; margin-bottom:14px;">The following language is designed to support your board presentation. Copy, adapt, or screenshot as needed.</p>
+      <div style="background:#F9FAFB; border-radius:10px; padding:16px; margin-bottom:12px;">
+        <p style="font-size:13px; color:#374151; line-height:1.7; font-family: Georgia, serif;">
+          "The Board is asked to approve renewal of the TDI partnership for the 2026-27 school year at $56,681. This represents $2,983 per educator for a comprehensive, 12-month professional development program that includes personalized coaching, on-site observations, virtual strategy sessions, executive leadership support, and access to TDI's digital learning platform. Year 1 data demonstrated measurable improvements in strategy implementation, educator wellness, and professional growth. Renewal ensures continuity of these gains and expands impact district-wide."
+        </p>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div style="background:#F0FDF4; border-radius:10px; padding:14px;">
+          <p style="font-size:12px; font-weight:600; color:#065F46; margin-bottom:6px;">ROI: Cost Comparison</p>
+          <p style="font-size:12px; color:#6B7280; line-height:1.5;">Traditional PD workshop: $300-500/person for a single day, no follow-up. TDI: $2,983/educator for 12 months of coaching, observations, virtual sessions, executive support, Hub access, and 40 books. That is less than $249/month per educator.</p>
+        </div>
+        <div style="background:#F0FDF4; border-radius:10px; padding:14px;">
+          <p style="font-size:12px; font-weight:600; color:#065F46; margin-bottom:6px;">ROI: Retention Savings</p>
+          <p style="font-size:12px; color:#6B7280; line-height:1.5;">Replacing one teacher costs a district $15,000-$30,000. TDI partner schools report retention intent of 8.4/10 vs the 3.2 industry average. If this partnership retains even one educator who would have otherwise left, it more than pays for itself.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Board-Ready Metrics -->
+    <div class="card" style="margin-top: 14px;">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 12px;">Board-Ready Metrics: Year 1 to Year 2 Trajectory</h3>
+      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+        <div style="background:#FFFBEB; border-radius:10px; padding:14px; text-align:center;">
+          <p style="font-size:10px; color:#92400E; text-transform:uppercase; font-weight:600; margin-bottom:4px;">National Average</p>
+          <p style="font-size:22px; font-weight:700; color:#92400E;">10%</p>
+          <p style="font-size:11px; color:#6B7280;">strategy implementation</p>
+        </div>
+        <div style="background:#F0FDFA; border-radius:10px; padding:14px; text-align:center;">
+          <p style="font-size:10px; color:#065F46; text-transform:uppercase; font-weight:600; margin-bottom:4px;">TDI Year 1</p>
+          <p style="font-size:22px; font-weight:700; color:#2A9D8F;">65%</p>
+          <p style="font-size:11px; color:#6B7280;">strategy implementation</p>
+        </div>
+        <div style="background:#F0F0FF; border-radius:10px; padding:14px; text-align:center;">
+          <p style="font-size:10px; color:#5B21B6; text-transform:uppercase; font-weight:600; margin-bottom:4px;">TDI Year 2 (Projected)</p>
+          <p style="font-size:22px; font-weight:700; color:#8B5CF6;">78%</p>
+          <p style="font-size:11px; color:#6B7280;">strategy implementation</p>
+        </div>
+      </div>
+      <p style="font-size:11px; color:#9CA3AF; margin-top:10px; text-align:center;">Year 2 districts consistently outperform Year 1 because the onboarding curve is eliminated and educators build on existing habits.</p>
+    </div>
+
+    <h3 style="font-size: 15px; font-weight: 700; margin: 20px 0 12px;">Example Exportable Report</h3>
+    <div class="report-mock">
+      <h4>WeGo D94 Partnership KPI Report (Projected Year 2)</h4>
+      <div class="report-row"><span>Hub engagement rate</span><strong>80%</strong></div>
+      <div class="report-row"><span>Strategy implementation</span><strong>65% (Year 1) --> 78% (Year 2 projected)</strong></div>
+      <div class="report-row"><span>Team wellness score</span><strong>4.2 / 5</strong></div>
+      <div class="report-row"><span>Teacher stress level</span><strong>5.2 / 10 (vs 8.9 industry)</strong></div>
+      <div class="report-row"><span>PD hours earned (district)</span><strong>57 hours</strong></div>
+      <div class="report-row"><span>Certificates issued</span><strong>22</strong></div>
+      <div class="report-row"><span>Retention intent</span><strong>8.4 / 10 (vs 3.2 industry)</strong></div>
+      <div class="report-row"><span>Field Notes earned</span><strong>24</strong></div>
+      <div class="report-row"><span>Cross-building consistency score</span><strong>High (all buildings active)</strong></div>
+    </div>
+
+    <div class="card" style="margin-top: 14px;">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">Single Educator Growth Story</h3>
+      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+        <div style="background:#F9FAFB; border-radius:8px; padding:12px;">
+          <p style="font-size:10px; color:#9CA3AF; text-transform:uppercase; margin-bottom:4px;">Month 1</p>
+          <p style="font-size:12px; color:#374151; line-height:1.5;">Logs in, explores 3 Quick Wins, downloads Calm Response Scripts, takes the Educator Quiz, starts the TDI book</p>
+        </div>
+        <div style="background:#F9FAFB; border-radius:8px; padding:12px;">
+          <p style="font-size:10px; color:#9CA3AF; text-transform:uppercase; margin-bottom:4px;">Month 2</p>
+          <p style="font-size:12px; color:#374151; line-height:1.5;">Completes first course, earns PD certificate, observed by TDI coach, receives personalized Love Note</p>
+        </div>
+        <div style="background:#F9FAFB; border-radius:8px; padding:12px;">
+          <p style="font-size:10px; color:#9CA3AF; text-transform:uppercase; margin-bottom:4px;">Month 3</p>
+          <p style="font-size:12px; color:#374151; line-height:1.5;">Shares wins in community, earns Field Notes, reports stress dropped from 7 to 4, collaborates with educator from another WeGo building using shared strategies</p>
+        </div>
+      </div>
+      <p style="font-size:12px; color:#6B7280; margin-top:12px; text-align:center;">Now multiply that by 19 educators across multiple buildings. That is district-wide alignment.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">What This Investment Includes (Board Summary)</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.8;">
+        <strong>$5,681</strong> -- Learning Hub access for 19 educators (courses, Quick Wins, community, certificates)<br>
+        <strong>$36,000</strong> -- 4 full-day on-campus observation visits with personalized Love Notes<br>
+        <strong>$6,000</strong> -- 4 virtual strategy sessions for teaching staff<br>
+        <strong>$9,000</strong> -- 3 executive impact sessions for district leadership<br>
+        <strong>Included</strong> -- 40 TDI books for district-wide shared vocabulary<br>
+        <strong>$56,681 total</strong> -- $2,983 per educator for a full 12-month partnership
+      </p>
+    </div>
+  </div>
+
+  <!-- TIMELINE TAB -->
+  <div id="tab-timeline" class="tab-panel">
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 16px;">Your Partnership Year</h3>
+
+      <div class="tl-item"><div class="tl-dot" style="background:#1e2749;"></div><div class="tl-content"><div class="tl-title">Renewal confirmed</div><div class="tl-sub">Summer 2026 | Hub access renewed for all 19 educators. 40 TDI books shipped to WeGo D94 buildings.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#2A9D8F;"></div><div class="tl-content"><div class="tl-title">Year 2 kickoff with leadership</div><div class="tl-sub">Week 1 | Dashboard tour, Year 2 KPI setting, cross-building alignment planning</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#E8B84B;"></div><div class="tl-content"><div class="tl-title">Observation Day 1</div><div class="tl-sub">September 2026 | TDI coaches on-site. Love Notes delivered to every educator observed.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#4ecdc4;"></div><div class="tl-content"><div class="tl-title">Virtual Strategy Session 1</div><div class="tl-sub">September 2026 | Follow-up on observation data, early strategy implementation check</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#EC4899;"></div><div class="tl-content"><div class="tl-title">Executive Impact Session 1</div><div class="tl-sub">October 2026 | District leadership deep-dive: cross-building patterns, Year 2 goals</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#8B5CF6;"></div><div class="tl-content"><div class="tl-title">30-day report delivered</div><div class="tl-sub">October 2026 | First board-ready data. Hub engagement, tool usage, wellness trends.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#E8B84B;"></div><div class="tl-content"><div class="tl-title">Observation Day 2</div><div class="tl-sub">November 2026 | Second on-site visit. Building on September observations.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#4ecdc4;"></div><div class="tl-content"><div class="tl-title">Virtual Strategy Session 2</div><div class="tl-sub">December 2026 | Mid-fall check-in, strategy refinement</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#EC4899;"></div><div class="tl-content"><div class="tl-title">Executive Impact Session 2</div><div class="tl-sub">January 2027 | Mid-year leadership review, cross-building data analysis</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#E8B84B;"></div><div class="tl-content"><div class="tl-title">Observation Day 3</div><div class="tl-sub">January 2027 | Third on-site visit. Compare to fall baseline. Celebrate growth.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#4ecdc4;"></div><div class="tl-content"><div class="tl-title">Virtual Strategy Session 3</div><div class="tl-sub">February 2027 | Spring planning, sustained implementation strategies</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#E8B84B;"></div><div class="tl-content"><div class="tl-title">Observation Day 4</div><div class="tl-sub">March 2027 | Final on-site visit. Full-year growth comparison across buildings.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#4ecdc4;"></div><div class="tl-content"><div class="tl-title">Virtual Strategy Session 4</div><div class="tl-sub">April 2027 | Year-end reflection, sustaining strategies through summer</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#EC4899;"></div><div class="tl-content"><div class="tl-title">Executive Impact Session 3</div><div class="tl-sub">April 2027 | Year 3 vision conversation. Not a renewal pitch -- a strategic planning session.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#1e2749;"></div><div class="tl-content"><div class="tl-title">Year 2 Impact Report</div><div class="tl-sub">Spring 2027 | Shareable with superintendent and board. Year-over-year comparison, district-wide outcomes.</div></div></div>
+    </div>
+
+    <div class="card-amber card" style="border-radius: 14px;">
+      <p style="font-size:13px; color:#374151; line-height:1.6;"><strong>What is included in $56,681:</strong> 19 Learning Hub memberships ($5,681) + 4 on-site observation days ($36,000) + 4 virtual strategy sessions ($6,000) + 3 executive impact sessions ($9,000) + 40 TDI books (included free). That is $2,983 per educator for a full year of personalized PD, coaching, executive support, wellness data, and district-wide alignment.</p>
+    </div>
+
+    <div class="cta">
+      <h3>Year 1 proved it. Year 2 scales it.</h3>
+      <p>Your team knows TDI. Your buildings are ready. 19 educators, multiple buildings, one aligned district.</p>
+      <a href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone">Schedule our next conversation</a>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Teachers Deserve It | Year 2 District-Wide Partnership Preview for WeGo D94 | June 2026<br>
+  Projections based on TDI partner benchmarks. Your actual dashboard will use your real data.
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
