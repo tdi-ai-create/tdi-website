@@ -18,29 +18,7 @@ export async function GET() {
 
     const results: { step: string; success: boolean; error?: string; data?: unknown }[] = [];
 
-    // ONE-TIME: Fix Joe Vercellino's milestones -- advance to "outline submitted, awaiting feedback"
-    {
-      const joeId = '74058153-665a-4435-8895-e7470b11cb52';
-      const milestonesToComplete = ['agreement_sign', 'outline_meeting_scheduled', 'outline_meeting_completed'];
-      const milestonesToUnlock = ['outline_finalized'];
-
-      for (const mid of milestonesToComplete) {
-        const { error } = await supabase
-          .from('creator_milestones')
-          .update({ status: 'completed', completed_at: new Date().toISOString(), completed_by: 'rae@teachersdeserveit.com', updated_at: new Date().toISOString() })
-          .eq('creator_id', joeId)
-          .eq('milestone_id', mid);
-        results.push({ step: `joe-complete-${mid}`, success: !error, error: error?.message });
-      }
-      for (const mid of milestonesToUnlock) {
-        const { error } = await supabase
-          .from('creator_milestones')
-          .update({ status: 'available', updated_at: new Date().toISOString() })
-          .eq('creator_id', joeId)
-          .eq('milestone_id', mid);
-        results.push({ step: `joe-unlock-${mid}`, success: !error, error: error?.message });
-      }
-    }
+    // Joe Vercellino milestone fix completed June 9, 2026 -- removed one-time code
 
     // Step 1: Check if columns exist, if not they need to be added via Supabase dashboard
     const { data: columns, error: columnsError } = await supabase
