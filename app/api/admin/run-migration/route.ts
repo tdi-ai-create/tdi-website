@@ -18,27 +18,7 @@ export async function GET() {
 
     const results: { step: string; success: boolean; error?: string; data?: unknown }[] = [];
 
-    // ONE-TIME FIX: Restore Jay Jackson's milestones that have completed_at back to completed status
-    // (previous migration over-unlocked them)
-    {
-      const jayId = 'a33904a3-40ff-4a7c-9fa5-fa4ca98b621a';
-      const { data: jayMilestones } = await supabase
-        .from('creator_milestones')
-        .select('id, milestone_id, status, completed_at')
-        .eq('creator_id', jayId);
-
-      if (jayMilestones) {
-        // Re-complete milestones that have completed_at but aren't marked completed
-        const needsRestore = jayMilestones.filter(m => m.completed_at && m.status !== 'completed');
-        for (const rm of needsRestore) {
-          const { error: restoreErr } = await supabase
-            .from('creator_milestones')
-            .update({ status: 'completed', updated_at: new Date().toISOString() })
-            .eq('id', rm.id);
-          results.push({ step: `restore-jay-${rm.milestone_id}`, success: !restoreErr, error: restoreErr?.message });
-        }
-      }
-    }
+    // Jay Jackson milestone fix completed June 8, 2026 -- removed one-time code
 
     // Step 1: Check if columns exist, if not they need to be added via Supabase dashboard
     const { data: columns, error: columnsError } = await supabase
