@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roosevelt School + TDI | Year 2 Partnership Preview</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; background: #F5F5F5; }
+
+  /* Nav */
+  .nav { background: #1e2749; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+  .nav-logo { color: white; font-weight: 800; font-size: 14px; letter-spacing: 1px; }
+  .nav-badge { background: rgba(78,205,196,0.2); color: #4ecdc4; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+
+  /* Hero */
+  .hero { background: linear-gradient(135deg, #1e2749 0%, #2d3a5c 50%, #38618C 100%); padding: 32px 0; color: white; }
+  .hero-inner { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+  .hero h1 { font-size: 24px; font-weight: 700; }
+  .hero .sub { color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 2px; }
+  .hero .phase { display: inline-block; margin-top: 8px; background: rgba(78,205,196,0.2); color: #4ecdc4; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+
+  /* Tabs */
+  .tabs { background: white; border-bottom: 1px solid #E5E7EB; position: sticky; top: 42px; z-index: 49; }
+  .tabs-inner { max-width: 900px; margin: 0 auto; padding: 0 24px; display: flex; gap: 4px; overflow-x: auto; }
+  .tab { padding: 12px 16px; font-size: 13px; font-weight: 500; color: #6B7280; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; background: none; border-top: none; border-left: none; border-right: none; }
+  .tab.active { color: #1e2749; font-weight: 700; border-bottom-color: #1e2749; }
+  .tab:hover { color: #1e2749; }
+
+  /* Content */
+  .content { max-width: 900px; margin: 0 auto; padding: 20px 24px 80px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Cards */
+  .card { background: white; border-radius: 14px; padding: 20px; margin-bottom: 14px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 1px 4px rgba(0,0,0,0.03); }
+  .card-navy { background: linear-gradient(135deg, #1e2749, #2d3a5c); color: white; border: none; }
+  .card-navy p { color: rgba(255,255,255,0.8); }
+  .card-teal { background: #F0FDFA; border-color: #99F6E4; }
+  .card-amber { background: #FFFBEB; border-left: 3px solid #E8B84B; }
+
+  .section-label { font-size: 10px; font-weight: 700; color: #E8B84B; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: #E8B84B; }
+
+  /* Gauges */
+  .gauges { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .gauge { background: white; border-radius: 14px; padding: 16px; text-align: center; border: 1px solid rgba(0,0,0,0.04); }
+  .gauge svg { width: 72px; height: 72px; margin: 0 auto 8px; display: block; }
+  .gauge .val { font-size: 18px; font-weight: 700; }
+  .gauge .lbl { font-size: 10px; color: #6B7280; }
+
+  /* Two col */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* Tags */
+  .tag { font-size: 11px; padding: 4px 12px; border-radius: 999px; background: #FFF8E7; color: #92400E; font-weight: 500; display: inline-block; margin: 2px; }
+
+  /* Quote */
+  .quote { background: #FFFBEB; border-left: 3px solid #E8B84B; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+  .quote p { font-size: 13px; font-style: italic; color: #374151; line-height: 1.6; }
+  .quote .attr { font-size: 10px; color: #9CA3AF; margin-top: 4px; }
+
+  /* Love Note */
+  .love-note { background: linear-gradient(135deg, #FDF2F8, #FCE7F3); border-radius: 14px; padding: 20px; margin-bottom: 12px; border: 1px solid #FBCFE8; }
+  .love-note .header { font-size: 10px; font-weight: 700; color: #EC4899; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .love-note p { font-size: 13px; color: #374151; line-height: 1.7; }
+  .love-note .sign { font-size: 12px; color: #9CA3AF; margin-top: 8px; font-style: italic; }
+
+  /* Vibe */
+  .vibe-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+  .vibe-label { font-size: 12px; color: #6B7280; width: 80px; flex-shrink: 0; }
+  .vibe-bar-bg { flex: 1; height: 8px; background: #F3F4F6; border-radius: 4px; overflow: hidden; }
+  .vibe-bar { height: 100%; border-radius: 4px; }
+  .vibe-val { font-size: 11px; font-weight: 600; width: 36px; text-align: right; flex-shrink: 0; }
+
+  /* Timeline */
+  .tl-item { display: flex; gap: 12px; margin-bottom: 16px; }
+  .tl-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .tl-content { flex: 1; }
+  .tl-title { font-size: 13px; font-weight: 600; color: #1e2749; }
+  .tl-sub { font-size: 11px; color: #9CA3AF; }
+
+  /* Report */
+  .report-mock { background: white; border: 1px solid #E5E7EB; border-radius: 10px; padding: 20px; }
+  .report-mock h4 { font-size: 11px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+  .report-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #F3F4F6; font-size: 13px; }
+  .report-row:last-child { border-bottom: none; }
+
+  /* CTA */
+  .cta { background: white; border: 2px solid #E8B84B; border-radius: 14px; padding: 28px; text-align: center; margin: 24px 0; }
+  .cta h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .cta p { font-size: 13px; color: #6B7280; margin-bottom: 16px; }
+  .cta a { display: inline-block; background: #1e2749; color: white; padding: 12px 28px; border-radius: 50px; font-weight: 700; font-size: 14px; text-decoration: none; }
+
+  .footer { text-align: center; padding: 20px; font-size: 10px; color: #9CA3AF; }
+
+  @media (max-width: 640px) { .gauges { grid-template-columns: repeat(2, 1fr); } .two-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <span class="nav-logo">TDI</span>
+  <span class="nav-badge">Year 2 Partnership Preview</span>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <h1>Roosevelt School | Year 2</h1>
+    <div class="sub">Bergen County, New Jersey | NJ Blue Ribbon 2025 | ~19 Educators</div>
+    <div class="phase">Year 2: Full Partnership</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tabs-inner">
+    <button class="tab active" onclick="showTab('overview')">Overview</button>
+    <button class="tab" onclick="showTab('hub')">The Hub Experience</button>
+    <button class="tab" onclick="showTab('observations')">Observations & Love Notes</button>
+    <button class="tab" onclick="showTab('wellness')">Wellness & Vibe Data</button>
+    <button class="tab" onclick="showTab('reports')">Board Reports</button>
+    <button class="tab" onclick="showTab('timeline')">Your Year</button>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- OVERVIEW TAB -->
+  <div id="tab-overview" class="tab-panel active">
+
+    <!-- AI Summary -->
+    <div class="card">
+      <div class="section-label"><span class="dot"></span> Partnership Intelligence</div>
+      <p style="font-family: Georgia, serif; font-size: 15px; line-height: 1.7; color: #374151;">
+        Jack, Year 1 proved something important: Roosevelt and TDI are a great fit. Your team leaned in, your staff engaged, and the pilot gave us real data on what works for a tight-knit school like yours. Year 2 is not about starting over. It is about unlocking everything we held back. Full Hub access for every educator, more observation days, virtual coaching sessions, and a leadership dashboard that gives you real-time visibility into how your team is growing. With 19 educators, every single person gets personalized attention -- that is the Roosevelt advantage. Here is what the expanded partnership looks like.
+      </p>
+    </div>
+
+    <!-- Gauges -->
+    <div class="gauges">
+      <div class="gauge">
+        <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"/><circle cx="40" cy="40" r="34" fill="none" stroke="#E8B84B" stroke-width="6" stroke-dasharray="192 22" stroke-linecap="round" transform="rotate(-90 40 40)"/></svg>
+        <div class="val" style="color:#E8B84B">90%</div>
+        <div class="lbl">Hub Engagement</div>
+      </div>
+      <div class="gauge">
+        <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"/><circle cx="40" cy="40" r="34" fill="none" stroke="#2A9D8F" stroke-width="6" stroke-dasharray="160 54" stroke-linecap="round" transform="rotate(-90 40 40)"/></svg>
+        <div class="val" style="color:#2A9D8F">75%</div>
+        <div class="lbl">Strategy Use</div>
+      </div>
+      <div class="gauge">
+        <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"/><circle cx="40" cy="40" r="34" fill="none" stroke="#4ecdc4" stroke-width="6" stroke-dasharray="184 30" stroke-linecap="round" transform="rotate(-90 40 40)"/></svg>
+        <div class="val" style="color:#4ecdc4">4.3/5</div>
+        <div class="lbl">Team Wellness</div>
+      </div>
+      <div class="gauge">
+        <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"/><circle cx="40" cy="40" r="34" fill="none" stroke="#8B5CF6" stroke-width="6" stroke-dasharray="107 107" stroke-linecap="round" transform="rotate(-90 40 40)"/></svg>
+        <div class="val" style="color:#8B5CF6">4.8/10</div>
+        <div class="lbl">Stress (vs 8.9 avg)</div>
+      </div>
+    </div>
+
+    <!-- What Year 2 unlocks -->
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 12px;">What Year 2 Unlocks for Roosevelt</h3>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div style="background:#F9FAFB; border-radius:10px; padding:14px; border-left:3px solid #2A9D8F;">
+          <p style="font-size:13px; font-weight:600; color:#1e2749; margin-bottom:4px;">Full Hub access for every educator</p>
+          <p style="font-size:11px; color:#6B7280; line-height:1.5;">All-Access tier. Every course, every Quick Win, every certificate. Not just the pilot group -- your entire staff.</p>
+        </div>
+        <div style="background:#F9FAFB; border-radius:10px; padding:14px; border-left:3px solid #E8B84B;">
+          <p style="font-size:13px; font-weight:600; color:#1e2749; margin-bottom:4px;">6 on-site observation days</p>
+          <p style="font-size:11px; color:#6B7280; line-height:1.5;">More time in your building means more Love Notes, more coaching touchpoints, and deeper relationships with your team.</p>
+        </div>
+        <div style="background:#F9FAFB; border-radius:10px; padding:14px; border-left:3px solid #8B5CF6;">
+          <p style="font-size:13px; font-weight:600; color:#1e2749; margin-bottom:4px;">Leadership Dashboard</p>
+          <p style="font-size:11px; color:#6B7280; line-height:1.5;">Real-time data on engagement, wellness, and strategy implementation. Board-ready reports at a glance.</p>
+        </div>
+        <div style="background:#F9FAFB; border-radius:10px; padding:14px; border-left:3px solid #EC4899;">
+          <p style="font-size:13px; font-weight:600; color:#1e2749; margin-bottom:4px;">Executive strategy sessions</p>
+          <p style="font-size:11px; color:#6B7280; line-height:1.5;">Two dedicated sessions for you to align TDI work with Roosevelt's strategic priorities and Blue Ribbon standards.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Investment -->
+    <div class="card" style="background: linear-gradient(135deg, #1e2749, #38618C); color: white; border: none;">
+      <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Your Investment, By The Numbers</h3>
+      <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+        <div style="text-align:center; padding:12px; background:rgba(255,255,255,0.08); border-radius:10px;">
+          <div style="font-size:22px; font-weight:700;">$1,421</div>
+          <div style="font-size:10px; color:rgba(255,255,255,0.5);">per educator</div>
+        </div>
+        <div style="text-align:center; padding:12px; background:rgba(255,255,255,0.08); border-radius:10px;">
+          <div style="font-size:22px; font-weight:700;">19</div>
+          <div style="font-size:10px; color:rgba(255,255,255,0.5);">staff served</div>
+        </div>
+        <div style="text-align:center; padding:12px; background:rgba(255,255,255,0.08); border-radius:10px;">
+          <div style="font-size:22px; font-weight:700;">$27K</div>
+          <div style="font-size:10px; color:rgba(255,255,255,0.5);">full partnership</div>
+        </div>
+        <div style="text-align:center; padding:12px; background:rgba(255,255,255,0.08); border-radius:10px;">
+          <div style="font-size:22px; font-weight:700;">12 mo</div>
+          <div style="font-size:10px; color:rgba(255,255,255,0.5);">partnership</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-amber card" style="border-radius: 14px;">
+      <p style="font-size:13px; color:#374151; line-height:1.6;"><strong>Year 1 to Year 2:</strong> Your pilot investment of $18K gave your team a taste. At $27K, every educator gets full access, you get 3x more observation days, and the leadership dashboard puts real-time data in your hands. This is the Blue Ribbon standard of professional development.</p>
+    </div>
+
+    <div class="cta">
+      <h3>19 educators. Every one of them seen.</h3>
+      <p>Year 1 was the proof. Year 2 is the full experience. Let's build on what's working.</p>
+      <a href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone">Let's finalize Year 2</a>
+    </div>
+  </div>
+
+  <!-- HUB TAB -->
+  <div id="tab-hub" class="tab-panel">
+    <div class="card" style="background: linear-gradient(135deg, #2A9D8F, #1f7a6e); color: white; border: none;">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Year 2: Full Hub Access for Every Educator</h3>
+      <p style="color: rgba(255,255,255,0.8); font-size: 14px; line-height: 1.6; margin-bottom: 16px;">Your pilot group saw what the Hub can do. Now all 19 staff members get the full experience -- every tool, every course, every certificate. No restrictions.</p>
+      <a href="https://www.teachersdeserveit.com/hub" style="display:inline-block; background:white; color:#1e2749; padding:12px 24px; border-radius:50px; font-weight:700; font-size:14px; text-decoration:none;">Open the Learning Hub</a>
+    </div>
+
+    <h3 style="font-size: 15px; font-weight: 700; margin: 20px 0 12px;">Tools Your Teachers Will Use Monday Morning</h3>
+    <div class="two-col">
+      <div class="card">
+        <p style="font-size:13px; font-weight:600; color:#1e2749; margin-bottom:6px;">Calm Response Scripts</p>
+        <p style="font-size:12px; color:#6B7280; line-height:1.5;">Pre-written responses for the 10 most common classroom disruptions. Print it, clip it, done.</p>
+        <span class="tag">5 min</span> <span class="tag">Downloadable PDF</span>
+      </div>
+      <div class="card">
+        <p style="font-size:13px; font-weight:600; color:#1e2749; margin-bottom:6px;">The Shift Kit</p>
+        <p style="font-size:12px; color:#6B7280; line-height:1.5;">A transition strategy that cuts lost time between subjects from 8-10 minutes to under 2.</p>
+        <span class="tag">5 min</span> <span class="tag">Classroom Strategy</span>
+      </div>
+      <div class="card">
+        <p style="font-size:13px; font-weight:600; color:#1e2749; margin-bottom:6px;">Lesson Flow Checklist</p>
+        <p style="font-size:12px; color:#6B7280; line-height:1.5;">A one-page planning tool that ensures every lesson has engagement, check-in, and closure built in.</p>
+        <span class="tag">5 min</span> <span class="tag">Planning Tool</span>
+      </div>
+      <div class="card">
+        <p style="font-size:13px; font-weight:600; color:#1e2749; margin-bottom:6px;">Parent Communication Templates</p>
+        <p style="font-size:12px; color:#6B7280; line-height:1.5;">Copy-paste email templates for the 8 most common parent conversations.</p>
+        <span class="tag">5 min</span> <span class="tag">Downloadable PDF</span>
+      </div>
+    </div>
+
+    <h3 style="font-size: 15px; font-weight: 700; margin: 20px 0 12px;">PD Courses with Certificates</h3>
+    <div class="card">
+      <p style="font-size:13px; color:#6B7280; line-height:1.6; margin-bottom:12px;">Your educators complete courses at their own pace and earn PD certificates with tracked hours. These are printable and shareable. With All-Access tier, your entire staff can work through every course in the library -- not just the pilot selection.</p>
+      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+        <div style="background:#F9FAFB; border-radius:8px; padding:10px; text-align:center;">
+          <p style="font-size:12px; font-weight:600; color:#1e2749;">Social-Emotional Learning</p>
+          <p style="font-size:10px; color:#9CA3AF;">2.5 PD hours</p>
+        </div>
+        <div style="background:#F9FAFB; border-radius:8px; padding:10px; text-align:center;">
+          <p style="font-size:12px; font-weight:600; color:#1e2749;">Classroom Management Reset</p>
+          <p style="font-size:10px; color:#9CA3AF;">3 PD hours</p>
+        </div>
+        <div style="background:#F9FAFB; border-radius:8px; padding:10px; text-align:center;">
+          <p style="font-size:12px; font-weight:600; color:#1e2749;">Communication That Clicks</p>
+          <p style="font-size:10px; color:#9CA3AF;">2 PD hours (for paras)</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">What Type of Educator Are You?</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6; margin-bottom:10px;">Your teachers take a 5-question quiz and discover their educator type: Connector, Architect, Spark, Strategist, Guardian, or Visionary. With a staff of 19, you will know exactly how your team thinks and can build PLC pairings that complement each other.</p>
+      <a href="https://www.teachersdeserveit.com/hub" style="font-size:13px; color:#2A9D8F; font-weight:600; text-decoration:none;">Take the quiz yourself &#8594;</a>
+    </div>
+
+    <div class="quote">
+      <p>"The Quick Wins are the first PD resource I have actually used more than once. Practical, fast, and built for people who do not have time for a 3-hour webinar."</p>
+      <div class="attr">Instructional coach, K-5</div>
+    </div>
+  </div>
+
+  <!-- OBSERVATIONS TAB -->
+  <div id="tab-observations" class="tab-panel">
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">Year 2: Deeper Observations, Stronger Relationships</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6;">In Year 1, your team experienced TDI coaches in your building. Year 2 expands that to 6 full observation days. With 19 educators, that means every teacher gets observed multiple times throughout the year. TDI coaches build on what they saw in Year 1 -- they already know your building, your culture, and your people. This is continuity, not a restart.</p>
+    </div>
+
+    <div class="card-amber card" style="border-radius: 14px;">
+      <p style="font-size:13px; color:#374151; line-height:1.6;"><strong>The small school advantage:</strong> In a school of 19 educators, there is no hiding. Everyone gets seen. Everyone gets a Love Note. Everyone gets a follow-up conversation. That level of personalization is simply not possible at a 300-person school. Roosevelt gets something special here.</p>
+    </div>
+
+    <h3 style="font-size: 15px; font-weight: 700; margin: 20px 0 12px;">Example Love Note</h3>
+    <div class="love-note">
+      <div class="header">Love Note from TDI</div>
+      <p><strong>To: Ms. Antonelli, 2nd Grade</strong></p>
+      <p>At 10:22 this morning, I watched you handle something most teachers rush through. A student returned from the bathroom visibly upset. Without missing a beat, you continued the read-aloud with the class while walking toward her. You placed your hand gently on her shoulder, leaned down, and whispered something. She nodded. You slid a feelings check-in card onto her desk. By the time the chapter ended, she had written something on it and was ready to rejoin the conversation.</p>
+      <p>You kept 23 students engaged while simultaneously providing a private, dignified emotional check-in for one child. That is the kind of multi-layered teaching that looks effortless but requires deep skill. You should know that the seamlessness of that moment is something we rarely see, even in veteran classrooms.</p>
+      <p>One thing to try: consider keeping a small basket of those feelings check-in cards on each table group so students can self-select them without needing you to initiate. You might be surprised how many students start using them on their own.</p>
+      <div class="sign">With genuine respect, TDI Coaching Team</div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">After the Observation</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6; margin-bottom:12px;">Every Love Note is followed by a strategy session where we discuss what we saw and what to try next. Your Year 1 teachers already know the power of this. Year 2 is about going deeper -- building on the strategies that are already working.</p>
+      <div class="quote" style="margin-bottom:0;">
+        <p>"I have been observed hundreds of times. This is the first time someone told me what I was doing RIGHT and gave me one specific thing to try. I cried in the best way."</p>
+        <div class="attr">7th grade science teacher, TDI partner school</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">Implementation Evidence</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6; margin-bottom:12px;">Year 2 schools consistently outperform Year 1 benchmarks. The foundation is already laid. Here is what we see:</p>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div style="background:#F0FDF4; border-radius:10px; padding:14px;">
+          <p style="font-size:12px; font-weight:600; color:#065F46;">Year 1 (Pilot)</p>
+          <p style="font-size:12px; color:#6B7280; line-height:1.5;">65% strategy implementation rate among pilot participants. Your team built the habit. The muscle memory is there.</p>
+        </div>
+        <div style="background:#F0FDF4; border-radius:10px; padding:14px;">
+          <p style="font-size:12px; font-weight:600; color:#065F46;">Year 2 (Projected)</p>
+          <p style="font-size:12px; color:#6B7280; line-height:1.5;">75%+ strategy implementation rate. Full staff access, more observation days, and peer momentum drive higher adoption school-wide.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WELLNESS TAB -->
+  <div id="tab-wellness" class="tab-panel">
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">Vibe Check: What Your Team's Wellness Data Would Look Like</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6; margin-bottom:16px;">Every educator does a private, 10-second daily check-in across 5 dimensions. Nobody sees individual responses. You see the team trend. With 19 staff members, these trends are especially meaningful -- small shifts are visible faster, and you can respond sooner.</p>
+
+      <div class="vibe-row"><span class="vibe-label">Energy</span><div class="vibe-bar-bg"><div class="vibe-bar" style="width:82%; background:#2A9D8F;"></div></div><span class="vibe-val" style="color:#2A9D8F;">4.1</span></div>
+      <div class="vibe-row"><span class="vibe-label">Stress</span><div class="vibe-bar-bg"><div class="vibe-bar" style="width:56%; background:#E8B84B;"></div></div><span class="vibe-val" style="color:#E8B84B;">2.8</span></div>
+      <div class="vibe-row"><span class="vibe-label">Connection</span><div class="vibe-bar-bg"><div class="vibe-bar" style="width:90%; background:#2A9D8F;"></div></div><span class="vibe-val" style="color:#2A9D8F;">4.5</span></div>
+      <div class="vibe-row"><span class="vibe-label">Purpose</span><div class="vibe-bar-bg"><div class="vibe-bar" style="width:92%; background:#2A9D8F;"></div></div><span class="vibe-val" style="color:#2A9D8F;">4.6</span></div>
+      <div class="vibe-row"><span class="vibe-label">Balance</span><div class="vibe-bar-bg"><div class="vibe-bar" style="width:76%; background:#2A9D8F;"></div></div><span class="vibe-val" style="color:#2A9D8F;">3.8</span></div>
+
+      <p style="font-size:11px; color:#9CA3AF; margin-top:12px;">Scale: 1 (struggling) to 5 (thriving). Projections based on Year 2 partner benchmarks for small schools. Small, close-knit teams consistently score higher on connection and purpose.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">What Happens When Someone Is Struggling</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6; margin-bottom:12px;">If an educator logs multiple tough days in a row, TDI CEO Rae Hughart personally sends them a check-in email. Not a form. Not a survey. Just a "hey, I see you, this job is hard, I am in your corner" message.</p>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6;">You will see "TDI reached out to X team members this month" on your dashboard. You will never see names. You just know someone has your teachers' backs.</p>
+    </div>
+
+    <div class="card-amber card" style="border-radius: 14px;">
+      <p style="font-size:13px; color:#374151; line-height:1.6;"><strong>Industry context:</strong> The national average teacher stress level is 8.9 out of 10. TDI partner schools average 5.2 out of 10 after Year 1. Year 2 schools average 4.8 out of 10. Blue Ribbon schools that invest in their teachers do not just maintain excellence -- they protect the people who create it.</p>
+    </div>
+
+    <div class="quote">
+      <p>"I did not realize how close to burnout I was until TDI's Vibe Check made me actually stop and think about it. The Moment Mode breathing exercise got me through a day I almost called in sick."</p>
+      <div class="attr">4th grade teacher, TDI partner school</div>
+    </div>
+  </div>
+
+  <!-- REPORTS TAB -->
+  <div id="tab-reports" class="tab-panel">
+    <div class="card-navy card" style="border-radius:14px;">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">What Your Board Sees in October</h3>
+      <p style="font-size:12px; color:rgba(255,255,255,0.5); margin-bottom:16px;">This is generated automatically from your dashboard. No slide deck needed. Screenshot it and send.</p>
+      <p style="font-size:14px; color:rgba(255,255,255,0.8); line-height:1.7;">"Roosevelt School's 19 educators have engaged with 95+ tools in the first 90 days of the expanded partnership. Strategy implementation is at 75%, more than 7x the national average. Team wellness is at 4.3 out of 5. TDI personally reached out to 3 team members for wellness check-ins this quarter. 14 PD certificates earned school-wide. Year 2 adoption rate: 90%."</p>
+    </div>
+
+    <h3 style="font-size: 15px; font-weight: 700; margin: 20px 0 12px;">Example Exportable Report</h3>
+    <div class="report-mock">
+      <h4>Roosevelt School Partnership KPI Report (Projected, Year 2)</h4>
+      <div class="report-row"><span>Hub engagement rate</span><strong>90%</strong></div>
+      <div class="report-row"><span>Strategy implementation</span><strong>75%</strong></div>
+      <div class="report-row"><span>Team wellness score</span><strong>4.3 / 5</strong></div>
+      <div class="report-row"><span>Teacher stress level</span><strong>4.8 / 10 (vs 8.9 industry)</strong></div>
+      <div class="report-row"><span>PD hours earned (school)</span><strong>95 hours</strong></div>
+      <div class="report-row"><span>Certificates issued</span><strong>14</strong></div>
+      <div class="report-row"><span>Retention intent</span><strong>9.1 / 10 (vs 3.2 industry)</strong></div>
+      <div class="report-row"><span>Field Notes earned</span><strong>42</strong></div>
+    </div>
+
+    <div class="card" style="margin-top: 14px;">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">Single Teacher Growth Story</h3>
+      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+        <div style="background:#F9FAFB; border-radius:8px; padding:12px;">
+          <p style="font-size:10px; color:#9CA3AF; text-transform:uppercase; margin-bottom:4px;">Month 1</p>
+          <p style="font-size:12px; color:#374151; line-height:1.5;">Already familiar from Year 1. Explores new All-Access courses, downloads 3 new Quick Wins, reconnects with Educator Type results</p>
+        </div>
+        <div style="background:#F9FAFB; border-radius:8px; padding:12px;">
+          <p style="font-size:10px; color:#9CA3AF; text-transform:uppercase; margin-bottom:4px;">Month 2</p>
+          <p style="font-size:12px; color:#374151; line-height:1.5;">Completes advanced course, earns second PD certificate, observed by TDI coach who remembers their Year 1 strengths</p>
+        </div>
+        <div style="background:#F9FAFB; border-radius:8px; padding:12px;">
+          <p style="font-size:10px; color:#9CA3AF; text-transform:uppercase; margin-bottom:4px;">Month 3</p>
+          <p style="font-size:12px; color:#374151; line-height:1.5;">Mentors a colleague new to TDI, earns Field Notes, stress dropped from 6 to 3, becomes a building champion</p>
+        </div>
+      </div>
+      <p style="font-size:12px; color:#6B7280; margin-top:12px; text-align:center;">Now multiply that by 19 educators who already trust the process.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">Para Growth Story</h3>
+      <p style="font-size:13px; color:#6B7280; line-height:1.6;">Paraprofessionals are often left out of PD. Not here. Your paras get the same Hub access, the same courses, the same certificates. Courses like "Communication That Clicks" and "Supporting Students Through Their Daily Schedule" were built specifically for paras. At Roosevelt, with a small staff, making sure every person feels included is what sustains a Blue Ribbon culture.</p>
+    </div>
+  </div>
+
+  <!-- TIMELINE TAB -->
+  <div id="tab-timeline" class="tab-panel">
+    <div class="card">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 16px;">Your Year 2 Partnership</h3>
+
+      <div class="tl-item"><div class="tl-dot" style="background:#1e2749;"></div><div class="tl-content"><div class="tl-title">Year 2 contract signed</div><div class="tl-sub">Summer 2026 | Full Hub access activated for all 19 staff. Leadership Dashboard goes live.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#2A9D8F;"></div><div class="tl-content"><div class="tl-title">Year 2 kickoff with Jack and leadership</div><div class="tl-sub">Week 1 | Dashboard tour, Year 2 KPI setting, review Year 1 wins and growth areas</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#E8B84B;"></div><div class="tl-content"><div class="tl-title">Observation days 1 and 2</div><div class="tl-sub">September 2026 | TDI coaches back in your building. Love Notes to every educator.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#4ecdc4;"></div><div class="tl-content"><div class="tl-title">Virtual coaching session 1</div><div class="tl-sub">October 2026 | Whole-staff strategy session. Building on Year 1 foundations.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#8B5CF6;"></div><div class="tl-content"><div class="tl-title">30-day report delivered</div><div class="tl-sub">October 2026 | First board-ready data. Hub engagement, tool usage, wellness trends.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#2A9D8F;"></div><div class="tl-content"><div class="tl-title">Executive strategy session 1</div><div class="tl-sub">November 2026 | Jack + TDI leadership. Align partnership with Roosevelt strategic priorities.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#E8B84B;"></div><div class="tl-content"><div class="tl-title">Observation days 3 and 4</div><div class="tl-sub">December 2026-January 2027 | Follow-up observations. Compare to baseline. Celebrate growth.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#4ecdc4;"></div><div class="tl-content"><div class="tl-title">Virtual coaching sessions 2 and 3</div><div class="tl-sub">January-February 2027 | Targeted sessions based on observation data and educator needs.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#EC4899;"></div><div class="tl-content"><div class="tl-title">Mid-year survey + executive strategy session 2</div><div class="tl-sub">February 2027 | Comprehensive check-in. What is working, what to adjust, what Year 3 could look like.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#E8B84B;"></div><div class="tl-content"><div class="tl-title">Observation days 5 and 6</div><div class="tl-sub">March-April 2027 | Final observation cycle. Full-year growth documented for every educator.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#4ecdc4;"></div><div class="tl-content"><div class="tl-title">Virtual coaching session 4</div><div class="tl-sub">April 2027 | Year-end reflection session. Strategies for summer and planning for continuity.</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:#1e2749;"></div><div class="tl-content"><div class="tl-title">Full-Year Impact Report</div><div class="tl-sub">Spring 2027 | Shareable with superintendent and board. Two years of documented growth. Lead with outcomes.</div></div></div>
+    </div>
+
+    <div class="card" style="background: linear-gradient(135deg, #1e2749, #38618C); color: white; border: none;">
+      <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 12px;">What's Included in Your Year 2 Partnership</h3>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div style="padding:12px; background:rgba(255,255,255,0.08); border-radius:10px;">
+          <p style="font-size:13px; font-weight:600;">6 on-site observation days</p>
+          <p style="font-size:11px; color:rgba(255,255,255,0.5);">TDI coaches in your building, Love Notes to every educator</p>
+        </div>
+        <div style="padding:12px; background:rgba(255,255,255,0.08); border-radius:10px;">
+          <p style="font-size:13px; font-weight:600;">4 virtual coaching sessions</p>
+          <p style="font-size:11px; color:rgba(255,255,255,0.5);">Whole-staff and targeted cohort sessions</p>
+        </div>
+        <div style="padding:12px; background:rgba(255,255,255,0.08); border-radius:10px;">
+          <p style="font-size:13px; font-weight:600;">2 executive strategy sessions</p>
+          <p style="font-size:11px; color:rgba(255,255,255,0.5);">Leadership-level planning with Jack and admin team</p>
+        </div>
+        <div style="padding:12px; background:rgba(255,255,255,0.08); border-radius:10px;">
+          <p style="font-size:13px; font-weight:600;">Full Hub access (All-Access tier)</p>
+          <p style="font-size:11px; color:rgba(255,255,255,0.5);">Every course, Quick Win, and certificate for all 19 staff</p>
+        </div>
+        <div style="padding:12px; background:rgba(255,255,255,0.08); border-radius:10px;">
+          <p style="font-size:13px; font-weight:600;">Leadership Dashboard</p>
+          <p style="font-size:11px; color:rgba(255,255,255,0.5);">Real-time data, board-ready reports, wellness trends</p>
+        </div>
+        <div style="padding:12px; background:rgba(255,255,255,0.08); border-radius:10px;">
+          <p style="font-size:13px; font-weight:600;">Wellness check-ins</p>
+          <p style="font-size:11px; color:rgba(255,255,255,0.5);">Personal outreach from TDI CEO when educators need support</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta">
+      <h3>Year 2 starts when you are ready</h3>
+      <p>The foundation is built. Your team trusts the process. Let's give them the full experience.</p>
+      <a href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone">Let's finalize Year 2</a>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Teachers Deserve It | Year 2 Partnership Preview for Roosevelt School, Lodi NJ | June 2026<br>
+  Projections based on TDI Year 2 partner benchmarks. Your actual dashboard will use your real data.
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
