@@ -9,6 +9,7 @@ import { FilterPanel, EMPTY_FILTERS, type ActiveFilters } from './components/Fil
 import { KanbanColumn } from './components/KanbanColumn'
 import { SalesCard, type SalesCardOpp } from './components/SalesCard'
 import AddLeadModal from '@/components/sales/AddLeadModal'
+import * as XLSX from 'xlsx'
 import { OpportunityDetailPanel, type FullOpportunity } from './components/OpportunityDetailPanel'
 import {
   TYPE_PAGE_TITLE,
@@ -530,57 +531,72 @@ export default function SalesPage() {
     return oppNotes[oppId]?.[0] || null
   }
 
-  // Export Jim's list to CSV
-  function csvDownload(rows: string[], filename: string) {
-    const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename
-    a.click()
-    URL.revokeObjectURL(url)
-  }
+  // --- Spreadsheet export helpers ---
 
-  function esc(v: any): string {
-    if (v === null || v === undefined) return ''
-    const s = String(v)
-    return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
-  }
+  function exportToSheet(rows: Opportunity[], filename: string, sheetName: string, isJimsList: boolean) {
+    const data = rows.map(o => {
+      const base: Record<string, string | number | null> = {
+        'District / School': o.name || '',
+        'Contact Name': o.contactName || '',
+        'Contact Email': o.contactEmail || '',
+        'Phone': o.contactPhone || '',
+        'City': o.city || '',
+        'State': o.state || '',
+        'Stage': o.stageName || '',
+        'Deal Value': o.value ?? '',
+        'Heat': o.heat ? o.heat.charAt(0).toUpperCase() + o.heat.slice(1) : '',
+        'Source': o.source || '',
+        'Deal Type': o.type === 'new_business' ? 'New Business' : o.type === 'renewal' ? 'Renewal' : o.type || '',
+        'School Year': o.schoolYear || '',
+        'Notes': (o.notes || '').replace(/\n/g, ' '),
+      }
+      if (isJimsList) {
+        base['Assigned To'] = o.assignedTo || ''
+      }
+      return base
+    })
 
-  function exportRows(rows: Opportunity[], filename: string) {
-    const headers = 'Name,Contact Name,Phone,Email,Website,Stage,Amount,Source,Notes'
-    const csvRows = [
-      headers,
-      ...rows.map(o => [
-        esc(o.name),
-        esc(o.contactName),
-        esc(o.contactPhone),
-        esc(o.contactEmail),
-        esc(o.website),
-        esc(o.stageName),
-        o.value ? `$${o.value.toLocaleString()}` : '',
-        esc(o.source),
-        esc((o.notes || '').replace(/\n/g, ' ').slice(0, 300)),
-      ].join(','))
-    ]
-    csvDownload(csvRows, filename)
+    const ws = XLSX.utils.json_to_sheet(data)
+
+    // Set column widths for readability
+    const colWidths: Record<string, number> = {
+      'District / School': 35,
+      'Contact Name': 22,
+      'Contact Email': 30,
+      'Phone': 18,
+      'City': 16,
+      'State': 7,
+      'Stage': 20,
+      'Deal Value': 12,
+      'Heat': 8,
+      'Source': 28,
+      'Deal Type': 14,
+      'School Year': 12,
+      'Notes': 60,
+      'Assigned To': 22,
+    }
+    const headers = Object.keys(data[0] || {})
+    ws['!cols'] = headers.map(h => ({ wch: colWidths[h] || 15 }))
+
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, sheetName)
+    XLSX.writeFile(wb, filename)
   }
 
   function handleExportJimsList() {
     const rows = activeOpps
       .filter(o => !o.deleted_at && o.onCallSheet)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
-    exportRows(rows, `jims-call-list-${new Date().toISOString().split('T')[0]}.csv`)
-    showToastMsg(`Exported ${rows.length} Jim's list deals to CSV`, 'success')
+    exportToSheet(rows, `jims-call-list-${new Date().toISOString().split('T')[0]}.xlsx`, "Jim's Call List", true)
+    showToastMsg(`Exported ${rows.length} Jim's list deals`, 'success')
   }
 
-  // Export all active pipeline to CSV
   function handleExport() {
     const rows = activeOpps
       .filter(o => !o.deleted_at)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
-    exportRows(rows, `tdi-pipeline-${new Date().toISOString().split('T')[0]}.csv`)
-    showToastMsg(`Exported ${rows.length} deals to CSV`, 'success')
+    exportToSheet(rows, `tdi-pipeline-${new Date().toISOString().split('T')[0]}.xlsx`, 'Pipeline', false)
+    showToastMsg(`Exported ${rows.length} deals`, 'success')
   }
 
   // Context menu: add note
