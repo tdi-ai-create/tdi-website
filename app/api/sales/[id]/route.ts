@@ -19,6 +19,11 @@ const EDITABLE_FIELDS: Record<string, { type: 'text' | 'number' | 'enum' | 'bool
   contract_year: { type: 'text' },
   type: { type: 'enum', values: ['new_business', 'renewal', 'upsell', 'reactivation', 'expansion', 'pilot'] },
   assigned_to_email: { type: 'text' },
+  contact_name: { type: 'text' },
+  contact_email: { type: 'text' },
+  contact_phone: { type: 'text' },
+  city: { type: 'text' },
+  state: { type: 'text' },
 }
 
 export async function PATCH(
