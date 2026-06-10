@@ -39,6 +39,10 @@
     {
       "path": "/api/cron/monthly-principal-email",
       "schedule": "0 14 1 * *"
+    },
+    {
+      "path": "/api/cron/restart-paperclip",
+      "schedule": "0 */2 * * *"
     }
   ]
 }
