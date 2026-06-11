@@ -225,6 +225,8 @@ export default function SalesPage() {
 
   // Add Lead modal state
   const [addLeadModalOpen, setAddLeadModalOpen] = useState(false)
+  const [batchEnriching, setBatchEnriching] = useState(false)
+  const [enrichProgress, setEnrichProgress] = useState('')
   const [detailPanelOppId, setDetailPanelOppId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -820,6 +822,42 @@ export default function SalesPage() {
             style={{ fontSize: 12, color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer' }}
           >
             Sync Contacts
+          </button>
+          <button
+            disabled={batchEnriching}
+            onClick={async () => {
+              const unscored = opportunities.filter(o => !o.deleted_at && !o.leadScore && o.stage !== 'lost' && o.stage !== 'paid')
+              if (unscored.length === 0) {
+                showToastMsg('All active leads already have scores', 'success')
+                return
+              }
+              setBatchEnriching(true)
+              setEnrichProgress(`0/${unscored.length}`)
+              let done = 0
+              for (const opp of unscored.slice(0, 20)) {
+                try {
+                  await fetch('/api/leads/enrich', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ lead_id: opp.supabase_id }),
+                  })
+                } catch {}
+                done++
+                setEnrichProgress(`${done}/${Math.min(unscored.length, 20)}`)
+              }
+              showToastMsg(`Enrichment triggered for ${done} leads. Scores will populate as research completes.`, 'success')
+              setBatchEnriching(false)
+              setEnrichProgress('')
+              setTimeout(loadAll, 5000)
+            }}
+            style={{
+              fontSize: 11, fontWeight: 600, cursor: batchEnriching ? 'wait' : 'pointer',
+              background: batchEnriching ? '#E5E7EB' : '#EEF2FF', color: batchEnriching ? '#9CA3AF' : '#4F46E5',
+              border: '1px solid ' + (batchEnriching ? '#D1D5DB' : '#C7D2FE'),
+              borderRadius: 6, padding: '4px 10px',
+            }}
+          >
+            {batchEnriching ? `Enriching ${enrichProgress}...` : 'Enrich All'}
           </button>
           <div style={{ display: 'flex', background: '#ECFDF5', borderRadius: 8, padding: 2 }}>
             {(['list', 'kanban'] as ViewMode[]).map(v => (
