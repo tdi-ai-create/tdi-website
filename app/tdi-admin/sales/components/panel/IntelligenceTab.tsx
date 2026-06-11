@@ -127,6 +127,27 @@ export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRe
   const funding = enrichmentData?.funding_signals
   const warmth = enrichmentData?.warmth_signals
 
+  const [logType, setLogType] = useState<string | null>(null)
+  const [logText, setLogText] = useState('')
+  const [loggingSaving, setLoggingSaving] = useState(false)
+
+  async function saveQuickLog() {
+    if (!logText.trim() || !logType) return
+    setLoggingSaving(true)
+    try {
+      await fetch(`/api/sales/opportunities/${opp.id}/log-outreach`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: logType, summary: logText, agent_name: 'rae_manual' }),
+      })
+      setLogText('')
+      setLogType(null)
+      onRefresh()
+    } finally {
+      setLoggingSaving(false)
+    }
+  }
+
   async function runEnrichment() {
     setEnriching(true)
     try {
@@ -189,6 +210,50 @@ export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRe
 
   return (
     <div style={{ padding: 16 }}>
+      {/* Quick Log Activity */}
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 6 }}>
+          {['call', 'email', 'meeting', 'note'].map(t => (
+            <button
+              key={t}
+              onClick={() => setLogType(logType === t ? null : t)}
+              style={{
+                fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 12, cursor: 'pointer',
+                border: `1px solid ${logType === t ? '#4F46E5' : '#D1D5DB'}`,
+                background: logType === t ? '#EEF2FF' : 'white',
+                color: logType === t ? '#4F46E5' : '#6B7280',
+                textTransform: 'capitalize',
+              }}
+            >
+              Log {t}
+            </button>
+          ))}
+        </div>
+        {logType && (
+          <div style={{ display: 'flex', gap: 6 }}>
+            <input
+              type="text"
+              value={logText}
+              onChange={e => setLogText(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && saveQuickLog()}
+              placeholder={`What happened? (${logType})`}
+              style={{ flex: 1, fontSize: 12, padding: '6px 10px', border: '1px solid #D1D5DB', borderRadius: 6, outline: 'none' }}
+              autoFocus
+            />
+            <button
+              onClick={saveQuickLog}
+              disabled={loggingSaving || !logText.trim()}
+              style={{
+                fontSize: 11, fontWeight: 600, padding: '6px 12px', borderRadius: 6, cursor: 'pointer',
+                background: '#4F46E5', color: 'white', border: 'none', opacity: loggingSaving || !logText.trim() ? 0.5 : 1,
+              }}
+            >
+              {loggingSaving ? '...' : 'Save'}
+            </button>
+          </div>
+        )}
+      </div>
+
       {/* Manual Fit Assessment */}
       <InfoSection title={`Fit Assessment ${fitComposite > 0 ? `(${fitComposite}/60)` : ''}`}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
