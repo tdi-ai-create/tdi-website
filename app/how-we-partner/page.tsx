@@ -428,7 +428,7 @@ function LearningHubPanel() {
       <div className="p-4 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
         <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Built for Implementation,<br />Not Consumption</h3>
         <p className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
-          Research shows traditional PD produces a 5-10% classroom transfer rate (Joyce & Showers, 2002). TDI partners average 65%. The difference is sustained, phased support - not a single event.
+          Research shows traditional PD produces a 5-10% classroom transfer rate (Joyce & Showers, 2002). TDI partners average 74%. The difference is sustained, phased support - not a single event.
         </p>
       </div>
 
@@ -807,7 +807,7 @@ function ResultsPanel() {
           </div>
           <div className="grid grid-cols-3 text-sm" style={{ backgroundColor: '#f5f5f5' }}>
             <div className="p-3 border-r" style={{ borderColor: '#e5e7eb', color: '#ef4444' }}>10% industry average</div>
-            <div className="p-3 border-r" style={{ borderColor: '#e5e7eb', color: '#22c55e' }}>65% with TDI</div>
+            <div className="p-3 border-r" style={{ borderColor: '#e5e7eb', color: '#22c55e' }}>74% with TDI</div>
             <div className="p-3" style={{ color: '#1e2749' }}>Strategy implementation rate</div>
           </div>
         </div>
@@ -815,7 +815,7 @@ function ResultsPanel() {
           Based on verified survey data from TDI partner schools after 3-4 months.
         </p>
         <p className="text-xs mt-3 p-3 rounded" style={{ color: '#1e2749', opacity: 0.6, backgroundColor: '#f5f5f5' }}>
-          <strong>Research context:</strong> Joyce & Showers (1980, 2002) found that traditional &quot;sit-and-get&quot; PD produces 5-10% classroom transfer. Sustained coaching models produce 80-90%. TDI&apos;s 65% reflects real partner data within this research-backed range.
+          <strong>Research context:</strong> Joyce & Showers (1980, 2002) found that traditional &quot;sit-and-get&quot; PD produces 5-10% classroom transfer. Sustained coaching models produce 80-90%. TDI&apos;s 74% reflects real partner data within this research-backed range.
         </p>
       </div>
 
@@ -823,7 +823,7 @@ function ResultsPanel() {
       <div className="p-5 rounded-xl" style={{ backgroundColor: '#f0fdf4', border: '1px solid #86efac' }}>
         <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>What This Means for Your Budget</h3>
         <p className="text-sm" style={{ color: '#1e2749', opacity: 0.85 }}>
-          If your school currently spends $15-20K annually on professional development that produces a 10% implementation rate, a significant portion of that investment is not converting to classroom change. TDI partnerships start at $6,600 and deliver 6.5x the implementation - meaning your PD dollars actually reach students.
+          If your school currently spends $15-20K annually on professional development that produces a 10% implementation rate, a significant portion of that investment is not converting to classroom change. TDI partnerships start at $6,600 and deliver 7.4x the implementation - meaning your PD dollars actually reach students.
         </p>
       </div>
 

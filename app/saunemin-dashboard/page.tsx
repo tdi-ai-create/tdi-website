@@ -2288,7 +2288,7 @@ export default function SauneminDashboard() {
               <div className="flex items-center gap-3">
                 <Sparkles className="w-5 h-5 text-amber-600 flex-shrink-0" />
                 <p className="text-amber-900">
-                  <span className="font-medium">Did you know?</span> TDI partners see a 65% implementation rate (vs. 10% industry average).
+                  <span className="font-medium">Did you know?</span> TDI partners see a 74% implementation rate (vs. 10% industry average).
                 </p>
               </div>
             </div>

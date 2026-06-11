@@ -2153,7 +2153,7 @@ End-of-day stress was the most common stress peak (7 of 10 PAs). This is worth a
             <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
               <h3 className="text-xl font-bold mb-3">Why ACCELERATE?</h3>
               <p className="text-white/90 mb-4">
-                95% of WEGO paras logged into the Hub. Your team completed Year 1 with a 65% implementation rate - six times the industry average. They built trust, shared strategies, and started showing up differently for students.
+                95% of WEGO paras logged into the Hub. Your team completed Year 1 with a 74% implementation rate - six times the industry average. They built trust, shared strategies, and started showing up differently for students.
               </p>
               <p className="text-white/90">
                 Year 2 is the natural next step - bringing their teachers into the same room, the same conversation, and the same commitment. When teachers and paras speak the same language, students feel it every single day.
@@ -2780,7 +2780,7 @@ End-of-day stress was the most common stress peak (7 of 10 PAs). This is worth a
               <div className="flex items-center gap-3">
                 <Sparkles className="w-5 h-5 text-amber-600 flex-shrink-0" />
                 <p className="text-amber-900">
-                  <span className="font-medium">Did you know?</span> TDI partners see a 65% implementation rate (vs. 10% industry average).
+                  <span className="font-medium">Did you know?</span> TDI partners see a 74% implementation rate (vs. 10% industry average).
                 </p>
               </div>
             </div>

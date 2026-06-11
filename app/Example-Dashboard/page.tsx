@@ -980,12 +980,12 @@ export default function ExampleDashboard() {
       ],
       unlocks: 'ACCELERATE phase complete + Demonstrated implementation momentum',
       goals: [
-        '65%+ strategy implementation rate',
+        '74%+ strategy implementation rate',
         'Teacher-led coaching conversations',
         'Sustainable systems in place'
       ],
       outcomes: [
-        { label: 'Target', value: '65%+', sublabel: 'Implementation rate' },
+        { label: 'Target', value: '74%+', sublabel: 'Implementation rate' },
         { label: 'Unlocks When', value: 'Year 2+', sublabel: 'After ACCELERATE' }
       ],
       blueprintPreview: 'Long-term sustainability through teacher leadership and embedded systems.'
@@ -2014,10 +2014,10 @@ export default function ExampleDashboard() {
                   <div>
                     <div className="flex justify-between mb-1">
                       <span className="text-xs text-blue-200 font-medium">TDI Partner Average</span>
-                      <span className="text-xs font-bold text-blue-300">65%</span>
+                      <span className="text-xs font-bold text-blue-300">74%</span>
                     </div>
                     <div className="h-3 bg-white/10 rounded-full overflow-hidden">
-                      <div className="h-full bg-blue-400 rounded-full opacity-60" style={{ width: '65%' }} />
+                      <div className="h-full bg-blue-400 rounded-full opacity-60" style={{ width: '74%' }} />
                     </div>
                   </div>
                   <div>
@@ -3313,7 +3313,7 @@ export default function ExampleDashboard() {
                   <p className="text-xs opacity-60 mt-2">8.2 → 6.1 avg rating</p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 text-center">
-                  <Tooltip content="TDI partner avg: 65%. Industry avg: 10%.">
+                  <Tooltip content="TDI partner avg: 74%. Industry avg: 10%.">
                     <p className="text-4xl font-bold">4x</p>
                   </Tooltip>
                   <p className="text-sm opacity-80 mt-1">Implementation Growth</p>

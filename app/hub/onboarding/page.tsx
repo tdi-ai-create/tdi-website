@@ -608,7 +608,7 @@ export default function OnboardingPage() {
                 {[
                   { number: '100K+', label: 'Educators in our community' },
                   { number: '21', label: 'States with partner schools' },
-                  { number: '65%', label: 'Implementation rate' },
+                  { number: '74%', label: 'Implementation rate' },
                   { number: '4.8/5', label: 'Average course rating' },
                 ].map((stat, i) => (
                   <div key={i} className="text-center">

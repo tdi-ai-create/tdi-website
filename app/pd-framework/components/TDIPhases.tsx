@@ -167,7 +167,7 @@ export default function TDIPhases({ onCtaClick, onFundingClick }: TDIPhasesProps
               </p>
             </div>
             <div className="bg-white/10 rounded-xl p-6 text-center">
-              <p className="text-4xl font-bold mb-2" style={{ color: '#ffba06' }}>65%</p>
+              <p className="text-4xl font-bold mb-2" style={{ color: '#ffba06' }}>74%</p>
               <p className="text-white/70 text-sm">
                 implementation rate<br />vs. 15% industry average
               </p>

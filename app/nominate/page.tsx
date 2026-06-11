@@ -596,7 +596,7 @@ function NominatePageInner() {
                     <p className="text-sm font-medium text-gray-700">Strategy Implementation</p>
                     <div className="flex items-center gap-2 mt-1"><span className="text-red-400 text-sm line-through">10% industry avg</span><ArrowRight className="w-3 h-3 text-gray-300" /><span className="text-teal-600 text-lg font-bold">{implRate}%</span></div>
                   </div>
-                  <div className="w-24"><div className="h-2 bg-gray-100 rounded-full overflow-hidden"><div className={`h-full bg-teal-500 rounded-full transition-all duration-1000 delay-[400ms] ease-out ${impactVisible ? 'w-[65%]' : 'w-0'}`} /></div><p className="text-xs text-teal-600 mt-1 text-right">6.5x industry</p></div>
+                  <div className="w-24"><div className="h-2 bg-gray-100 rounded-full overflow-hidden"><div className={`h-full bg-teal-500 rounded-full transition-all duration-1000 delay-[400ms] ease-out ${impactVisible ? 'w-[74%]' : 'w-0'}`} /></div><p className="text-xs text-teal-600 mt-1 text-right">7.4x industry</p></div>
                 </div>
                 <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -617,7 +617,7 @@ function NominatePageInner() {
           <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 max-w-2xl mx-auto">
             <div className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white shadow-sm"><MapPin className="w-5 h-5" style={{ color: '#35A7FF' }} /><p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>21</p><p className="text-sm font-medium" style={{ color: '#1e2749' }}>States</p></div>
             <div className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white shadow-sm"><Users className="w-5 h-5" style={{ color: '#35A7FF' }} /><p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>100K+</p><p className="text-sm font-medium" style={{ color: '#1e2749' }}>Educators</p></div>
-            <div className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white shadow-sm"><TrendingUp className="w-5 h-5" style={{ color: '#35A7FF' }} /><p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>65%</p><p className="text-sm font-medium" style={{ color: '#1e2749' }}>Implementation</p></div>
+            <div className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white shadow-sm"><TrendingUp className="w-5 h-5" style={{ color: '#35A7FF' }} /><p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>74%</p><p className="text-sm font-medium" style={{ color: '#1e2749' }}>Implementation</p></div>
           </div>
         </div>
       </section>

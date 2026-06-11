@@ -55,7 +55,7 @@ export default function Home() {
         <div className="container-default">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
-              TDI&apos;s sustained partnership model delivers <strong>65% implementation</strong> - 6.5x the industry average - because it is built for what actually changes behavior: phased support, real-time coaching, and accountability that feels like partnership, not surveillance.
+              TDI&apos;s sustained partnership model delivers <strong>74% implementation</strong> - 7.4x the industry average - because it is built for what actually changes behavior: phased support, real-time coaching, and accountability that feels like partnership, not surveillance.
             </p>
           </div>
 
@@ -86,7 +86,7 @@ export default function Home() {
               </div>
               <h4 className="font-bold mb-3" style={{ color: '#1e2749' }}>Strategies That Get Used, Not Filed Away</h4>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Teachers do not just hear ideas - they change what happens in their classrooms. TDI&apos;s 65% implementation rate means strategies move from session to classroom within days, not months.
+                Teachers do not just hear ideas - they change what happens in their classrooms. TDI&apos;s 74% implementation rate means strategies move from session to classroom within days, not months.
               </p>
             </div>
             <div className="bg-gray-50 rounded-xl p-6 text-center flex flex-col items-center hover:shadow-lg transition-shadow">

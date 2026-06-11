@@ -275,7 +275,7 @@ export default function TCCSDashboard() {
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center p-4 bg-[#35A7FF]/5 rounded-lg border border-[#35A7FF]/20">
-                  <div className="text-3xl font-bold text-[#1e2749]">65%</div>
+                  <div className="text-3xl font-bold text-[#1e2749]">74%</div>
                   <div className="text-xs text-gray-600 mt-1">Strategy Implementation</div>
                   <div className="text-xs text-[#E07A5F] mt-0.5">(vs 10% industry avg)</div>
                 </div>
@@ -438,9 +438,9 @@ export default function TCCSDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-24">TDI Partners</span>
                       <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '65%' }}></div>
+                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '74%' }}></div>
                       </div>
-                      <span className="text-sm font-medium text-gray-600 w-16 text-right">65%</span>
+                      <span className="text-sm font-medium text-gray-600 w-16 text-right">74%</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-24">TCCS</span>

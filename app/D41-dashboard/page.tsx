@@ -1198,7 +1198,7 @@ export default function D41Dashboard() {
                   <p className="text-xs text-gray-500 mt-1">Industry average without coaching support</p>
                 </div>
                 <div className="bg-white rounded-lg p-4 border border-emerald-200">
-                  <p className="text-3xl font-bold text-emerald-600 mb-1">65%</p>
+                  <p className="text-3xl font-bold text-emerald-600 mb-1">74%</p>
                   <p className="text-sm text-gray-700">of teachers implement strategies with embedded coaching &amp; observation</p>
                   <p className="text-xs text-gray-500 mt-1">TDI partner average with full support</p>
                 </div>
@@ -1333,7 +1333,7 @@ export default function D41Dashboard() {
             <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
               <h3 className="text-xl font-bold mb-3">Why Full Partnership?</h3>
               <p className="text-white/90">
-                Your team has Hub access - that&apos;s a great start. But memberships alone achieve only 10% implementation. Full partnership with embedded coaching, observation cycles, and implementation support gets you to 65%+ - that&apos;s the difference between &quot;nice resources&quot; and &quot;real classroom change.&quot;
+                Your team has Hub access - that&apos;s a great start. But memberships alone achieve only 10% implementation. Full partnership with embedded coaching, observation cycles, and implementation support gets you to 74%+ - that&apos;s the difference between &quot;nice resources&quot; and &quot;real classroom change.&quot;
               </p>
             </div>
 
@@ -1450,7 +1450,7 @@ export default function D41Dashboard() {
                 </div>
                 <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
                   <Check className="w-5 h-5 text-emerald-600 mb-2" />
-                  <p className="text-sm text-gray-700">65%+ implementation rate of TDI strategies in classrooms</p>
+                  <p className="text-sm text-gray-700">74%+ implementation rate of TDI strategies in classrooms</p>
                 </div>
                 <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
                   <Check className="w-5 h-5 text-emerald-600 mb-2" />
@@ -1576,7 +1576,7 @@ export default function D41Dashboard() {
             <div className="bg-blue-50 rounded-xl p-5 border border-blue-200">
               <h4 className="font-semibold text-[#1e2749] mb-2">Why This Investment Matters for D41</h4>
               <p className="text-sm text-gray-700 mb-3">
-                Year 1 memberships gave your team access to resources. Year 2 gives them the support structure to actually use them. The difference between 10% and 65% implementation is the difference between &quot;we tried some new PD&quot; and &quot;we transformed how our team works.&quot;
+                Year 1 memberships gave your team access to resources. Year 2 gives them the support structure to actually use them. The difference between 10% and 74% implementation is the difference between &quot;we tried some new PD&quot; and &quot;we transformed how our team works.&quot;
               </p>
               <p className="text-sm text-gray-600 italic">
                 This partnership meets ESSA&apos;s definition of effective professional development: sustained, intensive, collaborative, job-embedded, data-driven, and classroom-focused.
@@ -1845,7 +1845,7 @@ export default function D41Dashboard() {
               <div className="flex items-center gap-3">
                 <Sparkles className="w-5 h-5 text-amber-600 flex-shrink-0" />
                 <p className="text-amber-900">
-                  <span className="font-medium">Did you know?</span> TDI partners see a 65% implementation rate (vs. 10% industry average).
+                  <span className="font-medium">Did you know?</span> TDI partners see a 74% implementation rate (vs. 10% industry average).
                 </p>
               </div>
             </div>

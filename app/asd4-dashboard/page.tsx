@@ -2715,10 +2715,10 @@ Thank you for setting the example. It matters more than you know.`;
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs text-blue-200 font-medium">TDI Partner Average</span>
-                        <span className="text-xs font-bold text-blue-300">65%</span>
+                        <span className="text-xs font-bold text-blue-300">74%</span>
                       </div>
                       <div className="h-3 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-blue-400 rounded-full opacity-60" style={{ width: '65%' }} />
+                        <div className="h-full bg-blue-400 rounded-full opacity-60" style={{ width: '74%' }} />
                       </div>
                     </div>
                     <div>
@@ -5078,7 +5078,7 @@ Thank you for setting the example. It matters more than you know.`;
               <div className="flex items-center gap-3">
                 <Sparkles className="w-5 h-5 text-amber-600 flex-shrink-0" />
                 <p className="text-amber-900">
-                  <span className="font-medium">Did you know?</span> TDI partners see a 65% implementation rate (vs. 10% industry average).
+                  <span className="font-medium">Did you know?</span> TDI partners see a 74% implementation rate (vs. 10% industry average).
                 </p>
               </div>
             </div>

@@ -108,7 +108,7 @@ export default function ForSchoolsPage() {
       question: 'We have tried coaching partnerships before and they did not stick.',
       answer: (
         <>
-          Traditional PD produces 5-10% implementation because it is event-based, not sustained. TDI&apos;s phased model (Ignite, Accelerate, Sustain) builds habits over months with embedded coaching, real-time analytics, and between-visit virtual support. Our 65% implementation rate is anchored in Joyce & Showers&apos; foundational research on sustained coaching and validated by our partner data.
+          Traditional PD produces 5-10% implementation because it is event-based, not sustained. TDI&apos;s phased model (Ignite, Accelerate, Sustain) builds habits over months with embedded coaching, real-time analytics, and between-visit virtual support. Our 74% implementation rate is anchored in Joyce & Showers&apos; foundational research on sustained coaching and validated by our partner data.
         </>
       ),
     },
@@ -116,7 +116,7 @@ export default function ForSchoolsPage() {
       question: 'We do not have the budget for this.',
       answer: (
         <>
-          Most districts are already spending $15-20K annually on PD that produces 10% implementation - that means a significant portion is effectively lost. TDI partnerships start at $6,600 and deliver 6.5x the classroom impact. And 80% of our partner schools secure external funding through Title II-A, Title IV-A, or state PD grants.{' '}
+          Most districts are already spending $15-20K annually on PD that produces 10% implementation - that means a significant portion is effectively lost. TDI partnerships start at $6,600 and deliver 7.4x the classroom impact. And 80% of our partner schools secure external funding through Title II-A, Title IV-A, or state PD grants.{' '}
           <a
             href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
             target="_blank"
@@ -495,7 +495,7 @@ export default function ForSchoolsPage() {
               Where does your PD budget actually go?
             </h2>
             <p className="text-lg max-w-2xl mx-auto" style={{ color: '#4b5563' }}>
-              Most schools spend $15-20K a year on PD that produces a 10% implementation rate. TDI delivers 65%. 6.5x the classroom impact - and most schools already have the funding.
+              Most schools spend $15-20K a year on PD that produces a 10% implementation rate. TDI delivers 74%. 7.4x the classroom impact - and most schools already have the funding.
             </p>
           </div>
           <CompactAdmin />
@@ -566,14 +566,14 @@ export default function ForSchoolsPage() {
               </div>
               <div className="grid grid-cols-3 text-sm" style={{ backgroundColor: '#f5f5f5' }}>
                 <div className="p-3 border-r" style={{ borderColor: '#e5e7eb', color: '#ef4444' }}>10% industry average</div>
-                <div className="p-3 border-r" style={{ borderColor: '#e5e7eb', color: '#22c55e' }}>65% with TDI</div>
+                <div className="p-3 border-r" style={{ borderColor: '#e5e7eb', color: '#22c55e' }}>74% with TDI</div>
                 <div className="p-3" style={{ color: '#1e2749' }}>Strategy implementation rate</div>
               </div>
             </div>
 
             {/* Research Footnote */}
             <p className="text-xs mb-10" style={{ color: '#1e2749', opacity: 0.5 }}>
-              Implementation baseline: Joyce & Showers (1980, 2002) found that traditional &quot;sit-and-get&quot; PD produces 5-10% classroom transfer. Sustained coaching models produce 80-90%. TDI&apos;s 65% reflects real partner data within this research-backed range.
+              Implementation baseline: Joyce & Showers (1980, 2002) found that traditional &quot;sit-and-get&quot; PD produces 5-10% classroom transfer. Sustained coaching models produce 80-90%. TDI&apos;s 74% reflects real partner data within this research-backed range.
             </p>
 
             {/* Partner Success Stories - Stat Cards */}

@@ -1596,7 +1596,7 @@ export default function AllenwoodDashboard() {
                 <div className="bg-teal-50 rounded-xl p-5 border border-teal-100">
                   <h4 className="font-semibold text-gray-800 mb-3">What Full-Year TDI Support Produces</h4>
                   <p className="text-gray-700 text-sm mb-3">
-                    TDI partners typically see teacher stress drop from 8-9 to 5-7 on a 10-point scale, strategy implementation rates reach 65% versus 10% industry average, and retention intent increases measurably. These outcomes are verified after 3-4 months of implementation.
+                    TDI partners typically see teacher stress drop from 8-9 to 5-7 on a 10-point scale, strategy implementation rates reach 74% versus 10% industry average, and retention intent increases measurably. These outcomes are verified after 3-4 months of implementation.
                   </p>
                   <p className="text-gray-700 text-sm mb-3">
                     We&apos;ll measure Allenwood&apos;s starting point at your first virtual session and track growth from there.
@@ -2961,7 +2961,7 @@ export default function AllenwoodDashboard() {
               <div className="flex items-center gap-3">
                 <Sparkles className="w-5 h-5 text-amber-600 flex-shrink-0" />
                 <p className="text-amber-900">
-                  <span className="font-medium">Did you know?</span> TDI partners see a 65% implementation rate (vs. 10% industry average).
+                  <span className="font-medium">Did you know?</span> TDI partners see a 74% implementation rate (vs. 10% industry average).
                 </p>
               </div>
             </div>

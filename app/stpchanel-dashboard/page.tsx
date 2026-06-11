@@ -486,12 +486,12 @@ export default function StPeterChanelDashboard() {
       ],
       unlocks: 'ACCELERATE phase complete + Demonstrated implementation momentum',
       goals: [
-        '65%+ strategy implementation rate',
+        '74%+ strategy implementation rate',
         'Teacher-led coaching conversations',
         'Sustainable systems in place'
       ],
       outcomes: [
-        { label: 'Target', value: '65%+', sublabel: 'Implementation rate' },
+        { label: 'Target', value: '74%+', sublabel: 'Implementation rate' },
         { label: 'Unlocks When', value: 'Year 2+', sublabel: 'After ACCELERATE' }
       ],
       blueprintPreview: 'Long-term sustainability through teacher leadership and embedded systems.'
@@ -1360,9 +1360,9 @@ export default function StPeterChanelDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '65%' }}></div>
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '74%' }}></div>
                       </div>
-                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">65%</span>
+                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">74%</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-28 flex-shrink-0">St. Peter Chanel</span>
@@ -2949,7 +2949,7 @@ export default function StPeterChanelDashboard() {
               <div className="flex items-center gap-3">
                 <Sparkles className="w-5 h-5 text-amber-600 flex-shrink-0" />
                 <p className="text-amber-900">
-                  <span className="font-medium">Did you know?</span> TDI partners see a 65% implementation rate (vs. 10% industry average).
+                  <span className="font-medium">Did you know?</span> TDI partners see a 74% implementation rate (vs. 10% industry average).
                 </p>
               </div>
             </div>

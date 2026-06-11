@@ -88,7 +88,7 @@ function BoardMemoPDF({ data }: { data: MemoData }) {
           <Text style={styles.sectionTitle}>One-Sentence Board Justification</Text>
           <View style={styles.quoteBox}>
             <Text style={styles.quoteText}>
-              &ldquo;We are reallocating {fmt(data.budget)} of existing PD spend into a TDI partnership that delivers 6.5x the classroom implementation rate, funded primarily through {data.grants[0]} allocations our district already receives.&rdquo;
+              &ldquo;We are reallocating {fmt(data.budget)} of existing PD spend into a TDI partnership that delivers 7.4x the classroom implementation rate, funded primarily through {data.grants[0]} allocations our district already receives.&rdquo;
             </Text>
           </View>
         </View>

@@ -1985,9 +1985,9 @@ export default function PartnerDashboard() {
                         <div>
                           <div className="flex justify-between mb-1">
                             <span className="text-gray-500">TDI Partners</span>
-                            <span className="text-[#1e2749] font-medium">65%</span>
+                            <span className="text-[#1e2749] font-medium">74%</span>
                           </div>
-                          <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '65%'}} /></div>
+                          <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '74%'}} /></div>
                         </div>
                         <div>
                           <div className="flex justify-between mb-1">
@@ -3718,7 +3718,7 @@ export default function PartnerDashboard() {
                         <div className="p-4 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
                           <h3 className="font-bold text-gray-900 mb-2">Built for Implementation,<br />Not Consumption</h3>
                           <p className="text-sm text-[#1e2749]/80">
-                            Most PD has a 10% implementation rate. Ours is 65%. The difference is in the design. Every course includes action steps, not just information. We measure what teachers do, not what they watch.
+                            Most PD has a 10% implementation rate. Ours is 74%. The difference is in the design. Every course includes action steps, not just information. We measure what teachers do, not what they watch.
                           </p>
                         </div>
 
@@ -3866,7 +3866,7 @@ export default function PartnerDashboard() {
                               { before: '12 hours/week', after: '6-8 hours/week', metric: 'Weekly planning time' },
                               { before: '9 out of 10', after: '5-7 out of 10', metric: 'Staff stress levels' },
                               { before: '2-4 out of 10', after: '5-7 out of 10', metric: 'Teacher retention intent' },
-                              { before: '10% industry avg', after: '65% with TDI', metric: 'Strategy implementation' },
+                              { before: '10% industry avg', after: '74% with TDI', metric: 'Strategy implementation' },
                             ].map((row, idx) => (
                               <div key={idx} className={`grid grid-cols-3 text-sm border-b border-gray-200 ${idx % 2 ? 'bg-gray-50' : ''}`}>
                                 <div className="p-3 border-r border-gray-200 text-red-500">{row.before}</div>
