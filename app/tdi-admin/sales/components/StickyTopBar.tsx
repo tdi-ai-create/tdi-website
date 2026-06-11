@@ -7,6 +7,7 @@ interface TopBarStats {
   invoiceCount: number
   callSheetCount: number
   callSheetValue: number
+  tier1Count?: number
 }
 
 export function StickyTopBar({
@@ -62,6 +63,17 @@ export function StickyTopBar({
             {stats.invoiceCount} invoices
           </div>
         </div>
+
+        {/* Tier 1 leads */}
+        {(stats.tier1Count ?? 0) > 0 && (
+          <div style={{ borderLeft: '1px solid #E5E7EB', paddingLeft: 20 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#065F46', display: 'flex', alignItems: 'center', gap: 5 }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
+              {stats.tier1Count} Tier 1
+            </div>
+            <div style={{ fontSize: 11, color: '#6B7280' }}>top-fit leads</div>
+          </div>
+        )}
 
         {/* Jim's call sheet count */}
         {stats.callSheetCount > 0 && (

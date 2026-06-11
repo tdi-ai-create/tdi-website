@@ -7,6 +7,7 @@ import { NotesTab } from './panel/NotesTab'
 import { ContactTab } from './panel/ContactTab'
 import { DetailsTab } from './panel/DetailsTab'
 import { ActivityTab } from './panel/ActivityTab'
+import { IntelligenceTab } from './panel/IntelligenceTab'
 import { PanelFooter } from './panel/PanelFooter'
 
 export interface OppNote {
@@ -49,7 +50,7 @@ export interface FullOpportunity {
   [key: string]: unknown
 }
 
-type TabId = 'notes' | 'contact' | 'details' | 'activity'
+type TabId = 'notes' | 'contact' | 'details' | 'intelligence' | 'activity'
 
 const STAGE_OPTIONS = [
   { id: 'unassigned', name: 'Unassigned' },
@@ -222,7 +223,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, showT
 
             {/* Tabs */}
             <div className="flex border-b border-gray-200 px-4 shrink-0">
-              {(['notes', 'contact', 'details', 'activity'] as TabId[]).map(tab => (
+              {(['notes', 'contact', 'details', 'intelligence', 'activity'] as TabId[]).map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -251,6 +252,9 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, showT
               )}
               {activeTab === 'details' && (
                 <DetailsTab opp={opp} onPatch={patchOpp} stageOptions={STAGE_OPTIONS} />
+              )}
+              {activeTab === 'intelligence' && (
+                <IntelligenceTab opp={opp} onRefresh={() => loadOpp(opp.id)} />
               )}
               {activeTab === 'activity' && (
                 <ActivityTab activity={opp.activity ?? []} />

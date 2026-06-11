@@ -6,6 +6,10 @@ const ALLOWED_PATCH_FIELDS = new Set([
   'source', 'type', 'is_contact_only',
   'contact_name', 'contact_title', 'contact_email', 'contact_phone',
   'expected_close_date',
+  // Fit scoring fields
+  'fit_district_size', 'fit_turnover_signal', 'fit_pd_investment',
+  'fit_budget_timing', 'fit_leadership_stability', 'fit_tdi_alignment',
+  'fit_composite_score', 'fit_tier',
 ])
 
 const ACTIVITY_TRACKED = ['stage', 'value', 'heat', 'assigned_to_email'] as const
@@ -86,6 +90,18 @@ export async function PATCH(
   const updateFields: Record<string, unknown> = { updated_at: new Date().toISOString() }
   for (const key of Object.keys(rawFields)) {
     if (ALLOWED_PATCH_FIELDS.has(key)) updateFields[key] = rawFields[key]
+  }
+
+  // Auto-compute fit composite score and tier when any fit factor changes
+  const fitFields = ['fit_district_size', 'fit_turnover_signal', 'fit_pd_investment', 'fit_budget_timing', 'fit_leadership_stability', 'fit_tdi_alignment']
+  const hasFitChange = fitFields.some(f => f in updateFields)
+  if (hasFitChange) {
+    // Merge current values with updates to compute composite
+    const merged = { ...current, ...updateFields }
+    const factors = fitFields.map(f => (merged[f] as number) || 0)
+    const composite = factors.reduce((sum, v) => sum + v, 0)
+    updateFields.fit_composite_score = composite
+    updateFields.fit_tier = composite >= 45 ? 'tier_1' : composite >= 25 ? 'tier_2' : 'tier_3'
   }
 
   const { data, error } = await supabase

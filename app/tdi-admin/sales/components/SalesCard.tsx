@@ -29,6 +29,12 @@ const TYPE_COLORS: Record<string, string> = {
   reactivation: '#2563EB',
 }
 
+const TIER_STYLES: Record<string, { bg: string; color: string; dot: string }> = {
+  T1: { bg: '#D1FAE5', color: '#065F46', dot: '#10B981' },
+  T2: { bg: '#FEF3C7', color: '#854D0E', dot: '#F59E0B' },
+  T3: { bg: '#F3F4F6', color: '#374151', dot: '#9CA3AF' },
+}
+
 export interface SalesCardOpp {
   id: string
   name: string
@@ -46,6 +52,8 @@ export interface SalesCardOpp {
   contract_year?: string | null
   city?: string | null
   state?: string | null
+  leadScore?: number | null
+  tier?: 'T1' | 'T2' | 'T3' | null
 }
 
 function extractSubtitle(opp: SalesCardOpp): string {
@@ -202,6 +210,12 @@ export function SalesCard({ opp, onClick, draggable = false, onContextMenu, onFi
           <span style={{ color: '#6B7280', fontWeight: 400, marginLeft: 6 }}>&middot; ${(factored / 1000).toFixed(0)}K factored</span>
         </span>
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+          {opp.tier && TIER_STYLES[opp.tier] && (
+            <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: TIER_STYLES[opp.tier].bg, color: TIER_STYLES[opp.tier].color, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+              <span style={{ width: 5, height: 5, borderRadius: '50%', background: TIER_STYLES[opp.tier].dot, display: 'inline-block' }} />
+              {opp.tier}
+            </span>
+          )}
           {opp.needs_invoice && (
             <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 4, background: '#FEE2E2', color: '#991B1B', fontWeight: 600 }}>invoice</span>
           )}

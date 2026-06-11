@@ -57,6 +57,13 @@ interface SalesOpportunity {
   state: string | null
   created_at: string
   updated_at: string
+  // AI enrichment fields (migration 063)
+  lead_score: number | null
+  score_breakdown: { fit?: number; pain?: number; funding?: number; warmth?: number } | null
+  enrichment_data: Record<string, any> | null
+  ai_strategic_brief: string | null
+  enrichment_status: string | null
+  enriched_at: string | null
 }
 
 interface Opportunity {
@@ -94,6 +101,14 @@ interface Opportunity {
   website: string | null
   city: string | null
   state: string | null
+  // AI enrichment
+  leadScore: number | null
+  scoreBreakdown: { fit?: number; pain?: number; funding?: number; warmth?: number } | null
+  enrichmentData: Record<string, any> | null
+  strategicBrief: string | null
+  enrichmentStatus: string | null
+  enrichedAt: string | null
+  tier: 'T1' | 'T2' | 'T3' | null
 }
 
 const STAGE_DISPLAY: Record<string, string> = {
@@ -146,6 +161,13 @@ function formatCurrencyFull(n: number): string {
   return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 }
 
+function computeTier(leadScore: number | null): 'T1' | 'T2' | 'T3' | null {
+  if (leadScore == null) return null
+  if (leadScore >= 70) return 'T1'
+  if (leadScore >= 40) return 'T2'
+  return 'T3'
+}
+
 function toCardOpp(opp: Opportunity): SalesCardOpp {
   return {
     id: opp.supabase_id,
@@ -164,6 +186,8 @@ function toCardOpp(opp: Opportunity): SalesCardOpp {
     contract_year: opp.contract_year,
     city: opp.city,
     state: opp.state,
+    leadScore: opp.leadScore,
+    tier: opp.tier,
   }
 }
 
@@ -277,6 +301,13 @@ export default function SalesPage() {
         website: row.website,
         city: row.city,
         state: row.state,
+        leadScore: row.lead_score,
+        scoreBreakdown: row.score_breakdown,
+        enrichmentData: row.enrichment_data,
+        strategicBrief: row.ai_strategic_brief,
+        enrichmentStatus: row.enrichment_status,
+        enrichedAt: row.enriched_at,
+        tier: computeTier(row.lead_score),
       }))
 
       setOpportunities(mapped)
@@ -702,6 +733,10 @@ export default function SalesPage() {
       if (f.search && !opp.name.toLowerCase().includes(f.search.toLowerCase())) return false
       if (f.deal_types.length > 0 && !f.deal_types.includes(opp.type)) return false
       if (f.sources.length > 0 && !f.sources.includes(opp.source || 'Other')) return false
+      if (f.tiers.length > 0) {
+        const oppTier = opp.tier || 'unscored'
+        if (!f.tiers.includes(oppTier)) return false
+      }
       if (showCallSheetOnly && !opp.onCallSheet) return false
       return true
     })
@@ -726,6 +761,15 @@ export default function SalesPage() {
     return counts
   }, [activeOpps])
 
+  const tierCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    activeOpps.forEach(o => {
+      const t = o.tier || 'unscored'
+      counts[t] = (counts[t] || 0) + 1
+    })
+    return counts
+  }, [activeOpps])
+
   // Stats for sticky top bar (exclude Targeting from pipeline totals — cold outbound, 5% probability)
   const stats = useMemo(() => {
     const pipelineOpps = activeOpps.filter(o => o.stage !== 'targeting')
@@ -737,6 +781,7 @@ export default function SalesPage() {
       invoiceCount: opportunities.filter(o => o.needs_invoice && !o.deleted_at).length,
       callSheetCount: callSheetOpps.length,
       callSheetValue: callSheetOpps.reduce((s, o) => s + (o.value ?? 0), 0),
+      tier1Count: pipelineOpps.filter(o => o.tier === 'T1').length,
     }
   }, [activeOpps, opportunities])
 
@@ -973,6 +1018,7 @@ export default function SalesPage() {
                 sources={uniqueSources}
                 dealTypeCounts={dealTypeCounts}
                 sourceCounts={sourceCounts}
+                tierCounts={tierCounts}
               />
 
               {/* KANBAN VIEW */}

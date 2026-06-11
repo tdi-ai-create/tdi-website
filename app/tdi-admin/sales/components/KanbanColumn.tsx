@@ -44,8 +44,14 @@ export function KanbanColumn({
     if (byHeat[h]) byHeat[h].push(o)
     else byHeat.warm.push(o)
   })
+  // Sort within heat groups: by lead score first (best fit leads on top), then by factored value
   Object.values(byHeat).forEach(arr =>
-    arr.sort((a, b) => ((b.value || 0) * (b.probability || 0)) - ((a.value || 0) * (a.probability || 0)))
+    arr.sort((a, b) => {
+      const scoreA = a.leadScore || 0
+      const scoreB = b.leadScore || 0
+      if (scoreB !== scoreA) return scoreB - scoreA
+      return ((b.value || 0) * (b.probability || 0)) - ((a.value || 0) * (a.probability || 0))
+    })
   )
 
   function handleDragOver(e: React.DragEvent) {

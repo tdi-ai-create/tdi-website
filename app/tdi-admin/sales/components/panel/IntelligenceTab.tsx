@@ -1,0 +1,334 @@
+'use client'
+
+import { useState, useCallback } from 'react'
+import type { FullOpportunity } from '../OpportunityDetailPanel'
+import { getBudgetTimingScore } from '@/lib/budgetCycleScoring'
+
+const TIER_CONFIG: Record<string, { label: string; color: string; bg: string; dot: string }> = {
+  T1: { label: 'Tier 1', color: '#065F46', bg: '#D1FAE5', dot: '#10B981' },
+  T2: { label: 'Tier 2', color: '#854D0E', bg: '#FEF3C7', dot: '#F59E0B' },
+  T3: { label: 'Tier 3', color: '#374151', bg: '#F3F4F6', dot: '#9CA3AF' },
+}
+
+function computeTier(score: number | null): string | null {
+  if (score == null) return null
+  if (score >= 70) return 'T1'
+  if (score >= 40) return 'T2'
+  return 'T3'
+}
+
+function ScoreBar({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
+  const pct = Math.min((value / max) * 100, 100)
+  return (
+    <div style={{ marginBottom: 8 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+        <span style={{ fontSize: 11, color: '#4B5563', fontWeight: 500 }}>{label}</span>
+        <span style={{ fontSize: 11, color: '#6B7280', fontWeight: 600 }}>{value}/{max}</span>
+      </div>
+      <div style={{ height: 6, background: '#F3F4F6', borderRadius: 3, overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 3, transition: 'width 0.3s' }} />
+      </div>
+    </div>
+  )
+}
+
+function InfoSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <h4 style={{ fontSize: 11, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>{title}</h4>
+      <div style={{ background: '#F9FAFB', borderRadius: 8, padding: 12 }}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function InfoRow({ label, value }: { label: string; value: string | number | null | undefined }) {
+  if (!value) return null
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0', borderBottom: '1px solid #F3F4F6' }}>
+      <span style={{ fontSize: 12, color: '#6B7280' }}>{label}</span>
+      <span style={{ fontSize: 12, color: '#111827', fontWeight: 500 }}>{value}</span>
+    </div>
+  )
+}
+
+function FitSlider({ label, description, value, onChange }: { label: string; description: string; value: number; onChange: (v: number) => void }) {
+  const color = value >= 8 ? '#10B981' : value >= 5 ? '#F59E0B' : value >= 1 ? '#EF4444' : '#D1D5DB'
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+        <span style={{ fontSize: 11, color: '#374151', fontWeight: 600 }}>{label}</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color, minWidth: 20, textAlign: 'right' }}>{value || '--'}</span>
+      </div>
+      <input
+        type="range"
+        min={0}
+        max={10}
+        step={1}
+        value={value}
+        onChange={(e) => onChange(parseInt(e.target.value))}
+        style={{ width: '100%', height: 4, accentColor: color, cursor: 'pointer' }}
+      />
+      <p style={{ fontSize: 10, color: '#9CA3AF', margin: '1px 0 0' }}>{description}</p>
+    </div>
+  )
+}
+
+export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRefresh: () => void }) {
+  const [enriching, setEnriching] = useState(false)
+
+  const leadScore = opp.lead_score as number | null
+  const scoreBreakdown = opp.score_breakdown as { fit?: number; pain?: number; funding?: number; warmth?: number } | null
+  const enrichmentData = opp.enrichment_data as Record<string, any> | null
+  const strategicBrief = opp.ai_strategic_brief as string | null
+  const enrichmentStatus = opp.enrichment_status as string | null
+  const enrichedAt = opp.enriched_at as string | null
+
+  // Manual fit scoring state
+  const [fitScores, setFitScores] = useState({
+    fit_district_size: (opp.fit_district_size as number) || 0,
+    fit_turnover_signal: (opp.fit_turnover_signal as number) || 0,
+    fit_pd_investment: (opp.fit_pd_investment as number) || 0,
+    fit_budget_timing: (opp.fit_budget_timing as number) || (() => {
+      const state = opp.state as string | null
+      return state ? getBudgetTimingScore(state).score : 0
+    })(),
+    fit_leadership_stability: (opp.fit_leadership_stability as number) || 0,
+    fit_tdi_alignment: (opp.fit_tdi_alignment as number) || 0,
+  })
+  const [savingFit, setSavingFit] = useState(false)
+
+  const fitComposite = Object.values(fitScores).reduce((sum, v) => sum + v, 0)
+  const fitTier = fitComposite >= 45 ? 'T1' : fitComposite >= 25 ? 'T2' : 'T3'
+  const fitTierConfig = TIER_CONFIG[fitTier]
+
+  const budgetRationale = opp.state ? getBudgetTimingScore(opp.state as string).rationale : null
+
+  const saveFitScore = useCallback(async (field: string, value: number) => {
+    setFitScores(prev => ({ ...prev, [field]: value }))
+    setSavingFit(true)
+    try {
+      await fetch(`/api/sales/opportunities/${opp.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [field]: value }),
+      })
+    } finally {
+      setSavingFit(false)
+    }
+  }, [opp.id])
+
+  const tier = computeTier(leadScore)
+  const tierConfig = tier ? TIER_CONFIG[tier] : null
+
+  const district = enrichmentData?.district_profile
+  const decisionMaker = enrichmentData?.decision_maker
+  const funding = enrichmentData?.funding_signals
+  const warmth = enrichmentData?.warmth_signals
+
+  async function runEnrichment() {
+    setEnriching(true)
+    try {
+      const res = await fetch('/api/leads/enrich', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lead_id: opp.id }),
+      })
+      if (!res.ok) throw new Error('Enrichment failed')
+      // Give it a moment to process, then refresh
+      setTimeout(() => {
+        onRefresh()
+        setEnriching(false)
+      }, 3000)
+    } catch {
+      setEnriching(false)
+    }
+  }
+
+  // No enrichment data yet -- show CTA
+  if (!leadScore && !enrichmentData && enrichmentStatus !== 'in_progress') {
+    return (
+      <div style={{ padding: 20, textAlign: 'center' }}>
+        <div style={{ width: 48, height: 48, margin: '0 auto 12px', background: '#EEF2FF', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+          </svg>
+        </div>
+        <h3 style={{ fontSize: 15, fontWeight: 600, color: '#111827', margin: '0 0 4px' }}>Run Lead Intelligence</h3>
+        <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 16px', lineHeight: 1.4 }}>
+          AI will research this district, score fit, identify decision makers, and surface funding signals.
+        </p>
+        <button
+          onClick={runEnrichment}
+          disabled={enriching}
+          style={{
+            padding: '8px 20px', borderRadius: 6, border: 'none', cursor: enriching ? 'wait' : 'pointer',
+            background: enriching ? '#9CA3AF' : '#4F46E5', color: 'white', fontSize: 13, fontWeight: 600,
+          }}
+        >
+          {enriching ? 'Researching...' : 'Run Intelligence'}
+        </button>
+      </div>
+    )
+  }
+
+  // Enrichment in progress
+  if (enrichmentStatus === 'in_progress') {
+    return (
+      <div style={{ padding: 20, textAlign: 'center' }}>
+        <div style={{ fontSize: 13, color: '#6B7280' }}>Intelligence research in progress...</div>
+        <div style={{ marginTop: 8 }}>
+          <div style={{ width: 120, height: 4, background: '#E5E7EB', borderRadius: 2, margin: '0 auto', overflow: 'hidden' }}>
+            <div style={{ width: '60%', height: '100%', background: '#6366F1', borderRadius: 2, animation: 'pulse 1.5s infinite' }} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ padding: 16 }}>
+      {/* Manual Fit Assessment */}
+      <InfoSection title={`Fit Assessment ${fitComposite > 0 ? `(${fitComposite}/60)` : ''}`}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          {fitComposite > 0 && fitTierConfig && (
+            <span style={{
+              fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6,
+              background: fitTierConfig.bg, color: fitTierConfig.color,
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+            }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: fitTierConfig.dot }} />
+              {fitTier === 'T1' ? 'Tier 1' : fitTier === 'T2' ? 'Tier 2' : 'Tier 3'}
+            </span>
+          )}
+          {savingFit && <span style={{ fontSize: 10, color: '#9CA3AF' }}>Saving...</span>}
+        </div>
+        <FitSlider label="District Size" description="1 = small (<500 students), 10 = large (10K+)" value={fitScores.fit_district_size} onChange={(v) => saveFitScore('fit_district_size', v)} />
+        <FitSlider label="Turnover Signal" description="1 = stable staff, 10 = high turnover (need for support)" value={fitScores.fit_turnover_signal} onChange={(v) => saveFitScore('fit_turnover_signal', v)} />
+        <FitSlider label="PD Investment" description="1 = no PD budget, 10 = strong PD culture & spending" value={fitScores.fit_pd_investment} onChange={(v) => saveFitScore('fit_pd_investment', v)} />
+        <FitSlider label="Budget Timing" description={budgetRationale || '1 = just started FY, 10 = peak purchasing window'} value={fitScores.fit_budget_timing} onChange={(v) => saveFitScore('fit_budget_timing', v)} />
+        <FitSlider label="Leadership Stability" description="1 = new/unstable leadership, 10 = stable, long-tenure" value={fitScores.fit_leadership_stability} onChange={(v) => saveFitScore('fit_leadership_stability', v)} />
+        <FitSlider label="TDI Alignment" description="1 = no alignment, 10 = SEL/wellness focus, perfect fit" value={fitScores.fit_tdi_alignment} onChange={(v) => saveFitScore('fit_tdi_alignment', v)} />
+      </InfoSection>
+
+      {/* AI Score Overview */}
+      <InfoSection title="Lead Score">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+          <div style={{ fontSize: 28, fontWeight: 700, color: '#111827' }}>{leadScore ?? '--'}</div>
+          <div style={{ fontSize: 12, color: '#6B7280' }}>/100</div>
+          {tierConfig && (
+            <span style={{
+              fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6,
+              background: tierConfig.bg, color: tierConfig.color,
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+            }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: tierConfig.dot }} />
+              {tierConfig.label}
+            </span>
+          )}
+        </div>
+        {scoreBreakdown && (
+          <>
+            <ScoreBar label="Fit" value={scoreBreakdown.fit ?? 0} max={25} color="#10B981" />
+            <ScoreBar label="Pain Signals" value={scoreBreakdown.pain ?? 0} max={25} color="#EF4444" />
+            <ScoreBar label="Funding" value={scoreBreakdown.funding ?? 0} max={25} color="#3B82F6" />
+            <ScoreBar label="Warmth" value={scoreBreakdown.warmth ?? 0} max={25} color="#F59E0B" />
+          </>
+        )}
+        {enrichedAt && (
+          <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>Last researched: {new Date(enrichedAt).toLocaleDateString()}</span>
+            <button
+              onClick={runEnrichment}
+              disabled={enriching}
+              style={{ fontSize: 10, color: '#6366F1', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+            >
+              {enriching ? 'Running...' : 'Re-run'}
+            </button>
+          </div>
+        )}
+      </InfoSection>
+
+      {/* Strategic Brief */}
+      {strategicBrief && (
+        <InfoSection title="Strategic Brief">
+          <p style={{ fontSize: 12, color: '#374151', lineHeight: 1.5, margin: 0, whiteSpace: 'pre-wrap' }}>{strategicBrief}</p>
+        </InfoSection>
+      )}
+
+      {/* District Profile */}
+      {district && (
+        <InfoSection title="District Profile">
+          <InfoRow label="Enrollment" value={district.enrollment?.toLocaleString()} />
+          <InfoRow label="Schools" value={district.num_schools} />
+          <InfoRow label="Teachers" value={district.num_teachers?.toLocaleString()} />
+          <InfoRow label="State" value={district.state} />
+          <InfoRow label="Type" value={district.district_type} />
+          {district.demographics && (
+            <InfoRow label="Demographics" value={district.demographics} />
+          )}
+        </InfoSection>
+      )}
+
+      {/* Decision Maker */}
+      {decisionMaker && (
+        <InfoSection title="Decision Maker">
+          <InfoRow label="Name" value={decisionMaker.name} />
+          <InfoRow label="Title" value={decisionMaker.title} />
+          <InfoRow label="Tenure" value={decisionMaker.tenure} />
+          {decisionMaker.priorities && (
+            <div style={{ marginTop: 6 }}>
+              <span style={{ fontSize: 11, color: '#6B7280' }}>Priorities:</span>
+              <p style={{ fontSize: 12, color: '#374151', margin: '2px 0 0', lineHeight: 1.4 }}>
+                {Array.isArray(decisionMaker.priorities) ? decisionMaker.priorities.join(', ') : decisionMaker.priorities}
+              </p>
+            </div>
+          )}
+          {decisionMaker.burnout_signals && (
+            <div style={{ marginTop: 6 }}>
+              <span style={{ fontSize: 11, color: '#6B7280' }}>Burnout signals:</span>
+              <p style={{ fontSize: 12, color: '#991B1B', margin: '2px 0 0', lineHeight: 1.4 }}>
+                {Array.isArray(decisionMaker.burnout_signals) ? decisionMaker.burnout_signals.join(', ') : decisionMaker.burnout_signals}
+              </p>
+            </div>
+          )}
+        </InfoSection>
+      )}
+
+      {/* Funding Signals */}
+      {funding && (
+        <InfoSection title="Funding Signals">
+          <InfoRow label="ESSER Status" value={funding.esser_status} />
+          <InfoRow label="Title I" value={funding.title_i ? 'Yes' : funding.title_i === false ? 'No' : null} />
+          <InfoRow label="Title II" value={funding.title_ii ? 'Yes' : funding.title_ii === false ? 'No' : null} />
+          {funding.recent_grants && (
+            <div style={{ marginTop: 6 }}>
+              <span style={{ fontSize: 11, color: '#6B7280' }}>Recent grants:</span>
+              <p style={{ fontSize: 12, color: '#374151', margin: '2px 0 0', lineHeight: 1.4 }}>
+                {Array.isArray(funding.recent_grants) ? funding.recent_grants.join(', ') : funding.recent_grants}
+              </p>
+            </div>
+          )}
+          <InfoRow label="PD Budget" value={funding.pd_budget} />
+        </InfoSection>
+      )}
+
+      {/* Warmth Signals */}
+      {warmth && (
+        <InfoSection title="Warmth Signals">
+          <InfoRow label="Geographic proximity" value={warmth.proximity} />
+          {warmth.connections && (
+            <div style={{ marginTop: 6 }}>
+              <span style={{ fontSize: 11, color: '#6B7280' }}>Connections:</span>
+              <p style={{ fontSize: 12, color: '#374151', margin: '2px 0 0', lineHeight: 1.4 }}>
+                {Array.isArray(warmth.connections) ? warmth.connections.join(', ') : warmth.connections}
+              </p>
+            </div>
+          )}
+          <InfoRow label="Referral source" value={warmth.referral_source} />
+        </InfoSection>
+      )}
+    </div>
+  )
+}
