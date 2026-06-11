@@ -168,15 +168,23 @@ export async function enrichLead(input: CreateLeadInput): Promise<{
       };
     }
 
-    // The final text block should contain the JSON
+    // The final text block should contain the JSON (possibly wrapped in text)
     const finalText = textBlocks[textBlocks.length - 1].text;
 
     // Strip any markdown fences if present
-    const cleaned = finalText
+    let cleaned = finalText
       .replace(/^```json\s*/i, '')
       .replace(/^```\s*/i, '')
       .replace(/\s*```$/i, '')
       .trim();
+
+    // If the response starts with text (not JSON), try to extract JSON from it
+    if (!cleaned.startsWith('{')) {
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        cleaned = jsonMatch[0];
+      }
+    }
 
     let parsed: EnrichmentData;
     try {
