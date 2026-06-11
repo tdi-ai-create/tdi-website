@@ -24,16 +24,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
   }
 
-  // Create job record
-  const { data: job } = await supabase
-    .from('lead_enrichment_jobs')
-    .insert({
-      lead_id,
-      status: 'in_progress',
-      started_at: new Date().toISOString(),
-    })
-    .select()
-    .single();
+  // Create job record (table may not exist -- non-blocking)
+  let job: any = null;
+  try {
+    const { data: jobData } = await supabase
+      .from('lead_enrichment_jobs')
+      .insert({
+        lead_id,
+        status: 'in_progress',
+        started_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+    job = jobData;
+  } catch {
+    // Table may not exist yet -- continue without job tracking
+  }
 
   // Mark lead as in_progress
   await supabase
@@ -47,9 +53,10 @@ export async function POST(req: NextRequest) {
   const result = await enrichLead({
     district_name: lead.name,
     contact_name: lead.contact_name,
-    contact_role: lead.contact_role,
+    contact_role: lead.contact_title || lead.contact_role,
     source: lead.source,
-    state_code: lead.state_code,
+    state_code: lead.state || lead.state_code,
+    contact_email: lead.contact_email,
     notes: lead.notes,
   });
 

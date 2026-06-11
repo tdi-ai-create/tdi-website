@@ -148,21 +148,35 @@ export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRe
     }
   }
 
+  const [enrichError, setEnrichError] = useState<string | null>(null)
+
   async function runEnrichment() {
     setEnriching(true)
+    setEnrichError(null)
     try {
       const res = await fetch('/api/leads/enrich', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lead_id: opp.id }),
       })
-      if (!res.ok) throw new Error('Enrichment failed')
+      const data = await res.json()
+      if (!res.ok) {
+        setEnrichError(data.error || `Failed (${res.status})`)
+        setEnriching(false)
+        return
+      }
+      if (data.error) {
+        setEnrichError(data.error)
+        setEnriching(false)
+        return
+      }
       // Give it a moment to process, then refresh
       setTimeout(() => {
         onRefresh()
         setEnriching(false)
-      }, 3000)
-    } catch {
+      }, 5000)
+    } catch (e: any) {
+      setEnrichError(e.message || 'Network error')
       setEnriching(false)
     }
   }
@@ -190,6 +204,9 @@ export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRe
         >
           {enriching ? 'Researching...' : 'Run Intelligence'}
         </button>
+        {enrichError && (
+          <p style={{ fontSize: 11, color: '#EF4444', marginTop: 8 }}>Error: {enrichError}</p>
+        )}
       </div>
     )
   }
