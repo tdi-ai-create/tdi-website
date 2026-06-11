@@ -183,20 +183,6 @@ export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRe
 
   const hasEnrichmentData = !!(leadScore || enrichmentData)
 
-  // Enrichment in progress
-  if (enrichmentStatus === 'in_progress') {
-    return (
-      <div style={{ padding: 20, textAlign: 'center' }}>
-        <div style={{ fontSize: 13, color: '#6B7280' }}>Intelligence research in progress...</div>
-        <div style={{ marginTop: 8 }}>
-          <div style={{ width: 120, height: 4, background: '#E5E7EB', borderRadius: 2, margin: '0 auto', overflow: 'hidden' }}>
-            <div style={{ width: '60%', height: '100%', background: '#6366F1', borderRadius: 2, animation: 'pulse 1.5s infinite' }} />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div style={{ padding: 16 }}>
       {/* Quick Log Activity */}
