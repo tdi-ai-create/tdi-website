@@ -1,5 +1,5 @@
 'use client'
-
+// v2 - fit sliders + quick log buttons
 import { useState, useCallback } from 'react'
 import type { FullOpportunity } from '../OpportunityDetailPanel'
 import { getBudgetTimingScore } from '@/lib/budgetCycleScoring'
