@@ -181,35 +181,7 @@ export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRe
     }
   }
 
-  // No enrichment data yet -- show CTA
-  if (!leadScore && !enrichmentData && enrichmentStatus !== 'in_progress') {
-    return (
-      <div style={{ padding: 20, textAlign: 'center' }}>
-        <div style={{ width: 48, height: 48, margin: '0 auto 12px', background: '#EEF2FF', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
-          </svg>
-        </div>
-        <h3 style={{ fontSize: 15, fontWeight: 600, color: '#111827', margin: '0 0 4px' }}>Run Lead Intelligence</h3>
-        <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 16px', lineHeight: 1.4 }}>
-          AI will research this district, score fit, identify decision makers, and surface funding signals.
-        </p>
-        <button
-          onClick={runEnrichment}
-          disabled={enriching}
-          style={{
-            padding: '8px 20px', borderRadius: 6, border: 'none', cursor: enriching ? 'wait' : 'pointer',
-            background: enriching ? '#9CA3AF' : '#4F46E5', color: 'white', fontSize: 13, fontWeight: 600,
-          }}
-        >
-          {enriching ? 'Researching...' : 'Run Intelligence'}
-        </button>
-        {enrichError && (
-          <p style={{ fontSize: 11, color: '#EF4444', marginTop: 8 }}>Error: {enrichError}</p>
-        )}
-      </div>
-    )
-  }
+  const hasEnrichmentData = !!(leadScore || enrichmentData)
 
   // Enrichment in progress
   if (enrichmentStatus === 'in_progress') {
@@ -294,7 +266,32 @@ export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRe
         <FitSlider label="TDI Alignment" description="1 = no alignment, 10 = SEL/wellness focus, perfect fit" value={fitScores.fit_tdi_alignment} onChange={(v) => saveFitScore('fit_tdi_alignment', v)} />
       </InfoSection>
 
-      {/* AI Score Overview */}
+      {/* AI Research -- CTA or results */}
+      {!hasEnrichmentData && (
+        <InfoSection title="AI Research">
+          <div style={{ textAlign: 'center', padding: '8px 0' }}>
+            <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 10px', lineHeight: 1.4 }}>
+              AI will research this district, score fit, identify decision makers, and surface funding signals.
+            </p>
+            <button
+              onClick={runEnrichment}
+              disabled={enriching}
+              style={{
+                padding: '6px 16px', borderRadius: 6, border: 'none', cursor: enriching ? 'wait' : 'pointer',
+                background: enriching ? '#9CA3AF' : '#4F46E5', color: 'white', fontSize: 12, fontWeight: 600,
+              }}
+            >
+              {enriching ? 'Researching...' : 'Run Lead Intelligence'}
+            </button>
+            {enrichError && (
+              <p style={{ fontSize: 11, color: '#EF4444', marginTop: 6 }}>Error: {enrichError}</p>
+            )}
+          </div>
+        </InfoSection>
+      )}
+
+      {/* AI Score Overview -- only show if enrichment data exists */}
+      {hasEnrichmentData && (
       <InfoSection title="Lead Score">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
           <div style={{ fontSize: 28, fontWeight: 700, color: '#111827' }}>{leadScore ?? '--'}</div>
@@ -331,6 +328,7 @@ export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRe
           </div>
         )}
       </InfoSection>
+      )}
 
       {/* Strategic Brief */}
       {strategicBrief && (
