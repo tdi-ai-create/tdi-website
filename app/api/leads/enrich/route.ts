@@ -49,25 +49,44 @@ export async function POST(req: NextRequest) {
 
   const startTime = Date.now();
 
-  // Run enrichment
-  const result = await enrichLead({
-    district_name: lead.name,
-    contact_name: lead.contact_name,
-    contact_role: lead.contact_title || lead.contact_role,
-    source: lead.source,
-    state_code: lead.state || lead.state_code,
-    contact_email: lead.contact_email,
-    notes: lead.notes,
-  });
-
-  const duration = Date.now() - startTime;
-
-  if (!result.success || !result.data) {
+  // Run enrichment with full error catching
+  let result: any;
+  try {
+    result = await enrichLead({
+      district_name: lead.name,
+      contact_name: lead.contact_name,
+      contact_role: lead.contact_title || lead.contact_role,
+      source: lead.source,
+      state_code: lead.state || lead.state_code,
+      contact_email: lead.contact_email,
+      notes: lead.notes,
+    });
+  } catch (enrichErr: any) {
+    console.error('[enrich] enrichLead threw:', enrichErr?.message || enrichErr);
+    const duration = Date.now() - startTime;
     await supabase
       .from('sales_opportunities')
       .update({
         enrichment_status: 'failed',
-        enrichment_error: result.error || 'Unknown error',
+        enrichment_error: enrichErr?.message || 'enrichLead threw an exception',
+      })
+      .eq('id', lead_id);
+    return NextResponse.json(
+      { error: 'Enrichment crashed', details: enrichErr?.message || 'Unknown exception' },
+      { status: 500 }
+    );
+  }
+
+  const duration = Date.now() - startTime;
+
+  if (!result.success || !result.data) {
+    const errMsg = result?.error || 'Unknown error';
+    console.error('[enrich] enrichLead failed:', errMsg);
+    await supabase
+      .from('sales_opportunities')
+      .update({
+        enrichment_status: 'failed',
+        enrichment_error: errMsg,
       })
       .eq('id', lead_id);
 

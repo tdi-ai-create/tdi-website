@@ -112,22 +112,39 @@ export async function enrichLead(input: CreateLeadInput): Promise<{
   rawResponse?: any;
 }> {
   try {
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4096,
-      tools: [
-        {
-          type: 'web_search_20250305',
-          name: 'web_search',
-        } as any,
-      ],
-      messages: [
-        {
-          role: 'user',
-          content: RESEARCH_PROMPT(input),
-        },
-      ],
-    });
+    // Try with web search first, fall back to without
+    let response: any;
+    try {
+      response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4096,
+        tools: [
+          {
+            type: 'web_search_20250305',
+            name: 'web_search',
+          } as any,
+        ],
+        messages: [
+          {
+            role: 'user',
+            content: RESEARCH_PROMPT(input),
+          },
+        ],
+      });
+    } catch (webSearchErr: any) {
+      // Web search tool may not be available -- fall back to regular Claude
+      console.log('[enrich] Web search failed, falling back to regular Claude:', webSearchErr?.message);
+      response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4096,
+        messages: [
+          {
+            role: 'user',
+            content: RESEARCH_PROMPT(input) + '\n\nNote: You do not have web search access. Use your training knowledge to provide the best research you can about this district.',
+          },
+        ],
+      });
+    }
 
     // Log AI usage
     import('@/lib/ai-usage').then(({ logAIUsage }) => logAIUsage({
