@@ -8,12 +8,13 @@ const LOST_REASONS = ['Not a fit', 'Budget', 'Timing', 'Competitor', 'No respons
 
 interface Props {
   opp: FullOpportunity
-  onPatch: (changes: Partial<FullOpportunity>) => void
+  onPatch: (changes: Partial<FullOpportunity>) => Promise<boolean> | void
   onClose: () => void
+  onDelete?: () => void
   showToast: (msg: string, type: 'success' | 'error') => void
 }
 
-export function PanelFooter({ opp, onPatch, onClose, showToast }: Props) {
+export function PanelFooter({ opp, onPatch, onClose, onDelete, showToast }: Props) {
   const router = useRouter()
   const [showLostModal, setShowLostModal] = useState(false)
   const [lostReason, setLostReason] = useState('Not a fit')
@@ -102,14 +103,16 @@ export function PanelFooter({ opp, onPatch, onClose, showToast }: Props) {
   }
 
   async function markWon() {
-    await onPatch({ stage: 'paid' })
+    const result = await onPatch({ stage: 'paid' })
+    if (result === false) return // patch failed, don't close
     showToast('Deal marked as Won', 'success')
     onClose()
   }
 
   async function markLost() {
-    await onPatch({ stage: 'lost' })
-    showToast('Deal marked as Lost', 'success')
+    const result = await onPatch({ stage: 'lost', deletion_reason: lostReason } as any)
+    if (result === false) return // patch failed, don't close
+    showToast(`Deal marked as Lost (${lostReason})`, 'success')
     setShowLostModal(false)
     onClose()
   }
@@ -174,6 +177,16 @@ export function PanelFooter({ opp, onPatch, onClose, showToast }: Props) {
           Mark as Lost
         </button>
       </div>
+      {onDelete && (
+        <div className="border-t border-gray-100 px-5 py-2 flex justify-center">
+          <button
+            onClick={onDelete}
+            className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+          >
+            Move to Trash
+          </button>
+        </div>
+      )}
 
       {/* Partnership Creation Modal */}
       {showPartnershipModal && (

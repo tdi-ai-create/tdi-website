@@ -5,7 +5,7 @@ const ALLOWED_PATCH_FIELDS = new Set([
   'name', 'stage', 'value', 'heat', 'assigned_to_email',
   'source', 'type', 'is_contact_only',
   'contact_name', 'contact_title', 'contact_email', 'contact_phone',
-  'expected_close_date',
+  'expected_close_date', 'deletion_reason',
   // Fit scoring fields
   'fit_district_size', 'fit_turnover_signal', 'fit_pd_investment',
   'fit_budget_timing', 'fit_leadership_stability', 'fit_tdi_alignment',

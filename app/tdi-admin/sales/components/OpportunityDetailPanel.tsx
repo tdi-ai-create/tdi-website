@@ -73,10 +73,11 @@ interface Props {
   opportunityId: string | null
   onClose: () => void
   onUpdate: (id: string, changes: Partial<FullOpportunity>) => void
+  onDelete?: (id: string) => void
   showToast: (message: string, type: 'success' | 'error') => void
 }
 
-export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, showToast }: Props) {
+export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDelete, showToast }: Props) {
   const [opp, setOpp] = useState<FullOpportunity | null>(null)
   const [loading, setLoading] = useState(false)
   const [fetchError, setFetchError] = useState('')
@@ -119,8 +120,8 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, showT
     }
   }
 
-  async function patchOpp(changes: Partial<FullOpportunity>) {
-    if (!opp) return
+  async function patchOpp(changes: Partial<FullOpportunity>): Promise<boolean> {
+    if (!opp) return false
     const prev = { ...opp }
     setOpp(o => o ? { ...o, ...changes } : o)
     try {
@@ -133,9 +134,11 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, showT
       const updated = await res.json()
       setOpp(o => o ? { ...o, ...updated } : o)
       onUpdate(opp.id, changes)
+      return true
     } catch {
       setOpp(prev)
       showToast('Failed to save changes', 'error')
+      return false
     }
   }
 
@@ -261,7 +264,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, showT
               )}
             </div>
 
-            <PanelFooter opp={opp} onPatch={patchOpp} onClose={onClose} showToast={showToast} />
+            <PanelFooter opp={opp} onPatch={patchOpp} onClose={onClose} onDelete={onDelete && opp ? () => { onDelete(opp.id); onClose() } : undefined} showToast={showToast} />
           </>
         )}
       </div>

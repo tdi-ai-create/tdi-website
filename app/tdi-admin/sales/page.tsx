@@ -1450,6 +1450,10 @@ export default function SalesPage() {
             }
           }))
         }}
+        onDelete={(id) => {
+          const opp = opportunities.find(o => o.supabase_id === id)
+          if (opp) handleDeleteOpp(opp)
+        }}
         showToast={showToastMsg}
       />
 
