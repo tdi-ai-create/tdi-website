@@ -1,5 +1,5 @@
 'use client'
-
+// v2 - intelligence tab with fit sliders + quick log
 import { useEffect, useRef, useState } from 'react'
 import { PanelHeader } from './panel/PanelHeader'
 import { PanelStats } from './panel/PanelStats'

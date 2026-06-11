@@ -1,5 +1,5 @@
 'use client'
-
+// v2 - sales intelligence with fit scoring
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { getSupabase } from '@/lib/supabase'
