@@ -132,15 +132,16 @@ export async function enrichLead(input: CreateLeadInput): Promise<{
         ],
       });
     } catch (webSearchErr: any) {
-      // Web search tool may not be available -- fall back to regular Claude
+      // Web search tool may not be available -- fall back to regular Claude with strict JSON instruction
       console.log('[enrich] Web search failed, falling back to regular Claude:', webSearchErr?.message);
       response = await anthropic.messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
+        system: 'You are a JSON API. You MUST respond with ONLY a valid JSON object. No text before or after the JSON. No preamble. No explanation. Start your response with { and end with }.',
         messages: [
           {
             role: 'user',
-            content: RESEARCH_PROMPT(input) + '\n\nNote: You do not have web search access. Use your training knowledge to provide the best research you can about this district.',
+            content: RESEARCH_PROMPT(input),
           },
         ],
       });
@@ -178,12 +179,11 @@ export async function enrichLead(input: CreateLeadInput): Promise<{
       .replace(/\s*```$/i, '')
       .trim();
 
-    // If the response starts with text (not JSON), try to extract JSON from it
-    if (!cleaned.startsWith('{')) {
-      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        cleaned = jsonMatch[0];
-      }
+    // Extract JSON robustly: find the first { and last } regardless of surrounding text
+    const firstBrace = cleaned.indexOf('{');
+    const lastBrace = cleaned.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace > firstBrace) {
+      cleaned = cleaned.substring(firstBrace, lastBrace + 1);
     }
 
     let parsed: EnrichmentData;
