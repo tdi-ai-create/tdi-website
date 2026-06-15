@@ -269,17 +269,18 @@ export default function SalesPage() {
 
       if (fetchError) throw fetchError
 
-      const mapped: Opportunity[] = (data || []).map((row: SalesOpportunity) => ({
+      const mapped: Opportunity[] = (data || []).map((row: SalesOpportunity) => {
+        try { return {
         id: row.ghl_opportunity_id || row.id,
         supabase_id: row.id,
         ghl_id: row.ghl_opportunity_id,
-        name: row.name,
+        name: row.name || 'Unnamed',
         stage: row.stage,
         stageName: STAGE_DISPLAY[row.stage] || row.stage,
         value: row.value,
         type: row.type,
         assignedTo: row.assigned_to_email,
-        isRenewal: row.type === 'renewal' || row.name.toLowerCase().includes('renewal'),
+        isRenewal: row.type === 'renewal' || (row.name || '').toLowerCase().includes('renewal'),
         isContactOnly: row.is_contact_only || false,
         lastActivityAt: row.last_activity_at,
         probability: row.probability ?? STAGE_PROBABILITY[row.stage] ?? 0,
@@ -311,7 +312,7 @@ export default function SalesPage() {
         enrichmentStatus: row.enrichment_status,
         enrichedAt: row.enriched_at,
         tier: computeTier(row.lead_score),
-      }))
+      } } catch (e) { console.error('Failed to map opportunity:', row.id, e); return null } }).filter(Boolean) as Opportunity[]
 
       setOpportunities(mapped)
       setLastSynced(new Date())
