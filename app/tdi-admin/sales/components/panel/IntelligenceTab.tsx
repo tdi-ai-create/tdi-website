@@ -44,12 +44,14 @@ function InfoSection({ title, children }: { title: string; children: React.React
   )
 }
 
-function InfoRow({ label, value }: { label: string; value: string | number | null | undefined }) {
-  if (!value) return null
+function InfoRow({ label, value }: { label: string; value: any }) {
+  if (value == null || value === '') return null
+  // Safely convert objects/arrays to string for display
+  const display = typeof value === 'object' ? JSON.stringify(value) : String(value)
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0', borderBottom: '1px solid #F3F4F6' }}>
       <span style={{ fontSize: 12, color: '#6B7280' }}>{label}</span>
-      <span style={{ fontSize: 12, color: '#111827', fontWeight: 500 }}>{value}</span>
+      <span style={{ fontSize: 12, color: '#111827', fontWeight: 500, maxWidth: '60%', textAlign: 'right', wordBreak: 'break-word' }}>{display}</span>
     </div>
   )
 }
@@ -80,7 +82,7 @@ export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRe
   const [enriching, setEnriching] = useState(false)
 
   const leadScore = opp.lead_score as number | null
-  const scoreBreakdown = opp.score_breakdown as { fit?: number; pain?: number; funding?: number; warmth?: number } | null
+  const scoreBreakdown = opp.score_breakdown as Record<string, any> | null
   const enrichmentData = opp.enrichment_data as Record<string, any> | null
   const strategicBrief = opp.ai_strategic_brief as string | null
   const enrichmentStatus = opp.enrichment_status as string | null
@@ -296,10 +298,10 @@ export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRe
         </div>
         {scoreBreakdown && (
           <>
-            <ScoreBar label="Fit" value={scoreBreakdown.fit ?? 0} max={25} color="#10B981" />
-            <ScoreBar label="Pain Signals" value={scoreBreakdown.pain ?? 0} max={25} color="#EF4444" />
-            <ScoreBar label="Funding" value={scoreBreakdown.funding ?? 0} max={25} color="#3B82F6" />
-            <ScoreBar label="Warmth" value={scoreBreakdown.warmth ?? 0} max={25} color="#F59E0B" />
+            <ScoreBar label="Fit" value={scoreBreakdown.fit_score ?? scoreBreakdown.fit ?? 0} max={25} color="#10B981" />
+            <ScoreBar label="Pain Signals" value={scoreBreakdown.pain_score ?? scoreBreakdown.pain ?? 0} max={25} color="#EF4444" />
+            <ScoreBar label="Funding" value={scoreBreakdown.funding_score ?? scoreBreakdown.funding ?? 0} max={25} color="#3B82F6" />
+            <ScoreBar label="Warmth" value={scoreBreakdown.warmth_score ?? scoreBreakdown.warmth ?? 0} max={25} color="#F59E0B" />
           </>
         )}
         {enrichedAt && (
