@@ -343,13 +343,28 @@ export const CHECK_IN_QUESTIONS: CheckInQuestion[] = [
   },
 ]
 
-// Get the question to show for this visit
-// Cycles through all 20, never repeats category back-to-back
+// Category rotation order — one dimension per day, cycling through all 5
+const CATEGORY_ORDER: QuestionCategory[] = ['mood', 'energy', 'belonging', 'purpose', 'needs']
+
+// Get the question to show for this visit.
+// Advances to the next CATEGORY each time (not the next question in the list),
+// so all 5 dimensions get data within 5 check-ins. Within each category,
+// picks a random variant to keep it fresh.
 export function getNextQuestion(lastQuestionId: string | null): CheckInQuestion {
-  if (!lastQuestionId) return CHECK_IN_QUESTIONS[0]
-  const lastIndex = CHECK_IN_QUESTIONS.findIndex(q => q.id === lastQuestionId)
-  const nextIndex = (lastIndex + 1) % CHECK_IN_QUESTIONS.length
-  return CHECK_IN_QUESTIONS[nextIndex]
+  let nextCategory: QuestionCategory
+
+  if (!lastQuestionId) {
+    nextCategory = 'mood'
+  } else {
+    const lastQuestion = CHECK_IN_QUESTIONS.find(q => q.id === lastQuestionId)
+    const lastCategory = lastQuestion?.category ?? 'mood'
+    const lastCatIndex = CATEGORY_ORDER.indexOf(lastCategory)
+    nextCategory = CATEGORY_ORDER[(lastCatIndex + 1) % CATEGORY_ORDER.length]
+  }
+
+  // Pick a random question within the next category
+  const categoryQuestions = CHECK_IN_QUESTIONS.filter(q => q.category === nextCategory)
+  return categoryQuestions[Math.floor(Math.random() * categoryQuestions.length)]
 }
 
 // Map a question response to a numeric score for analytics

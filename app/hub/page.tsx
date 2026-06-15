@@ -1039,6 +1039,15 @@ export default function HubDashboard() {
                 onClick={() => {
                   setTourCompleted(true);
                   try { localStorage.removeItem('tdi-hub-tour-step'); } catch {}
+                  // Persist skip to Supabase so the tour never reappears
+                  if (user?.id) {
+                    const supabase = getSupabase();
+                    supabase.from('hub_activity_log').insert({
+                      user_id: user.id,
+                      action: 'tour_completed',
+                      metadata: { stops_seen: 10, skipped: true },
+                    }).then(() => {});
+                  }
                 }}
                 className="text-xs transition-colors"
                 style={{ color: 'rgba(255,255,255,0.4)' }}

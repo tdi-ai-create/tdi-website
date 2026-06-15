@@ -10,7 +10,6 @@ import { useHub } from '@/components/hub/HubContext';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 
 const CheckInSlideUp = dynamic(() => import('@/components/hub/CheckInSlideUp'), { ssr: false });
-const WellbeingPopup = dynamic(() => import('@/components/hub/WellbeingPopup'), { ssr: false });
 const AdminBanner = dynamic(() => import('@/components/hub/AdminBanner'), { ssr: false });
 const AddToHomeScreen = dynamic(() => import('@/components/hub/AddToHomeScreen'), { ssr: false });
 
@@ -77,7 +76,6 @@ function HubLayoutInner({ children }: { children: React.ReactNode }) {
       {showCheckIn && (
         <CheckInSlideUp onDismiss={() => setShowCheckIn(false)} />
       )}
-      <WellbeingPopup />
       <AddToHomeScreen />
     </div>
   );
