@@ -161,10 +161,11 @@ function formatCurrencyFull(n: number): string {
   return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 }
 
-function computeTier(leadScore: number | null): 'T1' | 'T2' | 'T3' | null {
-  if (leadScore == null) return null
-  if (leadScore >= 70) return 'T1'
-  if (leadScore >= 40) return 'T2'
+function computeTier(leadScore: unknown): 'T1' | 'T2' | 'T3' | null {
+  const score = typeof leadScore === 'number' ? leadScore : typeof leadScore === 'string' ? parseInt(leadScore) : null
+  if (score == null || isNaN(score)) return null
+  if (score >= 70) return 'T1'
+  if (score >= 40) return 'T2'
   return 'T3'
 }
 

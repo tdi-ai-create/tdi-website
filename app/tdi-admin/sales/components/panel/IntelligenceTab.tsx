@@ -10,10 +10,11 @@ const TIER_CONFIG: Record<string, { label: string; color: string; bg: string; do
   T3: { label: 'Tier 3', color: '#374151', bg: '#F3F4F6', dot: '#9CA3AF' },
 }
 
-function computeTier(score: number | null): string | null {
-  if (score == null) return null
-  if (score >= 70) return 'T1'
-  if (score >= 40) return 'T2'
+function computeTier(score: unknown): string | null {
+  const n = typeof score === 'number' ? score : typeof score === 'string' ? parseInt(score) : null
+  if (n == null || isNaN(n)) return null
+  if (n >= 70) return 'T1'
+  if (n >= 40) return 'T2'
   return 'T3'
 }
 
