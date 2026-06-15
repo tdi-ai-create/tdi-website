@@ -732,7 +732,11 @@ export default function SalesPage() {
   const filtered = useMemo(() => {
     return activeOpps.filter(opp => {
       const f = activeFilters
-      if (f.search && !opp.name.toLowerCase().includes(f.search.toLowerCase())) return false
+      if (f.search) {
+        const q = f.search.toLowerCase()
+        const searchable = [opp.name, opp.contactName, opp.contactEmail, opp.city, opp.state, opp.notes].filter(Boolean).join(' ').toLowerCase()
+        if (!searchable.includes(q)) return false
+      }
       if (f.deal_types.length > 0 && !f.deal_types.includes(opp.type)) return false
       if (f.sources.length > 0 && !f.sources.includes(opp.source || 'Other')) return false
       if (f.tiers.length > 0) {

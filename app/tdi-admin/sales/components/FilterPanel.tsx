@@ -84,7 +84,7 @@ export function FilterPanel({
         type="text"
         value={activeFilters.search}
         onChange={e => setActiveFilters({ ...activeFilters, search: e.target.value })}
-        placeholder="Search opportunities..."
+        placeholder="Search by name, contact, email, city..."
         style={{
           border: '1px solid #D1D5DB',
           borderRadius: 8,
