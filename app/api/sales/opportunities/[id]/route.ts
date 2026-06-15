@@ -3,7 +3,7 @@ import { getServiceSupabase } from '@/lib/supabase'
 
 const ALLOWED_PATCH_FIELDS = new Set([
   'name', 'stage', 'value', 'heat', 'assigned_to_email',
-  'source', 'type', 'is_contact_only',
+  'source', 'type', 'is_contact_only', 'partnership_status',
   'contact_name', 'contact_title', 'contact_email', 'contact_phone',
   'expected_close_date', 'deletion_reason',
   // Fit scoring fields
