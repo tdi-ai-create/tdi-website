@@ -190,11 +190,28 @@ export async function enrichLead(input: CreateLeadInput): Promise<{
     try {
       parsed = JSON.parse(cleaned);
     } catch (parseErr) {
-      return {
-        success: false,
-        error: `JSON parse failed: ${(parseErr as Error).message}`,
-        rawResponse: { textReceived: cleaned, fullResponse: response },
-      };
+      // Try to repair common JSON issues from Claude
+      try {
+        let repaired = cleaned
+          // Remove trailing commas before } or ]
+          .replace(/,\s*([}\]])/g, '$1')
+          // Replace single quotes with double quotes
+          .replace(/'/g, '"')
+          // Remove comments
+          .replace(/\/\/[^\n]*/g, '')
+          // Fix unquoted keys
+          .replace(/(\{|\,)\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":')
+          // Remove control characters
+          .replace(/[\x00-\x1F\x7F]/g, ' ')
+          .trim();
+        parsed = JSON.parse(repaired);
+      } catch (repairErr) {
+        return {
+          success: false,
+          error: `JSON parse failed: ${(parseErr as Error).message}`,
+          rawResponse: { textReceived: cleaned.substring(0, 500), fullResponse: 'truncated' },
+        };
+      }
     }
 
     // Validate critical fields exist
