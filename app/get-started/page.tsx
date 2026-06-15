@@ -186,6 +186,34 @@ export default function GetStartedPage() {
         }),
       }).catch(() => {});
 
+      // Persist to CRM (non-blocking — form success doesn't depend on this)
+      const crmNotes = isTeacherPath
+        ? [
+            `${selectedRole}. Nomination submitted via /get-started.`,
+            formData.teacher_pd_frustration && `PD Frustration: ${formData.teacher_pd_frustration}`,
+            formData.teacher_pd_leadership_wish && `Leadership Wish: ${formData.teacher_pd_leadership_wish}`,
+            formData.teacher_pd_contact && `Contact preference: ${formData.teacher_pd_contact}`,
+          ].filter(Boolean).join('\n')
+        : [
+            `${selectedRole}. PD Plan Request submitted via /get-started.`,
+            `Audience: ${formData.pd_plan_audience.join(', ')}`,
+            `Scope: ${formData.pd_plan_scope}`,
+            `Pain point: ${formData.pd_pain_point}`,
+          ].filter(Boolean).join('\n');
+
+      fetch('/api/leads/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          district_name: `${formData.schoolName} (${formData.schoolState}) - ${isTeacherPath ? 'Nomination' : 'PD Plan Inquiry'}`,
+          contact_name: formData.name,
+          contact_email: formData.email,
+          source: isTeacherPath ? 'Nomination form' : 'PD Plan Request (website)',
+          state_code: formData.schoolState,
+          notes: crmNotes,
+        }),
+      }).catch(() => {});
+
       if (typeof window !== 'undefined' && window.gtag) {
         window.gtag('event', 'get_started_form_submit', { role: (({"Teacher":"teacher","Para":"paraprofessional","Building Leader":"building leader","District Leader":"district leader"} as Record<string, string>)[selectedRole ?? ""]) ?? selectedRole?.toLowerCase(), path: isTeacherPath ? 'nomination' : 'pd-plan' });
       }

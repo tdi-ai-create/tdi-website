@@ -445,6 +445,30 @@ function NominatePageInner() {
         setSubmitted(true);
         setTrack(currentTrack);
         if (typeof window !== 'undefined' && window.gtag) window.gtag('event', 'nominate_form_submit', { track: currentTrack });
+
+        // Persist to CRM (non-blocking — form success doesn't depend on this)
+        const crmNotes = [
+          `${getTrackTypeLabel()}. Nomination submitted via /nominate.`,
+          isPartner !== null && `TDI Partner: ${isPartner ? 'Yes' : 'No'}`,
+          formData.nominatedSchool && `School nominated: ${formData.nominatedSchool}, ${formData.schoolCity}, ${formData.schoolState}`,
+          formData.principalName && `Principal (if known): ${formData.principalName}`,
+          formData.relationship && `Relationship to school: ${formData.relationship}`,
+          formData.pdChallenge && `Biggest PD challenge: ${formData.pdChallenge}`,
+          formData.notes && `Additional notes: ${formData.notes}`,
+        ].filter(Boolean).join('\n');
+
+        fetch('/api/leads/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            district_name: `${formData.nominatedSchool} (${formData.schoolState}) - Nomination`,
+            contact_name: formData.name,
+            contact_email: formData.email,
+            source: 'Nomination form',
+            state_code: formData.schoolState,
+            notes: crmNotes,
+          }),
+        }).catch(() => {});
       } else {
         setError(true);
       }
