@@ -96,11 +96,14 @@ export interface CreateLeadInput {
   contact_role?: ContactRole;
   contact_email?: string;
   contact_phone?: string;
-  source: LeadSource;
+  source: LeadSource | string;
   state_code?: string;
   estimated_deal_size?: number;
   initial_heat?: LeadHeat;
   notes?: string;
+  assigned_to_email?: string;
+  partnership_status?: string;
+  stage?: string;
 }
 
 export interface Lead {

@@ -33,9 +33,11 @@ export async function POST(req: NextRequest) {
       value: body.estimated_deal_size || null,
       heat: body.initial_heat || 'warm',
       notes: combinedNotes,
-      stage: 'qualified',
+      stage: body.stage || 'qualified',
       type: 'new_business',
       school_year: '2026-27',
+      assigned_to_email: body.assigned_to_email || 'rae@teachersdeserveit.com',
+      partnership_status: body.partnership_status || 'prospect',
     };
 
     // Try columns from migration 063 — they may not exist on production yet
