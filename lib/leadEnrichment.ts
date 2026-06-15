@@ -116,7 +116,7 @@ export async function enrichLead(input: CreateLeadInput): Promise<{
     let response: any;
     try {
       response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6-20250620',
         max_tokens: 4096,
         tools: [
           {
@@ -135,7 +135,7 @@ export async function enrichLead(input: CreateLeadInput): Promise<{
       // Web search tool may not be available -- fall back to regular Claude with strict JSON instruction
       console.log('[enrich] Web search failed, falling back to regular Claude:', webSearchErr?.message);
       response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6-20250620',
         max_tokens: 4096,
         system: 'You are a JSON API. You MUST respond with ONLY a valid JSON object. No text before or after the JSON. No preamble. No explanation. Start your response with { and end with }.',
         messages: [
@@ -150,7 +150,7 @@ export async function enrichLead(input: CreateLeadInput): Promise<{
     // Log AI usage
     import('@/lib/ai-usage').then(({ logAIUsage }) => logAIUsage({
       endpoint: 'lead_enrich',
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6-20250620',
       inputTokens: response.usage?.input_tokens || 0,
       outputTokens: response.usage?.output_tokens || 0,
       metadata: { input_type: 'lead_enrich' },
