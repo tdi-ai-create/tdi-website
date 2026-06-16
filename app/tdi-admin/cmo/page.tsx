@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, Loader2, BarChart3 } from 'lucide-react';
+import { Loader2, BarChart3 } from 'lucide-react';
 import { HorizontalBarChart, DonutChart, DonutLegend, TrendAreaChart, RadialGauge, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts';
 import { USChoroplethMap } from '@/components/tdi-admin/shared/USChoroplethMap';
 import { getSupabase } from '@/lib/supabase';
@@ -152,11 +152,34 @@ function HubIntelligenceSection() {
   );
 }
 
+type DateRange = '14d' | '30d' | '90d' | 'all';
+
+function getRangeStart(range: DateRange): string | null {
+  if (range === 'all') return null;
+  const d = new Date();
+  const days = range === '14d' ? 14 : range === '30d' ? 30 : 90;
+  d.setDate(d.getDate() - days);
+  return d.toISOString().split('T')[0];
+}
+
+function getRangeLabel(range: DateRange): string {
+  if (range === 'all') return 'All Time';
+  const end = new Date();
+  const start = new Date();
+  const days = range === '14d' ? 14 : range === '30d' ? 30 : 90;
+  start.setDate(start.getDate() - days);
+  const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return `${fmt(start)} - ${fmt(end)}`;
+}
+
 export default function CMODashboardPage() {
   const supabase = getSupabase();
   const [pageState, setPageState] = useState<'loading' | 'ready' | 'db_pending'>('loading');
-  const [weekStart, setWeekStart] = useState(() => getWeekStart(new Date()));
+  const [dateRange, setDateRange] = useState<DateRange>('90d');
+  const [showDataEntry, setShowDataEntry] = useState(false);
+  const [entryWeek, setEntryWeek] = useState(() => getWeekStart(new Date()));
 
+  const [allMetrics, setAllMetrics] = useState<WeeklyMetrics[]>([]);
   const [currentMetrics, setCurrentMetrics] = useState<WeeklyMetrics | null>(null);
   const [previousMetrics, setPreviousMetrics] = useState<WeeklyMetrics | null>(null);
   const [tiktokPosts, setTiktokPosts] = useState<TikTokPost[]>([]);
@@ -178,10 +201,6 @@ export default function CMODashboardPage() {
       if (error?.code === '42P01' || error?.message?.includes('does not exist')) {
         setPageState('db_pending');
       } else {
-        // Auto-select the most recent week that has data
-        if (data && data.length > 0) {
-          setWeekStart(data[0].week_start);
-        }
         setPageState('ready');
       }
     };
@@ -190,11 +209,25 @@ export default function CMODashboardPage() {
 
   const loadData = useCallback(async () => {
     setDataLoading(true);
-    const prevWeek = shiftWeek(weekStart, -1);
+    const rangeStart = getRangeStart(dateRange);
+
+    // Build queries with optional date filter
+    let metricsQuery = supabase.from('cmo_weekly_metrics').select('*').order('week_start', { ascending: true });
+    let tiktokQuery = supabase.from('cmo_tiktok_posts').select('*').order('post_date', { ascending: false });
+    let substackQuery = supabase.from('cmo_substack_posts').select('*').order('post_date', { ascending: false });
+    let utmQuery = supabase.from('cmo_utm_tracking').select('*');
+    let briefQuery = supabase.from('cmo_rae_brief').select('*').order('week_start', { ascending: false });
+
+    if (rangeStart) {
+      metricsQuery = metricsQuery.gte('week_start', rangeStart);
+      tiktokQuery = tiktokQuery.gte('week_start', rangeStart);
+      substackQuery = substackQuery.gte('week_start', rangeStart);
+      utmQuery = utmQuery.gte('week_start', rangeStart);
+      briefQuery = briefQuery.gte('week_start', rangeStart);
+    }
 
     const [
-      { data: current },
-      { data: previous },
+      { data: metrics },
       { data: tiktok },
       { data: substack },
       { data: utm },
@@ -202,18 +235,41 @@ export default function CMODashboardPage() {
       { data: subSources },
       { data: arr },
     ] = await Promise.all([
-      supabase.from('cmo_weekly_metrics').select('*').eq('week_start', weekStart).maybeSingle(),
-      supabase.from('cmo_weekly_metrics').select('*').eq('week_start', prevWeek).maybeSingle(),
-      supabase.from('cmo_tiktok_posts').select('*').eq('week_start', weekStart).order('post_date', { ascending: true }),
-      supabase.from('cmo_substack_posts').select('*').eq('week_start', weekStart).order('post_date', { ascending: true }),
-      supabase.from('cmo_utm_tracking').select('*').eq('week_start', weekStart),
-      supabase.from('cmo_rae_brief').select('*').eq('week_start', weekStart),
+      metricsQuery,
+      tiktokQuery,
+      substackQuery,
+      utmQuery,
+      briefQuery,
       supabase.from('cmo_subscriber_sources').select('*').order('month', { ascending: true }),
       supabase.from('cmo_paid_arr').select('*').order('month', { ascending: true }),
     ]);
 
-    setCurrentMetrics(current as WeeklyMetrics | null);
-    setPreviousMetrics(previous as WeeklyMetrics | null);
+    const allWeeks = (metrics as WeeklyMetrics[]) || [];
+    setAllMetrics(allWeeks);
+
+    // Aggregate: use the latest week's cumulative values (followers, subscribers)
+    // and sum the periodic values (views, clicks, applications)
+    if (allWeeks.length > 0) {
+      const latest = allWeeks[allWeeks.length - 1];
+      const aggregated: WeeklyMetrics = {
+        ...latest,
+        tiktok_views: allWeeks.reduce((s, w) => s + (w.tiktok_views || 0), 0),
+        form_clicks: allWeeks.reduce((s, w) => s + (w.form_clicks || 0), 0),
+        applications_received: allWeeks.reduce((s, w) => s + (w.applications_received || 0), 0),
+        // Keep latest cumulative values for followers/subscribers
+        tiktok_followers: latest.tiktok_followers,
+        substack_subscribers: latest.substack_subscribers,
+        substack_paid_subscribers: latest.substack_paid_subscribers,
+        substack_arr_cents: latest.substack_arr_cents,
+      };
+      setCurrentMetrics(aggregated);
+      // Previous = first week in range for comparison
+      setPreviousMetrics(allWeeks.length > 1 ? allWeeks[0] : null);
+    } else {
+      setCurrentMetrics(null);
+      setPreviousMetrics(null);
+    }
+
     setTiktokPosts((tiktok as TikTokPost[]) || []);
     setSubstackPosts((substack as SubstackPost[]) || []);
     setUtmRows((utm as UTMTrackingType[]) || []);
@@ -221,7 +277,7 @@ export default function CMODashboardPage() {
     setSubscriberSources((subSources as SubscriberSource[]) || []);
     setArrData((arr as PaidARR[]) || []);
     setDataLoading(false);
-  }, [weekStart, supabase]);
+  }, [dateRange, supabase]);
 
   useEffect(() => {
     if (pageState === 'ready') loadData();
@@ -259,11 +315,7 @@ export default function CMODashboardPage() {
     );
   }
 
-  const weekLabel = new Date(weekStart + 'T00:00').toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  // Range label computed inline
 
   return (
     <div style={{ background: PORTAL_TOKENS.pageBg }}>
@@ -283,37 +335,53 @@ export default function CMODashboardPage() {
             CMO Dashboard
           </h1>
           <p style={{ ...TYPE_PAGE_SUBTITLE, marginTop: 8 }}>
-            Attract → Warm → Convert · weekly marketing funnel
+            Attract → Warm → Convert · marketing funnel
           </p>
         </div>
-        {/* Week selector */}
-        <div className="flex items-center justify-between">
+
+        {/* Range selector */}
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-2">
+            {([['14d', 'Last 14 days'], ['30d', 'Last 30 days'], ['90d', 'Last 90 days'], ['all', 'All Time']] as [DateRange, string][]).map(([range, label]) => (
+              <button
+                key={range}
+                onClick={() => setDateRange(range)}
+                style={{
+                  padding: '6px 14px',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  borderRadius: 8,
+                  border: `1.5px solid ${dateRange === range ? '#2A9D8F' : '#D1D5DB'}`,
+                  background: dateRange === range ? '#2A9D8F' : 'white',
+                  color: dateRange === range ? 'white' : '#374151',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                }}
+              >
+                {label}
+              </button>
+            ))}
+            {dataLoading && <Loader2 size={16} className="animate-spin text-gray-400 ml-2" />}
+          </div>
           <div className="flex items-center gap-3">
+            <span style={{ fontSize: 12, color: '#9CA3AF' }}>{getRangeLabel(dateRange)}</span>
             <button
-              onClick={() => setWeekStart(shiftWeek(weekStart, -1))}
-              className="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
+              onClick={() => setShowDataEntry(!showDataEntry)}
+              style={{
+                fontSize: 11, fontWeight: 600, padding: '5px 12px', borderRadius: 6,
+                border: '1px solid #D1D5DB', background: showDataEntry ? '#F3F4F6' : 'white',
+                color: '#374151', cursor: 'pointer',
+              }}
             >
-              <ChevronLeft size={16} className="text-gray-600" />
-            </button>
-            <span
-              className="text-sm font-medium text-gray-700"
-              style={{ fontFamily: ADMIN_TYPOGRAPHY.fontFamily.body }}
-            >
-              Week of {weekLabel}
-            </span>
-            <button
-              onClick={() => setWeekStart(shiftWeek(weekStart, 1))}
-              className="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
-            >
-              <ChevronRight size={16} className="text-gray-600" />
+              {showDataEntry ? 'Hide Data Entry' : 'Add Data'}
             </button>
           </div>
-
-          {dataLoading && <Loader2 size={16} className="animate-spin text-gray-400" />}
         </div>
 
-        {/* Data entry form */}
-        <WeeklyEntryForm weekStart={weekStart} onSaved={loadData} supabase={supabase} />
+        {/* Data entry form (collapsible) */}
+        {showDataEntry && (
+          <WeeklyEntryForm weekStart={entryWeek} onSaved={loadData} supabase={supabase} />
+        )}
 
         {/* Funnel KPI Cards */}
         <FunnelCards current={currentMetrics} previous={previousMetrics} />
