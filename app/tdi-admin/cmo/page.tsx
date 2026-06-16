@@ -384,7 +384,7 @@ export default function CMODashboardPage() {
         )}
 
         {/* Funnel KPI Cards */}
-        <FunnelCards current={currentMetrics} previous={previousMetrics} />
+        <FunnelCards current={currentMetrics} previous={previousMetrics} allWeeks={allMetrics} />
 
         {/* Content tables */}
         <div className="grid grid-cols-1 gap-6">

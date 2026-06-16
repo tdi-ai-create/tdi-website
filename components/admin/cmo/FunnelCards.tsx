@@ -7,6 +7,22 @@ import { ADMIN_SHADOWS, ADMIN_TYPOGRAPHY } from '@/components/tdi-admin/ui/desig
 interface FunnelCardsProps {
   current: WeeklyMetrics | null;
   previous: WeeklyMetrics | null;
+  allWeeks?: WeeklyMetrics[];
+}
+
+function MiniSparkline({ data, color }: { data: number[]; color: string }) {
+  if (data.length < 2) return null;
+  const max = Math.max(...data, 1);
+  const min = Math.min(...data, 0);
+  const range = max - min || 1;
+  const w = 100;
+  const h = 24;
+  const points = data.map((v, i) => `${(i / (data.length - 1)) * w},${h - ((v - min) / range) * h}`).join(' ');
+  return (
+    <svg width={w} height={h} style={{ display: 'block', marginTop: 4 }}>
+      <polyline points={points} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
 }
 
 function pctChange(curr: number, prev: number): number | null {
@@ -40,7 +56,7 @@ const cards: CardDef[] = [
     color: CMO_COLORS.attract,
     getValue: (m) => m.tiktok_views,
     format: formatNumber,
-    subtitle: 'Total video views this week',
+    subtitle: 'TikTok Weekly Views',
   },
   {
     label: 'Substack Subscribers',
@@ -56,7 +72,7 @@ const cards: CardDef[] = [
     color: CMO_COLORS.convert,
     getValue: (m) => m.form_clicks,
     format: formatNumber,
-    subtitle: 'Tracked link clicks this week',
+    subtitle: 'Form Clicks (UTM)',
   },
   {
     label: 'Applications',
@@ -64,17 +80,18 @@ const cards: CardDef[] = [
     color: CMO_COLORS.amber,
     getValue: (m) => m.applications_received,
     format: formatNumber,
-    subtitle: 'New applications this week',
+    subtitle: 'Applications',
   },
 ];
 
-export function FunnelCards({ current, previous }: FunnelCardsProps) {
+export function FunnelCards({ current, previous, allWeeks = [] }: FunnelCardsProps) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {cards.map((card) => {
         const value = current ? card.getValue(current) : 0;
         const prevValue = previous ? card.getValue(previous) : null;
         const change = prevValue !== null ? pctChange(value, prevValue) : null;
+        const sparkData = allWeeks.map(w => card.getValue(w));
 
         return (
           <div
@@ -103,8 +120,9 @@ export function FunnelCards({ current, previous }: FunnelCardsProps) {
             >
               {card.label}
             </div>
+            <MiniSparkline data={sparkData} color={card.color.accent} />
             {change !== null && (
-              <div className="flex items-center gap-1 text-xs">
+              <div className="flex items-center gap-1 text-xs mt-1">
                 {change > 0 ? (
                   <TrendingUp size={12} className="text-green-600" />
                 ) : change < 0 ? (
@@ -113,7 +131,7 @@ export function FunnelCards({ current, previous }: FunnelCardsProps) {
                   <Minus size={12} className="text-gray-400" />
                 )}
                 <span className={change > 0 ? 'text-green-600' : change < 0 ? 'text-red-500' : 'text-gray-400'}>
-                  {change > 0 ? '+' : ''}{change}% vs last week
+                  {change > 0 ? '+' : ''}{change}% vs first week
                 </span>
               </div>
             )}
