@@ -15,6 +15,7 @@ const ALLOWED_FIELDS = [
   'website_title',
   'website_bio',
   'display_order',
+  'author_bio',
 ];
 
 export async function POST(request: NextRequest) {
@@ -142,6 +143,7 @@ export async function POST(request: NextRequest) {
       website_title: 'Website Title',
       website_bio: 'Website Bio',
       display_order: 'Display Order',
+      author_bio: 'Author Bio',
     };
 
     const formatValue = (val: unknown): string => {
