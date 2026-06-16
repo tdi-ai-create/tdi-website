@@ -30,6 +30,7 @@ export interface UserMembership {
   source: MembershipSource;
   status: MembershipStatus;
   org_id?: string | null;
+  expires_at?: string | null;
 }
 
 export interface ContentAccess {
@@ -82,9 +83,14 @@ export function getEffectiveTier(
 ): MembershipTier {
   // Base tier from membership
   let baseTier: MembershipTier = 'free';
-  if (membership?.status === 'active') {
-    if (membership.source === 'district_partner') return 'all_access';
-    baseTier = membership.tier;
+  if (membership?.status === 'active' || membership?.status === 'trial') {
+    // Check expires_at — if set and in the past, treat as expired (downgrade to free)
+    if (membership.expires_at && new Date(membership.expires_at).getTime() <= Date.now()) {
+      // Membership has expired — baseTier stays 'free'
+    } else {
+      if (membership.source === 'district_partner') return 'all_access';
+      baseTier = membership.tier;
+    }
   }
 
   // Check for unexpired tier overrides -- take the highest

@@ -75,6 +75,9 @@ import {
   GraduationCap,
   Heart,
   Info,
+  UserPlus,
+  Copy,
+  Gift,
 } from 'lucide-react';
 import {
   TYPE_PAGE_TITLE,
@@ -187,6 +190,298 @@ function EmptyState({ icon: Icon, title, description }: { icon: React.ElementTyp
   );
 }
 
+// ============= GRANT FREE ACCESS MODAL =============
+
+function GrantAccessModal({ onClose }: { onClose: () => void }) {
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [tier, setTier] = useState<string>('all_access');
+  const [durationDays, setDurationDays] = useState<number>(30);
+  const [customDate, setCustomDate] = useState('');
+  const [useCustomDate, setUseCustomDate] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [result, setResult] = useState<{
+    success: boolean;
+    email: string;
+    tier: string;
+    expiresAt: string;
+    inviteLink: string | null;
+    loginUrl: string;
+    isNewUser: boolean;
+  } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState<'link' | 'login' | null>(null);
+
+  const tierOptions = [
+    { value: 'essentials', label: 'Essentials' },
+    { value: 'professional', label: 'Professional' },
+    { value: 'all_access', label: 'All-Access' },
+  ];
+
+  const durationOptions = [
+    { value: 14, label: '14 days' },
+    { value: 30, label: '30 days' },
+    { value: 60, label: '60 days' },
+    { value: 90, label: '90 days' },
+  ];
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const body: Record<string, unknown> = { email, name, tier };
+      if (useCustomDate && customDate) {
+        body.customExpiry = customDate;
+      } else {
+        body.durationDays = durationDays;
+      }
+
+      const response = await fetch('/api/tdi-admin/grant-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Failed to grant access');
+        return;
+      }
+
+      setResult(data);
+    } catch {
+      setError('Network error. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const copyToClipboard = async (text: string, type: 'link' | 'login') => {
+    await navigator.clipboard.writeText(text);
+    setCopied(type);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const tierLabel = (t: string) => tierOptions.find(o => o.value === t)?.label || t;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
+      <div
+        className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between" style={{ backgroundColor: theme.accentLight }}>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${theme.accent}20` }}>
+              <Gift size={18} style={{ color: theme.accent }} />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-gray-900">Grant Free Access</h2>
+              <p className="text-xs text-gray-500">Give a prospect or partner time-limited hub access</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+            <X size={18} className="text-gray-400" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="px-6 py-5">
+          {result ? (
+            /* ── Success State ── */
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                  <Check size={16} className="text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    Access granted{result.isNewUser ? ' (new account created)' : ' (existing account updated)'}
+                  </p>
+                  <p className="text-xs text-gray-500">{result.email} &mdash; {tierLabel(result.tier)} until {new Date(result.expiresAt).toLocaleDateString()}</p>
+                </div>
+              </div>
+
+              {/* Invite Link */}
+              {result.inviteLink && (
+                <div className="mb-3">
+                  <label className="text-xs font-medium text-gray-600 mb-1 block">Invite Link (one-time use)</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={result.inviteLink}
+                      className="flex-1 px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg font-mono truncate"
+                    />
+                    <button
+                      onClick={() => copyToClipboard(result.inviteLink!, 'link')}
+                      className="px-3 py-2 text-xs font-medium rounded-lg border border-gray-200 hover:bg-gray-50 flex items-center gap-1.5 transition-colors"
+                    >
+                      {copied === 'link' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                      {copied === 'link' ? 'Copied' : 'Copy'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Login URL fallback */}
+              <div className="mb-4">
+                <label className="text-xs font-medium text-gray-600 mb-1 block">Or share the login page</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={result.loginUrl}
+                    className="flex-1 px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg font-mono truncate"
+                  />
+                  <button
+                    onClick={() => copyToClipboard(result.loginUrl, 'login')}
+                    className="px-3 py-2 text-xs font-medium rounded-lg border border-gray-200 hover:bg-gray-50 flex items-center gap-1.5 transition-colors"
+                  >
+                    {copied === 'login' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                    {copied === 'login' ? 'Copied' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                onClick={onClose}
+                className="w-full py-2.5 text-sm font-medium rounded-lg transition-colors text-white"
+                style={{ backgroundColor: theme.accent }}
+              >
+                Done
+              </button>
+            </div>
+          ) : (
+            /* ── Form State ── */
+            <form onSubmit={handleSubmit}>
+              {error && (
+                <div className="mb-4 px-3 py-2 rounded-lg bg-red-50 border border-red-200 flex items-center gap-2">
+                  <AlertCircle size={14} className="text-red-500 flex-shrink-0" />
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              )}
+
+              {/* Email */}
+              <div className="mb-4">
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Email <span className="text-red-400">*</span></label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="prospect@school.edu"
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
+                />
+              </div>
+
+              {/* Name */}
+              <div className="mb-4">
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Name <span className="text-gray-400 font-normal">(optional)</span></label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="First Last"
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
+                />
+              </div>
+
+              {/* Tier */}
+              <div className="mb-4">
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Membership Tier</label>
+                <div className="flex gap-2">
+                  {tierOptions.map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setTier(opt.value)}
+                      className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                        tier === opt.value
+                          ? 'border-[#00B5AD] bg-[#00B5AD]/10 text-[#00B5AD]'
+                          : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Duration */}
+              <div className="mb-5">
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Duration</label>
+                <div className="flex gap-2 mb-2">
+                  {durationOptions.map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => { setDurationDays(opt.value); setUseCustomDate(false); }}
+                      className={`flex-1 px-2 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                        !useCustomDate && durationDays === opt.value
+                          ? 'border-[#00B5AD] bg-[#00B5AD]/10 text-[#00B5AD]'
+                          : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setUseCustomDate(true)}
+                    className={`px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                      useCustomDate
+                        ? 'border-[#00B5AD] bg-[#00B5AD]/10 text-[#00B5AD]'
+                        : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    Custom
+                  </button>
+                  {useCustomDate && (
+                    <input
+                      type="date"
+                      value={customDate}
+                      onChange={e => setCustomDate(e.target.value)}
+                      min={new Date().toISOString().split('T')[0]}
+                      className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
+                    />
+                  )}
+                </div>
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={isSubmitting || !email || (useCustomDate && !customDate)}
+                className="w-full py-2.5 text-sm font-medium rounded-lg text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                style={{ backgroundColor: theme.accent }}
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Granting access...
+                  </>
+                ) : (
+                  <>
+                    <Gift size={16} />
+                    Grant Free Access
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ============= TAB COMPONENTS =============
 
 // ACCOUNTS TAB
@@ -199,6 +494,7 @@ function AccountsTab() {
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState<string | null>(null);
+  const [showGrantModal, setShowGrantModal] = useState(false);
   const perPage = 50;
 
   useEffect(() => {
@@ -376,7 +672,17 @@ function AccountsTab() {
           <Download size={16} />
           Export CSV
         </button>
+        <button
+          onClick={() => setShowGrantModal(true)}
+          className="px-4 py-2 rounded-lg text-sm text-white font-medium flex items-center gap-2 transition-colors hover:opacity-90"
+          style={{ backgroundColor: theme.accent }}
+        >
+          <Gift size={16} />
+          Grant Free Access
+        </button>
       </div>
+
+      {showGrantModal && <GrantAccessModal onClose={() => setShowGrantModal(false)} />}
 
       {/* Stats Row */}
       <div className="grid grid-cols-4 gap-4 mb-6">

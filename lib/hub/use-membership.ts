@@ -58,7 +58,7 @@ export function useMembership(): UseMembershipResult {
       const [membershipResult, overridesResult] = await Promise.all([
         supabase
           .from('hub_memberships')
-          .select('tier, source, status, org_id')
+          .select('tier, source, status, org_id, expires_at')
           .eq('user_id', user.id)
           .single(),
         supabase
@@ -81,6 +81,7 @@ export function useMembership(): UseMembershipResult {
           source: membershipResult.data.source as UserMembership['source'],
           status: membershipResult.data.status as UserMembership['status'],
           org_id: membershipResult.data.org_id,
+          expires_at: membershipResult.data.expires_at,
         });
       }
 
@@ -135,7 +136,7 @@ export async function getMembership(userId: string): Promise<{
   const [membershipResult, overridesResult] = await Promise.all([
     supabase
       .from('hub_memberships')
-      .select('tier, source, status, org_id')
+      .select('tier, source, status, org_id, expires_at')
       .eq('user_id', userId)
       .single(),
     supabase
@@ -151,6 +152,7 @@ export async function getMembership(userId: string): Promise<{
         source: membershipResult.data.source as UserMembership['source'],
         status: membershipResult.data.status as UserMembership['status'],
         org_id: membershipResult.data.org_id,
+        expires_at: membershipResult.data.expires_at,
       }
     : null;
 
