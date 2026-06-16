@@ -838,23 +838,27 @@ export default function SalesPage() {
                 return
               }
               setBatchEnriching(true)
-              setEnrichProgress(`0/${unscored.length}`)
+              const batch = unscored.slice(0, 20)
+              setEnrichProgress(`0/${batch.length}`)
               let done = 0
-              for (const opp of unscored.slice(0, 20)) {
-                try {
-                  await fetch('/api/leads/enrich', {
+              // Process in parallel batches of 5 for speed
+              for (let i = 0; i < batch.length; i += 5) {
+                const chunk = batch.slice(i, i + 5)
+                await Promise.allSettled(chunk.map(opp =>
+                  fetch('/api/leads/enrich', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ lead_id: opp.supabase_id }),
-                  })
-                } catch {}
-                done++
-                setEnrichProgress(`${done}/${Math.min(unscored.length, 20)}`)
+                  }).catch(() => {})
+                ))
+                done += chunk.length
+                setEnrichProgress(`${done}/${batch.length}`)
+                loadAll() // refresh after each batch
               }
-              showToastMsg(`Enrichment triggered for ${done} leads. Scores will populate as research completes.`, 'success')
+              showToastMsg(`Enrichment complete for ${done} leads.`, 'success')
               setBatchEnriching(false)
               setEnrichProgress('')
-              setTimeout(loadAll, 5000)
+              loadAll()
             }}
             style={{
               fontSize: 11, fontWeight: 600, cursor: batchEnriching ? 'wait' : 'pointer',
