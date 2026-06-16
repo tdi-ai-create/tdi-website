@@ -169,7 +169,7 @@ export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRe
         return
       }
       if (data.error) {
-        setEnrichError(data.error)
+        setEnrichError(data.details || data.error)
         setEnriching(false)
         return
       }
