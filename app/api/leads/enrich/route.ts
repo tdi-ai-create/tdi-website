@@ -52,6 +52,18 @@ export async function POST(req: NextRequest) {
   // Run enrichment with full error catching
   let result: any;
   try {
+    // Fetch recent notes for additional context
+    let notesContext = lead.notes || '';
+    const { data: recentNotes } = await supabase
+      .from('sales_opportunity_notes')
+      .select('body')
+      .eq('opportunity_id', lead_id)
+      .order('created_at', { ascending: false })
+      .limit(3);
+    if (recentNotes?.length) {
+      notesContext = [notesContext, ...recentNotes.map((n: any) => n.body)].filter(Boolean).join(' | ');
+    }
+
     result = await enrichLead({
       district_name: lead.name,
       contact_name: lead.contact_name,
@@ -59,7 +71,7 @@ export async function POST(req: NextRequest) {
       source: lead.source,
       state_code: lead.state || lead.state_code,
       contact_email: lead.contact_email,
-      notes: lead.notes,
+      notes: notesContext,
     });
   } catch (enrichErr: any) {
     console.error('[enrich] enrichLead threw:', enrichErr?.message || enrichErr);

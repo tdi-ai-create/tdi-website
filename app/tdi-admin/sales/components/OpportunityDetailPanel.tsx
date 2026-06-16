@@ -82,6 +82,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
   const [loading, setLoading] = useState(false)
   const [fetchError, setFetchError] = useState('')
   const [activeTab, setActiveTab] = useState<TabId>('notes')
+  const [expanded, setExpanded] = useState(false)
   const prevIdRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -185,10 +186,21 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
 
       {/* Slide-in panel */}
       <div
-        className="fixed right-0 top-0 h-full w-full sm:w-[480px] bg-white z-50 shadow-2xl flex flex-col"
+        className={`fixed right-0 top-0 h-full w-full ${expanded ? 'sm:w-[720px]' : 'sm:w-[480px]'} bg-white z-50 shadow-2xl flex flex-col transition-all duration-200`}
         role="dialog"
         aria-modal="true"
       >
+        {/* Expand/collapse toggle */}
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 bg-white border border-gray-200 rounded-l-lg px-1 py-3 shadow-md hover:bg-gray-50 z-10 hidden sm:block"
+          title={expanded ? 'Collapse panel' : 'Expand panel'}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            {expanded ? <path d="M13 17l5-5-5-5M6 17l5-5-5-5" /> : <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5" />}
+          </svg>
+        </button>
+
         {loading && (
           <div className="flex-1 p-6 space-y-4 animate-pulse">
             <div className="h-7 bg-gray-100 rounded w-3/4" />
