@@ -149,6 +149,9 @@ export async function PUT(
       org_name,
       org_partnership_goal,
       org_success_targets,
+      address_city,
+      address_state,
+      address_zip,
       ...partnershipFields
     } = body;
 
@@ -193,6 +196,15 @@ export async function PUT(
     }
     if (org_success_targets !== undefined) {
       orgUpdateFields.success_targets = org_success_targets;
+    }
+    if (address_city !== undefined) {
+      orgUpdateFields.address_city = address_city;
+    }
+    if (address_state !== undefined) {
+      orgUpdateFields.address_state = address_state;
+    }
+    if (address_zip !== undefined) {
+      orgUpdateFields.address_zip = address_zip;
     }
 
     // Update organization if there are fields to update

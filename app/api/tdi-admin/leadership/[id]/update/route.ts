@@ -73,6 +73,8 @@ export async function PATCH(
       'obs_days_total',
       'virtual_sessions_total',
       'executive_sessions_total',
+      'address',
+      'website',
     ];
 
     // Organization table fields
@@ -83,6 +85,9 @@ export async function PATCH(
       'state',
       'zip',
       'website',
+      'address_city',
+      'address_state',
+      'address_zip',
     ];
 
     const supabase = getServiceSupabase();

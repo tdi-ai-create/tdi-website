@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
+import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { hasPermission } from '@/lib/tdi-admin/permissions';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
 import {
@@ -495,6 +496,9 @@ function AccountsTab() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState<string | null>(null);
   const [showGrantModal, setShowGrantModal] = useState(false);
+  const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
+  const [editingUser, setEditingUser] = useState<Record<string, any>>({});
+  const [savingUser, setSavingUser] = useState(false);
   const perPage = 50;
 
   useEffect(() => {
@@ -725,8 +729,25 @@ function AccountsTab() {
                 const gradeLevel = onboarding?.grade_level || '-';
                 const isSelected = selectedIds.has(account.id);
                 return (
-                  <tr key={account.id} className={`${isSelected ? 'bg-blue-50' : i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAF8]'}`}>
-                    <td className="px-3 py-3">
+                  <React.Fragment key={account.id}>
+                  <tr
+                    className={`${isSelected ? 'bg-blue-50' : i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAF8]'} cursor-pointer hover:bg-gray-50 transition-colors`}
+                    onClick={() => {
+                      if (expandedUserId === account.id) {
+                        setExpandedUserId(null);
+                      } else {
+                        setExpandedUserId(account.id);
+                        setEditingUser({
+                          display_name: account.display_name || '',
+                          role: account.role || 'teacher',
+                          membership_tier: account.membership_tier || 'free',
+                          school_name: (account.onboarding_data as any)?.school_name || '',
+                          email: account.email || '',
+                        });
+                      }
+                    }}
+                  >
+                    <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
                       <input
                         type="checkbox"
                         checked={isSelected}
@@ -734,7 +755,10 @@ function AccountsTab() {
                         className="rounded border-gray-300"
                       />
                     </td>
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{account.display_name || 'No name'}</td>
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                      {account.display_name || 'No name'}
+                      <ChevronDown size={12} className={`inline ml-1 text-gray-400 transition-transform ${expandedUserId === account.id ? 'rotate-180' : ''}`} />
+                    </td>
                     <td className="px-4 py-3 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         account.role === 'school_leader' ? 'bg-purple-100 text-purple-700' :
@@ -764,6 +788,105 @@ function AccountsTab() {
                       )}
                     </td>
                   </tr>
+                  {expandedUserId === account.id && (
+                    <tr key={`${account.id}-detail`}>
+                      <td colSpan={7} className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div>
+                            <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Display Name</label>
+                            <input
+                              type="text"
+                              value={editingUser.display_name || ''}
+                              onChange={(e) => setEditingUser(prev => ({ ...prev, display_name: e.target.value }))}
+                              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#00B5AD]"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Email</label>
+                            <p className="text-sm text-gray-700 py-1.5">{account.email}</p>
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Role</label>
+                            <select
+                              value={editingUser.role || 'teacher'}
+                              onChange={(e) => setEditingUser(prev => ({ ...prev, role: e.target.value }))}
+                              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#00B5AD]"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <option value="teacher">Teacher</option>
+                              <option value="school_leader">School Leader</option>
+                              <option value="coach">Coach</option>
+                              <option value="para">Para</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Membership Tier</label>
+                            <select
+                              value={editingUser.membership_tier || 'free'}
+                              onChange={(e) => setEditingUser(prev => ({ ...prev, membership_tier: e.target.value }))}
+                              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#00B5AD]"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <option value="free">Free</option>
+                              <option value="essentials">Essentials</option>
+                              <option value="professional">Professional</option>
+                              <option value="all_access">All Access</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">School/Org</label>
+                            <input
+                              type="text"
+                              value={editingUser.school_name || ''}
+                              onChange={(e) => setEditingUser(prev => ({ ...prev, school_name: e.target.value }))}
+                              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#00B5AD]"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Joined</label>
+                            <p className="text-sm text-gray-700 py-1.5">{new Date(account.created_at).toLocaleDateString()}</p>
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Partnership</label>
+                            <p className="text-sm text-gray-700 py-1.5">{account.partnership_id || 'None'}</p>
+                          </div>
+                          <div className="flex items-end">
+                            <button
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                setSavingUser(true);
+                                try {
+                                  const hubDb = getSupabase();
+                                  const updates: Record<string, any> = {};
+                                  if (editingUser.display_name !== account.display_name) updates.display_name = editingUser.display_name;
+                                  if (editingUser.role !== account.role) updates.role = editingUser.role;
+                                  if (editingUser.membership_tier !== account.membership_tier) updates.membership_tier = editingUser.membership_tier;
+                                  if (editingUser.school_name !== ((account.onboarding_data as any)?.school_name || '')) {
+                                    updates.onboarding_data = { ...(account.onboarding_data || {}), school_name: editingUser.school_name };
+                                  }
+                                  if (Object.keys(updates).length > 0) {
+                                    const { error } = await hubDb.from('hub_profiles').update(updates).eq('id', account.id);
+                                    if (!error) {
+                                      setAccounts(prev => prev.map(a => a.id === account.id ? { ...a, ...updates } : a));
+                                    }
+                                  }
+                                } catch {}
+                                setSavingUser(false);
+                              }}
+                              disabled={savingUser}
+                              className="px-4 py-1.5 rounded-lg text-xs font-medium text-white transition-colors"
+                              style={{ backgroundColor: savingUser ? '#9CA3AF' : '#00B5AD' }}
+                            >
+                              {savingUser ? 'Saving...' : 'Save Changes'}
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                  </React.Fragment>
                 );
               })
             )}
@@ -962,13 +1085,37 @@ function EnrollmentsTab() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        enrollment.status === 'completed' ? 'bg-green-100 text-green-700' :
-                        enrollment.status === 'active' ? 'bg-blue-100 text-blue-700' :
-                        'bg-gray-100 text-gray-700'
-                      }`}>
-                        {enrollment.status}
-                      </span>
+                      <select
+                        value={enrollment.status}
+                        onChange={async (e) => {
+                          const newStatus = e.target.value;
+                          try {
+                            const hubDb = getSupabase();
+                            const updates: Record<string, any> = { status: newStatus };
+                            if (newStatus === 'completed') {
+                              updates.completed_at = new Date().toISOString();
+                              updates.progress_pct = 100;
+                            }
+                            if (newStatus === 'active' && enrollment.status === 'completed') {
+                              updates.completed_at = null;
+                            }
+                            const { error } = await hubDb.from('hub_enrollments').update(updates).eq('id', enrollment.id);
+                            if (!error) {
+                              setEnrollments(prev => prev.map(en => en.id === enrollment.id ? { ...en, ...updates } : en));
+                            }
+                          } catch {}
+                        }}
+                        className={`px-2 py-1 rounded-full text-xs font-medium border-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#00B5AD] ${
+                          enrollment.status === 'completed' ? 'bg-green-100 text-green-700' :
+                          enrollment.status === 'active' ? 'bg-blue-100 text-blue-700' :
+                          enrollment.status === 'dropped' ? 'bg-red-100 text-red-700' :
+                          'bg-gray-100 text-gray-700'
+                        }`}
+                      >
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="dropped">Dropped</option>
+                      </select>
                     </td>
                   </tr>
                 );

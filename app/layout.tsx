@@ -11,6 +11,7 @@ import { SubstackPopup } from "@/components/SubstackPopup";
 import { SocialProofPopup } from "@/components/SocialProofPopup";
 import { MainSiteWrapper } from "@/components/layout/MainSiteWrapper";
 import { MomentModeProvider } from "@/components/hub/MomentModeContext";
+import { PostHogProvider } from "@/components/PostHogProvider";
 import DesiWrapper from "@/components/DesiWrapper";
 
 export const metadata: Metadata = {
@@ -75,6 +76,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <PostHogProvider>
         <MomentModeProvider>
           <GoogleAnalytics />
           <MicrosoftClarity />
@@ -94,6 +96,7 @@ export default function RootLayout({
           </MainSiteWrapper>
           <DesiWrapper />
         </MomentModeProvider>
+        </PostHogProvider>
       </body>
     </html>
   );

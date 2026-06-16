@@ -1562,6 +1562,82 @@ export default function AdminPartnershipDetailPage() {
                     <p className="text-sm text-gray-700">{partnership?.slug ? `/partners/${partnership.slug}` : 'Not set'}</p>
                   )}
                 </div>
+
+                {/* Address */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                    Address
+                  </label>
+                  {editMode ? (
+                    <InlineEditField
+                      partnershipId={partnershipId}
+                      field="address"
+                      value={partnership?.address}
+                      type="text"
+                      onSaved={(v) => setPartnership((p: any) => ({ ...p, address: v }))}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700">{partnership?.address || '—'}</p>
+                  )}
+                </div>
+
+                {/* City */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                    City
+                  </label>
+                  {editMode ? (
+                    <InlineEditField
+                      partnershipId={partnershipId}
+                      field="address_city"
+                      value={(organization as any)?.address_city}
+                      type="text"
+                      onSaved={(v) => setOrganization((o: any) => ({ ...o, address_city: v }))}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700">{(organization as any)?.address_city || '—'}</p>
+                  )}
+                </div>
+
+                {/* State */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                    State
+                  </label>
+                  {editMode ? (
+                    <InlineEditField
+                      partnershipId={partnershipId}
+                      field="address_state"
+                      value={(organization as any)?.address_state}
+                      type="text"
+                      onSaved={(v) => setOrganization((o: any) => ({ ...o, address_state: v }))}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700">{(organization as any)?.address_state || '—'}</p>
+                  )}
+                </div>
+
+                {/* Website */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
+                    Website
+                  </label>
+                  {editMode ? (
+                    <InlineEditField
+                      partnershipId={partnershipId}
+                      field="website"
+                      value={partnership?.website}
+                      type="text"
+                      onSaved={(v) => setPartnership((p: any) => ({ ...p, website: v }))}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700">
+                      {partnership?.website ? (
+                        <a href={partnership.website.startsWith('http') ? partnership.website : `https://${partnership.website}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{partnership.website}</a>
+                      ) : '—'}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
