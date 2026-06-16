@@ -334,7 +334,7 @@ export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRe
           <InfoRow label="Teachers" value={district.num_teachers?.toLocaleString()} />
           <InfoRow label="State" value={district.state} />
           <InfoRow label="Type" value={district.district_type} />
-          {district.demographics && (
+          {district.demographics && typeof district.demographics === 'string' && (
             <InfoRow label="Demographics" value={district.demographics} />
           )}
         </InfoSection>
