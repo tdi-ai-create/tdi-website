@@ -9,6 +9,7 @@ import { FilterPanel, EMPTY_FILTERS, type ActiveFilters } from './components/Fil
 import { KanbanColumn } from './components/KanbanColumn'
 import { SalesCard, type SalesCardOpp } from './components/SalesCard'
 import AddLeadModal from '@/components/sales/AddLeadModal'
+import { generateOutreachEmail } from '@/lib/salesEmailTemplates'
 import * as XLSX from 'xlsx'
 import { OpportunityDetailPanel, type FullOpportunity } from './components/OpportunityDetailPanel'
 import {
@@ -972,11 +973,46 @@ export default function SalesPage() {
                         {lead.contactName || 'No contact'} {lead.contactEmail ? `-- ${lead.contactEmail}` : ''} {lead.state ? `(${lead.state})` : ''}
                       </div>
                     </div>
-                    <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 16 }}>
-                      <div style={{ fontSize: 11, fontWeight: 600, color: lead.daysSince >= 30 ? '#EF4444' : lead.daysSince >= 14 ? '#F59E0B' : '#6B7280' }}>
-                        {lead.daysSince === 999 ? 'Never contacted' : `${lead.daysSince}d ago`}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginLeft: 16 }}>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: 11, fontWeight: 600, color: lead.daysSince >= 30 ? '#EF4444' : lead.daysSince >= 14 ? '#F59E0B' : '#6B7280' }}>
+                          {lead.daysSince === 999 ? 'Never contacted' : `${lead.daysSince}d ago`}
+                        </div>
+                        <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 2 }}>{lead.action}</div>
                       </div>
-                      <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 2 }}>{lead.action}</div>
+                      {lead.contactEmail && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            const templateType = lead.daysSince >= 30 ? 're_engagement' as const : lead.daysSince >= 14 ? 'follow_up' as const : 'initial' as const
+                            const email = generateOutreachEmail({
+                              name: lead.name,
+                              contactName: lead.contactName,
+                              state: lead.state,
+                              city: lead.city,
+                              tier: lead.tier,
+                            }, templateType)
+                            const mailto = `mailto:${lead.contactEmail}?subject=${encodeURIComponent(email.subject)}&body=${encodeURIComponent(email.body)}`
+                            window.open(mailto, '_blank')
+                            // Auto-log the outreach
+                            fetch(`/api/sales/opportunities/${lead.supabase_id}/notes`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                note_text: `Drafted ${templateType} email to ${lead.contactEmail}: "${email.subject}"`,
+                                note_type: 'email',
+                              }),
+                            }).catch(() => {})
+                          }}
+                          style={{
+                            fontSize: 10, fontWeight: 600, padding: '4px 10px', borderRadius: 6,
+                            background: '#4F46E5', color: 'white', border: 'none', cursor: 'pointer',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          Draft Email
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}

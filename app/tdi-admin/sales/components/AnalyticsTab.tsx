@@ -5,6 +5,7 @@ import { ConversionFunnel } from './ConversionFunnel'
 import { SourceAttribution } from './SourceAttribution'
 import { GeographyMap } from './GeographyMap'
 import { PipelineTrend } from './PipelineTrend'
+import { PipelineVelocity } from './PipelineVelocity'
 import { TeamPerformance } from './TeamPerformance'
 import { SegmentBreakdown } from './SegmentBreakdown'
 import { FactoredCalculator } from './FactoredCalculator'
@@ -25,12 +26,15 @@ interface AnalyticsData {
   byOwner: Record<string, { count: number; value: number; factored: number; won: number; lost: number }>
   byType: Record<string, { count: number; value: number; factored: number }>
   snapshots: { snapshot_date: string; total_pipeline: number; factored_pipeline: number; active_count: number }[]
+  velocity: { stage: string; avgDays: number; count: number }[]
 }
 
 export function AnalyticsTab({ opportunities = [] }: { opportunities?: { value: number | null; probability: number; stage: string; name: string }[] }) {
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [reportLoading, setReportLoading] = useState(false)
+  const [reportCopied, setReportCopied] = useState(false)
 
   useEffect(() => {
     fetch('/api/sales/analytics')
@@ -53,8 +57,39 @@ export function AnalyticsTab({ opportunities = [] }: { opportunities?: { value: 
   if (error) return <div style={{ padding: 40, textAlign: 'center', color: '#EF4444' }}>Failed to load: {error}</div>
   if (!data) return null
 
+  async function generateReport() {
+    setReportLoading(true)
+    try {
+      const res = await fetch('/api/sales/board-report')
+      const report = await res.json()
+      if (report.plainText) {
+        await navigator.clipboard.writeText(report.plainText)
+        setReportCopied(true)
+        setTimeout(() => setReportCopied(false), 3000)
+      }
+    } catch {
+      // silent fail
+    } finally {
+      setReportLoading(false)
+    }
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <button
+          onClick={generateReport}
+          disabled={reportLoading}
+          style={{
+            fontSize: 12, fontWeight: 600, padding: '6px 16px', borderRadius: 8,
+            background: reportCopied ? '#10B981' : '#0a0f1e', color: 'white',
+            border: 'none', cursor: reportLoading ? 'wait' : 'pointer',
+            transition: 'background 0.2s',
+          }}
+        >
+          {reportCopied ? 'Copied to clipboard' : reportLoading ? 'Generating...' : 'Generate Board Report'}
+        </button>
+      </div>
       <PulseSection pulse={data.pulse} />
 
       {opportunities.length > 0 && (
@@ -71,6 +106,10 @@ export function AnalyticsTab({ opportunities = [] }: { opportunities?: { value: 
 
       <Section title="Geography" subtitle="Where TDI is winning by state">
         <GeographyMap byState={data.byState} />
+      </Section>
+
+      <Section title="Pipeline Velocity" subtitle="How long deals spend in each stage -- highlights bottlenecks">
+        <PipelineVelocity velocity={data.velocity || []} />
       </Section>
 
       <Section title="Pipeline Trend" subtitle="How the pipeline has grown over time">

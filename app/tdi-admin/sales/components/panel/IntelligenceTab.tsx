@@ -78,6 +78,98 @@ function FitSlider({ label, description, value, onChange }: { label: string; des
   )
 }
 
+function RenewalRisk({ oppId }: { oppId: string }) {
+  const [data, setData] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
+  const [fetched, setFetched] = useState(false)
+
+  async function fetchRisk() {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/sales/opportunities/${oppId}/renewal-risk`)
+      const d = await res.json()
+      setData(d)
+    } catch {
+      setData({ error: 'Failed to load' })
+    } finally {
+      setLoading(false)
+      setFetched(true)
+    }
+  }
+
+  if (!fetched) {
+    return (
+      <InfoSection title="Renewal Risk (Hub Engagement)">
+        <div style={{ textAlign: 'center', padding: '8px 0' }}>
+          <button
+            onClick={fetchRisk}
+            disabled={loading}
+            style={{
+              fontSize: 11, fontWeight: 600, padding: '5px 14px', borderRadius: 6,
+              background: loading ? '#D1D5DB' : '#EEF2FF', color: loading ? '#6B7280' : '#4F46E5',
+              border: '1px solid #C7D2FE', cursor: loading ? 'wait' : 'pointer',
+            }}
+          >
+            {loading ? 'Checking...' : 'Check Hub Engagement Risk'}
+          </button>
+        </div>
+      </InfoSection>
+    )
+  }
+
+  if (!data?.matched) {
+    return (
+      <InfoSection title="Renewal Risk (Hub Engagement)">
+        <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>{data?.reason || 'No matching partnership found'}</p>
+      </InfoSection>
+    )
+  }
+
+  const riskColor = data.risk === 'high' ? '#EF4444' : data.risk === 'medium' ? '#F59E0B' : '#10B981'
+  const riskBg = data.risk === 'high' ? '#FEF2F2' : data.risk === 'medium' ? '#FFFBEB' : '#F0FDF4'
+  const f = data.factors || {}
+
+  return (
+    <InfoSection title="Renewal Risk (Hub Engagement)">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+        <div style={{
+          fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 6,
+          background: riskBg, color: riskColor, textTransform: 'uppercase',
+        }}>
+          {data.risk} risk
+        </div>
+        <span style={{ fontSize: 12, color: '#6B7280' }}>Score: {data.riskScore}/100</span>
+      </div>
+      {data.partnershipName && (
+        <p style={{ fontSize: 11, color: '#9CA3AF', margin: '0 0 8px' }}>Matched to: {data.partnershipName}</p>
+      )}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+        <div style={{ background: '#F9FAFB', borderRadius: 6, padding: '6px 8px' }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#111827' }}>{f.memberCount ?? '--'}</div>
+          <div style={{ fontSize: 10, color: '#6B7280' }}>Hub members</div>
+        </div>
+        <div style={{ background: '#F9FAFB', borderRadius: 6, padding: '6px 8px' }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#111827' }}>{f.loginRate ?? '--'}%</div>
+          <div style={{ fontSize: 10, color: '#6B7280' }}>30d login rate</div>
+        </div>
+        <div style={{ background: '#F9FAFB', borderRadius: 6, padding: '6px 8px' }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#111827' }}>{f.activeUsers7d ?? '--'}</div>
+          <div style={{ fontSize: 10, color: '#6B7280' }}>Active (7d)</div>
+        </div>
+        <div style={{ background: '#F9FAFB', borderRadius: 6, padding: '6px 8px' }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#111827' }}>{f.avgProgress ?? '--'}%</div>
+          <div style={{ fontSize: 10, color: '#6B7280' }}>Avg course progress</div>
+        </div>
+      </div>
+      {f.completedEnrollments > 0 && (
+        <p style={{ fontSize: 11, color: '#10B981', margin: '6px 0 0', fontWeight: 500 }}>
+          {f.completedEnrollments} course completion{f.completedEnrollments !== 1 ? 's' : ''}
+        </p>
+      )}
+    </InfoSection>
+  )
+}
+
 export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRefresh: () => void }) {
   const [enriching, setEnriching] = useState(false)
 
@@ -317,6 +409,11 @@ export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRe
           </div>
         )}
       </InfoSection>
+      )}
+
+      {/* Renewal Risk -- show for renewal/signed/paid type opps, or any with existing partnership */}
+      {(opp.type === 'renewal' || opp.stage === 'signed' || opp.stage === 'paid' || opp.stage === 'proposal_sent') && (
+        <RenewalRisk oppId={opp.id} />
       )}
 
       {/* Strategic Brief */}

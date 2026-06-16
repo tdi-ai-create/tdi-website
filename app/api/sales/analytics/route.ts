@@ -157,6 +157,62 @@ export async function GET() {
       // Table may not exist yet
     }
 
+    // Pipeline velocity: compute avg days in each stage from activity logs
+    let velocity: { stage: string; avgDays: number; count: number }[] = []
+    try {
+      const { data: activities } = await (supabase
+        .from('opportunity_activity') as any)
+        .select('opportunity_id, activity_type, old_value, new_value, created_at')
+        .eq('activity_type', 'stage_changed')
+        .order('created_at', { ascending: true })
+
+      if (activities?.length) {
+        // Group stage durations: track time between entering and leaving each stage
+        const stageDurations: Record<string, number[]> = {}
+        const oppLastStageTime: Record<string, { stage: string; at: number }> = {}
+
+        for (const a of activities) {
+          const oppId = a.opportunity_id
+          const prev = oppLastStageTime[oppId]
+          if (prev) {
+            const days = (new Date(a.created_at).getTime() - prev.at) / 86400000
+            if (days > 0 && days < 365) { // sanity cap
+              if (!stageDurations[prev.stage]) stageDurations[prev.stage] = []
+              stageDurations[prev.stage].push(days)
+            }
+          }
+          oppLastStageTime[oppId] = { stage: a.new_value, at: new Date(a.created_at).getTime() }
+        }
+
+        velocity = stageOrder.map(stage => {
+          const durations = stageDurations[stage] || []
+          const avgDays = durations.length ? Math.round(durations.reduce((s, d) => s + d, 0) / durations.length) : 0
+          return { stage, avgDays, count: durations.length }
+        }).filter(v => v.count > 0)
+      }
+
+      // Fallback: if no activity logs, estimate from stage_entered_at and created_at
+      if (velocity.length === 0) {
+        const stageGroups: Record<string, number[]> = {}
+        ;(opps || []).forEach((o: any) => {
+          if (o.stage_entered_at && o.created_at) {
+            const days = (new Date().getTime() - new Date(o.stage_entered_at).getTime()) / 86400000
+            if (days > 0 && days < 365) {
+              if (!stageGroups[o.stage]) stageGroups[o.stage] = []
+              stageGroups[o.stage].push(days)
+            }
+          }
+        })
+        velocity = stageOrder.map(stage => {
+          const durations = stageGroups[stage] || []
+          const avgDays = durations.length ? Math.round(durations.reduce((s, d) => s + d, 0) / durations.length) : 0
+          return { stage, avgDays, count: durations.length }
+        }).filter(v => v.count > 0)
+      }
+    } catch {
+      // Activity table may not exist
+    }
+
     return NextResponse.json({
       pulse: {
         totalPipeline: Math.round(totalPipeline),
@@ -173,6 +229,7 @@ export async function GET() {
       byOwner,
       byType,
       snapshots,
+      velocity,
     })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })

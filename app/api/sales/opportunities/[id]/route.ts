@@ -92,6 +92,11 @@ export async function PATCH(
     if (ALLOWED_PATCH_FIELDS.has(key)) updateFields[key] = rawFields[key]
   }
 
+  // Auto-set stage_entered_at when stage changes
+  if (updateFields.stage && updateFields.stage !== current.stage) {
+    updateFields.stage_entered_at = new Date().toISOString()
+  }
+
   // Auto-compute fit composite score and tier when any fit factor changes
   const fitFields = ['fit_district_size', 'fit_turnover_signal', 'fit_pd_investment', 'fit_budget_timing', 'fit_leadership_stability', 'fit_tdi_alignment']
   const hasFitChange = fitFields.some(f => f in updateFields)
