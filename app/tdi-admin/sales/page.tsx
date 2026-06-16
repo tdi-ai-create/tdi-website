@@ -21,7 +21,7 @@ import {
 import { HorizontalBarChart, DonutChart, DonutLegend, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts'
 
 type ViewMode = 'kanban' | 'list'
-type PageTab = 'pipeline' | 'analytics' | 'trash' | 'invoices' | 'hub-leads'
+type PageTab = 'pipeline' | 'analytics' | 'trash' | 'invoices' | 'hub-leads' | 'outreach'
 
 interface SalesOpportunity {
   id: string
@@ -893,6 +893,7 @@ export default function SalesPage() {
       <div style={{ display: 'flex', borderBottom: '1px solid #E5E7EB', marginBottom: 20, gap: 0 }}>
         {([
           { id: 'pipeline' as PageTab, label: 'Pipeline' },
+          { id: 'outreach' as PageTab, label: 'Outreach Queue' },
           { id: 'analytics' as PageTab, label: 'Analytics' },
           { id: 'hub-leads' as PageTab, label: 'Hub Leads' },
           ...(outstandingInvoices.length > 0 ? [{ id: 'invoices' as PageTab, label: `Outstanding Invoices (${outstandingInvoices.length})` }] : []),
@@ -913,6 +914,77 @@ export default function SalesPage() {
           </button>
         ))}
       </div>
+
+      {/* Outreach Queue Tab */}
+      {pageTab === 'outreach' && (() => {
+        const now = Date.now()
+        const staleLeads = activeOpps
+          .filter(o => !o.deleted_at && o.stage !== 'lost' && o.stage !== 'paid' && o.contactEmail)
+          .map(o => {
+            const daysSince = o.lastActivityAt ? Math.floor((now - new Date(o.lastActivityAt).getTime()) / 86400000) : 999
+            const tierWeight = o.tier === 'T1' ? 30 : o.tier === 'T2' ? 20 : 10
+            const priority = tierWeight + Math.min(daysSince, 60) + Math.min((o.value || 0) / 5000, 10)
+            let action = 'Initial outreach'
+            if (daysSince < 7) action = 'Follow up if no response'
+            else if (daysSince < 14) action = 'Follow-up email -- been a week'
+            else if (daysSince < 30) action = 'Re-engagement needed'
+            else if (daysSince >= 30) action = 'Dormant -- re-engage or archive'
+            if (!o.lastActivityAt) action = 'No contact yet -- initial outreach'
+            return { ...o, daysSince, priority, action, needsOutreach: daysSince >= 14 || !o.lastActivityAt }
+          })
+          .filter(o => o.needsOutreach)
+          .sort((a, b) => b.priority - a.priority)
+
+        return (
+          <div style={{ marginTop: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <div>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0a0f1e', margin: 0 }}>Outreach Queue</h2>
+                <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>{staleLeads.length} leads needing outreach -- sorted by priority (tier + staleness + value)</p>
+              </div>
+            </div>
+            {staleLeads.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF' }}>All leads are contacted. Nice work.</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {staleLeads.slice(0, 30).map(lead => (
+                  <div
+                    key={lead.supabase_id}
+                    onClick={() => setDetailPanelOppId(lead.supabase_id)}
+                    style={{
+                      background: 'white', border: '1px solid #E5E7EB', borderRadius: 10, padding: '12px 16px',
+                      cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      borderLeft: `3px solid ${lead.tier === 'T1' ? '#10B981' : lead.tier === 'T2' ? '#F59E0B' : '#D1D5DB'}`,
+                      transition: 'border-color 0.1s',
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#0a0f1e' }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#E5E7EB' }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#0a0f1e' }}>{lead.name}</span>
+                        {lead.tier && (
+                          <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: lead.tier === 'T1' ? '#D1FAE5' : lead.tier === 'T2' ? '#FEF3C7' : '#F3F4F6', color: lead.tier === 'T1' ? '#065F46' : lead.tier === 'T2' ? '#854D0E' : '#374151' }}>{lead.tier}</span>
+                        )}
+                        {lead.value && <span style={{ fontSize: 11, color: '#6B7280' }}>${(lead.value / 1000).toFixed(0)}K</span>}
+                      </div>
+                      <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
+                        {lead.contactName || 'No contact'} {lead.contactEmail ? `-- ${lead.contactEmail}` : ''} {lead.state ? `(${lead.state})` : ''}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 16 }}>
+                      <div style={{ fontSize: 11, fontWeight: 600, color: lead.daysSince >= 30 ? '#EF4444' : lead.daysSince >= 14 ? '#F59E0B' : '#6B7280' }}>
+                        {lead.daysSince === 999 ? 'Never contacted' : `${lead.daysSince}d ago`}
+                      </div>
+                      <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 2 }}>{lead.action}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )
+      })()}
 
       {/* Analytics Tab */}
       {pageTab === 'analytics' && <AnalyticsTab opportunities={activeOpps.map(o => ({ value: o.value, probability: o.probability, stage: o.stage, name: o.name }))} />}
