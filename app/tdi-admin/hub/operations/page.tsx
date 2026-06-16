@@ -194,6 +194,7 @@ function EmptyState({ icon: Icon, title, description }: { icon: React.ElementTyp
 // ============= GRANT FREE ACCESS MODAL =============
 
 function GrantAccessModal({ onClose }: { onClose: () => void }) {
+  const { teamMember } = useTDIAdmin();
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [tier, setTier] = useState<string>('all_access');
@@ -232,7 +233,7 @@ function GrantAccessModal({ onClose }: { onClose: () => void }) {
     setError(null);
 
     try {
-      const body: Record<string, unknown> = { email, name, tier };
+      const body: Record<string, unknown> = { email, name, tier, grantedBy: teamMember?.email || 'unknown' };
       if (useCustomDate && customDate) {
         body.customExpiry = customDate;
       } else {
