@@ -116,7 +116,25 @@ export async function POST(request: NextRequest) {
 
     if (memberError) {
       console.error('[GrantAccess] Membership error:', memberError);
-      return NextResponse.json({ error: 'Failed to create membership' }, { status: 500 });
+      // If granted_by column doesn't exist yet, retry without it
+      if (memberError.message?.includes('granted_by')) {
+        const { error: retryError } = await hub
+          .from('hub_memberships')
+          .upsert({
+            user_id: userId,
+            tier,
+            source: 'admin_assigned',
+            status: 'trial',
+            starts_at: new Date().toISOString(),
+            expires_at: expiresAt,
+          }, { onConflict: 'user_id' });
+        if (retryError) {
+          console.error('[GrantAccess] Retry membership error:', retryError);
+          return NextResponse.json({ error: 'Failed to create membership: ' + retryError.message }, { status: 500 });
+        }
+      } else {
+        return NextResponse.json({ error: 'Failed to create membership: ' + memberError.message }, { status: 500 });
+      }
     }
 
     // Generate a magic link so the admin can share it with the prospect
