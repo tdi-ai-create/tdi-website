@@ -101,40 +101,20 @@ export async function POST(request: NextRequest) {
       }, { onConflict: 'id' });
     }
 
-    // Create or update membership with comp access
-    const { error: memberError } = await hub
-      .from('hub_memberships')
-      .upsert({
-        user_id: userId,
-        tier,
-        source: 'admin_assigned',
-        status: 'trial',
-        starts_at: new Date().toISOString(),
-        expires_at: expiresAt,
-        granted_by: adminEmail,
-      }, { onConflict: 'user_id' });
+    // Create or update membership via RPC (bypasses PostgREST schema cache)
+    const { error: memberError } = await hub.rpc('grant_comp_access', {
+      p_user_id: userId,
+      p_tier: tier,
+      p_source: 'admin_assigned',
+      p_status: 'trial',
+      p_starts_at: new Date().toISOString(),
+      p_expires_at: expiresAt,
+      p_granted_by: adminEmail,
+    });
 
     if (memberError) {
       console.error('[GrantAccess] Membership error:', memberError);
-      // If granted_by column doesn't exist yet, retry without it
-      if (memberError.message?.includes('granted_by')) {
-        const { error: retryError } = await hub
-          .from('hub_memberships')
-          .upsert({
-            user_id: userId,
-            tier,
-            source: 'admin_assigned',
-            status: 'trial',
-            starts_at: new Date().toISOString(),
-            expires_at: expiresAt,
-          }, { onConflict: 'user_id' });
-        if (retryError) {
-          console.error('[GrantAccess] Retry membership error:', retryError);
-          return NextResponse.json({ error: 'Failed to create membership: ' + retryError.message }, { status: 500 });
-        }
-      } else {
-        return NextResponse.json({ error: 'Failed to create membership: ' + memberError.message }, { status: 500 });
-      }
+      return NextResponse.json({ error: 'Failed to create membership: ' + memberError.message }, { status: 500 });
     }
 
     // Generate a magic link so the admin can share it with the prospect
