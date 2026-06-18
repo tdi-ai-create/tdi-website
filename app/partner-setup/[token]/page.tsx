@@ -272,15 +272,27 @@ function PartnerSetupContent() {
             <AlertCircle className="w-8 h-8 text-red-600" />
           </div>
           <h1 className="text-2xl font-bold text-[#1e2749] mb-2">Invalid or Expired Link</h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-4">
             This invitation link is no longer valid. It may have already been used or has expired.
           </p>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 bg-[#1e2749] text-white px-6 py-3 rounded-xl hover:bg-[#2a3459] transition-colors"
-          >
-            Return Home
-          </Link>
+          <p className="text-sm text-gray-500 mb-6">
+            If you already have an account, <Link href="/partners/login" className="text-[#80a4ed] hover:underline font-medium">log in here</Link>.
+            Otherwise, contact us to request a new invite.
+          </p>
+          <div className="flex flex-col gap-3">
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center gap-2 bg-[#1e2749] text-white px-6 py-3 rounded-xl hover:bg-[#2a3459] transition-colors"
+            >
+              Return Home
+            </Link>
+            <a
+              href="mailto:rae@teachersdeserveit.com?subject=Partnership%20Invite%20Request"
+              className="inline-flex items-center justify-center gap-2 text-sm text-[#80a4ed] hover:underline"
+            >
+              Request a new invite
+            </a>
+          </div>
         </div>
       </div>
     );
@@ -405,11 +417,11 @@ function PartnerSetupContent() {
         {/* Progress */}
         <div className="px-8 pt-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-500">Step 1 of 4</span>
-            <span className="text-sm text-gray-500">25%</span>
+            <span className="text-sm text-gray-500">Step 1 of 3</span>
+            <span className="text-sm text-gray-500">33%</span>
           </div>
           <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full w-1/4 bg-[#4ecdc4] rounded-full" />
+            <div className="h-full w-1/3 bg-[#4ecdc4] rounded-full" />
           </div>
         </div>
 
@@ -466,11 +478,10 @@ function PartnerSetupContent() {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none transition-colors ${
-                  fieldErrors.email ? 'border-red-300 bg-red-50' : 'border-gray-200'
-                }`}
+                readOnly
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-600 cursor-not-allowed"
               />
+              <p className="text-xs text-gray-400 mt-1">This is the email your invitation was sent to.</p>
               {fieldErrors.email && (
                 <p className="text-sm text-red-500 mt-1 flex items-center gap-1">
                   {fieldErrors.email}

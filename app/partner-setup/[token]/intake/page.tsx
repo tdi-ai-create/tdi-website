@@ -198,44 +198,100 @@ function IntakeWizardContent() {
   };
 
   // CSV upload handler - simplified columns (no building)
+  const [csvParseMessage, setCsvParseMessage] = useState<string | null>(null);
+
   const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // File size check (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setCsvParseMessage('File is too large. Please use a CSV under 5MB.');
+      return;
+    }
+
     setCsvFileName(file.name);
+    setCsvParseMessage(null);
 
     const reader = new FileReader();
     reader.onload = (event) => {
       const text = event.target?.result as string;
       const lines = text.split('\n').filter(line => line.trim());
-      const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
 
-      const firstNameIdx = headers.findIndex(h => h.includes('first') && h.includes('name'));
-      const lastNameIdx = headers.findIndex(h => h.includes('last') && h.includes('name'));
-      const emailIdx = headers.findIndex(h => h.includes('email'));
-      const roleIdx = headers.findIndex(h => h.includes('role') || h.includes('title') || h.includes('position'));
+      if (lines.length < 2) {
+        setCsvParseMessage('CSV appears empty. Make sure it has a header row and at least one staff member.');
+        return;
+      }
+
+      const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/[^a-z0-9\s]/g, ''));
+
+      // Flexible header matching -- handles common variations
+      const firstNameIdx = headers.findIndex(h =>
+        (h.includes('first') && h.includes('name')) || h === 'firstname' || h === 'first'
+      );
+      const lastNameIdx = headers.findIndex(h =>
+        (h.includes('last') && h.includes('name')) || h === 'lastname' || h === 'last' || h === 'surname'
+      );
+      // Also check for a single "name" column (full name)
+      const fullNameIdx = firstNameIdx < 0 ? headers.findIndex(h => h === 'name' || h === 'full name' || h === 'fullname') : -1;
+      const emailIdx = headers.findIndex(h => h.includes('email') || h === 'e-mail');
+      const roleIdx = headers.findIndex(h =>
+        h.includes('role') || h.includes('title') || h.includes('position') || h.includes('job')
+      );
+
+      if (emailIdx < 0 && firstNameIdx < 0 && fullNameIdx < 0) {
+        setCsvParseMessage('Could not find name or email columns. Make sure your CSV has headers like "First Name", "Last Name", "Email".');
+        return;
+      }
 
       const staff: StaffMember[] = [];
+      const seenEmails = new Set<string>();
 
       for (let i = 1; i < lines.length; i++) {
         const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
 
-        if (values.length >= 3) {
-          const firstName = firstNameIdx >= 0 ? values[firstNameIdx] : values[0] || '';
-          const lastName = lastNameIdx >= 0 ? values[lastNameIdx] : values[1] || '';
-          const email = emailIdx >= 0 ? values[emailIdx] : values[2] || '';
+        if (values.length < 2) continue;
 
-          // Skip empty rows
-          if (!firstName && !lastName && !email) continue;
+        let firstName = '';
+        let lastName = '';
 
-          staff.push({
-            first_name: firstName,
-            last_name: lastName,
-            email: email,
-            role_title: roleIdx >= 0 ? values[roleIdx] : '',
-          });
+        if (fullNameIdx >= 0 && firstNameIdx < 0) {
+          // Split full name into first/last
+          const parts = (values[fullNameIdx] || '').split(/\s+/);
+          firstName = parts[0] || '';
+          lastName = parts.slice(1).join(' ') || '';
+        } else {
+          firstName = firstNameIdx >= 0 ? values[firstNameIdx] : values[0] || '';
+          lastName = lastNameIdx >= 0 ? values[lastNameIdx] : values[1] || '';
         }
+
+        const email = emailIdx >= 0 ? values[emailIdx] : values[2] || '';
+
+        // Skip empty rows
+        if (!firstName && !lastName && !email) continue;
+
+        // Deduplicate by email
+        const emailLower = email.toLowerCase();
+        if (emailLower && seenEmails.has(emailLower)) continue;
+        if (emailLower) seenEmails.add(emailLower);
+
+        staff.push({
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          role_title: roleIdx >= 0 ? values[roleIdx] : '',
+        });
       }
+
+      if (staff.length === 0) {
+        setCsvParseMessage('No staff members found in the file. Check that your data starts on row 2.');
+        return;
+      }
+
+      const messages: string[] = [];
+      if (roleIdx < 0) messages.push('No role column detected -- you can add roles manually.');
+      if (seenEmails.size < staff.length + (lines.length - 1 - staff.length)) messages.push('Duplicate emails were removed.');
+      setCsvParseMessage(messages.length > 0 ? messages.join(' ') : null);
 
       setStaffList(staff);
       setShowManualEntry(false);
@@ -407,6 +463,25 @@ function IntakeWizardContent() {
               </div>
             </div>
 
+            {/* What happens next */}
+            <div className="bg-[#F9FAFB] rounded-xl p-5 mb-6 text-left">
+              <p className="text-sm font-semibold text-[#1e2749] mb-3">What happens next:</p>
+              <div className="space-y-2.5">
+                <div className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#4ecdc4]/20 flex items-center justify-center text-[10px] font-bold text-[#2A9D8F] flex-shrink-0 mt-0.5">1</span>
+                  <p className="text-sm text-gray-600">Your {staffList.length} educators will receive Hub access within 24 hours.</p>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#4ecdc4]/20 flex items-center justify-center text-[10px] font-bold text-[#2A9D8F] flex-shrink-0 mt-0.5">2</span>
+                  <p className="text-sm text-gray-600">Your dashboard will update in real time as your team starts exploring.</p>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#4ecdc4]/20 flex items-center justify-center text-[10px] font-bold text-[#2A9D8F] flex-shrink-0 mt-0.5">3</span>
+                  <p className="text-sm text-gray-600">We&apos;ll reach out to schedule your first check-in call.</p>
+                </div>
+              </div>
+            </div>
+
             <button
               onClick={goToDashboard}
               className="w-full bg-[#1e2749] text-white py-4 rounded-xl font-semibold text-lg hover:bg-[#2a3459] transition-colors flex items-center justify-center gap-2"
@@ -414,6 +489,10 @@ function IntakeWizardContent() {
               Go to My Dashboard
               <ChevronRight className="w-5 h-5" />
             </button>
+
+            <p className="text-xs text-gray-400 mt-4">
+              Questions? Email <a href="mailto:rae@teachersdeserveit.com" className="text-[#80a4ed] hover:underline">rae@teachersdeserveit.com</a> anytime.
+            </p>
           </div>
         </main>
       </div>
@@ -555,8 +634,11 @@ function IntakeWizardContent() {
                     <div className="text-center py-6 border-2 border-dashed border-gray-200 rounded-xl">
                       <FileSpreadsheet className="w-10 h-10 mx-auto mb-3 text-gray-400" />
                       <h3 className="font-medium text-[#1e2749] mb-1">Upload Staff CSV</h3>
-                      <p className="text-sm text-gray-500 mb-4">
+                      <p className="text-sm text-gray-500 mb-1">
                         Columns: First Name, Last Name, Email, Role Title
+                      </p>
+                      <p className="text-xs text-gray-400 mb-4">
+                        Most formats work -- we&apos;ll match columns automatically. You can also use a single &quot;Name&quot; column.
                       </p>
 
                       <label className="inline-flex items-center gap-2 bg-[#1e2749] text-white px-5 py-2.5 rounded-lg hover:bg-[#2a3459] transition-colors cursor-pointer">
@@ -569,6 +651,12 @@ function IntakeWizardContent() {
                           className="hidden"
                         />
                       </label>
+
+                      {csvParseMessage && (
+                        <p className={`text-sm mt-3 ${csvParseMessage.includes('Could not') || csvParseMessage.includes('empty') || csvParseMessage.includes('too large') ? 'text-red-500' : 'text-amber-600'}`}>
+                          {csvParseMessage}
+                        </p>
+                      )}
 
                       <button
                         onClick={downloadTemplate}
