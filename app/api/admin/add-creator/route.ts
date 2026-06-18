@@ -48,6 +48,9 @@ export async function POST(request: Request) {
 
     if (creatorError) {
       console.error('[add-creator] Error creating creator:', creatorError);
+      if (creatorError.message?.includes('duplicate key') || creatorError.message?.includes('creators_email_key')) {
+        return NextResponse.json({ success: false, error: `A creator with email ${email} already exists` }, { status: 409 });
+      }
       return NextResponse.json({ success: false, error: creatorError.message }, { status: 500 });
     }
 

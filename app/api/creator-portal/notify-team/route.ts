@@ -11,53 +11,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Notification data structure - ready to connect to email service
-    // Options: SendGrid, Resend, Postmark, or a webhook to Slack/email
-    const notificationData = {
-      to: ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
-      subject: `Action Needed: ${creatorName} is waiting on TDI`,
-      body: `
+    const recipients = ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'];
+    const subject = `Action Needed: ${creatorName} is waiting on TDI`;
+    const body = `
 Creator: ${creatorName} (${creatorEmail})
 Waiting on: ${milestoneName}
 
-View in Admin Portal: https://www.teachersdeserveit.com/admin/creators/${creatorId}
-      `.trim(),
-      metadata: {
-        creatorId,
-        creatorEmail,
-        milestoneName,
-        timestamp: new Date().toISOString(),
-      },
-    };
+View in Admin Portal: https://www.teachersdeserveit.com/tdi-admin/creators/${creatorId}
+    `.trim();
 
-    // Log the notification for now
-    // TODO: Connect to email service (SendGrid, Resend, etc.)
-    console.log('[notify-team] Team notification:', JSON.stringify(notificationData, null, 2));
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (resendApiKey) {
+      try {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${resendApiKey}`,
+          },
+          body: JSON.stringify({
+            from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
+            to: recipients,
+            subject,
+            text: body,
+          }),
+        });
+      } catch (emailError) {
+        console.error('[notify-team] Email send error:', emailError);
+        // Non-fatal -- log but don't fail the request
+      }
+    } else {
+      console.warn('[notify-team] RESEND_API_KEY not set, notification logged only');
+    }
 
-    // You can add email sending logic here later:
-    //
-    // Example with Resend:
-    // const resend = new Resend(process.env.RESEND_API_KEY);
-    // await resend.emails.send({
-    //   from: 'Creator Portal <portal@teachersdeserveit.com>',
-    //   to: notificationData.to,
-    //   subject: notificationData.subject,
-    //   text: notificationData.body,
-    // });
-    //
-    // Example with SendGrid:
-    // const sgMail = require('@sendgrid/mail');
-    // sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-    // await sgMail.send({
-    //   to: notificationData.to,
-    //   from: 'portal@teachersdeserveit.com',
-    //   subject: notificationData.subject,
-    //   text: notificationData.body,
-    // });
+    console.log('[notify-team] Team notification:', { creatorName, milestoneName, creatorId });
 
     return NextResponse.json({
       success: true,
-      message: 'Notification logged (email integration pending)',
+      message: 'Team notified',
     });
   } catch (error) {
     console.error('[notify-team] Error:', error);

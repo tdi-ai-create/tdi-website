@@ -25,6 +25,20 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
+    // Validate milestone exists
+    const { data: milestoneExists } = await supabase
+      .from('milestones')
+      .select('id')
+      .eq('id', milestoneId)
+      .maybeSingle();
+
+    if (!milestoneExists) {
+      return NextResponse.json({
+        success: false,
+        error: `Milestone '${milestoneId}' does not exist`
+      }, { status: 404 });
+    }
+
     // 1. Try to save the submission (table may not exist yet)
     const { error: submitError } = await supabase
       .from('creator_submissions')
