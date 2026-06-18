@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission } from '@/lib/tdi-admin/permissions';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
@@ -259,6 +259,7 @@ function PortalAccessCell({
 }
 
 export default function LeadershipDashboardPage() {
+  const router = useRouter();
   const { permissions, isOwner, teamMember } = useTDIAdmin();
   const [activeTab, setActiveTab] = useState<TabId>('partnerships');
 
@@ -800,7 +801,8 @@ export default function LeadershipDashboardPage() {
                       filteredPartnerships.map((partnership) => (
                         <tr
                           key={partnership.id}
-                          className="hover:bg-gray-50 transition-colors"
+                          className="hover:bg-gray-50 transition-colors cursor-pointer"
+                          onClick={() => router.push(`/tdi-admin/leadership/${partnership.id}`)}
                         >
                           {/* Organization */}
                           <td className="px-4 py-3">
@@ -819,12 +821,13 @@ export default function LeadershipDashboardPage() {
                                 )}
                               </div>
                               <div className="min-w-0">
-                                <p
-                                  className="font-medium truncate"
+                                <Link
+                                  href={`/tdi-admin/leadership/${partnership.id}`}
+                                  className="font-medium truncate block hover:underline"
                                   style={{ color: '#2B3A67' }}
                                 >
                                   {partnership.org_name || partnership.contact_name}
-                                </p>
+                                </Link>
                                 <p className="text-xs text-gray-500">
                                   {(partnership.staff_count ?? 0) > 0
                                     ? `${partnership.staff_count} educators`

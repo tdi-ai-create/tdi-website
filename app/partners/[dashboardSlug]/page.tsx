@@ -336,23 +336,20 @@ const Tooltip = ({
   );
 };
 
-// Example Preview component for Day 1 dashboards
+// Empty state for sections that don't have data yet
 const ExamplePreview = ({ children, message }: { children: React.ReactNode; message?: string }) => {
+  // Show clean empty state instead of fake data
   return (
-    <div className="relative border-2 border-dashed border-[#FFBA06] rounded-xl overflow-hidden">
-      {/* Yellow banner */}
-      <div className="bg-[#FFBA06]/10 border-b border-[#FFBA06]/30 px-4 py-2 flex flex-wrap items-center gap-2">
-        <svg className="w-4 h-4 text-[#d97706] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-        </svg>
-        <span className="text-sm font-medium text-[#92400e]">
-          {message || "This is an example - your data will appear here as your partnership progresses."}
-        </span>
+    <div className="rounded-2xl border border-gray-100 bg-gray-50/50 p-6 text-center">
+      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
+        <Clock className="w-5 h-5 text-gray-400" />
       </div>
-      {/* Example content with slight opacity to reinforce "not real" */}
-      <div className="opacity-75 pointer-events-none select-none">
-        {children}
-      </div>
+      <p className="text-sm font-medium text-gray-600 mb-1">Coming Soon</p>
+      <p className="text-xs text-gray-400 max-w-md mx-auto">
+        {message || "This section will populate with real data as your partnership progresses."}
+      </p>
+      {/* Keep children hidden -- preserves layout but doesn't confuse with fake data */}
+      <div className="hidden">{children}</div>
     </div>
   );
 };
@@ -387,6 +384,7 @@ export default function PartnerDashboard() {
   const [suggestions, setSuggestions] = useState<TDISuggestion[]>([]);
   const [sessionRecords, setSessionRecords] = useState<SessionRecord[]>([]);
   const [hubIntel, setHubIntel] = useState<Record<string, unknown> | null>(null);
+  const [observationImpact, setObservationImpact] = useState<{ has_data: boolean; observations: { event_title: string; event_date: string; before_logins: number; after_logins: number; engagement_change_pct: number; before_mood: number | null; after_mood: number | null; mood_change: number | null; before_quick_wins: number; after_quick_wins: number }[] } | null>(null);
   const [hubStats, setHubStats] = useState<{
     has_real_data: boolean
     member_count: number
@@ -600,6 +598,17 @@ export default function PartnerDashboard() {
         }
       } catch (intelError) {
         console.error('Error fetching hub intelligence:', intelError);
+      }
+
+      // Fetch Observation Impact (before/after metrics around visits)
+      try {
+        const impactResponse = await fetch(`/api/partnerships/${partnershipId}/hub-observation-impact`);
+        if (impactResponse.ok) {
+          const impactData = await impactResponse.json();
+          if (impactData.has_data) setObservationImpact(impactData);
+        }
+      } catch (impactError) {
+        console.error('Error fetching observation impact:', impactError);
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -1439,6 +1448,49 @@ export default function PartnerDashboard() {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* ─── OBSERVATION IMPACT ─── */}
+            {observationImpact?.has_data && observationImpact.observations.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#E0F7F6' }}>
+                    <TrendingUp className="w-3.5 h-3.5" style={{ color: '#2A9D8F' }} />
+                  </div>
+                  <span className="text-sm font-bold text-[#1e2749]">Impact Spotlight</span>
+                  <span className="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-semibold">After your last visit</span>
+                </div>
+                {(() => {
+                  const latest = observationImpact.observations[0];
+                  return (
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-600" style={{ fontFamily: 'Georgia, serif' }}>
+                        After your {latest.event_title || 'observation'} on {new Date(latest.event_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}, here&apos;s what changed in the week that followed:
+                      </p>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="rounded-xl p-3 bg-gray-50 text-center">
+                          <p className={`text-lg font-bold ${latest.engagement_change_pct >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                            {latest.engagement_change_pct >= 0 ? '+' : ''}{latest.engagement_change_pct}%
+                          </p>
+                          <p className="text-[10px] text-gray-500 mt-0.5">Hub engagement</p>
+                        </div>
+                        {latest.mood_change !== null && (
+                          <div className="rounded-xl p-3 bg-gray-50 text-center">
+                            <p className={`text-lg font-bold ${latest.mood_change >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                              {latest.mood_change >= 0 ? '+' : ''}{latest.mood_change.toFixed(1)}
+                            </p>
+                            <p className="text-[10px] text-gray-500 mt-0.5">Wellness shift</p>
+                          </div>
+                        )}
+                        <div className="rounded-xl p-3 bg-gray-50 text-center">
+                          <p className="text-lg font-bold text-[#E8B84B]">{latest.after_quick_wins}</p>
+                          <p className="text-[10px] text-gray-500 mt-0.5">Tools used after</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
