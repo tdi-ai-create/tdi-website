@@ -155,6 +155,7 @@ export default function CreateWithUsPage() {
   const turnstileWidgetId = useRef<string | null>(null);
 
   const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '';
+  const turnstileEnabled = !!TURNSTILE_SITE_KEY;
   const INTAKE_API_URL = '/api/creators/intake';
 
   const renderTurnstile = useCallback(() => {
@@ -251,7 +252,7 @@ export default function CreateWithUsPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!turnstileToken) return;
+    if (turnstileEnabled && !turnstileToken) return;
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
@@ -714,7 +715,7 @@ export default function CreateWithUsPage() {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  disabled={isSubmitting || formState.contentTypes.length === 0 || !turnstileToken}
+                  disabled={isSubmitting || formState.contentTypes.length === 0 || (turnstileEnabled && !turnstileToken)}
                   className="w-full bg-[#ffba06] text-[#1e2749] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-[#e5a800] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-md hover:shadow-lg"
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Application'}

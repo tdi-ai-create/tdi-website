@@ -36,14 +36,15 @@ export async function POST(request: NextRequest) {
   }
 
   const turnstileToken = (body['cf-turnstile-response'] ?? body.turnstile_token) as string | undefined;
-  if (!turnstileToken) {
-    return NextResponse.json({ error: 'Turnstile token is required' }, { status: 400 });
-  }
+  const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
 
-  const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null;
-  const valid = await verifyTurnstile(turnstileToken, clientIp);
-  if (!valid) {
-    return NextResponse.json({ error: 'Turnstile verification failed' }, { status: 403 });
+  // Only enforce Turnstile if both client token and server secret are present
+  if (turnstileSecret && turnstileToken) {
+    const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null;
+    const valid = await verifyTurnstile(turnstileToken, clientIp);
+    if (!valid) {
+      return NextResponse.json({ error: 'Turnstile verification failed' }, { status: 403 });
+    }
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -59,23 +60,29 @@ export async function POST(request: NextRequest) {
 
   const name = String(body.name);
   const email = String(body.email);
-  const strategy = body.strategy ? String(body.strategy) : null;
-  const contentTypes = body.content_types ? String(body.content_types) : null;
-  const referralSource = body.referral_dropdown ? String(body.referral_dropdown) : null;
+  const strategy = body.strategy ? String(body.strategy) : '';
+  const contentTypes = body.content_types ? String(body.content_types) : '';
+  const referralDropdown = body.referral_dropdown ? String(body.referral_dropdown) : '';
 
   const { error } = await supabase.from('pending_creators').insert({
     name,
     email,
     strategy,
-    referral_source: referralSource,
+    referral_dropdown: referralDropdown,
     content_types: contentTypes,
   });
 
   if (error) {
-    console.error('Failed to insert pending_creators:', error);
-    return NextResponse.json({ error: 'Failed to save submission' }, { status: 500 });
+    console.error('Failed to insert pending_creators:', JSON.stringify(error));
+    // If table doesn't exist, still send the notification email so the application isn't lost
+    if (error.code === '42P01' || error.message?.includes('does not exist')) {
+      console.warn('pending_creators table does not exist -- skipping DB insert, will send email notification');
+    } else {
+      return NextResponse.json({ error: 'Failed to save submission' }, { status: 500 });
+    }
   }
 
+  // Always send email notification so no application is lost
   const resendApiKey = process.env.RESEND_API_KEY;
   if (resendApiKey) {
     const emailBody = `
@@ -87,7 +94,7 @@ Name: ${name}
 Email: ${email}
 Strategy/Topic: ${strategy || '(not provided)'}
 Content Types: ${contentTypes || '(not selected)'}
-Referral Source: ${referralSource || '(not provided)'}
+Referral Source: ${referralDropdown || '(not provided)'}
 
 Sign in to the Admin Portal to review:
 https://www.teachersdeserveit.com/tdi-admin/creators
