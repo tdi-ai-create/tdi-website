@@ -413,6 +413,7 @@ export default function PartnerDashboard() {
     'leadership': false,
     'community': false,
   });
+  const [showGettingStarted, setShowGettingStarted] = useState(true);
   const toggleOverviewSection = (key: string) => setOverviewSections(prev => ({ ...prev, [key]: !prev[key] }));
   const [blueprintSubTab, setBlueprintSubTab] = useState<'approach' | 'in-person' | 'learning-hub' | 'dashboard' | 'book' | 'results' | 'contract'>('approach');
   const [mobileExpandedBlueprint, setMobileExpandedBlueprint] = useState<string | null>('approach');
@@ -1284,6 +1285,163 @@ export default function PartnerDashboard() {
             aria-labelledby="tab-overview"
             className="space-y-6"
           >
+            {/* ─── GETTING STARTED (first visit / early partnership) ─── */}
+            {showGettingStarted && staffStats.hubLoggedIn === 0 && actionItems.filter(i => i.status === 'completed').length <= 1 && (
+              <div className="bg-gradient-to-br from-[#1B2A4A] to-[#38618C] rounded-2xl p-6 md:p-7 text-white relative overflow-hidden">
+                <button
+                  onClick={() => setShowGettingStarted(false)}
+                  className="absolute top-4 right-4 text-white/40 hover:text-white/80 transition-colors"
+                  aria-label="Dismiss"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <div className="flex items-center gap-2 mb-3">
+                  <Rocket className="w-5 h-5 text-[#E8B84B]" />
+                  <span className="text-sm font-bold text-[#E8B84B]">Welcome to Your Dashboard</span>
+                </div>
+                <p className="text-base md:text-lg leading-relaxed text-white/90 mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                  Your {staffStats.total} educators will receive Learning Hub access within 24 hours. While they get set up, here&apos;s what you can do:
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="bg-white/10 rounded-xl p-3.5">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-5 h-5 rounded-full bg-[#E8B84B]/20 flex items-center justify-center text-[10px] font-bold text-[#E8B84B]">1</span>
+                      <span className="text-sm font-semibold">Explore the Hub</span>
+                    </div>
+                    <p className="text-xs text-white/60">See what your team will experience -- browse courses, tools, and quick wins.</p>
+                  </div>
+                  <div className="bg-white/10 rounded-xl p-3.5">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-5 h-5 rounded-full bg-[#E8B84B]/20 flex items-center justify-center text-[10px] font-bold text-[#E8B84B]">2</span>
+                      <span className="text-sm font-semibold">Schedule Your First Call</span>
+                    </div>
+                    <p className="text-xs text-white/60">Book a 30-minute kickoff call to set goals and customize your experience.</p>
+                  </div>
+                  <div className="bg-white/10 rounded-xl p-3.5">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-5 h-5 rounded-full bg-[#E8B84B]/20 flex items-center justify-center text-[10px] font-bold text-[#E8B84B]">3</span>
+                      <span className="text-sm font-semibold">Share With Your Team</span>
+                    </div>
+                    <p className="text-xs text-white/60">Let your staff know they have access. A quick email goes a long way.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ─── YOUR NEXT STEPS (action items) ─── */}
+            {actionItems.filter(i => i.status === 'pending' || i.status === 'in_progress').length > 0 && (
+              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#E0F7F6' }}>
+                      <Target className="w-3.5 h-3.5" style={{ color: '#2A9D8F' }} />
+                    </div>
+                    <span className="text-sm font-bold text-[#1e2749]">Your Next Steps</span>
+                    <span className="text-[10px] bg-[#E0F7F6] text-[#2A9D8F] px-2 py-0.5 rounded-full font-semibold">
+                      {actionItems.filter(i => i.status === 'pending' || i.status === 'in_progress').length} remaining
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {actionItems
+                    .filter(i => i.status === 'pending' || i.status === 'in_progress')
+                    .slice(0, 4)
+                    .map((item) => (
+                      <div key={item.id} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                        <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center ${
+                          item.status === 'in_progress' ? 'border-[#E8B84B] bg-[#FFF8E7]' : 'border-gray-300'
+                        }`}>
+                          {item.status === 'in_progress' && <div className="w-2 h-2 rounded-full bg-[#E8B84B]" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-[#1e2749]">{item.title}</p>
+                          {item.description && <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{item.description}</p>}
+                        </div>
+                        {item.cta_url && (
+                          <a href={item.cta_url} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-[#2A9D8F] hover:underline flex-shrink-0 flex items-center gap-1">
+                            {item.cta_label || 'Go'} <ArrowRight className="w-3 h-3" />
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                </div>
+                {actionItems.filter(i => i.status === 'completed').length > 0 && (
+                  <p className="text-[10px] text-gray-400 mt-3 text-center">
+                    {actionItems.filter(i => i.status === 'completed').length} completed
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* ─── STAFF ACTIVATION ─── */}
+            {staffStats.total > 0 && (
+              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#EDE9FE' }}>
+                      <Users className="w-3.5 h-3.5" style={{ color: '#8B5CF6' }} />
+                    </div>
+                    <span className="text-sm font-bold text-[#1e2749]">Team Activation</span>
+                  </div>
+                  <button
+                    onClick={() => navigateToTab('team')}
+                    className="text-xs font-medium text-[#8B5CF6] hover:underline flex items-center gap-1"
+                  >
+                    View all <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+                <div className="flex items-center gap-6">
+                  <div className="relative w-16 h-16">
+                    <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
+                      <path d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f3f4f6" strokeWidth="3" />
+                      <path d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#8B5CF6" strokeWidth="3"
+                        strokeDasharray={`${staffStats.total > 0 ? (staffStats.hubLoggedIn / staffStats.total) * 100 : 0}, 100`} strokeLinecap="round" />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-sm font-bold text-[#1e2749]">{staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0}%</span>
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold text-[#1e2749]">{staffStats.hubLoggedIn}</span>
+                      <span className="text-sm text-gray-500">of {staffStats.total} educators active on Hub</span>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {staffStats.hubLoggedIn === 0
+                        ? 'Your team hasn\'t logged in yet -- they\'ll receive an email invite shortly.'
+                        : staffStats.hubLoggedIn < staffStats.total
+                          ? `${staffStats.total - staffStats.hubLoggedIn} educators haven't logged in yet. A quick reminder can help.`
+                          : 'Your entire team is active on the Hub!'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ─── WHAT EDUCATORS ARE SAYING ─── */}
+            {teacherQuotes.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#FFF8E7' }}>
+                    <Quote className="w-3.5 h-3.5" style={{ color: '#E8B84B' }} />
+                  </div>
+                  <span className="text-sm font-bold text-[#1e2749]">What Educators Are Saying</span>
+                </div>
+                <div className="space-y-3">
+                  {teacherQuotes.slice(0, 3).map((q) => (
+                    <div key={q.id} className="border-l-2 border-[#E8B84B] pl-4 py-1">
+                      <p className="text-sm text-gray-700 italic" style={{ fontFamily: 'Georgia, serif' }}>
+                        &ldquo;{q.quote_text}&rdquo;
+                      </p>
+                      <p className="text-[10px] text-gray-400 mt-1">
+                        -- {q.teacher_role}{q.session_type ? `, ${q.session_type}` : ''}{q.created_at ? `, ${new Date(q.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* ─── AI SUMMARY ─── replaces data overload */}
             {(() => {
               const hubPct = hubStats?.hub_login_pct ?? (staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0);
