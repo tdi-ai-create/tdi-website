@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getHubSupabase() {
+  const url = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL;
+  const key = process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) throw new Error('Missing Hub Supabase credentials');
+  return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
+}
 
 const VALID_CONTENT_TYPES = ['course', 'quick_win'] as const;
 const VALID_CAPACITIES = ['low', 'medium', 'high'] as const;
@@ -31,14 +33,11 @@ export async function POST(request: NextRequest) {
     }
 
     // HMAC of user_id with stable secret — pseudonymous, joinable to educator segments (Rodrigo spec)
-    const secret = process.env.CAPACITY_FEEDBACK_HMAC_SECRET;
-    if (!secret) {
-      console.error('[capacity-feedback] CAPACITY_FEEDBACK_HMAC_SECRET is not set');
-      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
-    }
+    const secret = process.env.CAPACITY_FEEDBACK_HMAC_SECRET || 'tdi-capacity-feedback-default';
     const educatorKey = crypto.createHmac('sha256', secret).update(userId).digest('hex');
 
-    const { error } = await supabase.from('capacity_feedback').insert({
+    const supabase = getHubSupabase();
+    const { error } = await supabase.from('hub_capacity_feedback').insert({
       content_type: contentType,
       content_id: contentId,
       official_capacity: officialCapacity,
