@@ -2,14 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 // Helper to check if a milestone applies to a content path
-function milestoneAppliesTo(milestone: { applies_to?: string[] | null }, contentPath: string | null): boolean {
-  // If path not yet selected, only show intake and path selection milestones
+function milestoneAppliesTo(
+  milestone: { applies_to?: string[] | null; phase_id?: string },
+  contentPath: string | null
+): boolean {
+  // If path not yet selected, show onboarding + agreement milestones
+  // (these are universal pre-selection steps every creator needs)
   if (!contentPath) {
+    const preSelectionPhases = ['onboarding', 'agreement'];
+    if (milestone.phase_id && preSelectionPhases.includes(milestone.phase_id)) {
+      return true;
+    }
+    // For other phases, only show if applies_to is null (universal)
     if (milestone.applies_to === null) return true;
     if (!milestone.applies_to) return true;
-    return milestone.applies_to.includes('blog') &&
-           milestone.applies_to.includes('download') &&
-           milestone.applies_to.includes('course');
+    return false;
   }
 
   // If applies_to is null or empty, default to course only (backwards compatibility)
