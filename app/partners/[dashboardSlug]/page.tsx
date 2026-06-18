@@ -1597,6 +1597,106 @@ export default function PartnerDashboard() {
                     ))}
                   </div>
 
+                  {/* Principal Goal Setting -- show when no KPIs set yet */}
+                  {partnershipKpis.length === 0 && (
+                    <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Target className="w-4 h-4 text-[#8B5CF6]" />
+                          <span className="text-sm font-semibold text-[#1e2749]">Set a Goal for Your Team</span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            const goal = prompt('What % Hub login rate do you want by end of partnership? (e.g., 75)');
+                            if (goal && !isNaN(Number(goal))) {
+                              fetch(`/api/tdi-admin/leadership/${partnership.id}/kpis`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  kpis: [{ kpi_key: 'hub_engagement', kpi_label: 'Hub Login Rate', target_value: Number(goal), target_unit: '%', current_value: staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0 }]
+                                })
+                              }).then(() => window.location.reload());
+                            }
+                          }}
+                          className="text-xs font-medium px-3 py-1.5 rounded-lg bg-[#8B5CF6] text-white hover:bg-[#7C3AED] transition-colors"
+                        >
+                          Set Goal
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">Tell us what success looks like for your school. We&apos;ll track progress and help you get there.</p>
+                    </div>
+                  )}
+
+                  {/* Board Report Download */}
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => {
+                        const w = window.open('', '_blank');
+                        if (!w) return;
+                        const schoolName = partnership.org_name || partnership.contact_name || 'School';
+                        const date = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                        w.document.write(`<!DOCTYPE html><html><head><title>${schoolName} - TDI Partnership Report</title>
+                          <style>
+                            * { margin: 0; padding: 0; box-sizing: border-box; }
+                            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1e2749; max-width: 800px; margin: 0 auto; padding: 40px; }
+                            h1 { font-size: 28px; margin-bottom: 4px; }
+                            .subtitle { color: #6B7280; font-size: 14px; margin-bottom: 32px; }
+                            .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+                            .stat { background: #F9FAFB; border-radius: 12px; padding: 20px; text-align: center; }
+                            .stat-value { font-size: 32px; font-weight: 700; color: #2A9D8F; }
+                            .stat-label { font-size: 11px; color: #6B7280; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+                            .section { margin-bottom: 28px; }
+                            .section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #F3F4F6; }
+                            .quote { border-left: 3px solid #E8B84B; padding: 8px 16px; margin: 8px 0; font-style: italic; color: #374151; }
+                            .quote-attr { font-size: 11px; color: #9CA3AF; font-style: normal; }
+                            .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #E5E7EB; color: #9CA3AF; font-size: 11px; text-align: center; }
+                            @media print { body { padding: 20px; } }
+                          </style>
+                        </head><body>
+                          <h1>${schoolName}</h1>
+                          <p class="subtitle">TDI Partnership Report | ${date} | Phase: ${partnership.contract_phase || 'IGNITE'}</p>
+                          <div class="stats">
+                            <div class="stat"><div class="stat-value">${staffStats.total}</div><div class="stat-label">Educators Enrolled</div></div>
+                            <div class="stat"><div class="stat-value">${hubPct}%</div><div class="stat-label">Hub Engagement</div></div>
+                            <div class="stat"><div class="stat-value">${completedDeliverables}/${totalDeliverables}</div><div class="stat-label">Deliverables</div></div>
+                            <div class="stat"><div class="stat-value">${wellnessScore ? wellnessScore + '/5' : staffStats.hubLoggedIn}</div><div class="stat-label">${wellnessScore ? 'Wellness Score' : 'Staff Active'}</div></div>
+                          </div>
+                          <div class="section">
+                            <div class="section-title">Partnership Summary</div>
+                            <p style="font-size:14px;line-height:1.7;color:#374151;">
+                              ${hubPct > 0
+                                ? `${hubPct}% of ${staffStats.total} educators are actively engaging with the TDI Learning Hub. ${toolsExplored > 0 ? `The team has explored ${toolsExplored} classroom tools. ` : ''}${completedDeliverables > 0 ? `${completedDeliverables} of ${totalDeliverables} contracted deliverables are complete.` : ''}`
+                                : `${staffStats.total} educators are enrolled in the TDI Learning Hub with access to courses, tools, and PD resources. The partnership is in the onboarding phase.`
+                              }
+                            </p>
+                          </div>
+                          ${teacherQuotes.length > 0 ? `
+                            <div class="section">
+                              <div class="section-title">What Educators Are Saying</div>
+                              ${teacherQuotes.slice(0, 3).map(q => `<div class="quote">"${q.quote_text}"<div class="quote-attr">-- ${q.teacher_role}</div></div>`).join('')}
+                            </div>
+                          ` : ''}
+                          ${partnershipKpis.length > 0 ? `
+                            <div class="section">
+                              <div class="section-title">Key Performance Indicators</div>
+                              ${partnershipKpis.map(k => `<p style="font-size:14px;margin:6px 0;"><strong>${k.kpi_label}:</strong> ${k.current_value}${k.target_unit} of ${k.target_value}${k.target_unit} target</p>`).join('')}
+                            </div>
+                          ` : ''}
+                          <div class="footer">
+                            <p>Teachers Deserve It | teachersdeserveit.com</p>
+                            <p style="margin-top:4px;">Generated ${new Date().toLocaleDateString()}</p>
+                          </div>
+                        </body></html>`);
+                        w.document.close();
+                        setTimeout(() => w.print(), 500);
+                      }}
+                      className="text-xs font-medium text-gray-500 hover:text-[#1e2749] flex items-center gap-1.5 transition-colors"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      Download Board Report
+                    </button>
+                  </div>
+
                   {/* Partnership Health */}
                   <div className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center gap-4">
                     {(() => {
