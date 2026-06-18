@@ -383,6 +383,7 @@ export default function PartnerDashboard() {
   const [teacherQuotes, setTeacherQuotes] = useState<{ id: string; quote_text: string; teacher_role: string; session_type: string; created_at: string }[]>([]);
   const [suggestions, setSuggestions] = useState<TDISuggestion[]>([]);
   const [sessionRecords, setSessionRecords] = useState<SessionRecord[]>([]);
+  const [recentActivity, setRecentActivity] = useState<{ action: string; details?: Record<string, unknown>; created_at: string }[]>([]);
   const [hubIntel, setHubIntel] = useState<Record<string, unknown> | null>(null);
   const [observationImpact, setObservationImpact] = useState<{ has_data: boolean; observations: { event_title: string; event_date: string; before_logins: number; after_logins: number; engagement_change_pct: number; before_mood: number | null; after_mood: number | null; mood_change: number | null; before_quick_wins: number; after_quick_wins: number }[] } | null>(null);
   const [hubStats, setHubStats] = useState<{
@@ -412,6 +413,7 @@ export default function PartnerDashboard() {
     'community': false,
   });
   const [showGettingStarted, setShowGettingStarted] = useState(true);
+  const [metricsRange, setMetricsRange] = useState<'month' | 'quarter' | 'all'>('all');
   const toggleOverviewSection = (key: string) => setOverviewSections(prev => ({ ...prev, [key]: !prev[key] }));
   const [blueprintSubTab, setBlueprintSubTab] = useState<'approach' | 'in-person' | 'learning-hub' | 'dashboard' | 'book' | 'results' | 'contract'>('approach');
   const [mobileExpandedBlueprint, setMobileExpandedBlueprint] = useState<string | null>('approach');
@@ -574,6 +576,7 @@ export default function PartnerDashboard() {
           setTimelineEvents(data.timelineEvents || []);
           setTeacherQuotes(data.teacherQuotes || []);
           setSessionRecords(data.sessionRecords || []);
+          setRecentActivity(data.activityLog || []);
           if (data.kpis) setPartnershipKpis(data.kpis);
         }
       }
@@ -1498,7 +1501,8 @@ export default function PartnerDashboard() {
             {(() => {
               const hubPct = hubStats?.hub_login_pct ?? (staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0);
               const toolsExplored = hubStats?.quick_wins_completed ?? 0;
-              const wellnessScore = hubStats?.mood_avg_7d ?? null;
+              const wellnessScore = metricsRange === 'month' ? (hubStats?.mood_avg_30d ?? hubStats?.mood_avg_7d ?? null) : (hubStats?.mood_avg_7d ?? null);
+              const activeUsers = metricsRange === 'month' ? (hubStats?.logins_this_month ?? hubStats?.active_users_7d ?? 0) : (hubStats?.active_users_7d ?? 0);
               const totalDeliverables = (partnership.observation_days_total || 0) + (partnership.virtual_sessions_total || 0);
               const completedDeliverables = (partnership.observation_days_completed || 0) + (partnership.virtual_sessions_completed || 0);
               const phaseNum = partnership.contract_phase === 'IGNITE' ? 1 : partnership.contract_phase === 'ACCELERATE' ? 2 : 3;
@@ -1536,8 +1540,8 @@ export default function PartnerDashboard() {
                             <p className="text-[10px] text-gray-500 mt-0.5">tools explored</p>
                           </div>
                           <div className="rounded-xl p-3 bg-gray-50">
-                            <p className="text-xl font-bold" style={{ color: '#2563EB' }}>{hubStats?.active_users_7d ?? 0}</p>
-                            <p className="text-[10px] text-gray-500 mt-0.5">active this week</p>
+                            <p className="text-xl font-bold" style={{ color: '#2563EB' }}>{activeUsers}</p>
+                            <p className="text-[10px] text-gray-500 mt-0.5">{metricsRange === 'month' ? 'active this month' : 'active this week'}</p>
                           </div>
                           <div className="rounded-xl p-3 bg-gray-50">
                             <p className="text-xl font-bold" style={{ color: '#2A9D8F' }}>{wellnessScore ? `${wellnessScore}/5` : `${staffStats.hubLoggedIn}/${staffStats.total}`}</p>
@@ -1554,7 +1558,24 @@ export default function PartnerDashboard() {
                     )}
                   </div>
 
-                  {/* Visual Gauge Rings -- KPI-driven when set, generic fallback */}
+                  {/* Date Range Toggle + Visual Gauge Rings */}
+                  <div className="flex justify-end mb-1">
+                    <div className="inline-flex bg-gray-100 rounded-lg p-0.5">
+                      {([['month', 'This Month'], ['quarter', 'Quarter'], ['all', 'All Time']] as const).map(([key, label]) => (
+                        <button
+                          key={key}
+                          onClick={() => setMetricsRange(key)}
+                          className={`px-3 py-1 text-[10px] font-semibold rounded-md transition-colors ${
+                            metricsRange === key
+                              ? 'bg-white text-[#1e2749] shadow-sm'
+                              : 'text-gray-500 hover:text-gray-700'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {(partnershipKpis.length > 0
                       ? partnershipKpis.slice(0, 4).map(kpi => {
@@ -1577,7 +1598,7 @@ export default function PartnerDashboard() {
                       : [
                           { value: hubPct, label: 'Hub Engagement', display: `${hubPct}%`, color: '#E8B84B', max: 100 },
                           { value: totalDeliverables > 0 ? (completedDeliverables / totalDeliverables) * 100 : 0, label: 'Deliverables', display: `${completedDeliverables}/${totalDeliverables}`, color: '#4ecdc4', max: 100 },
-                          { value: wellnessScore ? (wellnessScore / 5) * 100 : (staffStats.total > 0 ? (staffStats.hubLoggedIn / staffStats.total) * 100 : 0), label: wellnessScore ? 'Team Wellness' : 'Staff Active', display: wellnessScore ? `${wellnessScore}` : `${staffStats.hubLoggedIn}`, color: '#2A9D8F', max: 100 },
+                          { value: wellnessScore ? (wellnessScore / 5) * 100 : (staffStats.total > 0 ? (staffStats.hubLoggedIn / staffStats.total) * 100 : 0), label: wellnessScore ? (metricsRange === 'month' ? '30-Day Wellness' : 'Team Wellness') : 'Staff Active', display: wellnessScore ? `${wellnessScore}` : `${staffStats.hubLoggedIn}`, color: '#2A9D8F', max: 100 },
                           { value: (phaseNum / 3) * 100, label: 'Current Phase', display: `${phaseNum}/3`, color: '#1e2749', max: 100 },
                         ]
                     ).map((gauge, i) => (
@@ -1754,6 +1775,54 @@ export default function PartnerDashboard() {
                 </>
               );
             })()}
+
+            {/* ─── RECENT ACTIVITY FEED ─── */}
+            {recentActivity.length > 0 && (
+              <>
+                <button
+                  onClick={() => toggleOverviewSection('community')}
+                  className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-50">
+                      <Zap className="w-4 h-4 text-blue-500" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-[#1e2749]">What&apos;s New</p>
+                      <p className="text-xs text-gray-500">{recentActivity.length} recent activities</p>
+                    </div>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${overviewSections['community'] ? 'rotate-180' : ''}`} />
+                </button>
+                {overviewSections['community'] && (
+                  <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 -mt-4 pt-8">
+                    <div className="space-y-3">
+                      {recentActivity.slice(0, 8).map((a, i) => {
+                        const actionLabels: Record<string, string> = {
+                          'login': 'Dashboard viewed',
+                          'account_created': 'Account activated',
+                          'action_completed': 'Action item completed',
+                          'action_paused': 'Action item paused',
+                          'evidence_uploaded': 'Evidence uploaded',
+                          'monthly_email_sent': 'Monthly update sent',
+                          'staff_provisioned': 'Staff added to Hub',
+                          'invite_accepted': 'Portal invite accepted',
+                        };
+                        return (
+                          <div key={i} className="flex items-start gap-3">
+                            <div className="w-1.5 h-1.5 rounded-full bg-gray-300 mt-2 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm text-gray-700">{actionLabels[a.action] || a.action.replace(/_/g, ' ')}</p>
+                              <p className="text-[10px] text-gray-400">{new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
 
             {/* ─── COLLAPSIBLE: Hub Intelligence ─── */}
             {hubIntel && (
