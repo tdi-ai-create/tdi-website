@@ -8,7 +8,7 @@ const ALLOWED_FIELDS = [
   'course_title',
   'course_audience',
   'target_publish_month',
-  'discount_code',
+  'discount_code_legacy',
   'status',
   'display_on_website',
   'website_display_name',

@@ -71,14 +71,13 @@ export async function POST(request: Request) {
         course_title: null,
         course_audience: null,
         target_publish_month: null,
-        discount_code: null,
         google_doc_link: null,
         drive_folder_link: null,
         marketing_doc_link: null,
         course_url: null,
         launch_date: null,
         wants_video_editing: false,
-        wants_download_design: true, // always team-built from spec
+        wants_download_design: true,
         active_project_id: newProject.id,
         updated_at: new Date().toISOString()
       })
