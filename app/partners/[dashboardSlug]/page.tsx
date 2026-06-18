@@ -414,6 +414,8 @@ export default function PartnerDashboard() {
   });
   const [showGettingStarted, setShowGettingStarted] = useState(true);
   const [metricsRange, setMetricsRange] = useState<'month' | 'quarter' | 'all'>('all');
+  const [tourStep, setTourStep] = useState(-1); // -1 = not showing
+  const [tourDismissed, setTourDismissed] = useState(false);
   const toggleOverviewSection = (key: string) => setOverviewSections(prev => ({ ...prev, [key]: !prev[key] }));
   const [blueprintSubTab, setBlueprintSubTab] = useState<'approach' | 'in-person' | 'learning-hub' | 'dashboard' | 'book' | 'results' | 'contract'>('approach');
   const [mobileExpandedBlueprint, setMobileExpandedBlueprint] = useState<string | null>('approach');
@@ -740,6 +742,66 @@ export default function PartnerDashboard() {
 
     checkAuthAndLoad();
   }, [partnerSlug, router, loadDashboardData]);
+
+  // Show guided tour on first visit
+  useEffect(() => {
+    if (!isLoading && partnership && !tourDismissed) {
+      const tourKey = `tdi_tour_seen_${partnership.id}`;
+      if (!localStorage.getItem(tourKey)) {
+        const timer = setTimeout(() => setTourStep(0), 1500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isLoading, partnership, tourDismissed]);
+
+  const tourSteps = [
+    {
+      title: 'Welcome to Your Dashboard',
+      body: 'This is your partnership command center. Everything you need to track your team\'s growth, see what\'s working, and stay connected with TDI is right here.',
+      icon: '1',
+    },
+    {
+      title: 'Your Team\'s Progress',
+      body: 'These rings show how your team is engaging. Hub login rate, deliverables completed, wellness scores, and your current phase -- all updated in real time.',
+      icon: '2',
+    },
+    {
+      title: 'Next Steps & Action Items',
+      body: 'We\'ll always show you what to focus on next. Action items, scheduling, and recommended tools appear here so nothing falls through the cracks.',
+      icon: '3',
+    },
+    {
+      title: 'Educator Voices & Impact',
+      body: 'See what your teachers are saying about their experience. After school visits, you\'ll also see before-and-after engagement data right here.',
+      icon: '4',
+    },
+    {
+      title: 'Tabs for Everything Else',
+      body: 'Use the tabs above to dive deeper: Our Partnership for session history, Blueprint for deliverables, Team for staff info, and Billing for contract details.',
+      icon: '5',
+    },
+    {
+      title: 'You\'re All Set',
+      body: 'Questions? Hit "Schedule Session" anytime to book a call with Rae. Or just reply to any email from us. We read every one.',
+      icon: '6',
+    },
+  ];
+
+  const advanceTour = () => {
+    if (tourStep < tourSteps.length - 1) {
+      setTourStep(tourStep + 1);
+    } else {
+      setTourStep(-1);
+      setTourDismissed(true);
+      if (partnership) localStorage.setItem(`tdi_tour_seen_${partnership.id}`, '1');
+    }
+  };
+
+  const dismissTour = () => {
+    setTourStep(-1);
+    setTourDismissed(true);
+    if (partnership) localStorage.setItem(`tdi_tour_seen_${partnership.id}`, '1');
+  };
 
   // Generate suggestions when data is ready
   useEffect(() => {
@@ -1231,9 +1293,65 @@ export default function PartnerDashboard() {
               <Calendar className="w-4 h-4" />
               <span className="hidden sm:inline">Schedule Session</span>
             </a>
+            <button
+              onClick={() => { setTourStep(0); setTourDismissed(false); }}
+              className="text-white/50 hover:text-white/90 transition-colors"
+              title="Take a tour"
+            >
+              <HelpCircle className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </nav>
+
+      {/* ─── GUIDED TOUR OVERLAY ─── */}
+      {tourStep >= 0 && tourStep < tourSteps.length && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center" onClick={dismissTour}>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div
+            className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="bg-gradient-to-br from-[#1B2A4A] to-[#38618C] px-6 py-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold text-white">
+                    {tourSteps[tourStep].icon}
+                  </div>
+                  <h3 className="text-base font-bold text-white">{tourSteps[tourStep].title}</h3>
+                </div>
+                <button onClick={dismissTour} className="text-white/40 hover:text-white/80 transition-colors">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            <div className="px-6 py-5">
+              <p className="text-sm text-gray-600 leading-relaxed">{tourSteps[tourStep].body}</p>
+              <div className="flex items-center justify-between mt-6">
+                <div className="flex gap-1.5">
+                  {tourSteps.map((_, i) => (
+                    <div key={i} className={`w-2 h-2 rounded-full transition-colors ${i === tourStep ? 'bg-[#1B2A4A]' : i < tourStep ? 'bg-[#E8B84B]' : 'bg-gray-200'}`} />
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={dismissTour}
+                    className="text-xs text-gray-400 hover:text-gray-600 transition-colors px-3 py-2"
+                  >
+                    Skip
+                  </button>
+                  <button
+                    onClick={advanceTour}
+                    className="text-sm font-semibold px-5 py-2 rounded-lg bg-[#1B2A4A] text-white hover:bg-[#2d3a5c] transition-colors"
+                  >
+                    {tourStep < tourSteps.length - 1 ? 'Next' : 'Got it'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero - Elevated DashboardHeader component */}
       <DashboardHeader
