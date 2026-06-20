@@ -1,22 +1,22 @@
 'use client';
 
+import Image from 'next/image';
 import { Monitor, Globe } from 'lucide-react';
 import { COLORS, type GameId } from '../data/gameConfig';
 import { useLanguage } from '../context/LanguageContext';
 import { UI_TRANSLATIONS } from '../data/translations';
 
-// Card data with emoji icons and updated copy
 const GAME_CARDS: {
   id: GameId;
-  icon: string;
+  thumbnail: string;
   color: keyof typeof COLORS;
 }[] = [
-  { id: 'knockout', icon: '🎯', color: 'orange' },
-  { id: 'tellorask', icon: '⚡', color: 'yellow' },
-  { id: 'levelup', icon: '📈', color: 'green' },
-  { id: 'madlibs', icon: '😂', color: 'purple' },
-  { id: 'makeover', icon: '🔧', color: 'red' },
-  { id: 'whatsyourmove', icon: '🎯', color: 'teal' },
+  { id: 'knockout', thumbnail: '/images/practice-tools/knockout.svg', color: 'orange' },
+  { id: 'tellorask', thumbnail: '/images/practice-tools/tellorask.svg', color: 'yellow' },
+  { id: 'levelup', thumbnail: '/images/practice-tools/levelup.svg', color: 'green' },
+  { id: 'madlibs', thumbnail: '/images/practice-tools/madlibs.svg', color: 'purple' },
+  { id: 'makeover', thumbnail: '/images/practice-tools/makeover.svg', color: 'red' },
+  { id: 'whatsyourmove', thumbnail: '/images/practice-tools/whatsyourmove.svg', color: 'teal' },
 ];
 
 const TIMES: Record<GameId, string> = {
@@ -92,7 +92,7 @@ export function HomeScreen({ onSelectGame, onFacilitatorMode }: HomeScreenProps)
           return (
             <div
               key={game.id}
-              className="w-full rounded-2xl p-6 transition-all duration-200 hover:-translate-y-0.5 animate-slide-up"
+              className="w-full rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-0.5 animate-slide-up"
               style={{
                 backgroundColor: colorConfig.bg,
                 border: `2px solid ${colorConfig.border}`,
@@ -107,38 +107,48 @@ export function HomeScreen({ onSelectGame, onFacilitatorMode }: HomeScreenProps)
                 e.currentTarget.style.boxShadow = 'none';
               }}
             >
-              {/* Icon + Title row */}
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-[28px]">{game.icon}</span>
-                <h2 className="text-2xl md:text-[28px] font-bold text-white">
-                  {gameTranslations.title[language]}
-                </h2>
+              <div className="relative w-full aspect-[5/2]">
+                <Image
+                  src={game.thumbnail}
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 100vw, 600px"
+                  className="object-cover"
+                  priority={index < 2}
+                />
               </div>
+              <div className="p-6">
+                <div className="mb-3">
+                  <h2 className="text-2xl md:text-[28px] font-bold text-white">
+                    {gameTranslations.title[language]}
+                  </h2>
+                </div>
 
-              {/* Description */}
-              <p
-                className="text-base md:text-lg mb-3 leading-relaxed"
-                style={{ color: '#8899aa' }}
-              >
-                {gameTranslations.description[language]}
-              </p>
+                {/* Description */}
+                <p
+                  className="text-base md:text-lg mb-3 leading-relaxed"
+                  style={{ color: '#8899aa' }}
+                >
+                  {gameTranslations.description[language]}
+                </p>
 
-              {/* Metadata line */}
-              <p className="text-sm mb-4" style={{ color: '#667788' }}>
-                ⏱ {TIMES[game.id]} • {gameTranslations.format[language]}
-              </p>
+                {/* Metadata line */}
+                <p className="text-sm mb-4" style={{ color: '#667788' }}>
+                  ⏱ {TIMES[game.id]} • {gameTranslations.format[language]}
+                </p>
 
-              {/* Play button */}
-              <button
-                onClick={() => onSelectGame(game.id)}
-                className="w-full min-h-[48px] text-lg font-bold rounded-xl transition-all duration-150 hover:brightness-110 active:scale-[0.98]"
-                style={{
-                  backgroundColor: colorConfig.accent,
-                  color: '#ffffff',
-                }}
-              >
-                {t.playGame[language]}
-              </button>
+                {/* Play button */}
+                <button
+                  onClick={() => onSelectGame(game.id)}
+                  className="w-full min-h-[48px] text-lg font-bold rounded-xl transition-all duration-150 hover:brightness-110 active:scale-[0.98]"
+                  style={{
+                    backgroundColor: colorConfig.accent,
+                    color: '#ffffff',
+                  }}
+                >
+                  {t.playGame[language]}
+                </button>
+              </div>
             </div>
           );
         })}

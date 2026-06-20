@@ -8,8 +8,9 @@ export interface GameConfig {
   description: string;
   time: string;
   duration: number; // default minutes for facilitator timer
-  color: 'orange' | 'yellow' | 'green' | 'purple' | 'red';
+  color: 'orange' | 'yellow' | 'green' | 'purple' | 'red' | 'teal';
   rounds: string;
+  thumbnail: string;
 }
 
 export const GAMES: GameConfig[] = [
@@ -21,6 +22,7 @@ export const GAMES: GameConfig[] = [
     duration: 15,
     color: 'orange',
     rounds: '10 rounds, 90 sec each',
+    thumbnail: '/images/practice-tools/knockout.svg',
   },
   {
     id: 'tellorask',
@@ -30,6 +32,7 @@ export const GAMES: GameConfig[] = [
     duration: 10,
     color: 'yellow',
     rounds: '14 rounds',
+    thumbnail: '/images/practice-tools/tellorask.svg',
   },
   {
     id: 'levelup',
@@ -39,6 +42,7 @@ export const GAMES: GameConfig[] = [
     duration: 12,
     color: 'green',
     rounds: '12 rounds',
+    thumbnail: '/images/practice-tools/levelup.svg',
   },
   {
     id: 'madlibs',
@@ -48,6 +52,7 @@ export const GAMES: GameConfig[] = [
     duration: 10,
     color: 'purple',
     rounds: '6 rounds (3 silly + 3 real)',
+    thumbnail: '/images/practice-tools/madlibs.svg',
   },
   {
     id: 'makeover',
@@ -57,6 +62,17 @@ export const GAMES: GameConfig[] = [
     duration: 15,
     color: 'red',
     rounds: '6 rounds, 120 sec each',
+    thumbnail: '/images/practice-tools/makeover.svg',
+  },
+  {
+    id: 'whatsyourmove',
+    title: "What's Your Move?",
+    description: 'Six real classroom scenarios. Three strategies. Can you spot the right move?',
+    time: '~8 min',
+    duration: 8,
+    color: 'teal',
+    rounds: '6 scenarios',
+    thumbnail: '/images/practice-tools/whatsyourmove.svg',
   },
 ];
 
