@@ -1262,32 +1262,33 @@ export default function PartnerDashboard() {
         }),
       });
 
+      const reportTitles: Record<string, string> = {
+        board: 'Board Presentation Report',
+        engagement: 'Staff Engagement Analysis',
+        impact: 'Impact & ROI Report',
+        quarterly: 'Quarterly Progress Report',
+        teacher: 'Teacher Highlights',
+        community: 'Community Update',
+      };
+      const title = reportTitles[reportType] || 'Partnership Report';
+
       if (response.ok) {
         const data = await response.json();
-        const reportTitles: Record<string, string> = {
-          board: 'Board Presentation Report',
-          engagement: 'Staff Engagement Analysis',
-          impact: 'Impact & ROI Report',
-          quarterly: 'Quarterly Progress Report',
-        };
-        setGeneratedReport({
-          type: reportType,
-          content: data.insight || data.text || data.content || 'Report generation failed. Please try again.',
-          title: reportTitles[reportType] || 'Report',
-        });
+        const content = data.insight || data.text || data.content || generateFallbackReport(reportType, dataContext);
+        printReport(title, content);
       } else {
-        setGeneratedReport({
-          type: reportType,
-          content: generateFallbackReport(reportType, dataContext),
-          title: reportType === 'board' ? 'Board Presentation Report' : reportType === 'engagement' ? 'Staff Engagement Analysis' : reportType === 'impact' ? 'Impact & ROI Report' : 'Quarterly Progress Report',
-        });
+        printReport(title, generateFallbackReport(reportType, dataContext));
       }
     } catch {
-      setGeneratedReport({
-        type: reportType,
-        content: generateFallbackReport(reportType, dataContext),
-        title: 'Report',
-      });
+      const reportTitles: Record<string, string> = {
+        board: 'Board Presentation Report',
+        engagement: 'Staff Engagement Analysis',
+        impact: 'Impact & ROI Report',
+        quarterly: 'Quarterly Progress Report',
+        teacher: 'Teacher Highlights',
+        community: 'Community Update',
+      };
+      printReport(reportTitles[reportType] || 'Report', generateFallbackReport(reportType, dataContext));
     } finally {
       setReportGenerating(null);
     }
@@ -4645,40 +4646,7 @@ export default function PartnerDashboard() {
               </div>
             </div>
 
-            {/* Generated Report Display */}
-            {generatedReport && (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="bg-[#F9FAFB] px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <h3 className="text-sm font-bold text-[#1e2749]">{generatedReport.title}</h3>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(generatedReport.content);
-                        setToastMessage('Report copied to clipboard');
-                        setTimeout(() => setToastMessage(''), 2000);
-                      }}
-                      className="text-xs font-medium text-gray-500 hover:text-[#1e2749] flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                      <Copy className="w-3.5 h-3.5" /> Copy
-                    </button>
-                    <button
-                      onClick={() => printReport(generatedReport.title, generatedReport.content)}
-                      className="text-xs font-medium text-gray-500 hover:text-[#1e2749] flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                      <FileText className="w-3.5 h-3.5" /> Print / PDF
-                    </button>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>
-                    {generatedReport.content}
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Reports open directly in new tab as branded PDF */}
 
             {/* Quick Data Export */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
