@@ -1557,6 +1557,15 @@ export default function PartnerDashboard() {
                   actionLabel: 'Add Staff',
                 },
                 {
+                  id: 'photos',
+                  title: 'Upload Staff Photos',
+                  description: 'Helps us know your team during school visits.',
+                  done: false, // Will be true when photos are uploaded
+                  icon: Eye,
+                  action: () => navigateToTab('team'),
+                  actionLabel: 'Upload',
+                },
+                {
                   id: 'hub_access',
                   title: 'Hub Access Activated',
                   description: `${staffStats.hubLoggedIn} of ${staffStats.total} educators have logged in.`,
@@ -3962,6 +3971,116 @@ export default function PartnerDashboard() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Staff Roster with Photos */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-base font-semibold text-gray-900">Your Educators</h2>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500">{staffStats.hubLoggedIn}/{staffStats.total} on Hub</span>
+                </div>
+              </div>
+
+              {staffStats.total === 0 ? (
+                <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl">
+                  <Users className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                  <p className="text-sm font-medium text-gray-600 mb-1">No staff uploaded yet</p>
+                  <p className="text-xs text-gray-400 mb-4">Upload your roster to give your team Hub access.</p>
+                  <label className="inline-flex items-center gap-2 bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#2a3459] transition-colors cursor-pointer">
+                    <Upload className="w-4 h-4" />
+                    Upload CSV
+                    <input
+                      type="file"
+                      accept=".csv"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file || !partnership) return;
+                        const text = await file.text();
+                        const lines = text.split('\n').filter(l => l.trim());
+                        const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/[^a-z0-9\s]/g, ''));
+                        const fnIdx = headers.findIndex(h => (h.includes('first') && h.includes('name')) || h === 'firstname' || h === 'first');
+                        const lnIdx = headers.findIndex(h => (h.includes('last') && h.includes('name')) || h === 'lastname' || h === 'last');
+                        const emIdx = headers.findIndex(h => h.includes('email'));
+                        const rlIdx = headers.findIndex(h => h.includes('role') || h.includes('title') || h.includes('position'));
+
+                        const staff = [];
+                        for (let i = 1; i < lines.length; i++) {
+                          const vals = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+                          if (vals.length < 2) continue;
+                          const fn = fnIdx >= 0 ? vals[fnIdx] : vals[0] || '';
+                          const ln = lnIdx >= 0 ? vals[lnIdx] : vals[1] || '';
+                          const em = emIdx >= 0 ? vals[emIdx] : vals[2] || '';
+                          if (!fn && !ln && !em) continue;
+                          staff.push({ first_name: fn, last_name: ln, email: em, role_title: rlIdx >= 0 ? vals[rlIdx] : '' });
+                        }
+                        if (staff.length > 0) {
+                          await fetch('/api/partners/roster', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ partnershipId: partnership.id, staff }),
+                          });
+                          window.location.reload();
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-amber-50 border border-amber-100">
+                    <Upload className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-xs font-medium text-amber-800">Staff photos help us during school visits</p>
+                      <p className="text-[10px] text-amber-600">Upload a ZIP of headshots named by staff member (e.g., john-smith.jpg)</p>
+                    </div>
+                    <label className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition-colors cursor-pointer flex-shrink-0">
+                      Upload Photos
+                      <input
+                        type="file"
+                        accept=".zip"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file || !partnership) return;
+                          const formData = new FormData();
+                          formData.append('file', file);
+                          formData.append('consentChecked', 'true');
+                          const resp = await fetch(`/api/tdi-admin/leadership/${partnership.id}/staff-photos/bulk`, {
+                            method: 'POST',
+                            headers: { 'x-user-email': partnership.contact_email || '' },
+                            body: formData,
+                          });
+                          const result = await resp.json();
+                          if (result.uploaded > 0) {
+                            setToastMessage(`${result.uploaded} photos uploaded successfully`);
+                            setTimeout(() => setToastMessage(''), 3000);
+                          } else {
+                            setToastMessage(result.error || 'Photo upload failed');
+                            setTimeout(() => setToastMessage(''), 3000);
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    <div className="rounded-xl bg-gray-50 p-3 text-center">
+                      <p className="text-lg font-bold text-[#1e2749]">{staffStats.total}</p>
+                      <p className="text-[10px] text-gray-500">Total Staff</p>
+                    </div>
+                    <div className="rounded-xl bg-gray-50 p-3 text-center">
+                      <p className="text-lg font-bold text-green-600">{staffStats.hubLoggedIn}</p>
+                      <p className="text-[10px] text-gray-500">Hub Active</p>
+                    </div>
+                    <div className="rounded-xl bg-gray-50 p-3 text-center">
+                      <p className="text-lg font-bold text-amber-600">{staffStats.total - staffStats.hubLoggedIn}</p>
+                      <p className="text-[10px] text-gray-500">Not Yet Active</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Partnership Includes card -- two-tier when grant-supported */}
