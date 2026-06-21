@@ -20,8 +20,20 @@ const PORTAL_COLORS = {
   team: { accent: '#6B7280', light: '#F3F4F6', bg15: 'rgba(107, 114, 128, 0.15)', border30: 'rgba(107, 114, 128, 0.3)' },
 };
 
-// Navigation items - order: CMO, Sales, Operations, Leadership, Hub, Creator Studio, Funding
+// Navigation items - order: Ops, CMO, Sales, Operations, Leadership, Hub, Creator Studio, Funding
 const NAV_ITEMS = [
+  {
+    id: 'ops',
+    label: 'Ops Dashboard',
+    href: '/tdi-admin/ops',
+    section: 'intelligence',
+    accent: PORTAL_COLORS.intelligence.accent,
+    icon: (active: boolean) => (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+  },
   {
     id: 'cmo',
     label: 'CMO Dashboard',
