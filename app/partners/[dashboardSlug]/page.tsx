@@ -1544,48 +1544,130 @@ export default function PartnerDashboard() {
             aria-labelledby="tab-overview"
             className="space-y-6"
           >
-            {/* ─── GETTING STARTED (first visit / early partnership) ─── */}
-            {showGettingStarted && staffStats.hubLoggedIn === 0 && actionItems.filter(i => i.status === 'completed').length <= 1 && (
-              <div className="bg-gradient-to-br from-[#1B2A4A] to-[#38618C] rounded-2xl p-6 md:p-7 text-white relative overflow-hidden">
-                <button
-                  onClick={() => setShowGettingStarted(false)}
-                  className="absolute top-4 right-4 text-white/40 hover:text-white/80 transition-colors"
-                  aria-label="Dismiss"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-                <div className="flex items-center gap-2 mb-3">
-                  <Rocket className="w-5 h-5 text-[#E8B84B]" />
-                  <span className="text-sm font-bold text-[#E8B84B]">Welcome to Your Dashboard</span>
+            {/* ─── PARTNERSHIP SETUP CHECKLIST (onboarding hub) ─── */}
+            {showGettingStarted && (() => {
+              const setupSteps = [
+                {
+                  id: 'roster',
+                  title: 'Upload Staff Roster',
+                  description: 'Add your educators so they get Learning Hub access.',
+                  done: staffStats.total > 0,
+                  icon: Users,
+                  action: staffStats.total > 0 ? undefined : () => navigateToTab('team'),
+                  actionLabel: 'Add Staff',
+                },
+                {
+                  id: 'hub_access',
+                  title: 'Hub Access Activated',
+                  description: `${staffStats.hubLoggedIn} of ${staffStats.total} educators have logged in.`,
+                  done: staffStats.hubLoggedIn > 0,
+                  icon: BookOpen,
+                  action: () => window.open('https://teachersdeserveit.com/hub', '_blank'),
+                  actionLabel: 'Preview Hub',
+                },
+                {
+                  id: 'schedule',
+                  title: 'Schedule Kickoff Call',
+                  description: 'Book your first session to set partnership goals.',
+                  done: actionItems.some(i => i.category === 'scheduling' && i.status === 'completed'),
+                  icon: Calendar,
+                  action: () => window.open('https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat', '_blank'),
+                  actionLabel: 'Book Call',
+                },
+                {
+                  id: 'goals',
+                  title: 'Set Your Goals',
+                  description: 'Tell us what success looks like for your team.',
+                  done: partnershipKpis.length > 0,
+                  icon: Target,
+                  action: partnershipKpis.length > 0 ? undefined : () => {
+                    const goal = prompt('What % Hub login rate do you want by end of partnership? (e.g., 75)');
+                    if (goal && !isNaN(Number(goal))) {
+                      fetch(`/api/tdi-admin/leadership/${partnership.id}/kpis`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ kpis: [{ kpi_key: 'hub_engagement', kpi_label: 'Hub Login Rate', target_value: Number(goal), target_unit: '%', current_value: staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0 }] })
+                      }).then(() => window.location.reload());
+                    }
+                  },
+                  actionLabel: 'Set Goal',
+                },
+                {
+                  id: 'dates',
+                  title: 'Confirm Key Dates',
+                  description: 'Lock in observation days and virtual sessions.',
+                  done: actionItems.some(i => i.title?.toLowerCase().includes('observation') && i.status === 'completed'),
+                  icon: CalendarDays,
+                  action: () => navigateToTab('blueprint'),
+                  actionLabel: 'View Schedule',
+                },
+              ];
+
+              const completedCount = setupSteps.filter(s => s.done).length;
+              const allDone = completedCount === setupSteps.length;
+
+              if (allDone) return null;
+
+              return (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  {/* Header */}
+                  <div className="bg-gradient-to-br from-[#1B2A4A] to-[#38618C] px-6 py-5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Rocket className="w-5 h-5 text-[#E8B84B]" />
+                        <div>
+                          <h2 className="text-base font-bold text-white">Set Up Your Partnership</h2>
+                          <p className="text-xs text-white/50">{completedCount} of {setupSteps.length} steps complete</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 h-2 bg-white/10 rounded-full overflow-hidden">
+                          <div className="h-full bg-[#E8B84B] rounded-full transition-all" style={{ width: `${(completedCount / setupSteps.length) * 100}%` }} />
+                        </div>
+                        <button onClick={() => setShowGettingStarted(false)} className="text-white/30 hover:text-white/70 ml-2">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Steps */}
+                  <div className="divide-y divide-gray-50">
+                    {setupSteps.map((step) => {
+                      const Icon = step.icon;
+                      return (
+                        <div key={step.id} className={`px-6 py-4 flex items-center gap-4 ${step.done ? 'bg-gray-50/50' : ''}`}>
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                            step.done ? 'bg-green-100' : 'bg-gray-100'
+                          }`}>
+                            {step.done ? (
+                              <Check className="w-4 h-4 text-green-600" />
+                            ) : (
+                              <Icon className="w-4 h-4 text-gray-400" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm font-medium ${step.done ? 'text-gray-400 line-through' : 'text-[#1e2749]'}`}>{step.title}</p>
+                            <p className="text-xs text-gray-500">{step.description}</p>
+                          </div>
+                          {!step.done && step.action && (
+                            <button
+                              onClick={step.action}
+                              className="text-xs font-semibold px-4 py-2 rounded-lg bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors flex-shrink-0"
+                            >
+                              {step.actionLabel}
+                            </button>
+                          )}
+                          {step.done && (
+                            <span className="text-[10px] font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full flex-shrink-0">Done</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-                <p className="text-base md:text-lg leading-relaxed text-white/90 mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-                  Your {staffStats.total} educators will receive Learning Hub access within 24 hours. While they get set up, here&apos;s what you can do:
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div className="bg-white/10 rounded-xl p-3.5">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="w-5 h-5 rounded-full bg-[#E8B84B]/20 flex items-center justify-center text-[10px] font-bold text-[#E8B84B]">1</span>
-                      <span className="text-sm font-semibold">Explore the Hub</span>
-                    </div>
-                    <p className="text-xs text-white/60">See what your team will experience -- browse courses, tools, and quick wins.</p>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-3.5">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="w-5 h-5 rounded-full bg-[#E8B84B]/20 flex items-center justify-center text-[10px] font-bold text-[#E8B84B]">2</span>
-                      <span className="text-sm font-semibold">Schedule Your First Call</span>
-                    </div>
-                    <p className="text-xs text-white/60">Book a 30-minute kickoff call to set goals and customize your experience.</p>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-3.5">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="w-5 h-5 rounded-full bg-[#E8B84B]/20 flex items-center justify-center text-[10px] font-bold text-[#E8B84B]">3</span>
-                      <span className="text-sm font-semibold">Share With Your Team</span>
-                    </div>
-                    <p className="text-xs text-white/60">Let your staff know they have access. A quick email goes a long way.</p>
-                  </div>
-                </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* ─── YOUR NEXT STEPS (action items) ─── */}
             {actionItems.filter(i => i.status === 'pending' || i.status === 'in_progress').length > 0 && (
