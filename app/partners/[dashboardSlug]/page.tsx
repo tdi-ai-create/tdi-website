@@ -1192,10 +1192,139 @@ export default function PartnerDashboard() {
     { id: 'overview', label: 'Overview' },
     { id: 'our-partnership', label: 'Our Partnership' },
     { id: 'blueprint', label: 'Blueprint' },
+    { id: 'reporting', label: 'Reports' },
     { id: 'next-year', label: 'Next Year', badge: true },
     { id: 'team', label: 'Team' },
     { id: 'billing', label: 'Billing' },
   ];
+
+  // Reporting state
+  const [reportGenerating, setReportGenerating] = useState<string | null>(null);
+  const [generatedReport, setGeneratedReport] = useState<{ type: string; content: string; title: string } | null>(null);
+
+  const generateAIReport = async (reportType: string) => {
+    if (!partnership) return;
+    setReportGenerating(reportType);
+    setGeneratedReport(null);
+
+    const schoolName = partnership.org_name || partnership.contact_name || 'Your School';
+    const hubPctVal = hubStats?.hub_login_pct ?? (staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0);
+    const totalDel = (partnership.observation_days_total || 0) + (partnership.virtual_sessions_total || 0);
+    const completedDel = (partnership.observation_days_completed || 0) + (partnership.virtual_sessions_completed || 0);
+
+    const dataContext = {
+      schoolName,
+      phase: partnership.contract_phase || 'IGNITE',
+      staffTotal: staffStats.total,
+      staffLoggedIn: staffStats.hubLoggedIn,
+      hubLoginPct: hubPctVal,
+      toolsExplored: hubStats?.quick_wins_completed ?? 0,
+      courseCompletions: hubStats?.course_completions ?? 0,
+      wellnessScore: hubStats?.mood_avg_7d ?? null,
+      totalDeliverables: totalDel,
+      completedDeliverables: completedDel,
+      kpis: partnershipKpis.map(k => ({ label: k.kpi_label, current: k.current_value, target: k.target_value, unit: k.target_unit })),
+      quotes: teacherQuotes.slice(0, 5).map(q => ({ text: q.quote_text, role: q.teacher_role })),
+      actionItemsCompleted: actionItems.filter(i => i.status === 'completed').length,
+      actionItemsPending: actionItems.filter(i => i.status === 'pending' || i.status === 'in_progress').length,
+      observationImpact: observationImpact?.observations?.[0] || null,
+    };
+
+    try {
+      const response = await fetch('/api/hub/insights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tab: 'partnership_report',
+          context: JSON.stringify({
+            reportType,
+            ...dataContext,
+          }),
+          data: {
+            prompt: reportType === 'board'
+              ? `Write a professional board presentation report for ${schoolName}'s TDI partnership. Include: executive summary, key metrics, educator testimonials, ROI analysis, and recommendations. Data: ${JSON.stringify(dataContext)}. Format with clear sections. No emojis. Professional tone.`
+              : reportType === 'engagement'
+              ? `Write a detailed staff engagement analysis for ${schoolName}. Cover: Hub adoption rates, most-used tools, engagement trends, educator feedback, and specific recommendations to increase participation. Data: ${JSON.stringify(dataContext)}. Be specific and actionable.`
+              : reportType === 'impact'
+              ? `Write an impact and ROI report for ${schoolName}'s TDI partnership investment. Include: investment summary, measurable outcomes, educator wellness changes, professional development hours, before/after comparisons, and projected year-end outcomes. Data: ${JSON.stringify(dataContext)}. Make it compelling for budget justification.`
+              : reportType === 'quarterly'
+              ? `Write a quarterly progress report for ${schoolName}'s TDI partnership. Include: this quarter's highlights, metrics vs targets, challenges and solutions, upcoming milestones, and a forward-looking summary. Data: ${JSON.stringify(dataContext)}. Keep it concise but thorough.`
+              : reportType === 'teacher'
+              ? `Write a celebratory staff highlights summary for ${schoolName}'s teachers. Include: most popular Hub tools, educator quotes and shout-outs, courses completed, PD hours earned, and fun engagement stats. Tone: warm, encouraging, celebratory. Perfect for a staff newsletter or PLC agenda. Data: ${JSON.stringify(dataContext)}.`
+              : reportType === 'community'
+              ? `Write a parent-friendly community update about ${schoolName}'s professional development investment through TDI. Explain in plain language: what teachers are learning, how it benefits students, popular topics (stress management, classroom strategies, communication), and the school's commitment to educator growth. Tone: positive, accessible, no jargon. Suitable for a school newsletter or website. Data: ${JSON.stringify(dataContext)}.`
+              : `Write a comprehensive partnership summary for ${schoolName}. Data: ${JSON.stringify(dataContext)}.`,
+          },
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const reportTitles: Record<string, string> = {
+          board: 'Board Presentation Report',
+          engagement: 'Staff Engagement Analysis',
+          impact: 'Impact & ROI Report',
+          quarterly: 'Quarterly Progress Report',
+        };
+        setGeneratedReport({
+          type: reportType,
+          content: data.insight || data.text || data.content || 'Report generation failed. Please try again.',
+          title: reportTitles[reportType] || 'Report',
+        });
+      } else {
+        setGeneratedReport({
+          type: reportType,
+          content: generateFallbackReport(reportType, dataContext),
+          title: reportType === 'board' ? 'Board Presentation Report' : reportType === 'engagement' ? 'Staff Engagement Analysis' : reportType === 'impact' ? 'Impact & ROI Report' : 'Quarterly Progress Report',
+        });
+      }
+    } catch {
+      setGeneratedReport({
+        type: reportType,
+        content: generateFallbackReport(reportType, dataContext),
+        title: 'Report',
+      });
+    } finally {
+      setReportGenerating(null);
+    }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const generateFallbackReport = (type: string, data: any) => {
+    const schoolName = data.schoolName;
+    if (type === 'board') {
+      return `EXECUTIVE SUMMARY\n\n${schoolName} is in Phase ${data.phase} of its TDI partnership with ${data.staffTotal} educators enrolled. ${data.hubLoginPct}% have actively engaged with the Learning Hub.\n\nKEY METRICS\n- Hub Engagement: ${data.hubLoginPct}%\n- Tools Explored: ${data.toolsExplored}\n- Course Completions: ${data.courseCompletions}\n- Deliverables: ${data.completedDeliverables}/${data.totalDeliverables}\n${data.wellnessScore ? `- Educator Wellness: ${data.wellnessScore}/5` : ''}\n\n${data.kpis.length > 0 ? 'KPI PROGRESS\n' + data.kpis.map((k: {label:string;current:number;target:number;unit:string}) => `- ${k.label}: ${k.current}${k.unit} of ${k.target}${k.unit} target`).join('\n') : ''}\n\n${data.quotes.length > 0 ? 'EDUCATOR FEEDBACK\n' + data.quotes.map((q: {text:string;role:string}) => `"${q.text}" -- ${q.role}`).join('\n\n') : ''}\n\nRECOMMENDATION\nContinue partnership into next phase to build on current momentum and deepen classroom implementation.`;
+    }
+    return `${schoolName} Partnership Report\n\nStaff: ${data.staffTotal} enrolled, ${data.staffLoggedIn} active (${data.hubLoginPct}%)\nTools explored: ${data.toolsExplored}\nDeliverables: ${data.completedDeliverables}/${data.totalDeliverables}\n${data.quotes.length > 0 ? '\nEducator Voices:\n' + data.quotes.map((q: {text:string;role:string}) => `"${q.text}" -- ${q.role}`).join('\n') : ''}`;
+  };
+
+  const printReport = (title: string, content: string) => {
+    const schoolName = partnership?.org_name || partnership?.contact_name || 'School';
+    const w = window.open('', '_blank');
+    if (!w) return;
+    w.document.write(`<!DOCTYPE html><html><head><title>${title} - ${schoolName}</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1e2749; max-width: 800px; margin: 0 auto; padding: 48px 40px; line-height: 1.7; }
+        .header { border-bottom: 3px solid #1e2749; padding-bottom: 16px; margin-bottom: 32px; }
+        h1 { font-size: 24px; color: #1e2749; }
+        .meta { font-size: 13px; color: #6B7280; margin-top: 4px; }
+        .content { white-space: pre-wrap; font-size: 14px; }
+        .content strong, .content b { font-weight: 700; }
+        .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #E5E7EB; font-size: 11px; color: #9CA3AF; text-align: center; }
+        @media print { body { padding: 24px; } }
+      </style>
+    </head><body>
+      <div class="header">
+        <h1>${title}</h1>
+        <p class="meta">${schoolName} | ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} | Teachers Deserve It</p>
+      </div>
+      <div class="content">${content.replace(/\n/g, '<br>')}</div>
+      <div class="footer">Confidential -- Prepared by Teachers Deserve It for ${schoolName}</div>
+    </body></html>`);
+    w.document.close();
+    setTimeout(() => w.print(), 500);
+  };
 
   return (
     <>
@@ -3827,6 +3956,235 @@ export default function PartnerDashboard() {
               Data Privacy: In your partnership dashboard, access is role-based.
               All data handling follows FERPA guidelines.
             </p>
+          </div>
+        )}
+
+        {/* REPORTING TAB */}
+        {activeTab === 'reporting' && partnership && (
+          <div className="py-6 space-y-6">
+            {/* Header */}
+            <div className="bg-gradient-to-br from-[#1B2A4A] to-[#38618C] rounded-2xl p-6 md:p-8 text-white">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-[#E8B84B]" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold">Partnership Reports</h2>
+                  <p className="text-sm text-white/60">AI-generated reports ready to share with your board, staff, or community.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Report Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              {/* Board Report */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-purple-50">
+                    <GraduationCap className="w-4.5 h-4.5 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1e2749]">Board Presentation</h3>
+                    <p className="text-xs text-gray-500">For superintendents, board members, and district leadership</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">Executive summary with key metrics, ROI analysis, educator testimonials, and renewal recommendations. Formatted for board meeting presentations.</p>
+                <button
+                  onClick={() => generateAIReport('board')}
+                  disabled={reportGenerating !== null}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {reportGenerating === 'board' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                </button>
+              </div>
+
+              {/* Staff Engagement */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-teal-50">
+                    <Users className="w-4.5 h-4.5 text-teal-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1e2749]">Staff Engagement</h3>
+                    <p className="text-xs text-gray-500">For principals, coaches, and team leads</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">Hub adoption rates, most-used tools, engagement trends, and actionable recommendations to share at your next PLC or staff meeting.</p>
+                <button
+                  onClick={() => generateAIReport('engagement')}
+                  disabled={reportGenerating !== null}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {reportGenerating === 'engagement' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                </button>
+              </div>
+
+              {/* Impact & ROI */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-amber-50">
+                    <TrendingUp className="w-4.5 h-4.5 text-amber-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1e2749]">Impact & ROI</h3>
+                    <p className="text-xs text-gray-500">For budget justification and grant reporting</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">Investment analysis, measurable outcomes, wellness improvements, PD hours earned, and projected outcomes. Perfect for budget season and grant applications.</p>
+                <button
+                  onClick={() => generateAIReport('impact')}
+                  disabled={reportGenerating !== null}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {reportGenerating === 'impact' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                </button>
+              </div>
+
+              {/* Quarterly Progress */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-blue-50">
+                    <BarChart3 className="w-4.5 h-4.5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1e2749]">Quarterly Progress</h3>
+                    <p className="text-xs text-gray-500">For check-ins and progress tracking</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">This quarter&apos;s highlights, metrics vs targets, milestones reached, challenges addressed, and what&apos;s ahead. Share with leadership or use for your own planning.</p>
+                <button
+                  onClick={() => generateAIReport('quarterly')}
+                  disabled={reportGenerating !== null}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {reportGenerating === 'quarterly' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                </button>
+              </div>
+
+              {/* Teacher Highlights */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-green-50">
+                    <Heart className="w-4.5 h-4.5 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1e2749]">Teacher Highlights</h3>
+                    <p className="text-xs text-gray-500">For staff newsletters, emails, and PLC agendas</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">Popular tools your team loves, educator quotes, completion milestones, and celebration-worthy moments. Great for staff newsletters or morning announcements.</p>
+                <button
+                  onClick={() => generateAIReport('teacher')}
+                  disabled={reportGenerating !== null}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {reportGenerating === 'teacher' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                </button>
+              </div>
+
+              {/* Community / Parent Report */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-rose-50">
+                    <MessageCircle className="w-4.5 h-4.5 text-rose-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1e2749]">Community Update</h3>
+                    <p className="text-xs text-gray-500">For parent newsletters, school websites, and social media</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">A parent-friendly summary of your school&apos;s PD investment: what teachers are learning, how it helps students, and why it matters. Ready for newsletters or your school website.</p>
+                <button
+                  onClick={() => generateAIReport('community')}
+                  disabled={reportGenerating !== null}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {reportGenerating === 'community' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                </button>
+              </div>
+            </div>
+
+            {/* Generated Report Display */}
+            {generatedReport && (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-[#F9FAFB] px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <h3 className="text-sm font-bold text-[#1e2749]">{generatedReport.title}</h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(generatedReport.content);
+                        setToastMessage('Report copied to clipboard');
+                        setTimeout(() => setToastMessage(''), 2000);
+                      }}
+                      className="text-xs font-medium text-gray-500 hover:text-[#1e2749] flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <Copy className="w-3.5 h-3.5" /> Copy
+                    </button>
+                    <button
+                      onClick={() => printReport(generatedReport.title, generatedReport.content)}
+                      className="text-xs font-medium text-gray-500 hover:text-[#1e2749] flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <FileText className="w-3.5 h-3.5" /> Print / PDF
+                    </button>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>
+                    {generatedReport.content}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Quick Data Export */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h3 className="text-sm font-bold text-[#1e2749] mb-4">Quick Data Export</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  { label: 'Engagement Summary', icon: Users, action: () => {
+                    const csv = `Metric,Value\nTotal Staff,${staffStats.total}\nHub Active,${staffStats.hubLoggedIn}\nHub Login %,${staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0}%\nTools Explored,${hubStats?.quick_wins_completed ?? 0}\nCourse Completions,${hubStats?.course_completions ?? 0}\nWellness Score,${hubStats?.mood_avg_7d ?? 'N/A'}`;
+                    const blob = new Blob([csv], { type: 'text/csv' });
+                    const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
+                    link.download = `engagement-summary-${new Date().toISOString().slice(0,10)}.csv`; link.click();
+                  }},
+                  { label: 'KPI Summary', icon: Target, action: () => {
+                    const csv = 'KPI,Current,Target,Unit\n' + partnershipKpis.map(k => `${k.kpi_label},${k.current_value},${k.target_value},${k.target_unit}`).join('\n');
+                    const blob = new Blob([csv], { type: 'text/csv' });
+                    const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
+                    link.download = `kpi-summary-${new Date().toISOString().slice(0,10)}.csv`; link.click();
+                  }},
+                  { label: 'Action Items', icon: CheckCircle, action: () => {
+                    const csv = 'Title,Status,Priority,Category\n' + actionItems.map(i => `"${i.title}",${i.status},${i.priority},${i.category}`).join('\n');
+                    const blob = new Blob([csv], { type: 'text/csv' });
+                    const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
+                    link.download = `action-items-${new Date().toISOString().slice(0,10)}.csv`; link.click();
+                  }},
+                  { label: 'Educator Quotes', icon: Quote, action: () => {
+                    const csv = 'Quote,Role,Date\n' + teacherQuotes.map(q => `"${q.quote_text}","${q.teacher_role}","${q.created_at}"`).join('\n');
+                    const blob = new Blob([csv], { type: 'text/csv' });
+                    const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
+                    link.download = `educator-quotes-${new Date().toISOString().slice(0,10)}.csv`; link.click();
+                  }},
+                ].map((exp, i) => {
+                  const Icon = exp.icon;
+                  return (
+                    <button
+                      key={i}
+                      onClick={exp.action}
+                      className="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 hover:border-gray-200 transition-all text-center"
+                    >
+                      <Icon className="w-4 h-4 text-gray-400" />
+                      <span className="text-[11px] font-medium text-gray-600">{exp.label}</span>
+                      <span className="text-[9px] text-gray-400">CSV</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         )}
 
