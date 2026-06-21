@@ -70,9 +70,12 @@ export async function PATCH(
       'slug',
       'building_count',
       'partnership_type',
-      'obs_days_total',
+      'observation_days_total',
+      'observation_days_completed',
       'virtual_sessions_total',
+      'virtual_sessions_completed',
       'executive_sessions_total',
+      'executive_sessions_completed',
       'address',
       'website',
     ];
