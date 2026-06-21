@@ -1855,41 +1855,25 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
         <div class="meta">${date} | Phase: ${partnership?.contract_phase || 'IGNITE'} | Contract: ${partnership?.contract_start ? new Date(partnership.contract_start).toLocaleDateString('en-US', {month: 'short', year: 'numeric'}) : ''} - ${partnership?.contract_end ? new Date(partnership.contract_end).toLocaleDateString('en-US', {month: 'short', year: 'numeric'}) : ''}</div>
       </div>
 
-      <!-- Key Metrics with Donut Charts -->
+      <!-- Key Metrics -->
       <div class="metrics">
-        <div class="metric">
-          <svg width="80" height="80" viewBox="0 0 80 80" style="margin: 0 auto 8px;">
-            <circle cx="40" cy="40" r="32" fill="none" stroke="#f3f4f6" stroke-width="6"/>
-            <circle cx="40" cy="40" r="32" fill="none" stroke="#059669" stroke-width="6" stroke-dasharray="${hubPctVal * 2.01} ${(100 - hubPctVal) * 2.01}" stroke-linecap="round" transform="rotate(-90 40 40)"/>
-            <text x="40" y="44" text-anchor="middle" font-size="16" font-weight="800" fill="#059669">${hubPctVal}%</text>
-          </svg>
-          <div class="metric-label">Hub Engagement</div>
-        </div>
-        <div class="metric">
-          <svg width="80" height="80" viewBox="0 0 80 80" style="margin: 0 auto 8px;">
-            <circle cx="40" cy="40" r="32" fill="none" stroke="#f3f4f6" stroke-width="6"/>
-            <circle cx="40" cy="40" r="32" fill="none" stroke="#2563EB" stroke-width="6" stroke-dasharray="${Math.min(staffStats.hubLoggedIn / Math.max(staffStats.total, 1) * 100, 100) * 2.01} ${(100 - Math.min(staffStats.hubLoggedIn / Math.max(staffStats.total, 1) * 100, 100)) * 2.01}" stroke-linecap="round" transform="rotate(-90 40 40)"/>
-            <text x="40" y="38" text-anchor="middle" font-size="18" font-weight="800" fill="#2563EB">${staffStats.total}</text>
-            <text x="40" y="52" text-anchor="middle" font-size="9" fill="#6B7280">enrolled</text>
-          </svg>
-          <div class="metric-label">Educators</div>
-        </div>
-        <div class="metric">
-          <svg width="80" height="80" viewBox="0 0 80 80" style="margin: 0 auto 8px;">
-            <circle cx="40" cy="40" r="32" fill="none" stroke="#f3f4f6" stroke-width="6"/>
-            <circle cx="40" cy="40" r="32" fill="none" stroke="#D97706" stroke-width="6" stroke-dasharray="${totalDel > 0 ? (completedDel / totalDel * 100) * 2.01 : 0} ${totalDel > 0 ? (100 - completedDel / totalDel * 100) * 2.01 : 201}" stroke-linecap="round" transform="rotate(-90 40 40)"/>
-            <text x="40" y="44" text-anchor="middle" font-size="16" font-weight="800" fill="#D97706">${completedDel}/${totalDel}</text>
-          </svg>
-          <div class="metric-label">Deliverables</div>
-        </div>
-        <div class="metric">
-          <svg width="80" height="80" viewBox="0 0 80 80" style="margin: 0 auto 8px;">
-            <circle cx="40" cy="40" r="32" fill="none" stroke="#f3f4f6" stroke-width="6"/>
-            <circle cx="40" cy="40" r="32" fill="none" stroke="#7C3AED" stroke-width="6" stroke-dasharray="${wellness ? (wellness / 5 * 100) * 2.01 : tools > 0 ? Math.min(tools, 100) * 2.01 : 0} ${wellness ? (100 - wellness / 5 * 100) * 2.01 : 201}" stroke-linecap="round" transform="rotate(-90 40 40)"/>
-            <text x="40" y="44" text-anchor="middle" font-size="16" font-weight="800" fill="#7C3AED">${wellness ? wellness + '/5' : tools > 0 ? tools : '--'}</text>
-          </svg>
-          <div class="metric-label">${wellness ? 'Wellness' : tools > 0 ? 'Tools Used' : 'Coming Soon'}</div>
-        </div>
+        ${[
+          { value: hubPctVal + '%', label: 'Hub Engagement', pct: hubPctVal, color: '#059669' },
+          { value: staffStats.total.toString(), label: 'Educators', pct: staffStats.total > 0 ? Math.min(staffStats.hubLoggedIn / staffStats.total * 100, 100) : 0, color: '#2563EB' },
+          { value: completedDel + '/' + totalDel, label: 'Deliverables', pct: totalDel > 0 ? (completedDel / totalDel) * 100 : 0, color: '#D97706' },
+          { value: wellness ? wellness + '/5' : tools > 0 ? tools.toString() : '--', label: wellness ? 'Wellness' : tools > 0 ? 'Tools Used' : 'Coming Soon', pct: wellness ? (wellness / 5) * 100 : tools > 0 ? Math.min(tools, 100) : 0, color: '#7C3AED' },
+        ].map(m => `
+          <div class="metric">
+            <div style="width:80px;height:80px;margin:0 auto 8px;position:relative;">
+              <div style="width:80px;height:80px;border-radius:50%;background:conic-gradient(${m.color} ${m.pct * 3.6}deg, #f3f4f6 ${m.pct * 3.6}deg);display:flex;align-items:center;justify-content:center;">
+                <div style="width:62px;height:62px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+                  <span style="font-size:18px;font-weight:800;color:${m.color};line-height:1;">${m.value}</span>
+                </div>
+              </div>
+            </div>
+            <div class="metric-label">${m.label}</div>
+          </div>
+        `).join('')}
       </div>
 
       <!-- TDI vs National Benchmark Chart -->
