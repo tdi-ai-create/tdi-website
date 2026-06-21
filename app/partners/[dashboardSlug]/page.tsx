@@ -1597,8 +1597,15 @@ Learn more about TDI: teachersdeserveit.com`;
         .section-title { font-size: 16px; font-weight: 700; color: #1e2749; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #E8B84B; display: flex; align-items: center; gap: 8px; }
         .section-icon { width: 20px; height: 20px; display: inline-block; }
 
-        .content-text { font-size: 14px; line-height: 1.8; color: #374151; white-space: pre-wrap; }
-        .content-text p, .content-text br + br { margin-bottom: 12px; }
+        .content-text { font-size: 14px; line-height: 1.8; color: #374151; }
+        .content-text p { margin-bottom: 14px; }
+        .content-text h2 { font-size: 18px; font-weight: 700; color: #1e2749; margin: 32px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #E8B84B; }
+        .content-text h3 { font-size: 15px; font-weight: 700; color: #1e2749; margin: 24px 0 8px; }
+        .content-text ul { margin: 8px 0 16px 0; padding-left: 0; list-style: none; }
+        .content-text li { padding: 4px 0 4px 20px; position: relative; }
+        .content-text li:before { content: ''; position: absolute; left: 0; top: 12px; width: 6px; height: 6px; border-radius: 50%; background: #E8B84B; }
+        .content-text strong, .content-text b { font-weight: 700; color: #1e2749; }
+        .stat-inline { display: inline-block; background: #F3F4F6; padding: 2px 10px; border-radius: 6px; font-weight: 700; color: #1e2749; }
 
         .quote-block { border-left: 3px solid #E8B84B; padding: 12px 20px; margin: 16px 0; background: #FFFBEB; border-radius: 0 8px 8px 0; }
         .quote-text { font-style: italic; font-size: 14px; color: #1e2749; }
@@ -1640,10 +1647,36 @@ Learn more about TDI: teachersdeserveit.com`;
       <!-- Report Content -->
       <div class="body">
         <div class="content-text">${content
-          .replace(/\n\n/g, '</p><p>')
-          .replace(/\n/g, '<br>')
-          .replace(/^/, '<p>').replace(/$/, '</p>')
-          .replace(/"([^"]+)"/g, '<span class="quote-block"><span class="quote-text">"$1"</span></span>')
+          .split('\n')
+          .map(line => {
+            const trimmed = line.trim();
+            if (!trimmed) return '';
+            // ALL CAPS lines = section headers
+            if (/^[A-Z][A-Z\s&:,\-\/]+$/.test(trimmed) && trimmed.length > 3 && trimmed.length < 80) {
+              return '<h2>' + trimmed.charAt(0) + trimmed.slice(1).toLowerCase().replace(/\b(tdi|hub|plc|roi|pd|faq|k-12)\b/gi, m => m.toUpperCase()).replace(/\bi\b/g, 'I') + '</h2>';
+            }
+            // Lines starting with - or bullet
+            if (/^[-]/.test(trimmed)) {
+              return '<li>' + trimmed.replace(/^[-]\s*/, '') + '</li>';
+            }
+            // Lines starting with numbers (1. 2. 3.)
+            if (/^\d+\./.test(trimmed)) {
+              return '<li><strong>' + trimmed + '</strong></li>';
+            }
+            // Stat lines (Key: Value format)
+            if (/^[A-Z][a-zA-Z\s]+:/.test(trimmed) && trimmed.length < 80 && !trimmed.includes('.')) {
+              const [label, ...rest] = trimmed.split(':');
+              return '<p><strong>' + label + ':</strong> ' + rest.join(':').trim() + '</p>';
+            }
+            return '<p>' + trimmed + '</p>';
+          })
+          .join('')
+          .replace(/<\/li><li>/g, '</li><li>')
+          .replace(/(<li>)/g, (m, _, offset, str) => {
+            const before = str.substring(Math.max(0, offset - 10), offset);
+            return before.includes('</li>') || before.includes('<ul>') ? m : '<ul>' + m;
+          })
+          .replace(/<\/li>(?!<li>)/g, '</li></ul>')
         }</div>
 
         ${teacherQuotes.length > 0 ? `
