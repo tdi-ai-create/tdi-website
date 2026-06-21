@@ -416,6 +416,10 @@ export default function PartnerDashboard() {
   const [metricsRange, setMetricsRange] = useState<'month' | 'quarter' | 'all'>('all');
   const [tourStep, setTourStep] = useState(-1); // -1 = not showing
   const [tourDismissed, setTourDismissed] = useState(false);
+  const [showGoalWizard, setShowGoalWizard] = useState(false);
+  const [goalStep, setGoalStep] = useState(0);
+  const [goalSelections, setGoalSelections] = useState<Record<string, boolean>>({});
+  const [goalTargets, setGoalTargets] = useState<Record<string, number>>({});
   const toggleOverviewSection = (key: string) => setOverviewSections(prev => ({ ...prev, [key]: !prev[key] }));
   const [blueprintSubTab, setBlueprintSubTab] = useState<'approach' | 'in-person' | 'learning-hub' | 'dashboard' | 'book' | 'results' | 'contract'>('approach');
   const [mobileExpandedBlueprint, setMobileExpandedBlueprint] = useState<string | null>('approach');
@@ -1482,6 +1486,191 @@ export default function PartnerDashboard() {
         </div>
       )}
 
+      {/* ─── GOAL SETTING WIZARD ─── */}
+      {showGoalWizard && partnership && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center" onClick={() => setShowGoalWizard(false)}>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+
+            {/* Header */}
+            <div className="bg-gradient-to-br from-[#1B2A4A] to-[#38618C] px-6 py-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Target className="w-5 h-5 text-[#E8B84B]" />
+                  <div>
+                    <h3 className="text-base font-bold text-white">
+                      {goalStep === 0 ? 'What matters most to your team?' : goalStep === 1 ? 'Set your targets' : 'Review your goals'}
+                    </h3>
+                    <p className="text-xs text-white/50">Step {goalStep + 1} of 3</p>
+                  </div>
+                </div>
+                <button onClick={() => setShowGoalWizard(false)} className="text-white/40 hover:text-white/80">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {/* Step 1: Priority Selection */}
+              {goalStep === 0 && (
+                <div>
+                  <p className="text-sm text-gray-600 mb-4">Pick the areas that matter most to your {partnership.partnership_type === 'district' ? 'district' : 'school'}. We&apos;ll suggest targets based on what TDI partners typically aim for.</p>
+                  <div className="space-y-2">
+                    {[
+                      { key: 'hub_engagement', label: 'Hub Engagement', desc: 'Get my team actively using the Learning Hub', icon: '1' },
+                      { key: 'stress_reduction', label: 'Teacher Wellness', desc: 'Reduce staff stress and prevent burnout', icon: '2' },
+                      { key: 'course_completion', label: 'PD Completion', desc: 'Teachers completing courses and earning PD hours', icon: '3' },
+                      { key: 'classroom_application', label: 'Classroom Implementation', desc: 'Teachers applying what they learn in their classrooms', icon: '4' },
+                      { key: 'retention_intent', label: 'Staff Retention', desc: 'Keep great teachers at our school', icon: '5' },
+                    ].map(item => (
+                      <button
+                        key={item.key}
+                        onClick={() => setGoalSelections(prev => ({ ...prev, [item.key]: !prev[item.key] }))}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                          goalSelections[item.key]
+                            ? 'border-[#8B5CF6] bg-purple-50'
+                            : 'border-gray-100 hover:border-gray-200'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                            goalSelections[item.key] ? 'bg-[#8B5CF6] text-white' : 'bg-gray-100 text-gray-400'
+                          }`}>
+                            {goalSelections[item.key] ? <Check className="w-3.5 h-3.5" /> : item.icon}
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-[#1e2749]">{item.label}</p>
+                            <p className="text-xs text-gray-500">{item.desc}</p>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex justify-between mt-6">
+                    <button onClick={() => setShowGoalWizard(false)} className="text-xs text-gray-400 px-3 py-2">Cancel</button>
+                    <button
+                      onClick={() => {
+                        // Set default targets for selected goals
+                        const defaults: Record<string, number> = { hub_engagement: 70, stress_reduction: 15, course_completion: 50, classroom_application: 60, retention_intent: 85 };
+                        const targets: Record<string, number> = {};
+                        Object.keys(goalSelections).filter(k => goalSelections[k]).forEach(k => { targets[k] = defaults[k] || 50; });
+                        setGoalTargets(targets);
+                        setGoalStep(1);
+                      }}
+                      disabled={Object.values(goalSelections).filter(Boolean).length === 0}
+                      className="text-sm font-semibold px-5 py-2 rounded-lg bg-[#1e2749] text-white hover:bg-[#2a3459] disabled:opacity-50 transition-colors"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Target Setting with Sliders */}
+              {goalStep === 1 && (
+                <div>
+                  <p className="text-sm text-gray-600 mb-4">Adjust each target to what feels ambitious but achievable. These are starting points -- you&apos;ll finalize them with Rae on your kickoff call.</p>
+                  <div className="space-y-5">
+                    {Object.entries(goalTargets).map(([key, value]) => {
+                      const labels: Record<string, { label: string; unit: string; max: number; benchmark: string }> = {
+                        hub_engagement: { label: 'Hub Login Rate', unit: '%', max: 100, benchmark: 'Most TDI partners aim for 60-80%' },
+                        stress_reduction: { label: 'Stress Reduction', unit: '%', max: 50, benchmark: 'Average TDI partner sees 10-20% improvement' },
+                        course_completion: { label: 'Course Completion Rate', unit: '%', max: 100, benchmark: 'Strong schools hit 40-60% completion' },
+                        classroom_application: { label: 'Classroom Implementation', unit: '%', max: 100, benchmark: 'Top partners see 50-70% application rate' },
+                        retention_intent: { label: 'Staff Retention Intent', unit: '%', max: 100, benchmark: 'National average is 82%, TDI partners avg 90%' },
+                      };
+                      const info = labels[key] || { label: key, unit: '%', max: 100, benchmark: '' };
+                      return (
+                        <div key={key}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm font-medium text-[#1e2749]">{info.label}</span>
+                            <span className="text-sm font-bold text-[#8B5CF6]">{value}{info.unit}</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="10"
+                            max={info.max}
+                            step="5"
+                            value={value}
+                            onChange={e => setGoalTargets(prev => ({ ...prev, [key]: Number(e.target.value) }))}
+                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#8B5CF6]"
+                          />
+                          <p className="text-[10px] text-gray-400 mt-1">{info.benchmark}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="flex justify-between mt-6">
+                    <button onClick={() => setGoalStep(0)} className="text-xs text-gray-400 px-3 py-2">Back</button>
+                    <button
+                      onClick={() => setGoalStep(2)}
+                      className="text-sm font-semibold px-5 py-2 rounded-lg bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors"
+                    >
+                      Review
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Review & Save */}
+              {goalStep === 2 && (
+                <div>
+                  <p className="text-sm text-gray-600 mb-4">Here&apos;s what we&apos;ll track together. These are draft goals -- you&apos;ll review and finalize them with Rae on your kickoff call.</p>
+                  <div className="space-y-2 mb-4">
+                    {Object.entries(goalTargets).map(([key, value]) => {
+                      const labels: Record<string, string> = {
+                        hub_engagement: 'Hub Login Rate',
+                        stress_reduction: 'Stress Reduction',
+                        course_completion: 'Course Completion',
+                        classroom_application: 'Classroom Implementation',
+                        retention_intent: 'Staff Retention',
+                      };
+                      return (
+                        <div key={key} className="flex items-center justify-between p-3 rounded-xl bg-gray-50">
+                          <span className="text-sm text-[#1e2749]">{labels[key] || key}</span>
+                          <span className="text-sm font-bold text-[#8B5CF6]">{value}%</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="bg-amber-50 rounded-xl p-3 mb-6">
+                    <p className="text-xs text-amber-700">
+                      <strong>These are draft goals.</strong> During your kickoff call, Rae will review these with you, adjust based on your school&apos;s context, and lock them in. You can always update them later.
+                    </p>
+                  </div>
+                  <div className="flex justify-between">
+                    <button onClick={() => setGoalStep(1)} className="text-xs text-gray-400 px-3 py-2">Back</button>
+                    <button
+                      onClick={async () => {
+                        const kpis = Object.entries(goalTargets).map(([key, target]) => {
+                          const labels: Record<string, string> = {
+                            hub_engagement: 'Hub Login Rate', stress_reduction: 'Stress Reduction',
+                            course_completion: 'Course Completion', classroom_application: 'Classroom Implementation',
+                            retention_intent: 'Staff Retention',
+                          };
+                          return { kpi_key: key, kpi_label: labels[key] || key, target_value: target, target_unit: '%', current_value: 0, status: 'draft' };
+                        });
+                        await fetch(`/api/tdi-admin/leadership/${partnership.id}/kpis`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ kpis }),
+                        });
+                        setShowGoalWizard(false);
+                        setGoalStep(0);
+                        window.location.reload();
+                      }}
+                      className="text-sm font-semibold px-5 py-2 rounded-lg bg-[#8B5CF6] text-white hover:bg-[#7C3AED] transition-colors"
+                    >
+                      Save Draft Goals
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hero - Elevated DashboardHeader component */}
       <DashboardHeader
         schoolName={partnership?.org_name || organization?.name || 'Your School'}
@@ -1604,17 +1793,8 @@ export default function PartnerDashboard() {
                     : 'What does a great year look like for your team? We\'ll track progress together.',
                   done: partnershipKpis.length > 0,
                   icon: Target,
-                  action: partnershipKpis.length > 0 ? undefined : () => {
-                    const goal = prompt('What % Hub login rate do you want by end of partnership? (e.g., 75)');
-                    if (goal && !isNaN(Number(goal))) {
-                      fetch(`/api/tdi-admin/leadership/${partnership.id}/kpis`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ kpis: [{ kpi_key: 'hub_engagement', kpi_label: 'Hub Login Rate', target_value: Number(goal), target_unit: '%', current_value: staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0 }] })
-                      }).then(() => window.location.reload());
-                    }
-                  },
-                  actionLabel: 'Set Goal',
+                  action: partnershipKpis.length > 0 ? undefined : () => setShowGoalWizard(true),
+                  actionLabel: 'Get Started',
                 },
                 // Only if contract includes observations or virtual sessions
                 ...((hasObservations || hasVirtualSessions) ? [{
@@ -1983,21 +2163,10 @@ export default function PartnerDashboard() {
                           <span className="text-sm font-semibold text-[#1e2749]">Set a Goal for Your Team</span>
                         </div>
                         <button
-                          onClick={() => {
-                            const goal = prompt('What % Hub login rate do you want by end of partnership? (e.g., 75)');
-                            if (goal && !isNaN(Number(goal))) {
-                              fetch(`/api/tdi-admin/leadership/${partnership.id}/kpis`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                  kpis: [{ kpi_key: 'hub_engagement', kpi_label: 'Hub Login Rate', target_value: Number(goal), target_unit: '%', current_value: staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0 }]
-                                })
-                              }).then(() => window.location.reload());
-                            }
-                          }}
+                          onClick={() => setShowGoalWizard(true)}
                           className="text-xs font-medium px-3 py-1.5 rounded-lg bg-[#8B5CF6] text-white hover:bg-[#7C3AED] transition-colors"
                         >
-                          Set Goal
+                          Get Started
                         </button>
                       </div>
                       <p className="text-xs text-gray-500 mt-2">Tell us what success looks like for your school. We&apos;ll track progress and help you get there.</p>
