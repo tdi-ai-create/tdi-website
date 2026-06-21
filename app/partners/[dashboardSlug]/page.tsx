@@ -2234,30 +2234,65 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
             </div>
 
             <div className="overflow-y-auto flex-1 p-6">
+              {/* Action buttons */}
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={() => {
+                    // Auto-assign random staff-appropriate awards
+                    const names: string[] = [];
+                    // Use partnership contact as a fallback name source
+                    if (staffStats.total > 0) {
+                      for (let n = 1; n <= Math.min(staffStats.total, certAwards.length); n++) {
+                        names.push(`Educator ${n}`);
+                      }
+                    }
+                    const shuffled = [...certAwards].sort(() => Math.random() - 0.5);
+                    const updated = shuffled.map((cert, i) => ({
+                      ...cert,
+                      recipient: i < names.length ? names[i] : '',
+                    }));
+                    setCertAwards(updated);
+                    setToastMessage(`Auto-assigned ${Math.min(names.length, certAwards.length)} awards. Edit names below.`);
+                    setTimeout(() => setToastMessage(''), 3000);
+                  }}
+                  className="text-xs font-semibold px-4 py-2 rounded-lg bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors flex items-center gap-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5" /> Auto-Assign Awards
+                </button>
+                <button
+                  onClick={() => setCertAwards(certAwards.map(c => ({ ...c, recipient: '' })))}
+                  className="text-xs font-medium px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+                >
+                  Clear All
+                </button>
+              </div>
+
               <div className="bg-amber-50 rounded-xl p-3 mb-4 border border-amber-100">
-                <p className="text-xs text-amber-800"><strong>Tip:</strong> Pick 3-5 awards to start. Type a name or leave blank to handwrite it. Print on cardstock for extra impact. Want custom designs with your school logo? Download these and drop them into Canva, or email hello@teachersdeserveit.com and we will design them for you.</p>
+                <p className="text-xs text-amber-800"><strong>Tip:</strong> Click "Auto-Assign" to get started, then edit names to match your people. Print on cardstock for extra impact. Want custom designs with your school logo? Drop these into Canva, or email hello@teachersdeserveit.com.</p>
               </div>
 
               <div className="space-y-2">
                 {certAwards.map((cert, i) => (
-                  <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${cert.recipient ? 'border-green-200 bg-green-50/50' : 'border-gray-100 hover:border-gray-200'}`}>
-                    <div className="w-8 h-8 rounded-full bg-[#E8B84B]/10 flex items-center justify-center flex-shrink-0">
-                      <Award className="w-4 h-4 text-[#E8B84B]" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[#1e2749]">{cert.award}</p>
-                      <p className="text-[10px] text-gray-500 truncate">{cert.tagline}</p>
+                  <div key={i} className={`p-3 rounded-xl border transition-all ${cert.recipient ? 'border-green-200 bg-green-50/50' : 'border-gray-100 hover:border-gray-200'}`}>
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-7 h-7 rounded-full bg-[#E8B84B]/10 flex items-center justify-center flex-shrink-0">
+                        <Award className="w-3.5 h-3.5 text-[#E8B84B]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-[#1e2749]">{cert.award}</p>
+                        <p className="text-[10px] text-gray-500">{cert.tagline}</p>
+                      </div>
                     </div>
                     <input
                       type="text"
-                      placeholder="Recipient name..."
+                      placeholder="Type recipient name..."
                       value={cert.recipient}
                       onChange={e => {
                         const updated = [...certAwards];
                         updated[i] = { ...updated[i], recipient: e.target.value };
                         setCertAwards(updated);
                       }}
-                      className="w-40 px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
+                      className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
                     />
                   </div>
                 ))}
@@ -2295,8 +2330,12 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                       .award-title { font-size: 18px; text-transform: uppercase; letter-spacing: 3px; color: #E8B84B; font-weight: 700; margin-bottom: 16px; }
                       .recipient { font-size: 48px; font-weight: 700; color: #1e2749; margin-bottom: 16px; border-bottom: 2px solid #E8B84B; padding-bottom: 8px; display: inline-block; min-width: 300px; }
                       .tagline { font-size: 16px; color: #374151; font-style: italic; max-width: 500px; line-height: 1.6; margin-bottom: 32px; }
-                      .school { font-size: 13px; color: #6B7280; }
-                      .date { font-size: 12px; color: #9CA3AF; margin-top: 8px; }
+                      .school { font-size: 14px; font-weight: 600; color: #1e2749; }
+                      .date { font-size: 12px; color: #9CA3AF; margin-top: 4px; }
+                      .signature { display: flex; justify-content: center; gap: 80px; margin-top: 32px; }
+                      .sig-block { text-align: center; }
+                      .sig-line { width: 180px; border-bottom: 1px solid #1e2749; margin-bottom: 4px; height: 24px; }
+                      .sig-label { font-size: 10px; color: #6B7280; font-family: 'Helvetica Neue', sans-serif; }
                       .star { font-size: 24px; color: #E8B84B; margin: 0 4px; }
                       @media print { .cert { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
                     </style>
@@ -2317,6 +2356,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                         <div class="star">&#9733; &#9733; &#9733;</div>
                         <div class="school">${schoolName}</div>
                         <div class="date">${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                        <div class="signature">
+                          <div class="sig-block"><div class="sig-line"></div><div class="sig-label">Principal / Administrator</div></div>
+                          <div class="sig-block"><div class="sig-line"></div><div class="sig-label">Date</div></div>
+                        </div>
                       </div>
                     `).join('')}
                   </body></html>`);
