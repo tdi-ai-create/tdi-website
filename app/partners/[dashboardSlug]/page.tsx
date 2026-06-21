@@ -6931,6 +6931,76 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               </p>
             </div>
 
+            {/* Grant Funding Status -- only for grant-supported partnerships */}
+            {partnership?.has_grant_support && (
+              <div className="bg-white rounded-xl border border-gray-100 overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                <div className="bg-gradient-to-r from-green-50 to-white px-6 py-4 border-b border-green-100">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+                      <Sprout className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <h2 className="text-base font-semibold text-gray-900">Grant Funding Status</h2>
+                      <p className="text-xs text-gray-500">Your partnership has a grant application in progress</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-6 space-y-4">
+                  {/* Current Contract */}
+                  <div>
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Current Contract (Guaranteed)</p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div className="rounded-lg bg-gray-50 p-3 text-center">
+                        <p className="text-lg font-bold text-[#1e2749]">{partnership.staff_enrolled || 0}</p>
+                        <p className="text-[10px] text-gray-500">Hub Memberships</p>
+                      </div>
+                      <div className="rounded-lg bg-gray-50 p-3 text-center">
+                        <p className="text-lg font-bold text-[#1e2749]">{partnership.observation_days_total || 0}</p>
+                        <p className="text-[10px] text-gray-500">Observation Days</p>
+                      </div>
+                      <div className="rounded-lg bg-gray-50 p-3 text-center">
+                        <p className="text-lg font-bold text-[#1e2749]">{partnership.executive_sessions_total || 0}</p>
+                        <p className="text-[10px] text-gray-500">Exec Sessions</p>
+                      </div>
+                      <div className="rounded-lg bg-gray-50 p-3 text-center">
+                        <p className="text-lg font-bold text-[#1e2749]">{partnership.virtual_sessions_total || 0}</p>
+                        <p className="text-[10px] text-gray-500">Virtual Sessions</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Grant Expansion */}
+                  <div className="border-t border-gray-100 pt-4">
+                    <p className="text-xs font-bold text-green-600 uppercase tracking-wide mb-2">If Grant Approved (Expands To)</p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div className="rounded-lg bg-green-50 p-3 text-center border border-green-100">
+                        <p className="text-lg font-bold text-green-700">{partnership.staff_enrolled || 0}</p>
+                        <p className="text-[10px] text-green-600">Hub Memberships</p>
+                      </div>
+                      <div className="rounded-lg bg-green-50 p-3 text-center border border-green-100">
+                        <p className="text-lg font-bold text-green-700">{(partnership.observation_days_total || 0) + 1}</p>
+                        <p className="text-[10px] text-green-600">Observation Days</p>
+                      </div>
+                      <div className="rounded-lg bg-green-50 p-3 text-center border border-green-100">
+                        <p className="text-lg font-bold text-green-700">{partnership.executive_sessions_total || 0}</p>
+                        <p className="text-[10px] text-green-600">Exec Sessions</p>
+                      </div>
+                      <div className="rounded-lg bg-green-50 p-3 text-center border border-green-100">
+                        <p className="text-lg font-bold text-green-700">{partnership.virtual_sessions_total || 0}</p>
+                        <p className="text-[10px] text-green-600">Virtual Sessions</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-amber-50 rounded-lg p-3 border border-amber-100">
+                    <p className="text-xs text-amber-800">
+                      <strong>What this means:</strong> Your base contract is guaranteed regardless of grant outcome. If the grant is approved, your partnership automatically expands with additional services at no extra cost to your school. The TDI team is managing the grant process and will keep you updated.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Phase Timeline */}
             <div className="bg-white rounded-xl border border-gray-100 p-6"
               style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
