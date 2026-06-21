@@ -417,6 +417,8 @@ export default function PartnerDashboard() {
   const [tourStep, setTourStep] = useState(-1); // -1 = not showing
   const [tourDismissed, setTourDismissed] = useState(false);
   const [showGoalWizard, setShowGoalWizard] = useState(false);
+  const [showCertificates, setShowCertificates] = useState(false);
+  const [certAwards, setCertAwards] = useState<{award: string; tagline: string; recipient: string}[]>([]);
   const [showPreviewData, setShowPreviewData] = useState(true); // ON by default for new partnerships
   const [goalStep, setGoalStep] = useState(0);
   const [goalSelections, setGoalSelections] = useState<Record<string, boolean>>({});
@@ -2205,6 +2207,127 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── STAFF CERTIFICATES MODAL ─── */}
+      {showCertificates && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center" onClick={() => setShowCertificates(false)}>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 overflow-hidden max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+
+            <div className="bg-gradient-to-br from-[#1B2A4A] to-[#38618C] px-6 py-5 flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Award className="w-5 h-5 text-[#E8B84B]" />
+                  <div>
+                    <h3 className="text-base font-bold" style={{ color: '#FFFFFF' }}>Staff Celebration Certificates</h3>
+                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>Select awards, assign names, print. Drop one in a mailbox and watch what happens.</p>
+                  </div>
+                </div>
+                <button onClick={() => setShowCertificates(false)} className="text-white/40 hover:text-white/80">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="overflow-y-auto flex-1 p-6">
+              <div className="bg-amber-50 rounded-xl p-3 mb-4 border border-amber-100">
+                <p className="text-xs text-amber-800"><strong>Tip:</strong> Pick 3-5 awards to start. Type a name or leave blank to handwrite it. Print on cardstock for extra impact. Want custom designs with your school logo? Download these and drop them into Canva, or email hello@teachersdeserveit.com and we will design them for you.</p>
+              </div>
+
+              <div className="space-y-2">
+                {certAwards.map((cert, i) => (
+                  <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${cert.recipient ? 'border-green-200 bg-green-50/50' : 'border-gray-100 hover:border-gray-200'}`}>
+                    <div className="w-8 h-8 rounded-full bg-[#E8B84B]/10 flex items-center justify-center flex-shrink-0">
+                      <Award className="w-4 h-4 text-[#E8B84B]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-[#1e2749]">{cert.award}</p>
+                      <p className="text-[10px] text-gray-500 truncate">{cert.tagline}</p>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Recipient name..."
+                      value={cert.recipient}
+                      onChange={e => {
+                        const updated = [...certAwards];
+                        updated[i] = { ...updated[i], recipient: e.target.value };
+                        setCertAwards(updated);
+                      }}
+                      className="w-40 px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between flex-shrink-0">
+              <p className="text-xs text-gray-400">{certAwards.filter(c => c.recipient).length} of {certAwards.length} assigned</p>
+              <button
+                onClick={() => {
+                  const selected = certAwards.filter(c => c.recipient);
+                  if (selected.length === 0) {
+                    setToastMessage('Assign at least one name to print');
+                    setTimeout(() => setToastMessage(''), 2000);
+                    return;
+                  }
+                  const schoolName = partnership?.org_name || partnership?.contact_name || 'Your School';
+                  const w = window.open('', '_blank');
+                  if (!w) return;
+                  w.document.write(`<!DOCTYPE html><html><head><title>Staff Certificates - ${schoolName}</title>
+                    <style>
+                      * { margin: 0; padding: 0; box-sizing: border-box; }
+                      @page { size: landscape; margin: 0; }
+                      body { font-family: 'Georgia', serif; }
+                      .cert { width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 48px; page-break-after: always; position: relative; overflow: hidden; background: white; }
+                      .cert:last-child { page-break-after: auto; }
+                      .border-frame { position: absolute; inset: 20px; border: 3px solid #E8B84B; border-radius: 8px; }
+                      .border-inner { position: absolute; inset: 28px; border: 1px solid #E8B84B40; border-radius: 4px; }
+                      .corner { position: absolute; width: 40px; height: 40px; border: 2px solid #E8B84B; }
+                      .corner-tl { top: 16px; left: 16px; border-right: none; border-bottom: none; }
+                      .corner-tr { top: 16px; right: 16px; border-left: none; border-bottom: none; }
+                      .corner-bl { bottom: 16px; left: 16px; border-right: none; border-top: none; }
+                      .corner-br { bottom: 16px; right: 16px; border-left: none; border-top: none; }
+                      .logo { font-size: 11px; text-transform: uppercase; letter-spacing: 4px; color: #9CA3AF; margin-bottom: 32px; }
+                      .award-title { font-size: 18px; text-transform: uppercase; letter-spacing: 3px; color: #E8B84B; font-weight: 700; margin-bottom: 16px; }
+                      .recipient { font-size: 48px; font-weight: 700; color: #1e2749; margin-bottom: 16px; border-bottom: 2px solid #E8B84B; padding-bottom: 8px; display: inline-block; min-width: 300px; }
+                      .tagline { font-size: 16px; color: #374151; font-style: italic; max-width: 500px; line-height: 1.6; margin-bottom: 32px; }
+                      .school { font-size: 13px; color: #6B7280; }
+                      .date { font-size: 12px; color: #9CA3AF; margin-top: 8px; }
+                      .star { font-size: 24px; color: #E8B84B; margin: 0 4px; }
+                      @media print { .cert { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+                    </style>
+                  </head><body>
+                    ${selected.map(cert => `
+                      <div class="cert">
+                        <div class="border-frame"></div>
+                        <div class="border-inner"></div>
+                        <div class="corner corner-tl"></div>
+                        <div class="corner corner-tr"></div>
+                        <div class="corner corner-bl"></div>
+                        <div class="corner corner-br"></div>
+                        <div class="logo">Teachers Deserve It</div>
+                        <div class="star">&#9733;</div>
+                        <div class="award-title">${cert.award}</div>
+                        <div class="recipient">${cert.recipient}</div>
+                        <div class="tagline">${cert.tagline}</div>
+                        <div class="star">&#9733; &#9733; &#9733;</div>
+                        <div class="school">${schoolName}</div>
+                        <div class="date">${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                      </div>
+                    `).join('')}
+                  </body></html>`);
+                  w.document.close();
+                  setTimeout(() => w.print(), 500);
+                  setShowCertificates(false);
+                }}
+                className="text-sm font-semibold px-6 py-2.5 rounded-lg bg-[#E8B84B] text-[#1e2749] hover:bg-[#d4a63e] transition-colors flex items-center gap-2"
+              >
+                <Award className="w-4 h-4" /> Print {certAwards.filter(c => c.recipient).length > 0 ? certAwards.filter(c => c.recipient).length : ''} Certificate{certAwards.filter(c => c.recipient).length !== 1 ? 's' : ''}
+              </button>
             </div>
           </div>
         </div>
@@ -5307,11 +5430,39 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 </div>
                 <p className="text-xs text-gray-600 mb-4 leading-relaxed">Make your staff feel great. Auto-generated printable certificates for fun awards, milestones, and shout-outs. Drop one in a mailbox and watch what happens.</p>
                 <button
-                  onClick={() => generateAIReport('certificates')}
-                  disabled={reportGenerating !== null}
-                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  onClick={() => {
+                    const allAwards = [
+                      { award: 'Hub Explorer', tagline: 'For diving into the Learning Hub and discovering tools that make a real difference.' },
+                      { award: 'Strategy Champion', tagline: 'For trying a new strategy this week and actually using it in the classroom.' },
+                      { award: 'Team Heartbeat', tagline: 'For being the person everyone goes to when they need a lift.' },
+                      { award: 'Wellness Warrior', tagline: 'For taking care of yourself so you can take care of your students.' },
+                      { award: 'PLC MVP', tagline: 'For bringing the best ideas to the table and making everyone better.' },
+                      { award: 'Calm in the Storm', tagline: 'For keeping it together when the day goes sideways.' },
+                      { award: 'First One In', tagline: 'For showing up early, staying late, and never complaining about it.' },
+                      { award: 'Snack Hero', tagline: 'For keeping the lounge stocked and morale high. The real MVP.' },
+                      { award: 'Tech Whisperer', tagline: 'For fixing the printer, resetting passwords, and saving the day.' },
+                      { award: 'Parent Communicator', tagline: 'For turning tough conversations into partnerships.' },
+                      { award: 'Hallway High-Fiver', tagline: 'For making every kid feel seen between classes.' },
+                      { award: 'Growth Mindset', tagline: 'For saying "I have not figured it out yet" instead of "I can not."' },
+                      { award: 'Collaboration King/Queen', tagline: 'For making co-planning actually enjoyable.' },
+                      { award: 'Most Creative Lesson', tagline: 'For the lesson that made students forget they were learning.' },
+                      { award: 'Unsung Hero', tagline: 'For the hundred small things you do that nobody notices but everyone benefits from.' },
+                      { award: 'New Idea Generator', tagline: 'For starting sentences with "What if we tried..." and meaning it.' },
+                      { award: 'Student Whisperer', tagline: 'For reaching the kid everyone else had given up on.' },
+                      { award: 'Positive Energy', tagline: 'For walking into the building and making it better just by being there.' },
+                      { award: 'Data Detective', tagline: 'For finding the story inside the numbers and using it to help kids.' },
+                      { award: 'Above and Beyond', tagline: 'For the thing you did this week that was not in your job description.' },
+                      { award: 'Coffee Champion', tagline: 'For running on caffeine and compassion in equal measure.' },
+                      { award: 'Friday Survivor', tagline: 'For making it through the week with grace, humor, and only minimal caffeine.' },
+                      { award: 'Most Likely to Brighten Your Day', tagline: 'For the smile, the joke, or the perfectly timed meme.' },
+                      { award: 'Classroom Magician', tagline: 'For making 45 minutes feel like 10 and a small room feel like the world.' },
+                    ];
+                    setCertAwards(allAwards.map(a => ({ ...a, recipient: '' })));
+                    setShowCertificates(true);
+                  }}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors flex items-center justify-center gap-2"
                 >
-                  {reportGenerating === 'certificates' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Award className="w-4 h-4" /> Generate Certificates</>}
+                  <Award className="w-4 h-4" /> Create Certificates
                 </button>
               </div>
             </div>
