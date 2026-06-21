@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server';
-import { getServiceSupabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
+
+/** Hub lessons live in the Learning Hub Supabase, not Creator Portal */
+function getHubServiceSupabase() {
+  const url = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL;
+  const key = process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY;
+  if (!url || !key) throw new Error('Learning Hub Supabase not configured');
+  return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
+}
 
 /**
  * POST /api/tdi-admin/lessons
@@ -11,7 +19,7 @@ export async function POST(request: Request) {
     const auth = await requireAdminAuth();
     if (auth instanceof NextResponse) return auth;
 
-    const supabase = getServiceSupabase();
+    const supabase = getHubServiceSupabase();
     const body = await request.json();
 
     const { module_id, title, type, sort_order } = body;
@@ -76,7 +84,7 @@ export async function PATCH(request: Request) {
     const auth = await requireAdminAuth();
     if (auth instanceof NextResponse) return auth;
 
-    const supabase = getServiceSupabase();
+    const supabase = getHubServiceSupabase();
     const body = await request.json();
 
     const {
@@ -144,7 +152,7 @@ export async function DELETE(request: Request) {
     const auth = await requireAdminAuth();
     if (auth instanceof NextResponse) return auth;
 
-    const supabase = getServiceSupabase();
+    const supabase = getHubServiceSupabase();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
