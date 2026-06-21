@@ -1636,13 +1636,86 @@ Learn more about TDI: teachersdeserveit.com`;
         <div class="meta">${date} | Phase: ${partnership?.contract_phase || 'IGNITE'} | Contract: ${partnership?.contract_start ? new Date(partnership.contract_start).toLocaleDateString('en-US', {month: 'short', year: 'numeric'}) : ''} - ${partnership?.contract_end ? new Date(partnership.contract_end).toLocaleDateString('en-US', {month: 'short', year: 'numeric'}) : ''}</div>
       </div>
 
-      <!-- Key Metrics -->
+      <!-- Key Metrics with Donut Charts -->
       <div class="metrics">
-        <div class="metric"><div class="metric-value metric-green">${hubPctVal}%</div><div class="metric-label">Hub Engagement</div></div>
-        <div class="metric"><div class="metric-value metric-blue">${staffStats.total}</div><div class="metric-label">Educators Enrolled</div></div>
-        <div class="metric"><div class="metric-value metric-amber">${completedDel}/${totalDel}</div><div class="metric-label">Deliverables</div></div>
-        <div class="metric"><div class="metric-value metric-purple">${wellness ? wellness + '/5' : tools > 0 ? tools : courses > 0 ? courses : '--'}</div><div class="metric-label">${wellness ? 'Wellness Score' : tools > 0 ? 'Tools Explored' : courses > 0 ? 'Courses Done' : 'Coming Soon'}</div></div>
+        <div class="metric">
+          <svg width="80" height="80" viewBox="0 0 80 80" style="margin: 0 auto 8px;">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="#f3f4f6" stroke-width="6"/>
+            <circle cx="40" cy="40" r="32" fill="none" stroke="#059669" stroke-width="6" stroke-dasharray="${hubPctVal * 2.01} ${(100 - hubPctVal) * 2.01}" stroke-linecap="round" transform="rotate(-90 40 40)"/>
+            <text x="40" y="44" text-anchor="middle" font-size="16" font-weight="800" fill="#059669">${hubPctVal}%</text>
+          </svg>
+          <div class="metric-label">Hub Engagement</div>
+        </div>
+        <div class="metric">
+          <svg width="80" height="80" viewBox="0 0 80 80" style="margin: 0 auto 8px;">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="#f3f4f6" stroke-width="6"/>
+            <circle cx="40" cy="40" r="32" fill="none" stroke="#2563EB" stroke-width="6" stroke-dasharray="${Math.min(staffStats.hubLoggedIn / Math.max(staffStats.total, 1) * 100, 100) * 2.01} ${(100 - Math.min(staffStats.hubLoggedIn / Math.max(staffStats.total, 1) * 100, 100)) * 2.01}" stroke-linecap="round" transform="rotate(-90 40 40)"/>
+            <text x="40" y="38" text-anchor="middle" font-size="18" font-weight="800" fill="#2563EB">${staffStats.total}</text>
+            <text x="40" y="52" text-anchor="middle" font-size="9" fill="#6B7280">enrolled</text>
+          </svg>
+          <div class="metric-label">Educators</div>
+        </div>
+        <div class="metric">
+          <svg width="80" height="80" viewBox="0 0 80 80" style="margin: 0 auto 8px;">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="#f3f4f6" stroke-width="6"/>
+            <circle cx="40" cy="40" r="32" fill="none" stroke="#D97706" stroke-width="6" stroke-dasharray="${totalDel > 0 ? (completedDel / totalDel * 100) * 2.01 : 0} ${totalDel > 0 ? (100 - completedDel / totalDel * 100) * 2.01 : 201}" stroke-linecap="round" transform="rotate(-90 40 40)"/>
+            <text x="40" y="44" text-anchor="middle" font-size="16" font-weight="800" fill="#D97706">${completedDel}/${totalDel}</text>
+          </svg>
+          <div class="metric-label">Deliverables</div>
+        </div>
+        <div class="metric">
+          <svg width="80" height="80" viewBox="0 0 80 80" style="margin: 0 auto 8px;">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="#f3f4f6" stroke-width="6"/>
+            <circle cx="40" cy="40" r="32" fill="none" stroke="#7C3AED" stroke-width="6" stroke-dasharray="${wellness ? (wellness / 5 * 100) * 2.01 : tools > 0 ? Math.min(tools, 100) * 2.01 : 0} ${wellness ? (100 - wellness / 5 * 100) * 2.01 : 201}" stroke-linecap="round" transform="rotate(-90 40 40)"/>
+            <text x="40" y="44" text-anchor="middle" font-size="16" font-weight="800" fill="#7C3AED">${wellness ? wellness + '/5' : tools > 0 ? tools : '--'}</text>
+          </svg>
+          <div class="metric-label">${wellness ? 'Wellness' : tools > 0 ? 'Tools Used' : 'Coming Soon'}</div>
+        </div>
       </div>
+
+      <!-- TDI vs National Benchmark Chart -->
+      <div style="padding: 0 40px; margin-bottom: 32px;">
+        <div style="background: #F9FAFB; border-radius: 12px; padding: 24px; border: 1px solid #f3f4f6;">
+          <p style="font-size: 13px; font-weight: 700; color: #1e2749; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px;">Classroom Implementation Rate</p>
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+            <span style="font-size: 11px; color: #6B7280; width: 100px; text-align: right;">National Avg</span>
+            <div style="flex: 1; height: 24px; background: #E5E7EB; border-radius: 6px; overflow: hidden; position: relative;">
+              <div style="width: 10%; height: 100%; background: #9CA3AF; border-radius: 6px;"></div>
+              <span style="position: absolute; left: 12%; top: 50%; transform: translateY(-50%); font-size: 12px; font-weight: 700; color: #6B7280;">10%</span>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 11px; color: #1e2749; width: 100px; text-align: right; font-weight: 700;">TDI Partners</span>
+            <div style="flex: 1; height: 24px; background: #E5E7EB; border-radius: 6px; overflow: hidden; position: relative;">
+              <div style="width: 74%; height: 100%; background: linear-gradient(90deg, #E8B84B, #D97706); border-radius: 6px;"></div>
+              <span style="position: absolute; left: 76%; top: 50%; transform: translateY(-50%); font-size: 12px; font-weight: 700; color: #1e2749;">74%</span>
+            </div>
+          </div>
+          <p style="font-size: 10px; color: #9CA3AF; margin-top: 12px;">TDI measures what teachers DO, not what they watch. Every course includes classroom action steps.</p>
+        </div>
+      </div>
+
+      ${partnershipKpis.length > 0 ? `
+      <!-- KPI Progress Bars -->
+      <div style="padding: 0 40px; margin-bottom: 32px;">
+        <div style="background: white; border-radius: 12px; padding: 24px; border: 1px solid #f3f4f6; box-shadow: 0 1px 4px rgba(0,0,0,0.04);">
+          <p style="font-size: 13px; font-weight: 700; color: #1e2749; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px;">Partnership Goals</p>
+          ${partnershipKpis.map(k => {
+            const pct = k.target_value > 0 ? Math.min((k.current_value / k.target_value) * 100, 100) : 0;
+            return `
+            <div style="margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-size: 13px; font-weight: 600; color: #1e2749;">${k.kpi_label}</span>
+                <span style="font-size: 13px; font-weight: 700; color: #7C3AED;">${k.current_value}${k.target_unit} / ${k.target_value}${k.target_unit}</span>
+              </div>
+              <div style="height: 8px; background: #F3F4F6; border-radius: 4px; overflow: hidden;">
+                <div style="width: ${pct}%; height: 100%; background: linear-gradient(90deg, #8B5CF6, #7C3AED); border-radius: 4px;"></div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+      ` : ''}
 
       <!-- Report Content -->
       <div class="body">
