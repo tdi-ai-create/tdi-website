@@ -1304,11 +1304,15 @@ export default function PartnerDashboard() {
 
     switch (type) {
       case 'board':
-        return `EXECUTIVE SUMMARY
+        return `THE 30-SECOND VERSION
+
+${s} has ${data.staffTotal} educators with TDI Learning Hub access. ${hasEngagement ? `${data.hubLoginPct}% are actively engaged, ${data.toolsExplored} tools explored, ${data.completedDeliverables} of ${data.totalDeliverables} contracted sessions delivered.` : `The team is onboarding now. Contracted sessions and Hub engagement tracking begin this school year.`} TDI's implementation rate is 74%, compared to 10% for traditional PD. Investment: approximately $${costPerEducator} per educator for the full school year.
+
+EXECUTIVE SUMMARY
 
 ${s} ${hasEngagement ? `is ${data.hubLoginPct >= 60 ? 'thriving' : 'building momentum'} in Phase ${data.phase} of its TDI partnership.` : `has launched its TDI partnership with ${data.staffTotal} educators enrolled in Phase ${data.phase}.`} ${hasEngagement ? `${data.hubLoginPct}% of ${data.staffTotal} educators are actively engaging with the Learning Hub, exploring ${data.toolsExplored} classroom tools and strategies.` : `As staff begin engaging with the Learning Hub, this report will reflect real-time data on adoption, engagement, and classroom impact.`}
 
-TDI partners with schools to build sustainable, educator-centered professional development. Unlike traditional PD, which has a 10% classroom implementation rate nationally, TDI's approach achieves 74% implementation because every course includes action steps, not just information.
+TDI partners with schools to build sustainable, educator-centered professional development. Unlike traditional PD, which has a 10% classroom implementation rate nationally, TDI's approach achieves 74% implementation because every course includes action steps, not just information. This is a school-year partnership, not a one-day event.
 
 KEY METRICS
 
@@ -1338,7 +1342,7 @@ TDI RECOMMENDATION
 
 ${hasEngagement ? `${s} is showing strong early signals of engagement. ${data.hubLoginPct >= 50 ? 'With over half the staff actively using the Hub, this partnership is well-positioned to deepen classroom impact in the coming months.' : 'Continue building momentum by encouraging staff to explore Hub tools during PLCs and team meetings.'}` : `${s} is in the onboarding phase. The foundation is set with ${data.staffTotal} educators enrolled. As the team begins exploring the Hub and observation days take place, this report will show measurable impact on teaching practice, staff wellness, and classroom implementation.`}
 
-${data.phase === 'IGNITE' ? 'Schools that continue into Phase 2 (ACCELERATE) typically see 3x the implementation depth as the program expands from a pilot group to full staff.' : ''}
+${data.phase === 'IGNITE' ? 'When your team is ready, Phase 2 (ACCELERATE) expands from a pilot group to full staff. Schools that make this move typically see 3x the implementation depth. Phase progression is based on your school\'s growth milestones, not a calendar.' : ''}
 
 ABOUT TEACHERS DESERVE IT
 
@@ -1380,6 +1384,21 @@ ${hasEngagement ? `1. Celebrate early adopters. Recognize the ${data.staffLogged
 
 ${data.staffTotal - data.staffLoggedIn > 0 ? `\nREACHING INACTIVE STAFF\n\n${data.staffTotal - data.staffLoggedIn} educators have not yet logged in. This is normal in the first weeks. Research shows that peer influence is the strongest driver of PD adoption. When teachers see colleagues using a tool and getting results, they follow. Focus on your early adopters first.` : ''}
 ${quotesBlock}
+
+TRENDING ACROSS TDI SCHOOLS RIGHT NOW
+
+These are the most-used tools across all TDI partner schools this month. If your team has not explored them yet, they are worth a look:
+- Calm Classrooms, Not Chaos (Classroom Management course, PD eligible)
+- The RINSE Method: Mindset Reset (Stress and Wellness, 5-min Quick Win)
+- Communication that Clicks (Communication course, PD eligible)
+- Lesson Flow Checklist (Time Saver, 5-min Quick Win)
+- Your End-of-Year Checklist for a Guilt-Free Summer (Self-Care Quick Win)
+
+Schools with similar staff sizes to yours are averaging 65% Hub engagement and 12 tools explored per educator. These numbers grow fastest when leaders model engagement by sharing a Quick Win at staff meetings.
+
+YOUR SCHOOL YEAR AT A GLANCE
+
+This partnership runs for the full school year. Your team has access to the Hub every day, not just during scheduled sessions. The most successful schools weave Hub tools into their existing rhythms: PLCs, staff meetings, coaching conversations, and personal planning time.
 
 Explore the Hub: teachersdeserveit.com/hub
 Questions? hello@teachersdeserveit.com`;
@@ -1435,11 +1454,13 @@ GRANT-READY LANGUAGE
 
 PROJECTED OUTCOMES
 
-${data.phase === 'IGNITE' ? `As a Phase 1 (IGNITE) partnership, ${s} is building the foundation for school-wide change. Based on data from similar TDI partnerships, projected outcomes by end of year include:
+${data.phase === 'IGNITE' ? `As a Phase 1 (IGNITE) partnership, ${s} is building the foundation for school-wide change. Based on data from similar TDI partnerships, projected outcomes by end of this school year include:
 - 60-80% Hub engagement rate
 - 15-20% reduction in reported teacher stress
 - 50%+ course completion rate among active users
-- Observable changes in classroom practice during observation days` : `${s} is positioned to see deepening impact as the partnership matures. Schools in Phase 2+ typically see 3x the implementation depth of Phase 1.`}`;
+- Observable changes in classroom practice during observation days
+
+Phase progression is milestone-based. When your team demonstrates consistent engagement and classroom implementation, the conversation about Phase 2 (ACCELERATE) happens naturally. There is no pressure to move on a timeline that does not fit your school.` : `${s} is seeing deepening impact as the partnership matures. Schools in this phase typically see 3x the implementation depth compared to their first year. The growth is compounding.`}`;
 
       case 'quarterly':
         return `QUARTERLY PROGRESS REPORT
@@ -1779,6 +1800,69 @@ Learn more about TDI: teachersdeserveit.com`;
         <div class="highlight-box">
           <div class="highlight-title">About Teachers Deserve It</div>
           <div class="highlight-text">TDI partners with schools to build sustainable, educator-centered professional development. Our approach combines on-demand learning through the Hub, in-person observation days with personalized feedback, and data-driven leadership support. 74% of educators who complete a TDI course report implementing strategies in their classroom within one week.</div>
+        </div>
+
+        <!-- Partnership Status & Next Steps -->
+        <div style="background: #1B2A4A; border-radius: 12px; padding: 24px; margin-top: 24px; color: white;">
+          <p style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #E8B84B; margin-bottom: 12px;">Your Partnership</p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+              <p style="font-size: 11px; color: rgba(255,255,255,0.5);">Current Phase</p>
+              <p style="font-size: 16px; font-weight: 700;">${partnership?.contract_phase || 'IGNITE'}</p>
+            </div>
+            <div>
+              <p style="font-size: 11px; color: rgba(255,255,255,0.5);">Contract Through</p>
+              <p style="font-size: 16px; font-weight: 700;">${partnership?.contract_end ? new Date(partnership.contract_end).toLocaleDateString('en-US', {month: 'long', year: 'numeric'}) : 'Active'}</p>
+            </div>
+            <div>
+              <p style="font-size: 11px; color: rgba(255,255,255,0.5);">Deliverables Remaining</p>
+              <p style="font-size: 16px; font-weight: 700;">${totalDel - completedDel} of ${totalDel}</p>
+            </div>
+            <div>
+              <p style="font-size: 11px; color: rgba(255,255,255,0.5);">Hub Content Available</p>
+              <p style="font-size: 16px; font-weight: 700;">100+ hours</p>
+            </div>
+          </div>
+          <p style="font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.6;">
+            Phase progression is based on your school's growth, not a calendar. When your team hits its stride in ${partnership?.contract_phase || 'IGNITE'}, we will talk together about what the next phase looks like and whether expanding makes sense for your goals.
+          </p>
+        </div>
+
+        <!-- What Else TDI Offers -->
+        <div style="margin-top: 24px; border: 1px solid #f3f4f6; border-radius: 12px; padding: 24px;">
+          <p style="font-size: 13px; font-weight: 700; color: #1e2749; margin-bottom: 12px;">Expand Your Impact</p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div style="padding: 12px; background: #F9FAFB; border-radius: 8px;">
+              <p style="font-size: 13px; font-weight: 600; color: #1e2749;">Additional Observation Days</p>
+              <p style="font-size: 11px; color: #6B7280;">More classroom visits, more Love Notes, deeper coaching conversations.</p>
+            </div>
+            <div style="padding: 12px; background: #F9FAFB; border-radius: 8px;">
+              <p style="font-size: 13px; font-weight: 600; color: #1e2749;">Executive Impact Sessions</p>
+              <p style="font-size: 11px; color: #6B7280;">Strategic planning sessions for your leadership team with TDI experts.</p>
+            </div>
+            <div style="padding: 12px; background: #F9FAFB; border-radius: 8px;">
+              <p style="font-size: 13px; font-weight: 600; color: #1e2749;">District Expansion</p>
+              <p style="font-size: 11px; color: #6B7280;">Bring TDI to additional buildings. Multi-school partnerships see 2x engagement.</p>
+            </div>
+            <div style="padding: 12px; background: #F9FAFB; border-radius: 8px;">
+              <p style="font-size: 13px; font-weight: 600; color: #1e2749;">Custom Course Development</p>
+              <p style="font-size: 11px; color: #6B7280;">We build courses around your school's specific initiatives and priorities.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Referral & Satisfaction -->
+        <div style="margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 12px; padding: 20px;">
+            <p style="font-size: 13px; font-weight: 700; color: #92400E; margin-bottom: 4px;">Know Another School?</p>
+            <p style="font-size: 12px; color: #92400E; line-height: 1.6;">If you know a principal or superintendent who could benefit from TDI, we would love an introduction. Our best partnerships start with a recommendation from a leader like you.</p>
+            <p style="font-size: 11px; color: #B45309; margin-top: 8px;">Email hello@teachersdeserveit.com to connect us.</p>
+          </div>
+          <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 12px; padding: 20px;">
+            <p style="font-size: 13px; font-weight: 700; color: #1E40AF; margin-bottom: 4px;">How Are We Doing?</p>
+            <p style="font-size: 12px; color: #1E40AF; line-height: 1.6;">Your feedback helps us get better. If something is working well, or if something could be better, we want to hear it. We read every response personally.</p>
+            <p style="font-size: 11px; color: #2563EB; margin-top: 8px;">Reply to any TDI email or contact hello@teachersdeserveit.com.</p>
+          </div>
         </div>
       </div>
 
