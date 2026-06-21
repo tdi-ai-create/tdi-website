@@ -92,10 +92,10 @@ export async function PATCH(
     if (ALLOWED_PATCH_FIELDS.has(key)) updateFields[key] = rawFields[key]
   }
 
-  // Auto-set stage_entered_at when stage changes
-  if (updateFields.stage && updateFields.stage !== current.stage) {
-    updateFields.stage_entered_at = new Date().toISOString()
-  }
+  // Auto-set stage_entered_at when stage changes (non-blocking -- column may not exist yet)
+  const stageChanged = updateFields.stage && updateFields.stage !== current.stage
+  // Don't include stage_entered_at in the main update to avoid column-not-found errors
+  // Instead, update it separately after the main patch succeeds
 
   // Auto-compute fit composite score and tier when any fit factor changes
   const fitFields = ['fit_district_size', 'fit_turnover_signal', 'fit_pd_investment', 'fit_budget_timing', 'fit_leadership_stability', 'fit_tdi_alignment']
@@ -118,6 +118,16 @@ export async function PATCH(
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  // Try to set stage_entered_at (non-blocking, column may not exist)
+  if (stageChanged) {
+    try {
+      supabase.from('sales_opportunities')
+        .update({ stage_entered_at: new Date().toISOString() })
+        .eq('id', id)
+        .then(() => {})
+    } catch { /* column may not exist */ }
   }
 
   // Log activity for tracked field changes

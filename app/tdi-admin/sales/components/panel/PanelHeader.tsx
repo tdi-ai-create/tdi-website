@@ -53,11 +53,11 @@ export function PanelHeader({ opp, onClose, onPatch }: Props) {
               if (e.key === 'Enter') commitName()
               if (e.key === 'Escape') { setEditingName(false); setName(opp.name) }
             }}
-            className="w-full text-lg font-bold text-gray-900 border-b border-indigo-400 outline-none bg-transparent"
+            className="w-full text-base font-bold text-gray-900 border-b border-indigo-400 outline-none bg-transparent"
           />
         ) : (
           <h2
-            className="text-lg font-bold text-gray-900 leading-snug cursor-text hover:text-indigo-700 truncate"
+            className="text-base font-bold text-gray-900 leading-snug cursor-text hover:text-indigo-700"
             onClick={() => setEditingName(true)}
             title="Click to edit"
           >

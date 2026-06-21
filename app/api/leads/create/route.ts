@@ -40,29 +40,17 @@ export async function POST(req: NextRequest) {
       partnership_status: body.partnership_status || 'prospect',
     };
 
-    // Try columns from migration 063 — they may not exist on production yet
-    const optionalColumns: Record<string, unknown> = {
-      contact_role: body.contact_role || null,
-      state_code: body.state_code || null,
-      enrichment_status: 'pending',
-    };
+    // Add state if provided
+    if (body.state_code) insertData.state = body.state_code;
 
-    // First attempt: include all columns
+    // Add optional columns directly to insertData
+    if (body.contact_role) insertData.contact_title = body.contact_role;
+
     let { data: lead, error: insertErr } = await supabase
       .from('sales_opportunities')
-      .insert({ ...insertData, ...optionalColumns })
+      .insert(insertData)
       .select()
       .single();
-
-    // If it fails due to missing columns, retry with only base columns
-    if (insertErr && insertErr.message?.includes('schema cache')) {
-      console.warn('Retrying insert without optional columns:', insertErr.message);
-      ({ data: lead, error: insertErr } = await supabase
-        .from('sales_opportunities')
-        .insert(insertData)
-        .select()
-        .single());
-    }
 
     if (insertErr) {
       console.error('Lead insert failed:', insertErr);
