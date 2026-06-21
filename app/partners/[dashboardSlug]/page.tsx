@@ -1304,27 +1304,125 @@ export default function PartnerDashboard() {
 
   const printReport = (title: string, content: string) => {
     const schoolName = partnership?.org_name || partnership?.contact_name || 'School';
+    const date = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const hubPctVal = hubStats?.hub_login_pct ?? (staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0);
+    const totalDel = (partnership?.observation_days_total || 0) + (partnership?.virtual_sessions_total || 0);
+    const completedDel = (partnership?.observation_days_completed || 0) + (partnership?.virtual_sessions_completed || 0);
+    const wellness = hubStats?.mood_avg_7d;
+    const tools = hubStats?.quick_wins_completed ?? 0;
+    const courses = hubStats?.course_completions ?? 0;
+
     const w = window.open('', '_blank');
     if (!w) return;
     w.document.write(`<!DOCTYPE html><html><head><title>${title} - ${schoolName}</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1e2749; max-width: 800px; margin: 0 auto; padding: 48px 40px; line-height: 1.7; }
-        .header { border-bottom: 3px solid #1e2749; padding-bottom: 16px; margin-bottom: 32px; }
-        h1 { font-size: 24px; color: #1e2749; }
-        .meta { font-size: 13px; color: #6B7280; margin-top: 4px; }
-        .content { white-space: pre-wrap; font-size: 14px; }
-        .content strong, .content b { font-weight: 700; }
-        .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #E5E7EB; font-size: 11px; color: #9CA3AF; text-align: center; }
-        @media print { body { padding: 24px; } }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1e2749; max-width: 850px; margin: 0 auto; padding: 0; line-height: 1.7; }
+
+        .cover { background: linear-gradient(135deg, #1B2A4A 0%, #38618C 100%); color: white; padding: 48px; margin-bottom: 32px; }
+        .cover h1 { font-size: 32px; font-weight: 800; margin-bottom: 4px; }
+        .cover .school { font-size: 20px; font-weight: 600; opacity: 0.9; margin-bottom: 24px; }
+        .cover .meta { font-size: 13px; opacity: 0.5; }
+        .cover .logo-text { font-size: 11px; text-transform: uppercase; letter-spacing: 3px; opacity: 0.4; margin-bottom: 32px; }
+
+        .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 0 40px; margin-bottom: 32px; margin-top: -24px; }
+        .metric { background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #f3f4f6; }
+        .metric-value { font-size: 28px; font-weight: 800; }
+        .metric-label { font-size: 10px; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+        .metric-green { color: #059669; }
+        .metric-blue { color: #2563EB; }
+        .metric-amber { color: #D97706; }
+        .metric-purple { color: #7C3AED; }
+
+        .body { padding: 0 40px 40px; }
+        .section { margin-bottom: 28px; }
+        .section-title { font-size: 16px; font-weight: 700; color: #1e2749; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #E8B84B; display: flex; align-items: center; gap: 8px; }
+        .section-icon { width: 20px; height: 20px; display: inline-block; }
+
+        .content-text { font-size: 14px; line-height: 1.8; color: #374151; white-space: pre-wrap; }
+        .content-text p, .content-text br + br { margin-bottom: 12px; }
+
+        .quote-block { border-left: 3px solid #E8B84B; padding: 12px 20px; margin: 16px 0; background: #FFFBEB; border-radius: 0 8px 8px 0; }
+        .quote-text { font-style: italic; font-size: 14px; color: #1e2749; }
+        .quote-attr { font-size: 11px; color: #9CA3AF; margin-top: 4px; }
+
+        .highlight-box { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 12px; padding: 20px; margin: 16px 0; }
+        .highlight-title { font-size: 14px; font-weight: 700; color: #059669; margin-bottom: 4px; }
+        .highlight-text { font-size: 13px; color: #374151; }
+
+        .footer { padding: 24px 40px; border-top: 2px solid #1e2749; margin-top: 32px; display: flex; justify-content: space-between; align-items: center; }
+        .footer-left { font-size: 11px; color: #1e2749; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .footer-right { font-size: 10px; color: #9CA3AF; }
+
+        @media print {
+          body { padding: 0; }
+          .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .metric { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .highlight-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .quote-block { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
       </style>
     </head><body>
-      <div class="header">
+      <!-- Cover -->
+      <div class="cover">
+        <div class="logo-text">Teachers Deserve It</div>
         <h1>${title}</h1>
-        <p class="meta">${schoolName} | ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} | Teachers Deserve It</p>
+        <div class="school">${schoolName}</div>
+        <div class="meta">${date} | Phase: ${partnership?.contract_phase || 'IGNITE'} | Contract: ${partnership?.contract_start ? new Date(partnership.contract_start).toLocaleDateString('en-US', {month: 'short', year: 'numeric'}) : ''} - ${partnership?.contract_end ? new Date(partnership.contract_end).toLocaleDateString('en-US', {month: 'short', year: 'numeric'}) : ''}</div>
       </div>
-      <div class="content">${content.replace(/\n/g, '<br>')}</div>
-      <div class="footer">Confidential -- Prepared by Teachers Deserve It for ${schoolName}</div>
+
+      <!-- Key Metrics -->
+      <div class="metrics">
+        <div class="metric"><div class="metric-value metric-green">${hubPctVal}%</div><div class="metric-label">Hub Engagement</div></div>
+        <div class="metric"><div class="metric-value metric-blue">${staffStats.total}</div><div class="metric-label">Educators Enrolled</div></div>
+        <div class="metric"><div class="metric-value metric-amber">${completedDel}/${totalDel}</div><div class="metric-label">Deliverables</div></div>
+        <div class="metric"><div class="metric-value metric-purple">${wellness ? wellness + '/5' : tools > 0 ? tools : courses > 0 ? courses : '--'}</div><div class="metric-label">${wellness ? 'Wellness Score' : tools > 0 ? 'Tools Explored' : courses > 0 ? 'Courses Done' : 'Coming Soon'}</div></div>
+      </div>
+
+      <!-- Report Content -->
+      <div class="body">
+        <div class="content-text">${content
+          .replace(/\n\n/g, '</p><p>')
+          .replace(/\n/g, '<br>')
+          .replace(/^/, '<p>').replace(/$/, '</p>')
+          .replace(/"([^"]+)"/g, '<span class="quote-block"><span class="quote-text">"$1"</span></span>')
+        }</div>
+
+        ${teacherQuotes.length > 0 ? `
+          <div class="section">
+            <div class="section-title">What Educators Are Saying</div>
+            ${teacherQuotes.slice(0, 3).map(q => `
+              <div class="quote-block">
+                <div class="quote-text">"${q.quote_text}"</div>
+                <div class="quote-attr">-- ${q.teacher_role}${q.session_type ? ', ' + q.session_type : ''}</div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+
+        ${partnershipKpis.length > 0 ? `
+          <div class="section">
+            <div class="section-title">Partnership Goals</div>
+            ${partnershipKpis.map(k => `
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;">
+                <span style="font-size:14px;font-weight:500;">${k.kpi_label}</span>
+                <span style="font-size:14px;font-weight:700;color:#7C3AED;">${k.current_value}${k.target_unit} of ${k.target_value}${k.target_unit}</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+
+        <div class="highlight-box">
+          <div class="highlight-title">About Teachers Deserve It</div>
+          <div class="highlight-text">TDI partners with schools to build sustainable, educator-centered professional development. Our approach combines on-demand learning through the Hub, in-person observation days with personalized feedback, and data-driven leadership support. 74% of educators who complete a TDI course report implementing strategies in their classroom within one week.</div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <div class="footer-left">Teachers Deserve It</div>
+        <div class="footer-right">Confidential | Prepared for ${schoolName} | ${date}</div>
+      </div>
     </body></html>`);
     w.document.close();
     setTimeout(() => w.print(), 500);
