@@ -417,6 +417,7 @@ export default function PartnerDashboard() {
   const [tourStep, setTourStep] = useState(-1); // -1 = not showing
   const [tourDismissed, setTourDismissed] = useState(false);
   const [showGoalWizard, setShowGoalWizard] = useState(false);
+  const [showPreviewData, setShowPreviewData] = useState(false);
   const [goalStep, setGoalStep] = useState(0);
   const [goalSelections, setGoalSelections] = useState<Record<string, boolean>>({});
   const [goalTargets, setGoalTargets] = useState<Record<string, number>>({});
@@ -2033,12 +2034,34 @@ export default function PartnerDashboard() {
               </div>
             )}
 
+            {/* ─── PREVIEW MODE TOGGLE ─── show when no real data yet */}
+            {staffStats.hubLoggedIn === 0 && !hubStats?.has_real_data && (
+              <div className="flex items-center justify-between bg-white rounded-2xl px-5 py-3 shadow-sm border border-gray-100">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-gray-400" />
+                  <span className="text-xs text-gray-600">
+                    {showPreviewData ? 'Showing example data so you can see what this dashboard looks like in action.' : 'Your dashboard will come alive as your team starts using the Hub.'}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setShowPreviewData(!showPreviewData)}
+                  className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
+                    showPreviewData ? 'bg-gray-100 text-gray-600' : 'bg-[#1e2749] text-white'
+                  }`}
+                >
+                  {showPreviewData ? 'Hide Preview' : 'Preview with Data'}
+                </button>
+              </div>
+            )}
+
             {/* ─── AI SUMMARY ─── replaces data overload */}
             {(() => {
-              const hubPct = hubStats?.hub_login_pct ?? (staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0);
-              const toolsExplored = hubStats?.quick_wins_completed ?? 0;
-              const wellnessScore = metricsRange === 'month' ? (hubStats?.mood_avg_30d ?? hubStats?.mood_avg_7d ?? null) : (hubStats?.mood_avg_7d ?? null);
-              const activeUsers = metricsRange === 'month' ? (hubStats?.logins_this_month ?? hubStats?.active_users_7d ?? 0) : (hubStats?.active_users_7d ?? 0);
+              // Use preview data when toggled on and no real data exists
+              const isPreview = showPreviewData && staffStats.hubLoggedIn === 0;
+              const hubPct = isPreview ? 72 : (hubStats?.hub_login_pct ?? (staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0));
+              const toolsExplored = isPreview ? 47 : (hubStats?.quick_wins_completed ?? 0);
+              const wellnessScore = isPreview ? 4.2 : (metricsRange === 'month' ? (hubStats?.mood_avg_30d ?? hubStats?.mood_avg_7d ?? null) : (hubStats?.mood_avg_7d ?? null));
+              const activeUsers = isPreview ? 14 : (metricsRange === 'month' ? (hubStats?.logins_this_month ?? hubStats?.active_users_7d ?? 0) : (hubStats?.active_users_7d ?? 0));
               const totalDeliverables = (partnership.observation_days_total || 0) + (partnership.virtual_sessions_total || 0);
               const completedDeliverables = (partnership.observation_days_completed || 0) + (partnership.virtual_sessions_completed || 0);
               const phaseNum = partnership.contract_phase === 'IGNITE' ? 1 : partnership.contract_phase === 'ACCELERATE' ? 2 : 3;
@@ -2046,10 +2069,11 @@ export default function PartnerDashboard() {
               return (
                 <>
                   {/* AI Summary Card */}
-                  <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+                  <div className={`bg-white rounded-2xl p-6 md:p-7 shadow-sm border ${isPreview ? 'border-purple-200 ring-1 ring-purple-100' : 'border-gray-100'}`}>
                     <div className="flex items-center gap-1.5 mb-3">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#E8B84B]" />
                       <span className="text-[10px] font-bold text-[#E8B84B] uppercase tracking-widest">Partnership Intelligence</span>
+                      {isPreview && <span className="text-[9px] font-bold text-purple-500 bg-purple-50 px-2 py-0.5 rounded-full ml-2">PREVIEW</span>}
                     </div>
                     <p className="text-base md:text-lg leading-relaxed text-gray-700" style={{ fontFamily: 'Georgia, serif' }}>
                       {hubPct > 0 ? (
