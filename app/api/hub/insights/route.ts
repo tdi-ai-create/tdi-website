@@ -93,6 +93,15 @@ Write the full report content. Use ALL CAPS for section headers. Use bullet poin
     return NextResponse.json({ insight: text.text })
   } catch (error) {
     console.error('[insights] error:', error)
+    // For partnership reports, return the error so the client can fall back gracefully
+    if (request) {
+      try {
+        const body = await request.clone().json().catch(() => ({}));
+        if (body.tab === 'partnership_report') {
+          return NextResponse.json({ insight: '', error: String(error) })
+        }
+      } catch {}
+    }
     return NextResponse.json({ insight: '' })
   }
 }
