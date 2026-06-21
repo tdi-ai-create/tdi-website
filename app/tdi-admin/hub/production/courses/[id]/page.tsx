@@ -37,7 +37,235 @@ import {
   Eye,
   EyeOff,
   Save,
+  Upload,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
+
+/**
+ * VideoUploadSection -- handles video upload to Cloudflare Stream
+ * and displays the existing video player if a video_id is set.
+ */
+function VideoUploadSection({
+  videoId,
+  durationMinutes,
+  transcriptText,
+  onUpdate,
+}: {
+  videoId: string;
+  durationMinutes: number;
+  transcriptText: string;
+  onUpdate: (updates: { video_id?: string; duration_minutes?: number; transcript_text?: string }) => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'processing' | 'ready' | 'error'>('idle');
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const cfAccountId = 'a559fc0dc4cb956f505801ed5427ba99';
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('video/')) {
+      setErrorMsg('Please select a video file (MP4, MOV, etc.)');
+      setUploadStatus('error');
+      return;
+    }
+
+    setUploading(true);
+    setUploadStatus('uploading');
+    setUploadProgress(0);
+    setErrorMsg('');
+
+    try {
+      // Step 1: Get direct upload URL from our API
+      const urlRes = await fetch('/api/tdi-admin/videos/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          filename: file.name,
+          maxDurationSeconds: 7200,
+        }),
+      });
+
+      if (!urlRes.ok) {
+        const err = await urlRes.json();
+        throw new Error(err.error || 'Failed to get upload URL');
+      }
+
+      const { uploadUrl, videoUid } = await urlRes.json();
+
+      // Step 2: Upload file directly to Cloudflare
+      setUploadProgress(10);
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const uploadRes = await fetch(uploadUrl, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error('Upload to Cloudflare failed');
+      }
+
+      setUploadProgress(70);
+      setUploadStatus('processing');
+
+      // Step 3: Poll for processing completion
+      onUpdate({ video_id: videoUid });
+
+      let ready = false;
+      let attempts = 0;
+      while (!ready && attempts < 60) {
+        await new Promise(r => setTimeout(r, 3000));
+        attempts++;
+
+        const statusRes = await fetch(`/api/tdi-admin/videos/upload?uid=${videoUid}`);
+        if (statusRes.ok) {
+          const status = await statusRes.json();
+          if (status.readyToStream) {
+            ready = true;
+            setUploadProgress(100);
+            setUploadStatus('ready');
+            // Auto-set duration from Cloudflare
+            if (status.duration) {
+              onUpdate({
+                video_id: videoUid,
+                duration_minutes: Math.round(status.duration / 60),
+              });
+            }
+          } else if (status.status === 'error') {
+            throw new Error('Video processing failed');
+          } else {
+            setUploadProgress(70 + Math.min(attempts, 25));
+          }
+        }
+      }
+
+      if (!ready) {
+        // Still processing but we have the ID -- it'll be ready soon
+        setUploadStatus('ready');
+        setUploadProgress(100);
+      }
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Upload failed');
+      setUploadStatus('error');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Video</label>
+
+        {/* Show player if video exists */}
+        {videoId && (
+          <div className="mb-3 rounded-lg overflow-hidden border border-gray-200">
+            <iframe
+              src={`https://customer-${cfAccountId}.cloudflarestream.com/${videoId}/iframe`}
+              style={{ width: '100%', aspectRatio: '16/9', border: 'none' }}
+              allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        )}
+
+        {/* Upload area */}
+        {!uploading && uploadStatus !== 'processing' && (
+          <label className="flex flex-col items-center justify-center w-full p-4 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-teal-400 hover:bg-teal-50/30 transition-colors">
+            <Upload className="w-6 h-6 text-gray-400 mb-2" />
+            <p className="text-sm text-gray-500 font-medium">
+              {videoId ? 'Replace video' : 'Click to upload video'}
+            </p>
+            <p className="text-xs text-gray-400 mt-1">MP4, MOV, MKV, or WebM</p>
+            <input
+              type="file"
+              accept="video/*"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+          </label>
+        )}
+
+        {/* Upload progress */}
+        {(uploading || uploadStatus === 'processing') && (
+          <div className="p-4 border border-gray-200 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />
+              <span className="text-sm text-gray-600">
+                {uploadStatus === 'uploading' ? 'Uploading...' : 'Processing video...'}
+              </span>
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-2">
+              <div
+                className="h-2 rounded-full transition-all duration-500"
+                style={{ width: `${uploadProgress}%`, background: '#00B5AD' }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Success */}
+        {uploadStatus === 'ready' && !uploading && (
+          <div className="flex items-center gap-2 mt-2 text-sm text-green-600">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Video uploaded and ready</span>
+          </div>
+        )}
+
+        {/* Error */}
+        {uploadStatus === 'error' && (
+          <div className="flex items-center gap-2 mt-2 text-sm text-red-600">
+            <AlertCircle className="w-4 h-4" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
+        {/* Manual ID fallback */}
+        <details className="mt-2">
+          <summary className="text-xs text-gray-400 cursor-pointer hover:text-gray-600">
+            Or paste a video ID manually
+          </summary>
+          <input
+            type="text"
+            value={videoId}
+            onChange={(e) => onUpdate({ video_id: e.target.value })}
+            className="w-full mt-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+            placeholder="Cloudflare Stream video ID"
+          />
+        </details>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Duration (minutes)</label>
+        <input
+          type="number"
+          value={durationMinutes}
+          onChange={(e) => onUpdate({ duration_minutes: parseInt(e.target.value) || 0 })}
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+          min={0}
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Transcript</label>
+        <textarea
+          value={transcriptText}
+          onChange={(e) => onUpdate({ transcript_text: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+          rows={6}
+          placeholder="Paste transcript here..."
+        />
+      </div>
+    </>
+  );
+}
 
 const theme = {
   primary: '#00B5AD',
@@ -632,38 +860,12 @@ function LessonEditorPanel({
 
       {/* Video Lesson Fields */}
       {lesson.type === 'video' && (
-        <>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Video ID</label>
-            <input
-              type="text"
-              value={form.video_id}
-              onChange={(e) => setForm({ ...form, video_id: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              placeholder="Mux/Cloudflare asset ID"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Duration (minutes)</label>
-            <input
-              type="number"
-              value={form.duration_minutes}
-              onChange={(e) => setForm({ ...form, duration_minutes: parseInt(e.target.value) || 0 })}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              min={0}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Transcript</label>
-            <textarea
-              value={form.transcript_text}
-              onChange={(e) => setForm({ ...form, transcript_text: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
-              rows={6}
-              placeholder="Paste transcript here..."
-            />
-          </div>
-        </>
+        <VideoUploadSection
+          videoId={form.video_id}
+          durationMinutes={form.duration_minutes}
+          transcriptText={form.transcript_text}
+          onUpdate={(updates) => setForm({ ...form, ...updates })}
+        />
       )}
 
       {/* Text Lesson Fields */}

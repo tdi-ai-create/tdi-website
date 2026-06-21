@@ -390,24 +390,15 @@ export default function LessonPage({ params }: LessonPageProps) {
             {/* ── LESSON TAB ── */}
             {activeTab === 'lesson' && (<>
 
-            {/* Video placeholder (if video_url exists) */}
+            {/* Video player (Cloudflare Stream) */}
             {currentLesson.video_url && (
-              <div
-                className="w-full aspect-video rounded-xl mb-6 flex flex-col items-center justify-center"
-                style={{ backgroundColor: '#E5E7EB' }}
-              >
-                <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-                  style={{ backgroundColor: 'rgba(43, 58, 103, 0.1)' }}
-                >
-                  <Play size={32} style={{ color: '#2B3A67', marginLeft: '4px' }} />
-                </div>
-                <p
-                  className="text-gray-500"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  {tUI('Video player coming soon')}
-                </p>
+              <div className="w-full aspect-video rounded-xl mb-6 overflow-hidden bg-black">
+                <iframe
+                  src={`https://customer-a559fc0dc4cb956f505801ed5427ba99.cloudflarestream.com/${currentLesson.video_url}/iframe`}
+                  style={{ width: '100%', height: '100%', border: 'none' }}
+                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                  allowFullScreen
+                />
               </div>
             )}
 

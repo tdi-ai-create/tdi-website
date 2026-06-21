@@ -478,7 +478,7 @@ function MediaTab() {
         <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
           Upload and manage PDFs, images, and other files for courses and Quick Wins. Files are stored in Supabase Storage.
         </p>
-        <p className="text-xs text-gray-400 mb-6">Video hosting integration (Mux/Cloudflare) coming in a future update.</p>
+        <p className="text-xs text-gray-400 mb-6">Videos are hosted on Cloudflare Stream. Upload videos when editing a course lesson.</p>
         <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 max-w-sm mx-auto hover:border-gray-300 transition-colors cursor-pointer">
           <Upload size={24} className="mx-auto mb-2 text-gray-400" />
           <p className="text-sm text-gray-500">Drag and drop files here</p>
