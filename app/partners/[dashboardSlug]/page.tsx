@@ -5584,6 +5584,59 @@ export default function PartnerDashboard() {
         {activeTab === 'our-partnership' && (
           <div className="py-6 space-y-4">
 
+            {/* Welcome / Context Section */}
+            <div className="bg-gradient-to-br from-[#1B2A4A] to-[#38618C] rounded-2xl p-6 md:p-8 text-white">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <Handshake className="w-6 h-6 text-[#E8B84B]" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold mb-2">Your Partnership Story</h2>
+                  <p className="text-sm text-white/70 leading-relaxed mb-4">
+                    This is where your year with TDI comes to life. As we work together, this page will fill with session notes, teacher feedback, milestone celebrations, and the data that tells your school&apos;s growth story. Everything you need for board presentations, grant reporting, or just remembering how far your team has come.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      onClick={() => { setActiveTab('blueprint'); }}
+                      className="text-xs font-semibold px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors flex items-center gap-1.5"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      View Your Plan
+                    </button>
+                    <button
+                      onClick={() => { setActiveTab('reporting'); }}
+                      className="text-xs font-semibold px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors flex items-center gap-1.5"
+                    >
+                      <BarChart3 className="w-3.5 h-3.5" />
+                      Generate Reports
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* What's Included Summary */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <h2 className="text-base font-semibold text-gray-900 mb-4">What Your Partnership Includes</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  { value: staffStats.total, label: 'Hub Memberships', icon: Users, color: '#8B5CF6' },
+                  { value: partnership?.observation_days_total || 0, label: 'Observation Days', icon: Eye, color: '#D97706' },
+                  { value: partnership?.executive_sessions_total || 0, label: 'Executive Sessions', icon: GraduationCap, color: '#2563EB' },
+                  { value: partnership?.virtual_sessions_total || 0, label: 'Virtual Sessions', icon: Headphones, color: '#2A9D8F' },
+                ].filter(item => item.value > 0).map((item, i) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={i} className="rounded-xl bg-gray-50 p-4 text-center">
+                      <Icon className="w-5 h-5 mx-auto mb-2" style={{ color: item.color }} />
+                      <p className="text-2xl font-bold text-[#1e2749]">{item.value}</p>
+                      <p className="text-[10px] text-gray-500 font-medium">{item.label}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Partnership Goal */}
             <div className="bg-white rounded-xl border border-gray-100 p-6"
               style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
