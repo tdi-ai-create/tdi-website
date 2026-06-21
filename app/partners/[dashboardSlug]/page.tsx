@@ -1544,49 +1544,64 @@ export default function PartnerDashboard() {
             aria-labelledby="tab-overview"
             className="space-y-6"
           >
-            {/* ─── PARTNERSHIP SETUP CHECKLIST (onboarding hub) ─── */}
+            {/* ─── PARTNERSHIP SETUP CHECKLIST (contract-specific onboarding) ─── */}
             {showGettingStarted && (() => {
+              const hasObservations = (partnership.observation_days_total || 0) > 0;
+              const hasVirtualSessions = (partnership.virtual_sessions_total || 0) > 0;
+              const isDistrict = partnership.partnership_type === 'district';
+
               const setupSteps = [
+                // Always: staff roster
                 {
                   id: 'roster',
-                  title: 'Upload Staff Roster',
-                  description: 'Add your educators so they get Learning Hub access.',
+                  title: 'Add Your Educators',
+                  description: staffStats.total > 0
+                    ? `${staffStats.total} educators added. They\'ll get Learning Hub access automatically.`
+                    : `Upload your staff list so your team gets Learning Hub access. CSV, spreadsheet, or even a list of names and emails works.`,
                   done: staffStats.total > 0,
                   icon: Users,
                   action: staffStats.total > 0 ? undefined : () => navigateToTab('team'),
                   actionLabel: 'Add Staff',
                 },
-                {
+                // Only if contract includes in-person observations
+                ...(hasObservations ? [{
                   id: 'photos',
-                  title: 'Upload Staff Photos',
-                  description: 'Helps us know your team during school visits.',
-                  done: false, // Will be true when photos are uploaded
+                  title: 'Share Staff Photos',
+                  description: 'Even a few photos help. When our team visits your building for observations, knowing faces makes the experience more personal for everyone. Send whatever you have -- a staff directory page, a few headshots, or a ZIP file. New staff can be added later.',
+                  done: false,
                   icon: Eye,
                   action: () => navigateToTab('team'),
                   actionLabel: 'Upload',
-                },
+                }] : []),
+                // Always: Hub access
                 {
                   id: 'hub_access',
-                  title: 'Hub Access Activated',
-                  description: `${staffStats.hubLoggedIn} of ${staffStats.total} educators have logged in.`,
+                  title: 'Your Team Starts Exploring',
+                  description: staffStats.hubLoggedIn > 0
+                    ? `${staffStats.hubLoggedIn} of ${staffStats.total} educators have logged into the Hub so far.`
+                    : 'Once your roster is uploaded, your team will receive an email with Hub access. This usually happens within 24 hours.',
                   done: staffStats.hubLoggedIn > 0,
                   icon: BookOpen,
                   action: () => window.open('https://teachersdeserveit.com/hub', '_blank'),
                   actionLabel: 'Preview Hub',
                 },
+                // Always: kickoff call
                 {
                   id: 'schedule',
-                  title: 'Schedule Kickoff Call',
-                  description: 'Book your first session to set partnership goals.',
+                  title: 'Schedule Your Kickoff Call',
+                  description: 'A 30-minute call with Rae to align on goals, walk through your dashboard, and answer any questions.',
                   done: actionItems.some(i => i.category === 'scheduling' && i.status === 'completed'),
                   icon: Calendar,
                   action: () => window.open('https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat', '_blank'),
                   actionLabel: 'Book Call',
                 },
+                // Always: goals
                 {
                   id: 'goals',
-                  title: 'Set Your Goals',
-                  description: 'Tell us what success looks like for your team.',
+                  title: 'Define What Success Looks Like',
+                  description: partnershipKpis.length > 0
+                    ? 'Goals are set. You can adjust these anytime.'
+                    : 'What does a great year look like for your team? We\'ll track progress together.',
                   done: partnershipKpis.length > 0,
                   icon: Target,
                   action: partnershipKpis.length > 0 ? undefined : () => {
@@ -1601,15 +1616,18 @@ export default function PartnerDashboard() {
                   },
                   actionLabel: 'Set Goal',
                 },
-                {
+                // Only if contract includes observations or virtual sessions
+                ...((hasObservations || hasVirtualSessions) ? [{
                   id: 'dates',
-                  title: 'Confirm Key Dates',
-                  description: 'Lock in observation days and virtual sessions.',
-                  done: actionItems.some(i => i.title?.toLowerCase().includes('observation') && i.status === 'completed'),
+                  title: hasObservations ? 'Confirm Observation Dates' : 'Schedule Virtual Sessions',
+                  description: hasObservations
+                    ? `Your contract includes ${partnership.observation_days_total} in-person observation day${partnership.observation_days_total > 1 ? 's' : ''}. Let\'s get those on the calendar.`
+                    : `Your contract includes ${partnership.virtual_sessions_total} virtual session${partnership.virtual_sessions_total > 1 ? 's' : ''}. Pick times that work for your team.`,
+                  done: actionItems.some(i => (i.title?.toLowerCase().includes('observation') || i.title?.toLowerCase().includes('session')) && i.status === 'completed'),
                   icon: CalendarDays,
                   action: () => navigateToTab('blueprint'),
                   actionLabel: 'View Schedule',
-                },
+                }] : []),
               ];
 
               const completedCount = setupSteps.filter(s => s.done).length;
@@ -4030,41 +4048,74 @@ export default function PartnerDashboard() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-amber-50 border border-amber-100">
-                    <Upload className="w-4 h-4 text-amber-600 flex-shrink-0" />
-                    <div className="flex-1">
-                      <p className="text-xs font-medium text-amber-800">Staff photos help us during school visits</p>
-                      <p className="text-[10px] text-amber-600">Upload a ZIP of headshots named by staff member (e.g., john-smith.jpg)</p>
+                  {/* Photo upload -- only show if contract includes observations */}
+                  {(partnership.observation_days_total || 0) > 0 && (
+                    <div className="rounded-xl bg-gradient-to-r from-amber-50 to-white border border-amber-100 p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Eye className="w-4 h-4 text-amber-700" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-amber-900 mb-1">Help us know your team</p>
+                          <p className="text-xs text-amber-700 leading-relaxed mb-3">
+                            When our team visits for observations, knowing faces makes the experience more personal. Even a few photos is a great start -- you can always add more later as new staff join.
+                          </p>
+                          <p className="text-[10px] text-amber-600 mb-3">
+                            Send whatever you have: a staff directory PDF, individual headshots, a ZIP file, or a spreadsheet with photo links. We&apos;ll sort it out.
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            <label className="text-xs font-semibold px-3 py-2 rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                              <Upload className="w-3.5 h-3.5" />
+                              Upload Photos
+                              <input
+                                type="file"
+                                accept=".zip,.pdf,.jpg,.jpeg,.png,.webp"
+                                multiple
+                                className="hidden"
+                                onChange={async (e) => {
+                                  const files = e.target.files;
+                                  if (!files || !partnership) return;
+
+                                  // If it's a ZIP, use bulk upload
+                                  if (files[0]?.name.endsWith('.zip')) {
+                                    const formData = new FormData();
+                                    formData.append('file', files[0]);
+                                    formData.append('consentChecked', 'true');
+                                    const resp = await fetch(`/api/tdi-admin/leadership/${partnership.id}/staff-photos/bulk`, {
+                                      method: 'POST',
+                                      headers: { 'x-user-email': partnership.contact_email || '' },
+                                      body: formData,
+                                    });
+                                    const result = await resp.json();
+                                    setToastMessage(result.uploaded > 0 ? `${result.uploaded} photos matched and uploaded` : 'Photos received -- we\'ll match them to your roster');
+                                  } else {
+                                    // For individual files or PDFs, upload as evidence
+                                    for (const file of Array.from(files)) {
+                                      const formData = new FormData();
+                                      formData.append('file', file);
+                                      formData.append('partnershipId', partnership.id);
+                                      formData.append('itemId', 'staff-photos');
+                                      formData.append('userId', userId || '');
+                                      await fetch('/api/partners/upload-evidence', { method: 'POST', body: formData });
+                                    }
+                                    setToastMessage(`${files.length} file${files.length > 1 ? 's' : ''} uploaded -- we'll match photos to your roster`);
+                                  }
+                                  setTimeout(() => setToastMessage(''), 4000);
+                                }}
+                              />
+                            </label>
+                            <a
+                              href={`mailto:rae@teachersdeserveit.com?subject=Staff%20Photos%20for%20${encodeURIComponent(partnership.org_name || partnership.contact_name || 'Partnership')}`}
+                              className="text-xs font-medium px-3 py-2 rounded-lg border border-amber-200 text-amber-700 hover:bg-amber-50 transition-colors inline-flex items-center gap-1.5"
+                            >
+                              <Mail className="w-3.5 h-3.5" />
+                              Email them instead
+                            </a>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <label className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition-colors cursor-pointer flex-shrink-0">
-                      Upload Photos
-                      <input
-                        type="file"
-                        accept=".zip"
-                        className="hidden"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (!file || !partnership) return;
-                          const formData = new FormData();
-                          formData.append('file', file);
-                          formData.append('consentChecked', 'true');
-                          const resp = await fetch(`/api/tdi-admin/leadership/${partnership.id}/staff-photos/bulk`, {
-                            method: 'POST',
-                            headers: { 'x-user-email': partnership.contact_email || '' },
-                            body: formData,
-                          });
-                          const result = await resp.json();
-                          if (result.uploaded > 0) {
-                            setToastMessage(`${result.uploaded} photos uploaded successfully`);
-                            setTimeout(() => setToastMessage(''), 3000);
-                          } else {
-                            setToastMessage(result.error || 'Photo upload failed');
-                            setTimeout(() => setToastMessage(''), 3000);
-                          }
-                        }}
-                      />
-                    </label>
-                  </div>
+                  )}
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     <div className="rounded-xl bg-gray-50 p-3 text-center">
                       <p className="text-lg font-bold text-[#1e2749]">{staffStats.total}</p>
