@@ -1296,11 +1296,268 @@ export default function PartnerDashboard() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const generateFallbackReport = (type: string, data: any) => {
-    const schoolName = data.schoolName;
-    if (type === 'board') {
-      return `EXECUTIVE SUMMARY\n\n${schoolName} is in Phase ${data.phase} of its TDI partnership with ${data.staffTotal} educators enrolled. ${data.hubLoginPct}% have actively engaged with the Learning Hub.\n\nKEY METRICS\n- Hub Engagement: ${data.hubLoginPct}%\n- Tools Explored: ${data.toolsExplored}\n- Course Completions: ${data.courseCompletions}\n- Deliverables: ${data.completedDeliverables}/${data.totalDeliverables}\n${data.wellnessScore ? `- Educator Wellness: ${data.wellnessScore}/5` : ''}\n\n${data.kpis.length > 0 ? 'KPI PROGRESS\n' + data.kpis.map((k: {label:string;current:number;target:number;unit:string}) => `- ${k.label}: ${k.current}${k.unit} of ${k.target}${k.unit} target`).join('\n') : ''}\n\n${data.quotes.length > 0 ? 'EDUCATOR FEEDBACK\n' + data.quotes.map((q: {text:string;role:string}) => `"${q.text}" -- ${q.role}`).join('\n\n') : ''}\n\nRECOMMENDATION\nContinue partnership into next phase to build on current momentum and deepen classroom implementation.`;
+    const s = data.schoolName;
+    const hasEngagement = data.hubLoginPct > 0;
+    const costPerEducator = data.staffTotal > 0 ? Math.round(18000 / data.staffTotal) : 0; // Approximate based on typical contract
+    const quotesBlock = data.quotes.length > 0 ? '\n\nWHAT EDUCATORS ARE SAYING\n\n' + data.quotes.map((q: {text:string;role:string}) => `"${q.text}"\n-- ${q.role}`).join('\n\n') : '';
+    const kpiBlock = data.kpis.length > 0 ? '\n\nPARTNERSHIP GOALS\n\n' + data.kpis.map((k: {label:string;current:number;target:number;unit:string}) => `${k.label}: ${k.current}${k.unit} of ${k.target}${k.unit} target`).join('\n') : '';
+
+    switch (type) {
+      case 'board':
+        return `EXECUTIVE SUMMARY
+
+${s} ${hasEngagement ? `is ${data.hubLoginPct >= 60 ? 'thriving' : 'building momentum'} in Phase ${data.phase} of its TDI partnership.` : `has launched its TDI partnership with ${data.staffTotal} educators enrolled in Phase ${data.phase}.`} ${hasEngagement ? `${data.hubLoginPct}% of ${data.staffTotal} educators are actively engaging with the Learning Hub, exploring ${data.toolsExplored} classroom tools and strategies.` : `As staff begin engaging with the Learning Hub, this report will reflect real-time data on adoption, engagement, and classroom impact.`}
+
+TDI partners with schools to build sustainable, educator-centered professional development. Unlike traditional PD, which has a 10% classroom implementation rate nationally, TDI's approach achieves 74% implementation because every course includes action steps, not just information.
+
+KEY METRICS
+
+Hub Engagement: ${data.hubLoginPct}% of staff active
+Educators Enrolled: ${data.staffTotal}
+Tools and Strategies Explored: ${data.toolsExplored}
+Course Completions: ${data.courseCompletions}
+Deliverables Completed: ${data.completedDeliverables} of ${data.totalDeliverables}${data.wellnessScore ? `\nEducator Wellness Score: ${data.wellnessScore}/5` : ''}
+${kpiBlock}
+
+INVESTMENT ANALYSIS
+
+Cost per educator: approximately $${costPerEducator}/year
+This includes: Learning Hub access (100+ hours of content), ${data.totalDeliverables} in-person and virtual sessions, personalized observation feedback (Love Notes), leadership dashboard with real-time data, and ongoing support.
+
+For comparison, a single-day PD conference costs $500-2,000 per teacher with no follow-up and no implementation tracking. TDI provides year-round support at a fraction of that cost with measurable outcomes.
+
+HOW TDI IS DIFFERENT
+
+Most PD is consumed and forgotten. TDI measures what teachers DO, not what they watch. Every course includes classroom action steps. Every observation day produces personalized feedback. Every data point on this dashboard is evidence of real change happening in real classrooms.
+
+National PD implementation rate: 10%
+TDI partner implementation rate: 74%
+${quotesBlock}
+
+TDI RECOMMENDATION
+
+${hasEngagement ? `${s} is showing strong early signals of engagement. ${data.hubLoginPct >= 50 ? 'With over half the staff actively using the Hub, this partnership is well-positioned to deepen classroom impact in the coming months.' : 'Continue building momentum by encouraging staff to explore Hub tools during PLCs and team meetings.'}` : `${s} is in the onboarding phase. The foundation is set with ${data.staffTotal} educators enrolled. As the team begins exploring the Hub and observation days take place, this report will show measurable impact on teaching practice, staff wellness, and classroom implementation.`}
+
+${data.phase === 'IGNITE' ? 'Schools that continue into Phase 2 (ACCELERATE) typically see 3x the implementation depth as the program expands from a pilot group to full staff.' : ''}
+
+ABOUT TEACHERS DESERVE IT
+
+TDI has partnered with schools across all 50 states, supporting over 100,000 educators. Our three-phase model (IGNITE, ACCELERATE, SUSTAIN) meets schools where they are and grows with them. Learn more at teachersdeserveit.com.`;
+
+      case 'engagement':
+        return `STAFF ENGAGEMENT ANALYSIS
+
+${hasEngagement ? `${data.hubLoginPct}% of ${s}'s ${data.staffTotal} educators have logged into the TDI Learning Hub. Here is what the data shows about how your team is engaging.` : `${s} has ${data.staffTotal} educators enrolled in the TDI Learning Hub. As your team begins exploring, this report will show adoption rates, popular content, and engagement trends.`}
+
+ADOPTION OVERVIEW
+
+Total Staff Enrolled: ${data.staffTotal}
+Active on Hub: ${data.staffLoggedIn} (${data.hubLoginPct}%)
+Not Yet Logged In: ${data.staffTotal - data.staffLoggedIn}
+Tools Explored: ${data.toolsExplored}
+Courses Completed: ${data.courseCompletions}
+
+${hasEngagement ? `Your adoption rate of ${data.hubLoginPct}% ${data.hubLoginPct >= 60 ? 'exceeds the typical TDI partner benchmark of 60% in the first quarter.' : data.hubLoginPct >= 30 ? 'is building steadily. Most TDI partners reach 60%+ within the first quarter.' : 'has room to grow. Here are strategies that work for other schools.'}` : 'Typical TDI partners see 30-40% adoption in the first two weeks and 60%+ by the end of the first month.'}
+
+POPULAR HUB CONTENT
+
+TDI's Learning Hub includes 100+ hours of practical, classroom-ready content organized by what educators need most:
+
+Stress and Wellness: Tools like the RINSE Method for mid-day resets, breathing exercises, and boundary-setting scripts
+Classroom Management: Strategies including Calm Classrooms, Not Chaos and executive functioning tools
+Time Savers: Lesson planning shortcuts, communication templates, and workflow tools
+Leadership: Courses for coaches and admin on building teacher-centered culture
+
+Each tool takes 5-15 minutes and includes a specific classroom action step. This is why TDI's implementation rate is 74%, compared to the national average of 10%.
+
+RECOMMENDATIONS FOR YOUR NEXT PLC
+
+${hasEngagement ? `1. Celebrate early adopters. Recognize the ${data.staffLoggedIn} educators who have already engaged.
+2. Start a staff meeting with a 5-minute Quick Win. The Lesson Flow Checklist or Professional Email Practices guide are great starters.
+3. Ask your team: "What is one classroom challenge you are facing this week?" Then point them to a specific Hub tool that addresses it.` : `1. Send a brief email letting your staff know they have Hub access. We provide a template you can copy and paste.
+2. Start your next staff meeting with a 5-minute Quick Win from the Hub. Screen-share it so the team sees how easy it is.
+3. Identify 2-3 early adopters who can champion the Hub in your building.`}
+
+${data.staffTotal - data.staffLoggedIn > 0 ? `\nREACHING INACTIVE STAFF\n\n${data.staffTotal - data.staffLoggedIn} educators have not yet logged in. This is normal in the first weeks. Research shows that peer influence is the strongest driver of PD adoption. When teachers see colleagues using a tool and getting results, they follow. Focus on your early adopters first.` : ''}
+${quotesBlock}
+
+Explore the Hub: teachersdeserveit.com/hub
+Questions? hello@teachersdeserveit.com`;
+
+      case 'impact':
+        return `IMPACT AND ROI REPORT
+
+INVESTMENT SUMMARY
+
+${s} has invested in a TDI ${data.phase} partnership providing ${data.staffTotal} educators with year-round professional development support. This is not a one-day workshop. It is a sustained, multi-channel approach to building teaching capacity.
+
+Your partnership includes:
+- Learning Hub access for ${data.staffTotal} educators (100+ hours of content)
+- ${data.totalDeliverables} contracted deliverables (observation days, virtual sessions, executive sessions)
+- Personalized observation feedback (Love Notes) for every observed teacher
+- Real-time leadership dashboard with engagement data
+- AI-generated reports for board presentations and grant reporting
+
+COST COMPARISON
+
+TDI Partnership: approximately $${costPerEducator} per educator per year
+Traditional PD Conference: $500-2,000 per teacher per day (no follow-up)
+External Coaching: $150-300 per hour per teacher
+
+TDI provides daily access to tools, ongoing support, in-person feedback, and measurable outcomes at a fraction of what traditional approaches cost.
+
+MEASURABLE OUTCOMES
+
+Hub Engagement: ${data.hubLoginPct}% of staff active
+Tools and Strategies Explored: ${data.toolsExplored}
+Courses Completed: ${data.courseCompletions}
+Deliverables Completed: ${data.completedDeliverables} of ${data.totalDeliverables}
+${data.wellnessScore ? `Educator Wellness Score: ${data.wellnessScore}/5` : ''}
+${kpiBlock}
+
+WHY THIS MATTERS
+
+Teachers are nearly twice as likely to suffer from job-related stress compared to other industries, yet only 2% of schools offer comprehensive wellness support for staff. TDI's Learning Hub addresses this directly with stress management tools, boundary-setting resources, and daily wellness check-ins.
+
+When teachers feel supported, student outcomes improve. Research consistently shows that teacher effectiveness is the single largest in-school factor affecting student achievement, and teacher effectiveness improves when educators have access to practical, implementable strategies with follow-up support.
+
+TDI BENCHMARK: IMPLEMENTATION RATE
+
+National average PD implementation: 10%
+TDI partner implementation rate: 74%
+
+This is not a typo. The difference is in the design. Every TDI course includes action steps, not just information. We measure what teachers do, not what they watch.
+${quotesBlock}
+
+GRANT-READY LANGUAGE
+
+"${s} has partnered with Teachers Deserve It (TDI) to provide ${data.staffTotal} educators with sustained, evidence-based professional development. The TDI model combines on-demand digital learning, in-person classroom observations with personalized feedback, and data-driven leadership support. TDI partners report a 74% classroom implementation rate, compared to the national average of 10% for traditional professional development."
+
+PROJECTED OUTCOMES
+
+${data.phase === 'IGNITE' ? `As a Phase 1 (IGNITE) partnership, ${s} is building the foundation for school-wide change. Based on data from similar TDI partnerships, projected outcomes by end of year include:
+- 60-80% Hub engagement rate
+- 15-20% reduction in reported teacher stress
+- 50%+ course completion rate among active users
+- Observable changes in classroom practice during observation days` : `${s} is positioned to see deepening impact as the partnership matures. Schools in Phase 2+ typically see 3x the implementation depth of Phase 1.`}`;
+
+      case 'quarterly':
+        return `QUARTERLY PROGRESS REPORT
+
+QUARTER HIGHLIGHTS
+
+${hasEngagement ? `${s} has ${data.staffLoggedIn} of ${data.staffTotal} educators actively using the Learning Hub (${data.hubLoginPct}%). ${data.toolsExplored > 0 ? `The team has explored ${data.toolsExplored} classroom tools and strategies.` : ''} ${data.completedDeliverables > 0 ? `${data.completedDeliverables} of ${data.totalDeliverables} contracted deliverables are complete.` : 'Deliverables are scheduled and upcoming.'}` : `${s} launched its TDI partnership this quarter with ${data.staffTotal} educators enrolled. The team is in the onboarding phase with Hub access being activated.`}
+${kpiBlock}
+
+METRICS VS TARGETS
+
+Hub Engagement: ${data.hubLoginPct}% (TDI benchmark: 60-80%)
+Tools Explored: ${data.toolsExplored}
+Courses Completed: ${data.courseCompletions}
+Deliverables: ${data.completedDeliverables}/${data.totalDeliverables}
+Action Items: ${data.actionItemsCompleted} completed, ${data.actionItemsPending} pending
+${data.wellnessScore ? `Wellness Score: ${data.wellnessScore}/5` : ''}
+${quotesBlock}
+
+WHAT TDI IS DELIVERING NEXT
+
+${data.completedDeliverables < data.totalDeliverables ? `Your partnership still has ${data.totalDeliverables - data.completedDeliverables} deliverables remaining this contract year. These may include observation days, virtual strategy sessions, or executive impact sessions. Check your dashboard's "Your Plan" tab for details on what each session includes and how to prepare.` : 'All contracted deliverables have been completed.'}
+
+The Learning Hub continues to add new content regularly, including seasonal tools, timely resources, and courses built by practicing educators. Encourage your team to check the "Quick Wins" section for 5-minute tools they can use immediately.
+
+LOOKING AHEAD
+
+${data.phase === 'IGNITE' ? 'As Phase 1 progresses, focus on building a core group of Hub champions who can model engagement for the rest of the staff. Schools that identify 3-5 early adopters see significantly faster whole-staff adoption.' : 'Continue deepening implementation by connecting Hub tools to your existing PLC structure and school improvement goals.'}
+
+Dashboard: teachersdeserveit.com/partners
+Questions: hello@teachersdeserveit.com`;
+
+      case 'teacher':
+        return `TEACHER HIGHLIGHTS
+
+FOR YOUR NEXT STAFF MEETING, NEWSLETTER, OR PLC AGENDA
+
+${hasEngagement ? `Your team has been exploring the TDI Learning Hub, and here is what is getting the most attention.` : `The TDI Learning Hub is now available to your entire team. Here is what educators at schools like yours are finding most valuable.`}
+
+WHAT EDUCATORS LOVE MOST
+
+Quick Wins (5-minute tools):
+- Lesson Flow Checklist: A simple checklist that saves 10+ minutes of planning time
+- Professional Email Practices: Templates for every tough conversation
+- The RINSE Method: A 5-step mid-day reset when stress hits
+- Calm Classrooms, Not Chaos: Practical strategies that work in real time
+
+Courses (PD credit eligible):
+- The Differentiation Fix: Making one lesson work for every learner
+- Building Strong Teacher-Para Partnerships: Collaboration that actually works
+- Executive Functioning Made Simple: Tools for K-5 classrooms
+- Smart Communication Choices: What to use, when, and how
+
+Every tool includes a specific action step for your classroom. This is not theory. It is "try this tomorrow" practical.
+
+${data.toolsExplored > 0 ? `YOUR TEAM BY THE NUMBERS\n\n${data.staffLoggedIn} educators have logged in\n${data.toolsExplored} tools explored\n${data.courseCompletions} courses completed` : 'Once your team starts exploring, we will track tools used, courses completed, and PD hours earned right here.'}
+${quotesBlock}
+
+SHARE THIS WITH YOUR TEAM
+
+Copy and paste this into your next staff email:
+
+"Hey team, just a reminder that you have full access to the TDI Learning Hub. If you have 5 minutes, try a Quick Win. If you have 30 minutes, start a course. Everything counts toward your PD hours, and the tools are designed to be used in your classroom the next day. Log in at teachersdeserveit.com/hub."
+
+RECOMMENDED FOR THIS MONTH
+
+Based on what is popular across TDI partner schools right now:
+1. Your End-of-Year Checklist for a Guilt-Free Summer (Quick Win, 5 min)
+2. Communication that Clicks (Course, PD eligible)
+3. Mastery Learning + TDI PD Model Explainer (Quick Win, 5 min)
+
+Explore everything: teachersdeserveit.com/hub`;
+
+      case 'community':
+        return `COMMUNITY UPDATE
+
+WHAT YOUR SCHOOL IS DOING TO SUPPORT GREAT TEACHING
+
+${s} has partnered with Teachers Deserve It (TDI), a nationally recognized professional development organization, to give our educators the tools, strategies, and support they need to thrive.
+
+WHAT OUR TEACHERS ARE LEARNING
+
+Our ${data.staffTotal} educators now have access to the TDI Learning Hub, an online platform with over 100 hours of practical, classroom-ready professional development. Unlike traditional PD workshops, which often feel disconnected from daily teaching, TDI's content is designed to be used the next day.
+
+Popular topics include:
+- Managing stress and avoiding burnout
+- Classroom management strategies that work
+- Time-saving tools for lesson planning and communication
+- Building strong relationships with students and families
+- Supporting diverse learners with practical differentiation strategies
+
+HOW THIS HELPS YOUR STUDENTS
+
+When teachers have better tools, students have better experiences. Research shows that teacher effectiveness is the single largest in-school factor affecting student achievement. By investing in our educators' growth, we are investing directly in every student's success.
+
+TDI's approach is different from traditional professional development:
+- 74% of educators who complete a TDI course implement strategies in their classroom within one week (national average: 10%)
+- Every tool includes a specific action step, not just theory
+- Educators access support on their own schedule, not just during workshop days
+
+OUR COMMITMENT
+
+${s} is committed to building a school where educators are supported, valued, and growing. Our partnership with TDI is one part of that commitment. ${data.totalDeliverables > 0 ? `This year, our partnership includes ${data.totalDeliverables} in-person and virtual sessions where TDI's team works directly with our staff.` : ''}
+
+We believe that when teachers thrive, students thrive. That is what Teachers Deserve It is all about.
+
+BY THE NUMBERS
+
+${data.staffTotal} educators with Hub access
+100+ hours of on-demand professional development
+${data.totalDeliverables} contracted support sessions this year
+50 states served by TDI nationally
+
+Learn more about TDI: teachersdeserveit.com`;
+
+      default:
+        return `${s} Partnership Report\n\nStaff: ${data.staffTotal} enrolled, ${data.staffLoggedIn} active (${data.hubLoginPct}%)\nTools explored: ${data.toolsExplored}\nDeliverables: ${data.completedDeliverables}/${data.totalDeliverables}`;
     }
-    return `${schoolName} Partnership Report\n\nStaff: ${data.staffTotal} enrolled, ${data.staffLoggedIn} active (${data.hubLoginPct}%)\nTools explored: ${data.toolsExplored}\nDeliverables: ${data.completedDeliverables}/${data.totalDeliverables}\n${data.quotes.length > 0 ? '\nEducator Voices:\n' + data.quotes.map((q: {text:string;role:string}) => `"${q.text}" -- ${q.role}`).join('\n') : ''}`;
   };
 
   const printReport = (title: string, content: string) => {
