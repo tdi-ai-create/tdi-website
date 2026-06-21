@@ -417,7 +417,7 @@ export default function PartnerDashboard() {
   const [tourStep, setTourStep] = useState(-1); // -1 = not showing
   const [tourDismissed, setTourDismissed] = useState(false);
   const [showGoalWizard, setShowGoalWizard] = useState(false);
-  const [showPreviewData, setShowPreviewData] = useState(false);
+  const [showPreviewData, setShowPreviewData] = useState(true); // ON by default for new partnerships
   const [goalStep, setGoalStep] = useState(0);
   const [goalSelections, setGoalSelections] = useState<Record<string, boolean>>({});
   const [goalTargets, setGoalTargets] = useState<Record<string, number>>({});
@@ -787,7 +787,7 @@ export default function PartnerDashboard() {
     },
     {
       title: 'You\'re All Set',
-      body: 'Questions? Hit "Schedule Session" anytime to book a call with Rae. Or just reply to any email from us. We read every one.',
+      body: 'Questions? Hit "Schedule Session" anytime to book a call with our team. Or just reply to any email from us. We read every one.',
       icon: '6',
     },
   ];
@@ -1570,7 +1570,7 @@ export default function PartnerDashboard() {
               {/* Step 2: Target Setting with Sliders */}
               {goalStep === 1 && (
                 <div>
-                  <p className="text-sm text-gray-600 mb-4">Adjust each target to what feels ambitious but achievable. These are starting points -- you&apos;ll finalize them with Rae on your kickoff call.</p>
+                  <p className="text-sm text-gray-600 mb-4">Adjust each target to what feels ambitious but achievable. These are starting points -- you&apos;ll finalize them with our team on your kickoff call.</p>
                   <div className="space-y-5">
                     {Object.entries(goalTargets).map(([key, value]) => {
                       const labels: Record<string, { label: string; unit: string; max: number; benchmark: string }> = {
@@ -1616,7 +1616,7 @@ export default function PartnerDashboard() {
               {/* Step 3: Review & Save */}
               {goalStep === 2 && (
                 <div>
-                  <p className="text-sm text-gray-600 mb-4">Here&apos;s what we&apos;ll track together. These are draft goals -- you&apos;ll review and finalize them with Rae on your kickoff call.</p>
+                  <p className="text-sm text-gray-600 mb-4">Here&apos;s what we&apos;ll track together. These are draft goals -- you&apos;ll review and finalize them with our team on your kickoff call.</p>
                   <div className="space-y-2 mb-4">
                     {Object.entries(goalTargets).map(([key, value]) => {
                       const labels: Record<string, string> = {
@@ -1636,7 +1636,7 @@ export default function PartnerDashboard() {
                   </div>
                   <div className="bg-amber-50 rounded-xl p-3 mb-6">
                     <p className="text-xs text-amber-700">
-                      <strong>These are draft goals.</strong> During your kickoff call, Rae will review these with you, adjust based on your school&apos;s context, and lock them in. You can always update them later.
+                      <strong>These are draft goals.</strong> During your kickoff call, our team will review these with you, adjust based on your school&apos;s context, and lock them in. You can always update them later.
                     </p>
                   </div>
                   <div className="flex justify-between">
@@ -1779,7 +1779,7 @@ export default function PartnerDashboard() {
                 {
                   id: 'schedule',
                   title: 'Schedule Your Kickoff Call',
-                  description: 'A 30-minute call with Rae to align on goals, walk through your dashboard, and answer any questions.',
+                  description: 'A 30-minute call with our team to align on goals, walk through your dashboard, and answer any questions.',
                   done: actionItems.some(i => i.category === 'scheduling' && i.status === 'completed'),
                   icon: Calendar,
                   action: () => window.open('https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat', '_blank'),
@@ -2034,22 +2034,20 @@ export default function PartnerDashboard() {
               </div>
             )}
 
-            {/* ─── PREVIEW MODE TOGGLE ─── show when no real data yet */}
-            {staffStats.hubLoggedIn === 0 && !hubStats?.has_real_data && (
-              <div className="flex items-center justify-between bg-white rounded-2xl px-5 py-3 shadow-sm border border-gray-100">
+            {/* ─── PREVIEW MODE BANNER ─── show when preview data is active */}
+            {staffStats.hubLoggedIn === 0 && !hubStats?.has_real_data && showPreviewData && (
+              <div className="flex items-center justify-between bg-purple-50 rounded-2xl px-5 py-3 border border-purple-100">
                 <div className="flex items-center gap-2">
-                  <Eye className="w-4 h-4 text-gray-400" />
-                  <span className="text-xs text-gray-600">
-                    {showPreviewData ? 'Showing example data so you can see what this dashboard looks like in action.' : 'Your dashboard will come alive as your team starts using the Hub.'}
+                  <Eye className="w-4 h-4 text-purple-500" />
+                  <span className="text-xs text-purple-700 font-medium">
+                    Showing example data so you can see what this dashboard will look like once your team is active.
                   </span>
                 </div>
                 <button
-                  onClick={() => setShowPreviewData(!showPreviewData)}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
-                    showPreviewData ? 'bg-gray-100 text-gray-600' : 'bg-[#1e2749] text-white'
-                  }`}
+                  onClick={() => setShowPreviewData(false)}
+                  className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors"
                 >
-                  {showPreviewData ? 'Hide Preview' : 'Preview with Data'}
+                  Hide Preview
                 </button>
               </div>
             )}
@@ -3383,7 +3381,7 @@ export default function PartnerDashboard() {
                               return (
                                 <div className="mt-3">
                                   <p style={{ color: '#6b7280' }} className="text-sm">
-                                    Your TDI partner will send your staff a welcome email with Hub access instructions. If you need to resend, contact Rae@TeachersDeserveIt.com
+                                    Your TDI partner will send your staff a welcome email with Hub access instructions. If you need to resend, contact hello@teachersdeserveit.com
                                   </p>
                                   <p style={{ color: '#9ca3af' }} className="text-xs mt-1">
                                     {staffStats.hubLoggedIn}/{staffStats.total} logged in
@@ -4051,7 +4049,7 @@ export default function PartnerDashboard() {
                     }}
                   >
                     <Mail className="w-4 h-4" />
-                    Email Rae
+                    Email Us
                   </a>
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
@@ -4141,7 +4139,7 @@ export default function PartnerDashboard() {
                     <a href="mailto:rae@teachersdeserveit.com"
                       className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold"
                       style={{ background: '#1B2A4A', color: '#FFFFFF' }}>
-                      Email Rae
+                      Email Us
                     </a>
                     <a href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                       target="_blank" rel="noopener noreferrer"
@@ -5595,7 +5593,7 @@ export default function PartnerDashboard() {
               </div>
               <p className="text-base text-gray-700 leading-relaxed font-medium">
                 {partnership?.partnership_goal ||
-                  'Your partnership goal will be set during your onboarding call with Rae.'}
+                  'Your partnership goal will be set during your onboarding call with our team.'}
               </p>
             </div>
 
@@ -6168,7 +6166,7 @@ export default function PartnerDashboard() {
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 px-6 py-3 bg-[#1e2749] text-white rounded-lg font-medium hover:bg-[#2a3459] transition-colors"
                       >
-                        Schedule a Call with Rae
+                        Schedule a Call
                         <ArrowRight className="w-4 h-4" />
                       </a>
                     </div>
