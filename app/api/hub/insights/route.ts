@@ -44,13 +44,34 @@ Total check-ins: ${data.totalCheckIns || 0}
 Dimensions checked: ${data.dimensionsChecked?.join(', ') || 'none yet'}
 
 Keep it under 100 words total. Be honest and caring, not clinical.`
+    } else if (tab === 'partnership_report') {
+      const reportPrompt = data?.prompt || context;
+      if (!reportPrompt) {
+        return NextResponse.json({ error: 'Missing report prompt' }, { status: 400 })
+      }
+      prompt = `You are a professional report writer for Teachers Deserve It (TDI), an education company that partners with schools for year-long professional development.
+
+Voice rules:
+- Warm, direct, honest, no fluff
+- Never use em dashes. Use commas or periods instead.
+- No emojis
+- Professional but human, not corporate
+- Always position TDI positively with specific data points
+- Include the 74% implementation rate stat (vs 10% national average) where relevant
+- End sections with forward-looking language
+
+${reportPrompt}
+
+Write the full report content. Use ALL CAPS for section headers. Use bullet points with - for lists. Keep it thorough but readable.`
     } else {
       return NextResponse.json({ error: 'Unknown tab type' }, { status: 400 })
     }
 
+    const maxTokens = tab === 'partnership_report' ? 1500 : 200;
+
     const response = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 200,
+      max_tokens: maxTokens,
       messages: [{ role: 'user', content: prompt }],
     })
 
