@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { getHubSupabase } from '@/lib/supabase-hub';
 import {
   Search,
   Plus,
@@ -542,17 +543,51 @@ export function CoursesTab() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
 
-  // Load courses
+  // Load courses directly from Hub Supabase (bypasses API auth issues)
   const loadCourses = async () => {
     setIsLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (statusFilter !== 'all') params.set('status', statusFilter);
-      if (search) params.set('search', search);
+      const supabase = getHubSupabase();
+      let query = supabase
+        .from('hub_courses')
+        .select(`
+          *,
+          modules:hub_modules(count),
+          lessons:hub_modules(
+            lessons:hub_lessons(count)
+          )
+        `)
+        .order('updated_at', { ascending: false });
 
-      const response = await fetch(`/api/tdi-admin/courses?${params.toString()}`);
-      const data = await response.json();
-      setCourses(data.courses || []);
+      if (statusFilter === 'published') {
+        query = query.eq('is_published', true);
+      } else if (statusFilter === 'draft') {
+        query = query.eq('is_published', false);
+      }
+
+      const { data: courseData, error } = await query;
+
+      if (error) {
+        console.error('Error loading courses:', error);
+        setCourses([]);
+        return;
+      }
+
+      const enriched = (courseData || []).map((course: any) => {
+        const moduleCount = course.modules?.[0]?.count || 0;
+        let lessonCount = 0;
+        if (course.lessons) {
+          course.lessons.forEach((mod: any) => {
+            if (mod.lessons) {
+              mod.lessons.forEach((l: any) => { lessonCount += l.count || 0; });
+            }
+          });
+        }
+        const { modules, lessons, ...rest } = course;
+        return { ...rest, module_count: moduleCount, lesson_count: lessonCount };
+      });
+
+      setCourses(enriched);
     } catch (error) {
       console.error('Error loading courses:', error);
     } finally {
