@@ -421,6 +421,12 @@ export default function PartnerDashboard() {
   const [showGoalWizard, setShowGoalWizard] = useState(false);
   const [showCertificates, setShowCertificates] = useState(false);
   const [certAwards, setCertAwards] = useState<{award: string; tagline: string; recipient: string}[]>([]);
+  const [showDateRequest, setShowDateRequest] = useState(false);
+  const [dateRequestType, setDateRequestType] = useState('');
+  const [dateRequestDate, setDateRequestDate] = useState('');
+  const [dateRequestAltDate, setDateRequestAltDate] = useState('');
+  const [dateRequestNotes, setDateRequestNotes] = useState('');
+  const [dateRequestSubmitting, setDateRequestSubmitting] = useState(false);
   const [showPreviewData, setShowPreviewData] = useState(true); // ON by default for new partnerships
   const [goalStep, setGoalStep] = useState(0);
   const [goalSelections, setGoalSelections] = useState<Record<string, boolean>>({});
@@ -2417,6 +2423,203 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
         </div>
       )}
 
+      {/* ─── DATE REQUEST MODAL ─── */}
+      {showDateRequest && partnership && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center" onClick={() => setShowDateRequest(false)}>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+
+            <div className="bg-gradient-to-br from-[#1B2A4A] to-[#38618C] px-6 py-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <CalendarDays className="w-5 h-5 text-[#E8B84B]" />
+                  <div>
+                    <h3 className="text-base font-bold" style={{ color: '#FFFFFF' }}>Request a Date</h3>
+                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>Pick your event type and preferred date. We will confirm within 48 hours.</p>
+                  </div>
+                </div>
+                <button onClick={() => setShowDateRequest(false)} className="text-white/40 hover:text-white/80">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-5">
+              {/* Event Type Selection */}
+              <div>
+                <label className="text-sm font-semibold text-[#1e2749] block mb-2">What are you scheduling?</label>
+                <div className="space-y-2">
+                  {[
+                    ...(partnership.observation_days_total > 0 ? [{
+                      id: 'observation',
+                      label: 'On-Campus Observation Day',
+                      detail: 'Full day, students in session. Our team observes classrooms and delivers personalized Love Notes to every teacher visited.',
+                      timing: partnership.observation_days_total >= 3
+                        ? 'Day 1: Sept-Dec, Day 2: Jan-Mar, Day 3: Apr-May'
+                        : partnership.observation_days_total >= 2
+                        ? 'Day 1: Sept-Dec, Day 2: Jan-Mar'
+                        : 'Best scheduled Sept-Dec',
+                      tips: 'Pick a regular school day with students in session. Early release or late start works if you want time for a staff debrief. We can start as early and stay as late as you need. Consider morning donuts for your team if you want to set the tone.',
+                      icon: Eye,
+                      color: '#D97706',
+                    }] : []),
+                    ...(partnership.executive_sessions_total > 0 ? [{
+                      id: 'executive',
+                      label: 'Executive Impact Session',
+                      detail: 'Virtual strategic session with your leadership team. Align vision, review progress, plan next steps.',
+                      timing: partnership.executive_sessions_total >= 3
+                        ? 'Session 1: Jul-Aug, Session 2: Dec, Session 3: Apr-May'
+                        : partnership.executive_sessions_total >= 2
+                        ? 'Session 1: Jul-Aug, Session 2: Apr-May'
+                        : 'Best scheduled Jul-Aug',
+                      tips: 'Block a full 2 hours for your team even though the session is 90 minutes. This gives breathing room for the conversation to go where it needs to go. Virtual, so no travel needed.',
+                      icon: GraduationCap,
+                      color: '#2563EB',
+                    }] : []),
+                    ...(partnership.virtual_sessions_total > 0 ? [{
+                      id: 'virtual',
+                      label: 'Virtual Strategy Session',
+                      detail: '45-60 minute virtual session. Coaching, problem-solving, planning support, or check-ins.',
+                      timing: 'Flexible throughout the year. Most useful between observation days or when your team needs a boost.',
+                      tips: 'These are designed to be responsive to what you need right now. No prep required. Come with questions, challenges, or just a "here is what is happening" and we will work through it together.',
+                      icon: Headphones,
+                      color: '#2A9D8F',
+                    }] : []),
+                  ].map(event => {
+                    const Icon = event.icon;
+                    const selected = dateRequestType === event.id;
+                    return (
+                      <button
+                        key={event.id}
+                        onClick={() => setDateRequestType(event.id)}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                          selected ? 'border-[#E8B84B] bg-amber-50/50' : 'border-gray-100 hover:border-gray-200'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: `${event.color}15` }}>
+                            <Icon className="w-4 h-4" style={{ color: event.color }} />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-[#1e2749]">{event.label}</p>
+                            <p className="text-xs text-gray-500 mt-0.5">{event.detail}</p>
+                            {selected && (
+                              <div className="mt-3 space-y-2">
+                                <div className="bg-white rounded-lg p-3 border border-gray-100">
+                                  <p className="text-[10px] font-bold text-[#E8B84B] uppercase tracking-wide mb-1">Ideal Timing</p>
+                                  <p className="text-xs text-gray-700">{event.timing}</p>
+                                </div>
+                                <div className="bg-white rounded-lg p-3 border border-gray-100">
+                                  <p className="text-[10px] font-bold text-[#2A9D8F] uppercase tracking-wide mb-1">Tips</p>
+                                  <p className="text-xs text-gray-700">{event.tips}</p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Date Selection */}
+              {dateRequestType && (
+                <>
+                  <div>
+                    <label className="text-sm font-semibold text-[#1e2749] block mb-1">Preferred Date</label>
+                    <input
+                      type="date"
+                      value={dateRequestDate}
+                      onChange={e => setDateRequestDate(e.target.value)}
+                      min={new Date().toISOString().split('T')[0]}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-semibold text-[#1e2749] block mb-1">Alternate Date <span className="font-normal text-gray-400">(optional)</span></label>
+                    <input
+                      type="date"
+                      value={dateRequestAltDate}
+                      onChange={e => setDateRequestAltDate(e.target.value)}
+                      min={new Date().toISOString().split('T')[0]}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-semibold text-[#1e2749] block mb-1">Notes <span className="font-normal text-gray-400">(optional)</span></label>
+                    <textarea
+                      value={dateRequestNotes}
+                      onChange={e => setDateRequestNotes(e.target.value)}
+                      placeholder={dateRequestType === 'observation' ? 'e.g., We have an early release that day at 1pm. Would love a staff debrief after students leave.' : 'Any details that would help us prepare...'}
+                      rows={3}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50 resize-none"
+                    />
+                  </div>
+
+                  <button
+                    onClick={async () => {
+                      if (!dateRequestDate) {
+                        setToastMessage('Please select a preferred date');
+                        setTimeout(() => setToastMessage(''), 2000);
+                        return;
+                      }
+                      setDateRequestSubmitting(true);
+                      const eventLabels: Record<string, string> = {
+                        observation: 'On-Campus Observation Day',
+                        executive: 'Executive Impact Session',
+                        virtual: 'Virtual Strategy Session',
+                      };
+                      try {
+                        const resp = await fetch('/api/partners/request-date', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            partnershipId: partnership.id,
+                            eventType: eventLabels[dateRequestType] || dateRequestType,
+                            preferredDate: dateRequestDate,
+                            alternateDate: dateRequestAltDate || null,
+                            notes: dateRequestNotes || null,
+                            requesterName: partnership.contact_name,
+                            requesterEmail: partnership.contact_email,
+                            needsTravel: dateRequestType === 'observation',
+                          }),
+                        });
+                        const data = await resp.json();
+                        if (data.success) {
+                          setShowDateRequest(false);
+                          setDateRequestType('');
+                          setDateRequestDate('');
+                          setDateRequestAltDate('');
+                          setDateRequestNotes('');
+                          setToastMessage('Date request submitted. We will confirm within 48 hours.');
+                          setTimeout(() => setToastMessage(''), 4000);
+                        }
+                      } catch {
+                        setToastMessage('Something went wrong. Please try again.');
+                        setTimeout(() => setToastMessage(''), 3000);
+                      } finally {
+                        setDateRequestSubmitting(false);
+                      }
+                    }}
+                    disabled={dateRequestSubmitting || !dateRequestDate}
+                    className="w-full py-3 rounded-xl text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {dateRequestSubmitting ? (
+                      <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</>
+                    ) : (
+                      <><CalendarDays className="w-4 h-4" /> Request This Date</>
+                    )}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ─── GOAL SETTING WIZARD ─── */}
       {showGoalWizard && partnership && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center" onClick={() => setShowGoalWizard(false)}>
@@ -2736,8 +2939,8 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     : `Your contract includes ${partnership.virtual_sessions_total} virtual session${partnership.virtual_sessions_total > 1 ? 's' : ''}. Pick times that work for your team.`,
                   done: actionItems.some(i => (i.title?.toLowerCase().includes('observation') || i.title?.toLowerCase().includes('session')) && i.status === 'completed'),
                   icon: CalendarDays,
-                  action: () => navigateToTab('blueprint'),
-                  actionLabel: 'View Schedule',
+                  action: () => setShowDateRequest(true),
+                  actionLabel: 'Request Date',
                 }] : []),
               ];
 

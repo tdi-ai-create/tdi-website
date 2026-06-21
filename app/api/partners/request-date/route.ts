@@ -13,7 +13,7 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
  */
 export async function POST(request: NextRequest) {
   try {
-    const { partnershipId, eventType, preferredDate, alternateDate, notes, requesterName, requesterEmail } = await request.json();
+    const { partnershipId, eventType, preferredDate, alternateDate, notes, requesterName, requesterEmail, needsTravel } = await request.json();
 
     if (!partnershipId || !eventType || !preferredDate) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -94,6 +94,24 @@ export async function POST(request: NextRequest) {
           `,
         }),
       });
+    }
+
+    // Send travel booking notification for in-person events
+    if (needsTravel && RESEND_API_KEY) {
+      const preferred = new Date(preferredDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: 'Teachers Deserve It Team <hello@teachersdeserveit.com>',
+          to: ['hello@teachersdeserveit.com'],
+          subject: `Travel Event Needed: ${eventType} at ${schoolName}`,
+          text: `A date has been requested that requires travel.\n\nSchool: ${schoolName}\nEvent: ${eventType}\nRequested Date: ${preferred}\nAlternate: ${alternateDate ? new Date(alternateDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : 'None'}\nNotes: ${notes || 'None'}\nContact: ${requesterName} (${requesterEmail})\n\nOnce the date is confirmed, book travel accordingly.\n\nPartnership: https://www.teachersdeserveit.com/tdi-admin/leadership/${partnershipId}`,
+        }),
+      }).catch(() => {});
     }
 
     return NextResponse.json({ success: true, message: 'Date request submitted. We will confirm within 48 hours.' });
