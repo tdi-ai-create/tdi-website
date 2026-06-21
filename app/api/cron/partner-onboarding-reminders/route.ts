@@ -224,6 +224,65 @@ The TDI Team`;
       }
     }
 
+    // === FIRST HUB LOGIN NOTIFICATION ===
+    // Check if any partnership has staff who just started using the Hub
+    for (const p of partnerships) {
+      if (!p.contact_email) continue;
+
+      // Check if we already sent this notification
+      const { data: alreadySent } = await supabase
+        .from('activity_log')
+        .select('id')
+        .eq('partnership_id', p.id)
+        .eq('action', 'first_hub_login_notification')
+        .limit(1);
+
+      if (alreadySent && alreadySent.length > 0) continue;
+
+      // Check if any staff have logged in
+      const { data: staffWithLogins } = await supabase
+        .from('staff_members')
+        .select('first_name, last_name, hub_login_date')
+        .eq('partnership_id', p.id)
+        .not('hub_login_date', 'is', null)
+        .limit(5);
+
+      if (staffWithLogins && staffWithLogins.length > 0) {
+        const firstName = (p.contact_name || '').split(' ')[0] || 'there';
+        const schoolName = p.org_name || p.contact_name || 'Your School';
+        const dashboardUrl = `https://www.teachersdeserveit.com/partners/${p.slug}`;
+        const loginCount = staffWithLogins.length;
+
+        const resp = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: 'Teachers Deserve It Team <hello@teachersdeserveit.com>',
+            to: [p.contact_email.toLowerCase()],
+            subject: `${firstName}, your team has started exploring the Hub`,
+            html: wrapEmail(`${firstName},
+
+Your team is in. ${loginCount} educator${loginCount > 1 ? 's have' : ' has'} logged into the Learning Hub and started exploring.
+
+This is the beginning. Your dashboard is now showing real engagement data. Check the Overview tab to see who is active and what tools they are using.
+
+<a href="${dashboardUrl}" style="display:inline-block;padding:12px 24px;background:#1e2749;color:white;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;margin:16px 0;">See Your Team's Activity</a>
+
+The TDI Team`, schoolName, dashboardUrl),
+          }),
+        });
+
+        if (resp.ok) {
+          sent++;
+          await supabase.from('activity_log').insert({
+            partnership_id: p.id,
+            action: 'first_hub_login_notification',
+            details: { loginCount },
+          });
+        }
+      }
+    }
+
     return NextResponse.json({ success: true, sent });
   } catch (error) {
     console.error('[partner-onboarding-reminders] Error:', error);
