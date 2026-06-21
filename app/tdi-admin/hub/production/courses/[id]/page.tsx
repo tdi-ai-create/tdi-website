@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { getHubSupabase } from '@/lib/supabase-hub';
 import {
   DndContext,
   closestCenter,
@@ -959,17 +960,40 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
   const [showAddModule, setShowAddModule] = useState(false);
   const [newModuleTitle, setNewModuleTitle] = useState('');
 
-  // Load course
+  // Load course directly from Hub Supabase
   useEffect(() => {
     async function loadCourse() {
       try {
-        const response = await fetch(`/api/tdi-admin/courses/${resolvedParams.id}`);
-        const data = await response.json();
-        if (data.course) {
-          setCourse(data.course);
-          // Expand all modules by default
-          setExpandedModules(new Set(data.course.modules.map((m: Module) => m.id)));
+        const supabase = getHubSupabase();
+        const { data: courseData, error: courseError } = await supabase
+          .from('hub_courses')
+          .select('*')
+          .eq('id', resolvedParams.id)
+          .single();
+
+        if (courseError || !courseData) {
+          console.error('Error loading course:', courseError);
+          setIsLoading(false);
+          return;
         }
+
+        const { data: modules, error: modulesError } = await supabase
+          .from('hub_modules')
+          .select(`*, lessons:hub_lessons(*)`)
+          .eq('course_id', resolvedParams.id)
+          .order('sort_order', { ascending: true });
+
+        if (modulesError) {
+          console.error('Error loading modules:', modulesError);
+        }
+
+        const sortedModules = (modules || []).map((m: any) => ({
+          ...m,
+          lessons: (m.lessons || []).sort((a: any, b: any) => a.sort_order - b.sort_order),
+        }));
+
+        setCourse({ ...courseData, modules: sortedModules });
+        setExpandedModules(new Set(sortedModules.map((m: any) => m.id)));
       } catch (error) {
         console.error('Error loading course:', error);
       } finally {

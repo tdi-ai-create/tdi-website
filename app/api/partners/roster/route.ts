@@ -138,16 +138,59 @@ export async function POST(request: NextRequest) {
       .ilike('title', '%staff roster%')
       .eq('status', 'pending');
 
+    // Auto-provision Hub accounts for each new staff member
+    let provisioned = 0;
+    let provisionFailed = 0;
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com';
+
+    for (const s of newStaff) {
+      try {
+        const provResp = await fetch(`${baseUrl}/api/hub/provision`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: s.email,
+            name: `${s.firstName} ${s.lastName}`.trim() || s.email.split('@')[0],
+            tier: 'all_access',
+            source: 'partner_roster',
+          }),
+        });
+        if (provResp.ok) {
+          provisioned++;
+          // Mark as hub_enrolled in staff_members
+          await supabase
+            .from('staff_members')
+            .update({ hub_enrolled: true })
+            .eq('partnership_id', partnershipId)
+            .eq('email', s.email);
+          // Send staff welcome email (fire and forget)
+          fetch(`${baseUrl}/api/hub/emails/staff-welcome`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: s.email,
+              firstName: s.firstName || s.email.split('@')[0],
+              schoolName: partnership.contact_name || 'your school',
+            }),
+          }).catch(() => {});
+        } else {
+          provisionFailed++;
+        }
+      } catch {
+        provisionFailed++;
+      }
+    }
+
     // Log activity
     await supabase.from('activity_log').insert({
       partnership_id: partnershipId,
       action: 'roster_uploaded',
-      details: { count: newStaff.length, skipped, total: totalCount },
+      details: { count: newStaff.length, skipped, total: totalCount, hub_provisioned: provisioned, hub_failed: provisionFailed },
     });
 
     // Notify admin team
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-    fetch(`${baseUrl}/api/admin/notify`, {
+    const notifyUrl = process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+    fetch(`${notifyUrl}/api/admin/notify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -163,7 +206,9 @@ export async function POST(request: NextRequest) {
       added: newStaff.length,
       skipped,
       total: totalCount,
-      message: `Added ${newStaff.length} staff member${newStaff.length !== 1 ? 's' : ''} to the roster.${skipped > 0 ? ` ${skipped} already existed.` : ''}`,
+      hubProvisioned: provisioned,
+      hubFailed: provisionFailed,
+      message: `Added ${newStaff.length} staff member${newStaff.length !== 1 ? 's' : ''} to the roster. ${provisioned} Hub account${provisioned !== 1 ? 's' : ''} created.${skipped > 0 ? ` ${skipped} already existed.` : ''}${provisionFailed > 0 ? ` ${provisionFailed} Hub account${provisionFailed !== 1 ? 's' : ''} could not be created.` : ''}`,
     });
   } catch (error) {
     console.error('[roster] Error:', error);
