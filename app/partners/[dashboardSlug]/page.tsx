@@ -1230,6 +1230,26 @@ export default function PartnerDashboard() {
     const totalDel = (partnership.observation_days_total || 0) + (partnership.virtual_sessions_total || 0);
     const completedDel = (partnership.observation_days_completed || 0) + (partnership.virtual_sessions_completed || 0);
 
+    // Fetch live popular content from Hub
+    let popularTools: string[] = [];
+    let popularCourses: string[] = [];
+    try {
+      const statsResp = await fetch('/api/tdi-admin/stats');
+      if (statsResp.ok) {
+        const statsData = await statsResp.json();
+        popularTools = (statsData.topQuickWins || []).slice(0, 6).map((q: { title: string }) => q.title);
+        popularCourses = (statsData.topCourses || []).slice(0, 6).map((c: { title: string }) => c.title);
+      }
+    } catch { /* non-fatal */ }
+
+    // Fallback if API didn't return data
+    if (popularTools.length === 0) {
+      popularTools = ['Lesson Flow Checklist', 'The Shift Kit', 'Reset Without the Guilt', 'Class Skipping Intervention Plan', 'Professional Email Practices'];
+    }
+    if (popularCourses.length === 0) {
+      popularCourses = ['Calm Classrooms, Not Chaos', 'The Differentiation Fix', 'Communication that Clicks', 'Building Strong Teacher-Para Partnerships'];
+    }
+
     const dataContext = {
       schoolName,
       phase: partnership.contract_phase || 'IGNITE',
@@ -1245,6 +1265,8 @@ export default function PartnerDashboard() {
       quotes: teacherQuotes.slice(0, 5).map(q => ({ text: q.quote_text, role: q.teacher_role })),
       actionItemsCompleted: actionItems.filter(i => i.status === 'completed').length,
       actionItemsPending: actionItems.filter(i => i.status === 'pending' || i.status === 'in_progress').length,
+      popularTools,
+      popularCourses,
       observationImpact: observationImpact?.observations?.[0] || null,
       upcomingEvents: timelineEvents.filter(e => e.status === 'upcoming' || e.status === 'in_progress').map(e => ({ title: e.title, date: e.date, status: e.status })),
       completedEvents: timelineEvents.filter(e => e.status === 'completed').map(e => ({ title: e.title, date: e.date })),
@@ -1406,10 +1428,11 @@ POPULAR HUB CONTENT
 
 TDI's Learning Hub includes 100+ hours of practical, classroom-ready content organized by what educators need most:
 
-Stress and Wellness: Tools like the RINSE Method for mid-day resets, breathing exercises, and boundary-setting scripts
-Classroom Management: Strategies including Calm Classrooms, Not Chaos and executive functioning tools
-Time Savers: Lesson planning shortcuts, communication templates, and workflow tools
-Leadership: Courses for coaches and admin on building teacher-centered culture
+Most Popular Quick Wins Right Now:
+${data.popularTools.slice(0, 5).map((t: string) => `- ${t}`).join('\n')}
+
+Most Popular Courses:
+${data.popularCourses.slice(0, 4).map((c: string) => `- ${c}`).join('\n')}
 
 Each tool takes 5-15 minutes and includes a specific classroom action step. This is why TDI's implementation rate is 74%, compared to the national average of 10%.
 
@@ -1427,11 +1450,8 @@ ${quotesBlock}
 TRENDING ACROSS TDI SCHOOLS RIGHT NOW
 
 These are the most-used tools across all TDI partner schools this month. If your team has not explored them yet, they are worth a look:
-- Calm Classrooms, Not Chaos (Classroom Management course, PD eligible)
-- The RINSE Method: Mindset Reset (Stress and Wellness, 5-min Quick Win)
-- Communication that Clicks (Communication course, PD eligible)
-- Lesson Flow Checklist (Time Saver, 5-min Quick Win)
-- Your End-of-Year Checklist for a Guilt-Free Summer (Self-Care Quick Win)
+${data.popularTools.map((t: string) => `- ${t} (Quick Win)`).join('\n')}
+${data.popularCourses.length > 0 ? data.popularCourses.slice(0, 3).map((c: string) => `- ${c} (Course, PD eligible)`).join('\n') : ''}
 
 Schools with similar staff sizes to yours are averaging 65% Hub engagement and 12 tools explored per educator. These numbers grow fastest when leaders model engagement by sharing a Quick Win at staff meetings.
 
@@ -1560,16 +1580,10 @@ ${hasEngagement ? `Your team has been exploring the TDI Learning Hub, and here i
 WHAT EDUCATORS LOVE MOST
 
 Quick Wins (5-minute tools):
-- Lesson Flow Checklist: A simple checklist that saves 10+ minutes of planning time
-- Professional Email Practices: Templates for every tough conversation
-- The RINSE Method: A 5-step mid-day reset when stress hits
-- Calm Classrooms, Not Chaos: Practical strategies that work in real time
+${data.popularTools.slice(0, 5).map((t: string) => `- ${t}`).join('\n')}
 
 Courses (PD credit eligible):
-- The Differentiation Fix: Making one lesson work for every learner
-- Building Strong Teacher-Para Partnerships: Collaboration that actually works
-- Executive Functioning Made Simple: Tools for K-5 classrooms
-- Smart Communication Choices: What to use, when, and how
+${data.popularCourses.slice(0, 4).map((c: string) => `- ${c}`).join('\n')}
 
 Every tool includes a specific action step for your classroom. This is not theory. It is "try this tomorrow" practical.
 
@@ -1585,9 +1599,8 @@ Copy and paste this into your next staff email:
 RECOMMENDED FOR THIS MONTH
 
 Based on what is popular across TDI partner schools right now:
-1. Your End-of-Year Checklist for a Guilt-Free Summer (Quick Win, 5 min)
-2. Communication that Clicks (Course, PD eligible)
-3. Mastery Learning + TDI PD Model Explainer (Quick Win, 5 min)
+${data.popularTools.slice(0, 2).map((t: string, i: number) => `${i + 1}. ${t} (Quick Win, 5 min)`).join('\n')}
+${data.popularCourses.slice(0, 1).map((c: string) => `3. ${c} (Course, PD eligible)`).join('\n')}
 
 Explore everything: teachersdeserveit.com/hub`;
 
@@ -1638,29 +1651,29 @@ Learn more about TDI: teachersdeserveit.com`;
 
 Copy and paste these into your weekly or monthly staff newsletter. Each one takes 30 seconds to add and gives your team a reason to check the Hub.
 
-WEEK 1: THE 5-MINUTE RESET
+WEEK 1: QUICK WIN OF THE WEEK
 
-Subject line suggestion: "When the afternoon hits hard, try this"
+Subject line suggestion: "This 5-minute tool is the most popular across TDI schools"
 
-Your TDI Learning Hub has a tool called the RINSE Method. It is a five-step mental reset you can do between classes or during a planning period. It takes less than 5 minutes and it works.
+${data.popularTools[0] ? `"${data.popularTools[0]}" is the most-used tool across all TDI partner schools right now. It takes less than 5 minutes and it is designed to be used in your classroom the next day.` : 'Check out the Quick Wins section on the Hub for 5-minute tools you can use tomorrow.'}
 
-Here is the link: teachersdeserveit.com/hub
+Find it at: teachersdeserveit.com/hub
 
-Try it this week and let me know what you think. I have been using it myself.
+Try it this week and let me know what you think.
 
 WEEK 2: STRATEGY SPOTLIGHT
 
 Subject line suggestion: "One strategy that changes how students respond"
 
-This week, check out "Calm Classrooms, Not Chaos" on the Hub. It is not about discipline. It is about small shifts in how you set up your room, your transitions, and your tone that change how students respond. Most teachers say they see a difference the same day.
+${data.popularCourses[0] ? `This week, check out "${data.popularCourses[0]}" on the Hub. It is one of the most popular courses across TDI schools. Teachers say they see a difference the same week they start.` : 'Check out the Courses section on the Hub for PD-eligible content your team will actually use.'}
 
 Find it at: teachersdeserveit.com/hub
 
-WEEK 3: QUICK WIN OF THE WEEK
+WEEK 3: HIDDEN GEM
 
-Subject line suggestion: "This 5-minute tool saves 30 minutes of planning"
+Subject line suggestion: "A tool most people miss but everyone loves"
 
-The Lesson Flow Checklist on the Hub is the most popular tool across all TDI schools right now. It is a simple framework that helps you plan lessons faster without sacrificing quality. Five minutes to learn, and it pays off every day after.
+${data.popularTools[1] ? `"${data.popularTools[1]}" does not get as much attention as some of the bigger tools, but teachers who find it keep coming back to it. Give it 5 minutes this week.` : 'Explore the Quick Wins section. Some of the best tools are the ones you did not expect.'}
 
 Grab it: teachersdeserveit.com/hub
 
