@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 
 /**
  * Ops Dashboard API -- Aggregates key metrics for daily ops view
- * Pulls from: creators, intelligence_invoices, hub (separate DB), funding
+ * Pulls from: creators, sales_opportunities (invoices), hub (separate DB), funding
  */
 export async function GET() {
   try {
@@ -29,21 +29,15 @@ export async function GET() {
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
 
     // Fetch everything in parallel
-    const [creatorsRes, invoicesRes, hubRes, fundingRes] = await Promise.all([
+    const [creatorsRes, oppsRes, hubRes, fundingRes] = await Promise.all([
       // Creators
       supabase
         .from('creators')
         .select('id, name, email, current_phase, publish_status, lifecycle_state, is_active, status, content_path, course_title, target_completion_date, created_at, updated_at')
         .neq('status', 'archived'),
 
-      // Invoices -- same table as Operations page
-      supabase
-        .from('intelligence_invoices')
-        .select(`
-          id, invoice_number, amount, status, due_date, invoice_date, district_id, notes,
-          districts:district_id (id, name, state)
-        `)
-        .order('invoice_date', { ascending: false }),
+      // Sales opportunities (invoices come from here -- needs_invoice flag)
+      (supabase.from('sales_opportunities') as any).select('*'),
 
       // Hub enrollments from separate database
       hubSupabase
@@ -70,49 +64,26 @@ export async function GET() {
       c.publish_status === 'published' || c.publish_status === 'scheduled'
     );
 
-    // Process invoices -- same logic as intelligence/invoices route
-    const invoices = invoicesRes.data || [];
-    let totalOutstanding = 0;
-    let totalOverdue = 0;
-    const overdueInvoices: Array<{
-      id: string; invoice_number: string; amount: number;
-      due_date: string; district_name: string; notes: string;
-    }> = [];
-    const outstandingInvoices: Array<{
-      id: string; invoice_number: string; amount: number;
-      status: string; due_date: string; district_name: string; notes: string;
-    }> = [];
+    // Process invoices from sales_opportunities (same source as Operations page)
+    const allOpps = oppsRes.data || [];
+    const invoicesOwed = allOpps.filter((o: any) => o.needs_invoice);
+    const totalInvoiceAmount = invoicesOwed.reduce((s: number, o: any) => s + (o.invoice_amount || 0), 0);
+    const tbdCount = invoicesOwed.filter((o: any) => !o.invoice_amount).length;
 
-    for (const inv of invoices) {
-      const amount = parseFloat(inv.amount) || 0;
-      const dueDate = inv.due_date ? new Date(inv.due_date) : null;
-      const districtName = (inv.districts as any)?.name || 'Unknown';
-
-      if (['paid', 'void', 'draft'].includes(inv.status)) continue;
-
-      totalOutstanding += amount;
-      outstandingInvoices.push({
-        id: inv.id,
-        invoice_number: inv.invoice_number,
-        amount,
-        status: inv.status,
-        due_date: inv.due_date,
-        district_name: districtName,
-        notes: inv.notes || '',
-      });
-
-      if (dueDate && dueDate < now) {
-        totalOverdue += amount;
-        overdueInvoices.push({
-          id: inv.id,
-          invoice_number: inv.invoice_number,
-          amount,
-          due_date: inv.due_date,
-          district_name: districtName,
-          notes: inv.notes || '',
-        });
-      }
-    }
+    const invoiceList = invoicesOwed.map((o: any) => ({
+      id: o.id,
+      district: o.name,
+      amount: o.invoice_amount || 0,
+      contract_year: o.contract_year,
+      notes: o.invoice_notes || o.notes || '',
+      needs_action: !o.invoice_amount || o.relationship_signal === 'contact_changed',
+      blocked_reason: o.relationship_signal === 'contact_changed'
+        ? 'Contact changed -- need new contact before sending invoice'
+        : !o.invoice_amount
+        ? 'Invoice amount needs to be calculated'
+        : null,
+      contact_changed: o.relationship_signal === 'contact_changed',
+    }));
 
     // Process funding (gracefully handle if table doesn't exist)
     const pursuits = fundingRes?.data || [];
@@ -131,21 +102,21 @@ export async function GET() {
           .map(c => ({
             id: c.id,
             name: c.name,
+            email: c.email,
             phase: c.current_phase,
             content_path: c.content_path,
             course_title: c.course_title,
             last_activity: c.updated_at,
+            target_date: c.target_completion_date,
           })),
         launched: launchedCreators.length,
         inProgress: activeCreators.filter(c => c.publish_status === 'in_progress').length,
       },
       invoices: {
-        totalOutstanding,
-        totalOverdue,
-        overdueCount: overdueInvoices.length,
-        overdueList: overdueInvoices,
-        outstandingCount: outstandingInvoices.length,
-        outstandingList: outstandingInvoices,
+        count: invoicesOwed.length,
+        totalAmount: totalInvoiceAmount,
+        tbdCount,
+        list: invoiceList,
       },
       hub: {
         totalEnrollments: hubTotal,
