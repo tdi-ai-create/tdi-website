@@ -1272,6 +1272,8 @@ export default function PartnerDashboard() {
         quarterly: 'Quarterly Progress Report',
         teacher: 'Teacher Highlights',
         community: 'Community Update',
+        newsletter: 'Newsletter Ready Content',
+        certificates: 'Staff Celebration Certificates',
       };
       const title = reportTitles[reportType] || 'Partnership Report';
 
@@ -1418,6 +1420,16 @@ These are the most-used tools across all TDI partner schools this month. If your
 - Your End-of-Year Checklist for a Guilt-Free Summer (Self-Care Quick Win)
 
 Schools with similar staff sizes to yours are averaging 65% Hub engagement and 12 tools explored per educator. These numbers grow fastest when leaders model engagement by sharing a Quick Win at staff meetings.
+
+COMMUNITY ENGAGEMENT
+
+The Hub is not just content. It is a community. Here is how TDI educators are engaging beyond courses and tools:
+
+- "Tried It" Responses: Educators share when they have used a strategy in their classroom and what happened. These anonymous, honest reflections are some of the most valuable content on the Hub.
+- Q&A Threads: Teachers ask questions and get answers from peers and TDI experts. Topics range from classroom management to work-life balance.
+- Practice Notes: Educators document what they are implementing and how it is going. These become a record of professional growth over time.
+
+Encourage your team to check the community section after trying a tool. Seeing that a colleague across the country had the same experience makes the strategy feel more real.
 
 YOUR SCHOOL YEAR AT A GLANCE
 
@@ -1607,6 +1619,118 @@ ${data.totalDeliverables} contracted support sessions this year
 
 Learn more about TDI: teachersdeserveit.com`;
 
+      case 'newsletter':
+        return `NEWSLETTER READY CONTENT
+
+Copy and paste these into your weekly or monthly staff newsletter. Each one takes 30 seconds to add and gives your team a reason to check the Hub.
+
+WEEK 1: THE 5-MINUTE RESET
+
+Subject line suggestion: "When the afternoon hits hard, try this"
+
+Your TDI Learning Hub has a tool called the RINSE Method. It is a five-step mental reset you can do between classes or during a planning period. It takes less than 5 minutes and it works.
+
+Here is the link: teachersdeserveit.com/hub
+
+Try it this week and let me know what you think. I have been using it myself.
+
+WEEK 2: STRATEGY SPOTLIGHT
+
+Subject line suggestion: "One strategy that changes how students respond"
+
+This week, check out "Calm Classrooms, Not Chaos" on the Hub. It is not about discipline. It is about small shifts in how you set up your room, your transitions, and your tone that change how students respond. Most teachers say they see a difference the same day.
+
+Find it at: teachersdeserveit.com/hub
+
+WEEK 3: QUICK WIN OF THE WEEK
+
+Subject line suggestion: "This 5-minute tool saves 30 minutes of planning"
+
+The Lesson Flow Checklist on the Hub is the most popular tool across all TDI schools right now. It is a simple framework that helps you plan lessons faster without sacrificing quality. Five minutes to learn, and it pays off every day after.
+
+Grab it: teachersdeserveit.com/hub
+
+WEEK 4: TEAM CELEBRATION
+
+Subject line suggestion: "Look what our team is doing"
+
+${hasEngagement ? `So far, ${data.staffLoggedIn} of us have explored the Learning Hub. ${data.toolsExplored > 0 ? `We have collectively tried ${data.toolsExplored} classroom tools and strategies.` : ''} That is real engagement, not just clicking through slides.` : `Our team now has access to the TDI Learning Hub with 100+ hours of practical tools and strategies. This is not sit-and-get PD. Everything is designed to be used in your classroom the next day.`}
+
+If you have not logged in yet, give it 5 minutes this week. Start with a Quick Win. I think you will be surprised.
+
+Log in: teachersdeserveit.com/hub
+
+COMMUNITY HIGHLIGHTS
+
+${hasEngagement ? `Across all TDI partner schools, educators are sharing what works. The "Tried It" feature lets teachers share when they have used a strategy in their classroom and what happened. It is anonymous, honest, and incredibly helpful. Encourage your team to check the community section after trying a tool.` : `The Hub includes a community feature where educators across TDI schools share what they have tried and what worked. As your team starts using tools, they can contribute their own experiences and learn from others.`}
+
+BONUS: CONVERSATION STARTERS FOR YOUR NEXT PLC
+
+- "What is one thing you tried from the Hub this week?"
+- "Which Quick Win would be most useful for our students right now?"
+- "Has anyone taken a course? What was your biggest takeaway?"
+- "If you could pick one classroom challenge for TDI to address, what would it be?"
+
+These questions turn the Hub from a solo experience into a team conversation. That is when real implementation happens.`;
+
+      case 'certificates':
+        return `STAFF CELEBRATION CERTIFICATES
+
+Print these out, drop them in a mailbox, and watch what happens. Recognition does not need to be formal to be meaningful.
+
+CERTIFICATE 1: HUB EXPLORER AWARD
+
+Awarded to: ________________________________
+
+For diving into the TDI Learning Hub and exploring tools that make a real difference. Your curiosity is contagious.
+
+"The best teachers never stop learning. You are proof of that."
+
+CERTIFICATE 2: STRATEGY CHAMPION
+
+Awarded to: ________________________________
+
+For trying a new classroom strategy this week and sharing what happened. Implementation is where the magic lives, and you brought it.
+
+"You did not just learn it. You used it. That is what sets you apart."
+
+CERTIFICATE 3: TEAM PLAYER AWARD
+
+Awarded to: ________________________________
+
+For making your colleagues' day better. Whether it was covering a duty, sharing a resource, or just checking in, you made this school a better place to work today.
+
+"Schools run on people like you."
+
+CERTIFICATE 4: WELLNESS WARRIOR
+
+Awarded to: ________________________________
+
+For taking care of yourself so you can take care of your students. Using the wellness tools on the Hub is not a luxury. It is leadership.
+
+"You cannot pour from an empty cup. Thank you for filling yours."
+
+CERTIFICATE 5: MOST LIKELY TO...
+
+Awarded to: ________________________________
+
+Most likely to: ________________________________
+
+(Make this one your own. Funniest email signature? Best snack drawer? Most creative use of a whiteboard? You know your people.)
+
+"This school would not be the same without you."
+
+HOW TO USE THESE
+
+- Print on cardstock if you have it, regular paper if you do not
+- Handwrite the name. It matters more than you think
+- Drop it in their mailbox before school or leave it on their desk
+- Do one a week. By the end of the month, four teachers will have their day made
+
+The research is clear: specific, personal recognition is one of the strongest drivers of teacher retention. And it costs nothing.
+
+Want custom certificates with your school logo? Contact hello@teachersdeserveit.com and we will create them for you.`;
+
       default:
         return `${s} Partnership Report\n\nStaff: ${data.staffTotal} enrolled, ${data.staffLoggedIn} active (${data.hubLoginPct}%)\nTools explored: ${data.toolsExplored}\nDeliverables: ${data.completedDeliverables}/${data.totalDeliverables}`;
     }
@@ -1771,38 +1895,61 @@ Learn more about TDI: teachersdeserveit.com`;
 
       <!-- Report Content -->
       <div class="body">
-        <div class="content-text">${content
-          .split('\n')
-          .map(line => {
-            const trimmed = line.trim();
-            if (!trimmed) return '';
-            // ALL CAPS lines = section headers
-            if (/^[A-Z][A-Z\s&:,\-\/]+$/.test(trimmed) && trimmed.length > 3 && trimmed.length < 80) {
-              return '<h2>' + trimmed.charAt(0) + trimmed.slice(1).toLowerCase().replace(/\b(tdi|hub|plc|roi|pd|faq|k-12)\b/gi, m => m.toUpperCase()).replace(/\bi\b/g, 'I') + '</h2>';
+        <div class="content-text">${(() => {
+          let inList = false;
+          const lines = content.split('\n');
+          const html: string[] = [];
+
+          for (const line of lines) {
+            const t = line.trim();
+            if (!t) {
+              if (inList) { html.push('</ul>'); inList = false; }
+              continue;
             }
-            // Lines starting with - or bullet
-            if (/^[-]/.test(trimmed)) {
-              return '<li>' + trimmed.replace(/^[-]\s*/, '') + '</li>';
+
+            const isBullet = /^[-*]/.test(t);
+            const isNumbered = /^\d+[\.\)]/.test(t);
+            const isHeader = /^[A-Z][A-Z\s&:,\-\/\']+$/.test(t) && t.length > 3 && t.length < 80;
+            const isStat = /^[A-Z][a-zA-Z\s]+:/.test(t) && t.length < 100 && !t.includes('. ') && !isBullet;
+
+            // Close list if current line is not a list item
+            if (inList && !isBullet && !isNumbered) {
+              html.push('</ul>');
+              inList = false;
             }
-            // Lines starting with numbers (1. 2. 3.)
-            if (/^\d+\./.test(trimmed)) {
-              return '<li><strong>' + trimmed + '</strong></li>';
+
+            if (isHeader) {
+              const title = t.charAt(0) + t.slice(1).toLowerCase()
+                .replace(/\b(tdi|hub|plc|roi|pd|faq|k-12|nps)\b/gi, m => m.toUpperCase())
+                .replace(/\bi\b/g, 'I');
+              html.push('<h2>' + title + '</h2>');
+            } else if (isBullet || isNumbered) {
+              if (!inList) { html.push('<ul>'); inList = true; }
+              const text = t.replace(/^[-*]\s*/, '').replace(/^\d+[\.\)]\s*/, '');
+              // Bold the part before a colon if it exists
+              const colonIdx = text.indexOf(':');
+              if (colonIdx > 0 && colonIdx < 60) {
+                html.push('<li><strong>' + text.slice(0, colonIdx) + ':</strong>' + text.slice(colonIdx + 1) + '</li>');
+              } else {
+                html.push('<li>' + text + '</li>');
+              }
+            } else if (isStat) {
+              const [label, ...rest] = t.split(':');
+              html.push('<p><strong>' + label + ':</strong> ' + rest.join(':').trim() + '</p>');
+            } else {
+              html.push('<p>' + t + '</p>');
             }
-            // Stat lines (Key: Value format)
-            if (/^[A-Z][a-zA-Z\s]+:/.test(trimmed) && trimmed.length < 80 && !trimmed.includes('.')) {
-              const [label, ...rest] = trimmed.split(':');
-              return '<p><strong>' + label + ':</strong> ' + rest.join(':').trim() + '</p>';
-            }
-            return '<p>' + trimmed + '</p>';
-          })
-          .join('')
-          .replace(/<\/li><li>/g, '</li><li>')
-          .replace(/(<li>)/g, (m, _, offset, str) => {
-            const before = str.substring(Math.max(0, offset - 10), offset);
-            return before.includes('</li>') || before.includes('<ul>') ? m : '<ul>' + m;
-          })
-          .replace(/<\/li>(?!<li>)/g, '</li></ul>')
-        }</div>
+          }
+          if (inList) html.push('</ul>');
+
+          // Add hyperlinks
+          return html.join('')
+            .replace(/teachersdeserveit\.com\/hub\/courses/g, '<a href="https://www.teachersdeserveit.com/hub/courses" style="color:#2563EB;text-decoration:underline;">teachersdeserveit.com/hub/courses</a>')
+            .replace(/teachersdeserveit\.com\/hub/g, '<a href="https://www.teachersdeserveit.com/hub" style="color:#2563EB;text-decoration:underline;">teachersdeserveit.com/hub</a>')
+            .replace(/teachersdeserveit\.com\/partners/g, '<a href="https://www.teachersdeserveit.com/partners" style="color:#2563EB;text-decoration:underline;">teachersdeserveit.com/partners</a>')
+            .replace(/teachersdeserveit\.com(?!\/)/g, '<a href="https://www.teachersdeserveit.com" style="color:#2563EB;text-decoration:underline;">teachersdeserveit.com</a>')
+            .replace(/hello@teachersdeserveit\.com/g, '<a href="mailto:hello@teachersdeserveit.com" style="color:#2563EB;text-decoration:underline;">hello@teachersdeserveit.com</a>');
+        })()}</div>
 
         ${teacherQuotes.length > 0 ? `
           <div class="section">
@@ -5124,7 +5271,50 @@ Learn more about TDI: teachersdeserveit.com`;
               </div>
             </div>
 
-            {/* Reports open directly in new tab as branded PDF */}
+            {/* Newsletter & Certificates Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Newsletter Ready */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-indigo-50">
+                    <Pencil className="w-4 h-4 text-indigo-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1e2749]">Newsletter Ready</h3>
+                    <p className="text-xs text-gray-500">4 weeks of copy-paste content for staff emails</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">TDI tips, strategy spotlights, and Hub tool recommendations formatted for your weekly or monthly staff newsletter. Copy, paste, send.</p>
+                <button
+                  onClick={() => generateAIReport('newsletter')}
+                  disabled={reportGenerating !== null}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {reportGenerating === 'newsletter' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Content</>}
+                </button>
+              </div>
+
+              {/* Fun Staff Certificates */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-yellow-50">
+                    <Award className="w-4 h-4 text-yellow-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1e2749]">Staff Celebrations</h3>
+                    <p className="text-xs text-gray-500">Printable certificates and fun awards</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">Make your staff feel great. Auto-generated printable certificates for fun awards, milestones, and shout-outs. Drop one in a mailbox and watch what happens.</p>
+                <button
+                  onClick={() => generateAIReport('certificates')}
+                  disabled={reportGenerating !== null}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {reportGenerating === 'certificates' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Award className="w-4 h-4" /> Generate Certificates</>}
+                </button>
+              </div>
+            </div>
 
             {/* Quick Data Export */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
