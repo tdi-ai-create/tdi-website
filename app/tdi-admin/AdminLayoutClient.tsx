@@ -20,20 +20,8 @@ const PORTAL_COLORS = {
   team: { accent: '#6B7280', light: '#F3F4F6', bg15: 'rgba(107, 114, 128, 0.15)', border30: 'rgba(107, 114, 128, 0.3)' },
 };
 
-// Navigation items - order: Ops, CMO, Sales, Operations, Leadership, Hub, Creator Studio, Funding
+// Navigation items - order: CMO, Sales, Operations, Leadership, Hub, Creator Studio, Funding
 const NAV_ITEMS = [
-  {
-    id: 'ops',
-    label: 'Ops Dashboard',
-    href: '/tdi-admin/ops',
-    section: 'intelligence',
-    accent: PORTAL_COLORS.intelligence.accent,
-    icon: (active: boolean) => (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-  },
   {
     id: 'cmo',
     label: 'CMO Dashboard',
@@ -61,12 +49,12 @@ const NAV_ITEMS = [
   {
     id: 'intelligence',
     label: 'Operations',
-    href: '/tdi-admin/intelligence',
+    href: '/tdi-admin/ops',
     section: 'intelligence',
     accent: PORTAL_COLORS.intelligence.accent,
     icon: (active: boolean) => (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
   },

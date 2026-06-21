@@ -37,6 +37,17 @@ interface OpsData {
       amount: number;
       due_date: string;
       district_name: string;
+      notes: string;
+    }>;
+    outstandingCount: number;
+    outstandingList: Array<{
+      id: string;
+      invoice_number: string;
+      amount: number;
+      status: string;
+      due_date: string;
+      district_name: string;
+      notes: string;
     }>;
   };
   hub: {
@@ -157,10 +168,10 @@ export default function OpsPage() {
         />
         <AdminStatCard
           icon={DollarSign}
-          label="Overdue Invoices"
-          value={formatCurrency(data.invoices.totalOverdue)}
-          subtitle={`${data.invoices.overdueCount} invoice${data.invoices.overdueCount !== 1 ? 's' : ''}`}
-          accentColor={data.invoices.totalOverdue > 0 ? '#EF4444' : '#10B981'}
+          label="Invoices Owed"
+          value={data.invoices.totalOutstanding > 0 ? formatCurrency(data.invoices.totalOutstanding) : '$0'}
+          subtitle={`${data.invoices.outstandingCount || 0} outstanding`}
+          accentColor={data.invoices.totalOutstanding > 0 ? '#EF4444' : '#10B981'}
         />
         <AdminStatCard
           icon={Users}
@@ -263,22 +274,27 @@ export default function OpsPage() {
               </div>
             </div>
 
-            {data.invoices.overdueList.length > 0 ? (
+            {data.invoices.outstandingList && data.invoices.outstandingList.length > 0 ? (
               <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Overdue Invoices</p>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Outstanding Invoices</p>
                 <div className="space-y-2">
-                  {data.invoices.overdueList.map(inv => (
+                  {data.invoices.outstandingList.map(inv => (
                     <div
                       key={inv.id}
                       className="flex items-center justify-between p-3 rounded-lg bg-red-50 border border-red-100"
                     >
                       <div>
                         <p className="text-sm font-medium text-gray-900">{inv.district_name}</p>
-                        <p className="text-xs text-gray-500">Invoice #{inv.invoice_number} -- due {new Date(inv.due_date).toLocaleDateString()}</p>
+                        <p className="text-xs text-gray-500">
+                          {inv.invoice_number ? `Invoice #${inv.invoice_number}` : 'No invoice sent yet'}
+                          {inv.due_date ? ` -- due ${new Date(inv.due_date).toLocaleDateString()}` : ' -- TBD'}
+                        </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-bold text-red-600">{formatCurrency(inv.amount)}</p>
-                        <p className="text-xs text-red-400">{daysSince(inv.due_date)}d overdue</p>
+                        <p className="text-sm font-bold text-red-600">{inv.amount > 0 ? formatCurrency(inv.amount) : 'TBD'}</p>
+                        {inv.due_date && new Date(inv.due_date) < new Date() && (
+                          <p className="text-xs text-red-400">{daysSince(inv.due_date)}d overdue</p>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -287,17 +303,20 @@ export default function OpsPage() {
             ) : (
               <div className="text-center p-4 bg-green-50 rounded-lg">
                 <CheckCircle2 className="w-6 h-6 text-green-500 mx-auto mb-1" />
-                <p className="text-sm text-green-700">No overdue invoices</p>
+                <p className="text-sm text-green-700">No outstanding invoices</p>
               </div>
             )}
 
-            <div className="flex gap-2 mt-3">
-              <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg">
-                <Phone className="w-3 h-3" /> Call AP contacts
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg">
-                <Mail className="w-3 h-3" /> Send follow-up
-              </div>
+            <div className="flex flex-wrap gap-2 mt-3">
+              <a href="/tdi-admin/intelligence" className="flex items-center gap-1.5 text-xs text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg hover:bg-orange-100 transition-colors">
+                <DollarSign className="w-3 h-3" /> View all invoices
+              </a>
+              <a href="/tdi-admin/intelligence/renewals" className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                <Clock className="w-3 h-3" /> Renewals
+              </a>
+              <a href="/tdi-admin/intelligence/districts" className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                <Users className="w-3 h-3" /> Districts
+              </a>
             </div>
 
             <PaperclipTip area="invoices" />
