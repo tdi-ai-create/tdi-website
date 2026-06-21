@@ -100,6 +100,7 @@ interface Partnership {
   base_virtual_sessions?: number | null;
   base_executive_sessions?: number | null;
   base_staff_enrolled?: number | null;
+  year2_planning_notes?: string | null;
 }
 
 interface Organization {
@@ -1267,6 +1268,7 @@ export default function PartnerDashboard() {
       actionItemsPending: actionItems.filter(i => i.status === 'pending' || i.status === 'in_progress').length,
       popularTools,
       popularCourses,
+      year1Data: partnership.year2_planning_notes || null,
       observationImpact: observationImpact?.observations?.[0] || null,
       upcomingEvents: timelineEvents.filter(e => e.status === 'upcoming' || e.status === 'in_progress').map(e => ({ title: e.title, date: e.date, status: e.status })),
       completedEvents: timelineEvents.filter(e => e.status === 'completed').map(e => ({ title: e.title, date: e.date })),
@@ -1404,6 +1406,12 @@ TDI RECOMMENDATION
 ${hasEngagement ? `${s} is showing strong early signals of engagement. ${data.hubLoginPct >= 50 ? 'With over half the staff actively using the Hub, this partnership is well-positioned to deepen classroom impact in the coming months.' : 'Continue building momentum by encouraging staff to explore Hub tools during PLCs and team meetings.'}` : `${s} is in the onboarding phase. The foundation is set with ${data.staffTotal} educators enrolled. As the team begins exploring the Hub and observation days take place, this report will show measurable impact on teaching practice, staff wellness, and classroom implementation.`}
 
 ${data.phase === 'IGNITE' ? 'When your team is ready, Phase 2 (ACCELERATE) expands from a pilot group to full staff. Schools that make this move typically see 3x the implementation depth. Phase progression is based on your school\'s growth milestones, not a calendar.' : ''}
+
+${data.year1Data ? `YEAR-OVER-YEAR COMPARISON
+
+${data.year1Data}
+
+This data represents your school's baseline from the previous contract year. As this year progresses, your dashboard will show how current metrics compare to these benchmarks. Growth is not always linear, but the trajectory matters.` : ''}
 
 ABOUT TEACHERS DESERVE IT
 
@@ -1566,6 +1574,8 @@ An elementary principal in the Southeast started reading one educator quote from
 LOOKING AHEAD
 
 ${data.phase === 'IGNITE' ? 'As Phase 1 progresses, focus on building a core group of Hub champions who can model engagement for the rest of the staff. Schools that identify 3-5 early adopters see significantly faster whole-staff adoption. Phase progression is milestone-based, not calendar-based.' : 'Continue deepening implementation by connecting Hub tools to your existing PLC structure and school improvement goals.'}
+
+${data.year1Data ? `\nCOMPARISON TO PREVIOUS YEAR\n\n${data.year1Data}\n\nUse these benchmarks to evaluate this quarter's progress against your school's historical data.` : ''}
 
 Dashboard: teachersdeserveit.com/partners
 Questions: hello@teachersdeserveit.com`;
