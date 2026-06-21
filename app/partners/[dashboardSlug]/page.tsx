@@ -1451,7 +1451,7 @@ export default function PartnerDashboard() {
                   <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold text-white">
                     {tourSteps[tourStep].icon}
                   </div>
-                  <h3 className="text-base font-bold text-white">{tourSteps[tourStep].title}</h3>
+                  <h3 className="text-base font-bold" style={{ color: '#FFFFFF' }}>{tourSteps[tourStep].title}</h3>
                 </div>
                 <button onClick={dismissTour} className="text-white/40 hover:text-white/80 transition-colors">
                   <X className="w-4 h-4" />
@@ -1498,10 +1498,10 @@ export default function PartnerDashboard() {
                 <div className="flex items-center gap-3">
                   <Target className="w-5 h-5 text-[#E8B84B]" />
                   <div>
-                    <h3 className="text-base font-bold text-white">
+                    <h3 className="text-base font-bold" style={{ color: '#FFFFFF' }}>
                       {goalStep === 0 ? 'What matters most to your team?' : goalStep === 1 ? 'Set your targets' : 'Review your goals'}
                     </h3>
-                    <p className="text-xs text-white/50">Step {goalStep + 1} of 3</p>
+                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>Step {goalStep + 1} of 3</p>
                   </div>
                 </div>
                 <button onClick={() => setShowGoalWizard(false)} className="text-white/40 hover:text-white/80">
@@ -1823,8 +1823,8 @@ export default function PartnerDashboard() {
                       <div className="flex items-center gap-3">
                         <Rocket className="w-5 h-5 text-[#E8B84B]" />
                         <div>
-                          <h2 className="text-base font-bold text-white">Set Up Your Partnership</h2>
-                          <p className="text-xs text-white/50">{completedCount} of {setupSteps.length} steps complete</p>
+                          <h2 className="text-base font-bold" style={{ color: '#FFFFFF' }}>Set Up Your Partnership</h2>
+                          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{completedCount} of {setupSteps.length} steps complete</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -4411,8 +4411,8 @@ export default function PartnerDashboard() {
                   <FileText className="w-5 h-5 text-[#E8B84B]" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold">Partnership Reports</h2>
-                  <p className="text-sm text-white/60">AI-generated reports ready to share with your board, staff, or community.</p>
+                  <h2 className="text-xl font-bold" style={{ color: '#FFFFFF' }}>Partnership Reports</h2>
+                  <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>AI-generated reports ready to share with your board, staff, or community.</p>
                 </div>
               </div>
             </div>
@@ -5600,7 +5600,7 @@ export default function PartnerDashboard() {
                   <Handshake className="w-6 h-6 text-[#E8B84B]" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold mb-2">Your Partnership Story</h2>
+                  <h2 className="text-lg font-bold mb-2" style={{ color: '#FFFFFF' }}>Your Partnership Story</h2>
                   <p className="text-sm text-white/70 leading-relaxed mb-4">
                     This is where your year with TDI comes to life. As we work together, this page will fill with session notes, teacher feedback, milestone celebrations, and the data that tells your school&apos;s growth story. Everything you need for board presentations, grant reporting, or just remembering how far your team has come.
                   </p>
