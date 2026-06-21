@@ -783,7 +783,7 @@ label {
   font-size: 1.125rem !important;  /* text-lg = 18px */
   font-weight: 700 !important;
   line-height: 1.75rem !important;
-  color: #111827 !important;  /* gray-900 */
+  color: #111827;  /* gray-900 -- no !important so inline styles can override for dark backgrounds */
 }
 
 /* All h3 headings inside dashboard content = card titles */
@@ -791,7 +791,7 @@ label {
   font-size: 1rem !important;  /* text-base = 16px */
   font-weight: 600 !important;
   line-height: 1.5rem !important;
-  color: #111827 !important;
+  color: #111827;  /* no !important */
 }
 
 /* All h4 headings inside dashboard content = sub-labels */
