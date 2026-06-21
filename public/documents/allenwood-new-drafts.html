@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Allenwood · New Funding Drafts</title>
+<style>
+  :root {
+    --navy: #1B365D; --navy-deep: #0F1B2D; --teal: #0F766E; --teal-soft: #E6F4F2;
+    --ink: #1A2230; --slate: #4A5568; --line: #DCE3EC; --paper: #FBFCFE;
+    --amber: #B45309; --amber-soft: #FEF3E2; --rule: #C7D2E0;
+    --green: #15803D; --green-soft: #E7F5EC; --red: #B91C1C; --fed: #1B365D; --corp: #B45309;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, 'Times New Roman', serif; color: var(--ink); background: var(--paper); line-height: 1.58; font-size: 16px; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 30px 80px; }
+  .masthead { background: var(--navy); color: #fff; padding: 50px 0 40px; }
+  .masthead .inner { max-width: 860px; margin: 0 auto; padding: 0 30px; }
+  .eyebrow { font-family: 'Helvetica Neue', Arial, sans-serif; text-transform: uppercase; letter-spacing: 0.22em; font-size: 12px; font-weight: 700; color: #8FB3C9; margin-bottom: 16px; }
+  .masthead h1 { font-size: 38px; line-height: 1.1; font-weight: 400; letter-spacing: -0.01em; margin-bottom: 12px; }
+  .masthead .sub { font-size: 16.5px; color: #C5D6E3; max-width: 660px; }
+  .masthead .meta { margin-top: 20px; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 12.5px; color: #7E9DB5; }
+  section { margin-top: 50px; }
+  .tier-tag { font-family: 'Helvetica Neue', Arial, sans-serif; text-transform: uppercase; letter-spacing: 0.18em; font-size: 11px; font-weight: 700; margin-bottom: 10px; }
+  .tier-tag.fed { color: var(--fed); }
+  .tier-tag.corp { color: var(--corp); }
+  h2 { font-size: 26px; font-weight: 400; color: var(--navy); margin-bottom: 8px; padding-bottom: 12px; border-bottom: 2px solid var(--rule); }
+  h3 { font-size: 18px; font-weight: 700; color: var(--ink); margin: 24px 0 6px; }
+  p { margin-bottom: 13px; }
+  .lead { font-size: 17px; color: var(--slate); margin: 14px 0 8px; }
+  ul, ol { margin: 0 0 14px 22px; }
+  li { margin-bottom: 7px; }
+  li strong { color: var(--navy); }
+  .copyhead { display: flex; align-items: center; justify-content: space-between; margin: 14px 0 4px; }
+  .copylabel { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--teal); }
+  .copybtn { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11px; font-weight: 700; background: var(--teal); color: #fff; border: none; border-radius: 5px; padding: 5px 14px; cursor: pointer; letter-spacing: 0.03em; }
+  .copybtn:active { background: var(--navy); }
+  .copybtn.copied { background: var(--green); }
+  .copyblock { background: #F8FAFC; border: 1px solid var(--line); border-left: 4px solid var(--teal); border-radius: 6px; padding: 14px 16px; font-family: Georgia, serif; font-size: 14px; line-height: 1.6; white-space: pre-wrap; color: var(--ink); margin-bottom: 6px; }
+  .subj { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: var(--slate); margin-bottom: 6px; }
+  .subj b { color: var(--navy); }
+  .fillin { color: var(--red); font-weight: 700; }
+  .callout { background: var(--teal-soft); border-left: 4px solid var(--teal); padding: 16px 20px; margin: 18px 0; border-radius: 0 6px 6px 0; }
+  .callout .label, .good .label, .warn .label { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+  .callout .label { color: var(--teal); }
+  .callout p:last-child, .good p:last-child, .warn p:last-child { margin-bottom: 0; }
+  .good { background: var(--green-soft); border-left: 4px solid var(--green); padding: 16px 20px; margin: 18px 0; border-radius: 0 6px 6px 0; }
+  .good .label { color: var(--green); }
+  .warn { background: var(--amber-soft); border-left: 4px solid var(--amber); padding: 16px 20px; margin: 18px 0; border-radius: 0 6px 6px 0; }
+  .warn .label { color: var(--amber); }
+  .qbox { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 4px 20px 16px; margin: 16px 0; }
+  .q { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; font-weight: 700; color: var(--navy); background: #F4F7FB; border-left: 4px solid var(--corp); padding: 10px 14px; border-radius: 0 5px 5px 0; margin: 14px 0 4px; }
+  .qlimit { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11.5px; color: var(--slate); margin: 4px 0 6px; font-style: italic; }
+  .answer { background: #FCFDFE; border: 1px dashed var(--rule); border-radius: 6px; padding: 12px 14px; margin: 4px 0; white-space: pre-wrap; font-size: 14px; line-height: 1.55; }
+  .toc { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; margin-top: 36px; }
+  .toc h4 { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--slate); margin-bottom: 8px; }
+  .toc ol { margin: 0 0 0 20px; }
+  .toc a { color: var(--navy); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .footer { margin-top: 54px; padding-top: 18px; border-top: 2px solid var(--rule); font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: var(--slate); }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="inner">
+    <div class="eyebrow">Teachers Deserve It &middot; Allenwood Elementary</div>
+    <h1>Two New Funding Drafts</h1>
+    <p class="sub">The big lever and the easy win, both drafted and ready. The federal ATSI school-improvement ask that targets the Hub-membership gap, and the Walmart Spark Good application a school can submit directly.</p>
+    <div class="meta">Drafted for Allenwood &middot; School submits, TDI drafts &middot; June 2026</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="toc">
+    <h4>What's drafted here</h4>
+    <ol>
+      <li><a href="#sig">The federal ATSI / Section 1003 ask (the big lever)</a></li>
+      <li><a href="#walmart">The Walmart Spark Good application (the easy win)</a></li>
+      <li><a href="#facts">The few facts still needed</a></li>
+    </ol>
+  </div>
+
+  <section id="sig">
+    <div class="tier-tag fed">Draft 1 &middot; the big lever</div>
+    <h2>The federal ATSI / Section 1003 ask</h2>
+    <p class="lead">This is the one that can actually move the Hub-membership gap. It is not a competitive grant application. It is a request to the district to direct Allenwood's own school-improvement money, the funds tied to its ATSI status, toward the evidence-based PD that money exists to fund. Framed as a School Improvement Plan alignment question, not a vendor ask.</p>
+
+    <div class="warn">
+      <div class="label">Why this framing matters</div>
+      <p>This goes through PGCPS, the same office that pushed back before. The difference is the ask. We are not asking them to approve a vendor. We are asking how to direct the school's own ATSI improvement allocation, tied to the improvement plan the district already approves every year, toward the professional learning that Section 1003 is designed to fund. That is a question the district is obligated to engage.</p>
+    </div>
+
+    <h3>Who sends it and to whom</h3>
+    <p>This comes best from the principal, Dr. Porter, to the PGCPS office that administers school improvement and Title I funds (the Department of Title I or the school improvement team that supports ATSI schools). Teri can prepare and route it, but the principal's voice is what makes it a school leadership request rather than an outside one.</p>
+
+    <div class="qbox">
+      <div class="q">The email, drafted in the principal's voice</div>
+      <div class="subj"><b>To:</b> <span class="fillin">[PGCPS Title I / School Improvement office contact]</span> &nbsp; <b>Subject:</b> Allenwood Elementary: directing Section 1003 school-improvement funds to our SIP professional learning</div>
+      <div class="copyhead"><span class="copylabel">Copy this</span><button class="copybtn" data-copy="sig1">Copy</button></div>
+      <div class="copyblock" id="sig1">Dear [Name],
+
+I am writing as principal of Allenwood Elementary regarding our school improvement funding for the 2026-27 school year.
+
+As an ATSI-identified school, Allenwood receives school-improvement support under Title I, Section 1003, dedicated to evidence-based strategies in our School Improvement Plan. Our plan this year centers on sustained, job-embedded professional learning for all 75 of our educators, focused on reading, mathematics, and overall instructional practice, the areas our data show we most need to strengthen.
+
+We have a professional development program ready to implement that delivers exactly this: ongoing professional learning platform access, on-site instructional coaching, and collaborative leadership sessions for our full staff, beginning in August. This is evidence-based professional learning directly aligned to our improvement plan and our ATSI-identified needs.
+
+My question is how to direct our school's Section 1003 school-improvement allocation toward funding this professional learning. I want to be sure we are using the resources designated for our improvement in the way that most directly serves our educators and students. Could you let me know the process to align these funds with our School Improvement Plan for the coming year, and what you need from us to formalize it?
+
+I appreciate your partnership in our improvement work.
+
+Sincerely,
+Dr. Sharon Porter
+Principal, Allenwood Elementary School</div>
+    </div>
+
+    <div class="callout">
+      <div class="label">The supporting points, if they ask for detail</div>
+      <p>The program meets the ESSA definition of professional development (sustained, intensive, job-embedded, collaborative, data-driven). It is tied directly to the School Improvement Plan. It serves the ATSI-identified student groups by strengthening core instruction. And Section 1003 funds are specifically intended for evidence-based improvement strategies at identified schools. TDI prepares any budget detail or evidence the district requests.</p>
+    </div>
+
+    <div class="good">
+      <div class="label">Why this is the highest-value draft</div>
+      <p>If this lands, it can fund the largest piece of the gap, the Hub memberships, from money Allenwood is already entitled to as an ATSI school. No competitive cycle, no nonprofit-applicant barrier, no waiting on an outside funder's calendar. It is the school directing its own improvement dollars to its own improvement plan.</p>
+    </div>
+  </section>
+
+  <section id="walmart">
+    <div class="tier-tag corp">Draft 2 &middot; the easy win</div>
+    <h2>The Walmart Spark Good application</h2>
+    <p class="lead">A public school can apply directly, by its NCES number, no nonprofit partner needed. Grants run $250 to $5,000 from local stores. This is the cleanest corporate path, and the answers below are written to fit Walmart's actual application fields.</p>
+
+    <div class="callout">
+      <div class="label">Setup before the application</div>
+      <p>One-time setup: create a Spark Good account at Walmart.com/nonprofits and verify Allenwood through Deed (Walmart's verification partner), using the school's NCES number. Once verified, the school can apply to nearby Walmart and Sam's Club facilities. The next cycle runs August 1 to November 30, which lines up with the program launch.</p>
+    </div>
+
+    <h3>The application answers, ready to paste</h3>
+
+    <div class="qbox">
+      <div class="q">Organization and what it does</div>
+      <div class="copyhead"><span class="copylabel">Copy this</span><button class="copybtn" data-copy="w1">Copy</button></div>
+      <div class="copyblock" id="w1">Allenwood Elementary School is a Prince George's County public school in Temple Hills, Maryland, serving a high-need community. We are identified for Additional Targeted Support and Improvement, and we are committed to strengthening instruction for all 75 of our educators and the students they serve.</div>
+
+      <div class="q">Project description: how will the funds be used?</div>
+      <div class="qlimit">Walmart wants a specific, tangible, local use. We point this ask at the professional books, a concrete $1,800 need.</div>
+      <div class="copyhead"><span class="copylabel">Copy this</span><button class="copybtn" data-copy="w2">Copy</button></div>
+      <div class="copyblock" id="w2">This grant would fund a set of professional books for a school-wide educator study at Allenwood Elementary. Our 75 teachers will read and work through a common professional text together this year as part of a sustained effort to improve reading and mathematics instruction. The funds would purchase the books that make this shared learning possible, a direct, lasting investment in stronger teaching for the students in our community who need it most.</div>
+
+      <div class="q">Local connection: how does this connect to the local Walmart community?</div>
+      <div class="qlimit">350-character field. Mention the local community served.</div>
+      <div class="copyhead"><span class="copylabel">Copy this</span><button class="copybtn" data-copy="w3">Copy</button></div>
+      <div class="copyblock" id="w3">Allenwood Elementary serves families in the Temple Hills community that this Walmart serves every day. Strengthening our teachers strengthens the neighborhood's children. Support here reaches local students directly and helps a high-need school in your own service area improve outcomes for the families who shop and live nearby.</div>
+
+      <div class="q">Amount requested</div>
+      <div class="copyhead"><span class="copylabel">Copy this</span><button class="copybtn" data-copy="w4">Copy</button></div>
+      <div class="copyblock" id="w4">$1,800 (or the maximum the facility awards toward this need)</div>
+
+      <div class="q">Expected impact</div>
+      <div class="copyhead"><span class="copylabel">Copy this</span><button class="copybtn" data-copy="w5">Copy</button></div>
+      <div class="copyblock" id="w5">All 75 Allenwood educators will participate in the professional study these books make possible, reaching every classroom in the school. The result is stronger, more consistent instruction in reading and mathematics for our students, and a shared professional practice that continues in future years because the books and the learning stay with our school.</div>
+    </div>
+
+    <div class="callout">
+      <div class="label">A second, faster Walmart path</div>
+      <p>For in-kind help rather than a cash grant, the route is the local store manager directly, not the online form. Allenwood is near multiple Walmart and Sam's Club facilities. A short in-person or emailed ask to a store manager for support toward the books can move quickly, and the school can pursue this alongside the online application.</p>
+    </div>
+  </section>
+
+  <section id="facts">
+    <div class="tier-tag fed">The gaps</div>
+    <h2>The few facts still needed</h2>
+    <p class="lead">Both drafts are complete except for these, all marked red above. None require writing anything.</p>
+    <ul>
+      <li><strong>The PGCPS Title I / School Improvement office contact</strong> for the Section 1003 ask. TDI can help identify the right office; the principal likely already knows who administers Allenwood's improvement funds.</li>
+      <li><strong>Allenwood's NCES number</strong> for the Walmart Deed verification. This is public and easy to look up; TDI can find it.</li>
+      <li><strong>Confirmation that Dr. Porter will send the Section 1003 email</strong>, since the principal's voice is what makes it land.</li>
+    </ul>
+    <div class="good">
+      <div class="label">What these two drafts add</div>
+      <p>The Section 1003 ask goes after the real money, the funds Allenwood is already entitled to as an ATSI school, aimed at the Hub-membership gap that small grants could not cover. The Walmart application is a clean, school-eligible win for the books. Together with the NEA grant already in motion, the school now has live paths at the federal, corporate, and national levels, all things a school or its people can actually submit.</p>
+    </div>
+  </section>
+
+  <div class="footer">
+    Teachers Deserve It &middot; Allenwood New Funding Drafts &middot; School submits, TDI drafts. Section 1003 / ATSI eligibility confirmed via MSDE and PGCPS. Walmart Spark Good school eligibility confirmed via Walmart.org. Red items are facts still to be supplied.
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.copybtn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var el = document.getElementById(btn.getAttribute('data-copy'));
+      if(!el) return;
+      var text = el.innerText || el.textContent;
+      function done(){ btn.textContent='Copied'; btn.classList.add('copied'); setTimeout(function(){btn.textContent='Copy';btn.classList.remove('copied');},1600); }
+      if(navigator.clipboard){ navigator.clipboard.writeText(text).then(done); }
+      else { var r=document.createRange(); r.selectNode(el); window.getSelection().removeAllRanges(); window.getSelection().addRange(r); try{document.execCommand('copy');done();}catch(e){} window.getSelection().removeAllRanges(); }
+    });
+  });
+</script>
+
+</body>
+</html>

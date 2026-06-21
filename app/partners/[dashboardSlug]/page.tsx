@@ -6934,87 +6934,128 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
             {/* Grant Funding Status -- only for grant-supported partnerships */}
             {partnership?.has_grant_support && (
               <div className="bg-white rounded-xl border border-gray-100 overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                <div className="bg-gradient-to-r from-green-50 to-white px-6 py-4 border-b border-green-100">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
-                      <Sprout className="w-4 h-4 text-green-600" />
+                {/* Header with funding goal countdown */}
+                <div className="bg-gradient-to-r from-[#1B2A4A] to-[#38618C] px-6 py-5">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Sprout className="w-5 h-5 text-[#E8B84B]" />
+                    <h2 className="text-base font-bold" style={{ color: '#FFFFFF' }}>Funding Your Full Partnership</h2>
+                  </div>
+                  <p className="text-xs mb-4" style={{ color: 'rgba(255,255,255,0.6)' }}>TDI is actively pursuing funding so your entire staff gets access. Here is where things stand.</p>
+
+                  {/* Funding Progress Bar */}
+                  <div className="bg-white/10 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.8)' }}>Funding Goal: $66,225</span>
+                      <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>For 75 educators</span>
                     </div>
-                    <div>
-                      <h2 className="text-base font-semibold text-gray-900">Grant Funding Status</h2>
-                      <p className="text-xs text-gray-500">Your partnership has a grant application in progress</p>
+                    <div className="h-3 bg-white/10 rounded-full overflow-hidden mb-2">
+                      <div className="h-full rounded-full bg-gradient-to-r from-green-400 to-green-500" style={{ width: '4%' }} />
+                    </div>
+                    <div className="flex justify-between text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                      <span>$2,332 confirmed (base contract)</span>
+                      <span>$63,893 being pursued</span>
                     </div>
                   </div>
                 </div>
-                <div className="p-6 space-y-4">
-                  {/* Current Contract */}
+
+                <div className="p-6 space-y-5">
+                  {/* Funding Paths */}
                   <div>
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Current Contract (Guaranteed)</p>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      <div className="rounded-lg bg-gray-50 p-3 text-center">
-                        <p className="text-lg font-bold text-[#1e2749]">{partnership.staff_enrolled || 0}</p>
-                        <p className="text-[10px] text-gray-500">Hub Memberships</p>
-                      </div>
-                      <div className="rounded-lg bg-gray-50 p-3 text-center">
-                        <p className="text-lg font-bold text-[#1e2749]">{partnership.observation_days_total || 0}</p>
-                        <p className="text-[10px] text-gray-500">Observation Days</p>
-                      </div>
-                      <div className="rounded-lg bg-gray-50 p-3 text-center">
-                        <p className="text-lg font-bold text-[#1e2749]">{partnership.executive_sessions_total || 0}</p>
-                        <p className="text-[10px] text-gray-500">Exec Sessions</p>
-                      </div>
-                      <div className="rounded-lg bg-gray-50 p-3 text-center">
-                        <p className="text-lg font-bold text-[#1e2749]">{partnership.virtual_sessions_total || 0}</p>
-                        <p className="text-[10px] text-gray-500">Virtual Sessions</p>
-                      </div>
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Funding Paths</p>
+                    <div className="space-y-2">
+                      {[
+                        { name: 'Base Contract (Signed)', amount: '$2,332', status: 'confirmed', detail: '13 Hub memberships, guaranteed regardless of grants' },
+                        { name: 'Section 1003 / ATSI (Federal)', amount: 'TBD', status: 'ready', detail: 'The big lever. Letter drafted for Dr. Porter to direct school-improvement funds to PD. Not competitive, money Allenwood is entitled to as ATSI school.' },
+                        { name: 'NEA Grant', amount: 'Pending', status: 'submitted', detail: 'Application submitted June 16 via Jovita Ortiz' },
+                        { name: 'Walmart Spark Good', amount: '$1,800', status: 'ready', detail: 'Easy win. Application drafted for professional books. School applies directly by NCES number. Next cycle Aug 1 to Nov 30.' },
+                        { name: 'Excellence in Education Foundation', amount: 'Exploring', status: 'outreach', detail: 'Inquiry sent June 18 to Thea Wilson at PGCPS foundation' },
+                        { name: 'Greater Washington Community Foundation', amount: 'Exploring', status: 'outreach', detail: 'Inquiry sent June 18 to Darcelle Wilson' },
+                        { name: 'Title II-A (Federal)', amount: '$33,225', status: 'stalled', detail: 'Submitted May 18, redirected between offices. TDI coaching resubmission.' },
+                        { name: 'IDEA/CEIS (Federal)', amount: '$27,000', status: 'pending', detail: '3 observation days for special education support. Ready to submit.' },
+                        { name: 'Community Schools', amount: '$6,000', status: 'stalled', detail: 'Forwarded to Kevin Thompson, awaiting response' },
+                      ].map((path, i) => (
+                        <div key={i} className={`flex items-center gap-3 p-3 rounded-lg ${
+                          path.status === 'confirmed' ? 'bg-green-50 border border-green-100' :
+                          path.status === 'ready' ? 'bg-teal-50 border border-teal-100' :
+                          path.status === 'submitted' ? 'bg-blue-50 border border-blue-100' :
+                          path.status === 'outreach' ? 'bg-purple-50 border border-purple-100' :
+                          path.status === 'stalled' ? 'bg-amber-50 border border-amber-100' :
+                          'bg-gray-50 border border-gray-100'
+                        }`}>
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                            path.status === 'confirmed' ? 'bg-green-200' :
+                            path.status === 'ready' ? 'bg-teal-200' :
+                            path.status === 'submitted' ? 'bg-blue-200' :
+                            path.status === 'outreach' ? 'bg-purple-200' :
+                            path.status === 'stalled' ? 'bg-amber-200' :
+                            'bg-gray-200'
+                          }`}>
+                            {path.status === 'confirmed' ? <Check className="w-3.5 h-3.5 text-green-700" /> :
+                             path.status === 'ready' ? <FileText className="w-3.5 h-3.5 text-teal-700" /> :
+                             path.status === 'submitted' ? <Clock className="w-3.5 h-3.5 text-blue-700" /> :
+                             path.status === 'outreach' ? <Mail className="w-3.5 h-3.5 text-purple-700" /> :
+                             path.status === 'stalled' ? <AlertCircle className="w-3.5 h-3.5 text-amber-700" /> :
+                             <div className="w-2 h-2 rounded-full bg-gray-400" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-medium text-[#1e2749]">{path.name}</p>
+                              <span className={`text-xs font-bold ${
+                                path.status === 'confirmed' ? 'text-green-700' :
+                                path.status === 'ready' ? 'text-teal-700' :
+                                path.status === 'submitted' ? 'text-blue-700' :
+                                path.status === 'outreach' ? 'text-purple-700' :
+                                path.status === 'stalled' ? 'text-amber-700' :
+                                'text-gray-500'
+                              }`}>{path.amount}</span>
+                            </div>
+                            <p className="text-[10px] text-gray-500">{path.detail}</p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Grant Expansion */}
+                  {/* What Expands */}
                   <div className="border-t border-gray-100 pt-4">
-                    <p className="text-xs font-bold text-green-600 uppercase tracking-wide mb-2">If Grant Approved (Expands To)</p>
+                    <p className="text-xs font-bold text-green-600 uppercase tracking-wide mb-2">What Full Funding Unlocks</p>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      <div className="rounded-lg bg-green-50 p-3 text-center border border-green-100">
-                        <p className="text-lg font-bold text-green-700">{partnership.staff_enrolled || 0}</p>
-                        <p className="text-[10px] text-green-600">Hub Memberships</p>
-                      </div>
-                      <div className="rounded-lg bg-green-50 p-3 text-center border border-green-100">
-                        <p className="text-lg font-bold text-green-700">{(partnership.observation_days_total || 0) + 1}</p>
-                        <p className="text-[10px] text-green-600">Observation Days</p>
-                      </div>
-                      <div className="rounded-lg bg-green-50 p-3 text-center border border-green-100">
-                        <p className="text-lg font-bold text-green-700">{partnership.executive_sessions_total || 0}</p>
-                        <p className="text-[10px] text-green-600">Exec Sessions</p>
-                      </div>
-                      <div className="rounded-lg bg-green-50 p-3 text-center border border-green-100">
-                        <p className="text-lg font-bold text-green-700">{partnership.virtual_sessions_total || 0}</p>
-                        <p className="text-[10px] text-green-600">Virtual Sessions</p>
-                      </div>
+                      {[
+                        { value: '75', label: 'Hub Memberships', current: String(partnership.staff_enrolled || 0) },
+                        { value: '3', label: 'Observation Days', current: String(partnership.observation_days_total || 0) },
+                        { value: '3', label: 'Exec Sessions', current: String(partnership.executive_sessions_total || 0) },
+                        { value: '4', label: 'Virtual Sessions', current: String(partnership.virtual_sessions_total || 0) },
+                      ].map((item, i) => (
+                        <div key={i} className="rounded-lg bg-green-50 p-3 text-center border border-green-100">
+                          <p className="text-lg font-bold text-green-700">{item.value}</p>
+                          <p className="text-[10px] text-green-600">{item.label}</p>
+                          <p className="text-[9px] text-gray-400 mt-0.5">Currently: {item.current}</p>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Grant Progress Timeline */}
+                  {/* TDI Work Timeline */}
                   <div className="border-t border-gray-100 pt-4">
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">What TDI Is Doing</p>
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">What TDI Has Done</p>
                     <div className="space-y-3">
                       {[
-                        { phase: 'Research', status: 'done', detail: 'Identified funding paths, researched contacts, mapped eligibility' },
-                        { phase: 'Document Prep', status: 'done', detail: 'Drafted budget narratives, submission packets, and copy-paste emails' },
-                        { phase: 'Submissions', status: 'done', detail: 'All applications submitted through school contacts' },
-                        { phase: 'Follow-up', status: 'active', detail: 'Tracking responses, diagnosing routing issues, coaching resubmissions' },
-                        { phase: 'Alternative Paths', status: 'active', detail: 'NEA grant submitted, foundation outreach sent, exploring additional sources' },
-                        { phase: 'Approval', status: 'pending', detail: 'Awaiting decisions from funding sources' },
+                        { phase: 'Research', status: 'done', detail: 'Identified 5+ funding paths, researched PGCPS contacts, mapped eligibility for Title II-A, IDEA/CEIS, Community Schools, NEA, and private foundations' },
+                        { phase: 'Document Prep', status: 'done', detail: 'Drafted 3 federal budget narratives, NEA packet, 2 foundation emails, Section 1003/ATSI principal letter, Walmart Spark Good application, all copy-paste ready' },
+                        { phase: 'Federal Submissions', status: 'done', detail: 'Title II-A ($33K) and Community Schools ($6K) submitted through Teri. IDEA/CEIS ($27K) ready to submit. Section 1003 letter drafted for Dr. Porter.' },
+                        { phase: 'NEA Grant', status: 'done', detail: 'Found NEA member Jovita Ortiz on staff, drafted full packet. Application submitted June 16.' },
+                        { phase: 'Foundation Outreach', status: 'done', detail: 'Emails sent June 18 to Excellence in Education Foundation (PGCPS) and Greater Washington Community Foundation.' },
+                        { phase: 'Follow-up & Troubleshooting', status: 'active', detail: 'Title II-A bounced between 4 offices. TDI diagnosed routing issue, coached resubmission. Tracking all pending responses.' },
+                        { phase: 'Corporate & Local Grants', status: 'active', detail: 'Walmart Spark Good application drafted ($1,800 for professional books). Researching DonorsChoose, local foundations, and additional corporate paths.' },
+                        { phase: 'Approvals & Decisions', status: 'pending', detail: 'Awaiting NEA decision, foundation responses, and federal office replies.' },
                       ].map((step, i) => (
                         <div key={i} className="flex items-start gap-3">
                           <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
                             step.status === 'done' ? 'bg-green-100' : step.status === 'active' ? 'bg-amber-100' : 'bg-gray-100'
                           }`}>
-                            {step.status === 'done' ? (
-                              <Check className="w-3.5 h-3.5 text-green-600" />
-                            ) : step.status === 'active' ? (
-                              <Clock className="w-3.5 h-3.5 text-amber-600" />
-                            ) : (
-                              <div className="w-2 h-2 rounded-full bg-gray-300" />
-                            )}
+                            {step.status === 'done' ? <Check className="w-3.5 h-3.5 text-green-600" /> :
+                             step.status === 'active' ? <Clock className="w-3.5 h-3.5 text-amber-600" /> :
+                             <div className="w-2 h-2 rounded-full bg-gray-300" />}
                           </div>
                           <div>
                             <p className={`text-sm font-medium ${step.status === 'pending' ? 'text-gray-400' : 'text-[#1e2749]'}`}>{step.phase}</p>
@@ -7025,9 +7066,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     </div>
                   </div>
 
-                  <div className="bg-amber-50 rounded-lg p-3 border border-amber-100">
-                    <p className="text-xs text-amber-800">
-                      <strong>What this means:</strong> Your base contract is guaranteed regardless of grant outcome. If approved, your partnership automatically expands with additional services at no extra cost to your school. The TDI team is managing the entire grant process, from research to submission to follow-up. We will keep you updated as decisions come in.
+                  <div className="bg-[#1B2A4A] rounded-lg p-4">
+                    <p className="text-xs font-semibold" style={{ color: '#E8B84B' }}>Why TDI does this</p>
+                    <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                      Most PD companies sign a contract and move on. We believe every educator at your school deserves access, not just the ones the budget covers. That is why we research, draft, submit, and follow up on funding applications on your behalf. Your base contract is guaranteed. Everything we find through grants expands what your team gets at no additional cost to your school.
                     </p>
                   </div>
                 </div>
