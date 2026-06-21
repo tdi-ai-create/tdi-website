@@ -51,6 +51,10 @@
     {
       "path": "/api/cron/seasonal-partner-email",
       "schedule": "0 14 15 * *"
+    },
+    {
+      "path": "/api/cron/partner-onboarding-reminders",
+      "schedule": "0 14 * * *"
     }
   ]
 }
