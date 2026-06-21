@@ -422,7 +422,7 @@ export default function PartnerDashboard() {
   const [goalSelections, setGoalSelections] = useState<Record<string, boolean>>({});
   const [goalTargets, setGoalTargets] = useState<Record<string, number>>({});
   const toggleOverviewSection = (key: string) => setOverviewSections(prev => ({ ...prev, [key]: !prev[key] }));
-  const [blueprintSubTab, setBlueprintSubTab] = useState<'approach' | 'in-person' | 'learning-hub' | 'dashboard' | 'book' | 'results' | 'contract'>('approach');
+  const [blueprintSubTab, setBlueprintSubTab] = useState<'approach' | 'in-person' | 'learning-hub' | 'dashboard' | 'book' | 'results' | 'contract' | 'tools' | 'community'>('approach');
   const [mobileExpandedBlueprint, setMobileExpandedBlueprint] = useState<string | null>('approach');
   const [showPausedItems, setShowPausedItems] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -1200,7 +1200,6 @@ export default function PartnerDashboard() {
     { id: 'reporting', label: 'Reports' },
     { id: 'next-year', label: 'Next Year', badge: true },
     { id: 'team', label: 'Team' },
-    { id: 'billing', label: 'Billing' },
   ];
 
   // Reporting state
@@ -4738,6 +4737,8 @@ export default function PartnerDashboard() {
                 { id: 'book', name: 'The Book', icon: <FileText className="w-5 h-5" /> },
                 { id: 'results', name: 'Proven Results', icon: <TrendingUp className="w-5 h-5" /> },
                 { id: 'contract', name: 'Your Contract', icon: <Award className="w-5 h-5" /> },
+                { id: 'tools', name: 'Leadership Tools', icon: <Hammer className="w-5 h-5" /> },
+                { id: 'community', name: 'Community & FAQ', icon: <MessageCircle className="w-5 h-5" /> },
               ] as const;
 
               const renderBlueprintPanel = () => {
@@ -5353,6 +5354,53 @@ export default function PartnerDashboard() {
                       </div>
                     );
 
+                  case 'tools':
+                    return (
+                      <div className="space-y-8">
+                        <div>
+                          <h2 className="text-lg font-bold text-gray-900 mb-3">Leadership Tools & Resources</h2>
+                          <p className="text-lg text-[#1e2749]/80">
+                            Practical resources designed for school leaders. Use these in PLCs, staff meetings, or your own planning time.
+                          </p>
+                        </div>
+                        <LeadershipQuiz />
+                        <AICoachingCard />
+                        <LeadershipToolkit />
+                      </div>
+                    );
+
+                  case 'community':
+                    return (
+                      <div className="space-y-8">
+                        <div>
+                          <h2 className="text-lg font-bold text-gray-900 mb-3">Community, Tips & FAQ</h2>
+                          <p className="text-lg text-[#1e2749]/80">
+                            Seasonal resources, answers to common questions, and tips from the TDI community of school leaders.
+                          </p>
+                        </div>
+                        <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                          <h3 className="text-base font-bold text-gray-900 mb-4">Frequently Asked Questions</h3>
+                          <div className="space-y-4">
+                            {[
+                              { q: 'How do my teachers get Hub access?', a: 'Once you upload your staff roster, each educator receives an email invitation to create their Learning Hub account. They can log in with email or Google.' },
+                              { q: 'What happens during an observation day?', a: 'Our team visits classrooms for 10-15 minutes each, takes notes on strengths, and leaves every teacher a personalized Love Note. We end the day with a leadership debrief. No evaluation, no judgment.' },
+                              { q: 'Can I add more staff members later?', a: 'Yes. Go to the Team tab anytime to upload additional staff via CSV or add them one by one. They will receive Hub access automatically.' },
+                              { q: 'How do I share this dashboard with my admin team?', a: 'Contact us and we will add additional leadership accounts to your dashboard. Each person gets their own login.' },
+                              { q: 'What if a teacher is struggling with the Hub?', a: 'The Hub is designed to be intuitive, but if someone needs help, they can use the "I need a moment" button or email hello@teachersdeserveit.com.' },
+                            ].map((faq, i) => (
+                              <details key={i} className="group">
+                                <summary className="flex items-center justify-between cursor-pointer list-none py-2">
+                                  <span className="text-sm font-medium text-[#1e2749]">{faq.q}</span>
+                                  <ChevronDown className="w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform" />
+                                </summary>
+                                <p className="text-sm text-gray-600 pb-2 pl-0 leading-relaxed">{faq.a}</p>
+                              </details>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    );
+
                   default:
                     return null;
                 }
@@ -5445,48 +5493,9 @@ export default function PartnerDashboard() {
               );
             })()}
 
-            {/* ─── COLLAPSIBLE: Leadership Tools ─── */}
-            <button
-              onClick={() => toggleOverviewSection('leadership')}
-              className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#EDE9FE' }}>
-                  <GraduationCap className="w-4 h-4" style={{ color: '#8B5CF6' }} />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-semibold text-[#1e2749]">Leadership Tools & Quiz</p>
-                  <p className="text-xs text-gray-500">Printable tools, conversation starters, leadership style quiz</p>
-                </div>
-              </div>
-              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${overviewSections['leadership'] ? 'rotate-180' : ''}`} />
-            </button>
-            {overviewSections['leadership'] && (
-              <div className="-mt-4 space-y-4">
-                <LeadershipQuiz />
-                <AICoachingCard />
-                <LeadershipToolkit />
-              </div>
-            )}
-
-            {/* ─── COLLAPSIBLE: Community & FAQ ─── */}
-            <button
-              onClick={() => toggleOverviewSection('community')}
-              className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#DBEAFE' }}>
-                  <Handshake className="w-4 h-4" style={{ color: '#2563EB' }} />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-semibold text-[#1e2749]">Community, Tips & FAQ</p>
-                  <p className="text-xs text-gray-500">Seasonal tips, common questions, resources</p>
-                </div>
-              </div>
-              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${overviewSections['community'] ? 'rotate-180' : ''}`} />
-            </button>
-            {overviewSections['community'] && (
-              <div className="-mt-4 space-y-4">
+            {/* Leadership Tools & Community moved to Your Plan sub-tabs */}
+            {false && (
+              <div className="hidden">
 
             {/* Quick Access Bar -- hidden, replaced by quick actions above */}
             <div className="hidden">
