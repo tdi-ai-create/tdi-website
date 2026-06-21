@@ -384,6 +384,7 @@ export default function PartnerDashboard() {
   const [suggestions, setSuggestions] = useState<TDISuggestion[]>([]);
   const [sessionRecords, setSessionRecords] = useState<SessionRecord[]>([]);
   const [recentActivity, setRecentActivity] = useState<{ action: string; details?: Record<string, unknown>; created_at: string }[]>([]);
+  const [staffRoster, setStaffRoster] = useState<{ id: string; name: string; role: string; hubActive: boolean }[]>([]);
   const [hubIntel, setHubIntel] = useState<Record<string, unknown> | null>(null);
   const [observationImpact, setObservationImpact] = useState<{ has_data: boolean; observations: { event_title: string; event_date: string; before_logins: number; after_logins: number; engagement_change_pct: number; before_mood: number | null; after_mood: number | null; mood_change: number | null; before_quick_wins: number; after_quick_wins: number }[] } | null>(null);
   const [hubStats, setHubStats] = useState<{
@@ -586,6 +587,7 @@ export default function PartnerDashboard() {
           setTeacherQuotes(data.teacherQuotes || []);
           setSessionRecords(data.sessionRecords || []);
           setRecentActivity(data.activityLog || []);
+          setStaffRoster(data.staffMembers || []);
           if (data.kpis) setPartnershipKpis(data.kpis);
         }
       }
@@ -768,29 +770,39 @@ export default function PartnerDashboard() {
       icon: '1',
     },
     {
-      title: 'Your Team\'s Progress',
-      body: 'These rings show how your team is engaging. Hub login rate, deliverables completed, wellness scores, and your current phase -- all updated in real time.',
+      title: 'Setup Checklist & Progress',
+      body: 'Start at the top. Your setup checklist walks you through getting your team on the Hub, setting goals, and scheduling key dates. Below that, live metrics show how your team is engaging in real time.',
       icon: '2',
     },
     {
-      title: 'Next Steps & Action Items',
-      body: 'We\'ll always show you what to focus on next. Action items, scheduling, and recommended tools appear here so nothing falls through the cracks.',
+      title: 'Reports You Can Share',
+      body: 'The Reports tab generates professional documents for any audience: board presentations, staff engagement analyses, ROI reports, and newsletter content. Each one opens as a branded PDF ready to print or share.',
       icon: '3',
     },
     {
-      title: 'Educator Voices & Impact',
-      body: 'See what your teachers are saying about their experience. After school visits, you\'ll also see before-and-after engagement data right here.',
+      title: 'Celebrate Your Staff',
+      body: 'Under Reports, you\'ll find Staff Celebrations. Pick from 24 fun awards, assign names, and print beautiful certificates. Drop one in a teacher\'s mailbox and watch what happens.',
       icon: '4',
     },
     {
-      title: 'Tabs for Everything Else',
-      body: 'Use the tabs above to dive deeper: Our Partnership for session history, Blueprint for deliverables, Team for staff info, and Billing for contract details.',
+      title: 'Your Plan & Services',
+      body: 'The "Your Plan" tab explains everything in your partnership: what observation days look like, how to prepare (almost nothing), leadership tools, FAQ, and your contract details.',
       icon: '5',
     },
     {
-      title: 'You\'re All Set',
-      body: 'Questions? Hit "Schedule Session" anytime to book a call with our team. Or just reply to any email from us. We read every one.',
+      title: 'Newsletter Content',
+      body: 'Need content for your weekly staff email? The Newsletter Ready report gives you 4 weeks of copy-paste TDI tips, strategy spotlights, and conversation starters for PLCs.',
       icon: '6',
+    },
+    {
+      title: 'Team & Community',
+      body: 'The Team tab shows your staff roster, Hub activity, and photo uploads. Your educators can also engage with the Hub community: Q&A threads, "Tried It" reflections, and practice notes.',
+      icon: '7',
+    },
+    {
+      title: 'You\'re All Set',
+      body: 'Hit the ? icon anytime to replay this tour. Click "Schedule Session" to book a call. Or just reply to any TDI email. We read every one.',
+      icon: '8',
     },
   ];
 
@@ -2238,22 +2250,28 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               <div className="flex gap-2 mb-4">
                 <button
                   onClick={() => {
-                    // Auto-assign random staff-appropriate awards
-                    const names: string[] = [];
-                    // Use partnership contact as a fallback name source
-                    if (staffStats.total > 0) {
+                    // Use real staff names if available, otherwise fallback
+                    const names = staffRoster.length > 0
+                      ? staffRoster.map(s => s.name).filter(n => n.length > 0)
+                      : [];
+                    if (names.length === 0 && staffStats.total > 0) {
                       for (let n = 1; n <= Math.min(staffStats.total, certAwards.length); n++) {
                         names.push(`Educator ${n}`);
                       }
                     }
-                    const shuffled = [...certAwards].sort(() => Math.random() - 0.5);
-                    const updated = shuffled.map((cert, i) => ({
+                    // Shuffle names and awards independently for fun pairings
+                    const shuffledNames = [...names].sort(() => Math.random() - 0.5);
+                    const shuffledAwards = [...certAwards].sort(() => Math.random() - 0.5);
+                    const updated = shuffledAwards.map((cert, i) => ({
                       ...cert,
-                      recipient: i < names.length ? names[i] : '',
+                      recipient: i < shuffledNames.length ? shuffledNames[i] : '',
                     }));
                     setCertAwards(updated);
-                    setToastMessage(`Auto-assigned ${Math.min(names.length, certAwards.length)} awards. Edit names below.`);
-                    setTimeout(() => setToastMessage(''), 3000);
+                    const count = Math.min(shuffledNames.length, certAwards.length);
+                    setToastMessage(staffRoster.length > 0
+                      ? `Auto-assigned ${count} staff members to awards. Swap any names you want.`
+                      : `Assigned ${count} placeholders. Upload your roster in the Team tab for real names.`);
+                    setTimeout(() => setToastMessage(''), 4000);
                   }}
                   className="text-xs font-semibold px-4 py-2 rounded-lg bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors flex items-center gap-1.5"
                 >

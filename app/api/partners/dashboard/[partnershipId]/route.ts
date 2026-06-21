@@ -69,7 +69,7 @@ export async function GET(
     // Get staff login stats (for hub_login tracking)
     const { data: staffMembers } = await supabase
       .from('staff_members')
-      .select('id, hub_enrolled, hub_login_date')
+      .select('id, first_name, last_name, role_title, hub_enrolled, hub_login_date')
       .eq('partnership_id', partnershipId);
 
     // Use staff_enrolled from partnerships table for total count
@@ -138,6 +138,7 @@ export async function GET(
       organization,
       actionItems: actionItems || [],
       staffStats,
+      staffMembers: (staffMembers || []).map(s => ({ id: s.id, name: `${s.first_name || ''} ${s.last_name || ''}`.trim(), role: s.role_title, hubActive: !!s.hub_login_date })),
       metricSnapshots: Object.values(latestMetrics),
       buildings: buildings || [],
       activityLog: activityLog || [],
