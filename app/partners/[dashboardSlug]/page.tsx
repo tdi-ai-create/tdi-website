@@ -1196,7 +1196,7 @@ export default function PartnerDashboard() {
   const TABS = [
     { id: 'overview', label: 'Overview' },
     { id: 'our-partnership', label: 'Our Partnership' },
-    { id: 'blueprint', label: 'Blueprint' },
+    { id: 'blueprint', label: 'Your Plan' },
     { id: 'reporting', label: 'Reports' },
     { id: 'next-year', label: 'Next Year', badge: true },
     { id: 'team', label: 'Team' },
@@ -4982,6 +4982,66 @@ export default function PartnerDashboard() {
                           <p className="text-sm text-[#1e2749]/70">
                             This is what teachers tell us they remember months later. Not the PD slides. The moment someone noticed what they were doing right.
                           </p>
+                        </div>
+
+                        {/* Preparation Guide */}
+                        <div className="bg-[#F0FDF4] rounded-xl p-6 border border-green-100">
+                          <div className="flex items-center gap-2 mb-3">
+                            <CheckCircle className="w-5 h-5 text-green-600" />
+                            <h3 className="text-base font-bold text-gray-900">How to Prepare (Spoiler: Almost Nothing)</h3>
+                          </div>
+                          <p className="text-sm text-gray-700 mb-4">
+                            We designed observation days to require almost zero preparation from you. Here is everything you need to do:
+                          </p>
+                          <div className="space-y-2">
+                            {[
+                              { task: 'Let your staff know we are coming', detail: 'A simple email works. We provide a template you can copy and paste.' },
+                              { task: 'Keep your normal schedule', detail: 'We want to see a real day, not a performance. The more normal, the better.' },
+                              { task: 'Block 30 minutes at the end of the day', detail: 'For our leadership debrief. This is where the gold is.' },
+                            ].map((item, i) => (
+                              <div key={i} className="flex items-start gap-3 bg-white/70 rounded-lg p-3">
+                                <span className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-[10px] font-bold text-green-700 flex-shrink-0 mt-0.5">{i + 1}</span>
+                                <div>
+                                  <p className="text-sm font-medium text-gray-900">{item.task}</p>
+                                  <p className="text-xs text-gray-600">{item.detail}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Teacher Experience */}
+                        <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                          <h3 className="text-base font-bold text-gray-900 mb-3">What Your Teachers Will Experience</h3>
+                          <div className="space-y-4">
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                                <Clock className="w-4 h-4 text-amber-600" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">10-15 minute classroom visit</p>
+                                <p className="text-xs text-gray-600">Our observer sits quietly and takes notes. No interruptions. No checklists being waved around. Most teachers tell us they forgot we were there.</p>
+                              </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                                <Heart className="w-4 h-4 text-amber-600" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">A Love Note in their mailbox</p>
+                                <p className="text-xs text-gray-600">Within 24 hours, every observed teacher gets a personalized note highlighting specific strengths. This is often the first time someone has told them what they are doing right.</p>
+                              </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                                <MessageCircle className="w-4 h-4 text-amber-600" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">No evaluations. No judgment.</p>
+                                <p className="text-xs text-gray-600">This is not tied to teacher evaluations in any way. It is purely growth-focused. Teachers can be themselves. That is the whole point.</p>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     );
