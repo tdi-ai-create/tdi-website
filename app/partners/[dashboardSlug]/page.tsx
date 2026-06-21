@@ -6992,9 +6992,42 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     </div>
                   </div>
 
+                  {/* Grant Progress Timeline */}
+                  <div className="border-t border-gray-100 pt-4">
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">What TDI Is Doing</p>
+                    <div className="space-y-3">
+                      {[
+                        { phase: 'Research', status: 'done', detail: 'Identified funding paths, researched contacts, mapped eligibility' },
+                        { phase: 'Document Prep', status: 'done', detail: 'Drafted budget narratives, submission packets, and copy-paste emails' },
+                        { phase: 'Submissions', status: 'done', detail: 'All applications submitted through school contacts' },
+                        { phase: 'Follow-up', status: 'active', detail: 'Tracking responses, diagnosing routing issues, coaching resubmissions' },
+                        { phase: 'Alternative Paths', status: 'active', detail: 'NEA grant submitted, foundation outreach sent, exploring additional sources' },
+                        { phase: 'Approval', status: 'pending', detail: 'Awaiting decisions from funding sources' },
+                      ].map((step, i) => (
+                        <div key={i} className="flex items-start gap-3">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                            step.status === 'done' ? 'bg-green-100' : step.status === 'active' ? 'bg-amber-100' : 'bg-gray-100'
+                          }`}>
+                            {step.status === 'done' ? (
+                              <Check className="w-3.5 h-3.5 text-green-600" />
+                            ) : step.status === 'active' ? (
+                              <Clock className="w-3.5 h-3.5 text-amber-600" />
+                            ) : (
+                              <div className="w-2 h-2 rounded-full bg-gray-300" />
+                            )}
+                          </div>
+                          <div>
+                            <p className={`text-sm font-medium ${step.status === 'pending' ? 'text-gray-400' : 'text-[#1e2749]'}`}>{step.phase}</p>
+                            <p className="text-xs text-gray-500">{step.detail}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="bg-amber-50 rounded-lg p-3 border border-amber-100">
                     <p className="text-xs text-amber-800">
-                      <strong>What this means:</strong> Your base contract is guaranteed regardless of grant outcome. If the grant is approved, your partnership automatically expands with additional services at no extra cost to your school. The TDI team is managing the grant process and will keep you updated.
+                      <strong>What this means:</strong> Your base contract is guaranteed regardless of grant outcome. If approved, your partnership automatically expands with additional services at no extra cost to your school. The TDI team is managing the entire grant process, from research to submission to follow-up. We will keep you updated as decisions come in.
                     </p>
                   </div>
                 </div>
