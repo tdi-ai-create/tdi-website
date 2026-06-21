@@ -106,6 +106,25 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Send branded TDI welcome email (in addition to Supabase auth invite)
+    const { data: partnershipData } = await supabase
+      .from('partnerships')
+      .select('org_name, contact_name, slug')
+      .eq('id', partnershipId)
+      .single();
+
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com';
+    fetch(`${baseUrl}/api/partners/welcome-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: inviteEmail,
+        firstName: (name || inviteEmail).split(' ')[0],
+        schoolName: partnershipData?.org_name || partnershipData?.contact_name || 'your school',
+        dashboardUrl: `${baseUrl}/partners/${partnershipData?.slug || 'login'}`,
+      }),
+    }).catch(() => {}); // Fire and forget
+
     return NextResponse.json({
       success: true,
       message: `Invite sent to ${inviteEmail}`,

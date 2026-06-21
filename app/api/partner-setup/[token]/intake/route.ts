@@ -211,6 +211,36 @@ export async function POST(
 
       await supabase.from('staff_members').insert(staffData);
 
+      // Auto-provision Hub accounts for each staff member
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com';
+      const schoolName = partnership.contact_name || 'your school';
+      for (const s of staff) {
+        try {
+          const provResp = await fetch(`${baseUrl}/api/hub/provision`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: s.email,
+              name: `${s.first_name} ${s.last_name}`.trim() || s.email.split('@')[0],
+              tier: 'all_access',
+              source: 'partner_intake',
+            }),
+          });
+          if (provResp.ok) {
+            await supabase.from('staff_members')
+              .update({ hub_enrolled: true })
+              .eq('partnership_id', partnership.id)
+              .eq('email', s.email);
+            // Send staff welcome email
+            fetch(`${baseUrl}/api/hub/emails/staff-welcome`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: s.email, firstName: s.first_name || s.email.split('@')[0], schoolName }),
+            }).catch(() => {});
+          }
+        } catch { /* non-fatal */ }
+      }
+
       // Create default action items (updated list with 10 items)
       const defaultItems = [
         {

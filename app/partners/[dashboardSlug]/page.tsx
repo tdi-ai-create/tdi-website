@@ -5458,6 +5458,71 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               )}
             </div>
 
+            {/* Add Team Access */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-base font-semibold text-gray-900">Dashboard Access</h2>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">Want your assistant principal, coach, or admin team to see this dashboard too? Add their details and we will set up access within 24 hours.</p>
+              <div className="space-y-3">
+                <div className="grid grid-cols-3 gap-2">
+                  <input
+                    type="text"
+                    placeholder="Name"
+                    id="access-name"
+                    className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    id="access-email"
+                    className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Role (e.g., AP, Coach)"
+                    id="access-role"
+                    className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
+                  />
+                </div>
+                <button
+                  onClick={async () => {
+                    const nameEl = document.getElementById('access-name') as HTMLInputElement;
+                    const emailEl = document.getElementById('access-email') as HTMLInputElement;
+                    const roleEl = document.getElementById('access-role') as HTMLInputElement;
+                    if (!emailEl?.value) {
+                      setToastMessage('Please enter an email address');
+                      setTimeout(() => setToastMessage(''), 2000);
+                      return;
+                    }
+                    const resp = await fetch('/api/partners/request-access', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        partnershipId: partnership?.id,
+                        requesterName: partnership?.contact_name,
+                        requesterEmail: partnership?.contact_email,
+                        newMembers: [{ name: nameEl?.value || '', email: emailEl.value, role: roleEl?.value || '' }],
+                      }),
+                    });
+                    const data = await resp.json();
+                    if (data.success) {
+                      setToastMessage('Request submitted. Access will be set up within 24 hours.');
+                      if (nameEl) nameEl.value = '';
+                      if (emailEl) emailEl.value = '';
+                      if (roleEl) roleEl.value = '';
+                    } else {
+                      setToastMessage('Something went wrong. Please try again.');
+                    }
+                    setTimeout(() => setToastMessage(''), 4000);
+                  }}
+                  className="text-sm font-semibold px-4 py-2 rounded-lg bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" /> Request Access
+                </button>
+              </div>
+            </div>
+
             {/* Partnership Includes card -- two-tier when grant-supported */}
             <div className="bg-white rounded-xl border border-gray-100 p-6"
               style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
