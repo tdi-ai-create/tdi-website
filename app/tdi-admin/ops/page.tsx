@@ -210,6 +210,40 @@ export default function OpsPage() {
         </p>
       </div>
 
+      {/* Guides & Docs */}
+      <div className="flex flex-wrap gap-3">
+        <a
+          href="https://docs.google.com/document/d/1V9Bbmopev_qPC05zmN8QTY3bdw4u3ArSHEbuG8Uobjc/edit"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:border-orange-300 hover:bg-orange-50 transition-colors"
+        >
+          <FileText className="w-4 h-4" style={{ color: ACCENT }} />
+          Ops Playbook
+          <ExternalLink className="w-3 h-3 text-gray-400" />
+        </a>
+        <a
+          href="https://docs.google.com/document/d/1Ri_GRXTSjsMyVb-Uqr_eqT9UDzLUJnMoFC4J9Z5Yvno/edit"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:border-yellow-300 hover:bg-yellow-50 transition-colors"
+        >
+          <BookOpen className="w-4 h-4" style={{ color: '#EAB308' }} />
+          Hub Migration Guide
+          <ExternalLink className="w-3 h-3 text-gray-400" />
+        </a>
+        <a
+          href="https://paperclip.teachersdeserveit.com/TEA/inbox"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:border-orange-300 hover:bg-orange-50 transition-colors"
+        >
+          <Bot className="w-4 h-4" style={{ color: ACCENT }} />
+          Paperclip Inbox
+          <ExternalLink className="w-3 h-3 text-gray-400" />
+        </a>
+      </div>
+
       {/* Top-level stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <AdminStatCard
@@ -430,29 +464,62 @@ export default function OpsPage() {
               </div>
             </div>
 
-            <ExpandableItem title="Migration Steps" subtitle="Move videos from Thinkific to new Learning Hub" badge="In Progress" badgeColor="#EAB308" defaultOpen>
+            <ExpandableItem title="How to Migrate a Video" subtitle="Full process from Thinkific to Hub" badge="Step-by-step" badgeColor="#EAB308" defaultOpen>
               <div className="pt-3 space-y-2">
                 <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-2 text-xs text-yellow-800">
-                  <p className="font-medium">Step-by-step:</p>
-                  <ol className="mt-1 space-y-1 list-decimal list-inside">
-                    <li><strong>Inventory first:</strong> List every course and video in Thinkific. Create a spreadsheet: Course Name | Video Title | Duration | Status</li>
-                    <li><strong>Download:</strong> Download video files from Thinkific (get login from Rae)</li>
-                    <li><strong>Upload:</strong> Go to TDI Admin {'>'} Learning Hub {'>'} Production and upload each video</li>
-                    <li><strong>QA:</strong> Watch each video in the new Hub to confirm it plays correctly</li>
-                    <li><strong>Mark complete:</strong> Update your spreadsheet, flag any issues for Rae</li>
+                  <p className="font-medium">1. Download from Thinkific:</p>
+                  <ol className="mt-1 space-y-0.5 list-decimal list-inside">
+                    <li>Log into Thinkific {'>'} Products {'>'} Video Library</li>
+                    <li>Click the three-dot menu (...) next to the video</li>
+                    <li>Click Download and save the file</li>
+                    <li>Name it: <code>[Course] - [Lesson #] - [Title].mp4</code></li>
+                  </ol>
+                </div>
+                <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-2 text-xs text-yellow-800">
+                  <p className="font-medium">2. Create course in Hub (if it doesn&apos;t exist yet):</p>
+                  <ol className="mt-1 space-y-0.5 list-decimal list-inside">
+                    <li>Go to Hub Production {'>'} Create Course</li>
+                    <li>Match the Thinkific title, description, and category</li>
+                    <li>Add modules (sections) to match Thinkific structure</li>
+                  </ol>
+                </div>
+                <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-2 text-xs text-yellow-800">
+                  <p className="font-medium">3. Upload video to the right lesson:</p>
+                  <ol className="mt-1 space-y-0.5 list-decimal list-inside">
+                    <li>Open the course {'>'} click the module {'>'} Add Lesson {'>'} Video</li>
+                    <li>Click on the lesson {'>'} click &quot;Upload video&quot;</li>
+                    <li>Select the downloaded file {'>'} wait for upload + processing</li>
+                    <li>Duration auto-fills {'>'} click Save Lesson</li>
+                  </ol>
+                </div>
+                <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-2 text-xs text-yellow-800">
+                  <p className="font-medium">4. QA + Publish:</p>
+                  <ol className="mt-1 space-y-0.5 list-decimal list-inside">
+                    <li>Go to the public Hub and play each video to verify</li>
+                    <li>Update your migration tracker spreadsheet</li>
+                    <li>When all lessons are done, click Publish</li>
                   </ol>
                 </div>
                 <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-2 text-xs text-yellow-800">
                   <p className="font-medium">Timeline:</p>
                   <ul className="mt-1 space-y-0.5">
                     <li>Inventory complete by end of first week</li>
-                    <li>50% migrated by July 4</li>
-                    <li>100% migrated by July 18</li>
+                    <li>50% migrated (~15 videos) by July 4</li>
+                    <li>100% migrated (~30 videos) by July 18</li>
+                    <li>All QA&apos;d, Thinkific ready to sunset by July 25</li>
                   </ul>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <NavButton href="/tdi-admin/hub/production" label="Hub Production" icon={BookOpen} />
-                  <NavButton href="/tdi-admin/hub" label="Hub Dashboard" icon={Users} />
+                  <NavButton href="/hub" label="Public Hub (QA)" icon={Users} />
+                  <a
+                    href="https://docs.google.com/document/d/1Ri_GRXTSjsMyVb-Uqr_eqT9UDzLUJnMoFC4J9Z5Yvno/edit"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                  >
+                    <FileText className="w-3.5 h-3.5" /> Full Migration Guide
+                  </a>
                 </div>
               </div>
             </ExpandableItem>
