@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { LogOut, AlertCircle, Mail, User, CheckCircle, X, Target, Calendar, RefreshCw, ExternalLink } from 'lucide-react';
+import { LogOut, AlertCircle, Mail, User, CheckCircle, X, Target, Calendar, RefreshCw, ExternalLink, FileText } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CreatorDashboardHeader } from '@/components/creator-portal/CreatorDashboardHeader';
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
@@ -878,6 +878,17 @@ export default function CreatorDashboardPage() {
                           creatorstudio@teachersdeserveit.com
                         </a>
                       </div>
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                      <a
+                        href="https://drive.google.com/file/d/1pDekiLqVYygJwcTxvTqOWkD7PHhIIPxf/view?usp=sharing"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-[#80a4ed] hover:text-[#1e2749] transition-colors"
+                      >
+                        <FileText className="w-4 h-4" />
+                        TDI Recording Guide (PDF)
+                      </a>
                     </div>
                   </div>
                 </div>

@@ -232,6 +232,30 @@ export function CourseDetailsPanel({ creator }: CourseDetailsPanelProps) {
         </div>
       )}
 
+      {/* Creator Resources - Universal tools for all creators */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <h3 className="font-semibold text-[#1e2749] mb-4">Creator Resources</h3>
+        <div className="space-y-3">
+          <a
+            href="https://drive.google.com/file/d/1pDekiLqVYygJwcTxvTqOWkD7PHhIIPxf/view?usp=sharing"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-[#80a4ed]/10 transition-colors group"
+          >
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
+              <Video className="w-4 h-4 text-red-600" />
+            </div>
+            <div className="flex-grow min-w-0">
+              <p className="text-sm font-medium text-[#1e2749] group-hover:text-[#80a4ed]">
+                TDI Recording Guide
+              </p>
+              <p className="text-xs text-gray-500 truncate">Tips for recording your content</p>
+            </div>
+            <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-[#80a4ed]" />
+          </a>
+        </div>
+      </div>
+
       {/* Production Preferences Section - Only show if preferences are set */}
       {hasPreferences && (
         <div className="bg-white rounded-xl border border-gray-200 p-6">
