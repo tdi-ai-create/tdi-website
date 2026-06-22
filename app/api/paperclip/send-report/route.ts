@@ -62,6 +62,22 @@ export async function POST(request: NextRequest) {
     const result = await emailResponse.json();
     console.log('[send-report] Email sent:', subject);
 
+    // Also save a copy to Google Drive for backup
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com';
+    fetch(`${siteUrl}/api/paperclip/save-to-drive`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${expectedSecret}`,
+      },
+      body: JSON.stringify({
+        title: subject,
+        content,
+        folder: 'Paperclip Reports',
+        agentName: 'Olivia Smith',
+      }),
+    }).catch(() => {}); // Fire and forget -- email is the primary delivery
+
     return NextResponse.json({ success: true, emailId: result.id });
   } catch (error) {
     console.error('[send-report] Error:', error);

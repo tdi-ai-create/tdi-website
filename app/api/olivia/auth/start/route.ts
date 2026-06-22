@@ -4,6 +4,7 @@ import { randomBytes } from 'crypto';
 const SCOPES = [
   'https://www.googleapis.com/auth/gmail.metadata',
   'https://www.googleapis.com/auth/calendar.readonly',
+  'https://www.googleapis.com/auth/drive.file',
 ];
 
 export async function GET(request: NextRequest) {
