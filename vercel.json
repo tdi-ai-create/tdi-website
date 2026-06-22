@@ -42,7 +42,7 @@
     },
     {
       "path": "/api/cron/restart-paperclip",
-      "schedule": "0 */4 * * *"
+      "schedule": "0 6 * * *"
     },
     {
       "path": "/api/cron/paperclip-watchdog",
