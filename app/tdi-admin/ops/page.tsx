@@ -548,10 +548,56 @@ export default function OpsPage() {
               </div>
             </div>
 
-            <ExpandableItem title="Getting Started with Grants" subtitle="Help current clients pursue funding" badge="New" badgeColor="#8B5CF6" defaultOpen>
+            <ExpandableItem title="Allenwood Elementary -- Active Funding" subtitle="8 paths being pursued, $66K goal" badge="Active" badgeColor="#8B5CF6" defaultOpen>
+              <div className="pt-3 space-y-2">
+                {[
+                  { name: 'Section 1003 / ATSI', amount: 'TBD (potentially largest)', status: 'action', statusLabel: 'Waiting on School', statusColor: '#D97706', detail: 'Letter sent to Teri June 21. Dr. Porter needs to email Dr. Gloster (Innovation & Performance).', followUp: 'If no update by June 28, email Teri to check if Dr. Porter sent it.', owner: 'Teri / Dr. Porter' },
+                  { name: 'NEA Grant', amount: 'Pending', status: 'waiting', statusLabel: 'Submitted', statusColor: '#2563EB', detail: 'Application submitted June 16 via Jovita Ortiz.', followUp: 'Check NEA website for decision timeline. Follow up if no response by mid-July.', owner: 'Jovita Ortiz' },
+                  { name: 'Walmart Spark Good', amount: '$1,800', status: 'action', statusLabel: 'Account Setup Needed', statusColor: '#D97706', detail: 'Instructions sent to Teri June 21. She needs to create Spark Good account (NCES: 240051000966). Application opens Aug 1.', followUp: 'If no update by July 5, email Teri to check if account is set up. Remind her again in late July before Aug 1 cycle.', owner: 'Teri' },
+                  { name: 'Excellence in Education Foundation', amount: 'Exploring', status: 'waiting', statusLabel: 'Outreach Sent', statusColor: '#7C3AED', detail: 'Inquiry sent June 18 to Thea Wilson at PGCPS foundation.', followUp: 'If no response by July 2, send a polite follow-up email.', owner: 'TDI' },
+                  { name: 'Greater Washington Community Foundation', amount: 'Exploring', status: 'waiting', statusLabel: 'Outreach Sent', statusColor: '#7C3AED', detail: 'Inquiry sent June 18 to Darcelle Wilson.', followUp: 'If no response by July 2, send a polite follow-up email.', owner: 'TDI' },
+                  { name: 'Title II-A (Federal)', amount: '$33,225', status: 'stalled', statusLabel: 'Stalled', statusColor: '#DC2626', detail: 'Submitted May 18. Bounced: Flood to Parker ("we don\'t offer grants") to Kevin Thompson. Framing issue, not a real rejection.', followUp: 'Hold until Section 1003 response. If 1003 lands, Title II-A becomes less critical. If not, TDI will re-approach with better framing.', owner: 'TDI' },
+                  { name: 'IDEA/CEIS (Federal)', amount: '$27,000', status: 'pending', statusLabel: 'Not Yet Submitted', statusColor: '#6B7280', detail: 'Budget narrative drafted May 2026. Contact: Camille Johnson (camille.johnson@pgcps.org) at PGCPS Special Ed.', followUp: 'TDI will coordinate submission timing after Section 1003 response. Do not submit yet.', owner: 'TDI' },
+                  { name: 'Community Schools', amount: '$6,000', status: 'pending', statusLabel: 'Not Yet Submitted', statusColor: '#6B7280', detail: 'Budget narrative drafted May 2026. Kevin Thompson identified as contact.', followUp: 'Same as IDEA/CEIS. Wait for Section 1003 response first.', owner: 'TDI' },
+                ].map((path, i) => (
+                  <div key={i} className="border border-gray-100 rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm font-semibold text-gray-900">{path.name}</p>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: `${path.statusColor}15`, color: path.statusColor }}>{path.statusLabel}</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-1">{path.detail}</p>
+                    <div className="flex items-start gap-1 mt-2 bg-amber-50 border border-amber-100 rounded p-2">
+                      <Clock className="w-3 h-3 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-[10px] font-bold text-amber-700">Follow-up:</p>
+                        <p className="text-[10px] text-amber-700">{path.followUp}</p>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-gray-400 mt-1">Owner: {path.owner} | Amount: {path.amount}</p>
+                  </div>
+                ))}
+                <div className="bg-purple-50 border border-purple-100 rounded-lg p-3 mt-2">
+                  <p className="text-xs font-bold text-purple-700 mb-1">Key Dates</p>
+                  <div className="space-y-1 text-xs text-purple-600">
+                    <p>June 28 -- Check if Dr. Porter sent Section 1003 email</p>
+                    <p>July 2 -- Follow up on foundation outreach (2 emails)</p>
+                    <p>July 5 -- Check if Teri set up Walmart account</p>
+                    <p>Mid-July -- Check NEA grant decision status</p>
+                    <p>Late July -- Remind Teri about Walmart application (Aug 1 cycle)</p>
+                    <p>Aug 1 -- Walmart Spark Good application cycle opens</p>
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-2">
+                  <NavButton href="/tdi-admin/funding" label="Funding Portal" icon={Sparkles} />
+                  <NavButton href="/tdi-admin/leadership" label="Lead Dashboard" icon={Users} />
+                </div>
+              </div>
+            </ExpandableItem>
+
+            <ExpandableItem title="How to Start a New Grant Pursuit" subtitle="For other clients beyond Allenwood" badge="Reference" badgeColor="#6B7280">
               <div className="pt-3 space-y-2">
                 <div className="bg-purple-50 border border-purple-100 rounded-lg p-2 text-xs text-purple-700">
-                  <p className="font-medium">How to start:</p>
+                  <p className="font-medium">Steps:</p>
                   <ol className="mt-1 space-y-1 list-decimal list-inside">
                     <li><strong>Get client list</strong> from Lead Dashboard -- focus on active partnerships</li>
                     <li><strong>Research grants</strong> in each client&apos;s state/district (federal, state, foundation)</li>
@@ -564,7 +610,6 @@ export default function OpsPage() {
                 </div>
                 <div className="flex gap-2">
                   <NavButton href="/tdi-admin/funding" label="Funding Portal" icon={Sparkles} />
-                  <NavButton href="/tdi-admin/leadership" label="Lead Dashboard" icon={Users} />
                 </div>
               </div>
             </ExpandableItem>
