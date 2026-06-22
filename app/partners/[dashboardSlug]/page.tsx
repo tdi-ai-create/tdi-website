@@ -6965,14 +6965,14 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     <div className="space-y-2">
                       {[
                         { name: 'Base Contract (Signed)', amount: '$2,332', status: 'confirmed', detail: '13 Hub memberships, guaranteed regardless of grants' },
-                        { name: 'Section 1003 / ATSI (Federal)', amount: 'TBD', status: 'ready', detail: 'The big lever. Letter drafted for Dr. Porter to direct school-improvement funds to PD. Not competitive, money Allenwood is entitled to as ATSI school.' },
-                        { name: 'NEA Grant', amount: 'Pending', status: 'submitted', detail: 'Application submitted June 16 via Jovita Ortiz' },
-                        { name: 'Walmart Spark Good', amount: '$1,800', status: 'ready', detail: 'Easy win. Application drafted for professional books. School applies directly by NCES number. Next cycle Aug 1 to Nov 30.' },
-                        { name: 'Excellence in Education Foundation', amount: 'Exploring', status: 'outreach', detail: 'Inquiry sent June 18 to Thea Wilson at PGCPS foundation' },
-                        { name: 'Greater Washington Community Foundation', amount: 'Exploring', status: 'outreach', detail: 'Inquiry sent June 18 to Darcelle Wilson' },
-                        { name: 'Title II-A (Federal)', amount: '$33,225', status: 'stalled', detail: 'Submitted May 18, redirected between offices. TDI coaching resubmission.' },
-                        { name: 'IDEA/CEIS (Federal)', amount: '$27,000', status: 'pending', detail: '3 observation days for special education support. Ready to submit.' },
-                        { name: 'Community Schools', amount: '$6,000', status: 'stalled', detail: 'Forwarded to Kevin Thompson, awaiting response' },
+                        { name: 'Section 1003 / ATSI (Federal)', amount: 'TBD', status: 'submitted', detail: 'The big lever. Letter sent to school June 21 for Dr. Porter to submit to Dr. Gloster (Innovation & Performance). Not competitive, Allenwood is entitled to this money as an ATSI school.' },
+                        { name: 'NEA Grant', amount: 'Pending', status: 'submitted', detail: 'Application submitted June 16 via Jovita Ortiz. Awaiting decision.' },
+                        { name: 'Walmart Spark Good', amount: '$1,800', status: 'ready', detail: 'Easy win. Application drafted for professional books. School applies directly by NCES number. Next cycle Aug 1 to Nov 30. Instructions sent to school June 21.' },
+                        { name: 'Excellence in Education Foundation', amount: 'Exploring', status: 'outreach', detail: 'Inquiry sent June 18 to Thea Wilson at PGCPS foundation. Awaiting response.' },
+                        { name: 'Greater Washington Community Foundation', amount: 'Exploring', status: 'outreach', detail: 'Inquiry sent June 18 to Darcelle Wilson. Awaiting response.' },
+                        { name: 'Title II-A (Federal)', amount: '$33,225', status: 'stalled', detail: 'Submitted May 18. Bounced between Mrs. Flood, Clarence Parker ("we don\'t offer grants"), and Kevin Thompson. TDI tracking.' },
+                        { name: 'IDEA/CEIS (Federal)', amount: '$27,000', status: 'pending', detail: 'Budget narrative drafted May 2026. Not yet submitted to PGCPS Special Education office. TDI will coordinate timing.' },
+                        { name: 'Community Schools', amount: '$6,000', status: 'pending', detail: 'Budget narrative drafted May 2026. Not yet submitted. Kevin Thompson identified as contact.' },
                       ].map((path, i) => (
                         <div key={i} className={`flex items-center gap-3 p-3 rounded-lg ${
                           path.status === 'confirmed' ? 'bg-green-50 border border-green-100' :
@@ -7040,14 +7040,15 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">What TDI Has Done</p>
                     <div className="space-y-3">
                       {[
-                        { phase: 'Research', status: 'done', detail: 'Identified 5+ funding paths, researched PGCPS contacts, mapped eligibility for Title II-A, IDEA/CEIS, Community Schools, NEA, and private foundations' },
-                        { phase: 'Document Prep', status: 'done', detail: 'Drafted 3 federal budget narratives, NEA packet, 2 foundation emails, Section 1003/ATSI principal letter, Walmart Spark Good application, all copy-paste ready' },
-                        { phase: 'Federal Submissions', status: 'done', detail: 'Title II-A ($33K) and Community Schools ($6K) submitted through Teri. IDEA/CEIS ($27K) ready to submit. Section 1003 letter drafted for Dr. Porter.' },
+                        { phase: 'Research', status: 'done', detail: 'Identified 8 funding paths. Researched PGCPS contacts, mapped eligibility for Title II-A, IDEA/CEIS, Community Schools, Section 1003/ATSI, NEA, Walmart, and private foundations.' },
+                        { phase: 'Document Prep', status: 'done', detail: 'Drafted 3 federal budget narratives, NEA packet, 2 foundation emails, Section 1003 principal letter, Walmart Spark Good application. All copy-paste ready.' },
+                        { phase: 'Title II-A Submission', status: 'done', detail: 'Submitted May 18. Got redirected between 4 offices (Flood, Parker, Thompson). Parker said "we don\'t offer grants." TDI diagnosed as a framing issue and is tracking.' },
                         { phase: 'NEA Grant', status: 'done', detail: 'Found NEA member Jovita Ortiz on staff, drafted full packet. Application submitted June 16.' },
                         { phase: 'Foundation Outreach', status: 'done', detail: 'Emails sent June 18 to Excellence in Education Foundation (PGCPS) and Greater Washington Community Foundation.' },
-                        { phase: 'Follow-up & Troubleshooting', status: 'active', detail: 'Title II-A bounced between 4 offices. TDI diagnosed routing issue, coached resubmission. Tracking all pending responses.' },
-                        { phase: 'Corporate & Local Grants', status: 'active', detail: 'Walmart Spark Good application drafted ($1,800 for professional books). Researching DonorsChoose, local foundations, and additional corporate paths.' },
-                        { phase: 'Approvals & Decisions', status: 'pending', detail: 'Awaiting NEA decision, foundation responses, and federal office replies.' },
+                        { phase: 'Section 1003 / ATSI', status: 'active', detail: 'New approach. Letter drafted for Dr. Porter to send to Dr. Gloster (Innovation & Performance). Sent to school June 21. Waiting for Dr. Porter to send.' },
+                        { phase: 'Corporate & Local Grants', status: 'active', detail: 'Walmart Spark Good application drafted ($1,800 for books). Account setup instructions sent to school June 21. Application cycle opens August 1.' },
+                        { phase: 'IDEA/CEIS & Community Schools', status: 'pending', detail: 'Budget narratives drafted. TDI will coordinate submission timing after Section 1003 response comes back.' },
+                        { phase: 'Approvals & Decisions', status: 'pending', detail: 'Awaiting NEA decision, foundation responses, Dr. Porter/Dr. Gloster response on Section 1003.' },
                       ].map((step, i) => (
                         <div key={i} className="flex items-start gap-3">
                           <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
