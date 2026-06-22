@@ -550,15 +550,19 @@ export default function OpsPage() {
 
             <ExpandableItem title="Allenwood Elementary -- Active Funding" subtitle="8 paths being pursued, $66K goal" badge="Active" badgeColor="#8B5CF6" defaultOpen>
               <div className="pt-3 space-y-2">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-800">
+                  <p className="font-bold mb-1">Follow-up rule: Your job is not to send one email. Your job is to get a confirmed answer.</p>
+                  <p>If someone does not respond, follow up again. And again. Be polite but persistent. Every item below stays open until you have a real answer (yes, no, or a specific next step). If you have followed up 3 times with no response, escalate to Rae. Do not let anything sit unanswered for more than 2 weeks.</p>
+                </div>
                 {[
-                  { name: 'Section 1003 / ATSI', amount: 'TBD (potentially largest)', status: 'action', statusLabel: 'Waiting on School', statusColor: '#D97706', detail: 'Letter sent to Teri June 21. Dr. Porter needs to email Dr. Gloster (Innovation & Performance).', followUp: 'If no update by June 28, email Teri to check if Dr. Porter sent it.', owner: 'Teri / Dr. Porter' },
-                  { name: 'NEA Grant', amount: 'Pending', status: 'waiting', statusLabel: 'Submitted', statusColor: '#2563EB', detail: 'Application submitted June 16 via Jovita Ortiz.', followUp: 'Check NEA website for decision timeline. Follow up if no response by mid-July.', owner: 'Jovita Ortiz' },
-                  { name: 'Walmart Spark Good', amount: '$1,800', status: 'action', statusLabel: 'Account Setup Needed', statusColor: '#D97706', detail: 'Instructions sent to Teri June 21. She needs to create Spark Good account (NCES: 240051000966). Application opens Aug 1.', followUp: 'If no update by July 5, email Teri to check if account is set up. Remind her again in late July before Aug 1 cycle.', owner: 'Teri' },
-                  { name: 'Excellence in Education Foundation', amount: 'Exploring', status: 'waiting', statusLabel: 'Outreach Sent', statusColor: '#7C3AED', detail: 'Inquiry sent June 18 to Thea Wilson at PGCPS foundation.', followUp: 'If no response by July 2, send a polite follow-up email.', owner: 'TDI' },
-                  { name: 'Greater Washington Community Foundation', amount: 'Exploring', status: 'waiting', statusLabel: 'Outreach Sent', statusColor: '#7C3AED', detail: 'Inquiry sent June 18 to Darcelle Wilson.', followUp: 'If no response by July 2, send a polite follow-up email.', owner: 'TDI' },
-                  { name: 'Title II-A (Federal)', amount: '$33,225', status: 'stalled', statusLabel: 'Stalled', statusColor: '#DC2626', detail: 'Submitted May 18. Bounced: Flood to Parker ("we don\'t offer grants") to Kevin Thompson. Framing issue, not a real rejection.', followUp: 'Hold until Section 1003 response. If 1003 lands, Title II-A becomes less critical. If not, TDI will re-approach with better framing.', owner: 'TDI' },
-                  { name: 'IDEA/CEIS (Federal)', amount: '$27,000', status: 'pending', statusLabel: 'Not Yet Submitted', statusColor: '#6B7280', detail: 'Budget narrative drafted May 2026. Contact: Camille Johnson (camille.johnson@pgcps.org) at PGCPS Special Ed.', followUp: 'TDI will coordinate submission timing after Section 1003 response. Do not submit yet.', owner: 'TDI' },
-                  { name: 'Community Schools', amount: '$6,000', status: 'pending', statusLabel: 'Not Yet Submitted', statusColor: '#6B7280', detail: 'Budget narrative drafted May 2026. Kevin Thompson identified as contact.', followUp: 'Same as IDEA/CEIS. Wait for Section 1003 response first.', owner: 'TDI' },
+                  { name: 'Section 1003 / ATSI', amount: 'TBD (potentially largest)', status: 'action', statusLabel: 'Waiting on School', statusColor: '#D97706', detail: 'Letter sent to Teri June 21. Dr. Porter needs to email Dr. Gloster (Innovation & Performance).', followUp: 'June 28: Email Teri -- "Did Dr. Porter send the email?" Get a yes or no. If yes, ask if Dr. Gloster replied. If no, ask what is blocking it and offer to help. Keep following up every 3-4 days until Dr. Porter has sent it AND Dr. Gloster has responded with next steps.', owner: 'Teri / Dr. Porter' },
+                  { name: 'NEA Grant', amount: 'Pending', status: 'waiting', statusLabel: 'Submitted', statusColor: '#2563EB', detail: 'Application submitted June 16 via Jovita Ortiz.', followUp: 'Mid-July: Research NEA grant decision timeline. If no decision by end of July, email Teri to ask Jovita to check her NEA account for status. Keep checking every 2 weeks until we have a decision (approved, denied, or pending with a date).', owner: 'Jovita Ortiz' },
+                  { name: 'Walmart Spark Good', amount: '$1,800', status: 'action', statusLabel: 'Account Setup Needed', statusColor: '#D97706', detail: 'Instructions sent to Teri June 21. She needs to create Spark Good account (NCES: 240051000966). Application opens Aug 1.', followUp: 'July 5: Email Teri -- "Did you set up the Walmart Spark Good account?" Get a yes or no. If she is stuck, offer to walk her through it on a call. If yes, confirm she can log in. Late July: Remind her the application opens Aug 1 and she needs to copy-paste the answers from the doc. First week of August: Confirm she submitted it.', owner: 'Teri' },
+                  { name: 'Excellence in Education Foundation', amount: 'Exploring', status: 'waiting', statusLabel: 'Outreach Sent', statusColor: '#7C3AED', detail: 'Inquiry sent June 18 to Thea Wilson at PGCPS foundation.', followUp: 'July 2: Send follow-up email to Thea Wilson. If no response by July 10, try a different contact method (phone, LinkedIn). If still nothing by July 18, escalate to Rae. Goal: get a meeting or a clear "we do/don\'t fund this."', owner: 'TDI' },
+                  { name: 'Greater Washington Community Foundation', amount: 'Exploring', status: 'waiting', statusLabel: 'Outreach Sent', statusColor: '#7C3AED', detail: 'Inquiry sent June 18 to Darcelle Wilson.', followUp: 'July 2: Send follow-up email to Darcelle Wilson. If no response by July 10, try phone or different contact. If still nothing by July 18, escalate to Rae. Goal: get a meeting or a clear "we do/don\'t fund this."', owner: 'TDI' },
+                  { name: 'Title II-A (Federal)', amount: '$33,225', status: 'stalled', statusLabel: 'Stalled', statusColor: '#DC2626', detail: 'Submitted May 18. Bounced: Flood to Parker ("we don\'t offer grants") to Kevin Thompson. Framing issue, not a real rejection.', followUp: 'On hold until Section 1003 response comes back. If Section 1003 lands, Title II-A becomes less critical. If Section 1003 does not work, Rae will decide the next approach. Do not re-contact Parker or Thompson without Rae\'s approval.', owner: 'TDI (Rae decides)' },
+                  { name: 'IDEA/CEIS (Federal)', amount: '$27,000', status: 'pending', statusLabel: 'Not Yet Submitted', statusColor: '#6B7280', detail: 'Budget narrative drafted May 2026. Contact: Camille Johnson (camille.johnson@pgcps.org) at PGCPS Special Ed.', followUp: 'Do not submit yet. Wait for Section 1003 response. When Rae gives the green light, coordinate with Teri to submit to Camille Johnson. Then follow up until you get a real answer.', owner: 'TDI (Rae decides timing)' },
+                  { name: 'Community Schools', amount: '$6,000', status: 'pending', statusLabel: 'Not Yet Submitted', statusColor: '#6B7280', detail: 'Budget narrative drafted May 2026. Kevin Thompson identified as contact.', followUp: 'Do not submit yet. Same as IDEA/CEIS. Wait for Section 1003 response and Rae\'s go-ahead.', owner: 'TDI (Rae decides timing)' },
                 ].map((path, i) => (
                   <div key={i} className="border border-gray-100 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-1">
@@ -577,14 +581,16 @@ export default function OpsPage() {
                   </div>
                 ))}
                 <div className="bg-purple-50 border border-purple-100 rounded-lg p-3 mt-2">
-                  <p className="text-xs font-bold text-purple-700 mb-1">Key Dates</p>
+                  <p className="text-xs font-bold text-purple-700 mb-1">Key Dates (keep following up until you get a real answer)</p>
                   <div className="space-y-1 text-xs text-purple-600">
-                    <p>June 28 -- Check if Dr. Porter sent Section 1003 email</p>
-                    <p>July 2 -- Follow up on foundation outreach (2 emails)</p>
-                    <p>July 5 -- Check if Teri set up Walmart account</p>
-                    <p>Mid-July -- Check NEA grant decision status</p>
-                    <p>Late July -- Remind Teri about Walmart application (Aug 1 cycle)</p>
-                    <p>Aug 1 -- Walmart Spark Good application cycle opens</p>
+                    <p><strong>June 28</strong> -- Email Teri: did Dr. Porter send the Section 1003 email? Get a yes or no.</p>
+                    <p><strong>July 2</strong> -- Follow up with Thea Wilson and Darcelle Wilson (foundations). Need a real response.</p>
+                    <p><strong>July 5</strong> -- Email Teri: did she set up the Walmart account? Get a yes or no.</p>
+                    <p><strong>July 10</strong> -- 2nd follow-up on foundations if no response. Try phone.</p>
+                    <p><strong>Mid-July</strong> -- Check NEA grant decision. Ask Teri to have Jovita check her NEA account.</p>
+                    <p><strong>July 18</strong> -- If foundations still silent, escalate to Rae.</p>
+                    <p><strong>Late July</strong> -- Remind Teri: Walmart application opens Aug 1. Confirm she can log in.</p>
+                    <p><strong>Aug 1</strong> -- Walmart cycle opens. Confirm Teri submitted within first week.</p>
                   </div>
                 </div>
                 <div className="flex gap-2 mt-2">
