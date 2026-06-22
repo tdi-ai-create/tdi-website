@@ -14,7 +14,7 @@ const RAILWAY_API_URL = 'https://backboard.railway.com/graphql/v2';
 const PAPERCLIP_SERVICE_ID = '29ec2529-3d91-472b-82db-3049c1027cc4';
 const ENVIRONMENT_ID = '97a6200a-0263-437a-855b-183af689992d';
 const PAPERCLIP_URL = 'https://paperclip-production-014f.up.railway.app';
-const SLOW_THRESHOLD_MS = 3000; // 3 seconds = degraded
+const SLOW_THRESHOLD_MS = 5000; // 5 seconds = degraded (raised from 3s to reduce restart frequency)
 
 export async function GET() {
   const timestamp = new Date().toISOString();
