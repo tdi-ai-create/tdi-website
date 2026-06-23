@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getHubSupabase } from '@/lib/supabase-hub';
+
 import {
   Search,
   Plus,
@@ -543,51 +543,24 @@ export function CoursesTab() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
 
-  // Load courses directly from Hub Supabase (bypasses API auth issues)
+  // Load courses via API route (uses service key, bypasses RLS so all admins see courses)
   const loadCourses = async () => {
     setIsLoading(true);
     try {
-      const supabase = getHubSupabase();
-      let query = supabase
-        .from('hub_courses')
-        .select(`
-          *,
-          modules:hub_modules(count),
-          lessons:hub_modules(
-            lessons:hub_lessons(count)
-          )
-        `)
-        .order('updated_at', { ascending: false });
+      const params = new URLSearchParams();
+      if (statusFilter === 'published') params.set('status', 'published');
+      else if (statusFilter === 'draft') params.set('status', 'draft');
 
-      if (statusFilter === 'published') {
-        query = query.eq('is_published', true);
-      } else if (statusFilter === 'draft') {
-        query = query.eq('is_published', false);
-      }
+      const res = await fetch(`/api/tdi-admin/courses?${params.toString()}`);
+      const data = await res.json();
 
-      const { data: courseData, error } = await query;
-
-      if (error) {
-        console.error('Error loading courses:', error);
+      if (!res.ok) {
+        console.error('Error loading courses:', data.error);
         setCourses([]);
         return;
       }
 
-      const enriched = (courseData || []).map((course: any) => {
-        const moduleCount = course.modules?.[0]?.count || 0;
-        let lessonCount = 0;
-        if (course.lessons) {
-          course.lessons.forEach((mod: any) => {
-            if (mod.lessons) {
-              mod.lessons.forEach((l: any) => { lessonCount += l.count || 0; });
-            }
-          });
-        }
-        const { modules, lessons, ...rest } = course;
-        return { ...rest, module_count: moduleCount, lesson_count: lessonCount };
-      });
-
-      setCourses(enriched);
+      setCourses(data.courses || []);
     } catch (error) {
       console.error('Error loading courses:', error);
     } finally {
