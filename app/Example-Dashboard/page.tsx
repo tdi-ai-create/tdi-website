@@ -857,8 +857,6 @@ export default function ExampleDashboard() {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
-    const el = document.getElementById('tab-content-area');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   // Due dates for each item (month, year)
@@ -1125,7 +1123,6 @@ export default function ExampleDashboard() {
         phase="ACCELERATE"
         contractStart="2025-08-01"
         contractEnd="2026-06-30"
-        partnershipGoal="Student performance aligned with state benchmarks through educator support and sustainable professional development."
         partnershipType="district"
       />
 
@@ -1445,7 +1442,7 @@ export default function ExampleDashboard() {
                   <Handshake className="w-6 h-6 text-[#E8B84B]" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold mb-2" style={{ color: '#FFFFFF' }}>Your Partnership Story</h2>
+                  <h2 className="text-sm font-bold mb-2" style={{ color: '#FFFFFF' }}>Your Partnership Story</h2>
                   <p className="text-sm text-white/70 leading-relaxed mb-4">
                     This is where your year with TDI comes to life. Session notes, educator feedback, milestone celebrations, and data that tells your district&apos;s growth story. Everything you need for board presentations, grant reporting, or just remembering how far your team has come.
                   </p>
@@ -2001,7 +1998,7 @@ export default function ExampleDashboard() {
 
             {/* District-wide Building Comparison */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h3 className="text-lg font-bold text-[#1B2A4A] mb-4">Building Comparison</h3>
+              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4">Building Comparison</h3>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -2536,7 +2533,7 @@ export default function ExampleDashboard() {
         {activeTab === 'blueprint' && (
           <div className="space-y-4">
             <div className="text-center">
-              <h2 className="text-xl font-bold text-[#1B2A4A] mb-2">The Full TDI Blueprint</h2>
+              <h2 className="text-sm font-semibold text-[#1B2A4A] mb-2">The Full TDI Blueprint</h2>
               <p className="text-gray-600">What becomes available when we continue our partnership</p>
             </div>
 
@@ -2572,7 +2569,7 @@ export default function ExampleDashboard() {
                   <FileText className="w-5 h-5 text-[#E8B84B]" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold" style={{ color: '#FFFFFF' }}>Partnership Reports</h2>
+                  <h2 className="text-sm font-bold" style={{ color: '#FFFFFF' }}>Partnership Reports</h2>
                   <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>AI-generated reports ready to share with your board, staff, or community.</p>
                 </div>
               </div>
@@ -2762,7 +2759,7 @@ export default function ExampleDashboard() {
                   <Calculator className="w-6 h-6 text-[#E8B84B]" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold mb-1" style={{ color: '#FFFFFF' }}>We Find the Funding. You Focus on Teaching.</h2>
+                  <h2 className="text-sm font-bold mb-1" style={{ color: '#FFFFFF' }}>We Find the Funding. You Focus on Teaching.</h2>
                   <p className="text-sm text-white/70 leading-relaxed mb-3">
                     80% of schools we partner with find over $35K in funding for TDI. We research every option, write the grant language, prepare the board proposals -- you just review and submit.
                   </p>
@@ -2912,7 +2909,7 @@ export default function ExampleDashboard() {
 
             {/* CTA */}
             <div className="bg-gradient-to-r from-[#1B2A4A] via-[#38618C] to-[#4ecdc4] rounded-2xl p-6 text-white text-center">
-              <p className="text-lg font-bold mb-2">Want to See What Funding Your District Qualifies For?</p>
+              <p className="text-sm font-bold mb-2">Want to See What Funding Your District Qualifies For?</p>
               <p className="text-sm text-white/70 mb-4">It takes 5 minutes. We do the rest.</p>
               <span
                 className="inline-flex items-center gap-2 bg-white text-[#1B2A4A] px-6 py-3 rounded-lg font-semibold text-sm opacity-60 cursor-not-allowed"
@@ -2978,7 +2975,7 @@ export default function ExampleDashboard() {
 
             {/* SECTION B: Phase Journey Visual */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h3 className="text-lg font-bold text-[#1B2A4A] mb-6 text-center">Your District&apos;s TDI Journey</h3>
+              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-6 text-center">Your District&apos;s TDI Journey</h3>
 
               <div className="grid md:grid-cols-3 gap-4">
                 {/* Year 1 - LAUNCH (Complete) */}
@@ -3071,7 +3068,7 @@ export default function ExampleDashboard() {
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-6">
                 <Target className="w-5 h-5 text-[#1B2A4A]" />
-                <h3 className="text-lg font-bold text-[#1B2A4A]">Aligned to Your District Goals</h3>
+                <h3 className="text-sm font-semibold text-[#1B2A4A]">Aligned to Your District Goals</h3>
               </div>
 
               <div className="grid md:grid-cols-3 gap-4">
@@ -3155,7 +3152,7 @@ export default function ExampleDashboard() {
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-6">
                 <TrendingUp className="w-5 h-5 text-[#1B2A4A]" />
-                <h3 className="text-lg font-bold text-[#1B2A4A]">What Year 3 Will Achieve</h3>
+                <h3 className="text-sm font-semibold text-[#1B2A4A]">What Year 3 Will Achieve</h3>
               </div>
 
               <div className="overflow-x-auto">
@@ -3221,7 +3218,7 @@ export default function ExampleDashboard() {
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-5 h-5 text-[#4ecdc4]" />
-                <h3 className="text-lg font-bold text-[#1B2A4A]">What Year 3 Unlocks</h3>
+                <h3 className="text-sm font-semibold text-[#1B2A4A]">What Year 3 Unlocks</h3>
               </div>
               <p className="text-sm text-gray-500 mb-6">Everything that made Year 2 successful - plus sustainability features that make it permanent</p>
 
@@ -3585,7 +3582,7 @@ export default function ExampleDashboard() {
         {activeTab === 'team' && (
           <div className="space-y-4">
             <div className="text-center">
-              <h2 className="text-xl font-bold text-[#1B2A4A] mb-2">Your TDI Team</h2>
+              <h2 className="text-sm font-semibold text-[#1B2A4A] mb-2">Your TDI Team</h2>
               <p className="text-gray-600">Your dedicated partner for this journey</p>
             </div>
 
@@ -3604,7 +3601,7 @@ export default function ExampleDashboard() {
 
                 {/* Rae's Info */}
                 <div className="flex-1 text-center md:text-left">
-                  <h3 className="text-xl font-bold text-[#1B2A4A]">Rae Hughart</h3>
+                  <h3 className="text-base font-bold text-[#1B2A4A]">Rae Hughart</h3>
                   <p className="text-[#38618C] font-medium mb-3">Lead Partner, Motown District 360 Account</p>
                   
                   <p className="text-gray-600 text-sm mb-4">
