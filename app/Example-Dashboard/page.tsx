@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
+import { DashboardHeader } from '@/components/dashboard/shared/DashboardHeader';
 import dynamic from 'next/dynamic';
 
 const LeadershipQuiz = dynamic(() => import('@/components/dashboard/shared/LeadershipQuiz'), { ssr: false });
@@ -79,10 +80,10 @@ const Tooltip = ({ children, content }: { children: React.ReactNode; content: st
         <Info className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" />
       </button>
       {showMobile && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2.5 bg-[#1e2749] text-white text-xs leading-relaxed rounded-lg whitespace-normal max-w-[280px] text-center shadow-xl"
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2.5 bg-[#1B2A4A] text-white text-xs leading-relaxed rounded-lg whitespace-normal max-w-[280px] text-center shadow-xl"
           style={{ zIndex: 9999 }}>
           {content}
-          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1e2749]"></div>
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1B2A4A]"></div>
         </div>
       )}
     </div>
@@ -775,7 +776,7 @@ export default function ExampleDashboard() {
     const isOpen = openSections[id];
 
     const typeConfig = {
-      leadership: { bg: 'bg-[#1e2749]', label: 'Leadership' },
+      leadership: { bg: 'bg-[#1B2A4A]', label: 'Leadership' },
       onsite: { bg: 'bg-[#38618C]', label: 'On-Site' },
       virtual: { bg: 'bg-[#35A7FF]', label: 'Virtual' },
       celebration: { bg: 'bg-green-500', label: 'Celebration' },
@@ -797,7 +798,7 @@ export default function ExampleDashboard() {
           {/* Content */}
           <div className="flex-1 text-left">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-medium text-[#1e2749]">{title}</span>
+              <span className="font-medium text-[#1B2A4A]">{title}</span>
               <span className={`text-xs ${config.bg} text-white px-2 py-0.5 rounded-full`}>
                 {config.label}
               </span>
@@ -856,6 +857,8 @@ export default function ExampleDashboard() {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
+    const el = document.getElementById('tab-content-area');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   // Due dates for each item (month, year)
@@ -1005,7 +1008,7 @@ export default function ExampleDashboard() {
     stats: {
       educatorsEnrolled: { value: 255, total: 255, label: 'Staff Enrolled', sublabel: '187 teachers + 68 paras across 6 buildings' },
       deliverables: { completed: 8, total: 14, label: 'Deliverables', sublabel: 'completed vs. contracted' },
-      hubEngagement: { percent: 87, raw: '223/255', label: 'Hub Engagement', sublabel: '223 staff actively learning' },
+      hubEngagement: { percent: 87, active: 223, raw: '223/255', label: 'Hub Engagement', sublabel: '223 staff actively learning' },
       phase: { name: 'ACCELERATE', number: 2, total: 3, label: 'Current Phase', sublabel: 'Phase 2 of 3' },
     },
 
@@ -1115,82 +1118,54 @@ export default function ExampleDashboard() {
       {/* Confetti celebration for gold medal schools */}
       <Confetti isActive={showConfetti} />
 
-      {/* Compact Navigation */}
-      <nav className="bg-[#1e2749] sticky top-0 z-50 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-14">
-            <div className="flex items-center gap-3">
-              <span className="bg-white text-[#1e2749] px-2 py-1 rounded text-xs font-extrabold tracking-wide">TDI</span>
-              <span className="text-white font-semibold hidden sm:inline">Teachers Deserve It</span>
-              <span className="text-white/60 hidden md:inline">| Partner Dashboard</span>
-            </div>
-            <span
-              className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 opacity-50 cursor-not-allowed"
-              title="This is an example dashboard"
-              onClick={handleDisabledClick}
-            >
-              <Calendar className="w-4 h-4" />
-              <span className="hidden sm:inline">Schedule Session</span>
-            </span>
-          </div>
-        </div>
-      </nav>
+      {/* Hero - DashboardHeader component (matches live design) */}
+      <DashboardHeader
+        schoolName="Motown District 360"
+        location="Glenview, Illinois"
+        phase="ACCELERATE"
+        contractStart="2025-08-01"
+        contractEnd="2026-06-30"
+        partnershipGoal="Student performance aligned with state benchmarks through educator support and sustainable professional development."
+        partnershipType="district"
+      />
 
-      {/* Compact Hero */}
-      <section className="relative text-white py-6 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1e2749] via-[#38618C] to-[#1e2749]" />
-        
-        <div className="relative max-w-4xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl md:text-3xl font-bold whitespace-nowrap">Motown District 360</h1>
-              <Tooltip content="Preview with sample data. Your dashboard shows your real metrics.">
-                <span></span>
-              </Tooltip>
-            </div>
-            <p className="text-white/80 text-sm">Glenview, Illinois | District Partnership</p>
-          </div>
-          <div className="flex items-center gap-3 text-sm">
-            <div className="bg-white/10 px-3 py-1.5 rounded-lg">
-              <span className="text-white/60">Status:</span>
-              <span className="ml-2 font-semibold text-[#38618C] bg-white px-2 py-0.5 rounded whitespace-nowrap">Phase 2 - ACCELERATE</span>
-            </div>
-            <Tooltip content="This data supports board presentations, Title II-A/IV-A grant renewals, and state accountability documentation.">
-              <div className="bg-white/10 px-3 py-1.5 rounded-lg flex items-center gap-2 cursor-help hover:bg-white/20 transition-colors">
-                <Lock className="w-3.5 h-3.5 text-white/80" />
-                <span className="font-semibold text-white whitespace-nowrap">Board & Grant Ready</span>
-              </div>
-            </Tooltip>
-          </div>
-        </div>
-      </section>
-
-      {/* Tab Navigation */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-3">
-          <div className="flex justify-center gap-2 flex-wrap">
+      {/* Tab Navigation - underline style matching live design */}
+      <div
+        className="sticky top-0 z-30 bg-white border-b border-gray-100"
+        style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+        role="tablist"
+        aria-label="Dashboard sections"
+      >
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
             {[
-              { id: 'overview', label: 'Overview', icon: Eye },
-              { id: 'ourPartnership', label: 'Our Partnership', icon: Heart },
-              { id: 'schools', label: 'Schools', icon: School },
-              { id: 'blueprint', label: 'Blueprint', icon: Star },
-              { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
-              { id: 'team', label: 'Team', icon: User },
+              { id: 'overview', label: 'Overview' },
+              { id: 'our-partnership', label: 'Our Partnership' },
+              { id: 'schools', label: 'Schools' },
+              { id: 'blueprint', label: 'Your Plan' },
+              { id: 'reporting', label: 'Reports' },
+              { id: 'next-year', label: 'Next Year', badge: true },
+              { id: 'team', label: 'Team' },
             ].map((tab) => (
               <button
                 key={tab.id}
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                aria-controls={`panel-${tab.id}`}
                 onClick={() => handleTabChange(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-[#1e2749] text-white shadow-md'
-                    : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
-                }`}
+                className="flex items-center gap-1.5 px-4 py-4 text-sm font-semibold whitespace-nowrap border-b-2 transition-all flex-shrink-0"
+                style={{
+                  borderBottomColor: activeTab === tab.id ? '#1B2A4A' : 'transparent',
+                  color: activeTab === tab.id ? '#1B2A4A' : '#9CA3AF',
+                }}
               >
-                <tab.icon className="w-4 h-4" />
-                <span>{tab.label}</span>
+                {tab.label}
                 {tab.badge && (
-                  <span className="text-xs bg-[#35A7FF] text-white px-2 py-0.5 rounded-full">
-                    {tab.badge}
+                  <span
+                    className="text-xs px-1.5 py-0.5 rounded-full font-bold"
+                    style={{ background: '#DBEAFE', color: '#1D4ED8' }}
+                  >
+                    New
                   </span>
                 )}
               </button>
@@ -1200,13 +1175,119 @@ export default function ExampleDashboard() {
       </div>
 
       {/* Tab Content */}
-      <div id="tab-content-area" className="max-w-4xl mx-auto px-4 py-6">
+      <main id="tab-content-area" className="max-w-5xl mx-auto px-3 md:px-4 py-4 md:py-8" role="main">
         
         {/* ==================== OVERVIEW TAB ==================== */}
         {activeTab === 'overview' && (
-          <div className="space-y-4 pb-16">
+          <div
+            role="tabpanel"
+            id="panel-overview"
+            aria-labelledby="tab-overview"
+            className="space-y-6"
+          >
 
-            {/* ─── AI SUMMARY ─── replaces wall of data cards */}
+            {/* ─── YOUR NEXT STEPS (action items) ─── */}
+            <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#E0F7F6' }}>
+                    <Target className="w-3.5 h-3.5" style={{ color: '#2A9D8F' }} />
+                  </div>
+                  <span className="text-sm font-bold text-[#1B2A4A]">Your Next Steps</span>
+                  <span className="text-[10px] bg-[#E0F7F6] text-[#2A9D8F] px-2 py-0.5 rounded-full font-semibold">
+                    {overviewData.actions.nextToUnlock.length} remaining
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {overviewData.actions.nextToUnlock.map((item, i) => (
+                  <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <div className="w-5 h-5 rounded-full border-2 border-[#E8B84B] bg-[#FFF8E7] flex-shrink-0 mt-0.5 flex items-center justify-center">
+                      <div className="w-2 h-2 rounded-full bg-[#E8B84B]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-[#1B2A4A]">{item.label}</p>
+                      <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{item.detail}</p>
+                    </div>
+                    {item.cta && (
+                      <span className="text-xs font-medium text-[#2A9D8F] flex-shrink-0 flex items-center gap-1 cursor-not-allowed opacity-60" onClick={handleDisabledClick}>
+                        {item.cta} <ArrowRight className="w-3 h-3" />
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <p className="text-[10px] text-gray-400 mt-3 text-center">
+                {overviewData.actions.alreadyInMotion.length} completed
+              </p>
+            </div>
+
+            {/* ─── TEAM ACTIVATION ─── */}
+            <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#EDE9FE' }}>
+                    <Users className="w-3.5 h-3.5" style={{ color: '#8B5CF6' }} />
+                  </div>
+                  <span className="text-sm font-bold text-[#1B2A4A]">Team Activation</span>
+                </div>
+                <button
+                  onClick={() => handleTabChange('schools')}
+                  className="text-xs font-medium text-[#8B5CF6] hover:underline flex items-center gap-1"
+                >
+                  View all <ArrowRight className="w-3 h-3" />
+                </button>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="relative w-16 h-16">
+                  <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
+                    <path d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f3f4f6" strokeWidth="3" />
+                    <path d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#8B5CF6" strokeWidth="3"
+                      strokeDasharray={`${(overviewData.stats.hubEngagement.active / overviewData.stats.educatorsEnrolled.total) * 100}, 100`} strokeLinecap="round" />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-sm font-bold text-[#1B2A4A]">{overviewData.stats.hubEngagement.percent}%</span>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-bold text-[#1B2A4A]">{overviewData.stats.hubEngagement.active}</span>
+                    <span className="text-sm text-gray-500">of {overviewData.stats.educatorsEnrolled.total} educators active on Hub</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {overviewData.stats.educatorsEnrolled.total - overviewData.stats.hubEngagement.active} educators haven&apos;t logged in yet. A quick reminder can help.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* ─── WHAT EDUCATORS ARE SAYING ─── */}
+            <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#FFF8E7' }}>
+                  <Quote className="w-3.5 h-3.5" style={{ color: '#E8B84B' }} />
+                </div>
+                <span className="text-sm font-bold text-[#1B2A4A]">What Educators Are Saying</span>
+              </div>
+              <div className="space-y-3">
+                {[
+                  { text: 'I tried the shift technique with my kids on Monday and was shocked. We went from losing 8-10 minutes between subjects to being seated and ready in under 2.', role: 'Teacher, Crescendo Middle', date: 'Mar 12' },
+                  { text: 'The Quick Wins are the first PD resource I have actually used more than once. Practical, fast, and built for people who do not have time for a 3-hour webinar.', role: 'Instructional Coach, K-5', date: 'Feb 28' },
+                  { text: 'I printed my certificate, added it to my portfolio, and used the email template to send it to my principal. She was impressed.', role: 'Paraprofessional, 2nd year', date: 'Feb 15' },
+                ].map((q, i) => (
+                  <div key={i} className="border-l-2 border-[#E8B84B] pl-4 py-1">
+                    <p className="text-sm text-gray-700 italic" style={{ fontFamily: 'Georgia, serif' }}>
+                      &ldquo;{q.text}&rdquo;
+                    </p>
+                    <p className="text-[10px] text-gray-400 mt-1">
+                      -- {q.role}, {q.date}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ─── AI SUMMARY ─── Partnership Intelligence */}
             <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
               <div className="flex items-center gap-1.5 mb-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#E8B84B]" />
@@ -1219,53 +1300,62 @@ export default function ExampleDashboard() {
                 onClick={() => setOpenSections(prev => ({ ...prev, 'overview-hub-detail': !prev['overview-hub-detail'] }))}
                 className="text-xs text-gray-400 hover:text-gray-600 mt-3 transition-colors"
               >
-                {openSections['overview-hub-detail'] ? 'Hide details' : 'See detailed breakdown'} {openSections['overview-hub-detail'] ? '\u2191' : '\u2193'}
+                {openSections['overview-hub-detail'] ? 'Hide details \u2191' : 'See detailed breakdown \u2193'}
               </button>
 
               {/* Expandable detail */}
               {openSections['overview-hub-detail'] && (
                 <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <div className="rounded-xl p-3" style={{ background: '#F9FAFB' }}>
+                    <div className="rounded-xl p-3 bg-gray-50">
                       <p className="text-xl font-bold" style={{ color: '#E8B84B' }}>87%</p>
                       <p className="text-[10px] text-gray-500 mt-0.5">team logged in</p>
                     </div>
-                    <div className="rounded-xl p-3" style={{ background: '#F9FAFB' }}>
+                    <div className="rounded-xl p-3 bg-gray-50">
                       <p className="text-xl font-bold" style={{ color: '#2A9D8F' }}>342</p>
                       <p className="text-[10px] text-gray-500 mt-0.5">tools explored</p>
                     </div>
-                    <div className="rounded-xl p-3" style={{ background: '#F9FAFB' }}>
+                    <div className="rounded-xl p-3 bg-gray-50">
                       <p className="text-xl font-bold" style={{ color: '#2563EB' }}>189</p>
                       <p className="text-[10px] text-gray-500 mt-0.5">active this week</p>
                     </div>
-                    <div className="rounded-xl p-3" style={{ background: '#F9FAFB' }}>
+                    <div className="rounded-xl p-3 bg-gray-50">
                       <p className="text-xl font-bold" style={{ color: '#2A9D8F' }}>4.2/5</p>
                       <p className="text-[10px] text-gray-500 mt-0.5">wellness score</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F9FAFB' }}>
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
                     <Award className="w-4 h-4 text-[#E8B84B] flex-shrink-0" />
-                    <p className="text-sm text-gray-600">Your team earned <strong>127 Field Notes</strong> and completed <strong>38 courses</strong> (94.5 PD hours).</p>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#EFF6FF' }}>
-                    <Heart className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                    <p className="text-sm text-gray-600">TDI personally reached out to <strong>7</strong> team members for wellness check-ins. Names are never shared.</p>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F0FDF4' }}>
-                    <MessageCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                    <p className="text-sm text-gray-600">Your team contributed <strong>89 posts</strong> and engaged in <strong>34 Q&A threads</strong>. <strong>4 PD content requests</strong> submitted.</p>
+                    <p className="text-sm text-gray-600"><strong>38</strong> courses completed -- PD credit your team can show you.</p>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* ─── VISUAL GAUGES ─── at-a-glance row */}
+            {/* ─── DATE RANGE TOGGLE + VISUAL GAUGE RINGS ─── */}
+            <div className="flex justify-end mb-1">
+              <div className="inline-flex bg-gray-100 rounded-lg p-0.5">
+                {[['month', 'This Month'], ['quarter', 'Quarter'], ['all', 'All Time']].map(([key, label]) => (
+                  <button
+                    key={key}
+                    className={`px-3 py-1 text-[10px] font-semibold rounded-md transition-colors ${
+                      key === 'month'
+                        ? 'bg-white text-[#1B2A4A] shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                    onClick={handleDisabledClick}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {[
                 { value: overviewData.stats.hubEngagement.percent, label: 'Hub Engagement', display: `${overviewData.stats.hubEngagement.percent}%`, color: '#E8B84B', max: 100 },
                 { value: (overviewData.stats.deliverables.completed / overviewData.stats.deliverables.total) * 100, label: 'Deliverables', display: `${overviewData.stats.deliverables.completed}/${overviewData.stats.deliverables.total}`, color: '#4ecdc4', max: 100 },
                 { value: (4.2 / 5) * 100, label: 'Team Wellness', display: '4.2', color: '#2A9D8F', max: 100 },
-                { value: (overviewData.stats.phase.number / overviewData.stats.phase.total) * 100, label: 'Current Phase', display: `${overviewData.stats.phase.number}/${overviewData.stats.phase.total}`, color: '#1e2749', max: 100 },
+                { value: (overviewData.stats.phase.number / overviewData.stats.phase.total) * 100, label: 'Current Phase', display: `${overviewData.stats.phase.number}/${overviewData.stats.phase.total}`, color: '#1B2A4A', max: 100 },
               ].map((gauge, i) => (
                 <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col items-center">
                   <div className="relative w-20 h-20 mb-3">
@@ -1283,251 +1373,35 @@ export default function ExampleDashboard() {
               ))}
             </div>
 
-            {/* ─── PARTNERSHIP HEALTH ─── */}
-            <div className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="w-3 h-3 rounded-full bg-green-500 flex-shrink-0" style={{ boxShadow: '0 0 8px rgba(34,197,94,0.4)' }} />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-[#1e2749]">Partnership Momentum: <span className="text-green-600">{overviewData.health.status}</span></p>
-                <p className="text-xs text-gray-500 truncate">Hub above target | Observations on schedule | No blockers</p>
-              </div>
-            </div>
-
-            {/* ─── QUICK ACTIONS ─── */}
-            <div className="grid grid-cols-4 gap-3">
-              {[
-                { href: 'https://teachersdeserveit.com/hub', icon: BookOpen, label: 'Open Hub', bg: '#FFF8E7', iconColor: '#E8B84B' },
-                { href: 'https://calendly.com/raehughart', icon: Calendar, label: 'Schedule', bg: '#E0F7F6', iconColor: '#2A9D8F' },
-                { href: '#', icon: Star, label: 'Quiz', bg: '#EDE9FE', iconColor: '#8B5CF6', onClick: () => setOpenSections(prev => ({ ...prev, 'overview-leadership': !prev['overview-leadership'] })) },
-                { href: '#', icon: FileText, label: 'Tools', bg: '#DBEAFE', iconColor: '#2563EB', onClick: () => setOpenSections(prev => ({ ...prev, 'overview-leadership': !prev['overview-leadership'] })) },
-              ].map((action, i) => {
-                const Icon = action.icon;
-                return (
-                  <a
-                    key={i}
-                    href={action.onClick ? undefined : action.href}
-                    target={action.onClick ? undefined : '_blank'}
-                    rel={action.onClick ? undefined : 'noopener noreferrer'}
-                    onClick={action.onClick ? (e) => { e.preventDefault(); action.onClick?.(); } : undefined}
-                    className="flex flex-col items-center gap-2 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer"
-                  >
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: action.bg }}>
-                      <Icon className="w-4 h-4" style={{ color: action.iconColor }} />
-                    </div>
-                    <span className="text-[11px] font-semibold text-[#1e2749]">{action.label}</span>
-                  </a>
-                );
-              })}
-            </div>
-
-            {/* ─── TWO COLUMN: Popular Tools + Educator Types ─── */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">Popular in Your District</p>
-                <div className="flex flex-wrap gap-2">
-                  {['Calm Response Scripts', 'Lesson Flow Checklist', 'The Shift Kit', 'Parent Comms'].map((tool, i) => (
-                    <span key={i} className="text-xs px-3 py-1.5 rounded-full font-medium" style={{ background: '#FFF8E7', color: '#92400E' }}>
-                      {tool}
-                    </span>
-                  ))}
+            {/* ─── OBSERVATION IMPACT ─── */}
+            <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#E0F7F6' }}>
+                  <TrendingUp className="w-3.5 h-3.5" style={{ color: '#2A9D8F' }} />
                 </div>
+                <span className="text-sm font-bold text-[#1B2A4A]">Impact Spotlight</span>
+                <span className="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-semibold">After your last visit</span>
               </div>
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">Your Team&apos;s Educator Types</p>
-                <div className="flex flex-wrap gap-4">
-                  {[
-                    { count: 42, name: 'Connectors', color: '#E8B84B' },
-                    { count: 38, name: 'Architects', color: '#2563EB' },
-                    { count: 31, name: 'Sparks', color: '#EC4899' },
-                  ].map((type, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded" style={{ background: type.color }} />
-                      <span className="text-base font-bold text-[#1e2749]">{type.count}</span>
-                      <span className="text-xs text-gray-500">{type.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* ─── TEACHER QUOTE ─── */}
-            <div className="rounded-2xl p-5" style={{ background: '#FFFBEB', borderLeft: '3px solid #E8B84B' }}>
-              <p className="text-sm italic text-gray-700" style={{ lineHeight: 1.7 }}>
-                &ldquo;I tried the shift technique with my kids on Monday and was shocked. We went from losing 8-10 minutes between subjects to being seated and ready in under 2.&rdquo;
+              <p className="text-sm text-gray-600 mb-3" style={{ fontFamily: 'Georgia, serif' }}>
+                After your observation on February 26, here&apos;s what changed in the week that followed:
               </p>
-              <p className="text-[10px] text-gray-400 mt-2">-- An educator at Crescendo Middle</p>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="rounded-xl p-3 bg-gray-50 text-center">
+                  <p className="text-lg font-bold text-green-600">+12%</p>
+                  <p className="text-[10px] text-gray-500 mt-0.5">Hub engagement</p>
+                </div>
+                <div className="rounded-xl p-3 bg-gray-50 text-center">
+                  <p className="text-lg font-bold text-green-600">+0.3</p>
+                  <p className="text-[10px] text-gray-500 mt-0.5">Wellness shift</p>
+                </div>
+                <div className="rounded-xl p-3 bg-gray-50 text-center">
+                  <p className="text-lg font-bold text-[#E8B84B]">47</p>
+                  <p className="text-[10px] text-gray-500 mt-0.5">Tools used after</p>
+                </div>
+              </div>
             </div>
 
-            {/* ─── EXPANDABLE SECTIONS ─── collapsed by default */}
-
-            {/* 1. Detailed Hub Activity */}
-            <button
-              onClick={() => setOpenSections(prev => ({ ...prev, 'overview-hub-full': !prev['overview-hub-full'] }))}
-              className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#FFF8E7' }}>
-                  <BarChart3 className="w-4 h-4" style={{ color: '#E8B84B' }} />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-semibold text-[#1e2749]">Investment & Impact</p>
-                  <p className="text-xs text-gray-500">${overviewData.investment.perEducator}/educator | {overviewData.investment.retentionStat} implementation | 9.8/10 retention</p>
-                </div>
-              </div>
-              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${openSections['overview-hub-full'] ? 'rotate-180' : ''}`} />
-            </button>
-            {openSections['overview-hub-full'] && (
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 -mt-2">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                  {[
-                    { value: overviewData.investment.perEducator, label: 'per educator', sub: overviewData.investment.perEducatorSublabel },
-                    { value: overviewData.investment.implementationRate, label: 'retention intent', sub: overviewData.investment.implementationSublabel },
-                    { value: overviewData.investment.coursesCompleted, label: 'avg stress score', sub: overviewData.investment.coursesCompletedSublabel },
-                    { value: overviewData.investment.retentionStat, label: 'implementation', sub: overviewData.investment.retentionSublabel },
-                  ].map((stat, i) => (
-                    <div key={i} className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
-                      <div className="text-xl font-bold text-[#38618C] mb-0.5">{stat.value}</div>
-                      <div className="text-xs font-semibold text-[#1e2749]">{stat.label}</div>
-                      <div className="text-[10px] text-gray-400 mt-0.5 leading-snug">{stat.sub}</div>
-                    </div>
-                  ))}
-                </div>
-                <div className="bg-[#FDF8E7] rounded-xl p-4 text-center border border-[#F5C542]/20">
-                  <p className="text-sm font-bold text-[#1e2749]">{overviewData.quickWin.line1}</p>
-                  <p className="text-xs text-gray-500 mt-1">{overviewData.quickWin.line2}</p>
-                </div>
-              </div>
-            )}
-
-            {/* 2. Partnership Timeline */}
-            <button
-              onClick={() => setOpenSections(prev => ({ ...prev, 'overview-timeline': !prev['overview-timeline'] }))}
-              className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#E0F7F6' }}>
-                  <Calendar className="w-4 h-4" style={{ color: '#2A9D8F' }} />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-semibold text-[#1e2749]">Partnership Timeline</p>
-                  <p className="text-xs text-gray-500">{overviewData.timeline.done.length} done, {overviewData.timeline.inProgress.length} in progress, {overviewData.timeline.comingSoon.length} coming soon</p>
-                </div>
-              </div>
-              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${openSections['overview-timeline'] ? 'rotate-180' : ''}`} />
-            </button>
-            {openSections['overview-timeline'] && (
-              <div className="-mt-2">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div className="bg-green-50 rounded-2xl p-4 border border-green-100">
-                    <div className="flex items-center gap-2 mb-3">
-                      <CheckCircle className="w-3.5 h-3.5 text-green-600" />
-                      <span className="text-xs font-bold text-green-700">Done ({overviewData.timeline.done.length})</span>
-                    </div>
-                    <div className="space-y-2">
-                      {overviewData.timeline.done.map((item, i) => (
-                        <div key={i} className="flex gap-2">
-                          <div className="w-1 h-1 rounded-full bg-green-400 mt-1.5 flex-shrink-0" />
-                          <div className="text-[11px] text-gray-600 leading-snug">{item.label} <span className="text-gray-400">({item.date})</span></div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="bg-amber-50 rounded-2xl p-4 border border-amber-100">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-3.5 h-3.5 rounded-full border-2 border-amber-500 flex items-center justify-center">
-                        <div className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" />
-                      </div>
-                      <span className="text-xs font-bold text-amber-700">Active ({overviewData.timeline.inProgress.length})</span>
-                    </div>
-                    <div className="space-y-2">
-                      {overviewData.timeline.inProgress.map((item, i) => (
-                        <div key={i} className="flex gap-2">
-                          <div className="w-1 h-1 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
-                          <div className="text-[11px] text-gray-600 leading-snug">{item.label}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="bg-[#e8f5f5] rounded-2xl p-4 border border-[#38618C]/10">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Calendar className="w-3.5 h-3.5 text-[#38618C]" />
-                      <span className="text-xs font-bold text-[#38618C]">Coming ({overviewData.timeline.comingSoon.length})</span>
-                    </div>
-                    <div className="space-y-2">
-                      {overviewData.timeline.comingSoon.map((item, i) => (
-                        <div key={i} className="flex gap-2">
-                          <div className="w-1 h-1 rounded-full bg-[#38618C]/40 mt-1.5 flex-shrink-0" />
-                          <div className="text-[11px] text-gray-600 leading-snug">{item.label} <span className="text-gray-400">({item.date})</span></div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* 3. Next Steps & Actions */}
-            <button
-              onClick={() => setOpenSections(prev => ({ ...prev, 'overview-actions': !prev['overview-actions'] }))}
-              className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#FEF3C7' }}>
-                  <AlertCircle className="w-4 h-4 text-amber-500" />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-semibold text-[#1e2749]">Next Steps & Actions</p>
-                  <p className="text-xs text-gray-500">{overviewData.actions.nextToUnlock.length} items need your attention | {overviewData.actions.alreadyInMotion.length} already in motion</p>
-                </div>
-              </div>
-              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${openSections['overview-actions'] ? 'rotate-180' : ''}`} />
-            </button>
-            {openSections['overview-actions'] && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 -mt-2">
-                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                  <h4 className="text-xs font-bold text-amber-600 uppercase tracking-wider mb-3">Your Next Steps</h4>
-                  <div className="space-y-2">
-                    {overviewData.actions.nextToUnlock.map((item, i) => (
-                      <div key={i} className="bg-amber-50 rounded-xl p-3 border border-amber-100">
-                        <p className="text-xs font-semibold text-[#1e2749]">{item.label}</p>
-                        <p className="text-[10px] text-gray-500 mt-0.5">{item.detail}</p>
-                        {item.cta && (
-                          <a href={item.ctaHref} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-[#38618C] hover:underline">
-                            {item.cta} <ArrowRight className="w-2.5 h-2.5" />
-                          </a>
-                        )}
-                      </div>
-                    ))}
-                    {overviewData.actions.tdiHandling.map((item, i) => (
-                      <div key={i} className="bg-blue-50 rounded-xl p-3 border border-blue-100">
-                        <div className="flex items-start justify-between gap-2">
-                          <p className="text-xs font-semibold text-[#1e2749]">{item.label}</p>
-                          <span className="text-[9px] font-medium bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full flex-shrink-0">TDI</span>
-                        </div>
-                        <p className="text-[10px] text-gray-500 mt-0.5">{item.detail}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                  <h4 className="text-xs font-bold text-green-600 uppercase tracking-wider mb-3">Already In Motion</h4>
-                  <div className="space-y-2">
-                    {overviewData.actions.alreadyInMotion.map((item, i) => (
-                      <div key={i} className="flex items-center gap-3 bg-green-50 rounded-xl p-3 border border-green-100">
-                        <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                          <Check className="w-3 h-3 text-green-600" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-[#1e2749]">{item.label}</p>
-                          <p className="text-[10px] text-gray-500">{item.date}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* 4. Leadership Tools & Quiz */}
+            {/* ─── EXPANDABLE: Leadership Tools & Quiz ─── */}
             <button
               onClick={() => setOpenSections(prev => ({ ...prev, 'overview-leadership': !prev['overview-leadership'] }))}
               className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
@@ -1537,7 +1411,7 @@ export default function ExampleDashboard() {
                   <GraduationCap className="w-4 h-4" style={{ color: '#8B5CF6' }} />
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-semibold text-[#1e2749]">Leadership Tools & Quiz</p>
+                  <p className="text-sm font-semibold text-[#1B2A4A]">Leadership Tools & Quiz</p>
                   <p className="text-xs text-gray-500">Printable tools, conversation starters, leadership style quiz</p>
                 </div>
               </div>
@@ -1551,94 +1425,18 @@ export default function ExampleDashboard() {
               </div>
             )}
 
-            {/* 5. Community, Testimonials & FAQ */}
-            <button
-              onClick={() => setOpenSections(prev => ({ ...prev, 'overview-community': !prev['overview-community'] }))}
-              className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#DBEAFE' }}>
-                  <MessageSquare className="w-4 h-4" style={{ color: '#2563EB' }} />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-semibold text-[#1e2749]">Community & FAQ</p>
-                  <p className="text-xs text-gray-500">Testimonials, seasonal tips, common questions</p>
-                </div>
-              </div>
-              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${openSections['overview-community'] ? 'rotate-180' : ''}`} />
-            </button>
-            {openSections['overview-community'] && (
-              <div className="space-y-4 -mt-2">
-                {/* Community testimonials */}
-                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-3">From the TDI Community (100,000+ educators)</p>
-                  <div className="grid md:grid-cols-2 gap-3">
-                    <div className="p-4 rounded-xl bg-gray-50" style={{ borderLeft: '3px solid #4ecdc4' }}>
-                      <p className="text-sm italic text-gray-600" style={{ lineHeight: 1.6 }}>
-                        &ldquo;The Quick Wins are the first PD resource I have actually used more than once. Practical, fast, and built for people who do not have time for a 3-hour webinar.&rdquo;
-                      </p>
-                      <p className="text-xs text-gray-400 mt-2">-- Instructional coach, K-5</p>
-                    </div>
-                    <div className="p-4 rounded-xl bg-gray-50" style={{ borderLeft: '3px solid #E8B84B' }}>
-                      <p className="text-sm italic text-gray-600" style={{ lineHeight: 1.6 }}>
-                        &ldquo;I printed my certificate, added it to my portfolio, and used the email template to send it to my principal. She was impressed.&rdquo;
-                      </p>
-                      <p className="text-xs text-gray-400 mt-2">-- Paraprofessional, 2nd year</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Seasonal tip */}
-                <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, #1e2749 0%, #2d3a5c 50%, #38618C 100%)' }}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.1)' }}>
-                      <Calendar className="w-5 h-5 text-[#FFBA06]" />
-                    </div>
-                    <div>
-                      <p className="text-white/50 text-[10px] uppercase tracking-wider">June Leadership Strategy</p>
-                      <p className="text-white font-bold text-sm">End-of-Year Teacher Appreciation</p>
-                    </div>
-                  </div>
-                  <p className="text-white/70 text-sm leading-relaxed">
-                    Your team has worked hard this year. Before summer break, consider three things: (1) a personal handwritten note to each educator highlighting something specific you noticed, (2) a 5-minute staff meeting shout-out for Hub engagement, and (3) sharing their PD certificate count with the school board. These small moments carry teachers through the summer.
-                  </p>
-                </div>
-
-                {/* FAQ */}
-                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                  <h3 className="text-sm font-bold mb-3" style={{ color: '#1e2749' }}>Common Questions from Principals</h3>
-                  <div className="space-y-2">
-                    {[
-                      { q: 'How do I know if my teachers are actually using the Hub?', a: 'Check the Hub Activity section above -- it shows login %, tools explored, and active users in real time. If engagement drops, TDI will flag it and help re-engage your team.' },
-                      { q: 'What should I say to teachers who have not logged in yet?', a: 'Keep it simple: "We have a free resource for you -- the TDI Learning Hub has 5-minute tools you can use Monday morning. Your account is already set up."' },
-                      { q: 'Can my teachers earn PD credit through the Hub?', a: 'Yes. When educators complete courses, they earn PD certificates with tracked hours. Printable and shareable for professional portfolios.' },
-                      { q: 'What happens if a teacher is struggling?', a: 'If an educator logs multiple tough days on their private Vibe Check, TDI sends a personal wellness email. Names are never shared with you -- just a warm check-in.' },
-                    ].map((faq, i) => (
-                      <details key={i} className="group">
-                        <summary className="flex items-center gap-2 cursor-pointer py-1.5 text-xs font-medium text-[#1e2749]">
-                          <ChevronDown className="w-3 h-3 text-gray-400 transition-transform group-open:rotate-180" />
-                          {faq.q}
-                        </summary>
-                        <p className="text-xs text-gray-600 ml-5 pb-2 leading-relaxed">{faq.a}</p>
-                      </details>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
           </div>
         )}
 
         {/* ==================== OUR PARTNERSHIP TAB ==================== */}
-        {activeTab === 'ourPartnership' && (
+        {activeTab === 'our-partnership' && (
           <div className="space-y-4 pb-16">
 
             {/* ─────────────────────────────────────────────
                 SECTION 1 - PARTNERSHIP GOAL
                 Always visible. Dark navy gradient hero card.
             ───────────────────────────────────────────── */}
-            <div className="relative bg-gradient-to-br from-[#1e2749] to-[#2d3a6b] rounded-2xl p-8 overflow-hidden shadow-xl">
+            <div className="relative bg-gradient-to-br from-[#1B2A4A] to-[#2d3a6b] rounded-2xl p-8 overflow-hidden shadow-xl">
               <div className="absolute top-0 right-0 w-64 h-64 opacity-5 pointer-events-none">
                 <svg viewBox="0 0 200 200" fill="none">
                   <circle cx="150" cy="50" r="100" fill="white"/>
@@ -1850,7 +1648,7 @@ export default function ExampleDashboard() {
                 {phases.map((phase, i) => (
                   <React.Fragment key={phase.name}>
                     <div className={`flex-1 rounded-xl p-4 ${
-                      phase.isCurrent ? 'bg-[#1e2749] text-white' :
+                      phase.isCurrent ? 'bg-[#1B2A4A] text-white' :
                       phase.isComplete ? 'bg-teal-600 text-white' :
                       'bg-gray-100 text-gray-400'
                     }`}>
@@ -1988,7 +1786,7 @@ export default function ExampleDashboard() {
               accent="teal"
             >
               {/* Hero card with comparison bars */}
-              <div className="bg-gradient-to-br from-[#1e2749] to-[#2d3a6b] rounded-2xl p-6 mb-5 text-white">
+              <div className="bg-gradient-to-br from-[#1B2A4A] to-[#2d3a6b] rounded-2xl p-6 mb-5 text-white">
                 <p className="text-xs font-bold uppercase tracking-widest text-blue-300 mb-1">
                   Strategy Implementation Rate
                 </p>
@@ -2234,7 +2032,7 @@ export default function ExampleDashboard() {
             {/* District Summary Bar */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
-                <div className="text-3xl font-bold text-[#1e2749]">{districtTotals.schools}</div>
+                <div className="text-3xl font-bold text-[#1B2A4A]">{districtTotals.schools}</div>
                 <div className="text-sm text-gray-500">Schools</div>
               </div>
               <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
@@ -2248,7 +2046,7 @@ export default function ExampleDashboard() {
                 <div className="text-xs text-green-600 mt-1">{Math.round((districtTotals.parasLoggedIn / districtTotals.paras) * 100)}% logged in</div>
               </div>
               <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
-                <div className="text-3xl font-bold text-[#1e2749]">{totalStaff}</div>
+                <div className="text-3xl font-bold text-[#1B2A4A]">{totalStaff}</div>
                 <div className="text-sm text-gray-500">Total Staff</div>
                 <div className="text-xs text-green-600 mt-1">{Math.round((totalLoggedIn / totalStaff) * 100)}% logged in</div>
               </div>
@@ -2256,7 +2054,7 @@ export default function ExampleDashboard() {
 
             {/* District-wide Building Comparison */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h3 className="text-lg font-bold text-[#1e2749] mb-4">Building Comparison</h3>
+              <h3 className="text-lg font-bold text-[#1B2A4A] mb-4">Building Comparison</h3>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -2295,7 +2093,7 @@ export default function ExampleDashboard() {
 
                       return (
                         <tr key={school.id} className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer" onClick={() => setExpandedSchool(school.id)}>
-                          <td className="py-3 text-[#1e2749] font-medium">{school.name}</td>
+                          <td className="py-3 text-[#1B2A4A] font-medium">{school.name}</td>
                           <td className="py-3 text-center">
                             <span className={`px-2 py-0.5 rounded text-xs font-medium ${loginRate >= 90 ? 'bg-green-50 text-green-600' : loginRate >= 85 ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'}`}>
                               {loginRate}%
@@ -2364,7 +2162,7 @@ export default function ExampleDashboard() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <h3 className="font-bold text-[#1e2749]">{school.name}</h3>
+                            <h3 className="font-bold text-[#1B2A4A]">{school.name}</h3>
                             <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-0.5 rounded-full">{school.grades}</span>
                             {school.champion && (
                               <span className="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full">Champion: {school.champion}</span>
@@ -2501,8 +2299,8 @@ export default function ExampleDashboard() {
 
                         {/* Building-specific TDI note */}
                         {school.tdiNote && (
-                          <div className="mb-4 p-3 bg-[#1e2749]/5 rounded-lg">
-                            <p className="text-sm text-[#1e2749]">
+                          <div className="mb-4 p-3 bg-[#1B2A4A]/5 rounded-lg">
+                            <p className="text-sm text-[#1B2A4A]">
                               <span className="font-semibold">TDI Note:</span> {school.tdiNote}
                             </p>
                           </div>
@@ -2513,7 +2311,7 @@ export default function ExampleDashboard() {
                           <div className={school.paras ? 'md:pr-4' : ''}>
                             {/* Header - Stacked Layout */}
                             <div className="mb-3">
-                              <h4 className="font-semibold text-[#1e2749] flex items-center gap-2 mb-1">
+                              <h4 className="font-semibold text-[#1B2A4A] flex items-center gap-2 mb-1">
                                 <GraduationCap className="w-4 h-4" />
                                 Teachers
                               </h4>
@@ -2524,7 +2322,7 @@ export default function ExampleDashboard() {
                             {/* Progress Bar */}
                             <div className="bg-gray-200 rounded-full h-2 mb-3 overflow-hidden">
                               <div
-                                className="h-full rounded-full bg-[#1e2749]"
+                                className="h-full rounded-full bg-[#1B2A4A]"
                                 style={{ width: `${(school.teachers.loggedIn / school.teachers.total) * 100}%` }}
                               />
                             </div>
@@ -2566,7 +2364,7 @@ export default function ExampleDashboard() {
                               <p className="text-xs text-gray-500 mb-2">What Teachers Are Exploring:</p>
                               <div className="flex flex-wrap gap-1.5">
                                 {school.teacherCourses.map((course, i) => (
-                                  <span key={i} className="text-xs bg-[#1e2749]/10 text-[#1e2749] px-3 py-1 rounded-full">
+                                  <span key={i} className="text-xs bg-[#1B2A4A]/10 text-[#1B2A4A] px-3 py-1 rounded-full">
                                     {course}
                                   </span>
                                 ))}
@@ -2791,7 +2589,7 @@ export default function ExampleDashboard() {
         {activeTab === 'blueprint' && (
           <div className="space-y-4">
             <div className="text-center">
-              <h2 className="text-xl font-bold text-[#1e2749] mb-2">The Full TDI Blueprint</h2>
+              <h2 className="text-xl font-bold text-[#1B2A4A] mb-2">The Full TDI Blueprint</h2>
               <p className="text-gray-600">What becomes available when we continue our partnership</p>
             </div>
 
@@ -2812,12 +2610,202 @@ export default function ExampleDashboard() {
           </div>
         )}
 
+        {/* ==================== REPORTS TAB ==================== */}
+        {activeTab === 'reporting' && (
+          <div
+            role="tabpanel"
+            id="panel-reporting"
+            aria-labelledby="tab-reporting"
+            className="space-y-6"
+          >
+            {/* Header */}
+            <div className="bg-gradient-to-br from-[#1B2A4A] to-[#38618C] rounded-2xl p-6 md:p-8 text-white">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-[#E8B84B]" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold" style={{ color: '#FFFFFF' }}>Partnership Reports</h2>
+                  <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>AI-generated reports ready to share with your board, staff, or community.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Report Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              {/* Board Report */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-purple-50">
+                    <GraduationCap className="w-4 h-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1B2A4A]">Board Presentation</h3>
+                    <p className="text-xs text-gray-500">For superintendents, board members, and district leadership</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">Executive summary with key metrics, ROI analysis, educator testimonials, and renewal recommendations. Formatted for board meeting presentations.</p>
+                <button
+                  onClick={handleDisabledClick}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1B2A4A] text-white hover:bg-[#2a3459] transition-colors opacity-60 cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4" /> Generate Report
+                </button>
+              </div>
+
+              {/* Staff Engagement */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-teal-50">
+                    <Users className="w-4 h-4 text-teal-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1B2A4A]">Staff Engagement</h3>
+                    <p className="text-xs text-gray-500">For principals, coaches, and team leads</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">Hub adoption rates, most-used tools, engagement trends, and actionable recommendations to share at your next PLC or staff meeting.</p>
+                <button
+                  onClick={handleDisabledClick}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1B2A4A] text-white hover:bg-[#2a3459] transition-colors opacity-60 cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4" /> Generate Report
+                </button>
+              </div>
+
+              {/* Impact & ROI */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-amber-50">
+                    <TrendingUp className="w-4 h-4 text-amber-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1B2A4A]">Impact & ROI</h3>
+                    <p className="text-xs text-gray-500">For budget justification and grant reporting</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">Investment analysis, measurable outcomes, wellness improvements, PD hours earned, and projected outcomes. Perfect for budget season and grant applications.</p>
+                <button
+                  onClick={handleDisabledClick}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1B2A4A] text-white hover:bg-[#2a3459] transition-colors opacity-60 cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4" /> Generate Report
+                </button>
+              </div>
+
+              {/* Quarterly Progress */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-blue-50">
+                    <BarChart3 className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1B2A4A]">Quarterly Progress</h3>
+                    <p className="text-xs text-gray-500">For check-ins and progress tracking</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">This quarter&apos;s highlights, metrics vs targets, milestones reached, challenges addressed, and what&apos;s ahead. Share with leadership or use for your own planning.</p>
+                <button
+                  onClick={handleDisabledClick}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1B2A4A] text-white hover:bg-[#2a3459] transition-colors opacity-60 cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4" /> Generate Report
+                </button>
+              </div>
+
+              {/* Teacher Highlights */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-green-50">
+                    <Heart className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1B2A4A]">Teacher Highlights</h3>
+                    <p className="text-xs text-gray-500">For staff newsletters, emails, and PLC agendas</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">Popular tools your team loves, educator quotes, completion milestones, and celebration-worthy moments. Great for staff newsletters or morning announcements.</p>
+                <button
+                  onClick={handleDisabledClick}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1B2A4A] text-white hover:bg-[#2a3459] transition-colors opacity-60 cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4" /> Generate Report
+                </button>
+              </div>
+
+              {/* Community Update */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-rose-50">
+                    <MessageCircle className="w-4 h-4 text-rose-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1B2A4A]">Community Update</h3>
+                    <p className="text-xs text-gray-500">For parent newsletters, school websites, and social media</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">A parent-friendly summary of your district&apos;s PD investment: what teachers are learning, how it helps students, and why it matters. Ready for newsletters or your website.</p>
+                <button
+                  onClick={handleDisabledClick}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1B2A4A] text-white hover:bg-[#2a3459] transition-colors opacity-60 cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4" /> Generate Report
+                </button>
+              </div>
+            </div>
+
+            {/* Newsletter & Certificates Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Newsletter Ready */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-indigo-50">
+                    <FileText className="w-4 h-4 text-indigo-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1B2A4A]">Newsletter Ready</h3>
+                    <p className="text-xs text-gray-500">4 weeks of copy-paste content for staff emails</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">TDI tips, strategy spotlights, and Hub tool recommendations formatted for your weekly or monthly staff newsletter. Copy, paste, send.</p>
+                <button
+                  onClick={handleDisabledClick}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1B2A4A] text-white hover:bg-[#2a3459] transition-colors opacity-60 cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4" /> Generate Content
+                </button>
+              </div>
+
+              {/* Staff Celebrations */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-yellow-50">
+                    <Award className="w-4 h-4 text-yellow-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1B2A4A]">Staff Celebrations</h3>
+                    <p className="text-xs text-gray-500">Printable certificates and fun awards</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">Auto-generated printable certificates for fun awards, milestones, and shout-outs. Drop one in a mailbox and watch what happens.</p>
+                <button
+                  onClick={handleDisabledClick}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1B2A4A] text-white hover:bg-[#2a3459] transition-colors opacity-60 cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Award className="w-4 h-4" /> Generate Certificates
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* 2026-27 PREVIEW TAB - OVERHAULED */}
         {activeTab === 'next-year' && (
           <div className="space-y-4">
 
             {/* SECTION A: Hero Banner */}
-            <div className="relative bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-8 text-white overflow-hidden">
+            <div className="relative bg-gradient-to-br from-[#1B2A4A] via-[#38618C] to-[#4ecdc4] rounded-2xl p-8 text-white overflow-hidden">
               {/* Decorative elements */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
@@ -2865,7 +2853,7 @@ export default function ExampleDashboard() {
 
             {/* SECTION B: Phase Journey Visual */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h3 className="text-lg font-bold text-[#1e2749] mb-6 text-center">Your District&apos;s TDI Journey</h3>
+              <h3 className="text-lg font-bold text-[#1B2A4A] mb-6 text-center">Your District&apos;s TDI Journey</h3>
 
               <div className="grid md:grid-cols-3 gap-4">
                 {/* Year 1 - LAUNCH (Complete) */}
@@ -2924,17 +2912,17 @@ export default function ExampleDashboard() {
 
                 {/* Year 3 - SUSTAIN (Next) */}
                 <div className="relative">
-                  <div className="bg-gradient-to-br from-[#4ecdc4]/20 to-[#1e2749]/10 rounded-xl p-5 border-2 border-[#4ecdc4] shadow-lg">
+                  <div className="bg-gradient-to-br from-[#4ecdc4]/20 to-[#1B2A4A]/10 rounded-xl p-5 border-2 border-[#4ecdc4] shadow-lg">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-8 h-8 bg-[#4ecdc4] rounded-full flex items-center justify-center">
-                        <Star className="w-5 h-5 text-[#1e2749]" />
+                        <Star className="w-5 h-5 text-[#1B2A4A]" />
                       </div>
                       <div>
                         <span className="text-xs text-[#4ecdc4] uppercase tracking-wide font-bold">Year 3</span>
-                        <p className="font-bold text-[#1e2749]">SUSTAIN</p>
+                        <p className="font-bold text-[#1B2A4A]">SUSTAIN</p>
                       </div>
                     </div>
-                    <div className="space-y-2 text-sm text-[#1e2749]">
+                    <div className="space-y-2 text-sm text-[#1B2A4A]">
                       <p>★ Embed systems permanently</p>
                       <p>★ Internal coaching capacity</p>
                       <p>★ Self-sustaining culture</p>
@@ -2957,13 +2945,13 @@ export default function ExampleDashboard() {
             {/* SECTION C: Goals Alignment (moved to position #3) */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-6">
-                <Target className="w-5 h-5 text-[#1e2749]" />
-                <h3 className="text-lg font-bold text-[#1e2749]">Aligned to Your District Goals</h3>
+                <Target className="w-5 h-5 text-[#1B2A4A]" />
+                <h3 className="text-lg font-bold text-[#1B2A4A]">Aligned to Your District Goals</h3>
               </div>
 
               <div className="grid md:grid-cols-3 gap-4">
                 {/* District Goal */}
-                <div className="bg-gradient-to-br from-[#1e2749] to-[#38618C] rounded-xl p-5 text-white">
+                <div className="bg-gradient-to-br from-[#1B2A4A] to-[#38618C] rounded-xl p-5 text-white">
                   <div className="flex items-center gap-2 mb-3">
                     <School className="w-5 h-5" />
                     <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">Your Goal</span>
@@ -2978,7 +2966,7 @@ export default function ExampleDashboard() {
                 <div className="bg-[#4ecdc4]/10 border border-[#4ecdc4]/20 rounded-xl p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <Check className="w-5 h-5 text-[#4ecdc4]" />
-                    <span className="text-xs bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-0.5 rounded-full">Year 3 Delivers</span>
+                    <span className="text-xs bg-[#4ecdc4]/20 text-[#1B2A4A] px-2 py-0.5 rounded-full">Year 3 Delivers</span>
                   </div>
                   <ul className="text-sm text-gray-700 space-y-2">
                     <li className="flex items-start gap-2">
@@ -3041,8 +3029,8 @@ export default function ExampleDashboard() {
             {/* SECTION D: Year 2 vs Year 3 Projections */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-6">
-                <TrendingUp className="w-5 h-5 text-[#1e2749]" />
-                <h3 className="text-lg font-bold text-[#1e2749]">What Year 3 Will Achieve</h3>
+                <TrendingUp className="w-5 h-5 text-[#1B2A4A]" />
+                <h3 className="text-lg font-bold text-[#1B2A4A]">What Year 3 Will Achieve</h3>
               </div>
 
               <div className="overflow-x-auto">
@@ -3060,31 +3048,31 @@ export default function ExampleDashboard() {
                       <td className="py-4 text-sm text-gray-700">Educator Stress Level</td>
                       <td className="py-4 text-center"><span className="text-gray-400">8.2/10</span></td>
                       <td className="py-4 text-center"><span className="text-[#38618C] font-semibold">6.1/10</span> <span className="text-xs text-green-600">↓25%</span></td>
-                      <td className="py-4 text-center"><span className="bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-1 rounded font-bold">5.2/10</span></td>
+                      <td className="py-4 text-center"><span className="bg-[#4ecdc4]/20 text-[#1B2A4A] px-2 py-1 rounded font-bold">5.2/10</span></td>
                     </tr>
                     <tr className="hover:bg-gray-50">
                       <td className="py-4 text-sm text-gray-700">Strategy Implementation</td>
                       <td className="py-4 text-center"><span className="text-gray-400">13%</span></td>
                       <td className="py-4 text-center"><span className="text-[#38618C] font-semibold">52%</span> <span className="text-xs text-green-600">↑4x</span></td>
-                      <td className="py-4 text-center"><span className="bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-1 rounded font-bold">72%</span></td>
+                      <td className="py-4 text-center"><span className="bg-[#4ecdc4]/20 text-[#1B2A4A] px-2 py-1 rounded font-bold">72%</span></td>
                     </tr>
                     <tr className="hover:bg-gray-50">
                       <td className="py-4 text-sm text-gray-700">Retention Intent</td>
                       <td className="py-4 text-center"><span className="text-gray-400">5.2/10</span></td>
                       <td className="py-4 text-center"><span className="text-[#38618C] font-semibold">7.8/10</span> <span className="text-xs text-green-600">↑50%</span></td>
-                      <td className="py-4 text-center"><span className="bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-1 rounded font-bold">8.5/10</span></td>
+                      <td className="py-4 text-center"><span className="bg-[#4ecdc4]/20 text-[#1B2A4A] px-2 py-1 rounded font-bold">8.5/10</span></td>
                     </tr>
                     <tr className="hover:bg-gray-50">
                       <td className="py-4 text-sm text-gray-700">Hub Engagement</td>
                       <td className="py-4 text-center"><span className="text-gray-400">-</span></td>
                       <td className="py-4 text-center"><span className="text-[#38618C] font-semibold">87%</span></td>
-                      <td className="py-4 text-center"><span className="bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-1 rounded font-bold">92%</span></td>
+                      <td className="py-4 text-center"><span className="bg-[#4ecdc4]/20 text-[#1B2A4A] px-2 py-1 rounded font-bold">92%</span></td>
                     </tr>
                     <tr className="hover:bg-gray-50">
                       <td className="py-4 text-sm text-gray-700">Internal Coaching Capacity</td>
                       <td className="py-4 text-center"><span className="text-gray-400">0%</span></td>
                       <td className="py-4 text-center"><span className="text-[#38618C] font-semibold">12%</span> <span className="text-xs text-gray-500">(TDI Champions)</span></td>
-                      <td className="py-4 text-center"><span className="bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-1 rounded font-bold">40%</span></td>
+                      <td className="py-4 text-center"><span className="bg-[#4ecdc4]/20 text-[#1B2A4A] px-2 py-1 rounded font-bold">40%</span></td>
                     </tr>
                   </tbody>
                 </table>
@@ -3108,7 +3096,7 @@ export default function ExampleDashboard() {
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-5 h-5 text-[#4ecdc4]" />
-                <h3 className="text-lg font-bold text-[#1e2749]">What Year 3 Unlocks</h3>
+                <h3 className="text-lg font-bold text-[#1B2A4A]">What Year 3 Unlocks</h3>
               </div>
               <p className="text-sm text-gray-500 mb-6">Everything that made Year 2 successful - plus sustainability features that make it permanent</p>
 
@@ -3118,9 +3106,9 @@ export default function ExampleDashboard() {
                   <div className="w-12 h-12 bg-[#4ecdc4]/20 rounded-xl flex items-center justify-center mb-4">
                     <Laptop className="w-6 h-6 text-[#4ecdc4]" />
                   </div>
-                  <h4 className="font-semibold text-[#1e2749] mb-2">Full Hub Access</h4>
+                  <h4 className="font-semibold text-[#1B2A4A] mb-2">Full Hub Access</h4>
                   <p className="text-sm text-gray-600 mb-3">All 255 educators continue with unlimited access to 300+ resources, templates, and tools</p>
-                  <span className="text-xs bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-1 rounded-full">Continues</span>
+                  <span className="text-xs bg-[#4ecdc4]/20 text-[#1B2A4A] px-2 py-1 rounded-full">Continues</span>
                 </div>
 
                 {/* Observations */}
@@ -3128,19 +3116,19 @@ export default function ExampleDashboard() {
                   <div className="w-12 h-12 bg-[#38618C]/20 rounded-xl flex items-center justify-center mb-4">
                     <Search className="w-6 h-6 text-[#38618C]" />
                   </div>
-                  <h4 className="font-semibold text-[#1e2749] mb-2">Extended Observations</h4>
+                  <h4 className="font-semibold text-[#1B2A4A] mb-2">Extended Observations</h4>
                   <p className="text-sm text-gray-600 mb-3">2 full on-campus days with expanded classroom coverage and personalized Love Notes</p>
-                  <span className="text-xs bg-[#38618C]/20 text-[#1e2749] px-2 py-1 rounded-full">Continues</span>
+                  <span className="text-xs bg-[#38618C]/20 text-[#1B2A4A] px-2 py-1 rounded-full">Continues</span>
                 </div>
 
                 {/* Leadership Sessions */}
-                <div className="bg-gradient-to-br from-[#1e2749]/10 to-transparent rounded-xl p-5 border border-[#1e2749]/20">
-                  <div className="w-12 h-12 bg-[#1e2749]/20 rounded-xl flex items-center justify-center mb-4">
-                    <Users className="w-6 h-6 text-[#1e2749]" />
+                <div className="bg-gradient-to-br from-[#1B2A4A]/10 to-transparent rounded-xl p-5 border border-[#1B2A4A]/20">
+                  <div className="w-12 h-12 bg-[#1B2A4A]/20 rounded-xl flex items-center justify-center mb-4">
+                    <Users className="w-6 h-6 text-[#1B2A4A]" />
                   </div>
-                  <h4 className="font-semibold text-[#1e2749] mb-2">Executive Impact Sessions</h4>
+                  <h4 className="font-semibold text-[#1B2A4A] mb-2">Executive Impact Sessions</h4>
                   <p className="text-sm text-gray-600 mb-3">4 strategic sessions with Dr. Ford and leadership team for data-driven decisions</p>
-                  <span className="text-xs bg-[#1e2749]/20 text-[#1e2749] px-2 py-1 rounded-full">Continues</span>
+                  <span className="text-xs bg-[#1B2A4A]/20 text-[#1B2A4A] px-2 py-1 rounded-full">Continues</span>
                 </div>
 
                 {/* Internal Coaching - NEW */}
@@ -3148,7 +3136,7 @@ export default function ExampleDashboard() {
                   <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-4">
                     <Award className="w-6 h-6 text-amber-600" />
                   </div>
-                  <h4 className="font-semibold text-[#1e2749] mb-2">Internal Coaching Capacity</h4>
+                  <h4 className="font-semibold text-[#1B2A4A] mb-2">Internal Coaching Capacity</h4>
                   <p className="text-sm text-gray-600 mb-3">Train your TDI Champions to lead peer observations and Growth Groups independently</p>
                   <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium">NEW in Year 3</span>
                 </div>
@@ -3158,7 +3146,7 @@ export default function ExampleDashboard() {
                   <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-4">
                     <Eye className="w-6 h-6 text-amber-600" />
                   </div>
-                  <h4 className="font-semibold text-[#1e2749] mb-2">Peer Observation Circles</h4>
+                  <h4 className="font-semibold text-[#1B2A4A] mb-2">Peer Observation Circles</h4>
                   <p className="text-sm text-gray-600 mb-3">Teacher-led observation structures that continue after TDI partnership ends</p>
                   <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium">NEW in Year 3</span>
                 </div>
@@ -3168,7 +3156,7 @@ export default function ExampleDashboard() {
                   <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-4">
                     <Download className="w-6 h-6 text-amber-600" />
                   </div>
-                  <h4 className="font-semibold text-[#1e2749] mb-2">Sustainability Toolkit</h4>
+                  <h4 className="font-semibold text-[#1B2A4A] mb-2">Sustainability Toolkit</h4>
                   <p className="text-sm text-gray-600 mb-3">Templates, protocols, and systems designed to run independently post-partnership</p>
                   <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium">NEW in Year 3</span>
                 </div>
@@ -3178,7 +3166,7 @@ export default function ExampleDashboard() {
 
             {/* SECTION: Included With Every Service (Standard Table) */}
             <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
-              <h3 className="font-bold text-[#1e2749] mb-4">Included With Every Service</h3>
+              <h3 className="font-bold text-[#1B2A4A] mb-4">Included With Every Service</h3>
               <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
                 <table className="w-full">
                   <thead>
@@ -3189,19 +3177,19 @@ export default function ExampleDashboard() {
                   </thead>
                   <tbody>
                     <tr className="border-b border-gray-100">
-                      <td className="py-3 px-4 font-medium text-[#1e2749]">Learning Hub Membership</td>
+                      <td className="py-3 px-4 font-medium text-[#1B2A4A]">Learning Hub Membership</td>
                       <td className="py-3 px-4 text-right font-bold text-[#38618C]">255 STAFF</td>
                     </tr>
                     <tr className="border-b border-gray-100">
-                      <td className="py-3 px-4 font-medium text-[#1e2749]">In-Person Observation Days</td>
+                      <td className="py-3 px-4 font-medium text-[#1B2A4A]">In-Person Observation Days</td>
                       <td className="py-3 px-4 text-right font-bold text-[#38618C]">2 DAYS</td>
                     </tr>
                     <tr className="border-b border-gray-100">
-                      <td className="py-3 px-4 font-medium text-[#1e2749]">Virtual Strategy Sessions</td>
+                      <td className="py-3 px-4 font-medium text-[#1B2A4A]">Virtual Strategy Sessions</td>
                       <td className="py-3 px-4 text-right font-bold text-[#38618C]">4 SESSIONS</td>
                     </tr>
                     <tr className="border-b border-gray-200">
-                      <td className="py-3 px-4 font-medium text-[#1e2749]">Executive Impact Sessions</td>
+                      <td className="py-3 px-4 font-medium text-[#1B2A4A]">Executive Impact Sessions</td>
                       <td className="py-3 px-4 text-right font-bold text-[#38618C]">4 SESSIONS</td>
                     </tr>
                     <tr className="border-b border-gray-100 bg-gray-50/50">
@@ -3239,14 +3227,14 @@ export default function ExampleDashboard() {
 
             {/* SECTION: TDI Does the Work (Two-Column) */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
+              <h3 className="font-bold text-[#1B2A4A] mb-4 flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-[#4ecdc4]" />
                 TDI Does the Work
               </h3>
               <div className="grid md:grid-cols-2 gap-6">
                 {/* TDI Handles */}
                 <div className="bg-teal-50 rounded-lg p-5 border border-teal-200">
-                  <h4 className="font-semibold text-[#1e2749] mb-3">TDI Handles Everything:</h4>
+                  <h4 className="font-semibold text-[#1B2A4A] mb-3">TDI Handles Everything:</h4>
                   <ul className="space-y-2 text-sm text-gray-700">
                     <li className="flex items-center gap-2"><Check className="w-4 h-4 text-teal-600" />Research every funding source</li>
                     <li className="flex items-center gap-2"><Check className="w-4 h-4 text-teal-600" />Write all budget narratives</li>
@@ -3262,7 +3250,7 @@ export default function ExampleDashboard() {
                 </div>
                 {/* Dr. Ford Does This */}
                 <div className="bg-amber-50 rounded-lg p-5 border border-amber-200">
-                  <h4 className="font-semibold text-[#1e2749] mb-3">Dr. Ford Does This:</h4>
+                  <h4 className="font-semibold text-[#1B2A4A] mb-3">Dr. Ford Does This:</h4>
                   <ul className="space-y-3 text-sm text-gray-700">
                     <li className="flex items-start gap-2">
                       <div className="w-6 h-6 bg-amber-200 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -3289,7 +3277,7 @@ export default function ExampleDashboard() {
             </div>
 
             {/* SECTION E: ROI / Numbers That Matter */}
-            <div className="bg-gradient-to-br from-[#1e2749] to-[#38618C] rounded-2xl p-8 text-white">
+            <div className="bg-gradient-to-br from-[#1B2A4A] to-[#38618C] rounded-2xl p-8 text-white">
               <div className="text-center mb-8">
                 <span className="text-xs bg-white/20 px-3 py-1 rounded-full">The Numbers That Matter</span>
                 <h3 className="text-2xl font-bold mt-3">Your Return on Investment</h3>
@@ -3334,25 +3322,25 @@ export default function ExampleDashboard() {
                 <div className="grid md:grid-cols-2 gap-4 text-sm">
                   <div className="flex items-start gap-3">
                     <div className="w-6 h-6 bg-[#4ecdc4] rounded-full flex items-center justify-center flex-shrink-0">
-                      <Check className="w-4 h-4 text-[#1e2749]" />
+                      <Check className="w-4 h-4 text-[#1B2A4A]" />
                     </div>
                     <p className="opacity-90">Teachers are less burned out and more likely to stay</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-6 h-6 bg-[#4ecdc4] rounded-full flex items-center justify-center flex-shrink-0">
-                      <Check className="w-4 h-4 text-[#1e2749]" />
+                      <Check className="w-4 h-4 text-[#1B2A4A]" />
                     </div>
                     <p className="opacity-90">Strategies are actually being used in classrooms</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-6 h-6 bg-[#4ecdc4] rounded-full flex items-center justify-center flex-shrink-0">
-                      <Check className="w-4 h-4 text-[#1e2749]" />
+                      <Check className="w-4 h-4 text-[#1B2A4A]" />
                     </div>
                     <p className="opacity-90">Paras feel valued and included in professional growth</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-6 h-6 bg-[#4ecdc4] rounded-full flex items-center justify-center flex-shrink-0">
-                      <Check className="w-4 h-4 text-[#1e2749]" />
+                      <Check className="w-4 h-4 text-[#1B2A4A]" />
                     </div>
                     <p className="opacity-90">Hub resources are being actively used (not shelfware)</p>
                   </div>
@@ -3363,7 +3351,7 @@ export default function ExampleDashboard() {
               <div className="mt-6 text-center">
                 <a
                   href="/calculator"
-                  className="inline-flex items-center gap-2 bg-white text-[#1e2749] px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                  className="inline-flex items-center gap-2 bg-white text-[#1B2A4A] px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
                 >
                   <Calculator className="w-5 h-5" />
                   See Full ROI Breakdown →
@@ -3374,14 +3362,14 @@ export default function ExampleDashboard() {
 
             {/* SECTION: Why Grants Exist for Districts Like Motown */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <h3 className="font-bold text-[#1e2749] mb-4">Why Grants Exist for Districts Like Motown</h3>
+              <h3 className="font-bold text-[#1B2A4A] mb-4">Why Grants Exist for Districts Like Motown</h3>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <p className="text-sm text-gray-600 mb-4">Federal and state funding was built for exactly this moment.</p>
                   <p className="text-sm text-gray-700 mb-4">
                     Districts with multi-year PD partnerships, measurable retention data, and documented educator wellness outcomes are the strongest grant candidates in the state.
                   </p>
-                  <p className="text-sm font-semibold text-[#1e2749]">Motown District 360 has all three.</p>
+                  <p className="text-sm font-semibold text-[#1B2A4A]">Motown District 360 has all three.</p>
                 </div>
                 <div className="bg-[#4ecdc4]/10 rounded-lg p-5 border border-[#4ecdc4]/30">
                   <ul className="space-y-3 text-sm text-gray-700">
@@ -3412,7 +3400,7 @@ export default function ExampleDashboard() {
             </div>
 
             {/* SECTION: Renewal CTA (Tightened Single-CTA) */}
-            <div className="relative bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-8 text-white overflow-hidden">
+            <div className="relative bg-gradient-to-br from-[#1B2A4A] via-[#38618C] to-[#4ecdc4] rounded-2xl p-8 text-white overflow-hidden">
               {/* Decorative */}
               <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
 
@@ -3427,7 +3415,7 @@ export default function ExampleDashboard() {
                 <div className="flex flex-col items-center gap-3 mb-4">
                   <span
                     onClick={handleDisabledClick}
-                    className="inline-flex items-center gap-2 bg-white text-[#1e2749] px-8 py-4 rounded-xl font-bold text-lg opacity-60 cursor-not-allowed"
+                    className="inline-flex items-center gap-2 bg-white text-[#1B2A4A] px-8 py-4 rounded-xl font-bold text-lg opacity-60 cursor-not-allowed"
                     title="This is an example dashboard"
                   >
                     <Calendar className="w-5 h-5" />
@@ -3472,7 +3460,7 @@ export default function ExampleDashboard() {
         {activeTab === 'team' && (
           <div className="space-y-4">
             <div className="text-center">
-              <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your TDI Team</h2>
+              <h2 className="text-xl font-bold text-[#1B2A4A] mb-2">Your TDI Team</h2>
               <p className="text-gray-600">Your dedicated partner for this journey</p>
             </div>
 
@@ -3491,7 +3479,7 @@ export default function ExampleDashboard() {
 
                 {/* Rae's Info */}
                 <div className="flex-1 text-center md:text-left">
-                  <h3 className="text-xl font-bold text-[#1e2749]">Rae Hughart</h3>
+                  <h3 className="text-xl font-bold text-[#1B2A4A]">Rae Hughart</h3>
                   <p className="text-[#38618C] font-medium mb-3">Lead Partner, Motown District 360 Account</p>
                   
                   <p className="text-gray-600 text-sm mb-4">
@@ -3535,14 +3523,14 @@ export default function ExampleDashboard() {
               href="https://teachersdeserveit.com/about"
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full max-w-2xl mx-auto bg-[#F5F5F5] hover:bg-gray-200 text-[#1e2749] text-center py-4 rounded-xl font-semibold transition-all border border-gray-200"
+              className="block w-full max-w-2xl mx-auto bg-[#F5F5F5] hover:bg-gray-200 text-[#1B2A4A] text-center py-4 rounded-xl font-semibold transition-all border border-gray-200"
             >
               Meet the Full TDI Team →
             </a>
 
             {/* District Info */}
             <div className="bg-white rounded-xl p-5 shadow-sm max-w-2xl mx-auto">
-              <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
+              <h3 className="font-bold text-[#1B2A4A] mb-4 flex items-center gap-2">
                 <Building className="w-5 h-5 text-[#38618C]" />
                 District Information
               </h3>
@@ -3580,11 +3568,11 @@ export default function ExampleDashboard() {
             </div>
           </div>
         )}
-      </div>
+      </main>
 
       {/* Compact Footer */}
-      <footer className="bg-[#1e2749] text-white py-6 px-4">
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+      <footer className="bg-[#1B2A4A] text-white py-6 px-4">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           <div>
             <div className="font-bold">Teachers Deserve It</div>
             <p className="text-white/60 text-sm">Partner Dashboard for Motown District 360</p>
@@ -3605,7 +3593,7 @@ export default function ExampleDashboard() {
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
           <div className="bg-white rounded-xl shadow-xl px-6 py-4 flex items-center gap-4 max-w-lg border border-gray-100">
             <div className="flex-1">
-              <p className="text-[#1e2749] font-medium text-sm">
+              <p className="text-[#1B2A4A] font-medium text-sm">
                 This is a demo dashboard. Ready to see what yours could look like?
               </p>
             </div>
