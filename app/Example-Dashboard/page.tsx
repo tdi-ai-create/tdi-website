@@ -1116,15 +1116,26 @@ export default function ExampleDashboard() {
       {/* Confetti celebration for gold medal schools */}
       <Confetti isActive={showConfetti} />
 
-      {/* Hero - DashboardHeader component (matches live design) */}
-      <DashboardHeader
-        schoolName="Motown District 360"
-        location="Glenview, Illinois"
-        phase="ACCELERATE"
-        contractStart="2025-08-01"
-        contractEnd="2026-06-30"
-        partnershipType="district"
-      />
+      {/* Compact Hero */}
+      <section className="relative text-white overflow-hidden">
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 50%, #38618C 100%)' }} />
+        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 25% 25%, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        <div className="relative max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <h1 className="text-xl md:text-2xl font-bold tracking-tight">Motown District 360</h1>
+                <span className="hidden md:inline-flex px-3 py-1 rounded-full text-xs font-semibold" style={{ background: 'linear-gradient(135deg, rgba(255,186,6,0.2), rgba(255,186,6,0.1))', border: '1px solid rgba(255,186,6,0.4)', color: '#FFBA06' }}>2025-2026</span>
+              </div>
+              <p className="text-white/60 text-sm">Glenview, Illinois | District Partnership</p>
+            </div>
+            <div className="px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2" style={{ background: 'linear-gradient(135deg, rgba(78,205,196,0.2), rgba(78,205,196,0.1))', border: '1px solid rgba(78,205,196,0.4)', boxShadow: '0 0 20px rgba(78,205,196,0.2)' }}>
+              <span className="w-2 h-2 rounded-full" style={{ background: '#4ecdc4', boxShadow: '0 0 8px rgba(78,205,196,0.6)' }} />
+              <span style={{ color: '#4ecdc4' }}>Phase 2 - ACCELERATE</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Tab Navigation - underline style matching live design */}
       <div
@@ -1183,107 +1194,6 @@ export default function ExampleDashboard() {
             aria-labelledby="tab-overview"
             className="space-y-6"
           >
-
-            {/* ─── YOUR NEXT STEPS (action items) ─── */}
-            <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#E0F7F6' }}>
-                    <Target className="w-3.5 h-3.5" style={{ color: '#2A9D8F' }} />
-                  </div>
-                  <span className="text-base font-bold text-[#1B2A4A]">Your Next Steps</span>
-                  <span className="text-[10px] bg-[#E0F7F6] text-[#2A9D8F] px-2 py-0.5 rounded-full font-semibold">
-                    {overviewData.actions.nextToUnlock.length} remaining
-                  </span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                {overviewData.actions.nextToUnlock.map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
-                    <div className="w-5 h-5 rounded-full border-2 border-[#E8B84B] bg-[#FFF8E7] flex-shrink-0 mt-0.5 flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-[#E8B84B]" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#1B2A4A]">{item.label}</p>
-                      <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{item.detail}</p>
-                    </div>
-                    {item.cta && (
-                      <span className="text-xs font-medium text-[#2A9D8F] flex-shrink-0 flex items-center gap-1 cursor-not-allowed opacity-60" onClick={handleDisabledClick}>
-                        {item.cta} <ArrowRight className="w-3 h-3" />
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <p className="text-[10px] text-gray-400 mt-3 text-center">
-                {overviewData.actions.alreadyInMotion.length} completed
-              </p>
-            </div>
-
-            {/* ─── TEAM ACTIVATION ─── */}
-            <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#EDE9FE' }}>
-                    <Users className="w-3.5 h-3.5" style={{ color: '#8B5CF6' }} />
-                  </div>
-                  <span className="text-base font-bold text-[#1B2A4A]">Team Activation</span>
-                </div>
-                <button
-                  onClick={() => handleTabChange('schools')}
-                  className="text-xs font-medium text-[#8B5CF6] hover:underline flex items-center gap-1"
-                >
-                  View all <ArrowRight className="w-3 h-3" />
-                </button>
-              </div>
-              <div className="flex items-center gap-6">
-                <div className="relative w-16 h-16">
-                  <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
-                    <path d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f3f4f6" strokeWidth="3" />
-                    <path d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#8B5CF6" strokeWidth="3"
-                      strokeDasharray={`${(overviewData.stats.hubEngagement.active / overviewData.stats.educatorsEnrolled.total) * 100}, 100`} strokeLinecap="round" />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-sm font-bold text-[#1B2A4A]">{overviewData.stats.hubEngagement.percent}%</span>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-[#1B2A4A]">{overviewData.stats.hubEngagement.active}</span>
-                    <span className="text-sm text-gray-500">of {overviewData.stats.educatorsEnrolled.total} educators active on Hub</span>
-                  </div>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {overviewData.stats.educatorsEnrolled.total - overviewData.stats.hubEngagement.active} educators haven&apos;t logged in yet. A quick reminder can help.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* ─── WHAT EDUCATORS ARE SAYING ─── */}
-            <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#FFF8E7' }}>
-                  <Quote className="w-3.5 h-3.5" style={{ color: '#E8B84B' }} />
-                </div>
-                <span className="text-base font-bold text-[#1B2A4A]">What Educators Are Saying</span>
-              </div>
-              <div className="space-y-3">
-                {[
-                  { text: 'I tried the shift technique with my kids on Monday and was shocked. We went from losing 8-10 minutes between subjects to being seated and ready in under 2.', role: 'Teacher, Crescendo Middle', date: 'Mar 12' },
-                  { text: 'The Quick Wins are the first PD resource I have actually used more than once. Practical, fast, and built for people who do not have time for a 3-hour webinar.', role: 'Instructional Coach, K-5', date: 'Feb 28' },
-                  { text: 'I printed my certificate, added it to my portfolio, and used the email template to send it to my principal. She was impressed.', role: 'Paraprofessional, 2nd year', date: 'Feb 15' },
-                ].map((q, i) => (
-                  <div key={i} className="border-l-2 border-[#E8B84B] pl-4 py-1">
-                    <p className="text-sm text-gray-700 italic" style={{ fontFamily: 'Georgia, serif' }}>
-                      &ldquo;{q.text}&rdquo;
-                    </p>
-                    <p className="text-[10px] text-gray-400 mt-1">
-                      -- {q.role}, {q.date}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
 
             {/* ─── AI SUMMARY ─── Partnership Intelligence */}
             <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
@@ -1371,13 +1281,52 @@ export default function ExampleDashboard() {
               ))}
             </div>
 
+            {/* ─── TEAM ACTIVATION ─── */}
+            <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#EDE9FE' }}>
+                    <Users className="w-3.5 h-3.5" style={{ color: '#8B5CF6' }} />
+                  </div>
+                  <span className="text-sm font-semibold text-[#1B2A4A]">Team Activation</span>
+                </div>
+                <button
+                  onClick={() => handleTabChange('schools')}
+                  className="text-xs font-medium text-[#8B5CF6] hover:underline flex items-center gap-1"
+                >
+                  View all <ArrowRight className="w-3 h-3" />
+                </button>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="relative w-16 h-16">
+                  <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
+                    <path d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f3f4f6" strokeWidth="3" />
+                    <path d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#8B5CF6" strokeWidth="3"
+                      strokeDasharray={`${(overviewData.stats.hubEngagement.active / overviewData.stats.educatorsEnrolled.total) * 100}, 100`} strokeLinecap="round" />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-sm font-bold text-[#1B2A4A]">{overviewData.stats.hubEngagement.percent}%</span>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-bold text-[#1B2A4A]">{overviewData.stats.hubEngagement.active}</span>
+                    <span className="text-sm text-gray-500">of {overviewData.stats.educatorsEnrolled.total} educators active on Hub</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {overviewData.stats.educatorsEnrolled.total - overviewData.stats.hubEngagement.active} educators haven&apos;t logged in yet. A quick reminder can help.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* ─── OBSERVATION IMPACT ─── */}
             <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#E0F7F6' }}>
                   <TrendingUp className="w-3.5 h-3.5" style={{ color: '#2A9D8F' }} />
                 </div>
-                <span className="text-base font-bold text-[#1B2A4A]">Impact Spotlight</span>
+                <span className="text-sm font-semibold text-[#1B2A4A]">Impact Spotlight</span>
                 <span className="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-semibold">After your last visit</span>
               </div>
               <p className="text-sm text-gray-600 mb-3" style={{ fontFamily: 'Georgia, serif' }}>
@@ -1397,6 +1346,68 @@ export default function ExampleDashboard() {
                   <p className="text-[10px] text-gray-500 mt-0.5">Tools used after</p>
                 </div>
               </div>
+            </div>
+
+            {/* ─── WHAT EDUCATORS ARE SAYING ─── */}
+            <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#FFF8E7' }}>
+                  <Quote className="w-3.5 h-3.5" style={{ color: '#E8B84B' }} />
+                </div>
+                <span className="text-sm font-semibold text-[#1B2A4A]">What Educators Are Saying</span>
+              </div>
+              <div className="space-y-3">
+                {[
+                  { text: 'I tried the shift technique with my kids on Monday and was shocked. We went from losing 8-10 minutes between subjects to being seated and ready in under 2.', role: 'Teacher, Crescendo Middle', date: 'Mar 12' },
+                  { text: 'The Quick Wins are the first PD resource I have actually used more than once. Practical, fast, and built for people who do not have time for a 3-hour webinar.', role: 'Instructional Coach, K-5', date: 'Feb 28' },
+                  { text: 'I printed my certificate, added it to my portfolio, and used the email template to send it to my principal. She was impressed.', role: 'Paraprofessional, 2nd year', date: 'Feb 15' },
+                ].map((q, i) => (
+                  <div key={i} className="border-l-2 border-[#E8B84B] pl-4 py-1">
+                    <p className="text-sm text-gray-700 italic" style={{ fontFamily: 'Georgia, serif' }}>
+                      &ldquo;{q.text}&rdquo;
+                    </p>
+                    <p className="text-[10px] text-gray-400 mt-1">
+                      -- {q.role}, {q.date}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ─── YOUR NEXT STEPS (action items) ─── */}
+            <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#E0F7F6' }}>
+                    <Target className="w-3.5 h-3.5" style={{ color: '#2A9D8F' }} />
+                  </div>
+                  <span className="text-sm font-semibold text-[#1B2A4A]">Your Next Steps</span>
+                  <span className="text-[10px] bg-[#E0F7F6] text-[#2A9D8F] px-2 py-0.5 rounded-full font-semibold">
+                    {overviewData.actions.nextToUnlock.length} remaining
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {overviewData.actions.nextToUnlock.map((item, i) => (
+                  <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <div className="w-5 h-5 rounded-full border-2 border-[#E8B84B] bg-[#FFF8E7] flex-shrink-0 mt-0.5 flex items-center justify-center">
+                      <div className="w-2 h-2 rounded-full bg-[#E8B84B]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-[#1B2A4A]">{item.label}</p>
+                      <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{item.detail}</p>
+                    </div>
+                    {item.cta && (
+                      <span className="text-xs font-medium text-[#2A9D8F] flex-shrink-0 flex items-center gap-1 cursor-not-allowed opacity-60" onClick={handleDisabledClick}>
+                        {item.cta} <ArrowRight className="w-3 h-3" />
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <p className="text-[10px] text-gray-400 mt-3 text-center">
+                {overviewData.actions.alreadyInMotion.length} completed
+              </p>
             </div>
 
             {/* ─── EXPANDABLE: Leadership Tools & Quiz ─── */}
@@ -1468,7 +1479,7 @@ export default function ExampleDashboard() {
 
             {/* ─── WHAT YOUR PARTNERSHIP INCLUDES ─── */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-              <h2 className="text-base font-bold text-[#1B2A4A] mb-4">What Your Partnership Includes</h2>
+              <h2 className="text-sm font-semibold text-[#1B2A4A] mb-4">What Your Partnership Includes</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
                   { value: 255, label: 'Hub Memberships', icon: Users, color: '#8B5CF6' },
@@ -1569,7 +1580,7 @@ export default function ExampleDashboard() {
               <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Eye className="w-4 h-4 text-[#D97706]" />
-                  <h3 className="text-base font-bold text-[#1B2A4A]">Classroom Observations</h3>
+                  <h3 className="text-sm font-semibold text-[#1B2A4A]">Classroom Observations</h3>
                   <span className="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-semibold">2 of 4 complete</span>
                 </div>
               </div>
@@ -1782,7 +1793,7 @@ export default function ExampleDashboard() {
 
             {/* ─── PARTNERSHIP JOURNEY (Phase Stepper) ─── */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-              <h3 className="text-base font-bold text-[#1B2A4A] mb-4">Your Partnership Journey</h3>
+              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4">Your Partnership Journey</h3>
               <div className="flex items-stretch gap-1 mb-5">
                 {phases.map((phase, i) => (
                   <React.Fragment key={phase.name}>
@@ -1845,7 +1856,7 @@ export default function ExampleDashboard() {
 
             {/* ─── SESSIONS & MEETINGS ─── */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-              <h3 className="text-base font-bold text-[#1B2A4A] mb-4">Sessions & Leadership Meetings</h3>
+              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4">Sessions & Leadership Meetings</h3>
               <div className="space-y-2">
                 {[
                   { title: 'Virtual Session 1 -- Para Cohort (district-wide)', date: 'January 2026', status: 'complete' },
