@@ -857,6 +857,8 @@ export default function ExampleDashboard() {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
+    const el = document.getElementById('tab-content-area');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   // Due dates for each item (month, year)
@@ -1142,6 +1144,7 @@ export default function ExampleDashboard() {
               { id: 'schools', label: 'Schools' },
               { id: 'blueprint', label: 'Your Plan' },
               { id: 'reporting', label: 'Reports' },
+              { id: 'funding', label: 'Funding' },
               { id: 'next-year', label: 'Next Year', badge: true },
               { id: 'team', label: 'Team' },
             ].map((tab) => (
@@ -1191,7 +1194,7 @@ export default function ExampleDashboard() {
                   <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#E0F7F6' }}>
                     <Target className="w-3.5 h-3.5" style={{ color: '#2A9D8F' }} />
                   </div>
-                  <span className="text-sm font-semibold text-[#1B2A4A]">Your Next Steps</span>
+                  <span className="text-base font-bold text-[#1B2A4A]">Your Next Steps</span>
                   <span className="text-[10px] bg-[#E0F7F6] text-[#2A9D8F] px-2 py-0.5 rounded-full font-semibold">
                     {overviewData.actions.nextToUnlock.length} remaining
                   </span>
@@ -1227,7 +1230,7 @@ export default function ExampleDashboard() {
                   <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#EDE9FE' }}>
                     <Users className="w-3.5 h-3.5" style={{ color: '#8B5CF6' }} />
                   </div>
-                  <span className="text-sm font-semibold text-[#1B2A4A]">Team Activation</span>
+                  <span className="text-base font-bold text-[#1B2A4A]">Team Activation</span>
                 </div>
                 <button
                   onClick={() => handleTabChange('schools')}
@@ -1265,7 +1268,7 @@ export default function ExampleDashboard() {
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#FFF8E7' }}>
                   <Quote className="w-3.5 h-3.5" style={{ color: '#E8B84B' }} />
                 </div>
-                <span className="text-sm font-semibold text-[#1B2A4A]">What Educators Are Saying</span>
+                <span className="text-base font-bold text-[#1B2A4A]">What Educators Are Saying</span>
               </div>
               <div className="space-y-3">
                 {[
@@ -1292,7 +1295,7 @@ export default function ExampleDashboard() {
                 <span className="text-[10px] font-bold text-[#E8B84B] uppercase tracking-widest">Partnership Intelligence</span>
               </div>
               <p className="text-base md:text-lg leading-relaxed text-gray-700" style={{ fontFamily: 'Georgia, serif' }}>
-                Your team is engaged. {overviewData.stats.hubEngagement.percent}% of {overviewData.stats.educatorsEnrolled.total} educators logged into the Hub this month, exploring 342 tools across {districtSchools.length} buildings. Crescendo Middle is your standout at 78% course completion. Strategy implementation is at 62% district-wide -- 6x the national average. Your educators&apos; average wellness score is 4.2 out of 5 -- stronger than the national average. TDI reached out to 7 team members for wellness check-ins this week.
+                Your team is engaged. {overviewData.stats.hubEngagement.percent}% of {overviewData.stats.educatorsEnrolled.total} educators logged into the Hub this month, exploring 342 tools across {districtSchools.length} buildings. Strategy implementation is at 62% district-wide -- 6x the national average. Your team has logged 472 PD hours so far this year. Your educators&apos; average wellness score is 4.5 out of 5 -- stronger than the national average.
               </p>
               <button
                 onClick={() => setOpenSections(prev => ({ ...prev, 'overview-hub-detail': !prev['overview-hub-detail'] }))}
@@ -1318,13 +1321,13 @@ export default function ExampleDashboard() {
                       <p className="text-[10px] text-gray-500 mt-0.5">active this week</p>
                     </div>
                     <div className="rounded-xl p-3 bg-gray-50">
-                      <p className="text-xl font-bold" style={{ color: '#2A9D8F' }}>4.2/5</p>
+                      <p className="text-xl font-bold" style={{ color: '#2A9D8F' }}>4.5/5</p>
                       <p className="text-[10px] text-gray-500 mt-0.5">wellness score</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
                     <Award className="w-4 h-4 text-[#E8B84B] flex-shrink-0" />
-                    <p className="text-sm text-gray-600"><strong>38</strong> courses completed -- PD credit your team can show you.</p>
+                    <p className="text-sm text-gray-600"><strong>472 PD hours</strong> logged -- <strong>38</strong> courses completed. Board-ready compliance data.</p>
                   </div>
                 </div>
               )}
@@ -1377,7 +1380,7 @@ export default function ExampleDashboard() {
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#E0F7F6' }}>
                   <TrendingUp className="w-3.5 h-3.5" style={{ color: '#2A9D8F' }} />
                 </div>
-                <span className="text-sm font-semibold text-[#1B2A4A]">Impact Spotlight</span>
+                <span className="text-base font-bold text-[#1B2A4A]">Impact Spotlight</span>
                 <span className="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-semibold">After your last visit</span>
               </div>
               <p className="text-sm text-gray-600 mb-3" style={{ fontFamily: 'Georgia, serif' }}>
@@ -1468,7 +1471,7 @@ export default function ExampleDashboard() {
 
             {/* ─── WHAT YOUR PARTNERSHIP INCLUDES ─── */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-              <h2 className="text-sm font-semibold text-gray-900 mb-4">What Your Partnership Includes</h2>
+              <h2 className="text-base font-bold text-[#1B2A4A] mb-4">What Your Partnership Includes</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
                   { value: 255, label: 'Hub Memberships', icon: Users, color: '#8B5CF6' },
@@ -1488,15 +1491,80 @@ export default function ExampleDashboard() {
               </div>
             </div>
 
-            {/* ─── PARTNERSHIP GOAL (simple, clean) ─── */}
+            {/* ─── PARTNERSHIP GOALS (SMART, measurable) ─── */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-2 h-2 rounded-full" style={{ background: '#2D7D78' }} />
-                <h2 className="text-sm font-semibold text-gray-900">Our Partnership Goal</h2>
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-2">
+                  <Target className="w-4 h-4 text-[#8B5CF6]" />
+                  <h2 className="text-sm font-semibold text-[#1B2A4A]">Partnership Goals</h2>
+                </div>
+                <span className="text-[10px] text-gray-400">Established Aug 2025</span>
               </div>
-              <p className="text-base text-gray-700 leading-relaxed font-medium">
-                Student performance aligned with state benchmarks through educator support and sustainable professional development.
-              </p>
+              <p className="text-xs text-gray-500 mb-4">Aligned to Motown District 360 School Improvement Plan</p>
+
+              <div className="space-y-4">
+                {[
+                  {
+                    title: 'Hub Engagement',
+                    description: '90% of enrolled staff actively using the Learning Hub by June 2026',
+                    baseline: 0, target: 90, current: 87, unit: '%',
+                    baselineLabel: '0% (Aug 2025)', color: '#E8B84B',
+                    status: 'on-track',
+                  },
+                  {
+                    title: 'Strategy Implementation',
+                    description: '65% of educators applying TDI strategies in classroom practice by Spring 2026',
+                    baseline: 10, target: 65, current: 62, unit: '%',
+                    baselineLabel: '10% (industry avg)', color: '#4ecdc4',
+                    status: 'on-track',
+                  },
+                  {
+                    title: 'Staff Wellness',
+                    description: 'Reduce average staff stress score below 5.0/10 (national avg: 8-9)',
+                    baseline: 7.8, target: 5.0, current: 4.5, unit: '/10',
+                    baselineLabel: '7.8/10 (Aug 2025)', color: '#2A9D8F',
+                    status: 'exceeded', invertProgress: true,
+                  },
+                  {
+                    title: 'Professional Growth',
+                    description: '500+ combined PD hours through Hub courses and observations by June 2026',
+                    baseline: 0, target: 500, current: 472, unit: ' hrs',
+                    baselineLabel: '0 hrs (Aug 2025)', color: '#8B5CF6',
+                    status: 'on-track',
+                  },
+                ].map((goal, i) => {
+                  const pct = goal.invertProgress
+                    ? Math.min(((goal.baseline - goal.current) / (goal.baseline - goal.target)) * 100, 100)
+                    : Math.min((goal.current / goal.target) * 100, 100);
+                  return (
+                    <div key={i} className="border border-gray-100 rounded-xl p-4">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-semibold text-[#1B2A4A]">{goal.title}</span>
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                          goal.status === 'exceeded' ? 'bg-green-50 text-green-600' :
+                          goal.status === 'on-track' ? 'bg-blue-50 text-blue-600' :
+                          'bg-amber-50 text-amber-600'
+                        }`}>
+                          {goal.status === 'exceeded' ? 'Exceeded' : goal.status === 'on-track' ? 'On Track' : 'Needs Focus'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 mb-3">{goal.description}</p>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1">
+                          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: goal.color }} />
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span className="text-lg font-bold" style={{ color: goal.color }}>{goal.current}{goal.unit}</span>
+                          <span className="text-[10px] text-gray-400">/ {goal.target}{goal.unit}</span>
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-gray-400 mt-1">Baseline: {goal.baselineLabel}</p>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             {/* ─── CLASSROOM OBSERVATIONS (expanded showcase) ─── */}
@@ -1504,7 +1572,7 @@ export default function ExampleDashboard() {
               <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Eye className="w-4 h-4 text-[#D97706]" />
-                  <h3 className="text-sm font-semibold text-[#1B2A4A]">Classroom Observations</h3>
+                  <h3 className="text-base font-bold text-[#1B2A4A]">Classroom Observations</h3>
                   <span className="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-semibold">2 of 4 complete</span>
                 </div>
               </div>
@@ -1717,7 +1785,7 @@ export default function ExampleDashboard() {
 
             {/* ─── PARTNERSHIP JOURNEY (Phase Stepper) ─── */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4">Your Partnership Journey</h3>
+              <h3 className="text-base font-bold text-[#1B2A4A] mb-4">Your Partnership Journey</h3>
               <div className="flex items-stretch gap-1 mb-5">
                 {phases.map((phase, i) => (
                   <React.Fragment key={phase.name}>
@@ -1780,7 +1848,7 @@ export default function ExampleDashboard() {
 
             {/* ─── SESSIONS & MEETINGS ─── */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4">Sessions & Leadership Meetings</h3>
+              <h3 className="text-base font-bold text-[#1B2A4A] mb-4">Sessions & Leadership Meetings</h3>
               <div className="space-y-2">
                 {[
                   { title: 'Virtual Session 1 -- Para Cohort (district-wide)', date: 'January 2026', status: 'complete' },
@@ -1818,6 +1886,30 @@ export default function ExampleDashboard() {
             {/* ─── INSIGHTS & GROWTH (merged What We're Learning + Building Spotlight) ─── */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
               <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4">Insights & Growth</h3>
+
+              {/* Baseline vs Current */}
+              <div className="mb-4">
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Baseline vs Current</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    { metric: 'Staff Stress', baseline: '7.8/10', current: '4.5/10', change: '-42%', positive: true },
+                    { metric: 'Implementation', baseline: '10%', current: '62%', change: '+520%', positive: true },
+                    { metric: 'Hub Engagement', baseline: '0%', current: '87%', change: '+87%', positive: true },
+                    { metric: 'Retention Intent', baseline: '6.2/10', current: '9.8/10', change: '+58%', positive: true },
+                  ].map((item, i) => (
+                    <div key={i} className="rounded-xl p-3 bg-gray-50 border border-gray-100">
+                      <p className="text-[10px] text-gray-500 font-medium mb-1">{item.metric}</p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-400 line-through">{item.baseline}</span>
+                        <ArrowRight className="w-3 h-3 text-gray-300" />
+                        <span className="text-sm font-bold text-[#1B2A4A]">{item.current}</span>
+                      </div>
+                      <span className="text-[10px] font-semibold text-green-600">{item.change}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[10px] text-gray-400 mt-2 text-center">Baseline: August 2025 (pre-partnership) | Current: March 2026</p>
+              </div>
 
               {/* Implementation comparison */}
               <div className="bg-gradient-to-br from-[#1B2A4A] to-[#2d3a6b] rounded-xl p-5 mb-4 text-white">
@@ -2651,6 +2743,184 @@ export default function ExampleDashboard() {
                   <Award className="w-4 h-4" /> Generate Certificates
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== FUNDING TAB ==================== */}
+        {activeTab === 'funding' && (
+          <div
+            role="tabpanel"
+            id="panel-funding"
+            aria-labelledby="tab-funding"
+            className="space-y-6"
+          >
+            {/* Hero */}
+            <div className="bg-gradient-to-br from-[#1B2A4A] to-[#38618C] rounded-2xl p-6 md:p-8 text-white">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <Calculator className="w-6 h-6 text-[#E8B84B]" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold mb-1" style={{ color: '#FFFFFF' }}>We Find the Funding. You Focus on Teaching.</h2>
+                  <p className="text-sm text-white/70 leading-relaxed mb-3">
+                    80% of schools we partner with find over $35K in funding for TDI. We research every option, write the grant language, prepare the board proposals -- you just review and submit.
+                  </p>
+                  <div className="grid grid-cols-3 gap-3 mt-4">
+                    <div className="bg-white/10 rounded-lg p-3 text-center">
+                      <p className="text-xl font-bold text-[#E8B84B]">$63K</p>
+                      <p className="text-[10px] text-white/50">identified for Motown</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3 text-center">
+                      <p className="text-xl font-bold text-white">7</p>
+                      <p className="text-[10px] text-white/50">funding paths researched</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3 text-center">
+                      <p className="text-xl font-bold text-[#4ecdc4]">$0</p>
+                      <p className="text-[10px] text-white/50">cost to explore options</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Funding Paths */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4">Funding Paths Identified</h3>
+              <div className="space-y-2">
+                {[
+                  { name: 'Title II-A (Federal)', amount: '$33,225', status: 'submitted', detail: 'Professional development allocation. Budget narrative written by TDI, submitted to district office May 2026.' },
+                  { name: 'Title IV-A (Federal)', amount: '$12,000', status: 'confirmed', detail: 'Well-rounded education / safe schools allocation. Confirmed for Motown District, funds available July 2026.' },
+                  { name: 'IDEA / CEIS (Federal)', amount: '$8,500', status: 'submitted', detail: 'Coordinated Early Intervening Services for para professional development. Narrative drafted by TDI.' },
+                  { name: 'ESSA Section 1003 (Federal)', amount: '$6,000', status: 'ready', detail: 'School improvement funds. Letter prepared for district leadership to submit to state office.' },
+                  { name: 'NEA Foundation Grant', amount: '$2,500', status: 'submitted', detail: 'Application submitted via building union rep. Awaiting decision.' },
+                  { name: 'Walmart Spark Good', amount: '$1,800', status: 'ready', detail: 'Professional books for educator libraries. Application drafted, next cycle opens August.' },
+                  { name: 'Local Education Foundation', amount: '$1,500', status: 'outreach', detail: 'Inquiry sent to Motown Community Foundation. Awaiting response.' },
+                ].map((path, i) => (
+                  <div key={i} className={`flex items-center gap-3 p-3 rounded-lg ${
+                    path.status === 'confirmed' ? 'bg-green-50 border border-green-100' :
+                    path.status === 'submitted' ? 'bg-blue-50 border border-blue-100' :
+                    path.status === 'ready' ? 'bg-teal-50 border border-teal-100' :
+                    'bg-purple-50 border border-purple-100'
+                  }`}>
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      path.status === 'confirmed' ? 'bg-green-200' :
+                      path.status === 'submitted' ? 'bg-blue-200' :
+                      path.status === 'ready' ? 'bg-teal-200' :
+                      'bg-purple-200'
+                    }`}>
+                      {path.status === 'confirmed' ? <Check className="w-3.5 h-3.5 text-green-700" /> :
+                       path.status === 'submitted' ? <Clock className="w-3.5 h-3.5 text-blue-700" /> :
+                       path.status === 'ready' ? <FileText className="w-3.5 h-3.5 text-teal-700" /> :
+                       <Mail className="w-3.5 h-3.5 text-purple-700" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-[#1B2A4A]">{path.name}</p>
+                        <span className={`text-xs font-bold ${
+                          path.status === 'confirmed' ? 'text-green-700' :
+                          path.status === 'submitted' ? 'text-blue-700' :
+                          path.status === 'ready' ? 'text-teal-700' :
+                          'text-purple-700'
+                        }`}>{path.amount}</span>
+                      </div>
+                      <p className="text-[10px] text-gray-500">{path.detail}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-bold text-[#1B2A4A]">Total Identified: <span className="text-[#2A9D8F]">$65,525</span></p>
+                  <p className="text-[10px] text-gray-400">$12,000 confirmed + $53,525 in progress</p>
+                </div>
+                <div className="w-32 h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full rounded-full bg-gradient-to-r from-green-400 to-[#4ecdc4]" style={{ width: '18%' }} />
+                </div>
+              </div>
+            </div>
+
+            {/* TDI Does the Work */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-teal-50 rounded-2xl p-6 border border-teal-100">
+                <h3 className="text-sm font-semibold text-teal-800 mb-3">TDI Handles Everything</h3>
+                <ul className="space-y-2">
+                  {[
+                    'Research all eligible funding sources',
+                    'Write grant narratives and budgets',
+                    'Prepare board presentation materials',
+                    'Draft compliance documentation',
+                    'Create scope of work proposals',
+                    'Write reference letters',
+                    'Handle all follow-up communications',
+                    'Manage invoicing and deadlines',
+                    'Track approval timelines',
+                    'Build renewal justification',
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-xs text-teal-700">
+                      <Check className="w-3.5 h-3.5 text-teal-600 mt-0.5 flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-amber-50 rounded-2xl p-6 border border-amber-100">
+                <h3 className="text-sm font-semibold text-amber-800 mb-3">You Do This</h3>
+                <div className="space-y-3">
+                  {[
+                    { num: '1', text: 'Pick a path that fits your district' },
+                    { num: '2', text: 'Route pre-written requests to the right office' },
+                    { num: '3', text: 'Sign the partnership agreement' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-amber-200 flex items-center justify-center flex-shrink-0">
+                        <span className="text-xs font-bold text-amber-800">{item.num}</span>
+                      </div>
+                      <p className="text-sm text-amber-800 font-medium">{item.text}</p>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs font-bold text-amber-700 mt-4 pt-3 border-t border-amber-200">
+                  That&apos;s it. We&apos;ve prepared everything else.
+                </p>
+              </div>
+            </div>
+
+            {/* What Funding Unlocks */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-3">What Full Funding Unlocks</h3>
+              <p className="text-xs text-gray-500 mb-4">If all identified funding is secured, your partnership expands to:</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  { value: '255', label: 'Hub Memberships', current: '255', icon: Users, color: '#8B5CF6' },
+                  { value: '6', label: 'Observation Days', current: '4', icon: Eye, color: '#D97706' },
+                  { value: '4', label: 'Executive Sessions', current: '2', icon: GraduationCap, color: '#2563EB' },
+                  { value: '8', label: 'Virtual Sessions', current: '4', icon: Headphones, color: '#2A9D8F' },
+                ].map((item, i) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={i} className="rounded-xl bg-green-50 p-4 text-center border border-green-100">
+                      <Icon className="w-4 h-4 mx-auto mb-2" style={{ color: item.color }} />
+                      <p className="text-xl font-bold text-green-700">{item.value}</p>
+                      <p className="text-[10px] text-green-600">{item.label}</p>
+                      <p className="text-[9px] text-gray-400 mt-0.5">Currently: {item.current}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="bg-gradient-to-r from-[#1B2A4A] via-[#38618C] to-[#4ecdc4] rounded-2xl p-6 text-white text-center">
+              <p className="text-lg font-bold mb-2">Want to See What Funding Your District Qualifies For?</p>
+              <p className="text-sm text-white/70 mb-4">It takes 5 minutes. We do the rest.</p>
+              <span
+                className="inline-flex items-center gap-2 bg-white text-[#1B2A4A] px-6 py-3 rounded-lg font-semibold text-sm opacity-60 cursor-not-allowed"
+                onClick={handleDisabledClick}
+              >
+                <Calculator className="w-4 h-4" />
+                Explore Funding Options
+              </span>
             </div>
           </div>
         )}
