@@ -74,6 +74,7 @@ interface Course {
   module_count: number;
   lesson_count: number;
   origin_type: 'internal' | 'external_creator' | 'mixed' | null;
+  danielson_domains?: string[];
   created_at: string;
   updated_at: string;
 }
@@ -760,6 +761,9 @@ export function CoursesTab() {
                     Origin
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Danielson
+                  </th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
                     Status
                   </th>
                   <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
@@ -818,6 +822,19 @@ export function CoursesTab() {
                         <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-400">
                           —
                         </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      {course.danielson_domains && course.danielson_domains.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {course.danielson_domains.map((d: string) => (
+                            <span key={d} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-100 text-indigo-700">
+                              D{d.charAt(0)}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400">—</span>
                       )}
                     </td>
                     <td className="px-4 py-3">
