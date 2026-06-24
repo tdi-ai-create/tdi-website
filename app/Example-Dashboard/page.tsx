@@ -857,8 +857,6 @@ export default function ExampleDashboard() {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
-    const el = document.getElementById('tab-content-area');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   // Due dates for each item (month, year)
@@ -1193,7 +1191,7 @@ export default function ExampleDashboard() {
                   <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#E0F7F6' }}>
                     <Target className="w-3.5 h-3.5" style={{ color: '#2A9D8F' }} />
                   </div>
-                  <span className="text-base font-bold text-[#1B2A4A]">Your Next Steps</span>
+                  <span className="text-sm font-semibold text-[#1B2A4A]">Your Next Steps</span>
                   <span className="text-[10px] bg-[#E0F7F6] text-[#2A9D8F] px-2 py-0.5 rounded-full font-semibold">
                     {overviewData.actions.nextToUnlock.length} remaining
                   </span>
@@ -1229,7 +1227,7 @@ export default function ExampleDashboard() {
                   <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#EDE9FE' }}>
                     <Users className="w-3.5 h-3.5" style={{ color: '#8B5CF6' }} />
                   </div>
-                  <span className="text-base font-bold text-[#1B2A4A]">Team Activation</span>
+                  <span className="text-sm font-semibold text-[#1B2A4A]">Team Activation</span>
                 </div>
                 <button
                   onClick={() => handleTabChange('schools')}
@@ -1267,7 +1265,7 @@ export default function ExampleDashboard() {
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#FFF8E7' }}>
                   <Quote className="w-3.5 h-3.5" style={{ color: '#E8B84B' }} />
                 </div>
-                <span className="text-base font-bold text-[#1B2A4A]">What Educators Are Saying</span>
+                <span className="text-sm font-semibold text-[#1B2A4A]">What Educators Are Saying</span>
               </div>
               <div className="space-y-3">
                 {[
@@ -1379,7 +1377,7 @@ export default function ExampleDashboard() {
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#E0F7F6' }}>
                   <TrendingUp className="w-3.5 h-3.5" style={{ color: '#2A9D8F' }} />
                 </div>
-                <span className="text-base font-bold text-[#1B2A4A]">Impact Spotlight</span>
+                <span className="text-sm font-semibold text-[#1B2A4A]">Impact Spotlight</span>
                 <span className="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-semibold">After your last visit</span>
               </div>
               <p className="text-sm text-gray-600 mb-3" style={{ fontFamily: 'Georgia, serif' }}>
@@ -1470,7 +1468,7 @@ export default function ExampleDashboard() {
 
             {/* ─── WHAT YOUR PARTNERSHIP INCLUDES ─── */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-              <h2 className="text-base font-bold text-[#1B2A4A] mb-4">What Your Partnership Includes</h2>
+              <h2 className="text-sm font-semibold text-gray-900 mb-4">What Your Partnership Includes</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
                   { value: 255, label: 'Hub Memberships', icon: Users, color: '#8B5CF6' },
@@ -1494,7 +1492,7 @@ export default function ExampleDashboard() {
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-2 h-2 rounded-full" style={{ background: '#2D7D78' }} />
-                <h2 className="text-base font-bold text-[#1B2A4A]">Our Partnership Goal</h2>
+                <h2 className="text-sm font-semibold text-gray-900">Our Partnership Goal</h2>
               </div>
               <p className="text-base text-gray-700 leading-relaxed font-medium">
                 Student performance aligned with state benchmarks through educator support and sustainable professional development.
@@ -1506,7 +1504,7 @@ export default function ExampleDashboard() {
               <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Eye className="w-4 h-4 text-[#D97706]" />
-                  <h3 className="text-base font-bold text-[#1B2A4A]">Classroom Observations</h3>
+                  <h3 className="text-sm font-semibold text-[#1B2A4A]">Classroom Observations</h3>
                   <span className="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-semibold">2 of 4 complete</span>
                 </div>
               </div>
@@ -1719,7 +1717,7 @@ export default function ExampleDashboard() {
 
             {/* ─── PARTNERSHIP JOURNEY (Phase Stepper) ─── */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-              <h3 className="text-base font-bold text-[#1B2A4A] mb-4">Your Partnership Journey</h3>
+              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4">Your Partnership Journey</h3>
               <div className="flex items-stretch gap-1 mb-5">
                 {phases.map((phase, i) => (
                   <React.Fragment key={phase.name}>
@@ -1782,7 +1780,7 @@ export default function ExampleDashboard() {
 
             {/* ─── SESSIONS & MEETINGS ─── */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-              <h3 className="text-base font-bold text-[#1B2A4A] mb-4">Sessions & Leadership Meetings</h3>
+              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4">Sessions & Leadership Meetings</h3>
               <div className="space-y-2">
                 {[
                   { title: 'Virtual Session 1 -- Para Cohort (district-wide)', date: 'January 2026', status: 'complete' },
@@ -1819,7 +1817,7 @@ export default function ExampleDashboard() {
 
             {/* ─── INSIGHTS & GROWTH (merged What We're Learning + Building Spotlight) ─── */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-              <h3 className="text-base font-bold text-[#1B2A4A] mb-4">Insights & Growth</h3>
+              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4">Insights & Growth</h3>
 
               {/* Implementation comparison */}
               <div className="bg-gradient-to-br from-[#1B2A4A] to-[#2d3a6b] rounded-xl p-5 mb-4 text-white">
