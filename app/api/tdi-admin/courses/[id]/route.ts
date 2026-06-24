@@ -107,6 +107,7 @@ export async function PATCH(
       difficulty,
       capacity,
       danielson_domains,
+      roles,
       estimated_minutes,
       pd_hours,
       is_free,
@@ -153,6 +154,7 @@ export async function PATCH(
     if (difficulty !== undefined) updates.difficulty = difficulty;
     if (capacity !== undefined) updates.capacity = capacity;
     if (danielson_domains !== undefined) updates.danielson_domains = danielson_domains;
+    if (roles !== undefined) updates.roles = roles;
     if (estimated_minutes !== undefined) updates.estimated_minutes = estimated_minutes;
     if (pd_hours !== undefined) updates.pd_hours = pd_hours;
     if (is_free !== undefined) {

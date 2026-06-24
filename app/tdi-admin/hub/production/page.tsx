@@ -115,7 +115,14 @@ const DANIELSON_DOMAINS = [
   { value: '4-professional', label: 'Professional Responsibilities' },
 ] as const;
 
-const EMPTY_QW_FORM = { title: '', slug: '', description: '', category: 'Classroom Tools', type: 'do', duration_minutes: 10, capacity: '', danielson_domains: [] as string[], is_published: false };
+const ROLE_OPTIONS = [
+  { value: 'teacher', label: 'Teachers' },
+  { value: 'para', label: 'Paraprofessionals' },
+  { value: 'leader', label: 'Leaders & Admin' },
+  { value: 'coach', label: 'Coaches' },
+] as const;
+
+const EMPTY_QW_FORM = { title: '', slug: '', description: '', category: 'Classroom Tools', type: 'do', duration_minutes: 10, capacity: '', danielson_domains: [] as string[], roles: [] as string[], is_published: false };
 
 function QuickWinsTab() {
   const [quickWins, setQuickWins] = useState<any[]>([]);
@@ -168,6 +175,7 @@ function QuickWinsTab() {
       duration_minutes: qw.duration_minutes || 10,
       capacity: qw.capacity || '',
       danielson_domains: qw.danielson_domains || [],
+      roles: qw.roles || [],
       is_published: qw.is_published || false,
     });
     setEditingQW(qw);
@@ -193,6 +201,7 @@ function QuickWinsTab() {
       duration_minutes: form.duration_minutes || null,
       capacity: form.capacity || null,
       danielson_domains: form.danielson_domains,
+      roles: form.roles,
       is_published: form.is_published,
     };
     try {
@@ -345,6 +354,30 @@ function QuickWinsTab() {
                         className="w-4 h-4 rounded"
                       />
                       <span className="text-sm">{domain.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Roles</label>
+                <div className="space-y-2">
+                  {ROLE_OPTIONS.map((role) => (
+                    <label key={role.value} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={form.roles.includes(role.value)}
+                        onChange={(e) => {
+                          setForm(f => ({
+                            ...f,
+                            roles: e.target.checked
+                              ? [...f.roles, role.value]
+                              : f.roles.filter(r => r !== role.value),
+                          }));
+                        }}
+                        className="w-4 h-4 rounded"
+                      />
+                      <span className="text-sm">{role.label}</span>
                     </label>
                   ))}
                 </div>
