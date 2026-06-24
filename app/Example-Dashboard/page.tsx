@@ -407,9 +407,9 @@ export default function ExampleDashboard() {
       grades: 'PreK-2',
       teachers: { total: 16, loggedIn: 15 },
       paras: { total: 14, loggedIn: 9 },
-      coursesCompleted: 61,
-      avgStress: 5.0, // GOLD Wellness Leader - lowest stress is best
-      implementationRate: 22,
+      coursesCompleted: 71,
+      avgStress: 4.1, // GOLD Wellness Leader - lowest stress is best
+      implementationRate: 58,
       observationStatus: 'Scheduled April',
       champion: 'Mrs. Patel',
       tdiNote: 'Lowest stress scores in the district! Staff wellness initiatives are a model for others.',
@@ -421,8 +421,8 @@ export default function ExampleDashboard() {
       ],
       teacherCourses: ['Social-Emotional Learning Foundations', 'Play-Based Assessment', 'Classroom Environment Design'],
       paraCourses: ['Supporting Early Learners', 'Calm Classroom Strategies', 'Communication that Clicks'],
-      teacherBreakdown: { logins: 94, courses: 68, stress: 4.8, implementation: 26 },
-      paraBreakdown: { logins: 64, courses: 52, stress: 6.1, implementation: 15 },
+      teacherBreakdown: { logins: 94, courses: 74, stress: 3.9, implementation: 64 },
+      paraBreakdown: { logins: 64, courses: 58, stress: 4.8, implementation: 42 },
       teacherStaff: [
         { name: 'Sarah M.', loggedIn: true }, { name: 'Maria L.', loggedIn: true }, { name: 'James K.', loggedIn: true },
         { name: 'Priya S.', loggedIn: true }, { name: 'Ana G.', loggedIn: true }, { name: 'Michael C.', loggedIn: true },
@@ -445,9 +445,9 @@ export default function ExampleDashboard() {
       grades: 'K-5',
       teachers: { total: 45, loggedIn: 42 },
       paras: { total: 20, loggedIn: 15 },
-      coursesCompleted: 68, // SILVER Top Learners
-      avgStress: 5.2, // SILVER Wellness Leader
-      implementationRate: 34, // GOLD Implementation
+      coursesCompleted: 76, // SILVER Top Learners
+      avgStress: 4.4, // SILVER Wellness Leader
+      implementationRate: 72, // GOLD Implementation
       observationStatus: 'Complete',
       champion: 'Ms. Rivera',
       tdiNote: 'Most medals in the district (2 golds, 4 silvers). Ms. Rivera\'s PLC structure is a model we\'d love to share with other buildings.',
@@ -461,8 +461,8 @@ export default function ExampleDashboard() {
       ],
       teacherCourses: ['The Differentiation Fix', 'Small Group Mastery', 'Time Management for Teachers'],
       paraCourses: ['Building Strong Teacher-Para Partnerships', 'Small-Group & One-on-One Instruction', 'De-Escalation Strategies'],
-      teacherBreakdown: { logins: 100, courses: 78, stress: 4.8, implementation: 38 },
-      paraBreakdown: { logins: 85, courses: 58, stress: 5.9, implementation: 26 },
+      teacherBreakdown: { logins: 100, courses: 82, stress: 4.0, implementation: 78 },
+      paraBreakdown: { logins: 85, courses: 64, stress: 5.1, implementation: 56 },
       teacherStaff: [
         { name: 'Emily W.', loggedIn: true }, { name: 'Robert J.', loggedIn: true }, { name: 'Michelle P.', loggedIn: true },
         { name: 'Kevin D.', loggedIn: true }, { name: 'Patricia A.', loggedIn: true }, { name: 'Brian M.', loggedIn: true },
@@ -484,9 +484,9 @@ export default function ExampleDashboard() {
       grades: 'K-8',
       teachers: { total: 32, loggedIn: 28 }, // 88% = BRONZE Most Engaged
       paras: null,
-      coursesCompleted: 58,
-      avgStress: 6.4,
-      implementationRate: 19,
+      coursesCompleted: 65,
+      avgStress: 4.8,
+      implementationRate: 55,
       observationStatus: 'Scheduled April',
       champion: 'Ms. Thompson',
       tdiNote: 'Resource Champion! Staff are downloading and using more materials than any other building.',
@@ -496,7 +496,7 @@ export default function ExampleDashboard() {
       ],
       teacherCourses: ['Student Engagement Strategies', 'Formative Assessment Toolkit', 'Collaborative Planning'],
       paraCourses: null,
-      teacherBreakdown: { logins: 88, courses: 58, stress: 6.4, implementation: 19 },
+      teacherBreakdown: { logins: 88, courses: 65, stress: 4.8, implementation: 55 },
       paraBreakdown: null,
       teacherStaff: [
         { name: 'William H.', loggedIn: true }, { name: 'Susan K.', loggedIn: true }, { name: 'Charles M.', loggedIn: true },
@@ -513,9 +513,9 @@ export default function ExampleDashboard() {
       grades: '6-8',
       teachers: { total: 28, loggedIn: 26 }, // 91% = SILVER Most Engaged
       paras: { total: 10, loggedIn: 7 },
-      coursesCompleted: 72, // GOLD Top Learners
-      avgStress: 5.8, // BRONZE Wellness Leader
-      implementationRate: 28, // SILVER Implementation
+      coursesCompleted: 78, // GOLD Top Learners
+      avgStress: 4.6, // BRONZE Wellness Leader
+      implementationRate: 68, // SILVER Implementation
       observationStatus: 'Complete',
       champion: 'Mr. Okafor',
       tdiNote: 'Leading in course completion and movement engagement. Strong middle school team (2 golds, 3 silvers, 1 bronze).',
@@ -529,8 +529,8 @@ export default function ExampleDashboard() {
       ],
       teacherCourses: ['Classroom Management Reset', 'Student Voice & Choice', 'Advisory Period Design'],
       paraCourses: ['Supporting Students Through Their Daily Schedule', 'Behavior Support in Transitions'],
-      teacherBreakdown: { logins: 94, courses: 72, stress: 5.4, implementation: 32 },
-      paraBreakdown: { logins: 81, courses: 51, stress: 6.7, implementation: 18 },
+      teacherBreakdown: { logins: 94, courses: 80, stress: 4.2, implementation: 74 },
+      paraBreakdown: { logins: 81, courses: 62, stress: 5.4, implementation: 48 },
       teacherStaff: [
         { name: 'George H.', loggedIn: true }, { name: 'Helen I.', loggedIn: true }, { name: 'Edward J.', loggedIn: true },
         { name: 'Ruth K.', loggedIn: true }, { name: 'Frank L.', loggedIn: true }, { name: 'Virginia M.', loggedIn: true },
@@ -551,9 +551,9 @@ export default function ExampleDashboard() {
       grades: '9-12',
       teachers: { total: 52, loggedIn: 47 },
       paras: { total: 16, loggedIn: 13 },
-      coursesCompleted: 48,
-      avgStress: 7.1,
-      implementationRate: 14,
+      coursesCompleted: 52,
+      avgStress: 5.9,
+      implementationRate: 38,
       observationStatus: 'Not yet scheduled',
       champion: 'Coach Williams',
       tdiNote: 'Growing momentum! Movement engagement improving each month.',
@@ -562,8 +562,8 @@ export default function ExampleDashboard() {
       ],
       teacherCourses: ['Engagement in Large Classes', 'Student-Led Conferences', 'Reducing Grading Load'],
       paraCourses: ['Supporting Students with IEPs', 'Study Skills Coaching', 'Communication that Clicks'],
-      teacherBreakdown: { logins: 90, courses: 55, stress: 6.8, implementation: 18 },
-      paraBreakdown: { logins: 65, courses: 34, stress: 7.8, implementation: 6 },
+      teacherBreakdown: { logins: 90, courses: 58, stress: 5.5, implementation: 44 },
+      paraBreakdown: { logins: 65, courses: 38, stress: 6.8, implementation: 22 },
       teacherStaff: [
         { name: 'Harold A.', loggedIn: true }, { name: 'Sharon B.', loggedIn: true }, { name: 'Douglas C.', loggedIn: true },
         { name: 'Catherine D.', loggedIn: true }, { name: 'Gerald E.', loggedIn: false }, { name: 'Deborah F.', loggedIn: true },
@@ -585,9 +585,9 @@ export default function ExampleDashboard() {
       grades: 'K-8',
       teachers: { total: 14, loggedIn: 12 },
       paras: { total: 8, loggedIn: 7 },
-      coursesCompleted: 55,
-      avgStress: 6.7,
-      implementationRate: 17,
+      coursesCompleted: 68,
+      avgStress: 4.3,
+      implementationRate: 62,
       observationStatus: 'Scheduled May',
       champion: 'Dr. Nguyen',
       tdiNote: 'Highest retention intent in the district! Staff love working here.',
@@ -597,8 +597,8 @@ export default function ExampleDashboard() {
       ],
       teacherCourses: ['Trauma-Informed Practices', 'Restorative Conversations', 'Flexible Scheduling'],
       paraCourses: ['De-Escalation Strategies', 'Building Trust with Students'],
-      teacherBreakdown: { logins: 89, courses: 62, stress: 6.2, implementation: 22 },
-      paraBreakdown: { logins: 75, courses: 43, stress: 7.4, implementation: 9 },
+      teacherBreakdown: { logins: 89, courses: 72, stress: 4.0, implementation: 68 },
+      paraBreakdown: { logins: 75, courses: 52, stress: 5.2, implementation: 45 },
       teacherStaff: [
         { name: 'Samuel A.', loggedIn: true }, { name: 'Diane B.', loggedIn: true }, { name: 'Gregory C.', loggedIn: true },
         { name: 'Joyce D.', loggedIn: true }, { name: 'Patrick E.', loggedIn: true }, { name: 'Theresa F.', loggedIn: true },
@@ -1038,7 +1038,7 @@ export default function ExampleDashboard() {
       ],
       inProgress: [
         { label: 'Hub engagement - 223/255 staff active across 6 buildings', detail: '87% and growing - goal: 100% by spring obs' },
-        { label: 'Strategy implementation tracking', detail: '21% district-wide - 2x the 10% national average' },
+        { label: 'Strategy implementation tracking', detail: '62% district-wide - 6x the 10% national average' },
         { label: 'Spring observation day coordination', detail: 'Para + Teacher Pilot Groups - April 2026' },
         { label: 'Year 2 district expansion planning', detail: 'Discussions underway with district leadership' },
       ],
@@ -1057,10 +1057,10 @@ export default function ExampleDashboard() {
       perEducatorSublabel: 'per educator - less than a one-day sub, district-wide',
       implementationRate: '9.8',
       implementationSublabel: 'out of 10 - staff retention intent (industry avg: 2-4)',
-      coursesCompleted: 6.0,
+      coursesCompleted: 4.5,
       coursesCompletedSublabel: 'avg stress score - well below industry average of 8-9',
-      retentionStat: '21%',
-      retentionSublabel: 'strategy implementation - 2x the 10% national average',
+      retentionStat: '62%',
+      retentionSublabel: 'strategy implementation - 6x the 10% national average',
     },
 
     // ZONE 2C - Quick win counter
@@ -1294,7 +1294,7 @@ export default function ExampleDashboard() {
                 <span className="text-[10px] font-bold text-[#E8B84B] uppercase tracking-widest">Partnership Intelligence</span>
               </div>
               <p className="text-base md:text-lg leading-relaxed text-gray-700" style={{ fontFamily: 'Georgia, serif' }}>
-                Your team is engaged. {overviewData.stats.hubEngagement.percent}% of {overviewData.stats.educatorsEnrolled.total} educators logged into the Hub this month, exploring 342 tools across {districtSchools.length} buildings. Crescendo Middle is your standout at 72% course completion. Your educators&apos; average wellness score is 4.2 out of 5 -- stronger than the national average. TDI reached out to 7 team members for wellness check-ins this week.
+                Your team is engaged. {overviewData.stats.hubEngagement.percent}% of {overviewData.stats.educatorsEnrolled.total} educators logged into the Hub this month, exploring 342 tools across {districtSchools.length} buildings. Crescendo Middle is your standout at 78% course completion. Strategy implementation is at 62% district-wide -- 6x the national average. Your educators&apos; average wellness score is 4.2 out of 5 -- stronger than the national average. TDI reached out to 7 team members for wellness check-ins this week.
               </p>
               <button
                 onClick={() => setOpenSections(prev => ({ ...prev, 'overview-hub-detail': !prev['overview-hub-detail'] }))}
@@ -1354,7 +1354,7 @@ export default function ExampleDashboard() {
               {[
                 { value: overviewData.stats.hubEngagement.percent, label: 'Hub Engagement', display: `${overviewData.stats.hubEngagement.percent}%`, color: '#E8B84B', max: 100 },
                 { value: (overviewData.stats.deliverables.completed / overviewData.stats.deliverables.total) * 100, label: 'Deliverables', display: `${overviewData.stats.deliverables.completed}/${overviewData.stats.deliverables.total}`, color: '#4ecdc4', max: 100 },
-                { value: (4.2 / 5) * 100, label: 'Team Wellness', display: '4.2', color: '#2A9D8F', max: 100 },
+                { value: (4.5 / 5) * 100, label: 'Team Wellness', display: '4.5', color: '#2A9D8F', max: 100 },
                 { value: (overviewData.stats.phase.number / overviewData.stats.phase.total) * 100, label: 'Current Phase', display: `${overviewData.stats.phase.number}/${overviewData.stats.phase.total}`, color: '#1B2A4A', max: 100 },
               ].map((gauge, i) => (
                 <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col items-center">
@@ -1824,15 +1824,15 @@ export default function ExampleDashboard() {
               {/* Implementation comparison */}
               <div className="bg-gradient-to-br from-[#1B2A4A] to-[#2d3a6b] rounded-xl p-5 mb-4 text-white">
                 <div className="flex items-end gap-3 mb-3">
-                  <span className="text-4xl font-black">21%</span>
+                  <span className="text-4xl font-black">62%</span>
                   <div className="pb-1">
                     <p className="text-white/80 text-sm font-medium">strategy implementation rate</p>
-                    <p className="text-white/50 text-xs">2x the 10% national average after just 2 sessions</p>
+                    <p className="text-white/50 text-xs">6x the 10% national average -- approaching TDI partner benchmark</p>
                   </div>
                 </div>
                 <div className="space-y-2">
                   {[
-                    { label: 'Motown District', pct: 21, color: '#4ecdc4' },
+                    { label: 'Motown District', pct: 62, color: '#4ecdc4' },
                     { label: 'TDI Partner Avg', pct: 74, color: '#80a4ed' },
                     { label: 'Industry Avg', pct: 10, color: '#6B7280' },
                   ].map((bar, i) => (
@@ -1873,7 +1873,7 @@ export default function ExampleDashboard() {
                     <Trophy className="w-4 h-4 text-amber-600" />
                     <span className="font-bold text-amber-800 text-sm">Crescendo Middle</span>
                   </div>
-                  <p className="text-xs text-amber-700">28% implementation rate -- highest in district</p>
+                  <p className="text-xs text-amber-700">68% implementation rate -- highest in district</p>
                 </div>
               </div>
             </div>
@@ -2862,7 +2862,7 @@ export default function ExampleDashboard() {
                     <Heart className="w-5 h-5 text-green-600" />
                     <div>
                       <p className="text-sm font-medium text-green-800">Educator Wellness</p>
-                      <p className="text-xs text-green-600">Sustain below 6.0 stress</p>
+                      <p className="text-xs text-green-600">Sustain below 4.5 stress</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 bg-blue-50 rounded-lg p-3">
