@@ -307,6 +307,13 @@ interface Module {
   lessons: Lesson[];
 }
 
+const DANIELSON_DOMAINS = [
+  { value: '1-planning', label: 'Planning & Preparation' },
+  { value: '2-environment', label: 'Classroom Environment' },
+  { value: '3-instruction', label: 'Instruction' },
+  { value: '4-professional', label: 'Professional Responsibilities' },
+] as const;
+
 interface Course {
   id: string;
   title: string;
@@ -315,6 +322,7 @@ interface Course {
   category: string;
   difficulty: string;
   capacity?: 'low' | 'medium' | 'high' | null;
+  danielson_domains?: string[];
   estimated_minutes: number;
   pd_hours: number;
   is_published: boolean;
@@ -667,6 +675,7 @@ function CourseSettingsPanel({
     category: course.category,
     difficulty: course.difficulty,
     capacity: course.capacity || '',
+    danielson_domains: course.danielson_domains || [],
     estimated_minutes: course.estimated_minutes,
     pd_hours: course.pd_hours,
     is_free: course.is_free,
@@ -678,6 +687,7 @@ function CourseSettingsPanel({
     onUpdate({
       ...form,
       capacity: (form.capacity || null) as 'low' | 'medium' | 'high' | null,
+      danielson_domains: form.danielson_domains,
       price: form.is_free ? null : parseFloat(form.price) || null,
       thumbnail_url: form.thumbnail_url || null,
     });
@@ -751,6 +761,30 @@ function CourseSettingsPanel({
           <option value="medium">Medium — Some prep, 1-2 sessions</option>
           <option value="high">High — Significant investment, multi-session</option>
         </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Danielson Domains</label>
+        <div className="space-y-2">
+          {DANIELSON_DOMAINS.map((domain) => (
+            <label key={domain.value} className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.danielson_domains.includes(domain.value)}
+                onChange={(e) => {
+                  setForm({
+                    ...form,
+                    danielson_domains: e.target.checked
+                      ? [...form.danielson_domains, domain.value]
+                      : form.danielson_domains.filter((d: string) => d !== domain.value),
+                  });
+                }}
+                className="w-4 h-4 text-teal-600 rounded"
+              />
+              <span className="text-sm">{domain.label}</span>
+            </label>
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
