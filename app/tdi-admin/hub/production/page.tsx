@@ -108,7 +108,14 @@ function titleToSlug(t: string) {
   return t.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').trim();
 }
 
-const EMPTY_QW_FORM = { title: '', slug: '', description: '', category: 'Classroom Tools', type: 'do', duration_minutes: 10, capacity: '', is_published: false };
+const DANIELSON_DOMAINS = [
+  { value: '1-planning', label: 'Planning & Preparation' },
+  { value: '2-environment', label: 'Classroom Environment' },
+  { value: '3-instruction', label: 'Instruction' },
+  { value: '4-professional', label: 'Professional Responsibilities' },
+] as const;
+
+const EMPTY_QW_FORM = { title: '', slug: '', description: '', category: 'Classroom Tools', type: 'do', duration_minutes: 10, capacity: '', danielson_domains: [] as string[], is_published: false };
 
 function QuickWinsTab() {
   const [quickWins, setQuickWins] = useState<any[]>([]);
@@ -160,6 +167,7 @@ function QuickWinsTab() {
       type: qw.type || 'do',
       duration_minutes: qw.duration_minutes || 10,
       capacity: qw.capacity || '',
+      danielson_domains: qw.danielson_domains || [],
       is_published: qw.is_published || false,
     });
     setEditingQW(qw);
@@ -184,6 +192,7 @@ function QuickWinsTab() {
       type: form.type,
       duration_minutes: form.duration_minutes || null,
       capacity: form.capacity || null,
+      danielson_domains: form.danielson_domains,
       is_published: form.is_published,
     };
     try {
@@ -314,6 +323,30 @@ function QuickWinsTab() {
                     <option value="medium">Medium — Some prep</option>
                     <option value="high">High — Significant investment</option>
                   </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Danielson Domains</label>
+                <div className="space-y-2">
+                  {DANIELSON_DOMAINS.map((domain) => (
+                    <label key={domain.value} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={form.danielson_domains.includes(domain.value)}
+                        onChange={(e) => {
+                          setForm(f => ({
+                            ...f,
+                            danielson_domains: e.target.checked
+                              ? [...f.danielson_domains, domain.value]
+                              : f.danielson_domains.filter(d => d !== domain.value),
+                          }));
+                        }}
+                        className="w-4 h-4 rounded"
+                      />
+                      <span className="text-sm">{domain.label}</span>
+                    </label>
+                  ))}
                 </div>
               </div>
 

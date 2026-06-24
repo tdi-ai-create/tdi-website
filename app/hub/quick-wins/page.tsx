@@ -132,6 +132,13 @@ const PRACTICE_TOOLS: QuickWin[] = [
   },
 ];
 
+const DANIELSON_DOMAINS = [
+  { value: '1-planning', label: 'Planning & Prep', short: 'D1' },
+  { value: '2-environment', label: 'Classroom Environment', short: 'D2' },
+  { value: '3-instruction', label: 'Instruction', short: 'D3' },
+  { value: '4-professional', label: 'Professional Responsibilities', short: 'D4' },
+] as const;
+
 interface QuickWin {
   id: string;
   slug: string;
@@ -145,6 +152,7 @@ interface QuickWin {
   access_tier?: string;
   is_free_rotating?: boolean;
   capacity?: 'low' | 'medium' | 'high' | null;
+  danielson_domains?: string[];
   title_es?: string | null;
   description_es?: string | null;
 }
@@ -153,6 +161,7 @@ export default function QuickWinsPage() {
   const [quickWins, setQuickWins] = useState<QuickWin[]>([]);
   const [activeFilter, setActiveFilter] = useState('All');
   const [capacityFilter, setCapacityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
+  const [danielsonFilter, setDanielsonFilter] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { isFavorite, toggleFavorite } = useFavorites();
   const { canAccess } = useMembership();
@@ -188,6 +197,7 @@ export default function QuickWinsPage() {
           access_tier: qw.access_tier,
           is_free_rotating: qw.is_free_rotating,
           capacity: qw.lift === 'LOW' ? 'low' : qw.lift === 'MED' ? 'medium' : qw.lift === 'HIGH' ? 'high' : null,
+          danielson_domains: qw.danielson_domains || [],
           title_es: qw.title_es,
           description_es: qw.description_es,
         }));
@@ -244,7 +254,8 @@ export default function QuickWinsPage() {
       return qw.category === activeFilter;
     })();
     const capacityMatch = capacityFilter === 'all' || qw.capacity === capacityFilter;
-    return categoryMatch && capacityMatch;
+    const danielsonMatch = danielsonFilter.length === 0 || danielsonFilter.some(d => qw.danielson_domains?.includes(d));
+    return categoryMatch && capacityMatch && danielsonMatch;
   });
 
   // Loading skeleton
@@ -392,6 +403,44 @@ export default function QuickWinsPage() {
               {tUI(label)}
             </button>
           ))}
+        </div>
+
+        {/* Danielson Framework Filter Row */}
+        <div className="flex items-center gap-2 mb-6 flex-wrap">
+          <span
+            className="text-[11px] font-bold tracking-wider flex-shrink-0"
+            style={{
+              color: '#9CA3AF',
+              textTransform: 'uppercase',
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            {tUI('Danielson Framework')}
+          </span>
+          {DANIELSON_DOMAINS.map((domain) => {
+            const isActive = danielsonFilter.includes(domain.value);
+            return (
+              <button
+                key={domain.value}
+                onClick={() => {
+                  setDanielsonFilter(prev =>
+                    prev.includes(domain.value)
+                      ? prev.filter(d => d !== domain.value)
+                      : [...prev, domain.value]
+                  );
+                }}
+                className="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0"
+                style={{
+                  backgroundColor: isActive ? '#1B2A4A' : 'white',
+                  color: isActive ? 'white' : '#6B7280',
+                  border: isActive ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                {tUI(domain.label)} ({domain.short})
+              </button>
+            );
+          })}
         </div>
 
         {/* Quick Wins Grid or Empty State */}
