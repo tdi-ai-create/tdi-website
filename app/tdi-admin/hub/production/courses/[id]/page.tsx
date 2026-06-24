@@ -314,6 +314,13 @@ const DANIELSON_DOMAINS = [
   { value: '4-professional', label: 'Professional Responsibilities' },
 ] as const;
 
+const ROLE_OPTIONS = [
+  { value: 'teacher', label: 'Teachers' },
+  { value: 'para', label: 'Paraprofessionals' },
+  { value: 'leader', label: 'Leaders & Admin' },
+  { value: 'coach', label: 'Coaches' },
+] as const;
+
 interface Course {
   id: string;
   title: string;
@@ -323,6 +330,7 @@ interface Course {
   difficulty: string;
   capacity?: 'low' | 'medium' | 'high' | null;
   danielson_domains?: string[];
+  roles?: string[];
   estimated_minutes: number;
   pd_hours: number;
   is_published: boolean;
@@ -676,6 +684,7 @@ function CourseSettingsPanel({
     difficulty: course.difficulty,
     capacity: course.capacity || '',
     danielson_domains: course.danielson_domains || [],
+    roles: course.roles || [],
     estimated_minutes: course.estimated_minutes,
     pd_hours: course.pd_hours,
     is_free: course.is_free,
@@ -688,6 +697,7 @@ function CourseSettingsPanel({
       ...form,
       capacity: (form.capacity || null) as 'low' | 'medium' | 'high' | null,
       danielson_domains: form.danielson_domains,
+      roles: form.roles,
       price: form.is_free ? null : parseFloat(form.price) || null,
       thumbnail_url: form.thumbnail_url || null,
     });
@@ -782,6 +792,30 @@ function CourseSettingsPanel({
                 className="w-4 h-4 text-teal-600 rounded"
               />
               <span className="text-sm">{domain.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Roles</label>
+        <div className="space-y-2">
+          {ROLE_OPTIONS.map((role) => (
+            <label key={role.value} className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.roles.includes(role.value)}
+                onChange={(e) => {
+                  setForm({
+                    ...form,
+                    roles: e.target.checked
+                      ? [...form.roles, role.value]
+                      : form.roles.filter((r: string) => r !== role.value),
+                  });
+                }}
+                className="w-4 h-4 text-teal-600 rounded"
+              />
+              <span className="text-sm">{role.label}</span>
             </label>
           ))}
         </div>

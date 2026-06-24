@@ -32,6 +32,14 @@ const DANIELSON_DOMAINS = [
   { value: '4-professional', label: 'Professional Responsibilities', short: 'D4' },
 ] as const;
 
+const ROLE_FILTERS = [
+  { value: 'all', label: 'All Roles' },
+  { value: 'teacher', label: 'Teachers' },
+  { value: 'para', label: 'Paraprofessionals' },
+  { value: 'leader', label: 'Leaders & Admin' },
+  { value: 'coach', label: 'Coaches' },
+] as const;
+
 interface Course {
   id: string;
   slug: string;
@@ -46,6 +54,7 @@ interface Course {
   is_free_rotating?: boolean;
   capacity?: 'low' | 'medium' | 'high' | null;
   danielson_domains?: string[];
+  roles?: string[];
   title_es?: string | null;
   description_es?: string | null;
 }
@@ -63,6 +72,7 @@ export default function CourseCatalogPage() {
   const [enrollments, setEnrollments] = useState<Record<string, Enrollment>>({});
   const [activeFilter, setActiveFilter] = useState('All');
   const [capacityFilter, setCapacityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
+  const [roleFilter, setRoleFilter] = useState<string>('all');
   const [danielsonFilter, setDanielsonFilter] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isEnrolling, setIsEnrolling] = useState<string | null>(null);
@@ -84,7 +94,7 @@ export default function CourseCatalogPage() {
       // Fetch all published courses
       const { data: courseData } = await supabase
         .from('hub_courses')
-        .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url, is_published, access_tier, is_free_rotating, capacity, danielson_domains, title_es, description_es')
+        .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url, is_published, access_tier, is_free_rotating, capacity, danielson_domains, roles, title_es, description_es')
         .eq('is_published', true)
         .order('created_at', { ascending: false });
 
@@ -218,7 +228,8 @@ export default function CourseCatalogPage() {
     })();
     const capacityMatch = capacityFilter === 'all' || course.capacity === capacityFilter;
     const danielsonMatch = danielsonFilter.length === 0 || danielsonFilter.some(d => course.danielson_domains?.includes(d));
-    return categoryMatch && capacityMatch && danielsonMatch;
+    const roleMatch = roleFilter === 'all' || course.roles?.includes(roleFilter);
+    return categoryMatch && capacityMatch && danielsonMatch && roleMatch;
   });
 
   // Get in-progress courses (enrolled but not completed)
@@ -309,6 +320,38 @@ export default function CourseCatalogPage() {
           >
             {courses.length} {tUI('courses')} · {tUI('Practical PD built by teachers, for teachers')}
           </p>
+        </div>
+
+        {/* Role Filter */}
+        <div className="flex items-center gap-2 mb-6 flex-wrap">
+          <span
+            className="text-[11px] font-bold tracking-wider flex-shrink-0"
+            style={{
+              color: '#9CA3AF',
+              textTransform: 'uppercase',
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            {tUI('I am a...')}
+          </span>
+          {ROLE_FILTERS.map((role) => {
+            const isActive = roleFilter === role.value;
+            return (
+              <button
+                key={role.value}
+                onClick={() => setRoleFilter(role.value)}
+                className="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0"
+                style={{
+                  backgroundColor: isActive ? '#1B2A4A' : 'white',
+                  color: isActive ? 'white' : '#6B7280',
+                  border: isActive ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                {tUI(role.label)}
+              </button>
+            );
+          })}
         </div>
 
         {/* Filter Pills */}

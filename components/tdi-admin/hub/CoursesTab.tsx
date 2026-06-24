@@ -75,6 +75,7 @@ interface Course {
   lesson_count: number;
   origin_type: 'internal' | 'external_creator' | 'mixed' | null;
   danielson_domains?: string[];
+  roles?: string[];
   created_at: string;
   updated_at: string;
 }
