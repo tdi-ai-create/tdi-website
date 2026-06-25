@@ -82,7 +82,6 @@ export default function RootLayout({
           <MicrosoftClarity />
           <ScrollToTop />
           <MainSiteWrapper>
-            <AnnouncementBanner />
             <Header />
           </MainSiteWrapper>
           <main className="min-h-screen">
