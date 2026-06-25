@@ -95,7 +95,7 @@ export function Header() {
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => (
-              link.external || link.newTab ? (
+              link.newTab ? (
                 <a
                   key={link.href}
                   href={link.href}
@@ -247,7 +247,7 @@ export function Header() {
                 Login
               </Link>
               {navLinks.map((link) => (
-                link.external || link.newTab ? (
+                link.newTab ? (
                   <a
                     key={link.href}
                     href={link.href}
