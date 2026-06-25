@@ -1122,6 +1122,8 @@ export default function ExampleDashboard() {
           </p>
           <a
             href="/get-started"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all hover:shadow-lg"
             style={{ backgroundColor: '#ffffff', color: '#1e2749' }}
           >
@@ -3781,6 +3783,8 @@ export default function ExampleDashboard() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
               href="/get-started"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:shadow-lg"
               style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
             >
@@ -3791,6 +3795,8 @@ export default function ExampleDashboard() {
             </a>
             <a
               href="/contact"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-white border border-white/30 hover:bg-white/10 transition-all"
             >
               Book a Conversation
