@@ -434,6 +434,84 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
+      {/* SECTION: Leadership Dashboard Preview */}
+      <section className="py-20 md:py-28" style={{ backgroundColor: '#f8f9fa' }}>
+        <div className="container-default">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-10">
+              <p className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: '#2B8C96' }}>
+                Your Leadership Dashboard
+              </p>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e2749' }}>
+                See What Your Board Will See
+              </h2>
+              <p className="text-lg" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Every TDI partnership includes a live Leadership Dashboard. Real engagement data, progress tracking, observation reports, certificates, and board-ready materials. No more guessing if PD is working.
+              </p>
+            </div>
+
+            <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 mb-8">
+              <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] p-4 flex items-center gap-3">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-400" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                  <div className="w-3 h-3 rounded-full bg-green-400" />
+                </div>
+                <p className="text-sm font-medium text-white opacity-70">teachersdeserveit.com/partners/your-school</p>
+              </div>
+              <div className="bg-white p-8 md:p-12 text-center">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                  <div>
+                    <p className="text-3xl font-bold" style={{ color: '#1e2749' }}>94%</p>
+                    <p className="text-xs" style={{ color: '#6b7280' }}>Staff Logged In</p>
+                  </div>
+                  <div>
+                    <p className="text-3xl font-bold" style={{ color: '#2B8C96' }}>847</p>
+                    <p className="text-xs" style={{ color: '#6b7280' }}>Resources Downloaded</p>
+                  </div>
+                  <div>
+                    <p className="text-3xl font-bold" style={{ color: '#38618C' }}>74%</p>
+                    <p className="text-xs" style={{ color: '#6b7280' }}>Implementation Rate</p>
+                  </div>
+                  <div>
+                    <p className="text-3xl font-bold" style={{ color: '#ffba06' }}>4.8</p>
+                    <p className="text-xs" style={{ color: '#6b7280' }}>Educator Satisfaction</p>
+                  </div>
+                </div>
+                <p className="text-sm mb-6" style={{ color: '#6b7280' }}>
+                  Live engagement tracking, observation reports, trend data, certificates, and board materials. All in one place.
+                </p>
+                <Link
+                  href="/Example-Dashboard"
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:shadow-lg"
+                  style={{ backgroundColor: '#1e2749', color: '#ffffff' }}
+                >
+                  Explore the Full Dashboard
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4 text-center">
+              <div className="p-4">
+                <p className="font-semibold text-sm mb-1" style={{ color: '#1e2749' }}>For Your Board</p>
+                <p className="text-xs" style={{ color: '#6b7280' }}>Generate board-ready reports with one click. Real data, not promises.</p>
+              </div>
+              <div className="p-4">
+                <p className="font-semibold text-sm mb-1" style={{ color: '#1e2749' }}>For Your Coaches</p>
+                <p className="text-xs" style={{ color: '#6b7280' }}>Observation reports, implementation tracking, and role-based breakdowns.</p>
+              </div>
+              <div className="p-4">
+                <p className="font-semibold text-sm mb-1" style={{ color: '#1e2749' }}>For Your Team</p>
+                <p className="text-xs" style={{ color: '#6b7280' }}>Certificates, celebration tools, and automated check-ins that keep momentum going.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* SECTION 3: Advantage (What Changes) */}
       <section
         id="section-advantage"
