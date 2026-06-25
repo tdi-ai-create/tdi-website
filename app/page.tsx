@@ -3,7 +3,6 @@ import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import { DualTeaser } from '@/components/calculators/v2/compact/DualTeaser';
 import { FAQ } from '@/components/FAQ';
 import { ParallaxHero } from '@/components/ParallaxHero';
-import { CoursesSection } from '@/components/CoursesSection';
 import { AnimatedStatsBar } from '@/components/AnimatedStatsBar';
 import TeamStrip from '@/components/TeamStrip'
 
@@ -440,8 +439,90 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 9: Dynamic Courses from Thinkific */}
-      <CoursesSection />
+      {/* SECTION 9: A Taste of What's Inside the Hub */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container-default">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: '#1e2749' }}>
+              A Taste of What&apos;s Inside
+            </h2>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+              Courses, quick wins, and community -- all in one place.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {/* Course */}
+            <a
+              href="https://www.teachersdeserveit.com/hub"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-0.5"
+              style={{ textDecoration: 'none', border: '1px solid #e5e7eb' }}
+            >
+              <div style={{ height: 6, background: 'linear-gradient(90deg, #80a4ed, #38618C)' }} />
+              <div className="p-6">
+                <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#80a4ed' }}>Course</p>
+                <h3 className="text-lg font-bold mb-2" style={{ color: '#1e2749' }}>Boundaries Without Backlash</h3>
+                <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  Practical scripts, reflection tools, and mindset shifts for setting limits without guilt.
+                </p>
+                <span className="text-sm font-semibold" style={{ color: '#38618C' }}>Start learning →</span>
+              </div>
+            </a>
+
+            {/* Quick Win */}
+            <a
+              href="https://www.teachersdeserveit.com/hub"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-0.5"
+              style={{ textDecoration: 'none', border: '1px solid #e5e7eb' }}
+            >
+              <div style={{ height: 6, background: 'linear-gradient(90deg, #ffba06, #E8A000)' }} />
+              <div className="p-6">
+                <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#D4A006' }}>Quick Win</p>
+                <h3 className="text-lg font-bold mb-2" style={{ color: '#1e2749' }}>Para-Teacher Weekly Check In Guide</h3>
+                <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  A one-page PDF to structure your weekly para-teacher communication. Download and use today.
+                </p>
+                <span className="text-sm font-semibold" style={{ color: '#D4A006' }}>Download free →</span>
+              </div>
+            </a>
+
+            {/* Community */}
+            <a
+              href="https://www.teachersdeserveit.com/hub"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-0.5"
+              style={{ textDecoration: 'none', border: '1px solid #e5e7eb' }}
+            >
+              <div style={{ height: 6, background: 'linear-gradient(90deg, #2B8C96, #1B6B73)' }} />
+              <div className="p-6">
+                <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#2B8C96' }}>Community Thread</p>
+                <h3 className="text-lg font-bold mb-2" style={{ color: '#1e2749' }}>What worked this week?</h3>
+                <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  Educators share wins, adaptations, and honest reflections after trying new strategies.
+                </p>
+                <span className="text-sm font-semibold" style={{ color: '#2B8C96' }}>Join the conversation →</span>
+              </div>
+            </a>
+          </div>
+
+          <div className="text-center mt-10">
+            <a
+              href="https://www.teachersdeserveit.com/hub"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover-glow"
+              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            >
+              Explore the Full Hub
+            </a>
+          </div>
+        </div>
+      </section>
 
       {/* SECTION 10: Substack/Newsletter Section */}
       <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
