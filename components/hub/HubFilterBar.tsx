@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { Heart, Info, ChevronDown, ChevronUp } from 'lucide-react';
 
 export const ROLE_FILTERS = [
-  { value: 'all', label: 'All Roles' },
-  { value: 'teacher', label: 'Teachers' },
-  { value: 'para', label: 'Paraprofessionals' },
-  { value: 'leader', label: 'Leaders & Admin' },
-  { value: 'coach', label: 'Coaches' },
+  { value: 'all', label: 'All Roles', short: 'All Roles' },
+  { value: 'teacher', label: 'Teachers', short: 'Teachers' },
+  { value: 'para', label: 'Paraprofessionals', short: 'Paras' },
+  { value: 'leader', label: 'Leaders & Admin', short: 'Leaders' },
+  { value: 'coach', label: 'Coaches', short: 'Coaches' },
 ] as const;
 
 export const DANIELSON_DOMAINS = [
@@ -89,13 +89,11 @@ export default function HubFilterBar({
               border: roleFilter !== 'all' ? 'none' : '1px solid rgba(0,0,0,0.08)',
               fontFamily: "'DM Sans', sans-serif",
               outline: 'none',
-              minWidth: 0,
-              maxWidth: 150,
             }}
           >
-            {ROLE_FILTERS.map(({ value, label }) => (
+            {ROLE_FILTERS.map(({ value, short }) => (
               <option key={value} value={value}>
-                {value === 'all' ? tUI('I am a...') : tUI(label)}
+                {value === 'all' ? tUI('I am a...') : tUI(short)}
               </option>
             ))}
           </select>
@@ -112,57 +110,55 @@ export default function HubFilterBar({
           style={{ backgroundColor: 'rgba(0,0,0,0.12)' }}
         />
 
-        {/* Scrollable category pills */}
+        {/* Scrollable category pills + More Filters */}
         <style>{`.hub-filter-scroll::-webkit-scrollbar { display: none; }`}</style>
         <div
           className="flex items-center gap-2 overflow-x-auto flex-1 min-w-0 hub-filter-scroll"
           style={{ scrollbarWidth: 'none' }}
         >
-          <div className="flex items-center gap-2">
-            {categories.map((category) => {
-              const isSaved = category === 'Saved';
-              const isActive = activeFilter === category;
-              return (
-                <button
-                  key={category}
-                  onClick={() => setActiveFilter(category)}
-                  className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5"
-                  style={{
-                    backgroundColor: isActive ? (isSaved ? '#E53935' : '#1B2A4A') : 'white',
-                    color: isActive ? 'white' : '#6B7280',
-                    border: isActive ? 'none' : '1px solid rgba(0,0,0,0.08)',
-                    fontFamily: "'DM Sans', sans-serif",
-                  }}
-                >
-                  {isSaved && <Heart size={14} style={{ fill: isActive ? 'white' : 'none' }} />}
-                  {tUI(category)}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+          {categories.map((category) => {
+            const isSaved = category === 'Saved';
+            const isActive = activeFilter === category;
+            return (
+              <button
+                key={category}
+                onClick={() => setActiveFilter(category)}
+                className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5"
+                style={{
+                  backgroundColor: isActive ? (isSaved ? '#E53935' : '#1B2A4A') : 'white',
+                  color: isActive ? 'white' : '#6B7280',
+                  border: isActive ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                {isSaved && <Heart size={14} style={{ fill: isActive ? 'white' : 'none' }} />}
+                {tUI(category)}
+              </button>
+            );
+          })}
 
-        {/* More Filters toggle - pinned right */}
-        <button
-          onClick={() => setMoreFiltersOpen(!moreFiltersOpen)}
-          className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5 relative"
-          style={{
-            backgroundColor: moreFiltersOpen || hasAdvancedFilters ? '#1B2A4A' : 'white',
-            color: moreFiltersOpen || hasAdvancedFilters ? 'white' : '#6B7280',
-            border: moreFiltersOpen || hasAdvancedFilters ? 'none' : '1px solid rgba(0,0,0,0.08)',
-            fontFamily: "'DM Sans', sans-serif",
-          }}
-        >
-          {tUI('More Filters')}
-          {moreFiltersOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-          {/* Active indicator dot */}
-          {hasAdvancedFilters && !moreFiltersOpen && (
-            <span
-              className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full"
-              style={{ backgroundColor: '#E53935', border: '2px solid #F0EEE9' }}
-            />
-          )}
-        </button>
+          {/* More Filters toggle - inside scroll area but at end */}
+          <button
+            onClick={() => setMoreFiltersOpen(!moreFiltersOpen)}
+            className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5 relative"
+            style={{
+              backgroundColor: moreFiltersOpen || hasAdvancedFilters ? '#1B2A4A' : 'white',
+              color: moreFiltersOpen || hasAdvancedFilters ? 'white' : '#6B7280',
+              border: moreFiltersOpen || hasAdvancedFilters ? 'none' : '1px solid rgba(0,0,0,0.08)',
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            {tUI('More Filters')}
+            {moreFiltersOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            {/* Active indicator dot */}
+            {hasAdvancedFilters && !moreFiltersOpen && (
+              <span
+                className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full"
+                style={{ backgroundColor: '#E53935', border: '2px solid #F0EEE9' }}
+              />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Expanded: Effort Level + Danielson rows */}
