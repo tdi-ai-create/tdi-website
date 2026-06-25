@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import { useState, useEffect } from 'react';
 import SymbolAnimation from '@/components/SymbolAnimation';
@@ -457,9 +458,16 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <p className="text-center text-sm mt-8 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
+          <p className="text-center text-sm mt-8 max-w-2xl mx-auto mb-10" style={{ color: '#1e2749', opacity: 0.8 }}>
             The industry average for PD classroom transfer is just 5-10% (Joyce & Showers, 2002).<br />Our partners average 74% because TDI is built for Monday morning, not &quot;someday.&quot;
           </p>
+
+          <div className="max-w-3xl mx-auto">
+            <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200">
+              <Image src="/hub-welcome/hub-admin-dashboard.png" alt="TDI admin analytics dashboard showing real partner data" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
+            </div>
+            <p className="text-center text-xs mt-2" style={{ color: '#9ca3af' }}>Real dashboards, real data -- not just promises</p>
+          </div>
         </div>
       </section>
 

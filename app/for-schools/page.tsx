@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import Link from 'next/link';
+import Image from 'next/image';
 import TeamStrip from '@/components/TeamStrip'
 import { CompactAdmin } from '@/components/calculators/v2/compact/CompactAdmin';
 
@@ -415,6 +416,13 @@ export default function ForSchoolsPage() {
               </div>
             </div>
 
+            <div className="max-w-3xl mx-auto mb-10">
+              <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 mb-2">
+                <Image src="/hub-welcome/hub-user-dashboard.png" alt="What your educators see in the TDI Learning Hub" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
+              </div>
+              <p className="text-center text-xs mt-2" style={{ color: '#9ca3af' }}>What your educators see when they log in</p>
+            </div>
+
             <div className="text-center">
               <Link
                 href="/get-started"
@@ -478,6 +486,10 @@ export default function ForSchoolsPage() {
                     <p className="text-xs" style={{ color: '#6b7280' }}>Educator Satisfaction</p>
                   </div>
                 </div>
+                <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 mb-6">
+                  <Image src="/hub-welcome/hub-admin-dashboard.png" alt="TDI admin analytics dashboard with real-time data" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
+                </div>
+                <p className="text-center text-xs mb-4" style={{ color: '#9ca3af' }}>Real admin analytics from the TDI Leadership Dashboard</p>
                 <p className="text-sm mb-6" style={{ color: '#6b7280' }}>
                   Live engagement tracking, observation reports, trend data, certificates, and board materials. All in one place.
                 </p>

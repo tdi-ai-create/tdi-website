@@ -425,6 +425,21 @@ function LearningHubPanel() {
         </ul>
       </div>
 
+      <div className="space-y-6">
+        <div>
+          <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200">
+            <Image src="/hub-welcome/hub-user-dashboard.png" alt="Educator personalized dashboard in the TDI Learning Hub" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
+          </div>
+          <p className="text-center text-xs mt-2" style={{ color: '#9ca3af' }}>What your educators see when they log in</p>
+        </div>
+        <div>
+          <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200">
+            <Image src="/hub-welcome/hub-conversation.png" alt="Community discussion threads in the TDI Learning Hub" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
+          </div>
+          <p className="text-center text-xs mt-2" style={{ color: '#9ca3af' }}>Real community discussions between educators</p>
+        </div>
+      </div>
+
       <div className="p-4 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
         <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Built for Implementation,<br />Not Consumption</h3>
         <p className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>

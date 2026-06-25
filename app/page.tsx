@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import { DualTeaser } from '@/components/calculators/v2/compact/DualTeaser';
 import { FAQ } from '@/components/FAQ';
@@ -499,6 +500,18 @@ export default function Home() {
                 <div className="absolute inset-0 bg-[#1e2749]/0 group-hover:bg-[#1e2749]/10 transition-colors" />
               </div>
             </Link>
+
+            <div className="mt-8 mb-8">
+              <p className="text-lg font-semibold mb-4 text-center" style={{ color: '#1e2749' }}>
+                And here is what your educators see:
+              </p>
+              <Link href="/learning" className="block group">
+                <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 mx-auto" style={{ maxWidth: '900px' }}>
+                  <Image src="/hub-welcome/hub-user-dashboard.png" alt="Educator personalized dashboard in the TDI Learning Hub" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
+                </div>
+              </Link>
+              <p className="text-center text-xs mt-2" style={{ color: '#9ca3af' }}>The TDI Learning Hub -- personalized for every educator</p>
+            </div>
 
             <div className="mt-8">
               <Link
