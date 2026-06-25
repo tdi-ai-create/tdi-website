@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
-import { CoursesSection } from '@/components/CoursesSection';
 import { CompactBurnout } from '@/components/calculators/v2/compact/CompactBurnout';
 
 export default function JoinPage() {
@@ -478,7 +477,97 @@ export default function JoinPage() {
         </div>
       </section>
 
-      <CoursesSection />
+      {/* Sample What's Inside */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#f8f9fa' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1e2749', margin: '0 0 8px 0' }}>
+              A taste of what is inside
+            </h2>
+            <p style={{ fontSize: 15, color: '#6B7280' }}>
+              Courses, quick wins, and community -- all in one place.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+            {/* Course Example */}
+            <a
+              href="https://www.teachersdeserveit.com/hub"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group"
+              style={{ display: 'block', background: '#ffffff', borderRadius: 12, overflow: 'hidden', textDecoration: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', transition: 'transform 0.2s, box-shadow 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(30,39,73,0.1)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)'; }}
+            >
+              <div style={{ height: 8, background: 'linear-gradient(90deg, #80a4ed, #38618C)' }} />
+              <div style={{ padding: 24 }}>
+                <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: 1, color: '#80a4ed', margin: '0 0 8px 0' }}>Course</p>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e2749', margin: '0 0 8px 0' }}>Boundaries Without Backlash</h3>
+                <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+                  Practical scripts, reflection tools, and mindset shifts for setting limits without guilt.
+                </p>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#38618C' }}>Start learning →</span>
+              </div>
+            </a>
+
+            {/* Quick Win Example */}
+            <a
+              href="https://www.teachersdeserveit.com/hub"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group"
+              style={{ display: 'block', background: '#ffffff', borderRadius: 12, overflow: 'hidden', textDecoration: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', transition: 'transform 0.2s, box-shadow 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(30,39,73,0.1)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)'; }}
+            >
+              <div style={{ height: 8, background: 'linear-gradient(90deg, #ffba06, #E8A000)' }} />
+              <div style={{ padding: 24 }}>
+                <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: 1, color: '#D4A006', margin: '0 0 8px 0' }}>Quick Win</p>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e2749', margin: '0 0 8px 0' }}>Para-Teacher Weekly Check In Guide</h3>
+                <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+                  A one-page PDF to structure your weekly para-teacher communication. Download and use today.
+                </p>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#D4A006' }}>Download free →</span>
+              </div>
+            </a>
+
+            {/* Community Example */}
+            <a
+              href="https://www.teachersdeserveit.com/hub"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group"
+              style={{ display: 'block', background: '#ffffff', borderRadius: 12, overflow: 'hidden', textDecoration: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', transition: 'transform 0.2s, box-shadow 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(30,39,73,0.1)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)'; }}
+            >
+              <div style={{ height: 8, background: 'linear-gradient(90deg, #2B8C96, #1B6B73)' }} />
+              <div style={{ padding: 24 }}>
+                <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: 1, color: '#2B8C96', margin: '0 0 8px 0' }}>Community Thread</p>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e2749', margin: '0 0 8px 0' }}>What worked this week?</h3>
+                <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+                  Educators share wins, adaptations, and honest reflections after trying new strategies in their classrooms.
+                </p>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#2B8C96' }}>Join the conversation →</span>
+              </div>
+            </a>
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: 32 }}>
+            <a
+              href="https://www.teachersdeserveit.com/hub"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-block', padding: '14px 32px', borderRadius: 8, fontWeight: 700, fontSize: 16, backgroundColor: '#ffba06', color: '#1e2749', textDecoration: 'none', transition: 'opacity 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+            >
+              Explore the Full Hub
+            </a>
+          </div>
+        </div>
+      </section>
 
       {/* Testimonials Section */}
       <section className="py-12" style={{ backgroundColor: '#ffffff' }}>

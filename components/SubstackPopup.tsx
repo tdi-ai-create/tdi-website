@@ -128,7 +128,7 @@ export function SubstackPopup() {
 
           {/* Substack form */}
           <form
-            action="https://teachersdeserveit.substack.com/api/v1/free?nojs=true"
+            action="https://raehughart.substack.com/api/v1/free?nojs=true"
             method="post"
             target="_blank"
             className="flex flex-col gap-3"

@@ -76,7 +76,7 @@ export function EmailPopup({ delay = 90000 }: EmailPopupProps) {
           Join 100,000+ educators. Weekly, no spam.
         </p>
         <a
-          href="https://teachersdeserveit.substack.com"
+          href="https://raehughart.substack.com"
           target="_blank"
           rel="noopener noreferrer"
           onClick={handleDismiss}
