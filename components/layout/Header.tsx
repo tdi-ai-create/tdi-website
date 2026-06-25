@@ -47,7 +47,7 @@ export function Header() {
     { href: '/how-we-partner', label: 'How We Partner' },
     { href: 'https://raehughart.substack.com', label: 'Blog', external: true },
     { href: 'https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274', label: 'Podcast', external: true },
-    { href: '/Example-Dashboard', label: 'Your Dashboard' },
+    { href: '/Example-Dashboard', label: 'Your Dashboard', newTab: true },
     { href: '/about', label: 'About' },
     { href: '/create-with-us', label: 'Creators' },
     { href: '/contact', label: 'Contact' },
@@ -80,7 +80,7 @@ export function Header() {
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => (
-              link.external ? (
+              link.external || link.newTab ? (
                 <a
                   key={link.href}
                   href={link.href}
@@ -142,7 +142,7 @@ export function Header() {
                 Login
               </Link>
               {navLinks.map((link) => (
-                link.external ? (
+                link.external || link.newTab ? (
                   <a
                     key={link.href}
                     href={link.href}

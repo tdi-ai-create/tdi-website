@@ -1113,6 +1113,26 @@ export default function ExampleDashboard() {
 
   return (
     <div className="min-h-screen bg-[#F5F5F5] overflow-x-hidden">
+      {/* Context banner for prospects */}
+      <div className="bg-[#1e2749] text-white py-3 px-4 text-center relative z-50">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+          <p className="text-sm">
+            <span className="font-semibold">You are previewing a Leadership Dashboard.</span>{' '}
+            <span className="opacity-80">Every TDI partnership includes one, customized for your school.</span>
+          </p>
+          <a
+            href="/get-started"
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all hover:shadow-lg"
+            style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+          >
+            Get Your Own
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
       {/* Confetti celebration for gold medal schools */}
       <Confetti isActive={showConfetti} />
 
@@ -3727,7 +3747,7 @@ export default function ExampleDashboard() {
           <div className="bg-white rounded-xl shadow-xl px-6 py-4 flex items-center gap-4 max-w-lg border border-gray-100">
             <div className="flex-1">
               <p className="text-[#1B2A4A] font-medium text-sm">
-                This is a demo dashboard. Ready to see what yours could look like?
+                This is an example dashboard. Ready to see what yours could look like?
               </p>
             </div>
             <a
@@ -3748,6 +3768,41 @@ export default function ExampleDashboard() {
           </div>
         </div>
       )}
+
+      {/* Footer CTA for prospects */}
+      <footer className="bg-[#1e2749] py-12 px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">
+            Want this for your school?
+          </h3>
+          <p className="text-white/70 mb-6 text-lg">
+            Every TDI partnership includes a Leadership Dashboard customized for your building, your goals, and your team. No guessing if PD is working.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a
+              href="/get-started"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:shadow-lg"
+              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            >
+              Get Your Custom PD Plan
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+            <a
+              href="/contact"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-white border border-white/30 hover:bg-white/10 transition-all"
+            >
+              Book a Conversation
+            </a>
+          </div>
+          <div className="mt-8 pt-6 border-t border-white/10">
+            <a href="/" className="text-sm text-white/50 hover:text-white/80 transition-colors">
+              Return to teachersdeserveit.com
+            </a>
+          </div>
+        </div>
+      </footer>
 
       <style jsx>{`
         @keyframes slide-up {
