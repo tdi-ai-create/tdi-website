@@ -110,32 +110,6 @@ export default function HubFilterBar({
           style={{ backgroundColor: 'rgba(0,0,0,0.12)' }}
         />
 
-        {/* Saved - pinned */}
-        {(() => {
-          const isActive = activeFilter === 'Saved';
-          return (
-            <button
-              onClick={() => setActiveFilter('Saved')}
-              className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5"
-              style={{
-                backgroundColor: isActive ? '#E53935' : 'white',
-                color: isActive ? 'white' : '#6B7280',
-                border: isActive ? 'none' : '1px solid rgba(0,0,0,0.08)',
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
-              <Heart size={14} style={{ fill: isActive ? 'white' : 'none' }} />
-              {tUI('Saved')}
-            </button>
-          );
-        })()}
-
-        {/* Divider */}
-        <div
-          className="w-px h-6 flex-shrink-0"
-          style={{ backgroundColor: 'rgba(0,0,0,0.12)' }}
-        />
-
         {/* Scrollable category pills */}
         <style>{`.hub-filter-scroll::-webkit-scrollbar { display: none; }`}</style>
         <div
@@ -162,11 +136,25 @@ export default function HubFilterBar({
           })}
         </div>
 
-        {/* Divider */}
-        <div
-          className="w-px h-6 flex-shrink-0"
-          style={{ backgroundColor: 'rgba(0,0,0,0.12)' }}
-        />
+        {/* Saved circle icon - pinned right */}
+        {(() => {
+          const isActive = activeFilter === 'Saved';
+          return (
+            <button
+              onClick={() => setActiveFilter(isActive ? 'All' : 'Saved')}
+              className="w-10 h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0"
+              style={{
+                backgroundColor: isActive ? '#E53935' : 'transparent',
+                color: isActive ? 'white' : '#1B2A4A',
+                border: isActive ? 'none' : '1.5px dashed #1B2A4A',
+              }}
+              aria-label={tUI('Saved')}
+              title={tUI('Saved')}
+            >
+              <Heart size={16} style={{ fill: isActive ? 'white' : 'none' }} />
+            </button>
+          );
+        })()}
 
         {/* More Filters toggle - pinned right */}
         <button
