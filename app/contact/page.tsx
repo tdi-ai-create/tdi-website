@@ -94,21 +94,33 @@ export default function ContactPage() {
               {/* Team Avatars */}
               <div className="flex-shrink-0 flex -space-x-3">
                 <Image
-                  src="/images/rae-headshot.webp"
+                  src="/team/rae-hughart.jpg"
                   alt="Rae Hughart"
                   width={64}
                   height={64}
                   className="w-14 h-14 rounded-full object-cover ring-2 ring-white"
                 />
-                <div className="w-14 h-14 rounded-full flex items-center justify-center text-sm font-bold ring-2 ring-white" style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}>
-                  KW
-                </div>
-                <div className="w-14 h-14 rounded-full flex items-center justify-center text-sm font-bold ring-2 ring-white" style={{ backgroundColor: '#38618C', color: '#ffffff' }}>
-                  JF
-                </div>
-                <div className="w-14 h-14 rounded-full flex items-center justify-center text-sm font-bold ring-2 ring-white" style={{ backgroundColor: '#2B8C96', color: '#ffffff' }}>
-                  HS
-                </div>
+                <Image
+                  src="/team/kristin-williams.jpg"
+                  alt="Kristin Williams"
+                  width={64}
+                  height={64}
+                  className="w-14 h-14 rounded-full object-cover ring-2 ring-white"
+                />
+                <Image
+                  src="/team/jim-ford.jpg"
+                  alt="Jim Ford"
+                  width={64}
+                  height={64}
+                  className="w-14 h-14 rounded-full object-cover ring-2 ring-white"
+                />
+                <Image
+                  src="/team/holly-scott.jpg"
+                  alt="Holly Scott"
+                  width={64}
+                  height={64}
+                  className="w-14 h-14 rounded-full object-cover ring-2 ring-white"
+                />
               </div>
               {/* Message */}
               <div className="text-center md:text-left">
