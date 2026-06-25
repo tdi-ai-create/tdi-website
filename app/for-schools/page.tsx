@@ -435,7 +435,7 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* SECTION: Leadership Dashboard Preview */}
-      <section className="py-20 md:py-28" style={{ backgroundColor: '#f8f9fa' }}>
+      <section className="py-20 md:py-28" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-10">
