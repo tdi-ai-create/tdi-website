@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { CalculatorSuite } from '@/components/calculators/v2/CalculatorSuite';
 
 export const metadata = {
-  title: 'Impact Calculator | Teachers Deserve It',
+  title: 'PD Impact Calculator | Teachers Deserve It',
   description: 'Build your board memo with grant funding pathways, or check in on your stress and joy as an educator.',
 };
 

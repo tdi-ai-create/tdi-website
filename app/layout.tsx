@@ -46,6 +46,9 @@ export const metadata: Metadata = {
     description: "Join 100,000+ educators with PD that respects your time. Practical strategies, wellness support, and a community that gets it.",
     images: ["/og-image.png"],
   },
+  alternates: {
+    canonical: 'https://www.teachersdeserveit.com',
+  },
   robots: {
     index: true,
     follow: true,
@@ -76,6 +79,16 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "Teachers Deserve It",
+          "url": "https://www.teachersdeserveit.com",
+          "logo": "https://www.teachersdeserveit.com/images/logo.webp",
+          "description": "Research-backed professional development for schools, teachers, and paraprofessionals across all 50 states.",
+          "sameAs": ["https://raehughart.substack.com", "https://www.facebook.com/groups/tdimovement"],
+          "contactPoint": { "@type": "ContactPoint", "email": "hello@teachersdeserveit.com", "contactType": "customer service" }
+        }) }} />
         <PostHogProvider>
         <MomentModeProvider>
           <GoogleAnalytics />

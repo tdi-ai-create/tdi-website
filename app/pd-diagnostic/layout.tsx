@@ -1,6 +1,6 @@
 export const metadata = {
-  title: 'PD Diagnostic | The 4 Types of Professional Development | Teachers Deserve It',
-  description: 'Assess your school\'s PD structure and discover which of the 4 types of professional development you\'re currently using. Free self-assessment for school leaders.',
+  title: 'Free PD Diagnostic for Schools | Teachers Deserve It',
+  description: 'Discover which of the 4 PD types your school is running. 8 questions, instant results, and a clear roadmap for improvement. Used by 500+ schools.',
   openGraph: {
     title: 'The 4 Types of PD | Free Diagnostic for School Leaders',
     description: 'Most school leaders can identify their PD type immediately. Take this quick assessment to see where your school fits.',

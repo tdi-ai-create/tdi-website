@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'For Schools | Teachers Deserve It',
-  description: 'Professional development that actually works, with outcomes you can measure and report. 74% implementation rate vs. 10% industry average.',
+  title: 'Professional Development for Schools & Districts | Teachers Deserve It',
+  description: 'Partner with TDI for research-backed PD that delivers 74% implementation -- 7.4x the industry average. Phased support for teachers, paras, and leadership teams.',
 };
 
 export default function ForSchoolsLayout({

@@ -14,4 +14,4 @@ Disallow: /*-dashboard
 Disallow: /dashboard-creation-team-use
 
 # Sitemap
-Sitemap: https://teachersdeserveit.com/sitemap.xml
+Sitemap: https://www.teachersdeserveit.com/sitemap.xml

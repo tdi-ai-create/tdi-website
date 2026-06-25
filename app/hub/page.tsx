@@ -1111,7 +1111,7 @@ export default function HubDashboard() {
                               background: qw.thumbnail_url ? undefined : `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}cc 100%)`,
                             }}>
                               {qw.thumbnail_url ? (
-                                <img src={qw.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                                <img src={qw.thumbnail_url} alt={qw.title || 'Quick win thumbnail'} className="w-full h-full object-cover" />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center">
                                   <BookOpen size={24} style={{ color: 'rgba(255,255,255,0.6)' }} />
@@ -1655,7 +1655,7 @@ export default function HubDashboard() {
                         background: course.thumbnail_url ? undefined : `linear-gradient(135deg, ${catAccent} 0%, ${catAccent}99 100%)`,
                       }}>
                         {course.thumbnail_url ? (
-                          <img src={course.thumbnail_url} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'top' }} />
+                          <img src={course.thumbnail_url} alt={course.title || 'Course thumbnail'} className="w-full h-full object-cover" style={{ objectPosition: 'top' }} />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center min-h-[60px]">
                             <BookOpen size={16} style={{ color: 'rgba(255,255,255,0.5)' }} />
@@ -1725,7 +1725,7 @@ export default function HubDashboard() {
                       {/* Thumbnail strip or gradient */}
                       {qw.thumbnail_url ? (
                         <div className="w-full h-20 overflow-hidden">
-                          <img src={qw.thumbnail_url} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'top' }} />
+                          <img src={qw.thumbnail_url} alt={qw.title || 'Quick win thumbnail'} className="w-full h-full object-cover" style={{ objectPosition: 'top' }} />
                         </div>
                       ) : (
                         <div className="w-full h-2.5" style={{ background: `linear-gradient(90deg, ${accentColor}, ${accentColor}88)` }} />

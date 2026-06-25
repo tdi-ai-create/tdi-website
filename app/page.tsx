@@ -1,3 +1,4 @@
+import { Metadata } from 'next';
 import Link from 'next/link';
 import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import { DualTeaser } from '@/components/calculators/v2/compact/DualTeaser';
@@ -5,6 +6,11 @@ import { FAQ } from '@/components/FAQ';
 import { ParallaxHero } from '@/components/ParallaxHero';
 import { AnimatedStatsBar } from '@/components/AnimatedStatsBar';
 import TeamStrip from '@/components/TeamStrip'
+
+export const metadata: Metadata = {
+  title: 'Research-Backed Professional Development for Schools | Teachers Deserve It',
+  description: 'Join 100,000+ educators with PD that respects your time. Practical strategies, wellness support, and a community that gets it. For teachers and schools across all 50 states.',
+};
 
 export default function Home() {
   return (

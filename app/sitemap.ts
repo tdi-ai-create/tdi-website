@@ -27,8 +27,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/learning`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/create-with-us`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${baseUrl}/movement`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
-
-    // Demo / showcase
-    { url: `${baseUrl}/Example-Dashboard`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
   ];
 }

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import FundingFinderWrapper from '@/components/FundingFinderWrapper';
 
 export const metadata: Metadata = {
-  title: 'Funding Options | Teachers Deserve It',
+  title: 'PD Funding Options for Schools | Teachers Deserve It',
   description: '80% of schools we work with find over $35K in funding for TDI. We find the funding, you focus on your teachers.',
 };
 
