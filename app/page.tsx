@@ -426,6 +426,24 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Team Strip */}
+      <section style={{ backgroundColor: '#F0FAF6', borderTop: '0.5px solid #D4EDE0', borderBottom: '0.5px solid #D4EDE0' }}>
+        <div className="container-default">
+          <TeamStrip
+            members={[
+              { type: 'team', name: 'Kristin Williams', imageSlug: 'kristin-williams', isHuman: true },
+              { type: 'team', name: 'Holly Scott', imageSlug: 'holly-scott' },
+              { type: 'team', name: 'Bella Dailey', imageSlug: 'bella-dailey', isHuman: true },
+              { type: 'team', name: 'Mel Martinez', imageSlug: 'mel-martinez', isHuman: true },
+              { type: 'team', name: 'Dr. Maya Johnson', imageSlug: 'maya-johnson' },
+              { type: 'creator', name: 'Dr. Stephanie Nardi', topic: 'Science' },
+              { type: 'creator', name: 'Amy Storer', topic: 'Math' },
+            ]}
+            copy="Teachers Deserve It is built by a team of educators, specialists, and creators making this work possible for schools across all 50 states."
+          />
+        </div>
+      </section>
+
       {/* SECTION 8: Calculator */}
       <section className="py-16 md:py-20 px-6" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="max-w-5xl mx-auto">
@@ -625,24 +643,6 @@ export default function Home() {
       </section>
 
       {/* SECTION 12: Final CTA */}
-      {/* Team Strip */}
-      <section style={{ backgroundColor: '#F0FAF6', borderTop: '0.5px solid #D4EDE0', borderBottom: '0.5px solid #D4EDE0' }}>
-        <div className="container-default">
-          <TeamStrip
-            members={[
-              { type: 'team', name: 'Kristin Williams', imageSlug: 'kristin-williams', isHuman: true },
-              { type: 'team', name: 'Holly Scott', imageSlug: 'holly-scott' },
-              { type: 'team', name: 'Bella Dailey', imageSlug: 'bella-dailey', isHuman: true },
-              { type: 'team', name: 'Mel Martinez', imageSlug: 'mel-martinez', isHuman: true },
-              { type: 'team', name: 'Dr. Maya Johnson', imageSlug: 'maya-johnson' },
-              { type: 'creator', name: 'Dr. Stephanie Nardi', topic: 'Science' },
-              { type: 'creator', name: 'Amy Storer', topic: 'Math' },
-            ]}
-            copy="Teachers Deserve It is built by a team of educators, specialists, and creators making this work possible for schools across all 50 states."
-          />
-        </div>
-      </section>
-
       <section className="section" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default text-center">
           <h2 className="mb-4" style={{ color: '#1e2749' }}>Ready to Reimagine PD?</h2>
