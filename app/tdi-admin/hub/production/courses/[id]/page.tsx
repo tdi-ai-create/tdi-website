@@ -760,7 +760,7 @@ function CourseSettingsPanel({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Lift</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Effort Level</label>
         <select
           value={form.capacity}
           onChange={(e) => setForm({ ...form, capacity: e.target.value })}

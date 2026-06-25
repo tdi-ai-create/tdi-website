@@ -504,7 +504,7 @@ export default function PlansPage() {
               },
               {
                 q: "What if my staff won't actually use it?",
-                a: "We hear you. That's why we built the LIFT filter - strategies sorted by effort, so teachers can find a 5-minute win on a hard day. 74% of teachers implement a strategy within their first 30 days. The Hub is designed for the educator who doesn't have an hour, not for the one with all the time in the world."
+                a: "We hear you. That's why we built the Effort Level filter - resources sorted by how action-ready they are, so teachers can find a Grab & Go win on a hard day. 74% of teachers implement a strategy within their first 30 days. The Hub is designed for the educator who doesn't have an hour, not for the one with all the time in the world."
               },
               {
                 q: "Can this count toward PD hours or licensure?",

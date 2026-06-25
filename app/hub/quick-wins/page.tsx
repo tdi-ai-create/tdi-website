@@ -8,8 +8,9 @@ import { useFavorites } from '@/lib/hub/useFavorites';
 import { useMembership, type ContentAccess } from '@/lib/hub/use-membership';
 import { useLanguage } from '@/lib/hub/useLanguage';
 import { useTranslation } from '@/lib/hub/useTranslation';
-import { Zap, Heart, Info } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import QuizNudge from '@/components/hub/QuizNudge';
+import HubFilterBar from '@/components/hub/HubFilterBar';
 
 // Filter categories for Quick Wins
 const FILTER_CATEGORIES = [
@@ -132,20 +133,6 @@ const PRACTICE_TOOLS: QuickWin[] = [
   },
 ];
 
-const DANIELSON_DOMAINS = [
-  { value: '1-planning', label: 'Planning & Prep', short: 'D1' },
-  { value: '2-environment', label: 'Classroom Environment', short: 'D2' },
-  { value: '3-instruction', label: 'Instruction', short: 'D3' },
-  { value: '4-professional', label: 'Professional Responsibilities', short: 'D4' },
-] as const;
-
-const ROLE_FILTERS = [
-  { value: 'all', label: 'All Roles' },
-  { value: 'teacher', label: 'Teachers' },
-  { value: 'para', label: 'Paraprofessionals' },
-  { value: 'leader', label: 'Leaders & Admin' },
-  { value: 'coach', label: 'Coaches' },
-] as const;
 
 interface QuickWin {
   id: string;
@@ -256,6 +243,7 @@ export default function QuickWinsPage() {
 
   // Merge practice tools with database quick wins
   const allQuickWins = [...quickWins, ...PRACTICE_TOOLS];
+  const totalCount = allQuickWins.length;
 
   // Filter quick wins by category and capacity
   const filteredQuickWins = allQuickWins.filter((qw) => {
@@ -317,7 +305,7 @@ export default function QuickWinsPage() {
       <div className="max-w-6xl mx-auto">
         <QuizNudge />
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-4">
           <h1
             className="font-bold mb-2"
             style={{
@@ -328,15 +316,6 @@ export default function QuickWinsPage() {
           >
             {tUI('Quick Wins')}
           </h1>
-          <p
-            className="text-[15px]"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              color: '#6B7280',
-            }}
-          >
-            {quickWins.length + PRACTICE_TOOLS.length} {tUI('quick wins')} · {tUI('Short, practical tools you can use right now')}
-          </p>
         </div>
 
         {/* ES notice */}
@@ -349,143 +328,23 @@ export default function QuickWinsPage() {
           </div>
         )}
 
-        {/* Role Filter */}
-        <div className="flex items-center gap-2 mb-6 flex-wrap">
-          <span
-            className="text-[11px] font-bold tracking-wider flex-shrink-0"
-            style={{
-              color: '#9CA3AF',
-              textTransform: 'uppercase',
-              fontFamily: "'DM Sans', sans-serif",
-            }}
-          >
-            {tUI('I am a...')}
-          </span>
-          {ROLE_FILTERS.map((role) => {
-            const isActive = roleFilter === role.value;
-            return (
-              <button
-                key={role.value}
-                onClick={() => setRoleFilter(role.value)}
-                className="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0"
-                style={{
-                  backgroundColor: isActive ? '#1B2A4A' : 'white',
-                  color: isActive ? 'white' : '#6B7280',
-                  border: isActive ? 'none' : '1px solid rgba(0,0,0,0.08)',
-                  fontFamily: "'DM Sans', sans-serif",
-                }}
-              >
-                {tUI(role.label)}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Filter Pills */}
-        <div className="flex gap-2 mb-8 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
-          {FILTER_CATEGORIES.map((category) => {
-            const isSaved = category === 'Saved';
-            const isActive = activeFilter === category;
-            return (
-              <button
-                key={category}
-                onClick={() => setActiveFilter(category)}
-                className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5"
-                style={{
-                  backgroundColor: isActive ? (isSaved ? '#E53935' : '#1B2A4A') : 'white',
-                  color: isActive ? 'white' : '#6B7280',
-                  border: isActive ? 'none' : '1px solid rgba(0,0,0,0.08)',
-                  fontFamily: "'DM Sans', sans-serif",
-                }}
-              >
-                {isSaved && <Heart size={14} style={{ fill: isActive ? 'white' : 'none' }} />}
-                {tUI(category)}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Lift Filter Row */}
-        <div data-tour="lift-filter" className="flex items-center gap-2 mb-6 flex-wrap">
-          <span
-            className="text-[11px] font-bold tracking-wider flex-shrink-0"
-            style={{
-              color: '#9CA3AF',
-              textTransform: 'uppercase',
-              fontFamily: "'DM Sans', sans-serif",
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-            }}
-          >
-            {tUI('Lift')}
-            <span className="relative group" style={{ display: 'inline-flex' }}>
-              <Info size={13} style={{ color: '#9CA3AF', cursor: 'help' }} />
-              <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-72 p-3 rounded-lg text-left normal-case tracking-normal pointer-events-none opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity z-50"
-                style={{ background: '#1B2A4A', color: 'white', fontSize: 12, fontWeight: 400, lineHeight: 1.5, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-                <strong style={{ display: 'block', marginBottom: 6, fontSize: 13 }}>Lift = how action-ready a resource is.</strong>
-                <span style={{ display: 'block', marginBottom: 4 }}><strong>Low lift</strong> — Grab and go. Open it, use it, done.</span>
-                <span style={{ display: 'block', marginBottom: 4 }}><strong>Medium lift</strong> — A planning period. A few moments to think, then implement.</span>
-                <span style={{ display: 'block' }}><strong>High lift</strong> — Grab a coffee. Deeper reflection and planning, then action.</span>
-              </span>
-            </span>
-          </span>
-          {([['all', 'All'], ['low', 'Low'], ['medium', 'Medium'], ['high', 'High']] as const).map(([val, label]) => (
-            <button
-              key={val}
-              onClick={() => setCapacityFilter(val)}
-              className="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0"
-              style={{
-                backgroundColor: capacityFilter === val
-                  ? (val === 'low' ? '#6BA368' : val === 'medium' ? '#E8B84B' : val === 'high' ? '#E8927C' : '#1B2A4A')
-                  : 'white',
-                color: capacityFilter === val ? 'white' : '#6B7280',
-                border: capacityFilter === val ? 'none' : '1px solid rgba(0,0,0,0.08)',
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
-              {tUI(label)}
-            </button>
-          ))}
-        </div>
-
-        {/* Danielson Framework Filter Row */}
-        <div className="flex items-center gap-2 mb-6 flex-wrap">
-          <span
-            className="text-[11px] font-bold tracking-wider flex-shrink-0"
-            style={{
-              color: '#9CA3AF',
-              textTransform: 'uppercase',
-              fontFamily: "'DM Sans', sans-serif",
-            }}
-          >
-            {tUI('Danielson Framework')}
-          </span>
-          {DANIELSON_DOMAINS.map((domain) => {
-            const isActive = danielsonFilter.includes(domain.value);
-            return (
-              <button
-                key={domain.value}
-                onClick={() => {
-                  setDanielsonFilter(prev =>
-                    prev.includes(domain.value)
-                      ? prev.filter(d => d !== domain.value)
-                      : [...prev, domain.value]
-                  );
-                }}
-                className="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0"
-                style={{
-                  backgroundColor: isActive ? '#1B2A4A' : 'white',
-                  color: isActive ? 'white' : '#6B7280',
-                  border: isActive ? 'none' : '1px solid rgba(0,0,0,0.08)',
-                  fontFamily: "'DM Sans', sans-serif",
-                }}
-              >
-                {tUI(domain.label)} ({domain.short})
-              </button>
-            );
-          })}
-        </div>
+        <HubFilterBar
+          categories={FILTER_CATEGORIES}
+          totalCount={totalCount}
+          filteredCount={filteredQuickWins.length}
+          roleFilter={roleFilter}
+          setRoleFilter={setRoleFilter}
+          activeFilter={activeFilter}
+          setActiveFilter={setActiveFilter}
+          capacityFilter={capacityFilter}
+          setCapacityFilter={setCapacityFilter}
+          danielsonFilter={danielsonFilter}
+          setDanielsonFilter={setDanielsonFilter}
+          isFavorite={isFavorite}
+          tUI={tUI}
+          itemLabel="quick wins"
+          subtitle="Short, practical tools you can use right now"
+        />
 
         {/* Quick Wins Grid or Empty State */}
         {filteredQuickWins.length > 0 ? (

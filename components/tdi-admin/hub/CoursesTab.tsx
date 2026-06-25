@@ -266,10 +266,10 @@ function CreateCourseModal({
             </div>
           </div>
 
-          {/* Lift */}
+          {/* Effort Level */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Lift
+              Effort Level
             </label>
             <select
               value={form.capacity}

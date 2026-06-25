@@ -26,9 +26,9 @@ export const TOUR_STOPS: TourStop[] = [
   },
   {
     id: 3,
-    title: 'The LIFT Filter',
+    title: 'Effort Level Filter',
     description:
-      'Every resource is tagged by how action-ready it is. Low lift is grab and go. Medium takes a planning period. High means grab a coffee. Everything here is built for implementation.',
+      'Every resource is tagged by how action-ready it is. Grab & Go means open it, use it, done. Short Prep takes a few moments to think, then implement. Deep Dive means deeper reflection and planning, then action. Everything here is built for implementation.',
   },
   {
     id: 4,
