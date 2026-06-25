@@ -3802,9 +3802,18 @@ export default function ExampleDashboard() {
               Book a Conversation
             </a>
           </div>
-          <div className="mt-8 pt-6 border-t border-white/10">
-            <a href="/" className="text-sm text-white/50 hover:text-white/80 transition-colors">
-              Return to teachersdeserveit.com
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-8 pt-6 border-t border-white/10">
+            <a href="/learning" target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 hover:text-white transition-colors">
+              Explore the Learning Hub
+            </a>
+            <a href="/pd-framework" target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 hover:text-white transition-colors">
+              See our PD Framework
+            </a>
+            <a href="/funding" target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 hover:text-white transition-colors">
+              Funding support
+            </a>
+            <a href="/" className="text-sm text-white/40 hover:text-white/70 transition-colors">
+              teachersdeserveit.com
             </a>
           </div>
         </div>
