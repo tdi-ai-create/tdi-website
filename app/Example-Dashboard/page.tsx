@@ -1114,16 +1114,16 @@ export default function ExampleDashboard() {
   return (
     <div className="min-h-screen bg-[#F5F5F5] overflow-x-hidden">
       {/* Context banner for prospects */}
-      <div className="bg-[#1e2749] text-white py-3 px-4 text-center relative z-50">
+      <div className="py-3 px-4 text-center relative z-50" style={{ backgroundColor: '#2B8C96' }}>
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
-          <p className="text-sm">
+          <p className="text-sm text-white">
             <span className="font-semibold">You are previewing a Leadership Dashboard.</span>{' '}
-            <span className="opacity-80">Every TDI partnership includes one, customized for your school.</span>
+            <span className="opacity-90">Every TDI partnership includes one, customized for your school.</span>
           </p>
           <a
             href="/get-started"
             className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all hover:shadow-lg"
-            style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            style={{ backgroundColor: '#ffffff', color: '#1e2749' }}
           >
             Get Your Own
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
