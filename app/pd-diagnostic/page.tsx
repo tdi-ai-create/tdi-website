@@ -916,10 +916,10 @@ export default function PDDiagnosticPage() {
                   </div>
                   <div className="bg-[#E8F0FD] rounded-2xl p-6">
                     <p className="text-slate-700 italic mb-4">
-                      &quot;This was the first PD I did not have to apologize for. Our teachers actually thanked me.&quot;
+                      &quot;I brought TDI data to our board meeting and for the first time, they could see the ROI on PD. That changed the entire budget conversation.&quot;
                     </p>
-                    <p className="text-slate-600 font-semibold text-sm">James T.</p>
-                    <p className="text-slate-500 text-sm">School Principal</p>
+                    <p className="text-slate-600 font-semibold text-sm">Robert A.</p>
+                    <p className="text-slate-500 text-sm">Superintendent</p>
                   </div>
                 </div>
               </div>
@@ -936,24 +936,24 @@ export default function PDDiagnosticPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="bg-[#E8F0FD] rounded-2xl p-6">
                     <p className="text-slate-700 italic mb-4">
-                      &quot;I finally feel like I have strategies that work AND time to breathe. TDI changed how I approach my classroom and myself.&quot;
+                      &quot;I stopped dreading PD days. The courses are short enough that I actually finish them, and the strategies are specific enough that I actually use them.&quot;
                     </p>
-                    <p className="text-slate-600 font-semibold text-sm">Sarah K.</p>
-                    <p className="text-slate-500 text-sm">5th Grade Teacher</p>
+                    <p className="text-slate-600 font-semibold text-sm">Natasha G.</p>
+                    <p className="text-slate-500 text-sm">Special Education Teacher</p>
                   </div>
                   <div className="bg-[#E8F0FD] rounded-2xl p-6">
                     <p className="text-slate-700 italic mb-4">
-                      &quot;Our teachers are actually excited about PD now. I do not have to chase them down or babysit. They are learning because they want to.&quot;
+                      &quot;My first year teaching, I almost quit. TDI gave me a community of people who understood what I was going through and tools I could actually use.&quot;
                     </p>
-                    <p className="text-slate-600 font-semibold text-sm">Michelle M.</p>
-                    <p className="text-slate-500 text-sm">K-8 School Director</p>
+                    <p className="text-slate-600 font-semibold text-sm">Chris B.</p>
+                    <p className="text-slate-500 text-sm">1st Year Middle School Teacher</p>
                   </div>
                   <div className="bg-[#E8F0FD] rounded-2xl p-6">
                     <p className="text-slate-700 italic mb-4">
-                      &quot;TDI did not just drop a slide deck and bounce. Every part of the experience felt personal. Our staff felt understood.&quot;
+                      &quot;We ran the diagnostic with our leadership team and it gave us a shared starting point. Best 60 seconds we spent all year.&quot;
                     </p>
-                    <p className="text-slate-600 font-semibold text-sm">Julie H.</p>
-                    <p className="text-slate-500 text-sm">Principal, MI</p>
+                    <p className="text-slate-600 font-semibold text-sm">Vanessa T.</p>
+                    <p className="text-slate-500 text-sm">Assistant Principal</p>
                   </div>
                 </div>
               </div>

@@ -890,7 +890,7 @@ function NominatePageInner() {
                       )}
                       {error && (
                         <div className="p-4 rounded-lg" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444' }}>
-                          <p style={{ color: '#ef4444' }}>Something went wrong. Please try again or email us at <a href="mailto:info@teachersdeserveit.com" className="underline">info@teachersdeserveit.com</a></p>
+                          <p style={{ color: '#ef4444' }}>Something went wrong. Please try again or email us at <a href="mailto:hello@teachersdeserveit.com" className="underline">hello@teachersdeserveit.com</a></p>
                         </div>
                       )}
                       <button type="submit" disabled={isSubmitting} className="w-full py-4 rounded-lg font-bold text-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>

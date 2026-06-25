@@ -135,7 +135,7 @@ ${contactForm.message}
 --- FULL CHAT TRANSCRIPT ---
 ${transcript}
           `.trim(),
-          to: 'info@teachersdeserveit.com',
+          to: 'hello@teachersdeserveit.com',
         }),
       })
 

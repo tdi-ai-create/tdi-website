@@ -64,11 +64,7 @@ export default function AboutCreatorsSection() {
   if (creators.length === 0) return null
 
   return (
-    <section id="creators" style={{ padding: '48px 0' }}>
-      <h2 style={{ fontSize: 28, fontWeight: 500, color: '#1e2749', marginBottom: 32, fontFamily: "'Source Serif 4', Georgia, serif" }}>
-        Creators
-      </h2>
-
+    <div id="creators" style={{ padding: '16px 0' }}>
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))',
@@ -102,6 +98,6 @@ export default function AboutCreatorsSection() {
           <p style={{ fontSize: 10, color: '#6B7280', margin: 0, lineHeight: 1.3 }}>Apply to become a creator</p>
         </a>
       </div>
-    </section>
+    </div>
   )
 }

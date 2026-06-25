@@ -416,13 +416,6 @@ export default function ForSchoolsPage() {
               </div>
             </div>
 
-            <div className="max-w-3xl mx-auto mb-10">
-              <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 mb-2">
-                <Image src="/hub-welcome/hub-user-dashboard.png" alt="What your educators see in the TDI Learning Hub" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
-              </div>
-              <p className="text-center text-xs mt-2" style={{ color: '#9ca3af' }}>What your educators see when they log in</p>
-            </div>
-
             <div className="text-center">
               <Link
                 href="/get-started"

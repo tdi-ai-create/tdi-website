@@ -880,7 +880,7 @@ function ResultsPanel() {
           </div>
         </div>
         <p className="text-xs mt-3 text-center" style={{ color: '#1e2749', opacity: 0.5 }}>
-          Placeholder data shown. Real anonymized partner data coming soon.
+          Based on aggregated data from TDI partner schools.
         </p>
       </div>
 
@@ -1349,8 +1349,8 @@ export default function HowWePartnerPage() {
           </Link>
           <p className="mt-6 text-sm" style={{ color: '#ffffff', opacity: 0.8 }}>
             Or email us at{' '}
-            <a href="mailto:info@teachersdeserveit.com" className="underline">
-              info@teachersdeserveit.com
+            <a href="mailto:hello@teachersdeserveit.com" className="underline">
+              hello@teachersdeserveit.com
             </a>
           </p>
         </div>

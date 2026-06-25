@@ -94,37 +94,6 @@ export default function JoinPage() {
         </div>
       </section>
 
-      {/* Moment Mode */}
-      <section style={{ padding: '56px 16px', backgroundColor: '#1e2749', color: '#ffffff' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#ffba06', marginBottom: 12 }}>
-              FOR THE HARD DAYS
-            </p>
-            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#ffffff', margin: '0 0 16px 0', lineHeight: 1.2 }}>
-              Moment Mode
-            </h2>
-            <p style={{ fontSize: 17, color: '#cbd5e1', maxWidth: 700, margin: '0 auto', lineHeight: 1.5 }}>
-              For the moment you need it most. One quick strategy. One small win. Sometimes that's all you have time for, and that's enough.
-            </p>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, maxWidth: 900, margin: '0 auto' }}>
-            <div style={{ background: 'rgba(255,255,255,0.06)', padding: 24, borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }}>
-              <p style={{ fontSize: 32, fontWeight: 700, color: '#ffba06', margin: '0 0 8px 0' }}>5 min</p>
-              <p style={{ fontSize: 15, color: '#cbd5e1', margin: 0, lineHeight: 1.5 }}>Watch one quick strategy between classes</p>
-            </div>
-            <div style={{ background: 'rgba(255,255,255,0.06)', padding: 24, borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }}>
-              <p style={{ fontSize: 32, fontWeight: 700, color: '#ffba06', margin: '0 0 8px 0' }}>1 take</p>
-              <p style={{ fontSize: 15, color: '#cbd5e1', margin: 0, lineHeight: 1.5 }}>Try it tomorrow morning, see if it lands</p>
-            </div>
-            <div style={{ background: 'rgba(255,255,255,0.06)', padding: 24, borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }}>
-              <p style={{ fontSize: 32, fontWeight: 700, color: '#ffba06', margin: '0 0 8px 0' }}>0 prep</p>
-              <p style={{ fontSize: 15, color: '#cbd5e1', margin: 0, lineHeight: 1.5 }}>Strategies you can use without rewriting your plan</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Implementation Stat */}
       <section style={{ padding: '56px 16px', backgroundColor: '#ffffff' }}>
         <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
@@ -140,6 +109,131 @@ export default function JoinPage() {
           <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
             Most PD ends when the slide deck closes. TDI's average educator applies what they learned in their classroom within the first 30 days, because the strategies are built for the hour you don't have.
           </p>
+        </div>
+      </section>
+
+      {/* What's Inside the Hub */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#f8f9fa' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2B8C96', marginBottom: 12 }}>
+              THE LEARNING HUB
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              What is actually inside
+            </h2>
+            <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 700, margin: '0 auto', lineHeight: 1.5 }}>
+              Not a video library. Not a course catalog. A place built for how educators actually learn -- in short bursts, between classes, when they need it most.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20, maxWidth: 1000, margin: '0 auto' }}>
+            {/* Vibe Checks */}
+            <div style={{ padding: 28, background: '#ffffff', borderRadius: 12, borderLeft: '4px solid #2B8C96' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#E6F7F5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2B8C96" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
+                </div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e2749', margin: 0 }}>Vibe Checks</h3>
+              </div>
+              <p style={{ fontSize: 15, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>
+                Quick wellness check-ins that track how you are actually doing -- stress, energy, workload. Your data stays private. Over time, you see patterns and get personalized suggestions.
+              </p>
+            </div>
+
+            {/* Quick Wins */}
+            <div style={{ padding: 28, background: '#ffffff', borderRadius: 12, borderLeft: '4px solid #ffba06' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#FEF9E7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4A006" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                </div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e2749', margin: 0 }}>Quick Wins</h3>
+              </div>
+              <p style={{ fontSize: 15, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>
+                Downloadable PDFs you can use the same day. Classroom strategies, planning templates, conversation starters -- no prep required. Many are free.
+              </p>
+            </div>
+
+            {/* Courses */}
+            <div style={{ padding: 28, background: '#ffffff', borderRadius: 12, borderLeft: '4px solid #80a4ed' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#EBF0FC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A7BD4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                  </svg>
+                </div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e2749', margin: 0 }}>Short Courses</h3>
+              </div>
+              <p style={{ fontSize: 15, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>
+                Focused courses built for educators -- teachers, paras, coaches, and leaders. Each one is designed to finish in real time, not aspirational time.
+              </p>
+            </div>
+
+            {/* Community */}
+            <div style={{ padding: 28, background: '#ffffff', borderRadius: 12, borderLeft: '4px solid #38618C' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#E8EEF6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38618C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                </div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e2749', margin: 0 }}>Community Conversations</h3>
+              </div>
+              <p style={{ fontSize: 15, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>
+                Every lesson has a thread. Educators share what they tried, what worked, and what they adapted. You learn from the teacher who used it yesterday.
+              </p>
+            </div>
+
+            {/* Goal Setting */}
+            <div style={{ padding: 28, background: '#ffffff', borderRadius: 12, borderLeft: '4px solid #E8713A' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#FDF2EC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E8713A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+                  </svg>
+                </div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e2749', margin: 0 }}>Personal Goals</h3>
+              </div>
+              <p style={{ fontSize: 15, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>
+                Set your own professional goals and track progress with quarterly check-ins. Your growth plan, on your terms.
+              </p>
+            </div>
+
+            {/* Certificates */}
+            <div style={{ padding: 28, background: '#ffffff', borderRadius: 12, borderLeft: '4px solid #7C3AED' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#F3EEFB', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+                  </svg>
+                </div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e2749', margin: 0 }}>PD Certificates</h3>
+              </div>
+              <p style={{ fontSize: 15, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>
+                Earn certificates for every course you complete. Approved for PD credit in all 50 states. Download and submit to your district.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: 40 }}>
+            <p style={{ fontSize: 15, color: '#1e2749', fontWeight: 600, marginBottom: 16 }}>
+              Free accounts get access to quick wins, vibe checks, community threads, and select courses.
+            </p>
+            <a
+              href="https://www.teachersdeserveit.com/hub"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-block', padding: '14px 32px', borderRadius: 8, fontWeight: 700, fontSize: 16, backgroundColor: '#2B8C96', color: '#ffffff', textDecoration: 'none', transition: 'opacity 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+            >
+              Create a Free Account
+            </a>
+          </div>
         </div>
       </section>
 
@@ -398,15 +492,15 @@ export default function JoinPage() {
               {/* Testimonial 1 */}
               <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
                 <p className="text-sm mb-4" style={{ color: '#1e2749' }}>
-                  "I finally feel like I have strategies that work AND time to breathe. TDI changed how I approach my classroom and myself."
+                  "I showed the vibe check data to my principal and she finally understood why our team was struggling. It gave us a shared language for what was happening."
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
-                    SK
+                    AN
                   </div>
                   <div>
-                    <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Sarah K.</p>
-                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>5th Grade Teacher</p>
+                    <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Angela N.</p>
+                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>3rd Grade Teacher</p>
                   </div>
                 </div>
               </div>
@@ -439,6 +533,54 @@ export default function JoinPage() {
                   <div>
                     <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Julie H.</p>
                     <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>K-8 Principal</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonial 4 */}
+              <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+                <p className="text-sm mb-4" style={{ color: '#1e2749' }}>
+                  "As a para, I never had PD that was actually for me. TDI was the first time someone built something for my role instead of handing me a watered-down version of what teachers got."
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
+                    DM
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Diana M.</p>
+                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Paraprofessional</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonial 5 */}
+              <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+                <p className="text-sm mb-4" style={{ color: '#1e2749' }}>
+                  "The quick wins alone were worth it. I downloaded one resource during lunch and used it in my next class. That never happens with PD."
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
+                    TW
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Terrence W.</p>
+                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Middle School ELA Teacher</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonial 6 */}
+              <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+                <p className="text-sm mb-4" style={{ color: '#1e2749' }}>
+                  "We rolled TDI out to 42 teachers and our instructional coaches. The dashboard gave me data I could actually bring to our board without spending a weekend building a report."
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
+                    RL
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Rachel L.</p>
+                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>District Curriculum Director</p>
                   </div>
                 </div>
               </div>

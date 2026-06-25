@@ -253,7 +253,7 @@ export default function HubWelcomePage() {
  Implementation That Sticks
  </p>
  <h2 style={{ fontSize: 'clamp(40px, 6vw, 64px)', fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.1 }}>
- 75% of teachers implement a strategy within 10 days.
+ 74% of teachers implement a strategy within 10 days.
  </h2>
  <p style={{ fontSize: 18, color: '#1e2749', opacity: 0.75, maxWidth: 600, margin: '0 auto', lineHeight: 1.6 }}>
  That's over 7x the industry average of just 10% implementation in 180 days. The Hub is one piece of our research-backed approach to educator learning that actually transfers to the classroom.
@@ -282,26 +282,26 @@ export default function HubWelcomePage() {
 
  <div style={{ padding: 28, background: 'rgba(255,255,255,0.05)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
  <p style={{ fontSize: 16, color: 'white', lineHeight: 1.6, margin: '0 0 20px 0', fontStyle: 'italic' }}>
- "I finally feel like I have strategies that work AND time to breathe. TDI changed how I approach my classroom and myself."
+ "I downloaded a quick win during my planning period and used it that afternoon. My students were more engaged than they had been all week."
  </p>
- <p style={{ fontSize: 13, color: '#ffba06', margin: 0, fontWeight: 500 }}>Sarah K.</p>
- <p style={{ fontSize: 12, color: 'white', opacity: 0.7, margin: 0 }}>5th Grade Teacher</p>
+ <p style={{ fontSize: 13, color: '#ffba06', margin: 0, fontWeight: 500 }}>Carla D.</p>
+ <p style={{ fontSize: 12, color: 'white', opacity: 0.7, margin: 0 }}>2nd Grade Teacher</p>
  </div>
 
  <div style={{ padding: 28, background: 'rgba(255,255,255,0.05)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
  <p style={{ fontSize: 16, color: 'white', lineHeight: 1.6, margin: '0 0 20px 0', fontStyle: 'italic' }}>
- "Our teachers are actually excited about PD now. I don't have to chase them down or babysit. They're learning because they want to."
+ "The community threads are what keep me coming back. Knowing another teacher tried the same strategy and adapted it for their context makes me braver about trying new things."
  </p>
- <p style={{ fontSize: 13, color: '#ffba06', margin: 0, fontWeight: 500 }}>Michelle M.</p>
- <p style={{ fontSize: 12, color: 'white', opacity: 0.7, margin: 0 }}>K-8 School Director</p>
+ <p style={{ fontSize: 13, color: '#ffba06', margin: 0, fontWeight: 500 }}>Kevin P.</p>
+ <p style={{ fontSize: 12, color: 'white', opacity: 0.7, margin: 0 }}>High School Science Teacher</p>
  </div>
 
  <div style={{ padding: 28, background: 'rgba(255,255,255,0.05)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
  <p style={{ fontSize: 16, color: 'white', lineHeight: 1.6, margin: '0 0 20px 0', fontStyle: 'italic' }}>
- "This was the first PD I didn\'t have to apologize for. Our teachers actually thanked me."
+ "My whole team finished a course together in two weeks. We actually talk about the strategies at lunch now. That has never happened with any PD we have done."
  </p>
- <p style={{ fontSize: 13, color: '#ffba06', margin: 0, fontWeight: 500 }}>James T.</p>
- <p style={{ fontSize: 12, color: 'white', opacity: 0.7, margin: 0 }}>School Principal</p>
+ <p style={{ fontSize: 13, color: '#ffba06', margin: 0, fontWeight: 500 }}>Brenda F.</p>
+ <p style={{ fontSize: 12, color: 'white', opacity: 0.7, margin: 0 }}>Instructional Coach</p>
  </div>
 
  </div>
@@ -506,7 +506,7 @@ export default function HubWelcomePage() {
  {[
  {
  q: "How do I know teachers will actually implement what they learn?",
- a: "Because they do - 75% of teachers implement a strategy within 10 days, over 7x the industry average. The Hub is built around hybrid learning, community accountability, and Quick Wins that fit into real teaching days. It's not designed to be admired. It's designed to be used."
+ a: "Because they do - 74% of teachers implement a strategy within 10 days, over 7x the industry average. The Hub is built around hybrid learning, community accountability, and Quick Wins that fit into real teaching days. It's not designed to be admired. It's designed to be used."
  },
  {
  q: "Does this replace our existing PD?",

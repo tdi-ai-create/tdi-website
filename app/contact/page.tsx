@@ -287,7 +287,7 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
             {/* Card 1: See Your School's Impact */}
             <a
-              href="/for-schools#calculator"
+              href="/for-schools#section-benefit"
               className="bg-white rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow border border-gray-100"
               style={{ textDecoration: 'none' }}
             >

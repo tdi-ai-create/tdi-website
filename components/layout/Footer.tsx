@@ -116,16 +116,6 @@ export function Footer() {
               <h4 className="font-semibold mb-4" style={{ color: 'white' }}>Resources</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/movement" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
-                    Join the Movement
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/paragametools" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
-                    Para Game Tools
-                  </Link>
-                </li>
-                <li>
                   <Link href="/funding" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Funding Options
                   </Link>
@@ -146,19 +136,9 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <a href="https://www.facebook.com/groups/tdimovement" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
-                    Free FB Community
-                  </a>
-                </li>
-                <li>
                   <Link href="/create-with-us" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Become a Creator
                   </Link>
-                </li>
-                <li>
-                  <a href="https://us.shaklee.com/en_US/raehughart/storefront" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
-                    Health Check
-                  </a>
                 </li>
               </ul>
             </div>
@@ -178,7 +158,7 @@ export function Footer() {
                 <input type="hidden" name="_subject" value="New Email Signup from TDI Website" />
                 <input type="hidden" name="_captcha" value="false" />
                 <input type="hidden" name="_template" value="table" />
-                <input type="hidden" name="_next" value="https://teachersdeserveit.vercel.app/?signup=success" />
+                <input type="hidden" name="_next" value="https://www.teachersdeserveit.com/?signup=success" />
 
                 <input
                   type="email"
