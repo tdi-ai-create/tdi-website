@@ -892,7 +892,7 @@ function ResultsPanel() {
               "Our staff actually looked forward to PD. The flipped model made a huge difference. Teachers could watch on their own time and come ready for real conversations. We will absolutely be partnering with TDI again."
             </p>
             <p className="text-sm font-medium" style={{ color: '#1e2749', opacity: 0.7 }}>
-              Principal, K-8 School
+              Sandra W., K-8 Principal, Louisiana
             </p>
           </div>
           <div className="p-4 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
@@ -900,7 +900,7 @@ function ResultsPanel() {
               "Professional development that finally meets the moment. Between burnout and new initiatives, our team needed clarity and care. TDI delivered both."
             </p>
             <p className="text-sm font-medium" style={{ color: '#1e2749', opacity: 0.7 }}>
-              Assistant Superintendent
+              Mark H., Assistant Superintendent, Ohio
             </p>
           </div>
         </div>
@@ -1062,6 +1062,93 @@ export default function HowWePartnerPage() {
           <p className="text-base md:text-lg max-w-3xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
             This is not about checking boxes or completing modules. It is about seeing and experiencing measurable change in your school.
           </p>
+        </div>
+      </section>
+
+      {/* What Makes This Different: Hub + Dashboard */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#f8f9fa' }}>
+        <div className="container-default">
+          <div className="text-center mb-12">
+            <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: '#2B8C96' }}>
+              What Makes This Different
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e2749' }}>
+              Two Tools No Other PD Provider Gives You
+            </h2>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+              Every TDI partnership includes a Learning Hub for your educators and a Leadership Dashboard for your admin team. Not add-ons. Not upgrades. Included.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {/* Learning Hub */}
+            <div className="rounded-2xl overflow-hidden shadow-lg" style={{ backgroundColor: '#ffffff' }}>
+              <div className="p-1">
+                <Image
+                  src="/hub-welcome/hub-user-dashboard.png"
+                  alt="TDI Learning Hub educator dashboard"
+                  width={600}
+                  height={400}
+                  style={{ width: '100%', height: 'auto', borderRadius: '12px 12px 0 0' }}
+                />
+              </div>
+              <div className="p-6">
+                <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#2B8C96' }}>For Your Educators</p>
+                <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>The Learning Hub</h3>
+                <ul className="space-y-2 mb-4">
+                  <li className="flex items-start gap-2 text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    <span style={{ color: '#2B8C96', fontWeight: 700 }}>--</span> Short courses built for every role
+                  </li>
+                  <li className="flex items-start gap-2 text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    <span style={{ color: '#2B8C96', fontWeight: 700 }}>--</span> Downloadable quick wins for same-day use
+                  </li>
+                  <li className="flex items-start gap-2 text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    <span style={{ color: '#2B8C96', fontWeight: 700 }}>--</span> Vibe checks to track wellness over time
+                  </li>
+                  <li className="flex items-start gap-2 text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    <span style={{ color: '#2B8C96', fontWeight: 700 }}>--</span> Community threads per lesson
+                  </li>
+                </ul>
+                <Link href="/join" className="text-sm font-semibold inline-flex items-center gap-1" style={{ color: '#2B8C96' }}>
+                  See what educators get <span>→</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Leadership Dashboard */}
+            <div className="rounded-2xl overflow-hidden shadow-lg" style={{ backgroundColor: '#ffffff' }}>
+              <div className="p-1">
+                <Image
+                  src="/hub-welcome/hub-admin-dashboard.png"
+                  alt="TDI Leadership Dashboard with real-time analytics"
+                  width={600}
+                  height={400}
+                  style={{ width: '100%', height: 'auto', borderRadius: '12px 12px 0 0' }}
+                />
+              </div>
+              <div className="p-6">
+                <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#38618C' }}>For Your Leadership Team</p>
+                <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>The Leadership Dashboard</h3>
+                <ul className="space-y-2 mb-4">
+                  <li className="flex items-start gap-2 text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    <span style={{ color: '#38618C', fontWeight: 700 }}>--</span> Real-time engagement and completion data
+                  </li>
+                  <li className="flex items-start gap-2 text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    <span style={{ color: '#38618C', fontWeight: 700 }}>--</span> Board-ready reports generated in one click
+                  </li>
+                  <li className="flex items-start gap-2 text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    <span style={{ color: '#38618C', fontWeight: 700 }}>--</span> Observation reports and implementation tracking
+                  </li>
+                  <li className="flex items-start gap-2 text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    <span style={{ color: '#38618C', fontWeight: 700 }}>--</span> Certificates, wellness trends, and KPIs
+                  </li>
+                </ul>
+                <Link href="/Example-Dashboard" target="_blank" className="text-sm font-semibold inline-flex items-center gap-1" style={{ color: '#38618C' }}>
+                  Explore an example dashboard <span>→</span>
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1289,24 +1376,24 @@ export default function HowWePartnerPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             <div className="p-6 rounded-xl" style={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}>
               <p className="mb-4 italic" style={{ color: '#1e2749' }}>
-                "I went from spending 12 hours a week planning to 6. I want that for every teacher I know."
+                "I went from spending 12 hours a week planning to 6. The Hub gave me strategies I could actually prep in real time, not aspirational time."
               </p>
-              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>TDI Partner Teacher</p>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Illinois</p>
+              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Laura S.</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>4th Grade Teacher, Illinois</p>
             </div>
             <div className="p-6 rounded-xl" style={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}>
               <p className="mb-4 italic" style={{ color: '#1e2749' }}>
-                "For the first time in 15 years, I'm excited about professional development."
+                "For the first time in 15 years, I am excited about professional development. The observation feedback felt like someone actually saw what I do."
               </p>
-              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Middle School Teacher</p>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Florida</p>
+              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Derek J.</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Middle School Science Teacher, Florida</p>
             </div>
             <div className="p-6 rounded-xl" style={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}>
               <p className="mb-4 italic" style={{ color: '#1e2749' }}>
-                "The strategies actually work in my classroom. That's rare for PD."
+                "The dashboard let me show my board exactly what changed. Implementation data, stress scores, engagement. They renewed our partnership on the spot."
               </p>
-              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>5th Grade Teacher</p>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>California</p>
+              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Monica R.</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Curriculum Coordinator, California</p>
             </div>
           </div>
         </div>
