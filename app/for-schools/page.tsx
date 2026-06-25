@@ -355,6 +355,85 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
+      {/* SECTION: Para PD */}
+      <section className="py-20 md:py-28" style={{ backgroundColor: '#1e2749' }}>
+        <div className="container-default">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <p className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: '#ffba06' }}>
+                Paraprofessional PD
+              </p>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#ffffff' }}>
+                Your Paras Deserve Real Training
+              </h2>
+              <p className="text-lg" style={{ color: '#ffffff', opacity: 0.8 }}>
+                Paraprofessionals make up 30 to 40 percent of the staff in many buildings. They do some of the most intensive one-on-one work with students. But most get zero intentional PD designed for their role. We built something for them.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6 mb-12">
+              <div className="p-6 rounded-xl" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}>
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: 'rgba(255,186,6,0.2)' }}>
+                  <svg className="w-5 h-5" fill="none" stroke="#ffba06" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                </div>
+                <p className="font-semibold mb-2" style={{ color: '#ffffff' }}>
+                  Courses designed for paras
+                </p>
+                <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>
+                  Not repackaged teacher PD. Built specifically for the way paras work, the challenges they face, and the skills they need.
+                </p>
+              </div>
+
+              <div className="p-6 rounded-xl" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}>
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: 'rgba(255,186,6,0.2)' }}>
+                  <svg className="w-5 h-5" fill="none" stroke="#ffba06" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                </div>
+                <p className="font-semibold mb-2" style={{ color: '#ffffff' }}>
+                  Tools they can use today
+                </p>
+                <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>
+                  Downloadable quick wins, short courses, and practical strategies. A para with 10 minutes can walk away with something useful.
+                </p>
+              </div>
+
+              <div className="p-6 rounded-xl" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}>
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: 'rgba(255,186,6,0.2)' }}>
+                  <svg className="w-5 h-5" fill="none" stroke="#ffba06" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <p className="font-semibold mb-2" style={{ color: '#ffffff' }}>
+                  Facilitated, not just self-paced
+                </p>
+                <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>
+                  We know paras need facilitation, not just a login. TDI offers in-person and virtual facilitated sessions alongside the Hub.
+                </p>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <Link
+                href="/get-started"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:shadow-lg"
+                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+              >
+                Get a Custom Para PD Plan
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+              <p className="text-sm mt-3" style={{ color: '#ffffff', opacity: 0.5 }}>
+                Most schools fund para PD through existing grants. We can help.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* SECTION 3: Advantage (What Changes) */}
       <section
         id="section-advantage"

@@ -455,17 +455,33 @@ export default function GetStartedPage() {
       {step === 2 && (
         <section id="step-2" className="py-8 px-4" style={{ backgroundColor: '#f5f5f5' }}>
           <div className="max-w-2xl mx-auto">
+            {/* Role-specific messaging */}
+            {selectedRole === 'Para' && (
+              <div className="mb-6 p-5 rounded-xl text-center" style={{ backgroundColor: '#1e2749' }}>
+                <p className="text-sm font-semibold mb-2" style={{ color: '#ffba06' }}>
+                  Built for paras, not borrowed from teachers
+                </p>
+                <p className="text-sm" style={{ color: '#ffffff', opacity: 0.85 }}>
+                  We have courses, tools, and resources designed specifically for paraprofessionals. Short, practical, and built for the way you actually work. Tell us about your school and we will make sure the right person knows you want this.
+                </p>
+              </div>
+            )}
+
             <div className="text-center mb-6">
               <p className="text-xs font-medium mb-2" style={{ color: '#2B8C96' }}>
                 Step 2 of 2
               </p>
               <h2 className="text-xl md:text-2xl font-bold mb-1" style={{ color: '#1e2749' }}>
-                {selectedRole === 'Teacher' || selectedRole === 'Para'
+                {selectedRole === 'Para'
+                  ? 'Tell us about your school'
+                  : selectedRole === 'Teacher'
                   ? 'Tell us about the school'
                   : 'Tell us about your school'}
               </h2>
               <p className="text-xs" style={{ color: '#6b7280' }}>
-                {selectedRole === 'Teacher' || selectedRole === 'Para'
+                {selectedRole === 'Para'
+                  ? "We'll reach out to your admin within 48 hours to get you access."
+                  : selectedRole === 'Teacher'
                   ? "We'll reach out to their admin within 48 hours."
                   : "We'll send your custom PD plan within 24 hours."}
               </p>
