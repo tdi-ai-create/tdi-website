@@ -84,7 +84,7 @@ export default function CapacityFeedbackPrompt({
               className="font-medium pr-6 mb-3"
               style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '14px', color: '#2B3A67' }}
             >
-              {tUI("Quick check — how did this lift feel?")}
+              {tUI("Quick check — how did the effort level feel?")}
             </p>
 
             <div className="flex flex-col gap-1.5">

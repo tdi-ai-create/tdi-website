@@ -605,7 +605,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           <div className="flex flex-col md:flex-row">
             {/* Left: content */}
             <div className="flex-1 p-6 md:p-10">
-              {/* Top row: branding + LIFT badge */}
+              {/* Top row: branding + effort level badge */}
               <div className="flex items-center gap-3 mb-3">
                 <p
                   style={{
