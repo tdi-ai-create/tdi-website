@@ -27,7 +27,6 @@ export function Header() {
     '/saunemin-dashboard',
     '/Allenwood-Dashboard',
     '/D41-dashboard',
-    '/Example-Dashboard',
   ];
 
   const shouldHideHeader = pathname === '/login' || hiddenRoutes.some(route => pathname?.startsWith(route));

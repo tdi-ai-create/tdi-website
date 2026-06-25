@@ -142,7 +142,10 @@ export default function ForSchoolsPage() {
       question: 'We need to see results before committing to a full partnership.',
       answer: (
         <>
-          That is exactly what Ignite is designed for. It starts with a pilot group of 10-25 educators and your leadership team. You see early wins within the first semester before expanding to full staff. The dashboard shows your board real data, not promises.
+          That is exactly what Ignite is designed for. It starts with a pilot group of 10-25 educators and your leadership team. You see early wins within the first semester before expanding to full staff. The dashboard shows your board real data, not promises.{' '}
+          <Link href="/Example-Dashboard" className="font-semibold underline" style={{ color: '#35A7FF' }}>
+            See a live dashboard example
+          </Link>.
         </>
       ),
     },
