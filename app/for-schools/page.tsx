@@ -741,47 +741,6 @@ export default function ForSchoolsPage() {
               Implementation baseline: Joyce & Showers (1980, 2002) found that traditional &quot;sit-and-get&quot; PD produces 5-10% classroom transfer. Sustained coaching models produce 80-90%. TDI&apos;s 74% reflects real partner data within this research-backed range.
             </p>
 
-            {/* Partner Success Stories - Stat Cards */}
-            <div className="grid md:grid-cols-3 gap-6">
-              {/* Card 1: Stress Score */}
-              <div className="p-6 rounded-xl h-full bg-white shadow-md hover:shadow-lg transition-shadow" style={{ borderLeft: '4px solid #38618C' }}>
-                <div className="text-3xl font-bold mb-2" style={{ color: '#38618C' }}>
-                  8.2 → 5.4
-                </div>
-                <div className="text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
-                  Teacher Stress Score
-                </div>
-                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  A 6-school district in Illinois reduced average teacher stress scores within one academic year of their Ignite partnership.
-                </p>
-              </div>
-
-              {/* Card 2: Implementation */}
-              <div className="p-6 rounded-xl h-full bg-white shadow-md hover:shadow-lg transition-shadow" style={{ borderLeft: '4px solid #38618C' }}>
-                <div className="text-3xl font-bold mb-2" style={{ color: '#38618C' }}>
-                  12% → 58%
-                </div>
-                <div className="text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
-                  Strategy Implementation
-                </div>
-                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  A K-8 school in the Midwest grew implementation across their first Ignite semester and continued through Year 2 in Accelerate.
-                </p>
-              </div>
-
-              {/* Card 3: Retention */}
-              <div className="p-6 rounded-xl h-full bg-white shadow-md hover:shadow-lg transition-shadow" style={{ borderLeft: '4px solid #38618C' }}>
-                <div className="text-3xl font-bold mb-2" style={{ color: '#38618C' }}>
-                  0 departures
-                </div>
-                <div className="text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
-                  Teacher Retention
-                </div>
-                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  A rural elementary school reported zero voluntary teacher departures in the year following their TDI partnership, after losing 4 the previous year.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </section>

@@ -187,21 +187,24 @@ export default function FAQPage() {
           <p className="mb-8 max-w-xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
             We're here to help. Reach out and a real human will get back to you within 24 hours.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col items-center gap-4">
             <a
-              href="/contact"
+              href="/get-started"
               className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover-glow"
               style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
             >
-              Get in Touch
+              Get Your Free PD Plan
             </a>
-            <a
-              href="mailto:hello@teachersdeserveit.com"
-              className="inline-block px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover-lift"
-              style={{ borderColor: '#1e2749', color: '#1e2749' }}
-            >
-              Email Us Directly
-            </a>
+            <p style={{ color: '#1e2749', opacity: 0.7 }}>
+              Or email us at{' '}
+              <a
+                href="mailto:hello@teachersdeserveit.com"
+                className="underline font-semibold"
+                style={{ color: '#1e2749' }}
+              >
+                hello@teachersdeserveit.com
+              </a>
+            </p>
           </div>
         </div>
       </section>
