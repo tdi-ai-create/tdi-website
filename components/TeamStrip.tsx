@@ -44,70 +44,80 @@ interface TeamStripProps {
 
 function TeamAvatar({ member }: { member: TeamStripMember }) {
   const [imgError, setImgError] = useState(false)
+  const firstName = member.name.replace('Dr. ', '').split(' ')[0]
   const initials = member.name.split(' ').filter(p => !['Dr.'].includes(p)).map(p => p[0]).join('').toUpperCase().slice(0, 2)
-  const goldRing = member.isHuman ? { boxShadow: '0 0 0 2px #C9A961' } : {}
+  const goldRing = member.isHuman ? { boxShadow: '0 0 0 2.5px #C9A961' } : {}
 
   if (!imgError) {
     return (
-      <Image
-        src={`/team/${member.imageSlug}.jpg`}
-        alt={member.name}
-        width={48} height={48}
-        style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', border: '2px solid white', marginLeft: -8, ...goldRing }}
-        onError={() => setImgError(true)}
-      />
+      <div className="flex flex-col items-center gap-2">
+        <Image
+          src={`/team/${member.imageSlug}.jpg`}
+          alt={member.name}
+          width={64} height={64}
+          className="rounded-full object-cover"
+          style={{ width: 64, height: 64, border: '3px solid white', ...goldRing }}
+          onError={() => setImgError(true)}
+        />
+        <span style={{ fontSize: 12, color: '#1e2749', fontWeight: 500, opacity: 0.7 }}>{firstName}</span>
+      </div>
     )
   }
   return (
-    <div style={{
-      width: 48, height: 48, borderRadius: '50%', border: '2px solid white', marginLeft: -8,
-      background: member.isHuman ? '#1B365D' : '#E1F5EE',
-      color: member.isHuman ? 'white' : '#0F6E56',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: 13, fontWeight: 500,
-      ...goldRing,
-    }}>{initials}</div>
+    <div className="flex flex-col items-center gap-2">
+      <div style={{
+        width: 64, height: 64, borderRadius: '50%', border: '3px solid white',
+        background: member.isHuman ? '#1B365D' : '#E1F5EE',
+        color: member.isHuman ? 'white' : '#0F6E56',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 16, fontWeight: 600,
+        ...goldRing,
+      }}>{initials}</div>
+      <span style={{ fontSize: 12, color: '#1e2749', fontWeight: 500, opacity: 0.7 }}>{firstName}</span>
+    </div>
   )
 }
 
 function CreatorAvatar({ member }: { member: CreatorStripMember }) {
   const config = getTopicConfig(member.topic)
   const Icon = ICON_COMPONENTS[config.icon] || Sparkles
+  const firstName = member.name.replace('Dr. ', '').split(' ')[0]
   return (
-    <div style={{
-      width: 48, height: 48, borderRadius: '50%', border: '2px solid white', marginLeft: -8,
-      background: config.background, color: config.iconColor,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      boxShadow: `inset 0 0 0 2px ${config.border}`,
-    }}>
-      <Icon size={20} />
+    <div className="flex flex-col items-center gap-2">
+      <div style={{
+        width: 64, height: 64, borderRadius: '50%', border: '3px solid white',
+        background: config.background, color: config.iconColor,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        boxShadow: `inset 0 0 0 2px ${config.border}`,
+      }}>
+        <Icon size={24} />
+      </div>
+      <span style={{ fontSize: 12, color: '#1e2749', fontWeight: 500, opacity: 0.7 }}>{firstName}</span>
     </div>
   )
 }
 
 export default function TeamStrip({ members, copy, linkText = 'Meet the team', linkHref = '/about#team' }: TeamStripProps) {
   return (
-    <div style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20,
-      padding: '24px 16px', flexWrap: 'wrap', textAlign: 'center',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', paddingLeft: 8 }}>
+    <div style={{ padding: '40px 16px', textAlign: 'center' }}>
+      <p style={{ fontSize: 15, color: '#1e2749', margin: '0 0 24px 0', maxWidth: 520, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
+        {copy}
+      </p>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 20, flexWrap: 'wrap', marginBottom: 20 }}>
         {members.map((m, i) => m.type === 'team' ? (
           <TeamAvatar key={`team-${m.name}-${i}`} member={m} />
         ) : (
           <CreatorAvatar key={`creator-${m.name}-${i}`} member={m} />
         ))}
       </div>
-      <p style={{ fontSize: 14, color: '#1e2749', margin: 0, maxWidth: 520 }}>
-        {copy}
-      </p>
       <Link
         href={linkHref}
         style={{
-          fontSize: 13, fontWeight: 500, color: '#1e2749',
-          padding: '8px 16px', borderRadius: 999,
-          background: 'white', border: '1px solid #2A9D8F',
+          fontSize: 13, fontWeight: 600, color: '#1e2749',
+          padding: '10px 20px', borderRadius: 999,
+          background: 'white', border: '1.5px solid #2A9D8F',
           textDecoration: 'none', whiteSpace: 'nowrap',
+          display: 'inline-block',
         }}
       >
         {linkText}
