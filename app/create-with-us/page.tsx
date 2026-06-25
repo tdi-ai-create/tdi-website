@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import AboutCreatorsSection from '@/components/AboutCreatorsSection';
+import TeamStrip from '@/components/TeamStrip';
 import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import Link from 'next/link';
 import Script from 'next/script';
@@ -852,6 +853,24 @@ export default function CreateWithUsPage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Team Strip */}
+      <section style={{ backgroundColor: '#F0FAF6', borderTop: '0.5px solid #D4EDE0', borderBottom: '0.5px solid #D4EDE0' }}>
+        <div className="container-default">
+          <TeamStrip
+            members={[
+              { type: 'team', name: 'Kristin Williams', imageSlug: 'kristin-williams', isHuman: true },
+              { type: 'team', name: 'Holly Scott', imageSlug: 'holly-scott' },
+              { type: 'team', name: 'Bella Dailey', imageSlug: 'bella-dailey', isHuman: true },
+              { type: 'team', name: 'Dr. Maya Johnson', imageSlug: 'maya-johnson' },
+              { type: 'team', name: 'Olivia Smith', imageSlug: 'olivia-smith' },
+              { type: 'creator', name: 'Dr. Stephanie Nardi', topic: 'Science' },
+              { type: 'creator', name: 'Amy Storer', topic: 'Math' },
+            ]}
+            copy="When you create with TDI, you join a team that supports you from first idea to published course."
+          />
         </div>
       </section>
 

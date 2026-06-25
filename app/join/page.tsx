@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import { CompactBurnout } from '@/components/calculators/v2/compact/CompactBurnout';
+import TeamStrip from '@/components/TeamStrip';
 
 export default function JoinPage() {
   return (
@@ -688,6 +689,24 @@ export default function JoinPage() {
             See the potential impact on your stress, time, and joy in teaching.
           </p>
           <CompactBurnout />
+        </div>
+      </section>
+
+      {/* Team Strip */}
+      <section style={{ backgroundColor: '#F0FAF6', borderTop: '0.5px solid #D4EDE0', borderBottom: '0.5px solid #D4EDE0' }}>
+        <div className="container-default">
+          <TeamStrip
+            members={[
+              { type: 'team', name: 'Holly Scott', imageSlug: 'holly-scott' },
+              { type: 'team', name: 'Kristin Williams', imageSlug: 'kristin-williams', isHuman: true },
+              { type: 'team', name: 'Dr. Maya Johnson', imageSlug: 'maya-johnson' },
+              { type: 'team', name: 'Bella Dailey', imageSlug: 'bella-dailey', isHuman: true },
+              { type: 'team', name: 'Mel Martinez', imageSlug: 'mel-martinez', isHuman: true },
+              { type: 'creator', name: 'Dr. Stephanie Nardi', topic: 'Science' },
+              { type: 'creator', name: 'Catherine Dorian', topic: 'Literacy' },
+            ]}
+            copy="Built by a team of educators, coaches, and specialists who know what it takes to support teachers and paras every day."
+          />
         </div>
       </section>
 

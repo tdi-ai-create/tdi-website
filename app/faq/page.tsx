@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import TeamStrip from '@/components/TeamStrip';
 
 export const metadata: Metadata = {
   title: 'FAQ | Teachers Deserve It',
@@ -157,6 +158,23 @@ export default function FAQPage() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Team Strip */}
+      <section style={{ backgroundColor: '#F0FAF6', borderTop: '0.5px solid #D4EDE0', borderBottom: '0.5px solid #D4EDE0' }}>
+        <div className="container-default">
+          <TeamStrip
+            members={[
+              { type: 'team', name: 'Jim Ford', imageSlug: 'jim-ford', isHuman: true },
+              { type: 'team', name: 'Holly Scott', imageSlug: 'holly-scott' },
+              { type: 'team', name: 'Kristin Williams', imageSlug: 'kristin-williams', isHuman: true },
+              { type: 'team', name: 'Olivia Smith', imageSlug: 'olivia-smith' },
+              { type: 'team', name: 'Dr. Maya Johnson', imageSlug: 'maya-johnson' },
+              { type: 'team', name: 'Nora Reeves', imageSlug: 'nora-reeves' },
+            ]}
+            copy="Real people behind every answer. Our team responds within 24 hours."
+          />
         </div>
       </section>
 
