@@ -142,11 +142,10 @@ export default function HubFilterBar({
             onClick={() => setMoreFiltersOpen(!moreFiltersOpen)}
             className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5 relative"
             style={{
-              backgroundColor: moreFiltersOpen || hasAdvancedFilters ? '#1B2A4A' : 'transparent',
-              color: moreFiltersOpen || hasAdvancedFilters ? 'white' : '#9CA3AF',
-              border: moreFiltersOpen || hasAdvancedFilters ? 'none' : '1px dashed rgba(0,0,0,0.15)',
+              backgroundColor: moreFiltersOpen || hasAdvancedFilters ? '#1B2A4A' : '#E8B84B',
+              color: moreFiltersOpen || hasAdvancedFilters ? 'white' : '#1B2A4A',
+              border: 'none',
               fontFamily: "'DM Sans', sans-serif",
-              fontSize: '13px',
             }}
           >
             {tUI('More Filters')}
