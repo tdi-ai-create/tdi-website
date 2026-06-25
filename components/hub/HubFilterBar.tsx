@@ -110,14 +110,39 @@ export default function HubFilterBar({
           style={{ backgroundColor: 'rgba(0,0,0,0.12)' }}
         />
 
-        {/* Scrollable category pills + More Filters */}
+        {/* Saved - pinned */}
+        {(() => {
+          const isActive = activeFilter === 'Saved';
+          return (
+            <button
+              onClick={() => setActiveFilter('Saved')}
+              className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5"
+              style={{
+                backgroundColor: isActive ? '#E53935' : 'white',
+                color: isActive ? 'white' : '#6B7280',
+                border: isActive ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              <Heart size={14} style={{ fill: isActive ? 'white' : 'none' }} />
+              {tUI('Saved')}
+            </button>
+          );
+        })()}
+
+        {/* Divider */}
+        <div
+          className="w-px h-6 flex-shrink-0"
+          style={{ backgroundColor: 'rgba(0,0,0,0.12)' }}
+        />
+
+        {/* Scrollable category pills */}
         <style>{`.hub-filter-scroll::-webkit-scrollbar { display: none; }`}</style>
         <div
           className="flex items-center gap-2 overflow-x-auto flex-1 min-w-0 hub-filter-scroll"
           style={{ scrollbarWidth: 'none' }}
         >
-          {categories.map((category) => {
-            const isSaved = category === 'Saved';
+          {categories.filter(c => c !== 'Saved').map((category) => {
             const isActive = activeFilter === category;
             return (
               <button
@@ -125,40 +150,45 @@ export default function HubFilterBar({
                 onClick={() => setActiveFilter(category)}
                 className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5"
                 style={{
-                  backgroundColor: isActive ? (isSaved ? '#E53935' : '#1B2A4A') : 'white',
+                  backgroundColor: isActive ? '#1B2A4A' : 'white',
                   color: isActive ? 'white' : '#6B7280',
                   border: isActive ? 'none' : '1px solid rgba(0,0,0,0.08)',
                   fontFamily: "'DM Sans', sans-serif",
                 }}
               >
-                {isSaved && <Heart size={14} style={{ fill: isActive ? 'white' : 'none' }} />}
                 {tUI(category)}
               </button>
             );
           })}
-
-          {/* More Filters toggle - inside scroll area but at end */}
-          <button
-            onClick={() => setMoreFiltersOpen(!moreFiltersOpen)}
-            className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5 relative"
-            style={{
-              backgroundColor: moreFiltersOpen || hasAdvancedFilters ? '#1B2A4A' : 'transparent',
-              color: moreFiltersOpen || hasAdvancedFilters ? 'white' : '#1B2A4A',
-              border: moreFiltersOpen || hasAdvancedFilters ? 'none' : '1.5px dashed #1B2A4A',
-              fontFamily: "'DM Sans', sans-serif",
-            }}
-          >
-            {tUI('More Filters')}
-            {moreFiltersOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-            {/* Active indicator dot */}
-            {hasAdvancedFilters && !moreFiltersOpen && (
-              <span
-                className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full"
-                style={{ backgroundColor: '#E53935', border: '2px solid #F0EEE9' }}
-              />
-            )}
-          </button>
         </div>
+
+        {/* Divider */}
+        <div
+          className="w-px h-6 flex-shrink-0"
+          style={{ backgroundColor: 'rgba(0,0,0,0.12)' }}
+        />
+
+        {/* More Filters toggle - pinned right */}
+        <button
+          onClick={() => setMoreFiltersOpen(!moreFiltersOpen)}
+          className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5 relative"
+          style={{
+            backgroundColor: moreFiltersOpen || hasAdvancedFilters ? '#1B2A4A' : 'transparent',
+            color: moreFiltersOpen || hasAdvancedFilters ? 'white' : '#1B2A4A',
+            border: moreFiltersOpen || hasAdvancedFilters ? 'none' : '1.5px dashed #1B2A4A',
+            fontFamily: "'DM Sans', sans-serif",
+          }}
+        >
+          {tUI('More Filters')}
+          {moreFiltersOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          {/* Active indicator dot */}
+          {hasAdvancedFilters && !moreFiltersOpen && (
+            <span
+              className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full"
+              style={{ backgroundColor: '#E53935', border: '2px solid #F0EEE9' }}
+            />
+          )}
+        </button>
       </div>
 
       {/* Expanded: Effort Level + Danielson rows */}
