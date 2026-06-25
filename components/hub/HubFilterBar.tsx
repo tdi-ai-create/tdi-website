@@ -76,8 +76,8 @@ export default function HubFilterBar({
       </p>
 
       {/* Role dropdown + Category pills row */}
-      <div className="flex items-center gap-3 mt-5 mb-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0">
-        {/* Role dropdown */}
+      <div className="flex items-center gap-3 mt-5 mb-2">
+        {/* Role dropdown - pinned left */}
         <div className="relative flex-shrink-0">
           <select
             value={roleFilter}
@@ -90,6 +90,7 @@ export default function HubFilterBar({
               fontFamily: "'DM Sans', sans-serif",
               outline: 'none',
               minWidth: 0,
+              maxWidth: 150,
             }}
           >
             {ROLE_FILTERS.map(({ value, label }) => (
@@ -105,35 +106,43 @@ export default function HubFilterBar({
           />
         </div>
 
-        {/* Divider */}
+        {/* Divider - pinned */}
         <div
           className="w-px h-6 flex-shrink-0"
-          style={{ backgroundColor: 'rgba(0,0,0,0.08)' }}
+          style={{ backgroundColor: 'rgba(0,0,0,0.12)' }}
         />
 
-        {/* Category pills */}
-        {categories.map((category) => {
-          const isSaved = category === 'Saved';
-          const isActive = activeFilter === category;
-          return (
-            <button
-              key={category}
-              onClick={() => setActiveFilter(category)}
-              className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5"
-              style={{
-                backgroundColor: isActive ? (isSaved ? '#E53935' : '#1B2A4A') : 'white',
-                color: isActive ? 'white' : '#6B7280',
-                border: isActive ? 'none' : '1px solid rgba(0,0,0,0.08)',
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
-              {isSaved && <Heart size={14} style={{ fill: isActive ? 'white' : 'none' }} />}
-              {tUI(category)}
-            </button>
-          );
-        })}
+        {/* Scrollable category pills */}
+        <style>{`.hub-filter-scroll::-webkit-scrollbar { display: none; }`}</style>
+        <div
+          className="flex items-center gap-2 overflow-x-auto flex-1 min-w-0 hub-filter-scroll"
+          style={{ scrollbarWidth: 'none' }}
+        >
+          <div className="flex items-center gap-2">
+            {categories.map((category) => {
+              const isSaved = category === 'Saved';
+              const isActive = activeFilter === category;
+              return (
+                <button
+                  key={category}
+                  onClick={() => setActiveFilter(category)}
+                  className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5"
+                  style={{
+                    backgroundColor: isActive ? (isSaved ? '#E53935' : '#1B2A4A') : 'white',
+                    color: isActive ? 'white' : '#6B7280',
+                    border: isActive ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}
+                >
+                  {isSaved && <Heart size={14} style={{ fill: isActive ? 'white' : 'none' }} />}
+                  {tUI(category)}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-        {/* More Filters toggle */}
+        {/* More Filters toggle - pinned right */}
         <button
           onClick={() => setMoreFiltersOpen(!moreFiltersOpen)}
           className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5 relative"
