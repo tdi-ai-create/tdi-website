@@ -474,15 +474,20 @@ export default function CreateWithUsPage() {
             className="flex flex-col md:flex-row md:items-center md:gap-12 lg:gap-16 opacity-0 translate-y-8 transition-all duration-700 delay-150"
             data-animate="true"
           >
-            {/* Left side - Photo + Name + Title */}
+            {/* Left side - Team Icon */}
             <div className="md:w-1/3 text-center md:text-left mb-8 md:mb-0">
-              <div className="w-24 h-24 bg-[#80a4ed] rounded-full flex items-center justify-center mx-auto md:mx-0 mb-4 hover:scale-105 transition-transform duration-300">
-                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+              <div className="flex -space-x-2 justify-center md:justify-start mb-4">
+                <div className="w-16 h-16 bg-[#ffba06] rounded-full flex items-center justify-center text-lg font-bold ring-2 ring-white" style={{ color: '#1e2749' }}>
+                  TDI
+                </div>
+                <div className="w-16 h-16 bg-[#80a4ed] rounded-full flex items-center justify-center ring-2 ring-white">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
               </div>
-              <h3 className="text-2xl font-bold text-[#1e2749] mb-1">Teachers Deserve It Team Member</h3>
-              <p className="text-[#80a4ed] font-medium mb-3">Director of Creative Solutions</p>
+              <h3 className="text-2xl font-bold text-[#1e2749] mb-1">The TDI Creator Team</h3>
+              <p className="text-[#80a4ed] font-medium mb-3">We guide you from idea to published course</p>
               <div className="w-16 h-1 bg-[#ffba06] mx-auto md:mx-0" />
             </div>
 
@@ -490,7 +495,7 @@ export default function CreateWithUsPage() {
             <div className="md:w-2/3 relative">
               <span className="absolute -top-4 -left-2 text-6xl text-[#ffba06] opacity-30 font-serif leading-none">"</span>
               <p className="text-lg md:text-xl text-gray-600 italic pl-6 md:pl-8">
-                Feeling unsure where to start? That's exactly why I'm here. I walk every creator through the entire process, from your first idea to your published course. You bring the strategy, and I'll handle the rest.
+                Feeling unsure where to start? That is exactly why we are here. Our team walks every creator through the entire process, from your first idea to your published course. You bring the strategy, and we will handle the rest.
               </p>
             </div>
           </div>

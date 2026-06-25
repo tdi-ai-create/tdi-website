@@ -169,7 +169,7 @@ export default function Home() {
       </section>
 
       {/* SECTION 5b: What Educators Are Saying */}
-      <section className="py-12 md:py-16" style={{ backgroundColor: '#f5f5f5' }}>
+      <section className="py-12 md:py-16" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-wide">
           <h2 className="text-center mb-8" style={{ color: '#1e2749' }}>What Educators Are Saying</h2>
 

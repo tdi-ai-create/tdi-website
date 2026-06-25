@@ -691,20 +691,29 @@ export default function JoinPage() {
         </div>
       </section>
 
-      {/* Budget CTA */}
+      {/* Want TDI for Your School? */}
       <section className="section" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default text-center">
-          <h2 className="mb-4" style={{ color: '#ffffff' }}>Think You Don't Have Budget?</h2>
+          <h2 className="mb-4" style={{ color: '#ffffff' }}>Want TDI for Your Whole Building?</h2>
           <p className="text-lg mb-6 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
-            80% of schools we work with secure external funds to cover PD. We help you find the funding and draft the language.
+            Love what you see? Share it with your admin. 80% of partner schools secure external funding, and we help with the paperwork.
           </p>
-          <Link
-            href="/funding"
-            className="inline-block px-8 py-4 rounded-lg font-semibold transition-all hover:opacity-90"
-            style={{ backgroundColor: '#1e2749', color: '#ffffff' }}
-          >
-            See How Funding Works
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/for-schools"
+              className="inline-block px-8 py-4 rounded-lg font-semibold transition-all hover:opacity-90"
+              style={{ backgroundColor: '#1e2749', color: '#ffffff' }}
+            >
+              Share With Your Admin
+            </Link>
+            <Link
+              href="/get-started"
+              className="inline-block px-8 py-4 rounded-lg font-semibold transition-all hover:opacity-90"
+              style={{ backgroundColor: '#ffffff', color: '#1e2749' }}
+            >
+              Request TDI for Your School
+            </Link>
+          </div>
         </div>
       </section>
     </main>
