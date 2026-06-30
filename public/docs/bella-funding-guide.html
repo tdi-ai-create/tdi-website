@@ -222,10 +222,24 @@
 
   /* Print styles */
   @media print {
-    body { background: white; }
-    .page { padding: 20px; }
-    .section { break-inside: avoid; }
-    .cover { break-after: page; }
+    body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { padding: 10px 16px; max-width: 100%; }
+    .cover { padding: 32px 24px; margin-bottom: 20px; border-radius: 12px; }
+    .cover h1 { font-size: 26px; }
+    .section { padding: 20px; margin-bottom: 12px; box-shadow: none; }
+    .section h2 { font-size: 16px; margin-bottom: 10px; padding-bottom: 8px; }
+    .section h3 { font-size: 13px; margin: 12px 0 6px; }
+    .section p, .section li { font-size: 12px; margin-bottom: 6px; }
+    .visual-example { padding: 12px; margin: 8px 0; }
+    .callout { padding: 10px 14px; margin: 8px 0; font-size: 12px; }
+    .step-row { margin-bottom: 10px; }
+    .rule-box { padding: 8px 12px; margin-bottom: 6px; }
+    .ref-table th, .ref-table td { padding: 6px 8px; font-size: 11px; }
+    .alert-bar { gap: 4px; }
+    .alert-card { padding: 6px 8px; }
+    .alert-card-value { font-size: 16px; }
+    .action-item { padding: 6px 10px; }
+    .opp-card { padding: 10px; margin-bottom: 4px; }
   }
 
   .step-num {
