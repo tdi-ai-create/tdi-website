@@ -16,10 +16,40 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 // From email address
 const FROM_EMAIL = 'Teachers Deserve It <noreply@teachersdeserveit.com>';
 
-// Check if email was already sent to prevent duplicates
-async function wasEmailSent(userId: string, emailType: EmailType): Promise<boolean> {
+// Atomic check-and-lock to prevent duplicate emails.
+// Uses hub_email_sent_log with a unique constraint on (user_id, email_type).
+// Falls back to hub_activity_log check if the table doesn't exist yet.
+async function claimEmailSend(userId: string, emailType: EmailType): Promise<boolean> {
   const supabase = getSupabase();
 
+  try {
+    // Try atomic insert into dedup table -- unique constraint prevents duplicates
+    const { error } = await supabase
+      .from('hub_email_sent_log')
+      .insert({ user_id: userId, email_type: emailType });
+
+    if (error) {
+      if (error.code === '23505') {
+        // Unique violation = already sent
+        return false;
+      }
+      if (error.code === '42P01') {
+        // Table doesn't exist yet, fall back to activity log check
+        return !(await wasEmailSentFallback(userId, emailType));
+      }
+      console.error('claimEmailSend error:', error);
+      return false;
+    }
+    return true; // Successfully claimed -- safe to send
+  } catch {
+    // Fallback to activity log check
+    return !(await wasEmailSentFallback(userId, emailType));
+  }
+}
+
+// Fallback duplicate check using activity log (not atomic, but better than nothing)
+async function wasEmailSentFallback(userId: string, emailType: EmailType): Promise<boolean> {
+  const supabase = getSupabase();
   try {
     const { data } = await supabase
       .from('hub_activity_log')
@@ -28,14 +58,13 @@ async function wasEmailSent(userId: string, emailType: EmailType): Promise<boole
       .eq('action', 'email_sent')
       .eq('metadata->>email_type', emailType)
       .limit(1);
-
     return (data?.length || 0) > 0;
   } catch {
     return false;
   }
 }
 
-// Record that an email was sent
+// Record that an email was sent (activity log for audit trail)
 async function recordEmailSent(userId: string, emailType: EmailType): Promise<void> {
   const supabase = getSupabase();
 
@@ -93,9 +122,9 @@ export async function sendWelcomeEmail(
   email: string,
   displayName?: string
 ): Promise<boolean> {
-  // Check if already sent
-  if (await wasEmailSent(userId, 'welcome')) {
-    return false; // Already sent, skip
+  // Atomic claim -- prevents race condition duplicates
+  if (!(await claimEmailSend(userId, 'welcome'))) {
+    return false; // Already sent or claimed by another request
   }
 
   const data: WelcomeEmailData = {
@@ -118,8 +147,8 @@ export async function sendNudgeEmail(
   displayName?: string,
   courseCount?: number
 ): Promise<boolean> {
-  // Check if already sent (only send one nudge per user)
-  if (await wasEmailSent(userId, 'nudge')) {
+  // Atomic claim -- prevents race condition duplicates
+  if (!(await claimEmailSend(userId, 'nudge'))) {
     return false;
   }
 
