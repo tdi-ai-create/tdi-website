@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { buildHtmlEmail } from '@/lib/olivia-email-template';
 
 /**
  * GET /api/cron/olivia-weekly-briefing
@@ -56,31 +57,39 @@ export async function GET(request: NextRequest) {
     const subject = `Weekly Briefing -- ${weekLabel}`;
     const content = buildWeeklyReport(weekLabel, hub, sales, partnerships);
 
-    // Send via Olivia
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com';
-    const reportSecret = process.env.PAPERCLIP_REPORT_SECRET;
-
-    if (!reportSecret) {
-      return NextResponse.json({ error: 'Missing report secret' }, { status: 500 });
+    // --- Send directly via Resend ---
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (!resendApiKey) {
+      console.error('[olivia-weekly-briefing] RESEND_API_KEY not set');
+      return NextResponse.json({ error: 'Missing RESEND_API_KEY' }, { status: 500 });
     }
 
-    const sendRes = await fetch(`${siteUrl}/api/paperclip/send-report`, {
+    const htmlBody = buildHtmlEmail(content, subject);
+
+    const emailRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
+        Authorization: `Bearer ${resendApiKey}`,
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${reportSecret}`,
       },
-      body: JSON.stringify({ subject, content }),
+      body: JSON.stringify({
+        from: 'Olivia Smith — TDI EA <notifications@teachersdeserveit.com>',
+        to: ['rae@teachersdeserveit.com'],
+        subject,
+        html: htmlBody,
+        text: content,
+      }),
     });
 
-    if (!sendRes.ok) {
-      const err = await sendRes.json().catch(() => ({}));
-      console.error('[olivia-weekly-briefing] Send failed:', err);
-      return NextResponse.json({ error: 'Failed to send briefing', details: err }, { status: 502 });
+    const emailResult = await emailRes.json().catch(() => ({}));
+
+    if (!emailRes.ok) {
+      console.error('[olivia-weekly-briefing] Resend failed:', emailRes.status, emailResult);
+      return NextResponse.json({ error: 'Email delivery failed', status: emailRes.status, details: emailResult }, { status: 502 });
     }
 
-    console.log('[olivia-weekly-briefing] Sent:', subject);
-    return NextResponse.json({ success: true, subject, timestamp });
+    console.log('[olivia-weekly-briefing] Sent:', subject, 'emailId:', emailResult.id);
+    return NextResponse.json({ success: true, subject, emailId: emailResult.id, timestamp });
   } catch (error) {
     console.error('[olivia-weekly-briefing] Error:', error);
     return NextResponse.json({ error: String(error), timestamp }, { status: 500 });

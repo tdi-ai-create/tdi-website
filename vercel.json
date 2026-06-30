@@ -62,7 +62,7 @@
     },
     {
       "path": "/api/cron/olivia-weekly-briefing",
-      "schedule": "0 12 * * 1"
+      "schedule": "30 12 * * 1"
     }
   ]
 }
