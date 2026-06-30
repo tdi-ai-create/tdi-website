@@ -5,6 +5,7 @@ import { AlertBar } from './components/AlertBar'
 import { PhaseTabs } from './components/PhaseTabs'
 import { PursuitCard } from './components/PursuitCard'
 import { PursuitDetailPanel } from './components/PursuitDetailPanel'
+import { MyTasks } from './components/MyTasks'
 import {
   TYPE_PAGE_TITLE,
   TYPE_PAGE_SUBTITLE,
@@ -116,7 +117,7 @@ export default function FundingPage() {
   const [activePhase, setActivePhase] = useState('all')
   const [selectedPursuitId, setSelectedPursuitId] = useState<string | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
-  const [newPursuit, setNewPursuit] = useState({ districtName: '', totalAmount: '', implementationDate: '' })
+  const [newPursuit, setNewPursuit] = useState({ districtName: '', totalAmount: '', implementationDate: '', clientName: '', clientEmail: '', clientPhone: '', clientRole: '' })
   const [addingPursuit, setAddingPursuit] = useState(false)
 
   useEffect(() => {
@@ -215,6 +216,30 @@ export default function FundingPage() {
               />
             </div>
           </div>
+          {/* Client contact fields */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12, marginBottom: 16 }}>
+            <div>
+              <label style={{ fontSize: 12, color: '#6B7280', fontWeight: 600, display: 'block', marginBottom: 4 }}>Client contact name</label>
+              <input type="text" value={newPursuit.clientName} onChange={e => setNewPursuit(p => ({ ...p, clientName: e.target.value }))}
+                placeholder="e.g. Teri Hernandez" style={{ width: '100%', padding: '8px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14 }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, color: '#6B7280', fontWeight: 600, display: 'block', marginBottom: 4 }}>Client email</label>
+              <input type="email" value={newPursuit.clientEmail} onChange={e => setNewPursuit(p => ({ ...p, clientEmail: e.target.value }))}
+                placeholder="e.g. name@school.org" style={{ width: '100%', padding: '8px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14 }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, color: '#6B7280', fontWeight: 600, display: 'block', marginBottom: 4 }}>Client phone</label>
+              <input type="tel" value={newPursuit.clientPhone} onChange={e => setNewPursuit(p => ({ ...p, clientPhone: e.target.value }))}
+                placeholder="e.g. 301-555-0100" style={{ width: '100%', padding: '8px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14 }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, color: '#6B7280', fontWeight: 600, display: 'block', marginBottom: 4 }}>Client role</label>
+              <input type="text" value={newPursuit.clientRole} onChange={e => setNewPursuit(p => ({ ...p, clientRole: e.target.value }))}
+                placeholder="e.g. Principal" style={{ width: '100%', padding: '8px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14 }} />
+            </div>
+          </div>
+
           <div style={{ display: 'flex', gap: 8 }}>
             <button
               onClick={async () => {
@@ -229,12 +254,16 @@ export default function FundingPage() {
                       totalAmount: parseFloat(newPursuit.totalAmount) || 0,
                       contractGap: parseFloat(newPursuit.totalAmount) || 0,
                       implementationDate: newPursuit.implementationDate || null,
+                      clientContactName: newPursuit.clientName || null,
+                      clientContactEmail: newPursuit.clientEmail || null,
+                      clientContactPhone: newPursuit.clientPhone || null,
+                      clientContactRole: newPursuit.clientRole || null,
                     }),
                   })
                   const result = await res.json()
                   if (result.success) {
                     setShowAddForm(false)
-                    setNewPursuit({ districtName: '', totalAmount: '', implementationDate: '' })
+                    setNewPursuit({ districtName: '', totalAmount: '', implementationDate: '', clientName: '', clientEmail: '', clientPhone: '', clientRole: '' })
                     // Reload data
                     window.location.reload()
                   }
@@ -253,7 +282,7 @@ export default function FundingPage() {
             </button>
           </div>
           <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8 }}>
-            This creates a pursuit with default Plan A/B/C/D funding paths based on the TDI Funding Playbook. You can customize paths after creation.
+            Auto-generates 6 standard funding opportunities (Title II-A, IDEA/CEIS, Title I, NEA, Community Schools, Walmart) and 9 action items with due dates calculated from implementation date. All assigned to Bella by default.
           </p>
         </div>
       )}
@@ -263,6 +292,9 @@ export default function FundingPage() {
 
       {/* Alert bar */}
       <AlertBar alerts={data.alerts} />
+
+      {/* My Tasks - cross-pursuit action items */}
+      <MyTasks />
 
       {/* Phase tabs */}
       <PhaseTabs
