@@ -186,6 +186,7 @@ export default function TDIAdminCreatorDetailPage() {
 
   // Archive state
   const [isArchiving, setIsArchiving] = useState(false);
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [showStartNewProjectModal, setShowStartNewProjectModal] = useState(false);
   const [isStartingNewProject, setIsStartingNewProject] = useState(false);
 
@@ -678,6 +679,29 @@ export default function TDIAdminCreatorDetailPage() {
       alert('Error updating archive status.');
     } finally {
       setIsArchiving(false);
+    }
+  };
+
+  // Handle withdraw creator
+  const handleWithdraw = async () => {
+    if (!canEdit) return;
+    if (!confirm('Are you sure you want to mark this creator as withdrawn? This means they chose not to participate.')) return;
+    setIsWithdrawing(true);
+    try {
+      const supabase = getSupabase();
+      const { error } = await supabase
+        .from('creators')
+        .update({ status: 'withdrawn', updated_at: new Date().toISOString() })
+        .eq('id', creatorId);
+      if (error) throw error;
+      await loadData();
+      setSuccessMessage('Creator marked as withdrawn.');
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (error) {
+      console.error('Error withdrawing creator:', error);
+      alert('Error updating creator status.');
+    } finally {
+      setIsWithdrawing(false);
     }
   };
 
@@ -1794,6 +1818,27 @@ export default function TDIAdminCreatorDetailPage() {
                   ) : (
                     <p className="text-xs text-gray-400 italic">No follow-up items</p>
                   )}
+                </div>
+              )}
+
+              {/* Withdraw Creator */}
+              {canEdit && creator.status !== 'withdrawn' && creator.status !== 'archived' && (
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <button
+                    onClick={handleWithdraw}
+                    disabled={isWithdrawing}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    {isWithdrawing ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
+                    Withdraw Creator
+                  </button>
+                </div>
+              )}
+
+              {/* Withdrawn notice */}
+              {creator.status === 'withdrawn' && (
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <p className="text-xs text-red-500 text-center font-medium">Creator has withdrawn</p>
                 </div>
               )}
 

@@ -65,7 +65,7 @@ export type ContentPath = 'blog' | 'download' | 'course';
 export type PublishStatus = 'in_progress' | 'scheduled' | 'published';
 
 // Creator status types (includes followed_up for stalled flow)
-export type CreatorStatus = 'active' | 'archived' | 'followed_up';
+export type CreatorStatus = 'active' | 'archived' | 'followed_up' | 'withdrawn';
 
 // Project status types
 export type ProjectStatus = 'active' | 'completed' | 'archived';
