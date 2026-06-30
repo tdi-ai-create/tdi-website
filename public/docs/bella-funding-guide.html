@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TDI Funding System Guide - Bella</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #1e2749;
+    background: #F9FAFB;
+    line-height: 1.6;
+  }
+
+  .page { max-width: 800px; margin: 0 auto; padding: 40px 32px; }
+
+  /* Cover */
+  .cover {
+    background: linear-gradient(135deg, #1B365D 0%, #4338CA 50%, #8B5CF6 100%);
+    color: white;
+    padding: 60px 40px;
+    border-radius: 20px;
+    margin-bottom: 40px;
+    text-align: center;
+  }
+  .cover h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+  .cover p { font-size: 16px; opacity: 0.85; }
+  .cover .subtitle { font-size: 13px; opacity: 0.6; margin-top: 16px; }
+
+  /* Sections */
+  .section {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+    border: 1px solid #E5E7EB;
+  }
+  .section h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0a0f1e;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #EDE9FE;
+  }
+  .section h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #4338CA;
+    margin: 20px 0 8px;
+  }
+  .section p { font-size: 14px; color: #374151; margin-bottom: 12px; }
+  .section ul { padding-left: 20px; margin-bottom: 12px; }
+  .section li { font-size: 14px; color: #374151; margin-bottom: 6px; }
+
+  /* Visual examples */
+  .visual-example {
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+  }
+  .visual-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+
+  /* Alert bar mock */
+  .alert-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .alert-card {
+    background: white;
+    border-radius: 8px;
+    padding: 10px 12px;
+    border: 1px solid #E5E7EB;
+  }
+  .alert-card-label { font-size: 9px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; }
+  .alert-card-value { font-size: 20px; font-weight: 800; color: #0a0f1e; margin: 2px 0; }
+  .alert-card-sub { font-size: 10px; color: #6B7280; }
+  .alert-card.danger { border-left: 3px solid #DC2626; }
+  .alert-card.warning { border-left: 3px solid #F59E0B; }
+  .alert-card.success { border-left: 3px solid #10B981; }
+
+  /* Action item mock */
+  .action-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 10px 14px;
+    border-bottom: 1px solid #F3F4F6;
+  }
+  .action-checkbox {
+    width: 18px; height: 18px; border-radius: 4px;
+    border: 2px solid #D1D5DB; flex-shrink: 0; margin-top: 2px;
+  }
+  .action-checkbox.done {
+    background: #8B5CF6; border-color: #8B5CF6;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 11px; font-weight: 700;
+  }
+  .action-content { flex: 1; }
+  .action-title { font-size: 13px; font-weight: 600; color: #0a0f1e; }
+  .action-title.overdue { color: #DC2626; }
+  .action-title.done { color: #9CA3AF; text-decoration: line-through; }
+  .action-meta { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+  .action-right { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .badge-client { background: #FFF7ED; color: #C2410C; }
+  .badge-tdi { background: #F5F3FF; color: #6D28D9; }
+  .badge-funder { background: #EFF6FF; color: #1D4ED8; }
+  .badge-overdue { background: #FEF2F2; color: #DC2626; }
+  .badge-nudge { background: #FFF7ED; color: #C2410C; font-size: 9px; }
+  .badge-due { background: #FEF2F2; color: #DC2626; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; }
+  .badge-due.safe { background: #F3F4F6; color: #6B7280; }
+  .badge-due.warning { background: #FFFBEB; color: #D97706; }
+
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid #E5E7EB;
+    background: white;
+    color: #6B7280;
+    cursor: pointer;
+  }
+  .btn-violet { background: #8B5CF6; color: white; border-color: #8B5CF6; }
+
+  /* Opportunity card mock */
+  .opp-card {
+    background: white;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 8px;
+    border: 1px solid #E5E7EB;
+  }
+  .opp-card.plan-a { border-left: 4px solid #0F766E; }
+  .opp-card.plan-b { border-left: 4px solid #1B365D; }
+  .opp-card.plan-c { border-left: 4px solid #7C3AED; }
+  .opp-card.plan-d { border-left: 4px solid #B45309; }
+  .opp-top { display: flex; justify-content: space-between; align-items: center; }
+  .opp-plan { font-size: 10px; font-weight: 700; margin-right: 6px; }
+  .opp-name { font-size: 13px; font-weight: 600; }
+  .opp-amount { font-size: 13px; font-weight: 700; }
+  .opp-mid { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+  .opp-status {
+    font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px;
+    background: #F3F4F6; color: #374151;
+  }
+  .opp-status.waiting { background: #FEF3C7; color: #92400E; }
+  .opp-status.applied { background: #DBEAFE; color: #1D4ED8; }
+  .opp-status.awarded { background: #D1FAE5; color: #065F46; }
+
+  /* Narrative dots */
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot-red { background: #DC2626; }
+  .dot-yellow { background: #F59E0B; }
+  .dot-green { background: #10B981; }
+
+  /* Tab bar mock */
+  .tab-bar {
+    display: flex; gap: 0; border-bottom: 1px solid #E5E7EB;
+    margin: 16px 0;
+  }
+  .tab {
+    font-size: 12px; font-weight: 600; padding: 8px 16px;
+    color: #6B7280; border-bottom: 2px solid transparent;
+  }
+  .tab.active { color: #8B5CF6; border-bottom-color: #8B5CF6; }
+
+  /* Callout */
+  .callout {
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  .callout-violet { background: #F5F3FF; border: 1px solid #DDD6FE; color: #4338CA; }
+  .callout-red { background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; }
+  .callout-amber { background: #FFFBEB; border: 1px solid #FDE68A; color: #92400E; }
+
+  /* Table */
+  .ref-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+  .ref-table th {
+    text-align: left; font-size: 11px; font-weight: 700; color: #6B7280;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 8px 12px; border-bottom: 2px solid #E5E7EB;
+  }
+  .ref-table td {
+    font-size: 13px; color: #374151; padding: 10px 12px;
+    border-bottom: 1px solid #F3F4F6;
+  }
+
+  /* Progress bar */
+  .gap-bar { height: 8px; background: #F3F4F6; border-radius: 4px; overflow: hidden; display: flex; margin: 8px 0; }
+  .gap-awarded { background: #10B981; height: 100%; }
+  .gap-pending { background: #3B82F6; height: 100%; }
+
+  /* Print styles */
+  @media print {
+    body { background: white; }
+    .page { padding: 20px; }
+    .section { break-inside: avoid; }
+    .cover { break-after: page; }
+  }
+
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%; background: #8B5CF6;
+    color: white; font-size: 12px; font-weight: 700; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 16px; }
+  .step-content { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 700; color: #0a0f1e; margin-bottom: 2px; }
+  .step-desc { font-size: 13px; color: #6B7280; }
+
+  .rule-box {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 10px 14px; border-radius: 8px; margin-bottom: 8px;
+  }
+  .rule-num {
+    font-size: 14px; font-weight: 800; color: #8B5CF6; flex-shrink: 0; width: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Cover -->
+  <div class="cover">
+    <h1>Funding System Guide</h1>
+    <p>How to track, nudge, and close every grant for every school</p>
+    <div class="subtitle">Teachers Deserve It -- Internal Operations Guide -- June 2026</div>
+  </div>
+
+  <!-- What this is -->
+  <div class="section">
+    <h2>What This System Does</h2>
+    <p>This is where we track every grant and funding path for every school we work with. TDI's promise is that <strong>we do 90% of the work</strong> -- we research funders, write narratives, draft emails, build submission packets. The school contact just needs to follow our instructions and hit send.</p>
+    <div class="callout callout-violet">
+      <strong>Your job:</strong> Make sure nothing falls through the cracks. Every school contact has clear next steps, every deadline is tracked, and every stalled item gets a nudge.
+    </div>
+  </div>
+
+  <!-- Daily workflow -->
+  <div class="section">
+    <h2>Your Daily Workflow</h2>
+    <p>Every morning, open <strong>teachersdeserveit.com/tdi-admin/funding</strong></p>
+
+    <h3>Step 1: Check the Alert Bar</h3>
+    <p>Four boxes at the top tell you the health of all pursuits at a glance:</p>
+
+    <div class="visual-example">
+      <div class="visual-label">What the Alert Bar looks like</div>
+      <div class="alert-bar">
+        <div class="alert-card danger">
+          <div class="alert-card-label">Waiting on Client</div>
+          <div class="alert-card-value">4</div>
+          <div class="alert-card-sub">opportunities need client action</div>
+        </div>
+        <div class="alert-card danger">
+          <div class="alert-card-label">Deadlines This Week</div>
+          <div class="alert-card-value">2</div>
+          <div class="alert-card-sub">applications closing</div>
+        </div>
+        <div class="alert-card warning">
+          <div class="alert-card-label">Overdue Actions</div>
+          <div class="alert-card-value">3</div>
+          <div class="alert-card-sub">past due date</div>
+        </div>
+        <div class="alert-card success">
+          <div class="alert-card-label">Awarded YTD</div>
+          <div class="alert-card-value">$5K</div>
+          <div class="alert-card-sub">2 pursuits</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-red">
+      <strong>If "Waiting on Client" or "Overdue Actions" are above zero, that's your first priority.</strong>
+    </div>
+
+    <h3>Step 2: Work Through Action Items</h3>
+    <p>Below the alerts is your daily to-do list across ALL schools, sorted by due date. This is the most important part of your day.</p>
+
+    <div class="visual-example">
+      <div class="visual-label">What Action Items look like</div>
+
+      <div style="background: white; border-radius: 10px; border: 1px solid #E5E7EB; overflow: hidden;">
+        <!-- Overdue client task -->
+        <div class="action-item" style="background: #FFFBEB;">
+          <div class="action-checkbox"></div>
+          <div class="action-content">
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <span class="badge badge-client">client</span>
+              <span class="action-title overdue">Get Dr. Porter to send ATSI email to Dr. Gloster</span>
+            </div>
+            <div class="action-meta">Allenwood Elementary / ATSI Section 1003</div>
+            <div style="font-size: 10px; color: #9CA3AF; font-style: italic; margin-top: 3px;">TDI prepared: Pre-written email in Google Doc (June 22 packet). Task 1.</div>
+          </div>
+          <div class="action-right">
+            <span class="badge-due">2d overdue</span>
+            <span class="badge badge-nudge">1x</span>
+            <span class="btn">Nudge</span>
+          </div>
+        </div>
+
+        <!-- Normal TDI task -->
+        <div class="action-item">
+          <div class="action-checkbox"></div>
+          <div class="action-content">
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <span class="badge badge-tdi">tdi</span>
+              <span class="action-title">Get NCES number for Allenwood and send to Teri</span>
+            </div>
+            <div class="action-meta">Allenwood Elementary</div>
+          </div>
+          <div class="action-right">
+            <span class="badge-due warning">3d</span>
+          </div>
+        </div>
+
+        <!-- Done task -->
+        <div class="action-item">
+          <div class="action-checkbox done">&#10003;</div>
+          <div class="action-content">
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <span class="badge badge-tdi">tdi</span>
+              <span class="action-title done">Draft all grant narratives</span>
+            </div>
+            <div class="action-meta">Lincoln Elementary</div>
+          </div>
+          <div class="action-right">
+            <span class="badge-due safe">done</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p><strong>How to use it:</strong></p>
+    <ul>
+      <li><strong>Filter tabs</strong> let you focus: All, Overdue, Client, or TDI</li>
+      <li><strong>Checkbox</strong> on the left -- click it when a task is done</li>
+      <li><strong>"Nudge" button</strong> (client tasks only) -- sends a pre-written email to the school contact automatically. One click. You don't write anything.</li>
+      <li><strong>Orange "2x" badge</strong> -- shows how many times they've been nudged. If 3x+ and nothing happened, flag it for Rae.</li>
+      <li><strong>Red highlighting</strong> -- task is overdue. Deal with these first.</li>
+    </ul>
+
+    <div class="callout callout-amber">
+      <strong>Start each day by filtering to "Overdue" and working through that list.</strong>
+    </div>
+  </div>
+
+  <!-- Pursuit cards -->
+  <div class="section">
+    <h2>Pursuit Cards</h2>
+    <p>Below the action items, each school has a card. Here's what the pieces mean:</p>
+
+    <div class="visual-example">
+      <div class="visual-label">What a Pursuit Card looks like</div>
+      <div style="background: white; border-radius: 14px; padding: 20px; border: 1px solid #E5E7EB;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+          <div>
+            <div style="font-size: 16px; font-weight: 700;">Allenwood Elementary</div>
+            <div style="font-size: 12px; color: #6B7280;">Grant Funded Funding</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 20px; font-weight: 800;">$56,373</div>
+            <div style="font-size: 11px; color: #DC2626; font-weight: 600;">Next deadline: 3d</div>
+          </div>
+        </div>
+
+        <!-- Opportunity chips -->
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
+          <span style="font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: #FEF3C7; color: #92400E; border-left: 3px solid #0F766E;">Title II-A: stalled</span>
+          <span style="font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: #FEF3C7; color: #92400E; border-left: 3px solid #7C3AED;">NEA: waiting</span>
+          <span style="font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: #DBEAFE; color: #1D4ED8; border-left: 3px solid #7C3AED;">Foundation: applied</span>
+          <span style="font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: #F3F4F6; color: #374151; border-left: 3px solid #B45309;">Walmart: researching</span>
+        </div>
+
+        <!-- Gap bar -->
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 10px; color: #6B7280;">
+            <span>$5,000 awarded / $2,500 pending</span>
+            <span style="font-weight: 700;">15% of $33,225</span>
+          </div>
+          <div class="gap-bar">
+            <div class="gap-awarded" style="width: 15%;"></div>
+            <div class="gap-pending" style="width: 7%;"></div>
+          </div>
+        </div>
+
+        <!-- Badges -->
+        <div style="display: flex; gap: 6px; margin-top: 10px;">
+          <span style="font-size: 10px; font-weight: 700; color: #C2410C; background: #FFF7ED; padding: 4px 8px; border-radius: 6px;">3 WAITING ON CLIENT</span>
+          <span style="font-size: 10px; font-weight: 700; color: #DC2626; background: #FEF2F2; padding: 4px 8px; border-radius: 6px;">2 OVERDUE</span>
+        </div>
+      </div>
+    </div>
+
+    <p><strong>Click any card to open the detail panel.</strong></p>
+  </div>
+
+  <!-- Detail panel -->
+  <div class="section">
+    <h2>The Detail Panel (5 Tabs)</h2>
+    <p>When you click a pursuit card, a panel slides open on the right with 5 tabs:</p>
+
+    <div class="visual-example">
+      <div class="visual-label">Tab navigation</div>
+      <div class="tab-bar">
+        <div class="tab">Overview</div>
+        <div class="tab active">Opportunities</div>
+        <div class="tab">Actions</div>
+        <div class="tab">Timeline</div>
+        <div class="tab">Emails</div>
+      </div>
+    </div>
+
+    <h3>Overview Tab</h3>
+    <ul>
+      <li>School contact info (name, email, phone, role)</li>
+      <li>Total amount and deadline</li>
+      <li>Strategy notes from Rae</li>
+      <li>Team ownership assignments</li>
+    </ul>
+
+    <h3>Opportunities Tab</h3>
+    <p>Every individual funding source for this school. Each has its own status, deadline, and contact.</p>
+
+    <div class="visual-example">
+      <div class="visual-label">What opportunity cards look like</div>
+
+      <div class="opp-card plan-a">
+        <div class="opp-top">
+          <div>
+            <span class="opp-plan" style="color: #0F766E;">Plan A</span>
+            <span class="opp-name">Title II-A Federal</span>
+          </div>
+          <span class="opp-amount">$33,225</span>
+        </div>
+        <div class="opp-mid">
+          <span class="opp-status">stalled</span>
+          <span class="badge badge-funder">Waiting on Funder</span>
+          <span style="font-size: 11px; color: #6B7280;">Kevin Thompson</span>
+          <span class="dot dot-green" title="Narrative ready"></span>
+        </div>
+      </div>
+
+      <div class="opp-card plan-c">
+        <div class="opp-top">
+          <div>
+            <span class="opp-plan" style="color: #7C3AED;">Plan C</span>
+            <span class="opp-name">NEA Learning & Leadership</span>
+          </div>
+          <span class="opp-amount">$5,000</span>
+        </div>
+        <div class="opp-mid">
+          <span class="opp-status waiting">waiting</span>
+          <span class="badge badge-funder">Waiting on Funder</span>
+          <span style="font-size: 11px; color: #6B7280;">Jovita Ortiz</span>
+          <span class="dot dot-green" title="Narrative ready"></span>
+          <span style="font-size: 11px; color: #10B981; font-weight: 600;">&#10003; Submitted</span>
+        </div>
+      </div>
+
+      <div class="opp-card plan-d">
+        <div class="opp-top">
+          <div>
+            <span class="opp-plan" style="color: #B45309;">Plan D</span>
+            <span class="opp-name">Walmart Spark Good</span>
+          </div>
+          <span class="opp-amount">$1,800</span>
+        </div>
+        <div class="opp-mid">
+          <span class="opp-status">researching</span>
+          <span class="badge badge-client">Waiting on Client</span>
+          <span class="dot dot-green" title="Narrative ready"></span>
+        </div>
+      </div>
+    </div>
+
+    <p><strong>Color key for the left border:</strong></p>
+    <div style="display: flex; gap: 16px; margin: 8px 0 16px;">
+      <span style="font-size: 12px;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: #0F766E; margin-right: 4px; vertical-align: middle;"></span> Plan A = Federal</span>
+      <span style="font-size: 12px;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: #1B365D; margin-right: 4px; vertical-align: middle;"></span> Plan B = State/Local</span>
+      <span style="font-size: 12px;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: #7C3AED; margin-right: 4px; vertical-align: middle;"></span> Plan C = Foundation</span>
+      <span style="font-size: 12px;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: #B45309; margin-right: 4px; vertical-align: middle;"></span> Plan D = Direct</span>
+    </div>
+
+    <p><strong>Narrative status dots:</strong></p>
+    <div style="display: flex; gap: 16px; margin: 8px 0 16px;">
+      <span style="font-size: 12px;"><span class="dot dot-red" style="margin-right: 4px; vertical-align: middle;"></span> Not started</span>
+      <span style="font-size: 12px;"><span class="dot dot-yellow" style="margin-right: 4px; vertical-align: middle;"></span> In progress</span>
+      <span style="font-size: 12px;"><span class="dot dot-green" style="margin-right: 4px; vertical-align: middle;"></span> Ready to send</span>
+    </div>
+
+    <h3>Actions Tab</h3>
+    <p>Same as the main Action Items view, but filtered to just this school. Split into <strong>Client Tasks</strong> (shown first) and <strong>TDI Tasks</strong>. You can add new tasks here too.</p>
+
+    <h3>Timeline Tab</h3>
+    <p>Chronological history of everything that's happened. Events are auto-created when emails are sent, actions are completed, or statuses change.</p>
+
+    <h3>Emails Tab</h3>
+    <p>Compose emails using pre-written templates, or view the full email log for this school.</p>
+    <ul>
+      <li>Pick a template type (nudge, submission instructions, deadline reminder, status update, follow-up)</li>
+      <li>The system auto-fills school name, contact name, funding source, deadline, etc.</li>
+      <li><strong>Save Draft</strong> to review later, or <strong>Send Now</strong> to send immediately</li>
+    </ul>
+  </div>
+
+  <!-- Adding a new school -->
+  <div class="section">
+    <h2>Adding a New School</h2>
+    <p>When a new school signs on and needs funding support:</p>
+
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Click "+ Add Pursuit" at the top right</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">Fill in the form</div>
+        <div class="step-desc">School name, contract amount, implementation date (usually August), and client contact info (name, email, phone, role)</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">Click "Create pursuit"</div>
+        <div class="step-desc">The system does the rest.</div>
+      </div>
+    </div>
+
+    <div class="callout callout-violet">
+      <strong>What happens automatically:</strong>
+      <ul style="margin-top: 8px; padding-left: 20px;">
+        <li>6 standard funding opportunities are created (Title II-A, IDEA/CEIS, Title I, NEA, Community Schools, Walmart)</li>
+        <li>9 action items are created with due dates calculated from the implementation date</li>
+        <li>All TDI tasks are assigned to you</li>
+        <li>A timeline event is logged</li>
+      </ul>
+    </div>
+
+    <p>After creation, customize: remove opportunities that don't apply to this school, add any school-specific ones, and start working through the action items.</p>
+  </div>
+
+  <!-- Rules -->
+  <div class="section">
+    <h2>5 Rules to Live By</h2>
+
+    <div class="rule-box" style="background: #FEF2F2;">
+      <div class="rule-num">1</div>
+      <div style="flex: 1;">
+        <strong>Never let a client task sit more than 7 days without a nudge.</strong><br>
+        <span style="font-size: 13px; color: #6B7280;">If it's overdue and you've nudged 2+ times, tell Rae.</span>
+      </div>
+    </div>
+
+    <div class="rule-box" style="background: #F5F3FF;">
+      <div class="rule-num">2</div>
+      <div style="flex: 1;">
+        <strong>Update statuses as things change.</strong><br>
+        <span style="font-size: 13px; color: #6B7280;">When a client confirms submission, change the opportunity to "applied" or "waiting" and check off the action item.</span>
+      </div>
+    </div>
+
+    <div class="rule-box" style="background: #FFFBEB;">
+      <div class="rule-num">3</div>
+      <div style="flex: 1;">
+        <strong>Log everything in the timeline.</strong><br>
+        <span style="font-size: 13px; color: #6B7280;">Phone calls, status changes, anything notable. If it's not in the system, it didn't happen.</span>
+      </div>
+    </div>
+
+    <div class="rule-box" style="background: #FEF2F2;">
+      <div class="rule-num">4</div>
+      <div style="flex: 1;">
+        <strong>Check the Overdue filter first thing every morning.</strong><br>
+        <span style="font-size: 13px; color: #6B7280;">That's where money gets left on the table.</span>
+      </div>
+    </div>
+
+    <div class="rule-box" style="background: #EFF6FF;">
+      <div class="rule-num">5</div>
+      <div style="flex: 1;">
+        <strong>When in doubt, nudge.</strong><br>
+        <span style="font-size: 13px; color: #6B7280;">The emails are pre-written and friendly. One too many is better than letting a $33,000 grant expire.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick reference -->
+  <div class="section">
+    <h2>Quick Reference</h2>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>What you want to do</th>
+          <th>Where to do it</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>See all tasks across schools</td><td>Action Items section at top of funding page</td></tr>
+        <tr><td>Send a reminder to a school contact</td><td>Click "Nudge" on any client task</td></tr>
+        <tr><td>Check what's overdue</td><td>Filter Action Items to "Overdue"</td></tr>
+        <tr><td>See all funding paths for one school</td><td>Click pursuit card > Opportunities tab</td></tr>
+        <tr><td>Add a new funding source</td><td>Detail panel > Opportunities tab > "Add Opportunity"</td></tr>
+        <tr><td>Send a custom email to a client</td><td>Detail panel > Emails tab > Compose</td></tr>
+        <tr><td>Mark something as done</td><td>Click the checkbox on any action item</td></tr>
+        <tr><td>See email history with a client</td><td>Detail panel > Emails tab (scroll to log)</td></tr>
+        <tr><td>Add a new school</td><td>Click "+ Add Pursuit" at top right</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align: center; padding: 24px 0; color: #9CA3AF; font-size: 11px;">
+    Teachers Deserve It -- Funding Operations Guide -- v1.0 -- June 30, 2026
+  </div>
+
+</div>
+</body>
+</html>
