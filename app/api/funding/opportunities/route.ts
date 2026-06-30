@@ -60,6 +60,12 @@ export async function POST(request: NextRequest) {
       contact_email: body.contactEmail || null,
       next_action: body.nextAction || null,
       next_action_due: body.nextActionDue || null,
+      // New fields
+      application_opens: body.applicationOpens || null,
+      application_closes: body.applicationCloses || null,
+      plan_category: body.planCategory || null,
+      waiting_on: body.waitingOn || 'tdi',
+      narrative_status: body.narrativeStatus || 'not_started',
     })
     .select()
     .single();
@@ -78,9 +84,36 @@ export async function PATCH(request: NextRequest) {
 
   const supabase = db();
 
+  // Get current state for change detection
+  const { data: before } = await supabase
+    .from('funding_opportunities')
+    .select('status, waiting_on, client_submitted, pursuit_id')
+    .eq('id', body.id)
+    .single();
+
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
-  const fields = ['name', 'amount', 'status', 'contact_name', 'contact_email', 'last_action', 'last_action_date', 'next_action', 'next_action_due'];
+  const fields = [
+    'name', 'amount', 'status', 'contact_name', 'contact_email',
+    'last_action', 'last_action_date', 'next_action', 'next_action_due',
+    // New fields from migration 093
+    'application_opens', 'application_closes', 'plan_category',
+    'waiting_on', 'narrative_status', 'narrative_url', 'forwarding_email_status',
+    'client_submitted', 'client_submitted_proof',
+    'decision_date', 'awarded_amount', 'denial_reason',
+  ];
   fields.forEach(f => { if (body[f] !== undefined) updates[f] = body[f]; });
+
+  // When client_submitted flips to true, set timestamp and update activity
+  if (body.client_submitted === true && !before?.client_submitted) {
+    updates.client_submitted_at = new Date().toISOString();
+    updates.last_activity_at = new Date().toISOString();
+    updates.waiting_on = 'funder';
+  }
+
+  // Any status change updates last_activity_at
+  if (body.status && body.status !== before?.status) {
+    updates.last_activity_at = new Date().toISOString();
+  }
 
   const { error } = await supabase.from('funding_opportunities').update(updates).eq('id', body.id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -104,6 +137,23 @@ export async function PATCH(request: NextRequest) {
         visible_to_partner: false,
       });
     }
+  }
+
+  // Auto-create timeline event when client submits
+  if (body.client_submitted === true && !before?.client_submitted && before?.pursuit_id) {
+    const { data: opp } = await supabase
+      .from('funding_opportunities')
+      .select('name')
+      .eq('id', body.id)
+      .single();
+
+    await supabase.from('funding_pursuit_timeline').insert({
+      pursuit_id: before.pursuit_id,
+      event_date: new Date().toISOString().split('T')[0],
+      event_title: `Client submitted: ${opp?.name || 'Unknown'}`,
+      event_detail: body.client_submitted_proof || 'Submission confirmed',
+      status: 'complete',
+    });
   }
 
   return NextResponse.json({ success: true });
