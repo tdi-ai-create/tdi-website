@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Olivia Smith — TDI EA <notifications@teachersdeserveit.com>',
+        from: 'Olivia Smith - TDI <noreply@teachersdeserveit.com>',
         to: ['rae@teachersdeserveit.com'],
         subject,
         html: htmlBody,
