@@ -583,6 +583,7 @@ export default function SalesPage() {
         'Heat': o.heat ? o.heat.charAt(0).toUpperCase() + o.heat.slice(1) : '',
         'Source': o.source || '',
         'Deal Type': o.type === 'new_business' ? 'New Business' : o.type === 'renewal' ? 'Renewal' : o.type || '',
+        'Website': o.website || '',
         'School Year': o.schoolYear || '',
         'Notes': (o.notes || '').replace(/\n/g, ' '),
       }
@@ -607,6 +608,7 @@ export default function SalesPage() {
       'Heat': 8,
       'Source': 28,
       'Deal Type': 14,
+      'Website': 35,
       'School Year': 12,
       'Notes': 60,
       'Assigned To': 22,
