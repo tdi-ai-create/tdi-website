@@ -8,7 +8,6 @@ import { getSupabase } from '@/lib/supabase';
 import { useProgressTracking } from '@/lib/hooks/useProgressTracking';
 import LessonContent from '@/components/hub/LessonContent';
 import CourseCompletionModal from '@/components/hub/CourseCompletionModal';
-import InlinePracticeNotes from '@/components/hub/InlinePracticeNotes';
 import InteractiveLessonRenderer from '@/components/hub/InteractiveLessonRenderer';
 import BranchingScenarioRenderer from '@/components/hub/BranchingScenarioRenderer';
 import EscapeRoomStageRenderer from '@/components/hub/EscapeRoomStageRenderer';
@@ -28,14 +27,14 @@ import { type QuizQuestion, type QuizResponse, getLessonQuestions, getUserRespon
 // video/resource lessons it comes back as a string (raw HTML) or null; for
 // TEA-7325 seeded interactive/branching/escape-room lessons it comes back as
 // { format, markdown }.
-type LessonContent = string | { format?: string; markdown?: string } | null;
+type LessonContentValue = string | { format?: string; markdown?: string } | null;
 
 interface Lesson {
   id: string;
   slug: string;
   title: string;
   description: string | null;
-  content: LessonContent;
+  content: LessonContentValue;
   video_url: string | null;
   estimated_minutes: number;
   content_type: string;
@@ -64,7 +63,7 @@ interface LessonPageProps {
   params: Promise<{ slug: string; lesson: string }>;
 }
 
-function getMarkdownContent(content: LessonContent): string | null {
+function getMarkdownContent(content: LessonContentValue): string | null {
   if (!content) return null;
   if (typeof content === 'string') return null; // legacy HTML lessons use the HTML path
   if (typeof content === 'object' && typeof content.markdown === 'string') return content.markdown;
@@ -547,13 +546,6 @@ export default function LessonPage({ params }: LessonPageProps) {
                 </label>
               </div>
             )}
-
-            {/* Inline practice notes for this lesson */}
-            <InlinePracticeNotes
-              courseId={course.id}
-              lessonId={currentLesson.id}
-              courseSlug={slug}
-            />
 
             {/* Lesson Navigation */}
             <div
