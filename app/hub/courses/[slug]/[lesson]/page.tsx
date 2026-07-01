@@ -7,8 +7,10 @@ import { useHub } from '@/components/hub/HubContext';
 import { getSupabase } from '@/lib/supabase';
 import { useProgressTracking } from '@/lib/hooks/useProgressTracking';
 import LessonContent from '@/components/hub/LessonContent';
-import LessonConversation from '@/components/hub/LessonConversation';
 import CourseCompletionModal from '@/components/hub/CourseCompletionModal';
+import InteractiveLessonRenderer from '@/components/hub/InteractiveLessonRenderer';
+import BranchingScenarioRenderer from '@/components/hub/BranchingScenarioRenderer';
+import EscapeRoomStageRenderer from '@/components/hub/EscapeRoomStageRenderer';
 import {
   ArrowLeft,
   ArrowRight,
@@ -18,20 +20,25 @@ import {
   ChevronRight,
   Menu,
   X,
-  MessageCircle,
-  BookOpen,
 } from 'lucide-react';
 import { type QuizQuestion, type QuizResponse, getLessonQuestions, getUserResponses } from '@/lib/hub/quiz';
+
+// content column is jsonb in the LEARNING_HUB Supabase project. For legacy
+// video/resource lessons it comes back as a string (raw HTML) or null; for
+// TEA-7325 seeded interactive/branching/escape-room lessons it comes back as
+// { format, markdown }.
+type LessonContentValue = string | { format?: string; markdown?: string } | null;
 
 interface Lesson {
   id: string;
   slug: string;
   title: string;
   description: string | null;
-  content: string | null;
+  content: LessonContentValue;
   video_url: string | null;
   estimated_minutes: number;
   content_type: string;
+  type: string | null;
   sort_order: number;
   module_id: string | null;
   transcript_text: string | null;
@@ -56,6 +63,31 @@ interface LessonPageProps {
   params: Promise<{ slug: string; lesson: string }>;
 }
 
+function getMarkdownContent(content: LessonContentValue): string | null {
+  if (!content) return null;
+  if (typeof content === 'string') return null; // legacy HTML lessons use the HTML path
+  if (typeof content === 'object' && typeof content.markdown === 'string') return content.markdown;
+  return null;
+}
+
+function isStructuredType(type: string | null | undefined): boolean {
+  return type === 'interactive' || type === 'branching-scenario' || type === 'escape-room-stage';
+}
+
+/**
+ * Escape-room courses have one stage per module. Compute this stage's 1-based
+ * index within the course and the total stage count so the renderer can show
+ * "Stage X of N" progress.
+ */
+function escapeRoomStageInfo(
+  current: Lesson,
+  allLessons: Lesson[]
+): { index: number; total: number } {
+  const stages = allLessons.filter((l) => l.type === 'escape-room-stage');
+  const idx = stages.findIndex((l) => l.id === current.id);
+  return { index: idx >= 0 ? idx + 1 : 1, total: stages.length || 1 };
+}
+
 export default function LessonPage({ params }: LessonPageProps) {
   const resolvedParams = use(params);
   const { slug, lesson: lessonSlug } = resolvedParams;
@@ -71,7 +103,6 @@ export default function LessonPage({ params }: LessonPageProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [hasTranscript, setHasTranscript] = useState(false);
   const [hasTranscriptEs, setHasTranscriptEs] = useState(false);
-  const [activeTab, setActiveTab] = useState<'lesson' | 'conversation'>('lesson');
 
   // Quiz state
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
@@ -130,12 +161,31 @@ export default function LessonPage({ params }: LessonPageProps) {
           .eq('course_id', courseData.id)
           .order('sort_order', { ascending: true });
 
-        // Fetch all lessons
-        const { data: lessonsData } = await supabase
+        // Fetch all lessons. TEA-7325 seeded the LEARNING_HUB Supabase without
+        // the description/video_url/content_type/transcript_text* columns —
+        // if they exist, we take them; if the wide select fails, retry with the
+        // minimal columns present in every deployment.
+        const fullColumns =
+          'id, slug, title, description, content, video_url, estimated_minutes, ' +
+          'content_type, type, sort_order, module_id, transcript_text, transcript_text_es';
+        const minimalColumns = 'id, slug, title, content, estimated_minutes, type, sort_order, module_id';
+
+        let lessonsData: Lesson[] | null = null;
+        const wide = await supabase
           .from('hub_lessons')
-          .select('id, slug, title, description, content, video_url, estimated_minutes, content_type, sort_order, module_id, transcript_text, transcript_text_es')
+          .select(fullColumns)
           .eq('course_id', courseData.id)
           .order('sort_order', { ascending: true });
+        if (wide.error) {
+          const narrow = await supabase
+            .from('hub_lessons')
+            .select(minimalColumns)
+            .eq('course_id', courseData.id)
+            .order('sort_order', { ascending: true });
+          lessonsData = (narrow.data as unknown as Lesson[]) || null;
+        } else {
+          lessonsData = (wide.data as unknown as Lesson[]) || null;
+        }
 
         if (!lessonsData || lessonsData.length === 0) {
           router.push(`/hub/courses/${slug}`);
@@ -341,39 +391,6 @@ export default function LessonPage({ params }: LessonPageProps) {
               Course outline
             </button>
 
-            {/* Lesson / Conversation tabs */}
-            <div className="flex gap-0 border-b border-gray-200 mb-6">
-              <button
-                onClick={() => setActiveTab('lesson')}
-                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors relative"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  color: activeTab === 'lesson' ? '#1B2A4A' : '#9CA3AF',
-                  borderBottom: activeTab === 'lesson' ? '2px solid #E8B84B' : '2px solid transparent',
-                  marginBottom: '-1px',
-                }}
-              >
-                <BookOpen size={16} />
-                Lesson
-              </button>
-              <button
-                onClick={() => setActiveTab('conversation')}
-                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors relative"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  color: activeTab === 'conversation' ? '#1B2A4A' : '#9CA3AF',
-                  borderBottom: activeTab === 'conversation' ? '2px solid #E8B84B' : '2px solid transparent',
-                  marginBottom: '-1px',
-                }}
-              >
-                <MessageCircle size={16} />
-                Conversation
-              </button>
-            </div>
-
-            {/* ── LESSON TAB ── */}
-            {activeTab === 'lesson' && (<>
-
             {/* Video placeholder (if video_url exists) */}
             {currentLesson.video_url && (
               <div
@@ -414,19 +431,66 @@ export default function LessonPage({ params }: LessonPageProps) {
               </p>
             )}
 
-            {/* Lesson content (if any) */}
-            {currentLesson.content && (
-              <div
-                className="prose prose-gray max-w-none mb-6"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '15px',
-                  color: '#374151',
-                  lineHeight: '1.7',
-                }}
-                dangerouslySetInnerHTML={{ __html: currentLesson.content }}
-              />
-            )}
+            {/* Structured lesson content — switch on lesson.type for the
+                three TEA-7325 seeded types; otherwise fall through to the
+                legacy HTML render for video/resource lessons. */}
+            {(() => {
+              const md = getMarkdownContent(currentLesson.content);
+              if (md && currentLesson.type === 'interactive') {
+                return (
+                  <div className="mb-8">
+                    <InteractiveLessonRenderer
+                      markdown={md}
+                      isCompleted={isComplete}
+                      onComplete={handleMarkComplete}
+                    />
+                  </div>
+                );
+              }
+              if (md && currentLesson.type === 'branching-scenario') {
+                return (
+                  <div className="mb-8">
+                    <BranchingScenarioRenderer
+                      markdown={md}
+                      isCompleted={isComplete}
+                      onComplete={handleMarkComplete}
+                    />
+                  </div>
+                );
+              }
+              if (md && currentLesson.type === 'escape-room-stage') {
+                const stageInfo = escapeRoomStageInfo(currentLesson, allLessons);
+                return (
+                  <div className="mb-8">
+                    <EscapeRoomStageRenderer
+                      markdown={md}
+                      isCompleted={isComplete}
+                      onComplete={handleMarkComplete}
+                      stageIndex={stageInfo.index}
+                      stageTotal={stageInfo.total}
+                    />
+                  </div>
+                );
+              }
+              // Legacy video / resource / null-type lessons: preserve prior
+              // HTML render path. content may be jsonb or string; only render
+              // when it's a plain string.
+              if (typeof currentLesson.content === 'string' && currentLesson.content) {
+                return (
+                  <div
+                    className="prose prose-gray max-w-none mb-6"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: '15px',
+                      color: '#374151',
+                      lineHeight: '1.7',
+                    }}
+                    dangerouslySetInnerHTML={{ __html: currentLesson.content }}
+                  />
+                );
+              }
+              return null;
+            })()}
 
             {/* Quiz content (if questions exist) */}
             {questions.length > 0 && user && (
@@ -443,8 +507,10 @@ export default function LessonPage({ params }: LessonPageProps) {
               </div>
             )}
 
-            {/* Mark as complete checkbox (only if no quiz) */}
-            {questions.length === 0 && (
+            {/* Mark-complete checkbox: only for legacy lessons without a quiz
+                and without a structured renderer (the new renderers handle
+                completion themselves). */}
+            {questions.length === 0 && !isStructuredType(currentLesson.type) && (
               <div className="mb-8">
                 <label
                   className="flex items-center gap-3 cursor-pointer select-none p-4 rounded-lg border transition-all"
@@ -577,17 +643,6 @@ export default function LessonPage({ params }: LessonPageProps) {
                   </a>
                 )}
               </div>
-            )}
-
-            </>)}
-
-            {/* ── CONVERSATION TAB ── */}
-            {activeTab === 'conversation' && (
-              <LessonConversation
-                lessonId={currentLesson.id}
-                courseId={course.id}
-                userId={user?.id || null}
-              />
             )}
           </div>
 
