@@ -658,17 +658,19 @@ const LESSON_ICONS: Record<string, React.ElementType> = {
   resource: Paperclip,
 };
 
-// Sortable Lesson Item
+// Sortable Lesson Item (with drag-and-drop video upload)
 function SortableLesson({
   lesson,
   isSelected,
   onSelect,
   onMenuAction,
+  onVideoDrop,
 }: {
   lesson: Lesson;
   isSelected: boolean;
   onSelect: () => void;
   onMenuAction: (action: string) => void;
+  onVideoDrop?: (lessonId: string, file: File) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: lesson.id,
@@ -682,15 +684,36 @@ function SortableLesson({
 
   const Icon = LESSON_ICONS[lesson.type] || FileText;
   const [showMenu, setShowMenu] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+
+  const hasVideo = !!(lesson.video_id || (lesson.content && typeof lesson.content === 'object' && (lesson.content as any).video_id));
 
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors ${
+        dragOver ? 'bg-teal-100 ring-2 ring-teal-400' :
         isSelected ? 'bg-teal-50' : 'hover:bg-gray-50'
       }`}
       onClick={onSelect}
+      onDragOver={(e) => {
+        if (lesson.type === 'video' && e.dataTransfer.types.includes('Files')) {
+          e.preventDefault();
+          e.stopPropagation();
+          setDragOver(true);
+        }
+      }}
+      onDragLeave={() => setDragOver(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragOver(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file && file.type.startsWith('video/') && onVideoDrop) {
+          onVideoDrop(lesson.id, file);
+        }
+      }}
     >
       <button {...attributes} {...listeners} className="cursor-grab hover:text-gray-600">
         <GripVertical size={14} className="text-gray-400" />
@@ -699,6 +722,9 @@ function SortableLesson({
       <span className={`flex-1 text-sm truncate ${isSelected ? 'font-medium text-teal-700' : 'text-gray-700'}`}>
         {lesson.title}
       </span>
+      {lesson.type === 'video' && (
+        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${hasVideo ? 'bg-green-500' : 'bg-red-300'}`} title={hasVideo ? 'Video uploaded' : 'No video yet'} />
+      )}
       {lesson.is_free_preview && (
         <span className="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700">Free</span>
       )}
@@ -905,6 +931,30 @@ function SortableModule({
                     onSelect={() => onSelectLesson(lesson)}
                     onMenuAction={(action) => {
                       if (action === 'delete') onDeleteLesson(lesson.id);
+                    }}
+                    onVideoDrop={async (lessonId, file) => {
+                      // Direct upload from drag-and-drop on sidebar
+                      try {
+                        const urlRes = await fetch('/api/tdi-admin/videos/upload', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ filename: file.name, maxDurationSeconds: 7200 }),
+                        });
+                        if (!urlRes.ok) return;
+                        const { uploadUrl, videoUid } = await urlRes.json();
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        await fetch(uploadUrl, { method: 'POST', body: formData });
+                        await fetch('/api/tdi-admin/lessons', {
+                          method: 'PATCH',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ id: lessonId, video_id: videoUid }),
+                        });
+                        // Refresh by selecting the lesson
+                        onSelectLesson(lesson);
+                      } catch (err) {
+                        console.error('Drag-drop upload failed:', err);
+                      }
                     }}
                   />
                 ))}
