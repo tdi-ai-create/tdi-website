@@ -46,7 +46,7 @@ import {
   GraduationCap, Sparkles, Languages, HeartHandshake, Music, Library,
   HeartPulse, Lightbulb, Route, ClipboardCheck, NotebookPen,
   PencilRuler, Baby, Puzzle, MessagesSquare, Star, Sprout,
-  Target, Home as HomeIcon, Laptop, Scale,
+  Target, Home as HomeIcon, Laptop, Scale, Mail,
 } from 'lucide-react';
 
 const TOPIC_ICON_MAP: Record<string, any> = {
@@ -1284,6 +1284,9 @@ export default function CreatorStudioPage() {
     target_launch_year: new Date().getFullYear().toString(),
   });
 
+  // Recent email activity
+  const [recentEmails, setRecentEmails] = useState<any[]>([]);
+
   // Geographic distribution state
   const [locationData, setLocationData] = useState<{
     stateData: { state: string; count: number }[];
@@ -1368,6 +1371,11 @@ export default function CreatorStudioPage() {
           }
         })
         .catch(err => console.error('Failed to load location data:', err));
+      // Load recent email activity
+      fetch('/api/admin/creator-email-activity')
+        .then(res => res.json())
+        .then(data => setRecentEmails(data.emails || []))
+        .catch(() => {});
       // Get admin email from session
       import('@/lib/supabase').then(({ supabase }) => {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -2173,6 +2181,77 @@ export default function CreatorStudioPage() {
                     )}
                   </div>
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* Recent Email Activity */}
+          {recentEmails.length > 0 && (
+            <div className="mb-5 bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
+              <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between" style={{ backgroundColor: '#fafbfc' }}>
+                <h2 className="text-sm font-semibold tracking-wide uppercase flex items-center gap-2" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>
+                  <Mail className="w-3.5 h-3.5" />
+                  Recent Automated Emails
+                </h2>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-gray-400">Last 7 days</span>
+                  <Link
+                    href="/tdi-admin/creator-email-audit"
+                    className="text-xs font-medium hover:underline"
+                    style={{ color: '#1e2749' }}
+                  >
+                    View all email types
+                  </Link>
+                </div>
+              </div>
+              <div className="divide-y divide-gray-50">
+                {recentEmails.slice(0, 8).map((email: any) => (
+                  <div key={email.id} className="px-5 py-2.5 flex items-center gap-3">
+                    <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                      email.category === 'reengagement' ? 'bg-amber-400' :
+                      email.category === 'countdown_reminder' ? 'bg-blue-400' :
+                      email.category === 'welcome' ? 'bg-green-400' :
+                      'bg-gray-300'
+                    }`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-700 truncate">
+                        <span className="font-medium">{email.creator_name || 'Unknown'}</span>
+                        <span className="text-gray-400 mx-1.5">&middot;</span>
+                        <span className="text-gray-500">{email.subject}</span>
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                        email.category === 'reengagement'
+                          ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                          : email.category === 'countdown_reminder'
+                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                          : 'bg-gray-50 text-gray-600 border border-gray-200'
+                      }`}>
+                        {email.category === 'reengagement'
+                          ? `Re-engage #${email.step ?? 0}`
+                          : email.category === 'countdown_reminder'
+                          ? 'Countdown'
+                          : email.category}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {new Date(email.sent_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+                {recentEmails.length > 8 && (
+                  <div className="px-5 py-2 text-center">
+                    <span className="text-xs text-gray-400">
+                      + {recentEmails.length - 8} more this week
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="px-5 py-2 border-t border-gray-100" style={{ backgroundColor: '#fafbfc' }}>
+                <p className="text-[11px] text-gray-400">
+                  All emails above were sent automatically. Bella receives a weekly digest every Monday at 8 AM.
+                </p>
               </div>
             </div>
           )}

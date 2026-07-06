@@ -232,6 +232,15 @@ export default function TDIAdminCreatorDetailPage() {
   const [overrideReason, setOverrideReason] = useState('');
   const [isSavingOverride, setIsSavingOverride] = useState(false);
 
+  // Re-engagement sequence state
+  const [reengagementSeq, setReengagementSeq] = useState<{
+    id: string;
+    current_step: number;
+    started_at: string;
+    last_email_sent_at: string;
+  } | null>(null);
+  const [isMarkingEngaged, setIsMarkingEngaged] = useState(false);
+
   const adminEmail = teamMember?.email || '';
 
   const loadData = useCallback(async () => {
@@ -311,6 +320,17 @@ export default function TDIAdminCreatorDetailPage() {
       }
     } catch {
       // Silently handle — history card will show "no changes"
+    }
+
+    // Load re-engagement sequence status
+    try {
+      const reengRes = await fetch(`/api/admin/creators/${creatorId}/mark-engaged`);
+      if (reengRes.ok) {
+        const reengData = await reengRes.json();
+        setReengagementSeq(reengData.activeSequence || null);
+      }
+    } catch {
+      // Non-critical — card just won't show
     }
 
     setIsLoading(false);
@@ -683,6 +703,31 @@ export default function TDIAdminCreatorDetailPage() {
   };
 
   // Handle withdraw creator
+  // Handle mark engaged (cancel re-engagement sequence)
+  const handleMarkEngaged = async () => {
+    if (!canEdit) return;
+    setIsMarkingEngaged(true);
+    try {
+      const res = await fetch(`/api/admin/creators/${creatorId}/mark-engaged`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminEmail }),
+      });
+      const result = await res.json();
+      if (result.success) {
+        setReengagementSeq(null);
+        setSuccessMessage(result.sequenceCancelled ? 'Marked as engaged — re-engagement emails stopped.' : 'Marked as engaged.');
+        setTimeout(() => setSuccessMessage(null), 3000);
+        await loadData();
+      }
+    } catch (error) {
+      console.error('Error marking engaged:', error);
+      alert('Error marking creator as engaged.');
+    } finally {
+      setIsMarkingEngaged(false);
+    }
+  };
+
   const handleWithdraw = async () => {
     if (!canEdit) return;
     if (!confirm('Are you sure you want to mark this creator as withdrawn? This means they chose not to participate.')) return;
@@ -1878,6 +1923,75 @@ export default function TDIAdminCreatorDetailPage() {
               )}
             </div>
           </div>
+
+          {/* Re-engagement Sequence Card */}
+          {reengagementSeq && (
+            <div className="bg-white rounded-xl border border-amber-200 p-5">
+              <h3
+                className="font-semibold flex items-center gap-2 mb-3"
+                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
+              >
+                <Mail className="w-4 h-4 text-amber-500" />
+                Re-engagement Active
+              </h3>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-50 border border-amber-100">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-amber-800">
+                      Step {reengagementSeq.current_step} of 6
+                    </p>
+                    <p className="text-xs text-amber-600 mt-0.5">
+                      {reengagementSeq.current_step === 0
+                        ? 'Initial check-in sent'
+                        : reengagementSeq.current_step <= 5
+                        ? `Weekly nudge #${reengagementSeq.current_step}`
+                        : 'Pause notice sent'}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Started {new Date(reengagementSeq.started_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {' | '}
+                      Last email {new Date(reengagementSeq.last_email_sent_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </p>
+                  </div>
+                </div>
+                {/* Step progress dots */}
+                <div className="flex items-center gap-1.5 px-1">
+                  {[0, 1, 2, 3, 4, 5, 6].map((step) => (
+                    <div
+                      key={step}
+                      className={`h-1.5 flex-1 rounded-full ${
+                        step <= reengagementSeq.current_step
+                          ? step === 6 ? 'bg-red-400' : 'bg-amber-400'
+                          : 'bg-gray-200'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <p className="text-[10px] text-gray-400 flex justify-between px-1">
+                  <span>Check-in</span>
+                  <span>Pause</span>
+                </p>
+                {canEdit && (
+                  <button
+                    onClick={handleMarkEngaged}
+                    disabled={isMarkingEngaged}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 mt-1 text-sm font-medium rounded-lg text-white transition-colors"
+                    style={{ backgroundColor: '#1e2749' }}
+                  >
+                    {isMarkingEngaged ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Check className="w-4 h-4" />
+                    )}
+                    Mark as Engaged
+                  </button>
+                )}
+                <p className="text-[10px] text-gray-400 text-center">
+                  Stops automated emails and updates their activity timestamp
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Previous Projects Card */}
           {creator.previous_project_id && (
