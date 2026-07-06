@@ -22,6 +22,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import DuplicateCourse from './components/DuplicateCourse';
 import ThumbnailSelector from './components/ThumbnailSelector';
+import { GoogleDrivePicker, downloadDriveFile } from './components/GoogleDrivePicker';
 import {
   ArrowLeft,
   Plus,
@@ -390,6 +391,7 @@ function VideoUploadSection({
 
         {/* Upload area */}
         {!uploading && uploadStatus !== 'processing' && (
+          <div>
           <label className="flex flex-col items-center justify-center w-full p-4 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-teal-400 hover:bg-teal-50/30 transition-colors">
             <Upload className="w-6 h-6 text-gray-400 mb-2" />
             <p className="text-sm text-gray-500 font-medium">
@@ -403,6 +405,27 @@ function VideoUploadSection({
               className="hidden"
             />
           </label>
+          {/* Google Drive option */}
+          <GoogleDrivePicker
+            onFileSelected={async (driveFile) => {
+              try {
+                setUploading(true);
+                setUploadStatus('uploading');
+                setUploadProgress(10);
+                setFileInfo({ name: driveFile.name, size: driveFile.size });
+                // Download from Drive
+                const file = await downloadDriveFile(driveFile.id, driveFile.name, driveFile.accessToken);
+                setFileInfo({ name: file.name, size: file.size });
+                // Start normal upload flow
+                startUpload(file);
+              } catch (err) {
+                setErrorMsg(err instanceof Error ? err.message : 'Drive download failed');
+                setUploadStatus('error');
+                setUploading(false);
+              }
+            }}
+          />
+          </div>
         )}
 
         {/* Upload progress */}
