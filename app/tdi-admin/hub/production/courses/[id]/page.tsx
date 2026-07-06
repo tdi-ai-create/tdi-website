@@ -20,6 +20,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import DuplicateCourse from './components/DuplicateCourse';
+import ThumbnailSelector from './components/ThumbnailSelector';
 import {
   ArrowLeft,
   Plus,
@@ -148,6 +150,9 @@ function VideoUploadSection({
   const [fileInfo, setFileInfo] = useState<{ name: string; size: number; originalSize?: number; compressed?: boolean } | null>(null);
   const [uploadSpeed, setUploadSpeed] = useState<string>('');
   const [timeRemaining, setTimeRemaining] = useState<string>('');
+  const [showReplaceConfirm, setShowReplaceConfirm] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [generatingTranscript, setGeneratingTranscript] = useState(false);
 
   const cfCustomerSubdomain = 'customer-4n38x6badamh5yps';
 
@@ -246,6 +251,19 @@ function VideoUploadSection({
       return;
     }
 
+    // Confirm replacement if video already exists
+    if (videoId) {
+      setPendingFile(file);
+      setShowReplaceConfirm(true);
+      return;
+    }
+
+    startUpload(file);
+  };
+
+  const startUpload = async (file: File) => {
+    setShowReplaceConfirm(false);
+    setPendingFile(null);
     setFileInfo({ name: file.name, size: file.size });
     setUploading(true);
     setUploadProgress(0);
@@ -477,6 +495,22 @@ function VideoUploadSection({
           </div>
         )}
 
+        {/* Replace confirmation dialog */}
+        {showReplaceConfirm && pendingFile && (
+          <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <p className="text-sm text-amber-800 font-medium">Replace existing video?</p>
+            <p className="text-xs text-amber-600 mt-1">This will replace the current video with "{pendingFile.name}". This cannot be undone.</p>
+            <div className="flex gap-2 mt-2">
+              <button onClick={() => startUpload(pendingFile)} className="px-3 py-1 text-xs font-medium text-white bg-amber-600 rounded-lg hover:bg-amber-700">
+                Yes, replace
+              </button>
+              <button onClick={() => { setShowReplaceConfirm(false); setPendingFile(null); }} className="px-3 py-1 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Manual ID fallback */}
         <details className="mt-2">
           <summary className="text-xs text-gray-400 cursor-pointer hover:text-gray-600">
@@ -503,7 +537,35 @@ function VideoUploadSection({
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Transcript</label>
+        <div className="flex items-center justify-between mb-1">
+          <label className="block text-sm font-medium text-gray-700">Transcript</label>
+          {videoId && (
+            <button
+              onClick={async () => {
+                setGeneratingTranscript(true);
+                try {
+                  // Request generation
+                  await fetch('/api/tdi-admin/videos/transcript', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uid: videoId }),
+                  });
+                  // Wait a moment then try to fetch
+                  await new Promise(r => setTimeout(r, 3000));
+                  const res = await fetch(`/api/tdi-admin/videos/transcript?uid=${videoId}`);
+                  const data = await res.json();
+                  if (data.transcript) {
+                    onUpdate({ transcript_text: data.transcript });
+                  }
+                } catch {} finally { setGeneratingTranscript(false); }
+              }}
+              disabled={generatingTranscript}
+              className="text-xs text-teal-600 hover:text-teal-700 font-medium disabled:opacity-50"
+            >
+              {generatingTranscript ? 'Generating...' : 'Auto-generate transcript'}
+            </button>
+          )}
+        </div>
         <textarea
           value={transcriptText}
           onChange={(e) => onUpdate({ transcript_text: e.target.value })}
@@ -1114,6 +1176,20 @@ function CourseSettingsPanel({
         )}
       </div>
 
+      {/* Thumbnail from video */}
+      {(() => {
+        const firstVideoId = course.modules
+          ?.flatMap((m: Module) => m.lessons)
+          .find((l: Lesson) => l.video_id)?.video_id;
+        return firstVideoId ? (
+          <ThumbnailSelector
+            videoId={firstVideoId}
+            currentThumbnail={form.thumbnail_url || null}
+            onSelect={(url) => setForm({ ...form, thumbnail_url: url })}
+          />
+        ) : null;
+      })()}
+
       <button
         onClick={handleSave}
         disabled={isSaving}
@@ -1597,26 +1673,40 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                 {course.is_published ? 'Published' : 'Draft'}
               </span>
             </div>
-            <button
-              onClick={togglePublish}
-              className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${
-                course.is_published
-                  ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  : 'bg-teal-600 text-white hover:bg-teal-700'
-              }`}
-            >
-              {course.is_published ? (
-                <>
-                  <EyeOff size={16} />
-                  Unpublish
-                </>
-              ) : (
-                <>
-                  <Eye size={16} />
-                  Publish
-                </>
-              )}
-            </button>
+            <div className="flex items-center gap-2">
+              <DuplicateCourse
+                courseId={course.id}
+                courseTitle={course.title}
+                modules={course.modules.map((m) => ({
+                  title: m.title,
+                  lessons: m.lessons.map((l) => ({
+                    title: l.title,
+                    type: l.type,
+                    sort_order: l.sort_order,
+                  })),
+                }))}
+              />
+              <button
+                onClick={togglePublish}
+                className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${
+                  course.is_published
+                    ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-teal-600 text-white hover:bg-teal-700'
+                }`}
+              >
+                {course.is_published ? (
+                  <>
+                    <EyeOff size={16} />
+                    Unpublish
+                  </>
+                ) : (
+                  <>
+                    <Eye size={16} />
+                    Publish
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </header>
