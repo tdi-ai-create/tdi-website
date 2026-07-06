@@ -14,17 +14,17 @@ import { NextResponse } from 'next/server';
  * are client-side only (known Next.js + Supabase SSR gap).
  */
 export async function POST(request: Request) {
+  const cfToken = process.env.CLOUDFLARE_STREAM_API_TOKEN;
+  const cfAccountId = process.env.CF_ACCOUNT_ID;
+
+  if (!cfToken || !cfAccountId) {
+    return NextResponse.json(
+      { error: 'Cloudflare Stream not configured', hasCfToken: !!cfToken, hasCfAccountId: !!cfAccountId },
+      { status: 500 }
+    );
+  }
+
   try {
-
-    const cfToken = process.env.CLOUDFLARE_STREAM_API_TOKEN;
-    const cfAccountId = process.env.CF_ACCOUNT_ID;
-
-    if (!cfToken || !cfAccountId) {
-      return NextResponse.json(
-        { error: 'Cloudflare Stream not configured. Set CLOUDFLARE_STREAM_API_TOKEN and CF_ACCOUNT_ID.' },
-        { status: 500 }
-      );
-    }
 
     const body = await request.json();
     const { filename, maxDurationSeconds } = body;
