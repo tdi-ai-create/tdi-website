@@ -71,6 +71,14 @@
     {
       "path": "/api/cron/creator-email-digest",
       "schedule": "0 8 * * 1"
+    },
+    {
+      "path": "/api/cron/creator-first-week",
+      "schedule": "30 9 * * *"
+    },
+    {
+      "path": "/api/cron/creator-monthly-newsletter",
+      "schedule": "0 10 1 * *"
     }
   ]
 }

@@ -278,6 +278,47 @@ const emails: EmailEntry[] = [
     file: 'api/creators/intake/route.ts',
     notes: 'Sent to admin team, not the creator. This is a new application, not an existing creator.',
   },
+
+  // ── First Week & Growth ──────────────────────────────────
+  {
+    id: 'first-week-momentum',
+    category: 'First Week & Growth',
+    trigger: 'Creator added 3 days ago with no milestones completed',
+    from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
+    replyTo: 'bella@teachersdeserveit.com',
+    subject: 'Your one thing this week, [Name]',
+    bodyPreview:
+      'Warm intro from Bella. Gives one specific, small action to take this week (usually "confirm your content path"). Includes a highlighted "your one thing" box. CTA to dashboard. Invites reply.',
+    file: 'api/cron/creator-first-week/route.ts',
+    schedule: 'Daily at 9:30 AM',
+    notes: 'Only sends once per creator. Skips creators who have already completed a milestone.',
+  },
+  {
+    id: 'monthly-newsletter',
+    category: 'First Week & Growth',
+    trigger: '1st of each month to all active creators',
+    from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
+    replyTo: 'bella@teachersdeserveit.com',
+    subject: 'Creator Spotlight: [Name] just launched! (or) Your monthly Creator Studio update',
+    bodyPreview:
+      'Monthly newsletter with smart content: features a spotlight creator if someone published recently, otherwise shares what TDI is building. Always includes: milestone celebrations, a rotating creator tip, CTA to dashboard, and a "nominate a creator" link.',
+    file: 'api/cron/creator-monthly-newsletter/route.ts',
+    schedule: '1st of month at 10 AM',
+    notes: 'Adapts automatically. 12 rotating tips built in. Nomination link goes to /create-with-us.',
+  },
+  {
+    id: 'publish-celebration',
+    category: 'First Week & Growth',
+    trigger: 'Admin publishes a creator\'s content (publish now or mark published)',
+    from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
+    replyTo: 'bella@teachersdeserveit.com',
+    cc: 'bella@teachersdeserveit.com, rae@teachersdeserveit.com',
+    subject: "You're officially published, [Name]!",
+    bodyPreview:
+      'Celebrates the launch. Includes a ready-to-share social media blurb the creator can copy. Features a "know another educator?" nomination CTA with link to the creator application.',
+    file: 'api/admin/update-publish-status/route.ts',
+    notes: 'Triggered automatically when publish status changes. Nomination CTA is placed at the perfect emotional moment.',
+  },
 ];
 
 // Group emails by category
@@ -296,6 +337,7 @@ const categoryOrder = [
   'Re-engagement Sequence',
   'Milestone Workflow',
   'Notes & Communication',
+  'First Week & Growth',
   'Admin Notifications',
 ];
 
@@ -310,6 +352,8 @@ const categoryDescriptions: Record<string, string> = {
     'Triggered by admin actions on creator milestones \u2014 approvals send a celebration email, revision requests send actionable feedback.',
   'Notes & Communication':
     'Notification sent when an admin adds a note that is visible to the creator.',
+  'First Week & Growth':
+    'Emails designed to build momentum early and celebrate wins. The first-week email catches creators before they disengage. The monthly newsletter keeps the community connected. The celebration email turns published creators into ambassadors.',
   'Admin Notifications':
     'These emails are sent TO the TDI team (creatorstudio@ and rae@), not to creators. They keep the team informed about creator activity that needs attention.',
 };
