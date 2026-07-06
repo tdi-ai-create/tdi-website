@@ -2128,35 +2128,31 @@ export default function CreatorStudioPage() {
                   </div>
                 </button>
 
-                {/* Stalled Creators */}
+                {/* Stalled Creators — auto-managed by re-engagement */}
                 <button
                   onClick={() => handleStatCardClick('stalled')}
                   className="flex items-start gap-3 p-4 hover:bg-slate-50 transition-colors text-left w-full"
                 >
                   <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    stalledBySeverity.critical > 0 ? 'bg-red-100' : stalledBySeverity.serious > 0 ? 'bg-amber-100' : stalledCreators.length > 0 ? 'bg-yellow-100' : 'bg-gray-100'
+                    stalledCreators.length > 0 ? 'bg-amber-100' : 'bg-gray-100'
                   }`}>
-                    <Hourglass className={`w-4.5 h-4.5 ${
-                      stalledBySeverity.critical > 0 ? 'text-red-600' : stalledBySeverity.serious > 0 ? 'text-amber-600' : stalledCreators.length > 0 ? 'text-yellow-600' : 'text-gray-400'
+                    <Mail className={`w-4.5 h-4.5 ${
+                      stalledCreators.length > 0 ? 'text-amber-600' : 'text-gray-400'
                     }`} />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-baseline gap-2">
                       <span className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>{stalledCreators.length}</span>
-                      <span className="text-sm text-gray-500">need outreach</span>
+                      <span className="text-sm text-gray-500">in re-engagement</span>
                     </div>
-                    {stalledCreators.length > 0 && (
-                      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
-                        {stalledBySeverity.critical > 0 && (
-                          <span className="text-xs font-medium text-red-600">{stalledBySeverity.critical} critical (60d+)</span>
-                        )}
-                        {stalledBySeverity.serious > 0 && (
-                          <span className="text-xs font-medium text-amber-600">{stalledBySeverity.serious} serious (30d+)</span>
-                        )}
-                        {stalledBySeverity.mild > 0 && (
-                          <span className="text-xs font-medium text-yellow-600">{stalledBySeverity.mild} mild (14d+)</span>
-                        )}
-                      </div>
+                    {stalledCreators.length > 0 ? (
+                      <p className="mt-1 text-xs text-amber-600 font-medium">
+                        Auto-emails active -- reply to Bella if they respond
+                      </p>
+                    ) : (
+                      <p className="mt-1 text-xs text-gray-400">
+                        No stalled creators
+                      </p>
                     )}
                   </div>
                 </button>
@@ -2190,77 +2186,6 @@ export default function CreatorStudioPage() {
                     )}
                   </div>
                 </button>
-              </div>
-            </div>
-          )}
-
-          {/* Recent Email Activity */}
-          {recentEmails.length > 0 && (
-            <div className="mb-5 bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
-              <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between" style={{ backgroundColor: '#fafbfc' }}>
-                <h2 className="text-sm font-semibold tracking-wide uppercase flex items-center gap-2" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>
-                  <Mail className="w-3.5 h-3.5" />
-                  Recent Automated Emails
-                </h2>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-gray-400">Last 7 days</span>
-                  <Link
-                    href="/tdi-admin/creator-email-audit"
-                    className="text-xs font-medium hover:underline"
-                    style={{ color: '#1e2749' }}
-                  >
-                    View all email types
-                  </Link>
-                </div>
-              </div>
-              <div className="divide-y divide-gray-50">
-                {recentEmails.slice(0, 8).map((email: any) => (
-                  <div key={email.id} className="px-5 py-2.5 flex items-center gap-3">
-                    <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                      email.category === 'reengagement' ? 'bg-amber-400' :
-                      email.category === 'countdown_reminder' ? 'bg-blue-400' :
-                      email.category === 'welcome' ? 'bg-green-400' :
-                      'bg-gray-300'
-                    }`} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-700 truncate">
-                        <span className="font-medium">{email.creator_name || 'Unknown'}</span>
-                        <span className="text-gray-400 mx-1.5">&middot;</span>
-                        <span className="text-gray-500">{email.subject}</span>
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                        email.category === 'reengagement'
-                          ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                          : email.category === 'countdown_reminder'
-                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                          : 'bg-gray-50 text-gray-600 border border-gray-200'
-                      }`}>
-                        {email.category === 'reengagement'
-                          ? `Re-engage #${email.step ?? 0}`
-                          : email.category === 'countdown_reminder'
-                          ? 'Countdown'
-                          : email.category}
-                      </span>
-                      <span className="text-xs text-gray-400">
-                        {new Date(email.sent_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-                {recentEmails.length > 8 && (
-                  <div className="px-5 py-2 text-center">
-                    <span className="text-xs text-gray-400">
-                      + {recentEmails.length - 8} more this week
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div className="px-5 py-2 border-t border-gray-100" style={{ backgroundColor: '#fafbfc' }}>
-                <p className="text-[11px] text-gray-400">
-                  All emails above were sent automatically. Bella receives a weekly digest every Monday at 8 AM.
-                </p>
               </div>
             </div>
           )}
@@ -2969,6 +2894,85 @@ export default function CreatorStudioPage() {
               <span className="mx-2">·</span>
               <span className="inline-block w-2 h-2 rounded-full bg-blue-500 mr-1"></span> Team
             </p>
+          </div>
+
+          {/* Automated Email Log */}
+          <div className="bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] mt-5 overflow-hidden">
+            <div className="px-6 py-4 flex items-center justify-between">
+              <h3 className="flex items-center gap-2" style={{ fontFamily: "'DM Sans', sans-serif", color: '#1e2749', fontSize: '14px', fontWeight: 600 }}>
+                <Mail className="w-4 h-4 text-gray-400" />
+                Automated Emails
+                {recentEmails.length > 0 && (
+                  <span className="text-xs font-normal text-gray-400 ml-1">
+                    {recentEmails.length} this week
+                  </span>
+                )}
+              </h3>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/tdi-admin/creator-email-audit"
+                  className="text-xs font-medium hover:underline"
+                  style={{ color: '#1e2749' }}
+                >
+                  View all email types
+                </Link>
+              </div>
+            </div>
+            {recentEmails.length === 0 ? (
+              <div className="px-6 pb-4">
+                <p className="text-xs text-gray-400">No automated emails sent in the last 7 days. Emails will appear here as the system sends them.</p>
+              </div>
+            ) : (
+              <div className="border-t border-gray-100">
+                <table className="w-full text-sm">
+                  <tbody>
+                    {recentEmails.slice(0, 10).map((email: any) => (
+                      <tr key={email.id} className="border-b border-gray-50 last:border-0">
+                        <td className="px-6 py-2">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                              email.category === 'reengagement' ? 'bg-amber-400' :
+                              email.category === 'countdown_reminder' ? 'bg-blue-400' :
+                              'bg-gray-300'
+                            }`} />
+                            <span className="font-medium text-gray-700">{email.creator_name || 'Unknown'}</span>
+                          </div>
+                        </td>
+                        <td className="py-2 text-gray-500 truncate max-w-[300px]">{email.subject}</td>
+                        <td className="px-4 py-2">
+                          <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                            email.category === 'reengagement'
+                              ? 'bg-amber-50 text-amber-700'
+                              : email.category === 'countdown_reminder'
+                              ? 'bg-blue-50 text-blue-700'
+                              : 'bg-gray-50 text-gray-600'
+                          }`}>
+                            {email.category === 'reengagement'
+                              ? `Re-engage #${email.step ?? 0}`
+                              : email.category === 'countdown_reminder'
+                              ? 'Countdown'
+                              : email.category}
+                          </span>
+                        </td>
+                        <td className="px-6 py-2 text-xs text-gray-400 text-right whitespace-nowrap">
+                          {new Date(email.sent_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {recentEmails.length > 10 && (
+                  <div className="px-6 py-2 text-center border-t border-gray-50">
+                    <span className="text-xs text-gray-400">+ {recentEmails.length - 10} more this week</span>
+                  </div>
+                )}
+                <div className="px-6 py-2 border-t border-gray-100" style={{ backgroundColor: '#fafbfc' }}>
+                  <p className="text-[11px] text-gray-400">
+                    All sent automatically. Bella receives a weekly digest every Monday at 8 AM.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Admin Tools */}
