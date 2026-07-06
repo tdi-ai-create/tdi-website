@@ -25,17 +25,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Debug: return token diagnostics temporarily
     const body = await request.json();
-    if (body.debug) {
-      return NextResponse.json({
-        tokenPrefix: cfToken.substring(0, 10),
-        tokenLength: cfToken.length,
-        accountPrefix: cfAccountId.substring(0, 8),
-        accountLength: cfAccountId.length,
-        hasWhitespace: cfToken !== cfToken.trim() || cfAccountId !== cfAccountId.trim(),
-      });
-    }
     const { filename, maxDurationSeconds } = body;
 
     // Request a direct upload URL from Cloudflare Stream
