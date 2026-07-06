@@ -42,7 +42,17 @@ export async function GET(request: NextRequest) {
 
     const sortedModules = (modules || []).map(m => ({
       ...m,
-      lessons: ((m as any).lessons || []).sort((a: any, b: any) => a.sort_order - b.sort_order),
+      lessons: ((m as any).lessons || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((l: any) => {
+        // Flatten content fields so client sees video_id at top level
+        const c = (l.content && typeof l.content === 'object') ? l.content : {}
+        return {
+          ...l,
+          video_id: c.video_id || null,
+          audio_url: c.audio_url || null,
+          duration_minutes: c.duration_minutes || null,
+          transcript_text: l.transcript || null,
+        }
+      }),
     }))
 
     return NextResponse.json({ course, modules: sortedModules })

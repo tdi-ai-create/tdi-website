@@ -63,12 +63,15 @@ export async function GET(
       return NextResponse.json({ error: modulesError.message }, { status: 500 });
     }
 
-    // Sort lessons within each module
+    // Sort lessons within each module and flatten content fields
     const sortedModules = (modules || []).map((module) => ({
       ...module,
       lessons: (module.lessons || []).sort(
         (a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order
-      ),
+      ).map((l: any) => {
+        const c = (l.content && typeof l.content === 'object') ? l.content : {};
+        return { ...l, video_id: c.video_id || null, audio_url: c.audio_url || null, duration_minutes: c.duration_minutes || null, transcript_text: l.transcript || null };
+      }),
     }));
 
     return NextResponse.json({

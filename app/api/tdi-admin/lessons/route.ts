@@ -109,15 +109,32 @@ export async function PATCH(request: Request) {
     const updates: Record<string, unknown> = {};
     if (title !== undefined) updates.title = title;
     if (type !== undefined) updates.type = type;
-    if (content !== undefined) updates.content = content;
-    if (video_id !== undefined) updates.video_id = video_id;
-    if (audio_url !== undefined) updates.audio_url = audio_url;
-    if (transcript_text !== undefined) updates.transcript_text = transcript_text;
     if (duration_seconds !== undefined) updates.duration_seconds = duration_seconds;
     if (is_free_preview !== undefined) updates.is_free_preview = is_free_preview;
     if (is_quick_win !== undefined) updates.is_quick_win = is_quick_win;
     if (sort_order !== undefined) updates.sort_order = sort_order;
     if (module_id !== undefined) updates.module_id = module_id;
+    if (transcript_text !== undefined) updates.transcript = transcript_text;
+
+    // Store video_id, audio_url, and other media fields inside the content JSON
+    // (hub_lessons doesn't have separate columns for these)
+    if (video_id !== undefined || audio_url !== undefined || content !== undefined || body.duration_minutes !== undefined) {
+      // Get current content first
+      const { data: current } = await supabase
+        .from('hub_lessons')
+        .select('content')
+        .eq('id', id)
+        .single();
+
+      const existingContent = (current?.content && typeof current.content === 'object') ? current.content as Record<string, unknown> : {};
+      const newContent = content !== undefined ? (typeof content === 'object' ? content as Record<string, unknown> : existingContent) : existingContent;
+
+      if (video_id !== undefined) newContent.video_id = video_id;
+      if (audio_url !== undefined) newContent.audio_url = audio_url;
+      if (body.duration_minutes !== undefined) newContent.duration_minutes = body.duration_minutes;
+
+      updates.content = newContent;
+    }
 
     if (Object.keys(updates).length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
@@ -129,6 +146,15 @@ export async function PATCH(request: Request) {
       .eq('id', id)
       .select()
       .single();
+
+    // Flatten content fields into the response for client compatibility
+    if (lesson && lesson.content && typeof lesson.content === 'object') {
+      const c = lesson.content as Record<string, unknown>;
+      (lesson as any).video_id = c.video_id || null;
+      (lesson as any).audio_url = c.audio_url || null;
+      (lesson as any).duration_minutes = c.duration_minutes || null;
+      (lesson as any).transcript_text = lesson.transcript || null;
+    }
 
     if (error) {
       console.error('[lessons] Error updating lesson:', error);
