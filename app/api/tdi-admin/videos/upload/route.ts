@@ -29,9 +29,8 @@ export async function POST(request: Request) {
     const { filename, maxDurationSeconds } = body;
 
     // Request a direct upload URL from Cloudflare Stream
-    // This uses TUS protocol for reliable uploads of any size
     const cfResponse = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/stream?direct_user=true`,
+      `https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/stream/direct_upload`,
       {
         method: 'POST',
         headers: {
@@ -39,11 +38,8 @@ export async function POST(request: Request) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          maxDurationSeconds: maxDurationSeconds || 3600, // Default 1 hour max
-          meta: {
-            name: filename || 'untitled',
-            source: 'tdi-hub-admin',
-          },
+          maxDurationSeconds: maxDurationSeconds || 3600,
+          creator: filename || 'tdi-hub-admin',
         }),
       }
     );
