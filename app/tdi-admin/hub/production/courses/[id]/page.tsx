@@ -23,6 +23,8 @@ import { CSS } from '@dnd-kit/utilities';
 import DuplicateCourse from './components/DuplicateCourse';
 import ThumbnailSelector from './components/ThumbnailSelector';
 import { GoogleDrivePicker, downloadDriveFile } from './components/GoogleDrivePicker';
+import ProductionDashboard from './components/ProductionDashboard';
+import BulkVideoUpload from './components/BulkVideoUpload';
 import {
   ArrowLeft,
   Plus,
@@ -1050,6 +1052,31 @@ function SortableModule({
   );
 }
 
+// Collapsible Section for settings panel
+function SettingsSection({
+  title,
+  defaultOpen = false,
+  children,
+}: {
+  title: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  return (
+    <div className="border border-gray-200 rounded-lg overflow-hidden">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-4 py-2.5 bg-gray-50 hover:bg-gray-100 transition-colors"
+      >
+        <span className="text-sm font-medium text-gray-700">{title}</span>
+        {isOpen ? <ChevronUp size={14} className="text-gray-400" /> : <ChevronDown size={14} className="text-gray-400" />}
+      </button>
+      {isOpen && <div className="p-4 space-y-3">{children}</div>}
+    </div>
+  );
+}
+
 // Course Settings Panel
 function CourseSettingsPanel({
   course,
@@ -1087,190 +1114,200 @@ function CourseSettingsPanel({
   };
 
   return (
-    <div className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Course Title</label>
-        <input
-          type="text"
-          value={form.title}
-          onChange={(e) => setForm({ ...form, title: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-        <textarea
-          value={form.description}
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
-          rows={4}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-        <select
-          value={form.category}
-          onChange={(e) => setForm({ ...form, category: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-        >
-          {CATEGORIES.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Difficulty</label>
-        <div className="flex gap-3">
-          {['beginner', 'intermediate', 'advanced'].map((level) => (
-            <label key={level} className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="difficulty"
-                value={level}
-                checked={form.difficulty === level}
-                onChange={(e) => setForm({ ...form, difficulty: e.target.value })}
-                className="w-4 h-4 text-teal-600"
-              />
-              <span className="text-sm capitalize">{level}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Effort Level</label>
-        <select
-          value={form.capacity}
-          onChange={(e) => setForm({ ...form, capacity: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-        >
-          <option value="">Not set</option>
-          <option value="low">Low — Grab-and-go, minimal prep</option>
-          <option value="medium">Medium — Some prep, 1-2 sessions</option>
-          <option value="high">High — Significant investment, multi-session</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Danielson Domains</label>
-        <div className="space-y-2">
-          {DANIELSON_DOMAINS.map((domain) => (
-            <label key={domain.value} className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={form.danielson_domains.includes(domain.value)}
-                onChange={(e) => {
-                  setForm({
-                    ...form,
-                    danielson_domains: e.target.checked
-                      ? [...form.danielson_domains, domain.value]
-                      : form.danielson_domains.filter((d: string) => d !== domain.value),
-                  });
-                }}
-                className="w-4 h-4 text-teal-600 rounded"
-              />
-              <span className="text-sm">{domain.label}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Roles</label>
-        <div className="space-y-2">
-          {ROLE_OPTIONS.map((role) => (
-            <label key={role.value} className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={form.roles.includes(role.value)}
-                onChange={(e) => {
-                  setForm({
-                    ...form,
-                    roles: e.target.checked
-                      ? [...form.roles, role.value]
-                      : form.roles.filter((r: string) => r !== role.value),
-                  });
-                }}
-                className="w-4 h-4 text-teal-600 rounded"
-              />
-              <span className="text-sm">{role.label}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Est. Minutes</label>
-          <input
-            type="number"
-            value={form.estimated_minutes}
-            onChange={(e) => setForm({ ...form, estimated_minutes: parseInt(e.target.value) || 0 })}
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-            min={0}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">PD Hours</label>
-          <input
-            type="number"
-            step="0.5"
-            value={form.pd_hours}
-            onChange={(e) => setForm({ ...form, pd_hours: parseFloat(e.target.value) || 0 })}
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-            min={0}
-          />
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Thumbnail URL</label>
-        <input
-          type="text"
-          value={form.thumbnail_url}
-          onChange={(e) => setForm({ ...form, thumbnail_url: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-          placeholder="https://..."
-        />
-        {form.thumbnail_url && (
-          <div className="mt-2 w-full h-32 bg-gray-100 rounded-lg overflow-hidden">
-            <img
-              src={form.thumbnail_url}
-              alt="Thumbnail preview"
-              className="w-full h-full object-cover"
-              onError={(e) => (e.currentTarget.style.display = 'none')}
+    <div className="flex flex-col h-full">
+      <div className="flex-1 space-y-3 overflow-y-auto pb-20">
+        {/* Basic Info - default open */}
+        <SettingsSection title="Basic Info" defaultOpen={true}>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Course Title</label>
+            <input
+              type="text"
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
-        )}
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Description</label>
+            <textarea
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+              rows={3}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Category</label>
+            <select
+              value={form.category}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+            >
+              {CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1.5">Difficulty</label>
+            <div className="flex gap-3">
+              {['beginner', 'intermediate', 'advanced'].map((level) => (
+                <label key={level} className="flex items-center gap-1.5 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="difficulty"
+                    value={level}
+                    checked={form.difficulty === level}
+                    onChange={(e) => setForm({ ...form, difficulty: e.target.value })}
+                    className="w-3.5 h-3.5 text-teal-600"
+                  />
+                  <span className="text-sm capitalize">{level}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </SettingsSection>
+
+        {/* Audience & Standards - default collapsed */}
+        <SettingsSection title="Audience & Standards">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Effort Level</label>
+            <select
+              value={form.capacity}
+              onChange={(e) => setForm({ ...form, capacity: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+            >
+              <option value="">Not set</option>
+              <option value="low">Low -- Grab-and-go</option>
+              <option value="medium">Medium -- Some prep</option>
+              <option value="high">High -- Significant investment</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1.5">Danielson Domains</label>
+            <div className="border border-gray-200 rounded-lg p-3 space-y-2 bg-gray-50/50">
+              {DANIELSON_DOMAINS.map((domain) => (
+                <label key={domain.value} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.danielson_domains.includes(domain.value)}
+                    onChange={(e) => {
+                      setForm({
+                        ...form,
+                        danielson_domains: e.target.checked
+                          ? [...form.danielson_domains, domain.value]
+                          : form.danielson_domains.filter((d: string) => d !== domain.value),
+                      });
+                    }}
+                    className="w-3.5 h-3.5 text-teal-600 rounded"
+                  />
+                  <span className="text-sm">{domain.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1.5">Roles</label>
+            <div className="border border-gray-200 rounded-lg p-3 space-y-2 bg-gray-50/50">
+              {ROLE_OPTIONS.map((role) => (
+                <label key={role.value} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.roles.includes(role.value)}
+                    onChange={(e) => {
+                      setForm({
+                        ...form,
+                        roles: e.target.checked
+                          ? [...form.roles, role.value]
+                          : form.roles.filter((r: string) => r !== role.value),
+                      });
+                    }}
+                    className="w-3.5 h-3.5 text-teal-600 rounded"
+                  />
+                  <span className="text-sm">{role.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </SettingsSection>
+
+        {/* Metrics - default collapsed */}
+        <SettingsSection title="Metrics">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Est. Minutes</label>
+              <input
+                type="number"
+                value={form.estimated_minutes}
+                onChange={(e) => setForm({ ...form, estimated_minutes: parseInt(e.target.value) || 0 })}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                min={0}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">PD Hours</label>
+              <input
+                type="number"
+                step="0.5"
+                value={form.pd_hours}
+                onChange={(e) => setForm({ ...form, pd_hours: parseFloat(e.target.value) || 0 })}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                min={0}
+              />
+            </div>
+          </div>
+        </SettingsSection>
+
+        {/* Appearance - default collapsed */}
+        <SettingsSection title="Appearance">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Thumbnail URL</label>
+            <input
+              type="text"
+              value={form.thumbnail_url}
+              onChange={(e) => setForm({ ...form, thumbnail_url: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              placeholder="https://..."
+            />
+            {form.thumbnail_url && (
+              <div className="mt-2 w-full h-28 bg-gray-100 rounded-lg overflow-hidden">
+                <img
+                  src={form.thumbnail_url}
+                  alt="Thumbnail preview"
+                  className="w-full h-full object-cover"
+                  onError={(e) => (e.currentTarget.style.display = 'none')}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Thumbnail from video */}
+          {(() => {
+            const firstVideoId = course.modules
+              ?.flatMap((m: Module) => m.lessons)
+              .find((l: Lesson) => l.video_id)?.video_id;
+            return firstVideoId ? (
+              <ThumbnailSelector
+                videoId={firstVideoId}
+                currentThumbnail={form.thumbnail_url || null}
+                onSelect={(url) => setForm({ ...form, thumbnail_url: url })}
+              />
+            ) : null;
+          })()}
+        </SettingsSection>
       </div>
 
-      {/* Thumbnail from video */}
-      {(() => {
-        const firstVideoId = course.modules
-          ?.flatMap((m: Module) => m.lessons)
-          .find((l: Lesson) => l.video_id)?.video_id;
-        return firstVideoId ? (
-          <ThumbnailSelector
-            videoId={firstVideoId}
-            currentThumbnail={form.thumbnail_url || null}
-            onSelect={(url) => setForm({ ...form, thumbnail_url: url })}
-          />
-        ) : null;
-      })()}
-
-      <button
-        onClick={handleSave}
-        disabled={isSaving}
-        className="w-full py-2 rounded-lg text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-50 flex items-center justify-center gap-2"
-      >
-        <Save size={16} />
-        {isSaving ? 'Saving...' : 'Save Changes'}
-      </button>
+      {/* Sticky Save Button */}
+      <div className="sticky bottom-0 bg-white border-t border-gray-100 pt-3 pb-1 -mx-6 px-6">
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="w-full py-2 rounded-lg text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          <Save size={16} />
+          {isSaving ? 'Saving...' : 'Save Changes'}
+        </button>
+      </div>
     </div>
   );
 }
@@ -1308,76 +1345,81 @@ function LessonEditorPanel({
   };
 
   return (
-    <div className="space-y-4">
-      <button onClick={onBack} className="text-sm text-teal-600 hover:underline flex items-center gap-1">
-        <ArrowLeft size={14} />
-        Back to Course Settings
-      </button>
+    <div className="flex flex-col h-full">
+      <div className="flex-1 space-y-3 overflow-y-auto pb-20">
+        <button onClick={onBack} className="text-xs text-teal-600 hover:underline flex items-center gap-1">
+          <ArrowLeft size={12} />
+          Back to Course Settings
+        </button>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Lesson Title</label>
-        <input
-          type="text"
-          value={form.title}
-          onChange={(e) => setForm({ ...form, title: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-        />
-      </div>
-
-      {/* Video Lesson Fields */}
-      {lesson.type === 'video' && (
-        <VideoUploadSection
-          videoId={form.video_id}
-          durationMinutes={form.duration_minutes}
-          transcriptText={form.transcript_text}
-          onUpdate={(updates) => {
-            setForm((prev) => ({ ...prev, ...updates }));
-            // Auto-save video_id to database immediately (don't wait for Save Lesson)
-            if (updates.video_id || updates.duration_minutes) {
-              fetch('/api/tdi-admin/lessons', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: lesson.id, ...updates }),
-              }).catch(err => console.error('Auto-save video failed:', err));
-            }
-          }}
-        />
-      )}
-
-      {/* Text Lesson Fields */}
-      {lesson.type === 'text' && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
-          <textarea
-            value={form.content}
-            onChange={(e) => setForm({ ...form, content: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none font-mono"
-            rows={10}
+          <label className="block text-xs font-medium text-gray-600 mb-1">Lesson Title</label>
+          <input
+            type="text"
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
         </div>
-      )}
 
-      {/* Quiz Lesson Fields */}
-      {lesson.type === 'quiz' && (
-        <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
-          <p className="text-sm text-amber-800">
-            Quiz builder coming in a future update. For now, describe the quiz in the content field below.
-          </p>
-          <textarea
-            value={form.content}
-            onChange={(e) => setForm({ ...form, content: e.target.value })}
-            className="w-full mt-3 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
-            rows={6}
-            placeholder="Describe the quiz questions and answers..."
-          />
-        </div>
-      )}
+        {/* Video Lesson Fields - grouped in a connected section */}
+        {lesson.type === 'video' && (
+          <div className="bg-gray-50/80 border border-gray-200 rounded-lg p-3 space-y-3">
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
+              <Video size={12} />
+              Video Content
+            </p>
+            <VideoUploadSection
+              videoId={form.video_id}
+              durationMinutes={form.duration_minutes}
+              transcriptText={form.transcript_text}
+              onUpdate={(updates) => {
+                setForm((prev) => ({ ...prev, ...updates }));
+                if (updates.video_id || updates.duration_minutes) {
+                  fetch('/api/tdi-admin/lessons', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: lesson.id, ...updates }),
+                  }).catch(err => console.error('Auto-save video failed:', err));
+                }
+              }}
+            />
+          </div>
+        )}
 
-      {/* Resource Lesson Fields */}
-      {lesson.type === 'resource' && (
-        <>
+        {/* Text Lesson Fields */}
+        {lesson.type === 'text' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Resource URL</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Content</label>
+            <textarea
+              value={form.content}
+              onChange={(e) => setForm({ ...form, content: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none font-mono"
+              rows={10}
+            />
+          </div>
+        )}
+
+        {/* Quiz Lesson Fields */}
+        {lesson.type === 'quiz' && (
+          <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+            <p className="text-xs text-amber-800">
+              Quiz builder coming in a future update. Describe the quiz below.
+            </p>
+            <textarea
+              value={form.content}
+              onChange={(e) => setForm({ ...form, content: e.target.value })}
+              className="w-full mt-2 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+              rows={6}
+              placeholder="Describe the quiz questions and answers..."
+            />
+          </div>
+        )}
+
+        {/* Resource Lesson Fields */}
+        {lesson.type === 'resource' && (
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Resource URL</label>
             <input
               type="text"
               value={form.content}
@@ -1386,38 +1428,41 @@ function LessonEditorPanel({
               placeholder="https://..."
             />
           </div>
-        </>
-      )}
+        )}
 
-      {/* Free Preview Toggle */}
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          id="free_preview"
-          checked={form.is_free_preview}
-          onChange={(e) => setForm({ ...form, is_free_preview: e.target.checked })}
-          className="w-4 h-4 rounded border-gray-300 text-teal-600"
-        />
-        <label htmlFor="free_preview" className="text-sm text-gray-700">
-          Free Preview (visible to non-enrolled users)
-        </label>
+        {/* Free Preview Toggle */}
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="free_preview"
+            checked={form.is_free_preview}
+            onChange={(e) => setForm({ ...form, is_free_preview: e.target.checked })}
+            className="w-3.5 h-3.5 rounded border-gray-300 text-teal-600"
+          />
+          <label htmlFor="free_preview" className="text-sm text-gray-700">
+            Free Preview
+          </label>
+        </div>
       </div>
 
-      <div className="flex gap-2">
-        <button
-          onClick={handleSave}
-          disabled={isSaving}
-          className="flex-1 py-2 rounded-lg text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-50 flex items-center justify-center gap-2"
-        >
-          <Save size={16} />
-          {isSaving ? 'Saving...' : 'Save Lesson'}
-        </button>
-        <button
-          onClick={onDelete}
-          className="px-4 py-2 rounded-lg text-sm font-medium text-red-600 border border-red-200 hover:bg-red-50"
-        >
-          <Trash2 size={16} />
-        </button>
+      {/* Sticky Save Button */}
+      <div className="sticky bottom-0 bg-white border-t border-gray-100 pt-3 pb-1 -mx-6 px-6">
+        <div className="flex gap-2">
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="flex-1 py-2 rounded-lg text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            <Save size={16} />
+            {isSaving ? 'Saving...' : 'Save Lesson'}
+          </button>
+          <button
+            onClick={onDelete}
+            className="px-3 py-2 rounded-lg text-sm font-medium text-red-600 border border-red-200 hover:bg-red-50"
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -1723,23 +1768,22 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-1">
+            <Link href="/tdi-admin/hub/production" className="hover:text-teal-600 transition-colors">
+              Production
+            </Link>
+            <span>/</span>
+            <span className="text-gray-600">Courses</span>
+            <span>/</span>
+            <span className="text-gray-600 truncate max-w-[200px]">{course.title}</span>
+          </div>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link
-                href="/tdi-admin/hub/production"
-                className="text-gray-500 hover:text-gray-700 flex items-center gap-1"
-              >
-                <ArrowLeft size={16} />
-                Back to Courses
-              </Link>
-              <div className="h-6 border-l border-gray-200" />
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">{course.title}</h1>
-                <p className="text-sm text-gray-500">/{course.slug}</p>
-              </div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-lg font-semibold text-gray-900 truncate max-w-[400px]">{course.title}</h1>
               <span
-                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                   course.is_published ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
                 }`}
               >
@@ -1761,7 +1805,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
               />
               <button
                 onClick={togglePublish}
-                className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors ${
                   course.is_published
                     ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     : 'bg-teal-600 text-white hover:bg-teal-700'
@@ -1769,12 +1813,12 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
               >
                 {course.is_published ? (
                   <>
-                    <EyeOff size={16} />
+                    <EyeOff size={14} />
                     Unpublish
                   </>
                 ) : (
                   <>
-                    <Eye size={16} />
+                    <Eye size={14} />
                     Publish
                   </>
                 )}
@@ -1789,6 +1833,22 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
         <div className="flex gap-6 flex-col lg:flex-row">
           {/* Left: Module/Lesson Tree (60%) */}
           <div className="flex-1 lg:w-[60%]">
+            {/* Production Dashboard */}
+            <div className="mb-4">
+              <ProductionDashboard course={course} />
+            </div>
+
+            {/* Bulk Video Upload */}
+            <div className="mb-4">
+              <BulkVideoUpload
+                course={{ id: course.id, modules: course.modules }}
+                onComplete={() => {
+                  // Reload course data after bulk upload
+                  window.location.reload();
+                }}
+              />
+            </div>
+
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleModuleDragEnd}>
               <SortableContext items={course.modules.map((m) => m.id)} strategy={verticalListSortingStrategy}>
                 <div className="space-y-4">
@@ -1865,8 +1925,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
 
           {/* Right: Editor Panel (40%) */}
           <div className="lg:w-[40%]">
-            <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-24">
-              <h2 className="font-semibold text-gray-900 mb-4">
+            <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
+              <h2 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide text-gray-500">
                 {selectedLesson ? 'Edit Lesson' : 'Course Settings'}
               </h2>
 

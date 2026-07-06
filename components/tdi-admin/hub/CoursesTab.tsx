@@ -7,7 +7,6 @@ import {
   Search,
   Plus,
   BookOpen,
-  FileText,
   Eye,
   EyeOff,
   Edit2,
@@ -15,7 +14,6 @@ import {
   Trash2,
   MoreHorizontal,
   Clock,
-  Layers,
   ChevronLeft,
   ChevronRight,
   X,
@@ -45,17 +43,6 @@ const DIFFICULTY_COLORS: Record<string, string> = {
   advanced: 'bg-rose-100 text-rose-700',
 };
 
-const ORIGIN_COLORS: Record<string, string> = {
-  internal: 'bg-blue-100 text-blue-700',
-  external_creator: 'bg-purple-100 text-purple-700',
-  mixed: 'bg-indigo-100 text-indigo-700',
-};
-
-const ORIGIN_LABELS: Record<string, string> = {
-  internal: 'Internal',
-  external_creator: 'External',
-  mixed: 'Mixed',
-};
 
 interface Course {
   id: string;
@@ -80,30 +67,25 @@ interface Course {
   updated_at: string;
 }
 
-// Relative time helper
-function getRelativeTime(dateString: string): string {
+// Concise date formatter: "Jul 1" for current year, "Jun 2025" for older
+function formatDate(dateString: string): string {
   const date = new Date(dateString);
   const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins} min ago`;
-  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-  return date.toLocaleDateString();
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  if (date.getFullYear() === now.getFullYear()) {
+    return `${months[date.getMonth()]} ${date.getDate()}`;
+  }
+  return `${months[date.getMonth()]} ${date.getFullYear()}`;
 }
 
-// Stat Card Component
+// Stat Card Component (compact)
 function StatCard({
   label,
   value,
   color,
 }: {
   label: string;
-  value: number;
+  value: number | string;
   color?: 'teal' | 'green' | 'amber';
 }) {
   const borderColors = {
@@ -111,21 +93,16 @@ function StatCard({
     green: '#22C55E',
     amber: '#F59E0B',
   };
-  const bgColors = {
-    teal: '#CCFBF1',
-    green: '#DCFCE7',
-    amber: '#FEF3C7',
-  };
 
   return (
     <div
-      className="bg-white rounded-lg p-4 shadow-sm transition-all hover:shadow-md"
+      className="bg-white rounded-lg px-4 py-3 shadow-sm"
       style={{
         borderLeft: `3px solid ${borderColors[color || 'teal']}`,
       }}
     >
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
-      <p className="text-sm text-gray-500">{label}</p>
+      <p className="text-xl font-bold text-gray-900">{value}</p>
+      <p className="text-xs text-gray-500">{label}</p>
     </div>
   );
 }
@@ -536,7 +513,6 @@ export function CoursesTab() {
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
-  const [originFilter, setOriginFilter] = useState<'all' | 'internal' | 'external_creator' | 'mixed' | 'untagged'>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean;
@@ -574,13 +550,9 @@ export function CoursesTab() {
     loadCourses();
   }, [statusFilter]);
 
-  // Filter courses by search and origin (client-side for responsiveness)
+  // Filter courses by search (client-side for responsiveness)
   const filteredCourses = courses.filter((c) => {
-    const matchesSearch = c.title.toLowerCase().includes(search.toLowerCase());
-    const matchesOrigin =
-      originFilter === 'all' ||
-      (originFilter === 'untagged' ? !c.origin_type : c.origin_type === originFilter);
-    return matchesSearch && matchesOrigin;
+    return c.title.toLowerCase().includes(search.toLowerCase());
   });
 
   // Pagination
@@ -595,7 +567,6 @@ export function CoursesTab() {
     total: courses.length,
     published: courses.filter((c) => c.is_published).length,
     drafts: courses.filter((c) => !c.is_published).length,
-    totalLessons: courses.reduce((sum, c) => sum + (c.lesson_count || 0), 0),
   };
 
   // Handlers
@@ -661,11 +632,10 @@ export function CoursesTab() {
   return (
     <div>
       {/* Stat Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-3 gap-4 mb-6">
         <StatCard label="Total Courses" value={stats.total} color="teal" />
         <StatCard label="Published" value={stats.published} color="green" />
         <StatCard label="Drafts" value={stats.drafts} color="amber" />
-        <StatCard label="Total Lessons" value={stats.totalLessons} color="teal" />
       </div>
 
       {/* Action Bar */}
@@ -705,22 +675,6 @@ export function CoursesTab() {
           ))}
         </div>
 
-        {/* Origin Filter */}
-        <select
-          value={originFilter}
-          onChange={(e) => {
-            setOriginFilter(e.target.value as typeof originFilter);
-            setCurrentPage(1);
-          }}
-          className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00B5AD]/50"
-        >
-          <option value="all">All Origins</option>
-          <option value="internal">Internal</option>
-          <option value="external_creator">External Creator</option>
-          <option value="mixed">Mixed</option>
-          <option value="untagged">Untagged</option>
-        </select>
-
         {/* Create Button */}
         <button
           onClick={() => setShowCreateModal(true)}
@@ -741,7 +695,7 @@ export function CoursesTab() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                  <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">
                     Course
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
@@ -750,19 +704,8 @@ export function CoursesTab() {
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
                     Difficulty
                   </th>
-                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    <Layers size={14} className="inline mr-1" />
-                    Modules
-                  </th>
-                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    <FileText size={14} className="inline mr-1" />
-                    Lessons
-                  </th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Origin
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Danielson
+                    Content
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
                     Status
@@ -784,18 +727,17 @@ export function CoursesTab() {
                   <tr
                     key={course.id}
                     onClick={() => handleEdit(course)}
-                    className="hover:bg-gray-50 cursor-pointer transition-colors"
+                    className="hover:bg-[#F8FFFE] cursor-pointer transition-colors"
                   >
-                    <td className="px-4 py-3">
+                    <td className="px-5 py-4">
                       <p className="text-sm font-medium text-gray-900">{course.title}</p>
-                      <p className="text-xs text-gray-500">{course.slug}</p>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-4">
                       <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
                         {course.category}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-4">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${
                           DIFFICULTY_COLORS[course.difficulty] || 'bg-gray-100 text-gray-700'
@@ -804,41 +746,12 @@ export function CoursesTab() {
                         {course.difficulty}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center text-sm text-gray-600">
-                      {course.module_count}
+                    <td className="px-4 py-4">
+                      <span className="text-sm text-gray-600">
+                        {course.module_count} module{course.module_count !== 1 ? 's' : ''}, {course.lesson_count} lesson{course.lesson_count !== 1 ? 's' : ''}
+                      </span>
                     </td>
-                    <td className="px-4 py-3 text-center text-sm text-gray-600">
-                      {course.lesson_count}
-                    </td>
-                    <td className="px-4 py-3">
-                      {course.origin_type ? (
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            ORIGIN_COLORS[course.origin_type] || 'bg-gray-100 text-gray-700'
-                          }`}
-                        >
-                          {ORIGIN_LABELS[course.origin_type] || course.origin_type}
-                        </span>
-                      ) : (
-                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-400">
-                          —
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {course.danielson_domains && course.danielson_domains.length > 0 ? (
-                        <div className="flex flex-wrap gap-1">
-                          {course.danielson_domains.map((d: string) => (
-                            <span key={d} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-100 text-indigo-700">
-                              D{d.charAt(0)}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-xs text-gray-400">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-4">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
                           course.is_published
@@ -849,13 +762,13 @@ export function CoursesTab() {
                         {course.is_published ? 'Published' : 'Draft'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center text-sm text-gray-600">
+                    <td className="px-4 py-4 text-center text-sm text-gray-600">
                       {course.pd_hours}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
-                      {getRelativeTime(course.updated_at)}
+                    <td className="px-4 py-4 text-sm text-gray-500">
+                      {formatDate(course.updated_at)}
                     </td>
-                    <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                    <td className="px-4 py-4 text-center" onClick={(e) => e.stopPropagation()}>
                       <ActionsMenu
                         course={course}
                         onEdit={() => handleEdit(course)}
