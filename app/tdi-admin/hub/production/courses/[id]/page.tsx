@@ -1181,7 +1181,17 @@ function LessonEditorPanel({
           videoId={form.video_id}
           durationMinutes={form.duration_minutes}
           transcriptText={form.transcript_text}
-          onUpdate={(updates) => setForm({ ...form, ...updates })}
+          onUpdate={(updates) => {
+            setForm((prev) => ({ ...prev, ...updates }));
+            // Auto-save video_id to database immediately (don't wait for Save Lesson)
+            if (updates.video_id || updates.duration_minutes) {
+              fetch('/api/tdi-admin/lessons', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: lesson.id, ...updates }),
+              }).catch(err => console.error('Auto-save video failed:', err));
+            }
+          }}
         />
       )}
 
