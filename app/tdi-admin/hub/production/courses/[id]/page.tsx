@@ -47,6 +47,18 @@ import {
  * VideoUploadSection -- handles video upload to Cloudflare Stream
  * and displays the existing video player if a video_id is set.
  */
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`
+}
+
+function formatTime(seconds: number): string {
+  if (seconds < 60) return `${Math.ceil(seconds)}s`
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${Math.ceil(seconds % 60)}s`
+  return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`
+}
+
 function VideoUploadSection({
   videoId,
   durationMinutes,
@@ -60,10 +72,98 @@ function VideoUploadSection({
 }) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'processing' | 'ready' | 'error'>('idle');
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'compressing' | 'uploading' | 'processing' | 'ready' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
+  const [fileInfo, setFileInfo] = useState<{ name: string; size: number; originalSize?: number; compressed?: boolean } | null>(null);
+  const [uploadSpeed, setUploadSpeed] = useState<string>('');
+  const [timeRemaining, setTimeRemaining] = useState<string>('');
 
   const cfAccountId = 'a559fc0dc4cb956f505801ed5427ba99';
+
+  // Compress video using browser canvas + MediaRecorder
+  const compressVideo = async (file: File): Promise<File> => {
+    // Only compress if file is larger than 50MB
+    if (file.size < 50 * 1024 * 1024) return file;
+    // Only compress supported formats
+    if (!file.type.includes('mp4') && !file.type.includes('webm') && !file.type.includes('quicktime')) return file;
+
+    setUploadStatus('compressing');
+
+    return new Promise((resolve) => {
+      const video = document.createElement('video');
+      video.muted = true;
+      video.playsInline = true;
+      video.src = URL.createObjectURL(file);
+
+      video.onloadedmetadata = () => {
+        // Target: 720p max, reasonable bitrate
+        const maxHeight = 720;
+        const scale = video.videoHeight > maxHeight ? maxHeight / video.videoHeight : 1;
+        const width = Math.round(video.videoWidth * scale / 2) * 2; // ensure even
+        const height = Math.round(video.videoHeight * scale / 2) * 2;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d')!;
+
+        // Target bitrate based on resolution (roughly 2.5 Mbps for 720p)
+        const videoBitsPerSecond = height <= 480 ? 1_500_000 : 2_500_000;
+
+        const stream = canvas.captureStream(30);
+        const recorder = new MediaRecorder(stream, {
+          mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm',
+          videoBitsPerSecond,
+        });
+
+        const chunks: Blob[] = [];
+        recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+
+        recorder.onstop = () => {
+          const compressed = new File(chunks, file.name.replace(/\.[^.]+$/, '.webm'), { type: 'video/webm' });
+          URL.revokeObjectURL(video.src);
+
+          // Only use compressed if it's actually smaller
+          if (compressed.size < file.size * 0.9) {
+            setFileInfo(prev => prev ? { ...prev, size: compressed.size, originalSize: file.size, compressed: true } : null);
+            resolve(compressed);
+          } else {
+            resolve(file);
+          }
+        };
+
+        recorder.start(1000);
+        video.play();
+
+        const drawFrame = () => {
+          if (video.ended || video.paused) {
+            recorder.stop();
+            return;
+          }
+          ctx.drawImage(video, 0, 0, width, height);
+          const pct = (video.currentTime / video.duration) * 100;
+          setUploadProgress(Math.round(pct * 0.3)); // compression is 0-30%
+          requestAnimationFrame(drawFrame);
+        };
+        requestAnimationFrame(drawFrame);
+
+        video.onended = () => { recorder.stop(); };
+
+        // Timeout: if compression takes longer than the video duration * 1.5, skip it
+        setTimeout(() => {
+          if (recorder.state === 'recording') {
+            recorder.stop();
+            video.pause();
+          }
+        }, (video.duration * 1500) + 5000);
+      };
+
+      video.onerror = () => {
+        URL.revokeObjectURL(video.src);
+        resolve(file); // fallback to original on error
+      };
+    });
+  };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -75,18 +175,24 @@ function VideoUploadSection({
       return;
     }
 
+    setFileInfo({ name: file.name, size: file.size });
     setUploading(true);
-    setUploadStatus('uploading');
     setUploadProgress(0);
     setErrorMsg('');
+    setUploadSpeed('');
+    setTimeRemaining('');
 
     try {
+      // Step 0: Compress if needed
+      const uploadFile = await compressVideo(file);
+
       // Step 1: Get direct upload URL from our API
+      setUploadStatus('uploading');
       const urlRes = await fetch('/api/tdi-admin/videos/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          filename: file.name,
+          filename: uploadFile.name,
           maxDurationSeconds: 7200,
         }),
       });
@@ -99,23 +205,46 @@ function VideoUploadSection({
 
       const { uploadUrl, videoUid } = await urlRes.json();
 
-      // Step 2: Upload file directly to Cloudflare
-      setUploadProgress(10);
+      // Step 2: Upload with real progress tracking using XMLHttpRequest
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        const startTime = Date.now();
 
-      const formData = new FormData();
-      formData.append('file', file);
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            const rawPct = (e.loaded / e.total) * 100;
+            // Map upload progress to 30-80% (0-30 was compression, 80-100 is processing)
+            setUploadProgress(30 + Math.round(rawPct * 0.5));
 
-      const uploadRes = await fetch(uploadUrl, {
-        method: 'POST',
-        body: formData,
+            // Calculate speed and ETA
+            const elapsed = (Date.now() - startTime) / 1000;
+            if (elapsed > 1) {
+              const bytesPerSec = e.loaded / elapsed;
+              const remaining = (e.total - e.loaded) / bytesPerSec;
+              setUploadSpeed(`${formatFileSize(bytesPerSec)}/s`);
+              setTimeRemaining(remaining > 1 ? `${formatTime(remaining)} remaining` : 'Almost done...');
+            }
+          }
+        });
+
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) resolve();
+          else reject(new Error(`Upload failed (${xhr.status})`));
+        });
+
+        xhr.addEventListener('error', () => reject(new Error('Upload to Cloudflare failed')));
+
+        const formData = new FormData();
+        formData.append('file', uploadFile);
+
+        xhr.open('POST', uploadUrl);
+        xhr.send(formData);
       });
 
-      if (!uploadRes.ok) {
-        throw new Error('Upload to Cloudflare failed');
-      }
-
-      setUploadProgress(70);
+      setUploadProgress(80);
       setUploadStatus('processing');
+      setUploadSpeed('');
+      setTimeRemaining('Cloudflare is processing your video...');
 
       // Step 3: Poll for processing completion
       onUpdate({ video_id: videoUid });
@@ -133,7 +262,7 @@ function VideoUploadSection({
             ready = true;
             setUploadProgress(100);
             setUploadStatus('ready');
-            // Auto-set duration from Cloudflare
+            setTimeRemaining('');
             if (status.duration) {
               onUpdate({
                 video_id: videoUid,
@@ -143,15 +272,16 @@ function VideoUploadSection({
           } else if (status.status === 'error') {
             throw new Error('Video processing failed');
           } else {
-            setUploadProgress(70 + Math.min(attempts, 25));
+            setUploadProgress(80 + Math.min(attempts, 18));
+            setTimeRemaining('Processing... this usually takes 30-60 seconds');
           }
         }
       }
 
       if (!ready) {
-        // Still processing but we have the ID -- it'll be ready soon
         setUploadStatus('ready');
         setUploadProgress(100);
+        setTimeRemaining('');
       }
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Upload failed');
@@ -185,7 +315,7 @@ function VideoUploadSection({
             <p className="text-sm text-gray-500 font-medium">
               {videoId ? 'Replace video' : 'Click to upload video'}
             </p>
-            <p className="text-xs text-gray-400 mt-1">MP4, MOV, MKV, or WebM</p>
+            <p className="text-xs text-gray-400 mt-1">MP4, MOV, MKV, or WebM -- files over 50MB auto-compress for faster upload</p>
             <input
               type="file"
               accept="video/*"
@@ -198,17 +328,73 @@ function VideoUploadSection({
         {/* Upload progress */}
         {(uploading || uploadStatus === 'processing') && (
           <div className="p-4 border border-gray-200 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />
-              <span className="text-sm text-gray-600">
-                {uploadStatus === 'uploading' ? 'Uploading...' : 'Processing video...'}
-              </span>
+            {/* File info */}
+            {fileInfo && (
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-gray-500 truncate max-w-[200px]">{fileInfo.name}</span>
+                <span className="text-xs text-gray-400">
+                  {formatFileSize(fileInfo.size)}
+                  {fileInfo.compressed && fileInfo.originalSize && (
+                    <span className="text-green-600 ml-1">
+                      (compressed from {formatFileSize(fileInfo.originalSize)})
+                    </span>
+                  )}
+                </span>
+              </div>
+            )}
+
+            {/* Status + speed */}
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />
+                <span className="text-sm text-gray-600">
+                  {uploadStatus === 'compressing' ? 'Compressing video...' :
+                   uploadStatus === 'uploading' ? 'Uploading...' :
+                   'Processing video...'}
+                </span>
+              </div>
+              {uploadSpeed && uploadStatus === 'uploading' && (
+                <span className="text-xs text-gray-400">{uploadSpeed}</span>
+              )}
             </div>
-            <div className="w-full bg-gray-100 rounded-full h-2">
+
+            {/* Progress bar */}
+            <div className="w-full bg-gray-100 rounded-full h-2.5 mb-1">
               <div
-                className="h-2 rounded-full transition-all duration-500"
-                style={{ width: `${uploadProgress}%`, background: '#00B5AD' }}
+                className="h-2.5 rounded-full transition-all duration-300"
+                style={{
+                  width: `${uploadProgress}%`,
+                  background: uploadStatus === 'compressing' ? '#8B5CF6' :
+                              uploadStatus === 'processing' ? '#F59E0B' : '#00B5AD',
+                }}
               />
+            </div>
+
+            {/* Time remaining */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-gray-400">{Math.round(uploadProgress)}%</span>
+              {timeRemaining && <span className="text-xs text-gray-400">{timeRemaining}</span>}
+            </div>
+
+            {/* Stage indicator */}
+            <div className="flex items-center gap-1 mt-3">
+              {['Compress', 'Upload', 'Process'].map((stage, i) => {
+                const stageNum = i;
+                const currentStage = uploadStatus === 'compressing' ? 0 : uploadStatus === 'uploading' ? 1 : 2;
+                return (
+                  <div key={stage} className="flex items-center gap-1">
+                    <div className={`w-2 h-2 rounded-full ${
+                      stageNum < currentStage ? 'bg-green-500' :
+                      stageNum === currentStage ? 'bg-teal-500 animate-pulse' :
+                      'bg-gray-200'
+                    }`} />
+                    <span className={`text-[10px] ${
+                      stageNum <= currentStage ? 'text-gray-600' : 'text-gray-300'
+                    }`}>{stage}</span>
+                    {i < 2 && <span className="text-gray-200 mx-0.5">-</span>}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
