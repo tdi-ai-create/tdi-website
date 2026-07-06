@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { logCreatorEmail } from '@/lib/creator-email-log';
+import { creatorEmailTemplate } from '@/lib/creator-email-template';
 
 // ---------------------------------------------------------------------------
 // First-Week Momentum Email
@@ -94,9 +95,11 @@ export async function GET(request: NextRequest) {
         oneThingWhy = 'Your path is set — now you can see every step from here to launch. Take a look and see what feels doable this week.';
       }
 
-      const subject = `Your one thing this week, ${firstName}`;
-      const html = `
-        <div style="font-family: 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto; color: #374151; font-size: 15px; line-height: 1.7;">
+      const subject = `Creator Studio | Your one thing this week, ${firstName}`;
+      const html = creatorEmailTemplate({
+        firstName,
+        tagline: 'Getting started is the hardest part — so let\'s make it easy',
+        body: `
           <p>Hey ${firstName},</p>
           <p>Welcome to the Creator Studio! I'm Bella, and I'll be your go-to person throughout this whole process.</p>
           <p>I know starting something new can feel like a lot, so here's my suggestion: <strong>just do one thing this week.</strong></p>
@@ -105,19 +108,12 @@ export async function GET(request: NextRequest) {
             <p style="margin: 6px 0 0; color: #713f12;">${oneThing}</p>
             <p style="margin: 8px 0 0; font-size: 13px; color: #a16207;">${oneThingWhy}</p>
           </div>
-          <p style="margin: 20px 0;">
-            <a href="${dashboardLink}" style="display: inline-block; background-color: #1e2749; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 14px;">
-              Open Your Creator Studio
-            </a>
-          </p>
-          <p>If you have questions, feel stuck, or just want to talk it through — reply to this email or <a href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2u_lKGMRaB_tUKQNNoYRyWR4PeeSbmkIW3auqmUGzkSTJFHsWqayLNkzDWqzoySgiaJ7FR12Sn" style="color: #1e2749; font-weight: 500;">book a quick call with me</a>. I'm here and I'm happy to help.</p>
+          <p>If you have questions, feel stuck, or just want to talk it through — reply to this email or <a href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2u_lKGMRaB_tUKQNNoYRyWR4PeeSbmkIW3auqmUGzkSTJFHsWqayLNkzDWqzoySgiaJ7FR12Sn" style="color: #1e2749; font-weight: 500;">book a quick call with me</a>.</p>
           <p>Talk soon,<br/>Bella</p>
-          <p style="margin-top: 24px; color: #6b7280; font-size: 13px;">
-            Bella Duran | Creator Success<br/>
-            Teachers Deserve It
-          </p>
-        </div>
-      `;
+        `,
+        ctaLabel: 'Open My Creator Studio',
+        showMission: true,
+      });
 
       try {
         const res = await fetch('https://api.resend.com/emails', {

@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
               from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
               to: [creator.email],
               cc: ['creatorstudio@teachersdeserveit.com', 'bella@teachersdeserveit.com'],
-              subject: 'You have a new note from the TDI team!',
+              subject: 'Creator Studio | New note from your team!',
               html: `
                 <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                   <h2 style="color: #1e2749;">Hi ${firstName}! 👋</h2>

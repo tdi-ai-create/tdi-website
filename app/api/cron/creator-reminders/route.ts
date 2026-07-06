@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
                   from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
                   to: [creator.email],
                   bcc: ['bella@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
-                  subject: `You're ${interval.days} days from your launch goal - ${firstName}!`,
+                  subject: `Creator Studio | ${interval.days} days to launch, ${firstName}!`,
                   html: `
                     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                       <h2 style="color: #1e2749;">Hey ${firstName}!</h2>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { logCreatorEmail } from '@/lib/creator-email-log';
+import { creatorEmailTemplate } from '@/lib/creator-email-template';
 
 // ---------------------------------------------------------------------------
 // Creator Re-engagement Cron
@@ -23,100 +24,118 @@ const REPLY_TO = 'bella@teachersdeserveit.com';
 // ---------------------------------------------------------------------------
 
 function getEmailContent(step: number, firstName: string): { subject: string; html: string } {
-  const dashboardLink = 'https://www.teachersdeserveit.com/creator-portal/dashboard';
-  const wrapper = (body: string) => `
-    <div style="font-family: 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto; color: #374151; font-size: 15px; line-height: 1.7;">
-      ${body}
-      <p style="margin-top: 24px; color: #6b7280; font-size: 13px;">
-        Bella Duran | Creator Success<br/>
-        Teachers Deserve It
-      </p>
-    </div>
-  `;
-
   switch (step) {
     case 0:
       return {
-        subject: `Hey ${firstName}, just checking in`,
-        html: wrapper(`
-          <p>Hey ${firstName},</p>
-          <p>I noticed it's been a little while since you've been in the Creator Studio — just wanted to reach out and see how things are going.</p>
-          <p>No pressure at all. If you're busy or life got hectic, totally get it. I just want to make sure you know I'm here if you need anything.</p>
-          <p>You can always <a href="${dashboardLink}" style="color: #1e2749; font-weight: 500;">pop back into your dashboard</a> whenever you're ready.</p>
-          <p>Talk soon,<br/>Bella</p>
-        `),
+        subject: `Creator Studio | Hey ${firstName}, just checking in`,
+        html: creatorEmailTemplate({
+          firstName,
+          tagline: 'We miss you!',
+          body: `
+            <p>Hey ${firstName},</p>
+            <p>I noticed it's been a little while since you've been in the Creator Studio — just wanted to reach out and see how things are going.</p>
+            <p>No pressure at all. If you're busy or life got hectic, totally get it. I just want to make sure you know I'm here if you need anything.</p>
+            <p>Your dashboard is right where you left it whenever you're ready.</p>
+            <p>Talk soon,<br/>Bella</p>
+          `,
+          ctaLabel: 'Open My Creator Studio',
+          showMission: true,
+        }),
       };
 
     case 1:
       return {
-        subject: `Quick thought for you, ${firstName}`,
-        html: wrapper(`
-          <p>Hey ${firstName},</p>
-          <p>Sometimes the hardest part is just opening the project back up — I get it. If it helps, even 15 minutes of progress can shift your momentum.</p>
-          <p>Your <a href="${dashboardLink}" style="color: #1e2749; font-weight: 500;">dashboard</a> is right where you left it. What's one small thing you could tackle today?</p>
-          <p>Rooting for you,<br/>Bella</p>
-        `),
+        subject: `Creator Studio | A quick thought for you, ${firstName}`,
+        html: creatorEmailTemplate({
+          firstName,
+          tagline: 'Small steps, big impact',
+          body: `
+            <p>Hey ${firstName},</p>
+            <p>Sometimes the hardest part is just opening the project back up — I get it. If it helps, even 15 minutes of progress can shift your momentum.</p>
+            <p>Your dashboard is right where you left it. What's one small thing you could tackle today?</p>
+            <p>Rooting for you,<br/>Bella</p>
+          `,
+          ctaLabel: 'Jump Back In',
+        }),
       };
 
     case 2:
       return {
-        subject: `You're not alone in this, ${firstName}`,
-        html: wrapper(`
-          <p>Hey ${firstName},</p>
-          <p>I work with creators every day, and I can tell you — almost everyone hits a pause at some point. It's normal and it doesn't mean you're behind.</p>
-          <p>If something specific is holding you up, I'd love to help you work through it. Just reply to this email and let me know what's going on.</p>
-          <p>Here for you,<br/>Bella</p>
-        `),
+        subject: `Creator Studio | You're not alone in this, ${firstName}`,
+        html: creatorEmailTemplate({
+          firstName,
+          tagline: 'Every creator hits a pause',
+          body: `
+            <p>Hey ${firstName},</p>
+            <p>I work with creators every day, and I can tell you — almost everyone hits a pause at some point. It's normal and it doesn't mean you're behind.</p>
+            <p>If something specific is holding you up, I'd love to help you work through it. Just reply to this email and let me know what's going on.</p>
+            <p>Here for you,<br/>Bella</p>
+          `,
+        }),
       };
 
     case 3:
       return {
-        subject: `Thinking about your project, ${firstName}`,
-        html: wrapper(`
-          <p>Hey ${firstName},</p>
-          <p>Your content idea is still a great one — I just wanted to remind you of that. The educators who will benefit from your work are still out there waiting for it.</p>
-          <p>If your timeline needs to shift, that's completely fine. We can adjust your <a href="${dashboardLink}" style="color: #1e2749; font-weight: 500;">target date</a> together — no judgment.</p>
-          <p>Just say the word,<br/>Bella</p>
-        `),
+        subject: `Creator Studio | Your content idea is still a great one, ${firstName}`,
+        html: creatorEmailTemplate({
+          firstName,
+          tagline: 'Educators are waiting for your expertise',
+          body: `
+            <p>Hey ${firstName},</p>
+            <p>Your content idea is still a great one — I just wanted to remind you of that. The educators who will benefit from your work are still out there waiting for it.</p>
+            <p>If your timeline needs to shift, that's completely fine. We can adjust your target date together — no judgment.</p>
+            <p>Just say the word,<br/>Bella</p>
+          `,
+          ctaLabel: 'Update My Timeline',
+          showMission: true,
+        }),
       };
 
     case 4:
       return {
-        subject: `Still here for you, ${firstName}`,
-        html: wrapper(`
-          <p>Hey ${firstName},</p>
-          <p>I know these emails might be piling up, and I promise I'm not trying to add to your plate. I just want you to know the door is open whenever you're ready.</p>
-          <p>If now isn't the right time, that's okay too. Just reply and let me know — even a quick "not yet" helps me know where you're at.</p>
-          <p>Warmly,<br/>Bella</p>
-        `),
+        subject: `Creator Studio | Still here for you, ${firstName}`,
+        html: creatorEmailTemplate({
+          firstName,
+          body: `
+            <p>Hey ${firstName},</p>
+            <p>I know these emails might be piling up, and I promise I'm not trying to add to your plate. I just want you to know the door is open whenever you're ready.</p>
+            <p>If now isn't the right time, that's okay too. Just reply and let me know — even a quick "not yet" helps me know where you're at.</p>
+            <p>Warmly,<br/>Bella</p>
+          `,
+        }),
       };
 
     case 5:
       return {
-        subject: `One more check-in, ${firstName}`,
-        html: wrapper(`
-          <p>Hey ${firstName},</p>
-          <p>This will be my last weekly check-in for now. I want to respect your time and your bandwidth.</p>
-          <p>If you'd like to keep going with your project, just <a href="${dashboardLink}" style="color: #1e2749; font-weight: 500;">log back into your dashboard</a> or reply here — I'll be right here to help.</p>
-          <p>Otherwise, I'll follow up one more time next week with some next steps about your account.</p>
-          <p>No matter what, I'm glad you started this journey,<br/>Bella</p>
-        `),
+        subject: `Creator Studio | One more check-in, ${firstName}`,
+        html: creatorEmailTemplate({
+          firstName,
+          tagline: 'Last weekly check-in',
+          body: `
+            <p>Hey ${firstName},</p>
+            <p>This will be my last weekly check-in for now. I want to respect your time and your bandwidth.</p>
+            <p>If you'd like to keep going with your project, just log back in or reply here — I'll be right here to help.</p>
+            <p>Otherwise, I'll follow up one more time next week with some next steps about your account.</p>
+            <p>No matter what, I'm glad you started this journey,<br/>Bella</p>
+          `,
+          ctaLabel: 'Continue My Project',
+        }),
       };
 
     case 6:
       return {
-        subject: `Update on your Creator Studio account, ${firstName}`,
-        html: wrapper(`
-          <p>Hey ${firstName},</p>
-          <p>Since it's been a while, we're going to go ahead and pause your Creator Studio account. This way it's not hanging over you, and you can focus on whatever else needs your attention right now.</p>
-          <p>This is <strong>not</strong> a goodbye — your work and progress are saved. Whenever you're ready to pick things back up, just reply to this email or click the link below and we'll get you going again.</p>
-          <p style="margin: 20px 0;">
-            <a href="${dashboardLink}" style="display: inline-block; background-color: #1e2749; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 14px;">
-              Reactivate My Account
-            </a>
-          </p>
-          <p>Wishing you the best,<br/>Bella</p>
-        `),
+        subject: `Creator Studio | Account update for ${firstName}`,
+        html: creatorEmailTemplate({
+          firstName,
+          tagline: 'Your account is being paused',
+          body: `
+            <p>Hey ${firstName},</p>
+            <p>Since it's been a while, we're going to go ahead and pause your Creator Studio account. This way it's not hanging over you, and you can focus on whatever else needs your attention right now.</p>
+            <p>This is <strong>not</strong> a goodbye — your work and progress are saved. Whenever you're ready to pick things back up, just reply to this email or click below and we'll get you going again.</p>
+            <p>Wishing you the best,<br/>Bella</p>
+          `,
+          ctaLabel: 'Reactivate My Account',
+        }),
       };
 
     default:

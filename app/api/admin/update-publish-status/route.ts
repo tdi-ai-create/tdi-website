@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
             </div>
           `;
 
-          const celebrationSubject = `You're officially published, ${firstName}!`;
+          const celebrationSubject = `Creator Studio | You're officially published, ${firstName}!`;
 
           await fetch('https://api.resend.com/emails', {
             method: 'POST',

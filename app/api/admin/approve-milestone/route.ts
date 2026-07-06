@@ -411,8 +411,8 @@ export async function POST(request: Request) {
         : `You've completed this phase! Check your portal for what's next.`;
 
       const emailSubject = isOutOfOrder
-        ? `✅ Milestone completed: ${milestone?.title || milestone?.name || 'Your milestone'}`
-        : `✅ You're approved! Next step unlocked`;
+        ? `Creator Studio | Milestone completed: ${milestone?.title || milestone?.name || 'Your milestone'}`
+        : `Creator Studio | You're approved — next step unlocked!`;
 
       await fetch('https://api.resend.com/emails', {
         method: 'POST',

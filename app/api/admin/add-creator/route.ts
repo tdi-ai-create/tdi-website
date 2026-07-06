@@ -134,7 +134,7 @@ export async function POST(request: Request) {
             from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
             to: [email.toLowerCase()],
             cc: ['creatorstudio@teachersdeserveit.com', 'bella@teachersdeserveit.com'],
-            subject: `You've Been Selected as a TDI Creator!`,
+            subject: `Creator Studio | Welcome to the team — you've been selected!`,
             html: `
               <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e2749;">
 

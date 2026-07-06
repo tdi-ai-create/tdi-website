@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
             from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
             to: [creator.email],
             cc: ['creatorstudio@teachersdeserveit.com', 'bella@teachersdeserveit.com'],
-            subject: `Action Needed: Revision requested for ${milestoneTitle}`,
+            subject: `Creator Studio | Revision requested for ${milestoneTitle}`,
             html: `
               <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                 <img src="https://www.teachersdeserveit.com/images/logo.webp" alt="Teachers Deserve It" style="height: 40px; margin-bottom: 20px;" />
