@@ -181,7 +181,7 @@ export default function GetStartedPage() {
             : ['get-started', selectedRole?.toLowerCase().replace(' ', '-')],
           ...(isTeacherPath && {
             pd_frustration: formData.teacher_pd_frustration ?? '',
-            pd_leadership_wish: formData.teacher_pd_leadership_wish ?? '',
+            leadership_pd_wish: formData.teacher_pd_leadership_wish ?? '',
             pd_decision_maker: formData.teacher_pd_contact ?? '',
           }),
           ...(!isTeacherPath && {
