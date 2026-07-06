@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${expectedSecret}`,
+        'Authorization': `Bearer ${token || ''}`,
       },
       body: JSON.stringify({
         title: subject,
