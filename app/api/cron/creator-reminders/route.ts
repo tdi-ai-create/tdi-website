@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { logCreatorEmail } from '@/lib/creator-email-log';
 
 // Reminder intervals in days before target date
 const REMINDER_INTERVALS = [
@@ -156,6 +157,17 @@ export async function GET(request: NextRequest) {
                     reminder_type: interval.type,
                     target_date: creator.target_completion_date,
                   });
+
+                await logCreatorEmail({
+                  creator_id: creator.id,
+                  creator_name: creator.name,
+                  creator_email: creator.email,
+                  direction: 'to_creator',
+                  category: 'countdown_reminder',
+                  subject: `You're ${interval.days} days from your launch goal`,
+                  sent_by: 'cron:creator-reminders',
+                  metadata: { reminder_type: interval.type, days: interval.days },
+                });
 
                 remindersSent++;
                 results.push({

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { logCreatorEmail } from '@/lib/creator-email-log';
 
 // ---------------------------------------------------------------------------
 // Creator Re-engagement Cron
@@ -272,6 +273,16 @@ export async function GET(request: NextRequest) {
                 .eq('id', seq.id);
             }
 
+            await logCreatorEmail({
+              creator_id: seq.creator_id,
+              creator_name: creator.name,
+              creator_email: creator.email,
+              direction: 'to_creator',
+              category: 'reengagement',
+              subject,
+              step: nextStep,
+              sent_by: 'cron:creator-reengagement',
+            });
             console.log(`[reengagement] Sent step ${nextStep} email to ${creator.email}`);
           } else {
             results.errors.push(`Failed to send step ${nextStep} email to ${creator.email}`);
@@ -344,6 +355,17 @@ export async function GET(request: NextRequest) {
               followed_up_by: 'system:reengagement',
             })
             .eq('id', creator.id);
+
+          await logCreatorEmail({
+            creator_id: creator.id,
+            creator_name: creator.name,
+            creator_email: creator.email,
+            direction: 'to_creator',
+            category: 'reengagement',
+            subject,
+            step: 0,
+            sent_by: 'cron:creator-reengagement',
+          });
 
           results.sequencesStarted++;
           results.emailsSent++;
