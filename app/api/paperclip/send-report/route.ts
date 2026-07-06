@@ -9,11 +9,21 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
+    // Auth: accept PAPERCLIP_REPORT_SECRET, PAPERCLIP_SYNC_KEY, or CRON_SECRET
     const authHeader = request.headers.get('authorization');
-    const expectedSecret = process.env.PAPERCLIP_REPORT_SECRET;
+    const token = authHeader?.replace('Bearer ', '');
+    const validTokens = [
+      process.env.PAPERCLIP_REPORT_SECRET,
+      process.env.PAPERCLIP_SYNC_KEY,
+      process.env.CRON_SECRET,
+    ].filter(Boolean);
 
-    if (!expectedSecret || authHeader !== `Bearer ${expectedSecret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (validTokens.length === 0 || !token || !validTokens.includes(token)) {
+      // Also allow Vercel cron header as fallback
+      const isVercelCron = request.headers.get('x-vercel-cron') === '1';
+      if (!isVercelCron) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
     }
 
     const { subject, content } = await request.json();
