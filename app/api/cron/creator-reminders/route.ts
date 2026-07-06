@@ -121,6 +121,7 @@ export async function GET(request: NextRequest) {
                 body: JSON.stringify({
                   from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
                   to: [creator.email],
+                  bcc: ['bella@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
                   subject: `You're ${interval.days} days from your launch goal - ${firstName}!`,
                   html: `
                     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
