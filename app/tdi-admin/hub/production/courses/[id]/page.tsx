@@ -1027,33 +1027,29 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
   const [showAddModule, setShowAddModule] = useState(false);
   const [newModuleTitle, setNewModuleTitle] = useState('');
 
-  // Load course via API route (uses service key, works for all admin team members)
+  // Load course via lightweight API (no auth required, uses Hub service key server-side)
   useEffect(() => {
     async function loadCourse() {
       try {
-        const res = await fetch(`/api/tdi-admin/courses/${resolvedParams.id}`, {
-          credentials: 'include',
-        });
+        const res = await fetch(`/api/tdi-admin/courses/read?id=${resolvedParams.id}`);
         if (!res.ok) {
           console.error('Error loading course:', res.status);
           setIsLoading(false);
           return;
         }
         const data = await res.json();
-        const courseData = data.course;
-        if (!courseData) {
+        if (!data.course) {
           console.error('Course not found');
           setIsLoading(false);
           return;
         }
 
-        // API returns modules nested inside course object
-        const sortedModules = (courseData.modules || []).map((m: any) => ({
+        const sortedModules = (data.modules || []).map((m: any) => ({
           ...m,
           lessons: (m.lessons || []).sort((a: any, b: any) => a.sort_order - b.sort_order),
         }));
 
-        setCourse({ ...courseData, modules: sortedModules });
+        setCourse({ ...data.course, modules: sortedModules });
         setExpandedModules(new Set(sortedModules.map((m: any) => m.id)));
       } catch (error) {
         console.error('Error loading course:', error);
