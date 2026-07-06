@@ -21,7 +21,7 @@ const milestoneActions: Record<string, { action_type: string; action_config: Rec
   },
   'rae_meeting_scheduled': {
     action_type: 'calendly',
-    action_config: { url: 'https://calendly.com/rae-teachersdeserveit/creator-chat', label: 'Book Your Kickoff Call' },
+    action_config: { url: 'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2u_lKGMRaB_tUKQNNoYRyWR4PeeSbmkIW3auqmUGzkSTJFHsWqayLNkzDWqzoySgiaJ7FR12Sn', label: 'Book Your Kickoff Call with the Team' },
     requires_team_action: false,
   },
   'rae_meeting_completed': {
@@ -45,7 +45,7 @@ const milestoneActions: Record<string, { action_type: string; action_config: Rec
   },
   'outline_meeting_scheduled': {
     action_type: 'calendly',
-    action_config: { url: 'https://calendly.com/rae-teachersdeserveit/creator-chat', label: 'Schedule Outline Review' },
+    action_config: { url: 'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2u_lKGMRaB_tUKQNNoYRyWR4PeeSbmkIW3auqmUGzkSTJFHsWqayLNkzDWqzoySgiaJ7FR12Sn', label: 'Schedule Outline Review' },
     requires_team_action: false,
   },
   'outline_meeting_completed': {
@@ -60,7 +60,7 @@ const milestoneActions: Record<string, { action_type: string; action_config: Rec
   },
   'final_outline_meeting_scheduled': {
     action_type: 'calendly',
-    action_config: { url: 'https://calendly.com/rae-teachersdeserveit/creator-chat', label: 'Schedule Final Review' },
+    action_config: { url: 'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2u_lKGMRaB_tUKQNNoYRyWR4PeeSbmkIW3auqmUGzkSTJFHsWqayLNkzDWqzoySgiaJ7FR12Sn', label: 'Schedule Final Review' },
     requires_team_action: false,
   },
   'final_outline_approved': {

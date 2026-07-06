@@ -55,9 +55,9 @@ ADD COLUMN IF NOT EXISTS action_config JSONB;
 
     // Step 3: Set calendly action for booking milestones
     const calendlyMilestones = [
-      { id: 'rae_meeting_scheduled', label: 'Book Kickoff Meeting' },
-      { id: 'outline_meeting_scheduled', label: 'Book Outline Review' },
-      { id: 'final_outline_meeting_scheduled', label: 'Book Final Review' },
+      { id: 'rae_meeting_scheduled', label: 'Book Your Kickoff Call with the Team' },
+      { id: 'outline_meeting_scheduled', label: 'Schedule Outline Review' },
+      { id: 'final_outline_meeting_scheduled', label: 'Schedule Final Review' },
     ];
 
     for (const m of calendlyMilestones) {
@@ -66,7 +66,7 @@ ADD COLUMN IF NOT EXISTS action_config JSONB;
         .update({
           action_type: 'calendly',
           action_config: {
-            url: 'https://calendly.com/rae-teachersdeserveit/creator-chat',
+            url: 'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2u_lKGMRaB_tUKQNNoYRyWR4PeeSbmkIW3auqmUGzkSTJFHsWqayLNkzDWqzoySgiaJ7FR12Sn',
             label: m.label,
           },
         })
