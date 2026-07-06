@@ -92,8 +92,9 @@ function VideoUploadSection({
       });
 
       if (!urlRes.ok) {
-        const err = await urlRes.json();
-        throw new Error(err.error || 'Failed to get upload URL');
+        let errMsg = `Upload failed (${urlRes.status})`;
+        try { const err = await urlRes.json(); errMsg = err.error || errMsg; } catch { /* non-JSON response */ }
+        throw new Error(errMsg);
       }
 
       const { uploadUrl, videoUid } = await urlRes.json();
