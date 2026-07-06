@@ -160,11 +160,10 @@ export default function GetStartedPage() {
         body: JSON.stringify(submitData),
       });
 
-      // TEA-7426: Teacher path fires teacher-nomination workflow in GHL (gated
-      // on the `nomination` tag). PD-question answers land on the contact via
-      // the pd_frustration / pd_leadership_wish / pd_decision_maker custom
-      // fields Kristin configured. Para keeps existing keys/tags; leaders
-      // unaffected.
+      // TEA-7426: Teacher and Para paths fire the nomination workflow in GHL
+      // (gated on the `nomination` tag). PD-question answers land on the
+      // contact via the pd_frustration / pd_leadership_wish / pd_decision_maker
+      // custom fields Kristin configured. Leaders unaffected.
       fetch('https://services.leadconnectorhq.com/hooks/3V0PYKAGmdo86GbTC1GC/webhook-trigger/afb49642-3913-454a-97e5-9823b40cf6c6', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -177,18 +176,13 @@ export default function GetStartedPage() {
           school_state: formData.schoolState,
           path: isTeacherPath ? 'nomination' : 'pd-plan',
           source: 'get-started page',
-          tags: selectedRole === 'Teacher'
-            ? ['get-started', 'teacher', 'nomination']
+          tags: isTeacherPath
+            ? ['get-started', selectedRole === 'Teacher' ? 'teacher' : 'para', 'nomination']
             : ['get-started', selectedRole?.toLowerCase().replace(' ', '-')],
-          ...(selectedRole === 'Teacher' && {
+          ...(isTeacherPath && {
             pd_frustration: formData.teacher_pd_frustration ?? '',
             pd_leadership_wish: formData.teacher_pd_leadership_wish ?? '',
             pd_decision_maker: formData.teacher_pd_contact ?? '',
-          }),
-          ...(selectedRole === 'Para' && {
-            teacher_pd_frustration: formData.teacher_pd_frustration,
-            teacher_pd_leadership_wish: formData.teacher_pd_leadership_wish,
-            teacher_pd_contact: formData.teacher_pd_contact,
           }),
           ...(!isTeacherPath && {
             pd_plan_audience: formData.pd_plan_audience.join(', '),
