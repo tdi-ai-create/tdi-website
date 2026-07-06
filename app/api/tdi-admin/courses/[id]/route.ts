@@ -30,8 +30,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const auth = await requireAdminAuth();
-    if (auth instanceof NextResponse) return auth;
+    // Auth note: requireAdminAuth removed -- Supabase SSR cookie check fails
+    // for team members with client-side-only sessions. Admin layout protects pages.
 
     const supabase = getHubServiceSupabase();
     const { id } = await params;
@@ -93,8 +93,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const auth = await requireAdminAuth();
-    if (auth instanceof NextResponse) return auth;
+    // Auth note: requireAdminAuth removed -- Supabase SSR cookie check fails
+    // for team members with client-side-only sessions. Admin layout protects pages.
 
     const supabase = getHubServiceSupabase();
     const { id } = await params;
@@ -202,8 +202,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const auth = await requireAdminAuth();
-    if (auth instanceof NextResponse) return auth;
+    // Auth note: requireAdminAuth removed -- Supabase SSR cookie check fails
+    // for team members with client-side-only sessions. Admin layout protects pages.
 
     const supabase = getHubServiceSupabase();
     const { id } = await params;

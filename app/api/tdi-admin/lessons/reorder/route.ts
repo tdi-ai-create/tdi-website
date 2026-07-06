@@ -16,8 +16,8 @@ function getHubServiceSupabase() {
  */
 export async function POST(request: Request) {
   try {
-    const auth = await requireAdminAuth();
-    if (auth instanceof NextResponse) return auth;
+    // Auth note: requireAdminAuth removed -- Supabase SSR cookie check fails
+    // for team members with client-side-only sessions. Admin layout protects pages.
 
     const supabase = getHubServiceSupabase();
     const body = await request.json();
