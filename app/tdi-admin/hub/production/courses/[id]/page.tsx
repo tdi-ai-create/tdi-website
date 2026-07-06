@@ -3,7 +3,6 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getHubSupabase } from '@/lib/supabase-hub';
 import {
   DndContext,
   closestCenter,
@@ -1028,34 +1027,28 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
   const [showAddModule, setShowAddModule] = useState(false);
   const [newModuleTitle, setNewModuleTitle] = useState('');
 
-  // Load course directly from Hub Supabase
+  // Load course via API route (uses service key, works for all admin team members)
   useEffect(() => {
     async function loadCourse() {
       try {
-        const supabase = getHubSupabase();
-        const { data: courseData, error: courseError } = await supabase
-          .from('hub_courses')
-          .select('*')
-          .eq('id', resolvedParams.id)
-          .single();
-
-        if (courseError || !courseData) {
-          console.error('Error loading course:', courseError);
+        const res = await fetch(`/api/tdi-admin/courses/${resolvedParams.id}`, {
+          credentials: 'include',
+        });
+        if (!res.ok) {
+          console.error('Error loading course:', res.status);
+          setIsLoading(false);
+          return;
+        }
+        const data = await res.json();
+        const courseData = data.course;
+        if (!courseData) {
+          console.error('Course not found');
           setIsLoading(false);
           return;
         }
 
-        const { data: modules, error: modulesError } = await supabase
-          .from('hub_modules')
-          .select(`*, lessons:hub_lessons(*)`)
-          .eq('course_id', resolvedParams.id)
-          .order('sort_order', { ascending: true });
-
-        if (modulesError) {
-          console.error('Error loading modules:', modulesError);
-        }
-
-        const sortedModules = (modules || []).map((m: any) => ({
+        // API returns modules nested inside course object
+        const sortedModules = (courseData.modules || []).map((m: any) => ({
           ...m,
           lessons: (m.lessons || []).sort((a: any, b: any) => a.sort_order - b.sort_order),
         }));
