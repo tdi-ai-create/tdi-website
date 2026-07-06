@@ -570,8 +570,32 @@ export default function SalesPage() {
   // --- Spreadsheet export helpers ---
 
   function exportToSheet(rows: Opportunity[], filename: string, sheetName: string, isJimsList: boolean) {
-    const data = rows.map(o => {
-      const base: Record<string, string | number | null> = {
+    let data: Record<string, string | number | null>[];
+    let colWidths: Record<string, number>;
+
+    if (isJimsList) {
+      // Jim's call sheet format -- matches his Google Sheet exactly
+      data = rows.map(o => ({
+        'District / School': (o.name || '').replace(/\s*\([A-Z]{2}\)\s*-\s*PD Plan Inquiry\s*$/i, '').replace(/\s*\([A-Z]{2}\)\s*-\s*Nomination\s*$/i, '').replace(/\s*-\s*PD Plan Inquiry\s*$/i, '').replace(/\s*-\s*Nomination\s*$/i, '').trim(),
+        'Contact Name': o.contactName || '',
+        'Contact Email': o.contactEmail || '',
+        'Phone': o.contactPhone || '',
+        'State': o.state || '',
+        'Source': o.source || '',
+        'Contact Date &Subject': (o.notes || '').replace(/\n/g, ' '),
+      }))
+      colWidths = {
+        'District / School': 40,
+        'Contact Name': 22,
+        'Contact Email': 30,
+        'Phone': 18,
+        'State': 7,
+        'Source': 28,
+        'Contact Date &Subject': 60,
+      }
+    } else {
+      // Full export with all fields
+      data = rows.map(o => ({
         'District / School': o.name || '',
         'Contact Name': o.contactName || '',
         'Contact Email': o.contactEmail || '',
@@ -586,33 +610,26 @@ export default function SalesPage() {
         'Website': o.website || '',
         'School Year': o.schoolYear || '',
         'Notes': (o.notes || '').replace(/\n/g, ' '),
+      }))
+      colWidths = {
+        'District / School': 35,
+        'Contact Name': 22,
+        'Contact Email': 30,
+        'Phone': 18,
+        'City': 16,
+        'State': 7,
+        'Stage': 20,
+        'Deal Value': 12,
+        'Heat': 8,
+        'Source': 28,
+        'Deal Type': 14,
+        'Website': 35,
+        'School Year': 12,
+        'Notes': 60,
       }
-      if (isJimsList) {
-        base['Assigned To'] = o.assignedTo || ''
-      }
-      return base
-    })
+    }
 
     const ws = XLSX.utils.json_to_sheet(data)
-
-    // Set column widths for readability
-    const colWidths: Record<string, number> = {
-      'District / School': 35,
-      'Contact Name': 22,
-      'Contact Email': 30,
-      'Phone': 18,
-      'City': 16,
-      'State': 7,
-      'Stage': 20,
-      'Deal Value': 12,
-      'Heat': 8,
-      'Source': 28,
-      'Deal Type': 14,
-      'Website': 35,
-      'School Year': 12,
-      'Notes': 60,
-      'Assigned To': 22,
-    }
     const headers = Object.keys(data[0] || {})
     ws['!cols'] = headers.map(h => ({ wch: colWidths[h] || 15 }))
 
