@@ -51,7 +51,7 @@ import {
  * VideoPlayer -- polls Cloudflare Stream until video is ready, then shows iframe.
  * Shows a friendly "processing" message instead of a 404 iframe.
  */
-function VideoPlayer({ videoId, cfAccountId }: { videoId: string; cfAccountId: string }) {
+function VideoPlayer({ videoId, cfAccountId: cfSubdomain }: { videoId: string; cfAccountId: string }) {
   const [ready, setReady] = useState(false);
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState(false);
@@ -109,7 +109,7 @@ function VideoPlayer({ videoId, cfAccountId }: { videoId: string; cfAccountId: s
   return (
     <div className="mb-3 rounded-lg overflow-hidden border border-gray-200">
       <iframe
-        src={`https://customer-${cfAccountId}.cloudflarestream.com/${videoId}/iframe`}
+        src={`https://${cfSubdomain}.cloudflarestream.com/${videoId}/iframe`}
         style={{ width: '100%', aspectRatio: '16/9', border: 'none' }}
         allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
         allowFullScreen
@@ -149,7 +149,7 @@ function VideoUploadSection({
   const [uploadSpeed, setUploadSpeed] = useState<string>('');
   const [timeRemaining, setTimeRemaining] = useState<string>('');
 
-  const cfAccountId = 'a559fc0dc4cb956f505801ed5427ba99';
+  const cfCustomerSubdomain = 'customer-4n38x6badamh5yps';
 
   // Compress video using browser canvas + MediaRecorder
   const compressVideo = async (file: File): Promise<File> => {
@@ -368,7 +368,7 @@ function VideoUploadSection({
         <label className="block text-sm font-medium text-gray-700 mb-1">Video</label>
 
         {/* Show player if video exists -- check if ready before showing iframe */}
-        {videoId && <VideoPlayer videoId={videoId} cfAccountId={cfAccountId} />}
+        {videoId && <VideoPlayer videoId={videoId} cfAccountId={cfCustomerSubdomain} />}
 
         {/* Upload area */}
         {!uploading && uploadStatus !== 'processing' && (
