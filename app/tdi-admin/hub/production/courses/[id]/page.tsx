@@ -1031,25 +1031,29 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
   useEffect(() => {
     async function loadCourse() {
       try {
-        const res = await fetch(`/api/tdi-admin/courses/${resolvedParams.id}`);
+        const res = await fetch(`/api/tdi-admin/courses/${resolvedParams.id}`, {
+          credentials: 'include',
+        });
         if (!res.ok) {
           console.error('Error loading course:', res.status);
           setIsLoading(false);
           return;
         }
         const data = await res.json();
-        if (!data.course) {
+        const courseData = data.course;
+        if (!courseData) {
           console.error('Course not found');
           setIsLoading(false);
           return;
         }
 
-        const sortedModules = (data.modules || []).map((m: any) => ({
+        // API returns modules nested inside course object
+        const sortedModules = (courseData.modules || []).map((m: any) => ({
           ...m,
           lessons: (m.lessons || []).sort((a: any, b: any) => a.sort_order - b.sort_order),
         }));
 
-        setCourse({ ...data.course, modules: sortedModules });
+        setCourse({ ...courseData, modules: sortedModules });
         setExpandedModules(new Set(sortedModules.map((m: any) => m.id)));
       } catch (error) {
         console.error('Error loading course:', error);
