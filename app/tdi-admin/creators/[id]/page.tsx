@@ -241,6 +241,10 @@ export default function TDIAdminCreatorDetailPage() {
   } | null>(null);
   const [isMarkingEngaged, setIsMarkingEngaged] = useState(false);
 
+  // AI summary state
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [isLoadingAiSummary, setIsLoadingAiSummary] = useState(false);
+
   const adminEmail = teamMember?.email || '';
 
   const loadData = useCallback(async () => {
@@ -703,6 +707,27 @@ export default function TDIAdminCreatorDetailPage() {
   };
 
   // Handle withdraw creator
+  // Generate AI summary
+  const handleGenerateAiSummary = async () => {
+    setIsLoadingAiSummary(true);
+    setAiSummary(null);
+    try {
+      const res = await fetch(`/api/admin/creators/${creatorId}/ai-summary`, {
+        method: 'POST',
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAiSummary(data.summary);
+      } else {
+        setAiSummary('Unable to generate summary. Please try again.');
+      }
+    } catch {
+      setAiSummary('Unable to generate summary. Please try again.');
+    } finally {
+      setIsLoadingAiSummary(false);
+    }
+  };
+
   // Handle mark engaged (cancel re-engagement sequence)
   const handleMarkEngaged = async () => {
     if (!canEdit) return;
@@ -1061,8 +1086,55 @@ export default function TDIAdminCreatorDetailPage() {
         </div>
       </div>
 
-      {/* Note: CreatorDashboardHeader removed from admin view to avoid double header
-          The "Viewing as" banner below provides sufficient context for admin preview */}
+      {/* AI Summary Panel */}
+      <div className="mb-6">
+        {!aiSummary && !isLoadingAiSummary ? (
+          <button
+            onClick={handleGenerateAiSummary}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            <Sparkles className="w-4 h-4 text-amber-500" />
+            Generate AI Summary
+          </button>
+        ) : isLoadingAiSummary ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <div className="flex items-center gap-3">
+              <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
+              <span className="text-sm text-gray-500">Generating summary...</span>
+            </div>
+          </div>
+        ) : aiSummary ? (
+          <div className="bg-white rounded-xl border border-amber-200 p-5">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold flex items-center gap-2" style={{ color: '#1e2749' }}>
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                AI Summary
+              </h3>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleGenerateAiSummary}
+                  className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  Refresh
+                </button>
+                <button
+                  onClick={() => setAiSummary(null)}
+                  className="text-xs text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+            <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap prose prose-sm max-w-none">
+              {aiSummary.split('\n').map((line, i) => {
+                const boldLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                return <p key={i} className="mb-1.5" dangerouslySetInnerHTML={{ __html: boldLine }} />;
+              })}
+            </div>
+          </div>
+        ) : null}
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main content - Milestones */}

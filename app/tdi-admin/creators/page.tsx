@@ -46,7 +46,7 @@ import {
   GraduationCap, Sparkles, Languages, HeartHandshake, Music, Library,
   HeartPulse, Lightbulb, Route, ClipboardCheck, NotebookPen,
   PencilRuler, Baby, Puzzle, MessagesSquare, Star, Sprout,
-  Target, Home as HomeIcon, Laptop, Scale, Mail,
+  Target, Home as HomeIcon, Laptop, Scale, Mail, MoreVertical,
 } from 'lucide-react';
 
 const TOPIC_ICON_MAP: Record<string, any> = {
@@ -1287,6 +1287,10 @@ export default function CreatorStudioPage() {
   // Recent email activity
   const [recentEmails, setRecentEmails] = useState<any[]>([]);
 
+  // Quick actions dropdown
+  const [quickActionCreatorId, setQuickActionCreatorId] = useState<string | null>(null);
+  const [quickActionLoading, setQuickActionLoading] = useState<string | null>(null);
+
   // Geographic distribution state
   const [locationData, setLocationData] = useState<{
     stateData: { state: string; count: number }[];
@@ -1388,6 +1392,51 @@ export default function CreatorStudioPage() {
       setIsLoading(false);
     }
   }, [hasAccess, loadDashboardData]);
+
+  // Quick actions from creator list
+  const handleQuickAction = async (action: string, creatorId: string, creatorEmail?: string) => {
+    setQuickActionLoading(action);
+    try {
+      switch (action) {
+        case 'mark-engaged':
+          await fetch(`/api/admin/creators/${creatorId}/mark-engaged`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminEmail }),
+          });
+          break;
+        case 'pause':
+          await fetch(`/api/admin/creators/${creatorId}/pause`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: 'Paused via quick action', adminEmail }),
+          });
+          break;
+        case 'resend-welcome':
+          await fetch('/api/admin/resend-welcome', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ creatorId }),
+          });
+          break;
+      }
+      setQuickActionCreatorId(null);
+      await loadDashboardData();
+    } catch (error) {
+      console.error('Quick action error:', error);
+    } finally {
+      setQuickActionLoading(null);
+    }
+  };
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = () => setQuickActionCreatorId(null);
+    if (quickActionCreatorId) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [quickActionCreatorId]);
 
   // Load Hub content data when analytics tab is active
   useEffect(() => {
@@ -3248,6 +3297,8 @@ export default function CreatorStudioPage() {
                       )}
                     </button>
                   </th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3 w-10">
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -3402,6 +3453,78 @@ export default function CreatorStudioPage() {
                             <Clock className="w-3.5 h-3.5" />
                             {getRelativeTime(creator.lastActivityDate)}
                           </span>
+                        </td>
+
+                        {/* Quick Actions */}
+                        <td className="px-2 py-3" onClick={(e) => e.stopPropagation()}>
+                          <div className="relative">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setQuickActionCreatorId(quickActionCreatorId === creator.id ? null : creator.id);
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                            >
+                              <MoreVertical className="w-4 h-4 text-gray-400" />
+                            </button>
+                            {quickActionCreatorId === creator.id && (
+                              <div className="absolute right-0 top-8 z-50 w-52 bg-white rounded-xl shadow-lg border border-gray-200 py-1.5 animate-in fade-in zoom-in-95">
+                                <button
+                                  onClick={() => window.location.href = `/tdi-admin/creators/${creator.id}`}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2.5"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5 text-gray-400" />
+                                  View Profile
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(creator.email);
+                                    setQuickActionCreatorId(null);
+                                  }}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2.5"
+                                >
+                                  <Copy className="w-3.5 h-3.5 text-gray-400" />
+                                  Copy Email
+                                </button>
+                                <div className="border-t border-gray-100 my-1" />
+                                {creator.isStalled && (
+                                  <button
+                                    onClick={() => handleQuickAction('mark-engaged', creator.id)}
+                                    disabled={quickActionLoading === 'mark-engaged'}
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2.5"
+                                  >
+                                    <Check className="w-3.5 h-3.5 text-green-500" />
+                                    {quickActionLoading === 'mark-engaged' ? 'Marking...' : 'Mark as Engaged'}
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => handleQuickAction('pause', creator.id)}
+                                  disabled={quickActionLoading === 'pause'}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2.5"
+                                >
+                                  <Clock className="w-3.5 h-3.5 text-amber-500" />
+                                  {quickActionLoading === 'pause' ? 'Pausing...' : 'Pause Account'}
+                                </button>
+                                <button
+                                  onClick={() => handleQuickAction('resend-welcome', creator.id)}
+                                  disabled={quickActionLoading === 'resend-welcome'}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2.5"
+                                >
+                                  <Mail className="w-3.5 h-3.5 text-blue-500" />
+                                  {quickActionLoading === 'resend-welcome' ? 'Sending...' : 'Resend Welcome'}
+                                </button>
+                                <div className="border-t border-gray-100 my-1" />
+                                <a
+                                  href={`mailto:${creator.email}`}
+                                  onClick={() => setQuickActionCreatorId(null)}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2.5"
+                                >
+                                  <Mail className="w-3.5 h-3.5 text-gray-400" />
+                                  Email Creator
+                                </a>
+                              </div>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
