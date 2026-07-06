@@ -1,366 +1,366 @@
 'use client';
 
+import { useState } from 'react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission } from '@/lib/tdi-admin/permissions';
+import { creatorEmailTemplate } from '@/lib/creator-email-template';
 
 // ---------------------------------------------------------------------------
-// Creator Studio Email Audit
-// A printable reference of every automated email in the Creator Studio system.
+// Creator Studio Email Audit + Preview
+// Combined view: visual email previews + metadata details
 // Access: /tdi-admin/creator-email-audit
-// Print to PDF via browser (Cmd+P / Ctrl+P)
 // ---------------------------------------------------------------------------
+
+const BOOKING_LINK = 'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2u_lKGMRaB_tUKQNNoYRyWR4PeeSbmkIW3auqmUGzkSTJFHsWqayLNkzDWqzoySgiaJ7FR12Sn';
+const SAMPLE_NAME = 'Sarah';
 
 interface EmailEntry {
   id: string;
+  name: string;
   category: string;
   trigger: string;
   from: string;
   replyTo: string;
   cc?: string;
   subject: string;
-  bodyPreview: string;
-  file: string;
   schedule?: string;
   notes?: string;
+  html: string;
 }
 
 const emails: EmailEntry[] = [
-  // ── Welcome ──────────────────────────────────────────────
+  // ── Onboarding ──────────────────────────────────────────
   {
     id: 'welcome',
+    name: 'Welcome Email',
     category: 'Onboarding',
     trigger: 'Admin adds a new creator (or resends welcome)',
     from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
     replyTo: 'notifications@teachersdeserveit.com',
-    cc: 'creatorstudio@teachersdeserveit.com, bella@teachersdeserveit.com',
-    subject: "You've Been Selected as a TDI Creator!",
-    bodyPreview:
-      'Congratulates the creator on being hand-selected. Explains what being a TDI Creator means: expertise amplified, earn while you impact (50% affiliate), guided process with dedicated team. CTA button to open Creator Studio.',
-    file: 'api/admin/add-creator/route.ts',
+    cc: 'creatorstudio@, bella@',
+    subject: `Creator Studio | Welcome to the team — you've been selected!`,
+    html: `<div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e2749;">
+      <div style="text-align: center; padding: 40px 20px 30px;">
+        <div style="display: inline-block; background: linear-gradient(135deg, #1e2749 0%, #2d3a5c 100%); color: white; padding: 12px 28px; border-radius: 50px; font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">Application Accepted</div>
+      </div>
+      <div style="padding: 0 30px 40px;">
+        <h1 style="font-size: 28px; font-weight: 700; margin: 0 0 16px; color: #1e2749;">Welcome to the TDI Creator Studio, ${SAMPLE_NAME}!</h1>
+        <p style="font-size: 16px; line-height: 1.7; color: #4b5563;">You've been hand-selected to join a community of educators who are turning their expertise into impactful content.</p>
+        <h3 style="color: #1e2749; margin-top: 24px;">What Being a TDI Creator Means:</h3>
+        <p style="font-size: 15px; line-height: 1.7; color: #4b5563;"><strong>1. Your expertise, amplified</strong> — Our team handles production and design.</p>
+        <p style="font-size: 15px; line-height: 1.7; color: #4b5563;"><strong>2. You earn while you impact</strong> — 50% on all sales.</p>
+        <p style="font-size: 15px; line-height: 1.7; color: #4b5563;"><strong>3. Guided process</strong> — Bella walks you through every step.</p>
+        <div style="text-align: center; margin: 28px 0;">
+          <a href="#" style="display: inline-block; background-color: #1e2749; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600;">Open Your Creator Studio</a>
+        </div>
+        <p style="font-size: 14px; color: #6b7280; text-align: center;">We're genuinely excited to have you on board. — The TDI Team</p>
+      </div>
+    </div>`,
   },
 
-  // ── Countdown Reminders ──────────────────────────────────
+  // ── First Week ──────────────────────────────────────────
   {
-    id: 'reminder-60',
-    category: 'Countdown Reminders',
-    trigger: '60 days before target completion date',
-    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-    replyTo: 'notifications@teachersdeserveit.com',
-    subject: "You're 60 days from your launch goal - [Name]!",
-    bodyPreview:
-      'Friendly countdown reminder with exact target date. Encourages updating timeline if needed. CTA to dashboard. "You\'ve got this! The TDI Team is cheering you on."',
-    file: 'api/cron/creator-reminders/route.ts',
-    schedule: 'Daily at 9:00 AM',
-  },
-  {
-    id: 'reminder-30',
-    category: 'Countdown Reminders',
-    trigger: '30 days before target completion date',
-    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-    replyTo: 'notifications@teachersdeserveit.com',
-    subject: "You're 30 days from your launch goal - [Name]!",
-    bodyPreview: 'Same format as 60-day reminder with updated countdown.',
-    file: 'api/cron/creator-reminders/route.ts',
-    schedule: 'Daily at 9:00 AM',
-  },
-  {
-    id: 'reminder-14',
-    category: 'Countdown Reminders',
-    trigger: '14 days before target completion date',
-    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-    replyTo: 'notifications@teachersdeserveit.com',
-    subject: "You're 14 days from your launch goal - [Name]!",
-    bodyPreview: 'Same format as 60-day reminder with updated countdown.',
-    file: 'api/cron/creator-reminders/route.ts',
-    schedule: 'Daily at 9:00 AM',
-  },
-  {
-    id: 'reminder-7',
-    category: 'Countdown Reminders',
-    trigger: '7 days before target completion date',
-    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-    replyTo: 'notifications@teachersdeserveit.com',
-    subject: "You're 7 days from your launch goal - [Name]!",
-    bodyPreview: 'Same format as 60-day reminder with updated countdown.',
-    file: 'api/cron/creator-reminders/route.ts',
-    schedule: 'Daily at 9:00 AM',
-  },
-  {
-    id: 'reminder-3',
-    category: 'Countdown Reminders',
-    trigger: '3 days before target completion date',
-    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-    replyTo: 'notifications@teachersdeserveit.com',
-    subject: "You're 3 days from your launch goal - [Name]!",
-    bodyPreview: 'Same format as 60-day reminder with updated countdown.',
-    file: 'api/cron/creator-reminders/route.ts',
-    schedule: 'Daily at 9:00 AM',
-  },
-
-  // ── Re-engagement Sequence ───────────────────────────────
-  {
-    id: 'reengagement-0',
-    category: 'Re-engagement Sequence',
-    trigger: 'Creator inactive for 15+ days (auto-detected)',
-    from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
-    replyTo: 'bella@teachersdeserveit.com',
-    subject: 'Hey [Name], just checking in',
-    bodyPreview:
-      '"I noticed it\'s been a little while since you\'ve been in the Creator Studio. No pressure at all. If you\'re busy or life got hectic, totally get it. I just want to make sure you know I\'m here if you need anything." CTA to dashboard.',
-    file: 'api/cron/creator-reengagement/route.ts',
-    schedule: 'Daily at 10:00 AM',
-    notes: 'Step 0 - Initial check-in. If creator logs back into portal, sequence auto-cancels.',
-  },
-  {
-    id: 'reengagement-1',
-    category: 'Re-engagement Sequence',
-    trigger: '7 days after Step 0 with no creator activity',
-    from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
-    replyTo: 'bella@teachersdeserveit.com',
-    subject: 'Quick thought for you, [Name]',
-    bodyPreview:
-      '"Sometimes the hardest part is just opening the project back up. Even 15 minutes of progress can shift your momentum. What\'s one small thing you could tackle today?" CTA to dashboard.',
-    file: 'api/cron/creator-reengagement/route.ts',
-    schedule: 'Daily at 10:00 AM',
-    notes: 'Step 1 - Momentum nudge.',
-  },
-  {
-    id: 'reengagement-2',
-    category: 'Re-engagement Sequence',
-    trigger: '7 days after Step 1 with no creator activity',
-    from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
-    replyTo: 'bella@teachersdeserveit.com',
-    subject: "You're not alone in this, [Name]",
-    bodyPreview:
-      '"Almost everyone hits a pause at some point. It\'s normal and it doesn\'t mean you\'re behind. If something specific is holding you up, I\'d love to help you work through it. Just reply to this email."',
-    file: 'api/cron/creator-reengagement/route.ts',
-    schedule: 'Daily at 10:00 AM',
-    notes: 'Step 2 - Normalization + invitation to reply.',
-  },
-  {
-    id: 'reengagement-3',
-    category: 'Re-engagement Sequence',
-    trigger: '7 days after Step 2 with no creator activity',
-    from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
-    replyTo: 'bella@teachersdeserveit.com',
-    subject: 'Thinking about your project, [Name]',
-    bodyPreview:
-      '"Your content idea is still a great one. The educators who will benefit from your work are still out there waiting for it. If your timeline needs to shift, that\'s completely fine." CTA to update target date.',
-    file: 'api/cron/creator-reengagement/route.ts',
-    schedule: 'Daily at 10:00 AM',
-    notes: 'Step 3 - Value reminder + timeline flexibility.',
-  },
-  {
-    id: 'reengagement-4',
-    category: 'Re-engagement Sequence',
-    trigger: '7 days after Step 3 with no creator activity',
-    from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
-    replyTo: 'bella@teachersdeserveit.com',
-    subject: 'Still here for you, [Name]',
-    bodyPreview:
-      '"I know these emails might be piling up. I just want you to know the door is open whenever you\'re ready. If now isn\'t the right time, that\'s okay too. Just reply and let me know \u2014 even a quick \'not yet\' helps."',
-    file: 'api/cron/creator-reengagement/route.ts',
-    schedule: 'Daily at 10:00 AM',
-    notes: 'Step 4 - Acknowledges email volume, asks for any signal.',
-  },
-  {
-    id: 'reengagement-5',
-    category: 'Re-engagement Sequence',
-    trigger: '7 days after Step 4 with no creator activity',
-    from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
-    replyTo: 'bella@teachersdeserveit.com',
-    subject: 'One more check-in, [Name]',
-    bodyPreview:
-      '"This will be my last weekly check-in for now. I want to respect your time and your bandwidth. Log back in or reply here \u2014 I\'ll be right here to help. Otherwise, I\'ll follow up one more time next week with some next steps about your account."',
-    file: 'api/cron/creator-reengagement/route.ts',
-    schedule: 'Daily at 10:00 AM',
-    notes: 'Step 5 - Last weekly nudge. Sets expectation for pause notice.',
-  },
-  {
-    id: 'reengagement-6',
-    category: 'Re-engagement Sequence',
-    trigger: '7 days after Step 5 with no creator activity',
-    from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
-    replyTo: 'bella@teachersdeserveit.com',
-    subject: 'Update on your Creator Studio account, [Name]',
-    bodyPreview:
-      '"We\'re going to go ahead and pause your Creator Studio account. This is not a goodbye \u2014 your work and progress are saved. Whenever you\'re ready to pick things back up, just reply or click the link below." CTA button: Reactivate My Account.',
-    file: 'api/cron/creator-reengagement/route.ts',
-    schedule: 'Daily at 10:00 AM',
-    notes: 'Step 6 - Pause notice. Account is auto-paused after this email. Creator can reactivate via magic link.',
-  },
-
-  // ── Milestone Workflow ───────────────────────────────────
-  {
-    id: 'milestone-approved',
-    category: 'Milestone Workflow',
-    trigger: 'Admin approves a creator milestone submission',
-    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-    replyTo: 'notifications@teachersdeserveit.com',
-    subject: "You're approved! Next step unlocked",
-    bodyPreview:
-      'Celebrates completion with the milestone name. Shows what the next step is. If phase is complete: "You\'ve completed this phase! Check your portal for what\'s next." CTA to continue in Creator Studio.',
-    file: 'api/admin/approve-milestone/route.ts',
-  },
-  {
-    id: 'revision-request',
-    category: 'Milestone Workflow',
-    trigger: 'Admin requests revision on a milestone',
-    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-    replyTo: 'notifications@teachersdeserveit.com',
-    cc: 'creatorstudio@teachersdeserveit.com, bella@teachersdeserveit.com',
-    subject: 'Action Needed: Revision requested for [Milestone Title]',
-    bodyPreview:
-      'States team reviewed submission and is requesting revision. Includes highlighted feedback box with exact admin note. Reassures "this is a normal part of the process." CTA to Creator Studio.',
-    file: 'api/admin/request-revision/route.ts',
-  },
-
-  // ── Notes & Communication ────────────────────────────────
-  {
-    id: 'note-visible',
-    category: 'Notes & Communication',
-    trigger: 'Admin adds a note marked "visible to creator"',
-    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-    replyTo: 'notifications@teachersdeserveit.com',
-    cc: 'creatorstudio@teachersdeserveit.com, bella@teachersdeserveit.com',
-    subject: 'You have a new note from the TDI team!',
-    bodyPreview:
-      'Lets the creator know a note was added to their profile. Encourages logging in to review. CTA to view Creator Studio. Invites replies for questions.',
-    file: 'api/admin/add-note/route.ts',
-  },
-
-  // ── Admin-Facing Notifications (sent TO team, not to creator) ──
-  {
-    id: 'admin-pep-talk',
-    category: 'Admin Notifications',
-    trigger: 'Creator clicks "Chat with team" button in their portal',
-    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-    replyTo: 'notifications@teachersdeserveit.com',
-    subject: 'Pep talk requested: [Creator Name]',
-    bodyPreview:
-      'Sent to creatorstudio@ and rae@. Includes creator name, email, content path, and their optional message. Instructs team to reach out within 24 hours. A visible note is also created on the creator\'s profile.',
-    file: 'api/creator/request-pep-talk/route.ts',
-    notes: 'Sent to admin team, not the creator. Creator sees a note on their dashboard confirming the request.',
-  },
-  {
-    id: 'admin-submission',
-    category: 'Admin Notifications',
-    trigger: 'Creator submits a milestone requiring review',
-    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-    replyTo: 'notifications@teachersdeserveit.com',
-    subject: 'New Submission from [Creator Name]',
-    bodyPreview:
-      'Sent to creatorstudio@ and rae@. Includes creator name, email, milestone name, and submission type (meeting date, change request, link, etc.). CTA to admin portal. Subject varies for meetings and change requests.',
-    file: 'api/creator-portal/submit/route.ts',
-    notes: 'Sent to admin team, not the creator. Subject varies: meetings show calendar icon, change requests show pencil icon.',
-  },
-  {
-    id: 'admin-waiting',
-    category: 'Admin Notifications',
-    trigger: 'Creator clicks "notify team" when waiting on TDI action',
-    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-    replyTo: 'notifications@teachersdeserveit.com',
-    subject: 'Action Needed: [Creator Name] is waiting on TDI',
-    bodyPreview:
-      'Sent to creatorstudio@ and rae@. Includes creator name, email, and which milestone they\'re waiting on. Link to admin portal.',
-    file: 'api/creator-portal/notify-team/route.ts',
-    notes: 'Sent to admin team, not the creator.',
-  },
-  {
-    id: 'admin-intake',
-    category: 'Admin Notifications',
-    trigger: 'Someone submits a creator application at /create-with-us',
-    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-    replyTo: 'notifications@teachersdeserveit.com',
-    subject: '[New Creator Application] [Applicant Name]',
-    bodyPreview:
-      'Sent to creatorstudio@ and rae@. Includes applicant name, email, strategy/topic, content types selected, and referral source. Link to admin portal to review.',
-    file: 'api/creators/intake/route.ts',
-    notes: 'Sent to admin team, not the creator. This is a new application, not an existing creator.',
-  },
-
-  // ── First Week & Growth ──────────────────────────────────
-  {
-    id: 'first-week-momentum',
+    id: 'first-week',
+    name: 'First Week Momentum (Day 3)',
     category: 'First Week & Growth',
     trigger: 'Creator added 3 days ago with no milestones completed',
     from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
     replyTo: 'bella@teachersdeserveit.com',
-    subject: 'Your one thing this week, [Name]',
-    bodyPreview:
-      'Warm intro from Bella. Gives one specific, small action to take this week (usually "confirm your content path"). Includes a highlighted "your one thing" box. CTA to dashboard. Invites reply.',
-    file: 'api/cron/creator-first-week/route.ts',
+    subject: `Creator Studio | Your one thing this week, ${SAMPLE_NAME}`,
     schedule: 'Daily at 9:30 AM',
-    notes: 'Only sends once per creator. Skips creators who have already completed a milestone.',
+    notes: 'Only sends once per creator. Skips creators who already completed a milestone.',
+    html: creatorEmailTemplate({
+      firstName: SAMPLE_NAME,
+      tagline: 'Getting started is the hardest part — so let\'s make it easy',
+      body: `
+        <p>Hey ${SAMPLE_NAME},</p>
+        <p>Welcome to the Creator Studio! I'm Bella, and I'll be your go-to person throughout this whole process.</p>
+        <p>I know starting something new can feel like a lot, so here's my suggestion: <strong>just do one thing this week.</strong></p>
+        <div style="background: #fefce8; border: 1px solid #fef08a; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <p style="margin: 0; font-weight: 600; color: #854d0e;">Your one thing:</p>
+          <p style="margin: 6px 0 0; color: #713f12;">Log into your Creator Studio and confirm your content path</p>
+          <p style="margin: 8px 0 0; font-size: 13px; color: #a16207;">Once you pick your path (course, blog, or quick tool), everything else opens up and I can start helping you plan.</p>
+        </div>
+        <p>If you have questions — reply to this email or <a href="${BOOKING_LINK}" style="color: #1e2749; font-weight: 500;">book a quick call with me</a>.</p>
+        <p>Talk soon,<br/>Bella</p>
+      `,
+      ctaLabel: 'Open My Creator Studio',
+      showMission: true,
+    }),
   },
+
+  // ── Re-engagement Sequence ──────────────────────────────
   {
-    id: 'monthly-newsletter',
-    category: 'First Week & Growth',
-    trigger: '1st of each month to all active creators',
+    id: 'reengagement-0',
+    name: 'Re-engagement Step 0 (Check-in)',
+    category: 'Re-engagement Sequence',
+    trigger: 'Creator inactive for 15+ days (auto-detected)',
     from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
     replyTo: 'bella@teachersdeserveit.com',
-    subject: 'Creator Spotlight: [Name] just launched! (or) Your monthly Creator Studio update',
-    bodyPreview:
-      'Monthly newsletter with smart content: features a spotlight creator if someone published recently, otherwise shares what TDI is building. Always includes: milestone celebrations, a rotating creator tip, CTA to dashboard, and a "nominate a creator" link.',
-    file: 'api/cron/creator-monthly-newsletter/route.ts',
-    schedule: '1st of month at 10 AM',
-    notes: 'Adapts automatically. 12 rotating tips built in. Nomination link goes to /create-with-us.',
+    subject: `Creator Studio | Hey ${SAMPLE_NAME}, just checking in`,
+    schedule: 'Daily at 10:00 AM',
+    notes: 'Step 0. If creator logs back into portal, sequence auto-cancels.',
+    html: creatorEmailTemplate({
+      firstName: SAMPLE_NAME,
+      tagline: 'We miss you!',
+      body: `
+        <p>Hey ${SAMPLE_NAME},</p>
+        <p>I noticed it's been a little while since you've been in the Creator Studio — just wanted to reach out and see how things are going.</p>
+        <p>No pressure at all. If you're busy or life got hectic, totally get it. I just want to make sure you know I'm here if you need anything.</p>
+        <p>Your dashboard is right where you left it whenever you're ready.</p>
+        <p>Talk soon,<br/>Bella</p>
+      `,
+      ctaLabel: 'Open My Creator Studio',
+      showMission: true,
+    }),
   },
   {
-    id: 'publish-celebration',
-    category: 'First Week & Growth',
-    trigger: 'Admin publishes a creator\'s content (publish now or mark published)',
+    id: 'reengagement-1',
+    name: 'Re-engagement Step 1 (Momentum)',
+    category: 'Re-engagement Sequence',
+    trigger: '7 days after Step 0 with no creator activity',
     from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
     replyTo: 'bella@teachersdeserveit.com',
-    cc: 'bella@teachersdeserveit.com, rae@teachersdeserveit.com',
-    subject: "You're officially published, [Name]!",
-    bodyPreview:
-      'Celebrates the launch. Includes a ready-to-share social media blurb the creator can copy. Features a "know another educator?" nomination CTA with link to the creator application.',
-    file: 'api/admin/update-publish-status/route.ts',
-    notes: 'Triggered automatically when publish status changes. Nomination CTA is placed at the perfect emotional moment.',
+    subject: `Creator Studio | A quick thought for you, ${SAMPLE_NAME}`,
+    schedule: 'Daily at 10:00 AM',
+    notes: 'Step 1 - Momentum nudge.',
+    html: creatorEmailTemplate({
+      firstName: SAMPLE_NAME,
+      tagline: 'Small steps, big impact',
+      body: `
+        <p>Hey ${SAMPLE_NAME},</p>
+        <p>Sometimes the hardest part is just opening the project back up — I get it. If it helps, even 15 minutes of progress can shift your momentum.</p>
+        <p>Your dashboard is right where you left it. What's one small thing you could tackle today?</p>
+        <p>Rooting for you,<br/>Bella</p>
+      `,
+      ctaLabel: 'Jump Back In',
+    }),
+  },
+  {
+    id: 'reengagement-3',
+    name: 'Re-engagement Step 3 (Value)',
+    category: 'Re-engagement Sequence',
+    trigger: '7 days after Step 2 with no creator activity',
+    from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
+    replyTo: 'bella@teachersdeserveit.com',
+    subject: `Creator Studio | Your content idea is still a great one, ${SAMPLE_NAME}`,
+    schedule: 'Daily at 10:00 AM',
+    notes: 'Step 3 - Value reminder + timeline flexibility.',
+    html: creatorEmailTemplate({
+      firstName: SAMPLE_NAME,
+      tagline: 'Educators are waiting for your expertise',
+      body: `
+        <p>Hey ${SAMPLE_NAME},</p>
+        <p>Your content idea is still a great one — I just wanted to remind you of that. The educators who will benefit from your work are still out there waiting for it.</p>
+        <p>If your timeline needs to shift, that's completely fine. We can adjust your target date together — no judgment.</p>
+        <p>Just say the word,<br/>Bella</p>
+      `,
+      ctaLabel: 'Update My Timeline',
+      showMission: true,
+    }),
+  },
+  {
+    id: 'reengagement-6',
+    name: 'Re-engagement Step 6 (Pause)',
+    category: 'Re-engagement Sequence',
+    trigger: '7 days after Step 5 with no creator activity',
+    from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
+    replyTo: 'bella@teachersdeserveit.com',
+    subject: `Creator Studio | Account update for ${SAMPLE_NAME}`,
+    schedule: 'Daily at 10:00 AM',
+    notes: 'Step 6 - Account auto-paused after this email. Creator can reactivate via magic link.',
+    html: creatorEmailTemplate({
+      firstName: SAMPLE_NAME,
+      tagline: 'Your account is being paused',
+      body: `
+        <p>Hey ${SAMPLE_NAME},</p>
+        <p>Since it's been a while, we're going to go ahead and pause your Creator Studio account. This way it's not hanging over you, and you can focus on whatever else needs your attention right now.</p>
+        <p>This is <strong>not</strong> a goodbye — your work and progress are saved. Whenever you're ready to pick things back up, just reply to this email or click below and we'll get you going again.</p>
+        <p>Wishing you the best,<br/>Bella</p>
+      `,
+      ctaLabel: 'Reactivate My Account',
+    }),
+  },
+
+  // ── Countdown ──────────────────────────────────────────
+  {
+    id: 'countdown',
+    name: 'Countdown Reminder (30 days)',
+    category: 'Countdown Reminders',
+    trigger: 'At 60, 30, 14, 7, and 3 days before target completion date',
+    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
+    replyTo: 'notifications@teachersdeserveit.com',
+    subject: `Creator Studio | 30 days to launch, ${SAMPLE_NAME}!`,
+    schedule: 'Daily at 9:00 AM',
+    notes: '5 countdown emails total. Only for active, unpublished creators with a target date.',
+    html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #1e2749;">Hey ${SAMPLE_NAME}!</h2>
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">Just a friendly reminder that you're <strong>30 days</strong> away from your course launch goal!</p>
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">Your target launch date is <strong>Saturday, August 9, 2026</strong>.</p>
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">We know life happens, and it's totally okay to adjust your goal if needed. Pop into your dashboard to update your timeline or check your progress.</p>
+      <div style="margin: 24px 0;">
+        <a href="#" style="display: inline-block; background-color: #1e2749; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 500;">Go to Your Dashboard</a>
+      </div>
+      <p style="color: #6b7280; font-size: 14px;">You've got this! The TDI Team is cheering you on.</p>
+    </div>`,
+  },
+
+  // ── Milestone Workflow ──────────────────────────────────
+  {
+    id: 'milestone-approved',
+    name: 'Milestone Approved',
+    category: 'Milestone Workflow',
+    trigger: 'Admin approves a creator milestone submission',
+    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
+    replyTo: 'notifications@teachersdeserveit.com',
+    subject: `Creator Studio | You're approved — next step unlocked!`,
+    html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #374151;">
+      <h2 style="color: #1e2749;">Great news, ${SAMPLE_NAME}!</h2>
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <p style="margin: 0; color: #166534; font-weight: 600;">Completed: Draft Course Outline</p>
+      </div>
+      <p>Your next step is ready: <strong>Schedule Outline Review</strong></p>
+      <div style="margin: 24px 0;">
+        <a href="#" style="display: inline-block; background-color: #1e2749; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 500;">Continue in Creator Studio</a>
+      </div>
+      <p style="color: #6b7280; font-size: 14px;">Keep up the great work! — The TDI Team</p>
+    </div>`,
+  },
+  {
+    id: 'revision-request',
+    name: 'Revision Request',
+    category: 'Milestone Workflow',
+    trigger: 'Admin requests revision on a milestone',
+    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
+    replyTo: 'notifications@teachersdeserveit.com',
+    cc: 'creatorstudio@, bella@',
+    subject: `Creator Studio | Revision requested for Draft Course Outline`,
+    html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #374151;">
+      <h2 style="color: #1e2749;">Hi ${SAMPLE_NAME},</h2>
+      <p>Our team reviewed your submission and we'd love to see a small revision before we move forward.</p>
+      <div style="background: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <p style="margin: 0; font-weight: 600; color: #92400e;">Feedback:</p>
+        <p style="margin: 6px 0 0; color: #78350f;">Could you add 2-3 more learning objectives to Module 3? The other sections look great.</p>
+      </div>
+      <p>This is a totally normal part of the process — it means we're paying attention and want your content to be the best it can be.</p>
+      <div style="margin: 24px 0;">
+        <a href="#" style="display: inline-block; background-color: #1e2749; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 500;">Go to Creator Studio</a>
+      </div>
+    </div>`,
+  },
+
+  // ── Notes ──────────────────────────────────────────────
+  {
+    id: 'note-visible',
+    name: 'New Note Notification',
+    category: 'Notes & Communication',
+    trigger: 'Admin adds a note marked "visible to creator"',
+    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
+    replyTo: 'notifications@teachersdeserveit.com',
+    cc: 'creatorstudio@, bella@',
+    subject: `Creator Studio | New note from your team!`,
+    html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #374151;">
+      <h2 style="color: #1e2749;">Hi ${SAMPLE_NAME}!</h2>
+      <p>Your team added a new note to your Creator Studio profile. Log in to see what they shared and continue your journey.</p>
+      <div style="margin: 24px 0;">
+        <a href="#" style="display: inline-block; background-color: #1e2749; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 500;">View My Creator Studio</a>
+      </div>
+      <p style="color: #6b7280; font-size: 14px;">Questions? Just reply to this email. — The TDI Team</p>
+    </div>`,
+  },
+
+  // ── Publish Celebration ──────────────────────────────────
+  {
+    id: 'celebration',
+    name: 'Publish Celebration',
+    category: 'First Week & Growth',
+    trigger: 'Admin publishes a creator\'s content',
+    from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
+    replyTo: 'bella@teachersdeserveit.com',
+    cc: 'bella@, rae@',
+    subject: `Creator Studio | You're officially published, ${SAMPLE_NAME}!`,
+    notes: 'Includes shareable social copy and nomination CTA at peak emotional moment.',
+    html: `<div style="font-family: 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto; color: #374151; font-size: 15px; line-height: 1.7;">
+      <div style="text-align: center; padding: 24px 0;">
+        <p style="font-size: 40px; margin: 0;">&#127881;</p>
+        <h1 style="font-size: 24px; font-weight: 700; color: #1e2749; margin: 8px 0 4px;">You did it, ${SAMPLE_NAME}!</h1>
+        <p style="color: #6b7280; font-size: 14px; margin: 0;">Your course is officially live.</p>
+      </div>
+      <p>This is a big deal. You took your expertise, put in the work, and now educators everywhere can learn from you.</p>
+      <p>Your course, <strong>"Classroom Management for New Teachers"</strong>, is now part of the TDI library.</p>
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px; margin: 20px 0;">
+        <p style="margin: 0 0 8px; font-weight: 600; color: #166534;">Share the news!</p>
+        <div style="background: white; border: 1px solid #dcfce7; border-radius: 8px; padding: 12px; margin-top: 10px;">
+          <p style="margin: 0; font-size: 14px; color: #374151; font-style: italic;">"I just launched my course with @TeachersDeserveIt! Excited to share what I've learned with educators everywhere."</p>
+        </div>
+      </div>
+      <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 20px; margin: 20px 0;">
+        <p style="margin: 0 0 8px; font-weight: 600; color: #1e40af;">Know another educator who should create with us?</p>
+        <p style="margin: 0 0 12px; color: #1e3a5f; font-size: 14px;">If there's a colleague with expertise worth sharing, we'd love to hear from them.</p>
+        <a href="#" style="display: inline-block; background-color: #1e2749; color: white; padding: 8px 18px; text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 13px;">Share the Creator Application</a>
+      </div>
+      <p>Celebrating you,<br/>Bella & the TDI Team</p>
+    </div>`,
+  },
+
+  // ── Admin Notifications ──────────────────────────────────
+  {
+    id: 'admin-pep-talk',
+    name: 'Pep Talk Request (to team)',
+    category: 'Admin Notifications',
+    trigger: 'Creator clicks "Chat with team" in their portal',
+    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
+    replyTo: 'notifications@teachersdeserveit.com',
+    subject: 'Pep talk requested: Sarah Johnson',
+    notes: 'Sent to admin team, not the creator.',
+    html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #374151;">
+      <h2 style="color: #1e2749;">Pep Talk Requested</h2>
+      <p><strong>Creator:</strong> Sarah Johnson (sarah@example.com)</p>
+      <p><strong>Content path:</strong> Course</p>
+      <p><strong>Message:</strong> "Feeling a bit overwhelmed with the outline. Could use some encouragement!"</p>
+      <p style="color: #6b7280; font-size: 14px;">Please reach out within 24 hours.</p>
+      <div style="margin: 24px 0;">
+        <a href="#" style="display: inline-block; background-color: #1e2749; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 500;">View in Admin Portal</a>
+      </div>
+    </div>`,
+  },
+  {
+    id: 'admin-submission',
+    name: 'Creator Submission (to team)',
+    category: 'Admin Notifications',
+    trigger: 'Creator submits a milestone requiring review',
+    from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
+    replyTo: 'notifications@teachersdeserveit.com',
+    subject: 'New Submission from Sarah Johnson',
+    notes: 'Sent to admin team, not the creator.',
+    html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #374151;">
+      <h2 style="color: #1e2749;">New Creator Submission</h2>
+      <p><strong>Creator:</strong> Sarah Johnson (sarah@example.com)</p>
+      <p><strong>Milestone:</strong> Draft Course Outline</p>
+      <p><strong>Type:</strong> Google Doc link submitted</p>
+      <div style="margin: 24px 0;">
+        <a href="#" style="display: inline-block; background-color: #1e2749; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 500;">Review in Admin Portal</a>
+      </div>
+    </div>`,
   },
 ];
 
-// Group emails by category
-function groupByCategory(entries: EmailEntry[]): Record<string, EmailEntry[]> {
-  const groups: Record<string, EmailEntry[]> = {};
-  for (const entry of entries) {
-    if (!groups[entry.category]) groups[entry.category] = [];
-    groups[entry.category].push(entry);
-  }
-  return groups;
-}
-
-const categoryOrder = [
+// Group by category for sidebar
+const categories = [
   'Onboarding',
-  'Countdown Reminders',
+  'First Week & Growth',
   'Re-engagement Sequence',
+  'Countdown Reminders',
   'Milestone Workflow',
   'Notes & Communication',
-  'First Week & Growth',
   'Admin Notifications',
 ];
-
-const categoryDescriptions: Record<string, string> = {
-  Onboarding:
-    'Sent once when a creator is added to the system. Can be resent by an admin if needed.',
-  'Countdown Reminders':
-    'Automated countdown emails at 60, 30, 14, 7, and 3 days before a creator\'s target completion date. Only sent to active, unpublished creators who have a target date set. Tracked in the database to prevent duplicates.',
-  'Re-engagement Sequence':
-    'Automated 7-email sequence triggered when a creator has no portal activity for 15+ days. Sends one email per week. If the creator logs back in or an admin clicks "Mark as Engaged," the sequence stops immediately. After the final email (Step 6), the account is automatically paused. The creator can reactivate at any time.',
-  'Milestone Workflow':
-    'Triggered by admin actions on creator milestones \u2014 approvals send a celebration email, revision requests send actionable feedback.',
-  'Notes & Communication':
-    'Notification sent when an admin adds a note that is visible to the creator.',
-  'First Week & Growth':
-    'Emails designed to build momentum early and celebrate wins. The first-week email catches creators before they disengage. The monthly newsletter keeps the community connected. The celebration email turns published creators into ambassadors.',
-  'Admin Notifications':
-    'These emails are sent TO the TDI team (creatorstudio@ and rae@), not to creators. They keep the team informed about creator activity that needs attention.',
-};
 
 export default function CreatorEmailAuditPage() {
   const { permissions, isOwner } = useTDIAdmin();
   const hasAccess = isOwner || hasAnySectionPermission(permissions, 'creator_studio');
+  const [activeEmail, setActiveEmail] = useState('welcome');
+  const [showDetails, setShowDetails] = useState(false);
 
   if (!hasAccess) {
     return (
@@ -370,193 +370,109 @@ export default function CreatorEmailAuditPage() {
     );
   }
 
-  const grouped = groupByCategory(emails);
+  const active = emails.find((e) => e.id === activeEmail) || emails[0];
+
+  // Group emails by category for sidebar
+  const grouped: Record<string, EmailEntry[]> = {};
+  for (const email of emails) {
+    if (!grouped[email.category]) grouped[email.category] = [];
+    grouped[email.category].push(email);
+  }
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-10 print:px-0 print:py-0">
-      {/* Print styles */}
-      <style>{`
-        @media print {
-          body { font-size: 11px; }
-          .no-print { display: none !important; }
-          .page-break { page-break-before: always; }
-          .email-card { break-inside: avoid; }
-        }
-      `}</style>
-
+    <div className="max-w-7xl mx-auto px-6 py-10">
       {/* Header */}
-      <div className="mb-10">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1
-              className="text-2xl font-bold"
-              style={{ fontFamily: "'DM Sans', sans-serif", color: '#1e2749' }}
-            >
-              Creator Studio Email Audit
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Every automated email in the Creator Studio system &mdash; updated {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-            </p>
-          </div>
-          <button
-            onClick={() => window.print()}
-            className="no-print px-4 py-2 text-sm font-medium rounded-lg text-white transition-colors"
-            style={{ backgroundColor: '#1e2749' }}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1
+            className="text-2xl font-bold"
+            style={{ fontFamily: "'DM Sans', sans-serif", color: '#1e2749' }}
           >
-            Save as PDF
-          </button>
+            Creator Studio Email Audit
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            {emails.length} email types &middot; Preview how each one looks to creators &middot; Sample name: &quot;{SAMPLE_NAME}&quot;
+          </p>
         </div>
-
-        {/* Summary stats */}
-        <div className="grid grid-cols-3 gap-4 mt-6">
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <p className="text-2xl font-bold" style={{ color: '#1e2749' }}>
-              {emails.length}
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">Total email types</p>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <p className="text-2xl font-bold" style={{ color: '#1e2749' }}>
-              {categoryOrder.length}
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">Categories</p>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <p className="text-2xl font-bold" style={{ color: '#1e2749' }}>
-              {emails.filter((e) => e.schedule).length}
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">Automated (cron)</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick reference: Sequence timeline */}
-      <div className="mb-10 bg-amber-50 border border-amber-200 rounded-xl p-5">
-        <h2
-          className="text-sm font-semibold mb-3"
-          style={{ fontFamily: "'DM Sans', sans-serif", color: '#1e2749' }}
+        <button
+          onClick={() => window.print()}
+          className="px-4 py-2 text-sm font-medium rounded-lg text-white transition-colors print:hidden"
+          style={{ backgroundColor: '#1e2749' }}
         >
-          Re-engagement Timeline at a Glance
-        </h2>
-        <div className="flex items-center gap-0 text-[10px] text-gray-600">
-          {[
-            { label: 'Day 15', desc: 'Check-in' },
-            { label: 'Day 22', desc: 'Nudge #1' },
-            { label: 'Day 29', desc: 'Nudge #2' },
-            { label: 'Day 36', desc: 'Nudge #3' },
-            { label: 'Day 43', desc: 'Nudge #4' },
-            { label: 'Day 50', desc: 'Nudge #5' },
-            { label: 'Day 57', desc: 'Pause' },
-          ].map((step, i) => (
-            <div key={i} className="flex-1 text-center">
-              <div
-                className={`h-2 rounded-full mx-0.5 ${
-                  i === 6 ? 'bg-red-300' : 'bg-amber-300'
-                }`}
-              />
-              <p className="font-semibold mt-1">{step.label}</p>
-              <p className="text-gray-500">{step.desc}</p>
-            </div>
-          ))}
-        </div>
-        <p className="text-xs text-gray-500 mt-3">
-          Sequence stops immediately if the creator logs back into the portal or an admin clicks &quot;Mark as Engaged.&quot;
-        </p>
+          Save as PDF
+        </button>
       </div>
 
-      {/* Email cards by category */}
-      {categoryOrder.map((cat, catIdx) => (
-        <div key={cat} className={catIdx > 0 ? 'page-break' : ''}>
-          <div className="mb-6 mt-8 first:mt-0">
-            <h2
-              className="text-lg font-bold border-b-2 pb-2"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                color: '#1e2749',
-                borderColor: '#1e2749',
-              }}
-            >
-              {cat}
-            </h2>
-            {categoryDescriptions[cat] && (
-              <p className="text-sm text-gray-600 mt-2 leading-relaxed">
-                {categoryDescriptions[cat]}
-              </p>
+      <div className="flex gap-6">
+        {/* Sidebar */}
+        <div className="w-64 flex-shrink-0 print:hidden">
+          <nav className="space-y-4">
+            {categories.map((cat) => {
+              const catEmails = grouped[cat];
+              if (!catEmails) return null;
+              return (
+                <div key={cat}>
+                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-3 mb-1">{cat}</p>
+                  {catEmails.map((email) => (
+                    <button
+                      key={email.id}
+                      onClick={() => { setActiveEmail(email.id); setShowDetails(false); }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                        activeEmail === email.id
+                          ? 'bg-[#1e2749] text-white font-medium'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      {email.name}
+                    </button>
+                  ))}
+                </div>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Preview pane */}
+        <div className="flex-1 min-w-0">
+          {/* Subject + metadata bar */}
+          <div className="bg-gray-50 border border-gray-200 rounded-t-xl px-5 py-4">
+            <p className="text-sm font-semibold text-gray-800">{active.subject}</p>
+            <div className="flex flex-wrap gap-x-5 gap-y-1 mt-2 text-xs text-gray-400">
+              <span><span className="text-gray-500">From:</span> {active.from}</span>
+              <span><span className="text-gray-500">Reply-to:</span> {active.replyTo}</span>
+              {active.cc && <span><span className="text-gray-500">CC:</span> {active.cc}</span>}
+            </div>
+            <div className="flex items-center gap-3 mt-3">
+              {active.schedule && (
+                <span className="text-[10px] font-medium px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                  {active.schedule}
+                </span>
+              )}
+              <span className="text-[10px] font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 border border-gray-200">
+                {active.category}
+              </span>
+              <button
+                onClick={() => setShowDetails(!showDetails)}
+                className="text-[11px] text-gray-400 hover:text-gray-600 ml-auto"
+              >
+                {showDetails ? 'Hide details' : 'Show details'}
+              </button>
+            </div>
+
+            {/* Expandable details */}
+            {showDetails && (
+              <div className="mt-3 pt-3 border-t border-gray-200 space-y-1.5 text-xs text-gray-500">
+                <p><span className="font-medium text-gray-600">Trigger:</span> {active.trigger}</p>
+                {active.notes && <p><span className="font-medium text-gray-600">Notes:</span> {active.notes}</p>}
+              </div>
             )}
           </div>
 
-          <div className="space-y-4">
-            {(grouped[cat] || []).map((email) => (
-              <div
-                key={email.id}
-                className="email-card bg-white border border-gray-200 rounded-xl p-5"
-              >
-                {/* Subject line */}
-                <div className="flex items-start justify-between gap-3">
-                  <h3
-                    className="font-semibold text-sm"
-                    style={{ color: '#1e2749' }}
-                  >
-                    {email.subject}
-                  </h3>
-                  {email.schedule && (
-                    <span className="shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                      {email.schedule}
-                    </span>
-                  )}
-                </div>
-
-                {/* Trigger */}
-                <p className="text-xs text-gray-500 mt-1.5">
-                  <span className="font-medium text-gray-700">Trigger:</span>{' '}
-                  {email.trigger}
-                </p>
-
-                {/* Body preview */}
-                <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                  <p className="text-sm text-gray-700 leading-relaxed">
-                    {email.bodyPreview}
-                  </p>
-                </div>
-
-                {/* Metadata row */}
-                <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-[11px] text-gray-500">
-                  <span>
-                    <span className="font-medium text-gray-600">From:</span>{' '}
-                    {email.from}
-                  </span>
-                  <span>
-                    <span className="font-medium text-gray-600">Reply-to:</span>{' '}
-                    {email.replyTo}
-                  </span>
-                  {email.cc && (
-                    <span>
-                      <span className="font-medium text-gray-600">CC:</span>{' '}
-                      {email.cc}
-                    </span>
-                  )}
-                </div>
-
-                {/* Notes */}
-                {email.notes && (
-                  <p className="mt-2 text-xs text-amber-700 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100">
-                    {email.notes}
-                  </p>
-                )}
-              </div>
-            ))}
+          {/* Email body preview */}
+          <div className="border border-t-0 border-gray-200 rounded-b-xl bg-white p-6 overflow-x-auto">
+            <div dangerouslySetInnerHTML={{ __html: active.html }} />
           </div>
         </div>
-      ))}
-
-      {/* Footer */}
-      <div className="mt-12 pt-6 border-t border-gray-200 text-center">
-        <p className="text-xs text-gray-400">
-          Teachers Deserve It &middot; Creator Studio Email Audit &middot; Generated {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-        </p>
-        <p className="text-xs text-gray-400 mt-1">
-          To update this document, edit <code className="text-gray-500">app/tdi-admin/creator-email-audit/page.tsx</code>
-        </p>
       </div>
     </div>
   );
