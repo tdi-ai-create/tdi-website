@@ -47,6 +47,77 @@ import {
  * VideoUploadSection -- handles video upload to Cloudflare Stream
  * and displays the existing video player if a video_id is set.
  */
+/**
+ * VideoPlayer -- polls Cloudflare Stream until video is ready, then shows iframe.
+ * Shows a friendly "processing" message instead of a 404 iframe.
+ */
+function VideoPlayer({ videoId, cfAccountId }: { videoId: string; cfAccountId: string }) {
+  const [ready, setReady] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    let attempts = 0;
+
+    async function checkReady() {
+      while (!cancelled && attempts < 40) {
+        try {
+          const res = await fetch(`/api/tdi-admin/videos/upload?uid=${videoId}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.readyToStream) {
+              if (!cancelled) { setReady(true); setChecking(false); }
+              return;
+            }
+            if (data.status === 'error') {
+              if (!cancelled) { setError(true); setChecking(false); }
+              return;
+            }
+          }
+        } catch {}
+        attempts++;
+        await new Promise(r => setTimeout(r, 3000));
+      }
+      if (!cancelled) { setReady(true); setChecking(false); } // assume ready after timeout
+    }
+
+    checkReady();
+    return () => { cancelled = true; };
+  }, [videoId]);
+
+  if (checking) {
+    return (
+      <div className="mb-3 rounded-lg border border-gray-200 bg-gray-50 flex flex-col items-center justify-center" style={{ aspectRatio: '16/9' }}>
+        <Loader2 className="w-8 h-8 text-teal-500 animate-spin mb-3" />
+        <p className="text-sm font-medium text-gray-600">Preparing your video...</p>
+        <p className="text-xs text-gray-400 mt-1">Cloudflare is encoding. This usually takes 30-90 seconds.</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mb-3 rounded-lg border border-red-200 bg-red-50 flex flex-col items-center justify-center p-6" style={{ aspectRatio: '16/9' }}>
+        <AlertCircle className="w-8 h-8 text-red-400 mb-3" />
+        <p className="text-sm font-medium text-red-600">Video processing failed</p>
+        <p className="text-xs text-red-400 mt-1">Try uploading again</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-3 rounded-lg overflow-hidden border border-gray-200">
+      <iframe
+        src={`https://customer-${cfAccountId}.cloudflarestream.com/${videoId}/iframe`}
+        style={{ width: '100%', aspectRatio: '16/9', border: 'none' }}
+        allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+        allowFullScreen
+      />
+    </div>
+  );
+}
+
 function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
   if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
@@ -296,17 +367,8 @@ function VideoUploadSection({
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Video</label>
 
-        {/* Show player if video exists */}
-        {videoId && (
-          <div className="mb-3 rounded-lg overflow-hidden border border-gray-200">
-            <iframe
-              src={`https://customer-${cfAccountId}.cloudflarestream.com/${videoId}/iframe`}
-              style={{ width: '100%', aspectRatio: '16/9', border: 'none' }}
-              allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        )}
+        {/* Show player if video exists -- check if ready before showing iframe */}
+        {videoId && <VideoPlayer videoId={videoId} cfAccountId={cfAccountId} />}
 
         {/* Upload area */}
         {!uploading && uploadStatus !== 'processing' && (
