@@ -2052,16 +2052,25 @@ export default function CreatorStudioPage() {
         {/* Page Header */}
         <div className="flex items-center justify-between mb-6">
           <h1 style={TYPE_PAGE_TITLE}>Creator Studio</h1>
-          {canEdit && (
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 text-white shadow-sm hover:shadow-md hover:opacity-90"
-              style={{ backgroundColor: '#1e2749' }}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/tdi-admin/creator-email-audit"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border border-gray-200 text-gray-600 hover:bg-gray-50"
             >
-              <Plus className="w-4 h-4" />
-              Add Creator
-            </button>
-          )}
+              <Mail className="w-4 h-4" />
+              Email Audit
+            </Link>
+            {canEdit && (
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 text-white shadow-sm hover:shadow-md hover:opacity-90"
+                style={{ backgroundColor: '#1e2749' }}
+              >
+                <Plus className="w-4 h-4" />
+                Add Creator
+              </button>
+            )}
+          </div>
         </div>
 
         {/* TAB CONTENT */}
