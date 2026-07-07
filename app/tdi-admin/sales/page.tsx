@@ -42,6 +42,28 @@ interface QuoteRow {
   quote_packages: { total_amount: number; package_name: string }[]
 }
 
+interface QuoteLineItem {
+  label: string
+  quantity: number
+  unit_price: number
+  total: number
+  is_complimentary: boolean
+}
+
+interface QuoteFormData {
+  id?: string
+  title: string
+  contact_name: string
+  contact_email: string
+  contact_organization: string
+  intro_message: string
+  service_start_date: string
+  service_end_date: string
+  payment_instructions: string
+  package_name: string
+  line_items: QuoteLineItem[]
+}
+
 interface SalesOpportunity {
   id: string
   ghl_opportunity_id: string | null
@@ -253,6 +275,14 @@ export default function SalesPage() {
   const [quotes, setQuotes] = useState<QuoteRow[]>([])
   const [quotesLoading, setQuotesLoading] = useState(false)
   const [copiedQuoteId, setCopiedQuoteId] = useState<string | null>(null)
+  const [contractModalOpen, setContractModalOpen] = useState(false)
+  const [contractForm, setContractForm] = useState<QuoteFormData>({
+    title: '', contact_name: '', contact_email: '', contact_organization: '',
+    intro_message: '', service_start_date: '2026-08-15', service_end_date: '2027-06-30',
+    payment_instructions: 'NO PAYMENT DUE UNLESS GRANT IS AWARDED.\nIf grant funding is secured, TDI will invoice the funding source directly or coordinate payment through the district as appropriate.\nClient owes nothing out of pocket.',
+    package_name: 'Grant-Funded Services', line_items: [{ label: '', quantity: 1, unit_price: 0, total: 0, is_complimentary: false }],
+  })
+  const [savingContract, setSavingContract] = useState(false)
 
   async function loadQuotes() {
     setQuotesLoading(true)
@@ -262,6 +292,126 @@ export default function SalesPage() {
       .order('created_at', { ascending: false })
     setQuotes((data as QuoteRow[]) || [])
     setQuotesLoading(false)
+  }
+
+  async function saveContract() {
+    setSavingContract(true)
+    try {
+      const total = contractForm.line_items.reduce((s, li) => s + li.total, 0)
+      const isEdit = !!contractForm.id
+
+      if (isEdit) {
+        // Update existing quote
+        await supabase.from('quotes').update({
+          title: contractForm.title,
+          contact_name: contractForm.contact_name,
+          contact_email: contractForm.contact_email,
+          contact_organization: contractForm.contact_organization,
+          intro_message: contractForm.intro_message,
+          service_start_date: contractForm.service_start_date,
+          service_end_date: contractForm.service_end_date,
+          payment_instructions: contractForm.payment_instructions,
+        }).eq('id', contractForm.id)
+
+        // Delete old packages and recreate
+        await supabase.from('quote_packages').delete().eq('quote_id', contractForm.id)
+        await supabase.from('quote_packages').insert({
+          quote_id: contractForm.id,
+          package_index: 0,
+          package_name: contractForm.package_name,
+          total_amount: total,
+          is_recommended: true,
+          line_items: contractForm.line_items,
+        })
+      } else {
+        // Create district first
+        const { data: district } = await supabase.from('districts').insert({
+          name: contractForm.contact_organization || contractForm.title,
+          status: 'prospect',
+        }).select().single()
+
+        if (!district) throw new Error('Failed to create district')
+
+        // Generate quote number
+        const qNum = `TDI-Q-${new Date().getFullYear()}-${String(quotes.length + 1).padStart(3, '0')}`
+
+        // Create quote
+        const { data: quote } = await supabase.from('quotes').insert({
+          district_id: district.id,
+          quote_number: qNum,
+          title: contractForm.title,
+          contact_name: contractForm.contact_name,
+          contact_email: contractForm.contact_email,
+          contact_organization: contractForm.contact_organization,
+          intro_message: contractForm.intro_message,
+          service_start_date: contractForm.service_start_date,
+          service_end_date: contractForm.service_end_date,
+          payment_instructions: contractForm.payment_instructions,
+          terms_of_service: 'This Grant Funding Services Agreement ("Agreement") is between Teachers Deserve It ("TDI") and the undersigned school or district ("Client").\n\n1. SCOPE: TDI will research, identify, and prepare grant applications and funding narratives on behalf of Client to secure funding for the professional development services outlined in this agreement.\n\n2. NO COST UNLESS FUNDED: Client is not obligated to pay any amount listed in this agreement unless and until grant funding is awarded and received. If no grant funding is secured, Client owes nothing.\n\n3. TDI RESPONSIBILITIES: TDI will identify applicable funding sources, draft grant narratives and supporting documents, prepare submission-ready packets, and provide pre-written forwarding emails for Client to submit.\n\n4. CLIENT RESPONSIBILITIES: Client agrees to forward pre-written emails to appropriate district or funding contacts as directed by TDI, provide school/district information as needed (EIN, enrollment data, etc.), and respond to TDI communications in a timely manner.\n\n5. SERVICES: Upon successful funding, TDI will deliver the professional development services listed in this agreement during the specified service period.\n\n6. TERM: This agreement is valid for the 2026-27 school year unless otherwise noted.\n\n7. CONFIDENTIALITY: Both parties agree to keep the terms of this agreement confidential.',
+          status: 'sent',
+          sent_at: new Date().toISOString(),
+          expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        }).select().single()
+
+        if (!quote) throw new Error('Failed to create quote')
+
+        // Create package
+        await supabase.from('quote_packages').insert({
+          quote_id: quote.id,
+          package_index: 0,
+          package_name: contractForm.package_name,
+          total_amount: total,
+          is_recommended: true,
+          line_items: contractForm.line_items,
+        })
+      }
+
+      setContractModalOpen(false)
+      loadQuotes()
+    } catch (err) {
+      console.error('Save contract error:', err)
+    }
+    setSavingContract(false)
+  }
+
+  function openEditContract(q: QuoteRow) {
+    const pkg = q.quote_packages?.[0]
+    setContractForm({
+      id: q.id,
+      title: q.title,
+      contact_name: q.contact_name || '',
+      contact_email: q.contact_email || '',
+      contact_organization: q.contact_organization || '',
+      intro_message: '', // Will be loaded
+      service_start_date: '2026-08-15',
+      service_end_date: '2027-06-30',
+      payment_instructions: '',
+      package_name: pkg?.package_name || 'Grant-Funded Services',
+      line_items: (pkg as any)?.line_items || [{ label: '', quantity: 1, unit_price: 0, total: 0, is_complimentary: false }],
+    })
+    // Load full quote data for fields not in the list query
+    supabase.from('quotes').select('intro_message, payment_instructions, service_start_date, service_end_date').eq('id', q.id).single().then(({ data }) => {
+      if (data) {
+        setContractForm(prev => ({
+          ...prev,
+          intro_message: data.intro_message || '',
+          payment_instructions: data.payment_instructions || '',
+          service_start_date: data.service_start_date || '2026-08-15',
+          service_end_date: data.service_end_date || '2027-06-30',
+        }))
+      }
+    })
+    setContractModalOpen(true)
+  }
+
+  function openNewContract() {
+    setContractForm({
+      title: '', contact_name: '', contact_email: '', contact_organization: '',
+      intro_message: '', service_start_date: '2026-08-15', service_end_date: '2027-06-30',
+      payment_instructions: 'NO PAYMENT DUE UNLESS GRANT IS AWARDED.\nIf grant funding is secured, TDI will invoice the funding source directly or coordinate payment through the district as appropriate.\nClient owes nothing out of pocket.',
+      package_name: 'Grant-Funded Services', line_items: [{ label: '', quantity: 1, unit_price: 0, total: 0, is_complimentary: false }],
+    })
+    setContractModalOpen(true)
   }
 
   useEffect(() => {
@@ -1388,6 +1538,14 @@ export default function SalesPage() {
       {/* Contracts Tab */}
       {pageTab === 'contracts' && (
         <div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+            <button
+              onClick={openNewContract}
+              style={{ fontSize: 13, padding: '8px 16px', borderRadius: 8, border: 'none', background: '#10B981', color: 'white', cursor: 'pointer', fontWeight: 700 }}
+            >
+              + Create Contract
+            </button>
+          </div>
           {quotesLoading ? (
             <p style={{ textAlign: 'center', color: '#9CA3AF', padding: 40 }}>Loading contracts...</p>
           ) : quotes.length === 0 ? (
@@ -1460,12 +1618,93 @@ export default function SalesPage() {
                       >
                         Preview
                       </a>
+                      <button
+                        onClick={() => openEditContract(q)}
+                        style={{ fontSize: 12, padding: '6px 12px', borderRadius: 6, border: '1px solid #D1D5DB', background: 'white', color: '#6B7280', cursor: 'pointer', fontWeight: 600 }}
+                      >
+                        Edit
+                      </button>
                     </div>
                   </div>
                 )
               })}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Contract Create/Edit Modal */}
+      {contractModalOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div onClick={() => setContractModalOpen(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)' }} />
+          <div style={{ position: 'relative', background: 'white', borderRadius: 16, width: '100%', maxWidth: 700, maxHeight: '90vh', overflow: 'auto', padding: 32, boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+            <h2 style={{ fontSize: 20, fontWeight: 800, color: '#0a0f1e', marginBottom: 20 }}>
+              {contractForm.id ? 'Edit Contract' : 'Create Contract'}
+            </h2>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase' }}>Title</label>
+                <input value={contractForm.title} onChange={e => setContractForm(p => ({ ...p, title: e.target.value }))} placeholder="Grant Funding Services Agreement -- School Name" style={{ width: '100%', padding: '8px 10px', border: '1px solid #D1D5DB', borderRadius: 6, fontSize: 13, marginTop: 4 }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase' }}>Organization</label>
+                <input value={contractForm.contact_organization} onChange={e => setContractForm(p => ({ ...p, contact_organization: e.target.value }))} placeholder="School or District Name" style={{ width: '100%', padding: '8px 10px', border: '1px solid #D1D5DB', borderRadius: 6, fontSize: 13, marginTop: 4 }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase' }}>Contact Name</label>
+                <input value={contractForm.contact_name} onChange={e => setContractForm(p => ({ ...p, contact_name: e.target.value }))} placeholder="First Last" style={{ width: '100%', padding: '8px 10px', border: '1px solid #D1D5DB', borderRadius: 6, fontSize: 13, marginTop: 4 }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase' }}>Contact Email</label>
+                <input value={contractForm.contact_email} onChange={e => setContractForm(p => ({ ...p, contact_email: e.target.value }))} placeholder="email@school.org" style={{ width: '100%', padding: '8px 10px', border: '1px solid #D1D5DB', borderRadius: 6, fontSize: 13, marginTop: 4 }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase' }}>Service Start</label>
+                <input type="date" value={contractForm.service_start_date} onChange={e => setContractForm(p => ({ ...p, service_start_date: e.target.value }))} style={{ width: '100%', padding: '8px 10px', border: '1px solid #D1D5DB', borderRadius: 6, fontSize: 13, marginTop: 4 }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase' }}>Service End</label>
+                <input type="date" value={contractForm.service_end_date} onChange={e => setContractForm(p => ({ ...p, service_end_date: e.target.value }))} style={{ width: '100%', padding: '8px 10px', border: '1px solid #D1D5DB', borderRadius: 6, fontSize: 13, marginTop: 4 }} />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase' }}>Intro Message</label>
+              <textarea value={contractForm.intro_message} onChange={e => setContractForm(p => ({ ...p, intro_message: e.target.value }))} rows={4} placeholder="Hi [Name],\n\nThis is our Grant Funding Services Agreement..." style={{ width: '100%', padding: '8px 10px', border: '1px solid #D1D5DB', borderRadius: 6, fontSize: 13, marginTop: 4, resize: 'vertical' }} />
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase' }}>Payment Instructions</label>
+              <textarea value={contractForm.payment_instructions} onChange={e => setContractForm(p => ({ ...p, payment_instructions: e.target.value }))} rows={3} style={{ width: '100%', padding: '8px 10px', border: '1px solid #D1D5DB', borderRadius: 6, fontSize: 13, marginTop: 4, resize: 'vertical' }} />
+            </div>
+
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase' }}>Line Items</label>
+                <button onClick={() => setContractForm(p => ({ ...p, line_items: [...p.line_items, { label: '', quantity: 1, unit_price: 0, total: 0, is_complimentary: false }] }))} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 4, border: '1px solid #D1D5DB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>+ Add line</button>
+              </div>
+              {contractForm.line_items.map((li, idx) => (
+                <div key={idx} style={{ display: 'grid', gridTemplateColumns: '2fr 60px 90px 90px 30px', gap: 8, marginBottom: 6, alignItems: 'center' }}>
+                  <input value={li.label} onChange={e => { const items = [...contractForm.line_items]; items[idx] = { ...items[idx], label: e.target.value }; setContractForm(p => ({ ...p, line_items: items })) }} placeholder="Service name" style={{ padding: '6px 8px', border: '1px solid #D1D5DB', borderRadius: 4, fontSize: 12 }} />
+                  <input type="number" value={li.quantity} onChange={e => { const items = [...contractForm.line_items]; const qty = parseInt(e.target.value) || 1; items[idx] = { ...items[idx], quantity: qty, total: qty * items[idx].unit_price }; setContractForm(p => ({ ...p, line_items: items })) }} placeholder="Qty" style={{ padding: '6px 8px', border: '1px solid #D1D5DB', borderRadius: 4, fontSize: 12, textAlign: 'center' }} />
+                  <input type="number" value={li.unit_price} onChange={e => { const items = [...contractForm.line_items]; const price = parseFloat(e.target.value) || 0; items[idx] = { ...items[idx], unit_price: price, total: items[idx].quantity * price }; setContractForm(p => ({ ...p, line_items: items })) }} placeholder="Price" style={{ padding: '6px 8px', border: '1px solid #D1D5DB', borderRadius: 4, fontSize: 12 }} />
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0a0f1e' }}>${li.total.toLocaleString()}</div>
+                  <button onClick={() => { const items = contractForm.line_items.filter((_, i) => i !== idx); setContractForm(p => ({ ...p, line_items: items.length ? items : [{ label: '', quantity: 1, unit_price: 0, total: 0, is_complimentary: false }] })) }} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', fontSize: 16 }}>x</button>
+                </div>
+              ))}
+              <div style={{ textAlign: 'right', fontSize: 14, fontWeight: 800, color: '#0a0f1e', marginTop: 8, paddingRight: 40 }}>
+                Total: ${contractForm.line_items.reduce((s, li) => s + li.total, 0).toLocaleString()}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20, borderTop: '1px solid #E5E7EB', paddingTop: 16 }}>
+              <button onClick={() => setContractModalOpen(false)} style={{ padding: '10px 20px', borderRadius: 8, border: '1px solid #D1D5DB', background: 'white', color: '#6B7280', cursor: 'pointer', fontSize: 13 }}>Cancel</button>
+              <button onClick={saveContract} disabled={savingContract || !contractForm.title || !contractForm.contact_name} style={{ padding: '10px 20px', borderRadius: 8, border: 'none', background: '#10B981', color: 'white', cursor: 'pointer', fontSize: 13, fontWeight: 700, opacity: savingContract ? 0.5 : 1 }}>
+                {savingContract ? 'Saving...' : contractForm.id ? 'Save Changes' : 'Create & Send'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
