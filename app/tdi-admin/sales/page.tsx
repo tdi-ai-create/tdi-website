@@ -22,7 +22,25 @@ import {
 import { HorizontalBarChart, DonutChart, DonutLegend, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts'
 
 type ViewMode = 'kanban' | 'list'
-type PageTab = 'pipeline' | 'analytics' | 'trash' | 'invoices' | 'hub-leads' | 'outreach'
+type PageTab = 'pipeline' | 'analytics' | 'trash' | 'invoices' | 'hub-leads' | 'outreach' | 'contracts'
+
+interface QuoteRow {
+  id: string
+  quote_number: string
+  title: string
+  contact_name: string | null
+  contact_email: string | null
+  contact_organization: string | null
+  status: string
+  sent_at: string | null
+  viewed_at: string | null
+  view_count: number
+  signed_by_name: string | null
+  signed_at: string | null
+  expires_at: string | null
+  created_at: string
+  quote_packages: { total_amount: number; package_name: string }[]
+}
 
 interface SalesOpportunity {
   id: string
@@ -231,8 +249,24 @@ export default function SalesPage() {
   const [enrichProgress, setEnrichProgress] = useState('')
   const [detailPanelOppId, setDetailPanelOppId] = useState<string | null>(null)
 
+  // Contracts/quotes state
+  const [quotes, setQuotes] = useState<QuoteRow[]>([])
+  const [quotesLoading, setQuotesLoading] = useState(false)
+  const [copiedQuoteId, setCopiedQuoteId] = useState<string | null>(null)
+
+  async function loadQuotes() {
+    setQuotesLoading(true)
+    const { data } = await supabase
+      .from('quotes')
+      .select('id, quote_number, title, contact_name, contact_email, contact_organization, status, sent_at, viewed_at, view_count, signed_by_name, signed_at, expires_at, created_at, quote_packages(total_amount, package_name)')
+      .order('created_at', { ascending: false })
+    setQuotes((data as QuoteRow[]) || [])
+    setQuotesLoading(false)
+  }
+
   useEffect(() => {
     loadAll()
+    loadQuotes()
   }, [])
 
   // Realtime: refresh when enrichment completes on any lead
@@ -916,6 +950,7 @@ export default function SalesPage() {
           { id: 'outreach' as PageTab, label: 'Outreach Queue' },
           { id: 'analytics' as PageTab, label: 'Analytics' },
           { id: 'hub-leads' as PageTab, label: 'Hub Leads' },
+          { id: 'contracts' as PageTab, label: `Contracts (${quotes.length})` },
           ...(outstandingInvoices.length > 0 ? [{ id: 'invoices' as PageTab, label: `Outstanding Invoices (${outstandingInvoices.length})` }] : []),
           ...(trashedOpps.length > 0 ? [{ id: 'trash' as PageTab, label: `Trash (${trashedOpps.length})` }] : []),
         ]).map(tab => (
@@ -1347,6 +1382,90 @@ export default function SalesPage() {
               </>
             )
           })()}
+        </div>
+      )}
+
+      {/* Contracts Tab */}
+      {pageTab === 'contracts' && (
+        <div>
+          {quotesLoading ? (
+            <p style={{ textAlign: 'center', color: '#9CA3AF', padding: 40 }}>Loading contracts...</p>
+          ) : quotes.length === 0 ? (
+            <p style={{ textAlign: 'center', color: '#9CA3AF', padding: 40 }}>No contracts created yet.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {quotes.map(q => {
+                const pkg = q.quote_packages?.[0]
+                const amount = pkg?.total_amount || 0
+                const url = `https://www.teachersdeserveit.com/invoice/${q.id}`
+                const isExpired = q.expires_at && new Date(q.expires_at) < new Date()
+                const statusColors: Record<string, { bg: string; text: string; label: string }> = {
+                  draft: { bg: '#F3F4F6', text: '#6B7280', label: 'Draft' },
+                  sent: { bg: '#DBEAFE', text: '#1E40AF', label: 'Sent' },
+                  viewed: { bg: '#FEF3C7', text: '#854D0E', label: 'Viewed' },
+                  signed: { bg: '#D1FAE5', text: '#065F46', label: 'Signed' },
+                  declined: { bg: '#FEE2E2', text: '#991B1B', label: 'Declined' },
+                  expired: { bg: '#FEE2E2', text: '#991B1B', label: 'Expired' },
+                }
+                const displayStatus = isExpired && q.status !== 'signed' ? 'expired' : q.status
+                const sc = statusColors[displayStatus] || statusColors.draft
+                const borderColor = displayStatus === 'signed' ? '#10B981' : displayStatus === 'viewed' ? '#F59E0B' : '#E5E7EB'
+
+                return (
+                  <div key={q.id} style={{
+                    background: 'white', border: '1px solid #E5E7EB',
+                    borderLeft: `4px solid ${borderColor}`, borderRadius: 10, padding: '14px 18px',
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: '#0a0f1e' }}>{q.title}</div>
+                        <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
+                          {q.contact_name && <span>{q.contact_name}</span>}
+                          {q.contact_organization && <span> · {q.contact_organization}</span>}
+                          {q.contact_email && <span> · {q.contact_email}</span>}
+                        </div>
+                        <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>
+                          {q.quote_number}
+                          {q.sent_at && ` · Sent ${new Date(q.sent_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                          {q.view_count > 0 && ` · Viewed ${q.view_count}x`}
+                          {q.viewed_at && ` (last ${new Date(q.viewed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}
+                          {q.signed_at && ` · Signed by ${q.signed_by_name} on ${new Date(q.signed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                          {q.expires_at && !q.signed_at && ` · Expires ${new Date(q.expires_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'right', minWidth: 140 }}>
+                        <div style={{ fontSize: 18, fontWeight: 800, color: '#0a0f1e' }}>
+                          ${Number(amount).toLocaleString()}
+                        </div>
+                        <span style={{
+                          fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4,
+                          background: sc.bg, color: sc.text,
+                        }}>
+                          {sc.label.toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                      <button
+                        onClick={() => { navigator.clipboard.writeText(url); setCopiedQuoteId(q.id); setTimeout(() => setCopiedQuoteId(null), 2000) }}
+                        style={{ fontSize: 12, padding: '6px 12px', borderRadius: 6, border: '1px solid #D1D5DB', background: copiedQuoteId === q.id ? '#D1FAE5' : 'white', color: copiedQuoteId === q.id ? '#065F46' : '#6B7280', cursor: 'pointer', fontWeight: 600 }}
+                      >
+                        {copiedQuoteId === q.id ? 'Copied!' : 'Copy link'}
+                      </button>
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ fontSize: 12, padding: '6px 12px', borderRadius: 6, border: '1px solid #3B82F6', background: 'white', color: '#3B82F6', cursor: 'pointer', fontWeight: 600, textDecoration: 'none', display: 'inline-block' }}
+                      >
+                        Preview
+                      </a>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       )}
 
