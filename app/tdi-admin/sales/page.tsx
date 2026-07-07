@@ -382,24 +382,29 @@ export default function SalesPage() {
       contact_name: q.contact_name || '',
       contact_email: q.contact_email || '',
       contact_organization: q.contact_organization || '',
-      intro_message: '', // Will be loaded
+      intro_message: '',
       service_start_date: '2026-08-15',
       service_end_date: '2027-06-30',
       payment_instructions: '',
       package_name: pkg?.package_name || 'Grant-Funded Services',
-      line_items: (pkg as any)?.line_items || [{ label: '', quantity: 1, unit_price: 0, total: 0, is_complimentary: false }],
+      line_items: [{ label: '', quantity: 1, unit_price: 0, total: 0, is_complimentary: false }],
     })
-    // Load full quote data for fields not in the list query
-    supabase.from('quotes').select('intro_message, payment_instructions, service_start_date, service_end_date').eq('id', q.id).single().then(({ data }) => {
-      if (data) {
-        setContractForm(prev => ({
-          ...prev,
-          intro_message: data.intro_message || '',
-          payment_instructions: data.payment_instructions || '',
-          service_start_date: data.service_start_date || '2026-08-15',
-          service_end_date: data.service_end_date || '2027-06-30',
-        }))
-      }
+    // Load full quote + package data including line_items
+    Promise.all([
+      supabase.from('quotes').select('intro_message, payment_instructions, service_start_date, service_end_date').eq('id', q.id).single(),
+      supabase.from('quote_packages').select('package_name, line_items, total_amount').eq('quote_id', q.id).order('package_index').limit(1).single(),
+    ]).then(([{ data: quoteData }, { data: pkgData }]) => {
+      setContractForm(prev => ({
+        ...prev,
+        intro_message: quoteData?.intro_message || '',
+        payment_instructions: quoteData?.payment_instructions || '',
+        service_start_date: quoteData?.service_start_date || '2026-08-15',
+        service_end_date: quoteData?.service_end_date || '2027-06-30',
+        package_name: pkgData?.package_name || prev.package_name,
+        line_items: (pkgData?.line_items as QuoteLineItem[])?.length
+          ? (pkgData.line_items as QuoteLineItem[])
+          : [{ label: '', quantity: 1, unit_price: 0, total: 0, is_complimentary: false }],
+      }))
     })
     setContractModalOpen(true)
   }
