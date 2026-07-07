@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 
 export default function DocsPage() {
   const { teamMember } = useTDIAdmin();
+  const router = useRouter();
   const [activeDoc, setActiveDoc] = useState<'admin-guide' | 'workflow'>('admin-guide');
 
   if (!teamMember) {
@@ -77,6 +79,16 @@ export default function DocsPage() {
             <p style={{ fontSize: 11, margin: '2px 0 0', opacity: 0.7 }}>{doc.desc}</p>
           </button>
         ))}
+        <button
+          onClick={() => router.push('/tdi-admin/docs/workflows')}
+          style={{
+            flex: 1, padding: '14px 16px', borderRadius: 10, border: '1px solid #E5E7EB',
+            background: 'white', color: '#1e2749', cursor: 'pointer', textAlign: 'left',
+          }}
+        >
+          <p style={{ fontSize: 14, fontWeight: 600, margin: 0 }}>Workflows</p>
+          <p style={{ fontSize: 11, margin: '2px 0 0', opacity: 0.7 }}>Project pipelines from draft to ship</p>
+        </button>
       </div>
 
       {/* Doc iframe */}
