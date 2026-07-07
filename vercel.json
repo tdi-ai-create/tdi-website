@@ -79,6 +79,10 @@
     {
       "path": "/api/cron/creator-monthly-newsletter",
       "schedule": "0 10 1 * *"
+    },
+    {
+      "path": "/api/cron/stripe-health",
+      "schedule": "0 12 * * *"
     }
   ]
 }
