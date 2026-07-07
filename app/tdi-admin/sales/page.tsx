@@ -401,8 +401,8 @@ export default function SalesPage() {
         service_start_date: quoteData?.service_start_date || '2026-08-15',
         service_end_date: quoteData?.service_end_date || '2027-06-30',
         package_name: pkgData?.package_name || prev.package_name,
-        line_items: (pkgData?.line_items as QuoteLineItem[])?.length
-          ? (pkgData.line_items as QuoteLineItem[])
+        line_items: (pkgData?.line_items as QuoteLineItem[] | null)?.length
+          ? (pkgData!.line_items as QuoteLineItem[])
           : [{ label: '', quantity: 1, unit_price: 0, total: 0, is_complimentary: false }],
       }))
     })
