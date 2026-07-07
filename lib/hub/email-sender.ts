@@ -8,6 +8,7 @@ import {
   type NudgeEmailData,
   type DigestEmailData,
   type ReplyNotificationEmailData,
+  type AccessGrantedEmailData,
 } from './emails';
 
 // Initialize Resend with API key (will be null if not configured)
@@ -210,6 +211,22 @@ export async function sendReplyNotificationEmail(
   if (result.success) {
     await recordEmailSent(userId, 'reply_notification');
   }
+  return result.success;
+}
+
+// Send access granted email to comped user
+export async function sendAccessGrantedEmail(
+  userId: string,
+  email: string,
+  data: AccessGrantedEmailData
+): Promise<boolean> {
+  // No dedup for access_granted -- admin may re-grant with new expiry
+  const result = await sendEmail(email, 'access_granted', data);
+
+  if (result.success) {
+    await recordEmailSent(userId, 'access_granted');
+  }
+
   return result.success;
 }
 

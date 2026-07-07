@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
+import { sendAccessGrantedEmail } from '@/lib/hub/email-sender';
 
 function getHubAdmin() {
   const url = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL;
@@ -137,6 +138,20 @@ export async function POST(request: NextRequest) {
       inviteLink = `${siteUrl}/hub/auth/callback?token_hash=${token}&type=magiclink`;
     }
 
+    // Send access granted email to the user
+    const displayName = name || email.split('@')[0];
+    const loginUrl = `${siteUrl}/hub/login`;
+
+    sendAccessGrantedEmail(userId, email, {
+      displayName,
+      tier,
+      expiresAt,
+      magicLink: inviteLink,
+      loginUrl,
+    }).catch((err) => {
+      console.error('[GrantAccess] Email send failed (non-blocking):', err);
+    });
+
     return NextResponse.json({
       success: true,
       userId,
@@ -146,7 +161,8 @@ export async function POST(request: NextRequest) {
       grantedBy: adminEmail,
       isNewUser,
       inviteLink,
-      loginUrl: `${siteUrl}/hub/login`,
+      loginUrl,
+      emailSent: true,
     });
   } catch (error) {
     console.error('[GrantAccess]', error);

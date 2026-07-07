@@ -372,9 +372,99 @@ ${ctaButton('View the conversation', data.contentUrl)}
   return emailWrapper(content);
 }
 
-export type EmailType = 'welcome' | 'nudge' | 'digest' | 'reply_notification';
+export interface AccessGrantedEmailData {
+  displayName: string;
+  tier: string;
+  expiresAt: string;
+  magicLink: string | null;
+  loginUrl: string;
+}
 
-export type EmailData = WelcomeEmailData | NudgeEmailData | DigestEmailData | ReplyNotificationEmailData;
+export function generateAccessGrantedEmail(data: AccessGrantedEmailData): string {
+  const tierLabels: Record<string, string> = {
+    essentials: 'Essentials',
+    professional: 'Professional',
+    all_access: 'All-Access',
+  };
+  const tierLabel = tierLabels[data.tier] || data.tier;
+
+  const expDate = new Date(data.expiresAt).toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
+  const accessButton = data.magicLink
+    ? ctaButton('Log in to your Hub', data.magicLink)
+    : ctaButton('Log in to your Hub', data.loginUrl);
+
+  const content = `
+<h1 style="margin: 0 0 24px 0; font-size: 24px; font-weight: 600; color: ${COLORS.textDark};">
+  You have been granted ${tierLabel} access
+</h1>
+<p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.6; color: ${COLORS.textDark};">
+  Hi ${data.displayName},
+</p>
+<p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6; color: ${COLORS.textDark};">
+  Great news -- you now have <strong style="color: ${COLORS.navy};">${tierLabel}</strong> access to the Teachers Deserve It Learning Hub. No payment required.
+</p>
+
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin: 16px 0; background-color: ${COLORS.lightGray}; border-radius: 8px;">
+  <tr>
+    <td style="padding: 20px;">
+      <p style="margin: 0 0 8px 0; font-size: 14px; color: ${COLORS.textMuted};">Your access details:</p>
+      <p style="margin: 0 0 6px 0; font-size: 16px; color: ${COLORS.textDark};">
+        <strong>Tier:</strong> ${tierLabel}
+      </p>
+      <p style="margin: 0; font-size: 16px; color: ${COLORS.textDark};">
+        <strong>Active until:</strong> ${expDate}
+      </p>
+    </td>
+  </tr>
+</table>
+
+${accessButton}
+
+${sectionHeading('What you can do now:')}
+
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin: 16px 0;">
+  <tr>
+    <td style="padding: 8px 0;">
+      <p style="margin: 0; font-size: 16px; line-height: 1.6; color: ${COLORS.textDark};">
+        <span style="color: ${COLORS.gold}; font-weight: 700; margin-right: 8px;">&#9679;</span>
+        Browse the full course library and earn PD hours
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 8px 0;">
+      <p style="margin: 0; font-size: 16px; line-height: 1.6; color: ${COLORS.textDark};">
+        <span style="color: ${COLORS.gold}; font-weight: 700; margin-right: 8px;">&#9679;</span>
+        Download Quick Wins -- practical strategies you can use today
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 8px 0;">
+      <p style="margin: 0; font-size: 16px; line-height: 1.6; color: ${COLORS.textDark};">
+        <span style="color: ${COLORS.gold}; font-weight: 700; margin-right: 8px;">&#9679;</span>
+        Join the educator community and connect with peers
+      </p>
+    </td>
+  </tr>
+</table>
+
+<p style="margin: 24px 0 0 0; font-size: 14px; color: ${COLORS.textMuted}; font-style: italic;">
+  Questions? Just reply to this email -- a real person reads every one.
+</p>
+  `.trim();
+
+  return emailWrapper(content);
+}
+
+export type EmailType = 'welcome' | 'nudge' | 'digest' | 'reply_notification' | 'access_granted';
+
+export type EmailData = WelcomeEmailData | NudgeEmailData | DigestEmailData | ReplyNotificationEmailData | AccessGrantedEmailData;
 
 export function generateEmailHTML(type: EmailType, data: EmailData): string {
   switch (type) {
@@ -386,6 +476,8 @@ export function generateEmailHTML(type: EmailType, data: EmailData): string {
       return generateDigestEmail(data as DigestEmailData);
     case 'reply_notification':
       return generateReplyNotificationEmail(data as ReplyNotificationEmailData);
+    case 'access_granted':
+      return generateAccessGrantedEmail(data as AccessGrantedEmailData);
     default:
       throw new Error(`Unknown email type: ${type}`);
   }
@@ -405,6 +497,8 @@ export function getEmailSubject(type: EmailType): string {
       return 'Your monthly Learning Hub update';
     case 'reply_notification':
       return 'Someone replied to your post in the Learning Hub';
+    case 'access_granted':
+      return 'Your Learning Hub access is ready';
     default:
       return 'Teachers Deserve It Learning Hub';
   }
@@ -429,6 +523,13 @@ export const sampleEmailData: Record<EmailType, EmailData> = {
     recommendedCourseTitle: 'Stress Management for Educators',
     recommendedCourseUrl: 'https://www.teachersdeserveit.com/hub/courses/stress-management',
   } as NudgeEmailData,
+  access_granted: {
+    displayName: 'Sarah',
+    tier: 'all_access',
+    expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    magicLink: null,
+    loginUrl: 'https://www.teachersdeserveit.com/hub/login',
+  } as AccessGrantedEmailData,
   digest: {
     displayName: 'Sarah',
     coursesInProgress: 2,
