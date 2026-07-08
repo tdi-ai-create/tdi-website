@@ -575,14 +575,28 @@ function VideoUploadSection({
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ uid: videoId }),
                   });
-                  // Wait a moment then try to fetch
-                  await new Promise(r => setTimeout(r, 3000));
-                  const res = await fetch(`/api/tdi-admin/videos/transcript?uid=${videoId}`);
-                  const data = await res.json();
-                  if (data.transcript) {
-                    onUpdate({ transcript_text: data.transcript });
+                  // Poll for transcript (up to 20 attempts, every 5 seconds = ~100s max)
+                  let transcript = null;
+                  for (let attempt = 0; attempt < 20; attempt++) {
+                    await new Promise(r => setTimeout(r, 5000));
+                    const res = await fetch(`/api/tdi-admin/videos/transcript?uid=${videoId}`);
+                    const data = await res.json();
+                    if (data.transcript) {
+                      transcript = data.transcript;
+                      break;
+                    }
+                    if (data.status === 'error') {
+                      throw new Error('Transcript generation failed');
+                    }
                   }
-                } catch {} finally { setGeneratingTranscript(false); }
+                  if (transcript) {
+                    onUpdate({ transcript_text: transcript });
+                  } else {
+                    console.error('Transcript generation timed out -- try again in a minute');
+                  }
+                } catch (err) {
+                  console.error('Transcript generation error:', err);
+                } finally { setGeneratingTranscript(false); }
               }}
               disabled={generatingTranscript}
               className="text-xs text-teal-600 hover:text-teal-700 font-medium disabled:opacity-50"
@@ -970,13 +984,28 @@ function SortableModule({
                         const formData = new FormData();
                         formData.append('file', file);
                         await fetch(uploadUrl, { method: 'POST', body: formData });
-                        await fetch('/api/tdi-admin/lessons', {
+                        const patchRes = await fetch('/api/tdi-admin/lessons', {
                           method: 'PATCH',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ id: lessonId, video_id: videoUid }),
                         });
-                        // Refresh by selecting the lesson
-                        onSelectLesson(lesson);
+                        const patchData = await patchRes.json();
+                        const updatedLesson = patchData.lesson || { ...lesson, video_id: videoUid };
+                        // Update course state so green dot appears immediately
+                        setCourse((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                modules: prev.modules.map((m) => ({
+                                  ...m,
+                                  lessons: m.lessons.map((l) =>
+                                    l.id === lessonId ? updatedLesson : l
+                                  ),
+                                })),
+                              }
+                            : null
+                        );
+                        onSelectLesson(updatedLesson);
                       } catch (err) {
                         console.error('Drag-drop upload failed:', err);
                       }
@@ -1845,6 +1874,22 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                 onComplete={() => {
                   // Reload course data after bulk upload
                   window.location.reload();
+                }}
+                onLessonUploaded={(lessonId, videoId) => {
+                  // Update course state so green dot appears per-lesson in real-time
+                  setCourse((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          modules: prev.modules.map((m) => ({
+                            ...m,
+                            lessons: m.lessons.map((l) =>
+                              l.id === lessonId ? { ...l, video_id: videoId } : l
+                            ),
+                          })),
+                        }
+                      : null
+                  );
                 }}
               />
             </div>
