@@ -811,6 +811,7 @@ function SortableModule({
   onDeleteModule,
   onDeleteLesson,
   onReorderLessons,
+  onLessonVideoUploaded,
 }: {
   module: Module;
   isExpanded: boolean;
@@ -822,6 +823,7 @@ function SortableModule({
   onDeleteModule: (moduleId: string) => void;
   onDeleteLesson: (lessonId: string) => void;
   onReorderLessons: (moduleId: string, lessons: Lesson[]) => void;
+  onLessonVideoUploaded: (lessonId: string, videoId: string, updatedLesson: Lesson) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: module.id,
@@ -992,20 +994,7 @@ function SortableModule({
                         const patchData = await patchRes.json();
                         const updatedLesson = patchData.lesson || { ...lesson, video_id: videoUid };
                         // Update course state so green dot appears immediately
-                        setCourse((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                modules: prev.modules.map((m) => ({
-                                  ...m,
-                                  lessons: m.lessons.map((l) =>
-                                    l.id === lessonId ? updatedLesson : l
-                                  ),
-                                })),
-                              }
-                            : null
-                        );
-                        onSelectLesson(updatedLesson);
+                        onLessonVideoUploaded(lessonId, videoUid, updatedLesson);
                       } catch (err) {
                         console.error('Drag-drop upload failed:', err);
                       }
@@ -1920,6 +1909,22 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                       onDeleteModule={deleteModule}
                       onDeleteLesson={deleteLesson}
                       onReorderLessons={reorderLessons}
+                      onLessonVideoUploaded={(lessonId, videoId, updatedLesson) => {
+                        setCourse((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                modules: prev.modules.map((m) => ({
+                                  ...m,
+                                  lessons: m.lessons.map((l) =>
+                                    l.id === lessonId ? updatedLesson : l
+                                  ),
+                                })),
+                              }
+                            : null
+                        );
+                        setSelectedLesson(updatedLesson);
+                      }}
                     />
                   ))}
                 </div>
