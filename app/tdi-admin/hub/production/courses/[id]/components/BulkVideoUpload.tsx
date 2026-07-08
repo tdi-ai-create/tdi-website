@@ -23,6 +23,7 @@ interface BulkVideoUploadProps {
     modules: BulkModule[];
   };
   onComplete: () => void;
+  onLessonUploaded?: (lessonId: string, videoId: string) => void;
 }
 
 interface FileMapping {
@@ -123,7 +124,7 @@ async function compressVideo(
   });
 }
 
-export default function BulkVideoUpload({ course, onComplete }: BulkVideoUploadProps) {
+export default function BulkVideoUpload({ course, onComplete, onLessonUploaded }: BulkVideoUploadProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [files, setFiles] = useState<FileMapping[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -302,6 +303,9 @@ export default function BulkVideoUpload({ course, onComplete }: BulkVideoUploadP
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: mapping.lessonId, video_id: videoUid }),
         });
+
+        // Update parent state so green dot appears immediately
+        onLessonUploaded?.(mapping.lessonId, videoUid);
 
         // Poll for ready (up to 60 attempts)
         let ready = false;
