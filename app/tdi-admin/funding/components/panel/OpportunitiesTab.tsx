@@ -4,6 +4,22 @@ import { useEffect, useState } from 'react'
 
 const PLAN_COLORS: Record<string, string> = { A: '#0F766E', B: '#1B365D', C: '#7C3AED', D: '#B45309' }
 const STATUS_OPTIONS = ['not_started', 'researching', 'applied', 'waiting', 'awarded', 'denied', 'stalled', 'backup']
+
+const WINDOW_STATUS_OPTIONS = [
+  { value: 'unknown', label: 'Unknown' },
+  { value: 'open', label: 'Open' },
+  { value: 'closed_missed', label: 'Missed' },
+  { value: 'closed_awarded', label: 'Awarded' },
+  { value: 'closed_denied', label: 'Denied' },
+]
+
+const WINDOW_STATUS_STYLES: Record<string, { bg: string; color: string }> = {
+  open: { bg: '#D1FAE5', color: '#065F46' },
+  unknown: { bg: '#F3F4F6', color: '#6B7280' },
+  closed_missed: { bg: '#FEE2E2', color: '#991B1B' },
+  closed_awarded: { bg: '#DBEAFE', color: '#1D4ED8' },
+  closed_denied: { bg: '#DBEAFE', color: '#1D4ED8' },
+}
 const NARRATIVE_COLORS: Record<string, string> = {
   not_started: '#EF4444',
   researching: '#F59E0B',
@@ -56,6 +72,17 @@ export function OpportunitiesTab({ pursuitId }: OpportunitiesTabProps) {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, status: newStatus }),
+    })
+    fetchOpps()
+  }
+
+  const handleWindowStatusChange = async (id: string, windowStatus: string) => {
+    // Optimistic update
+    setOpportunities(prev => prev.map(o => o.id === id ? { ...o, window_status: windowStatus } : o))
+    await fetch('/api/funding/opportunities', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, window_status: windowStatus }),
     })
     fetchOpps()
   }
@@ -203,6 +230,27 @@ export function OpportunitiesTab({ pursuitId }: OpportunitiesTabProps) {
                   Deadline: {new Date(opp.application_closes + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </span>
               )}
+
+              {/* Window status */}
+              {(() => {
+                const ws = opp.window_status || 'unknown'
+                const wsStyle = WINDOW_STATUS_STYLES[ws] || WINDOW_STATUS_STYLES.unknown
+                return (
+                  <select
+                    value={ws}
+                    onChange={e => handleWindowStatusChange(opp.id, e.target.value)}
+                    style={{
+                      fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
+                      background: wsStyle.bg, color: wsStyle.color,
+                      border: '1px solid #E5E7EB', cursor: 'pointer',
+                    }}
+                  >
+                    {WINDOW_STATUS_OPTIONS.map(o => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                )
+              })()}
             </div>
 
             {/* Contact */}

@@ -100,6 +100,7 @@ export async function PATCH(request: NextRequest) {
     'waiting_on', 'narrative_status', 'narrative_url', 'forwarding_email_status',
     'client_submitted', 'client_submitted_proof',
     'decision_date', 'awarded_amount', 'denial_reason',
+    'window_status', 'window_opens', 'window_closes',
   ];
   fields.forEach(f => { if (body[f] !== undefined) updates[f] = body[f]; });
 

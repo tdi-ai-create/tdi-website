@@ -17,9 +17,18 @@ interface Opportunity {
   notes?: any[]
 }
 
+const WINDOW_STATUS_OPTIONS = [
+  { value: 'unknown', label: 'Unknown' },
+  { value: 'open', label: 'Open' },
+  { value: 'closed_missed', label: 'Missed' },
+  { value: 'closed_awarded', label: 'Awarded' },
+  { value: 'closed_denied', label: 'Denied' },
+]
+
 interface OpportunityCardProps {
   opportunity: Opportunity
   onStatusChange: (id: string, status: string) => void
+  onWindowStatusChange?: (id: string, windowStatus: string) => void
   onExpand: (id: string) => void
 }
 
@@ -67,7 +76,7 @@ function displayStatus(s: string): string {
   return s.replace(/_/g, ' ')
 }
 
-export function OpportunityCard({ opportunity, onStatusChange, onExpand }: OpportunityCardProps) {
+export function OpportunityCard({ opportunity, onStatusChange, onWindowStatusChange, onExpand }: OpportunityCardProps) {
   const planKey = opportunity.plan_category?.replace(/^plan\s*/i, '').toUpperCase() || null
   const borderColor = (planKey && PLAN_COLORS[planKey]) || '#6B7280'
   const planLabel = planKey ? `Plan ${planKey}` : null
@@ -145,12 +154,30 @@ export function OpportunityCard({ opportunity, onStatusChange, onExpand }: Oppor
 
       {/* Bottom row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        {/* Window status badge */}
+        {/* Window status selector */}
         {(() => {
-          const ws = (opportunity as any).window_status as string | null
-          if (!ws) return null
+          const ws = ((opportunity as any).window_status as string) || 'unknown'
           const style = WINDOW_STATUS_STYLES[ws] || WINDOW_STATUS_STYLES.unknown
-          return (
+          return onWindowStatusChange ? (
+            <select
+              value={ws}
+              onClick={e => e.stopPropagation()}
+              onChange={e => {
+                e.stopPropagation()
+                onWindowStatusChange(opportunity.id, e.target.value)
+              }}
+              style={{
+                fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
+                background: style.bg, color: style.color,
+                border: '1px solid #E5E7EB', cursor: 'pointer',
+                appearance: 'auto' as any,
+              }}
+            >
+              {WINDOW_STATUS_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          ) : (
             <span style={{
               fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
               background: style.bg, color: style.color,
