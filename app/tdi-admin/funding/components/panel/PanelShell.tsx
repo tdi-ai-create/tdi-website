@@ -20,9 +20,10 @@ interface PanelShellProps {
   pursuit: any
   onClose: () => void
   pursuitId: string
+  gate?: any
 }
 
-export function PanelShell({ pursuit, onClose, pursuitId }: PanelShellProps) {
+export function PanelShell({ pursuit, onClose, pursuitId, gate }: PanelShellProps) {
   const [activeTab, setActiveTab] = useState('opportunities')
 
   return (
@@ -72,7 +73,7 @@ export function PanelShell({ pursuit, onClose, pursuitId }: PanelShellProps) {
 
       {/* Tab content */}
       <div style={{ padding: '20px 24px' }}>
-        {activeTab === 'overview' && <OverviewTab pursuit={pursuit} />}
+        {activeTab === 'overview' && <OverviewTab pursuit={pursuit} gate={gate} />}
         {activeTab === 'opportunities' && <OpportunitiesTab pursuitId={pursuitId} />}
         {activeTab === 'actions' && <ActionsTab pursuitId={pursuitId} />}
         {activeTab === 'timeline' && <TimelineTab pursuitId={pursuitId} />}

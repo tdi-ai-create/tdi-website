@@ -48,6 +48,14 @@ const NARRATIVE_DOT_COLORS: Record<string, string> = {
   ready: '#10B981',
 }
 
+const WINDOW_STATUS_STYLES: Record<string, { bg: string; color: string; label: string }> = {
+  open: { bg: '#D1FAE5', color: '#065F46', label: 'Window open' },
+  unknown: { bg: '#F3F4F6', color: '#6B7280', label: 'Window unknown' },
+  closed_missed: { bg: '#FEE2E2', color: '#991B1B', label: 'Missed' },
+  closed_awarded: { bg: '#DBEAFE', color: '#1D4ED8', label: 'Awarded' },
+  closed_denied: { bg: '#DBEAFE', color: '#1D4ED8', label: 'Denied' },
+}
+
 function formatAmount(n: number | null): string {
   if (n == null) return '--'
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`
@@ -137,6 +145,20 @@ export function OpportunityCard({ opportunity, onStatusChange, onExpand }: Oppor
 
       {/* Bottom row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        {/* Window status badge */}
+        {(() => {
+          const ws = (opportunity as any).window_status as string | null
+          if (!ws) return null
+          const style = WINDOW_STATUS_STYLES[ws] || WINDOW_STATUS_STYLES.unknown
+          return (
+            <span style={{
+              fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
+              background: style.bg, color: style.color,
+            }}>
+              {style.label}
+            </span>
+          )
+        })()}
         {opportunity.contact_name && (
           <span style={{ fontSize: 11, color: '#6B7280' }}>{opportunity.contact_name}</span>
         )}

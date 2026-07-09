@@ -29,10 +29,18 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       .eq('pursuit_id', id)
       .order('display_order')
 
+    // Fetch pursuit gate for submitter/backup/admin_sponsor info
+    const { data: gate } = await supabase
+      .from('pursuit_gate')
+      .select('*')
+      .eq('pursuit_id', id)
+      .maybeSingle()
+
     return NextResponse.json({
       pursuit,
       timeline: timeline || [],
       touchpoints: touchpoints || [],
+      gate: gate || null,
     })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })

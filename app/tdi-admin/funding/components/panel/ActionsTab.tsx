@@ -189,6 +189,19 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
   )
 }
 
+const COLOR_STATE_COLORS: Record<string, string> = {
+  green: '#10B981',
+  yellow: '#F59E0B',
+  red: '#DC2626',
+}
+
+const RUNG_LABELS: Record<string, { label: string; bg: string; color: string }> = {
+  submitter: { label: 'Submitter', bg: '#FEF3C7', color: '#92400E' },
+  backup: { label: 'Backup', bg: '#FEE2E2', color: '#991B1B' },
+  admin_sponsor: { label: 'Admin Sponsor', bg: '#FEE2E2', color: '#991B1B' },
+  rae: { label: 'Rae', bg: '#FEE2E2', color: '#991B1B' },
+}
+
 function ActionItem({ action, onToggle, isOverdue, getDueDateColor }: {
   action: any
   onToggle: (id: string) => void
@@ -196,9 +209,34 @@ function ActionItem({ action, onToggle, isOverdue, getDueDateColor }: {
   getDueDateColor: (d: string | null) => string
 }) {
   const isDone = action.status === 'done' || action.status === 'completed'
+  const colorState = action.color_state as string | null
+  const escalationRung = action.escalation_rung as string | null
+  const displayTitle = action.client_label || action.title
+
+  // Use color_state dot color if available, otherwise fall back to inline overdue calc
+  const titleColor = isDone
+    ? '#9CA3AF'
+    : colorState === 'red'
+      ? '#DC2626'
+      : colorState === 'yellow'
+        ? '#92400E'
+        : isOverdue
+          ? '#DC2626'
+          : '#0a0f1e'
 
   return (
     <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '8px 12px', background: '#F9FAFB', borderRadius: 8 }}>
+      {/* Color state dot */}
+      {colorState && !isDone && (
+        <div
+          title={`Status: ${colorState}`}
+          style={{
+            width: 8, height: 8, borderRadius: '50%', flexShrink: 0, marginTop: 5,
+            background: COLOR_STATE_COLORS[colorState] || '#D1D5DB',
+          }}
+        />
+      )}
+
       {/* Checkbox */}
       <button
         onClick={() => !isDone && onToggle(action.id)}
@@ -214,13 +252,13 @@ function ActionItem({ action, onToggle, isOverdue, getDueDateColor }: {
       </button>
 
       <div style={{ flex: 1 }}>
-        {/* Title */}
+        {/* Title — uses client_label if available */}
         <div style={{
           fontSize: 13, fontWeight: 500,
-          color: isDone ? '#9CA3AF' : isOverdue ? '#DC2626' : '#0a0f1e',
+          color: titleColor,
           textDecoration: isDone ? 'line-through' : 'none',
         }}>
-          {action.title}
+          {displayTitle}
         </div>
 
         {/* Description */}
@@ -238,6 +276,18 @@ function ActionItem({ action, onToggle, isOverdue, getDueDateColor }: {
           {action.owner_name && (
             <span style={{ fontSize: 10, color: '#6B7280' }}>{action.owner_name}</span>
           )}
+          {/* Escalation rung badge */}
+          {escalationRung && escalationRung !== 'none' && !isDone && (() => {
+            const rungStyle = RUNG_LABELS[escalationRung]
+            return rungStyle ? (
+              <span style={{
+                fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
+                background: rungStyle.bg, color: rungStyle.color,
+              }}>
+                Escalated: {rungStyle.label}
+              </span>
+            ) : null
+          })()}
         </div>
 
         {/* Client-specific: prepared materials */}
