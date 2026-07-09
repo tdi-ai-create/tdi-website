@@ -12,23 +12,22 @@ const DRY_RUN = true
 // ══════════════════════════════════════════════════════════════
 // SEND_ALLOWLIST — go-live safety rail (independent of DRY_RUN).
 //
-// When ALLOWLIST_ENABLED is true, emails may ONLY be sent to
-// addresses listed here. Everyone else is silently skipped with
-// a log entry. This lets us roll out school-by-school:
+// CLIENT ADDRESSES INTENTIONALLY EXCLUDED until Bella is onboarded
+// and go-live is approved. Add client contacts here to arm real
+// client sends. Until then, no client can be emailed by any path
+// — manual or automated.
 //
-//   1. Start with Allenwood contacts only (current seed list).
-//   2. As each school is verified, add their contacts here.
-//   3. When fully confident, set ALLOWLIST_ENABLED = false to
-//      allow sends to any address the engine resolves.
+// To arm Allenwood:
+//   'teri.gordonhernandez@pgcps.org',
+//   'sharonh.porter@pgcps.org',
 //
-// Order of checks: DRY_RUN → ALLOWLIST → send.
-// Both layers must pass for an email to actually leave.
+// Order of checks: DRY_RUN → WINDOW GATE → ALLOWLIST → send.
+// All layers must pass for an email to actually leave.
 // ══════════════════════════════════════════════════════════════
 const ALLOWLIST_ENABLED = true
 const SEND_ALLOWLIST: string[] = [
-  'teri.gordonhernandez@pgcps.org',
-  'sharonh.porter@pgcps.org',
   'rae@teachersdeserveit.com',
+  'hello@teachersdeserveit.com',
 ]
 
 function isOnAllowlist(email: string): boolean {

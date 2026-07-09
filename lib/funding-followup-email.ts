@@ -1,19 +1,23 @@
 /**
  * Shared email template + send logic for the funding follow-up system.
  * Used by both the automated cron engine and the manual "Send nudge" button.
- *
- * IMPORTANT: The SEND_ALLOWLIST controls which recipients can receive emails.
- * Currently seeded with Allenwood contacts + rae@ only. Do NOT add client
- * addresses until Bella is fully onboarded and ready to own the relationship.
  */
 
 // ── Recipient allowlist ──
+//
+// CLIENT ADDRESSES INTENTIONALLY EXCLUDED until Bella is onboarded
+// and go-live is approved. Add client contacts here to arm real
+// client sends. Until then, no client can be emailed by any path
+// — manual or automated.
+//
+// To arm Allenwood:
+//   'teri.gordonhernandez@pgcps.org',
+//   'sharonh.porter@pgcps.org',
 
 export const ALLOWLIST_ENABLED = true
 export const SEND_ALLOWLIST: string[] = [
-  'teri.gordonhernandez@pgcps.org',
-  'sharonh.porter@pgcps.org',
   'rae@teachersdeserveit.com',
+  'hello@teachersdeserveit.com',
 ]
 
 export function isOnAllowlist(email: string): boolean {
