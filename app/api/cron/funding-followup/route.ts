@@ -9,6 +9,32 @@ import { getServiceSupabase } from '@/lib/supabase'
 // ══════════════════════════════════════════════════════════════
 const DRY_RUN = true
 
+// ══════════════════════════════════════════════════════════════
+// SEND_ALLOWLIST — go-live safety rail (independent of DRY_RUN).
+//
+// When ALLOWLIST_ENABLED is true, emails may ONLY be sent to
+// addresses listed here. Everyone else is silently skipped with
+// a log entry. This lets us roll out school-by-school:
+//
+//   1. Start with Allenwood contacts only (current seed list).
+//   2. As each school is verified, add their contacts here.
+//   3. When fully confident, set ALLOWLIST_ENABLED = false to
+//      allow sends to any address the engine resolves.
+//
+// Order of checks: DRY_RUN → ALLOWLIST → send.
+// Both layers must pass for an email to actually leave.
+// ══════════════════════════════════════════════════════════════
+const ALLOWLIST_ENABLED = true
+const SEND_ALLOWLIST: string[] = [
+  'teri.gordonhernandez@pgcps.org',
+  'sharonh.porter@pgcps.org',
+  'rae@teachersdeserveit.com',
+]
+
+function isOnAllowlist(email: string): boolean {
+  return SEND_ALLOWLIST.some(a => a.toLowerCase() === email.toLowerCase())
+}
+
 const LOG = '[funding-followup]'
 
 // ── Lead windows (business days before due_date) by action_size ──
@@ -32,8 +58,11 @@ function rungIndex(rung: string | null): number {
 type Gate = {
   pursuit_id: string
   submitter_email: string | null
+  submitter_name: string | null
   backup_email: string | null
+  backup_name: string | null
   admin_sponsor_email: string | null
+  admin_sponsor_name: string | null
 }
 
 type LadderStep = { rung: Rung; email: string }
@@ -129,6 +158,62 @@ function escalationWindow(runwayCalDays: number): number {
   return 1
 }
 
+// ── Tone routing: client (submitter/backup) vs internal (rae) ──
+
+type EmailTone = 'client' | 'internal'
+
+function toneForRung(rung: string): EmailTone {
+  return rung === 'rae' ? 'internal' : 'client'
+}
+
+// ── Client-facing task label ──
+// Strips internal verb prefixes so clients see natural language.
+// If a client_label field exists on the item, use that instead.
+
+function clientTaskLabel(rawTitle: string, clientLabel?: string | null): string {
+  if (clientLabel) return clientLabel
+  // Strip leading internal verbs: "Get X to send ...", "Confirm: ...", "Follow up on ...", "Track ..."
+  const stripped = rawTitle
+    .replace(/^(Get\s+\S+\s+to\s+)/i, '')
+    .replace(/^(Confirm:\s*)/i, '')
+    .replace(/^(Follow\s+up\s+(on|with)\s+\S+[:/]?\s*)/i, '')
+    .replace(/^(Track\s+)/i, '')
+    .trim()
+  // If stripping left something meaningful, use it; otherwise fall back gracefully
+  return stripped.length > 5 ? stripped : 'this funding step'
+}
+
+// Capitalize a rung label for display
+function displayRung(rung: string): string {
+  if (rung === 'rae') return 'Rae'
+  if (rung === 'admin_sponsor') return 'Admin Sponsor'
+  return rung.charAt(0).toUpperCase() + rung.slice(1)
+}
+
+/**
+ * Resolve the best contact name for an escalation email greeting.
+ * For backup/admin_sponsor: use full stored name (e.g. "Dr. Porter") — formal.
+ * For submitter reminders/nudges: first name is fine (handled at call site).
+ * Fallback: parse from email prefix.
+ */
+function resolveContactName(
+  step: LadderStep,
+  gate: Gate | undefined,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  item: any,
+  ownerFirstName: string,
+): string {
+  if (step.rung === 'rae') return 'Rae'
+  if (step.rung === 'submitter') {
+    return item.owner_name ?? ownerFirstName
+  }
+  if (step.rung === 'backup' && gate?.backup_name) return gate.backup_name
+  if (step.rung === 'admin_sponsor' && gate?.admin_sponsor_name) return gate.admin_sponsor_name
+  // Fallback: capitalize email prefix
+  const prefix = (step.email.split('@')[0] ?? '').split('.')[0] ?? 'there'
+  return prefix.charAt(0).toUpperCase() + prefix.slice(1)
+}
+
 // ── Email sending (wired but gated by DRY_RUN) ──
 
 async function sendFollowUpEmail(params: {
@@ -138,6 +223,14 @@ async function sendFollowUpEmail(params: {
   bizDaysOverdue: number
   rungLabel: string
   type: 'reminder' | 'nudge' | 'escalation'
+  tone: EmailTone
+  // Client tone fields
+  contactName?: string   // full stored name for greeting (e.g. "Dr. Porter", "Teri")
+  schoolName?: string
+  clientLabel?: string   // optional client-friendly task label from DB
+  // Internal tone fields
+  submitterName?: string
+  nextRung?: string
 }): Promise<boolean> {
   const resendKey = process.env.RESEND_API_KEY
   if (!resendKey) {
@@ -145,38 +238,149 @@ async function sendFollowUpEmail(params: {
     return false
   }
 
-  const { to, itemTitle, dueDate, bizDaysOverdue, rungLabel, type } = params
+  const {
+    to, itemTitle, dueDate, bizDaysOverdue, rungLabel, type, tone,
+    contactName = 'there', schoolName = 'your school', clientLabel,
+    submitterName = 'unknown', nextRung = 'none',
+  } = params
 
-  const subject =
-    type === 'reminder'
-      ? `Upcoming: "${itemTitle}" is due ${dueDate}`
-      : type === 'nudge'
-        ? `Overdue: "${itemTitle}" was due ${dueDate} (${bizDaysOverdue} business days ago)`
-        : `Escalation: "${itemTitle}" needs attention — ${bizDaysOverdue} business days overdue`
+  const friendlyTask = clientTaskLabel(itemTitle, clientLabel)
+  const displayRungLabel = displayRung(rungLabel)
 
-  const urgencyColor =
-    type === 'escalation' ? '#DC2626' : type === 'nudge' ? '#D97706' : '#2563EB'
-  const urgencyLabel =
-    type === 'escalation' ? 'ESCALATED' : type === 'nudge' ? 'OVERDUE' : 'UPCOMING'
+  // ── Subject lines ──
 
-  const html = `
+  let subject: string
+  if (tone === 'client') {
+    subject =
+      type === 'reminder'
+        ? `Heads up on ${friendlyTask} for ${schoolName}`
+        : type === 'nudge'
+          ? `Following up: ${friendlyTask}`
+          : `Can you help with ${friendlyTask} for ${schoolName}?`
+  } else {
+    subject =
+      type === 'reminder'
+        ? `UPCOMING — "${itemTitle}" due ${dueDate}`
+        : type === 'nudge'
+          ? `OVERDUE (${bizDaysOverdue} biz days) — "${itemTitle}"`
+          : `ESCALATED to ${displayRungLabel} — "${itemTitle}" ${bizDaysOverdue} days overdue`
+  }
+
+  // ── HTML body ──
+
+  let html: string
+  if (tone === 'client') {
+    // Soft badge colors + warm labels for client emails
+    const badgeColor =
+      type === 'escalation' ? '#D4A843' : type === 'nudge' ? '#5B8FA8' : '#1B365D'
+    const badgeText =
+      type === 'escalation' ? 'Quick favor' : type === 'nudge' ? 'Checking in' : 'Friendly reminder'
+
+    let bodyParagraphs: string
+    if (type === 'reminder') {
+      bodyParagraphs = `
+        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Hi ${contactName},</p>
+        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Just a friendly heads-up — <strong>${friendlyTask}</strong> is coming up around <strong>${dueDate}</strong>. No rush at all, I just want to make sure you have everything you need from us to get it out the door.</p>
+        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Everything's prepared on our end — if anything's unclear or you'd like me to hop on a quick call to walk through it, I'm here.</p>
+        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Rooting for you and ${schoolName},</p>
+        <p style="color: #1e2749; font-size: 15px; font-weight: 600; margin-bottom: 0;">Bella</p>
+        <p style="color: #6B7280; font-size: 13px; margin-top: 2px;">Teachers Deserve It</p>`
+    } else if (type === 'nudge') {
+      bodyParagraphs = `
+        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Hi ${contactName},</p>
+        <p style="color: #374151; font-size: 15px; line-height: 1.7;">I wanted to follow up on <strong>${friendlyTask}</strong> — it was on the calendar for <strong>${dueDate}</strong>, and I know how full your plate is this time of year.</p>
+        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Is there anything holding it up that I can help with? A question, a quick call, or me sitting on Zoom while you send it — just say the word.</p>
+        <p style="color: #374151; font-size: 15px; line-height: 1.7;">We really want to land this funding for your teachers, and you're not doing it alone.</p>
+        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Here for you,</p>
+        <p style="color: #1e2749; font-size: 15px; font-weight: 600; margin-bottom: 0;">Bella</p>
+        <p style="color: #6B7280; font-size: 13px; margin-top: 2px;">Teachers Deserve It</p>`
+    } else {
+      bodyParagraphs = `
+        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Hi ${contactName},</p>
+        <p style="color: #374151; font-size: 15px; line-height: 1.7;">I'm reaching out because <strong>${friendlyTask}</strong> is a key piece of the funding we're working to secure for <strong>${schoolName}</strong>, and we want to make sure it doesn't slip through the cracks during a busy stretch.</p>
+        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Everything's prepared and ready — it just needs a few minutes from your side. Could you help us get it across the line, or point me to the best person to work with?</p>
+        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Thank you for championing this for your teachers,</p>
+        <p style="color: #1e2749; font-size: 15px; font-weight: 600; margin-bottom: 0;">Bella</p>
+        <p style="color: #6B7280; font-size: 13px; margin-top: 2px;">Teachers Deserve It</p>`
+    }
+
+    html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
+      <img src="https://www.teachersdeserveit.com/images/logo.webp" alt="TDI" style="height: 36px; margin-bottom: 20px;" />
+      <div style="background: ${badgeColor}; color: white; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 16px;">
+        ${badgeText}
+      </div>
+      ${bodyParagraphs}
+    </div>`
+  } else {
+    // Internal tone — crisp, scannable, sharp badges unchanged
+    const urgencyColor =
+      type === 'escalation' ? '#DC2626' : type === 'nudge' ? '#D97706' : '#2563EB'
+    const urgencyLabel =
+      type === 'escalation' ? 'ESCALATED' : type === 'nudge' ? 'OVERDUE' : 'UPCOMING'
+
+    // Format "Next:" line — replace bare "none" with a human-readable final-rung message
+    const nextDisplay = (!nextRung || nextRung === 'none')
+      ? 'Final rung (Rae is the last stop)'
+      : displayRung(nextRung)
+
+    let internalBody: string
+    if (type === 'reminder') {
+      internalBody = `
+        <h2 style="color: #1e2749; font-size: 18px; margin: 0 0 8px;">${itemTitle}</h2>
+        <p style="color: #6B7280; font-size: 14px; margin: 0 0 16px;">
+          Due: <strong>${dueDate}</strong>. On track?
+        </p>`
+    } else if (type === 'nudge') {
+      internalBody = `
+        <h2 style="color: #1e2749; font-size: 18px; margin: 0 0 8px;">${itemTitle}</h2>
+        <p style="color: #6B7280; font-size: 14px; margin: 0 0 4px;">
+          <strong>${bizDaysOverdue} business days overdue</strong> (due ${dueDate})
+        </p>
+        <p style="color: #6B7280; font-size: 14px; margin: 0 0 16px;">
+          Submitter: ${submitterName}. No response yet.
+        </p>`
+    } else {
+      internalBody = `
+        <h2 style="color: #1e2749; font-size: 18px; margin: 0 0 8px;">${itemTitle}</h2>
+        <p style="color: #6B7280; font-size: 14px; margin: 0 0 4px;">
+          Escalated to <strong>${displayRungLabel}</strong> rung. ${bizDaysOverdue} business days overdue.
+        </p>
+        <p style="color: #6B7280; font-size: 14px; margin: 0 0 16px;">
+          Next: ${nextDisplay}.
+        </p>`
+    }
+
+    html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
       <img src="https://www.teachersdeserveit.com/images/logo.webp" alt="TDI" style="height: 36px; margin-bottom: 20px;" />
       <div style="background: ${urgencyColor}; color: white; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 16px;">
         ${urgencyLabel}
       </div>
-      <h2 style="color: #1e2749; font-size: 18px; margin: 0 0 8px;">${itemTitle}</h2>
-      <p style="color: #6B7280; font-size: 14px; margin: 0 0 16px;">
-        Due: <strong>${dueDate}</strong>${bizDaysOverdue > 0 ? ` — ${bizDaysOverdue} business days overdue` : ''}
-      </p>
-      ${type === 'escalation' ? `<p style="color: #374151; font-size: 14px; line-height: 1.6;">This action item has been escalated to you (${rungLabel}) because the previous contact hasn't responded within the expected window. Please take action or reply to let us know the status.</p>` : ''}
-      ${type === 'nudge' ? `<p style="color: #374151; font-size: 14px; line-height: 1.6;">This action item is past its due date. Please complete it or reply with an update so we can adjust the timeline.</p>` : ''}
-      ${type === 'reminder' ? `<p style="color: #374151; font-size: 14px; line-height: 1.6;">Heads up — this action item is coming due soon. Please make sure it's on track.</p>` : ''}
+      ${internalBody}
       <p style="color: #9CA3AF; font-size: 12px; margin-top: 24px;">
         TDI Funding Follow-Up System
       </p>
-    </div>
-  `
+    </div>`
+  }
+
+  // ── Send via Resend ──
+
+  const fromName = tone === 'client'
+    ? 'Bella — Teachers Deserve It'
+    : 'TDI Funding'
+  const replyTo = tone === 'client'
+    ? 'hello@teachersdeserveit.com'
+    : undefined
+
+  const payload: Record<string, unknown> = {
+    from: `${fromName} <noreply@teachersdeserveit.com>`,
+    to: [to],
+    subject,
+    html,
+  }
+  if (replyTo) payload.reply_to = replyTo
+  if (tone === 'internal') payload.bcc = ['rae@teachersdeserveit.com']
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -184,13 +388,7 @@ async function sendFollowUpEmail(params: {
       Authorization: `Bearer ${resendKey}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      from: 'TDI Funding <noreply@teachersdeserveit.com>',
-      to: [to],
-      bcc: ['rae@teachersdeserveit.com'],
-      subject,
-      html,
-    }),
+    body: JSON.stringify(payload),
   })
 
   if (!res.ok) {
@@ -223,7 +421,13 @@ export async function GET(request: NextRequest) {
       reminders_fired: 0,
       nudges_fired: 0,
       escalations_advanced: 0,
+      sent: 0,
+      dry_run_skipped: 0,
+      window_skipped: 0,
+      allowlist_skipped: 0,
       dry_run: DRY_RUN,
+      allowlist_enabled: ALLOWLIST_ENABLED,
+      allowlist: SEND_ALLOWLIST,
       details: [] as Array<{
         item_id: string
         pursuit_id: string
@@ -263,7 +467,7 @@ export async function GET(request: NextRequest) {
     const { data: gates } = pursuitIds.length > 0
       ? await supabase
           .from('pursuit_gate')
-          .select('pursuit_id, submitter_email, backup_email, admin_sponsor_email')
+          .select('pursuit_id, submitter_email, submitter_name, backup_email, backup_name, admin_sponsor_email, admin_sponsor_name')
           .in('pursuit_id', pursuitIds)
       : { data: [] as Gate[] }
 
@@ -273,12 +477,17 @@ export async function GET(request: NextRequest) {
 
     // ── 3. Batch-fetch pursuits for owner email ──
 
-    type Pursuit = { id: string; next_action_owner_email: string | null }
+    type Pursuit = {
+      id: string
+      next_action_owner_email: string | null
+      pursuit_name: string | null
+      district_name: string | null
+    }
 
     const { data: pursuits } = pursuitIds.length > 0
       ? await supabase
           .from('funding_pursuits')
-          .select('id, next_action_owner_email')
+          .select('id, next_action_owner_email, pursuit_name, district_name')
           .in('id', pursuitIds)
       : { data: [] as Pursuit[] }
 
@@ -286,7 +495,78 @@ export async function GET(request: NextRequest) {
       (pursuits ?? []).map((p: Pursuit) => [p.id, p]),
     )
 
-    // ── 4. Process each item ──
+    // ── 4. Batch-fetch funding opportunities for window gate ──
+
+    type Opportunity = {
+      id: string
+      pursuit_id: string
+      window_status: string | null
+      window_closes: string | null
+    }
+
+    const { data: opportunities } = pursuitIds.length > 0
+      ? await supabase
+          .from('funding_opportunities')
+          .select('id, pursuit_id, window_status, window_closes')
+          .in('pursuit_id', pursuitIds)
+      : { data: [] as Opportunity[] }
+
+    // Index by opportunity id AND group by pursuit_id
+    const oppById = new Map<string, Opportunity>(
+      (opportunities ?? []).map((o: Opportunity) => [o.id, o]),
+    )
+    const oppsByPursuit = new Map<string, Opportunity[]>()
+    for (const o of opportunities ?? []) {
+      const list = oppsByPursuit.get(o.pursuit_id) ?? []
+      list.push(o)
+      oppsByPursuit.set(o.pursuit_id, list)
+    }
+
+    /**
+     * Window gate: returns { open: true } if the item is eligible to nudge/escalate,
+     * or { open: false, reason } if it should be skipped.
+     */
+    function checkWindowGate(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      actionItem: any,
+      currentDate: Date,
+    ): { open: boolean; status: string; closes: string | null } {
+      // If the item has a direct opportunity_id, check that one
+      if (actionItem.opportunity_id) {
+        const opp = oppById.get(actionItem.opportunity_id)
+        if (!opp) return { open: false, status: 'unknown', closes: null }
+        const status = opp.window_status ?? 'unknown'
+        const closes = opp.window_closes
+        if (status !== 'open') return { open: false, status, closes }
+        if (closes) {
+          const closesDate = new Date(closes + 'T00:00:00')
+          if (closesDate < currentDate) return { open: false, status: 'open_but_past_close', closes }
+        }
+        return { open: true, status, closes }
+      }
+
+      // No direct opportunity — check all opportunities for this pursuit
+      const pursuitOpps = oppsByPursuit.get(actionItem.pursuit_id) ?? []
+      if (pursuitOpps.length === 0) return { open: false, status: 'unknown', closes: null }
+
+      // If ANY opportunity on this pursuit is open with a valid window, the item is eligible
+      for (const opp of pursuitOpps) {
+        const status = opp.window_status ?? 'unknown'
+        if (status !== 'open') continue
+        const closes = opp.window_closes
+        if (closes) {
+          const closesDate = new Date(closes + 'T00:00:00')
+          if (closesDate < currentDate) continue
+        }
+        return { open: true, status: 'open', closes }
+      }
+
+      // None were open — report the first one's status for logging
+      const firstStatus = pursuitOpps[0].window_status ?? 'unknown'
+      return { open: false, status: firstStatus, closes: pursuitOpps[0].window_closes }
+    }
+
+    // ── 5. Process each item ──
 
     for (const item of items) {
       summary.items_processed++
@@ -298,10 +578,14 @@ export async function GET(request: NextRequest) {
       const leadBizDays = LEAD_WINDOWS[actionSize] ?? LEAD_WINDOWS.standard
       const leadStartDate = subtractBizDays(dueDate, leadBizDays)
 
+      const pursuit = pursuitById.get(item.pursuit_id)
       const ownerEmail =
         item.owner_email ??
-        pursuitById.get(item.pursuit_id)?.next_action_owner_email ??
+        pursuit?.next_action_owner_email ??
         null
+      const schoolName =
+        pursuit?.pursuit_name ?? pursuit?.district_name ?? 'your school'
+      const ownerFirstName = (item.owner_name ?? '').split(' ')[0] || 'there'
 
       const gate = gateByPursuit.get(item.pursuit_id)
       const effectiveLadder = buildEffectiveLadder(gate, ownerEmail)
@@ -321,6 +605,28 @@ export async function GET(request: NextRequest) {
 
       const updates: Record<string, unknown> = { color_state: color }
 
+      // ── WINDOW GATE — skip nudges/escalation if funding window is not confirmed open ──
+
+      const windowCheck = checkWindowGate(item, today)
+      if (!windowCheck.open) {
+        console.log(
+          LOG,
+          `[WINDOW] Skipped "${item.title}" — funding window not open ` +
+            `(status=${windowCheck.status}, closes=${windowCheck.closes ?? 'n/a'})`,
+        )
+        summary.window_skipped++
+
+        // Still write color_state, but skip all sending actions
+        const { error: updateErr } = await supabase
+          .from('funding_action_items')
+          .update(updates)
+          .eq('id', item.id)
+        if (updateErr) {
+          console.error(LOG, `Failed to update item ${item.id}:`, updateErr)
+        }
+        continue
+      }
+
       // ── REMINDERS (entering lead window, not yet reminded) ──
 
       if (color === 'yellow' && !item.reminder_first_at) {
@@ -334,6 +640,10 @@ export async function GET(request: NextRequest) {
 
         if (DRY_RUN) {
           console.log(LOG, `[DRY RUN] Would send reminder to ${targetEmail} for "${item.title}" (due ${dueDateStr})`)
+          summary.dry_run_skipped++
+        } else if (targetEmail && ALLOWLIST_ENABLED && !isOnAllowlist(targetEmail)) {
+          console.log(LOG, `[ALLOWLIST] Skipped ${targetEmail} — not on allowlist`)
+          summary.allowlist_skipped++
         } else if (targetEmail) {
           await sendFollowUpEmail({
             to: targetEmail,
@@ -342,7 +652,12 @@ export async function GET(request: NextRequest) {
             bizDaysOverdue: 0,
             rungLabel: 'owner',
             type: 'reminder',
+            tone: 'client',
+            contactName: ownerFirstName,
+            schoolName,
+            clientLabel: item.client_label,
           })
+          summary.sent++
         }
 
         summary.details.push({
@@ -384,6 +699,10 @@ export async function GET(request: NextRequest) {
 
           if (DRY_RUN) {
             console.log(LOG, `[DRY RUN] Would send nudge to ${targetEmail} for overdue "${item.title}"`)
+            summary.dry_run_skipped++
+          } else if (targetEmail && ALLOWLIST_ENABLED && !isOnAllowlist(targetEmail)) {
+            console.log(LOG, `[ALLOWLIST] Skipped ${targetEmail} — not on allowlist`)
+            summary.allowlist_skipped++
           } else if (targetEmail) {
             await sendFollowUpEmail({
               to: targetEmail,
@@ -392,7 +711,12 @@ export async function GET(request: NextRequest) {
               bizDaysOverdue,
               rungLabel: 'owner',
               type: 'nudge',
+              tone: 'client',
+              contactName: ownerFirstName,
+              schoolName,
+              clientLabel: item.client_label,
             })
+            summary.sent++
           }
 
           summary.details.push({
@@ -429,12 +753,17 @@ export async function GET(request: NextRequest) {
 
             summary.escalations_advanced++
 
+            const nextNextStep = effectiveLadder[1] ?? null
             if (DRY_RUN) {
               console.log(
                 LOG,
                 `[DRY RUN] Would escalate "${item.title}" → ${nextStep.rung} (${nextStep.email}), ` +
                   `${bizDaysOverdue} biz days overdue, window=${windowSize}`,
               )
+              summary.dry_run_skipped++
+            } else if (ALLOWLIST_ENABLED && !isOnAllowlist(nextStep.email)) {
+              console.log(LOG, `[ALLOWLIST] Skipped ${nextStep.email} — not on allowlist`)
+              summary.allowlist_skipped++
             } else {
               await sendFollowUpEmail({
                 to: nextStep.email,
@@ -443,7 +772,14 @@ export async function GET(request: NextRequest) {
                 bizDaysOverdue,
                 rungLabel: nextStep.rung,
                 type: 'escalation',
+                tone: toneForRung(nextStep.rung),
+                contactName: resolveContactName(nextStep, gate, item, ownerFirstName),
+                schoolName,
+                clientLabel: item.client_label,
+                submitterName: item.owner_name ?? ownerEmail ?? 'unknown',
+                nextRung: nextNextStep?.rung ?? 'none',
               })
+              summary.sent++
             }
 
             summary.details.push({
@@ -484,6 +820,7 @@ export async function GET(request: NextRequest) {
 
                 summary.escalations_advanced++
 
+                const advNextStep = findNextStep(effectiveLadder, nextStep.rung)
                 if (DRY_RUN) {
                   console.log(
                     LOG,
@@ -491,6 +828,10 @@ export async function GET(request: NextRequest) {
                       `(${nextStep.email}), ${bizDaysSinceEscalation} biz days since last escalation, ` +
                       `window=${windowSize}`,
                   )
+                  summary.dry_run_skipped++
+                } else if (ALLOWLIST_ENABLED && !isOnAllowlist(nextStep.email)) {
+                  console.log(LOG, `[ALLOWLIST] Skipped ${nextStep.email} — not on allowlist`)
+                  summary.allowlist_skipped++
                 } else {
                   await sendFollowUpEmail({
                     to: nextStep.email,
@@ -499,7 +840,14 @@ export async function GET(request: NextRequest) {
                     bizDaysOverdue,
                     rungLabel: nextStep.rung,
                     type: 'escalation',
+                    tone: toneForRung(nextStep.rung),
+                    contactName: resolveContactName(nextStep, gate, item, ownerFirstName),
+                    schoolName,
+                    clientLabel: item.client_label,
+                    submitterName: item.owner_name ?? ownerEmail ?? 'unknown',
+                    nextRung: advNextStep?.rung ?? 'none',
                   })
+                  summary.sent++
                 }
 
                 summary.details.push({
