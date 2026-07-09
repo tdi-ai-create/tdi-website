@@ -1,10 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import { OwnerAvatar, ownerName } from '../OwnerAvatar'
 
 interface OverviewTabProps {
   pursuit: any
   gate?: any
+  onGateUpdate?: (gate: any) => void
 }
 
 const GATE_ROLE_LABELS: Record<string, string> = {
@@ -13,20 +15,112 @@ const GATE_ROLE_LABELS: Record<string, string> = {
   admin_sponsor: 'Admin Sponsor',
 }
 
-export function OverviewTab({ pursuit, gate }: OverviewTabProps) {
+export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate }: OverviewTabProps) {
   const p = pursuit
   const eligibility = p.eligibility_snapshot || {}
   const hasContact = p.client_contact_name || p.client_contact_email || p.client_contact_phone || p.client_contact_role
+
+  const [gate, setGate] = useState<any>(initialGate ?? null)
+  const [editingGate, setEditingGate] = useState(false)
+  const [gateDraft, setGateDraft] = useState({
+    submitter_name: '', submitter_email: '',
+    backup_name: '', backup_email: '',
+    admin_sponsor_name: '', admin_sponsor_email: '',
+    gate_open: false,
+  })
+  const [savingGate, setSavingGate] = useState(false)
+
+  const startEditGate = () => {
+    setGateDraft({
+      submitter_name: gate?.submitter_name || '',
+      submitter_email: gate?.submitter_email || '',
+      backup_name: gate?.backup_name || '',
+      backup_email: gate?.backup_email || '',
+      admin_sponsor_name: gate?.admin_sponsor_name || '',
+      admin_sponsor_email: gate?.admin_sponsor_email || '',
+      gate_open: gate?.gate_open || false,
+    })
+    setEditingGate(true)
+  }
+
+  const saveGate = async () => {
+    setSavingGate(true)
+    const res = await fetch(`/api/funding/pursuits/${p.id}/gate`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(gateDraft),
+    })
+    const result = await res.json()
+    if (result.gate) {
+      setGate(result.gate)
+      onGateUpdate?.(result.gate)
+    }
+    setSavingGate(false)
+    setEditingGate(false)
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       {/* Escalation Gate */}
       <Section title="Escalation Gate">
-        {gate ? (
+        {editingGate ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: 16, background: '#F9FAFB', borderRadius: 10, border: '1px solid #E5E7EB' }}>
+            {(['submitter', 'backup', 'admin_sponsor'] as const).map(role => (
+              <div key={role}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>
+                  {GATE_ROLE_LABELS[role]}
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <input
+                    value={gateDraft[`${role}_name` as keyof typeof gateDraft] as string}
+                    onChange={e => setGateDraft({ ...gateDraft, [`${role}_name`]: e.target.value })}
+                    placeholder="Name"
+                    style={{ fontSize: 12, padding: '6px 10px', border: '1px solid #E5E7EB', borderRadius: 6, flex: 1 }}
+                  />
+                  <input
+                    value={gateDraft[`${role}_email` as keyof typeof gateDraft] as string}
+                    onChange={e => setGateDraft({ ...gateDraft, [`${role}_email`]: e.target.value })}
+                    placeholder="Email"
+                    style={{ fontSize: 12, padding: '6px 10px', border: '1px solid #E5E7EB', borderRadius: 6, flex: 1 }}
+                  />
+                </div>
+              </div>
+            ))}
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', marginTop: 4 }}>
+              <input
+                type="checkbox"
+                checked={gateDraft.gate_open}
+                onChange={e => setGateDraft({ ...gateDraft, gate_open: e.target.checked })}
+                style={{ accentColor: '#8B5CF6' }}
+              />
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>Gate satisfied (submitter + backup confirmed)</span>
+            </label>
+            <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+              <button
+                onClick={saveGate}
+                disabled={savingGate}
+                style={{
+                  fontSize: 12, fontWeight: 600, padding: '6px 16px', borderRadius: 6,
+                  border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer',
+                  opacity: savingGate ? 0.6 : 1,
+                }}
+              >
+                {savingGate ? 'Saving...' : 'Save gate'}
+              </button>
+              <button
+                onClick={() => setEditingGate(false)}
+                style={{
+                  fontSize: 12, padding: '6px 12px', borderRadius: 6,
+                  border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : gate ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4,
-            }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <div style={{
                 width: 8, height: 8, borderRadius: '50%',
                 background: gate.gate_open ? '#10B981' : '#DC2626',
@@ -34,11 +128,16 @@ export function OverviewTab({ pursuit, gate }: OverviewTabProps) {
               <span style={{ fontSize: 12, fontWeight: 700, color: gate.gate_open ? '#065F46' : '#991B1B' }}>
                 {gate.gate_open ? 'Gate satisfied' : 'Gate not satisfied'}
               </span>
-              {!gate.gate_open && (
-                <span style={{ fontSize: 11, color: '#9CA3AF' }}>
-                  — submission work should not proceed without a named backup
-                </span>
-              )}
+              <button
+                onClick={startEditGate}
+                style={{
+                  fontSize: 10, padding: '2px 8px', borderRadius: 4,
+                  border: '1px solid #E5E7EB', background: 'white', color: '#6B7280',
+                  cursor: 'pointer', marginLeft: 'auto',
+                }}
+              >
+                Edit
+              </button>
             </div>
             {['submitter', 'backup', 'admin_sponsor'].map(role => {
               const name = gate[`${role}_name`]
@@ -48,27 +147,35 @@ export function OverviewTab({ pursuit, gate }: OverviewTabProps) {
                 <div key={role} style={{
                   padding: '10px 14px', background: '#F9FAFB', borderRadius: 8,
                   borderLeft: `3px solid ${filled ? '#8B5CF6' : '#E5E7EB'}`,
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 }}>
-                  <div>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                      {GATE_ROLE_LABELS[role] || role}
-                    </div>
-                    {filled ? (
-                      <>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: '#0a0f1e', marginTop: 2 }}>{name || '—'}</div>
-                        {email && <div style={{ fontSize: 11, color: '#6B7280', marginTop: 1 }}>{email}</div>}
-                      </>
-                    ) : (
-                      <div style={{ fontSize: 12, color: '#D1D5DB', fontStyle: 'italic', marginTop: 2 }}>Not assigned</div>
-                    )}
+                  <div style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    {GATE_ROLE_LABELS[role] || role}
                   </div>
+                  {filled ? (
+                    <>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#0a0f1e', marginTop: 2 }}>{name || '—'}</div>
+                      {email && <div style={{ fontSize: 11, color: '#6B7280', marginTop: 1 }}>{email}</div>}
+                    </>
+                  ) : (
+                    <div style={{ fontSize: 12, color: '#D1D5DB', fontStyle: 'italic', marginTop: 2 }}>Not assigned</div>
+                  )}
                 </div>
               )
             })}
           </div>
         ) : (
-          <div style={{ fontSize: 13, color: '#9CA3AF', fontStyle: 'italic' }}>No gate configured for this pursuit</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 13, color: '#9CA3AF', fontStyle: 'italic' }}>No gate configured</span>
+            <button
+              onClick={startEditGate}
+              style={{
+                fontSize: 11, fontWeight: 600, padding: '4px 12px', borderRadius: 6,
+                border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer',
+              }}
+            >
+              Set up gate
+            </button>
+          </div>
         )}
       </Section>
 
