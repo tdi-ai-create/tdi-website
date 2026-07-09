@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { NudgePreviewModal } from './NudgePreviewModal'
 
 const CATEGORY_OPTIONS = ['research', 'writing', 'submission', 'follow_up', 'approval', 'documentation']
 
@@ -13,6 +14,7 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
   const [loading, setLoading] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
   const [newAction, setNewAction] = useState({ title: '', ownerType: 'tdi', dueDate: '', category: 'research' })
+  const [nudgeActionId, setNudgeActionId] = useState<string | null>(null)
 
   const fetchActions = () => {
     setLoading(true)
@@ -182,7 +184,7 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {clientActions.map(action => (
-              <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} isOverdue={isOverdue(action)} getDueDateColor={getDueDateColor} />
+              <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} isOverdue={isOverdue(action)} getDueDateColor={getDueDateColor} />
             ))}
           </div>
         )}
@@ -201,7 +203,7 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {tdiActions.map(action => (
-              <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} isOverdue={isOverdue(action)} getDueDateColor={getDueDateColor} />
+              <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} isOverdue={isOverdue(action)} getDueDateColor={getDueDateColor} />
             ))}
           </div>
         )}
@@ -218,10 +220,19 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {cancelledActions.map(action => (
-              <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} isOverdue={false} getDueDateColor={() => '#9CA3AF'} />
+              <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} isOverdue={false} getDueDateColor={() => '#9CA3AF'} />
             ))}
           </div>
         </div>
+      )}
+
+      {/* Nudge preview modal */}
+      {nudgeActionId && (
+        <NudgePreviewModal
+          actionId={nudgeActionId}
+          onClose={() => setNudgeActionId(null)}
+          onSent={() => { setNudgeActionId(null); fetchActions() }}
+        />
       )}
     </div>
   )
@@ -240,11 +251,12 @@ const RUNG_LABELS: Record<string, { label: string; bg: string; color: string }> 
   rae: { label: 'Rae', bg: '#FEE2E2', color: '#991B1B' },
 }
 
-function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, isOverdue, getDueDateColor }: {
+function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, isOverdue, getDueDateColor }: {
   action: any
   onToggle: (id: string, currentStatus: string) => void
   onCancel: (id: string, reason: string) => void
   onUpdateClientLabel: (id: string, label: string) => void
+  onNudge: (id: string) => void
   isOverdue: boolean
   getDueDateColor: (d: string | null) => string
 }) {
@@ -395,6 +407,19 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, isOverdue
               </span>
             ) : null
           })()}
+          {/* Send nudge button */}
+          {!isInactive && action.owner_email && (
+            <button
+              onClick={() => onNudge(action.id)}
+              style={{
+                fontSize: 9, fontWeight: 600, padding: '1px 6px', borderRadius: 3,
+                border: '1px solid #8B5CF6', background: '#F5F3FF', color: '#6D28D9',
+                cursor: 'pointer',
+              }}
+            >
+              Send nudge
+            </button>
+          )}
           {/* Cancel button */}
           {!isInactive && (
             <button
