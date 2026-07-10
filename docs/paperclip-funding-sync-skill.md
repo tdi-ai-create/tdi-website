@@ -233,14 +233,17 @@ curl -s -X POST \
 
 ### 3. Update Narrative
 
-Shortcut for updating narrative-specific fields on an opportunity.
+Shortcut for updating narrative-specific fields on an opportunity. Agents can now push the actual narrative text (`narrativeContent`) for inline reading in the portal, in addition to or instead of an external URL.
 
 | Field | Required | Description |
 |---|---|---|
 | `opportunityId` | YES | UUID of the opportunity |
-| `narrativeStatus` | no | One of: `drafting`, `review`, `ready` |
-| `narrativeUrl` | no | URL to the narrative document |
-| `note` | no | Note about the narrative update |
+| `narrativeStatus` | no | One of: `drafting`, `review`, `qa_review`, `ready` |
+| `narrativeUrl` | no | URL to the narrative document (external link) |
+| `narrativeContent` | no | Full narrative text for inline portal reading |
+| `note` | no | Note about the narrative update (logged to timeline) |
+
+**Narrative lifecycle:** `not_started` → `requested` → `drafting` → `review` → `qa_review` → `ready`. Agents set status up to `review`. QA reviewers pass/fail during `qa_review`. Only humans approve to `ready`. Agents must NEVER set `qa_review` or `ready`.
 
 ```bash
 curl -s -X POST \
@@ -252,7 +255,8 @@ curl -s -X POST \
     "opportunityId": "opp-789-xyz",
     "narrativeStatus": "review",
     "narrativeUrl": "https://docs.google.com/document/d/abc123",
-    "note": "First draft complete. Ready for Rae/Bella review."
+    "narrativeContent": "Teachers Deserve It delivers a multi-phase...",
+    "note": "First draft complete. Ready for QA review."
   }'
 ```
 

@@ -423,6 +423,7 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false }: OpportunitiesT
               gateOpen={gateOpen}
               onRequestDraft={(agent) => patchOpp(opp.id, { narrative_status: 'requested', assigned_agent: agent })}
               onApprove={() => patchOpp(opp.id, { narrative_status: 'ready' })}
+              onPatch={(fields) => patchOpp(opp.id, fields)}
             />
 
             {/* Research control */}
@@ -546,115 +547,215 @@ function DiversificationView({ opportunities }: { opportunities: any[] }) {
 
 // ── Narrative draft control ──
 
-function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove }: {
+function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onPatch }: {
   opp: any
   gateOpen: boolean
   onRequestDraft: (agent: string) => void
   onApprove: () => void
+  onPatch: (fields: Record<string, unknown>) => void
 }) {
   const [agentPick, setAgentPick] = useState(defaultAgent(opp.plan_category))
+  const [showContent, setShowContent] = useState(false)
+  const [qaReviewer, setQaReviewer] = useState(opp.qa_reviewer || '')
+  const [qaNotes, setQaNotes] = useState(opp.qa_notes || '')
+
   const ns = opp.narrative_status || 'not_started'
   const agent = opp.assigned_agent || ''
   const windowOpen = opp.window_status === 'open'
+  const hasContent = !!opp.narrative_content
+  const hasUrl = !!opp.narrative_url
+  const showReader = ['review', 'qa_review', 'ready'].includes(ns) && hasContent
+
+  const handleQaPass = () => {
+    onPatch({ narrative_status: 'qa_review', qa_passed: true, qa_reviewer: qaReviewer, qa_notes: qaNotes })
+  }
+
+  const handleQaFail = () => {
+    onPatch({ narrative_status: 'drafting', qa_passed: false, qa_reviewer: qaReviewer, qa_notes: qaNotes })
+  }
 
   return (
     <div style={{
-      marginTop: 8, padding: '8px 10px', background: '#FAFAFA',
+      marginTop: 8, padding: '10px 12px', background: '#FAFAFA',
       borderRadius: 6, border: '1px solid #F3F4F6',
-      display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
+      display: 'flex', flexDirection: 'column', gap: 8,
     }}>
-      <span style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-        Narrative
-      </span>
-
-      {(ns === 'not_started' || ns === 'ready') && (
-        <>
-          <select
-            value={agentPick}
-            onChange={e => setAgentPick(e.target.value)}
-            style={{
-              fontSize: 10, padding: '2px 4px', border: '1px solid #E5E7EB',
-              borderRadius: 4, background: 'white', cursor: 'pointer',
-            }}
-          >
-            {AGENT_OPTIONS.map(a => (
-              <option key={a.value} value={a.value}>{a.label}</option>
-            ))}
-          </select>
-          <button
-            onClick={() => onRequestDraft(agentPick)}
-            style={{
-              fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4,
-              border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer',
-            }}
-          >
-            {ns === 'ready' ? 'Request new draft' : 'Request draft'}
-          </button>
-          {ns === 'ready' && (
-            <span style={{ fontSize: 10, fontWeight: 600, color: '#10B981' }}>Approved</span>
-          )}
-        </>
-      )}
-
-      {ns === 'requested' && (
-        <>
-          <span style={{
-            fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
-            background: '#FEF3C7', color: '#92400E',
-          }}>
-            Draft requested — waiting for {agent || 'agent'}
-          </span>
-          {(!windowOpen || !gateOpen) && (
-            <span style={{ fontSize: 9, color: '#9CA3AF', fontStyle: 'italic' }}>
-              {!gateOpen && !windowOpen
-                ? 'Draft won\'t start until the alignment gate is satisfied and the funding window is verified open'
-                : !gateOpen
-                  ? 'Draft won\'t start until the alignment gate is satisfied (contracts signed + submitter/backup/sponsor named)'
-                  : 'Draft won\'t start until the funding window is verified open'
-              }
-            </span>
-          )}
-        </>
-      )}
-
-      {ns === 'drafting' && (
-        <span style={{
-          fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
-          background: '#DBEAFE', color: '#1D4ED8',
-        }}>
-          {agent || 'Agent'} is drafting...
+      {/* Header row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          Narrative
         </span>
+
+        {/* ── not_started / ready: request draft ── */}
+        {(ns === 'not_started' || ns === 'ready') && (
+          <>
+            <select
+              value={agentPick}
+              onChange={e => setAgentPick(e.target.value)}
+              style={{ fontSize: 10, padding: '2px 4px', border: '1px solid #E5E7EB', borderRadius: 4, background: 'white', cursor: 'pointer' }}
+            >
+              {AGENT_OPTIONS.map(a => <option key={a.value} value={a.value}>{a.label}</option>)}
+            </select>
+            <button onClick={() => onRequestDraft(agentPick)} style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4, border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer' }}>
+              {ns === 'ready' ? 'Request new draft' : 'Request draft'}
+            </button>
+            {ns === 'ready' && <span style={{ fontSize: 10, fontWeight: 600, color: '#10B981' }}>Approved</span>}
+          </>
+        )}
+
+        {/* ── requested ── */}
+        {ns === 'requested' && (
+          <>
+            <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#FEF3C7', color: '#92400E' }}>
+              Draft requested — waiting for {agent || 'agent'}
+            </span>
+            {(!windowOpen || !gateOpen) && (
+              <span style={{ fontSize: 9, color: '#9CA3AF', fontStyle: 'italic' }}>
+                {!gateOpen && !windowOpen
+                  ? 'Draft won\'t start until the alignment gate is satisfied and the funding window is verified open'
+                  : !gateOpen ? 'Draft won\'t start until the alignment gate is satisfied'
+                  : 'Draft won\'t start until the funding window is verified open'}
+              </span>
+            )}
+          </>
+        )}
+
+        {/* ── drafting ── */}
+        {ns === 'drafting' && (
+          <>
+            <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#DBEAFE', color: '#1D4ED8' }}>
+              {agent || 'Agent'} is drafting...
+            </span>
+            {/* Show QA feedback if returning from a fail */}
+            {opp.qa_passed === false && opp.qa_notes && (
+              <span style={{ fontSize: 9, color: '#DC2626', fontStyle: 'italic' }}>
+                QA feedback: {opp.qa_notes}
+              </span>
+            )}
+          </>
+        )}
+
+        {/* ── review: send to QA ── */}
+        {ns === 'review' && (
+          <>
+            <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#FEF3C7', color: '#92400E' }}>
+              Draft ready — needs QA
+            </span>
+            {hasUrl && (
+              <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: 10, color: '#8B5CF6', textDecoration: 'underline' }}>
+                Open external
+              </a>
+            )}
+            {hasContent && (
+              <button onClick={() => setShowContent(!showContent)} style={{ fontSize: 9, padding: '1px 6px', borderRadius: 3, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>
+                {showContent ? 'Hide' : 'Read inline'}
+              </button>
+            )}
+            <button onClick={() => onPatch({ narrative_status: 'qa_review' })} style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4, border: 'none', background: '#F59E0B', color: 'white', cursor: 'pointer' }}>
+              Send to QA
+            </button>
+          </>
+        )}
+
+        {/* ── qa_review: QA pass/fail ── */}
+        {ns === 'qa_review' && (
+          <>
+            <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#EDE9FE', color: '#6D28D9' }}>
+              In QA review
+            </span>
+            {hasUrl && (
+              <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: 10, color: '#8B5CF6', textDecoration: 'underline' }}>
+                Open external
+              </a>
+            )}
+            {hasContent && (
+              <button onClick={() => setShowContent(!showContent)} style={{ fontSize: 9, padding: '1px 6px', borderRadius: 3, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>
+                {showContent ? 'Hide' : 'Read inline'}
+              </button>
+            )}
+            {opp.qa_passed === true && (
+              <button onClick={onApprove} style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4, border: 'none', background: '#10B981', color: 'white', cursor: 'pointer' }}>
+                Approve (QA passed)
+              </button>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* ── Inline narrative reader ── */}
+      {showReader && showContent && (
+        <div style={{
+          padding: '12px 14px', background: 'white', border: '1px solid #E5E7EB',
+          borderRadius: 8, maxHeight: 300, overflowY: 'auto',
+          fontSize: 13, color: '#374151', lineHeight: 1.7, whiteSpace: 'pre-wrap',
+        }}>
+          {opp.narrative_content}
+        </div>
       )}
 
-      {ns === 'review' && (
-        <>
-          <span style={{
-            fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
-            background: '#FEF3C7', color: '#92400E',
-          }}>
-            Draft ready — review
-          </span>
-          {opp.narrative_url && (
-            <a
-              href={opp.narrative_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={e => e.stopPropagation()}
-              style={{ fontSize: 10, color: '#8B5CF6', textDecoration: 'underline' }}
+      {/* ── Inline reader fallback: URL only ── */}
+      {['review', 'qa_review', 'ready'].includes(ns) && !hasContent && hasUrl && !showContent && (
+        <div style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>
+          No inline content — <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" style={{ color: '#8B5CF6' }}>open external document</a>
+        </div>
+      )}
+
+      {/* ── QA panel (shown during qa_review when QA hasn't passed yet) ── */}
+      {ns === 'qa_review' && opp.qa_passed !== true && (
+        <div style={{
+          padding: '10px 14px', background: '#F5F3FF', border: '1px solid #DDD6FE',
+          borderRadius: 8, display: 'flex', flexDirection: 'column', gap: 8,
+        }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#6D28D9', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            QA Review
+          </div>
+          <input
+            value={qaReviewer}
+            onChange={e => setQaReviewer(e.target.value)}
+            placeholder="Reviewer name (e.g. Julie)"
+            style={{ fontSize: 12, padding: '6px 10px', border: '1px solid #E5E7EB', borderRadius: 6 }}
+          />
+          <textarea
+            value={qaNotes}
+            onChange={e => setQaNotes(e.target.value)}
+            placeholder="QA notes (required for fail, optional for pass)"
+            rows={3}
+            style={{ fontSize: 12, padding: '6px 10px', border: '1px solid #E5E7EB', borderRadius: 6, resize: 'vertical' }}
+          />
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={handleQaPass}
+              disabled={!qaReviewer}
+              style={{
+                fontSize: 11, fontWeight: 600, padding: '5px 14px', borderRadius: 6,
+                border: 'none', background: qaReviewer ? '#10B981' : '#D1D5DB',
+                color: 'white', cursor: qaReviewer ? 'pointer' : 'default',
+              }}
             >
-              Open draft
-            </a>
-          )}
-          <button
-            onClick={onApprove}
-            style={{
-              fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4,
-              border: 'none', background: '#10B981', color: 'white', cursor: 'pointer',
-            }}
-          >
-            Approve
-          </button>
-        </>
+              Pass
+            </button>
+            <button
+              onClick={handleQaFail}
+              disabled={!qaReviewer || !qaNotes}
+              style={{
+                fontSize: 11, fontWeight: 600, padding: '5px 14px', borderRadius: 6,
+                border: 'none', background: (qaReviewer && qaNotes) ? '#DC2626' : '#D1D5DB',
+                color: 'white', cursor: (qaReviewer && qaNotes) ? 'pointer' : 'default',
+              }}
+            >
+              Fail (return to drafting)
+            </button>
+          </div>
+          {!qaReviewer && <div style={{ fontSize: 9, color: '#9CA3AF' }}>Enter reviewer name to enable pass/fail</div>}
+          {qaReviewer && !qaNotes && <div style={{ fontSize: 9, color: '#9CA3AF' }}>Notes required to fail — agent needs feedback</div>}
+        </div>
+      )}
+
+      {/* QA passed confirmation */}
+      {ns === 'qa_review' && opp.qa_passed === true && (
+        <div style={{ fontSize: 11, color: '#065F46', background: '#D1FAE5', padding: '6px 10px', borderRadius: 6 }}>
+          QA passed{opp.qa_reviewer ? ` by ${opp.qa_reviewer}` : ''}{opp.qa_notes ? ` — ${opp.qa_notes}` : ''}. Ready for final approval.
+        </div>
       )}
     </div>
   )

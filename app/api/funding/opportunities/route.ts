@@ -102,7 +102,8 @@ export async function PATCH(request: NextRequest) {
     'last_action', 'last_action_date', 'next_action', 'next_action_due',
     // New fields from migration 093
     'application_opens', 'application_closes', 'plan_category',
-    'waiting_on', 'narrative_status', 'narrative_url', 'forwarding_email_status',
+    'waiting_on', 'narrative_status', 'narrative_url', 'narrative_content',
+    'qa_reviewer', 'qa_notes', 'qa_passed', 'forwarding_email_status',
     'client_submitted', 'client_submitted_proof',
     'decision_date', 'awarded_amount', 'denial_reason',
     'window_status', 'window_opens', 'window_closes',

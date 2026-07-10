@@ -288,7 +288,7 @@ export async function POST(request: NextRequest) {
   // ---- UPDATE NARRATIVE ----
   // Shortcut for the common case: agent drafted/reviewed a narrative
   if (action === 'update_narrative') {
-    const { opportunityId, narrativeStatus, narrativeUrl, note } = body
+    const { opportunityId, narrativeStatus, narrativeUrl, narrativeContent, note } = body
     if (!opportunityId) return NextResponse.json({ error: 'opportunityId required' }, { status: 400 })
 
     const updates: Record<string, unknown> = {
@@ -297,6 +297,7 @@ export async function POST(request: NextRequest) {
     }
     if (narrativeStatus) updates.narrative_status = narrativeStatus
     if (narrativeUrl) updates.narrative_url = narrativeUrl
+    if (narrativeContent !== undefined) updates.narrative_content = narrativeContent
 
     const { error } = await supabase
       .from('funding_opportunities')
@@ -316,6 +317,7 @@ export async function POST(request: NextRequest) {
       const statusLabels: Record<string, string> = {
         drafting: 'Narrative draft started',
         review: 'Narrative ready for review',
+        qa_review: 'Narrative in QA review',
         ready: 'Narrative approved and ready',
       }
       await supabase.from('funding_pursuit_timeline').insert({
