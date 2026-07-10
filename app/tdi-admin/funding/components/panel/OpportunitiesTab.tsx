@@ -34,6 +34,12 @@ const NARRATIVE_COLORS: Record<string, string> = {
   backup: '#6B7280',
 }
 
+// Agent defaults by plan category
+function defaultAgent(planCategory: string | null): string {
+  const cat = (planCategory || '').toUpperCase()
+  return (cat === 'A' || cat === 'B') ? 'vanessa' : 'amara'
+}
+
 interface OpportunitiesTabProps {
   pursuitId: string
 }
@@ -83,6 +89,16 @@ export function OpportunitiesTab({ pursuitId }: OpportunitiesTabProps) {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, window_status: windowStatus }),
+    })
+    fetchOpps()
+  }
+
+  const patchOpp = async (id: string, fields: Record<string, unknown>) => {
+    setOpportunities(prev => prev.map(o => o.id === id ? { ...o, ...fields } : o))
+    await fetch('/api/funding/opportunities', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ...fields }),
     })
     fetchOpps()
   }
@@ -257,6 +273,19 @@ export function OpportunitiesTab({ pursuitId }: OpportunitiesTabProps) {
             {opp.contact_name && (
               <div style={{ fontSize: 11, color: '#6B7280', marginTop: 6 }}>Contact: {opp.contact_name}</div>
             )}
+
+            {/* ── Agent trigger: narrative draft ── */}
+            <NarrativeControl
+              opp={opp}
+              onRequestDraft={(agent) => patchOpp(opp.id, { narrative_status: 'requested', assigned_agent: agent })}
+              onApprove={() => patchOpp(opp.id, { narrative_status: 'ready' })}
+            />
+
+            {/* ── Agent trigger: research funders ── */}
+            <ResearchControl
+              opp={opp}
+              onRequest={() => patchOpp(opp.id, { research_status: 'requested', assigned_agent: defaultAgent(opp.plan_category) })}
+            />
           </div>
         )
       })}
@@ -265,6 +294,171 @@ export function OpportunitiesTab({ pursuitId }: OpportunitiesTabProps) {
         <div style={{ textAlign: 'center', padding: 24, color: '#9CA3AF', fontSize: 13 }}>
           No opportunities yet. Click "+ Add Opportunity" to get started.
         </div>
+      )}
+    </div>
+  )
+}
+
+// ── Narrative draft control ──
+
+const AGENT_OPTIONS = [
+  { value: 'vanessa', label: 'Vanessa (federal/state)' },
+  { value: 'amara', label: 'Amara (local/foundation)' },
+]
+
+function NarrativeControl({ opp, onRequestDraft, onApprove }: {
+  opp: any
+  onRequestDraft: (agent: string) => void
+  onApprove: () => void
+}) {
+  const [agentPick, setAgentPick] = useState(defaultAgent(opp.plan_category))
+  const ns = opp.narrative_status || 'not_started'
+  const agent = opp.assigned_agent || ''
+  const windowOpen = opp.window_status === 'open'
+
+  return (
+    <div style={{
+      marginTop: 8, padding: '8px 10px', background: '#FAFAFA',
+      borderRadius: 6, border: '1px solid #F3F4F6',
+      display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
+    }}>
+      <span style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+        Narrative
+      </span>
+
+      {(ns === 'not_started' || ns === 'ready') && (
+        <>
+          <select
+            value={agentPick}
+            onChange={e => setAgentPick(e.target.value)}
+            style={{
+              fontSize: 10, padding: '2px 4px', border: '1px solid #E5E7EB',
+              borderRadius: 4, background: 'white', cursor: 'pointer',
+            }}
+          >
+            {AGENT_OPTIONS.map(a => (
+              <option key={a.value} value={a.value}>{a.label}</option>
+            ))}
+          </select>
+          <button
+            onClick={() => onRequestDraft(agentPick)}
+            style={{
+              fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4,
+              border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer',
+            }}
+          >
+            {ns === 'ready' ? 'Request new draft' : 'Request draft'}
+          </button>
+          {ns === 'ready' && (
+            <span style={{ fontSize: 10, fontWeight: 600, color: '#10B981' }}>Approved</span>
+          )}
+        </>
+      )}
+
+      {ns === 'requested' && (
+        <>
+          <span style={{
+            fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
+            background: '#FEF3C7', color: '#92400E',
+          }}>
+            Draft requested — waiting for {agent || 'agent'}
+          </span>
+          {!windowOpen && (
+            <span style={{ fontSize: 9, color: '#9CA3AF', fontStyle: 'italic' }}>
+              Draft won't start until the funding window is verified open
+            </span>
+          )}
+        </>
+      )}
+
+      {ns === 'drafting' && (
+        <span style={{
+          fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
+          background: '#DBEAFE', color: '#1D4ED8',
+        }}>
+          {agent || 'Agent'} is drafting...
+        </span>
+      )}
+
+      {ns === 'review' && (
+        <>
+          <span style={{
+            fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
+            background: '#FEF3C7', color: '#92400E',
+          }}>
+            Draft ready — review
+          </span>
+          {opp.narrative_url && (
+            <a
+              href={opp.narrative_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              style={{ fontSize: 10, color: '#8B5CF6', textDecoration: 'underline' }}
+            >
+              Open draft
+            </a>
+          )}
+          <button
+            onClick={onApprove}
+            style={{
+              fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4,
+              border: 'none', background: '#10B981', color: 'white', cursor: 'pointer',
+            }}
+          >
+            Approve
+          </button>
+        </>
+      )}
+    </div>
+  )
+}
+
+// ── Research funders control ──
+
+function ResearchControl({ opp, onRequest }: {
+  opp: any
+  onRequest: () => void
+}) {
+  const rs = opp.research_status || null
+  const agent = opp.assigned_agent || ''
+
+  // Only show for opportunities that aren't already awarded/denied
+  if (['awarded', 'denied'].includes(opp.status)) return null
+
+  return (
+    <div style={{
+      marginTop: 4, display: 'flex', alignItems: 'center', gap: 8,
+    }}>
+      {(!rs || rs === 'complete') && (
+        <button
+          onClick={onRequest}
+          style={{
+            fontSize: 9, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
+            border: '1px solid #E5E7EB', background: 'white', color: '#6B7280',
+            cursor: 'pointer',
+          }}
+        >
+          Find more funders
+        </button>
+      )}
+
+      {rs === 'requested' && (
+        <span style={{
+          fontSize: 9, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
+          background: '#F3F4F6', color: '#6B7280',
+        }}>
+          Research requested — {agent || 'amara'}
+        </span>
+      )}
+
+      {rs === 'in_progress' && (
+        <span style={{
+          fontSize: 9, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
+          background: '#DBEAFE', color: '#1D4ED8',
+        }}>
+          {agent || 'Agent'} researching...
+        </span>
       )}
     </div>
   )
