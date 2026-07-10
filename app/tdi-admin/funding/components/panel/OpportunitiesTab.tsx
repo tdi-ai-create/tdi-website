@@ -438,6 +438,15 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false }: OpportunitiesT
               gateOpen={gateOpen}
               onPatch={(fields) => patchOpp(opp.id, fields)}
             />
+
+            {/* Outcome + allocation (post-decision) */}
+            <OutcomePanel
+              opp={opp}
+              onPatch={(fields) => patchOpp(opp.id, fields)}
+            />
+            {opp.status === 'awarded' && (
+              <AllocationPanel opp={opp} pursuitId={pursuitId} />
+            )}
           </div>
         )
       })}
@@ -1018,6 +1027,278 @@ function SubmissionPanel({ opp, gateOpen, onPatch }: {
             )}
           </div>
         </div>
+      )}
+    </div>
+  )
+}
+
+// ── Outcome panel (record award/denial) ──
+
+function OutcomePanel({ opp, onPatch }: { opp: any; onPatch: (fields: Record<string, unknown>) => void }) {
+  const [mode, setMode] = useState<'idle' | 'award' | 'deny'>('idle')
+  const [awardedAmt, setAwardedAmt] = useState(String(opp.amount || ''))
+  const [decisionDate, setDecisionDate] = useState(new Date().toISOString().split('T')[0])
+  const [denialReason, setDenialReason] = useState('')
+
+  // Already decided — show the outcome
+  if (opp.status === 'awarded') {
+    return (
+      <div style={{ marginTop: 8, padding: '8px 12px', background: '#D1FAE5', borderRadius: 6, border: '1px solid #6EE7B7', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#065F46', textTransform: 'uppercase', letterSpacing: 0.5 }}>Awarded</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: '#065F46' }}>
+          ${(opp.awarded_amount ?? opp.amount ?? 0).toLocaleString()}
+        </span>
+        {opp.decision_date && (
+          <span style={{ fontSize: 10, color: '#065F46' }}>
+            on {new Date(opp.decision_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+          </span>
+        )}
+        <button onClick={() => onPatch({ status: 'waiting', awarded_amount: null, decision_date: null })} style={{ fontSize: 9, padding: '1px 6px', borderRadius: 3, border: '1px solid #6EE7B7', background: 'white', color: '#065F46', cursor: 'pointer', marginLeft: 'auto' }}>
+          Correct
+        </button>
+      </div>
+    )
+  }
+
+  if (opp.status === 'denied') {
+    return (
+      <div style={{ marginTop: 8, padding: '8px 12px', background: '#FEF2F2', borderRadius: 6, border: '1px solid #FECACA', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#991B1B', textTransform: 'uppercase', letterSpacing: 0.5 }}>Denied</span>
+        {opp.decision_date && (
+          <span style={{ fontSize: 10, color: '#991B1B' }}>
+            on {new Date(opp.decision_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+          </span>
+        )}
+        {opp.denial_reason && <span style={{ fontSize: 11, color: '#991B1B', fontStyle: 'italic' }}>{opp.denial_reason}</span>}
+        <button onClick={() => onPatch({ status: 'waiting', denial_reason: null, decision_date: null })} style={{ fontSize: 9, padding: '1px 6px', borderRadius: 3, border: '1px solid #FECACA', background: 'white', color: '#991B1B', cursor: 'pointer', marginLeft: 'auto' }}>
+          Correct
+        </button>
+      </div>
+    )
+  }
+
+  // Not yet decided — show record buttons or form
+  if (!['applied', 'waiting', 'submitted'].includes(opp.status) && opp.status !== 'stalled') return null
+
+  return (
+    <div style={{ marginTop: 8, padding: '10px 12px', background: '#FAFAFA', borderRadius: 6, border: '1px solid #F3F4F6', display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5 }}>Outcome</span>
+        {mode === 'idle' && (
+          <>
+            <button onClick={() => { setAwardedAmt(String(opp.amount || '')); setMode('award') }} style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4, border: 'none', background: '#10B981', color: 'white', cursor: 'pointer' }}>
+              Record award
+            </button>
+            <button onClick={() => setMode('deny')} style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4, border: 'none', background: '#DC2626', color: 'white', cursor: 'pointer' }}>
+              Record denial
+            </button>
+          </>
+        )}
+      </div>
+
+      {mode === 'award' && (
+        <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+          <div>
+            <label style={{ fontSize: 9, color: '#6B7280', display: 'block', marginBottom: 2 }}>Awarded amount ($)</label>
+            <input type="number" value={awardedAmt} onChange={e => setAwardedAmt(e.target.value)} style={{ fontSize: 12, padding: '5px 8px', border: '1px solid #E5E7EB', borderRadius: 4, width: 120 }} />
+          </div>
+          <div>
+            <label style={{ fontSize: 9, color: '#6B7280', display: 'block', marginBottom: 2 }}>Decision date</label>
+            <input type="date" value={decisionDate} onChange={e => setDecisionDate(e.target.value)} style={{ fontSize: 12, padding: '5px 8px', border: '1px solid #E5E7EB', borderRadius: 4 }} />
+          </div>
+          <button onClick={() => { onPatch({ status: 'awarded', awarded_amount: parseFloat(awardedAmt) || 0, decision_date: decisionDate }); setMode('idle') }} style={{ fontSize: 10, fontWeight: 600, padding: '5px 12px', borderRadius: 4, border: 'none', background: '#10B981', color: 'white', cursor: 'pointer' }}>
+            Confirm award
+          </button>
+          <button onClick={() => setMode('idle')} style={{ fontSize: 10, padding: '5px 8px', borderRadius: 4, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>
+            Cancel
+          </button>
+          {awardedAmt && parseFloat(awardedAmt) < (opp.amount || 0) && (
+            <span style={{ fontSize: 9, color: '#D97706' }}>Partial award (requested ${(opp.amount || 0).toLocaleString()})</span>
+          )}
+        </div>
+      )}
+
+      {mode === 'deny' && (
+        <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ fontSize: 9, color: '#6B7280', display: 'block', marginBottom: 2 }}>Reason</label>
+            <input value={denialReason} onChange={e => setDenialReason(e.target.value)} placeholder="e.g. Not eligible, underfunded cycle" style={{ fontSize: 12, padding: '5px 8px', border: '1px solid #E5E7EB', borderRadius: 4, width: '100%' }} />
+          </div>
+          <div>
+            <label style={{ fontSize: 9, color: '#6B7280', display: 'block', marginBottom: 2 }}>Decision date</label>
+            <input type="date" value={decisionDate} onChange={e => setDecisionDate(e.target.value)} style={{ fontSize: 12, padding: '5px 8px', border: '1px solid #E5E7EB', borderRadius: 4 }} />
+          </div>
+          <button onClick={() => { onPatch({ status: 'denied', denial_reason: denialReason, decision_date: decisionDate }); setMode('idle') }} style={{ fontSize: 10, fontWeight: 600, padding: '5px 12px', borderRadius: 4, border: 'none', background: '#DC2626', color: 'white', cursor: 'pointer' }}>
+            Confirm denial
+          </button>
+          <button onClick={() => setMode('idle')} style={{ fontSize: 10, padding: '5px 8px', borderRadius: 4, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>
+            Cancel
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Allocation panel (map award to line items + handoff) ──
+
+const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
+  allocated: { bg: '#DBEAFE', color: '#1D4ED8' },
+  delivered: { bg: '#FEF3C7', color: '#92400E' },
+  invoiced: { bg: '#D1FAE5', color: '#065F46' },
+}
+
+function AllocationPanel({ opp, pursuitId }: { opp: any; pursuitId: string }) {
+  const [allocations, setAllocations] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showAdd, setShowAdd] = useState(false)
+  const [newLabel, setNewLabel] = useState('')
+  const [newAmount, setNewAmount] = useState('')
+
+  const fetchAllocations = () => {
+    fetch(`/api/funding/allocations?opportunityId=${opp.id}`)
+      .then(r => r.json())
+      .then(d => { setAllocations(d.allocations || []); setLoading(false) })
+      .catch(() => setLoading(false))
+  }
+
+  useEffect(() => { fetchAllocations() }, [opp.id])
+
+  const awardedAmt = opp.awarded_amount ?? opp.amount ?? 0
+  const allocatedTotal = allocations.reduce((sum: number, a: any) => sum + (a.allocated_amount || 0), 0)
+  const remaining = awardedAmt - allocatedTotal
+
+  const handleAdd = async () => {
+    await fetch('/api/funding/allocations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pursuitId,
+        opportunityId: opp.id,
+        lineItemKey: newLabel,
+        allocatedAmount: parseFloat(newAmount) || 0,
+      }),
+    })
+    setNewLabel('')
+    setNewAmount('')
+    setShowAdd(false)
+    fetchAllocations()
+  }
+
+  const handleHandoff = async (id: string, type: 'trainer' | 'finance') => {
+    await fetch('/api/funding/allocations', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ...(type === 'trainer' ? { handToTrainer: true } : { handToFinance: true }) }),
+    })
+    fetchAllocations()
+  }
+
+  const handleDelete = async (id: string) => {
+    await fetch('/api/funding/allocations', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+    fetchAllocations()
+  }
+
+  if (loading) return null
+
+  return (
+    <div style={{ marginTop: 8, padding: '10px 12px', background: '#FAFAFA', borderRadius: 6, border: '1px solid #F3F4F6', display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {/* Header with totals */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5 }}>Allocations</span>
+        <span style={{ fontSize: 11, color: '#374151' }}>
+          ${awardedAmt.toLocaleString()} awarded
+        </span>
+        <span style={{ fontSize: 11, color: '#1D4ED8', fontWeight: 600 }}>
+          ${allocatedTotal.toLocaleString()} allocated
+        </span>
+        {remaining > 0 && (
+          <span style={{ fontSize: 11, color: '#D97706', fontWeight: 600 }}>
+            ${remaining.toLocaleString()} to allocate
+          </span>
+        )}
+        {remaining === 0 && allocations.length > 0 && (
+          <span style={{ fontSize: 10, color: '#065F46', fontWeight: 600 }}>Fully allocated</span>
+        )}
+        <button onClick={() => setShowAdd(!showAdd)} style={{ fontSize: 9, fontWeight: 600, padding: '2px 8px', borderRadius: 4, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer', marginLeft: 'auto' }}>
+          {showAdd ? 'Cancel' : '+ Allocate'}
+        </button>
+      </div>
+
+      {/* Progress bar */}
+      {awardedAmt > 0 && (
+        <div style={{ height: 4, background: '#E5E7EB', borderRadius: 2, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${Math.min((allocatedTotal / awardedAmt) * 100, 100)}%`, background: remaining <= 0 ? '#10B981' : '#3B82F6', borderRadius: 2, transition: 'width 0.2s' }} />
+        </div>
+      )}
+
+      {/* Add form */}
+      {showAdd && (
+        <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ fontSize: 9, color: '#6B7280', display: 'block', marginBottom: 2 }}>Line item</label>
+            <input value={newLabel} onChange={e => setNewLabel(e.target.value)} placeholder="e.g. On-Campus Observation Visit" style={{ fontSize: 12, padding: '5px 8px', border: '1px solid #E5E7EB', borderRadius: 4, width: '100%' }} />
+          </div>
+          <div>
+            <label style={{ fontSize: 9, color: '#6B7280', display: 'block', marginBottom: 2 }}>Amount ($)</label>
+            <input type="number" value={newAmount} onChange={e => setNewAmount(e.target.value)} placeholder={String(remaining)} style={{ fontSize: 12, padding: '5px 8px', border: '1px solid #E5E7EB', borderRadius: 4, width: 100 }} />
+          </div>
+          <button onClick={handleAdd} disabled={!newLabel || !newAmount} style={{ fontSize: 10, fontWeight: 600, padding: '5px 12px', borderRadius: 4, border: 'none', background: (newLabel && newAmount) ? '#8B5CF6' : '#D1D5DB', color: 'white', cursor: (newLabel && newAmount) ? 'pointer' : 'default' }}>
+            Add
+          </button>
+        </div>
+      )}
+
+      {/* Allocation rows */}
+      {allocations.map((alloc: any) => {
+        const st = alloc.line_item_status || 'allocated'
+        const stStyle = STATUS_COLORS[st] || STATUS_COLORS.allocated
+        return (
+          <div key={alloc.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'white', borderRadius: 6, border: '1px solid #F3F4F6' }}>
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#0a0f1e', flex: 1 }}>{alloc.line_item_key}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#0a0f1e' }}>${(alloc.allocated_amount || 0).toLocaleString()}</span>
+            <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: stStyle.bg, color: stStyle.color }}>
+              {st}
+            </span>
+
+            {/* Handoff buttons */}
+            {st === 'allocated' && (
+              <button onClick={() => handleHandoff(alloc.id, 'trainer')} title="Hand to trainer (delivery)" style={{ fontSize: 9, padding: '2px 6px', borderRadius: 3, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>
+                Deliver
+              </button>
+            )}
+            {st === 'delivered' && (
+              <>
+                <span style={{ fontSize: 9, color: '#6B7280' }}>
+                  {alloc.handed_to_trainer_at ? new Date(alloc.handed_to_trainer_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}
+                </span>
+                <button onClick={() => handleHandoff(alloc.id, 'finance')} title="Hand to finance (invoicing)" style={{ fontSize: 9, padding: '2px 6px', borderRadius: 3, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>
+                  Invoice
+                </button>
+              </>
+            )}
+            {st === 'invoiced' && (
+              <span style={{ fontSize: 9, color: '#065F46' }}>
+                {alloc.handed_to_finance_at ? new Date(alloc.handed_to_finance_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}
+              </span>
+            )}
+
+            {/* Delete (only if allocated, not yet handed off) */}
+            {st === 'allocated' && (
+              <button onClick={() => handleDelete(alloc.id)} style={{ fontSize: 9, padding: '1px 4px', borderRadius: 3, border: '1px solid #E5E7EB', background: 'white', color: '#D1D5DB', cursor: 'pointer' }}>
+                x
+              </button>
+            )}
+          </div>
+        )
+      })}
+
+      {allocations.length === 0 && !showAdd && (
+        <div style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>No allocations yet — click "+ Allocate" to map award to line items</div>
       )}
     </div>
   )
