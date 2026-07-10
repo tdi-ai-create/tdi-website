@@ -66,6 +66,11 @@ export async function POST(request: NextRequest) {
       plan_category: body.planCategory || null,
       waiting_on: body.waitingOn || 'tdi',
       narrative_status: body.narrativeStatus || 'not_started',
+      window_status: body.windowStatus || 'unknown',
+      window_opens: body.windowOpens || null,
+      window_closes: body.windowCloses || null,
+      internal_deadline: body.internalDeadline || null,
+      award_needed_by: body.awardNeededBy || null,
     })
     .select()
     .single();
@@ -101,6 +106,7 @@ export async function PATCH(request: NextRequest) {
     'client_submitted', 'client_submitted_proof',
     'decision_date', 'awarded_amount', 'denial_reason',
     'window_status', 'window_opens', 'window_closes',
+    'internal_deadline', 'award_needed_by',
     'assigned_agent', 'research_status',
   ];
   fields.forEach(f => { if (body[f] !== undefined) updates[f] = body[f]; });
