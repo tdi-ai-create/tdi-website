@@ -33,6 +33,7 @@ function authorize(request: NextRequest): boolean {
 type SyncAction =
   | 'find_pursuit'
   | 'get_pursuit'
+  | 'find_work'
   | 'create_opportunity'
   | 'update_opportunity'
   | 'create_action'
@@ -83,6 +84,70 @@ export async function GET(request: NextRequest) {
     })
   }
 
+  // Find actionable work for an agent
+  if (action === 'find_work') {
+    const agent = url.searchParams.get('agent') // optional: filter by assigned_agent
+
+    // 1. Draft narrative work — only where window is confirmed open
+    let narrativeQuery = supabase
+      .from('funding_opportunities')
+      .select(`
+        id, pursuit_id, name, plan_category, amount,
+        narrative_status, narrative_url, assigned_agent,
+        window_status, window_opens, window_closes,
+        application_opens, application_closes,
+        contact_name, contact_email, waiting_on,
+        pursuit:funding_pursuits!pursuit_id(id, pursuit_name, district_name, client_contact_name)
+      `)
+      .eq('narrative_status', 'requested')
+      .eq('window_status', 'open')
+
+    if (agent) {
+      narrativeQuery = narrativeQuery.eq('assigned_agent', agent)
+    }
+
+    const { data: narrativeWork } = await narrativeQuery
+
+    // 2. Research work — NOT window-gated (finding new funders is always allowed)
+    let researchQuery = supabase
+      .from('funding_opportunities')
+      .select(`
+        id, pursuit_id, name, plan_category, amount,
+        research_status, assigned_agent,
+        window_status, contact_name,
+        pursuit:funding_pursuits!pursuit_id(id, pursuit_name, district_name)
+      `)
+      .eq('research_status', 'requested')
+
+    if (agent) {
+      researchQuery = researchQuery.eq('assigned_agent', agent)
+    }
+
+    const { data: researchWork } = await researchQuery
+
+    // Tag each item with its request type
+    const work = [
+      ...(narrativeWork ?? []).map(item => ({
+        request_type: 'draft_narrative' as const,
+        ...item,
+      })),
+      ...(researchWork ?? []).map(item => ({
+        request_type: 'research_funders' as const,
+        ...item,
+      })),
+    ]
+
+    return NextResponse.json({
+      work,
+      count: work.length,
+      filters: {
+        agent: agent || 'all',
+        draft_narrative_count: (narrativeWork ?? []).length,
+        research_funders_count: (researchWork ?? []).length,
+      },
+    })
+  }
+
   // Get overall status across all pursuits
   if (action === 'get_status') {
     const { data: pursuits } = await supabase
@@ -107,7 +172,7 @@ export async function GET(request: NextRequest) {
     })
   }
 
-  return NextResponse.json({ error: 'Unknown action. Use: find_pursuit, get_pursuit, get_status' }, { status: 400 })
+  return NextResponse.json({ error: 'Unknown action. Use: find_pursuit, get_pursuit, find_work, get_status' }, { status: 400 })
 }
 
 // POST -- Paperclip pushes updates

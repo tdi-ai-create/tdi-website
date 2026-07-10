@@ -77,6 +77,93 @@ curl -s -X GET \
 
 **Response:** Aggregated status with counts and lists of active items.
 
+### 4. Find Actionable Work
+
+Returns ONLY items that need agent work right now — filtered by request type and window status. Use this to discover what to work on next.
+
+```
+GET /api/funding/sync?action=find_work
+GET /api/funding/sync?action=find_work&agent=elena
+```
+
+```bash
+curl -s -X GET \
+  "https://www.teachersdeserveit.com/api/funding/sync?action=find_work&agent=elena" \
+  -H "Authorization: Bearer ${PAPERCLIP_SYNC_KEY}"
+```
+
+**Parameters:**
+
+| Param | Required | Description |
+|---|---|---|
+| `agent` | no | Filter by `assigned_agent` on the opportunity. Omit to see all work. |
+
+**Response:**
+
+```json
+{
+  "work": [
+    {
+      "request_type": "draft_narrative",
+      "id": "opp-uuid",
+      "pursuit_id": "pursuit-uuid",
+      "name": "Title II-A ESSA",
+      "plan_category": "A",
+      "amount": 50000,
+      "narrative_status": "requested",
+      "narrative_url": null,
+      "assigned_agent": "elena",
+      "window_status": "open",
+      "window_opens": "2026-01-15",
+      "window_closes": "2026-09-30",
+      "application_opens": "2026-01-15",
+      "application_closes": "2026-06-01",
+      "contact_name": "Dr. Martinez",
+      "contact_email": "martinez@lincoln.edu",
+      "waiting_on": "tdi",
+      "pursuit": {
+        "id": "pursuit-uuid",
+        "pursuit_name": "Lincoln Elementary - Grant Funded Funding",
+        "district_name": "Lincoln Elementary",
+        "client_contact_name": "Dr. Martinez"
+      }
+    },
+    {
+      "request_type": "research_funders",
+      "id": "opp-uuid-2",
+      "pursuit_id": "pursuit-uuid",
+      "name": "Local foundation research",
+      "plan_category": "D",
+      "amount": null,
+      "research_status": "requested",
+      "assigned_agent": "elena",
+      "window_status": "unknown",
+      "contact_name": null,
+      "pursuit": {
+        "id": "pursuit-uuid",
+        "pursuit_name": "Lincoln Elementary - Grant Funded Funding",
+        "district_name": "Lincoln Elementary"
+      }
+    }
+  ],
+  "count": 2,
+  "filters": {
+    "agent": "elena",
+    "draft_narrative_count": 1,
+    "research_funders_count": 1
+  }
+}
+```
+
+**Work types returned:**
+
+| `request_type` | Source filter | Window-gated? | What the agent should do |
+|---|---|---|---|
+| `draft_narrative` | `narrative_status = 'requested'` | YES — only `window_status = 'open'` | Draft or update the grant narrative for this opportunity |
+| `research_funders` | `research_status = 'requested'` | NO — research finds new paths | Research available funding sources for this pursuit |
+
+**Window gate rule:** `draft_narrative` work is only returned when `window_status = 'open'`. Agents should not draft narratives for paths whose funding window is unknown or closed — that work would be wasted. Research work (`research_funders`) is exempt because research is how we discover and verify open paths.
+
 ---
 
 ## POST Endpoints (Write)
