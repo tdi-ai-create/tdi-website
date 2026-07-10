@@ -58,9 +58,10 @@ function emptyForm() {
 
 interface OpportunitiesTabProps {
   pursuitId: string
+  gateOpen?: boolean
 }
 
-export function OpportunitiesTab({ pursuitId }: OpportunitiesTabProps) {
+export function OpportunitiesTab({ pursuitId, gateOpen = false }: OpportunitiesTabProps) {
   const [opportunities, setOpportunities] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [formMode, setFormMode] = useState<'closed' | 'add' | 'edit'>('closed')
@@ -419,6 +420,7 @@ export function OpportunitiesTab({ pursuitId }: OpportunitiesTabProps) {
             {/* Narrative control */}
             <NarrativeControl
               opp={opp}
+              gateOpen={gateOpen}
               onRequestDraft={(agent) => patchOpp(opp.id, { narrative_status: 'requested', assigned_agent: agent })}
               onApprove={() => patchOpp(opp.id, { narrative_status: 'ready' })}
             />
@@ -544,8 +546,9 @@ function DiversificationView({ opportunities }: { opportunities: any[] }) {
 
 // ── Narrative draft control ──
 
-function NarrativeControl({ opp, onRequestDraft, onApprove }: {
+function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove }: {
   opp: any
+  gateOpen: boolean
   onRequestDraft: (agent: string) => void
   onApprove: () => void
 }) {
@@ -601,9 +604,14 @@ function NarrativeControl({ opp, onRequestDraft, onApprove }: {
           }}>
             Draft requested — waiting for {agent || 'agent'}
           </span>
-          {!windowOpen && (
+          {(!windowOpen || !gateOpen) && (
             <span style={{ fontSize: 9, color: '#9CA3AF', fontStyle: 'italic' }}>
-              Draft won't start until the funding window is verified open
+              {!gateOpen && !windowOpen
+                ? 'Draft won\'t start until the alignment gate is satisfied and the funding window is verified open'
+                : !gateOpen
+                  ? 'Draft won\'t start until the alignment gate is satisfied (contracts signed + submitter/backup/sponsor named)'
+                  : 'Draft won\'t start until the funding window is verified open'
+              }
             </span>
           )}
         </>

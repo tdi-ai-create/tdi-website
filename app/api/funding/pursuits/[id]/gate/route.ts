@@ -10,6 +10,25 @@ function db() {
   )
 }
 
+/**
+ * Compute gate_open from the 5 conditions. Never set manually.
+ * TRUE only when ALL are met:
+ *   1. submitter_name + submitter_email present
+ *   2. backup_name + backup_email present
+ *   3. admin_sponsor_name + admin_sponsor_email present
+ *   4. contract1_signed = true
+ *   5. contract2_signed = true
+ */
+function computeGateOpen(gate: Record<string, unknown>): boolean {
+  return !!(
+    gate.submitter_name && gate.submitter_email &&
+    gate.backup_name && gate.backup_email &&
+    gate.admin_sponsor_name && gate.admin_sponsor_email &&
+    gate.contract1_signed === true &&
+    gate.contract2_signed === true
+  )
+}
+
 // PUT — create or update pursuit_gate for this pursuit
 export async function PUT(
   request: NextRequest,
@@ -30,7 +49,7 @@ export async function PUT(
     'submitter_name', 'submitter_email',
     'backup_name', 'backup_email',
     'admin_sponsor_name', 'admin_sponsor_email',
-    'gate_open',
+    'contract1_signed', 'contract2_signed',
   ]
   for (const f of allowed) {
     if (body[f] !== undefined) fields[f] = body[f]
@@ -39,9 +58,19 @@ export async function PUT(
   // Check if a gate row exists for this pursuit
   const { data: existing } = await supabase
     .from('pursuit_gate')
-    .select('id')
+    .select('*')
     .eq('pursuit_id', pursuitId)
     .maybeSingle()
+
+  // Merge with existing data to compute gate_open from the full picture
+  const merged = { ...(existing || {}), ...fields }
+  const wasOpen = existing?.gate_open === true
+  const nowOpen = computeGateOpen(merged)
+
+  fields.gate_open = nowOpen
+  if (nowOpen && !wasOpen) {
+    fields.gate_opened_at = new Date().toISOString()
+  }
 
   let result
   if (existing) {

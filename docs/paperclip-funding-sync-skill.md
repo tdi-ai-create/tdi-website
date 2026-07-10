@@ -159,10 +159,12 @@ curl -s -X GET \
 
 | `request_type` | Source filter | Window-gated? | What the agent should do |
 |---|---|---|---|
-| `draft_narrative` | `narrative_status = 'requested'` | YES — only `window_status = 'open'` | Draft or update the grant narrative for this opportunity |
+| `draft_narrative` | `narrative_status = 'requested'` | YES — `window_status = 'open'` AND `gate_open = true` | Draft or update the grant narrative for this opportunity |
 | `research_funders` | `research_status = 'requested'` | NO — research finds new paths | Research available funding sources for this pursuit |
 
 **Window gate rule:** `draft_narrative` work is only returned when `window_status = 'open'`. Agents should not draft narratives for paths whose funding window is unknown or closed — that work would be wasted. Research work (`research_funders`) is exempt because research is how we discover and verify open paths.
+
+**Alignment gate rule:** `draft_narrative` work also requires the pursuit's `gate_open = true` (all 5 conditions met: submitter named, backup named, admin sponsor named, both contracts signed). An opportunity whose pursuit hasn't satisfied the alignment gate will not appear in draft work — even if its window is open. This ensures agents don't draft for pursuits where the submission path isn't confirmed. Research work is exempt from the gate.
 
 ---
 

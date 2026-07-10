@@ -74,7 +74,7 @@ export function PanelShell({ pursuit, onClose, pursuitId, gate }: PanelShellProp
       {/* Tab content */}
       <div style={{ padding: '20px 24px' }}>
         {activeTab === 'overview' && <OverviewTab pursuit={pursuit} gate={gate} onGateUpdate={() => {}} />}
-        {activeTab === 'opportunities' && <OpportunitiesTab pursuitId={pursuitId} />}
+        {activeTab === 'opportunities' && <OpportunitiesTab pursuitId={pursuitId} gateOpen={gate?.gate_open === true} />}
         {activeTab === 'actions' && <ActionsTab pursuitId={pursuitId} />}
         {activeTab === 'timeline' && <TimelineTab pursuitId={pursuitId} />}
         {activeTab === 'emails' && <EmailsTab pursuitId={pursuitId} pursuit={pursuit} />}

@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
   if (action === 'find_work') {
     const agent = url.searchParams.get('agent') // optional: filter by assigned_agent
 
-    // 1. Draft narrative work — only where window is confirmed open
+    // 1. Draft narrative work — requires BOTH window_status='open' AND gate_open=true
     let narrativeQuery = supabase
       .from('funding_opportunities')
       .select(`
@@ -106,9 +106,22 @@ export async function GET(request: NextRequest) {
       narrativeQuery = narrativeQuery.eq('assigned_agent', agent)
     }
 
-    const { data: narrativeWork } = await narrativeQuery
+    const { data: rawNarrativeWork } = await narrativeQuery
 
-    // 2. Research work — NOT window-gated (finding new funders is always allowed)
+    // Gate enforcement: only include draft work for pursuits whose gate_open = true
+    const narrativePursuitIds = [...new Set((rawNarrativeWork ?? []).map((o: any) => o.pursuit_id))]
+    let gateOpenPursuitIds: Set<string> = new Set()
+    if (narrativePursuitIds.length > 0) {
+      const { data: openGates } = await supabase
+        .from('pursuit_gate')
+        .select('pursuit_id')
+        .in('pursuit_id', narrativePursuitIds)
+        .eq('gate_open', true)
+      gateOpenPursuitIds = new Set((openGates ?? []).map(g => g.pursuit_id))
+    }
+    const narrativeWork = (rawNarrativeWork ?? []).filter((o: any) => gateOpenPursuitIds.has(o.pursuit_id))
+
+    // 2. Research work — NOT window-gated, NOT gate-gated (finding new funders is always allowed)
     let researchQuery = supabase
       .from('funding_opportunities')
       .select(`
@@ -127,11 +140,11 @@ export async function GET(request: NextRequest) {
 
     // Tag each item with its request type
     const work = [
-      ...(narrativeWork ?? []).map(item => ({
+      ...narrativeWork.map((item: any) => ({
         request_type: 'draft_narrative' as const,
         ...item,
       })),
-      ...(researchWork ?? []).map(item => ({
+      ...(researchWork ?? []).map((item: any) => ({
         request_type: 'research_funders' as const,
         ...item,
       })),
@@ -142,7 +155,7 @@ export async function GET(request: NextRequest) {
       count: work.length,
       filters: {
         agent: agent || 'all',
-        draft_narrative_count: (narrativeWork ?? []).length,
+        draft_narrative_count: narrativeWork.length,
         research_funders_count: (researchWork ?? []).length,
       },
     })

@@ -26,9 +26,20 @@ export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate }: Overvi
     submitter_name: '', submitter_email: '',
     backup_name: '', backup_email: '',
     admin_sponsor_name: '', admin_sponsor_email: '',
-    gate_open: false,
+    contract1_signed: false, contract2_signed: false,
   })
   const [savingGate, setSavingGate] = useState(false)
+
+  // 5 gate conditions for the checklist
+  const gateConditions = gate ? [
+    { label: 'Submitter named', met: !!(gate.submitter_name && gate.submitter_email) },
+    { label: 'Backup named', met: !!(gate.backup_name && gate.backup_email) },
+    { label: 'Admin sponsor named', met: !!(gate.admin_sponsor_name && gate.admin_sponsor_email) },
+    { label: 'Contract 1 signed', met: gate.contract1_signed === true },
+    { label: 'Contract 2 signed', met: gate.contract2_signed === true },
+  ] : []
+  const conditionsMet = gateConditions.filter(c => c.met).length
+  const conditionsTotal = gateConditions.length
 
   const startEditGate = () => {
     setGateDraft({
@@ -38,7 +49,8 @@ export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate }: Overvi
       backup_email: gate?.backup_email || '',
       admin_sponsor_name: gate?.admin_sponsor_name || '',
       admin_sponsor_email: gate?.admin_sponsor_email || '',
-      gate_open: gate?.gate_open || false,
+      contract1_signed: gate?.contract1_signed || false,
+      contract2_signed: gate?.contract2_signed || false,
     })
     setEditingGate(true)
   }
@@ -62,7 +74,7 @@ export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate }: Overvi
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       {/* Escalation Gate */}
-      <Section title="Escalation Gate">
+      <Section title="Alignment Gate">
         {editingGate ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: 16, background: '#F9FAFB', borderRadius: 10, border: '1px solid #E5E7EB' }}>
             {(['submitter', 'backup', 'admin_sponsor'] as const).map(role => (
@@ -86,15 +98,30 @@ export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate }: Overvi
                 </div>
               </div>
             ))}
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', marginTop: 4 }}>
-              <input
-                type="checkbox"
-                checked={gateDraft.gate_open}
-                onChange={e => setGateDraft({ ...gateDraft, gate_open: e.target.checked })}
-                style={{ accentColor: '#8B5CF6' }}
-              />
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>Gate satisfied (submitter + backup confirmed)</span>
-            </label>
+            {/* Contract signed toggles */}
+            <div style={{ display: 'flex', gap: 16, marginTop: 6 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={gateDraft.contract1_signed as boolean}
+                  onChange={e => setGateDraft({ ...gateDraft, contract1_signed: e.target.checked })}
+                  style={{ accentColor: '#8B5CF6' }}
+                />
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>Contract 1 signed</span>
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={gateDraft.contract2_signed as boolean}
+                  onChange={e => setGateDraft({ ...gateDraft, contract2_signed: e.target.checked })}
+                  style={{ accentColor: '#8B5CF6' }}
+                />
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>Contract 2 signed</span>
+              </label>
+            </div>
+            <div style={{ fontSize: 10, color: '#9CA3AF', fontStyle: 'italic', marginTop: 2 }}>
+              Gate status is computed automatically from the 5 conditions above
+            </div>
             <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
               <button
                 onClick={saveGate}
@@ -120,13 +147,17 @@ export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate }: Overvi
           </div>
         ) : gate ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {/* Overall gate status */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <div style={{
                 width: 8, height: 8, borderRadius: '50%',
                 background: gate.gate_open ? '#10B981' : '#DC2626',
               }} />
               <span style={{ fontSize: 12, fontWeight: 700, color: gate.gate_open ? '#065F46' : '#991B1B' }}>
-                {gate.gate_open ? 'Gate satisfied' : 'Gate not satisfied'}
+                {gate.gate_open
+                  ? 'Gate: OPEN'
+                  : `Gate: not yet satisfied — ${conditionsTotal - conditionsMet} of ${conditionsTotal} condition${conditionsTotal - conditionsMet !== 1 ? 's' : ''} remaining`
+                }
               </span>
               <button
                 onClick={startEditGate}
@@ -139,6 +170,25 @@ export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate }: Overvi
                 Edit
               </button>
             </div>
+
+            {/* 5-condition checklist */}
+            <div style={{
+              padding: '10px 14px', background: '#F9FAFB', borderRadius: 8,
+              display: 'flex', flexDirection: 'column', gap: 6,
+            }}>
+              {gateConditions.map((cond, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 13, color: cond.met ? '#10B981' : '#D1D5DB' }}>
+                    {cond.met ? '\u2713' : '\u2717'}
+                  </span>
+                  <span style={{ fontSize: 12, color: cond.met ? '#374151' : '#9CA3AF' }}>
+                    {cond.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Contact details */}
             {['submitter', 'backup', 'admin_sponsor'].map(role => {
               const name = gate[`${role}_name`]
               const email = gate[`${role}_email`]
