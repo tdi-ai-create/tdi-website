@@ -50,6 +50,8 @@ export async function PUT(
     'backup_name', 'backup_email',
     'admin_sponsor_name', 'admin_sponsor_email',
     'contract1_signed', 'contract2_signed',
+    'submitter_employment_verified_at', 'submitter_portal_login_capable',
+    'submitter_availability_window',
   ]
   for (const f of allowed) {
     if (body[f] !== undefined) fields[f] = body[f]

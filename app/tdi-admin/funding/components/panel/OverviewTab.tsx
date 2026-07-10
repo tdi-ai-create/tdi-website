@@ -190,6 +190,9 @@ export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate, partners
               ))}
             </div>
 
+            {/* Continuity check (1.5) */}
+            <ContinuityCheck gate={gate} pursuitId={p.id} onUpdate={(g: any) => setGate(g)} />
+
             {/* Contact details */}
             {['submitter', 'backup', 'admin_sponsor'].map(role => {
               const name = gate[`${role}_name`]
@@ -255,6 +258,9 @@ export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate, partners
           <div style={{ fontSize: 13, color: '#9CA3AF', fontStyle: 'italic' }}>No client contact set</div>
         )}
       </Section>
+
+      {/* School Profile + Data Quality */}
+      <SchoolProfileSection pursuit={p} />
 
       {/* Funding Stats */}
       <Section title="Funding Stats">
@@ -330,6 +336,236 @@ export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate, partners
         renewalEligible={renewalEligible}
         hasPartnership={!!partnershipHealth}
       />
+    </div>
+  )
+}
+
+// ── School Profile (display + edit + data quality) ──
+
+const PROFILE_FIELDS = [
+  { key: 'school_name', label: 'School Name' },
+  { key: 'district', label: 'District' },
+  { key: 'nces_id', label: 'NCES ID' },
+  { key: 'address', label: 'Address' },
+  { key: 'ein', label: 'EIN' },
+  { key: 'educator_count', label: 'Educator Count', type: 'number' },
+  { key: 'paraprofessionals', label: 'Paraprofessionals', type: 'number' },
+  { key: 'iep_students', label: 'IEP Students', type: 'number' },
+  { key: 'title_i_status', label: 'Title I Status' },
+  { key: 'atsi_status', label: 'ATSI/CSI Status' },
+  { key: 'frl_pct', label: 'FRL %' },
+  { key: 'reading_proficiency', label: 'Reading Proficiency' },
+  { key: 'math_proficiency', label: 'Math Proficiency' },
+  { key: 'budget_holder', label: 'Budget Holder' },
+]
+
+const REQUIRED_FOR_QUALITY = ['school_name', 'district', 'educator_count', 'title_i_status', 'frl_pct', 'budget_holder', 'atsi_status']
+
+function SchoolProfileSection({ pursuit }: { pursuit: any }) {
+  const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  let profile: Record<string, any> = {}
+  try {
+    profile = typeof pursuit.school_profile === 'string'
+      ? JSON.parse(pursuit.school_profile)
+      : (pursuit.school_profile || {})
+  } catch { profile = {} }
+
+  const [draft, setDraft] = useState<Record<string, any>>({ ...profile })
+
+  const missingFields = REQUIRED_FOR_QUALITY.filter(k => {
+    const v = profile[k]
+    return v == null || v === '' || v === false
+  })
+  const completePct = Math.round(((REQUIRED_FOR_QUALITY.length - missingFields.length) / REQUIRED_FOR_QUALITY.length) * 100)
+
+  const saveProfile = async () => {
+    setSaving(true)
+    // Merge draft with existing to preserve unknown keys
+    const merged = { ...profile, ...draft }
+    await fetch('/api/funding/pursuits', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pursuitId: pursuit.id, school_profile: merged }),
+    })
+    setSaving(false)
+    setEditing(false)
+    // Force page-level data to reflect the change
+    pursuit.school_profile = JSON.stringify(merged)
+  }
+
+  const startEdit = () => {
+    setDraft({ ...profile })
+    setEditing(true)
+  }
+
+  return (
+    <Section title="School Profile">
+      {editing ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 14, background: '#F9FAFB', borderRadius: 10, border: '1px solid #E5E7EB' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            {PROFILE_FIELDS.map(f => (
+              <div key={f.key}>
+                <label style={{ fontSize: 9, fontWeight: 600, color: '#6B7280', display: 'block', marginBottom: 2 }}>{f.label}</label>
+                {f.key === 'atsi_status' ? (
+                  <select
+                    value={draft[f.key] === true ? 'yes' : draft[f.key] === false ? 'no' : ''}
+                    onChange={e => setDraft({ ...draft, [f.key]: e.target.value === 'yes' ? true : e.target.value === 'no' ? false : null })}
+                    style={{ fontSize: 12, padding: '5px 8px', border: '1px solid #E5E7EB', borderRadius: 4, width: '100%' }}
+                  >
+                    <option value="">Not set</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                ) : (
+                  <input
+                    type={f.type === 'number' ? 'number' : 'text'}
+                    value={draft[f.key] ?? ''}
+                    onChange={e => setDraft({ ...draft, [f.key]: f.type === 'number' ? (e.target.value ? parseInt(e.target.value) : null) : e.target.value })}
+                    style={{ fontSize: 12, padding: '5px 8px', border: '1px solid #E5E7EB', borderRadius: 4, width: '100%', boxSizing: 'border-box' }}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+            <button onClick={saveProfile} disabled={saving} style={{ fontSize: 12, fontWeight: 600, padding: '6px 16px', borderRadius: 6, border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
+              {saving ? 'Saving...' : 'Save profile'}
+            </button>
+            <button onClick={() => setEditing(false)} style={{ fontSize: 12, padding: '6px 12px', borderRadius: 6, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {/* Data quality indicator */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <div style={{ height: 4, flex: 1, background: '#E5E7EB', borderRadius: 2, overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${completePct}%`, background: completePct === 100 ? '#10B981' : completePct >= 60 ? '#F59E0B' : '#EF4444', borderRadius: 2 }} />
+            </div>
+            <span style={{ fontSize: 10, fontWeight: 600, color: completePct === 100 ? '#065F46' : '#92400E' }}>
+              {completePct}% complete
+            </span>
+            <button onClick={startEdit} style={{ fontSize: 9, padding: '2px 8px', borderRadius: 4, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>
+              Edit
+            </button>
+          </div>
+
+          {/* Missing fields callout */}
+          {missingFields.length > 0 && (
+            <div style={{ padding: '6px 10px', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 6, fontSize: 10, color: '#92400E' }}>
+              {missingFields.length} field{missingFields.length !== 1 ? 's' : ''} need{missingFields.length === 1 ? 's' : ''} verification: {missingFields.map(k => PROFILE_FIELDS.find(f => f.key === k)?.label || k).join(', ')}
+            </div>
+          )}
+
+          {/* Profile data grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+            {PROFILE_FIELDS.map(f => {
+              const val = profile[f.key]
+              const display = val === true ? 'Yes' : val === false ? 'No' : val != null && val !== '' ? String(val) : null
+              return (
+                <div key={f.key} style={{ padding: '6px 10px', background: '#F9FAFB', borderRadius: 6 }}>
+                  <div style={{ fontSize: 9, color: '#6B7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>{f.label}</div>
+                  <div style={{ fontSize: 12, fontWeight: 500, color: display ? '#0a0f1e' : '#D1D5DB', marginTop: 1, fontStyle: display ? 'normal' : 'italic' }}>
+                    {display || 'Not set'}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+    </Section>
+  )
+}
+
+// ── Continuity check (1.5) ──
+
+function ContinuityCheck({ gate, pursuitId, onUpdate }: { gate: any; pursuitId: string; onUpdate: (g: any) => void }) {
+  if (!gate) return null
+
+  const verified = gate.submitter_employment_verified_at
+  const verifiedDate = verified ? new Date(verified) : null
+  const daysSinceVerified = verifiedDate ? Math.floor((Date.now() - verifiedDate.getTime()) / (1000 * 60 * 60 * 24)) : null
+  const stale = daysSinceVerified !== null && daysSinceVerified > 90
+
+  const handleVerify = async () => {
+    const res = await fetch(`/api/funding/pursuits/${pursuitId}/gate`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ submitter_employment_verified_at: new Date().toISOString() }),
+    })
+    const result = await res.json()
+    if (result.gate) onUpdate(result.gate)
+  }
+
+  const handleToggleLogin = async (v: boolean) => {
+    const res = await fetch(`/api/funding/pursuits/${pursuitId}/gate`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ submitter_portal_login_capable: v }),
+    })
+    const result = await res.json()
+    if (result.gate) onUpdate(result.gate)
+  }
+
+  return (
+    <div style={{
+      padding: '8px 10px', background: (!verified || stale) ? '#FFFBEB' : '#F0FDF4',
+      border: `1px solid ${(!verified || stale) ? '#FDE68A' : '#BBF7D0'}`,
+      borderRadius: 6, marginBottom: 8,
+      display: 'flex', flexDirection: 'column', gap: 6,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          Contact continuity
+        </span>
+        {verified && !stale ? (
+          <span style={{ fontSize: 10, color: '#065F46', fontWeight: 600 }}>
+            {'\u2713'} Verified employed {verifiedDate!.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            {daysSinceVerified !== null && daysSinceVerified > 30 && (
+              <span style={{ color: '#92400E' }}> ({daysSinceVerified}d ago)</span>
+            )}
+          </span>
+        ) : stale ? (
+          <>
+            <span style={{ fontSize: 10, color: '#DC2626', fontWeight: 600 }}>
+              Verification stale ({daysSinceVerified}d ago) — re-verify
+            </span>
+            <button onClick={handleVerify} style={{ fontSize: 9, fontWeight: 600, padding: '2px 8px', borderRadius: 4, border: 'none', background: '#F59E0B', color: 'white', cursor: 'pointer' }}>
+              Re-verify now
+            </button>
+          </>
+        ) : (
+          <>
+            <span style={{ fontSize: 10, color: '#DC2626', fontWeight: 600 }}>
+              Not verified — confirm this contact still works here
+            </span>
+            <button onClick={handleVerify} style={{ fontSize: 9, fontWeight: 600, padding: '2px 8px', borderRadius: 4, border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer' }}>
+              Verify employed
+            </button>
+          </>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            checked={gate.submitter_portal_login_capable || false}
+            onChange={e => handleToggleLogin(e.target.checked)}
+            style={{ accentColor: '#8B5CF6' }}
+          />
+          <span style={{ fontSize: 10, color: '#374151' }}>Portal login capable</span>
+        </label>
+        {gate.submitter_availability_window && (
+          <span style={{ fontSize: 10, color: '#6B7280' }}>
+            Available: {gate.submitter_availability_window}
+          </span>
+        )}
+      </div>
     </div>
   )
 }
