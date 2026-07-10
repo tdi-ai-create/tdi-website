@@ -21,9 +21,11 @@ interface PanelShellProps {
   onClose: () => void
   pursuitId: string
   gate?: any
+  partnershipHealth?: any
+  renewalEligible?: boolean
 }
 
-export function PanelShell({ pursuit, onClose, pursuitId, gate }: PanelShellProps) {
+export function PanelShell({ pursuit, onClose, pursuitId, gate, partnershipHealth, renewalEligible }: PanelShellProps) {
   const [activeTab, setActiveTab] = useState('opportunities')
 
   return (
@@ -73,7 +75,7 @@ export function PanelShell({ pursuit, onClose, pursuitId, gate }: PanelShellProp
 
       {/* Tab content */}
       <div style={{ padding: '20px 24px' }}>
-        {activeTab === 'overview' && <OverviewTab pursuit={pursuit} gate={gate} onGateUpdate={() => {}} />}
+        {activeTab === 'overview' && <OverviewTab pursuit={pursuit} gate={gate} onGateUpdate={() => {}} partnershipHealth={partnershipHealth} renewalEligible={renewalEligible} />}
         {activeTab === 'opportunities' && <OpportunitiesTab pursuitId={pursuitId} gateOpen={gate?.gate_open === true} />}
         {activeTab === 'actions' && <ActionsTab pursuitId={pursuitId} />}
         {activeTab === 'timeline' && <TimelineTab pursuitId={pursuitId} />}

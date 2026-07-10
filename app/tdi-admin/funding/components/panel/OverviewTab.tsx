@@ -7,6 +7,8 @@ interface OverviewTabProps {
   pursuit: any
   gate?: any
   onGateUpdate?: (gate: any) => void
+  partnershipHealth?: any
+  renewalEligible?: boolean
 }
 
 const GATE_ROLE_LABELS: Record<string, string> = {
@@ -15,7 +17,7 @@ const GATE_ROLE_LABELS: Record<string, string> = {
   admin_sponsor: 'Admin Sponsor',
 }
 
-export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate }: OverviewTabProps) {
+export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate, partnershipHealth, renewalEligible }: OverviewTabProps) {
   const p = pursuit
   const eligibility = p.eligibility_snapshot || {}
   const hasContact = p.client_contact_name || p.client_contact_email || p.client_contact_phone || p.client_contact_role
@@ -318,7 +320,152 @@ export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate }: Overvi
           </div>
         </Section>
       )}
+
+      {/* ── Delivery & Health (from linked partnership) ── */}
+      <DeliveryHealthSection partnershipHealth={partnershipHealth} />
+
+      {/* ── Renewal eligibility ── */}
+      <RenewalSection
+        pursuit={p}
+        renewalEligible={renewalEligible}
+        hasPartnership={!!partnershipHealth}
+      />
     </div>
+  )
+}
+
+// ── Delivery & Health (read-only from partnership) ──
+
+function DeliveryHealthSection({ partnershipHealth }: { partnershipHealth: any }) {
+  if (!partnershipHealth) return null
+
+  const ph = partnershipHealth
+  const metrics = [
+    { label: 'Phase', value: ph.contract_phase || '—', color: '#0a0f1e' },
+    { label: 'Momentum', value: ph.momentum_status || '—', color: ph.momentum_status === 'Thriving' ? '#065F46' : ph.momentum_status === 'Building' ? '#92400E' : '#6B7280' },
+    { label: 'Strategy Implementation', value: ph.strategy_implementation_pct != null ? `${ph.strategy_implementation_pct}%` : 'Not yet tracked', color: ph.strategy_implementation_pct != null ? '#0a0f1e' : '#9CA3AF' },
+    { label: 'Retention Intent', value: ph.retention_intent_score != null ? `${ph.retention_intent_score}/10` : 'Not yet tracked', color: ph.retention_intent_score != null ? '#0a0f1e' : '#9CA3AF' },
+    { label: 'Hub Login %', value: ph.hub_login_pct != null ? `${ph.hub_login_pct}%` : 'Not yet tracked', color: ph.hub_login_pct != null ? '#0a0f1e' : '#9CA3AF' },
+  ]
+
+  // Delivery sessions
+  const sessions = [
+    { label: 'Observations', used: ph.observation_days_used || 0, total: ph.observation_days_total || 0 },
+    { label: 'Virtual', used: ph.virtual_sessions_used || 0, total: ph.virtual_sessions_total || 0 },
+    { label: 'Executive', used: ph.executive_sessions_used || 0, total: ph.executive_sessions_total || 0 },
+  ].filter(s => s.total > 0)
+
+  return (
+    <Section title="Delivery & Health">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {/* Metrics */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          {metrics.map(m => (
+            <div key={m.label} style={{ padding: '8px 12px', background: '#F9FAFB', borderRadius: 8 }}>
+              <div style={{ fontSize: 10, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600 }}>{m.label}</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: m.color, marginTop: 2 }}>{m.value}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Session delivery progress */}
+        {sessions.length > 0 && (
+          <div style={{ display: 'flex', gap: 12 }}>
+            {sessions.map(s => (
+              <div key={s.label} style={{ flex: 1, padding: '8px 12px', background: '#F9FAFB', borderRadius: 8 }}>
+                <div style={{ fontSize: 10, color: '#6B7280', fontWeight: 600 }}>{s.label}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#0a0f1e', marginTop: 2 }}>{s.used}/{s.total}</div>
+                <div style={{ height: 3, background: '#E5E7EB', borderRadius: 2, marginTop: 4, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${s.total > 0 ? Math.min((s.used / s.total) * 100, 100) : 0}%`, background: '#8B5CF6', borderRadius: 2 }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Link to full detail */}
+        <a
+          href={`/tdi-admin/leadership/${ph.id}`}
+          style={{ fontSize: 11, color: '#8B5CF6', textDecoration: 'underline' }}
+        >
+          View full partnership detail
+        </a>
+      </div>
+    </Section>
+  )
+}
+
+// ── Renewal section ──
+
+function RenewalSection({ pursuit, renewalEligible, hasPartnership }: { pursuit: any; renewalEligible?: boolean; hasPartnership: boolean }) {
+  const [creating, setCreating] = useState(false)
+  const [created, setCreated] = useState(false)
+
+  if (!hasPartnership) return null
+
+  const handleStartRenewal = async () => {
+    setCreating(true)
+    const res = await fetch('/api/funding/pursuits', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        districtName: pursuit.district_name,
+        totalAmount: pursuit.total_amount || pursuit.contract_gap || 0,
+        implementationDate: null,
+        clientContactName: pursuit.client_contact_name,
+        clientContactEmail: pursuit.client_contact_email,
+        clientContactPhone: pursuit.client_contact_phone,
+        clientContactRole: pursuit.client_contact_role,
+        partnershipId: pursuit.partnership_id,
+        pursuitName: `(RENEWAL) ${pursuit.district_name || pursuit.pursuit_name} - Next Cycle`,
+      }),
+    })
+    const result = await res.json()
+    setCreating(false)
+    if (result.pursuit || result.success) setCreated(true)
+  }
+
+  return (
+    <Section title="Renewal">
+      {renewalEligible ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{
+            padding: '10px 14px', background: '#D1FAE5', border: '1px solid #6EE7B7',
+            borderRadius: 8, display: 'flex', alignItems: 'center', gap: 8,
+          }}>
+            <span style={{ fontSize: 13, color: '#065F46' }}>{'\u2713'}</span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#065F46' }}>
+              Ready for renewal cycle
+            </span>
+            <span style={{ fontSize: 10, color: '#065F46' }}>
+              All allocations delivered/invoiced
+            </span>
+          </div>
+          {!created ? (
+            <button
+              onClick={handleStartRenewal}
+              disabled={creating}
+              style={{
+                fontSize: 12, fontWeight: 600, padding: '8px 16px', borderRadius: 6,
+                border: 'none', background: creating ? '#9CA3AF' : '#8B5CF6',
+                color: 'white', cursor: creating ? 'default' : 'pointer',
+                alignSelf: 'flex-start',
+              }}
+            >
+              {creating ? 'Creating...' : 'Start renewal pursuit'}
+            </button>
+          ) : (
+            <div style={{ fontSize: 12, color: '#065F46', fontWeight: 600 }}>
+              {'\u2713'} Renewal pursuit created — check the funding list
+            </div>
+          )}
+        </div>
+      ) : (
+        <div style={{ fontSize: 12, color: '#9CA3AF', fontStyle: 'italic' }}>
+          Not yet eligible for renewal — all allocations must be delivered or invoiced first
+        </div>
+      )}
+    </Section>
   )
 }
 

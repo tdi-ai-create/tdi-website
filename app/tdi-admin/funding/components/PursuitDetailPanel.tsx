@@ -40,7 +40,7 @@ export function PursuitDetailPanel({ pursuitId, onClose }: PanelProps) {
         ) : !data?.pursuit ? (
           <div style={{ padding: 40, textAlign: 'center', color: '#991B1B' }}>Failed to load pursuit.</div>
         ) : (
-          <PanelShell pursuit={data.pursuit} pursuitId={pursuitId} onClose={onClose} gate={data.gate} />
+          <PanelShell pursuit={data.pursuit} pursuitId={pursuitId} onClose={onClose} gate={data.gate} partnershipHealth={data.partnershipHealth} renewalEligible={data.renewalEligible} />
         )}
       </div>
     </>

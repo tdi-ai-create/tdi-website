@@ -36,11 +36,35 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       .eq('pursuit_id', id)
       .maybeSingle()
 
+    // Fetch partnership health data if linked
+    let partnershipHealth = null
+    if (pursuit.partnership_id) {
+      const { data: partnership } = await supabase
+        .from('partnerships')
+        .select('id, slug, contact_name, status, contract_phase, momentum_status, strategy_implementation_pct, retention_intent_score, hub_login_pct, high_engagement_pct, observation_days_total, observation_days_used, virtual_sessions_total, virtual_sessions_used, executive_sessions_total, executive_sessions_used')
+        .eq('id', pursuit.partnership_id)
+        .maybeSingle()
+      partnershipHealth = partnership
+    }
+
+    // Fetch allocations for renewal eligibility check
+    const { data: allocations } = await supabase
+      .from('award_allocations')
+      .select('id, line_item_status')
+      .eq('pursuit_id', id)
+
+    const allAllocations = allocations || []
+    const renewalEligible = allAllocations.length > 0
+      && allAllocations.every(a => a.line_item_status === 'delivered' || a.line_item_status === 'invoiced')
+      && !!pursuit.partnership_id
+
     return NextResponse.json({
       pursuit,
       timeline: timeline || [],
       touchpoints: touchpoints || [],
       gate: gate || null,
+      partnershipHealth,
+      renewalEligible,
     })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })
