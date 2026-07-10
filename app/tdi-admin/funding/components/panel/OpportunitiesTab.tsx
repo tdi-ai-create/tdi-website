@@ -431,6 +431,13 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false }: OpportunitiesT
               opp={opp}
               onRequest={() => patchOpp(opp.id, { research_status: 'requested', assigned_agent: defaultAgent(opp.plan_category) })}
             />
+
+            {/* Submission panel */}
+            <SubmissionPanel
+              opp={opp}
+              gateOpen={gateOpen}
+              onPatch={(fields) => patchOpp(opp.id, fields)}
+            />
           </div>
         )
       })}
@@ -803,6 +810,214 @@ function ResearchControl({ opp, onRequest }: {
         }}>
           {agent || 'Agent'} researching...
         </span>
+      )}
+    </div>
+  )
+}
+
+// ── Submission panel ──
+
+const FWD_OPTIONS = [
+  { value: 'not_started', label: 'Not started', bg: '#F3F4F6', color: '#6B7280' },
+  { value: 'drafted', label: 'Drafted', bg: '#FEF3C7', color: '#92400E' },
+  { value: 'sent', label: 'Sent', bg: '#D1FAE5', color: '#065F46' },
+]
+
+function SubmissionPanel({ opp, gateOpen, onPatch }: {
+  opp: any
+  gateOpen: boolean
+  onPatch: (fields: Record<string, unknown>) => void
+}) {
+  const [proofInput, setProofInput] = useState('')
+  const [showSubmitForm, setShowSubmitForm] = useState(false)
+
+  const submitted = opp.client_submitted === true
+  const districtRouted = opp.routed_through_district === true
+  const routingConfirmed = opp.district_routing_confirmed === true
+  const fwdStatus = opp.forwarding_email_status || 'not_started'
+
+  // Anti-bounce: block submission for district-routed paths until routing confirmed
+  const submitBlocked = districtRouted && !routingConfirmed
+
+  // Deadline checkpoints
+  const deadline = opp.application_closes || opp.internal_deadline
+  let daysLeft: number | null = null
+  if (deadline) {
+    const today = new Date(); today.setHours(0, 0, 0, 0)
+    daysLeft = Math.floor((new Date(deadline + 'T00:00:00').getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+  }
+
+  const narrativeReady = opp.narrative_status === 'ready'
+  const fwdSent = fwdStatus === 'sent'
+
+  // Don't show for awarded/denied
+  if (['awarded', 'denied'].includes(opp.status)) return null
+
+  const handleSubmit = () => {
+    onPatch({
+      client_submitted: true,
+      client_submitted_proof: proofInput || null,
+    })
+    setShowSubmitForm(false)
+    setProofInput('')
+  }
+
+  const handleUnsubmit = () => {
+    onPatch({
+      client_submitted: false,
+      client_submitted_proof: null,
+    })
+  }
+
+  return (
+    <div style={{
+      marginTop: 8, padding: '10px 12px', background: '#FAFAFA',
+      borderRadius: 6, border: '1px solid #F3F4F6',
+      display: 'flex', flexDirection: 'column', gap: 8,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          Submission
+        </span>
+
+        {/* Submission status */}
+        {submitted ? (
+          <>
+            <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#D1FAE5', color: '#065F46' }}>
+              Submitted
+            </span>
+            {opp.client_submitted_at && (
+              <span style={{ fontSize: 10, color: '#6B7280' }}>
+                {new Date(opp.client_submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </span>
+            )}
+            {opp.client_submitted_proof && (
+              <span style={{ fontSize: 10, color: '#6B7280', fontStyle: 'italic' }}>
+                {opp.client_submitted_proof}
+              </span>
+            )}
+            <button onClick={handleUnsubmit} style={{ fontSize: 9, padding: '1px 6px', borderRadius: 3, border: '1px solid #E5E7EB', background: 'white', color: '#9CA3AF', cursor: 'pointer' }}>
+              Correct
+            </button>
+          </>
+        ) : (
+          <>
+            {!showSubmitForm ? (
+              <button
+                onClick={() => submitBlocked ? null : setShowSubmitForm(true)}
+                disabled={submitBlocked}
+                style={{
+                  fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4,
+                  border: 'none', background: submitBlocked ? '#E5E7EB' : '#10B981',
+                  color: submitBlocked ? '#9CA3AF' : 'white',
+                  cursor: submitBlocked ? 'default' : 'pointer',
+                }}
+              >
+                Mark submitted
+              </button>
+            ) : (
+              <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                <input
+                  value={proofInput}
+                  onChange={e => setProofInput(e.target.value)}
+                  placeholder="Proof (confirmation #, person + date)"
+                  style={{ fontSize: 11, padding: '4px 8px', border: '1px solid #E5E7EB', borderRadius: 4, width: 220 }}
+                  onKeyDown={e => { if (e.key === 'Enter') handleSubmit() }}
+                />
+                <button onClick={handleSubmit} style={{ fontSize: 10, fontWeight: 600, padding: '4px 10px', borderRadius: 4, border: 'none', background: '#10B981', color: 'white', cursor: 'pointer' }}>
+                  Confirm
+                </button>
+                <button onClick={() => { setShowSubmitForm(false); setProofInput('') }} style={{ fontSize: 10, padding: '4px 8px', borderRadius: 4, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>
+                  Cancel
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Anti-bounce warning */}
+      {submitBlocked && !submitted && (
+        <div style={{
+          padding: '8px 12px', background: '#FEF3C7', border: '1px solid #FDE68A',
+          borderRadius: 6, fontSize: 11, color: '#92400E', lineHeight: 1.5,
+        }}>
+          This path routes through the district office. Confirm it advanced past district routing to the funder before marking submitted — an email to a district inbox is not a submission to the funder (the Title II-A lesson).
+        </div>
+      )}
+
+      {/* District routing + forwarding email + readiness row */}
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+        {/* District routing toggle */}
+        <label style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            checked={districtRouted}
+            onChange={e => onPatch({ routed_through_district: e.target.checked, ...(!e.target.checked ? { district_routing_confirmed: false } : {}) })}
+            style={{ accentColor: '#8B5CF6' }}
+          />
+          <span style={{ fontSize: 10, color: '#374151' }}>District-routed</span>
+        </label>
+
+        {districtRouted && (
+          <label style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={routingConfirmed}
+              onChange={e => onPatch({ district_routing_confirmed: e.target.checked })}
+              style={{ accentColor: '#10B981' }}
+            />
+            <span style={{ fontSize: 10, color: routingConfirmed ? '#065F46' : '#92400E', fontWeight: 600 }}>
+              {routingConfirmed ? 'Routing confirmed' : 'Routing not confirmed'}
+            </span>
+          </label>
+        )}
+
+        {/* Forwarding email status */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ fontSize: 10, color: '#6B7280' }}>Fwd email:</span>
+          <select
+            value={fwdStatus}
+            onChange={e => onPatch({ forwarding_email_status: e.target.value })}
+            style={{
+              fontSize: 10, fontWeight: 600, padding: '2px 6px', borderRadius: 4,
+              border: '1px solid #E5E7EB', cursor: 'pointer',
+              background: FWD_OPTIONS.find(o => o.value === fwdStatus)?.bg || '#F3F4F6',
+              color: FWD_OPTIONS.find(o => o.value === fwdStatus)?.color || '#6B7280',
+            }}
+          >
+            {FWD_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+        </div>
+      </div>
+
+      {/* Deadline readiness checkpoints */}
+      {daysLeft !== null && daysLeft <= 14 && daysLeft >= 0 && !submitted && (
+        <div style={{
+          padding: '8px 12px', background: daysLeft <= 2 ? '#FEF2F2' : daysLeft <= 7 ? '#FFFBEB' : '#F9FAFB',
+          border: `1px solid ${daysLeft <= 2 ? '#FECACA' : daysLeft <= 7 ? '#FDE68A' : '#E5E7EB'}`,
+          borderRadius: 6, fontSize: 10, color: '#374151',
+        }}>
+          <div style={{ fontWeight: 700, marginBottom: 4, color: daysLeft <= 2 ? '#DC2626' : daysLeft <= 7 ? '#92400E' : '#374151' }}>
+            {daysLeft === 0 ? 'DEADLINE TODAY' : `${daysLeft} day${daysLeft !== 1 ? 's' : ''} to deadline`} — readiness check
+          </div>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <span style={{ color: narrativeReady ? '#065F46' : '#9CA3AF' }}>
+              {narrativeReady ? '\u2713' : '\u2717'} Narrative {narrativeReady ? 'ready' : 'not ready'}
+            </span>
+            <span style={{ color: gateOpen ? '#065F46' : '#9CA3AF' }}>
+              {gateOpen ? '\u2713' : '\u2717'} Gate {gateOpen ? 'open' : 'not open'}
+            </span>
+            <span style={{ color: fwdSent ? '#065F46' : '#9CA3AF' }}>
+              {fwdSent ? '\u2713' : '\u2717'} Fwd email {fwdSent ? 'sent' : 'not sent'}
+            </span>
+            {districtRouted && (
+              <span style={{ color: routingConfirmed ? '#065F46' : '#DC2626' }}>
+                {routingConfirmed ? '\u2713' : '\u2717'} District routing {routingConfirmed ? 'confirmed' : 'not confirmed'}
+              </span>
+            )}
+          </div>
+        </div>
       )}
     </div>
   )

@@ -105,6 +105,7 @@ export async function PATCH(request: NextRequest) {
     'waiting_on', 'narrative_status', 'narrative_url', 'narrative_content',
     'qa_reviewer', 'qa_notes', 'qa_passed', 'forwarding_email_status',
     'client_submitted', 'client_submitted_proof',
+    'routed_through_district', 'district_routing_confirmed',
     'decision_date', 'awarded_amount', 'denial_reason',
     'window_status', 'window_opens', 'window_closes',
     'internal_deadline', 'award_needed_by',
