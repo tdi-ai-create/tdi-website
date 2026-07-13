@@ -209,10 +209,19 @@ export default function QueuePage() {
         </div>
       )}
 
-      {/* Queue items */}
+      {/* Queue items — grouped by urgency */}
       {!loading && filtered.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {filtered.map(item => (
+          {renderGrouped(filtered, isMuted)
+            .map(item => item.type === 'separator' ? (
+              <div key={item.key} style={{
+                fontSize: 10, fontWeight: 700, color: item.color, textTransform: 'uppercase',
+                letterSpacing: 0.5, padding: '8px 0 2px', marginTop: 8,
+                borderBottom: `1px solid ${item.borderColor}`,
+              }}>
+                {item.label} ({item.count})
+              </div>
+            ) : (
             <QueueRow
               key={item.id}
               item={item}
@@ -242,6 +251,41 @@ export default function QueuePage() {
 }
 
 // ── Queue row ──
+
+// ── Group items by urgency with visual separators ──
+
+const URGENCY_GROUPS: { key: string; label: string; color: string; borderColor: string }[] = [
+  { key: 'critical', label: 'Critical', color: '#DC2626', borderColor: '#FECACA' },
+  { key: 'high', label: 'High priority', color: '#D97706', borderColor: '#FDE68A' },
+  { key: 'normal', label: 'Normal', color: '#374151', borderColor: '#E5E7EB' },
+  { key: 'low', label: 'Low / In progress', color: '#6B7280', borderColor: '#F3F4F6' },
+]
+
+function renderGrouped(items: any[], muted: boolean): any[] {
+  const result: any[] = []
+  let lastUrgency = ''
+
+  for (const item of items) {
+    if (item.urgency !== lastUrgency) {
+      const group = URGENCY_GROUPS.find(g => g.key === item.urgency)
+      const count = items.filter(i => i.urgency === item.urgency).length
+      if (group) {
+        result.push({
+          type: 'separator',
+          key: `sep-${item.urgency}`,
+          label: group.label,
+          color: group.color,
+          borderColor: group.borderColor,
+          count,
+        })
+      }
+      lastUrgency = item.urgency
+    }
+    result.push(item)
+  }
+
+  return result
+}
 
 function QueueRow({ item, muted, loading, onVerifyContact, onApproveDraft, onSendToQa, onMarkDone, onSendNudge, onRequestDraft }: {
   item: any

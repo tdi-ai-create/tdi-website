@@ -77,6 +77,18 @@ export async function GET() {
       }
     }
 
+    // Re-sort the flattened cross-portfolio list: critical → high → normal → low,
+    // then by due date (oldest/most overdue first)
+    const urgencyOrder: Record<string, number> = { critical: 0, high: 1, normal: 2, low: 3 }
+    allItems.sort((a, b) => {
+      const ua = urgencyOrder[a.urgency] ?? 2
+      const ub = urgencyOrder[b.urgency] ?? 2
+      if (ua !== ub) return ua - ub
+      const da = a.dueDate ? new Date(a.dueDate + 'T00:00:00').getTime() : Infinity
+      const db = b.dueDate ? new Date(b.dueDate + 'T00:00:00').getTime() : Infinity
+      return da - db
+    })
+
     // Counts
     const counts = {
       bella: allItems.filter(i => i.owner === 'bella' && !i.inProgress).length,

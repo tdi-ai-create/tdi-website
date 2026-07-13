@@ -37,6 +37,24 @@ export function computeNextActions(
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
+  // Detect unstarted pursuits: no opportunities, no gate, no action items
+  const isUnstarted = opportunities.length === 0 && !gate && actions.length === 0
+  if (isUnstarted) {
+    result.push({
+      id: `unstarted-${pursuit.id}`,
+      label: 'Not started — set up this pursuit',
+      why: 'No funding paths mapped yet',
+      owner: 'bella',
+      urgency: 'low',
+      actionType: 'setup_pursuit',
+      tab: 'overview',
+    })
+    return result
+  }
+
+  // Detect whether pursuit is in-flight (has opportunities or gate) for profile noise gating
+  const isInFlight = opportunities.length > 0 || !!gate
+
   const pendingActions = actions.filter((a: any) =>
     a.status === 'pending' || a.status === 'in_progress'
   )
@@ -232,25 +250,27 @@ export function computeNextActions(
     })
   }
 
-  // Profile incomplete
-  let profileFields = 0
-  let profileFilled = 0
-  try {
-    const sp = typeof pursuit.school_profile === 'string' ? JSON.parse(pursuit.school_profile) : (pursuit.school_profile || {})
-    const required = ['school_name', 'district', 'educator_count', 'title_i_status', 'frl_pct', 'budget_holder', 'atsi_status']
-    profileFields = required.length
-    profileFilled = required.filter(k => sp[k] != null && sp[k] !== '' && sp[k] !== false).length
-  } catch {}
-  if (profileFields > 0 && profileFilled < profileFields) {
-    result.push({
-      id: 'complete-profile',
-      label: `School profile ${Math.round((profileFilled / profileFields) * 100)}% complete`,
-      why: `${profileFields - profileFilled} field${profileFields - profileFilled !== 1 ? 's' : ''} need verification`,
-      owner: 'bella',
-      urgency: 'normal',
-      actionType: 'complete_profile',
-      tab: 'overview',
-    })
+  // Profile incomplete (only for in-flight pursuits — don't spam for unstarted ones)
+  if (isInFlight) {
+    let profileFields = 0
+    let profileFilled = 0
+    try {
+      const sp = typeof pursuit.school_profile === 'string' ? JSON.parse(pursuit.school_profile) : (pursuit.school_profile || {})
+      const required = ['school_name', 'district', 'educator_count', 'title_i_status', 'frl_pct', 'budget_holder', 'atsi_status']
+      profileFields = required.length
+      profileFilled = required.filter(k => sp[k] != null && sp[k] !== '' && sp[k] !== false).length
+    } catch {}
+    if (profileFields > 0 && profileFilled < profileFields) {
+      result.push({
+        id: 'complete-profile',
+        label: `School profile ${Math.round((profileFilled / profileFields) * 100)}% complete`,
+        why: `${profileFields - profileFilled} field${profileFields - profileFilled !== 1 ? 's' : ''} need verification`,
+        owner: 'bella',
+        urgency: 'normal',
+        actionType: 'complete_profile',
+        tab: 'overview',
+      })
+    }
   }
 
   // Opportunities with open window + gate open but narrative not started
@@ -348,9 +368,18 @@ export function computeNextActions(
     })
   }
 
-  // Sort: critical first, then high, normal, low. Within same urgency, keep insertion order.
+  // Sort: critical first, then high, normal, low.
+  // Within same urgency, sort by due date (oldest/most overdue first), then no-date items last.
   const urgencyOrder: Record<string, number> = { critical: 0, high: 1, normal: 2, low: 3 }
-  result.sort((a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency])
+  result.sort((a, b) => {
+    const ua = urgencyOrder[a.urgency] ?? 2
+    const ub = urgencyOrder[b.urgency] ?? 2
+    if (ua !== ub) return ua - ub
+    // Within same urgency, sort by due date (earliest first, null last)
+    const da = a.dueDate ? new Date(a.dueDate + 'T00:00:00').getTime() : Infinity
+    const db = b.dueDate ? new Date(b.dueDate + 'T00:00:00').getTime() : Infinity
+    return da - db
+  })
 
   return result
 }
