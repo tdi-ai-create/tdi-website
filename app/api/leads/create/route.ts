@@ -43,8 +43,7 @@ export async function POST(req: NextRequest) {
     // Add state if provided
     if (body.state_code) insertData.state = body.state_code;
 
-    // Add optional columns directly to insertData
-    if (body.contact_role) insertData.contact_role = body.contact_role;
+    // contact_role is included in notes above (column not yet in prod schema)
 
     let { data: lead, error: insertErr } = await supabase
       .from('sales_opportunities')
