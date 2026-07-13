@@ -182,6 +182,16 @@ export default function FundingPage() {
           >
             My Queue
           </Link>
+          <Link
+            href="/tdi-admin/funding/settings"
+            style={{
+              fontSize: 12, padding: '10px 14px', borderRadius: 8,
+              border: '1px solid #E5E7EB', background: 'white', color: '#6B7280',
+              textDecoration: 'none',
+            }}
+          >
+            Settings
+          </Link>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
             style={{

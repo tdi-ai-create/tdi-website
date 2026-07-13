@@ -9,6 +9,7 @@ import {
   toneForRung,
   type EmailType,
 } from '@/lib/funding-followup-email'
+import { postFundingEvent, nudgeSentEvent } from '@/lib/funding-slack'
 
 function db() {
   return createClient(
@@ -223,6 +224,9 @@ export async function POST(
       updated_at: new Date().toISOString(),
     })
     .eq('id', actionId)
+
+  // Slack narration
+  postFundingEvent(nudgeSentEvent(item.pursuit_id, schoolName, item.title, recipientEmail)).catch(() => {})
 
   return NextResponse.json({
     sent: true,

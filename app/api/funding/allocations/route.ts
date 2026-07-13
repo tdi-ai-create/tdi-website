@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
+import { postFundingEvent, allocationEvent } from '@/lib/funding-slack'
 
 function db() {
   return createClient(
@@ -55,6 +56,11 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Slack narration
+  const { data: pursuit } = await supabase.from('funding_pursuits').select('pursuit_name').eq('id', body.pursuitId).single()
+  postFundingEvent(allocationEvent(body.pursuitId, pursuit?.pursuit_name || 'Unknown', body.lineItemKey, body.allocatedAmount, 'allocated')).catch(() => {})
+
   return NextResponse.json({ success: true, allocation: data })
 }
 
@@ -85,6 +91,16 @@ export async function PATCH(request: NextRequest) {
     .eq('id', body.id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Slack narration for handoffs
+  if (body.handToTrainer || body.handToFinance) {
+    const { data: alloc } = await supabase.from('award_allocations').select('pursuit_id, line_item_key, allocated_amount').eq('id', body.id).single()
+    if (alloc) {
+      const { data: pursuit } = await supabase.from('funding_pursuits').select('pursuit_name').eq('id', alloc.pursuit_id).single()
+      postFundingEvent(allocationEvent(alloc.pursuit_id, pursuit?.pursuit_name || 'Unknown', alloc.line_item_key, alloc.allocated_amount, body.handToTrainer ? 'delivered' : 'invoiced')).catch(() => {})
+    }
+  }
+
   return NextResponse.json({ success: true })
 }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
+import { postFundingEvent, gateEvent, contactVerifiedEvent } from '@/lib/funding-slack'
 
 function db() {
   return createClient(
@@ -92,5 +93,17 @@ export async function PUT(
   }
 
   if (result.error) return NextResponse.json({ error: result.error.message }, { status: 500 })
+
+  // Slack narration
+  const { data: pursuit } = await supabase.from('funding_pursuits').select('pursuit_name').eq('id', pursuitId).single()
+  const pName = pursuit?.pursuit_name || 'Unknown'
+
+  if (nowOpen && !wasOpen) {
+    postFundingEvent(gateEvent(pursuitId, pName)).catch(() => {})
+  }
+  if (body.submitter_employment_verified_at && !existing?.submitter_employment_verified_at) {
+    postFundingEvent(contactVerifiedEvent(pursuitId, pName, result.data?.submitter_name || 'Contact')).catch(() => {})
+  }
+
   return NextResponse.json({ success: true, gate: result.data })
 }

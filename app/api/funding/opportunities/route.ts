@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
+import { postFundingEvent, narrativeEvent, windowEvent, submittedEvent, awardEvent, denialEvent, researchEvent } from '@/lib/funding-slack';
 
 function db() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { autoRefreshToken: false, persistSession: false } });
@@ -92,7 +93,7 @@ export async function PATCH(request: NextRequest) {
   // Get current state for change detection
   const { data: before } = await supabase
     .from('funding_opportunities')
-    .select('status, waiting_on, client_submitted, pursuit_id')
+    .select('status, waiting_on, client_submitted, pursuit_id, narrative_status')
     .eq('id', body.id)
     .single();
 
@@ -164,6 +165,42 @@ export async function PATCH(request: NextRequest) {
       event_detail: body.client_submitted_proof || 'Submission confirmed',
       status: 'complete',
     });
+  }
+
+  // ── Slack narration for state changes ──
+  // Fire-and-forget — don't block the response
+  if (before?.pursuit_id) {
+    const { data: oppNow } = await supabase.from('funding_opportunities').select('name, assigned_agent, awarded_amount, amount').eq('id', body.id).single()
+    const { data: pursuitNow } = await supabase.from('funding_pursuits').select('pursuit_name').eq('id', before.pursuit_id).single()
+    const pName = pursuitNow?.pursuit_name || 'Unknown'
+    const oName = oppNow?.name || 'Unknown'
+    const pId = before.pursuit_id
+
+    // Narrative status change
+    if (body.narrative_status && body.narrative_status !== before.narrative_status) {
+      const fromNs = before.narrative_status || 'not_started'
+      postFundingEvent(narrativeEvent(pId, pName, oName, fromNs, body.narrative_status, oppNow?.assigned_agent)).catch(() => {})
+    }
+    // Window status change
+    if (body.window_status) {
+      postFundingEvent(windowEvent(pId, pName, oName, body.window_status)).catch(() => {})
+    }
+    // Client submitted
+    if (body.client_submitted === true && !before.client_submitted) {
+      postFundingEvent(submittedEvent(pId, pName, oName, body.client_submitted_proof)).catch(() => {})
+    }
+    // Award recorded
+    if (body.status === 'awarded' && before.status !== 'awarded') {
+      postFundingEvent(awardEvent(pId, pName, oName, oppNow?.awarded_amount || oppNow?.amount || 0)).catch(() => {})
+    }
+    // Denial recorded
+    if (body.status === 'denied' && before.status !== 'denied') {
+      postFundingEvent(denialEvent(pId, pName, oName, body.denial_reason)).catch(() => {})
+    }
+    // Research status change
+    if (body.research_status) {
+      postFundingEvent(researchEvent(pId, pName, oName, body.research_status, oppNow?.assigned_agent)).catch(() => {})
+    }
   }
 
   return NextResponse.json({ success: true });
