@@ -31,6 +31,7 @@ export default function PursuitDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState('overview')
+  const [pursuit, setPursuit] = useState<any>(null)
 
   useEffect(() => {
     if (!pursuitId) return
@@ -38,7 +39,7 @@ export default function PursuitDetailPage() {
       .then(r => r.json())
       .then(d => {
         if (d.error) setError(d.error)
-        else setData(d)
+        else { setData(d); setPursuit(d.pursuit) }
         setLoading(false)
       })
       .catch(e => { setError(e.message); setLoading(false) })
@@ -61,7 +62,7 @@ export default function PursuitDetailPage() {
     )
   }
 
-  if (error || !data?.pursuit) {
+  if (error || !data?.pursuit || !pursuit) {
     return (
       <div style={{ padding: '32px 48px', fontFamily: "'DM Sans', sans-serif" }}>
         <div style={{ marginBottom: 24 }}>
@@ -76,7 +77,6 @@ export default function PursuitDetailPage() {
     )
   }
 
-  const [pursuit, setPursuit] = useState(data.pursuit)
   const p = pursuit
   const gate = data.gate
 
