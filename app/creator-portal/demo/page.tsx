@@ -61,7 +61,7 @@ const mockCreator = {
   name: 'Sarah Johnson',
   course_title: 'Classroom Management Strategies That Actually Work',
   course_audience: 'K-5 Elementary Teachers',
-  target_publish_month: 'March 2025',
+  target_publish_month: 'September 2026',
   discount_code: 'SARAH20',
 };
 
@@ -1119,7 +1119,7 @@ export default function CreatorPortalDemoPage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <h3 className="text-lg font-semibold text-[#1e2749] mb-4">Need Help?</h3>
               <p className="text-sm text-gray-600 mb-4">
-                Questions about your course? Reach out anytime!
+                Questions about your project? Reach out anytime!
               </p>
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 bg-[#80a4ed]/20 rounded-full flex items-center justify-center flex-shrink-0">

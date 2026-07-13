@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { CREATOR_STUDIO_RECIPIENTS } from '@/lib/creator-notification-recipients';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +12,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const recipients = ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'];
+    const recipients = CREATOR_STUDIO_RECIPIENTS;
     const subject = `Action Needed: ${creatorName} is waiting on TDI`;
     const body = `
 Creator: ${creatorName} (${creatorEmail})

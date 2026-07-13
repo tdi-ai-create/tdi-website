@@ -139,7 +139,7 @@ export default function DemoAgreementPage() {
               </div>
               <div>
                 <p className="font-medium text-[#1e2749]">How you get paid</p>
-                <p className="text-gray-600 text-sm">30% commission on sales using your code. We want you to feel valued! If you have questions, we are here to help!</p>
+                <p className="text-gray-600 text-sm">50% of revenue from your affiliate link, forever. We want you to feel valued! If you have questions, we are here to help!</p>
               </div>
             </div>
 
@@ -216,7 +216,7 @@ export default function DemoAgreementPage() {
               <p className="text-sm text-gray-700">Instead of a flat fee, you&apos;ll earn ongoing commission:</p>
               <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
                 <li>You&apos;ll receive a custom discount code to share publicly</li>
-                <li>You earn 30% commission on any purchases made with your code (courses or All Access Memberships)</li>
+                <li>You earn 50% of revenue from purchases made through your affiliate link</li>
                 <li>Commissions are calculated after discounts, excluding taxes/fees</li>
                 <li>Payouts happen quarterly</li>
               </ul>

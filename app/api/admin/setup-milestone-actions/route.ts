@@ -19,12 +19,12 @@ const milestoneActions: Record<string, { action_type: string; action_config: Rec
     action_config: { label: "I've Reviewed the Notes" },
     requires_team_action: false,
   },
-  'rae_meeting_scheduled': {
+  'kickoff_call_scheduled': {
     action_type: 'calendly',
     action_config: { url: 'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2u_lKGMRaB_tUKQNNoYRyWR4PeeSbmkIW3auqmUGzkSTJFHsWqayLNkzDWqzoySgiaJ7FR12Sn', label: 'Book Your Kickoff Call with the Team' },
     requires_team_action: false,
   },
-  'rae_meeting_completed': {
+  'kickoff_call_completed': {
     action_type: 'team_action',
     action_config: { label: 'Waiting on TDI Team' },
     requires_team_action: true,

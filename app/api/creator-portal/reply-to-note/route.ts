@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { CREATOR_STUDIO_RECIPIENTS } from '@/lib/creator-notification-recipients';
 
 export async function POST(request: NextRequest) {
   try {
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
           </div>
 
           <p style="margin-top: 32px;">
-            <a href="https://www.teachersdeserveit.com/admin/creators/${creatorId}"
+            <a href="https://www.teachersdeserveit.com/tdi-admin/creators/${creatorId}"
                style="display: inline-block; background: #1e2749; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600;">
               View Creator Profile →
             </a>
@@ -104,7 +105,7 @@ export async function POST(request: NextRequest) {
           },
           body: JSON.stringify({
             from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-            to: ['rae@teachersdeserveit.com', 'creatorstudio@teachersdeserveit.com'],
+            to: CREATOR_STUDIO_RECIPIENTS,
             subject: `Creator Reply: ${creatorName}`,
             html: emailHtml,
           }),

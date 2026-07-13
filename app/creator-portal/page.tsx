@@ -86,7 +86,7 @@ function CreatorPortalLoginContent({ onPendingRedirect }: CreatorPortalLoginCont
     if (!exists) {
       return {
         allowed: false,
-        error: "We couldn't find a creator account with that email. If you're interested in creating content with TDI, apply at /create-with-us.",
+        error: 'We couldn\'t find a creator account with that email. If you\'re interested in creating content with TDI, <a href="/create-with-us" style="color: #2563EB; text-decoration: underline;">apply here</a>.',
       };
     }
     return { allowed: true };
@@ -182,7 +182,7 @@ function CreatorPortalLoginContent({ onPendingRedirect }: CreatorPortalLoginCont
         }} className="creator-login-right">
           <div style={{ width: '100%', maxWidth: 420 }}>
             <div style={{ textAlign: 'center', marginBottom: 20 }}>
-              <h2 style={{ fontSize: 22, fontWeight: 700, color: '#ffffff', margin: '0 0 4px', fontFamily: "'Source Serif 4', Georgia, serif" }}>Sign in to Creator Studio</h2>
+              <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1e2749', margin: '0 0 4px', fontFamily: "'Source Serif 4', Georgia, serif" }}>Sign in to Creator Studio</h2>
               <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>Access your creator dashboard</p>
             </div>
             <PortalSignIn
