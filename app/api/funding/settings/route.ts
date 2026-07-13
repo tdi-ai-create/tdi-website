@@ -11,6 +11,9 @@ function db() {
 }
 
 export async function GET() {
+  const auth = await requireAdminAuth()
+  if (auth instanceof NextResponse) return auth
+
   const supabase = db()
   const { data } = await supabase.from('funding_notification_settings').select('*').limit(1).single()
   return NextResponse.json({ settings: data || null })
