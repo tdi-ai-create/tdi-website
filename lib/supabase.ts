@@ -16,6 +16,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 
 // Lazy-initialized Supabase client to avoid build-time errors
 let supabaseInstance: SupabaseClient | null = null;
@@ -32,7 +33,15 @@ export function getSupabase(): SupabaseClient {
     throw new Error('Supabase environment variables are not configured');
   }
 
-  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+  // Browser: cookie-backed client so the server (requireAdminAuth) can read
+  // the same session. One session store (cookies), no localStorage.
+  // Server: plain anon client (used by 3 Roosevelt dashboard routes).
+  if (typeof window !== 'undefined') {
+    supabaseInstance = createBrowserClient(supabaseUrl, supabaseAnonKey);
+  } else {
+    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+  }
+
   return supabaseInstance;
 }
 

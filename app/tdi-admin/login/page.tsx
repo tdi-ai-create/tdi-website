@@ -285,6 +285,7 @@ export default function TDIAdminLoginPage() {
               portalSubtitle="Sign in to manage Teachers Deserve It"
               methods={{ google: true, emailPassword: true, magicLink: true, signUp: false }}
               onSuccess={handleSuccess}
+              getSupabaseClient={getSupabase}
               magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/tdi-admin/login` : '/tdi-admin/login'}
               googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/tdi-admin` : '/tdi-admin'}
               forgotPasswordRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/tdi-admin/login` : '/tdi-admin/login'}
