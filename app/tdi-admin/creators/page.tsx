@@ -2103,7 +2103,7 @@ export default function CreatorStudioPage() {
           <h1 style={TYPE_PAGE_TITLE}>Creator Studio</h1>
           <div className="flex items-center gap-3">
             <Link
-              href="/tdi-admin/creator-updates"
+              href="/tdi-admin/creators/updates"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border border-violet-200 text-violet-600 hover:bg-violet-50"
             >
               <Sparkles className="w-4 h-4" />

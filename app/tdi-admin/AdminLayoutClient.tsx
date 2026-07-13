@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getSupabaseBrowser } from '@/lib/supabase-browser';
+import { getSupabase } from '@/lib/supabase';
 import { TDIAdminProvider, useTDIAdmin } from '@/lib/tdi-admin/context';
 import { ShieldAlert, LogOut, Settings } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
@@ -139,7 +139,7 @@ const SUB_NAV_ITEMS = [
 function AdminSidebar({ user }: { user: User }) {
   const pathname = usePathname();
   const router = useRouter();
-  const supabase = getSupabaseBrowser();
+  const supabase = getSupabase();
   const { teamMember, canManageTeam, accessibleSections, isOwner } = useTDIAdmin();
 
   // Collapsed state with localStorage persistence
@@ -351,7 +351,7 @@ function MinimalAdminHeader() {
 
 function AccessDenied({ userEmail }: { userEmail?: string }) {
   const router = useRouter();
-  const supabase = getSupabaseBrowser();
+  const supabase = getSupabase();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -521,7 +521,7 @@ function AdminLayoutContent({ children, user }: { children: React.ReactNode; use
 export default function AdminLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const supabase = getSupabaseBrowser();
+  const supabase = getSupabase();
 
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
