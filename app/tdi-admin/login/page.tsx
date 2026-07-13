@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { LayoutDashboard, Users, BarChart3, Settings } from 'lucide-react';
 import { checkTeamAccess } from '@/lib/tdi-admin/permissions';
-import { getSupabaseBrowser } from '@/lib/supabase-browser';
+import { getSupabase } from '@/lib/supabase';
 import PortalSignIn from '@/components/auth/PortalSignIn';
 
 export default function TDIAdminLoginPage() {
@@ -20,7 +20,7 @@ export default function TDIAdminLoginPage() {
     async function checkAuth() {
       try {
         // Use Creator Portal Supabase — admin users auth against Creator Portal, NOT the Hub
-        const supabase = getSupabaseBrowser();
+        const supabase = getSupabase();
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           const teamMember = await checkTeamAccess(user.id, user.email || '');
@@ -41,7 +41,7 @@ export default function TDIAdminLoginPage() {
   }, [router]);
 
   const handleSignOut = async () => {
-    const supabase = getSupabaseBrowser();
+    const supabase = getSupabase();
     await supabase.auth.signOut();
     setAccessDenied(false);
     setDeniedEmail('');
@@ -285,7 +285,6 @@ export default function TDIAdminLoginPage() {
               portalSubtitle="Sign in to manage Teachers Deserve It"
               methods={{ google: true, emailPassword: true, magicLink: true, signUp: false }}
               onSuccess={handleSuccess}
-              getSupabaseClient={getSupabaseBrowser}
               magicLinkRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/tdi-admin/login` : '/tdi-admin/login'}
               googleRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/tdi-admin` : '/tdi-admin'}
               forgotPasswordRedirectTo={typeof window !== 'undefined' ? `${window.location.origin}/tdi-admin/login` : '/tdi-admin/login'}
