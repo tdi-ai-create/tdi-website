@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { AlertBar } from './components/AlertBar'
 import { PhaseTabs } from './components/PhaseTabs'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { PursuitCard } from './components/PursuitCard'
 import { MyTasks } from './components/MyTasks'
 import {
@@ -170,15 +171,27 @@ export default function FundingPage() {
             Grant Pursuits &middot; Federal, State, Foundation
           </p>
         </div>
-        <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          style={{
-            fontSize: 13, fontWeight: 700, padding: '10px 20px', borderRadius: 8,
-            border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer',
-          }}
-        >
-          + Add Pursuit
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Link
+            href="/tdi-admin/funding/queue"
+            style={{
+              fontSize: 13, fontWeight: 700, padding: '10px 20px', borderRadius: 8,
+              border: '2px solid #8B5CF6', background: 'white', color: '#8B5CF6',
+              textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6,
+            }}
+          >
+            My Queue
+          </Link>
+          <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            style={{
+              fontSize: 13, fontWeight: 700, padding: '10px 20px', borderRadius: 8,
+              border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer',
+            }}
+          >
+            + Add Pursuit
+          </button>
+        </div>
       </div>
 
       {/* Add Pursuit Form */}
