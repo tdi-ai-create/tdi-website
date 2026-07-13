@@ -244,6 +244,7 @@ export default function TDIAdminCreatorDetailPage() {
   // AI summary state
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [isLoadingAiSummary, setIsLoadingAiSummary] = useState(false);
+  const [pendingDrafts, setPendingDrafts] = useState<any[]>([]);
 
   const adminEmail = teamMember?.email || '';
 
@@ -313,6 +314,20 @@ export default function TDIAdminCreatorDetailPage() {
     } else {
       const notes = await getCreatorNotes(creatorId, true);
       setAllNotes(notes);
+    }
+
+    // Load pending agent drafts for this creator
+    try {
+      const supabase = getSupabase();
+      const { data: drafts } = await supabase
+        .from('creator_notes')
+        .select('id, content, draft_reason, created_at')
+        .eq('creator_id', creatorId)
+        .eq('draft_status', 'pending_approval')
+        .order('created_at', { ascending: false });
+      setPendingDrafts(drafts || []);
+    } catch {
+      // Non-fatal -- agent drafts feature may not be set up yet
     }
 
     // Load projected date history via API (bypasses RLS)
@@ -1135,6 +1150,89 @@ export default function TDIAdminCreatorDetailPage() {
           </div>
         ) : null}
       </div>
+
+      {/* Agent Flag Banner */}
+      {(creator as any).agent_flag && !(creator as any).agent_flag_cleared && (
+        <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+              <AlertCircle className="w-5 h-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-amber-800">Anne Marie flagged this creator</p>
+              <p className="text-sm text-amber-700 mt-1">{(creator as any).agent_flag}</p>
+              {(creator as any).agent_flag_at && (
+                <p className="text-xs text-amber-500 mt-1">{new Date((creator as any).agent_flag_at).toLocaleDateString()}</p>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={async () => {
+              await fetch('/api/creator-studio/sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'clear_flag', creator_id: creatorId }),
+              });
+              setDashboardData((prev: any) => prev ? { ...prev, creator: { ...prev.creator, agent_flag: null, agent_flag_cleared: true } } : prev);
+            }}
+            className="text-xs text-amber-600 hover:text-amber-800 font-medium px-3 py-1.5 rounded-lg hover:bg-amber-100 transition-colors flex-shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Pending Agent Drafts for this creator */}
+      {pendingDrafts.length > 0 && (
+        <div className="mb-6 bg-violet-50 border border-violet-200 rounded-xl overflow-hidden">
+          <div className="px-4 py-3 border-b border-violet-100 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-violet-500" />
+            <span className="text-sm font-semibold text-violet-800">Agent Draft{pendingDrafts.length > 1 ? 's' : ''} Pending Approval</span>
+            <span className="text-xs bg-violet-200 text-violet-700 px-2 py-0.5 rounded-full font-medium">{pendingDrafts.length}</span>
+          </div>
+          {pendingDrafts.map((draft: any) => (
+            <div key={draft.id} className="p-4 border-b border-violet-50 last:border-b-0">
+              <p className="text-sm text-gray-700 mb-2 whitespace-pre-wrap">{draft.content}</p>
+              {draft.draft_reason && (
+                <p className="text-xs text-violet-500 mb-3">Reason: {draft.draft_reason}</p>
+              )}
+              <div className="flex gap-2">
+                <button
+                  onClick={async () => {
+                    const res = await fetch('/api/creator-studio/sync', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ action: 'approve_draft', note_id: draft.id, approved_by: adminEmail }),
+                    });
+                    if (res.ok) {
+                      setPendingDrafts((prev: any[]) => prev.filter((d: any) => d.id !== draft.id));
+                      loadData();
+                    }
+                  }}
+                  className="px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Approve & Send to Creator
+                </button>
+                <button
+                  onClick={async () => {
+                    const res = await fetch('/api/creator-studio/sync', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ action: 'reject_draft', note_id: draft.id }),
+                    });
+                    if (res.ok) {
+                      setPendingDrafts((prev: any[]) => prev.filter((d: any) => d.id !== draft.id));
+                    }
+                  }}
+                  className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Reject
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main content - Milestones */}
