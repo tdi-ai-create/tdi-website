@@ -29,6 +29,19 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       .eq('pursuit_id', id)
       .order('display_order')
 
+    // Fetch opportunities and actions for next-actions computation
+    const { data: opportunities } = await supabase
+      .from('funding_opportunities')
+      .select('*')
+      .eq('pursuit_id', id)
+      .order('created_at')
+
+    const { data: actionItems } = await supabase
+      .from('funding_action_items')
+      .select('*')
+      .eq('pursuit_id', id)
+      .order('due_date', { ascending: true, nullsFirst: false })
+
     // Fetch pursuit gate for submitter/backup/admin_sponsor info
     const { data: gate } = await supabase
       .from('pursuit_gate')
@@ -95,6 +108,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       timeline: timeline || [],
       touchpoints: touchpoints || [],
       gate: gate || null,
+      opportunities: opportunities || [],
+      actionItems: actionItems || [],
+      allocations: allAllocations,
       partnershipHealth,
       renewalEligible,
       contract1,

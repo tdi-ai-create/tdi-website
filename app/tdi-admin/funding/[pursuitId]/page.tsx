@@ -13,6 +13,7 @@ import {
   TYPE_PAGE_TITLE,
   TYPE_PAGE_SUBTITLE,
 } from '@/components/tdi-admin/ui/design-tokens'
+import { computeNextActions, type NextAction } from '@/lib/funding-next-actions'
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
@@ -77,6 +78,13 @@ export default function PursuitDetailPage() {
 
   const p = data.pursuit
   const gate = data.gate
+  const nextActions = computeNextActions(
+    p,
+    data.opportunities || [],
+    data.actionItems || [],
+    gate,
+    data.allocations || [],
+  )
   const awarded = p.total_awarded || 0
   const gap = p.contract_gap || p.total_amount || 0
   const remaining = gap - awarded
@@ -106,6 +114,9 @@ export default function PursuitDetailPage() {
         <div style={{ marginBottom: 16 }}>
           <PhaseChain currentPhase={p.current_phase} isStalled={p.is_stalled} />
         </div>
+
+        {/* Next Actions panel */}
+        <NextActionsPanel actions={nextActions} onTabChange={setActiveTab} />
 
         {/* Key stats row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
@@ -174,6 +185,120 @@ export default function PursuitDetailPage() {
         {activeTab === 'timeline' && <TimelineTab pursuitId={pursuitId} />}
         {activeTab === 'emails' && <EmailsTab pursuitId={pursuitId} pursuit={p} />}
       </div>
+    </div>
+  )
+}
+
+// ── Next Actions Panel ──
+
+const URGENCY_STYLES: Record<string, { dot: string; bg: string }> = {
+  critical: { dot: '#DC2626', bg: '#FEF2F2' },
+  high: { dot: '#F59E0B', bg: '#FFFBEB' },
+  normal: { dot: '#3B82F6', bg: 'white' },
+  low: { dot: '#D1D5DB', bg: 'white' },
+}
+
+const OWNER_BADGES: Record<string, { emoji: string; label: string; color: string; bg: string }> = {
+  bella: { emoji: '\uD83D\uDC64', label: 'Bella', color: '#6D28D9', bg: '#F5F3FF' },
+  rae: { emoji: '\uD83D\uDC54', label: 'Rae', color: '#0F766E', bg: '#F0FDFA' },
+  agent: { emoji: '\uD83E\uDD16', label: 'Agent', color: '#1D4ED8', bg: '#EFF6FF' },
+  school: { emoji: '\uD83C\uDFEB', label: 'School', color: '#92400E', bg: '#FFFBEB' },
+  auto: { emoji: '\u2699\uFE0F', label: 'Auto', color: '#6B7280', bg: '#F3F4F6' },
+}
+
+function NextActionsPanel({ actions, onTabChange }: { actions: NextAction[]; onTabChange: (tab: string) => void }) {
+  const actionable = actions.filter(a => !a.inProgress)
+  const inFlight = actions.filter(a => a.inProgress)
+  const [showInFlight, setShowInFlight] = useState(false)
+
+  return (
+    <div style={{
+      marginBottom: 16, padding: '16px 20px', background: 'white',
+      borderRadius: 14, border: '1px solid #E5E7EB',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: actionable.length > 0 ? 12 : 0 }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color: '#0a0f1e' }}>What's Next</span>
+        {actionable.length === 0 && (
+          <span style={{ fontSize: 12, color: '#065F46' }}>
+            Nothing needs you right now
+          </span>
+        )}
+        {inFlight.length > 0 && (
+          <button
+            onClick={() => setShowInFlight(!showInFlight)}
+            style={{ fontSize: 10, color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer', marginLeft: 'auto' }}
+          >
+            {showInFlight ? 'Hide' : 'Show'} {inFlight.length} in flight
+          </button>
+        )}
+      </div>
+
+      {/* Actionable items */}
+      {actionable.map(action => {
+        const urgency = URGENCY_STYLES[action.urgency] || URGENCY_STYLES.normal
+        const owner = OWNER_BADGES[action.owner] || OWNER_BADGES.auto
+
+        return (
+          <div
+            key={action.id}
+            style={{
+              display: 'flex', alignItems: 'flex-start', gap: 10,
+              padding: '8px 12px', borderRadius: 8, marginBottom: 4,
+              background: urgency.bg,
+              cursor: action.tab ? 'pointer' : 'default',
+            }}
+            onClick={() => action.tab && onTabChange(action.tab)}
+          >
+            {/* Urgency dot */}
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: urgency.dot, flexShrink: 0, marginTop: 5 }} />
+
+            {/* Content */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#0a0f1e' }}>{action.label}</div>
+              <div style={{ fontSize: 11, color: '#6B7280', marginTop: 1 }}>{action.why}</div>
+            </div>
+
+            {/* Owner badge */}
+            <span style={{
+              fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 4,
+              background: owner.bg, color: owner.color, whiteSpace: 'nowrap', flexShrink: 0,
+            }}>
+              {owner.emoji} {owner.label}
+            </span>
+
+            {/* Due date */}
+            {action.dueDate && (
+              <span style={{ fontSize: 10, color: '#6B7280', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                {new Date(action.dueDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </span>
+            )}
+          </div>
+        )
+      })}
+
+      {/* In-flight items (muted) */}
+      {showInFlight && inFlight.map(action => {
+        const owner = OWNER_BADGES[action.owner] || OWNER_BADGES.auto
+        return (
+          <div
+            key={action.id}
+            style={{
+              display: 'flex', alignItems: 'flex-start', gap: 10,
+              padding: '6px 12px', borderRadius: 8, marginBottom: 2,
+              opacity: 0.55,
+            }}
+          >
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#D1D5DB', flexShrink: 0, marginTop: 5 }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 12, color: '#6B7280' }}>{action.label}</div>
+              <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 1 }}>{action.why}</div>
+            </div>
+            <span style={{ fontSize: 9, fontWeight: 600, padding: '2px 6px', borderRadius: 4, background: owner.bg, color: owner.color, whiteSpace: 'nowrap', flexShrink: 0 }}>
+              {owner.emoji} {owner.label}
+            </span>
+          </div>
+        )
+      })}
     </div>
   )
 }
