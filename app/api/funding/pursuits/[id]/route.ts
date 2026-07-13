@@ -58,6 +58,38 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       && allAllocations.every(a => a.line_item_status === 'delivered' || a.line_item_status === 'invoiced')
       && !!pursuit.partnership_id
 
+    // Fetch linked contracts (Contract 1 & 2 from pursuit_gate)
+    let contract1 = null
+    let contract2 = null
+    let contract2LineItems: any[] = []
+    if (gate) {
+      if (gate.contract1_quote_id) {
+        const { data: q } = await supabase
+          .from('quotes')
+          .select('id, title, status, contract_type, signed_at')
+          .eq('id', gate.contract1_quote_id)
+          .maybeSingle()
+        contract1 = q
+      }
+      if (gate.contract2_quote_id) {
+        const { data: q } = await supabase
+          .from('quotes')
+          .select('id, title, status, contract_type, signed_at')
+          .eq('id', gate.contract2_quote_id)
+          .maybeSingle()
+        contract2 = q
+        // Fetch line items for Contract 2
+        if (q) {
+          const { data: pkgs } = await supabase
+            .from('quote_packages')
+            .select('id, package_name, total_amount, line_items')
+            .eq('quote_id', q.id)
+            .order('package_index')
+          contract2LineItems = pkgs || []
+        }
+      }
+    }
+
     return NextResponse.json({
       pursuit,
       timeline: timeline || [],
@@ -65,6 +97,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       gate: gate || null,
       partnershipHealth,
       renewalEligible,
+      contract1,
+      contract2,
+      contract2LineItems,
     })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })

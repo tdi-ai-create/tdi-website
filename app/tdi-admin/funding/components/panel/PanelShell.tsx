@@ -23,9 +23,12 @@ interface PanelShellProps {
   gate?: any
   partnershipHealth?: any
   renewalEligible?: boolean
+  contract1?: any
+  contract2?: any
+  contract2LineItems?: any[]
 }
 
-export function PanelShell({ pursuit, onClose, pursuitId, gate, partnershipHealth, renewalEligible }: PanelShellProps) {
+export function PanelShell({ pursuit, onClose, pursuitId, gate, partnershipHealth, renewalEligible, contract1, contract2, contract2LineItems }: PanelShellProps) {
   const [activeTab, setActiveTab] = useState('opportunities')
 
   return (
@@ -75,8 +78,8 @@ export function PanelShell({ pursuit, onClose, pursuitId, gate, partnershipHealt
 
       {/* Tab content */}
       <div style={{ padding: '20px 24px' }}>
-        {activeTab === 'overview' && <OverviewTab pursuit={pursuit} gate={gate} onGateUpdate={() => {}} partnershipHealth={partnershipHealth} renewalEligible={renewalEligible} />}
-        {activeTab === 'opportunities' && <OpportunitiesTab pursuitId={pursuitId} gateOpen={gate?.gate_open === true} />}
+        {activeTab === 'overview' && <OverviewTab pursuit={pursuit} gate={gate} onGateUpdate={() => {}} partnershipHealth={partnershipHealth} renewalEligible={renewalEligible} contract1={contract1} contract2={contract2} contract2LineItems={contract2LineItems} />}
+        {activeTab === 'opportunities' && <OpportunitiesTab pursuitId={pursuitId} gateOpen={gate?.gate_open === true} contract2LineItems={contract2LineItems} contract2QuotePackageId={contract2LineItems?.[0]?.id} />}
         {activeTab === 'actions' && <ActionsTab pursuitId={pursuitId} />}
         {activeTab === 'timeline' && <TimelineTab pursuitId={pursuitId} />}
         {activeTab === 'emails' && <EmailsTab pursuitId={pursuitId} pursuit={pursuit} />}

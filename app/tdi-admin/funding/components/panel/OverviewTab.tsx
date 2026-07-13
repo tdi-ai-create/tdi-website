@@ -9,6 +9,9 @@ interface OverviewTabProps {
   onGateUpdate?: (gate: any) => void
   partnershipHealth?: any
   renewalEligible?: boolean
+  contract1?: any
+  contract2?: any
+  contract2LineItems?: any[]
 }
 
 const GATE_ROLE_LABELS: Record<string, string> = {
@@ -17,7 +20,7 @@ const GATE_ROLE_LABELS: Record<string, string> = {
   admin_sponsor: 'Admin Sponsor',
 }
 
-export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate, partnershipHealth, renewalEligible }: OverviewTabProps) {
+export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate, partnershipHealth, renewalEligible, contract1, contract2, contract2LineItems }: OverviewTabProps) {
   const p = pursuit
   const eligibility = p.eligibility_snapshot || {}
   const hasContact = p.client_contact_name || p.client_contact_email || p.client_contact_phone || p.client_contact_role
@@ -234,6 +237,16 @@ export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate, partners
         )}
       </Section>
 
+      {/* Two-Contract Scoping */}
+      <TwoContractSection
+        pursuit={p}
+        gate={gate}
+        contract1={contract1}
+        contract2={contract2}
+        contract2LineItems={contract2LineItems}
+        onGateUpdate={(g: any) => setGate(g)}
+      />
+
       {/* Client Contact */}
       <Section title="Client Contact">
         {hasContact ? (
@@ -337,6 +350,168 @@ export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate, partners
         hasPartnership={!!partnershipHealth}
       />
     </div>
+  )
+}
+
+// ── Two-Contract Scoping ──
+
+const CONTRACT_STATUS_STYLES: Record<string, { bg: string; color: string }> = {
+  signed: { bg: '#D1FAE5', color: '#065F46' },
+  sent: { bg: '#DBEAFE', color: '#1D4ED8' },
+  viewed: { bg: '#FEF3C7', color: '#92400E' },
+  expired: { bg: '#FEE2E2', color: '#991B1B' },
+  draft: { bg: '#F3F4F6', color: '#6B7280' },
+}
+
+function TwoContractSection({ pursuit, gate, contract1, contract2, contract2LineItems, onGateUpdate }: {
+  pursuit: any; gate: any; contract1: any; contract2: any; contract2LineItems?: any[]; onGateUpdate: (g: any) => void
+}) {
+  const [linking, setLinking] = useState<'c1' | 'c2' | null>(null)
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [searching, setSearching] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const searchQuotes = async (term: string) => {
+    setSearchTerm(term)
+    if (term.length < 2) { setSearchResults([]); return }
+    setSearching(true)
+    const res = await fetch(`/api/funding/quotes-search?q=${encodeURIComponent(term)}`)
+    const data = await res.json()
+    setSearchResults(data.quotes || [])
+    setSearching(false)
+  }
+
+  const linkContract = async (slotKey: 'contract1_quote_id' | 'contract2_quote_id', quoteId: string, contractType: 'minimum' | 'grant_funded') => {
+    // Update gate with the quote id
+    const gateRes = await fetch(`/api/funding/pursuits/${pursuit.id}/gate`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ [slotKey]: quoteId }),
+    })
+    const gateResult = await gateRes.json()
+    if (gateResult.gate) onGateUpdate(gateResult.gate)
+
+    // Set the quote's contract_type
+    await fetch('/api/funding/opportunities', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      // Reuse a simple direct patch — but we need a quotes patch. Use inline.
+      body: JSON.stringify({ id: quoteId }),
+    })
+    // Direct supabase update for contract_type via a lightweight endpoint
+    await fetch(`/api/quotes/${quoteId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contract_type: contractType }),
+    }).catch(() => {})
+
+    setLinking(null)
+    setSearchResults([])
+    setSearchTerm('')
+  }
+
+  const slots = [
+    { key: 'c1' as const, label: 'Contract 1 — Minimum', subtitle: 'Own-budget, guaranteed scope', contract: contract1, gateField: 'contract1_quote_id' as const, type: 'minimum' as const, signedField: 'contract1_signed' },
+    { key: 'c2' as const, label: 'Contract 2 — Grant Funded', subtitle: 'Dream scope, funding-contingent, independently-priced line items', contract: contract2, gateField: 'contract2_quote_id' as const, type: 'grant_funded' as const, signedField: 'contract2_signed' },
+  ]
+
+  return (
+    <Section title="Two-Contract Scoping">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {slots.map(slot => {
+          const c = slot.contract
+          const isSigned = c?.status === 'signed'
+          const gateSigned = gate?.[slot.signedField] === true
+          const statusStyle = c ? (CONTRACT_STATUS_STYLES[c.status] || CONTRACT_STATUS_STYLES.draft) : null
+
+          return (
+            <div key={slot.key} style={{
+              padding: '12px 14px', background: '#F9FAFB', borderRadius: 8,
+              borderLeft: `3px solid ${c ? (isSigned ? '#10B981' : '#8B5CF6') : '#E5E7EB'}`,
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#374151' }}>{slot.label}</div>
+                  <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 1 }}>{slot.subtitle}</div>
+                </div>
+                {c && statusStyle && (
+                  <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: statusStyle.bg, color: statusStyle.color }}>
+                    {c.status}
+                  </span>
+                )}
+              </div>
+
+              {c ? (
+                <div style={{ marginTop: 8 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#0a0f1e' }}>{c.title}</div>
+                  {isSigned && !gateSigned && (
+                    <div style={{ fontSize: 10, color: '#065F46', marginTop: 4 }}>
+                      Signed — gate should reflect this
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div style={{ marginTop: 8 }}>
+                  {linking === slot.key ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <input
+                        value={searchTerm}
+                        onChange={e => searchQuotes(e.target.value)}
+                        placeholder="Search quotes by title..."
+                        autoFocus
+                        style={{ fontSize: 12, padding: '6px 10px', border: '1px solid #E5E7EB', borderRadius: 6 }}
+                      />
+                      {searching && <span style={{ fontSize: 10, color: '#9CA3AF' }}>Searching...</span>}
+                      {searchResults.map(q => (
+                        <button
+                          key={q.id}
+                          onClick={() => linkContract(slot.gateField, q.id, slot.type)}
+                          style={{
+                            fontSize: 11, padding: '6px 10px', background: 'white', border: '1px solid #E5E7EB',
+                            borderRadius: 6, textAlign: 'left', cursor: 'pointer', display: 'flex',
+                            justifyContent: 'space-between', alignItems: 'center',
+                          }}
+                        >
+                          <span>{q.title}</span>
+                          <span style={{ fontSize: 10, color: '#6B7280' }}>{q.status}</span>
+                        </button>
+                      ))}
+                      <button onClick={() => { setLinking(null); setSearchResults([]); setSearchTerm('') }} style={{ fontSize: 10, color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'flex-start' }}>
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setLinking(slot.key)}
+                      style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}
+                    >
+                      Link contract
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })}
+
+        {/* Contract 2 line items preview */}
+        {contract2LineItems && contract2LineItems.length > 0 && (
+          <div style={{ padding: '10px 14px', background: 'white', borderRadius: 8, border: '1px solid #E5E7EB' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>
+              Contract 2 — Line Items (allocatable)
+            </div>
+            {contract2LineItems.flatMap((pkg: any) =>
+              (pkg.line_items || []).map((li: any, i: number) => (
+                <div key={`${pkg.id}-${i}`} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid #F3F4F6', fontSize: 12 }}>
+                  <span style={{ color: '#374151' }}>{li.label}</span>
+                  <span style={{ fontWeight: 600, color: '#0a0f1e' }}>${(li.total || 0).toLocaleString()}</span>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+    </Section>
   )
 }
 

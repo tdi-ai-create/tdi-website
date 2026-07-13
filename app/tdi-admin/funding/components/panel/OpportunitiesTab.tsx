@@ -59,9 +59,11 @@ function emptyForm() {
 interface OpportunitiesTabProps {
   pursuitId: string
   gateOpen?: boolean
+  contract2LineItems?: any[]
+  contract2QuotePackageId?: string
 }
 
-export function OpportunitiesTab({ pursuitId, gateOpen = false }: OpportunitiesTabProps) {
+export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineItems, contract2QuotePackageId }: OpportunitiesTabProps) {
   const [opportunities, setOpportunities] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [formMode, setFormMode] = useState<'closed' | 'add' | 'edit'>('closed')
@@ -445,7 +447,7 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false }: OpportunitiesT
               onPatch={(fields) => patchOpp(opp.id, fields)}
             />
             {opp.status === 'awarded' && (
-              <AllocationPanel opp={opp} pursuitId={pursuitId} />
+              <AllocationPanel opp={opp} pursuitId={pursuitId} contract2LineItems={contract2LineItems} contract2QuotePackageId={contract2QuotePackageId} />
             )}
           </div>
         )
@@ -1148,12 +1150,19 @@ const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
   invoiced: { bg: '#D1FAE5', color: '#065F46' },
 }
 
-function AllocationPanel({ opp, pursuitId }: { opp: any; pursuitId: string }) {
+function AllocationPanel({ opp, pursuitId, contract2LineItems, contract2QuotePackageId }: {
+  opp: any; pursuitId: string; contract2LineItems?: any[]; contract2QuotePackageId?: string
+}) {
   const [allocations, setAllocations] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
   const [newLabel, setNewLabel] = useState('')
   const [newAmount, setNewAmount] = useState('')
+
+  // Extract line items from Contract 2 packages
+  const c2Items = (contract2LineItems || []).flatMap((pkg: any) =>
+    (pkg.line_items || []).map((li: any) => ({ ...li, packageId: pkg.id }))
+  )
 
   const fetchAllocations = () => {
     fetch(`/api/funding/allocations?opportunityId=${opp.id}`)
@@ -1169,6 +1178,8 @@ function AllocationPanel({ opp, pursuitId }: { opp: any; pursuitId: string }) {
   const remaining = awardedAmt - allocatedTotal
 
   const handleAdd = async () => {
+    // If selected from Contract 2 line items, include the package id
+    const selectedC2 = c2Items.find(li => li.label === newLabel)
     await fetch('/api/funding/allocations', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1177,6 +1188,7 @@ function AllocationPanel({ opp, pursuitId }: { opp: any; pursuitId: string }) {
         opportunityId: opp.id,
         lineItemKey: newLabel,
         allocatedAmount: parseFloat(newAmount) || 0,
+        quotePackageId: selectedC2?.packageId || contract2QuotePackageId || null,
       }),
     })
     setNewLabel('')
@@ -1240,8 +1252,36 @@ function AllocationPanel({ opp, pursuitId }: { opp: any; pursuitId: string }) {
       {showAdd && (
         <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end' }}>
           <div style={{ flex: 1 }}>
-            <label style={{ fontSize: 9, color: '#6B7280', display: 'block', marginBottom: 2 }}>Line item</label>
-            <input value={newLabel} onChange={e => setNewLabel(e.target.value)} placeholder="e.g. On-Campus Observation Visit" style={{ fontSize: 12, padding: '5px 8px', border: '1px solid #E5E7EB', borderRadius: 4, width: '100%' }} />
+            <label style={{ fontSize: 9, color: '#6B7280', display: 'block', marginBottom: 2 }}>Line item{c2Items.length > 0 ? ' (from Contract 2)' : ''}</label>
+            {c2Items.length > 0 ? (
+              <select
+                value={newLabel}
+                onChange={e => {
+                  const label = e.target.value
+                  setNewLabel(label)
+                  const li = c2Items.find(i => i.label === label)
+                  if (li) setNewAmount(String(li.total || ''))
+                }}
+                style={{ fontSize: 12, padding: '5px 8px', border: '1px solid #E5E7EB', borderRadius: 4, width: '100%' }}
+              >
+                <option value="">Select line item...</option>
+                {c2Items.map((li: any, i: number) => (
+                  <option key={i} value={li.label}>{li.label} (${(li.total || 0).toLocaleString()})</option>
+                ))}
+                <option value="__custom">Other (custom)</option>
+              </select>
+            ) : (
+              <input value={newLabel} onChange={e => setNewLabel(e.target.value)} placeholder="e.g. On-Campus Observation Visit" style={{ fontSize: 12, padding: '5px 8px', border: '1px solid #E5E7EB', borderRadius: 4, width: '100%' }} />
+            )}
+            {newLabel === '__custom' && (
+              <input
+                value=""
+                onChange={e => setNewLabel(e.target.value)}
+                placeholder="Custom line item name"
+                autoFocus
+                style={{ fontSize: 12, padding: '5px 8px', border: '1px solid #E5E7EB', borderRadius: 4, width: '100%', marginTop: 4 }}
+              />
+            )}
           </div>
           <div>
             <label style={{ fontSize: 9, color: '#6B7280', display: 'block', marginBottom: 2 }}>Amount ($)</label>
