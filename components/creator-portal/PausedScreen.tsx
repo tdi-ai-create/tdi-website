@@ -157,17 +157,18 @@ export default function PausedScreen({ creatorId, creatorEmail, firstName, pause
                       </button>
                     ))}
                   </div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Projected completion date</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Projected completion date (optional)</label>
                   <input
                     type="date"
                     value={projectedDate}
                     min={today}
                     onChange={(e) => setProjectedDate(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-[#1e2749] focus:outline-none focus:ring-2 focus:ring-[#80a4ed]/50 mb-5"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-[#1e2749] focus:outline-none focus:ring-2 focus:ring-[#80a4ed]/50 mb-1"
                   />
+                  <p className="text-xs text-gray-400 mb-5">You can set this later from your dashboard.</p>
                   <button
                     onClick={() => { setChoice('fresh'); handleUnpause() }}
-                    disabled={saving || !projectedDate}
+                    disabled={saving}
                     className="w-full px-4 py-3 bg-[#1e2749] text-white rounded-xl font-medium hover:bg-[#2a3459] disabled:opacity-50"
                   >
                     {saving ? 'Setting up...' : "Let's go!"}

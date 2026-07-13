@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
 
     if (adminData) {
       // User is an admin - redirect to admin panel
-      return NextResponse.redirect(`${origin}/admin/creators`);
+      return NextResponse.redirect(`${origin}/tdi-admin/creators`);
     }
 
     // User is not registered - sign them out and redirect with error

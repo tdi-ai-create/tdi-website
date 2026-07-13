@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { CREATOR_STUDIO_RECIPIENTS } from '@/lib/creator-notification-recipients';
 
 export async function POST(request: NextRequest) {
   try {
@@ -158,8 +159,8 @@ export async function POST(request: NextRequest) {
           },
           body: JSON.stringify({
             from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-            to: ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
-            subject: `🎉 ${existingCreator.name} signed their agreement!`,
+            to: CREATOR_STUDIO_RECIPIENTS,
+            subject: `${existingCreator.name} signed their agreement!`,
             html: `
               <div style="font-family: sans-serif; max-width: 600px;">
                 <h2 style="color: #1e2749;">Agreement Signed!</h2>

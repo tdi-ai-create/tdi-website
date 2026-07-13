@@ -55,7 +55,7 @@ ADD COLUMN IF NOT EXISTS action_config JSONB;
 
     // Step 3: Set calendly action for booking milestones
     const calendlyMilestones = [
-      { id: 'rae_meeting_scheduled', label: 'Book Your Kickoff Call with the Team' },
+      { id: 'kickoff_call_scheduled', label: 'Book Your Kickoff Call with the Team' },
       { id: 'outline_meeting_scheduled', label: 'Schedule Outline Review' },
       { id: 'final_outline_meeting_scheduled', label: 'Schedule Final Review' },
     ];

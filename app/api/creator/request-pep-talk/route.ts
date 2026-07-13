@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { CREATOR_STUDIO_RECIPIENTS } from '@/lib/creator-notification-recipients'
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
           headers: { 'Authorization': `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
             from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-            to: ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+            to: CREATOR_STUDIO_RECIPIENTS,
             subject: `Pep talk requested: ${creatorName || creatorEmail}`,
             html: `
               <div style="font-family: sans-serif; max-width: 600px;">

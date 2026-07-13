@@ -50,7 +50,7 @@ export function CreatorDashboardHeader({
             </p>
           ) : (
             <p className="text-white/80 mt-2">
-              Let&apos;s get your course set up!
+              Let&apos;s get your {creator.content_path === 'blog' ? 'blog post' : creator.content_path === 'download' ? 'download' : 'content'} set up!
             </p>
           )}
 

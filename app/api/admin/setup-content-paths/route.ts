@@ -18,8 +18,8 @@ const milestonePathMapping: Record<string, string[]> = {
   'content_path_selection': ['blog', 'download', 'course'],  // ID in DB is content_path_selection
   'team_intake_review': ['blog', 'download', 'course'],
   'creator_intake_review': ['blog', 'download', 'course'],
-  'rae_meeting_scheduled': ['blog', 'download', 'course'],
-  'rae_meeting_completed': ['blog', 'download', 'course'],
+  'kickoff_call_scheduled': ['blog', 'download', 'course'],
+  'kickoff_call_completed': ['blog', 'download', 'course'],
 
   // ===================
   // AGREEMENT - Course only (2 milestones)

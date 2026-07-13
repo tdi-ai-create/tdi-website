@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { CREATOR_STUDIO_RECIPIENTS } from '@/lib/creator-notification-recipients';
 
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
@@ -110,7 +111,7 @@ https://www.teachersdeserveit.com/tdi-admin/creators
       },
       body: JSON.stringify({
         from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-        to: ['creatorstudio@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+        to: CREATOR_STUDIO_RECIPIENTS,
         subject: `[New Creator Application] ${name}`,
         text: emailBody,
       }),

@@ -298,10 +298,11 @@ function AgreementContent() {
               style={{ padding: '10px 20px', border: '1px solid #D1D5DB', borderRadius: 10, color: '#1e2749', fontSize: 14, fontWeight: 500, textDecoration: 'none', background: 'white' }}>
               View full agreement
             </a>
-            <a href="/agreement-v2.3.pdf" target="_blank" rel="noopener noreferrer"
-              style={{ padding: '10px 20px', border: '1px solid #D1D5DB', borderRadius: 10, color: '#1e2749', fontSize: 14, fontWeight: 500, textDecoration: 'none', background: 'white' }}>
-              Download as PDF
-            </a>
+            <button
+              onClick={() => window.print()}
+              style={{ padding: '10px 20px', border: '1px solid #D1D5DB', borderRadius: 10, color: '#1e2749', fontSize: 14, fontWeight: 500, background: 'white', cursor: 'pointer' }}>
+              Save as PDF
+            </button>
           </div>
         </div>
 

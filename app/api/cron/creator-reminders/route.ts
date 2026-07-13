@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { logCreatorEmail } from '@/lib/creator-email-log';
+import { CREATOR_STUDIO_BCC } from '@/lib/creator-notification-recipients';
 
 // Reminder intervals in days before target date
 const REMINDER_INTERVALS = [
@@ -48,7 +49,8 @@ export async function GET(request: NextRequest) {
       .select('id, email, name, target_completion_date, content_path, publish_status')
       .not('target_completion_date', 'is', null)
       .neq('publish_status', 'published')
-      .eq('status', 'active');
+      .eq('status', 'active')
+      .or('lifecycle_state.is.null,lifecycle_state.eq.active');
 
     if (creatorsError) {
       console.error('[creator-reminders] Error fetching creators:', creatorsError);
@@ -121,7 +123,7 @@ export async function GET(request: NextRequest) {
                 body: JSON.stringify({
                   from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
                   to: [creator.email],
-                  bcc: ['bella@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+                  bcc: CREATOR_STUDIO_BCC,
                   subject: `Creator Studio | ${interval.days} days to launch, ${firstName}!`,
                   html: `
                     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">

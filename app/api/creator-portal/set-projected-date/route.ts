@@ -27,12 +27,16 @@ export async function POST(request: NextRequest) {
     const adjustmentNumber = (count || 0) + 1
 
     // Update creator — trigger will auto-populate projected_date_history
+    // Also set target_completion_date so cron reminders use the same date
     const { error: updateError } = await (supabase
       .from('creators') as any)
       .update({
         projected_completion_date: projectedDate,
+        target_completion_date: projectedDate,
         projected_date_set_at: new Date().toISOString(),
         projected_date_set_by: `creator:${email}`,
+        target_date_set_at: new Date().toISOString(),
+        target_date_set_by: `creator:${email}`,
         updated_at: new Date().toISOString(),
       })
       .eq('id', creatorId)
