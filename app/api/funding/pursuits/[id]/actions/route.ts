@@ -72,6 +72,7 @@ export async function POST(
       prepared_document_url: body.preparedDocumentUrl || null,
       sort_order: body.sortOrder || 0,
       category: body.category || null,
+      action_size: body.actionSize || 'standard',
     })
     .select()
     .single()
@@ -99,7 +100,7 @@ export async function PATCH(
   const fields = [
     'title', 'description', 'status', 'due_date', 'owner_type', 'owner_email',
     'owner_name', 'prepared_materials', 'prepared_document_url', 'sort_order', 'category',
-    'client_label', 'cancel_reason',
+    'client_label', 'cancel_reason', 'action_size',
   ]
   fields.forEach(f => {
     const camelKey = f.replace(/_([a-z])/g, (_, c) => c.toUpperCase())

@@ -13,7 +13,7 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
   const [actions, setActions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
-  const [newAction, setNewAction] = useState({ title: '', ownerType: 'tdi', dueDate: '', category: 'research' })
+  const [newAction, setNewAction] = useState({ title: '', ownerType: 'tdi', dueDate: '', category: 'research', actionSize: 'standard', ownerName: '', ownerEmail: '', description: '' })
   const [nudgeActionId, setNudgeActionId] = useState<string | null>(null)
 
   const fetchActions = () => {
@@ -64,7 +64,7 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newAction),
     })
-    setNewAction({ title: '', ownerType: 'tdi', dueDate: '', category: 'research' })
+    setNewAction({ title: '', ownerType: 'tdi', dueDate: '', category: 'research', actionSize: 'standard', ownerName: '', ownerEmail: '', description: '' })
     setShowAddForm(false)
     fetchActions()
   }
@@ -157,6 +157,36 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
               {CATEGORY_OPTIONS.map(c => <option key={c} value={c}>{c.replace(/_/g, ' ')}</option>)}
             </select>
           </div>
+          {/* Row 3: action size, owner name/email, description */}
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <select
+              value={newAction.actionSize}
+              onChange={e => setNewAction({ ...newAction, actionSize: e.target.value })}
+              style={{ fontSize: 13, padding: '6px 10px', border: '1px solid #E5E7EB', borderRadius: 6 }}
+            >
+              <option value="light">Light (1-2d lead)</option>
+              <option value="standard">Standard (3d lead)</option>
+              <option value="heavy">Heavy (5-7d lead)</option>
+            </select>
+            <input
+              value={newAction.ownerName}
+              onChange={e => setNewAction({ ...newAction, ownerName: e.target.value })}
+              placeholder="Owner name"
+              style={{ fontSize: 13, padding: '6px 10px', border: '1px solid #E5E7EB', borderRadius: 6, flex: 1 }}
+            />
+            <input
+              value={newAction.ownerEmail}
+              onChange={e => setNewAction({ ...newAction, ownerEmail: e.target.value })}
+              placeholder="Owner email"
+              style={{ fontSize: 13, padding: '6px 10px', border: '1px solid #E5E7EB', borderRadius: 6, flex: 1 }}
+            />
+          </div>
+          <input
+            value={newAction.description}
+            onChange={e => setNewAction({ ...newAction, description: e.target.value })}
+            placeholder="Description (optional)"
+            style={{ fontSize: 13, padding: '8px 12px', border: '1px solid #E5E7EB', borderRadius: 6, width: '100%', boxSizing: 'border-box' }}
+          />
           <button
             onClick={handleAdd}
             disabled={!newAction.title}

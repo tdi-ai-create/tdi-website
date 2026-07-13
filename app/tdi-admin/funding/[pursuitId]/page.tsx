@@ -76,8 +76,18 @@ export default function PursuitDetailPage() {
     )
   }
 
-  const p = data.pursuit
+  const [pursuit, setPursuit] = useState(data.pursuit)
+  const p = pursuit
   const gate = data.gate
+
+  const patchPursuit = async (fields: Record<string, unknown>) => {
+    setPursuit((prev: any) => ({ ...prev, ...fields }))
+    await fetch('/api/funding/pursuits', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pursuitId, ...fields }),
+    })
+  }
   const nextActions = computeNextActions(
     p,
     data.opportunities || [],
@@ -102,8 +112,12 @@ export default function PursuitDetailPage() {
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-          <div>
-            <h1 style={{ ...TYPE_PAGE_TITLE, margin: 0 }}>{p.pursuit_name}</h1>
+          <div style={{ flex: 1 }}>
+            <EditableText
+              value={p.pursuit_name}
+              onSave={v => patchPursuit({ pursuit_name: v })}
+              style={{ ...TYPE_PAGE_TITLE, margin: 0 }}
+            />
             <p style={{ ...TYPE_PAGE_SUBTITLE, marginTop: 4 }}>
               {p.district_name}{p.client_contact_name ? ` \u00b7 ${p.client_contact_name}` : ''}
             </p>
@@ -308,6 +322,36 @@ function StatCard({ label, value, color }: { label: string; value: string; color
     <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: '14px 18px' }}>
       <div style={{ fontSize: 10, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 700 }}>{label}</div>
       <div style={{ fontSize: 22, fontWeight: 800, color: color || '#0a0f1e', marginTop: 4 }}>{value}</div>
+    </div>
+  )
+}
+
+// ── EditableText — click-to-edit text field ──
+
+function EditableText({ value, onSave, style }: { value: string; onSave: (v: string) => void; style?: React.CSSProperties }) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(value)
+
+  if (editing) {
+    return (
+      <input
+        value={draft}
+        onChange={e => setDraft(e.target.value)}
+        onBlur={() => { if (draft !== value) onSave(draft); setEditing(false) }}
+        onKeyDown={e => { if (e.key === 'Enter') { if (draft !== value) onSave(draft); setEditing(false) } if (e.key === 'Escape') { setDraft(value); setEditing(false) } }}
+        autoFocus
+        style={{ ...style, border: '2px solid #8B5CF6', borderRadius: 6, padding: '4px 8px', outline: 'none', width: '100%', boxSizing: 'border-box' }}
+      />
+    )
+  }
+
+  return (
+    <div
+      onClick={() => { setDraft(value); setEditing(true) }}
+      style={{ ...style, cursor: 'pointer' }}
+      title="Click to edit"
+    >
+      {value}
     </div>
   )
 }

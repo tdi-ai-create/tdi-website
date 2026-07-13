@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { NudgePreviewModal } from '../components/panel/NudgePreviewModal'
 import {
@@ -33,7 +34,9 @@ export default function QueuePage() {
   const [items, setItems] = useState<any[]>([])
   const [counts, setCounts] = useState({ bella: 0, rae: 0, agent: 0, school: 0 })
   const [loading, setLoading] = useState(true)
-  const [bucket, setBucket] = useState<Bucket>('bella')
+  const searchParams = useSearchParams()
+  const initialBucket = (searchParams.get('owner') as Bucket) || 'bella'
+  const [bucket, setBucket] = useState<Bucket>(initialBucket)
   const [nudgeActionId, setNudgeActionId] = useState<string | null>(null)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
