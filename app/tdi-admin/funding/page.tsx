@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import { AlertBar } from './components/AlertBar'
 import { PhaseTabs } from './components/PhaseTabs'
+import { useRouter } from 'next/navigation'
 import { PursuitCard } from './components/PursuitCard'
-import { PursuitDetailPanel } from './components/PursuitDetailPanel'
 import { MyTasks } from './components/MyTasks'
 import {
   TYPE_PAGE_TITLE,
@@ -114,8 +114,8 @@ export default function FundingPage() {
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const router = useRouter()
   const [activePhase, setActivePhase] = useState('all')
-  const [selectedPursuitId, setSelectedPursuitId] = useState<string | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
   const [newPursuit, setNewPursuit] = useState({ districtName: '', totalAmount: '', implementationDate: '', clientName: '', clientEmail: '', clientPhone: '', clientRole: '' })
   const [addingPursuit, setAddingPursuit] = useState(false)
@@ -330,19 +330,12 @@ export default function FundingPage() {
             <PursuitCard
               key={p.id}
               pursuit={p}
-              onClick={() => setSelectedPursuitId(p.id)}
+              onClick={() => router.push(`/tdi-admin/funding/${p.id}`)}
             />
           ))}
         </div>
       )}
 
-      {/* Detail panel */}
-      {selectedPursuitId && (
-        <PursuitDetailPanel
-          pursuitId={selectedPursuitId}
-          onClose={() => setSelectedPursuitId(null)}
-        />
-      )}
     </div>
   )
 }
