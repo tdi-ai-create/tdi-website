@@ -33,6 +33,7 @@ function authorize(request: NextRequest): boolean {
 type SyncAction =
   | 'find_pursuit'
   | 'get_pursuit'
+  | 'find_work'
   | 'create_opportunity'
   | 'update_opportunity'
   | 'create_action'
@@ -83,6 +84,83 @@ export async function GET(request: NextRequest) {
     })
   }
 
+  // Find actionable work for an agent
+  if (action === 'find_work') {
+    const agent = url.searchParams.get('agent') // optional: filter by assigned_agent
+
+    // 1. Draft narrative work — requires BOTH window_status='open' AND gate_open=true
+    let narrativeQuery = supabase
+      .from('funding_opportunities')
+      .select(`
+        id, pursuit_id, name, plan_category, amount,
+        narrative_status, narrative_url, assigned_agent,
+        window_status, window_opens, window_closes,
+        application_opens, application_closes,
+        contact_name, contact_email, waiting_on,
+        pursuit:funding_pursuits!pursuit_id(id, pursuit_name, district_name, client_contact_name)
+      `)
+      .eq('narrative_status', 'requested')
+      .eq('window_status', 'open')
+
+    if (agent) {
+      narrativeQuery = narrativeQuery.eq('assigned_agent', agent)
+    }
+
+    const { data: rawNarrativeWork } = await narrativeQuery
+
+    // Gate enforcement: only include draft work for pursuits whose gate_open = true
+    const narrativePursuitIds = [...new Set((rawNarrativeWork ?? []).map((o: any) => o.pursuit_id))]
+    let gateOpenPursuitIds: Set<string> = new Set()
+    if (narrativePursuitIds.length > 0) {
+      const { data: openGates } = await supabase
+        .from('pursuit_gate')
+        .select('pursuit_id')
+        .in('pursuit_id', narrativePursuitIds)
+        .eq('gate_open', true)
+      gateOpenPursuitIds = new Set((openGates ?? []).map(g => g.pursuit_id))
+    }
+    const narrativeWork = (rawNarrativeWork ?? []).filter((o: any) => gateOpenPursuitIds.has(o.pursuit_id))
+
+    // 2. Research work — NOT window-gated, NOT gate-gated (finding new funders is always allowed)
+    let researchQuery = supabase
+      .from('funding_opportunities')
+      .select(`
+        id, pursuit_id, name, plan_category, amount,
+        research_status, assigned_agent,
+        window_status, contact_name,
+        pursuit:funding_pursuits!pursuit_id(id, pursuit_name, district_name)
+      `)
+      .eq('research_status', 'requested')
+
+    if (agent) {
+      researchQuery = researchQuery.eq('assigned_agent', agent)
+    }
+
+    const { data: researchWork } = await researchQuery
+
+    // Tag each item with its request type
+    const work = [
+      ...narrativeWork.map((item: any) => ({
+        request_type: 'draft_narrative' as const,
+        ...item,
+      })),
+      ...(researchWork ?? []).map((item: any) => ({
+        request_type: 'research_funders' as const,
+        ...item,
+      })),
+    ]
+
+    return NextResponse.json({
+      work,
+      count: work.length,
+      filters: {
+        agent: agent || 'all',
+        draft_narrative_count: narrativeWork.length,
+        research_funders_count: (researchWork ?? []).length,
+      },
+    })
+  }
+
   // Get overall status across all pursuits
   if (action === 'get_status') {
     const { data: pursuits } = await supabase
@@ -107,7 +185,7 @@ export async function GET(request: NextRequest) {
     })
   }
 
-  return NextResponse.json({ error: 'Unknown action. Use: find_pursuit, get_pursuit, get_status' }, { status: 400 })
+  return NextResponse.json({ error: 'Unknown action. Use: find_pursuit, get_pursuit, find_work, get_status' }, { status: 400 })
 }
 
 // POST -- Paperclip pushes updates
@@ -210,7 +288,7 @@ export async function POST(request: NextRequest) {
   // ---- UPDATE NARRATIVE ----
   // Shortcut for the common case: agent drafted/reviewed a narrative
   if (action === 'update_narrative') {
-    const { opportunityId, narrativeStatus, narrativeUrl, note } = body
+    const { opportunityId, narrativeStatus, narrativeUrl, narrativeContent, note } = body
     if (!opportunityId) return NextResponse.json({ error: 'opportunityId required' }, { status: 400 })
 
     const updates: Record<string, unknown> = {
@@ -219,6 +297,7 @@ export async function POST(request: NextRequest) {
     }
     if (narrativeStatus) updates.narrative_status = narrativeStatus
     if (narrativeUrl) updates.narrative_url = narrativeUrl
+    if (narrativeContent !== undefined) updates.narrative_content = narrativeContent
 
     const { error } = await supabase
       .from('funding_opportunities')
@@ -238,6 +317,7 @@ export async function POST(request: NextRequest) {
       const statusLabels: Record<string, string> = {
         drafting: 'Narrative draft started',
         review: 'Narrative ready for review',
+        qa_review: 'Narrative in QA review',
         ready: 'Narrative approved and ready',
       }
       await supabase.from('funding_pursuit_timeline').insert({

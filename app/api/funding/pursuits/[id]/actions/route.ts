@@ -99,6 +99,7 @@ export async function PATCH(
   const fields = [
     'title', 'description', 'status', 'due_date', 'owner_type', 'owner_email',
     'owner_name', 'prepared_materials', 'prepared_document_url', 'sort_order', 'category',
+    'client_label', 'cancel_reason',
   ]
   fields.forEach(f => {
     const camelKey = f.replace(/_([a-z])/g, (_, c) => c.toUpperCase())
@@ -109,6 +110,21 @@ export async function PATCH(
   // Handle completion
   if (body.status === 'done' || body.markDone) {
     updates.status = 'done'
+    updates.completed_at = new Date().toISOString()
+    updates.completed_by = actorEmail
+  }
+
+  // Handle reopen
+  if (body.reopen) {
+    updates.status = 'pending'
+    updates.completed_at = null
+    updates.completed_by = null
+  }
+
+  // Handle cancel
+  if (body.cancel) {
+    updates.status = 'cancelled'
+    updates.cancel_reason = body.cancelReason || body.cancel_reason || null
     updates.completed_at = new Date().toISOString()
     updates.completed_by = actorEmail
   }

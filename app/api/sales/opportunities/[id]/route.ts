@@ -6,10 +6,13 @@ const ALLOWED_PATCH_FIELDS = new Set([
   'source', 'type', 'is_contact_only', 'partnership_status',
   'contact_name', 'contact_title', 'contact_email', 'contact_phone',
   'expected_close_date', 'deletion_reason',
-  // Fit scoring fields
+  // Fit scoring fields (old model)
   'fit_district_size', 'fit_turnover_signal', 'fit_pd_investment',
   'fit_budget_timing', 'fit_leadership_stability', 'fit_tdi_alignment',
   'fit_composite_score', 'fit_tier',
+  // Four-factor grant qualification scoring (additive)
+  'score_fit', 'score_pain', 'score_warmth', 'score_funding',
+  'score_total', 'score_tier',
 ])
 
 const ACTIVITY_TRACKED = ['stage', 'value', 'heat', 'assigned_to_email'] as const

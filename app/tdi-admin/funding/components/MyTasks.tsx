@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 interface Task {
   id: string
   title: string
+  client_label: string | null
   description: string | null
   owner_type: 'tdi' | 'client'
   owner_name: string | null
@@ -13,11 +14,26 @@ interface Task {
   due_date: string | null
   category: string | null
   nudge_count: number
+  color_state: 'green' | 'yellow' | 'red' | null
+  escalation_rung: string | null
   prepared_materials: string | null
   is_overdue: boolean
   days_until_due: number | null
   pursuit: { id: string; pursuit_name: string; district_name: string; client_contact_name: string | null; client_contact_email: string | null } | null
   opportunity: { id: string; name: string; status: string; waiting_on: string | null } | null
+}
+
+const COLOR_DOT: Record<string, string> = {
+  green: '#10B981',
+  yellow: '#F59E0B',
+  red: '#DC2626',
+}
+
+const RUNG_BADGE: Record<string, { label: string; bg: string; color: string }> = {
+  submitter: { label: 'Submitter', bg: '#FEF3C7', color: '#92400E' },
+  backup: { label: 'Backup', bg: '#FEE2E2', color: '#991B1B' },
+  admin_sponsor: { label: 'Admin Sponsor', bg: '#FEE2E2', color: '#991B1B' },
+  rae: { label: 'Rae', bg: '#FEE2E2', color: '#991B1B' },
 }
 
 export function MyTasks() {
@@ -162,6 +178,17 @@ export function MyTasks() {
                     display: 'flex', gap: 10, alignItems: 'flex-start',
                     background: isOverdue ? '#FFFBEB' : 'transparent',
                   }}>
+                    {/* Color state dot */}
+                    {task.color_state && (
+                      <div
+                        title={`Follow-up: ${task.color_state}`}
+                        style={{
+                          width: 8, height: 8, borderRadius: '50%', flexShrink: 0, marginTop: 7,
+                          background: COLOR_DOT[task.color_state] || '#D1D5DB',
+                        }}
+                      />
+                    )}
+
                     {/* Checkbox */}
                     <button
                       onClick={() => task.pursuit && markDone(task.id, task.pursuit.id)}
@@ -188,12 +215,12 @@ export function MyTasks() {
                         }}>
                           {task.owner_type}
                         </span>
-                        {/* Title */}
+                        {/* Title — use client_label if available */}
                         <span style={{
                           fontSize: 13, fontWeight: 600,
-                          color: isOverdue ? '#DC2626' : '#0a0f1e',
+                          color: task.color_state === 'red' ? '#DC2626' : task.color_state === 'yellow' ? '#92400E' : isOverdue ? '#DC2626' : '#0a0f1e',
                         }}>
-                          {task.title}
+                          {task.client_label || task.title}
                         </span>
                       </div>
 
@@ -239,6 +266,19 @@ export function MyTasks() {
                           {task.nudge_count}x
                         </span>
                       )}
+
+                      {/* Escalation rung badge */}
+                      {task.escalation_rung && task.escalation_rung !== 'none' && (() => {
+                        const rs = RUNG_BADGE[task.escalation_rung]
+                        return rs ? (
+                          <span style={{
+                            fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
+                            background: rs.bg, color: rs.color,
+                          }}>
+                            Escalated: {rs.label}
+                          </span>
+                        ) : null
+                      })()}
 
                       {/* Nudge button for client tasks */}
                       {task.owner_type === 'client' && task.pursuit?.client_contact_email && (

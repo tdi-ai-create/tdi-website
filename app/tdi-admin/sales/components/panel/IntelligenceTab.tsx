@@ -495,6 +495,183 @@ export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRe
           <InfoRow label="Referral source" value={warmth.referral_source} />
         </InfoSection>
       )}
+
+      {/* ── Grant Fit Scoring (four-factor, additive to sales scoring) ── */}
+      <GrantFitScoring opp={opp} />
+
+      {/* ── Start Funding Pursuit (lead → pursuit conversion) ── */}
+      <StartPursuitAction opp={opp} />
     </div>
+  )
+}
+
+// ── Four-factor grant qualification scoring ──
+
+const GRANT_TIER_CONFIG: Record<string, { label: string; description: string; color: string; bg: string }> = {
+  tier1: { label: 'Fast lane', description: 'Move fast, standard path', color: '#065F46', bg: '#D1FAE5' },
+  tier2: { label: 'Standard', description: 'Work in normal sequence', color: '#854D0E', bg: '#FEF3C7' },
+  tier3: { label: 'Nurture / creative funding', description: 'Still served — trigger a creative funding hunt', color: '#374151', bg: '#F3F4F6' },
+}
+
+const GRANT_FACTORS = [
+  { key: 'score_fit', label: 'Fit', description: 'How well the school matches TDI\'s model' },
+  { key: 'score_pain', label: 'Pain', description: 'Retention, culture, SpEd gaps — how acute their need' },
+  { key: 'score_warmth', label: 'Warmth', description: 'Engagement / relationship signal strength' },
+  { key: 'score_funding', label: 'Funding', description: 'Realistic path to money (low = creative hunt, not rejection)' },
+]
+
+function GrantFitScoring({ opp }: { opp: FullOpportunity }) {
+  const [scores, setScores] = useState({
+    score_fit: (opp.score_fit as number) || 0,
+    score_pain: (opp.score_pain as number) || 0,
+    score_warmth: (opp.score_warmth as number) || 0,
+    score_funding: (opp.score_funding as number) || 0,
+  })
+  const [saving, setSaving] = useState(false)
+
+  const total = scores.score_fit + scores.score_pain + scores.score_warmth + scores.score_funding
+  const tier = total >= 70 ? 'tier1' : total >= 45 ? 'tier2' : 'tier3'
+  const tierConfig = GRANT_TIER_CONFIG[tier]
+
+  const saveScore = async (field: string, value: number) => {
+    const updated = { ...scores, [field]: value }
+    setScores(updated)
+    const newTotal = updated.score_fit + updated.score_pain + updated.score_warmth + updated.score_funding
+    const newTier = newTotal >= 70 ? 'tier1' : newTotal >= 45 ? 'tier2' : 'tier3'
+    setSaving(true)
+    try {
+      await fetch(`/api/sales/opportunities/${opp.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [field]: value, score_total: newTotal, score_tier: newTier }),
+      })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <InfoSection title="Grant Fit Scoring">
+      {/* Tier badge */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+        <span style={{
+          fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 6,
+          background: tierConfig.bg, color: tierConfig.color,
+        }}>
+          {tierConfig.label}
+        </span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: '#0a0f1e' }}>{total}/100</span>
+        <span style={{ fontSize: 10, color: '#6B7280' }}>{tierConfig.description}</span>
+        {saving && <span style={{ fontSize: 9, color: '#9CA3AF' }}>saving...</span>}
+      </div>
+
+      {/* Four sliders */}
+      {GRANT_FACTORS.map(f => {
+        const val = scores[f.key as keyof typeof scores]
+        const pct = (val / 25) * 100
+        const color = val >= 18 ? '#10B981' : val >= 10 ? '#F59E0B' : val >= 1 ? '#EF4444' : '#D1D5DB'
+        return (
+          <div key={f.key} style={{ marginBottom: 10 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+              <span style={{ fontSize: 11, color: '#374151', fontWeight: 600 }}>{f.label}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color, minWidth: 32, textAlign: 'right' }}>{val}/25</span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={25}
+              step={1}
+              value={val}
+              onChange={e => saveScore(f.key, parseInt(e.target.value))}
+              style={{ width: '100%', height: 4, accentColor: color, cursor: 'pointer' }}
+            />
+            <p style={{ fontSize: 10, color: '#9CA3AF', margin: '1px 0 0' }}>{f.description}</p>
+          </div>
+        )
+      })}
+
+      {/* Low funding note */}
+      {scores.score_funding < 10 && scores.score_funding > 0 && (
+        <div style={{
+          padding: '6px 10px', background: '#FFFBEB', border: '1px solid #FDE68A',
+          borderRadius: 6, fontSize: 10, color: '#92400E', marginTop: 4,
+        }}>
+          Low funding score triggers a creative funding hunt (local/community sources, braided funding, phased delivery) — every interested school gets served.
+        </div>
+      )}
+    </InfoSection>
+  )
+}
+
+// ── Start Funding Pursuit (lead → pursuit bridge) ──
+
+function StartPursuitAction({ opp }: { opp: FullOpportunity }) {
+  const [creating, setCreating] = useState(false)
+  const [created, setCreated] = useState<{ id: string } | null>(null)
+  const [error, setError] = useState('')
+
+  const handleCreate = async () => {
+    setCreating(true)
+    setError('')
+    try {
+      const res = await fetch('/api/funding/pursuits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          districtName: opp.name || 'Unknown',
+          totalAmount: opp.value || 0,
+          clientContactName: opp.contact_name as string || null,
+          clientContactEmail: opp.contact_email as string || null,
+          clientContactRole: opp.contact_title as string || null,
+        }),
+      })
+      const result = await res.json()
+      if (result.error) {
+        setError(result.error)
+      } else {
+        setCreated({ id: result.pursuit?.id || result.id })
+      }
+    } catch (e: any) {
+      setError(e.message)
+    } finally {
+      setCreating(false)
+    }
+  }
+
+  return (
+    <InfoSection title="Funding Pipeline">
+      {created ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ fontSize: 12, color: '#065F46', fontWeight: 600 }}>
+            {'\u2713'} Funding pursuit created
+          </div>
+          <a
+            href={`/tdi-admin/funding`}
+            style={{ fontSize: 11, color: '#8B5CF6', textDecoration: 'underline' }}
+          >
+            Open funding dashboard
+          </a>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <p style={{ fontSize: 11, color: '#6B7280', margin: 0 }}>
+            Create a funding pursuit to start the grant funding workflow for this school (path mapping, narrative drafting, submission tracking).
+          </p>
+          {error && <div style={{ fontSize: 11, color: '#DC2626' }}>{error}</div>}
+          <button
+            onClick={handleCreate}
+            disabled={creating}
+            style={{
+              fontSize: 12, fontWeight: 600, padding: '8px 16px', borderRadius: 6,
+              border: 'none', background: creating ? '#9CA3AF' : '#8B5CF6',
+              color: 'white', cursor: creating ? 'default' : 'pointer',
+              alignSelf: 'flex-start',
+            }}
+          >
+            {creating ? 'Creating...' : 'Start funding pursuit'}
+          </button>
+        </div>
+      )}
+    </InfoSection>
   )
 }

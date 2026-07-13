@@ -3,6 +3,7 @@
 interface ActionItemRowProps {
   id: string
   title: string
+  clientLabel?: string | null
   description?: string
   ownerType: 'tdi' | 'client'
   ownerName?: string
@@ -10,8 +11,23 @@ interface ActionItemRowProps {
   status: 'pending' | 'in_progress' | 'done' | 'blocked' | 'skipped'
   preparedMaterials?: string
   nudgeCount?: number
+  colorState?: 'green' | 'yellow' | 'red' | null
+  escalationRung?: string | null
   onToggleDone: (id: string) => void
   onNudge?: (id: string) => void
+}
+
+const COLOR_DOT: Record<string, string> = {
+  green: '#10B981',
+  yellow: '#F59E0B',
+  red: '#DC2626',
+}
+
+const RUNG_BADGE: Record<string, { label: string; bg: string; color: string }> = {
+  submitter: { label: 'Submitter', bg: '#FEF3C7', color: '#92400E' },
+  backup: { label: 'Backup', bg: '#FEE2E2', color: '#991B1B' },
+  admin_sponsor: { label: 'Admin Sponsor', bg: '#FEE2E2', color: '#991B1B' },
+  rae: { label: 'Rae', bg: '#FEE2E2', color: '#991B1B' },
 }
 
 function isOverdue(dueDate: string | null | undefined, status: string): boolean {
@@ -38,6 +54,7 @@ function getDueDateStyle(dueDate: string | null | undefined): { color: string; b
 export function ActionItemRow({
   id,
   title,
+  clientLabel,
   description,
   ownerType,
   ownerName,
@@ -45,12 +62,15 @@ export function ActionItemRow({
   status,
   preparedMaterials,
   nudgeCount,
+  colorState,
+  escalationRung,
   onToggleDone,
   onNudge,
 }: ActionItemRowProps) {
   const isDone = status === 'done' || status === 'skipped'
   const overdue = isOverdue(dueDate, status)
   const dueDateStyle = getDueDateStyle(dueDate)
+  const displayTitle = clientLabel || title
 
   return (
     <div
@@ -63,6 +83,17 @@ export function ActionItemRow({
         borderLeft: status === 'blocked' ? '3px solid #F59E0B' : 'none',
       }}
     >
+      {/* Color state dot */}
+      {colorState && !isDone && (
+        <div
+          title={`Follow-up: ${colorState}`}
+          style={{
+            width: 8, height: 8, borderRadius: '50%', flexShrink: 0, marginTop: 7,
+            background: COLOR_DOT[colorState] || '#D1D5DB',
+          }}
+        />
+      )}
+
       {/* Checkbox */}
       <div
         onClick={() => onToggleDone(id)}
@@ -93,11 +124,11 @@ export function ActionItemRow({
           style={{
             fontSize: 13,
             fontWeight: 600,
-            color: isDone ? '#9CA3AF' : overdue ? '#DC2626' : '#0a0f1e',
+            color: isDone ? '#9CA3AF' : colorState === 'red' ? '#DC2626' : colorState === 'yellow' ? '#92400E' : overdue ? '#DC2626' : '#0a0f1e',
             textDecoration: isDone ? 'line-through' : 'none',
           }}
         >
-          {title}
+          {displayTitle}
         </div>
         {description && (
           <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{description}</div>
@@ -129,7 +160,7 @@ export function ActionItemRow({
           </span>
         )}
         {ownerType === 'client' && (
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
             {(nudgeCount ?? 0) > 0 && (
               <span
                 style={{
@@ -144,6 +175,17 @@ export function ActionItemRow({
                 Nudged {nudgeCount}x
               </span>
             )}
+            {escalationRung && escalationRung !== 'none' && !isDone && (() => {
+              const rs = RUNG_BADGE[escalationRung]
+              return rs ? (
+                <span style={{
+                  fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
+                  background: rs.bg, color: rs.color,
+                }}>
+                  Escalated: {rs.label}
+                </span>
+              ) : null
+            })()}
             {onNudge && !isDone && (
               <button
                 onClick={(e) => {

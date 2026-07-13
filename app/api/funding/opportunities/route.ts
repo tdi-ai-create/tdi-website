@@ -66,6 +66,11 @@ export async function POST(request: NextRequest) {
       plan_category: body.planCategory || null,
       waiting_on: body.waitingOn || 'tdi',
       narrative_status: body.narrativeStatus || 'not_started',
+      window_status: body.windowStatus || 'unknown',
+      window_opens: body.windowOpens || null,
+      window_closes: body.windowCloses || null,
+      internal_deadline: body.internalDeadline || null,
+      award_needed_by: body.awardNeededBy || null,
     })
     .select()
     .single();
@@ -97,9 +102,14 @@ export async function PATCH(request: NextRequest) {
     'last_action', 'last_action_date', 'next_action', 'next_action_due',
     // New fields from migration 093
     'application_opens', 'application_closes', 'plan_category',
-    'waiting_on', 'narrative_status', 'narrative_url', 'forwarding_email_status',
+    'waiting_on', 'narrative_status', 'narrative_url', 'narrative_content',
+    'qa_reviewer', 'qa_notes', 'qa_passed', 'forwarding_email_status',
     'client_submitted', 'client_submitted_proof',
+    'routed_through_district', 'district_routing_confirmed',
     'decision_date', 'awarded_amount', 'denial_reason',
+    'window_status', 'window_opens', 'window_closes',
+    'internal_deadline', 'award_needed_by',
+    'assigned_agent', 'research_status',
   ];
   fields.forEach(f => { if (body[f] !== undefined) updates[f] = body[f]; });
 
