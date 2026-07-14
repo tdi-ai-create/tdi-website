@@ -62,10 +62,25 @@ export async function GET() {
       }
     })
 
-    // Source attribution
+    // Source attribution -- normalize duplicate/raw source values
+    const SOURCE_NORMALIZE: Record<string, string> = {
+      'pd_plan_request': 'PD Plan Request (website)',
+      'PD Plan Request': 'PD Plan Request (website)',
+      'cold_inbound': 'Cold Inbound',
+      'existing_customer_renewal': 'Existing Customer Renewal',
+      'Existing customer renewal': 'Existing Customer Renewal',
+      'Existing customer expansion': 'Existing Customer Expansion',
+      'rfp': 'RFP',
+      'other': 'Other',
+      'Direct inquiry form': 'Direct Inquiry',
+      'Direct inquiry': 'Direct Inquiry',
+      'Cold call (Jim)': "Jim's Call Sheet (April 2026)",
+      'GHL Import': 'Other',
+    }
     const bySource: Record<string, { count: number; value: number; factored: number; won: number }> = {}
     ;(opps || []).forEach((o: any) => {
-      const src = o.source || 'Unknown'
+      const rawSrc = o.source || 'Unknown'
+      const src = SOURCE_NORMALIZE[rawSrc] || rawSrc
       if (!bySource[src]) bySource[src] = { count: 0, value: 0, factored: 0, won: 0 }
       bySource[src].count++
       bySource[src].value += o.value || 0
