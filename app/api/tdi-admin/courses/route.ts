@@ -111,7 +111,35 @@ export async function GET(request: Request) {
       };
     });
 
-    return NextResponse.json({ courses: enrichedCourses });
+    // Fetch video production status for all courses in one query
+    const { data: allLessons } = await supabase
+      .from('hub_lessons')
+      .select('id, type, content, module:hub_modules!inner(course_id)')
+      .eq('type', 'video');
+
+    // Build production stats per course
+    const productionMap = new Map<string, { total: number; uploaded: number }>();
+    for (const lesson of (allLessons || [])) {
+      const courseId = (lesson.module as any)?.course_id;
+      if (!courseId) continue;
+      const stats = productionMap.get(courseId) || { total: 0, uploaded: 0 };
+      stats.total++;
+      const content = lesson.content as Record<string, unknown> | null;
+      if (content?.video_id) stats.uploaded++;
+      productionMap.set(courseId, stats);
+    }
+
+    // Attach production stats to each course
+    const coursesWithProduction = enrichedCourses.map(course => {
+      const stats = productionMap.get(course.id);
+      return {
+        ...course,
+        video_total: stats?.total || 0,
+        video_uploaded: stats?.uploaded || 0,
+      };
+    });
+
+    return NextResponse.json({ courses: coursesWithProduction });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('[courses] Error:', error);

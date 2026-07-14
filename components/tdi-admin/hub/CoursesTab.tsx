@@ -63,6 +63,8 @@ interface Course {
   origin_type: 'internal' | 'external_creator' | 'mixed' | null;
   danielson_domains?: string[];
   roles?: string[];
+  video_total: number;
+  video_uploaded: number;
   created_at: string;
   updated_at: string;
 }
@@ -708,6 +710,9 @@ export function CoursesTab() {
                     Content
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Production
+                  </th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
                     Status
                   </th>
                   <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
@@ -750,6 +755,29 @@ export function CoursesTab() {
                       <span className="text-sm text-gray-600">
                         {course.module_count} module{course.module_count !== 1 ? 's' : ''}, {course.lesson_count} lesson{course.lesson_count !== 1 ? 's' : ''}
                       </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      {course.video_total > 0 ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${
+                                course.video_uploaded === course.video_total ? 'bg-green-500' :
+                                course.video_uploaded === 0 ? 'bg-red-400' : 'bg-amber-400'
+                              }`}
+                              style={{ width: `${(course.video_uploaded / course.video_total) * 100}%` }}
+                            />
+                          </div>
+                          <span className={`text-xs font-medium ${
+                            course.video_uploaded === course.video_total ? 'text-green-600' :
+                            course.video_uploaded === 0 ? 'text-red-500' : 'text-amber-600'
+                          }`}>
+                            {course.video_uploaded}/{course.video_total}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-300">--</span>
+                      )}
                     </td>
                     <td className="px-4 py-4">
                       <span

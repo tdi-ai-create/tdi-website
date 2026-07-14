@@ -22,7 +22,7 @@ import {
 import { HorizontalBarChart, DonutChart, DonutLegend, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts'
 
 type ViewMode = 'kanban' | 'list'
-type PageTab = 'pipeline' | 'analytics' | 'trash' | 'invoices' | 'hub-leads' | 'outreach' | 'contracts'
+type PageTab = 'pipeline' | 'outreach' | 'analytics' | 'contracts' | 'hub-leads' | 'trash' | 'invoices'
 
 interface QuoteRow {
   id: string
@@ -1104,10 +1104,7 @@ export default function SalesPage() {
           { id: 'pipeline' as PageTab, label: 'Pipeline' },
           { id: 'outreach' as PageTab, label: 'Outreach Queue' },
           { id: 'analytics' as PageTab, label: 'Analytics' },
-          { id: 'hub-leads' as PageTab, label: 'Hub Leads' },
-          { id: 'contracts' as PageTab, label: `Contracts (${quotes.length})` },
-          ...(outstandingInvoices.length > 0 ? [{ id: 'invoices' as PageTab, label: `Outstanding Invoices (${outstandingInvoices.length})` }] : []),
-          ...(trashedOpps.length > 0 ? [{ id: 'trash' as PageTab, label: `Trash (${trashedOpps.length})` }] : []),
+          { id: 'contracts' as PageTab, label: `Contracts (${quotes.length})${outstandingInvoices.length > 0 ? ` \u00b7 ${outstandingInvoices.length} unpaid` : ''}` },
         ]).map(tab => (
           <button
             key={tab.id}
@@ -1234,121 +1231,6 @@ export default function SalesPage() {
       {/* Analytics Tab */}
       {pageTab === 'analytics' && <AnalyticsTab opportunities={activeOpps.map(o => ({ value: o.value, probability: o.probability, stage: o.stage, name: o.name }))} />}
 
-      {/* Hub Leads Tab */}
-      {pageTab === 'hub-leads' && (() => {
-        if (!hubLeads && !hubLeadsLoading) {
-          setHubLeadsLoading(true)
-          fetch('/api/tdi-admin/hub-connections?section=sales')
-            .then(r => r.json())
-            .then(data => { setHubLeads(data); setHubLeadsLoading(false) })
-            .catch(() => setHubLeadsLoading(false))
-        }
-
-        return (
-          <div>
-            {hubLeadsLoading ? (
-              <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF' }}>Loading Hub data...</div>
-            ) : !hubLeads ? (
-              <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF' }}>No data available</div>
-            ) : (
-              <>
-                {/* Summary cards */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
-                  <div style={{ background: 'white', borderRadius: 12, padding: 20, border: '1px solid #E5E7EB' }}>
-                    <p style={{ fontSize: 28, fontWeight: 700, color: '#10B981' }}>{hubLeads.warmLeads.length}</p>
-                    <p style={{ fontSize: 12, color: '#6B7280' }}>Warm Leads</p>
-                    <p style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>Schools with 2+ free Hub users</p>
-                  </div>
-                  <div style={{ background: 'white', borderRadius: 12, padding: 20, border: '1px solid #E5E7EB' }}>
-                    <p style={{ fontSize: 28, fontWeight: 700, color: '#2563EB' }}>{hubLeads.totalFreeUsers.toLocaleString()}</p>
-                    <p style={{ fontSize: 12, color: '#6B7280' }}>Free Users</p>
-                    <p style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>Potential conversion pool</p>
-                  </div>
-                  <div style={{ background: 'white', borderRadius: 12, padding: 20, border: '1px solid #E5E7EB' }}>
-                    <p style={{ fontSize: 28, fontWeight: 700, color: '#F59E0B' }}>{hubLeads.recentSignups}</p>
-                    <p style={{ fontSize: 12, color: '#6B7280' }}>Signups This Week</p>
-                    <p style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>New free accounts (7d)</p>
-                  </div>
-                  <div style={{ background: 'white', borderRadius: 12, padding: 20, border: '1px solid #E5E7EB' }}>
-                    <p style={{ fontSize: 28, fontWeight: 700, color: '#8B5CF6' }}>{hubLeads.topDistricts.length}</p>
-                    <p style={{ fontSize: 12, color: '#6B7280' }}>Active Districts</p>
-                    <p style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>Districts with Hub users</p>
-                  </div>
-                </div>
-
-                {/* Charts row: warm leads bar + district donut */}
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, marginBottom: 24 }}>
-                  {/* Warm leads bar chart */}
-                  <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
-                    <LiveSectionHeader title="Warm Leads from Hub" subtitle="Schools with multiple free Hub users -- already exploring TDI tools" dotColor="#10B981" badgeColor="#D1FAE5" badgeTextColor="#065F46" />
-                    {hubLeads.warmLeads.length === 0 ? (
-                      <p style={{ textAlign: 'center', color: '#9CA3AF', padding: 24 }}>No warm leads yet.</p>
-                    ) : (
-                      <HorizontalBarChart
-                        data={hubLeads.warmLeads.slice(0, 15).map(l => ({
-                          label: l.domain.length > 25 ? l.domain.slice(0, 25) + '...' : l.domain,
-                          value: l.freeUsers,
-                          color: '#10B981',
-                        }))}
-                        valueFormatter={(v) => `${v} users`}
-                      />
-                    )}
-                  </div>
-
-                  {/* District adoption donut */}
-                  <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
-                    <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>District Adoption</p>
-                    {hubLeads.topDistricts.length === 0 ? (
-                      <p style={{ textAlign: 'center', color: '#9CA3AF', padding: 24, fontSize: 13 }}>No district data yet.</p>
-                    ) : (() => {
-                      const totalPaid = hubLeads.topDistricts.reduce((s, d) => s + d.paid, 0)
-                      const totalFree = hubLeads.topDistricts.reduce((s, d) => s + d.free, 0)
-                      return (
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                          <DonutChart
-                            data={[
-                              { name: 'Paid', value: totalPaid, color: '#10B981' },
-                              { name: 'Free', value: totalFree, color: '#E5E7EB' },
-                            ]}
-                            size={180}
-                            innerRadius={50}
-                            outerRadius={72}
-                            centerValue={hubLeads.topDistricts.reduce((s, d) => s + d.total, 0)}
-                            centerLabel="total users"
-                          />
-                          <div style={{ marginTop: 12, width: '100%' }}>
-                            <DonutLegend data={[
-                              { name: 'Paid Members', value: totalPaid, color: '#10B981' },
-                              { name: 'Free Users', value: totalFree, color: '#E5E7EB' },
-                            ]} />
-                          </div>
-                        </div>
-                      )
-                    })()}
-                  </div>
-                </div>
-
-                {/* District detail bar chart */}
-                {hubLeads.topDistricts.length > 0 && (
-                  <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
-                    <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Users by District</p>
-                    <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 12 }}>Hub users grouped by district -- renewal evidence and upsell opportunities</p>
-                    <HorizontalBarChart
-                      data={hubLeads.topDistricts.slice(0, 15).map(d => ({
-                        label: d.name.length > 25 ? d.name.slice(0, 25) + '...' : d.name,
-                        value: d.total,
-                        color: '#8B5CF6',
-                      }))}
-                      valueFormatter={(v) => `${v} users`}
-                    />
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )
-      })()}
-
       {/* Pipeline Tab */}
       {pageTab === 'pipeline' && (
         <>
@@ -1456,8 +1338,8 @@ export default function SalesPage() {
         </>
       )}
 
-      {/* Outstanding Invoices Tab */}
-      {pageTab === 'invoices' && (
+      {/* Outstanding Invoices -- now shown inside Contracts tab */}
+      {false && (
         <div>
           {(() => {
             const totalOwed = outstandingInvoices.reduce((s, o) => s + (o.invoice_amount || o.value || 0), 0)
@@ -1713,8 +1595,8 @@ export default function SalesPage() {
         </div>
       )}
 
-      {/* Trash Tab */}
-      {pageTab === 'trash' && (
+      {/* Trash -- removed as tab, accessible via pipeline filter */}
+      {false && (
         <div>
           <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 16, fontStyle: 'italic' }}>
             Items in Trash are hidden from the pipeline but can be restored.

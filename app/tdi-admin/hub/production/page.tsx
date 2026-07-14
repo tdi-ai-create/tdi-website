@@ -603,6 +603,7 @@ function QuickWinsTab() {
               <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Effort Level</th>
               <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Type</th>
               <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Duration</th>
+              <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Ready</th>
               <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Status</th>
               <th className="text-left px-4 py-3" style={TYPE_TABLE_HEADER}>Actions</th>
             </tr>
@@ -610,7 +611,7 @@ function QuickWinsTab() {
           <tbody className="divide-y divide-gray-100">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={7}>
+                <td colSpan={8}>
                   <EmptyState
                     icon={Zap}
                     title="No Quick Wins Yet"
@@ -648,6 +649,15 @@ function QuickWinsTab() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">{qw.duration_minutes || '-'} min</td>
+                    <td className="px-4 py-3">
+                      {(() => {
+                        const hasThumbnail = !!qw.thumbnail_url;
+                        const hasDescription = !!qw.description;
+                        if (qw.is_published) return <span className="w-2 h-2 rounded-full bg-green-500 inline-block" title="Published" />;
+                        if (hasThumbnail && hasDescription) return <span className="w-2 h-2 rounded-full bg-amber-400 inline-block" title="Draft -- ready to publish" />;
+                        return <span className="w-2 h-2 rounded-full bg-red-300 inline-block" title={`Missing: ${!hasThumbnail ? 'thumbnail' : ''}${!hasThumbnail && !hasDescription ? ', ' : ''}${!hasDescription ? 'description' : ''}`} />;
+                      })()}
+                    </td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         qw.is_published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'

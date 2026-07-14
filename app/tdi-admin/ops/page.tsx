@@ -464,7 +464,7 @@ export default function OpsPage() {
               </div>
             </div>
 
-            <ExpandableItem title="How to Migrate a Video" subtitle="Full process from Thinkific to Hub" badge="Step-by-step" badgeColor="#EAB308" defaultOpen>
+            <ExpandableItem title="How to Migrate a Video" subtitle="Full process from Thinkific to Hub" badge="Step-by-step" badgeColor="#EAB308">
               <div className="pt-3 space-y-2">
                 <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-2 text-xs text-yellow-800">
                   <p className="font-medium">1. Download from Thinkific:</p>
@@ -548,7 +548,7 @@ export default function OpsPage() {
               </div>
             </div>
 
-            <ExpandableItem title="Allenwood Elementary -- Active Funding" subtitle="8 paths being pursued, $66K goal" badge="Active" badgeColor="#8B5CF6" defaultOpen>
+            <ExpandableItem title="Allenwood Elementary -- Active Funding" subtitle="8 paths being pursued, $66K goal" badge="Active" badgeColor="#8B5CF6">
               <div className="pt-3 space-y-2">
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-800">
                   <p className="font-bold mb-1">Follow-up rule: Your job is not to send one email. Your job is to get a confirmed answer.</p>

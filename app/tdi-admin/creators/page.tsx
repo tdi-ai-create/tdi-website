@@ -1232,6 +1232,26 @@ function AffiliateTab() {
   );
 }
 
+function DashboardRefSection({ children }: { children: React.ReactNode }) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="mt-6">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center gap-3 py-3 text-left group"
+      >
+        <div className="flex-grow h-px bg-gray-200" />
+        <span className="text-xs font-semibold uppercase tracking-wide text-gray-400 group-hover:text-gray-600 whitespace-nowrap flex items-center gap-1.5">
+          {isOpen ? 'Hide' : 'Show'} Reference & Details
+          {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        </span>
+        <div className="flex-grow h-px bg-gray-200" />
+      </button>
+      {isOpen && <div className="mt-4 space-y-5">{children}</div>}
+    </div>
+  );
+}
+
 export default function CreatorStudioPage() {
   const { permissions, isOwner } = useTDIAdmin();
   const hasAccess = isOwner || hasAnySectionPermission(permissions, 'creator_studio');
@@ -2838,6 +2858,9 @@ export default function CreatorStudioPage() {
             </div>
           </div>
 
+          {/* Reference & Details -- collapsed by default */}
+          <DashboardRefSection>
+
           {/* Geographic Distribution */}
           {locationData && (
             <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] mb-5">
@@ -3089,6 +3112,8 @@ export default function CreatorStudioPage() {
               )}
             </div>
           </div>
+
+          </DashboardRefSection>
         </div>
       )}
 

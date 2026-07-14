@@ -6,7 +6,6 @@ import { SourceAttribution } from './SourceAttribution'
 import { GeographyMap } from './GeographyMap'
 import { PipelineTrend } from './PipelineTrend'
 import { PipelineVelocity } from './PipelineVelocity'
-import { TeamPerformance } from './TeamPerformance'
 import { SegmentBreakdown } from './SegmentBreakdown'
 import { FactoredCalculator } from './FactoredCalculator'
 
@@ -119,10 +118,6 @@ export function AnalyticsTab({ opportunities = [] }: { opportunities?: { value: 
         <PipelineTrend snapshots={data.snapshots} />
       </Section>
 
-      <Section title="Team Performance" subtitle="Pipeline and conversion by owner">
-        <TeamPerformance byOwner={data.byOwner} />
-      </Section>
-
       <Section title="Deal Type Mix" subtitle="Renewals vs new business vs expansion">
         <SegmentBreakdown byType={data.byType} />
       </Section>
@@ -131,41 +126,49 @@ export function AnalyticsTab({ opportunities = [] }: { opportunities?: { value: 
 }
 
 function PulseSection({ pulse }: { pulse: AnalyticsData['pulse'] }) {
-  const cards = [
-    { label: 'Pipeline', value: `$${(pulse.totalPipeline / 1000).toFixed(0)}K`, color: '#10B981' },
-    { label: 'Factored', value: `$${(pulse.factored / 1000).toFixed(0)}K`, color: '#10B981' },
-    { label: 'Active deals', value: String(pulse.activeCount), color: '#10B981' },
-    { label: 'Avg deal size', value: `$${(pulse.avgDealSize / 1000).toFixed(0)}K`, color: '#10B981' },
-    { label: 'Signed', value: String(pulse.signedCount), color: '#6366F1' },
-    { label: 'Win rate', value: `${pulse.winRate}%`, color: '#10B981' },
-    { label: 'Won YTD', value: `$${(pulse.wonValue / 1000).toFixed(0)}K`, color: '#10B981' },
-    { label: 'Needs follow-up', value: String(pulse.needsFollowUp), color: pulse.needsFollowUp > 10 ? '#F59E0B' : '#10B981' },
-    { label: 'Stale (30d+)', value: String(pulse.staleLeads), color: pulse.staleLeads > 20 ? '#EF4444' : '#F59E0B' },
+  const pipelineCards = [
+    { label: 'Total Pipeline', value: `$${(pulse.totalPipeline / 1000).toFixed(0)}K`, color: '#2B3A67', accent: '#2B3A67' },
+    { label: 'Factored Revenue', value: `$${(pulse.factored / 1000).toFixed(0)}K`, color: '#10B981', accent: '#10B981' },
+    { label: 'Active Deals', value: String(pulse.activeCount), color: '#2B3A67', accent: '#6B7280' },
+    { label: 'Avg Deal Size', value: `$${(pulse.avgDealSize / 1000).toFixed(1)}K`, color: '#2B3A67', accent: '#6B7280' },
+    { label: 'Signed', value: String(pulse.signedCount), color: '#6366F1', accent: '#6366F1' },
   ]
+  const healthCards = [
+    { label: 'Win Rate', value: `${pulse.winRate}%`, color: pulse.winRate >= 50 ? '#10B981' : '#F59E0B', accent: pulse.winRate >= 50 ? '#10B981' : '#F59E0B' },
+    { label: 'Won YTD', value: `$${(pulse.wonValue / 1000).toFixed(0)}K`, color: pulse.wonValue > 0 ? '#10B981' : '#9CA3AF', accent: pulse.wonValue > 0 ? '#10B981' : '#D1D5DB' },
+    { label: 'Needs Follow-up', value: String(pulse.needsFollowUp), color: pulse.needsFollowUp > 20 ? '#EF4444' : pulse.needsFollowUp > 10 ? '#F59E0B' : '#10B981', accent: pulse.needsFollowUp > 20 ? '#EF4444' : pulse.needsFollowUp > 10 ? '#F59E0B' : '#10B981' },
+    { label: 'Stale (30d+)', value: String(pulse.staleLeads), color: pulse.staleLeads > 40 ? '#EF4444' : pulse.staleLeads > 20 ? '#F59E0B' : '#10B981', accent: pulse.staleLeads > 40 ? '#EF4444' : pulse.staleLeads > 20 ? '#F59E0B' : '#10B981' },
+  ]
+
+  const renderRow = (cards: typeof pipelineCards, title: string) => (
+    <div style={{ marginBottom: 16 }}>
+      <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase' as const, letterSpacing: '0.05em', marginBottom: 8 }}>{title}</div>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cards.length}, 1fr)`, gap: 10 }}>
+        {cards.map(c => (
+          <div key={c.label} style={{
+            background: 'white',
+            border: '1px solid #F3F4F6',
+            borderLeft: `3px solid ${c.accent}`,
+            borderRadius: 10,
+            padding: '14px 16px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', marginBottom: 4, textTransform: 'uppercase' as const, letterSpacing: '0.03em' }}>
+              {c.label}
+            </div>
+            <div style={{ fontSize: 26, fontWeight: 700, color: c.color, lineHeight: 1 }}>
+              {c.value}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-      gap: 12,
-      marginBottom: 8,
-    }}>
-      {cards.map(c => (
-        <div key={c.label} style={{
-          background: 'white',
-          border: '1px solid #F3F4F6',
-          borderTop: '3px solid #10B981',
-          borderRadius: 12,
-          padding: '16px 18px',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-        }}>
-          <div style={{ fontSize: 28, fontWeight: 700, color: c.color, lineHeight: 1 }}>
-            {c.value}
-          </div>
-          <div style={{ fontSize: 14, color: '#6B7280', marginTop: 6 }}>
-            {c.label}
-          </div>
-        </div>
-      ))}
+    <div>
+      {renderRow(pipelineCards, 'Pipeline')}
+      {renderRow(healthCards, 'Health')}
     </div>
   )
 }
