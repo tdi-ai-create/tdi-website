@@ -1958,64 +1958,47 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                 }}
               />
 
-              {/* Bulk Transcribe Buttons */}
+              {/* Bulk Transcribe (EN + ES) */}
               <button
                 onClick={async () => {
                   if (!course) return;
                   setBulkTranscribing(true);
-                  const videoLessons = course.modules.flatMap(m => m.lessons.filter(l => l.video_id && !l.transcript));
-                  setBulkTranscriptStatus(`Requesting EN transcripts for ${videoLessons.length} videos...`);
+                  const videoLessons = course.modules.flatMap(m => m.lessons.filter(l => {
+                    const vid = l.video_id || (l.content as any)?.video_id;
+                    return vid && (!l.transcript || !l.transcript_es);
+                  }));
+                  const total = videoLessons.length;
+                  setBulkTranscriptStatus(`Requesting transcripts for ${total} videos (EN + ES)...`);
                   let completed = 0;
                   for (const lesson of videoLessons) {
                     const videoId = lesson.video_id || (lesson.content as any)?.video_id;
                     if (!videoId) continue;
                     try {
-                      await fetch('/api/tdi-admin/videos/transcript', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ uid: videoId, lang: 'en' }),
-                      });
+                      // Request both EN and ES in parallel per video
+                      await Promise.all([
+                        !lesson.transcript ? fetch('/api/tdi-admin/videos/transcript', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ uid: videoId, lang: 'en' }),
+                        }) : Promise.resolve(),
+                        !lesson.transcript_es ? fetch('/api/tdi-admin/videos/transcript', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ uid: videoId, lang: 'es' }),
+                        }) : Promise.resolve(),
+                      ]);
                       completed++;
-                      setBulkTranscriptStatus(`Requested ${completed}/${videoLessons.length} EN transcripts`);
+                      setBulkTranscriptStatus(`Requested ${completed}/${total} (EN + ES)`);
                     } catch {}
                   }
-                  setBulkTranscriptStatus(`EN transcripts requested for ${completed} videos. They'll be ready in 1-2 minutes -- refresh to see them.`);
+                  setBulkTranscriptStatus(`Transcripts requested for ${completed} videos (EN + ES). Ready in 1-2 minutes -- refresh to see them.`);
                   setBulkTranscribing(false);
                 }}
                 disabled={bulkTranscribing}
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-teal-200 text-teal-700 hover:bg-teal-50 transition-colors disabled:opacity-50"
               >
                 <FileText size={16} />
-                {bulkTranscribing && bulkTranscriptStatus.includes('EN') ? bulkTranscriptStatus : 'Bulk Transcribe EN'}
-              </button>
-              <button
-                onClick={async () => {
-                  if (!course) return;
-                  setBulkTranscribing(true);
-                  const videoLessons = course.modules.flatMap(m => m.lessons.filter(l => l.video_id && !l.transcript_es));
-                  setBulkTranscriptStatus(`Requesting ES transcripts for ${videoLessons.length} videos...`);
-                  let completed = 0;
-                  for (const lesson of videoLessons) {
-                    const videoId = lesson.video_id || (lesson.content as any)?.video_id;
-                    if (!videoId) continue;
-                    try {
-                      await fetch('/api/tdi-admin/videos/transcript', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ uid: videoId, lang: 'es' }),
-                      });
-                      completed++;
-                      setBulkTranscriptStatus(`Requested ${completed}/${videoLessons.length} ES transcripts`);
-                    } catch {}
-                  }
-                  setBulkTranscriptStatus(`ES transcripts requested for ${completed} videos. They'll be ready in 1-2 minutes -- refresh to see them.`);
-                  setBulkTranscribing(false);
-                }}
-                disabled={bulkTranscribing}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-amber-200 text-amber-700 hover:bg-amber-50 transition-colors disabled:opacity-50"
-              >
-                <FileText size={16} />
-                {bulkTranscribing && bulkTranscriptStatus.includes('ES') ? bulkTranscriptStatus : 'Bulk Transcribe ES'}
+                {bulkTranscribing ? bulkTranscriptStatus : 'Bulk Transcribe (EN + ES)'}
               </button>
               {bulkTranscriptStatus && !bulkTranscribing && (
                 <p className="text-xs text-gray-500">{bulkTranscriptStatus}</p>
