@@ -1480,12 +1480,12 @@ function LessonEditorPanel({
               transcriptTextEs={form.transcript_text_es}
               onUpdate={(updates) => {
                 setForm((prev) => ({ ...prev, ...updates }));
-                if (updates.video_id || updates.duration_minutes) {
+                if (updates.video_id || updates.duration_minutes || updates.transcript_text || updates.transcript_text_es) {
                   fetch('/api/tdi-admin/lessons', {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: lesson.id, ...updates }),
-                  }).catch(err => console.error('Auto-save video failed:', err));
+                  }).catch(err => console.error('Auto-save failed:', err));
                 }
               }}
             />
@@ -1586,6 +1586,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
   const [newModuleTitle, setNewModuleTitle] = useState('');
   const [bulkTranscribing, setBulkTranscribing] = useState(false);
   const [bulkTranscriptStatus, setBulkTranscriptStatus] = useState('');
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   // Load course via lightweight API (no auth required, uses Hub service key server-side)
   useEffect(() => {
@@ -1694,13 +1695,19 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
       );
     } catch (error) {
       console.error('Error renaming module:', error);
+      setToast({ message: 'Failed to rename module', type: 'error' });
+      setTimeout(() => setToast(null), 4000);
     }
   };
 
   // Delete module
   const deleteModule = async (moduleId: string) => {
+    const module = course?.modules.find(m => m.id === moduleId);
+    const lessonCount = module?.lessons.length || 0;
+    if (!window.confirm(`Delete "${module?.title || 'this module'}"${lessonCount > 0 ? ` and its ${lessonCount} lesson${lessonCount > 1 ? 's' : ''}` : ''}? This cannot be undone.`)) return;
     try {
-      await fetch(`/api/tdi-admin/modules?id=${moduleId}`, { method: 'DELETE' });
+      const res = await fetch(`/api/tdi-admin/modules?id=${moduleId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete module');
       setCourse((prev) =>
         prev
           ? {
@@ -1709,8 +1716,12 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
             }
           : null
       );
+      setToast({ message: 'Module deleted', type: 'success' });
+      setTimeout(() => setToast(null), 3000);
     } catch (error) {
       console.error('Error deleting module:', error);
+      setToast({ message: 'Failed to delete module', type: 'error' });
+      setTimeout(() => setToast(null), 4000);
     }
   };
 
@@ -1737,13 +1748,18 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
       }
     } catch (error) {
       console.error('Error adding lesson:', error);
+      setToast({ message: 'Failed to add lesson', type: 'error' });
+      setTimeout(() => setToast(null), 4000);
     }
   };
 
   // Delete lesson
   const deleteLesson = async (lessonId: string) => {
+    const lesson = course?.modules.flatMap(m => m.lessons).find(l => l.id === lessonId);
+    if (!window.confirm(`Delete "${lesson?.title || 'this lesson'}"? This cannot be undone.`)) return;
     try {
-      await fetch(`/api/tdi-admin/lessons?id=${lessonId}`, { method: 'DELETE' });
+      const res = await fetch(`/api/tdi-admin/lessons?id=${lessonId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete lesson');
       setCourse((prev) =>
         prev
           ? {
@@ -1758,8 +1774,12 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
       if (selectedLesson?.id === lessonId) {
         setSelectedLesson(null);
       }
+      setToast({ message: 'Lesson deleted', type: 'success' });
+      setTimeout(() => setToast(null), 3000);
     } catch (error) {
       console.error('Error deleting lesson:', error);
+      setToast({ message: 'Failed to delete lesson', type: 'error' });
+      setTimeout(() => setToast(null), 4000);
     }
   };
 
@@ -1788,8 +1808,12 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
         );
         setSelectedLesson(data.lesson);
       }
+      setToast({ message: 'Lesson saved', type: 'success' });
+      setTimeout(() => setToast(null), 2000);
     } catch (error) {
       console.error('Error updating lesson:', error);
+      setToast({ message: 'Failed to save lesson', type: 'error' });
+      setTimeout(() => setToast(null), 4000);
     } finally {
       setIsSaving(false);
     }
@@ -1873,6 +1897,14 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Toast notification */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium animate-in fade-in slide-in-from-top-2 duration-200 ${
+          toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-gray-800 text-white'
+        }`}>
+          {toast.message}
+        </div>
+      )}
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 py-3">
