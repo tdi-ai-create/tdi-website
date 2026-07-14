@@ -156,6 +156,7 @@ function VideoUploadSection({
   const [showReplaceConfirm, setShowReplaceConfirm] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [generatingTranscript, setGeneratingTranscript] = useState(false);
+  const [transcriptStatus, setTranscriptStatus] = useState('');
 
   const cfCustomerSubdomain = 'customer-4n38x6badamh5yps';
 
@@ -568,17 +569,28 @@ function VideoUploadSection({
             <button
               onClick={async () => {
                 setGeneratingTranscript(true);
+                setTranscriptStatus('Requesting AI transcription...');
                 try {
                   // Request generation
-                  await fetch('/api/tdi-admin/videos/transcript', {
+                  const postRes = await fetch('/api/tdi-admin/videos/transcript', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ uid: videoId }),
                   });
-                  // Poll for transcript (up to 20 attempts, every 5 seconds = ~100s max)
+                  const postData = await postRes.json();
+
+                  if (!postRes.ok && !postData.already_exists) {
+                    setTranscriptStatus(`Error: ${postData.message || 'Failed to start transcription'}`);
+                    setGeneratingTranscript(false);
+                    return;
+                  }
+
+                  // Poll for transcript (up to 30 attempts, every 5 seconds = ~150s max)
+                  setTranscriptStatus('Transcribing audio... this takes 1-2 minutes');
                   let transcript = null;
-                  for (let attempt = 0; attempt < 20; attempt++) {
+                  for (let attempt = 0; attempt < 30; attempt++) {
                     await new Promise(r => setTimeout(r, 5000));
+                    setTranscriptStatus(`Transcribing audio... (${attempt * 5}s)`);
                     const res = await fetch(`/api/tdi-admin/videos/transcript?uid=${videoId}`);
                     const data = await res.json();
                     if (data.transcript) {
@@ -591,17 +603,19 @@ function VideoUploadSection({
                   }
                   if (transcript) {
                     onUpdate({ transcript_text: transcript });
+                    setTranscriptStatus('');
                   } else {
-                    console.error('Transcript generation timed out -- try again in a minute');
+                    setTranscriptStatus('Timed out -- click again to retry');
                   }
                 } catch (err) {
                   console.error('Transcript generation error:', err);
+                  setTranscriptStatus('Error generating transcript');
                 } finally { setGeneratingTranscript(false); }
               }}
               disabled={generatingTranscript}
               className="text-xs text-teal-600 hover:text-teal-700 font-medium disabled:opacity-50"
             >
-              {generatingTranscript ? 'Generating...' : 'Auto-generate transcript'}
+              {generatingTranscript ? transcriptStatus || 'Generating...' : 'Auto-generate transcript'}
             </button>
           )}
         </div>
