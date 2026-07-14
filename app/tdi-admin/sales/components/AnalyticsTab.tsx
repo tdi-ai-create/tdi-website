@@ -19,6 +19,9 @@ interface AnalyticsData {
     wonValue: number
     wonCount: number
     winRate: number
+    staleLeads: number
+    needsFollowUp: number
+    signedCount: number
   }
   funnel: { stage: string; count: number; value: number }[]
   bySource: Record<string, { count: number; value: number; factored: number; won: number }>
@@ -133,8 +136,11 @@ function PulseSection({ pulse }: { pulse: AnalyticsData['pulse'] }) {
     { label: 'Factored', value: `$${(pulse.factored / 1000).toFixed(0)}K`, color: '#10B981' },
     { label: 'Active deals', value: String(pulse.activeCount), color: '#10B981' },
     { label: 'Avg deal size', value: `$${(pulse.avgDealSize / 1000).toFixed(0)}K`, color: '#10B981' },
+    { label: 'Signed', value: String(pulse.signedCount), color: '#6366F1' },
     { label: 'Win rate', value: `${pulse.winRate}%`, color: '#10B981' },
     { label: 'Won YTD', value: `$${(pulse.wonValue / 1000).toFixed(0)}K`, color: '#10B981' },
+    { label: 'Needs follow-up', value: String(pulse.needsFollowUp), color: pulse.needsFollowUp > 10 ? '#F59E0B' : '#10B981' },
+    { label: 'Stale (30d+)', value: String(pulse.staleLeads), color: pulse.staleLeads > 20 ? '#EF4444' : '#F59E0B' },
   ]
   return (
     <div style={{

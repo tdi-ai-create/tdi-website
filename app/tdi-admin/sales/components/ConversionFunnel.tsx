@@ -17,14 +17,13 @@ interface FunnelStage {
 }
 
 export function ConversionFunnel({ funnel }: { funnel: FunnelStage[] }) {
-  const top = funnel[0]?.count || 1
+  const maxCount = Math.max(...funnel.map(s => s.count), 1)
+  const totalDeals = funnel.reduce((s, f) => s + f.count, 0)
   return (
     <div>
       {funnel.map((stage, i) => {
-        const width = Math.max((stage.count / top) * 100, 5)
-        const conversionRate = i > 0 && funnel[i - 1].count > 0
-          ? Math.round((stage.count / funnel[i - 1].count) * 100)
-          : null
+        const width = Math.max((stage.count / maxCount) * 100, stage.count > 0 ? 8 : 2)
+        const pctOfTotal = totalDeals > 0 ? Math.round((stage.count / totalDeals) * 100) : 0
         return (
           <div key={stage.stage} style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 16 }}>
             <div style={{ width: 140, fontSize: 12, fontWeight: 600, flexShrink: 0 }}>
@@ -54,7 +53,7 @@ export function ConversionFunnel({ funnel }: { funnel: FunnelStage[] }) {
               </div>
             </div>
             <div style={{ width: 50, fontSize: 11, color: '#6B7280', textAlign: 'right', flexShrink: 0 }}>
-              {conversionRate !== null ? `${conversionRate}%` : ''}
+              {stage.count > 0 ? `${pctOfTotal}%` : ''}
             </div>
           </div>
         )
