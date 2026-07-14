@@ -531,7 +531,7 @@ export default function BulkVideoUpload({ course, onComplete, onLessonUploaded }
             </div>
 
             {/* Modal footer */}
-            {!isUploading && files.length > 0 && !queue.every((q) => q.status === 'done' || q.status === 'error') && (
+            {!isUploading && files.length > 0 && (queue.length === 0 || !queue.every((q) => q.status === 'done' || q.status === 'error')) && (
               <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
                 <p className="text-xs text-gray-400">
                   {availableLessons.length} lesson{availableLessons.length !== 1 ? 's' : ''} still need
