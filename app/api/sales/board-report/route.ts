@@ -30,7 +30,7 @@ export async function GET() {
       return NextResponse.json({ error: 'No opportunities found' }, { status: 404 })
     }
 
-    const active = opps.filter(o => !['lost', 'paid'].includes(o.stage) && !o.deleted_at)
+    const active = opps.filter(o => !['lost', 'paid', 'cancelled'].includes(o.stage) && !o.deleted_at)
     const won = opps.filter(o => o.stage === 'paid')
     const lost = opps.filter(o => o.stage === 'lost')
     const now = new Date()
@@ -72,10 +72,25 @@ export async function GET() {
         tier: o.lead_score ? (o.lead_score >= 70 ? 'T1' : o.lead_score >= 40 ? 'T2' : 'T3') : null,
       }))
 
-    // Source breakdown
+    // Source breakdown -- normalize duplicates
+    const SOURCE_NORMALIZE: Record<string, string> = {
+      'pd_plan_request': 'PD Plan Request (website)',
+      'PD Plan Request': 'PD Plan Request (website)',
+      'cold_inbound': 'Cold Inbound',
+      'existing_customer_renewal': 'Existing Customer Renewal',
+      'Existing customer renewal': 'Existing Customer Renewal',
+      'Existing customer expansion': 'Existing Customer Expansion',
+      'rfp': 'RFP',
+      'other': 'Other',
+      'Direct inquiry form': 'Direct Inquiry',
+      'Direct inquiry': 'Direct Inquiry',
+      'Cold call (Jim)': "Jim's Call Sheet (April 2026)",
+      'GHL Import': 'Other',
+    }
     const bySource: Record<string, { count: number; value: number }> = {}
     active.forEach(o => {
-      const src = o.source || 'Unknown'
+      const rawSrc = o.source || 'Unknown'
+      const src = SOURCE_NORMALIZE[rawSrc] || rawSrc
       if (!bySource[src]) bySource[src] = { count: 0, value: 0 }
       bySource[src].count++
       bySource[src].value += o.value || 0
