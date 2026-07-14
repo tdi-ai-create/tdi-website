@@ -5,10 +5,10 @@ import { Heart, Info, ChevronDown, ChevronUp } from 'lucide-react';
 
 export const ROLE_FILTERS = [
   { value: 'all', label: 'All Roles', short: 'All Roles' },
-  { value: 'teacher', label: 'Teachers', short: 'Teachers' },
-  { value: 'para', label: 'Paraprofessionals', short: 'Paras' },
-  { value: 'leader', label: 'Leaders & Admin', short: 'Leaders' },
-  { value: 'coach', label: 'Coaches', short: 'Coaches' },
+  { value: 'teacher', label: 'Teacher', short: 'Teacher' },
+  { value: 'para', label: 'Paraprofessional', short: 'Para' },
+  { value: 'leader', label: 'Leader / Admin', short: 'Leader' },
+  { value: 'coach', label: 'Coach', short: 'Coach' },
 ] as const;
 
 export const DANIELSON_DOMAINS = [

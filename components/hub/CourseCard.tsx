@@ -185,7 +185,7 @@ export default function CourseCard({
             fontFamily: "'DM Sans', sans-serif",
           }}
         >
-          {course.category.replace(/-/g, ' ').replace(/&/g, '&').replace(/\b\w/g, c => c.toUpperCase())}
+          {(course.category || 'General').replace(/-/g, ' ').replace(/&/g, '&').replace(/\b\w/g, c => c.toUpperCase())}
         </span>
 
         {/* Title */}
