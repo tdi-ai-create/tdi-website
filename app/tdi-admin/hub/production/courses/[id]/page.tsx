@@ -175,7 +175,7 @@ function VideoUploadSection({
 
     return new Promise((resolve) => {
       const video = document.createElement('video');
-      video.muted = true;
+      video.muted = false;
       video.playsInline = true;
       video.src = URL.createObjectURL(file);
 
@@ -194,8 +194,21 @@ function VideoUploadSection({
         // Target bitrate based on resolution (roughly 2.5 Mbps for 720p)
         const videoBitsPerSecond = height <= 480 ? 1_500_000 : 2_500_000;
 
-        const stream = canvas.captureStream(30);
-        const recorder = new MediaRecorder(stream, {
+        // Capture video from canvas + audio from the video element
+        const canvasStream = canvas.captureStream(30);
+        const audioCtx = new AudioContext();
+        const source = audioCtx.createMediaElementSource(video);
+        const dest = audioCtx.createMediaStreamDestination();
+        source.connect(dest);
+        source.connect(audioCtx.destination);
+
+        // Combine video track from canvas + audio track from video
+        const combinedStream = new MediaStream([
+          ...canvasStream.getVideoTracks(),
+          ...dest.stream.getAudioTracks(),
+        ]);
+
+        const recorder = new MediaRecorder(combinedStream, {
           mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm',
           videoBitsPerSecond,
         });
@@ -1965,7 +1978,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                   setBulkTranscribing(true);
                   const videoLessons = course.modules.flatMap(m => m.lessons.filter(l => {
                     const vid = l.video_id || (l.content as any)?.video_id;
-                    return vid && (!l.transcript || !l.transcript_es);
+                    return vid && (!l.transcript_text || !l.transcript_text_es);
                   }));
                   const total = videoLessons.length;
                   setBulkTranscriptStatus(`Requesting transcripts for ${total} videos (EN + ES)...`);
@@ -2104,6 +2117,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
 
               {selectedLesson ? (
                 <LessonEditorPanel
+                  key={selectedLesson.id}
                   lesson={selectedLesson}
                   onUpdate={updateLesson}
                   onDelete={() => deleteLesson(selectedLesson.id)}

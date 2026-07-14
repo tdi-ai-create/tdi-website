@@ -48,7 +48,7 @@ async function compressVideo(
 
   return new Promise((resolve) => {
     const video = document.createElement('video');
-    video.muted = true;
+    video.muted = false;
     video.playsInline = true;
     video.src = URL.createObjectURL(file);
 
@@ -65,8 +65,20 @@ async function compressVideo(
 
       const videoBitsPerSecond = height <= 480 ? 1_500_000 : 2_500_000;
 
-      const stream = canvas.captureStream(30);
-      const recorder = new MediaRecorder(stream, {
+      // Capture video from canvas + audio from the video element
+      const canvasStream = canvas.captureStream(30);
+      const audioCtx = new AudioContext();
+      const source = audioCtx.createMediaElementSource(video);
+      const dest = audioCtx.createMediaStreamDestination();
+      source.connect(dest);
+      source.connect(audioCtx.destination);
+
+      const combinedStream = new MediaStream([
+        ...canvasStream.getVideoTracks(),
+        ...dest.stream.getAudioTracks(),
+      ]);
+
+      const recorder = new MediaRecorder(combinedStream, {
         mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
           ? 'video/webm;codecs=vp9'
           : 'video/webm',

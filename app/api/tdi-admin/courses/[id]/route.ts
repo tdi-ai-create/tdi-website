@@ -70,7 +70,7 @@ export async function GET(
         (a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order
       ).map((l: any) => {
         const c = (l.content && typeof l.content === 'object') ? l.content : {};
-        return { ...l, video_id: c.video_id || null, audio_url: c.audio_url || null, duration_minutes: c.duration_minutes || null, transcript_text: l.transcript || null };
+        return { ...l, video_id: c.video_id || null, audio_url: c.audio_url || null, duration_minutes: c.duration_minutes || null, transcript_text: l.transcript || null, transcript_text_es: l.transcript_es || null };
       }),
     }));
 

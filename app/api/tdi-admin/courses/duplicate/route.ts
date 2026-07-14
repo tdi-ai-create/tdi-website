@@ -127,13 +127,17 @@ export async function POST(request: NextRequest) {
         const lessonInsert: Record<string, unknown> = {
           ...lessonFields,
           module_id: newModule.id,
-          video_id: null, // Videos are unique, never copy
         };
+        // video_id lives inside content JSON, clear it for the copy
+        if (lessonInsert.content && typeof lessonInsert.content === 'object') {
+          lessonInsert.content = { ...(lessonInsert.content as Record<string, unknown>), video_id: null };
+        }
 
         // If not including content, clear it
         if (!includeContent) {
           lessonInsert.content = {};
-          lessonInsert.transcript_text = null;
+          lessonInsert.transcript = null;
+          lessonInsert.transcript_es = null;
         }
 
         const { error: lessonError } = await supabase

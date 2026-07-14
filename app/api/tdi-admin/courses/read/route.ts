@@ -51,6 +51,7 @@ export async function GET(request: NextRequest) {
           audio_url: c.audio_url || null,
           duration_minutes: c.duration_minutes || null,
           transcript_text: l.transcript || null,
+          transcript_text_es: l.transcript_es || null,
         }
       }),
     }))
