@@ -120,11 +120,56 @@ const phases = [
   },
 ];
 
+// Creator FAQ items
+const creatorFaqItems = [
+  {
+    question: 'How do creators get paid?',
+    answer: 'You receive a unique affiliate link when you join. Anyone who signs up to TDI through your link earns you 50% of revenue — forever. It\'s not a one-time payment. As long as referred users stay active, you keep earning. Paid monthly with a full transparency statement so you always know exactly what you earned.',
+  },
+  {
+    question: 'When do I receive my payouts?',
+    answer: 'Payouts are made by the 15th of the month following the sale. So if someone enrolls through your link in July, you\'re paid by August 15th. Every payout includes a line-by-line breakdown of conversions, amounts, and deductions (only processing fees, taxes, and refunds — never TDI overhead).',
+  },
+  {
+    question: 'Do I need special equipment or tech skills?',
+    answer: 'No. We handle all editing, design, and production. You bring the strategy and expertise — we take care of the rest. Many of our creators record on their phone or laptop. We also provide templates and outlines to help you structure your content.',
+  },
+  {
+    question: 'Who owns the content I create?',
+    answer: 'TDI owns the final published version, which is what allows us to distribute, market, and protect your work. You keep full ownership of any frameworks, templates, or materials you brought with you. And you can always reference your TDI work in your portfolio, resume, or social media.',
+  },
+  {
+    question: 'Can I work with other education companies?',
+    answer: 'Absolutely. Our creator agreement is non-exclusive by default. Run your own offerings, work with other platforms, grow your business. We only ask that you don\'t recreate the exact same content for a direct competitor. TDI works alongside your existing work — not instead of it.',
+  },
+  {
+    question: 'How long does it take to create a course?',
+    answer: 'Every creator moves at their own pace. Some finish in 4 weeks, others take 4 months. There\'s no deadline and no pressure. Our team is with you from first idea to launch day, and we work around your schedule — not the other way around.',
+  },
+  {
+    question: 'What if I want to stop or take a break?',
+    answer: 'Either side can end the partnership with 14 days\' written notice. Everything you\'ve already earned stays yours — no clawbacks. If you need a pause, your affiliate link stays active during that time so you continue earning from existing referrals.',
+  },
+  {
+    question: 'What types of content can I create?',
+    answer: 'We support three content paths: blog posts, downloadable resources (like checklists, guides, or templates), and full Learning Hub courses. You can choose one or all three. Many creators start with a blog post or download and grow into a full course.',
+  },
+  {
+    question: 'I\'m not an "expert." Can I still create?',
+    answer: 'Yes — and we hear this a lot. You don\'t need a doctorate or a book deal. If you do something in your classroom that works and colleagues ask you about it, that\'s worth sharing. Our community of 100,000+ educators is looking for practical, real-world strategies from teachers like you.',
+  },
+  {
+    question: 'How do I get started?',
+    answer: 'Fill out the short application form below. Our team will review it and reach out within a few days to set up a quick call. From there, we\'ll help you shape your idea, choose your content path, and get rolling. Questions before applying? Email us at hello@teachersdeserveit.com.',
+  },
+];
+
 // Navigation sections
 const navSections = [
   { id: 'how-it-works', label: 'How It Works' },
   { id: 'your-guide', label: 'Your Guide' },
   { id: 'why-create', label: 'Why Create' },
+  { id: 'creator-faq', label: 'FAQ' },
   { id: 'apply', label: 'Apply' },
   { id: 'our-creators', label: 'Our Creators' },
 ];
@@ -151,6 +196,7 @@ export default function CreateWithUsPage() {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [creators, setCreators] = useState<Creator[]>(fallbackCreators);
   const [activeSection, setActiveSection] = useState<string>('');
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const turnstileRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetId = useRef<string | null>(null);
@@ -617,6 +663,79 @@ export default function CreateWithUsPage() {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Creator FAQ */}
+      <section id="creator-faq" className="py-16 md:py-20 bg-gray-50 scroll-mt-32">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2
+              className="text-3xl md:text-4xl font-bold text-[#1e2749] mb-4 opacity-0 translate-y-8 transition-all duration-700"
+              data-animate="true"
+            >
+              Creator FAQ
+            </h2>
+            <p
+              className="text-lg text-gray-600 max-w-2xl mx-auto opacity-0 translate-y-8 transition-all duration-700 delay-100"
+              data-animate="true"
+            >
+              Everything you need to know before you apply.
+            </p>
+          </div>
+
+          <div
+            className="space-y-3 opacity-0 translate-y-8 transition-all duration-700 delay-200"
+            data-animate="true"
+          >
+            {creatorFaqItems.map((item, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-xl border border-gray-200 overflow-hidden transition-shadow duration-300 hover:shadow-md"
+              >
+                <button
+                  onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                  className="w-full text-left px-6 py-5 flex items-center justify-between gap-4"
+                >
+                  <span className="font-semibold text-[#1e2749] text-base md:text-lg leading-snug">
+                    {item.question}
+                  </span>
+                  <svg
+                    className={`w-5 h-5 text-[#80a4ed] shrink-0 transition-transform duration-300 ${
+                      openFaqIndex === index ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openFaqIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <p className="px-6 pb-5 text-gray-600 leading-relaxed">
+                    {item.answer}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div
+            className="text-center mt-10 opacity-0 translate-y-8 transition-all duration-700 delay-300"
+            data-animate="true"
+          >
+            <p className="text-gray-500 text-sm">
+              Still have questions?{' '}
+              <a href="mailto:hello@teachersdeserveit.com" className="text-[#80a4ed] hover:underline font-medium">
+                Email us anytime
+              </a>
+              {' '}— we love hearing from future creators.
+            </p>
           </div>
         </div>
       </section>
