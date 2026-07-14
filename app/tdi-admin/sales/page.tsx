@@ -1511,6 +1511,21 @@ export default function SalesPage() {
                       >
                         Edit
                       </button>
+                      {q.status !== 'signed' && (
+                        <button
+                          onClick={async () => {
+                            if (!confirm(`Delete contract "${q.title}"? This cannot be undone.`)) return
+                            await supabase.from('quote_packages').delete().eq('quote_id', q.id)
+                            await supabase.from('quote_invoices').delete().eq('quote_id', q.id)
+                            await supabase.from('quotes').delete().eq('id', q.id)
+                            setQuotes(prev => prev.filter(qq => qq.id !== q.id))
+                            showToastMsg(`Contract "${q.title}" deleted`, 'success')
+                          }}
+                          style={{ fontSize: 12, padding: '6px 12px', borderRadius: 6, border: '1px solid #EF4444', background: 'white', color: '#EF4444', cursor: 'pointer', fontWeight: 600 }}
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
                   </div>
                 )
