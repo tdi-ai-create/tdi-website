@@ -49,7 +49,6 @@ export default function QuizEngine({ quiz, onComplete }: QuizEngineProps) {
         if (error) { console.error('Failed to load recommended quick wins:', error); return }
         if (data) setRecommendedQW(data)
       })
-      .catch(err => console.error('Quick win recommendation fetch failed:', err))
 
     // Fetch Courses by keyword matching
     const keywords = getCourseKeywords(quiz.id, result.key)
@@ -69,7 +68,6 @@ export default function QuizEngine({ quiz, onComplete }: QuizEngineProps) {
           }).slice(0, 2)
           setRecommendedCourses(matches)
         })
-        .catch(err => console.error('Course recommendation fetch failed:', err))
     }
   }, [result, quiz.id])
 
