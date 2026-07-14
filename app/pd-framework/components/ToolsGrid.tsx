@@ -18,15 +18,6 @@ const resources = [
     external: false,
   },
   {
-    title: 'Join the Free\nFB Community',
-    description: 'Connect with thousands of educators\nwho get it.',
-    href: 'https://www.facebook.com/groups/tdimovement',
-    icon: Users,
-    iconBg: '#1e2749',
-    iconColor: '#ffffff',
-    external: true,
-  },
-  {
     title: 'Read\nOur Blog',
     description: 'Weekly insights for educators who refuse to burn out.',
     href: 'https://raehughart.substack.com',

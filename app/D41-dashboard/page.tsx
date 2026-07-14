@@ -951,25 +951,6 @@ export default function D41Dashboard() {
               </div>
             </div>
 
-            {/* Community */}
-            <a
-              href="https://www.facebook.com/groups/tdimovement"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-all group"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-[#35A7FF]/10 transition-colors">
-                  <Users className="w-7 h-7 text-[#38618C] group-hover:text-[#35A7FF]" />
-                </div>
-                <div className="flex-1">
-                  <div className="font-semibold text-[#1e2749] mb-1">Join the TDI Community</div>
-                  <p className="text-sm text-gray-500">Connect with educators nationwide who share resources, celebrate wins, and support each other.</p>
-                </div>
-                <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-[#35A7FF]" />
-              </div>
-            </a>
-
             {/* Resources + Coaching */}
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
               <div className="flex items-start gap-4">

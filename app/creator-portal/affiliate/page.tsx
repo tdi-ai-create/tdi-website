@@ -149,7 +149,7 @@ const TIPS = [
   { icon: '\uD83D\uDCF8', title: 'Pin it on Instagram', desc: 'Link in bio + a story highlight' },
   { icon: '\uD83C\uDF99\uFE0F', title: 'Mention it in talks', desc: 'Keynote, PD sessions, workshops' },
   { icon: '\uD83D\uDCF0', title: 'Drop it in your newsletter', desc: 'A single line, every issue' },
-  { icon: '\uD83D\uDCAC', title: 'Share it in teacher communities', desc: 'Facebook groups, Reddit, school staff meetings' },
+  { icon: '\uD83D\uDCAC', title: 'Share it in teacher communities', desc: 'Reddit, school staff meetings, PD sessions' },
 ];
 
 // ==========================================

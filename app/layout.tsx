@@ -86,7 +86,7 @@ export default function RootLayout({
           "url": "https://www.teachersdeserveit.com",
           "logo": "https://www.teachersdeserveit.com/images/logo.webp",
           "description": "Research-backed professional development for schools, teachers, and paraprofessionals across all 50 states.",
-          "sameAs": ["https://raehughart.substack.com", "https://www.facebook.com/groups/tdimovement"],
+          "sameAs": ["https://raehughart.substack.com"],
           "contactPoint": { "@type": "ContactPoint", "email": "hello@teachersdeserveit.com", "contactType": "customer service" }
         }) }} />
         <PostHogProvider>

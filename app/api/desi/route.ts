@@ -161,7 +161,6 @@ FOR INDIVIDUAL TEACHERS:
 - Affordable courses in the Learning Hub at www.teachersdeserveit.com/hub
 - Free PD Diagnostic: teachersdeserveit.com/pd-diagnostic
 - Free PD Plan: teachersdeserveit.com/get-started
-- Free Facebook community: facebook.com/groups/tdimovement
 
 KEY LINKS:
 - Home: teachersdeserveit.com

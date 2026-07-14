@@ -64,7 +64,6 @@ const referralSources = [
   'TDI Newsletter/Substack',
   'Current TDI Creator',
   'TDI Learning Hub',
-  'Facebook Community',
   'Conference/Event',
   'Friend or Colleague',
   'Other',
@@ -1024,14 +1023,6 @@ export default function CreateWithUsPage() {
             >
               Join the Movement
             </Link>
-            <a
-              href="https://www.facebook.com/groups/tdimovement"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-white text-[#1e2749] px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-lg hover:shadow-xl"
-            >
-              Join Free FB Community
-            </a>
           </div>
         </div>
       </section>
