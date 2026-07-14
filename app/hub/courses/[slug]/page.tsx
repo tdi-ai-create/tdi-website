@@ -61,8 +61,8 @@ function getTestimonials(id: string): typeof TESTIMONIALS {
   return result;
 }
 
-// Coming Soon flag — set to false when course playback goes live
-const COMING_SOON = true;
+// Coming Soon is now dynamic — a course is "coming soon" if it has no lessons
+// Once lessons exist, the course becomes startable automatically
 
 interface Lesson {
   id: string;
@@ -162,7 +162,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           .from('hub_courses')
           .select('*')
           .eq('slug', slug)
-          .eq('is_published', true)
           .single();
 
         if (courseError || !courseData) {
@@ -470,6 +469,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   }
 
   const totalLessons = getTotalLessons();
+  const comingSoon = totalLessons === 0;
   const completedLessons = progress.completedLessons || 0;
   const progressPct = progress.progressPct || 0;
 
@@ -652,7 +652,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             className="bg-white rounded-2xl p-5"
             style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
           >
-            {COMING_SOON ? (
+            {comingSoon ? (
               <div className="text-center">
                 <button
                   onClick={async () => {
@@ -957,7 +957,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t shadow-lg"
           style={{ borderColor: '#E5E5E5' }}
         >
-          {COMING_SOON ? (
+          {comingSoon ? (
             <div className="text-center">
               <div
                 className="w-full py-3 rounded-xl text-sm font-semibold"

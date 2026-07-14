@@ -40,6 +40,7 @@ interface CourseCardProps {
     access_tier?: string;
     is_free_rotating?: boolean;
     capacity?: 'low' | 'medium' | 'high' | null;
+    is_published?: boolean;
   };
   enrollment?: {
     status: 'active' | 'completed';
@@ -123,6 +124,14 @@ export default function CourseCard({
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
               {tUI("Course thumbnail")}
+            </span>
+          </div>
+        )}
+        {/* Coming Soon overlay */}
+        {course.is_published === false && (
+          <div className="absolute inset-0 bg-[#1B2A4A]/30 flex items-center justify-center">
+            <span className="px-3 py-1.5 rounded-full text-xs font-bold text-white bg-[#1B2A4A]/80 tracking-wide" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+              {tUI("COMING SOON")}
             </span>
           </div>
         )}
@@ -244,8 +253,21 @@ export default function CourseCard({
             <Check size={18} />
             <span className="font-medium">{tUI("Completed")}</span>
           </div>
-        ) : true ? (
-          /* Explore course -- detail page has Coming Soon for actual enrollment */
+        ) : course.is_published === false ? (
+          <Link
+            href={`/hub/courses/${course.slug}`}
+            className="block w-full py-2.5 rounded-lg font-medium text-center transition-opacity hover:opacity-90"
+            style={{
+              backgroundColor: 'transparent',
+              border: '1.5px solid #E8B84B',
+              color: '#1B2A4A',
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '14px',
+            }}
+          >
+            {tUI("Coming Soon")}
+          </Link>
+        ) : (
           <Link
             href={`/hub/courses/${course.slug}`}
             className="block w-full py-2.5 rounded-lg font-medium text-center transition-opacity hover:opacity-90"
@@ -258,63 +280,6 @@ export default function CourseCard({
           >
             {tUI("Explore Course")}
           </Link>
-        ) : isEnrolled ? (
-          <div className="space-y-2">
-            {/* Gradient progress bar */}
-            <div
-              className="h-1.5 rounded-full overflow-hidden"
-              style={{ backgroundColor: 'rgba(0,0,0,0.06)' }}
-            >
-              <div
-                className="h-full rounded-full transition-all duration-300"
-                style={{
-                  width: `${progress}%`,
-                  background: 'linear-gradient(90deg, #FFBA06, #4ecdc4)',
-                }}
-              />
-            </div>
-            <Link
-              href={`/hub/courses/${course.slug}`}
-              className="block w-full text-center py-2 rounded-lg font-medium transition-colors"
-              style={{
-                backgroundColor: '#1B2A4A',
-                color: 'white',
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '14px',
-              }}
-            >
-              {tUI("Continue")} ({progress}%)
-            </Link>
-          </div>
-        ) : !hasAccess ? (
-          <Link
-            href="/hub/membership"
-            className="flex items-center justify-center gap-1.5 w-full py-2 rounded-lg font-medium transition-colors"
-            style={{
-              backgroundColor: 'transparent',
-              border: '1px solid #9CA3AF',
-              color: '#6B7280',
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '14px',
-            }}
-          >
-            <Lock size={14} />
-            {tUI("Upgrade to Access")}
-          </Link>
-        ) : (
-          <button
-            onClick={() => onEnroll?.(course.id)}
-            disabled={isEnrolling}
-            className="w-full py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
-            style={{
-              backgroundColor: '#1B2A4A',
-              color: 'white',
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '14px',
-            }}
-          >
-            {isEnrolling ? tUI('Enrolling...') : tUI('Enroll')}
-          </button>
         )}
       </div>
     </div>

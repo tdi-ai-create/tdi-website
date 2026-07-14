@@ -78,11 +78,11 @@ export default function CourseCatalogPage() {
     setIsLoading(true);
 
     try {
-      // Fetch all published courses
+      // Fetch all courses (published first, then coming soon)
       const { data: courseData } = await supabase
         .from('hub_courses')
         .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url, is_published, access_tier, is_free_rotating, capacity, danielson_domains, roles, title_es, description_es')
-        .eq('is_published', true)
+        .order('is_published', { ascending: false })
         .order('created_at', { ascending: false });
 
       if (courseData) {

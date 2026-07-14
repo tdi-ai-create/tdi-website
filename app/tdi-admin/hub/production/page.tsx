@@ -122,7 +122,7 @@ const ROLE_OPTIONS = [
   { value: 'coach', label: 'Coaches' },
 ] as const;
 
-const EMPTY_QW_FORM = { title: '', slug: '', description: '', category: 'Classroom Tools', type: 'do', duration_minutes: 10, capacity: '', danielson_domains: [] as string[], roles: [] as string[], is_published: false };
+const EMPTY_QW_FORM = { title: '', slug: '', description: '', category: 'Classroom Tools', type: 'do', duration_minutes: 10, capacity: '', danielson_domains: [] as string[], roles: [] as string[], is_published: false, thumbnail_url: '' };
 
 function QuickWinsTab() {
   const [quickWins, setQuickWins] = useState<any[]>([]);
@@ -132,6 +132,10 @@ function QuickWinsTab() {
   const [editingQW, setEditingQW] = useState<any | null>(null);
   const [form, setForm] = useState(EMPTY_QW_FORM);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string>('');
+  const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
+  const [publishWarning, setPublishWarning] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -162,6 +166,9 @@ function QuickWinsTab() {
   const openCreate = () => {
     setForm(EMPTY_QW_FORM);
     setEditingQW(null);
+    setThumbnailFile(null);
+    setThumbnailPreview('');
+    setPublishWarning('');
     setShowCreateForm(true);
   };
 
@@ -177,7 +184,11 @@ function QuickWinsTab() {
       danielson_domains: qw.danielson_domains || [],
       roles: qw.roles || [],
       is_published: qw.is_published || false,
+      thumbnail_url: qw.thumbnail_url || '',
     });
+    setThumbnailFile(null);
+    setThumbnailPreview(qw.thumbnail_url || '');
+    setPublishWarning('');
     setEditingQW(qw);
     setShowCreateForm(false);
   };
@@ -186,42 +197,119 @@ function QuickWinsTab() {
     setShowCreateForm(false);
     setEditingQW(null);
     setForm(EMPTY_QW_FORM);
+    setThumbnailFile(null);
+    setThumbnailPreview('');
+    setPublishWarning('');
+  };
+
+  const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setThumbnailFile(file);
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setThumbnailPreview(ev.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+    setPublishWarning('');
   };
 
   const handleSave = async () => {
     if (!form.title.trim() || !form.slug.trim()) return;
+
+    // Validate: cannot publish without thumbnail
+    const hasThumbnail = !!thumbnailFile || !!form.thumbnail_url;
+    if (form.is_published && !hasThumbnail) {
+      setPublishWarning('A thumbnail image is required before publishing. Please upload a thumbnail or uncheck "Published".');
+      return;
+    }
+
     setIsSubmitting(true);
+    setPublishWarning('');
     const supabase = getSupabase();
-    const payload = {
-      title: form.title.trim(),
-      slug: form.slug.trim(),
-      description: form.description || null,
-      category: form.category || null,
-      type: form.type,
-      duration_minutes: form.duration_minutes || null,
-      capacity: form.capacity || null,
-      danielson_domains: form.danielson_domains,
-      roles: form.roles,
-      is_published: form.is_published,
-    };
+
+    let thumbnailUrl = form.thumbnail_url || null;
+
     try {
-      if (editingQW) {
-        const { error } = await supabase.from('hub_quick_wins').update(payload).eq('id', editingQW.id);
-        if (!error) {
+      // For new records, insert first to get the ID
+      let recordId = editingQW?.id;
+
+      if (!editingQW) {
+        const insertPayload = {
+          title: form.title.trim(),
+          slug: form.slug.trim(),
+          description: form.description || null,
+          category: form.category || null,
+          type: form.type,
+          duration_minutes: form.duration_minutes || null,
+          capacity: form.capacity || null,
+          danielson_domains: form.danielson_domains,
+          roles: form.roles,
+          is_published: false, // insert as draft first, publish after thumbnail upload
+        };
+        const { data, error } = await supabase.from('hub_quick_wins').insert(insertPayload).select().single();
+        if (error || !data) {
+          console.error('Error creating quick win:', error);
+          setIsSubmitting(false);
+          return;
+        }
+        recordId = data.id;
+      }
+
+      // Upload thumbnail if a new file was selected
+      if (thumbnailFile && recordId) {
+        setIsUploadingThumbnail(true);
+        const storagePath = `cover-images/quick-wins/${recordId}/thumbnail.png`;
+
+        // Upload (upsert to overwrite existing)
+        const { error: uploadError } = await supabase.storage
+          .from('hub-assets')
+          .upload(storagePath, thumbnailFile, {
+            cacheControl: '3600',
+            upsert: true,
+          });
+
+        if (uploadError) {
+          console.error('Thumbnail upload error:', uploadError);
+          // Try without specifying bucket name variations
+        } else {
+          const { data: urlData } = supabase.storage
+            .from('hub-assets')
+            .getPublicUrl(storagePath);
+          thumbnailUrl = urlData?.publicUrl || thumbnailUrl;
+        }
+        setIsUploadingThumbnail(false);
+      }
+
+      const payload = {
+        title: form.title.trim(),
+        slug: form.slug.trim(),
+        description: form.description || null,
+        category: form.category || null,
+        type: form.type,
+        duration_minutes: form.duration_minutes || null,
+        capacity: form.capacity || null,
+        danielson_domains: form.danielson_domains,
+        roles: form.roles,
+        is_published: form.is_published,
+        thumbnail_url: thumbnailUrl,
+      };
+
+      // Update the record (both for edit and for newly created records that need thumbnail_url + is_published)
+      const { error } = await supabase.from('hub_quick_wins').update(payload).eq('id', recordId);
+      if (!error) {
+        if (editingQW) {
           setQuickWins(prev => prev.map(qw => qw.id === editingQW.id ? { ...qw, ...payload } : qw));
-          closeModal();
+        } else {
+          setQuickWins(prev => [{ id: recordId, ...payload }, ...prev]);
         }
-      } else {
-        const { data, error } = await supabase.from('hub_quick_wins').insert(payload).select().single();
-        if (!error && data) {
-          setQuickWins(prev => [data, ...prev]);
-          closeModal();
-        }
+        closeModal();
       }
     } catch (err) {
       console.error('Error saving quick win:', err);
     } finally {
       setIsSubmitting(false);
+      setIsUploadingThumbnail(false);
     }
   };
 
@@ -282,6 +370,59 @@ function QuickWinsTab() {
                   rows={3}
                   placeholder="Brief description for educators"
                 />
+              </div>
+
+              {/* Thumbnail Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Thumbnail Image
+                  {form.is_published && <span className="text-red-500 ml-1">*</span>}
+                </label>
+                {thumbnailPreview ? (
+                  <div className="relative mb-2">
+                    <img
+                      src={thumbnailPreview}
+                      alt="Thumbnail preview"
+                      className="w-full h-40 object-cover rounded-lg border border-gray-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setThumbnailFile(null);
+                        setThumbnailPreview('');
+                        setForm(f => ({ ...f, thumbnail_url: '' }));
+                      }}
+                      className="absolute top-2 right-2 p-1 rounded-full bg-white/90 hover:bg-white shadow-sm"
+                      title="Remove thumbnail"
+                    >
+                      <X size={14} className="text-gray-600" />
+                    </button>
+                  </div>
+                ) : (
+                  <label className="block border-2 border-dashed border-gray-200 rounded-lg p-6 text-center cursor-pointer hover:border-gray-300 transition-colors">
+                    <Image size={24} className="mx-auto mb-2 text-gray-400" />
+                    <p className="text-sm text-gray-500">Click to upload thumbnail</p>
+                    <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 2MB</p>
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      onChange={handleThumbnailSelect}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+                {thumbnailPreview && (
+                  <label className="inline-flex items-center gap-1.5 text-xs cursor-pointer hover:underline mt-1" style={{ color: theme.accent }}>
+                    <Upload size={12} />
+                    Replace image
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      onChange={handleThumbnailSelect}
+                      className="hidden"
+                    />
+                  </label>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -387,11 +528,27 @@ function QuickWinsTab() {
                 <input
                   type="checkbox"
                   checked={form.is_published}
-                  onChange={(e) => setForm(f => ({ ...f, is_published: e.target.checked }))}
+                  onChange={(e) => {
+                    const wantPublish = e.target.checked;
+                    const hasThumbnail = !!thumbnailFile || !!form.thumbnail_url;
+                    if (wantPublish && !hasThumbnail) {
+                      setPublishWarning('A thumbnail image is required before publishing. Please upload a thumbnail first.');
+                    } else {
+                      setPublishWarning('');
+                    }
+                    setForm(f => ({ ...f, is_published: wantPublish }));
+                  }}
                   className="w-4 h-4 rounded"
                 />
                 <span className="text-sm text-gray-700">Published</span>
               </label>
+
+              {publishWarning && (
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200">
+                  <AlertCircle size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-amber-700">{publishWarning}</p>
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end gap-3 mt-6">
@@ -407,7 +564,7 @@ function QuickWinsTab() {
                 className="px-4 py-2 text-sm font-medium text-white rounded-lg disabled:opacity-50"
                 style={{ backgroundColor: theme.accent }}
               >
-                {isSubmitting ? 'Saving...' : editingQW ? 'Save Changes' : 'Create Quick Win'}
+                {isSubmitting ? (isUploadingThumbnail ? 'Uploading thumbnail...' : 'Saving...') : editingQW ? 'Save Changes' : 'Create Quick Win'}
               </button>
             </div>
           </div>
