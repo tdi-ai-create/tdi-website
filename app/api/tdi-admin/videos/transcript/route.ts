@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 /**
- * GET /api/tdi-admin/videos/transcript?uid=VIDEO_UID
+ * GET /api/tdi-admin/videos/transcript?uid=VIDEO_UID&lang=en|es
  *
  * Fetch auto-generated captions/transcript from Cloudflare Stream.
  */
 export async function GET(request: NextRequest) {
   try {
     const uid = request.nextUrl.searchParams.get('uid')
+    const lang = request.nextUrl.searchParams.get('lang') || 'en'
     if (!uid) return NextResponse.json({ error: 'uid required' }, { status: 400 })
 
     const cfToken = process.env.CLOUDFLARE_STREAM_API_TOKEN
@@ -42,45 +43,40 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Find the English caption track (generated or manual)
-    const enTrack = captionsData.result.find(
-      (t: any) => t.language === 'en' && t.status === 'ready'
+    // Find the requested language caption track
+    const track = captionsData.result.find(
+      (t: any) => t.language === lang && t.status === 'ready'
     ) || captionsData.result.find(
-      (t: any) => t.language === 'en'
+      (t: any) => t.language === lang
     )
 
-    if (!enTrack) {
+    if (!track) {
       return NextResponse.json({
         transcript: null,
         status: 'not_ready',
-        message: 'English transcript not ready yet. Try again in a minute.',
+        message: `${lang === 'es' ? 'Spanish' : 'English'} transcript not ready yet. Try again in a minute.`,
       })
     }
 
-    // If the track has status !== 'ready', it's still processing
-    if (enTrack.status && enTrack.status !== 'ready') {
+    if (track.status && track.status !== 'ready') {
       return NextResponse.json({
         transcript: null,
         status: 'processing',
-        message: `Transcript is ${enTrack.status}. Try again in a minute.`,
+        message: `Transcript is ${track.status}. Try again in a minute.`,
       })
     }
 
     // Download the actual VTT content
     const vttRes = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/stream/${uid}/captions/en`,
+      `https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/stream/${uid}/captions/${lang}`,
       {
         headers: { 'Authorization': `Bearer ${cfToken}` },
       }
     )
 
     if (!vttRes.ok) {
-      // Try getting the transcript text from the track data itself
-      if (enTrack.text) {
-        return NextResponse.json({
-          transcript: enTrack.text,
-          status: 'ready',
-        })
+      if (track.text) {
+        return NextResponse.json({ transcript: track.text, status: 'ready' })
       }
       return NextResponse.json({
         transcript: null,
@@ -90,13 +86,10 @@ export async function GET(request: NextRequest) {
     }
 
     const vttData = await vttRes.json()
-
-    // Extract transcript text from captions result
     let transcript = ''
     const result = vttData.result
 
     if (typeof result === 'string') {
-      // VTT format -- strip timestamps and metadata
       transcript = result
         .replace(/WEBVTT\n\n/g, '')
         .replace(/\d+\n/g, '')
@@ -107,7 +100,6 @@ export async function GET(request: NextRequest) {
     } else if (Array.isArray(result)) {
       transcript = result.map((c: any) => c.text || '').join(' ').trim()
     } else if (result && typeof result === 'object') {
-      // Sometimes the result contains a 'text' or 'vtt' field
       if (result.text) transcript = result.text
       else if (result.vtt) {
         transcript = result.vtt
@@ -123,6 +115,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       transcript: transcript || null,
       status: transcript ? 'ready' : 'not_ready',
+      lang,
       message: transcript ? undefined : 'Caption track exists but transcript text is empty.',
     })
   } catch (e: unknown) {
@@ -135,10 +128,11 @@ export async function GET(request: NextRequest) {
  * POST /api/tdi-admin/videos/transcript
  *
  * Request Cloudflare to generate AI captions for a video.
+ * Body: { uid, lang?: 'en' | 'es' }
  */
 export async function POST(request: NextRequest) {
   try {
-    const { uid } = await request.json()
+    const { uid, lang = 'en' } = await request.json()
     if (!uid) return NextResponse.json({ error: 'uid required' }, { status: 400 })
 
     const cfToken = process.env.CLOUDFLARE_STREAM_API_TOKEN
@@ -147,9 +141,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Cloudflare not configured' }, { status: 500 })
     }
 
-    // Request AI-generated captions from Cloudflare Stream
+    const label = lang === 'es' ? 'Spanish' : 'English'
+
     const res = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/stream/${uid}/captions/en`,
+      `https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/stream/${uid}/captions/${lang}`,
       {
         method: 'PUT',
         headers: {
@@ -157,7 +152,7 @@ export async function POST(request: NextRequest) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          label: 'English',
+          label,
           generated: true,
         }),
       }
@@ -166,24 +161,23 @@ export async function POST(request: NextRequest) {
     const data = await res.json()
 
     if (!res.ok || !data.success) {
-      // Check if captions already exist
       if (data.errors?.[0]?.message?.includes('already exists')) {
         return NextResponse.json({
           success: true,
-          message: 'Captions already exist. Fetching transcript...',
+          message: `${label} captions already exist. Fetching transcript...`,
           already_exists: true,
         })
       }
       return NextResponse.json({
         success: false,
-        message: data.errors?.[0]?.message || 'Failed to request transcript generation.',
+        message: data.errors?.[0]?.message || `Failed to request ${label} transcript.`,
         errors: data.errors,
       }, { status: 400 })
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Transcript generation started. It usually takes 1-2 minutes.',
+      message: `${label} transcript generation started. It usually takes 1-2 minutes.`,
     })
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : 'Unknown error'

@@ -95,6 +95,7 @@ export async function PATCH(request: Request) {
       video_id,
       audio_url,
       transcript_text,
+      transcript_text_es,
       duration_seconds,
       is_free_preview,
       is_quick_win,
@@ -115,6 +116,7 @@ export async function PATCH(request: Request) {
     if (sort_order !== undefined) updates.sort_order = sort_order;
     if (module_id !== undefined) updates.module_id = module_id;
     if (transcript_text !== undefined) updates.transcript = transcript_text;
+    if (transcript_text_es !== undefined) updates.transcript_es = transcript_text_es;
 
     // Store video_id, audio_url, and other media fields inside the content JSON
     // (hub_lessons doesn't have separate columns for these)
@@ -154,6 +156,7 @@ export async function PATCH(request: Request) {
       (lesson as any).audio_url = c.audio_url || null;
       (lesson as any).duration_minutes = c.duration_minutes || null;
       (lesson as any).transcript_text = lesson.transcript || null;
+      (lesson as any).transcript_text_es = lesson.transcript_es || null;
     }
 
     if (error) {

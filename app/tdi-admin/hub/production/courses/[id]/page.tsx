@@ -139,12 +139,14 @@ function VideoUploadSection({
   videoId,
   durationMinutes,
   transcriptText,
+  transcriptTextEs,
   onUpdate,
 }: {
   videoId: string;
   durationMinutes: number;
   transcriptText: string;
-  onUpdate: (updates: { video_id?: string; duration_minutes?: number; transcript_text?: string }) => void;
+  transcriptTextEs: string;
+  onUpdate: (updates: { video_id?: string; duration_minutes?: number; transcript_text?: string; transcript_text_es?: string }) => void;
 }) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -157,6 +159,8 @@ function VideoUploadSection({
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [generatingTranscript, setGeneratingTranscript] = useState(false);
   const [transcriptStatus, setTranscriptStatus] = useState('');
+  const [generatingTranscriptEs, setGeneratingTranscriptEs] = useState(false);
+  const [transcriptStatusEs, setTranscriptStatusEs] = useState('');
 
   const cfCustomerSubdomain = 'customer-4n38x6badamh5yps';
 
@@ -615,7 +619,51 @@ function VideoUploadSection({
               disabled={generatingTranscript}
               className="text-xs text-teal-600 hover:text-teal-700 font-medium disabled:opacity-50"
             >
-              {generatingTranscript ? transcriptStatus || 'Generating...' : 'Auto-generate transcript'}
+              {generatingTranscript ? transcriptStatus || 'Generating EN...' : 'Auto-generate EN'}
+            </button>
+          )}
+          {videoId && (
+            <button
+              onClick={async () => {
+                setGeneratingTranscriptEs(true);
+                setTranscriptStatusEs('Requesting Spanish transcription...');
+                try {
+                  const postRes = await fetch('/api/tdi-admin/videos/transcript', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uid: videoId, lang: 'es' }),
+                  });
+                  const postData = await postRes.json();
+                  if (!postRes.ok && !postData.already_exists) {
+                    setTranscriptStatusEs(`Error: ${postData.message || 'Failed'}`);
+                    setGeneratingTranscriptEs(false);
+                    return;
+                  }
+                  setTranscriptStatusEs('Transcribing Spanish... this takes 1-2 minutes');
+                  let transcript = null;
+                  for (let attempt = 0; attempt < 30; attempt++) {
+                    await new Promise(r => setTimeout(r, 5000));
+                    setTranscriptStatusEs(`Transcribing Spanish... (${attempt * 5}s)`);
+                    const res = await fetch(`/api/tdi-admin/videos/transcript?uid=${videoId}&lang=es`);
+                    const data = await res.json();
+                    if (data.transcript) { transcript = data.transcript; break; }
+                    if (data.status === 'error') throw new Error('Spanish transcript failed');
+                  }
+                  if (transcript) {
+                    onUpdate({ transcript_text_es: transcript });
+                    setTranscriptStatusEs('');
+                  } else {
+                    setTranscriptStatusEs('Timed out -- click again to retry');
+                  }
+                } catch (err) {
+                  console.error('Spanish transcript error:', err);
+                  setTranscriptStatusEs('Error generating Spanish transcript');
+                } finally { setGeneratingTranscriptEs(false); }
+              }}
+              disabled={generatingTranscriptEs}
+              className="text-xs text-amber-600 hover:text-amber-700 font-medium disabled:opacity-50"
+            >
+              {generatingTranscriptEs ? transcriptStatusEs || 'Generating ES...' : 'Auto-generate ES'}
             </button>
           )}
         </div>
@@ -623,8 +671,15 @@ function VideoUploadSection({
           value={transcriptText}
           onChange={(e) => onUpdate({ transcript_text: e.target.value })}
           className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
-          rows={6}
-          placeholder="Paste transcript here..."
+          rows={4}
+          placeholder="English transcript..."
+        />
+        <textarea
+          value={transcriptTextEs}
+          onChange={(e) => onUpdate({ transcript_text_es: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none mt-2"
+          rows={4}
+          placeholder="Spanish transcript..."
         />
       </div>
     </>
@@ -656,6 +711,9 @@ interface Lesson {
   video_id: string | null;
   audio_url: string | null;
   transcript_text: string | null;
+  transcript_text_es: string | null;
+  transcript?: string | null;
+  transcript_es?: string | null;
   duration_seconds: number;
   is_free_preview: boolean;
   is_quick_win: boolean;
@@ -1364,6 +1422,7 @@ function LessonEditorPanel({
     video_id: lesson.video_id || '',
     duration_minutes: Math.floor(lesson.duration_seconds / 60),
     transcript_text: lesson.transcript_text || '',
+    transcript_text_es: lesson.transcript_text_es || '',
     content: typeof lesson.content === 'object' ? JSON.stringify(lesson.content, null, 2) : lesson.content || '',
     is_free_preview: lesson.is_free_preview,
   });
@@ -1405,6 +1464,7 @@ function LessonEditorPanel({
               videoId={form.video_id}
               durationMinutes={form.duration_minutes}
               transcriptText={form.transcript_text}
+              transcriptTextEs={form.transcript_text_es}
               onUpdate={(updates) => {
                 setForm((prev) => ({ ...prev, ...updates }));
                 if (updates.video_id || updates.duration_minutes) {
@@ -1511,6 +1571,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [showAddModule, setShowAddModule] = useState(false);
   const [newModuleTitle, setNewModuleTitle] = useState('');
+  const [bulkTranscribing, setBulkTranscribing] = useState(false);
+  const [bulkTranscriptStatus, setBulkTranscriptStatus] = useState('');
 
   // Load course via lightweight API (no auth required, uses Hub service key server-side)
   useEffect(() => {
@@ -1870,8 +1932,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
               <ProductionDashboard course={course} />
             </div>
 
-            {/* Bulk Video Upload */}
-            <div className="mb-4">
+            {/* Bulk Actions */}
+            <div className="mb-4 flex flex-wrap items-center gap-3">
               <BulkVideoUpload
                 course={{ id: course.id, modules: course.modules }}
                 onComplete={() => {
@@ -1895,6 +1957,69 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                   );
                 }}
               />
+
+              {/* Bulk Transcribe Buttons */}
+              <button
+                onClick={async () => {
+                  if (!course) return;
+                  setBulkTranscribing(true);
+                  const videoLessons = course.modules.flatMap(m => m.lessons.filter(l => l.video_id && !l.transcript));
+                  setBulkTranscriptStatus(`Requesting EN transcripts for ${videoLessons.length} videos...`);
+                  let completed = 0;
+                  for (const lesson of videoLessons) {
+                    const videoId = lesson.video_id || (lesson.content as any)?.video_id;
+                    if (!videoId) continue;
+                    try {
+                      await fetch('/api/tdi-admin/videos/transcript', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ uid: videoId, lang: 'en' }),
+                      });
+                      completed++;
+                      setBulkTranscriptStatus(`Requested ${completed}/${videoLessons.length} EN transcripts`);
+                    } catch {}
+                  }
+                  setBulkTranscriptStatus(`EN transcripts requested for ${completed} videos. They'll be ready in 1-2 minutes -- refresh to see them.`);
+                  setBulkTranscribing(false);
+                }}
+                disabled={bulkTranscribing}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-teal-200 text-teal-700 hover:bg-teal-50 transition-colors disabled:opacity-50"
+              >
+                <FileText size={16} />
+                {bulkTranscribing && bulkTranscriptStatus.includes('EN') ? bulkTranscriptStatus : 'Bulk Transcribe EN'}
+              </button>
+              <button
+                onClick={async () => {
+                  if (!course) return;
+                  setBulkTranscribing(true);
+                  const videoLessons = course.modules.flatMap(m => m.lessons.filter(l => l.video_id && !l.transcript_es));
+                  setBulkTranscriptStatus(`Requesting ES transcripts for ${videoLessons.length} videos...`);
+                  let completed = 0;
+                  for (const lesson of videoLessons) {
+                    const videoId = lesson.video_id || (lesson.content as any)?.video_id;
+                    if (!videoId) continue;
+                    try {
+                      await fetch('/api/tdi-admin/videos/transcript', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ uid: videoId, lang: 'es' }),
+                      });
+                      completed++;
+                      setBulkTranscriptStatus(`Requested ${completed}/${videoLessons.length} ES transcripts`);
+                    } catch {}
+                  }
+                  setBulkTranscriptStatus(`ES transcripts requested for ${completed} videos. They'll be ready in 1-2 minutes -- refresh to see them.`);
+                  setBulkTranscribing(false);
+                }}
+                disabled={bulkTranscribing}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-amber-200 text-amber-700 hover:bg-amber-50 transition-colors disabled:opacity-50"
+              >
+                <FileText size={16} />
+                {bulkTranscribing && bulkTranscriptStatus.includes('ES') ? bulkTranscriptStatus : 'Bulk Transcribe ES'}
+              </button>
+              {bulkTranscriptStatus && !bulkTranscribing && (
+                <p className="text-xs text-gray-500">{bulkTranscriptStatus}</p>
+              )}
             </div>
 
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleModuleDragEnd}>
