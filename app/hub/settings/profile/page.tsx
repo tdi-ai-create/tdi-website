@@ -312,6 +312,7 @@ export default function ProfileSettingsPage() {
     if (!user?.id || dataLoaded) return;
 
     const loadData = async () => {
+      try {
       const supabase = getSupabase();
 
       const [
@@ -433,7 +434,11 @@ export default function ProfileSettingsPage() {
       }
 
       setRecognitionData(recognitionResult);
-      setDataLoaded(true);
+      } catch (err) {
+        console.error('Profile data load failed:', err);
+      } finally {
+        setDataLoaded(true);
+      }
     };
 
     loadData();
@@ -443,25 +448,33 @@ export default function ProfileSettingsPage() {
   useEffect(() => {
     if (!user?.id || quizResultsLoaded) return;
     const loadQuizResults = async () => {
-      const supabase = getSupabase();
-      // Load from unified quiz_results table
-      const { data: rows } = await supabase
-        .from('hub_quiz_results')
-        .select('quiz_type, result_key')
-        .eq('user_id', user.id);
-      const results: Record<string, string> = {};
-      // Also include the legacy educator_type from hub_profiles
-      const educatorType = (profile as unknown as Record<string, unknown>)?.educator_type as string | null;
-      if (educatorType) {
-        results['educator_type'] = educatorType;
-      }
-      if (rows) {
-        for (const row of rows) {
-          results[row.quiz_type] = row.result_key;
+      try {
+        const supabase = getSupabase();
+        // Load from unified quiz_results table
+        const { data: rows, error } = await supabase
+          .from('hub_quiz_results')
+          .select('quiz_type, result_key')
+          .eq('user_id', user.id);
+        if (error) {
+          console.error('Failed to load quiz results:', error);
         }
+        const results: Record<string, string> = {};
+        // Also include the legacy educator_type from hub_profiles
+        const educatorType = (profile as unknown as Record<string, unknown>)?.educator_type as string | null;
+        if (educatorType) {
+          results['educator_type'] = educatorType;
+        }
+        if (rows) {
+          for (const row of rows) {
+            results[row.quiz_type] = row.result_key;
+          }
+        }
+        setQuizResults(results);
+      } catch (err) {
+        console.error('Quiz results load failed:', err);
+      } finally {
+        setQuizResultsLoaded(true);
       }
-      setQuizResults(results);
-      setQuizResultsLoaded(true);
     };
     loadQuizResults();
   }, [user?.id, quizResultsLoaded, profile]);
@@ -469,20 +482,29 @@ export default function ProfileSettingsPage() {
   // ── Save quiz result helper ─────────────────────────────────────────
   const handleQuizComplete = async (quizId: string, resultKey: string) => {
     if (!user?.id) return;
-    const supabase = getSupabase();
-    // Upsert into hub_quiz_results
-    await supabase
-      .from('hub_quiz_results')
-      .upsert(
-        { user_id: user.id, quiz_type: quizId, result_key: resultKey, taken_at: new Date().toISOString() },
-        { onConflict: 'user_id,quiz_type' }
-      );
-    // Also keep educator_type in hub_profiles for backward compat
-    if (quizId === 'educator_type') {
-      await supabase.from('hub_profiles').update({ educator_type: resultKey }).eq('id', user.id);
+    try {
+      const supabase = getSupabase();
+      // Upsert into hub_quiz_results
+      const { error: upsertError } = await supabase
+        .from('hub_quiz_results')
+        .upsert(
+          { user_id: user.id, quiz_type: quizId, result_key: resultKey, taken_at: new Date().toISOString() },
+          { onConflict: 'user_id,quiz_type' }
+        );
+      if (upsertError) {
+        console.error('Failed to save quiz result:', upsertError);
+        return;
+      }
+      // Also keep educator_type in hub_profiles for backward compat
+      if (quizId === 'educator_type') {
+        const { error: profileError } = await supabase.from('hub_profiles').update({ educator_type: resultKey }).eq('id', user.id);
+        if (profileError) console.error('Failed to update educator_type on profile:', profileError);
+      }
+      setQuizResults(prev => ({ ...prev, [quizId]: resultKey }));
+      setActiveQuiz(null);
+    } catch (err) {
+      console.error('Quiz completion failed:', err);
     }
-    setQuizResults(prev => ({ ...prev, [quizId]: resultKey }));
-    setActiveQuiz(null);
   };
 
   // ── Fetch educator snapshot when quiz results change ──────────────────

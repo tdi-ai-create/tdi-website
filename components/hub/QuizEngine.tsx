@@ -45,7 +45,11 @@ export default function QuizEngine({ quiz, onComplete }: QuizEngineProps) {
       .eq('is_published', true)
       .in('category', rec.categories)
       .limit(3)
-      .then(({ data }) => { if (data) setRecommendedQW(data) })
+      .then(({ data, error }) => {
+        if (error) { console.error('Failed to load recommended quick wins:', error); return }
+        if (data) setRecommendedQW(data)
+      })
+      .catch(err => console.error('Quick win recommendation fetch failed:', err))
 
     // Fetch Courses by keyword matching
     const keywords = getCourseKeywords(quiz.id, result.key)
@@ -55,7 +59,8 @@ export default function QuizEngine({ quiz, onComplete }: QuizEngineProps) {
         .select('id, slug, title, category')
         .eq('is_published', true)
         .limit(20)
-        .then(({ data }) => {
+        .then(({ data, error }) => {
+          if (error) { console.error('Failed to load recommended courses:', error); return }
           if (!data) return
           // Filter courses whose title or category matches any keyword
           const matches = data.filter(course => {
@@ -64,6 +69,7 @@ export default function QuizEngine({ quiz, onComplete }: QuizEngineProps) {
           }).slice(0, 2)
           setRecommendedCourses(matches)
         })
+        .catch(err => console.error('Course recommendation fetch failed:', err))
     }
   }, [result, quiz.id])
 
