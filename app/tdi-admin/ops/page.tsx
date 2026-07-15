@@ -122,7 +122,8 @@ export default function OpsPage() {
       .then(([opsData, partData]) => {
         if (opsData.error) throw new Error(opsData.error);
         setData(opsData);
-        setPartnerships(Array.isArray(partData) ? partData.filter((p: Partnership) => p.status === 'active' && p.slug !== 'demo-elementary') : []);
+        const pList = partData?.partnerships || partData || [];
+        setPartnerships(Array.isArray(pList) ? pList.filter((p: Partnership) => p.status === 'active' && p.slug !== 'demo-elementary') : []);
       })
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
@@ -228,6 +229,21 @@ export default function OpsPage() {
                   </div>
                 </div>
                 {inv.blocked_reason && <p className="text-xs text-red-600 mt-1">{inv.blocked_reason}</p>}
+                <div className="flex gap-2 mt-2">
+                  <a href="/tdi-admin/sales" className="text-xs font-medium px-2 py-1 rounded bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">View in Sales</a>
+                  <button
+                    onClick={async () => {
+                      if (!confirm(`Mark ${inv.district} as paid?`)) return;
+                      await fetch(`/api/sales/${inv.id}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json', 'x-user-email': teamMember?.email || '' },
+                        body: JSON.stringify({ payment_received: true, payment_received_at: new Date().toISOString() }),
+                      });
+                      setData(prev => prev ? { ...prev, invoices: { ...prev.invoices, count: prev.invoices.count - 1, list: prev.invoices.list.filter(i => i.id !== inv.id) } } : prev);
+                    }}
+                    className="text-xs font-medium px-2 py-1 rounded bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
+                  >Mark Paid</button>
+                </div>
               </div>
             ))}
           </div>
