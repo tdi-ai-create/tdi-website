@@ -227,8 +227,8 @@ export function computeNextActions(
     if (opp.narrative_status === 'review') {
       result.push({
         id: `qa-${opp.id}`,
-        label: `"${opp.name}" narrative needs QA`,
-        why: 'Draft is ready — send to QA for review before approval',
+        label: `Review "${opp.name}" narrative and send to QA`,
+        why: 'Agent finished the draft. Read it, then click "Send to QA" for Julie to review. After QA passes, you approve it.',
         owner: 'bella',
         urgency: 'high',
         actionType: 'send_to_qa',
@@ -243,8 +243,8 @@ export function computeNextActions(
     if (opp.narrative_status === 'qa_review' && opp.qa_passed === true) {
       result.push({
         id: `approve-${opp.id}`,
-        label: `Approve "${opp.name}" narrative (QA passed)`,
-        why: `QA passed${opp.qa_reviewer ? ` by ${opp.qa_reviewer}` : ''} — ready for final approval`,
+        label: `Approve "${opp.name}" narrative`,
+        why: `QA passed${opp.qa_reviewer ? ` (${opp.qa_reviewer})` : ''}. Click Approve to mark it ready for the school.`,
         owner: 'bella',
         urgency: 'high',
         actionType: 'approve_draft',
@@ -275,6 +275,32 @@ export function computeNextActions(
   }
 
   // ── NORMAL ──
+
+  // Bella mapped opportunities but pursuit is still in Intake → Rae should review and advance
+  if (opportunities.length >= 3 && pursuit.current_phase === 'intake') {
+    result.push({
+      id: 'review-strategy',
+      label: `Review ${opportunities.length} funding paths and advance to Strategy`,
+      why: `Bella mapped ${opportunities.length} opportunities. Review the selections and plan categories, then advance this pursuit to Strategy phase.`,
+      owner: 'rae',
+      urgency: 'normal',
+      actionType: 'complete_action',
+      tab: 'opportunities',
+    })
+  }
+
+  // Bella mapped fewer than 3 opportunities and pursuit is in Intake → tell her to keep going
+  if (opportunities.length > 0 && opportunities.length < 3 && pursuit.current_phase === 'intake') {
+    result.push({
+      id: 'more-opps',
+      label: `Add more opportunities (${opportunities.length} mapped, aim for 3-5)`,
+      why: 'Most schools need at least 3 grant paths to have a realistic shot. Keep researching.',
+      owner: 'bella',
+      urgency: 'normal',
+      actionType: 'setup_pursuit',
+      tab: 'opportunities',
+    })
+  }
 
   // No fast funding source (diversification)
   const tiers: Record<string, number> = { A: 0, B: 0, C: 0, D: 0 }
