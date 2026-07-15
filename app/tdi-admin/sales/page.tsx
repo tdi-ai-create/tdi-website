@@ -157,6 +157,7 @@ const STAGE_DISPLAY: Record<string, string> = {
   targeting: 'Targeting (5%)',
   engaged: 'Engaged (20%)',
   qualified: 'Qualified (45%)',
+  in_conversation: 'In Conversation (55%)',
   likely_yes: 'Likely Yes (65%)',
   proposal_sent: 'Quote Sent (80%)',
   signed: 'Signed (95%)',
@@ -166,13 +167,14 @@ const STAGE_DISPLAY: Record<string, string> = {
 
 const STAGE_PROBABILITY: Record<string, number> = {
   unassigned: 0, targeting: 5, engaged: 20, qualified: 45,
-  likely_yes: 65, proposal_sent: 80, signed: 95, signed_no_grant: 95, signed_with_grant: 90, paid: 100, lost: 0,
+  in_conversation: 55, likely_yes: 65, proposal_sent: 80, signed: 95, signed_no_grant: 95, signed_with_grant: 90, paid: 100, lost: 0,
 }
 
 const STAGE_LABELS: Record<string, string> = {
   targeting: 'Targeting',
   engaged: 'Engaged',
   qualified: 'Qualified',
+  in_conversation: 'In Conversation',
   likely_yes: 'Likely Yes',
   proposal_sent: 'Quote Sent',
   signed: 'Signed',
@@ -181,8 +183,8 @@ const STAGE_LABELS: Record<string, string> = {
   paid: 'Won',
 }
 
-const DEFAULT_KANBAN_STAGES = ['qualified', 'likely_yes', 'proposal_sent']
-const ALL_ACTIVE_STAGES = ['targeting', 'engaged', 'qualified', 'likely_yes', 'proposal_sent', 'signed_with_grant', 'signed_no_grant', 'paid']
+const DEFAULT_KANBAN_STAGES = ['qualified', 'in_conversation', 'likely_yes', 'proposal_sent']
+const ALL_ACTIVE_STAGES = ['targeting', 'engaged', 'qualified', 'in_conversation', 'likely_yes', 'proposal_sent', 'signed_with_grant', 'signed_no_grant', 'paid']
 
 function factoredRevenue(opp: Opportunity): number {
   return Math.round((opp.value || 0) * opp.probability / 100)
