@@ -2,6 +2,9 @@ import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 
+// AI generation can take 15-30s -- extend Vercel function timeout
+export const maxDuration = 60
+
 /**
  * Hub Engagement Sync API -- Bridge between Paperclip agents and the Learning Hub
  *

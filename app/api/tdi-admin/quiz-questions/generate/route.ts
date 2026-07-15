@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
 
+// AI generation can take 15-30s -- extend Vercel function timeout
+export const maxDuration = 60;
+
 function getHubServiceSupabase() {
   const url = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL;
   const key = process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY;
