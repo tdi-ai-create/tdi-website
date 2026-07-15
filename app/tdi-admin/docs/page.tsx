@@ -7,7 +7,7 @@ import { useTDIAdmin } from '@/lib/tdi-admin/context';
 export default function DocsPage() {
   const { teamMember } = useTDIAdmin();
   const router = useRouter();
-  const [activeDoc, setActiveDoc] = useState<'admin-guide' | 'workflow'>('admin-guide');
+  const [activeDoc, setActiveDoc] = useState<'admin-guide' | 'workflow' | 'service-invoicing'>('admin-guide');
 
   if (!teamMember) {
     return (
@@ -63,6 +63,7 @@ export default function DocsPage() {
         {[
           { id: 'admin-guide' as const, label: 'Admin Guide', desc: 'How the portal works (start here)' },
           { id: 'workflow' as const, label: 'Technical Workflow', desc: 'Full system spec (APIs, tables, crons)' },
+          { id: 'service-invoicing' as const, label: 'Service Delivery + Invoicing', desc: 'Contract to delivery to invoice workflow' },
         ].map(doc => (
           <button
             key={doc.id}
