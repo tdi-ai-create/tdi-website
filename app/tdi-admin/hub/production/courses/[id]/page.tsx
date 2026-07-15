@@ -166,7 +166,11 @@ function VideoUploadSection({
   const cfCustomerSubdomain = 'customer-4n38x6badamh5yps';
 
   // Compress video using browser canvas + MediaRecorder
+  // DISABLED: Browser-based compression strips audio tracks in most browsers.
+  // Cloudflare Stream handles transcoding server-side -- no client compression needed.
   const compressVideo = async (file: File): Promise<File> => {
+    return file; // Skip compression to preserve audio
+    /* eslint-disable no-unreachable */
     // Only compress if file is larger than 50MB
     if (file.size < 50 * 1024 * 1024) return file;
     // Only compress supported formats
