@@ -49,6 +49,15 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
     fetchActions()
   }
 
+  const updateNotes = async (actionId: string, notes: string) => {
+    await fetch(`/api/funding/pursuits/${pursuitId}/actions`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ actionId, notes }),
+    })
+    fetchActions()
+  }
+
   const updateClientLabel = async (actionId: string, clientLabel: string) => {
     await fetch(`/api/funding/pursuits/${pursuitId}/actions`, {
       method: 'PATCH',
@@ -214,7 +223,7 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {clientActions.map(action => (
-              <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} isOverdue={isOverdue(action)} getDueDateColor={getDueDateColor} />
+              <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} onUpdateNotes={updateNotes} isOverdue={isOverdue(action)} getDueDateColor={getDueDateColor} />
             ))}
           </div>
         )}
@@ -233,7 +242,7 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {tdiActions.map(action => (
-              <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} isOverdue={isOverdue(action)} getDueDateColor={getDueDateColor} />
+              <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} onUpdateNotes={updateNotes} isOverdue={isOverdue(action)} getDueDateColor={getDueDateColor} />
             ))}
           </div>
         )}
@@ -243,7 +252,7 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
       {cancelledActions.length > 0 && (
         <CancelledSection count={cancelledActions.length}>
           {cancelledActions.map(action => (
-            <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} isOverdue={false} getDueDateColor={() => '#9CA3AF'} />
+            <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} onUpdateNotes={updateNotes} isOverdue={false} getDueDateColor={() => '#9CA3AF'} />
           ))}
         </CancelledSection>
       )}
@@ -299,12 +308,13 @@ const RUNG_LABELS: Record<string, { label: string; bg: string; color: string }> 
   rae: { label: 'Rae', bg: '#FEE2E2', color: '#991B1B' },
 }
 
-function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, isOverdue, getDueDateColor }: {
+function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, onUpdateNotes, isOverdue, getDueDateColor }: {
   action: any
   onToggle: (id: string, currentStatus: string) => void
   onCancel: (id: string, reason: string) => void
   onUpdateClientLabel: (id: string, label: string) => void
   onNudge: (id: string) => void
+  onUpdateNotes: (id: string, notes: string) => void
   isOverdue: boolean
   getDueDateColor: (d: string | null) => string
 }) {
@@ -312,6 +322,8 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
   const [cancelReason, setCancelReason] = useState('')
   const [editingLabel, setEditingLabel] = useState(false)
   const [labelDraft, setLabelDraft] = useState(action.client_label || '')
+  const [showNotes, setShowNotes] = useState(false)
+  const [notesDraft, setNotesDraft] = useState(action.notes || '')
 
   const isDone = action.status === 'done' || action.status === 'completed'
   const isCancelled = action.status === 'cancelled'
@@ -532,6 +544,59 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
           }}>
             Nudged {action.nudge_count} time{action.nudge_count > 1 ? 's' : ''}
           </span>
+        )}
+
+        {/* Notes section */}
+        {!isCancelled && (
+          <div style={{ marginTop: 8 }}>
+            <button
+              onClick={() => setShowNotes(!showNotes)}
+              style={{
+                fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 4,
+                border: '1px solid #E5E7EB', background: action.notes ? '#F0FDF4' : '#F9FAFB',
+                color: action.notes ? '#065F46' : '#9CA3AF', cursor: 'pointer',
+              }}
+            >
+              {action.notes ? 'Notes' : '+ Add notes'}
+            </button>
+            {showNotes && (
+              <div style={{ marginTop: 6 }}>
+                <textarea
+                  value={notesDraft}
+                  onChange={e => setNotesDraft(e.target.value)}
+                  placeholder="Log a note... (e.g. Called Teri, she said the PayPal issue is with Deed support)"
+                  rows={3}
+                  style={{
+                    fontSize: 12, padding: '8px 10px', borderRadius: 6,
+                    border: '1px solid #E5E7EB', width: '100%', boxSizing: 'border-box',
+                    fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5, resize: 'vertical',
+                  }}
+                />
+                <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+                  <button
+                    onClick={() => { onUpdateNotes(action.id, notesDraft); setShowNotes(false) }}
+                    disabled={notesDraft === (action.notes || '')}
+                    style={{
+                      fontSize: 11, fontWeight: 600, padding: '4px 12px', borderRadius: 6,
+                      border: 'none', background: notesDraft !== (action.notes || '') ? '#8B5CF6' : '#E5E7EB',
+                      color: 'white', cursor: notesDraft !== (action.notes || '') ? 'pointer' : 'default',
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => { setNotesDraft(action.notes || ''); setShowNotes(false) }}
+                    style={{
+                      fontSize: 11, padding: '4px 8px', borderRadius: 6,
+                      border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer',
+                    }}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>
