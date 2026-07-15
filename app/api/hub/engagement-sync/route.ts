@@ -204,6 +204,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  try {
   const body = await request.json()
   const action = body.action as SyncAction
 
@@ -345,4 +346,10 @@ JSON array only, no markdown fences.`
   }
 
   return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 })
+
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Unknown error'
+    console.error('[engagement-sync] POST error:', error)
+    return NextResponse.json({ error: msg }, { status: 500 })
+  }
 }
