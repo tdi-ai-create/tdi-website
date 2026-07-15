@@ -15,6 +15,7 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
   const [showAddForm, setShowAddForm] = useState(false)
   const [newAction, setNewAction] = useState({ title: '', ownerType: 'tdi', dueDate: '', category: 'research', actionSize: 'standard', ownerName: '', ownerEmail: '', description: '' })
   const [nudgeActionId, setNudgeActionId] = useState<string | null>(null)
+  const [addingAction, setAddingAction] = useState(false)
 
   const fetchActions = () => {
     setLoading(true)
@@ -68,6 +69,8 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
   }
 
   const handleAdd = async () => {
+    if (!newAction.title.trim()) return
+    setAddingAction(true)
     await fetch(`/api/funding/pursuits/${pursuitId}/actions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -75,6 +78,7 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
     })
     setNewAction({ title: '', ownerType: 'tdi', dueDate: '', category: 'research', actionSize: 'standard', ownerName: '', ownerEmail: '', description: '' })
     setShowAddForm(false)
+    setAddingAction(false)
     fetchActions()
   }
 
@@ -198,14 +202,15 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
           />
           <button
             onClick={handleAdd}
-            disabled={!newAction.title}
+            disabled={!newAction.title || addingAction}
             style={{
               fontSize: 12, fontWeight: 600, padding: '8px 16px', borderRadius: 6,
-              border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer',
-              opacity: newAction.title ? 1 : 0.5, alignSelf: 'flex-start',
+              border: 'none', background: addingAction ? '#9CA3AF' : '#8B5CF6', color: 'white',
+              cursor: !newAction.title || addingAction ? 'default' : 'pointer',
+              opacity: newAction.title && !addingAction ? 1 : 0.5, alignSelf: 'flex-start',
             }}
           >
-            Add Action
+            {addingAction ? 'Adding...' : 'Add Action'}
           </button>
         </div>
       )}

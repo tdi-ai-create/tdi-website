@@ -261,7 +261,10 @@ export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate, partners
               <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>{p.client_contact_role}</div>
             )}
             {p.client_contact_email && (
-              <div style={{ fontSize: 12, color: '#374151', marginTop: 4 }}>{p.client_contact_email}</div>
+              <div style={{ fontSize: 12, color: '#374151', marginTop: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                {p.client_contact_email}
+                <CopyButton text={p.client_contact_email} />
+              </div>
             )}
             {p.client_contact_phone && (
               <div style={{ fontSize: 12, color: '#374151', marginTop: 2 }}>{p.client_contact_phone}</div>
@@ -904,5 +907,27 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       </div>
       {children}
     </div>
+  )
+}
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation()
+        navigator.clipboard.writeText(text)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 1500)
+      }}
+      title="Copy to clipboard"
+      style={{
+        fontSize: 10, padding: '1px 6px', borderRadius: 4,
+        border: '1px solid #E5E7EB', background: copied ? '#D1FAE5' : 'white',
+        color: copied ? '#065F46' : '#9CA3AF', cursor: 'pointer',
+      }}
+    >
+      {copied ? 'Copied' : 'Copy'}
+    </button>
   )
 }

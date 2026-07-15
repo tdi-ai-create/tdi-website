@@ -70,6 +70,8 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
   const [editId, setEditId] = useState<string | null>(null)
   const [form, setForm] = useState(emptyForm())
   const [savedField, setSavedField] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [formError, setFormError] = useState('')
 
   const showSaved = (field: string) => {
     setSavedField(field)
@@ -145,6 +147,14 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
   }
 
   const handleSubmit = async () => {
+    // Validation
+    if (!form.name.trim()) { setFormError('Grant name is required'); return }
+    if (formMode === 'add' && !form.amount && !form.applicationCloses && !form.internalDeadline) {
+      setFormError('Add at least an amount or a deadline'); return
+    }
+    setFormError('')
+    setSubmitting(true)
+
     if (formMode === 'add') {
       await fetch('/api/funding/opportunities', {
         method: 'POST',
@@ -184,6 +194,7 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
         }),
       })
     }
+    setSubmitting(false)
     setFormMode('closed')
     setEditId(null)
     setForm(emptyForm())
@@ -309,16 +320,19 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
             </div>
           </FieldGroup>
 
+          {formError && (
+            <div style={{ fontSize: 12, color: '#DC2626', marginBottom: 8 }}>{formError}</div>
+          )}
           <button
             onClick={handleSubmit}
-            disabled={!form.name}
+            disabled={!form.name || submitting}
             style={{
               fontSize: 12, fontWeight: 600, padding: '8px 16px', borderRadius: 6,
-              border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer',
-              opacity: form.name ? 1 : 0.5, alignSelf: 'flex-start',
+              border: 'none', background: submitting ? '#9CA3AF' : '#8B5CF6', color: 'white', cursor: submitting ? 'default' : 'pointer',
+              opacity: form.name && !submitting ? 1 : 0.5, alignSelf: 'flex-start',
             }}
           >
-            {formMode === 'edit' ? 'Save changes' : 'Add Opportunity'}
+            {submitting ? 'Saving...' : formMode === 'edit' ? 'Save changes' : 'Add Opportunity'}
           </button>
         </div>
       )}
