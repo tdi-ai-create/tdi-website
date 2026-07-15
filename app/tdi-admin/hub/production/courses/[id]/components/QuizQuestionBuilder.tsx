@@ -75,6 +75,8 @@ export default function QuizQuestionBuilder({
   const [saving, setSaving] = useState<Record<string, boolean>>({});
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const [generateStatus, setGenerateStatus] = useState('');
 
   // Fetch questions on mount
   const fetchQuestions = useCallback(async () => {
@@ -94,6 +96,37 @@ export default function QuizQuestionBuilder({
   useEffect(() => {
     fetchQuestions();
   }, [fetchQuestions]);
+
+  // AI-generate engagement checks
+  const handleGenerate = async () => {
+    setGenerating(true);
+    setGenerateStatus('Analyzing lesson content...');
+    setError(null);
+    try {
+      const res = await fetch('/api/tdi-admin/quiz-questions/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lesson_id: lessonId }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Generation failed');
+        setGenerateStatus('');
+        return;
+      }
+
+      setGenerateStatus(`Created ${data.count} engagement checks`);
+      // Refresh the question list
+      await fetchQuestions();
+      setTimeout(() => setGenerateStatus(''), 3000);
+    } catch {
+      setError('Failed to generate checks. Please try again.');
+      setGenerateStatus('');
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   // Add a new question
   const handleAdd = async (type: QuestionType) => {
@@ -459,7 +492,26 @@ export default function QuizQuestionBuilder({
           <HelpCircle size={12} />
           Engagement Checks ({questions.length})
         </p>
+        <button
+          onClick={handleGenerate}
+          disabled={generating}
+          className="text-xs font-medium disabled:opacity-50 flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors"
+          style={{
+            background: generating ? '#F3F4F6' : 'linear-gradient(135deg, #FFBA06, #4ecdc4)',
+            color: generating ? '#6B7280' : '#fff',
+          }}
+        >
+          {generating ? (
+            <Loader2 size={11} className="animate-spin" />
+          ) : (
+            <Zap size={11} />
+          )}
+          {generating ? (generateStatus || 'Generating...') : 'Auto-Generate'}
+        </button>
       </div>
+      {generateStatus && !generating && (
+        <p className="text-xs text-green-600 font-medium">{generateStatus}</p>
+      )}
 
       {error && (
         <div className="flex items-center gap-2 p-2 bg-red-50 rounded text-xs text-red-700">
