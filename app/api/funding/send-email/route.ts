@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { isOnAllowlist, ALLOWLIST_ENABLED } from '@/lib/funding-followup-email'
 
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
   const auth = await requireAdminAuth()
   if (auth instanceof NextResponse) return auth
 
-  const { to, toName, subject, body, schoolName } = await request.json()
+  const { to, toName, subject, body, schoolName, pursuitId } = await request.json()
 
   if (!to || !subject || !body) {
     return NextResponse.json({ error: 'Missing required fields: to, subject, body' }, { status: 400 })
@@ -57,6 +58,19 @@ export async function POST(request: NextRequest) {
     if (!res.ok) {
       const err = await res.text()
       return NextResponse.json({ error: `Email send failed: ${err}`, sent: false })
+    }
+
+    // Mark intro_sent_at on the pursuit if pursuitId provided
+    if (pursuitId) {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { auth: { autoRefreshToken: false, persistSession: false } }
+      )
+      await supabase
+        .from('funding_pursuits')
+        .update({ intro_sent_at: new Date().toISOString() })
+        .eq('id', pursuitId)
     }
 
     return NextResponse.json({ sent: true })

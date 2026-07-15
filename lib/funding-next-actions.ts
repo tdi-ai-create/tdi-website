@@ -39,25 +39,32 @@ export function computeNextActions(
 
   // Detect unstarted pursuits: no opportunities, no gate, no action items
   const isUnstarted = opportunities.length === 0 && !gate && actions.length === 0
+  const introSent = !!pursuit.intro_sent_at
   if (isUnstarted) {
     const contactName = pursuit.client_contact_name || 'the school contact'
     const contactEmail = pursuit.client_contact_email || ''
     const schoolName = pursuit.district_name || pursuit.pursuit_name || 'this school'
-    result.push({
-      id: `intro-${pursuit.id}`,
-      label: `Send intro email to ${contactName}`,
-      why: `Introduce yourself as their TDI funding contact${contactEmail ? ` (${contactEmail})` : ''}. Let them know you'll be identifying grant opportunities for ${schoolName}.`,
-      owner: 'bella',
-      urgency: 'normal',
-      actionType: 'setup_pursuit',
-      tab: 'overview',
-    })
+
+    // Only show intro email item if not already sent
+    if (!introSent) {
+      result.push({
+        id: `intro-${pursuit.id}`,
+        label: `Send intro email to ${contactName}`,
+        why: `Introduce yourself as their TDI funding contact${contactEmail ? ` (${contactEmail})` : ''}. Let them know you'll be identifying grant opportunities for ${schoolName}.`,
+        owner: 'bella',
+        urgency: 'normal',
+        actionType: 'setup_pursuit',
+        tab: 'overview',
+      })
+    }
+
+    // Always show "add opportunities" for unstarted pursuits
     result.push({
       id: `map-${pursuit.id}`,
-      label: 'Add grant opportunities for this school',
+      label: introSent ? 'Add grant opportunities (intro sent)' : 'Add grant opportunities for this school',
       why: `Open the pursuit, go to Grant Opportunities section, and add 3-5 grants this school is eligible for (Walmart Spark, Title II-A, NEA, local foundations). Set plan categories A-D.`,
       owner: 'bella',
-      urgency: 'low',
+      urgency: introSent ? 'normal' : 'low',
       actionType: 'setup_pursuit',
       tab: 'opportunities',
     })

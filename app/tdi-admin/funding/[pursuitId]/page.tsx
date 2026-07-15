@@ -20,6 +20,7 @@ import {
   TYPE_PAGE_SUBTITLE,
 } from '@/components/tdi-admin/ui/design-tokens'
 import { computeNextActions, type NextAction } from '@/lib/funding-next-actions'
+import { DraftEmailModal, schoolInfoEmailDraft } from '../components/panel/DraftEmailModal'
 
 export default function PursuitDetailPage() {
   const params = useParams()
@@ -36,6 +37,7 @@ export default function PursuitDetailPage() {
   const [showOpportunities, setShowOpportunities] = useState(false)
   const [showTimeline, setShowTimeline] = useState(false)
   const [showEmails, setShowEmails] = useState(false)
+  const [draftEmail, setDraftEmail] = useState<{ to: string; toName: string; subject: string; body: string; schoolName: string; pursuitId?: string } | null>(null)
 
   useEffect(() => {
     if (!pursuitId) return
@@ -150,7 +152,21 @@ export default function PursuitDetailPage() {
       </div>
 
       {/* ── SITUATION BRIEFING ── */}
-      <PursuitBriefing pursuit={p} opportunities={data.opportunities || []} gate={gate} />
+      <PursuitBriefing pursuit={p} opportunities={data.opportunities || []} gate={gate} onRequestInfo={(draft) => setDraftEmail({ ...draft, pursuitId })} />
+
+      {/* Draft email modal */}
+      {draftEmail && (
+        <DraftEmailModal
+          to={draftEmail.to}
+          toName={draftEmail.toName}
+          subject={draftEmail.subject}
+          body={draftEmail.body}
+          schoolName={draftEmail.schoolName}
+          pursuitId={draftEmail.pursuitId}
+          onClose={() => setDraftEmail(null)}
+          onSent={() => { setDraftEmail(null); setToast('Email sent') }}
+        />
+      )}
 
       {/* ── WHAT'S NEXT: The primary content area ── */}
       <div style={{ marginBottom: 28 }}>
@@ -464,7 +480,7 @@ function EditableText({ value, onSave, style }: { value: string; onSave: (v: str
 
 // ── Pursuit Briefing — auto-generated context summary ──
 
-function PursuitBriefing({ pursuit, opportunities, gate }: { pursuit: any; opportunities: any[]; gate: any }) {
+function PursuitBriefing({ pursuit, opportunities, gate, onRequestInfo }: { pursuit: any; opportunities: any[]; gate: any; onRequestInfo?: (draft: { to: string; toName: string; subject: string; body: string; schoolName: string }) => void }) {
   const contact = pursuit.client_contact_name || 'No contact set'
   const email = pursuit.client_contact_email || ''
   const phone = pursuit.client_contact_phone || ''
@@ -539,6 +555,30 @@ function PursuitBriefing({ pursuit, opportunities, gate }: { pursuit: any; oppor
       {lines.map((line, i) => (
         <p key={i} style={{ fontSize: 13, color: '#374151', margin: '4px 0', lineHeight: 1.5 }}>{line}</p>
       ))}
+
+      {/* Request info button when gate has missing fields */}
+      {onRequestInfo && email && gateMissing.length > 0 && (
+        <button
+          onClick={() => {
+            const missingLabels = (gateMissing as string[]).map(f => {
+              if (f === 'submitter') return 'Who will be submitting grant applications? (name, title, email)'
+              if (f === 'backup') return 'Who is the backup contact if the submitter is unavailable? (name, email)'
+              if (f === 'admin sponsor') return 'Which administrator approved participation in grant funding? (name, title)'
+              if (f === 'employment verification') return 'Can you confirm the submitter currently works at the school?'
+              return f
+            })
+            const draft = schoolInfoEmailDraft(contact, school, missingLabels)
+            onRequestInfo({ to: email, toName: contact, subject: draft.subject, body: draft.body, schoolName: school })
+          }}
+          style={{
+            marginTop: 10, fontSize: 13, fontWeight: 600, padding: '8px 16px',
+            borderRadius: 8, border: 'none', background: '#8B5CF6', color: 'white',
+            cursor: 'pointer',
+          }}
+        >
+          Request missing info from {contact.split(' ')[0]}
+        </button>
+      )}
     </div>
   )
 }

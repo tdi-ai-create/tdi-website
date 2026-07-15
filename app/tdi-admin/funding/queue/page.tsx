@@ -64,7 +64,7 @@ export default function QueuePage() {
   const initialBucket = (searchParams.get('owner') as Bucket) || 'bella'
   const [bucket, setBucket] = useState<Bucket>(initialBucket)
   const [nudgeActionId, setNudgeActionId] = useState<string | null>(null)
-  const [draftEmail, setDraftEmail] = useState<{ to: string; toName: string; subject: string; body: string; schoolName: string } | null>(null)
+  const [draftEmail, setDraftEmail] = useState<{ to: string; toName: string; subject: string; body: string; schoolName: string; pursuitId?: string } | null>(null)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
   const load = useCallback(() => {
@@ -338,7 +338,7 @@ export default function QueuePage() {
                   return
                 }
                 const draft = introEmailDraft(contactName, schoolName)
-                setDraftEmail({ to: contactEmail, toName: contactName, subject: draft.subject, body: draft.body, schoolName })
+                setDraftEmail({ to: contactEmail, toName: contactName, subject: draft.subject, body: draft.body, schoolName, pursuitId: item.pursuitId })
               }}
             />
           ))}
@@ -362,6 +362,7 @@ export default function QueuePage() {
           subject={draftEmail.subject}
           body={draftEmail.body}
           schoolName={draftEmail.schoolName}
+          pursuitId={draftEmail.pursuitId}
           onClose={() => setDraftEmail(null)}
           onSent={() => { setDraftEmail(null); setToast('Email sent'); load() }}
         />

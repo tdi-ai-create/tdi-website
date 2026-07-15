@@ -8,11 +8,12 @@ interface DraftEmailModalProps {
   subject: string
   body: string
   schoolName: string
+  pursuitId?: string
   onClose: () => void
   onSent: () => void
 }
 
-export function DraftEmailModal({ to, toName, subject: initialSubject, body: initialBody, schoolName, onClose, onSent }: DraftEmailModalProps) {
+export function DraftEmailModal({ to, toName, subject: initialSubject, body: initialBody, schoolName, pursuitId, onClose, onSent }: DraftEmailModalProps) {
   const [subject, setSubject] = useState(initialSubject)
   const [body, setBody] = useState(initialBody)
   const [sending, setSending] = useState(false)
@@ -26,7 +27,7 @@ export function DraftEmailModal({ to, toName, subject: initialSubject, body: ini
       const res = await fetch('/api/funding/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to, toName, subject, body, schoolName }),
+        body: JSON.stringify({ to, toName, subject, body, schoolName, pursuitId }),
       })
       const result = await res.json()
       if (result.sent) {
@@ -217,6 +218,29 @@ If you have any questions or there are specific grants you've had success with i
 
 Looking forward to working with you!
 
+Bella
+Teachers Deserve It`,
+  }
+}
+
+export function schoolInfoEmailDraft(contactName: string, schoolName: string, missingFields: string[]): { subject: string; body: string } {
+  const firstName = contactName.split(' ')[0]
+  const fieldList = missingFields.map(f => `- ${f}`).join('\n')
+  return {
+    subject: `Quick info needed for ${schoolName} grant applications`,
+    body: `Hi ${firstName},
+
+I'm getting started on identifying grant opportunities for ${schoolName}, and I need a few pieces of information to make sure we're targeting the right funding sources.
+
+Could you help me with the following?
+
+${fieldList}
+
+Most of this is quick -- if you have a staff directory page or school profile handy, that would cover most of it. I can also look up some of this on my end if you point me in the right direction.
+
+No rush on a formal response -- a quick reply with whatever you have is perfect.
+
+Thanks!
 Bella
 Teachers Deserve It`,
   }
