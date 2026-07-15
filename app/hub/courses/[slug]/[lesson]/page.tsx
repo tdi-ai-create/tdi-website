@@ -29,6 +29,7 @@ interface LessonContentJson {
   body_html?: string;
   video_id?: string;
   text?: string;
+  markdown?: string;
   [key: string]: unknown;
 }
 
@@ -67,6 +68,7 @@ function extractBodyHtml(content: LessonContentJson | string | null): string | n
   if (typeof content === 'string') return content;
   if (content.body_html && typeof content.body_html === 'string') return content.body_html;
   if (content.text && typeof content.text === 'string') return content.text;
+  if (content.markdown && typeof content.markdown === 'string') return content.markdown;
   return null;
 }
 

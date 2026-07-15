@@ -19,7 +19,9 @@ export async function GET(
     'workflow': 'partnership-workflow.html',
     'service-invoicing': 'service-invoicing-workflow.html',
     'funding': 'funding-workflow.html',
+    'funding-launch': 'funding-onboarding.html',
     'hub-engagement': 'learning-hub-engagement.html',
+    'engagement-workflow': 'engagement-workflow.html',
   };
 
   const filename = allowedDocs[slug];

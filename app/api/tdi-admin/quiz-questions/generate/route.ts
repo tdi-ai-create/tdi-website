@@ -44,8 +44,9 @@ export async function POST(request: Request) {
       : {};
     const bodyHtml = (contentObj.body_html as string) || '';
     const bodyText = (contentObj.text as string) || '';
+    const markdown = (contentObj.markdown as string) || '';
     const transcript = lesson.transcript || '';
-    const lessonContent = bodyHtml || bodyText || transcript;
+    const lessonContent = bodyHtml || bodyText || markdown || transcript;
 
     if (!lessonContent || lessonContent.trim().length < 50) {
       return NextResponse.json(

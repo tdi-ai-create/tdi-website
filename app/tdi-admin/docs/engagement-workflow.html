@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hub Engagement Workflow</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; line-height: 1.6; padding: 40px 48px; max-width: 900px; }
+  h1 { font-family: 'Source Serif 4', Georgia, serif; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  h2 { font-family: 'Source Serif 4', Georgia, serif; font-size: 20px; font-weight: 700; margin: 32px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
+  h3 { font-size: 15px; font-weight: 700; margin: 20px 0 8px; color: #2B3A67; }
+  p { font-size: 14px; margin-bottom: 12px; color: #374151; }
+  .subtitle { font-size: 14px; color: #6B7280; margin-bottom: 24px; }
+  .updated { font-size: 11px; color: #9CA3AF; margin-bottom: 32px; }
+  ul, ol { font-size: 14px; margin: 8px 0 16px 24px; color: #374151; }
+  li { margin-bottom: 6px; }
+  .flow-box { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 10px; padding: 16px 20px; margin: 16px 0; }
+  .flow-arrow { text-align: center; font-size: 18px; color: #9CA3AF; margin: 8px 0; }
+  .role-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.03em; margin-right: 6px; }
+  .role-bella { background: #FCE7F3; color: #9D174D; }
+  .role-rae { background: #DBEAFE; color: #1E40AF; }
+  .role-agent { background: #EDE9FE; color: #7C3AED; }
+  .role-jasmine { background: #EDE9FE; color: #7C3AED; }
+  .role-julielynn { background: #D1FAE5; color: #065F46; }
+  .role-system { background: #F3F4F6; color: #6B7280; }
+  .role-learner { background: #FEF3C7; color: #854D0E; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
+  th { text-align: left; padding: 8px 12px; background: #F9FAFB; border-bottom: 2px solid #E5E7EB; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #6B7280; }
+  td { padding: 8px 12px; border-bottom: 1px solid #F3F4F6; }
+  .highlight { background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 12px 16px; margin: 12px 0; }
+  .highlight strong { color: #854D0E; }
+  .safety { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 12px 16px; margin: 12px 0; }
+  .safety strong { color: #991B1B; }
+  .checklist { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 12px 16px; margin: 12px 0; }
+  .checklist strong { color: #065F46; }
+  code { font-family: 'SF Mono', monospace; font-size: 12px; background: #F3F4F6; padding: 1px 6px; border-radius: 4px; }
+  hr { border: none; border-top: 1px solid #E5E7EB; margin: 32px 0; }
+
+  .flow-visual { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 16px 0; }
+  .flow-step { padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+  .flow-step-human { background: #DBEAFE; color: #1E40AF; }
+  .flow-step-agent { background: #EDE9FE; color: #7C3AED; }
+  .flow-step-system { background: #F3F4F6; color: #6B7280; }
+  .flow-step-qa { background: #D1FAE5; color: #065F46; }
+  .flow-connector { color: #9CA3AF; font-size: 16px; }
+</style>
+</head>
+<body>
+
+<h1>Hub Engagement Workflow</h1>
+<p class="subtitle">End-to-end pipeline for creating, generating, and validating engagement checks in Learning Hub lessons.</p>
+<p class="updated">Last updated: July 14, 2026 | Created by Rae Hughart</p>
+
+<hr>
+
+<h2>The Big Picture</h2>
+
+<div class="flow-box">
+  <strong>Lesson Created</strong> &rarr; Content Added &rarr; Auto-Generate Checks &rarr; QA Validates &rarr; Learner Sees Interleaved Flow
+</div>
+
+<p>This system ensures every lesson has meaningful engagement -- comprehension checks, reflections, action steps, and checkpoints -- interleaved with content so educators actively learn instead of passively watching.</p>
+
+<p>Three groups coordinate: <span class="role-tag role-bella">Bella</span> creates and manages course content, <span class="role-tag role-jasmine">Jasmine</span> (AI agent) generates engagement checks, and <span class="role-tag role-julielynn">Julie Lynn</span> (QA agent) validates density. <span class="role-tag role-rae">Rae</span> reviews and approves before publish.</p>
+
+<hr>
+
+<h2>Two Paths to Engagement Checks</h2>
+
+<p>Checks can be created manually through the admin UI or automatically via agents. Both paths end with the same result: engagement checks in <code>hub_quiz_questions</code> positioned between content sections.</p>
+
+<h3>Path 1: Manual (Admin Portal)</h3>
+
+<div class="flow-visual">
+  <div class="flow-step flow-step-human">Open Lesson Editor</div>
+  <span class="flow-connector">&rarr;</span>
+  <div class="flow-step flow-step-human">Add Body Content</div>
+  <span class="flow-connector">&rarr;</span>
+  <div class="flow-step flow-step-system">Click Auto-Generate</div>
+  <span class="flow-connector">&rarr;</span>
+  <div class="flow-step flow-step-human">Review + Position</div>
+  <span class="flow-connector">&rarr;</span>
+  <div class="flow-step flow-step-human">Save</div>
+</div>
+
+<table>
+  <tr><th>Step</th><th>Who</th><th>What happens</th></tr>
+  <tr>
+    <td>1. Add content</td>
+    <td><span class="role-tag role-bella">Bella</span></td>
+    <td>In the lesson editor, write or paste HTML content into <strong>Lesson Body Content</strong>. Use <code>&lt;h2&gt;</code> or <code>&lt;h3&gt;</code> tags to create sections. The system auto-detects sections.</td>
+  </tr>
+  <tr>
+    <td>2. Auto-Generate</td>
+    <td><span class="role-tag role-bella">Bella</span></td>
+    <td>Click the <strong>Auto-Generate</strong> button in the Engagement Checks section. AI analyzes the content and creates 5 checks (2 comprehension, 1 reflection, 1 action step, 1 checkpoint).</td>
+  </tr>
+  <tr>
+    <td>3. Review</td>
+    <td><span class="role-tag role-bella">Bella</span> or <span class="role-tag role-rae">Rae</span></td>
+    <td>Expand each check to review question text, options, and explanation. Edit as needed. Use the <strong>Position in Lesson</strong> dropdown to place checks between content sections.</td>
+  </tr>
+  <tr>
+    <td>4. Check flow</td>
+    <td><span class="role-tag role-bella">Bella</span></td>
+    <td>Look at the <strong>Lesson Flow Preview</strong> bar at the bottom. It shows the visual rhythm of content + checks. Should alternate naturally.</td>
+  </tr>
+  <tr>
+    <td>5. Save</td>
+    <td><span class="role-tag role-bella">Bella</span></td>
+    <td>Each question saves individually via its Save button. Lesson body content saves with the main Save Lesson button.</td>
+  </tr>
+</table>
+
+<h3>Path 2: Automated (Jasmine Agent)</h3>
+
+<div class="flow-visual">
+  <div class="flow-step flow-step-agent">find_work</div>
+  <span class="flow-connector">&rarr;</span>
+  <div class="flow-step flow-step-agent">generate_checks</div>
+  <span class="flow-connector">&rarr;</span>
+  <div class="flow-step flow-step-qa">validate_density</div>
+  <span class="flow-connector">&rarr;</span>
+  <div class="flow-step flow-step-agent">send_report</div>
+  <span class="flow-connector">&rarr;</span>
+  <div class="flow-step flow-step-human">Rae Reviews</div>
+</div>
+
+<table>
+  <tr><th>Step</th><th>Who</th><th>What happens</th></tr>
+  <tr>
+    <td>1. Discover work</td>
+    <td><span class="role-tag role-jasmine">Jasmine</span></td>
+    <td>Calls <code>GET /api/hub/engagement-sync?action=find_work</code>. Returns lessons with content but fewer than 4 engagement checks.</td>
+  </tr>
+  <tr>
+    <td>2. Generate checks</td>
+    <td><span class="role-tag role-jasmine">Jasmine</span></td>
+    <td>For each lesson, calls <code>POST /api/hub/engagement-sync</code> with <code>action: generate_checks</code>. AI generates and inserts 5 checks.</td>
+  </tr>
+  <tr>
+    <td>3. Validate</td>
+    <td><span class="role-tag role-julielynn">Julie Lynn</span></td>
+    <td>Calls <code>GET /api/hub/engagement-sync?action=validate_density&lesson_id=...</code>. Confirms 2+ comprehension, 1+ action step, 1+ checkpoint.</td>
+  </tr>
+  <tr>
+    <td>4. Report</td>
+    <td><span class="role-tag role-jasmine">Jasmine</span></td>
+    <td>Sends summary to Rae via send-report skill: which lessons were processed, check counts, any issues.</td>
+  </tr>
+  <tr>
+    <td>5. Review</td>
+    <td><span class="role-tag role-rae">Rae</span></td>
+    <td>Opens lessons in admin portal, reviews generated checks, edits as needed, publishes course.</td>
+  </tr>
+</table>
+
+<hr>
+
+<h2>What the Learner Sees</h2>
+
+<p>Once checks are in place and the lesson has body content, the learner sees an interleaved flow instead of "content then quiz":</p>
+
+<div class="flow-box" style="display: flex; gap: 3px; align-items: center;">
+  <div style="flex: 1; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #FFBA06, #4ecdc4); opacity: 0.3;"></div>
+  <div style="flex: 0.4; min-width: 14px; height: 8px; border-radius: 4px; background: #FFBA06;"></div>
+  <div style="flex: 1; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #FFBA06, #4ecdc4); opacity: 0.3;"></div>
+  <div style="flex: 0.4; min-width: 14px; height: 8px; border-radius: 4px; background: #FFBA06;"></div>
+  <div style="flex: 1; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #FFBA06, #4ecdc4); opacity: 0.3;"></div>
+  <div style="flex: 0.4; min-width: 14px; height: 8px; border-radius: 4px; background: #4ecdc4;"></div>
+  <div style="flex: 1; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #FFBA06, #4ecdc4); opacity: 0.3;"></div>
+  <div style="flex: 0.4; min-width: 14px; height: 8px; border-radius: 4px; background: #34D399;"></div>
+  <div style="flex: 0.4; min-width: 14px; height: 8px; border-radius: 4px; background: #8B5CF6;"></div>
+</div>
+
+<table>
+  <tr><th>Check Type</th><th>Color</th><th>Learner Experience</th></tr>
+  <tr><td>Multiple Choice / True-False</td><td style="color: #FFBA06; font-weight: 700;">Gold</td><td>Pick an answer, see immediate feedback + explanation. No penalty for wrong.</td></tr>
+  <tr><td>Reflection</td><td style="color: #4ecdc4; font-weight: 700;">Teal</td><td>Free-text private response. "This is just for you." Min 50 characters.</td></tr>
+  <tr><td>Action Step</td><td style="color: #34D399; font-weight: 700;">Green</td><td>"I'll try this" button + social proof ("12 educators have tried this").</td></tr>
+  <tr><td>Checkpoint</td><td style="color: #8B5CF6; font-weight: 700;">Purple</td><td>Key takeaways list. "I've got it" marks lesson complete.</td></tr>
+</table>
+
+<hr>
+
+<h2>Minimum Density Requirements</h2>
+
+<div class="checklist">
+  <strong>Every lesson must have at minimum:</strong>
+  <ul style="margin-top: 8px;">
+    <li>2 comprehension checks (multiple choice or true/false)</li>
+    <li>1 action step ("Try It" -- a specific classroom action)</li>
+    <li>1 checkpoint at the end (key takeaways)</li>
+  </ul>
+  <p style="margin: 8px 0 0; font-size: 12px; color: #065F46;">Reflections encouraged but not required. Julie Lynn validates before publish.</p>
+</div>
+
+<hr>
+
+<h2>API Reference</h2>
+
+<p>All endpoints use <code>Authorization: Bearer $PAPERCLIP_SYNC_KEY</code></p>
+<p>Base URL: <code>https://www.teachersdeserveit.com</code></p>
+
+<h3>Hub Engagement Sync API</h3>
+<table>
+  <tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr>
+  <tr><td>GET</td><td><code>/api/hub/engagement-sync?action=find_work</code></td><td>Find lessons needing checks</td></tr>
+  <tr><td>GET</td><td><code>/api/hub/engagement-sync?action=get_lesson&lesson_id=...</code></td><td>Get full lesson + existing questions</td></tr>
+  <tr><td>GET</td><td><code>/api/hub/engagement-sync?action=validate_density&lesson_id=...</code></td><td>Check if lesson meets minimum density</td></tr>
+  <tr><td>GET</td><td><code>/api/hub/engagement-sync?action=get_status</code></td><td>Overall coverage stats across all lessons</td></tr>
+  <tr><td>POST</td><td><code>/api/hub/engagement-sync</code> <code>{"action":"generate_checks","lesson_id":"..."}</code></td><td>AI-generate engagement checks for a lesson</td></tr>
+</table>
+
+<h3>Admin Quiz Questions API (no auth, admin-only routes)</h3>
+<table>
+  <tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr>
+  <tr><td>GET</td><td><code>/api/tdi-admin/quiz-questions?lesson_id=...</code></td><td>Fetch all questions for a lesson</td></tr>
+  <tr><td>POST</td><td><code>/api/tdi-admin/quiz-questions</code></td><td>Create a question manually</td></tr>
+  <tr><td>PATCH</td><td><code>/api/tdi-admin/quiz-questions</code></td><td>Update a question</td></tr>
+  <tr><td>DELETE</td><td><code>/api/tdi-admin/quiz-questions?id=...</code></td><td>Delete a question</td></tr>
+  <tr><td>POST</td><td><code>/api/tdi-admin/quiz-questions/generate</code></td><td>AI-generate (admin UI button)</td></tr>
+</table>
+
+<hr>
+
+<h2>Key Files</h2>
+
+<table>
+  <tr><th>File</th><th>Purpose</th></tr>
+  <tr><td><code>lib/hub/contentSections.ts</code></td><td>Splits HTML into sections, builds interleaved flow array</td></tr>
+  <tr><td><code>lib/hub/quiz.ts</code></td><td>QuizQuestion types, fetch helpers, answer checkers</td></tr>
+  <tr><td><code>components/hub/LessonContent.tsx</code></td><td>Renders interleaved content + questions for learners</td></tr>
+  <tr><td><code>app/api/hub/engagement-sync/route.ts</code></td><td>Paperclip agent sync API (auth required)</td></tr>
+  <tr><td><code>app/api/tdi-admin/quiz-questions/</code></td><td>Admin CRUD + generate API</td></tr>
+  <tr><td><code>QuizQuestionBuilder.tsx</code></td><td>Admin UI: question builder + Auto-Generate button</td></tr>
+</table>
+
+<hr>
+
+<h2>Paperclip Agent Setup</h2>
+
+<table>
+  <tr><th>Agent</th><th>Skill</th><th>Role</th></tr>
+  <tr>
+    <td><span class="role-tag role-jasmine">Jasmine</span></td>
+    <td><code>hub-engagement</code></td>
+    <td>Discovers lessons needing checks, triggers AI generation, reports results</td>
+  </tr>
+  <tr>
+    <td><span class="role-tag role-julielynn">Julie Lynn</span></td>
+    <td><code>hub-engagement</code></td>
+    <td>Validates density on generated checks, flags issues</td>
+  </tr>
+</table>
+
+<p>Skill file: <code>tdi-paperclip-skills/hub-engagement/SKILL.md</code></p>
+<p>Auth: same <code>PAPERCLIP_SYNC_KEY</code> used by funding agents -- already in company secrets.</p>
+
+<hr>
+
+<h2>Design Principles (Non-Negotiable)</h2>
+
+<div class="highlight">
+  <strong>These apply to every engagement check, whether human-written or AI-generated:</strong>
+  <ul style="margin-top: 8px;">
+    <li><strong>No penalties.</strong> Wrong answers get explanations, not point deductions.</li>
+    <li><strong>No artificial friction.</strong> Never lock lessons behind quizzes.</li>
+    <li><strong>Respect their time.</strong> Checks take 15-30 seconds. Low character minimums.</li>
+    <li><strong>Warm tone.</strong> "That's it. Nice work." -- not "Correct! +10 XP"</li>
+    <li><strong>No emojis.</strong> Colored dots, gradients, icons only.</li>
+    <li><strong>Test understanding, not recall.</strong> "Which approach would be most effective?" not "Which was mentioned in the video?"</li>
+  </ul>
+</div>
+
+<hr>
+
+<h2>Troubleshooting</h2>
+
+<table>
+  <tr><th>Issue</th><th>Cause</th><th>Fix</th></tr>
+  <tr>
+    <td>Auto-Generate button shows error</td>
+    <td>Lesson has no body content or transcript</td>
+    <td>Add body content (HTML with headings) or upload a video and generate a transcript first</td>
+  </tr>
+  <tr>
+    <td>Questions all appear at bottom</td>
+    <td><code>content_position</code> is null on all questions</td>
+    <td>Body content needs <code>&lt;h2&gt;</code> or <code>&lt;h3&gt;</code> tags to create sections, then set positions in the builder</td>
+  </tr>
+  <tr>
+    <td>Agent returns "no work"</td>
+    <td>All lessons already have 4+ checks</td>
+    <td>Expected behavior. Check <code>get_status</code> for coverage stats.</td>
+  </tr>
+  <tr>
+    <td>Learner sees [object Object]</td>
+    <td>Content JSONB rendered as HTML directly</td>
+    <td>Bug -- lesson page should extract <code>body_html</code> from content JSONB. Check <code>extractBodyHtml()</code> in lesson page.</td>
+  </tr>
+</table>
+
+</body>
+</html>

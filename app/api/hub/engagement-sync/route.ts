@@ -72,6 +72,8 @@ export async function GET(request: NextRequest) {
       const content = l.content as Record<string, unknown> | null
       const hasContent = content && (
         (content.body_html && typeof content.body_html === 'string' && (content.body_html as string).length > 50) ||
+        (content.text && typeof content.text === 'string' && (content.text as string).length > 50) ||
+        (content.markdown && typeof content.markdown === 'string' && (content.markdown as string).length > 50) ||
         (content.video_id)
       )
       const hasTranscript = false // Would need transcript column check
@@ -223,8 +225,9 @@ export async function POST(request: NextRequest) {
       : {}
     const bodyHtml = (contentObj.body_html as string) || ''
     const bodyText = (contentObj.text as string) || ''
+    const markdown = (contentObj.markdown as string) || ''
     const transcript = lesson.transcript || ''
-    const lessonContent = bodyHtml || bodyText || transcript
+    const lessonContent = bodyHtml || bodyText || markdown || transcript
 
     if (!lessonContent || lessonContent.trim().length < 50) {
       return NextResponse.json(
