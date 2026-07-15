@@ -285,10 +285,10 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
           {/* Dates */}
           <FieldGroup label="Dates & Window">
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              <DateField label="Application opens" value={form.applicationOpens} onChange={v => setForm({ ...form, applicationOpens: v })} />
-              <DateField label="Application closes" value={form.applicationCloses} onChange={v => setForm({ ...form, applicationCloses: v })} />
-              <DateField label="Internal deadline (our real date)" value={form.internalDeadline} onChange={v => setForm({ ...form, internalDeadline: v })} />
-              <DateField label="Award needed by" value={form.awardNeededBy} onChange={v => setForm({ ...form, awardNeededBy: v })} />
+              <DateField label="Window opens" value={form.applicationOpens} onChange={v => setForm({ ...form, applicationOpens: v })} />
+              <DateField label="Window closes (submission deadline)" value={form.applicationCloses} onChange={v => setForm({ ...form, applicationCloses: v })} />
+              <DateField label="Our internal deadline" value={form.internalDeadline} onChange={v => setForm({ ...form, internalDeadline: v })} />
+              <DateField label="School needs funds by" value={form.awardNeededBy} onChange={v => setForm({ ...form, awardNeededBy: v })} />
             </div>
             <div style={{ marginTop: 8 }}>
               <label style={{ fontSize: 10, fontWeight: 600, color: '#6B7280', display: 'block', marginBottom: 4 }}>Window status</label>
@@ -394,11 +394,16 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
                 </span>
               )}
 
-              {opp.application_closes && (
-                <span style={{ fontSize: 11, color: '#6B7280' }}>
-                  Deadline: {new Date(opp.application_closes + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                </span>
-              )}
+              {opp.application_closes && (() => {
+                const days = Math.ceil((new Date(opp.application_closes + 'T00:00:00').getTime() - Date.now()) / 86400000)
+                const color = days < 0 ? '#DC2626' : days <= 3 ? '#DC2626' : days <= 7 ? '#D97706' : '#6B7280'
+                return (
+                  <span style={{ fontSize: 11, fontWeight: days <= 7 ? 700 : 400, color }}>
+                    Deadline: {new Date(opp.application_closes + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    {days < 0 ? ' (passed)' : days <= 3 ? ` (${days}d left)` : ''}
+                  </span>
+                )
+              })()}
 
               {/* Window status */}
               {(() => {
@@ -428,11 +433,16 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
             {/* Date details row */}
             {(opp.internal_deadline || opp.award_needed_by) && (
               <div style={{ display: 'flex', gap: 12, marginTop: 6, flexWrap: 'wrap' }}>
-                {opp.internal_deadline && (
-                  <span style={{ fontSize: 10, color: '#DC2626', fontWeight: 600 }}>
-                    Internal deadline: {new Date(opp.internal_deadline + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  </span>
-                )}
+                {opp.internal_deadline && (() => {
+                  const days = Math.ceil((new Date(opp.internal_deadline + 'T00:00:00').getTime() - Date.now()) / 86400000)
+                  const color = days < 0 ? '#DC2626' : days <= 3 ? '#DC2626' : days <= 7 ? '#D97706' : '#6B7280'
+                  return (
+                    <span style={{ fontSize: 10, color, fontWeight: 600 }}>
+                      Internal: {new Date(opp.internal_deadline + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {days < 0 ? ' (passed)' : days <= 3 ? ` (${days}d)` : ''}
+                    </span>
+                  )
+                })()}
                 {opp.award_needed_by && (
                   <span style={{ fontSize: 10, color: '#6B7280' }}>
                     Award needed by: {new Date(opp.award_needed_by + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
@@ -744,13 +754,7 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onPatch }:
 
       {/* ── Inline narrative reader ── */}
       {showReader && showContent && (
-        <div style={{
-          padding: '12px 14px', background: 'white', border: '1px solid #E5E7EB',
-          borderRadius: 8, maxHeight: 300, overflowY: 'auto',
-          fontSize: 13, color: '#374151', lineHeight: 1.7, whiteSpace: 'pre-wrap',
-        }}>
-          {opp.narrative_content}
-        </div>
+        <NarrativeReader content={opp.narrative_content} url={opp.narrative_url} />
       )}
 
       {/* ── Inline reader fallback: URL only ── */}
@@ -1382,6 +1386,40 @@ function AllocationPanel({ opp, pursuitId, contract2LineItems, contract2QuotePac
       {allocations.length === 0 && !showAdd && (
         <div style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>No allocations yet — click "+ Allocate" to map award to line items</div>
       )}
+    </div>
+  )
+}
+
+function NarrativeReader({ content, url }: { content: string; url?: string | null }) {
+  const [expanded, setExpanded] = useState(false)
+  return (
+    <div>
+      <div style={{
+        padding: '12px 14px', background: 'white', border: '1px solid #E5E7EB',
+        borderRadius: 8, maxHeight: expanded ? 'none' : 300, overflowY: expanded ? 'visible' : 'auto',
+        fontSize: 13, color: '#374151', lineHeight: 1.7, whiteSpace: 'pre-wrap',
+      }}>
+        {content}
+      </div>
+      <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
+        <button
+          onClick={() => setExpanded(!expanded)}
+          style={{ fontSize: 11, color: '#8B5CF6', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
+        >
+          {expanded ? 'Collapse' : 'Read full narrative'}
+        </button>
+        {url && (
+          <a href={url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#8B5CF6', textDecoration: 'underline' }}>
+            Open Google Doc
+          </a>
+        )}
+        <button
+          onClick={() => { navigator.clipboard.writeText(content); }}
+          style={{ fontSize: 11, color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
+        >
+          Copy text
+        </button>
+      </div>
     </div>
   )
 }

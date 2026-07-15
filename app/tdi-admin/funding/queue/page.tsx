@@ -66,6 +66,7 @@ export default function QueuePage() {
   const [nudgeActionId, setNudgeActionId] = useState<string | null>(null)
   const [draftEmail, setDraftEmail] = useState<{ to: string; toName: string; subject: string; body: string; schoolName: string; pursuitId?: string } | null>(null)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [undoApproveState, setUndoApprove] = useState<{ id: string; timer: ReturnType<typeof setTimeout> } | null>(null)
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null)
   const [, setTick] = useState(0)
 
@@ -145,6 +146,22 @@ export default function QueuePage() {
     })
     setActionLoading(null)
     setToast('Draft approved')
+    // Store undo info for 5 seconds
+    const undoId = item.targetId
+    setUndoApprove({ id: undoId, timer: setTimeout(() => setUndoApprove(null), 5000) })
+    load()
+  }
+
+  const undoApproval = async () => {
+    if (!undoApproveState) return
+    clearTimeout(undoApproveState.timer)
+    await fetch('/api/funding/opportunities', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: undoApproveState.id, narrative_status: 'review' }),
+    })
+    setUndoApprove(null)
+    setToast('Approval undone')
     load()
   }
 
@@ -199,6 +216,23 @@ export default function QueuePage() {
   return (
     <div style={{ padding: '24px 32px', fontFamily: "'DM Sans', sans-serif", maxWidth: 1000 }}>
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {undoApproveState && (
+        <div style={{
+          position: 'fixed', bottom: 24, right: 24, zIndex: 9999,
+          background: '#1e2749', color: 'white', padding: '12px 20px',
+          borderRadius: 10, fontSize: 13, fontWeight: 600,
+          boxShadow: '0 4px 16px rgba(0,0,0,0.2)', display: 'flex', gap: 12, alignItems: 'center',
+        }}>
+          Draft approved
+          <button onClick={undoApproval} style={{
+            fontSize: 12, fontWeight: 700, padding: '4px 12px', borderRadius: 6,
+            border: '1px solid rgba(255,255,255,0.3)', background: 'transparent', color: '#FCD34D',
+            cursor: 'pointer',
+          }}>
+            Undo
+          </button>
+        </div>
+      )}
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
