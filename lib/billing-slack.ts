@@ -18,10 +18,10 @@ function db() {
 async function getWebhook(): Promise<{ url: string | null; enabled: boolean }> {
   const { data } = await db()
     .from('funding_notification_settings')
-    .select('slack_enabled, slack_webhook_url')
+    .select('slack_enabled, billing_webhook_url')
     .limit(1)
     .single()
-  return { url: data?.slack_webhook_url || null, enabled: data?.slack_enabled || false }
+  return { url: data?.billing_webhook_url || null, enabled: data?.slack_enabled || false }
 }
 
 async function postToSlack(text: string) {
