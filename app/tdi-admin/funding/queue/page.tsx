@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { NudgePreviewModal } from '../components/panel/NudgePreviewModal'
+import { DraftEmailModal, introEmailDraft, followUpEmailDraft } from '../components/panel/DraftEmailModal'
 import {
   TYPE_PAGE_TITLE,
   TYPE_PAGE_SUBTITLE,
@@ -63,6 +64,7 @@ export default function QueuePage() {
   const initialBucket = (searchParams.get('owner') as Bucket) || 'bella'
   const [bucket, setBucket] = useState<Bucket>(initialBucket)
   const [nudgeActionId, setNudgeActionId] = useState<string | null>(null)
+  const [draftEmail, setDraftEmail] = useState<{ to: string; toName: string; subject: string; body: string; schoolName: string } | null>(null)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
   const load = useCallback(() => {
@@ -327,6 +329,17 @@ export default function QueuePage() {
                 setToast('Pursuit archived')
                 load()
               }}
+              onDraftEmail={() => {
+                const contactName = item.contactName || item.districtName || 'there'
+                const contactEmail = item.contactEmail || ''
+                const schoolName = item.pursuitName || item.districtName || 'your school'
+                if (!contactEmail) {
+                  setToast('No contact email on this pursuit — open it and add one')
+                  return
+                }
+                const draft = introEmailDraft(contactName, schoolName)
+                setDraftEmail({ to: contactEmail, toName: contactName, subject: draft.subject, body: draft.body, schoolName })
+              }}
             />
           ))}
         </div>
@@ -338,6 +351,19 @@ export default function QueuePage() {
           actionId={nudgeActionId}
           onClose={() => setNudgeActionId(null)}
           onSent={() => { setNudgeActionId(null); load() }}
+        />
+      )}
+
+      {/* Draft email modal */}
+      {draftEmail && (
+        <DraftEmailModal
+          to={draftEmail.to}
+          toName={draftEmail.toName}
+          subject={draftEmail.subject}
+          body={draftEmail.body}
+          schoolName={draftEmail.schoolName}
+          onClose={() => setDraftEmail(null)}
+          onSent={() => { setDraftEmail(null); setToast('Email sent'); load() }}
         />
       )}
     </div>
@@ -381,7 +407,7 @@ function renderGrouped(items: any[], muted: boolean): any[] {
   return result
 }
 
-function QueueRow({ item, muted, loading, onVerifyContact, onApproveDraft, onSendToQa, onMarkDone, onSendNudge, onRequestDraft, onArchive }: {
+function QueueRow({ item, muted, loading, onVerifyContact, onApproveDraft, onSendToQa, onMarkDone, onSendNudge, onRequestDraft, onArchive, onDraftEmail }: {
   item: any
   muted: boolean
   loading: boolean
@@ -392,6 +418,7 @@ function QueueRow({ item, muted, loading, onVerifyContact, onApproveDraft, onSen
   onSendNudge: () => void
   onRequestDraft: (agent: string) => void
   onArchive: () => void
+  onDraftEmail: () => void
 }) {
   const [showAgentPicker, setShowAgentPicker] = useState(false)
   const urgencyDot = URGENCY_DOT[item.urgency] || URGENCY_DOT.normal
@@ -423,6 +450,23 @@ function QueueRow({ item, muted, loading, onVerifyContact, onApproveDraft, onSen
           </div>
         ) : (
           <InlineBtn label="Request draft" onClick={() => setShowAgentPicker(true)} />
+        )
+
+      case 'setup_pursuit':
+        return (
+          <div style={{ display: 'flex', gap: 4 }}>
+            <InlineBtn label="Draft email" onClick={onDraftEmail} />
+            <Link
+              href={`/tdi-admin/funding/${item.pursuitId}`}
+              style={{
+                fontSize: 12, fontWeight: 600, padding: '8px 12px', borderRadius: 8,
+                border: '1px solid #E5E7EB', background: 'white', color: '#8B5CF6',
+                textDecoration: 'none', whiteSpace: 'nowrap',
+              }}
+            >
+              Open
+            </Link>
+          </div>
         )
 
       case 'verify_window':

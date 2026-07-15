@@ -78,6 +78,8 @@ export async function GET() {
           pursuitId: p.id,
           pursuitName: p.pursuit_name,
           districtName: p.district_name,
+          contactName: p.client_contact_name,
+          contactEmail: p.client_contact_email,
         })
       }
     }
