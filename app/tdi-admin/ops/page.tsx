@@ -45,7 +45,7 @@ interface OpsData {
       contact_changed: boolean;
     }>;
   };
-  hub: { totalEnrollments: number };
+  hub: { totalEnrollments: number; paidMembers: number; courseCount: number; newThisWeek: number; activeLogins30d: number };
   funding: { activePursuits: number; totalPipeline: number };
   timestamp: string;
 }
@@ -313,18 +313,47 @@ export default function OpsPage() {
 
       {/* ===== SECTION 6: LEARNING HUB ===== */}
       <CollapsibleSection title="Learning Hub" icon={BookOpen} accentColor="#EAB308" defaultOpen={false}>
-        <div className="flex items-center justify-between">
-          <div className="flex gap-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex gap-6">
             <div className="text-center">
               <p className="text-xl font-bold" style={{ color: '#EAB308' }}>{data.hub.totalEnrollments || '--'}</p>
-              <p className="text-xs text-gray-500">Enrollments</p>
+              <p className="text-xs text-gray-500">Total Users</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xl font-bold" style={{ color: '#10B981' }}>{data.hub.paidMembers || 0}</p>
+              <p className="text-xs text-gray-500">Paid Members</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xl font-bold" style={{ color: '#3B82F6' }}>{data.hub.activeLogins30d || 0}</p>
+              <p className="text-xs text-gray-500">Active (30d)</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xl font-bold" style={{ color: '#8B5CF6' }}>{data.hub.newThisWeek || 0}</p>
+              <p className="text-xs text-gray-500">New This Week</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xl font-bold" style={{ color: '#6B7280' }}>{data.hub.courseCount || '--'}</p>
+              <p className="text-xs text-gray-500">Courses</p>
             </div>
           </div>
           <div className="flex gap-2">
-            <NavButton href="/tdi-admin/hub/production" label="Hub Production" icon={ArrowRight} />
-            <NavButton href="/hub" label="Public Hub" icon={ExternalLink} />
+            <NavButton href="/tdi-admin/hub" label="Hub Admin" icon={ArrowRight} />
+            <NavButton href="/tdi-admin/hub/production" label="Production" icon={BookOpen} />
           </div>
         </div>
+        {data.hub.paidMembers > 0 && data.hub.totalEnrollments > 0 && (
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+            <div className="flex-1">
+              <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                <span>Free to Paid Conversion</span>
+                <span className="font-medium">{Math.round((data.hub.paidMembers / data.hub.totalEnrollments) * 100)}%</span>
+              </div>
+              <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-full rounded-full bg-green-500" style={{ width: `${Math.min((data.hub.paidMembers / data.hub.totalEnrollments) * 100, 100)}%` }} />
+              </div>
+            </div>
+          </div>
+        )}
       </CollapsibleSection>
     </div>
   );

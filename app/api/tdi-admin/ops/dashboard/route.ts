@@ -39,10 +39,15 @@ export async function GET() {
       // Sales opportunities (invoices come from here -- needs_invoice flag)
       (supabase.from('sales_opportunities') as any).select('*'),
 
-      // Hub enrollments from separate database
+      // Hub data from separate database
       hubSupabase
-        ? hubSupabase.from('profiles').select('id', { count: 'exact', head: true })
-        : Promise.resolve({ count: null }),
+        ? Promise.all([
+            hubSupabase.from('profiles').select('id', { count: 'exact', head: true }),
+            hubSupabase.from('profiles').select('id, tier, created_at, last_login_at, organization').not('tier', 'eq', 'free'),
+            hubSupabase.from('hub_courses').select('id', { count: 'exact', head: true }),
+            hubSupabase.from('profiles').select('id').gte('created_at', new Date(Date.now() - 7 * 86400000).toISOString()),
+          ])
+        : Promise.resolve([{ count: null }, { data: null }, { count: null }, { data: null }]),
 
       // Funding pursuits
       supabase
@@ -90,7 +95,14 @@ export async function GET() {
     const activePursuits = pursuits.filter((p: any) => p.status !== 'closed' && p.status !== 'won');
 
     // Hub stats
-    const hubTotal = (hubRes as any)?.count || 0;
+    const [hubProfilesRes, hubPaidRes, hubCoursesRes, hubRecentRes] = hubRes as any[];
+    const hubTotal = hubProfilesRes?.count || 0;
+    const hubPaidMembers = hubPaidRes?.data?.length || 0;
+    const hubCourseCount = hubCoursesRes?.count || 0;
+    const hubNewThisWeek = hubRecentRes?.data?.length || 0;
+    const hubRecentLogins = (hubPaidRes?.data || []).filter((p: any) =>
+      p.last_login_at && new Date(p.last_login_at) > new Date(Date.now() - 30 * 86400000)
+    ).length;
 
     return NextResponse.json({
       creators: {
@@ -120,6 +132,10 @@ export async function GET() {
       },
       hub: {
         totalEnrollments: hubTotal,
+        paidMembers: hubPaidMembers,
+        courseCount: hubCourseCount,
+        newThisWeek: hubNewThisWeek,
+        activeLogins30d: hubRecentLogins,
       },
       funding: {
         activePursuits: activePursuits.length,
