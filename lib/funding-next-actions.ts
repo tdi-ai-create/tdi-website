@@ -37,38 +37,21 @@ export function computeNextActions(
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  // Detect unstarted pursuits: no opportunities, no gate, no action items
-  const isUnstarted = opportunities.length === 0 && !gate && actions.length === 0
+  // Intro email — show for ALL schools that haven't had one sent yet
   const introSent = !!pursuit.intro_sent_at
-  if (isUnstarted) {
+  if (!introSent && pursuit.client_contact_email) {
     const contactName = pursuit.client_contact_name || 'the school contact'
     const contactEmail = pursuit.client_contact_email || ''
     const schoolName = pursuit.district_name || pursuit.pursuit_name || 'this school'
-
-    // Only show intro email item if not already sent
-    if (!introSent) {
-      result.push({
-        id: `intro-${pursuit.id}`,
-        label: `Send intro email to ${contactName}`,
-        why: `Introduce yourself as their TDI funding contact${contactEmail ? ` (${contactEmail})` : ''}. Let them know you'll be identifying grant opportunities for ${schoolName}.`,
-        owner: 'bella',
-        urgency: 'normal',
-        actionType: 'setup_pursuit',
-        tab: 'overview',
-      })
-    }
-
-    // Always show "add opportunities" for unstarted pursuits
     result.push({
-      id: `map-${pursuit.id}`,
-      label: introSent ? 'Add grant opportunities (intro sent)' : 'Add grant opportunities for this school',
-      why: `Open the pursuit, go to Grant Opportunities section, and add 3-5 grants this school is eligible for (Walmart Spark, Title II-A, NEA, local foundations). Set plan categories A-D.`,
+      id: `intro-${pursuit.id}`,
+      label: `Send intro email to ${contactName}`,
+      why: `Introduce yourself as their TDI funding contact${contactEmail ? ` (${contactEmail})` : ''}. Let them know you'll be identifying grant opportunities for ${schoolName}.`,
       owner: 'bella',
-      urgency: introSent ? 'normal' : 'low',
+      urgency: 'normal',
       actionType: 'setup_pursuit',
-      tab: 'opportunities',
+      tab: 'overview',
     })
-    return result
   }
 
   // Detect whether pursuit is in-flight (has opportunities or gate) for profile noise gating
@@ -310,8 +293,8 @@ export function computeNextActions(
     })
   }
 
-  // Profile incomplete (only for in-flight pursuits — don't spam for unstarted ones)
-  if (isInFlight) {
+  // Profile incomplete
+  {
     let profileFields = 0
     let profileFilled = 0
     try {
