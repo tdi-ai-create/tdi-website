@@ -189,6 +189,11 @@ export default function PursuitDetailPage() {
             const sectionId = action.tab === 'actions' ? 'section-all-action-items' : `section-${action.tab}`
             document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
           }, 100)
+        }} pursuitId={pursuitId} onActionDone={() => {
+          // Refresh data after marking done
+          fetch(`/api/funding/pursuits/${pursuitId}`)
+            .then(r => r.json())
+            .then(d => { if (!d.error) { setData(d); setPursuit(d.pursuit) } })
         }} />
       </div>
 
@@ -255,7 +260,7 @@ const OWNER_BADGES: Record<string, { label: string; color: string; bg: string }>
   auto: { label: 'Auto', color: '#6B7280', bg: '#F3F4F6' },
 }
 
-function ActionCards({ actions, onCardClick }: { actions: NextAction[]; onCardClick?: (action: NextAction) => void }) {
+function ActionCards({ actions, onCardClick, pursuitId, onActionDone }: { actions: NextAction[]; onCardClick?: (action: NextAction) => void; pursuitId?: string; onActionDone?: () => void }) {
   const actionable = actions.filter(a => !a.inProgress)
   const inFlight = actions.filter(a => a.inProgress)
   const [showInFlight, setShowInFlight] = useState(false)
@@ -347,6 +352,14 @@ function ActionCards({ actions, onCardClick }: { actions: NextAction[]; onCardCl
                   {action.why}
                 </div>
               </div>
+              {/* Done button — only for DB action items with a targetId */}
+              {action.targetId && pursuitId && (
+                <ActionCardDoneBtn
+                  pursuitId={pursuitId}
+                  actionId={action.targetId}
+                  onDone={onActionDone}
+                />
+              )}
             </div>
           </div>
         )
@@ -449,6 +462,36 @@ function CollapsibleSection({ title, children, defaultOpen = false, onToggle, co
 }
 
 // ── Toast notification ──
+
+function ActionCardDoneBtn({ pursuitId, actionId, onDone }: { pursuitId: string; actionId: string; onDone?: () => void }) {
+  const [loading, setLoading] = useState(false)
+  const [done, setDone] = useState(false)
+  if (done) return <span style={{ fontSize: 11, color: '#065F46', fontWeight: 600 }}>Done</span>
+  return (
+    <button
+      onClick={async (e) => {
+        e.stopPropagation()
+        setLoading(true)
+        await fetch(`/api/funding/pursuits/${pursuitId}/actions`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ actionId, markDone: true }),
+        })
+        setDone(true)
+        onDone?.()
+      }}
+      disabled={loading}
+      style={{
+        fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8,
+        border: 'none', background: loading ? '#9CA3AF' : '#10B981', color: 'white',
+        cursor: loading ? 'default' : 'pointer', flexShrink: 0, alignSelf: 'flex-start',
+        marginTop: 4,
+      }}
+    >
+      {loading ? '...' : 'Done'}
+    </button>
+  )
+}
 
 function Toast({ message, onDone }: { message: string; onDone: () => void }) {
   useEffect(() => { const t = setTimeout(onDone, 2500); return () => clearTimeout(t) }, [onDone])
