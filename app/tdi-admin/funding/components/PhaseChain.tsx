@@ -1,15 +1,15 @@
 'use client'
 
 const PHASES = [
-  { id: 'intake', label: 'Intake' },
-  { id: 'researching', label: 'Research' },
-  { id: 'strategy', label: 'Strategy' },
-  { id: 'writing', label: 'Writing' },
-  { id: 'in_review', label: 'Review' },
-  { id: 'delivered', label: 'Delivered' },
-  { id: 'submitted', label: 'Submitted' },
-  { id: 'awaiting_decision', label: 'Awaiting' },
-  { id: 'awarded', label: 'Awarded' },
+  { id: 'intake', label: 'Intake', tip: 'School enrolled, gathering contacts and contracts' },
+  { id: 'researching', label: 'Research', tip: 'Finding matching grant opportunities' },
+  { id: 'strategy', label: 'Strategy', tip: 'Mapping funding paths and setting priorities' },
+  { id: 'writing', label: 'Writing', tip: 'Drafting grant narratives and applications' },
+  { id: 'in_review', label: 'Review', tip: 'Narratives under QA and Bella review' },
+  { id: 'delivered', label: 'Delivered', tip: 'Materials sent to school for submission' },
+  { id: 'submitted', label: 'Submitted', tip: 'Application submitted, awaiting funder decision' },
+  { id: 'awaiting_decision', label: 'Awaiting', tip: 'Waiting on funder award decision' },
+  { id: 'awarded', label: 'Awarded', tip: 'Grant awarded, ready for allocation' },
 ]
 
 const STATUS_COLORS = {
@@ -34,7 +34,7 @@ export function PhaseChain({ currentPhase, isStalled }: { currentPhase: string; 
         return (
           <div
             key={phase.id}
-            title={phase.label}
+            title={`${phase.label}: ${phase.tip}`}
             style={{
               padding: '4px 8px',
               fontSize: 9,

@@ -14,8 +14,16 @@ import {
 } from '@/components/tdi-admin/ui/design-tokens'
 import { RadialGauge, DonutChart, DonutLegend, ProgressRing, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts'
 
-// Impact Evidence from Hub
+/** Format a number as currency: $56,372 (whole) or $56,372.50 (if cents) */
+function fmtCurrency(n: number): string {
+  return n % 1 === 0
+    ? `$${n.toLocaleString()}`
+    : `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
+
+// Impact Evidence from Hub — collapsible reference section
 function ImpactEvidence() {
+  const [expanded, setExpanded] = useState(false)
   const [impact, setImpact] = useState<{
     impactMetrics: {
       totalEducators: number; statesReached: number; pdHoursDelivered: number;
@@ -42,8 +50,17 @@ function ImpactEvidence() {
 
   return (
     <div style={{ marginBottom: 24 }}>
-      <LiveSectionHeader title="Impact Evidence" subtitle="Ready-to-use metrics for grant applications and impact reports" dotColor="#8B5CF6" badgeColor="#EDE9FE" badgeTextColor="#6D28D9" />
+      <div
+        onClick={() => setExpanded(!expanded)}
+        style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, marginBottom: expanded ? 0 : 0 }}
+      >
+        <LiveSectionHeader title="Impact Evidence" subtitle="Ready-to-use metrics for grant applications and impact reports" dotColor="#8B5CF6" badgeColor="#EDE9FE" badgeTextColor="#6D28D9" />
+        <span style={{ fontSize: 11, color: '#9CA3AF', whiteSpace: 'nowrap', marginLeft: 'auto', paddingRight: 8 }}>
+          {expanded ? 'Collapse' : 'Expand'}
+        </span>
+      </div>
 
+      {!expanded ? null : <>
       {/* Gauges row: big visual indicators */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 20 }}>
         <div style={{ background: 'white', borderRadius: 14, border: '1px solid rgba(139, 92, 246, 0.2)', padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -107,6 +124,7 @@ function ImpactEvidence() {
           </div>
         </div>
       </div>
+      </>}
     </div>
   )
 }
@@ -310,14 +328,14 @@ export default function FundingPage() {
         </div>
       )}
 
-      {/* Impact Evidence from Hub */}
-      <ImpactEvidence />
-
-      {/* Alert bar */}
+      {/* Alert bar — top of page, Bella's daily priorities */}
       <AlertBar alerts={data.alerts} />
 
       {/* My Tasks - cross-pursuit action items */}
       <MyTasks />
+
+      {/* Impact Evidence from Hub — collapsible reference data */}
+      <ImpactEvidence />
 
       {/* Phase tabs */}
       <PhaseTabs
@@ -337,7 +355,7 @@ export default function FundingPage() {
             {data.alerts.in_flight_count} active {data.alerts.in_flight_count === 1 ? 'pursuit' : 'pursuits'} in flight
           </span>
           <span style={{ fontSize: 15, fontWeight: 700, color: '#6D28D9' }}>
-            ${data.alerts.in_flight_total.toLocaleString()} total
+            {fmtCurrency(data.alerts.in_flight_total)} total
           </span>
         </div>
       )}

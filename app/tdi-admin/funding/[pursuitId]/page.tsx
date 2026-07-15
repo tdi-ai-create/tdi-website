@@ -3,6 +3,12 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+
+function fmtCurrency(n: number): string {
+  return n % 1 === 0
+    ? `$${n.toLocaleString()}`
+    : `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
 import { PhaseChain } from '../components/PhaseChain'
 import { OverviewTab } from '../components/panel/OverviewTab'
 import { OpportunitiesTab } from '../components/panel/OpportunitiesTab'
@@ -134,9 +140,9 @@ export default function PursuitDetailPage() {
 
         {/* Key stats row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
-          <StatCard label="Contract" value={`$${(p.total_amount || 0).toLocaleString()}`} />
-          <StatCard label="Awarded" value={`$${awarded.toLocaleString()}`} color={awarded > 0 ? '#065F46' : undefined} />
-          <StatCard label="Remaining gap" value={`$${remaining.toLocaleString()}`} color={remaining > 0 ? '#92400E' : '#065F46'} />
+          <StatCard label="Contract" value={fmtCurrency(p.total_amount || 0)} />
+          <StatCard label="Awarded" value={fmtCurrency(awarded)} color={awarded > 0 ? '#065F46' : undefined} />
+          <StatCard label="Remaining gap" value={fmtCurrency(remaining)} color={remaining > 0 ? '#92400E' : '#065F46'} />
           <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: '14px 18px' }}>
             <div style={{ fontSize: 10, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 700 }}>Funded</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: '#0a0f1e', marginTop: 4 }}>{gapPct}%</div>

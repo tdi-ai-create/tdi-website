@@ -4,6 +4,13 @@ import { useEffect, useState } from 'react'
 import { PhaseChain } from './PhaseChain'
 import { OwnerAvatar, ownerName } from './OwnerAvatar'
 
+/** Format a number as currency: $56,372 (whole) or $56,372.50 (if cents) */
+function fmtCurrency(n: number): string {
+  return n % 1 === 0
+    ? `$${n.toLocaleString()}`
+    : `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
+
 interface Pursuit {
   id: string
   pursuit_name: string
@@ -108,7 +115,7 @@ export function PursuitCard({ pursuit, onClick }: { pursuit: Pursuit; onClick: (
         </div>
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontSize: 20, fontWeight: 800, color: '#0a0f1e' }}>
-            ${pursuit.total_amount.toLocaleString()}
+            {fmtCurrency(pursuit.total_amount)}
           </div>
           {deadlineDays !== null && (
             <div style={{
@@ -150,10 +157,10 @@ export function PursuitCard({ pursuit, onClick }: { pursuit: Pursuit; onClick: (
         <div style={{ marginBottom: 12 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
             <span style={{ fontSize: 10, color: '#6B7280' }}>
-              ${awarded.toLocaleString()} awarded{pending > 0 ? ` / $${pending.toLocaleString()} pending` : ''}
+              {fmtCurrency(awarded)} awarded{pending > 0 ? ` / ${fmtCurrency(pending)} pending` : ''}
             </span>
             <span style={{ fontSize: 10, fontWeight: 700, color: gapPct >= 100 ? '#065F46' : '#6B7280' }}>
-              {gapPct}% of ${gap.toLocaleString()}
+              {gapPct}% of {fmtCurrency(gap)}
             </span>
           </div>
           <div style={{ height: 6, background: '#F3F4F6', borderRadius: 3, overflow: 'hidden', display: 'flex' }}>

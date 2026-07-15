@@ -30,10 +30,25 @@ const WINDOW_OPTIONS = [
   { value: 'closed_denied', label: 'Denied' },
 ]
 
+function Toast({ message, onDone }: { message: string; onDone: () => void }) {
+  useEffect(() => { const t = setTimeout(onDone, 2500); return () => clearTimeout(t) }, [onDone])
+  return (
+    <div style={{
+      position: 'fixed', bottom: 24, right: 24, zIndex: 9999,
+      background: '#065F46', color: 'white', padding: '12px 20px',
+      borderRadius: 10, fontSize: 13, fontWeight: 600,
+      boxShadow: '0 4px 16px rgba(0,0,0,0.15)', animation: 'fadeIn 0.2s',
+    }}>
+      {message}
+    </div>
+  )
+}
+
 export default function QueuePage() {
   const [items, setItems] = useState<any[]>([])
   const [counts, setCounts] = useState({ bella: 0, rae: 0, agent: 0, school: 0 })
   const [loading, setLoading] = useState(true)
+  const [toast, setToast] = useState<string | null>(null)
   const searchParams = useSearchParams()
   const initialBucket = (searchParams.get('owner') as Bucket) || 'bella'
   const [bucket, setBucket] = useState<Bucket>(initialBucket)
@@ -69,6 +84,7 @@ export default function QueuePage() {
       body: JSON.stringify({ submitter_employment_verified_at: new Date().toISOString() }),
     })
     setActionLoading(null)
+    setToast('Contact verified')
     load()
   }
 
@@ -81,6 +97,7 @@ export default function QueuePage() {
       body: JSON.stringify({ id: item.targetId, narrative_status: 'ready' }),
     })
     setActionLoading(null)
+    setToast('Draft approved')
     load()
   }
 
@@ -93,6 +110,7 @@ export default function QueuePage() {
       body: JSON.stringify({ id: item.targetId, narrative_status: 'qa_review' }),
     })
     setActionLoading(null)
+    setToast('Sent to QA review')
     load()
   }
 
@@ -105,6 +123,7 @@ export default function QueuePage() {
       body: JSON.stringify({ actionId: item.targetId, markDone: true }),
     })
     setActionLoading(null)
+    setToast('Marked done')
     load()
   }
 
@@ -126,11 +145,13 @@ export default function QueuePage() {
       body: JSON.stringify({ id: item.targetId, narrative_status: 'requested', assigned_agent: agent }),
     })
     setActionLoading(null)
+    setToast(`Draft requested from ${agent}`)
     load()
   }
 
   return (
     <div style={{ padding: '24px 32px', fontFamily: "'DM Sans', sans-serif", maxWidth: 1000 }}>
+      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
