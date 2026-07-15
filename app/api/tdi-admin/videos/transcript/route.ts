@@ -143,18 +143,14 @@ export async function POST(request: NextRequest) {
 
     const label = lang === 'es' ? 'Spanish' : 'English'
 
+    // Use the /generate endpoint for AI-generated captions (POST, no body)
     const res = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/stream/${uid}/captions/${lang}`,
+      `https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/stream/${uid}/captions/${lang}/generate`,
       {
-        method: 'PUT',
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${cfToken}`,
-          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          label,
-          generated: true,
-        }),
       }
     )
 
