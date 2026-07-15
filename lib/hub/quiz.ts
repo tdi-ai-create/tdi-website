@@ -16,6 +16,7 @@ export interface QuizQuestion {
   correct_answer: string | null;
   explanation: string | null;
   sort_order: number;
+  content_position: number | null;
 }
 
 export interface QuizResponse {

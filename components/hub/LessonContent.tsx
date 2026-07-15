@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   CheckCircle,
   XCircle,
@@ -17,12 +17,14 @@ import {
   checkMultipleChoiceAnswer,
   checkTrueFalseAnswer,
 } from '@/lib/hub/quiz';
+import { buildLessonFlow, type LessonFlowItem } from '@/lib/hub/contentSections';
 import { useTranslation } from '@/lib/hub/useTranslation';
 
 interface LessonContentProps {
   lessonId: string;
   lessonTitle: string;
   lessonDescription?: string;
+  contentHtml?: string | null;
   questions: QuizQuestion[];
   userResponses: Record<string, QuizResponse>;
   userId: string;
@@ -34,6 +36,7 @@ export default function LessonContent({
   lessonId,
   lessonTitle,
   lessonDescription,
+  contentHtml,
   questions,
   userResponses,
   userId,
@@ -777,34 +780,127 @@ export default function LessonContent({
     );
   }
 
+  // Build interleaved flow when contentHtml is provided
+  const flow = useMemo(() => {
+    if (!contentHtml) return null;
+    const items = buildLessonFlow(contentHtml, questions);
+    // Pre-compute question indices for numbering
+    let qCounter = 0;
+    return items.map((item) => ({
+      ...item,
+      questionIndex: item.type === 'question' ? qCounter++ : -1,
+    }));
+  }, [contentHtml, questions]);
+
+  const renderFlowItem = (item: LessonFlowItem & { questionIndex: number }, index: number) => {
+    if (item.type === 'content') {
+      return (
+        <div
+          key={`content-${item.sectionIndex}`}
+          className="prose prose-gray max-w-none"
+          style={{
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: '15px',
+            color: '#374151',
+            lineHeight: '1.7',
+          }}
+          dangerouslySetInnerHTML={{ __html: item.html }}
+        />
+      );
+    }
+
+    return (
+      <div key={item.question.id}>
+        {renderQuestion(item.question, item.questionIndex)}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       {/* Lesson header */}
-      <div>
-        <h2
-          className="font-bold mb-2"
-          style={{
-            fontFamily: "'Source Serif 4', Georgia, serif",
-            fontSize: '24px',
-            color: '#2B3A67',
-          }}
-        >
-          {lessonTitle}
-        </h2>
-        {lessonDescription && (
-          <p
-            className="text-gray-600"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
+      {lessonTitle && (
+        <div>
+          <h2
+            className="font-bold mb-2"
+            style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontSize: '24px',
+              color: '#2B3A67',
+            }}
           >
-            {lessonDescription}
-          </p>
-        )}
-      </div>
+            {lessonTitle}
+          </h2>
+          {lessonDescription && (
+            <p
+              className="text-gray-600"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {lessonDescription}
+            </p>
+          )}
+        </div>
+      )}
 
-      {/* Questions */}
-      <div className="space-y-6">
-        {questions.map((question, index) => renderQuestion(question, index))}
-      </div>
+      {/* Flow progress indicator (interleaved mode only) */}
+      {flow && flow.length > 1 && (
+        <div className="flex items-center gap-1 mb-2" role="progressbar" aria-label="Lesson progress">
+          {flow.map((item, i) => {
+            const isContent = item.type === 'content';
+            const isAnswered = item.type === 'question' && !!responses[item.question.id];
+
+            // Determine segment color based on question type
+            let baseColor = '#E5E7EB';
+            let activeColor = 'linear-gradient(90deg, #FFBA06, #4ecdc4)';
+
+            if (item.type === 'question') {
+              const qType = item.question.question_type;
+              if (qType === 'reflection') {
+                baseColor = '#BAE6FD';
+                activeColor = '#4ecdc4';
+              } else if (qType === 'action_step') {
+                baseColor = '#A7F3D0';
+                activeColor = '#34D399';
+              } else if (qType === 'checkpoint') {
+                baseColor = '#C4B5FD';
+                activeColor = '#8B5CF6';
+              } else {
+                baseColor = '#FDE68A';
+                activeColor = '#FFBA06';
+              }
+            }
+
+            return (
+              <div
+                key={i}
+                className="rounded-full transition-all duration-500"
+                style={{
+                  flex: isContent ? 1 : 0.4,
+                  minWidth: isContent ? '30px' : '16px',
+                  height: '6px',
+                  background: isContent
+                    ? 'linear-gradient(90deg, #FFBA06, #4ecdc4)'
+                    : isAnswered
+                      ? activeColor
+                      : baseColor,
+                  opacity: isContent ? 0.3 : 1,
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
+
+      {/* Interleaved flow (content + questions) or questions only */}
+      {flow ? (
+        <div className="space-y-6">
+          {flow.map((item, index) => renderFlowItem(item, index))}
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {questions.map((question, index) => renderQuestion(question, index))}
+        </div>
+      )}
 
       {/* Mark complete button (for non-checkpoint lessons) */}
       {allQuestionsAnswered &&

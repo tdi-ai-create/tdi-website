@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Hub -- Engagement &amp; Confirmation System</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; background: #FAFBFC; line-height: 1.7; font-size: 15px; }
+  .page { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+  h2 { font-size: 20px; font-weight: 700; margin: 40px 0 12px; color: #1e2749; }
+  h3 { font-size: 15px; font-weight: 700; margin: 20px 0 6px; color: #374151; }
+  p { margin-bottom: 12px; }
+  .sub { color: #6B7280; font-size: 14px; margin-bottom: 28px; }
+  .updated { color: #9CA3AF; font-size: 11px; margin-bottom: 20px; }
+
+  .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 12px; border: 1px solid #E5E7EB; }
+  .card-highlight { border-left: 4px solid #E8B84B; }
+  .card-action { border-left: 4px solid #2A9D8F; }
+  .card-auto { border-left: 4px solid #8B5CF6; }
+  .card-warning { border-left: 4px solid #EF4444; background: #FEF2F2; }
+  .card-phase { border-left: 4px solid #4ecdc4; }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; letter-spacing: 0.03em; }
+  .badge-built { background: #D1FAE5; color: #065F46; }
+  .badge-next { background: #FEF3C7; color: #92400E; }
+  .badge-future { background: #F3F4F6; color: #374151; }
+  .badge-auto { background: #EDE9FE; color: #6D28D9; }
+
+  .who { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .who-admin { color: #D97706; }
+  .who-system { color: #7C3AED; }
+  .who-agent { color: #2563EB; }
+  .who-learner { color: #059669; }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 16px; font-size: 13px; }
+  th { text-align: left; padding: 8px 12px; background: #F9FAFB; border-bottom: 2px solid #E5E7EB; font-weight: 600; }
+  td { padding: 8px 12px; border-bottom: 1px solid #F3F4F6; }
+  td code { background: #F3F4F6; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+
+  .divider { border: none; border-top: 1px solid #E5E7EB; margin: 32px 0; }
+
+  .flow-bar { display: flex; gap: 3px; align-items: center; margin: 16px 0; }
+  .flow-seg { height: 8px; border-radius: 4px; }
+  .flow-content { flex: 1; background: linear-gradient(90deg, #FFBA06, #4ecdc4); opacity: 0.3; }
+  .flow-check { flex: 0.4; background: #FFBA06; min-width: 14px; }
+  .flow-reflect { flex: 0.4; background: #4ecdc4; min-width: 14px; }
+  .flow-action { flex: 0.4; background: #34D399; min-width: 14px; }
+  .flow-checkpoint { flex: 0.4; background: #8B5CF6; min-width: 14px; }
+
+  .flow-legend { display: flex; gap: 16px; font-size: 11px; color: #6B7280; margin-bottom: 8px; }
+  .flow-legend-dot { width: 8px; height: 8px; border-radius: 3px; display: inline-block; margin-right: 4px; vertical-align: middle; }
+
+  .step-grid { display: grid; grid-template-columns: 36px 1fr; gap: 12px; margin-bottom: 20px; }
+  .step-num { width: 36px; height: 36px; border-radius: 50%; background: #1e2749; color: white; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; }
+  .step-content { padding-top: 6px; }
+
+  .principle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+  @media (max-width: 600px) { .principle-grid { grid-template-columns: 1fr; } }
+
+  ul { margin: 8px 0 12px 20px; }
+  li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>Learning Hub Engagement System</h1>
+<p class="sub">Duolingo-inspired engagement and confirmation-of-learning system. Interleaved content and comprehension checks, implementation tracking, and learner momentum tools.</p>
+<p class="updated">Version 1.0 | July 2026 | Internal team reference</p>
+
+<!-- ═══════ THE PROBLEM ═══════ -->
+<h2>Why this exists</h2>
+<p>Most PD platforms (including our current Hub) deliver content passively -- educators watch a video, maybe answer a quiz at the end, and move on. There's no confirmation they understood the material or changed their practice.</p>
+
+<div class="card card-highlight">
+  <p style="font-weight: 600; margin-bottom: 6px;">The Duolingo insight</p>
+  <p style="margin-bottom: 0;">Duolingo doesn't teach then quiz. The quiz <em>is</em> the teaching. Every 30 seconds, the learner proves they understood something. We're applying this principle to professional development -- but going further by also tracking whether educators <em>tried it</em> in their classrooms.</p>
+</div>
+
+<!-- ═══════ THE RHYTHM ═══════ -->
+<h2>The lesson flow</h2>
+<p>Instead of "watch everything, then answer questions," lessons now interleave content and engagement checks. A teacher should never passively consume for more than 2-3 minutes without interacting.</p>
+
+<div class="flow-bar">
+  <div class="flow-seg flow-content"></div>
+  <div class="flow-seg flow-check"></div>
+  <div class="flow-seg flow-content"></div>
+  <div class="flow-seg flow-check"></div>
+  <div class="flow-seg flow-content"></div>
+  <div class="flow-seg flow-reflect"></div>
+  <div class="flow-seg flow-content"></div>
+  <div class="flow-seg flow-action"></div>
+  <div class="flow-seg flow-checkpoint"></div>
+</div>
+<div class="flow-legend">
+  <span><span class="flow-legend-dot" style="background: linear-gradient(90deg, #FFBA06, #4ecdc4);"></span>Content</span>
+  <span><span class="flow-legend-dot" style="background: #FFBA06;"></span>Quick Check</span>
+  <span><span class="flow-legend-dot" style="background: #4ecdc4;"></span>Reflection</span>
+  <span><span class="flow-legend-dot" style="background: #34D399;"></span>Try It</span>
+  <span><span class="flow-legend-dot" style="background: #8B5CF6;"></span>Checkpoint</span>
+</div>
+
+<h3>Five engagement types</h3>
+<table>
+  <tr><th>Type</th><th>Purpose</th><th>Learner experience</th></tr>
+  <tr>
+    <td><strong>Multiple Choice</strong></td>
+    <td>Comprehension check</td>
+    <td>Pick the right answer. Immediate feedback + explanation. No penalty for wrong answers.</td>
+  </tr>
+  <tr>
+    <td><strong>True / False</strong></td>
+    <td>Quick comprehension check</td>
+    <td>Binary choice. Immediate feedback + explanation.</td>
+  </tr>
+  <tr>
+    <td><strong>Reflection</strong></td>
+    <td>Depth of understanding</td>
+    <td>Free-text response. Private. Min 50 characters. "This is just for you."</td>
+  </tr>
+  <tr>
+    <td><strong>Try It</strong></td>
+    <td>Implementation prompt</td>
+    <td>Specific classroom action to try this week. "I'll try this" button. Shows social proof ("12 educators have tried this").</td>
+  </tr>
+  <tr>
+    <td><strong>Checkpoint</strong></td>
+    <td>Lesson summary</td>
+    <td>Key takeaways list. "I've got it" button marks lesson complete.</td>
+  </tr>
+</table>
+
+<!-- ═══════ MINIMUM DENSITY ═══════ -->
+<h3>Minimum density per lesson</h3>
+<div class="card card-action">
+  <p style="font-weight: 600; margin-bottom: 4px;">Every lesson must have at minimum:</p>
+  <ul>
+    <li>2 comprehension checks (multiple choice or true/false)</li>
+    <li>1 implementation prompt ("Try It")</li>
+    <li>1 checkpoint at the end</li>
+  </ul>
+  <p style="margin-bottom: 0; font-size: 13px; color: #6B7280;">Reflections are encouraged but not required. Julie Lynn (QA) validates density before publish.</p>
+</div>
+
+<!-- ═══════ HOW TO USE (ADMIN) ═══════ -->
+<hr class="divider">
+<h2>How to set up a lesson (admin workflow)</h2>
+
+<div class="step-grid">
+  <div class="step-num">1</div>
+  <div class="step-content">
+    <strong>Write lesson body content</strong>
+    <p>In the lesson editor, use the <strong>Lesson Body Content</strong> section. Write HTML with <code>&lt;h2&gt;</code> or <code>&lt;h3&gt;</code> tags to create sections. The system automatically detects sections and shows a count.</p>
+  </div>
+</div>
+
+<div class="step-grid">
+  <div class="step-num">2</div>
+  <div class="step-content">
+    <strong>Add engagement checks</strong>
+    <p>Below the body content, click <strong>"Add Engagement Check"</strong> and choose a type. Fill in the question text, answer options (for multiple choice), correct answer, and explanation.</p>
+  </div>
+</div>
+
+<div class="step-grid">
+  <div class="step-num">3</div>
+  <div class="step-content">
+    <strong>Position each check</strong>
+    <p>Each question has a <strong>"Position in Lesson"</strong> dropdown. Select which content section it should appear after (e.g., "After section 1", "After section 2"). Leave it as "end" if it should appear after all content.</p>
+  </div>
+</div>
+
+<div class="step-grid">
+  <div class="step-num">4</div>
+  <div class="step-content">
+    <strong>Check the flow preview</strong>
+    <p>The <strong>Lesson Flow Preview</strong> bar at the bottom of the builder shows the visual rhythm. Content segments (gradient), checks (gold), reflections (teal), actions (green), and checkpoints (purple) should alternate naturally.</p>
+  </div>
+</div>
+
+<div class="step-grid">
+  <div class="step-num">5</div>
+  <div class="step-content">
+    <strong>Save the lesson</strong>
+    <p>Click "Save Lesson" to persist the body content. Quiz questions save individually when you click their "Save" button. The learner will see the interleaved flow immediately.</p>
+  </div>
+</div>
+
+<!-- ═══════ DATA MODEL ═══════ -->
+<hr class="divider">
+<h2>Technical reference</h2>
+
+<h3>Database tables (Learning Hub Supabase)</h3>
+<table>
+  <tr><th>Table</th><th>Key fields</th><th>Purpose</th></tr>
+  <tr>
+    <td><code>hub_lessons</code></td>
+    <td><code>content</code> (JSONB) &rarr; <code>body_html</code></td>
+    <td>Lesson body HTML stored inside content JSONB</td>
+  </tr>
+  <tr>
+    <td><code>hub_quiz_questions</code></td>
+    <td><code>lesson_id</code>, <code>question_type</code>, <code>question_text</code>, <code>options</code>, <code>correct_answer</code>, <code>explanation</code>, <code>sort_order</code>, <code>content_position</code></td>
+    <td>All engagement checks. <code>content_position</code> determines placement between content sections.</td>
+  </tr>
+  <tr>
+    <td><code>hub_quiz_responses</code></td>
+    <td><code>user_id</code>, <code>question_id</code>, <code>response</code>, <code>is_correct</code></td>
+    <td>Learner answers. Upserted on (user_id, question_id).</td>
+  </tr>
+</table>
+
+<h3>Content sectioning</h3>
+<p>The system splits <code>body_html</code> into sections at <code>&lt;h2&gt;</code> and <code>&lt;h3&gt;</code> tags, or at explicit <code>&lt;!-- section-break --&gt;</code> comments. Each section gets an index (0-based). Setting <code>content_position = 0</code> on a question places it after the first section, <code>1</code> after the second, etc. <code>null</code> means "render at the end."</p>
+
+<h3>Key files</h3>
+<table>
+  <tr><th>File</th><th>What it does</th></tr>
+  <tr>
+    <td><code>lib/hub/contentSections.ts</code></td>
+    <td>Splits HTML into sections. Builds the interleaved flow array.</td>
+  </tr>
+  <tr>
+    <td><code>lib/hub/quiz.ts</code></td>
+    <td>QuizQuestion type, fetch helpers, answer checkers.</td>
+  </tr>
+  <tr>
+    <td><code>components/hub/LessonContent.tsx</code></td>
+    <td>Renders the interleaved content + questions flow for learners. Handles all response logic.</td>
+  </tr>
+  <tr>
+    <td><code>app/hub/courses/[slug]/[lesson]/page.tsx</code></td>
+    <td>Learner lesson page. Extracts <code>body_html</code> from content JSONB. Passes to LessonContent.</td>
+  </tr>
+  <tr>
+    <td><code>app/api/tdi-admin/quiz-questions/route.ts</code></td>
+    <td>Admin CRUD API for quiz questions.</td>
+  </tr>
+  <tr>
+    <td><code>QuizQuestionBuilder.tsx</code></td>
+    <td>Admin component for creating/editing/positioning engagement checks.</td>
+  </tr>
+</table>
+
+<h3>API endpoints</h3>
+<table>
+  <tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr>
+  <tr><td>GET</td><td><code>/api/tdi-admin/quiz-questions?lesson_id=...</code></td><td>Fetch all questions for a lesson</td></tr>
+  <tr><td>POST</td><td><code>/api/tdi-admin/quiz-questions</code></td><td>Create a new question</td></tr>
+  <tr><td>PATCH</td><td><code>/api/tdi-admin/quiz-questions</code></td><td>Update a question (include <code>id</code>)</td></tr>
+  <tr><td>DELETE</td><td><code>/api/tdi-admin/quiz-questions?id=...</code></td><td>Delete a question</td></tr>
+</table>
+
+<!-- ═══════ DESIGN PRINCIPLES ═══════ -->
+<hr class="divider">
+<h2>Design principles</h2>
+<p>These are non-negotiable across all engagement features.</p>
+
+<div class="principle-grid">
+  <div class="card">
+    <p style="font-weight: 700; font-size: 14px; margin-bottom: 4px;">No penalties</p>
+    <p style="font-size: 13px; margin-bottom: 0;">Wrong answers get explanations, not point deductions. Teachers are professionals, not students being graded.</p>
+  </div>
+  <div class="card">
+    <p style="font-weight: 700; font-size: 14px; margin-bottom: 4px;">No artificial friction</p>
+    <p style="font-size: 13px; margin-bottom: 0;">Don't lock lessons behind quizzes. Let teachers move forward freely. Make engagement so natural they want to participate.</p>
+  </div>
+  <div class="card">
+    <p style="font-weight: 700; font-size: 14px; margin-bottom: 4px;">Respect their time</p>
+    <p style="font-size: 13px; margin-bottom: 0;">Checks should take 15-30 seconds. Reflections have a low character minimum (50). Implementation prompts must be specific enough to act on immediately.</p>
+  </div>
+  <div class="card">
+    <p style="font-weight: 700; font-size: 14px; margin-bottom: 4px;">Warm tone</p>
+    <p style="font-size: 13px; margin-bottom: 0;">"That's it. Nice work." not "Correct! +10 XP". No emojis, no gamification language, no leaderboards. Personal milestones only.</p>
+  </div>
+</div>
+
+<!-- ═══════ PHASED ROLLOUT ═══════ -->
+<hr class="divider">
+<h2>Phased rollout</h2>
+
+<div class="card card-phase">
+  <span class="badge badge-built">BUILT</span>
+  <h3 style="margin-top: 8px;">Phase 1b: Inline Interleaving</h3>
+  <p style="font-size: 13px;">Content and quiz questions render interleaved based on <code>content_position</code>. Admin UI for creating, editing, and positioning questions. Flow progress indicator. Section detection from HTML headings.</p>
+</div>
+
+<div class="card card-phase">
+  <span class="badge badge-next">NEXT</span>
+  <h3 style="margin-top: 8px;">Phase 1a: Content Authoring</h3>
+  <p style="font-size: 13px;">Populate every lesson with engagement checks. Minimum density: 2 comprehension checks + 1 action step + 1 checkpoint per lesson. <strong>Jasmine</strong> (Paperclip agent) drafts questions, team reviews. <strong>Julie Lynn</strong> (QA agent) validates density.</p>
+</div>
+
+<div class="card">
+  <span class="badge badge-future">PHASE 2</span>
+  <h3 style="margin-top: 8px;">Implementation Tracking</h3>
+  <p style="font-size: 13px; margin-bottom: 8px;">Follow-up prompts 5-7 days after a "Try It" action step. Surfaces on dashboard or via Resend email. Three response options: "Tried it" (free text), "Not yet" (defer), "Doesn't apply" (dismiss). Implementation timeline on learner dashboard.</p>
+  <p style="font-size: 13px; margin-bottom: 0;"><strong>Requires:</strong> New <code>hub_implementation_prompts</code> table. Resend integration for email nudges.</p>
+</div>
+
+<div class="card">
+  <span class="badge badge-future">PHASE 3</span>
+  <h3 style="margin-top: 8px;">Consistency &amp; Momentum</h3>
+  <p style="font-size: 13px; margin-bottom: 8px;">Weekly engagement streaks (track meaningful interaction, not just login). Four-dimension learning pulse on dashboard: lessons completed, checks passed, actions tried, reflections shared.</p>
+  <p style="font-size: 13px; margin-bottom: 0;"><strong>New Field Notes recognitions:</strong><br>
+  "Reflective Practitioner" -- 5 reflections submitted<br>
+  "Action Taker" -- 3 implementation cycles completed<br>
+  "Consistent Learner" -- 4-week engagement streak</p>
+</div>
+
+<div class="card">
+  <span class="badge badge-future">PHASE 4</span>
+  <h3 style="margin-top: 8px;">Adaptive &amp; Social Learning</h3>
+  <p style="font-size: 13px; margin-bottom: 0;">Spaced repetition: revisit nudges for incorrectly answered questions. Cohort learning: shared reflections among same-period enrollees. Admin metrics: comprehension rate per lesson, implementation rate, time-to-try.</p>
+</div>
+
+<!-- ═══════ AGENT INVOLVEMENT ═══════ -->
+<hr class="divider">
+<h2>Agent involvement (when ready for Phase 1a)</h2>
+
+<div class="card">
+  <p class="who who-agent">JASMINE</p>
+  <p style="font-size: 13px; margin-bottom: 4px;"><strong>Role:</strong> Draft comprehension checks, action step prompts, and checkpoint summaries for each lesson.</p>
+  <p style="font-size: 13px; margin-bottom: 0;"><strong>Workflow:</strong> Jasmine generates first drafts per lesson based on content. Team reviews and edits. Triggered when Phase 1b code is live and we're ready to populate.</p>
+</div>
+
+<div class="card">
+  <p class="who who-agent">JULIE LYNN</p>
+  <p style="font-size: 13px; margin-bottom: 4px;"><strong>Role:</strong> QA gate. Validate every lesson meets minimum density before publish.</p>
+  <p style="font-size: 13px; margin-bottom: 0;"><strong>Checks:</strong> 2+ comprehension checks, 1+ action step, 1+ checkpoint. Questions test real comprehension, not surface recall. Action steps are specific and actionable.</p>
+</div>
+
+<!-- ═══════ MOCKUP REFERENCE ═══════ -->
+<hr class="divider">
+<h2>Visual mockup</h2>
+<p>An interactive HTML mockup showing the full learner experience is saved at:</p>
+<div class="card card-highlight">
+  <p style="font-size: 13px; margin-bottom: 0;"><code>~/tdi-engagement-mockup.html</code><br>Open in browser to see: lesson flow with interleaved checks, learner dashboard with streaks and pulse, follow-up prompts, email nudges, and new Field Notes recognitions. All interactive.</p>
+</div>
+
+</div>
+</body>
+</html>
