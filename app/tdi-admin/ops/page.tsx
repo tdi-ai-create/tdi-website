@@ -115,15 +115,17 @@ export default function OpsPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!teamMember?.email) return;
+    const userEmail = teamMember.email;
     Promise.all([
       fetch('/api/tdi-admin/ops/dashboard').then(r => r.json()),
-      fetch('/api/admin/partnerships', { headers: { 'x-user-email': teamMember?.email || 'rae@teachersdeserveit.com' } }).then(r => r.json()),
+      fetch('/api/admin/partnerships', { headers: { 'x-user-email': userEmail } }).then(r => r.json()).catch(() => ({ partnerships: [] })),
     ])
       .then(([opsData, partData]) => {
         if (opsData.error) throw new Error(opsData.error);
         setData(opsData);
-        const pList = partData?.partnerships || partData || [];
-        setPartnerships(Array.isArray(pList) ? pList.filter((p: Partnership) => p.status === 'active' && p.slug !== 'demo-elementary') : []);
+        const pList = partData?.partnerships || (Array.isArray(partData) ? partData : []);
+        setPartnerships(pList.filter((p: Partnership) => p.status === 'active' && p.slug !== 'demo-elementary'));
       })
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
