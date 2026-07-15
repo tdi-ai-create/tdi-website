@@ -11,6 +11,34 @@ function getHubServiceSupabase() {
 }
 
 /**
+ * GET /api/tdi-admin/lessons?id=UUID
+ * Fetch a single lesson (used to get fresh content before save)
+ */
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
+
+    const supabase = getHubServiceSupabase();
+    const { data: lesson, error } = await supabase
+      .from('hub_lessons')
+      .select('id, content, transcript, transcript_es')
+      .eq('id', id)
+      .single();
+
+    if (error || !lesson) {
+      return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ lesson });
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
+}
+
+/**
  * POST /api/tdi-admin/lessons
  * Create a new lesson
  */

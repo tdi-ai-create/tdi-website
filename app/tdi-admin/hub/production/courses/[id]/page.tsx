@@ -1704,9 +1704,22 @@ function LessonEditorPanel({
   // Track content fields that get updated by sub-components (resource upload, etc.)
   const [liveContentExtras, setLiveContentExtras] = useState<Record<string, unknown>>({});
 
-  const handleSave = () => {
-    // Build content JSONB preserving all fields: original + live updates + form changes
-    const newContent: Record<string, unknown> = { ...contentObj, ...liveContentExtras };
+  const handleSave = async () => {
+    // Fetch latest content from DB to avoid overwriting fields saved by
+    // auto-save (video upload, resource upload, etc.)
+    let latestContent: Record<string, unknown> = { ...contentObj };
+    try {
+      const res = await fetch(`/api/tdi-admin/lessons?id=${lesson.id}`, { method: 'GET' }).catch(() => null);
+      if (res?.ok) {
+        const data = await res.json();
+        if (data.lesson?.content && typeof data.lesson.content === 'object') {
+          latestContent = data.lesson.content as Record<string, unknown>;
+        }
+      }
+    } catch { /* use contentObj as fallback */ }
+
+    // Merge: DB state + live updates from sub-components + form changes
+    const newContent: Record<string, unknown> = { ...latestContent, ...liveContentExtras };
     if (form.body_html.trim()) {
       newContent.body_html = form.body_html;
     } else {

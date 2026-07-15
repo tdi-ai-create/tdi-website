@@ -423,7 +423,7 @@ export default function LessonPage({ params }: LessonPageProps) {
               return videoId ? (
                 <div className="w-full aspect-video rounded-xl mb-6 overflow-hidden bg-black">
                   <iframe
-                    src={`https://customer-a559fc0dc4cb956f505801ed5427ba99.cloudflarestream.com/${videoId}/iframe`}
+                    src={`https://customer-4n38x6badamh5yps.cloudflarestream.com/${videoId}/iframe`}
                     style={{ width: '100%', height: '100%', border: 'none' }}
                     allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
                     allowFullScreen

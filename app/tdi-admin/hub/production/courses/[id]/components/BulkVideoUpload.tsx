@@ -38,11 +38,14 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }
 
-// Compress video using browser canvas + MediaRecorder (same as existing VideoUploadSection)
+// Compress video using browser canvas + MediaRecorder
+// DISABLED: Browser-based compression strips audio tracks. Cloudflare handles transcoding server-side.
 async function compressVideo(
   file: File,
   onProgress: (pct: number) => void
 ): Promise<File> {
+  return file; // Skip compression to preserve audio
+  /* eslint-disable no-unreachable */
   if (file.size < 50 * 1024 * 1024) return file;
   if (!file.type.includes('mp4') && !file.type.includes('webm') && !file.type.includes('quicktime')) return file;
 
