@@ -21,14 +21,6 @@ import {
 } from '@/components/tdi-admin/ui/design-tokens'
 import { computeNextActions, type NextAction } from '@/lib/funding-next-actions'
 
-const TABS = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'opportunities', label: 'Opportunities' },
-  { id: 'actions', label: 'Actions' },
-  { id: 'timeline', label: 'Timeline' },
-  { id: 'emails', label: 'Emails' },
-]
-
 export default function PursuitDetailPage() {
   const params = useParams()
   const pursuitId = params.pursuitId as string
@@ -36,8 +28,14 @@ export default function PursuitDetailPage() {
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [activeTab, setActiveTab] = useState('overview')
   const [pursuit, setPursuit] = useState<any>(null)
+  const [toast, setToast] = useState<string | null>(null)
+
+  // Collapsible sections
+  const [showOverview, setShowOverview] = useState(false)
+  const [showOpportunities, setShowOpportunities] = useState(false)
+  const [showTimeline, setShowTimeline] = useState(false)
+  const [showEmails, setShowEmails] = useState(false)
 
   useEffect(() => {
     if (!pursuitId) return
@@ -107,221 +105,320 @@ export default function PursuitDetailPage() {
   const gapPct = gap > 0 ? Math.round((awarded / gap) * 100) : 0
 
   return (
-    <div style={{ padding: '32px 48px', fontFamily: "'DM Sans', sans-serif", maxWidth: 1100 }}>
+    <div style={{ padding: '32px 48px', fontFamily: "'DM Sans', sans-serif", maxWidth: 1000 }}>
+      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+
       {/* Back link */}
-      <div style={{ marginBottom: 20 }}>
+      <div style={{ marginBottom: 16 }}>
         <Link href="/tdi-admin/funding" style={{ fontSize: 13, color: '#8B5CF6', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
           &larr; Back to Funding
         </Link>
       </div>
 
-      {/* Header */}
-      <div style={{ marginBottom: 28 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+      {/* ── HEADER: School name + compact stats ── */}
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
           <div style={{ flex: 1 }}>
             <EditableText
               value={p.pursuit_name}
               onSave={v => patchPursuit({ pursuit_name: v })}
-              style={{ ...TYPE_PAGE_TITLE, margin: 0 }}
+              style={{ ...TYPE_PAGE_TITLE, margin: 0, fontSize: 22 }}
             />
-            <p style={{ ...TYPE_PAGE_SUBTITLE, marginTop: 4 }}>
-              {p.district_name}{p.client_contact_name ? ` \u00b7 ${p.client_contact_name}` : ''}
+            <p style={{ fontSize: 13, color: '#6B7280', marginTop: 2 }}>
+              {p.client_contact_name || 'No contact set'}
             </p>
+          </div>
+          {/* Compact stats inline */}
+          <div style={{ display: 'flex', gap: 16, alignItems: 'baseline', flexShrink: 0 }}>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 10, color: '#6B7280', textTransform: 'uppercase', fontWeight: 700 }}>Pipeline</div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: '#0a0f1e' }}>{fmtCurrency(p.total_amount || 0)}</div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 10, color: '#6B7280', textTransform: 'uppercase', fontWeight: 700 }}>Awarded</div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: awarded > 0 ? '#065F46' : '#9CA3AF' }}>{fmtCurrency(awarded)}</div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 10, color: '#6B7280', textTransform: 'uppercase', fontWeight: 700 }}>Funded</div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: gapPct >= 100 ? '#065F46' : '#0a0f1e' }}>{gapPct}%</div>
+            </div>
           </div>
         </div>
 
         {/* Phase chain */}
-        <div style={{ marginBottom: 16 }}>
-          <PhaseChain currentPhase={p.current_phase} isStalled={p.is_stalled} />
-        </div>
-
-        {/* Next Actions panel */}
-        <NextActionsPanel actions={nextActions} onTabChange={setActiveTab} />
-
-        {/* Key stats row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
-          <StatCard label="Contract" value={fmtCurrency(p.total_amount || 0)} />
-          <StatCard label="Awarded" value={fmtCurrency(awarded)} color={awarded > 0 ? '#065F46' : undefined} />
-          <StatCard label="Remaining gap" value={fmtCurrency(remaining)} color={remaining > 0 ? '#92400E' : '#065F46'} />
-          <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: '14px 18px' }}>
-            <div style={{ fontSize: 10, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 700 }}>Funded</div>
-            <div style={{ fontSize: 22, fontWeight: 800, color: '#0a0f1e', marginTop: 4 }}>{gapPct}%</div>
-            <div style={{ height: 4, background: '#E5E7EB', borderRadius: 2, marginTop: 6, overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${Math.min(gapPct, 100)}%`, background: gapPct >= 100 ? '#10B981' : '#3B82F6', borderRadius: 2 }} />
-            </div>
-          </div>
-        </div>
+        <PhaseChain currentPhase={p.current_phase} isStalled={p.is_stalled} />
       </div>
 
-      {/* Tab bar */}
-      <div style={{
-        display: 'flex', gap: 0, borderBottom: '2px solid #E5E7EB', marginBottom: 28,
-      }}>
-        {TABS.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            style={{
-              fontSize: 14,
-              fontWeight: 600,
-              padding: '10px 24px',
-              cursor: 'pointer',
-              background: 'none',
-              border: 'none',
-              borderBottom: `3px solid ${activeTab === tab.id ? '#8B5CF6' : 'transparent'}`,
-              color: activeTab === tab.id ? '#8B5CF6' : '#6B7280',
-              marginBottom: -2,
-              transition: 'color 0.15s, border-color 0.15s',
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
+      {/* ── WHAT'S NEXT: The primary content area ── */}
+      <div style={{ marginBottom: 28 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: '#0a0f1e', margin: '0 0 14px' }}>
+          What Needs to Happen
+        </h2>
+        <ActionCards actions={nextActions} />
       </div>
 
-      {/* Tab content — full width */}
-      <div style={{ minHeight: 400 }}>
-        {activeTab === 'overview' && (
-          <OverviewTab
-            pursuit={p}
-            gate={gate}
-            onGateUpdate={() => {}}
-            partnershipHealth={data.partnershipHealth}
-            renewalEligible={data.renewalEligible}
-            contract1={data.contract1}
-            contract2={data.contract2}
-            contract2LineItems={data.contract2LineItems}
-          />
-        )}
-        {activeTab === 'opportunities' && (
-          <OpportunitiesTab
-            pursuitId={pursuitId}
-            gateOpen={gate?.gate_open === true}
-            contract2LineItems={data.contract2LineItems}
-            contract2QuotePackageId={data.contract2LineItems?.[0]?.id}
-          />
-        )}
-        {activeTab === 'actions' && <ActionsTab pursuitId={pursuitId} />}
-        {activeTab === 'timeline' && <TimelineTab pursuitId={pursuitId} />}
-        {activeTab === 'emails' && <EmailsTab pursuitId={pursuitId} pursuit={p} />}
-      </div>
+      {/* ── ALL ACTIONS: Full task list with cancelled hidden ── */}
+      <CollapsibleSection
+        title="All Action Items"
+        defaultOpen={true}
+        count={data.actionItems?.filter((a: any) => a.status !== 'cancelled').length}
+      >
+        <ActionsTab pursuitId={pursuitId} />
+      </CollapsibleSection>
+
+      {/* ── DETAIL SECTIONS: Collapsed by default ── */}
+      <CollapsibleSection title="School Profile + Gate" defaultOpen={showOverview} onToggle={setShowOverview}>
+        <OverviewTab
+          pursuit={p}
+          gate={gate}
+          onGateUpdate={() => {}}
+          partnershipHealth={data.partnershipHealth}
+          renewalEligible={data.renewalEligible}
+          contract1={data.contract1}
+          contract2={data.contract2}
+          contract2LineItems={data.contract2LineItems}
+        />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="Grant Opportunities" defaultOpen={showOpportunities} onToggle={setShowOpportunities}
+        count={data.opportunities?.length}
+      >
+        <OpportunitiesTab
+          pursuitId={pursuitId}
+          gateOpen={gate?.gate_open === true}
+          contract2LineItems={data.contract2LineItems}
+          contract2QuotePackageId={data.contract2LineItems?.[0]?.id}
+        />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="Timeline" defaultOpen={showTimeline} onToggle={setShowTimeline}>
+        <TimelineTab pursuitId={pursuitId} />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="Emails" defaultOpen={showEmails} onToggle={setShowEmails}>
+        <EmailsTab pursuitId={pursuitId} pursuit={p} />
+      </CollapsibleSection>
     </div>
   )
 }
 
-// ── Next Actions Panel ──
+// ── Action Cards: The main "what to do" display ──
 
-const URGENCY_STYLES: Record<string, { dot: string; bg: string }> = {
-  critical: { dot: '#DC2626', bg: '#FEF2F2' },
-  high: { dot: '#F59E0B', bg: '#FFFBEB' },
-  normal: { dot: '#3B82F6', bg: 'white' },
-  low: { dot: '#D1D5DB', bg: 'white' },
+const URGENCY_STYLES: Record<string, { border: string; bg: string; label: string; labelBg: string }> = {
+  critical: { border: '#DC2626', bg: '#FEF2F2', label: 'OVERDUE', labelBg: '#DC2626' },
+  high: { border: '#F59E0B', bg: '#FFFBEB', label: 'URGENT', labelBg: '#D97706' },
+  normal: { border: '#3B82F6', bg: '#F0F7FF', label: '', labelBg: '' },
+  low: { border: '#E5E7EB', bg: '#FAFAFA', label: '', labelBg: '' },
 }
 
-const OWNER_BADGES: Record<string, { emoji: string; label: string; color: string; bg: string }> = {
-  bella: { emoji: '\uD83D\uDC64', label: 'Bella', color: '#6D28D9', bg: '#F5F3FF' },
-  rae: { emoji: '\uD83D\uDC54', label: 'Rae', color: '#0F766E', bg: '#F0FDFA' },
-  agent: { emoji: '\uD83E\uDD16', label: 'Agent', color: '#1D4ED8', bg: '#EFF6FF' },
-  school: { emoji: '\uD83C\uDFEB', label: 'School', color: '#92400E', bg: '#FFFBEB' },
-  auto: { emoji: '\u2699\uFE0F', label: 'Auto', color: '#6B7280', bg: '#F3F4F6' },
+const OWNER_BADGES: Record<string, { label: string; color: string; bg: string }> = {
+  bella: { label: 'Bella', color: '#6D28D9', bg: '#F5F3FF' },
+  rae: { label: 'Rae', color: '#0F766E', bg: '#F0FDFA' },
+  agent: { label: 'Agent', color: '#1D4ED8', bg: '#EFF6FF' },
+  school: { label: 'School', color: '#92400E', bg: '#FFFBEB' },
+  auto: { label: 'Auto', color: '#6B7280', bg: '#F3F4F6' },
 }
 
-function NextActionsPanel({ actions, onTabChange }: { actions: NextAction[]; onTabChange: (tab: string) => void }) {
+function ActionCards({ actions }: { actions: NextAction[] }) {
   const actionable = actions.filter(a => !a.inProgress)
   const inFlight = actions.filter(a => a.inProgress)
   const [showInFlight, setShowInFlight] = useState(false)
 
-  return (
-    <div style={{
-      marginBottom: 16, padding: '16px 20px', background: 'white',
-      borderRadius: 14, border: '1px solid #E5E7EB',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: actionable.length > 0 ? 12 : 0 }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: '#0a0f1e' }}>What's Next</span>
-        {actionable.length === 0 && (
-          <span style={{ fontSize: 12, color: '#065F46' }}>
-            Nothing needs you right now
-          </span>
-        )}
-        {inFlight.length > 0 && (
-          <button
-            onClick={() => setShowInFlight(!showInFlight)}
-            style={{ fontSize: 10, color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer', marginLeft: 'auto' }}
-          >
-            {showInFlight ? 'Hide' : 'Show'} {inFlight.length} in flight
-          </button>
-        )}
+  if (actionable.length === 0 && inFlight.length === 0) {
+    return (
+      <div style={{
+        padding: '24px 20px', background: '#F0FDF4', border: '1px solid #BBF7D0',
+        borderRadius: 12, textAlign: 'center', color: '#065F46', fontSize: 14, fontWeight: 600,
+      }}>
+        Nothing needs attention right now. All tasks are on track.
       </div>
+    )
+  }
 
-      {/* Actionable items */}
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {actionable.map(action => {
         const urgency = URGENCY_STYLES[action.urgency] || URGENCY_STYLES.normal
         const owner = OWNER_BADGES[action.owner] || OWNER_BADGES.auto
 
+        // Calculate days overdue/until
+        let daysLabel = ''
+        if (action.dueDate) {
+          const diff = Math.ceil(
+            (new Date(action.dueDate + 'T00:00:00').getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+          )
+          if (diff < 0) daysLabel = `${Math.abs(diff)} day${Math.abs(diff) > 1 ? 's' : ''} overdue`
+          else if (diff === 0) daysLabel = 'Due today'
+          else if (diff <= 7) daysLabel = `Due in ${diff} day${diff > 1 ? 's' : ''}`
+          else daysLabel = `Due ${new Date(action.dueDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+        }
+
         return (
           <div
             key={action.id}
             style={{
-              display: 'flex', alignItems: 'flex-start', gap: 10,
-              padding: '8px 12px', borderRadius: 8, marginBottom: 4,
               background: urgency.bg,
-              cursor: action.tab ? 'pointer' : 'default',
+              border: `1px solid ${urgency.border}`,
+              borderLeft: `4px solid ${urgency.border}`,
+              borderRadius: 10,
+              padding: '14px 18px',
             }}
-            onClick={() => action.tab && onTabChange(action.tab)}
           >
-            {/* Urgency dot */}
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: urgency.dot, flexShrink: 0, marginTop: 5 }} />
-
-            {/* Content */}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#0a0f1e' }}>{action.label}</div>
-              <div style={{ fontSize: 11, color: '#6B7280', marginTop: 1 }}>{action.why}</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                  {/* Urgency label */}
+                  {urgency.label && (
+                    <span style={{
+                      fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 3,
+                      background: urgency.labelBg, color: 'white', letterSpacing: 0.5,
+                    }}>
+                      {urgency.label}
+                    </span>
+                  )}
+                  {/* Owner */}
+                  <span style={{
+                    fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4,
+                    background: owner.bg, color: owner.color,
+                  }}>
+                    {owner.label}
+                  </span>
+                  {/* Due date */}
+                  {daysLabel && (
+                    <span style={{
+                      fontSize: 10, fontWeight: 600,
+                      color: action.urgency === 'critical' ? '#DC2626' : '#6B7280',
+                    }}>
+                      {daysLabel}
+                    </span>
+                  )}
+                </div>
+                {/* Action title — the instruction */}
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#0a0f1e', marginBottom: 2 }}>
+                  {action.label}
+                </div>
+                {/* Why / context — one line */}
+                <div style={{ fontSize: 12, color: '#6B7280' }}>
+                  {action.why}
+                </div>
+              </div>
             </div>
-
-            {/* Owner badge */}
-            <span style={{
-              fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 4,
-              background: owner.bg, color: owner.color, whiteSpace: 'nowrap', flexShrink: 0,
-            }}>
-              {owner.emoji} {owner.label}
-            </span>
-
-            {/* Due date */}
-            {action.dueDate && (
-              <span style={{ fontSize: 10, color: '#6B7280', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                {new Date(action.dueDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-              </span>
-            )}
           </div>
         )
       })}
 
-      {/* In-flight items (muted) */}
-      {showInFlight && inFlight.map(action => {
-        const owner = OWNER_BADGES[action.owner] || OWNER_BADGES.auto
-        return (
-          <div
-            key={action.id}
+      {/* In-flight summary */}
+      {inFlight.length > 0 && (
+        <div style={{ marginTop: 4 }}>
+          <button
+            onClick={() => setShowInFlight(!showInFlight)}
             style={{
-              display: 'flex', alignItems: 'flex-start', gap: 10,
-              padding: '6px 12px', borderRadius: 8, marginBottom: 2,
-              opacity: 0.55,
+              fontSize: 11, color: '#6B7280', background: 'none', border: 'none',
+              cursor: 'pointer', padding: '4px 0',
             }}
           >
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#D1D5DB', flexShrink: 0, marginTop: 5 }} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 12, color: '#6B7280' }}>{action.label}</div>
-              <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 1 }}>{action.why}</div>
+            {showInFlight ? 'Hide' : 'Show'} {inFlight.length} in progress
+          </button>
+          {showInFlight && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
+              {inFlight.map(action => {
+                const owner = OWNER_BADGES[action.owner] || OWNER_BADGES.auto
+                return (
+                  <div key={action.id} style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '8px 14px', background: '#F9FAFB', borderRadius: 8,
+                    border: '1px solid #F3F4F6', opacity: 0.7,
+                  }}>
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4,
+                      background: owner.bg, color: owner.color,
+                    }}>
+                      {owner.label}
+                    </span>
+                    <span style={{ fontSize: 12, color: '#6B7280' }}>{action.label}</span>
+                    <span style={{ fontSize: 10, color: '#9CA3AF', marginLeft: 'auto' }}>{action.why}</span>
+                  </div>
+                )
+              })}
             </div>
-            <span style={{ fontSize: 9, fontWeight: 600, padding: '2px 6px', borderRadius: 4, background: owner.bg, color: owner.color, whiteSpace: 'nowrap', flexShrink: 0 }}>
-              {owner.emoji} {owner.label}
-            </span>
-          </div>
-        )
-      })}
+          )}
+        </div>
+      )}
     </div>
   )
 }
+
+// ── Collapsible Section ──
+
+function CollapsibleSection({ title, children, defaultOpen = false, onToggle, count }: {
+  title: string
+  children: React.ReactNode
+  defaultOpen?: boolean
+  onToggle?: (open: boolean) => void
+  count?: number
+}) {
+  const [open, setOpen] = useState(defaultOpen)
+
+  const toggle = () => {
+    const next = !open
+    setOpen(next)
+    onToggle?.(next)
+  }
+
+  return (
+    <div style={{ marginBottom: 12, borderRadius: 12, border: '1px solid #E5E7EB', overflow: 'hidden' }}>
+      <button
+        onClick={toggle}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', gap: 8,
+          padding: '12px 18px', background: open ? 'white' : '#FAFAFA',
+          border: 'none', cursor: 'pointer', textAlign: 'left',
+        }}
+      >
+        <span style={{
+          fontSize: 10, color: '#6B7280', fontWeight: 700, width: 16,
+          transform: open ? 'rotate(90deg)' : 'rotate(0deg)',
+          transition: 'transform 0.15s',
+          display: 'inline-block',
+        }}>
+          &#9654;
+        </span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: '#0a0f1e' }}>{title}</span>
+        {count !== undefined && (
+          <span style={{
+            fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 8,
+            background: '#F3F4F6', color: '#6B7280',
+          }}>
+            {count}
+          </span>
+        )}
+      </button>
+      {open && (
+        <div style={{ padding: '0 18px 18px' }}>
+          {children}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Toast notification ──
+
+function Toast({ message, onDone }: { message: string; onDone: () => void }) {
+  useEffect(() => { const t = setTimeout(onDone, 2500); return () => clearTimeout(t) }, [onDone])
+  return (
+    <div style={{
+      position: 'fixed', bottom: 24, right: 24, zIndex: 9999,
+      background: '#065F46', color: 'white', padding: '12px 20px',
+      borderRadius: 10, fontSize: 13, fontWeight: 600,
+      boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+    }}>
+      {message}
+    </div>
+  )
+}
+
+// ── StatCard (kept for potential reuse) ──
 
 function StatCard({ label, value, color }: { label: string; value: string; color?: string }) {
   return (

@@ -239,21 +239,13 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
         )}
       </div>
 
-      {/* Cancelled */}
+      {/* Cancelled — hidden by default */}
       {cancelledActions.length > 0 && (
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <div style={{ width: 4, height: 18, background: '#D1D5DB', borderRadius: 2 }} />
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-              Cancelled ({cancelledActions.length})
-            </span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {cancelledActions.map(action => (
-              <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} isOverdue={false} getDueDateColor={() => '#9CA3AF'} />
-            ))}
-          </div>
-        </div>
+        <CancelledSection count={cancelledActions.length}>
+          {cancelledActions.map(action => (
+            <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} isOverdue={false} getDueDateColor={() => '#9CA3AF'} />
+          ))}
+        </CancelledSection>
       )}
 
       {/* Nudge preview modal */}
@@ -263,6 +255,32 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
           onClose={() => setNudgeActionId(null)}
           onSent={() => { setNudgeActionId(null); fetchActions() }}
         />
+      )}
+    </div>
+  )
+}
+
+function CancelledSection({ count, children }: { count: number; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0',
+          background: 'none', border: 'none', cursor: 'pointer',
+        }}
+      >
+        <div style={{ width: 4, height: 18, background: '#D1D5DB', borderRadius: 2 }} />
+        <span style={{ fontSize: 12, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          {count} Cancelled
+        </span>
+        <span style={{ fontSize: 10, color: '#9CA3AF' }}>{open ? 'Hide' : 'Show'}</span>
+      </button>
+      {open && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
+          {children}
+        </div>
       )}
     </div>
   )
