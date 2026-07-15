@@ -108,13 +108,13 @@ export function PursuitCard({ pursuit, onClick }: { pursuit: Pursuit; onClick: (
       {/* Top row: name + amount */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
         <div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: '#0a0f1e' }}>{pursuit.pursuit_name}</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: '#0a0f1e' }}>{pursuit.pursuit_name}</div>
           {pursuit.funder_label && (
             <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>{pursuit.funder_label}</div>
           )}
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: 20, fontWeight: 800, color: '#0a0f1e' }}>
+          <div style={{ fontSize: 22, fontWeight: 800, color: '#0a0f1e' }}>
             {fmtCurrency(pursuit.total_amount)}
           </div>
           {deadlineDays !== null && (
@@ -136,7 +136,7 @@ export function PursuitCard({ pursuit, onClick }: { pursuit: Pursuit; onClick: (
             const planColor = PLAN_COLORS[opp.plan_category] || '#6B7280'
             return (
               <span key={opp.id} style={{
-                fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 6,
+                fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6,
                 background: statusStyle.bg, color: statusStyle.color,
                 borderLeft: `3px solid ${planColor}`,
               }}>
@@ -190,7 +190,7 @@ export function PursuitCard({ pursuit, onClick }: { pursuit: Pursuit; onClick: (
           justifyContent: 'space-between',
           alignItems: 'center',
         }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: urgency.text }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: urgency.text }}>
             {pursuit.next_action_label}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -206,24 +206,24 @@ export function PursuitCard({ pursuit, onClick }: { pursuit: Pursuit; onClick: (
       <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
         {pursuit.is_stalled && (
           <span style={{
-            fontSize: 10, fontWeight: 700, color: '#991B1B',
-            background: '#FEE2E2', padding: '4px 8px', borderRadius: 6,
+            fontSize: 11, fontWeight: 800, color: '#991B1B',
+            background: '#FEE2E2', padding: '5px 10px', borderRadius: 6,
           }}>
             STALLED
           </span>
         )}
         {(pursuit.waiting_on_client_count ?? 0) > 0 && (
           <span style={{
-            fontSize: 10, fontWeight: 700, color: '#C2410C',
-            background: '#FFF7ED', padding: '4px 8px', borderRadius: 6,
+            fontSize: 11, fontWeight: 800, color: '#C2410C',
+            background: '#FFF7ED', padding: '5px 10px', borderRadius: 6,
           }}>
             {pursuit.waiting_on_client_count} WAITING ON CLIENT
           </span>
         )}
         {(pursuit.overdue_action_count ?? 0) > 0 && (
           <span style={{
-            fontSize: 10, fontWeight: 700, color: '#DC2626',
-            background: '#FEF2F2', padding: '4px 8px', borderRadius: 6,
+            fontSize: 11, fontWeight: 800, color: '#DC2626',
+            background: '#FEF2F2', padding: '5px 10px', borderRadius: 6,
           }}>
             {pursuit.overdue_action_count} OVERDUE
           </span>

@@ -34,8 +34,8 @@ export function PhaseTabs({
             key={phase}
             onClick={() => onSelect(phase)}
             style={{
-              padding: '6px 14px',
-              fontSize: 12,
+              padding: '8px 16px',
+              fontSize: 13,
               fontWeight: 600,
               borderRadius: 20,
               border: 'none',

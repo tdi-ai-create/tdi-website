@@ -36,8 +36,8 @@ export function PhaseChain({ currentPhase, isStalled }: { currentPhase: string; 
             key={phase.id}
             title={`${phase.label}: ${phase.tip}`}
             style={{
-              padding: '4px 8px',
-              fontSize: 9,
+              padding: '5px 10px',
+              fontSize: 11,
               fontWeight: 700,
               borderRadius: 10,
               background: colors.bg,

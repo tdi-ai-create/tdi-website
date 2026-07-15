@@ -236,9 +236,9 @@ export default function QueuePage() {
           {renderGrouped(filtered, isMuted)
             .map(item => item.type === 'separator' ? (
               <div key={item.key} style={{
-                fontSize: 10, fontWeight: 700, color: item.color, textTransform: 'uppercase',
-                letterSpacing: 0.5, padding: '8px 0 2px', marginTop: 8,
-                borderBottom: `1px solid ${item.borderColor}`,
+                fontSize: 13, fontWeight: 800, color: item.color, textTransform: 'uppercase',
+                letterSpacing: 0.5, padding: '12px 0 4px', marginTop: 12,
+                borderBottom: `2px solid ${item.borderColor}`,
               }}>
                 {item.label} ({item.count})
               </div>
@@ -375,47 +375,70 @@ function QueueRow({ item, muted, loading, onVerifyContact, onApproveDraft, onSen
     }
   }
 
+  // Calculate days for display
+  let daysLabel = ''
+  if (item.dueDate) {
+    const diff = Math.ceil(
+      (new Date(item.dueDate + 'T00:00:00').getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    )
+    if (diff < 0) daysLabel = `${Math.abs(diff)}d overdue`
+    else if (diff === 0) daysLabel = 'Due today'
+    else if (diff <= 7) daysLabel = `${diff}d left`
+    else daysLabel = new Date(item.dueDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  }
+
   return (
     <div style={{
-      display: 'flex', alignItems: 'flex-start', gap: 10,
-      padding: '10px 14px', borderRadius: 10,
+      display: 'flex', alignItems: 'flex-start', gap: 14,
+      padding: '14px 18px', borderRadius: 12,
       background: item.urgency === 'critical' ? '#FEF2F2' : item.urgency === 'high' ? '#FFFBEB' : 'white',
-      border: '1px solid #E5E7EB',
+      border: `1px solid ${item.urgency === 'critical' ? '#FECACA' : item.urgency === 'high' ? '#FDE68A' : '#E5E7EB'}`,
+      borderLeft: `4px solid ${urgencyDot}`,
       opacity: muted ? 0.6 : 1,
     }}>
-      {/* Urgency dot */}
-      <div style={{ width: 8, height: 8, borderRadius: '50%', background: urgencyDot, flexShrink: 0, marginTop: 6 }} />
-
       {/* Content */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        {/* School name */}
-        <Link
-          href={`/tdi-admin/funding/${item.pursuitId}`}
-          style={{ fontSize: 11, fontWeight: 700, color: '#8B5CF6', textDecoration: 'none' }}
-        >
-          {item.pursuitName || item.districtName}
-        </Link>
+        {/* Top row: urgency label + school name */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+          {item.urgency === 'critical' && (
+            <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 3, background: '#DC2626', color: 'white', letterSpacing: 0.5 }}>
+              OVERDUE
+            </span>
+          )}
+          {item.urgency === 'high' && (
+            <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 3, background: '#D97706', color: 'white', letterSpacing: 0.5 }}>
+              URGENT
+            </span>
+          )}
+          <Link
+            href={`/tdi-admin/funding/${item.pursuitId}`}
+            style={{ fontSize: 12, fontWeight: 700, color: '#8B5CF6', textDecoration: 'none' }}
+          >
+            {item.pursuitName || item.districtName}
+          </Link>
+          {daysLabel && (
+            <span style={{
+              fontSize: 11, fontWeight: 600, marginLeft: 'auto',
+              color: item.urgency === 'critical' ? '#DC2626' : item.urgency === 'high' ? '#D97706' : '#6B7280',
+            }}>
+              {daysLabel}
+            </span>
+          )}
+        </div>
 
-        {/* Action label */}
-        <div style={{ fontSize: 13, fontWeight: 600, color: '#0a0f1e', marginTop: 2 }}>
+        {/* Action label — the main instruction */}
+        <div style={{ fontSize: 15, fontWeight: 600, color: '#0a0f1e', marginBottom: 2 }}>
           {item.label}
         </div>
 
-        {/* Why */}
-        <div style={{ fontSize: 11, color: '#6B7280', marginTop: 1 }}>
+        {/* Why — context */}
+        <div style={{ fontSize: 13, color: '#6B7280' }}>
           {item.why}
         </div>
       </div>
 
-      {/* Due date */}
-      {item.dueDate && (
-        <span style={{ fontSize: 10, color: '#6B7280', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 4 }}>
-          {new Date(item.dueDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-        </span>
-      )}
-
-      {/* Inline action */}
-      <div style={{ flexShrink: 0, marginTop: 2 }}>
+      {/* Inline action — bigger button */}
+      <div style={{ flexShrink: 0, marginTop: 6 }}>
         {renderAction()}
       </div>
     </div>
@@ -427,9 +450,10 @@ function InlineBtn({ label, onClick, color }: { label: string; onClick: () => vo
     <button
       onClick={onClick}
       style={{
-        fontSize: 10, fontWeight: 600, padding: '4px 12px', borderRadius: 6,
+        fontSize: 12, fontWeight: 700, padding: '8px 16px', borderRadius: 8,
         border: 'none', background: color || '#8B5CF6', color: 'white',
         cursor: 'pointer', whiteSpace: 'nowrap',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
       }}
     >
       {label}

@@ -52,22 +52,22 @@ export function AlertBar({ alerts }: { alerts: Alerts }) {
   ]
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 28 }}>
       {segments.map(s => (
         <div key={s.label} style={{
           background: 'white',
           border: '1px solid #E5E7EB',
-          borderLeft: `3px solid ${s.borderColor}`,
-          borderRadius: 12,
-          padding: '16px 20px',
+          borderLeft: `4px solid ${s.borderColor}`,
+          borderRadius: 14,
+          padding: '20px 24px',
         }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 6 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
             {s.label}
           </div>
-          <div style={{ fontSize: 24, fontWeight: 800, color: '#0a0f1e', lineHeight: 1 }}>
+          <div style={{ fontSize: 28, fontWeight: 800, color: '#0a0f1e', lineHeight: 1 }}>
             {s.value}
           </div>
-          <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4 }}>
+          <div style={{ fontSize: 13, color: '#9CA3AF', marginTop: 6 }}>
             {s.sublabel}
           </div>
         </div>

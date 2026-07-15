@@ -123,10 +123,10 @@ export function MyTasks() {
             width: 8, height: 8, borderRadius: '50%',
             background: summary.overdue > 0 ? '#DC2626' : '#10B981',
           }} />
-          <span style={{ fontSize: 14, fontWeight: 700, color: '#0a0f1e' }}>
+          <span style={{ fontSize: 16, fontWeight: 700, color: '#0a0f1e' }}>
             Action Items
           </span>
-          <span style={{ fontSize: 12, color: '#6B7280' }}>
+          <span style={{ fontSize: 13, color: '#6B7280' }}>
             {summary.total} open{summary.overdue > 0 ? ` / ${summary.overdue} overdue` : ''}
           </span>
         </div>
@@ -208,16 +208,16 @@ export function MyTasks() {
                       <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
                         {/* Owner type badge */}
                         <span style={{
-                          fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4,
+                          fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 4,
                           textTransform: 'uppercase', letterSpacing: 0.5,
                           background: task.owner_type === 'client' ? '#FFF7ED' : '#F5F3FF',
                           color: task.owner_type === 'client' ? '#C2410C' : '#6D28D9',
                         }}>
-                          {task.owner_type}
+                          {task.owner_type === 'client' ? 'School' : 'TDI'}
                         </span>
                         {/* Title — use client_label if available */}
                         <span style={{
-                          fontSize: 13, fontWeight: 600,
+                          fontSize: 14, fontWeight: 600,
                           color: task.color_state === 'red' ? '#DC2626' : task.color_state === 'yellow' ? '#92400E' : isOverdue ? '#DC2626' : '#0a0f1e',
                         }}>
                           {task.client_label || task.title}
@@ -225,7 +225,7 @@ export function MyTasks() {
                       </div>
 
                       {/* Pursuit name */}
-                      <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
+                      <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 3 }}>
                         {task.pursuit?.pursuit_name || task.pursuit?.district_name || ''}
                         {task.opportunity ? ` / ${task.opportunity.name}` : ''}
                       </div>
