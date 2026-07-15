@@ -60,6 +60,7 @@ const STATUS_LABELS: Record<string, { bg: string; color: string }> = {
 
 export function PursuitCard({ pursuit, onClick, onArchive }: { pursuit: Pursuit; onClick: () => void; onArchive?: () => void }) {
   const urgency = URGENCY_STYLES[pursuit.next_action_urgency || 'info'] || URGENCY_STYLES.info
+  const [confirmArchive, setConfirmArchive] = useState(false)
 
   // Fetch opportunities for status chips
   const [opps, setOpps] = useState<any[]>([])
@@ -228,9 +229,9 @@ export function PursuitCard({ pursuit, onClick, onArchive }: { pursuit: Pursuit;
             {pursuit.overdue_action_count} OVERDUE
           </span>
         )}
-        {onArchive && (
+        {onArchive && !confirmArchive && (
           <button
-            onClick={(e) => { e.stopPropagation(); onArchive() }}
+            onClick={(e) => { e.stopPropagation(); setConfirmArchive(true) }}
             style={{
               fontSize: 11, padding: '4px 10px', borderRadius: 6,
               border: '1px solid #E5E7EB', background: 'white', color: '#9CA3AF',
@@ -239,6 +240,29 @@ export function PursuitCard({ pursuit, onClick, onArchive }: { pursuit: Pursuit;
           >
             Archive
           </button>
+        )}
+        {onArchive && confirmArchive && (
+          <div onClick={e => e.stopPropagation()} style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: 'auto', fontSize: 10, color: '#6B7280' }}>
+            <span>Archive? This hides it from all views.</span>
+            <button
+              onClick={() => { setConfirmArchive(false); onArchive() }}
+              style={{
+                fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 4,
+                border: 'none', background: '#DC2626', color: 'white', cursor: 'pointer',
+              }}
+            >
+              Yes
+            </button>
+            <button
+              onClick={() => setConfirmArchive(false)}
+              style={{
+                fontSize: 10, padding: '3px 8px', borderRadius: 4,
+                border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer',
+              }}
+            >
+              No
+            </button>
+          </div>
         )}
       </div>
     </div>

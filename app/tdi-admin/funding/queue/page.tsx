@@ -66,11 +66,29 @@ export default function QueuePage() {
   const [nudgeActionId, setNudgeActionId] = useState<string | null>(null)
   const [draftEmail, setDraftEmail] = useState<{ to: string; toName: string; subject: string; body: string; schoolName: string; pursuitId?: string } | null>(null)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null)
+  const [, setTick] = useState(0)
+
+  // Update relative time display every 30s
+  useEffect(() => {
+    const interval = setInterval(() => setTick(t => t + 1), 30000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const formatRelativeTime = (date: Date | null) => {
+    if (!date) return ''
+    const seconds = Math.floor((Date.now() - date.getTime()) / 1000)
+    if (seconds < 10) return 'just now'
+    if (seconds < 60) return `${seconds}s ago`
+    const minutes = Math.floor(seconds / 60)
+    if (minutes < 60) return `${minutes} min ago`
+    return `${Math.floor(minutes / 60)}h ago`
+  }
 
   const load = useCallback(() => {
     fetch('/api/funding/queue')
       .then(r => r.json())
-      .then(d => { setItems(d.items || []); setCounts(d.counts || {}); setLoading(false) })
+      .then(d => { setItems(d.items || []); setCounts(d.counts || {}); setLoading(false); setLastRefreshed(new Date()) })
       .catch(() => setLoading(false))
     // Also fetch metrics
     fetch('/api/funding/dashboard')
@@ -237,6 +255,23 @@ export default function QueuePage() {
         </div>
       )}
 
+      {/* Last refreshed */}
+      {lastRefreshed && (
+        <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+          Last refreshed {formatRelativeTime(lastRefreshed)}
+          <span style={{ color: '#D1D5DB' }}>&middot;</span>
+          <button
+            onClick={load}
+            style={{
+              fontSize: 11, color: '#8B5CF6', background: 'none', border: 'none',
+              cursor: 'pointer', padding: 0, textDecoration: 'underline',
+            }}
+          >
+            Refresh
+          </button>
+        </div>
+      )}
+
       {/* Bucket tabs */}
       <div style={{ display: 'flex', gap: 6, marginBottom: 20, borderBottom: '2px solid #E5E7EB', paddingBottom: 0 }}>
         {BUCKETS.map(b => (
@@ -320,7 +355,6 @@ export default function QueuePage() {
               onSendNudge={() => setNudgeActionId(item.targetId)}
               onRequestDraft={(agent: string) => requestDraft(item, agent)}
               onArchive={async () => {
-                if (!confirm(`Archive "${item.pursuitName || item.districtName}"? It will be hidden from all views.`)) return
                 await fetch('/api/funding/pursuits', {
                   method: 'PATCH',
                   headers: { 'Content-Type': 'application/json' },
@@ -422,6 +456,7 @@ function QueueRow({ item, muted, loading, onVerifyContact, onApproveDraft, onSen
   onDraftEmail: () => void
 }) {
   const [showAgentPicker, setShowAgentPicker] = useState(false)
+  const [confirmArchive, setConfirmArchive] = useState(false)
   const urgencyDot = URGENCY_DOT[item.urgency] || URGENCY_DOT.normal
 
   const renderAction = () => {
@@ -559,17 +594,41 @@ function QueueRow({ item, muted, loading, onVerifyContact, onApproveDraft, onSen
       {/* Inline actions */}
       <div style={{ display: 'flex', gap: 6, flexShrink: 0, marginTop: 6, alignItems: 'center' }}>
         {renderAction()}
-        <button
-          onClick={onArchive}
-          title="Archive this pursuit"
-          style={{
-            fontSize: 10, padding: '6px 8px', borderRadius: 6,
-            border: '1px solid #E5E7EB', background: 'white', color: '#9CA3AF',
-            cursor: 'pointer',
-          }}
-        >
-          Archive
-        </button>
+        {confirmArchive ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: '#6B7280' }}>
+            <span>Archive? This hides it from all views.</span>
+            <button
+              onClick={() => { setConfirmArchive(false); onArchive() }}
+              style={{
+                fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 4,
+                border: 'none', background: '#DC2626', color: 'white', cursor: 'pointer',
+              }}
+            >
+              Yes
+            </button>
+            <button
+              onClick={() => setConfirmArchive(false)}
+              style={{
+                fontSize: 10, padding: '3px 8px', borderRadius: 4,
+                border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer',
+              }}
+            >
+              No
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setConfirmArchive(true)}
+            title="Archive this pursuit"
+            style={{
+              fontSize: 10, padding: '6px 8px', borderRadius: 6,
+              border: '1px solid #E5E7EB', background: 'white', color: '#9CA3AF',
+              cursor: 'pointer',
+            }}
+          >
+            Archive
+          </button>
+        )}
       </div>
     </div>
   )

@@ -301,6 +301,12 @@ const COLOR_STATE_COLORS: Record<string, string> = {
   red: '#DC2626',
 }
 
+const COLOR_STATE_TOOLTIPS: Record<string, string> = {
+  green: 'On track — no action needed',
+  yellow: 'Approaching deadline — act soon',
+  red: 'Overdue or blocked — needs immediate attention',
+}
+
 const RUNG_LABELS: Record<string, { label: string; bg: string; color: string }> = {
   submitter: { label: 'Submitter', bg: '#FEF3C7', color: '#92400E' },
   backup: { label: 'Backup', bg: '#FEE2E2', color: '#991B1B' },
@@ -348,7 +354,7 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
       {/* Color state dot */}
       {colorState && !isInactive && (
         <div
-          title={`Status: ${colorState}`}
+          title={COLOR_STATE_TOOLTIPS[colorState] || `Status: ${colorState}`}
           style={{
             width: 8, height: 8, borderRadius: '50%', flexShrink: 0, marginTop: 5,
             background: COLOR_STATE_COLORS[colorState] || '#D1D5DB',

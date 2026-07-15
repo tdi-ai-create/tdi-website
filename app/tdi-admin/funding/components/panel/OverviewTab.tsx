@@ -539,6 +539,7 @@ const REQUIRED_FOR_QUALITY = ['school_name', 'district', 'educator_count', 'titl
 function SchoolProfileSection({ pursuit }: { pursuit: any }) {
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [justSaved, setJustSaved] = useState(false)
 
   let profile: Record<string, any> = {}
   try {
@@ -559,7 +560,7 @@ function SchoolProfileSection({ pursuit }: { pursuit: any }) {
     setSaving(true)
     // Merge draft with existing to preserve unknown keys
     const merged = { ...profile, ...draft }
-    await fetch('/api/funding/pursuits', {
+    const res = await fetch('/api/funding/pursuits', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ pursuitId: pursuit.id, school_profile: merged }),
@@ -568,6 +569,10 @@ function SchoolProfileSection({ pursuit }: { pursuit: any }) {
     setEditing(false)
     // Force page-level data to reflect the change
     pursuit.school_profile = JSON.stringify(merged)
+    if (res.ok) {
+      setJustSaved(true)
+      setTimeout(() => setJustSaved(false), 2000)
+    }
   }
 
   const startEdit = () => {
@@ -579,10 +584,15 @@ function SchoolProfileSection({ pursuit }: { pursuit: any }) {
     <Section title="School Profile">
       {editing ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 14, background: '#F9FAFB', borderRadius: 10, border: '1px solid #E5E7EB' }}>
+          <div style={{ fontSize: 11, color: '#6B7280', fontStyle: 'italic', marginBottom: 4 }}>
+            Fields marked <span style={{ color: '#DC2626', fontWeight: 700 }}>*</span> are needed for grant eligibility checks.
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {PROFILE_FIELDS.map(f => (
               <div key={f.key}>
-                <label style={{ fontSize: 9, fontWeight: 600, color: '#6B7280', display: 'block', marginBottom: 2 }}>{f.label}</label>
+                <label style={{ fontSize: 9, fontWeight: 600, color: '#6B7280', display: 'block', marginBottom: 2 }}>
+                  {f.label}{REQUIRED_FOR_QUALITY.includes(f.key) && <span style={{ color: '#DC2626', marginLeft: 2 }}>*</span>}
+                </label>
                 {f.key === 'atsi_status' ? (
                   <select
                     value={draft[f.key] === true ? 'yes' : draft[f.key] === false ? 'no' : ''}
@@ -623,6 +633,7 @@ function SchoolProfileSection({ pursuit }: { pursuit: any }) {
             <span style={{ fontSize: 10, fontWeight: 600, color: completePct === 100 ? '#065F46' : '#92400E' }}>
               {completePct}% complete
             </span>
+            {justSaved && <span style={{ fontSize: 10, fontWeight: 600, color: '#10B981' }}>Saved</span>}
             <button onClick={startEdit} style={{ fontSize: 9, padding: '2px 8px', borderRadius: 4, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>
               Edit
             </button>
@@ -636,13 +647,18 @@ function SchoolProfileSection({ pursuit }: { pursuit: any }) {
           )}
 
           {/* Profile data grid */}
+          <div style={{ fontSize: 11, color: '#6B7280', fontStyle: 'italic', marginBottom: 4 }}>
+            Fields marked <span style={{ color: '#DC2626', fontWeight: 700 }}>*</span> are needed for grant eligibility checks.
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
             {PROFILE_FIELDS.map(f => {
               const val = profile[f.key]
               const display = val === true ? 'Yes' : val === false ? 'No' : val != null && val !== '' ? String(val) : null
               return (
                 <div key={f.key} style={{ padding: '6px 10px', background: '#F9FAFB', borderRadius: 6 }}>
-                  <div style={{ fontSize: 9, color: '#6B7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>{f.label}</div>
+                  <div style={{ fontSize: 9, color: '#6B7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    {f.label}{REQUIRED_FOR_QUALITY.includes(f.key) && <span style={{ color: '#DC2626', marginLeft: 2 }}>*</span>}
+                  </div>
                   <div style={{ fontSize: 12, fontWeight: 500, color: display ? '#0a0f1e' : '#D1D5DB', marginTop: 1, fontStyle: display ? 'normal' : 'italic' }}>
                     {display || 'Not set'}
                   </div>

@@ -373,7 +373,6 @@ export default function FundingPage() {
               pursuit={p}
               onClick={() => router.push(`/tdi-admin/funding/${p.id}`)}
               onArchive={async () => {
-                if (!confirm(`Archive "${p.pursuit_name}"? It will be hidden from the portfolio and queue.`)) return
                 await fetch('/api/funding/pursuits', {
                   method: 'PATCH',
                   headers: { 'Content-Type': 'application/json' },

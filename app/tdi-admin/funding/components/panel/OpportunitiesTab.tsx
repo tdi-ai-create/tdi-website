@@ -69,6 +69,12 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
   const [formMode, setFormMode] = useState<'closed' | 'add' | 'edit'>('closed')
   const [editId, setEditId] = useState<string | null>(null)
   const [form, setForm] = useState(emptyForm())
+  const [savedField, setSavedField] = useState<string | null>(null)
+
+  const showSaved = (field: string) => {
+    setSavedField(field)
+    setTimeout(() => setSavedField(null), 2000)
+  }
 
   const fetchOpps = () => {
     setLoading(true)
@@ -93,21 +99,24 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
   useEffect(() => { fetchOpps() }, [pursuitId])
 
   const handleStatusChange = async (id: string, newStatus: string) => {
-    await fetch('/api/funding/opportunities', {
+    const res = await fetch('/api/funding/opportunities', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, status: newStatus }),
     })
+    if (res.ok) showSaved(`status-${id}`)
     fetchOpps()
   }
 
   const patchOpp = async (id: string, fields: Record<string, unknown>) => {
     setOpportunities(prev => prev.map(o => o.id === id ? { ...o, ...fields } : o))
-    await fetch('/api/funding/opportunities', {
+    const fieldKey = Object.keys(fields)[0] || 'field'
+    const res = await fetch('/api/funding/opportunities', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, ...fields }),
     })
+    if (res.ok) showSaved(`${fieldKey}-${id}`)
     fetchOpps()
   }
 
@@ -359,6 +368,7 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
               >
                 {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
               </select>
+              {savedField === `status-${opp.id}` && <span style={{ fontSize: 10, fontWeight: 600, color: '#10B981' }}>Saved</span>}
 
               {opp.waiting_on && (
                 <span style={{
@@ -381,19 +391,22 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
                 const ws = opp.window_status || 'unknown'
                 const wsStyle = WINDOW_STATUS_STYLES[ws] || WINDOW_STATUS_STYLES.unknown
                 return (
-                  <select
-                    value={ws}
-                    onChange={e => patchOpp(opp.id, { window_status: e.target.value })}
-                    style={{
-                      fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
-                      background: wsStyle.bg, color: wsStyle.color,
-                      border: '1px solid #E5E7EB', cursor: 'pointer',
-                    }}
-                  >
-                    {WINDOW_STATUS_OPTIONS.map(o => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
+                  <>
+                    <select
+                      value={ws}
+                      onChange={e => patchOpp(opp.id, { window_status: e.target.value })}
+                      style={{
+                        fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
+                        background: wsStyle.bg, color: wsStyle.color,
+                        border: '1px solid #E5E7EB', cursor: 'pointer',
+                      }}
+                    >
+                      {WINDOW_STATUS_OPTIONS.map(o => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </select>
+                    {savedField === `window_status-${opp.id}` && <span style={{ fontSize: 10, fontWeight: 600, color: '#10B981' }}>Saved</span>}
+                  </>
                 )
               })()}
             </div>
@@ -454,8 +467,23 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
       })}
 
       {opportunities.length === 0 && formMode === 'closed' && (
-        <div style={{ textAlign: 'center', padding: 24, color: '#9CA3AF', fontSize: 13 }}>
-          No opportunities yet. Click "+ Add Opportunity" to get started.
+        <div style={{ padding: 24, background: '#F9FAFB', borderRadius: 10, border: '1px solid #E5E7EB' }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#374151', marginBottom: 8 }}>
+            No grant opportunities mapped yet.
+          </div>
+          <div style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.7, marginBottom: 12 }}>
+            Research and add 3-5 grants this school is eligible for. Common sources:
+          </div>
+          <ul style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.8, margin: '0 0 12px 0', paddingLeft: 20 }}>
+            <li>Walmart Spark Good (most schools, window Aug-Sep)</li>
+            <li>Title II-A (federal, most public schools)</li>
+            <li>NEA Foundation (educator-focused, rolling deadlines)</li>
+            <li>Local community foundations (search by district/state)</li>
+            <li>IDEA/CEIS (special education, public schools)</li>
+          </ul>
+          <div style={{ fontSize: 12, color: '#9CA3AF' }}>
+            Click &quot;+ Add Opportunity&quot; to start.
+          </div>
         </div>
       )}
     </div>

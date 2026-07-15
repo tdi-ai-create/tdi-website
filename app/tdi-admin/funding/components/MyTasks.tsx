@@ -29,6 +29,12 @@ const COLOR_DOT: Record<string, string> = {
   red: '#DC2626',
 }
 
+const COLOR_DOT_TOOLTIPS: Record<string, string> = {
+  green: 'On track — no action needed',
+  yellow: 'Approaching deadline — act soon',
+  red: 'Overdue or blocked — needs immediate attention',
+}
+
 const RUNG_BADGE: Record<string, { label: string; bg: string; color: string }> = {
   submitter: { label: 'Submitter', bg: '#FEF3C7', color: '#92400E' },
   backup: { label: 'Backup', bg: '#FEE2E2', color: '#991B1B' },
@@ -181,7 +187,7 @@ export function MyTasks() {
                     {/* Color state dot */}
                     {task.color_state && (
                       <div
-                        title={`Follow-up: ${task.color_state}`}
+                        title={COLOR_DOT_TOOLTIPS[task.color_state] || `Follow-up: ${task.color_state}`}
                         style={{
                           width: 8, height: 8, borderRadius: '50%', flexShrink: 0, marginTop: 7,
                           background: COLOR_DOT[task.color_state] || '#D1D5DB',
