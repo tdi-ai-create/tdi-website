@@ -372,6 +372,18 @@ export default function FundingPage() {
               key={p.id}
               pursuit={p}
               onClick={() => router.push(`/tdi-admin/funding/${p.id}`)}
+              onArchive={async () => {
+                if (!confirm(`Archive "${p.pursuit_name}"? It will be hidden from the portfolio and queue.`)) return
+                await fetch('/api/funding/pursuits', {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ pursuitId: p.id, archived: true }),
+                })
+                setData((prev: any) => prev ? {
+                  ...prev,
+                  pursuits: prev.pursuits.filter((x: any) => x.id !== p.id),
+                } : prev)
+              }}
             />
           ))}
         </div>

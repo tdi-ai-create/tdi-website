@@ -143,7 +143,7 @@ export async function PATCH(request: NextRequest) {
     const supabase = getSupabaseAdmin();
 
     const allowed: Record<string, unknown> = { updated_at: new Date().toISOString() };
-    const fields = ['pursuit_name', 'current_phase', 'funding_paths', 'school_profile', 'total_amount', 'contract_gap', 'buffer_amount', 'implementation_date', 'next_action_label', 'next_action_urgency', 'next_action_owner_email', 'internal_notes', 'submission_deadline', 'expected_decision_date', 'paths_submitted', 'paths_awarded', 'total_awarded', 'is_stalled', 'client_contact_name', 'client_contact_email', 'client_contact_phone', 'client_contact_role', 'operational_owner_email', 'strategy_owner_email', 'drafting_owner_email', 'final_approver_email'];
+    const fields = ['pursuit_name', 'current_phase', 'funding_paths', 'school_profile', 'total_amount', 'contract_gap', 'buffer_amount', 'implementation_date', 'next_action_label', 'next_action_urgency', 'next_action_owner_email', 'internal_notes', 'submission_deadline', 'expected_decision_date', 'paths_submitted', 'paths_awarded', 'total_awarded', 'is_stalled', 'client_contact_name', 'client_contact_email', 'client_contact_phone', 'client_contact_role', 'operational_owner_email', 'strategy_owner_email', 'drafting_owner_email', 'final_approver_email', 'archived'];
 
     for (const f of fields) {
       if (updates[f] !== undefined) {

@@ -23,6 +23,7 @@ export async function GET() {
       const { data: pursuits, error } = await (supabase
         .from('funding_pursuits') as any)
         .select('*')
+        .neq('archived', true)
         .order('created_at', { ascending: false })
 
       if (error) throw error
@@ -51,7 +52,7 @@ export async function GET() {
       })
     }
 
-    const all = summaries || []
+    const all = (summaries || []).filter((p: any) => !p.archived)
 
     // Compute cross-pursuit alerts
     const totalWaitingOnClient = all.reduce((sum, p) => sum + (p.waiting_on_client_count || 0), 0)

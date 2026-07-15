@@ -58,7 +58,7 @@ const STATUS_LABELS: Record<string, { bg: string; color: string }> = {
   backup: { bg: '#F3F4F6', color: '#6B7280' },
 }
 
-export function PursuitCard({ pursuit, onClick }: { pursuit: Pursuit; onClick: () => void }) {
+export function PursuitCard({ pursuit, onClick, onArchive }: { pursuit: Pursuit; onClick: () => void; onArchive?: () => void }) {
   const urgency = URGENCY_STYLES[pursuit.next_action_urgency || 'info'] || URGENCY_STYLES.info
 
   // Fetch opportunities for status chips
@@ -203,7 +203,7 @@ export function PursuitCard({ pursuit, onClick }: { pursuit: Pursuit; onClick: (
       )}
 
       {/* Badges row */}
-      <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap', alignItems: 'center' }}>
         {pursuit.is_stalled && (
           <span style={{
             fontSize: 11, fontWeight: 800, color: '#991B1B',
@@ -227,6 +227,18 @@ export function PursuitCard({ pursuit, onClick }: { pursuit: Pursuit; onClick: (
           }}>
             {pursuit.overdue_action_count} OVERDUE
           </span>
+        )}
+        {onArchive && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onArchive() }}
+            style={{
+              fontSize: 11, padding: '4px 10px', borderRadius: 6,
+              border: '1px solid #E5E7EB', background: 'white', color: '#9CA3AF',
+              cursor: 'pointer', marginLeft: 'auto',
+            }}
+          >
+            Archive
+          </button>
         )}
       </div>
     </div>

@@ -30,6 +30,15 @@ const WINDOW_OPTIONS = [
   { value: 'closed_denied', label: 'Denied' },
 ]
 
+function MetricPill({ label, value, color }: { label: string; value: string; color?: string }) {
+  return (
+    <div>
+      <div style={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</div>
+      <div style={{ fontSize: 16, fontWeight: 800, color: color || '#0a0f1e' }}>{value}</div>
+    </div>
+  )
+}
+
 function Toast({ message, onDone }: { message: string; onDone: () => void }) {
   useEffect(() => { const t = setTimeout(onDone, 2500); return () => clearTimeout(t) }, [onDone])
   return (
@@ -47,6 +56,7 @@ function Toast({ message, onDone }: { message: string; onDone: () => void }) {
 export default function QueuePage() {
   const [items, setItems] = useState<any[]>([])
   const [counts, setCounts] = useState({ bella: 0, rae: 0, agent: 0, school: 0 })
+  const [metrics, setMetrics] = useState<{ pipeline: number; awarded: number; schools: number; overdue: number; fundedPct: number } | null>(null)
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState<string | null>(null)
   const searchParams = useSearchParams()
@@ -60,6 +70,23 @@ export default function QueuePage() {
       .then(r => r.json())
       .then(d => { setItems(d.items || []); setCounts(d.counts || {}); setLoading(false) })
       .catch(() => setLoading(false))
+    // Also fetch metrics
+    fetch('/api/funding/dashboard')
+      .then(r => r.json())
+      .then(d => {
+        const pursuits = d.pursuits || []
+        const pipeline = d.alerts?.in_flight_total || pursuits.reduce((s: number, p: any) => s + (p.total_amount || 0), 0)
+        const awarded = pursuits.reduce((s: number, p: any) => s + (p.total_awarded || 0), 0)
+        const gap = pursuits.reduce((s: number, p: any) => s + (p.contract_gap || p.total_amount || 0), 0)
+        setMetrics({
+          pipeline,
+          awarded,
+          schools: pursuits.length,
+          overdue: d.alerts?.overdue_actions || 0,
+          fundedPct: gap > 0 ? Math.round((awarded / gap) * 100) : 0,
+        })
+      })
+      .catch(() => {})
   }, [])
 
   useEffect(() => { load() }, [load])
@@ -183,6 +210,30 @@ export default function QueuePage() {
           </Link>
         </div>
       </div>
+
+      {/* Metrics bar */}
+      {metrics && (
+        <div style={{
+          display: 'flex', gap: 24, padding: '12px 20px', marginBottom: 20,
+          background: '#F9FAFB', borderRadius: 12, border: '1px solid #E5E7EB',
+          alignItems: 'center',
+        }}>
+          <MetricPill label="Pipeline" value={`$${(metrics.pipeline / 1000).toFixed(0)}K`} />
+          <MetricPill label="Awarded" value={`$${(metrics.awarded / 1000).toFixed(0)}K`} color={metrics.awarded > 0 ? '#065F46' : undefined} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #E5E7EB', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="32" height="32" style={{ position: 'absolute', top: -3, left: -3, transform: 'rotate(-90deg)' }}>
+                <circle cx="16" cy="16" r="13" fill="none" stroke={metrics.fundedPct > 0 ? '#10B981' : 'transparent'} strokeWidth="3"
+                  strokeDasharray={`${(metrics.fundedPct / 100) * 81.7} 81.7`} />
+              </svg>
+              <span style={{ fontSize: 9, fontWeight: 800, color: '#0a0f1e' }}>{metrics.fundedPct}%</span>
+            </div>
+            <span style={{ fontSize: 11, color: '#6B7280', fontWeight: 600 }}>Funded</span>
+          </div>
+          <MetricPill label="Schools" value={String(metrics.schools)} />
+          {metrics.overdue > 0 && <MetricPill label="Overdue" value={String(metrics.overdue)} color="#DC2626" />}
+        </div>
+      )}
 
       {/* Bucket tabs */}
       <div style={{ display: 'flex', gap: 6, marginBottom: 20, borderBottom: '2px solid #E5E7EB', paddingBottom: 0 }}>
