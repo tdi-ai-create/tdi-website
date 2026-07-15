@@ -25,12 +25,19 @@ import {
 } from 'lucide-react';
 import { type QuizQuestion, type QuizResponse, getLessonQuestions, getUserResponses } from '@/lib/hub/quiz';
 
+interface LessonContentJson {
+  body_html?: string;
+  video_id?: string;
+  text?: string;
+  [key: string]: unknown;
+}
+
 interface Lesson {
   id: string;
   slug: string;
   title: string;
   description: string | null;
-  content: string | null;
+  content: LessonContentJson | string | null;
   video_url: string | null;
   estimated_minutes: number;
   content_type: string;
@@ -52,6 +59,24 @@ interface Course {
   slug: string;
   title: string;
   pd_hours: number;
+}
+
+/** Extract body HTML from lesson content (JSONB or string) */
+function extractBodyHtml(content: LessonContentJson | string | null): string | null {
+  if (!content) return null;
+  if (typeof content === 'string') return content;
+  if (content.body_html && typeof content.body_html === 'string') return content.body_html;
+  if (content.text && typeof content.text === 'string') return content.text;
+  return null;
+}
+
+/** Extract video ID from lesson content JSONB */
+function extractVideoId(lesson: Lesson): string | null {
+  if (lesson.video_url) return lesson.video_url;
+  if (lesson.content && typeof lesson.content === 'object' && lesson.content.video_id) {
+    return lesson.content.video_id;
+  }
+  return null;
 }
 
 interface LessonPageProps {
@@ -391,16 +416,19 @@ export default function LessonPage({ params }: LessonPageProps) {
             {activeTab === 'lesson' && (<>
 
             {/* Video player (Cloudflare Stream) */}
-            {currentLesson.video_url && (
-              <div className="w-full aspect-video rounded-xl mb-6 overflow-hidden bg-black">
-                <iframe
-                  src={`https://customer-a559fc0dc4cb956f505801ed5427ba99.cloudflarestream.com/${currentLesson.video_url}/iframe`}
-                  style={{ width: '100%', height: '100%', border: 'none' }}
-                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-            )}
+            {(() => {
+              const videoId = extractVideoId(currentLesson);
+              return videoId ? (
+                <div className="w-full aspect-video rounded-xl mb-6 overflow-hidden bg-black">
+                  <iframe
+                    src={`https://customer-a559fc0dc4cb956f505801ed5427ba99.cloudflarestream.com/${videoId}/iframe`}
+                    style={{ width: '100%', height: '100%', border: 'none' }}
+                    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              ) : null;
+            })()}
 
             {/* Lesson Title */}
             <h1 className="text-lg font-bold mb-1.5" style={{ color: '#1B2A4A' }}>
@@ -411,7 +439,7 @@ export default function LessonPage({ params }: LessonPageProps) {
               {currentLesson.content_type && <><span>·</span><span>{currentLesson.content_type}</span></>}
             </div>
 
-            {/* Lesson description/content */}
+            {/* Lesson description */}
             {currentLesson.description && (
               <p
                 className="mb-6 text-sm leading-relaxed"
@@ -421,34 +449,41 @@ export default function LessonPage({ params }: LessonPageProps) {
               </p>
             )}
 
-            {/* Lesson content (if any) */}
-            {currentLesson.content && (
-              <div
-                className="prose prose-gray max-w-none mb-6"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '15px',
-                  color: '#374151',
-                  lineHeight: '1.7',
-                }}
-                dangerouslySetInnerHTML={{ __html: currentLesson.content }}
-              />
-            )}
-
-            {/* Quiz content (if questions exist) */}
-            {questions.length > 0 && user && (
-              <div className="mb-8">
-                <LessonContent
-                  lessonId={currentLesson.id}
-                  lessonTitle=""
-                  questions={questions}
-                  userResponses={userResponses}
-                  userId={user.id}
-                  onComplete={handleMarkComplete}
-                  isCompleted={isComplete}
-                />
-              </div>
-            )}
+            {/* Interleaved content + quiz flow, or standalone content */}
+            {(() => {
+              const bodyHtml = extractBodyHtml(currentLesson.content);
+              if (questions.length > 0 && user) {
+                return (
+                  <div className="mb-8">
+                    <LessonContent
+                      lessonId={currentLesson.id}
+                      lessonTitle=""
+                      contentHtml={bodyHtml}
+                      questions={questions}
+                      userResponses={userResponses}
+                      userId={user.id}
+                      onComplete={handleMarkComplete}
+                      isCompleted={isComplete}
+                    />
+                  </div>
+                );
+              }
+              if (bodyHtml) {
+                return (
+                  <div
+                    className="prose prose-gray max-w-none mb-6"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: '15px',
+                      color: '#374151',
+                      lineHeight: '1.7',
+                    }}
+                    dangerouslySetInnerHTML={{ __html: bodyHtml }}
+                  />
+                );
+              }
+              return null;
+            })()}
 
             {/* Mark as complete checkbox (only if no quiz) */}
             {questions.length === 0 && (

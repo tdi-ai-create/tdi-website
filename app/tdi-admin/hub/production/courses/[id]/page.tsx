@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -24,6 +24,7 @@ import DuplicateCourse from './components/DuplicateCourse';
 import ThumbnailSelector from './components/ThumbnailSelector';
 import { GoogleDrivePicker, downloadDriveFile } from './components/GoogleDrivePicker';
 import ProductionDashboard from './components/ProductionDashboard';
+import QuizQuestionBuilder from './components/QuizQuestionBuilder';
 import BulkVideoUpload from './components/BulkVideoUpload';
 import {
   ArrowLeft,
@@ -1429,22 +1430,59 @@ function LessonEditorPanel({
   onBack: () => void;
   isSaving: boolean;
 }) {
+  // Extract body_html from content JSONB
+  const contentObj = (typeof lesson.content === 'object' && lesson.content !== null) ? lesson.content as Record<string, unknown> : {};
+  const initialBodyHtml = (contentObj.body_html as string) || '';
+
   const [form, setForm] = useState({
     title: lesson.title,
     type: lesson.type,
-    video_id: lesson.video_id || '',
+    video_id: (contentObj.video_id as string) || lesson.video_id || '',
     duration_minutes: Math.floor(lesson.duration_seconds / 60),
     transcript_text: lesson.transcript_text || '',
     transcript_text_es: lesson.transcript_text_es || '',
     content: typeof lesson.content === 'object' ? JSON.stringify(lesson.content, null, 2) : lesson.content || '',
+    body_html: initialBodyHtml,
     is_free_preview: lesson.is_free_preview,
   });
 
+  // Compute content sections from body_html for the quiz builder position selector
+  const contentSections = useMemo(() => {
+    if (!form.body_html || !form.body_html.trim()) return [];
+    const breakPattern = /(?=<h[23][^>]*>)|(?:<!--\s*section-break\s*-->)/gi;
+    return form.body_html.split(breakPattern).filter((s: string) => s.trim().length > 0);
+  }, [form.body_html]);
+
+  // Generate section previews (first ~40 chars of text content)
+  const sectionPreviews = useMemo(() => {
+    return contentSections.map((html: string) => {
+      const text = html.replace(/<[^>]*>/g, '').trim();
+      return text.length > 40 ? text.slice(0, 40) + '...' : text;
+    });
+  }, [contentSections]);
+
   const handleSave = () => {
+    // Build the content JSONB with all fields preserved
+    const newContent: Record<string, unknown> = { ...contentObj };
+    if (form.body_html.trim()) {
+      newContent.body_html = form.body_html;
+    } else {
+      delete newContent.body_html;
+    }
+    if (form.type === 'text') {
+      newContent.text = form.content;
+    }
+    if (form.video_id) {
+      newContent.video_id = form.video_id;
+    }
+    if (form.duration_minutes) {
+      newContent.duration_minutes = form.duration_minutes;
+    }
+
     onUpdate({
       ...form,
       duration_seconds: form.duration_minutes * 60,
-      content: form.type === 'text' ? { text: form.content } : {},
+      content: newContent,
     });
   };
 
@@ -1505,22 +1543,6 @@ function LessonEditorPanel({
           </div>
         )}
 
-        {/* Quiz Lesson Fields */}
-        {lesson.type === 'quiz' && (
-          <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
-            <p className="text-xs text-amber-800">
-              Quiz builder coming in a future update. Describe the quiz below.
-            </p>
-            <textarea
-              value={form.content}
-              onChange={(e) => setForm({ ...form, content: e.target.value })}
-              className="w-full mt-2 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
-              rows={6}
-              placeholder="Describe the quiz questions and answers..."
-            />
-          </div>
-        )}
-
         {/* Resource Lesson Fields */}
         {lesson.type === 'resource' && (
           <div>
@@ -1534,6 +1556,53 @@ function LessonEditorPanel({
             />
           </div>
         )}
+
+        {/* Lesson Body Content (HTML) -- available for all lesson types */}
+        <div className="bg-gray-50/80 border border-gray-200 rounded-lg p-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
+              <FileText size={12} />
+              Lesson Body Content
+            </p>
+            {contentSections.length > 0 && (
+              <span className="text-[10px] text-gray-400">
+                {contentSections.length} section{contentSections.length !== 1 ? 's' : ''} detected
+              </span>
+            )}
+          </div>
+          <p className="text-[11px] text-gray-400">
+            HTML content shown to learners. Use &lt;h2&gt; or &lt;h3&gt; tags to create sections — engagement checks can be placed between them.
+          </p>
+          <textarea
+            value={form.body_html}
+            onChange={(e) => setForm({ ...form, body_html: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none font-mono"
+            rows={8}
+            placeholder="<h2>Section Title</h2>\n<p>Content here...</p>\n\n<h3>Next Section</h3>\n<p>More content...</p>"
+          />
+          {contentSections.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Sections:</p>
+              {sectionPreviews.map((preview: string, i: number) => (
+                <div key={i} className="flex items-center gap-2 text-[11px]">
+                  <span className="w-4 h-4 rounded bg-gray-200 text-gray-500 flex items-center justify-center text-[9px] font-bold flex-shrink-0">
+                    {i + 1}
+                  </span>
+                  <span className="text-gray-500 truncate">{preview}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Quiz / Engagement Checks */}
+        <div className="bg-gray-50/80 border border-gray-200 rounded-lg p-3">
+          <QuizQuestionBuilder
+            lessonId={lesson.id}
+            contentSectionCount={contentSections.length}
+            contentSectionPreviews={sectionPreviews}
+          />
+        </div>
 
         {/* Free Preview Toggle */}
         <div className="flex items-center gap-2">
