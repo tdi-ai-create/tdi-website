@@ -109,7 +109,42 @@ export async function POST(
         .eq('id', id);
     }
 
-    // 4. Update love notes count if this session had any
+    // 4. Mark next matching contract deliverable as delivered
+    if (field) {
+      const serviceTypeMap: Record<string, string> = {
+        observation: 'observation',
+        virtual_session: 'virtual_session',
+        executive_session: 'executive_session',
+      }
+      const deliverableType = serviceTypeMap[sessionType]
+      if (deliverableType) {
+        const { data: nextDeliverable } = await supabase
+          .from('contract_deliverables')
+          .select('id')
+          .eq('partnership_id', id)
+          .eq('service_type', deliverableType)
+          .in('delivery_status', ['pending', 'scheduled'])
+          .order('sequence_number', { ascending: true })
+          .limit(1)
+          .single()
+
+        if (nextDeliverable) {
+          await supabase
+            .from('contract_deliverables')
+            .update({
+              delivery_status: 'delivered',
+              delivery_date: sessionDate,
+              delivered_by: email,
+              delivery_notes: internalNotes || null,
+              session_record_id: sessionRecord.id,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', nextDeliverable.id)
+        }
+      }
+    }
+
+    // 5. Update love notes count if this session had any
     if (loveNotesCount > 0) {
       const { data: partnership } = await supabase
         .from('partnerships')
