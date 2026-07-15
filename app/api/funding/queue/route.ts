@@ -19,6 +19,7 @@ export async function GET() {
     const { data: pursuits } = await supabase
       .from('funding_pursuits')
       .select('*')
+      .neq('archived', true)
       .order('created_at', { ascending: false })
 
     if (!pursuits || pursuits.length === 0) {

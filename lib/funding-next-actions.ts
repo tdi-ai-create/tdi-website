@@ -40,14 +40,26 @@ export function computeNextActions(
   // Detect unstarted pursuits: no opportunities, no gate, no action items
   const isUnstarted = opportunities.length === 0 && !gate && actions.length === 0
   if (isUnstarted) {
+    const contactName = pursuit.client_contact_name || 'the school contact'
+    const contactEmail = pursuit.client_contact_email || ''
+    const schoolName = pursuit.district_name || pursuit.pursuit_name || 'this school'
     result.push({
-      id: `unstarted-${pursuit.id}`,
-      label: 'Not started — set up this pursuit',
-      why: 'No funding paths mapped yet',
+      id: `intro-${pursuit.id}`,
+      label: `Send intro email to ${contactName}`,
+      why: `Introduce yourself as their TDI funding contact${contactEmail ? ` (${contactEmail})` : ''}. Let them know you'll be identifying grant opportunities for ${schoolName}.`,
+      owner: 'bella',
+      urgency: 'normal',
+      actionType: 'setup_pursuit',
+      tab: 'overview',
+    })
+    result.push({
+      id: `map-${pursuit.id}`,
+      label: 'Add grant opportunities for this school',
+      why: `Open the pursuit, go to Grant Opportunities section, and add 3-5 grants this school is eligible for (Walmart Spark, Title II-A, NEA, local foundations). Set plan categories A-D.`,
       owner: 'bella',
       urgency: 'low',
       actionType: 'setup_pursuit',
-      tab: 'overview',
+      tab: 'opportunities',
     })
     return result
   }

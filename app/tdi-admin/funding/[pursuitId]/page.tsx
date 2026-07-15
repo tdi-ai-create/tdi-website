@@ -149,6 +149,9 @@ export default function PursuitDetailPage() {
         <PhaseChain currentPhase={p.current_phase} isStalled={p.is_stalled} />
       </div>
 
+      {/* ── SITUATION BRIEFING ── */}
+      <PursuitBriefing pursuit={p} opportunities={data.opportunities || []} gate={gate} />
+
       {/* ── WHAT'S NEXT: The primary content area ── */}
       <div style={{ marginBottom: 28 }}>
         <h2 style={{ fontSize: 16, fontWeight: 700, color: '#0a0f1e', margin: '0 0 14px' }}>
@@ -455,6 +458,87 @@ function EditableText({ value, onSave, style }: { value: string; onSave: (v: str
       title="Click to edit"
     >
       {value}
+    </div>
+  )
+}
+
+// ── Pursuit Briefing — auto-generated context summary ──
+
+function PursuitBriefing({ pursuit, opportunities, gate }: { pursuit: any; opportunities: any[]; gate: any }) {
+  const contact = pursuit.client_contact_name || 'No contact set'
+  const email = pursuit.client_contact_email || ''
+  const phone = pursuit.client_contact_phone || ''
+  const school = pursuit.district_name || pursuit.pursuit_name
+  const total = pursuit.total_amount || 0
+
+  const denied = opportunities.filter((o: any) => o.status === 'denied').length
+  const open = opportunities.filter((o: any) => ['not_started', 'researching', 'applied', 'waiting'].includes(o.status)).length
+  const awarded = opportunities.filter((o: any) => o.status === 'awarded').length
+  const totalOpps = opportunities.length
+
+  const gateOpen = gate?.gate_open === true
+  const gateMissing = gate ? [
+    !gate.submitter_name && 'submitter',
+    !gate.backup_name && 'backup',
+    !gate.admin_sponsor_name && 'admin sponsor',
+    !gate.submitter_employment_verified_at && 'employment verification',
+  ].filter(Boolean) : []
+
+  // Build summary sentences
+  const lines: string[] = []
+
+  if (totalOpps === 0) {
+    lines.push(`No grant opportunities mapped yet. Bella needs to research and add 3-5 grants this school is eligible for.`)
+  } else {
+    const parts = []
+    if (open > 0) parts.push(`${open} active`)
+    if (awarded > 0) parts.push(`${awarded} awarded`)
+    if (denied > 0) parts.push(`${denied} denied`)
+    lines.push(`${totalOpps} grant opportunities: ${parts.join(', ')}.`)
+  }
+
+  if (!gateOpen && gateMissing.length > 0) {
+    lines.push(`Gate is blocked — missing: ${(gateMissing as string[]).join(', ')}. Must be completed before outreach.`)
+  }
+
+  if (pursuit.internal_notes) {
+    lines.push(pursuit.internal_notes)
+  }
+
+  return (
+    <div style={{
+      marginBottom: 20, padding: '16px 20px',
+      background: '#F8FAFC', border: '1px solid #E2E8F0',
+      borderRadius: 12, borderLeft: '4px solid #8B5CF6',
+    }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>
+        About This School
+      </div>
+      <div style={{ display: 'flex', gap: 24, marginBottom: 10, flexWrap: 'wrap' }}>
+        <div>
+          <span style={{ fontSize: 12, color: '#6B7280' }}>Contact: </span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: '#0a0f1e' }}>{contact}</span>
+        </div>
+        {email && (
+          <div>
+            <span style={{ fontSize: 12, color: '#6B7280' }}>Email: </span>
+            <a href={`mailto:${email}`} style={{ fontSize: 13, color: '#8B5CF6', textDecoration: 'none' }}>{email}</a>
+          </div>
+        )}
+        {phone && (
+          <div>
+            <span style={{ fontSize: 12, color: '#6B7280' }}>Phone: </span>
+            <span style={{ fontSize: 13, color: '#0a0f1e' }}>{phone}</span>
+          </div>
+        )}
+        <div>
+          <span style={{ fontSize: 12, color: '#6B7280' }}>Contract: </span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#0a0f1e' }}>{fmtCurrency(total)}</span>
+        </div>
+      </div>
+      {lines.map((line, i) => (
+        <p key={i} style={{ fontSize: 13, color: '#374151', margin: '4px 0', lineHeight: 1.5 }}>{line}</p>
+      ))}
     </div>
   )
 }

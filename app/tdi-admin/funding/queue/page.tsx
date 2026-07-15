@@ -317,6 +317,16 @@ export default function QueuePage() {
               onMarkDone={() => markDone(item)}
               onSendNudge={() => setNudgeActionId(item.targetId)}
               onRequestDraft={(agent: string) => requestDraft(item, agent)}
+              onArchive={async () => {
+                if (!confirm(`Archive "${item.pursuitName || item.districtName}"? It will be hidden from all views.`)) return
+                await fetch('/api/funding/pursuits', {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ pursuitId: item.pursuitId, archived: true }),
+                })
+                setToast('Pursuit archived')
+                load()
+              }}
             />
           ))}
         </div>
@@ -371,7 +381,7 @@ function renderGrouped(items: any[], muted: boolean): any[] {
   return result
 }
 
-function QueueRow({ item, muted, loading, onVerifyContact, onApproveDraft, onSendToQa, onMarkDone, onSendNudge, onRequestDraft }: {
+function QueueRow({ item, muted, loading, onVerifyContact, onApproveDraft, onSendToQa, onMarkDone, onSendNudge, onRequestDraft, onArchive }: {
   item: any
   muted: boolean
   loading: boolean
@@ -381,6 +391,7 @@ function QueueRow({ item, muted, loading, onVerifyContact, onApproveDraft, onSen
   onMarkDone: () => void
   onSendNudge: () => void
   onRequestDraft: (agent: string) => void
+  onArchive: () => void
 }) {
   const [showAgentPicker, setShowAgentPicker] = useState(false)
   const urgencyDot = URGENCY_DOT[item.urgency] || URGENCY_DOT.normal
@@ -500,9 +511,20 @@ function QueueRow({ item, muted, loading, onVerifyContact, onApproveDraft, onSen
         </div>
       </div>
 
-      {/* Inline action — bigger button */}
-      <div style={{ flexShrink: 0, marginTop: 6 }}>
+      {/* Inline actions */}
+      <div style={{ display: 'flex', gap: 6, flexShrink: 0, marginTop: 6, alignItems: 'center' }}>
         {renderAction()}
+        <button
+          onClick={onArchive}
+          title="Archive this pursuit"
+          style={{
+            fontSize: 10, padding: '6px 8px', borderRadius: 6,
+            border: '1px solid #E5E7EB', background: 'white', color: '#9CA3AF',
+            cursor: 'pointer',
+          }}
+        >
+          Archive
+        </button>
       </div>
     </div>
   )

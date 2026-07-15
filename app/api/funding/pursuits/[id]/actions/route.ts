@@ -100,7 +100,7 @@ export async function PATCH(
   const fields = [
     'title', 'description', 'status', 'due_date', 'owner_type', 'owner_email',
     'owner_name', 'prepared_materials', 'prepared_document_url', 'sort_order', 'category',
-    'client_label', 'cancel_reason', 'action_size',
+    'client_label', 'cancel_reason', 'action_size', 'notes',
   ]
   fields.forEach(f => {
     const camelKey = f.replace(/_([a-z])/g, (_, c) => c.toUpperCase())
