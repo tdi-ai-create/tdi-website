@@ -29,9 +29,19 @@ const DRY_RUN = true
 // ══════════════════════════════════════════════════════════════
 const ALLOWLIST_ENABLED = true
 const SEND_ALLOWLIST: string[] = [
+  // TDI staff
   'rae@teachersdeserveit.com',
   'hello@teachersdeserveit.com',
   'bella@teachersdeserveit.com',
+  // School contacts (go-live July 15, 2026)
+  'teri.gordonhernandez@pgcps.org',   // Allenwood
+  'sharonh.porter@pgcps.org',          // Allenwood backup
+  'ppoche@stpchanel.org',              // St. Peter Chanel
+  'jsuarez@d94.org',                   // WeGo
+  'zwemke@ogschool.com',               // Oak Grove
+  'dneukirch@d41.org',                 // Glen Ellyn
+  'mandy.johnson@gcafbcd.org',         // Go Christian
+  'doughang@saunemin.org',             // Saunemin
 ]
 
 function isOnAllowlist(email: string): boolean {

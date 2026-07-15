@@ -16,9 +16,19 @@
 
 export const ALLOWLIST_ENABLED = true
 export const SEND_ALLOWLIST: string[] = [
+  // TDI staff
   'rae@teachersdeserveit.com',
   'hello@teachersdeserveit.com',
   'bella@teachersdeserveit.com',
+  // School contacts (go-live July 15, 2026)
+  'teri.gordonhernandez@pgcps.org',
+  'sharonh.porter@pgcps.org',
+  'ppoche@stpchanel.org',
+  'jsuarez@d94.org',
+  'zwemke@ogschool.com',
+  'dneukirch@d41.org',
+  'mandy.johnson@gcafbcd.org',
+  'doughang@saunemin.org',
 ]
 
 export function isOnAllowlist(email: string): boolean {
