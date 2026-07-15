@@ -7,7 +7,7 @@ import { getServiceSupabase } from '@/lib/supabase'
 // While true: all sends are console.log'd and recorded in DB
 // fields, but no actual emails leave the system.
 // ══════════════════════════════════════════════════════════════
-const DRY_RUN = true
+const DRY_RUN = false
 
 // ══════════════════════════════════════════════════════════════
 // SEND_ALLOWLIST — go-live safety rail (independent of DRY_RUN).
