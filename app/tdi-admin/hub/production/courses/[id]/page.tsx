@@ -1416,6 +1416,164 @@ function CourseSettingsPanel({
   );
 }
 
+// Resource Upload Section
+function ResourceUploadSection({
+  lessonId,
+  existingFile,
+  onUploaded,
+  onRemoved,
+}: {
+  lessonId: string;
+  existingFile: { url: string; filename: string; content_type: string; file_size: number } | null;
+  onUploaded: (fileInfo: Record<string, unknown>) => void;
+  onRemoved: () => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const [dragOver, setDragOver] = useState(false);
+  const [currentFile, setCurrentFile] = useState(existingFile);
+
+  const handleUpload = async (file: File) => {
+    setUploading(true);
+    setUploadError('');
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('lesson_id', lessonId);
+
+      const res = await fetch('/api/tdi-admin/resources/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setUploadError(data.error || 'Upload failed');
+        return;
+      }
+
+      setCurrentFile(data.file);
+      onUploaded({
+        resource_url: data.file.url,
+        resource_filename: data.file.filename,
+        resource_content_type: data.file.content_type,
+        resource_file_size: data.file.file_size,
+      });
+    } catch {
+      setUploadError('Upload failed. Please try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemove = async () => {
+    try {
+      await fetch(`/api/tdi-admin/resources/upload?lesson_id=${lessonId}`, { method: 'DELETE' });
+      setCurrentFile(null);
+      onRemoved();
+    } catch {
+      setUploadError('Failed to remove file.');
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleUpload(file);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleUpload(file);
+  };
+
+  const formatSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  if (currentFile) {
+    return (
+      <div className="bg-gray-50/80 border border-gray-200 rounded-lg p-3 space-y-2">
+        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
+          <Paperclip size={12} />
+          Resource File
+        </p>
+        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+          <div className="w-8 h-8 rounded bg-red-50 flex items-center justify-center flex-shrink-0">
+            <FileText size={14} className="text-red-500" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-gray-700 truncate">{currentFile.filename}</p>
+            <p className="text-xs text-gray-400">{formatSize(currentFile.file_size)}</p>
+          </div>
+          <a
+            href={currentFile.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-teal-600 hover:underline flex-shrink-0"
+          >
+            View
+          </a>
+          <button
+            onClick={handleRemove}
+            className="text-xs text-red-500 hover:text-red-700 flex-shrink-0"
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-gray-50/80 border border-gray-200 rounded-lg p-3 space-y-2">
+      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
+        <Paperclip size={12} />
+        Resource File
+      </p>
+      <div
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={handleDrop}
+        className="relative border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer"
+        style={{
+          borderColor: dragOver ? '#00B5AD' : '#E5E7EB',
+          backgroundColor: dragOver ? '#F0FDFA' : '#FAFBFC',
+        }}
+        onClick={() => document.getElementById(`resource-upload-${lessonId}`)?.click()}
+      >
+        <input
+          id={`resource-upload-${lessonId}`}
+          type="file"
+          accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg"
+          onChange={handleFileSelect}
+          className="hidden"
+        />
+        {uploading ? (
+          <>
+            <Loader2 className="w-6 h-6 text-teal-500 animate-spin mx-auto mb-2" />
+            <p className="text-sm text-gray-600">Uploading...</p>
+          </>
+        ) : (
+          <>
+            <Upload className="w-6 h-6 text-gray-400 mx-auto mb-2" />
+            <p className="text-sm text-gray-600">
+              Drag and drop a file here, or <span className="text-teal-600 font-medium">click to browse</span>
+            </p>
+            <p className="text-xs text-gray-400 mt-1">PDF, Word, PowerPoint, Excel, PNG, JPG -- up to 25MB</p>
+          </>
+        )}
+      </div>
+      {uploadError && (
+        <p className="text-xs text-red-600">{uploadError}</p>
+      )}
+    </div>
+  );
+}
+
 // Lesson Editor Panel
 function LessonEditorPanel({
   lesson,
@@ -1545,16 +1703,34 @@ function LessonEditorPanel({
 
         {/* Resource Lesson Fields */}
         {lesson.type === 'resource' && (
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Resource URL</label>
-            <input
-              type="text"
-              value={form.content}
-              onChange={(e) => setForm({ ...form, content: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              placeholder="https://..."
-            />
-          </div>
+          <ResourceUploadSection
+            lessonId={lesson.id}
+            existingFile={contentObj.resource_url ? {
+              url: contentObj.resource_url as string,
+              filename: (contentObj.resource_filename as string) || 'Uploaded file',
+              content_type: (contentObj.resource_content_type as string) || '',
+              file_size: (contentObj.resource_file_size as number) || 0,
+            } : null}
+            onUploaded={(fileInfo) => {
+              setForm((prev) => ({
+                ...prev,
+                content: JSON.stringify({ ...contentObj, ...fileInfo }),
+              }));
+              // Auto-save the content with the resource info
+              fetch('/api/tdi-admin/lessons', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: lesson.id, content: { ...contentObj, ...fileInfo } }),
+              }).catch(err => console.error('Auto-save resource failed:', err));
+            }}
+            onRemoved={() => {
+              const { resource_url, resource_filename, resource_content_type, resource_file_size, resource_storage_path, ...clean } = contentObj;
+              setForm((prev) => ({
+                ...prev,
+                content: JSON.stringify(clean),
+              }));
+            }}
+          />
         )}
 
         {/* Lesson Body Content (HTML) -- available for all lesson types */}
