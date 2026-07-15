@@ -1619,9 +1619,12 @@ function LessonEditorPanel({
     });
   }, [contentSections]);
 
+  // Track content fields that get updated by sub-components (resource upload, etc.)
+  const [liveContentExtras, setLiveContentExtras] = useState<Record<string, unknown>>({});
+
   const handleSave = () => {
-    // Build the content JSONB with all fields preserved
-    const newContent: Record<string, unknown> = { ...contentObj };
+    // Build content JSONB preserving all fields: original + live updates + form changes
+    const newContent: Record<string, unknown> = { ...contentObj, ...liveContentExtras };
     if (form.body_html.trim()) {
       newContent.body_html = form.body_html;
     } else {
@@ -1712,23 +1715,15 @@ function LessonEditorPanel({
               file_size: (contentObj.resource_file_size as number) || 0,
             } : null}
             onUploaded={(fileInfo) => {
-              setForm((prev) => ({
-                ...prev,
-                content: JSON.stringify({ ...contentObj, ...fileInfo }),
-              }));
-              // Auto-save the content with the resource info
-              fetch('/api/tdi-admin/lessons', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: lesson.id, content: { ...contentObj, ...fileInfo } }),
-              }).catch(err => console.error('Auto-save resource failed:', err));
+              // Track resource fields so handleSave preserves them
+              setLiveContentExtras((prev) => ({ ...prev, ...fileInfo }));
             }}
             onRemoved={() => {
-              const { resource_url, resource_filename, resource_content_type, resource_file_size, resource_storage_path, ...clean } = contentObj;
-              setForm((prev) => ({
-                ...prev,
-                content: JSON.stringify(clean),
-              }));
+              // Clear resource fields from live extras
+              setLiveContentExtras((prev) => {
+                const { resource_url, resource_filename, resource_content_type, resource_file_size, resource_storage_path, ...rest } = prev;
+                return rest;
+              });
             }}
           />
         )}
