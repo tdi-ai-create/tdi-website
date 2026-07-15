@@ -23,6 +23,7 @@ export interface NextAction {
   actionType: string
   targetId?: string | null
   tab?: string // which tab to navigate to
+  link?: string | null // external URL to open on click
   inProgress?: boolean // visually mute — no human action needed
 }
 
@@ -106,7 +107,8 @@ export function computeNextActions(
       dueDate: a.due_date,
       actionType: 'complete_action',
       targetId: a.id,
-      tab: 'actions',
+      tab: a.link ? undefined : 'actions',
+      link: a.link || null,
     })
   }
 
@@ -124,7 +126,8 @@ export function computeNextActions(
       urgency: 'low',
       actionType: 'complete_action',
       targetId: a.id,
-      tab: 'actions',
+      tab: a.link ? undefined : 'actions',
+      link: a.link || null,
     })
   }
 

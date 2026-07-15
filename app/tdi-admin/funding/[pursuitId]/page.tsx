@@ -173,20 +173,33 @@ export default function PursuitDetailPage() {
         <h2 style={{ fontSize: 16, fontWeight: 700, color: '#0a0f1e', margin: '0 0 14px' }}>
           What Needs to Happen
         </h2>
-        <ActionCards actions={nextActions} />
+        <ActionCards actions={nextActions} onCardClick={(action) => {
+          // Open the relevant section and scroll to it
+          if (action.tab === 'overview') setShowOverview(true)
+          if (action.tab === 'opportunities') setShowOpportunities(true)
+          if (action.tab === 'actions') {} // already open by default
+          if (action.tab === 'timeline') setShowTimeline(true)
+          if (action.tab === 'emails') setShowEmails(true)
+          // Scroll to the section after a brief delay for expansion
+          setTimeout(() => {
+            const sectionId = action.tab === 'actions' ? 'section-all-action-items' : `section-${action.tab}`
+            document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }, 100)
+        }} />
       </div>
 
       {/* ── ALL ACTIONS: Full task list with cancelled hidden ── */}
       <CollapsibleSection
         title="All Action Items"
         defaultOpen={true}
+        sectionId="section-all-action-items"
         count={data.actionItems?.filter((a: any) => a.status !== 'cancelled').length}
       >
         <ActionsTab pursuitId={pursuitId} />
       </CollapsibleSection>
 
       {/* ── DETAIL SECTIONS: Collapsed by default ── */}
-      <CollapsibleSection title="School Profile + Gate" defaultOpen={showOverview} onToggle={setShowOverview}>
+      <CollapsibleSection title="School Profile + Gate" sectionId="section-overview" defaultOpen={showOverview} onToggle={setShowOverview}>
         <OverviewTab
           pursuit={p}
           gate={gate}
@@ -199,7 +212,7 @@ export default function PursuitDetailPage() {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Grant Opportunities" defaultOpen={showOpportunities} onToggle={setShowOpportunities}
+      <CollapsibleSection title="Grant Opportunities" sectionId="section-opportunities" defaultOpen={showOpportunities} onToggle={setShowOpportunities}
         count={data.opportunities?.length}
       >
         <OpportunitiesTab
@@ -210,7 +223,7 @@ export default function PursuitDetailPage() {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection title="Timeline" defaultOpen={showTimeline} onToggle={setShowTimeline}>
+      <CollapsibleSection title="Timeline" sectionId="section-timeline" defaultOpen={showTimeline} onToggle={setShowTimeline}>
         <TimelineTab pursuitId={pursuitId} />
       </CollapsibleSection>
 
@@ -238,7 +251,7 @@ const OWNER_BADGES: Record<string, { label: string; color: string; bg: string }>
   auto: { label: 'Auto', color: '#6B7280', bg: '#F3F4F6' },
 }
 
-function ActionCards({ actions }: { actions: NextAction[] }) {
+function ActionCards({ actions, onCardClick }: { actions: NextAction[]; onCardClick?: (action: NextAction) => void }) {
   const actionable = actions.filter(a => !a.inProgress)
   const inFlight = actions.filter(a => a.inProgress)
   const [showInFlight, setShowInFlight] = useState(false)
@@ -275,12 +288,21 @@ function ActionCards({ actions }: { actions: NextAction[] }) {
         return (
           <div
             key={action.id}
+            onClick={() => {
+              if (action.link) {
+                window.open(action.link, '_blank')
+              } else {
+                onCardClick?.(action)
+              }
+            }}
             style={{
               background: urgency.bg,
               border: `1px solid ${urgency.border}`,
               borderLeft: `4px solid ${urgency.border}`,
               borderRadius: 10,
               padding: '14px 18px',
+              cursor: (action.tab || action.link) ? 'pointer' : 'default',
+              transition: 'box-shadow 0.15s',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
@@ -313,8 +335,8 @@ function ActionCards({ actions }: { actions: NextAction[] }) {
                   )}
                 </div>
                 {/* Action title — the instruction */}
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#0a0f1e', marginBottom: 2 }}>
-                  {action.label}
+                <div style={{ fontSize: 14, fontWeight: 600, color: action.link ? '#8B5CF6' : '#0a0f1e', marginBottom: 2, textDecoration: action.link ? 'underline' : 'none' }}>
+                  {action.label} {action.link && <span style={{ fontSize: 11, fontWeight: 400 }}>&#8599;</span>}
                 </div>
                 {/* Why / context — one line */}
                 <div style={{ fontSize: 12, color: '#6B7280' }}>
@@ -369,12 +391,13 @@ function ActionCards({ actions }: { actions: NextAction[] }) {
 
 // ── Collapsible Section ──
 
-function CollapsibleSection({ title, children, defaultOpen = false, onToggle, count }: {
+function CollapsibleSection({ title, children, defaultOpen = false, onToggle, count, sectionId }: {
   title: string
   children: React.ReactNode
   defaultOpen?: boolean
   onToggle?: (open: boolean) => void
   count?: number
+  sectionId?: string
 }) {
   const [open, setOpen] = useState(defaultOpen)
 
@@ -385,7 +408,7 @@ function CollapsibleSection({ title, children, defaultOpen = false, onToggle, co
   }
 
   return (
-    <div style={{ marginBottom: 12, borderRadius: 12, border: '1px solid #E5E7EB', overflow: 'hidden' }}>
+    <div id={sectionId} style={{ marginBottom: 12, borderRadius: 12, border: '1px solid #E5E7EB', overflow: 'hidden' }}>
       <button
         onClick={toggle}
         style={{
