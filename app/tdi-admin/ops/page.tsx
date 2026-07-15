@@ -9,6 +9,7 @@ import {
   Bot, ExternalLink, ChevronDown, ChevronUp,
   UserPlus, FileText, Phone, Mail,
 } from 'lucide-react';
+import { InvoiceQueue } from '@/components/tdi-admin/ops/InvoiceQueue';
 
 const ACCENT = '#F97316';
 
@@ -442,6 +443,11 @@ export default function OpsPage() {
 
             <PaperclipTip area="invoices" />
           </div>
+        </div>
+
+        {/* ===== SERVICE INVOICE QUEUE ===== */}
+        <div className="lg:col-span-2">
+          <InvoiceQueue userEmail={teamMember?.email || ''} />
         </div>
 
         {/* ===== LEARNING HUB MIGRATION ===== */}
