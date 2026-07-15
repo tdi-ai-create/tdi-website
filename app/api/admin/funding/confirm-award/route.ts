@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
+import { grantUnlockedServices } from '@/lib/billing-slack'
 
 function isTDIAdmin(email: string) {
   return email.toLowerCase().endsWith('@teachersdeserveit.com')
@@ -96,6 +97,11 @@ export async function POST(request: NextRequest) {
         confirmed_by: email,
       },
     })
+  }
+
+  // Slack notification
+  if (flippedCount > 0) {
+    grantUnlockedServices(pursuit.pursuit_name, flippedCount).catch(() => {})
   }
 
   return NextResponse.json({

@@ -83,9 +83,24 @@ export function InvoiceQueue({ userEmail }: { userEmail: string }) {
       })
       const result = await res.json()
       if (result.success) {
-        setSuccessMsg(`${result.invoice.invoice_number} created -- $${result.invoice.amount.toLocaleString()}`)
+        // Auto-send the invoice
+        try {
+          const sendRes = await fetch('/api/admin/deliverables/send-invoice', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-user-email': userEmail },
+            body: JSON.stringify({ invoice_id: result.invoice.id }),
+          })
+          const sendResult = await sendRes.json()
+          if (sendResult.success) {
+            setSuccessMsg(`${result.invoice.invoice_number} created and sent to ${sendResult.sent_to} -- $${result.invoice.amount.toLocaleString()}`)
+          } else {
+            setSuccessMsg(`${result.invoice.invoice_number} created -- $${result.invoice.amount.toLocaleString()} (email failed: ${sendResult.error})`)
+          }
+        } catch {
+          setSuccessMsg(`${result.invoice.invoice_number} created -- $${result.invoice.amount.toLocaleString()} (email send failed)`)
+        }
         setDeliverables(prev => prev.filter(d => !group.items.some(gi => gi.id === d.id)))
-        setTimeout(() => setSuccessMsg(''), 5000)
+        setTimeout(() => setSuccessMsg(''), 8000)
       }
     } catch { /* silent */ }
     setGenerating(null)
@@ -170,7 +185,7 @@ export function InvoiceQueue({ userEmail }: { userEmail: string }) {
                     opacity: generating === group.quoteId ? 0.5 : 1,
                   }}
                 >
-                  {generating === group.quoteId ? 'Creating...' : 'Create Invoice'}
+                  {generating === group.quoteId ? 'Creating + Sending...' : 'Create + Send Invoice'}
                 </button>
               </div>
             </div>

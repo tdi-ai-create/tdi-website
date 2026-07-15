@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
+import { invoiceCreated } from '@/lib/billing-slack'
 
 function isTDIAdmin(email: string) {
   return email.toLowerCase().endsWith('@teachersdeserveit.com')
@@ -109,6 +110,9 @@ export async function POST(request: NextRequest) {
       updated_at: now,
     })
     .in('id', deliverable_ids)
+
+  // Slack notification
+  invoiceCreated(invoiceNumber, quote.contact_organization || quote.title, totalAmount, lineItems.length).catch(() => {})
 
   return NextResponse.json({
     success: true,

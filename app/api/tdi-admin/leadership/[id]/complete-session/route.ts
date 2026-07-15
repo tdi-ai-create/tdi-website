@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { serviceDelivered } from '@/lib/billing-slack';
 
 // Service Supabase client
 function getServiceSupabase() {
@@ -192,6 +193,9 @@ export async function POST(
         completed_by: email,
       },
     });
+
+    // Slack notification
+    serviceDelivered(id, '', `${label} ${sessionNumber}`, email || 'unknown').catch(() => {})
 
     return NextResponse.json({
       success: true,
