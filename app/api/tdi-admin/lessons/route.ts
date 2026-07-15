@@ -157,7 +157,11 @@ export async function PATCH(request: Request) {
         .single();
 
       const existingContent = (current?.content && typeof current.content === 'object') ? current.content as Record<string, unknown> : {};
-      const newContent = content !== undefined ? (typeof content === 'object' ? content as Record<string, unknown> : existingContent) : existingContent;
+      // Always merge: start with DB state, overlay whatever the client sent.
+      // This prevents auto-saved fields (video_id, resource_url, etc.) from being lost.
+      const newContent = content !== undefined && typeof content === 'object'
+        ? { ...existingContent, ...(content as Record<string, unknown>) }
+        : { ...existingContent };
 
       if (video_id !== undefined) newContent.video_id = video_id;
       if (audio_url !== undefined) newContent.audio_url = audio_url;

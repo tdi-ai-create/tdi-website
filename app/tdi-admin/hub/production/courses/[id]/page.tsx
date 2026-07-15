@@ -163,7 +163,7 @@ function VideoUploadSection({
   const [generatingTranscriptEs, setGeneratingTranscriptEs] = useState(false);
   const [transcriptStatusEs, setTranscriptStatusEs] = useState('');
 
-  const cfCustomerSubdomain = 'customer-4n38x6badamh5yps';
+  const cfCustomerSubdomain = process.env.NEXT_PUBLIC_CF_STREAM_SUBDOMAIN || 'customer-4n38x6badamh5yps';
 
   // Compress video using browser canvas + MediaRecorder
   // DISABLED: Browser-based compression strips audio tracks in most browsers.
@@ -273,6 +273,14 @@ function VideoUploadSection({
 
     if (!file.type.startsWith('video/')) {
       setErrorMsg('Please select a video file (MP4, MOV, etc.)');
+      setUploadStatus('error');
+      return;
+    }
+
+    // Enforce max file size (2GB)
+    const MAX_SIZE = 2 * 1024 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      setErrorMsg(`File is too large (${(file.size / (1024 * 1024 * 1024)).toFixed(1)}GB). Maximum size is 2GB.`);
       setUploadStatus('error');
       return;
     }
@@ -1779,7 +1787,21 @@ function LessonEditorPanel({
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: lesson.id, ...updates }),
-                  }).catch(err => console.error('Auto-save failed:', err));
+                  }).then(res => {
+                    if (!res.ok) {
+                      console.error('Auto-save failed:', res.status);
+                      // Track that auto-save failed so user knows to manually save
+                      setLiveContentExtras((prev) => ({ ...prev, _autoSaveFailed: true }));
+                    } else {
+                      setLiveContentExtras((prev) => {
+                        const { _autoSaveFailed, ...rest } = prev;
+                        return rest;
+                      });
+                    }
+                  }).catch(err => {
+                    console.error('Auto-save failed:', err);
+                    setLiveContentExtras((prev) => ({ ...prev, _autoSaveFailed: true }));
+                  });
                 }
               }}
             />
@@ -1884,6 +1906,14 @@ function LessonEditorPanel({
           </label>
         </div>
       </div>
+
+      {/* Auto-save failure warning */}
+      {!!liveContentExtras._autoSaveFailed && (
+        <div className="p-2 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-center gap-2">
+          <AlertCircle size={12} className="flex-shrink-0" />
+          <span>Some changes may not have saved automatically. Click Save Lesson to ensure everything is saved.</span>
+        </div>
+      )}
 
       {/* Sticky Save Button */}
       <div className="sticky bottom-0 bg-white border-t border-gray-100 pt-3 pb-1 -mx-6 px-6">

@@ -9,7 +9,7 @@ interface ThumbnailSelectorProps {
   onSelect: (url: string) => void;
 }
 
-const CF_SUBDOMAIN = 'customer-4n38x6badamh5yps';
+const CF_SUBDOMAIN = process.env.NEXT_PUBLIC_CF_STREAM_SUBDOMAIN || 'customer-4n38x6badamh5yps';
 
 export default function ThumbnailSelector({ videoId, currentThumbnail, onSelect }: ThumbnailSelectorProps) {
   const [duration, setDuration] = useState<number | null>(null);

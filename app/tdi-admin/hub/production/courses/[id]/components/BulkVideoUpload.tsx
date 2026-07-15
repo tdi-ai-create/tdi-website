@@ -188,7 +188,15 @@ export default function BulkVideoUpload({ course, onComplete, onLessonUploaded }
   );
 
   const handleFiles = (fileList: FileList) => {
-    const videoFiles = Array.from(fileList).filter((f) => f.type.startsWith('video/'));
+    const MAX_SIZE = 2 * 1024 * 1024 * 1024; // 2GB
+    const videoFiles = Array.from(fileList).filter((f) => {
+      if (!f.type.startsWith('video/')) return false;
+      if (f.size > MAX_SIZE) {
+        alert(`"${f.name}" is too large (${(f.size / (1024 * 1024 * 1024)).toFixed(1)}GB). Maximum is 2GB. Skipped.`);
+        return false;
+      }
+      return true;
+    });
     const usedLessonIds = new Set(files.map((f) => f.lessonId).filter(Boolean));
 
     const newMappings: FileMapping[] = videoFiles.map((file) => {
@@ -257,14 +265,11 @@ export default function BulkVideoUpload({ course, onComplete, onLessonUploaded }
       const mapping = matchedFiles[i];
 
       try {
-        // Compress
-        updateQueueItem(i, { status: 'compressing', progress: 0 });
-        const uploadFile = await compressVideo(mapping.file, (pct) => {
-          updateQueueItem(i, { progress: Math.round(pct * 0.3) });
-        });
+        // Skip compression (disabled to preserve audio)
+        const uploadFile = mapping.file;
 
         // Get upload URL
-        updateQueueItem(i, { status: 'uploading', progress: 30 });
+        updateQueueItem(i, { status: 'uploading', progress: 0 });
         const urlRes = await fetch('/api/tdi-admin/videos/upload', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -292,7 +297,7 @@ export default function BulkVideoUpload({ course, onComplete, onLessonUploaded }
           xhr.upload.addEventListener('progress', (e) => {
             if (e.lengthComputable) {
               const rawPct = (e.loaded / e.total) * 100;
-              updateQueueItem(i, { progress: 30 + Math.round(rawPct * 0.5) });
+              updateQueueItem(i, { progress: Math.round(rawPct * 0.8) }); // Upload is 0-80%, processing is 80-100%
             }
           });
 

@@ -241,7 +241,8 @@ export default function LessonContent({
 
   // Render multiple choice question
   const renderMultipleChoice = (question: QuizQuestion) => {
-    const options = question.options as QuizOption[];
+    const options = (question.options as QuizOption[]) || [];
+    if (options.length === 0) return <p className="text-sm text-gray-400">No options configured for this question.</p>;
     const response = responses[question.id];
     const answered = showResults[question.id];
     const selectedIndex = response ? parseInt(response.response) : -1;
