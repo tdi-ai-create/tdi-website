@@ -495,12 +495,14 @@ export async function GET(request: NextRequest) {
       next_action_owner_email: string | null
       pursuit_name: string | null
       district_name: string | null
+      current_phase: string | null
+      archived: boolean | null
     }
 
     const { data: pursuits } = pursuitIds.length > 0
       ? await supabase
           .from('funding_pursuits')
-          .select('id, next_action_owner_email, pursuit_name, district_name')
+          .select('id, next_action_owner_email, pursuit_name, district_name, current_phase, archived')
           .in('id', pursuitIds)
       : { data: [] as Pursuit[] }
 
@@ -586,12 +588,40 @@ export async function GET(request: NextRequest) {
 
       if (!item.due_date) continue
 
+      const pursuit = pursuitById.get(item.pursuit_id)
+
+      // ── PREREQUISITE CHECK — skip items whose pursuit isn't ready ──
+      // Don't send reminders for archived pursuits
+      if (pursuit?.archived) continue
+
+      // Don't send reminders if the gate isn't open and this is a client-facing action
+      // (gate must be satisfied before any school outreach)
+      if (item.owner_type === 'client') {
+        const gate = gateByPursuit.get(item.pursuit_id)
+        const gateOpen = gate && gate.submitter_email && gate.backup_email && gate.admin_sponsor_email
+        if (!gateOpen) continue
+      }
+
+      // Don't send reminders for actions in phases ahead of the pursuit's current phase
+      const PHASE_ORDER = ['intake', 'researching', 'strategy', 'writing', 'in_review', 'delivered', 'submitted', 'awaiting_decision', 'awarded']
+      const currentPhaseIdx = PHASE_ORDER.indexOf(pursuit?.current_phase || 'intake')
+      const categoryToPhase: Record<string, string> = {
+        research: 'researching',
+        writing: 'writing',
+        submission: 'submitted',
+        follow_up: 'intake', // follow-ups are always valid
+        approval: 'in_review',
+        documentation: 'intake', // documentation is always valid
+      }
+      const itemPhase = categoryToPhase[item.category || ''] || 'intake'
+      const itemPhaseIdx = PHASE_ORDER.indexOf(itemPhase)
+      if (itemPhaseIdx > currentPhaseIdx + 1) continue // allow one phase ahead but not more
+
       const dueDate = new Date(item.due_date + 'T00:00:00')
       const actionSize: string = item.action_size || 'standard'
       const leadBizDays = LEAD_WINDOWS[actionSize] ?? LEAD_WINDOWS.standard
       const leadStartDate = subtractBizDays(dueDate, leadBizDays)
 
-      const pursuit = pursuitById.get(item.pursuit_id)
       const ownerEmail =
         item.owner_email ??
         pursuit?.next_action_owner_email ??
