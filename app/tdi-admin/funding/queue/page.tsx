@@ -155,21 +155,33 @@ export default function QueuePage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h1 style={{ ...TYPE_PAGE_TITLE, margin: 0 }}>Work Queue</h1>
+          <h1 style={{ ...TYPE_PAGE_TITLE, margin: 0 }}>Funding</h1>
           <p style={{ ...TYPE_PAGE_SUBTITLE, marginTop: 4 }}>
-            Cross-portfolio &middot; What needs doing right now
+            What needs doing right now
           </p>
         </div>
-        <Link
-          href="/tdi-admin/funding"
-          style={{
-            fontSize: 13, fontWeight: 600, padding: '8px 16px', borderRadius: 8,
-            border: '1px solid #E5E7EB', background: 'white', color: '#374151',
-            textDecoration: 'none',
-          }}
-        >
-          Portfolio view
-        </Link>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Link
+            href="/tdi-admin/funding/portfolio"
+            style={{
+              fontSize: 13, fontWeight: 600, padding: '8px 16px', borderRadius: 8,
+              border: '1px solid #E5E7EB', background: 'white', color: '#374151',
+              textDecoration: 'none',
+            }}
+          >
+            All Pursuits
+          </Link>
+          <Link
+            href="/tdi-admin/funding/settings"
+            style={{
+              fontSize: 13, fontWeight: 600, padding: '8px 16px', borderRadius: 8,
+              border: '1px solid #E5E7EB', background: 'white', color: '#374151',
+              textDecoration: 'none',
+            }}
+          >
+            Settings
+          </Link>
+        </div>
       </div>
 
       {/* Bucket tabs */}
