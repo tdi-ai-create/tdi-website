@@ -60,7 +60,7 @@ export async function POST(
   // Fetch the pursuit for school name + owner email fallback
   const { data: pursuit } = await supabase
     .from('funding_pursuits')
-    .select('id, pursuit_name, district_name, next_action_owner_email')
+    .select('id, pursuit_name, district_name, next_action_owner_email, client_contact_name')
     .eq('id', item.pursuit_id)
     .single()
 
@@ -103,9 +103,19 @@ export async function POST(
     }
   }
 
-  // Resolve contact name
-  const ownerFirstName = (item.owner_name ?? '').split(' ')[0] || 'there'
-  const contactName = tone === 'internal' ? 'Rae' : ownerFirstName
+  // Resolve contact name — for client emails, use the RECIPIENT's name (not the TDI owner)
+  let contactName = 'there'
+  if (tone === 'internal') {
+    contactName = 'Rae'
+  } else {
+    // For client emails: try gate submitter name, then pursuit contact, then parse from email
+    const gateSubmitterName = gate?.submitter_name
+    const pursuitContactName = pursuit?.client_contact_name
+    const emailLocalPart = recipientEmail.split('@')[0].split('.').map(
+      (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+    ).join(' ')
+    contactName = (gateSubmitterName ?? pursuitContactName ?? emailLocalPart ?? 'there').split(' ')[0]
+  }
 
   // Build the email type — nudge for overdue, reminder for upcoming
   const emailType: EmailType = bizDaysOverdue > 0 ? 'nudge' : 'reminder'

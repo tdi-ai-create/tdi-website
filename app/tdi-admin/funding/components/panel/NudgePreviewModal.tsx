@@ -170,7 +170,7 @@ export function NudgePreviewModal({ actionId, onClose, onSent }: NudgePreviewMod
                       background: preview.tone === 'client' ? '#D1FAE5' : '#DBEAFE',
                       color: preview.tone === 'client' ? '#065F46' : '#1D4ED8',
                     }}>
-                      {preview.tone === 'client' ? 'Client (Bella)' : 'Internal (TDI)'}
+                      {preview.tone === 'client' ? 'Warm (from Bella to school)' : 'Internal (to TDI team)'}
                     </span>
                   </div>
                 </div>
