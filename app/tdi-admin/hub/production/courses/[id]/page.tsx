@@ -2326,45 +2326,156 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                 onClick={async () => {
                   if (!course) return;
                   setBulkTranscribing(true);
+                  setBulkTranscriptStatus('');
                   const videoLessons = course.modules.flatMap(m => m.lessons.filter(l => {
                     const vid = l.video_id || (l.content as any)?.video_id;
                     return vid && (!l.transcript_text || !l.transcript_text_es);
                   }));
                   const total = videoLessons.length;
-                  setBulkTranscriptStatus(`Requesting transcripts for ${total} videos (EN + ES)...`);
-                  let completed = 0;
+                  if (total === 0) {
+                    setBulkTranscriptStatus('All videos already have transcripts.');
+                    setBulkTranscribing(false);
+                    return;
+                  }
+
+                  // Phase 1: Trigger generation for all videos
+                  setBulkTranscriptStatus(`Step 1/2: Requesting AI transcription for ${total} videos...`);
+                  let requested = 0;
+                  let skipped = 0;
+                  const pendingLessons: { lesson: Lesson; videoId: string; needsEn: boolean; needsEs: boolean }[] = [];
+
                   for (const lesson of videoLessons) {
                     const videoId = lesson.video_id || (lesson.content as any)?.video_id;
                     if (!videoId) continue;
+                    const needsEn = !lesson.transcript_text;
+                    const needsEs = !lesson.transcript_text_es;
                     try {
-                      // Request both EN and ES in parallel per video
-                      await Promise.all([
-                        !lesson.transcript ? fetch('/api/tdi-admin/videos/transcript', {
+                      const results = await Promise.all([
+                        needsEn ? fetch('/api/tdi-admin/videos/transcript', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ uid: videoId, lang: 'en' }),
-                        }) : Promise.resolve(),
-                        !lesson.transcript_es ? fetch('/api/tdi-admin/videos/transcript', {
+                        }).then(r => r.json()) : null,
+                        needsEs ? fetch('/api/tdi-admin/videos/transcript', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ uid: videoId, lang: 'es' }),
-                        }) : Promise.resolve(),
+                        }).then(r => r.json()) : null,
                       ]);
-                      completed++;
-                      setBulkTranscriptStatus(`Requested ${completed}/${total} (EN + ES)`);
-                    } catch {}
+                      // Check if any failed with "no audio"
+                      const enFailed = results[0] && !results[0].success && !results[0].already_exists;
+                      const esFailed = results[1] && !results[1].success && !results[1].already_exists;
+                      if (enFailed && esFailed) {
+                        skipped++;
+                      } else {
+                        pendingLessons.push({ lesson, videoId, needsEn: needsEn && !enFailed, needsEs: needsEs && !esFailed });
+                        requested++;
+                      }
+                      setBulkTranscriptStatus(`Step 1/2: Requested ${requested + skipped}/${total}${skipped > 0 ? ` (${skipped} skipped -- no audio)` : ''}`);
+                    } catch {
+                      skipped++;
+                    }
                   }
-                  setBulkTranscriptStatus(`Transcripts requested for ${completed} videos (EN + ES). Ready in 1-2 minutes -- refresh to see them.`);
+
+                  if (pendingLessons.length === 0) {
+                    setBulkTranscriptStatus(`No videos could be transcribed${skipped > 0 ? ` (${skipped} have no audio track)` : ''}.`);
+                    setBulkTranscribing(false);
+                    return;
+                  }
+
+                  // Phase 2: Poll and save each transcript
+                  setBulkTranscriptStatus(`Step 2/2: Waiting for ${pendingLessons.length} transcripts... (this takes 1-2 min)`);
+                  let saved = 0;
+                  let failed = 0;
+
+                  // Wait 15 seconds before starting to poll
+                  await new Promise(r => setTimeout(r, 15000));
+
+                  for (const { lesson, videoId, needsEn, needsEs } of pendingLessons) {
+                    let enTranscript: string | null = null;
+                    let esTranscript: string | null = null;
+
+                    // Poll up to 20 times (100 seconds) per video
+                    for (let attempt = 0; attempt < 20; attempt++) {
+                      const pct = Math.round(((saved + failed) / pendingLessons.length) * 100);
+                      setBulkTranscriptStatus(`Step 2/2: Processing ${saved + failed + 1}/${pendingLessons.length} -- ${pct}% complete`);
+
+                      if (needsEn && !enTranscript) {
+                        const res = await fetch(`/api/tdi-admin/videos/transcript?uid=${videoId}&lang=en`);
+                        const data = await res.json();
+                        if (data.transcript) enTranscript = data.transcript;
+                      }
+                      if (needsEs && !esTranscript) {
+                        const res = await fetch(`/api/tdi-admin/videos/transcript?uid=${videoId}&lang=es`);
+                        const data = await res.json();
+                        if (data.transcript) esTranscript = data.transcript;
+                      }
+
+                      const enDone = !needsEn || !!enTranscript;
+                      const esDone = !needsEs || !!esTranscript;
+                      if (enDone && esDone) break;
+
+                      await new Promise(r => setTimeout(r, 5000));
+                    }
+
+                    // Save whatever we got
+                    const updates: Record<string, string> = {};
+                    if (enTranscript) updates.transcript_text = enTranscript;
+                    if (esTranscript) updates.transcript_text_es = esTranscript;
+
+                    if (Object.keys(updates).length > 0) {
+                      try {
+                        await fetch('/api/tdi-admin/lessons', {
+                          method: 'PATCH',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ id: lesson.id, ...updates }),
+                        });
+                        saved++;
+                      } catch {
+                        failed++;
+                      }
+                    } else {
+                      failed++;
+                    }
+                  }
+
+                  const summary = [`${saved} transcript${saved !== 1 ? 's' : ''} saved`];
+                  if (failed > 0) summary.push(`${failed} failed`);
+                  if (skipped > 0) summary.push(`${skipped} skipped (no audio)`);
+                  setBulkTranscriptStatus(summary.join(', ') + '.');
                   setBulkTranscribing(false);
+                  // Reload to show transcripts
+                  if (saved > 0) window.location.reload();
                 }}
                 disabled={bulkTranscribing}
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-teal-200 text-teal-700 hover:bg-teal-50 transition-colors disabled:opacity-50"
               >
                 <FileText size={16} />
-                {bulkTranscribing ? bulkTranscriptStatus : 'Bulk Transcribe (EN + ES)'}
+                {bulkTranscribing ? 'Transcribing...' : 'Bulk Transcribe (EN + ES)'}
               </button>
-              {bulkTranscriptStatus && !bulkTranscribing && (
-                <p className="text-xs text-gray-500">{bulkTranscriptStatus}</p>
+              {bulkTranscriptStatus && (
+                <div className={`p-2.5 rounded-lg text-xs ${
+                  bulkTranscriptStatus.includes('failed') || bulkTranscriptStatus.includes('No videos')
+                    ? 'bg-red-50 text-red-700 border border-red-200'
+                    : bulkTranscriptStatus.includes('saved')
+                      ? 'bg-green-50 text-green-700 border border-green-200'
+                      : 'bg-blue-50 text-blue-700 border border-blue-200'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    {bulkTranscribing && <Loader2 size={12} className="animate-spin flex-shrink-0" />}
+                    {!bulkTranscribing && bulkTranscriptStatus.includes('saved') && <CheckCircle2 size={12} className="flex-shrink-0" />}
+                    {!bulkTranscribing && (bulkTranscriptStatus.includes('failed') || bulkTranscriptStatus.includes('No videos') || bulkTranscriptStatus.includes('no audio')) && <AlertCircle size={12} className="flex-shrink-0" />}
+                    <span>{bulkTranscriptStatus}</span>
+                  </div>
+                  {bulkTranscribing && bulkTranscriptStatus.includes('Step 2') && (
+                    <div className="mt-1.5 h-1.5 bg-blue-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                        style={{ width: (bulkTranscriptStatus.match(/(\d+)%/)?.[1] || '0') + '%' }}
+                      />
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
