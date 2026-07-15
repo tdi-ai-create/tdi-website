@@ -99,8 +99,10 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
     return '#10B981'
   }
 
-  const activeActions = actions.filter(a => a.status !== 'cancelled')
-  const cancelledActions = actions.filter(a => a.status === 'cancelled')
+  // Filter out system-level Rae tasks that aren't school-specific
+  const schoolActions = actions.filter(a => !(a.owner_email === 'rae@teachersdeserveit.com' && a.category === 'approval' && !a.opportunity_id))
+  const activeActions = schoolActions.filter(a => a.status !== 'cancelled')
+  const cancelledActions = schoolActions.filter(a => a.status === 'cancelled')
   const clientActions = activeActions.filter(a => a.owner_type === 'client')
   const tdiActions = activeActions.filter(a => a.owner_type !== 'client')
 

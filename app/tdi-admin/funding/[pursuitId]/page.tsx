@@ -94,10 +94,14 @@ export default function PursuitDetailPage() {
       body: JSON.stringify({ pursuitId, ...fields }),
     })
   }
+  // Filter out system-level Rae tasks from pursuit detail (they show in Rae's queue)
+  const schoolActionItems = (data.actionItems || []).filter((a: any) =>
+    !(a.owner_email === 'rae@teachersdeserveit.com' && a.category === 'approval' && !a.opportunity_id)
+  )
   const nextActions = computeNextActions(
     p,
     data.opportunities || [],
-    data.actionItems || [],
+    schoolActionItems,
     gate,
     data.allocations || [],
   )
