@@ -205,7 +205,7 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
           <div style={{ width: 4, height: 18, background: '#F59E0B', borderRadius: 2 }} />
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          <span style={{ fontSize: 13, fontWeight: 800, color: '#374151', textTransform: 'uppercase', letterSpacing: 0.5 }}>
             Client Tasks ({clientActions.length})
           </span>
         </div>
@@ -224,7 +224,7 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
           <div style={{ width: 4, height: 18, background: '#8B5CF6', borderRadius: 2 }} />
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          <span style={{ fontSize: 13, fontWeight: 800, color: '#374151', textTransform: 'uppercase', letterSpacing: 0.5 }}>
             TDI Tasks ({tdiActions.length})
           </span>
         </div>
@@ -393,7 +393,7 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
           ) : (
             <>
               <div style={{
-                fontSize: 13, fontWeight: 500,
+                fontSize: 14, fontWeight: 600,
                 color: titleColor,
                 textDecoration: isInactive ? 'line-through' : 'none',
                 flex: 1,
@@ -431,18 +431,24 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
 
         {/* Description */}
         {action.description && !isCancelled && (
-          <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{action.description}</div>
+          <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4, lineHeight: 1.5 }}>{action.description}</div>
         )}
 
         {/* Meta row */}
-        <div style={{ display: 'flex', gap: 10, marginTop: 4, alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 10, marginTop: 6, alignItems: 'center', flexWrap: 'wrap' }}>
           {action.due_date && (
-            <span style={{ fontSize: 10, fontWeight: 600, color: getDueDateColor(action.due_date) }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: getDueDateColor(action.due_date) }}>
               Due: {new Date(action.due_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
           )}
           {action.owner_name && (
-            <span style={{ fontSize: 10, color: '#6B7280' }}>{action.owner_name}</span>
+            <span style={{
+              fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
+              background: action.owner_type === 'client' ? '#FFF7ED' : '#F5F3FF',
+              color: action.owner_type === 'client' ? '#C2410C' : '#6D28D9',
+            }}>
+              {action.owner_type === 'client' ? `Waiting on ${action.owner_name}` : `${action.owner_name} needs to do this`}
+            </span>
           )}
           {escalationRung && escalationRung !== 'none' && !isInactive && (() => {
             const rungStyle = RUNG_LABELS[escalationRung]
@@ -460,7 +466,7 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
             <button
               onClick={() => onNudge(action.id)}
               style={{
-                fontSize: 9, fontWeight: 600, padding: '1px 6px', borderRadius: 3,
+                fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6,
                 border: '1px solid #8B5CF6', background: '#F5F3FF', color: '#6D28D9',
                 cursor: 'pointer',
               }}
@@ -473,12 +479,12 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
             <button
               onClick={() => setShowCancelInput(!showCancelInput)}
               style={{
-                fontSize: 9, padding: '1px 5px', borderRadius: 3,
+                fontSize: 11, padding: '4px 8px', borderRadius: 6,
                 border: '1px solid #E5E7EB', background: 'white', color: '#9CA3AF',
                 cursor: 'pointer',
               }}
             >
-              cancel
+              Cancel
             </button>
           )}
         </div>
