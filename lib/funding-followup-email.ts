@@ -18,6 +18,7 @@ export const ALLOWLIST_ENABLED = true
 export const SEND_ALLOWLIST: string[] = [
   'rae@teachersdeserveit.com',
   'hello@teachersdeserveit.com',
+  'bella@teachersdeserveit.com',
 ]
 
 export function isOnAllowlist(email: string): boolean {

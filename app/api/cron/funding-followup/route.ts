@@ -12,22 +12,26 @@ const DRY_RUN = true
 // ══════════════════════════════════════════════════════════════
 // SEND_ALLOWLIST — go-live safety rail (independent of DRY_RUN).
 //
-// CLIENT ADDRESSES INTENTIONALLY EXCLUDED until Bella is onboarded
-// and go-live is approved. Add client contacts here to arm real
-// client sends. Until then, no client can be emailed by any path
-// — manual or automated.
+// Bella is onboarded. TDI staff can receive emails now.
+// Client addresses still excluded until go-live (Day 3 of launch plan).
 //
-// To arm Allenwood:
-//   'teri.gordonhernandez@pgcps.org',
-//   'sharonh.porter@pgcps.org',
+// To arm school contacts (go-live step):
+//   'teri.gordonhernandez@pgcps.org',   // Allenwood
+//   'sharonh.porter@pgcps.org',          // Allenwood backup
+//   'ppoche@stpchanel.org',              // St. Peter Chanel
+//   'jsuarez@d94.org',                   // WeGo
+//   'zwemke@ogschool.com',               // Oak Grove
+//   'dneukirch@d41.org',                 // Glen Ellyn
+//   'mandy.johnson@gcafbcd.org',         // Go Christian
+//   'doughang@saunemin.org',             // Saunemin
 //
 // Order of checks: DRY_RUN → WINDOW GATE → ALLOWLIST → send.
-// All layers must pass for an email to actually leave.
 // ══════════════════════════════════════════════════════════════
 const ALLOWLIST_ENABLED = true
 const SEND_ALLOWLIST: string[] = [
   'rae@teachersdeserveit.com',
   'hello@teachersdeserveit.com',
+  'bella@teachersdeserveit.com',
 ]
 
 function isOnAllowlist(email: string): boolean {
@@ -320,7 +324,7 @@ async function sendFollowUpEmail(params: {
 
     // Format "Next:" line — replace bare "none" with a human-readable final-rung message
     const nextDisplay = (!nextRung || nextRung === 'none')
-      ? 'Final rung (Rae is the last stop)'
+      ? 'Final rung (escalated to Rae for resolution)'
       : displayRung(nextRung)
 
     let internalBody: string
