@@ -18,6 +18,7 @@ export async function GET(
     'admin-guide': 'admin-guide.html',
     'workflow': 'partnership-workflow.html',
     'service-invoicing': 'service-invoicing-workflow.html',
+    'funding': 'funding-workflow.html',
   };
 
   const filename = allowedDocs[slug];
