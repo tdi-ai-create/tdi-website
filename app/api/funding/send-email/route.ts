@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Email send failed: ${err}`, sent: false })
     }
 
-    // Mark intro_sent_at on the pursuit if pursuitId provided
+    // Mark intro_sent_at + log to email timeline
     if (pursuitId) {
       const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -71,6 +71,23 @@ export async function POST(request: NextRequest) {
         .from('funding_pursuits')
         .update({ intro_sent_at: new Date().toISOString() })
         .eq('id', pursuitId)
+
+      // Log to email log so it shows in the Emails tab
+      try {
+        await supabase
+          .from('funding_email_log')
+          .insert({
+            pursuit_id: pursuitId,
+            to_email: to,
+            to_name: toName,
+            subject,
+            body_text: body,
+            tone: 'client',
+            sent_at: new Date().toISOString(),
+            sent_by: 'bella',
+            email_type: 'custom',
+          })
+      } catch {}
     }
 
     return NextResponse.json({ sent: true })

@@ -324,6 +324,7 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
   const [labelDraft, setLabelDraft] = useState(action.client_label || '')
   const [showNotes, setShowNotes] = useState(false)
   const [notesDraft, setNotesDraft] = useState(action.notes || '')
+  const [notesSaved, setNotesSaved] = useState(false)
 
   const isDone = action.status === 'done' || action.status === 'completed'
   const isCancelled = action.status === 'cancelled'
@@ -574,15 +575,15 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
                 />
                 <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
                   <button
-                    onClick={() => { onUpdateNotes(action.id, notesDraft); setShowNotes(false) }}
+                    onClick={() => { onUpdateNotes(action.id, notesDraft); setNotesSaved(true); setTimeout(() => setNotesSaved(false), 2000) }}
                     disabled={notesDraft === (action.notes || '')}
                     style={{
                       fontSize: 11, fontWeight: 600, padding: '4px 12px', borderRadius: 6,
-                      border: 'none', background: notesDraft !== (action.notes || '') ? '#8B5CF6' : '#E5E7EB',
+                      border: 'none', background: notesSaved ? '#065F46' : notesDraft !== (action.notes || '') ? '#8B5CF6' : '#E5E7EB',
                       color: 'white', cursor: notesDraft !== (action.notes || '') ? 'pointer' : 'default',
                     }}
                   >
-                    Save
+                    {notesSaved ? 'Saved' : 'Save'}
                   </button>
                   <button
                     onClick={() => { setNotesDraft(action.notes || ''); setShowNotes(false) }}

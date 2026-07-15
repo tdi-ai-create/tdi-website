@@ -225,13 +225,19 @@ export async function POST(
     return NextResponse.json({ sent: false, error: result.error }, { status: 500 })
   }
 
-  // Update the action item
+  // Update the action item + auto-log to notes
+  const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  const noteEntry = `[${timestamp}] Nudge sent to ${recipientEmail}`
+  const existingNotes = item.notes || ''
+  const updatedNotes = existingNotes ? `${existingNotes}\n${noteEntry}` : noteEntry
+
   await supabase
     .from('funding_action_items')
     .update({
       nudge_count: (item.nudge_count ?? 0) + 1,
       last_nudge_sent_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      notes: updatedNotes,
     })
     .eq('id', actionId)
 
