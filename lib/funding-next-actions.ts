@@ -94,13 +94,54 @@ export function computeNextActions(
       id: `overdue-${a.id}`,
       label: a.client_label || a.title,
       why: `${daysOverdue} day${daysOverdue !== 1 ? 's' : ''} overdue${isClientOwned && alreadyNudged ? ' — nudged, waiting on school' : ''}`,
-      owner: isClientOwned && alreadyNudged ? 'school' : isClientOwned ? 'bella' : 'bella',
+      owner: isClientOwned && alreadyNudged ? 'school' : isClientOwned ? 'bella' : (a.owner_email === 'rae@teachersdeserveit.com' ? 'rae' : 'bella'),
       urgency: 'critical',
       dueDate: a.due_date,
       actionType: isClientOwned && !alreadyNudged ? 'send_nudge' : 'complete_action',
       targetId: a.id,
       tab: 'actions',
       inProgress: isClientOwned && alreadyNudged,
+    })
+  }
+
+  // Upcoming (non-overdue) pending action items from DB
+  for (const a of pendingActions) {
+    if (!a.due_date) continue
+    const due = new Date(a.due_date + 'T00:00:00')
+    if (due < today) continue // already handled above as overdue
+
+    const daysUntil = Math.floor((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+    const isClientOwned = a.owner_type === 'client'
+    const isRaeOwned = a.owner_email === 'rae@teachersdeserveit.com'
+
+    result.push({
+      id: `upcoming-${a.id}`,
+      label: a.client_label || a.title,
+      why: a.description || `Due in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}`,
+      owner: isClientOwned ? 'school' : isRaeOwned ? 'rae' : 'bella',
+      urgency: daysUntil <= 3 ? 'high' : 'normal',
+      dueDate: a.due_date,
+      actionType: 'complete_action',
+      targetId: a.id,
+      tab: 'actions',
+    })
+  }
+
+  // Pending actions without due dates
+  for (const a of pendingActions) {
+    if (a.due_date) continue // already handled above
+    const isClientOwned = a.owner_type === 'client'
+    const isRaeOwned = a.owner_email === 'rae@teachersdeserveit.com'
+
+    result.push({
+      id: `action-${a.id}`,
+      label: a.client_label || a.title,
+      why: a.description || 'No due date set',
+      owner: isClientOwned ? 'school' : isRaeOwned ? 'rae' : 'bella',
+      urgency: 'low',
+      actionType: 'complete_action',
+      targetId: a.id,
+      tab: 'actions',
     })
   }
 
