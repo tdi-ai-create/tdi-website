@@ -589,7 +589,6 @@ function VideoUploadSection({
                 setGeneratingTranscript(true);
                 setTranscriptStatus('Requesting AI transcription...');
                 try {
-                  // Request generation
                   const postRes = await fetch('/api/tdi-admin/videos/transcript', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -598,17 +597,23 @@ function VideoUploadSection({
                   const postData = await postRes.json();
 
                   if (!postRes.ok && !postData.already_exists) {
-                    setTranscriptStatus(`Error: ${postData.message || 'Failed to start transcription'}`);
+                    // Surface the specific error from Cloudflare
+                    const errorMsg = postData.message || 'Failed to start transcription';
+                    if (errorMsg.includes('Missing Audio')) {
+                      setTranscriptStatus('This video has no audio track. Upload a video with audio to generate a transcript.');
+                    } else {
+                      setTranscriptStatus(`Error: ${errorMsg}`);
+                    }
                     setGeneratingTranscript(false);
                     return;
                   }
 
-                  // Poll for transcript (up to 30 attempts, every 5 seconds = ~150s max)
                   setTranscriptStatus('Transcribing audio... this takes 1-2 minutes');
                   let transcript = null;
-                  for (let attempt = 0; attempt < 30; attempt++) {
+                  for (let attempt = 1; attempt <= 30; attempt++) {
                     await new Promise(r => setTimeout(r, 5000));
-                    setTranscriptStatus(`Transcribing audio... (${attempt * 5}s)`);
+                    const pct = Math.min(Math.round((attempt / 24) * 100), 95);
+                    setTranscriptStatus(`Transcribing audio... ${pct}% (${attempt * 5}s)`);
                     const res = await fetch(`/api/tdi-admin/videos/transcript?uid=${videoId}`);
                     const data = await res.json();
                     if (data.transcript) {
@@ -616,24 +621,25 @@ function VideoUploadSection({
                       break;
                     }
                     if (data.status === 'error') {
-                      throw new Error('Transcript generation failed');
+                      throw new Error(data.message || 'Transcript generation failed');
                     }
                   }
                   if (transcript) {
                     onUpdate({ transcript_text: transcript });
-                    setTranscriptStatus('');
+                    setTranscriptStatus('Transcript saved!');
+                    setTimeout(() => setTranscriptStatus(''), 3000);
                   } else {
                     setTranscriptStatus('Timed out -- click again to retry');
                   }
-                } catch (err) {
+                } catch (err: any) {
                   console.error('Transcript generation error:', err);
-                  setTranscriptStatus('Error generating transcript');
+                  setTranscriptStatus(`Error: ${err.message || 'Transcript generation failed'}`);
                 } finally { setGeneratingTranscript(false); }
               }}
               disabled={generatingTranscript}
               className="text-xs text-teal-600 hover:text-teal-700 font-medium disabled:opacity-50"
             >
-              {generatingTranscript ? transcriptStatus || 'Generating EN...' : 'Auto-generate EN'}
+              {generatingTranscript ? 'Generating EN...' : 'Auto-generate EN'}
             </button>
           )}
           {videoId && (
@@ -649,38 +655,110 @@ function VideoUploadSection({
                   });
                   const postData = await postRes.json();
                   if (!postRes.ok && !postData.already_exists) {
-                    setTranscriptStatusEs(`Error: ${postData.message || 'Failed'}`);
+                    const errorMsg = postData.message || 'Failed';
+                    if (errorMsg.includes('Missing Audio')) {
+                      setTranscriptStatusEs('This video has no audio track.');
+                    } else {
+                      setTranscriptStatusEs(`Error: ${errorMsg}`);
+                    }
                     setGeneratingTranscriptEs(false);
                     return;
                   }
                   setTranscriptStatusEs('Transcribing Spanish... this takes 1-2 minutes');
                   let transcript = null;
-                  for (let attempt = 0; attempt < 30; attempt++) {
+                  for (let attempt = 1; attempt <= 30; attempt++) {
                     await new Promise(r => setTimeout(r, 5000));
-                    setTranscriptStatusEs(`Transcribing Spanish... (${attempt * 5}s)`);
+                    const pct = Math.min(Math.round((attempt / 24) * 100), 95);
+                    setTranscriptStatusEs(`Transcribing Spanish... ${pct}% (${attempt * 5}s)`);
                     const res = await fetch(`/api/tdi-admin/videos/transcript?uid=${videoId}&lang=es`);
                     const data = await res.json();
                     if (data.transcript) { transcript = data.transcript; break; }
-                    if (data.status === 'error') throw new Error('Spanish transcript failed');
+                    if (data.status === 'error') throw new Error(data.message || 'Spanish transcript failed');
                   }
                   if (transcript) {
                     onUpdate({ transcript_text_es: transcript });
-                    setTranscriptStatusEs('');
+                    setTranscriptStatusEs('Spanish transcript saved!');
+                    setTimeout(() => setTranscriptStatusEs(''), 3000);
                   } else {
                     setTranscriptStatusEs('Timed out -- click again to retry');
                   }
-                } catch (err) {
+                } catch (err: any) {
                   console.error('Spanish transcript error:', err);
-                  setTranscriptStatusEs('Error generating Spanish transcript');
+                  setTranscriptStatusEs(`Error: ${err.message || 'Spanish transcript failed'}`);
                 } finally { setGeneratingTranscriptEs(false); }
               }}
               disabled={generatingTranscriptEs}
               className="text-xs text-amber-600 hover:text-amber-700 font-medium disabled:opacity-50"
             >
-              {generatingTranscriptEs ? transcriptStatusEs || 'Generating ES...' : 'Auto-generate ES'}
+              {generatingTranscriptEs ? 'Generating ES...' : 'Auto-generate ES'}
             </button>
           )}
         </div>
+        {/* Transcript status with progress bar */}
+        {(transcriptStatus || transcriptStatusEs) && (
+          <div className="space-y-1.5">
+            {transcriptStatus && (
+              <div className={`p-2 rounded-lg text-xs ${
+                transcriptStatus.includes('Error') || transcriptStatus.includes('no audio')
+                  ? 'bg-red-50 text-red-700 border border-red-200'
+                  : transcriptStatus.includes('saved')
+                    ? 'bg-green-50 text-green-700 border border-green-200'
+                    : 'bg-blue-50 text-blue-700 border border-blue-200'
+              }`}>
+                <div className="flex items-center gap-2">
+                  {generatingTranscript && !transcriptStatus.includes('Error') && (
+                    <Loader2 size={12} className="animate-spin flex-shrink-0" />
+                  )}
+                  {transcriptStatus.includes('saved') && (
+                    <CheckCircle2 size={12} className="flex-shrink-0" />
+                  )}
+                  {(transcriptStatus.includes('Error') || transcriptStatus.includes('no audio')) && (
+                    <AlertCircle size={12} className="flex-shrink-0" />
+                  )}
+                  <span>{transcriptStatus}</span>
+                </div>
+                {generatingTranscript && transcriptStatus.includes('%') && (
+                  <div className="mt-1.5 h-1.5 bg-blue-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                      style={{ width: transcriptStatus.match(/(\d+)%/)?.[1] + '%' || '0%' }}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+            {transcriptStatusEs && (
+              <div className={`p-2 rounded-lg text-xs ${
+                transcriptStatusEs.includes('Error') || transcriptStatusEs.includes('no audio')
+                  ? 'bg-red-50 text-red-700 border border-red-200'
+                  : transcriptStatusEs.includes('saved')
+                    ? 'bg-green-50 text-green-700 border border-green-200'
+                    : 'bg-amber-50 text-amber-700 border border-amber-200'
+              }`}>
+                <div className="flex items-center gap-2">
+                  {generatingTranscriptEs && !transcriptStatusEs.includes('Error') && (
+                    <Loader2 size={12} className="animate-spin flex-shrink-0" />
+                  )}
+                  {transcriptStatusEs.includes('saved') && (
+                    <CheckCircle2 size={12} className="flex-shrink-0" />
+                  )}
+                  {(transcriptStatusEs.includes('Error') || transcriptStatusEs.includes('no audio')) && (
+                    <AlertCircle size={12} className="flex-shrink-0" />
+                  )}
+                  <span>{transcriptStatusEs}</span>
+                </div>
+                {generatingTranscriptEs && transcriptStatusEs.includes('%') && (
+                  <div className="mt-1.5 h-1.5 bg-amber-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-amber-500 rounded-full transition-all duration-500"
+                      style={{ width: transcriptStatusEs.match(/(\d+)%/)?.[1] + '%' || '0%' }}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
         <textarea
           value={transcriptText}
           onChange={(e) => onUpdate({ transcript_text: e.target.value })}
