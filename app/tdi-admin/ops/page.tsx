@@ -46,7 +46,7 @@ interface OpsData {
     }>;
   };
   hub: { totalEnrollments: number; paidMembers: number; courseCount: number; newThisWeek: number; activeLogins30d: number };
-  funding: { activePursuits: number; totalPipeline: number };
+  funding: { activePursuits: number; totalPipeline: number; totalAwarded: number; overdueCount: number; pursuits: { id: string; name: string; phase: string; pipeline: number; awarded: number }[] };
   timestamp: string;
 }
 
@@ -161,7 +161,7 @@ export default function OpsPage() {
         <AdminStatCard icon={Calendar} label="Services Delivered" value={`${usedServices}/${totalServices}`} subtitle="observations + sessions" accentColor="#3B82F6" />
         <AdminStatCard icon={DollarSign} label="Outstanding AR" value={invoiceDisplay} subtitle={`${data.invoices.count} account${data.invoices.count !== 1 ? 's' : ''}`} accentColor={data.invoices.count > 0 ? '#EF4444' : '#10B981'} />
         <AdminStatCard icon={AlertTriangle} label="Stalled Creators" value={data.creators.stalled} subtitle={`of ${data.creators.total} active`} accentColor={data.creators.stalled > 0 ? '#EF4444' : '#10B981'} />
-        <AdminStatCard icon={Sparkles} label="Grant Pursuits" value={data.funding.activePursuits || partnerships.filter(p => p.has_grant_support).length} subtitle={data.funding.totalPipeline > 0 ? formatCurrency(data.funding.totalPipeline) + ' pipeline' : `${partnerships.filter(p => p.has_grant_support).length} clients`} accentColor="#8B5CF6" />
+        <AdminStatCard icon={Sparkles} label="Grant Pursuits" value={data.funding.activePursuits || partnerships.filter(p => p.has_grant_support).length} subtitle={`${formatCurrency(data.funding.totalPipeline)} pipeline${data.funding.totalAwarded > 0 ? ` / ${formatCurrency(data.funding.totalAwarded)} awarded` : ''}${data.funding.overdueCount > 0 ? ` / ${data.funding.overdueCount} overdue` : ''}`} accentColor="#8B5CF6" />
       </div>
 
       {/* ===== SECTION 1: INVOICE QUEUE (top priority action) ===== */}
@@ -292,21 +292,26 @@ export default function OpsPage() {
 
       {/* ===== SECTION 5: GRANT FUNDING ===== */}
       <CollapsibleSection title="Grant Funding" icon={Sparkles} accentColor="#8B5CF6" defaultOpen={false}>
-        <div className="flex justify-end mb-3">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex gap-4 text-xs text-gray-500">
+            <span><strong className="text-gray-900">{formatCurrency(data.funding.totalPipeline)}</strong> pipeline</span>
+            <span><strong className="text-green-700">{formatCurrency(data.funding.totalAwarded)}</strong> awarded</span>
+            {data.funding.overdueCount > 0 && <span><strong className="text-red-600">{data.funding.overdueCount}</strong> overdue</span>}
+          </div>
           <NavButton href="/tdi-admin/funding" label="Open Funding Portal" icon={ArrowRight} />
         </div>
         <div className="space-y-2">
-          {partnerships.filter(p => p.has_grant_support).map(p => (
-            <a key={p.id} href={`/tdi-admin/leadership/${p.id}`} className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:border-purple-200 transition-colors" style={{ borderLeft: '3px solid #8B5CF6' }}>
+          {(data.funding.pursuits || []).map((p: any) => (
+            <a key={p.id} href={`/tdi-admin/funding/${p.id}`} className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:border-purple-200 transition-colors" style={{ borderLeft: '3px solid #8B5CF6' }}>
               <div>
-                <span className="text-sm font-semibold text-gray-900">{p.slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</span>
-                <p className="text-xs text-gray-400 mt-0.5">{p.contact_name} | {p.staff_enrolled} staff</p>
+                <span className="text-sm font-semibold text-gray-900">{p.name}</span>
+                <p className="text-xs text-gray-400 mt-0.5">{formatCurrency(p.pipeline)} target{p.awarded > 0 ? ` / ${formatCurrency(p.awarded)} awarded` : ''}</p>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-600">Grant Active</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-600 capitalize">{(p.phase || 'intake').replace(/_/g, ' ')}</span>
             </a>
           ))}
-          {partnerships.filter(p => p.has_grant_support).length === 0 && (
-            <p className="text-center text-gray-400 py-4 text-sm">No grant-supported partnerships.</p>
+          {(data.funding.pursuits || []).length === 0 && partnerships.filter(p => p.has_grant_support).length === 0 && (
+            <p className="text-center text-gray-400 py-4 text-sm">No active funding pursuits.</p>
           )}
         </div>
       </CollapsibleSection>

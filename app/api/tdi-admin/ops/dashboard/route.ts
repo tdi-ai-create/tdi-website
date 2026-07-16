@@ -52,7 +52,8 @@ export async function GET() {
       // Funding pursuits
       supabase
         .from('funding_pursuits')
-        .select('id, title, status, amount, deadline, district_name, created_at'),
+        .select('id, pursuit_name, current_phase, total_amount, total_awarded, district_name, created_at, archived, overdue_action_count')
+        .neq('archived', true),
     ]);
 
     // Process creators
@@ -90,9 +91,9 @@ export async function GET() {
       contact_changed: o.relationship_signal === 'contact_changed',
     }));
 
-    // Process funding (gracefully handle if table doesn't exist)
+    // Process funding
     const pursuits = fundingRes?.data || [];
-    const activePursuits = pursuits.filter((p: any) => p.status !== 'closed' && p.status !== 'won');
+    const activePursuits = pursuits.filter((p: any) => !['awarded', 'denied', 'on_hold'].includes(p.current_phase));
 
     // Hub stats
     const [hubProfilesRes, hubPaidRes, hubCoursesRes, hubRecentRes] = hubRes as any[];
@@ -139,7 +140,16 @@ export async function GET() {
       },
       funding: {
         activePursuits: activePursuits.length,
-        totalPipeline: activePursuits.reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0),
+        totalPipeline: activePursuits.reduce((sum: number, p: any) => sum + (parseFloat(p.total_amount) || 0), 0),
+        totalAwarded: pursuits.reduce((sum: number, p: any) => sum + (parseFloat(p.total_awarded) || 0), 0),
+        overdueCount: pursuits.reduce((sum: number, p: any) => sum + (p.overdue_action_count || 0), 0),
+        pursuits: pursuits.map((p: any) => ({
+          id: p.id,
+          name: p.pursuit_name || p.district_name,
+          phase: p.current_phase,
+          pipeline: parseFloat(p.total_amount) || 0,
+          awarded: parseFloat(p.total_awarded) || 0,
+        })),
       },
       timestamp: now.toISOString(),
     });

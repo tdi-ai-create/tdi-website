@@ -34,6 +34,18 @@ const CONNECTIONS: Connection[] = [
   // Hub -> Funding
   { from: 'Learning Hub', to: 'Funding', data: 'Total educators, states reached, PD hours delivered, certificates earned', impact: 'Auto-generated impact metrics for grant applications', status: 'live' },
 
+  // Funding -> Agents (Paperclip)
+  { from: 'Funding', to: 'Agents', data: 'Draft narrative requests, research assignments via find_work API', impact: 'Agents pick up work from portal, draft grant narratives, push results back', status: 'live' },
+
+  // Funding -> Google Drive
+  { from: 'Funding', to: 'Google Drive', data: 'Grant narratives saved as Google Docs via save-to-drive API', impact: 'Bella and Julie review narratives directly in Google Docs', status: 'live' },
+
+  // Sales -> Funding
+  { from: 'Sales', to: 'Funding', data: 'Signed deal creates funding pursuit with contract line items', impact: 'Funding pipeline auto-populates when a deal closes', status: 'live' },
+
+  // Funding -> Operations
+  { from: 'Funding', to: 'Operations', data: 'Award amounts, grant allocation to contract line items', impact: 'Ops dashboard shows pipeline health, invoicing knows which services are grant-funded', status: 'live' },
+
   // Hub -> Operations/Intelligence
   { from: 'Learning Hub', to: 'Operations', data: 'Contract fulfillment: Hub access vs actual usage per partner district', impact: 'Identify underutilized partnerships before renewal conversations', status: 'live' },
 
@@ -56,8 +68,10 @@ const NODES = [
   { id: 'sales', label: 'Sales', color: '#7C3AED', desc: 'Pipeline, opportunities, and deal management', row: 1, col: 1 },
   { id: 'cmo', label: 'CMO Dashboard', color: '#DC2626', desc: 'Marketing funnel, Substack, and campaign tracking', row: 1, col: 2 },
   { id: 'creators', label: 'Creator Studio', color: '#0891B2', desc: 'Content creators, topics, and production pipeline', row: 2, col: 0 },
-  { id: 'funding', label: 'Funding', color: '#D97706', desc: 'Grant pursuits and impact evidence', row: 2, col: 1 },
+  { id: 'funding', label: 'Funding', color: '#D97706', desc: 'Grant pursuits, narratives, follow-up engine, agent drafting', row: 2, col: 1 },
   { id: 'operations', label: 'Operations', color: '#1B2A4A', desc: 'Contracts, districts, renewals, and billing', row: 2, col: 2 },
+  { id: 'agents', label: 'Agents', color: '#7C3AED', desc: 'Paperclip AI agents: Vanessa (grants), Amara (research), Nora (ops)', row: 3, col: 0 },
+  { id: 'gdrive', label: 'Google Drive', color: '#0F766E', desc: 'Grant narratives, reports, and shared documents', row: 3, col: 1 },
 ];
 
 export default function PortalConnectionsPage() {
