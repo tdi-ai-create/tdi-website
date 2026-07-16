@@ -16,8 +16,8 @@ export default async function InvoicePage({
     .eq('id', id)
     .single()
 
-  // If not found or draft, show 404
-  if (error || !quote || quote.status === 'draft') {
+  // If not found, show 404
+  if (error || !quote) {
     notFound()
   }
 
