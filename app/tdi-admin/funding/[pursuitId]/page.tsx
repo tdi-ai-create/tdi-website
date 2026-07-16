@@ -96,7 +96,7 @@ export default function PursuitDetailPage() {
   }
   // Filter out system-level Rae tasks from pursuit detail (they show in Rae's queue)
   const schoolActionItems = (data.actionItems || []).filter((a: any) =>
-    !(a.owner_email === 'rae@teachersdeserveit.com' && a.category === 'approval' && !a.opportunity_id)
+    !(a.owner_email === 'rae@teachersdeserveit.com' && !a.opportunity_id)
   )
   const nextActions = computeNextActions(
     p,

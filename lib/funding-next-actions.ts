@@ -276,28 +276,17 @@ export function computeNextActions(
 
   // ── NORMAL ──
 
-  // Bella mapped opportunities but pursuit is still in Intake → Rae should review and advance
-  if (opportunities.length >= 3 && pursuit.current_phase === 'intake') {
+  // Only show Rae review item when Bella has actually customized opportunities
+  // (at least one has a status other than 'not_started', meaning Bella researched it)
+  const customizedOpps = opportunities.filter((o: any) => o.status !== 'not_started' && o.status !== 'denied')
+  if (customizedOpps.length >= 1 && pursuit.current_phase === 'intake') {
     result.push({
       id: 'review-strategy',
-      label: `Review ${opportunities.length} funding paths and advance to Strategy`,
-      why: `Bella mapped ${opportunities.length} opportunities. Review the selections and plan categories, then advance this pursuit to Strategy phase.`,
+      label: `Review Bella's funding selections and approve strategy`,
+      why: `${customizedOpps.length} opportunities have been researched. Review the selections and plan categories.`,
       owner: 'rae',
       urgency: 'normal',
       actionType: 'complete_action',
-      tab: 'opportunities',
-    })
-  }
-
-  // Bella mapped fewer than 3 opportunities and pursuit is in Intake → tell her to keep going
-  if (opportunities.length > 0 && opportunities.length < 3 && pursuit.current_phase === 'intake') {
-    result.push({
-      id: 'more-opps',
-      label: `Add more opportunities (${opportunities.length} mapped, aim for 3-5)`,
-      why: 'Most schools need at least 3 grant paths to have a realistic shot. Keep researching.',
-      owner: 'bella',
-      urgency: 'normal',
-      actionType: 'setup_pursuit',
       tab: 'opportunities',
     })
   }

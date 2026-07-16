@@ -174,7 +174,7 @@ export default function FundingPage() {
     )
   }
 
-  const pursuits = data.pursuits || []
+  const pursuits = (data.pursuits || []).filter((p: any) => !p.archived)
   const filtered = activePhase === 'all'
     ? pursuits
     : pursuits.filter((p: any) => p.current_phase === activePhase)
@@ -336,13 +336,6 @@ export default function FundingPage() {
 
       {/* Impact Evidence from Hub — collapsible reference data */}
       <ImpactEvidence />
-
-      {/* Phase tabs */}
-      <PhaseTabs
-        activePhase={activePhase}
-        onSelect={setActivePhase}
-        counts={data.phase_counts || {}}
-      />
 
       {/* In-flight summary */}
       {data.alerts.in_flight_count > 0 && (
