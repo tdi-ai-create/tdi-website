@@ -336,8 +336,8 @@ function VideoUploadSection({
         xhr.upload.addEventListener('progress', (e) => {
           if (e.lengthComputable) {
             const rawPct = (e.loaded / e.total) * 100;
-            // Map upload progress to 30-80% (0-30 was compression, 80-100 is processing)
-            setUploadProgress(30 + Math.round(rawPct * 0.5));
+            // Upload is 0-80%, processing is 80-100%
+            setUploadProgress(Math.round(rawPct * 0.8));
 
             // Calculate speed and ETA
             const elapsed = (Date.now() - startTime) / 1000;
@@ -430,7 +430,7 @@ function VideoUploadSection({
             <p className="text-sm text-gray-500 font-medium">
               {videoId ? 'Replace video' : 'Click to upload video'}
             </p>
-            <p className="text-xs text-gray-400 mt-1">MP4, MOV, MKV, or WebM -- files over 50MB auto-compress for faster upload</p>
+            <p className="text-xs text-gray-400 mt-1">MP4, MOV, MKV, or WebM -- max 2GB per file</p>
             <input
               type="file"
               accept="video/*"
@@ -484,8 +484,7 @@ function VideoUploadSection({
               <div className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />
                 <span className="text-sm text-gray-600">
-                  {uploadStatus === 'compressing' ? 'Compressing video...' :
-                   uploadStatus === 'uploading' ? 'Uploading...' :
+                  {uploadStatus === 'uploading' ? 'Uploading to Cloudflare...' :
                    'Processing video...'}
                 </span>
               </div>
@@ -500,8 +499,7 @@ function VideoUploadSection({
                 className="h-2.5 rounded-full transition-all duration-300"
                 style={{
                   width: `${uploadProgress}%`,
-                  background: uploadStatus === 'compressing' ? '#8B5CF6' :
-                              uploadStatus === 'processing' ? '#F59E0B' : '#00B5AD',
+                  background: uploadStatus === 'processing' ? '#F59E0B' : '#00B5AD',
                 }}
               />
             </div>
@@ -514,20 +512,19 @@ function VideoUploadSection({
 
             {/* Stage indicator */}
             <div className="flex items-center gap-1 mt-3">
-              {['Compress', 'Upload', 'Process'].map((stage, i) => {
-                const stageNum = i;
-                const currentStage = uploadStatus === 'compressing' ? 0 : uploadStatus === 'uploading' ? 1 : 2;
+              {['Upload', 'Process'].map((stage, i) => {
+                const currentStage = uploadStatus === 'uploading' ? 0 : 1;
                 return (
                   <div key={stage} className="flex items-center gap-1">
                     <div className={`w-2 h-2 rounded-full ${
-                      stageNum < currentStage ? 'bg-green-500' :
-                      stageNum === currentStage ? 'bg-teal-500 animate-pulse' :
+                      i < currentStage ? 'bg-green-500' :
+                      i === currentStage ? 'bg-teal-500 animate-pulse' :
                       'bg-gray-200'
                     }`} />
                     <span className={`text-[10px] ${
-                      stageNum <= currentStage ? 'text-gray-600' : 'text-gray-300'
+                      i <= currentStage ? 'text-gray-600' : 'text-gray-300'
                     }`}>{stage}</span>
-                    {i < 2 && <span className="text-gray-200 mx-0.5">-</span>}
+                    {i < 1 && <span className="text-gray-200 mx-0.5">-</span>}
                   </div>
                 );
               })}

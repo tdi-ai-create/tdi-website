@@ -420,7 +420,7 @@ export default function BulkVideoUpload({ course, onComplete, onLessonUploaded }
                       : 'Drop video files here or click to select'}
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
-                    MP4, MOV, MKV, or WebM -- files over 50MB auto-compress
+                    MP4, MOV, MKV, or WebM -- max 2GB per file
                   </p>
                   <input
                     ref={fileInputRef}
