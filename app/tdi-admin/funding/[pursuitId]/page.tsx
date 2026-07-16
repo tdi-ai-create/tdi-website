@@ -151,8 +151,8 @@ export default function PursuitDetailPage() {
           </div>
         </div>
 
-        {/* Phase chain */}
-        <PhaseChain currentPhase={p.current_phase} isStalled={p.is_stalled} />
+        {/* Status summary — auto-computed from opportunities */}
+        <OpportunityStatusBar opportunities={data.opportunities || []} />
       </div>
 
       {/* ── SITUATION BRIEFING ── */}
@@ -549,6 +549,48 @@ function EditableText({ value, onSave, style }: { value: string; onSave: (v: str
 }
 
 // ── Pursuit Briefing — auto-generated context summary ──
+
+function OpportunityStatusBar({ opportunities }: { opportunities: any[] }) {
+  if (opportunities.length === 0) {
+    return (
+      <div style={{ fontSize: 13, color: '#9CA3AF', padding: '8px 0' }}>
+        No grant opportunities added yet
+      </div>
+    )
+  }
+
+  const counts: Record<string, { count: number; color: string; label: string }> = {
+    not_started: { count: 0, color: '#6B7280', label: 'Not started' },
+    researching: { count: 0, color: '#4338CA', label: 'Researching' },
+    applied: { count: 0, color: '#1D4ED8', label: 'Applied' },
+    waiting: { count: 0, color: '#D97706', label: 'Waiting' },
+    awarded: { count: 0, color: '#065F46', label: 'Awarded' },
+    denied: { count: 0, color: '#991B1B', label: 'Denied' },
+  }
+
+  for (const opp of opportunities) {
+    const status = opp.status || 'not_started'
+    if (counts[status]) counts[status].count++
+    else if (!counts[status]) counts[status] = { count: 1, color: '#6B7280', label: status }
+  }
+
+  const active = Object.entries(counts).filter(([, v]) => v.count > 0)
+
+  return (
+    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+      <span style={{ fontSize: 12, color: '#6B7280', fontWeight: 600 }}>{opportunities.length} grants:</span>
+      {active.map(([key, v]) => (
+        <span key={key} style={{
+          fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 6,
+          background: key === 'awarded' ? '#D1FAE5' : key === 'denied' ? '#FEE2E2' : key === 'waiting' || key === 'applied' ? '#DBEAFE' : '#F3F4F6',
+          color: v.color,
+        }}>
+          {v.count} {v.label}
+        </span>
+      ))}
+    </div>
+  )
+}
 
 function PursuitBriefing({ pursuit, opportunities, gate, onRequestInfo }: { pursuit: any; opportunities: any[]; gate: any; onRequestInfo?: (draft: { to: string; toName: string; subject: string; body: string; schoolName: string }) => void }) {
   const contact = pursuit.client_contact_name || 'No contact set'

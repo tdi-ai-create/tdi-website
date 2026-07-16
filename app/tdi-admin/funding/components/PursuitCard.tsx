@@ -175,10 +175,12 @@ export function PursuitCard({ pursuit, onClick, onArchive }: { pursuit: Pursuit;
         </div>
       )}
 
-      {/* Phase chain */}
-      <div style={{ marginBottom: 12 }}>
-        <PhaseChain currentPhase={pursuit.current_phase} isStalled={pursuit.is_stalled} />
-      </div>
+      {/* Status summary — shows when no opportunity chips */}
+      {opps.length === 0 && (
+        <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 12 }}>
+          Getting started — grant opportunities being identified
+        </div>
+      )}
 
       {/* Next action callout */}
       {pursuit.next_action_label && (
