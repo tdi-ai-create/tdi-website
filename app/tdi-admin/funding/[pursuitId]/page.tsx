@@ -208,7 +208,16 @@ export default function PursuitDetailPage() {
       </CollapsibleSection>
 
       {/* ── DETAIL SECTIONS: Collapsed by default ── */}
-      <CollapsibleSection title="School Profile + Gate" sectionId="section-overview" defaultOpen={showOverview} onToggle={setShowOverview}>
+      <CollapsibleSection
+        title="School Profile + Gate"
+        sectionId="section-overview"
+        defaultOpen={showOverview}
+        onToggle={setShowOverview}
+        badge={gate?.gate_open
+          ? { label: 'Gate open', color: '#065F46', bg: '#D1FAE5' }
+          : { label: `${5 - [gate?.submitter_name, gate?.backup_name, gate?.admin_sponsor_name, gate?.contract1_signed, gate?.contract2_signed].filter(Boolean).length} missing`, color: '#DC2626', bg: '#FEF2F2' }
+        }
+      >
         <OverviewTab
           pursuit={p}
           gate={gate}
@@ -223,6 +232,14 @@ export default function PursuitDetailPage() {
 
       <CollapsibleSection title="Grant Opportunities" sectionId="section-opportunities" defaultOpen={showOpportunities} onToggle={setShowOpportunities}
         count={data.opportunities?.length}
+        badge={(() => {
+          const opps = data.opportunities || []
+          const active = opps.filter((o: any) => !['denied', 'awarded'].includes(o.status)).length
+          const awarded = opps.filter((o: any) => o.status === 'awarded').length
+          if (awarded > 0) return { label: `${awarded} awarded`, color: '#065F46', bg: '#D1FAE5' }
+          if (active > 0) return { label: `${active} active`, color: '#1D4ED8', bg: '#DBEAFE' }
+          return { label: 'Not started', color: '#6B7280', bg: '#F3F4F6' }
+        })()}
       >
         <OpportunitiesTab
           pursuitId={pursuitId}
@@ -408,13 +425,14 @@ function ActionCards({ actions, onCardClick, pursuitId, onActionDone }: { action
 
 // ── Collapsible Section ──
 
-function CollapsibleSection({ title, children, defaultOpen = false, onToggle, count, sectionId }: {
+function CollapsibleSection({ title, children, defaultOpen = false, onToggle, count, sectionId, badge }: {
   title: string
   children: React.ReactNode
   defaultOpen?: boolean
   onToggle?: (open: boolean) => void
   count?: number
   sectionId?: string
+  badge?: { label: string; color: string; bg: string }
 }) {
   const [open, setOpen] = useState(defaultOpen)
 
@@ -449,6 +467,14 @@ function CollapsibleSection({ title, children, defaultOpen = false, onToggle, co
             background: '#F3F4F6', color: '#6B7280',
           }}>
             {count}
+          </span>
+        )}
+        {badge && (
+          <span style={{
+            fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 6,
+            background: badge.bg, color: badge.color, marginLeft: 'auto',
+          }}>
+            {badge.label}
           </span>
         )}
       </button>
