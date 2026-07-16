@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Lock, Heart } from 'lucide-react';
-import { useMembership } from '@/lib/hub/use-membership';
+import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import CoverImageOverlay from '@/components/hub/CoverImageOverlay';
 
@@ -27,6 +27,7 @@ interface QuickWinCardProps {
     category: string;
     estimated_minutes: number;
     content_type: 'download' | 'activity' | 'video';
+    format_label?: string | null;
     thumbnail_url?: string;
     course_slug?: string;
     access_tier?: string;
@@ -37,8 +38,6 @@ interface QuickWinCardProps {
   onToggleFavorite?: (id: string, type: 'course' | 'quick_win') => void;
   displayTitle?: string;
   displayDescription?: string;
-  /** When provided, skips the per-card useMembership hook (perf optimization). */
-  hasAccess?: boolean;
 }
 
 export default function QuickWinCard({
@@ -47,20 +46,27 @@ export default function QuickWinCard({
   onToggleFavorite,
   displayTitle,
   displayDescription,
-  hasAccess: hasAccessProp,
 }: QuickWinCardProps) {
   const colors = CATEGORY_COLORS[quickWin.category] || { bg: '#F3F4F6', text: '#374151' };
+  // Use display props if provided, otherwise fall back to quickWin data
   const title = displayTitle || quickWin.title;
 
+  // Check access using membership hook
   const { canAccess } = useMembership();
   const { tUI } = useTranslation();
-  const hasAccess = hasAccessProp ?? canAccess({
+  const contentAccess: ContentAccess = {
     access_tier: quickWin.access_tier || 'essentials',
     is_free_rotating: quickWin.is_free_rotating,
-  });
+  };
+  const hasAccess = canAccess(contentAccess);
   const isFreeRotating = quickWin.is_free_rotating;
 
   const getTypeLabel = () => {
+    // Prefer the rich DB format label (e.g. "Cheat Sheet", "Cards", "Playbook")
+    // over the generic technical type when authors have set one.
+    if (quickWin.format_label && quickWin.format_label.trim().length > 0) {
+      return tUI(quickWin.format_label);
+    }
     switch (quickWin.content_type) {
       case 'download':
         return tUI('Download');
@@ -73,17 +79,17 @@ export default function QuickWinCard({
 
   return (
     <div
-      className="flex flex-row overflow-hidden relative"
+      className="flex flex-col overflow-hidden relative"
       style={{
         backgroundColor: 'white',
-        borderRadius: '12px',
+        borderRadius: '16px',
         border: '0.5px solid rgba(0,0,0,0.06)',
         opacity: !hasAccess && !isFreeRotating ? 0.82 : 1,
       }}
     >
-      {/* Left: Cover image / placeholder — 50% width */}
+      {/* Cover image with LIFT pill + tier label overlays */}
       <CoverImageOverlay
-        className="w-1/2 flex-shrink-0"
+        className="h-[130px]"
         imageUrl={quickWin.thumbnail_url}
         imageAlt={quickWin.title}
         liftRating={quickWin.capacity}
@@ -95,7 +101,7 @@ export default function QuickWinCard({
       {onToggleFavorite && (
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavorite(quickWin.id, 'quick_win') }}
-          className="absolute top-2 right-2 p-1 rounded-full transition-all z-10"
+          className="absolute top-3 right-3 p-1.5 rounded-full transition-all z-10"
           style={{
             background: isFavorited ? '#FEE2E2' : 'rgba(0,0,0,0.04)',
             border: 'none',
@@ -104,7 +110,7 @@ export default function QuickWinCard({
           aria-label={isFavorited ? tUI('Remove from saved') : tUI('Save quick win')}
         >
           <Heart
-            size={12}
+            size={14}
             style={{
               color: isFavorited ? '#E53935' : '#9CA3AF',
               fill: isFavorited ? '#E53935' : 'none',
@@ -114,11 +120,10 @@ export default function QuickWinCard({
         </button>
       )}
 
-      {/* Right: Content — 50% width */}
-      <div className="w-1/2 p-3 flex flex-col justify-center min-w-0">
+      <div className="p-4 flex-1">
         {/* Category tag */}
         <div
-          className="inline-block text-[9px] font-bold px-1.5 py-0.5 rounded mb-1 self-start"
+          className="inline-block text-[10px] font-bold px-2 py-0.5 rounded mb-2"
           style={{
             backgroundColor: colors.bg,
             color: colors.text,
@@ -130,7 +135,7 @@ export default function QuickWinCard({
           {tUI(quickWin.category)}
         </div>
 
-        {/* Title — full, no truncation */}
+        {/* Title */}
         <div
           className="text-sm font-semibold mb-1 leading-snug"
           style={{
@@ -143,24 +148,25 @@ export default function QuickWinCard({
 
         {/* Meta */}
         <div
-          className="text-[11px] mb-3"
+          className="text-xs mb-3 flex items-center gap-2 flex-wrap"
           style={{
             color: '#9CA3AF',
             fontFamily: "'DM Sans', sans-serif",
           }}
         >
-          {quickWin.estimated_minutes} {tUI('min')} · {getTypeLabel()}
+          <span>
+            {quickWin.estimated_minutes} {tUI('min')}
+            {quickWin.content_type && ` · ${getTypeLabel()}`}
+          </span>
         </div>
 
         {/* Action */}
         {hasAccess ? (
           <Link
-            href={quickWin.category === 'Games'
-              ? `/hub/practice/${quickWin.slug}`
-              : quickWin.course_slug
-                ? `/hub/courses/${quickWin.course_slug}/${quickWin.slug}`
-                : `/hub/quick-wins/${quickWin.slug}`}
-            className="text-xs font-semibold rounded-lg py-2.5 block text-center transition-opacity hover:opacity-90"
+            href={quickWin.course_slug
+              ? `/hub/courses/${quickWin.course_slug}/${quickWin.slug}`
+              : `/hub/quick-wins/${quickWin.slug}`}
+            className="text-xs font-semibold rounded-lg px-3 py-1.5 inline-block transition-opacity hover:opacity-90"
             style={{
               backgroundColor: '#1B2A4A',
               color: 'white',
@@ -172,7 +178,7 @@ export default function QuickWinCard({
         ) : (
           <Link
             href="/hub/membership"
-            className="text-xs font-medium py-2.5 rounded-lg flex items-center justify-center gap-1 transition-colors hover:bg-gray-50"
+            className="text-xs font-medium px-3 py-1.5 rounded-lg inline-flex items-center gap-1 transition-colors hover:bg-gray-50"
             style={{
               border: '1px solid #9CA3AF',
               color: '#6B7280',
