@@ -552,6 +552,35 @@ function SchoolProfileSection({ pursuit }: { pursuit: any }) {
   } catch { profile = {} }
 
   const [draft, setDraft] = useState<Record<string, any>>({ ...profile })
+  const [ncesSearching, setNcesSearching] = useState(false)
+  const [ncesResults, setNcesResults] = useState<any[] | null>(null)
+
+  const searchNces = async () => {
+    const searchTerm = pursuit.district_name || pursuit.pursuit_name || ''
+    if (!searchTerm) return
+    setNcesSearching(true)
+    setNcesResults(null)
+    try {
+      const res = await fetch(`/api/funding/nces-lookup?q=${encodeURIComponent(searchTerm.replace(/- Grant Funding$/, '').trim())}`)
+      const data = await res.json()
+      setNcesResults(data.results || [])
+    } catch { setNcesResults([]) }
+    setNcesSearching(false)
+  }
+
+  const applyNcesData = (school: any) => {
+    const updated = { ...draft }
+    if (school.school_name) updated.school_name = school.school_name
+    if (school.district) updated.district = school.district
+    if (school.nces_id) updated.nces_id = school.nces_id
+    if (school.address) updated.address = school.address
+    if (school.educator_count) updated.educator_count = school.educator_count
+    if (school.title_i_status) updated.title_i_status = school.title_i_status
+    if (school.frl_pct) updated.frl_pct = school.frl_pct
+    if (school.atsi_status) updated.atsi_status = school.atsi_status
+    setDraft(updated)
+    setNcesResults(null)
+  }
 
   const missingFields = REQUIRED_FOR_QUALITY.filter(k => {
     const v = profile[k]
@@ -587,9 +616,53 @@ function SchoolProfileSection({ pursuit }: { pursuit: any }) {
     <Section title="School Profile">
       {editing ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 14, background: '#F9FAFB', borderRadius: 10, border: '1px solid #E5E7EB' }}>
-          <div style={{ fontSize: 11, color: '#6B7280', fontStyle: 'italic', marginBottom: 4 }}>
-            Fields marked <span style={{ color: '#DC2626', fontWeight: 700 }}>*</span> are needed for grant eligibility checks.
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <div style={{ fontSize: 11, color: '#6B7280', fontStyle: 'italic' }}>
+              Fields marked <span style={{ color: '#DC2626', fontWeight: 700 }}>*</span> are needed for grant eligibility checks.
+            </div>
+            <button
+              onClick={searchNces}
+              disabled={ncesSearching}
+              style={{
+                fontSize: 11, fontWeight: 700, padding: '5px 12px', borderRadius: 6,
+                border: 'none', background: ncesSearching ? '#9CA3AF' : '#0F766E', color: 'white',
+                cursor: ncesSearching ? 'default' : 'pointer',
+              }}
+            >
+              {ncesSearching ? 'Searching...' : 'Auto-fill from NCES'}
+            </button>
           </div>
+
+          {/* NCES search results */}
+          {ncesResults && ncesResults.length > 0 && (
+            <div style={{ marginBottom: 8, padding: 10, background: '#F0FDFA', borderRadius: 8, border: '1px solid #99F6E4' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#0F766E', marginBottom: 6 }}>
+                Select a school to auto-fill:
+              </div>
+              {ncesResults.map((r: any, i: number) => (
+                <button
+                  key={i}
+                  onClick={() => applyNcesData(r)}
+                  style={{
+                    display: 'block', width: '100%', textAlign: 'left', padding: '6px 10px',
+                    marginBottom: 4, borderRadius: 6, border: '1px solid #E5E7EB',
+                    background: 'white', cursor: 'pointer', fontSize: 12,
+                  }}
+                >
+                  <strong>{r.school_name}</strong> — {r.district}
+                  <span style={{ color: '#6B7280', marginLeft: 8 }}>
+                    {r.enrollment ? `${r.enrollment} students` : ''} {r.frl_pct ? `| ${r.frl_pct}% FRL` : ''} {r.title_i_status ? `| ${r.title_i_status}` : ''}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+          {ncesResults && ncesResults.length === 0 && (
+            <div style={{ marginBottom: 8, fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>
+              No NCES results found. Try a different search term.
+            </div>
+          )}
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {PROFILE_FIELDS.map(f => (
               <div key={f.key}>
