@@ -1,8 +1,20 @@
 'use client';
 
+/**
+ * !!! CRITICAL: DO NOT CHANGE THE SUPABASE IMPORT BELOW !!!
+ *
+ * This page MUST use getHubSupabase from '@/lib/supabase-hub'.
+ * NEVER import from '@/lib/supabase' -- that is the Creator Portal database
+ * and will cause Quick Wins to show only 3 seed rows instead of 122+ published items.
+ *
+ * This has broken TWICE in production (July 17, 2026). If you change this import,
+ * the Quick Wins page will break for all users.
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 import QuickWinCard from '@/components/hub/QuickWinCard';
 import EmptyState from '@/components/hub/EmptyState';
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports -- Hub pages MUST use supabase-hub
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { useFavorites } from '@/lib/hub/useFavorites';
 import { useLanguage } from '@/lib/hub/useLanguage';
