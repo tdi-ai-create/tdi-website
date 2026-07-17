@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { Resend } from 'resend';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-02-24.acacia',
@@ -99,6 +100,34 @@ export async function POST(req: Request) {
             }
           } else {
             console.warn('[stripe/webhook] no hub_profile found for', email);
+          }
+        }
+
+        // Notify Bella to comp this user on Substack if tier is Essentials or higher
+        const paidTiers = ['essentials', 'professional', 'all_access'];
+        if (paidTiers.includes(tier.toLowerCase())) {
+          const resendKey = process.env.RESEND_API_KEY;
+          if (resendKey) {
+            const resend = new Resend(resendKey);
+            await resend.emails.send({
+              from: 'TDI Admin <noreply@teachersdeserveit.com>',
+              to: ['hello@teachersdeserveit.com'],
+              cc: ['Rae@teachersdeserveit.com'],
+              subject: `New Hub subscriber -- please comp on Substack: ${email}`,
+              html: `
+                <h2>New Paid Hub Subscriber</h2>
+                <p><strong>${email}</strong> just subscribed to the <strong>${tier}</strong> tier on the Learning Hub.</p>
+                <p>Please add them as a comped subscriber on Substack:</p>
+                <ol>
+                  <li>Go to <a href="https://raehughart.substack.com/publish/subscribers">Substack Subscribers</a></li>
+                  <li>Click "Comp a subscription"</li>
+                  <li>Enter: <strong>${email}</strong></li>
+                  <li>Done!</li>
+                </ol>
+                <hr>
+                <p style="color:#71717a;font-size:12px;">Automated from TDI Stripe webhook. Hub tier: ${tier}.</p>
+              `,
+            }).catch(err => console.error('[stripe/webhook] Bella notification failed:', err));
           }
         }
 
