@@ -798,6 +798,16 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                 </div>
               )}
 
+              {/* Uploaded HTML resource (quick_win / game / quiz — served from Supabase Storage) */}
+              {(quickWin.content_type === 'quick_win' || quickWin.content_type === 'game' || quickWin.content_type === 'quiz') && quickWin.download_url && (
+                <iframe
+                  src={quickWin.download_url}
+                  title={quickWin.title}
+                  className="w-full min-h-[80vh]"
+                  style={{ border: 'none', borderRadius: '12px' }}
+                />
+              )}
+
               {/* Read type */}
               {(quickWin.content_type === 'read' || (!quickWin.video_url && !quickWin.download_url && actionSteps.length === 0 && quickWin.content_type !== 'reflection')) && (
                 <div>
