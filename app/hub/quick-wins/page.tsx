@@ -366,7 +366,6 @@ export default function QuickWinsPage() {
                 onToggleFavorite={toggleFavorite}
                 displayTitle={t(qw.title, qw.title_es)}
                 displayDescription={t(qw.description, qw.description_es)}
-                hasAccess={canAccess({ access_tier: qw.access_tier || 'essentials', is_free_rotating: qw.is_free_rotating } as ContentAccess)}
               />
             ))}
           </div>
