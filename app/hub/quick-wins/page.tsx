@@ -199,7 +199,29 @@ export default function QuickWinsPage() {
           title_es: qw.title_es,
           description_es: qw.description_es,
         }));
-        setQuickWins(formattedQuickWins);
+
+        // Shuffle using a daily seed so all users see the same order per day
+        // but the page feels fresh each day. Items with unique thumbnails
+        // are weighted to appear first for a better visual experience.
+        const today = new Date().toISOString().slice(0, 10);
+        const dailySeed = today.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+        const seededRandom = (i: number) => {
+          const x = Math.sin(dailySeed + i) * 10000;
+          return x - Math.floor(x);
+        };
+
+        // Separate items with unique thumbnails from generic ones
+        const hasUniqueThumbnail = (qw: QuickWin) =>
+          qw.thumbnail_url && qw.thumbnail_url.includes('cover-images/');
+        const withUnique = formattedQuickWins.filter(hasUniqueThumbnail);
+        const withGeneric = formattedQuickWins.filter(qw => !hasUniqueThumbnail(qw));
+
+        // Shuffle each group with daily seed
+        const shuffle = (arr: QuickWin[]) =>
+          arr.sort((a, b) => seededRandom(arr.indexOf(a)) - seededRandom(arr.indexOf(b)));
+
+        // Show unique-thumbnail items first, then generic ones
+        setQuickWins([...shuffle(withUnique), ...shuffle(withGeneric)]);
       }
     } catch (error) {
       console.error('Error loading quick wins:', error);
