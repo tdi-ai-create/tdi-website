@@ -16,6 +16,7 @@ const FILTER_CATEGORIES = [
   'Stress Relief',
   'Time Savers',
   'Classroom Tools',
+  'Classroom Management',
   'Communication',
   'Self-Care',
 ];
