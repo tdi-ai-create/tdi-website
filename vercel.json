@@ -41,10 +41,6 @@
       "schedule": "0 14 1 * *"
     },
     {
-      "path": "/api/cron/restart-paperclip",
-      "schedule": "0 6 * * *"
-    },
-    {
       "path": "/api/cron/paperclip-watchdog",
       "schedule": "*/30 * * * *"
     },
@@ -91,6 +87,10 @@
     {
       "path": "/api/cron/pipeline-snapshot",
       "schedule": "0 8 * * 1"
+    },
+    {
+      "path": "/api/cron/hub-content-health",
+      "schedule": "30 12 * * *"
     }
   ]
 }
