@@ -18,6 +18,7 @@ import ProjectedDateCountdown from '@/components/creator-portal/ProjectedDateCou
 import { TakeABreakButton } from '@/components/creator-portal/TakeABreak';
 import PausedScreen from '@/components/creator-portal/PausedScreen';
 import PepTalkCallout from '@/components/creator-portal/PepTalkCallout';
+import { FeedbackPortal } from '@/components/creator-portal/FeedbackPortal';
 import type { CreatorDashboardData, MilestoneWithStatus } from '@/types/creator-portal';
 
 // Component to handle search params (must be wrapped in Suspense)
@@ -533,6 +534,24 @@ export default function CreatorDashboardPage() {
                 />
               </div>
 
+
+              {/* Submissions & Feedback Portal */}
+              <div className="mt-6">
+                <FeedbackPortal
+                  creatorId={dashboardData.creator.id}
+                  milestones={dashboardData.phases.flatMap(p =>
+                    p.milestones
+                      .filter((m: MilestoneWithStatus) => m.isApplicable !== false)
+                      .map((m: MilestoneWithStatus) => ({
+                        progress_id: m.progress_id || m.id,
+                        id: m.id,
+                        title: m.title,
+                        status: m.status,
+                      }))
+                  )}
+                  onRefresh={refreshDashboard}
+                />
+              </div>
 
               {/* Content grid */}
               <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">

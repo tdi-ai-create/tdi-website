@@ -1361,6 +1361,13 @@ export default function CreatorStudioPage() {
   const [isMarkingFollowUp, setIsMarkingFollowUp] = useState(false);
   const [adminEmail, setAdminEmail] = useState<string>('');
 
+  // Feedback review queue state
+  const [feedbackQueue, setFeedbackQueue] = useState<any[]>([]);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [editingFeedbackId, setEditingFeedbackId] = useState<string | null>(null);
+  const [editedFeedbackContent, setEditedFeedbackContent] = useState('');
+  const [feedbackActionLoading, setFeedbackActionLoading] = useState<string | null>(null);
+
   const canEdit = isOwner || hasPermission(permissions, 'creator_studio', 'edit');
 
   const loadDashboardData = useCallback(async () => {
@@ -1399,6 +1406,11 @@ export default function CreatorStudioPage() {
       fetch('/api/admin/creator-email-activity')
         .then(res => res.json())
         .then(data => setRecentEmails(data.emails || []))
+        .catch(() => {});
+      // Load feedback review queue
+      fetch('/api/admin/creator-feedback?status=pending_review')
+        .then(res => res.json())
+        .then(data => setFeedbackQueue(data.feedback || []))
         .catch(() => {});
       // Get admin email from session
       import('@/lib/supabase').then(({ supabase }) => {
@@ -2154,6 +2166,164 @@ export default function CreatorStudioPage() {
       {/* DASHBOARD TAB */}
       {activeTab === 'dashboard' && (
         <div>
+          {/* Feedback Review Queue */}
+          {feedbackQueue.length > 0 && (
+            <div className="mb-5 bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
+              <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between" style={{ backgroundColor: '#fafbfc' }}>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-semibold tracking-wide uppercase" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>
+                    Feedback Review Queue
+                  </h2>
+                  <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold text-white" style={{ backgroundColor: '#8B5CF6' }}>
+                    {feedbackQueue.length}
+                  </span>
+                </div>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {feedbackQueue.map((item: any) => (
+                  <div key={item.id} className="p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-semibold" style={{ color: '#1e2749' }}>{item.creator_name}</span>
+                          <span className="text-xs text-gray-400">v{item.submission_version}</span>
+                        </div>
+                        <p className="text-xs text-gray-500 mb-2">{item.milestone_title}</p>
+                        {item.submitted_value && (
+                          <div className="mb-2 px-3 py-2 bg-gray-50 rounded-lg text-xs text-gray-600 line-clamp-2">
+                            <span className="font-medium text-gray-500">Submitted: </span>
+                            {item.submitted_value.length > 120 ? item.submitted_value.substring(0, 120) + '...' : item.submitted_value}
+                          </div>
+                        )}
+                        {editingFeedbackId === item.id ? (
+                          <div className="mb-2">
+                            <textarea
+                              value={editedFeedbackContent}
+                              onChange={(e) => setEditedFeedbackContent(e.target.value)}
+                              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400"
+                              rows={4}
+                              placeholder="Edit feedback before approving..."
+                            />
+                          </div>
+                        ) : (
+                          <div className="px-3 py-2 bg-violet-50 rounded-lg text-xs text-gray-700 line-clamp-3">
+                            <span className="font-medium text-violet-600">Anne Marie&apos;s draft: </span>
+                            {item.feedback_content}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-1.5 flex-shrink-0">
+                        {editingFeedbackId === item.id ? (
+                          <>
+                            <button
+                              onClick={async () => {
+                                setFeedbackActionLoading(item.id);
+                                try {
+                                  await fetch('/api/admin/creator-feedback', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                      action: 'approve',
+                                      feedback_id: item.id,
+                                      approved_by: adminEmail || 'admin',
+                                      edited_content: editedFeedbackContent,
+                                    }),
+                                  });
+                                  setFeedbackQueue(prev => prev.filter(f => f.id !== item.id));
+                                  setEditingFeedbackId(null);
+                                } catch (err) {
+                                  console.error('Error approving feedback:', err);
+                                } finally {
+                                  setFeedbackActionLoading(null);
+                                }
+                              }}
+                              disabled={feedbackActionLoading === item.id}
+                              className="px-3 py-1.5 text-xs font-medium rounded-lg text-white transition-colors disabled:opacity-50"
+                              style={{ backgroundColor: '#16a34a' }}
+                            >
+                              {feedbackActionLoading === item.id ? 'Saving...' : 'Save & Approve'}
+                            </button>
+                            <button
+                              onClick={() => { setEditingFeedbackId(null); setEditedFeedbackContent(''); }}
+                              className="px-3 py-1.5 text-xs font-medium rounded-lg text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={async () => {
+                                setFeedbackActionLoading(item.id);
+                                try {
+                                  await fetch('/api/admin/creator-feedback', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                      action: 'approve',
+                                      feedback_id: item.id,
+                                      approved_by: adminEmail || 'admin',
+                                    }),
+                                  });
+                                  setFeedbackQueue(prev => prev.filter(f => f.id !== item.id));
+                                } catch (err) {
+                                  console.error('Error approving feedback:', err);
+                                } finally {
+                                  setFeedbackActionLoading(null);
+                                }
+                              }}
+                              disabled={feedbackActionLoading === item.id}
+                              className="px-3 py-1.5 text-xs font-medium rounded-lg text-white transition-colors disabled:opacity-50"
+                              style={{ backgroundColor: '#16a34a' }}
+                            >
+                              {feedbackActionLoading === item.id ? '...' : 'Approve'}
+                            </button>
+                            <button
+                              onClick={() => {
+                                setEditingFeedbackId(item.id);
+                                setEditedFeedbackContent(item.feedback_content || '');
+                              }}
+                              className="px-3 py-1.5 text-xs font-medium rounded-lg text-violet-600 bg-violet-50 hover:bg-violet-100 transition-colors"
+                            >
+                              Edit & Approve
+                            </button>
+                            <button
+                              onClick={async () => {
+                                setFeedbackActionLoading(item.id);
+                                try {
+                                  await fetch('/api/admin/creator-feedback', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                      action: 'reject',
+                                      feedback_id: item.id,
+                                      reason: 'Rejected by admin',
+                                    }),
+                                  });
+                                  setFeedbackQueue(prev => prev.filter(f => f.id !== item.id));
+                                } catch (err) {
+                                  console.error('Error rejecting feedback:', err);
+                                } finally {
+                                  setFeedbackActionLoading(null);
+                                }
+                              }}
+                              disabled={feedbackActionLoading === item.id}
+                              className="px-3 py-1.5 text-xs font-medium rounded-lg text-red-600 bg-red-50 hover:bg-red-100 transition-colors disabled:opacity-50"
+                            >
+                              Reject
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Empty state for feedback queue when no items */}
+
           {/* Today's Priorities Banner */}
           {(pendingReviewsWithWait.length > 0 || stalledCreators.length > 0 || followedUpApproachingRestall.length > 0) && (
             <div className="mb-5 bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">

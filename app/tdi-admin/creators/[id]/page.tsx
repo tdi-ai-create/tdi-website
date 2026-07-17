@@ -41,6 +41,7 @@ import {
   User,
   Folder,
   Activity,
+  FileText,
 } from 'lucide-react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
@@ -246,6 +247,13 @@ export default function TDIAdminCreatorDetailPage() {
   const [isLoadingAiSummary, setIsLoadingAiSummary] = useState(false);
   const [pendingDrafts, setPendingDrafts] = useState<any[]>([]);
 
+  // Submissions & Feedback state
+  const [creatorFeedback, setCreatorFeedback] = useState<any[]>([]);
+  const [showFeedbackSection, setShowFeedbackSection] = useState(false);
+  const [directFeedbackMilestoneId, setDirectFeedbackMilestoneId] = useState<string | null>(null);
+  const [directFeedbackContent, setDirectFeedbackContent] = useState('');
+  const [isSendingDirectFeedback, setIsSendingDirectFeedback] = useState(false);
+
   const adminEmail = teamMember?.email || '';
 
   const loadData = useCallback(async () => {
@@ -328,6 +336,20 @@ export default function TDIAdminCreatorDetailPage() {
       setPendingDrafts(drafts || []);
     } catch {
       // Non-fatal -- agent drafts feature may not be set up yet
+    }
+
+    // Load submissions & feedback for this creator
+    try {
+      const feedbackRes = await fetch(`/api/admin/creator-feedback?status=all&creator_id=${creatorId}`);
+      if (feedbackRes.ok) {
+        const feedbackData = await feedbackRes.json();
+        setCreatorFeedback(feedbackData.feedback || []);
+        if ((feedbackData.feedback || []).length > 0) {
+          setShowFeedbackSection(true);
+        }
+      }
+    } catch {
+      // Non-fatal
     }
 
     // Load projected date history via API (bypasses RLS)
@@ -1231,6 +1253,157 @@ export default function TDIAdminCreatorDetailPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Submissions & Feedback History */}
+      {(showFeedbackSection || creatorFeedback.length > 0) && (
+        <div className="mb-6 bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <button
+            onClick={() => setShowFeedbackSection(!showFeedbackSection)}
+            className="w-full px-4 py-3 border-b border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <FileText className="w-4 h-4" style={{ color: theme.accent }} />
+              <span className="text-sm font-semibold" style={{ color: '#1e2749' }}>
+                Submissions & Feedback
+              </span>
+              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-medium">
+                {creatorFeedback.length}
+              </span>
+            </div>
+            {showFeedbackSection ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+          </button>
+          {showFeedbackSection && (
+            <div className="divide-y divide-gray-100">
+              {creatorFeedback.length === 0 ? (
+                <div className="p-4 text-center text-sm text-gray-400">No submissions yet</div>
+              ) : (
+                creatorFeedback.map((item: any) => (
+                  <div key={item.id} className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-sm font-medium" style={{ color: '#1e2749' }}>{item.milestone_title}</span>
+                      <span className="text-xs text-gray-400">v{item.submission_version}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        item.feedback_draft_status === 'approved' ? 'bg-green-100 text-green-700' :
+                        item.feedback_draft_status === 'pending_review' ? 'bg-amber-100 text-amber-700' :
+                        item.feedback_draft_status === 'rejected' ? 'bg-red-100 text-red-700' :
+                        'bg-gray-100 text-gray-600'
+                      }`}>
+                        {item.feedback_draft_status === 'approved' ? 'Approved' :
+                         item.feedback_draft_status === 'pending_review' ? 'Pending Review' :
+                         item.feedback_draft_status === 'rejected' ? 'Rejected' : 'Submitted'}
+                      </span>
+                      {item.call_requested && (
+                        <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-700">
+                          Call Requested
+                        </span>
+                      )}
+                    </div>
+                    {item.submitted_value && (
+                      <div className="mb-2 px-3 py-2 bg-gray-50 rounded-lg text-xs text-gray-600">
+                        <span className="font-medium text-gray-500">Submitted: </span>
+                        {item.submitted_value}
+                      </div>
+                    )}
+                    {item.submission_notes && (
+                      <p className="text-xs text-gray-500 mb-2 italic">Notes: {item.submission_notes}</p>
+                    )}
+                    {item.feedback_content && (
+                      <div className={`px-3 py-2 rounded-lg text-xs ${
+                        item.feedback_drafted_by === 'anne-marie' ? 'bg-violet-50 text-gray-700' : 'bg-blue-50 text-gray-700'
+                      }`}>
+                        <span className={`font-medium ${item.feedback_drafted_by === 'anne-marie' ? 'text-violet-600' : 'text-blue-600'}`}>
+                          {item.feedback_drafted_by === 'anne-marie' ? 'Anne Marie' : 'Direct feedback'}: </span>
+                        {item.feedback_content}
+                      </div>
+                    )}
+                    <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
+                      {item.submitted_at && <span>Submitted {new Date(item.submitted_at).toLocaleDateString()}</span>}
+                      {item.feedback_approved_at && (
+                        <span> | Approved {new Date(item.feedback_approved_at).toLocaleDateString()} by {item.feedback_approved_by}</span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+              {/* Add direct feedback */}
+              {canEdit && (
+                <div className="p-4 bg-gray-50">
+                  {directFeedbackMilestoneId ? (
+                    <div className="space-y-2">
+                      <textarea
+                        value={directFeedbackContent}
+                        onChange={(e) => setDirectFeedbackContent(e.target.value)}
+                        placeholder="Write direct feedback (bypasses Anne Marie)..."
+                        rows={3}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={async () => {
+                            if (!directFeedbackContent.trim()) return;
+                            setIsSendingDirectFeedback(true);
+                            try {
+                              await fetch('/api/admin/creator-feedback', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  action: 'add_direct',
+                                  milestone_record_id: directFeedbackMilestoneId,
+                                  creator_id: creatorId,
+                                  feedback_content: directFeedbackContent,
+                                  approved_by: adminEmail,
+                                }),
+                              });
+                              setDirectFeedbackMilestoneId(null);
+                              setDirectFeedbackContent('');
+                              loadData();
+                            } catch (err) {
+                              console.error('Error sending direct feedback:', err);
+                            } finally {
+                              setIsSendingDirectFeedback(false);
+                            }
+                          }}
+                          disabled={isSendingDirectFeedback || !directFeedbackContent.trim()}
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg text-white transition-colors disabled:opacity-50"
+                          style={{ backgroundColor: '#16a34a' }}
+                        >
+                          {isSendingDirectFeedback ? 'Sending...' : 'Send & Approve'}
+                        </button>
+                        <button
+                          onClick={() => { setDirectFeedbackMilestoneId(null); setDirectFeedbackContent(''); }}
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg text-gray-600 bg-gray-200 hover:bg-gray-300 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-xs text-gray-500 mb-2">Add direct feedback to a milestone:</p>
+                      <select
+                        onChange={(e) => { if (e.target.value) setDirectFeedbackMilestoneId(e.target.value); }}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-200"
+                        defaultValue=""
+                      >
+                        <option value="" disabled>Select a milestone...</option>
+                        {dashboardData?.phases.flatMap((phase: PhaseWithMilestones) =>
+                          phase.milestones
+                            .filter((m: MilestoneWithStatus) => m.isApplicable !== false && (m.status === 'waiting_approval' || m.status === 'in_progress' || m.status === 'available'))
+                            .map((m: MilestoneWithStatus) => (
+                              <option key={m.progress_id || m.id} value={m.progress_id || ''}>
+                                {m.title}
+                              </option>
+                            ))
+                        )}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
