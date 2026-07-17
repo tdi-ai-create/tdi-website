@@ -22,6 +22,7 @@ export async function GET(
     'funding-launch': 'funding-onboarding.html',
     'hub-engagement': 'learning-hub-engagement.html',
     'engagement-workflow': 'engagement-workflow.html',
+    'creator-feedback-sop': 'creator-feedback-sop.html',
   };
 
   const filename = allowedDocs[slug];
