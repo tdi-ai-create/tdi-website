@@ -38,6 +38,16 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: '/seed',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/documents/TDI-Seed-Funding-Deck.pdf',
+        destination: '/',
+        permanent: true,
+      },
+      {
         source: '/guest-promo-toolkit',
         destination: 'https://docs.google.com/document/d/1yAcAKpz03pWdQ0A9ZvEFxcdgiUtEfwtn/view',
         permanent: false,
