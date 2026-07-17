@@ -24,41 +24,48 @@ export async function middleware(req: NextRequest) {
   // (requireAdminAuth via @supabase/ssr) can read it.
   // This does NOT block unauthenticated requests — it only
   // refreshes the session cookie if one exists.
+  //
+  // Wrapped defensively: a session refresh failure must never
+  // surface as MIDDLEWARE_INVOCATION_FAILED on unrelated routes.
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (supabaseUrl && supabaseAnonKey) {
-    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-      cookies: {
-        getAll() {
-          return req.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => {
-            req.cookies.set(name, value);
-          });
-          response = NextResponse.next({ request: req });
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
-
-          // Re-apply partner cookie if it was set above
-          if (partnerParam) {
-            response.cookies.set(PARTNER_COOKIE, partnerParam, {
-              maxAge: COOKIE_MAX_AGE,
-              httpOnly: false,
-              sameSite: 'lax',
-              secure: process.env.NODE_ENV === 'production',
-              path: '/',
+    try {
+      const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+        cookies: {
+          getAll() {
+            return req.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) => {
+              req.cookies.set(name, value);
             });
-          }
-        },
-      },
-    });
+            response = NextResponse.next({ request: req });
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options);
+            });
 
-    // This refreshes the session — if a session cookie exists, it
-    // refreshes the token; if not, it's a no-op.
-    await supabase.auth.getUser();
+            // Re-apply partner cookie if it was set above
+            if (partnerParam) {
+              response.cookies.set(PARTNER_COOKIE, partnerParam, {
+                maxAge: COOKIE_MAX_AGE,
+                httpOnly: false,
+                sameSite: 'lax',
+                secure: process.env.NODE_ENV === 'production',
+                path: '/',
+              });
+            }
+          },
+        },
+      });
+
+      // This refreshes the session — if a session cookie exists, it
+      // refreshes the token; if not, it's a no-op.
+      await supabase.auth.getUser();
+    } catch (err) {
+      console.error('[middleware] supabase session refresh failed', err);
+    }
   }
 
   return response;
