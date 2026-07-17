@@ -801,7 +801,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               {/* Uploaded HTML resource (quick_win / game / quiz — served from Supabase Storage) */}
               {(quickWin.content_type === 'quick_win' || quickWin.content_type === 'game' || quickWin.content_type === 'quiz') && quickWin.download_url && (
                 <iframe
-                  src={quickWin.download_url}
+                  src={`/api/hub/resource-proxy?url=${encodeURIComponent(quickWin.download_url)}`}
                   title={quickWin.title}
                   className="w-full min-h-[80vh]"
                   style={{ border: 'none', borderRadius: '12px' }}
