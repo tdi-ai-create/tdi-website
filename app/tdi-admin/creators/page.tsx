@@ -2005,7 +2005,12 @@ export default function CreatorStudioPage() {
   // Compute creators needing team attention
   // Include: waitingOn === 'tdi' OR has post_launch_notes (active follow-up work)
   const needsAttention = dashboardData.creators
-    .filter((c: EnrichedCreator) => c.waitingOn === 'tdi' || (c.post_launch_notes && c.post_launch_notes.trim() !== ''))
+    .filter((c: EnrichedCreator) => {
+      // Exclude published creators -- they belong in "Recently Published", not "Needs Attention"
+      if (c.publish_status === 'published') return false;
+      if (c.status === 'archived') return false;
+      return c.waitingOn === 'tdi' || (c.post_launch_notes && c.post_launch_notes.trim() !== '');
+    })
     .sort((a: EnrichedCreator, b: EnrichedCreator) => {
       // Sort post-launch notes items to the end, then by last activity date
       const aHasNotes = a.post_launch_notes && a.post_launch_notes.trim() !== '';
@@ -2024,7 +2029,11 @@ export default function CreatorStudioPage() {
 
   // Count for display - how many need attention
   const needsAttentionCount = dashboardData.creators.filter(
-    (c: EnrichedCreator) => c.waitingOn === 'tdi' || (c.post_launch_notes && c.post_launch_notes.trim() !== '')
+    (c: EnrichedCreator) => {
+      if (c.publish_status === 'published') return false;
+      if (c.status === 'archived') return false;
+      return c.waitingOn === 'tdi' || (c.post_launch_notes && c.post_launch_notes.trim() !== '');
+    }
   ).length;
 
   // Compute priority data for "Today's Priorities" banner
@@ -2166,6 +2175,118 @@ export default function CreatorStudioPage() {
       {/* DASHBOARD TAB */}
       {activeTab === 'dashboard' && (
         <div>
+          {/* Today's Priorities Banner */}
+          {(pendingReviewsWithWait.length > 0 || stalledCreators.length > 0 || followedUpApproachingRestall.length > 0) && (
+            <div className="mb-5 bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
+              <div className="px-5 py-3 border-b border-gray-100" style={{ backgroundColor: '#fafbfc' }}>
+                <h2 className="text-sm font-semibold tracking-wide uppercase" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>
+                  Today&apos;s Priorities
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+                {/* Pending Reviews */}
+                <button
+                  onClick={() => handleStatCardClick('waitingOnTDI')}
+                  className="flex items-start gap-3 p-4 hover:bg-slate-50 transition-colors text-left w-full"
+                >
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    pendingReviewsWithWait.length > 0
+                      ? pendingReviewsWithWait.some(c => c.daysWaiting >= 5) ? 'bg-red-100' : pendingReviewsWithWait.some(c => c.daysWaiting >= 2) ? 'bg-amber-100' : 'bg-green-100'
+                      : 'bg-gray-100'
+                  }`}>
+                    <FileText className={`w-4.5 h-4.5 ${
+                      pendingReviewsWithWait.length > 0
+                        ? pendingReviewsWithWait.some(c => c.daysWaiting >= 5) ? 'text-red-600' : pendingReviewsWithWait.some(c => c.daysWaiting >= 2) ? 'text-amber-600' : 'text-green-600'
+                        : 'text-gray-400'
+                    }`} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>{pendingReviewsWithWait.length}</span>
+                      <span className="text-sm text-gray-500">pending review{pendingReviewsWithWait.length !== 1 ? 's' : ''}</span>
+                    </div>
+                    {pendingReviewsWithWait.length > 0 && (
+                      <div className="mt-1 space-y-0.5">
+                        {pendingReviewsWithWait.slice(0, 3).map(c => (
+                          <p key={c.id} className="text-xs text-gray-500 truncate flex items-center gap-1.5">
+                            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                              c.daysWaiting >= 5 ? 'bg-red-500' : c.daysWaiting >= 2 ? 'bg-amber-500' : 'bg-green-500'
+                            }`} />
+                            {c.name}
+                            <span className={`font-medium ${
+                              c.daysWaiting >= 5 ? 'text-red-600' : c.daysWaiting >= 2 ? 'text-amber-600' : 'text-green-600'
+                            }`}>
+                              {c.daysWaiting}d
+                            </span>
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </button>
+
+                {/* Stalled Creators — auto-managed by re-engagement */}
+                <button
+                  onClick={() => handleStatCardClick('stalled')}
+                  className="flex items-start gap-3 p-4 hover:bg-slate-50 transition-colors text-left w-full"
+                >
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    stalledCreators.length > 0 ? 'bg-amber-100' : 'bg-gray-100'
+                  }`}>
+                    <Mail className={`w-4.5 h-4.5 ${
+                      stalledCreators.length > 0 ? 'text-amber-600' : 'text-gray-400'
+                    }`} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>{stalledCreators.length}</span>
+                      <span className="text-sm text-gray-500">in re-engagement</span>
+                    </div>
+                    {stalledCreators.length > 0 ? (
+                      <p className="mt-1 text-xs text-amber-600 font-medium">
+                        Auto-emails active -- reply to Bella if they respond
+                      </p>
+                    ) : (
+                      <p className="mt-1 text-xs text-gray-400">
+                        No stalled creators
+                      </p>
+                    )}
+                  </div>
+                </button>
+
+                {/* Follow-up Check-ins */}
+                <button
+                  onClick={() => handleStatCardClick('followedUp')}
+                  className="flex items-start gap-3 p-4 hover:bg-slate-50 transition-colors text-left w-full"
+                >
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    followedUpApproachingRestall.length > 0 ? 'bg-orange-100' : 'bg-gray-100'
+                  }`}>
+                    <UserCheck className={`w-4.5 h-4.5 ${
+                      followedUpApproachingRestall.length > 0 ? 'text-orange-600' : 'text-gray-400'
+                    }`} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>{followedUpApproachingRestall.length}</span>
+                      <span className="text-sm text-gray-500">re-stalling soon</span>
+                    </div>
+                    {followedUpApproachingRestall.length > 0 && (
+                      <p className="mt-1 text-xs text-orange-600 font-medium">
+                        Followed up but no creator activity -- check in again
+                      </p>
+                    )}
+                    {followedUpApproachingRestall.length === 0 && stats.followedUp > 0 && (
+                      <p className="mt-1 text-xs text-gray-400">
+                        {stats.followedUp} followed up, all within window
+                      </p>
+                    )}
+                  </div>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Feedback Review Queue */}
           {feedbackQueue.length > 0 && (
             <div className="mb-5 bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
@@ -2322,116 +2443,107 @@ export default function CreatorStudioPage() {
             </div>
           )}
 
-          {/* Empty state for feedback queue when no items */}
-
-          {/* Today's Priorities Banner */}
-          {(pendingReviewsWithWait.length > 0 || stalledCreators.length > 0 || followedUpApproachingRestall.length > 0) && (
-            <div className="mb-5 bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
-              <div className="px-5 py-3 border-b border-gray-100" style={{ backgroundColor: '#fafbfc' }}>
-                <h2 className="text-sm font-semibold tracking-wide uppercase" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>
-                  Today&apos;s Priorities
-                </h2>
+          {/* Needs Your Attention */}
+          {needsAttention.length > 0 && (
+            <div
+              className="mb-5 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] border-l-4"
+              style={{ borderLeftColor: '#6B7280' }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="flex items-center gap-2" style={TYPE_CARD_TITLE}>
+                  <AlertTriangle className="w-5 h-5 text-gray-600" />
+                  Needs Your Attention
+                  {needsAttentionCount > 0 && (
+                    <span className="text-xs font-normal text-gray-500">({needsAttentionCount})</span>
+                  )}
+                </h3>
+                <button
+                  onClick={() => handleCopyEmails(needsAttention.map(c => c.email), 'needsAttention')}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
+                    copiedSection === 'needsAttention'
+                      ? 'bg-green-50 text-yellow-600 border border-green-200'
+                      : 'text-gray-500 hover:bg-gray-100 border border-transparent'
+                  }`}
+                >
+                  {copiedSection === 'needsAttention' ? (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      Copy Emails
+                    </>
+                  )}
+                </button>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
-                {/* Pending Reviews */}
-                <button
-                  onClick={() => handleStatCardClick('waitingOnTDI')}
-                  className="flex items-start gap-3 p-4 hover:bg-slate-50 transition-colors text-left w-full"
-                >
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    pendingReviewsWithWait.length > 0
-                      ? pendingReviewsWithWait.some(c => c.daysWaiting >= 5) ? 'bg-red-100' : pendingReviewsWithWait.some(c => c.daysWaiting >= 2) ? 'bg-amber-100' : 'bg-green-100'
-                      : 'bg-gray-100'
-                  }`}>
-                    <FileText className={`w-4.5 h-4.5 ${
-                      pendingReviewsWithWait.length > 0
-                        ? pendingReviewsWithWait.some(c => c.daysWaiting >= 5) ? 'text-red-600' : pendingReviewsWithWait.some(c => c.daysWaiting >= 2) ? 'text-amber-600' : 'text-green-600'
-                        : 'text-gray-400'
-                    }`} />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>{pendingReviewsWithWait.length}</span>
-                      <span className="text-sm text-gray-500">pending review{pendingReviewsWithWait.length !== 1 ? 's' : ''}</span>
-                    </div>
-                    {pendingReviewsWithWait.length > 0 && (
-                      <div className="mt-1 space-y-0.5">
-                        {pendingReviewsWithWait.slice(0, 3).map(c => (
-                          <p key={c.id} className="text-xs text-gray-500 truncate flex items-center gap-1.5">
-                            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                              c.daysWaiting >= 5 ? 'bg-red-500' : c.daysWaiting >= 2 ? 'bg-amber-500' : 'bg-green-500'
-                            }`} />
-                            {c.name}
-                            <span className={`font-medium ${
-                              c.daysWaiting >= 5 ? 'text-red-600' : c.daysWaiting >= 2 ? 'text-amber-600' : 'text-green-600'
-                            }`}>
-                              {c.daysWaiting}d
-                            </span>
-                          </p>
-                        ))}
+              <div className="space-y-2">
+                {needsAttention.map((creator: EnrichedCreator) => {
+                  const hasPostLaunchNotes = creator.post_launch_notes && creator.post_launch_notes.trim() !== '';
+                  const isWaitingOnTDI = creator.waitingOn === 'tdi';
+
+                  return (
+                    <Link
+                      key={creator.id}
+                      href={`/tdi-admin/creators/${creator.id}`}
+                      className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-slate-50 transition-colors group"
+                    >
+                      <div
+                        className={`w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium flex-shrink-0 ${
+                          hasPostLaunchNotes && !isWaitingOnTDI ? 'bg-yellow-500' : ''
+                        }`}
+                        style={{ backgroundColor: hasPostLaunchNotes && !isWaitingOnTDI ? undefined : theme.accent }}
+                      >
+                        {hasPostLaunchNotes && !isWaitingOnTDI ? (
+                          <Check className="w-4 h-4" />
+                        ) : (
+                          creator.name.charAt(0).toUpperCase()
+                        )}
                       </div>
-                    )}
-                  </div>
-                </button>
-
-                {/* Stalled Creators — auto-managed by re-engagement */}
-                <button
-                  onClick={() => handleStatCardClick('stalled')}
-                  className="flex items-start gap-3 p-4 hover:bg-slate-50 transition-colors text-left w-full"
-                >
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    stalledCreators.length > 0 ? 'bg-amber-100' : 'bg-gray-100'
-                  }`}>
-                    <Mail className={`w-4.5 h-4.5 ${
-                      stalledCreators.length > 0 ? 'text-amber-600' : 'text-gray-400'
-                    }`} />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>{stalledCreators.length}</span>
-                      <span className="text-sm text-gray-500">in re-engagement</span>
-                    </div>
-                    {stalledCreators.length > 0 ? (
-                      <p className="mt-1 text-xs text-amber-600 font-medium">
-                        Auto-emails active -- reply to Bella if they respond
-                      </p>
-                    ) : (
-                      <p className="mt-1 text-xs text-gray-400">
-                        No stalled creators
-                      </p>
-                    )}
-                  </div>
-                </button>
-
-                {/* Follow-up Check-ins */}
-                <button
-                  onClick={() => handleStatCardClick('followedUp')}
-                  className="flex items-start gap-3 p-4 hover:bg-slate-50 transition-colors text-left w-full"
-                >
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    followedUpApproachingRestall.length > 0 ? 'bg-orange-100' : 'bg-gray-100'
-                  }`}>
-                    <UserCheck className={`w-4.5 h-4.5 ${
-                      followedUpApproachingRestall.length > 0 ? 'text-orange-600' : 'text-gray-400'
-                    }`} />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-2xl font-bold" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>{followedUpApproachingRestall.length}</span>
-                      <span className="text-sm text-gray-500">re-stalling soon</span>
-                    </div>
-                    {followedUpApproachingRestall.length > 0 && (
-                      <p className="mt-1 text-xs text-orange-600 font-medium">
-                        Followed up but no creator activity -- check in again
-                      </p>
-                    )}
-                    {followedUpApproachingRestall.length === 0 && stats.followedUp > 0 && (
-                      <p className="mt-1 text-xs text-gray-400">
-                        {stats.followedUp} followed up, all within window
-                      </p>
-                    )}
-                  </div>
-                </button>
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className="text-sm font-medium truncate group-hover:text-slate-700"
+                          style={{ color: '#2B3A67' }}
+                        >
+                          {creator.name}
+                        </p>
+                        {hasPostLaunchNotes ? (
+                          <p className="text-xs text-gray-700 truncate flex items-center gap-1">
+                            <Clock className="w-3 h-3 flex-shrink-0" />
+                            {creator.post_launch_notes}
+                          </p>
+                        ) : (
+                          <p className="text-xs text-gray-500 truncate">
+                            {creator.currentMilestoneName || 'Waiting on review'}
+                          </p>
+                        )}
+                      </div>
+                      {hasPostLaunchNotes && !isWaitingOnTDI ? (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 flex-shrink-0">
+                          Published
+                        </span>
+                      ) : (() => {
+                        const daysWaiting = Math.floor((now.getTime() - new Date(creator.lastActivityDate).getTime()) / (1000 * 60 * 60 * 24));
+                        const slaColor = daysWaiting >= 5 ? 'bg-red-100 text-red-700' : daysWaiting >= 2 ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700';
+                        return (
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${slaColor}`}>
+                            {daysWaiting}d waiting
+                          </span>
+                        );
+                      })()}
+                    </Link>
+                  );
+                })}
+                {needsAttentionCount > 8 && (
+                  <button
+                    onClick={() => handleStatCardClick('waitingOnTDI')}
+                    className="w-full text-center text-xs pt-1"
+                    style={{ color: theme.accent }}
+                  >
+                    View all {needsAttentionCount} items →
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -2628,87 +2740,8 @@ export default function CreatorStudioPage() {
               )}
             </div>
 
-            {/* Scheduled for Launch */}
-            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-              {(() => {
-                const scheduled = dashboardData.creators
-                  .filter(c => c.publish_status === 'scheduled' && c.scheduled_publish_date)
-                  .sort((a, b) => new Date(a.scheduled_publish_date!).getTime() - new Date(b.scheduled_publish_date!).getTime())
-                  .slice(0, 5);
-
-                return (
-                  <>
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="flex items-center gap-2" style={TYPE_SECTION_HEADER}>
-                        <CalendarDays className="w-5 h-5 text-blue-500" />
-                        Scheduled for Launch
-                      </h3>
-                      {scheduled.length > 0 && (
-                        <button
-                          onClick={() => handleCopyEmails(scheduled.map(c => c.email), 'scheduled')}
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
-                            copiedSection === 'scheduled'
-                              ? 'bg-green-50 text-yellow-600 border border-green-200'
-                              : 'text-gray-500 hover:bg-gray-100 border border-transparent'
-                          }`}
-                        >
-                          {copiedSection === 'scheduled' ? (
-                            <>
-                              <Check className="w-3.5 h-3.5" />
-                              Copied!
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3.5 h-3.5" />
-                              Copy Emails
-                            </>
-                          )}
-                        </button>
-                      )}
-                    </div>
-
-                    {scheduled.length === 0 ? (
-                      <p className="text-sm text-gray-500">No creators scheduled</p>
-                    ) : (
-                      <div className="space-y-2">
-                        {scheduled.map((creator) => {
-                          const scheduledDate = new Date(creator.scheduled_publish_date!);
-                          const isPastDue = scheduledDate <= new Date();
-                          return (
-                            <Link
-                              key={creator.id}
-                              href={`/tdi-admin/creators/${creator.id}`}
-                              className="flex items-center gap-2 group"
-                            >
-                              <div
-                                className="w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0"
-                                style={{ backgroundColor: '#1e2749' }}
-                              >
-                                {creator.name.charAt(0).toUpperCase()}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p
-                                  className="text-sm font-medium truncate group-hover:opacity-80"
-                                  style={{ color: '#2B3A67' }}
-                                >
-                                  {creator.name}
-                                </p>
-                              </div>
-                              <div className={`text-xs flex-shrink-0 px-2 py-0.5 rounded ${isPastDue ? 'bg-gray-100 text-gray-700' : 'bg-blue-100 text-blue-700'}`}>
-                                {isPastDue ? 'Past due' : scheduledDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                              </div>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </>
-                );
-              })()}
-            </div>
-
             {/* Recently Published */}
-            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+            <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
               {(() => {
                 // Include creators who are either:
                 // 1. Explicitly marked as published (publish_status === 'published')
@@ -2790,116 +2823,39 @@ export default function CreatorStudioPage() {
               })()}
             </div>
 
-            {/* Needs Your Attention */}
-            <div
-              className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] border-l-4"
-              style={{ borderLeftColor: '#6B7280' }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="flex items-center gap-2" style={TYPE_CARD_TITLE}>
-                  <AlertTriangle className="w-5 h-5 text-gray-600" />
-                  Needs Your Attention
-                  {needsAttentionCount > 0 && (
-                    <span className="text-xs font-normal text-gray-500">({needsAttentionCount})</span>
-                  )}
-                </h3>
-                {needsAttention.length > 0 && (
-                  <button
-                    onClick={() => handleCopyEmails(needsAttention.map(c => c.email), 'needsAttention')}
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
-                      copiedSection === 'needsAttention'
-                        ? 'bg-green-50 text-yellow-600 border border-green-200'
-                        : 'text-gray-500 hover:bg-gray-100 border border-transparent'
-                    }`}
-                  >
-                    {copiedSection === 'needsAttention' ? (
-                      <>
-                        <Check className="w-3.5 h-3.5" />
-                        Copied!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5" />
-                        Copy Emails
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
-              {needsAttention.length === 0 ? (
-                <div className="flex items-center gap-2 text-yellow-600 py-2">
-                  <span>✓</span>
-                  <p className="text-sm">All caught up! No creators waiting on team feedback.</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {needsAttention.map((creator: EnrichedCreator) => {
-                    const hasPostLaunchNotes = creator.post_launch_notes && creator.post_launch_notes.trim() !== '';
-                    const isWaitingOnTDI = creator.waitingOn === 'tdi';
-
-                    return (
-                      <Link
-                        key={creator.id}
-                        href={`/tdi-admin/creators/${creator.id}`}
-                        className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-slate-50 transition-colors group"
-                      >
-                        <div
-                          className={`w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium flex-shrink-0 ${
-                            hasPostLaunchNotes && !isWaitingOnTDI ? 'bg-yellow-500' : ''
-                          }`}
-                          style={{ backgroundColor: hasPostLaunchNotes && !isWaitingOnTDI ? undefined : theme.accent }}
-                        >
-                          {hasPostLaunchNotes && !isWaitingOnTDI ? (
-                            <Check className="w-4 h-4" />
-                          ) : (
-                            creator.name.charAt(0).toUpperCase()
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p
-                            className="text-sm font-medium truncate group-hover:text-slate-700"
-                            style={{ color: '#2B3A67' }}
-                          >
-                            {creator.name}
-                          </p>
-                          {hasPostLaunchNotes ? (
-                            <p className="text-xs text-gray-700 truncate flex items-center gap-1">
-                              <Clock className="w-3 h-3 flex-shrink-0" />
-                              {creator.post_launch_notes}
-                            </p>
-                          ) : (
-                            <p className="text-xs text-gray-500 truncate">
-                              {creator.currentMilestoneName || 'Waiting on review'}
-                            </p>
-                          )}
-                        </div>
-                        {hasPostLaunchNotes && !isWaitingOnTDI ? (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 flex-shrink-0">
-                            Published
-                          </span>
-                        ) : (() => {
-                          const daysWaiting = Math.floor((now.getTime() - new Date(creator.lastActivityDate).getTime()) / (1000 * 60 * 60 * 24));
-                          const slaColor = daysWaiting >= 5 ? 'bg-red-100 text-red-700' : daysWaiting >= 2 ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700';
-                          return (
-                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${slaColor}`}>
-                              {daysWaiting}d waiting
-                            </span>
-                          );
-                        })()}
-                      </Link>
-                    );
-                  })}
-                  {needsAttentionCount > 8 && (
+            {/* Content Paths */}
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+              <h3 className="mb-4" style={TYPE_CARD_TITLE}>
+                Content Paths
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { key: 'blog', icon: FileText, label: 'Blog', count: pathCounts.blog, color: theme.accent },
+                  { key: 'download', icon: DownloadIcon, label: 'Quick Tool (Download)', count: pathCounts.download, color: theme.accent },
+                  { key: 'course', icon: BookOpen, label: 'Course', count: pathCounts.course, color: theme.accent },
+                  { key: 'notSet', icon: HelpCircle, label: 'Not Set', count: pathCounts.notSet, color: '#E8927C' },
+                ].map((path) => {
+                  const IconComponent = path.icon;
+                  return (
                     <button
-                      onClick={() => handleStatCardClick('waitingOnTDI')}
-                      className="w-full text-center text-xs pt-1"
-                      style={{ color: theme.accent }}
+                      key={path.key}
+                      onClick={() => handlePathClick(path.key)}
+                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer text-left"
                     >
-                      View all {needsAttentionCount} items →
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: theme.accentLight }}
+                      >
+                        <IconComponent className="w-5 h-5" style={{ color: path.color }} />
+                      </div>
+                      <div>
+                        <p className="leading-none" style={{ ...TYPE_STAT_VALUE, color: theme.accent }}>{path.count}</p>
+                        <p className="text-sm text-gray-500">{path.label}</p>
+                      </div>
                     </button>
-                  )}
-                </div>
-              )}
+                  );
+                })}
+              </div>
             </div>
 
             {/* Followed Up by Team */}
@@ -2991,42 +2947,79 @@ export default function CreatorStudioPage() {
                 </div>
               </div>
             )}
-
-            {/* Content Paths */}
-            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-              <h3 className="mb-4" style={TYPE_CARD_TITLE}>
-                Content Paths
-              </h3>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { key: 'blog', icon: FileText, label: 'Blog', count: pathCounts.blog, color: theme.accent },
-                  { key: 'download', icon: DownloadIcon, label: 'Quick Tool (Download)', count: pathCounts.download, color: theme.accent },
-                  { key: 'course', icon: BookOpen, label: 'Course', count: pathCounts.course, color: theme.accent },
-                  { key: 'notSet', icon: HelpCircle, label: 'Not Set', count: pathCounts.notSet, color: '#E8927C' },
-                ].map((path) => {
-                  const IconComponent = path.icon;
-                  return (
-                    <button
-                      key={path.key}
-                      onClick={() => handlePathClick(path.key)}
-                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer text-left"
-                    >
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: theme.accentLight }}
-                      >
-                        <IconComponent className="w-5 h-5" style={{ color: path.color }} />
-                      </div>
-                      <div>
-                        <p className="leading-none" style={{ ...TYPE_STAT_VALUE, color: theme.accent }}>{path.count}</p>
-                        <p className="text-sm text-gray-500">{path.label}</p>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
           </div>
+
+          {/* Scheduled for Launch -- only renders if there are scheduled creators */}
+          {(() => {
+            const scheduled = dashboardData.creators
+              .filter(c => c.publish_status === 'scheduled' && c.scheduled_publish_date)
+              .sort((a, b) => new Date(a.scheduled_publish_date!).getTime() - new Date(b.scheduled_publish_date!).getTime())
+              .slice(0, 5);
+
+            if (scheduled.length === 0) return null;
+
+            return (
+              <div className="mb-5 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="flex items-center gap-2" style={TYPE_SECTION_HEADER}>
+                    <CalendarDays className="w-5 h-5 text-blue-500" />
+                    Scheduled for Launch
+                  </h3>
+                  <button
+                    onClick={() => handleCopyEmails(scheduled.map(c => c.email), 'scheduled')}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
+                      copiedSection === 'scheduled'
+                        ? 'bg-green-50 text-yellow-600 border border-green-200'
+                        : 'text-gray-500 hover:bg-gray-100 border border-transparent'
+                    }`}
+                  >
+                    {copiedSection === 'scheduled' ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        Copy Emails
+                      </>
+                    )}
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {scheduled.map((creator) => {
+                    const scheduledDate = new Date(creator.scheduled_publish_date!);
+                    const isPastDue = scheduledDate <= new Date();
+                    return (
+                      <Link
+                        key={creator.id}
+                        href={`/tdi-admin/creators/${creator.id}`}
+                        className="flex items-center gap-2 group"
+                      >
+                        <div
+                          className="w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0"
+                          style={{ backgroundColor: '#1e2749' }}
+                        >
+                          {creator.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className="text-sm font-medium truncate group-hover:opacity-80"
+                            style={{ color: '#2B3A67' }}
+                          >
+                            {creator.name}
+                          </p>
+                        </div>
+                        <div className={`text-xs flex-shrink-0 px-2 py-0.5 rounded ${isPastDue ? 'bg-gray-100 text-gray-700' : 'bg-blue-100 text-blue-700'}`}>
+                          {isPastDue ? 'Past due' : scheduledDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Reference & Details -- collapsed by default */}
           <DashboardRefSection>
