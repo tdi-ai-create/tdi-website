@@ -25,9 +25,9 @@ import { Resend } from 'resend';
  */
 
 const RAILWAY_API_URL = 'https://backboard.railway.com/graphql/v2';
-const PAPERCLIP_SERVICE_ID = '29ec2529-3d91-472b-82db-3049c1027cc4';
-const ENVIRONMENT_ID = '97a6200a-0263-437a-855b-183af689992d';
-const PAPERCLIP_URL = 'https://paperclip-production-014f.up.railway.app';
+const PAPERCLIP_SERVICE_ID = 'a1b621b2-1abc-43b9-84fb-1d9ba8297aa8';
+const ENVIRONMENT_ID = '45885bca-d925-412f-b7e6-8ec663cdc248';
+const PAPERCLIP_URL = 'https://paperclip-railway-template-production.up.railway.app';
 const SLOW_THRESHOLD_MS = 5000;
 const HEALTH_TIMEOUT_MS = 8000; // longer than threshold so we measure slow vs. down
 const COOLDOWN_MINUTES = 10;
