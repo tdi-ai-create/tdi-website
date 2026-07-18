@@ -15,7 +15,7 @@ import { createClient } from '@supabase/supabase-js';
  */
 
 const MIN_PUBLISHED_QUICK_WINS = 50; // Alert if below this
-const MIN_PUBLISHED_COURSES = 3;     // Alert if below this
+const MIN_PUBLISHED_COURSES = 0;     // Courses are "coming soon" -- set to 1+ when first course publishes
 
 export async function GET() {
   const timestamp = new Date().toISOString();
