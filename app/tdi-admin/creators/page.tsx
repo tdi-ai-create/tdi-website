@@ -2603,19 +2603,133 @@ export default function CreatorStudioPage() {
             </div>
           )}
 
-          {/* Empty State -- shown when no action items */}
+          {/* Calm State -- shown when no action items. Still useful. */}
           {newSubmissions.length === 0 && feedbackQueue.length === 0 && needsAttention.length === 0 && !(pendingReviewsWithWait.length > 0 || stalledCreators.length > 0 || followedUpApproachingRestall.length > 0) && (
-            <div className="flex items-center justify-center py-16">
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-                  <Check className="w-6 h-6 text-green-600" />
+            <>
+              {/* All caught up + quick pulse */}
+              <div className="mb-5 bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
+                <div className="p-6 flex items-center gap-4 border-b border-gray-100">
+                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>
+                      All caught up
+                    </p>
+                    <p className="text-sm text-gray-400">No submissions, feedback, or action items waiting.</p>
+                  </div>
                 </div>
-                <p className="text-gray-700 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                  You&apos;re all caught up -- no actions needed right now.
-                </p>
-                <p className="text-sm text-gray-400 mt-1">Check the Analytics tab for pipeline status and reporting.</p>
+                <div className="grid grid-cols-4 divide-x divide-gray-100">
+                  {[
+                    { label: 'Active', value: stats.total - (dashboardData.creators.filter((c: EnrichedCreator) => c.lifecycle_state === 'paused').length), color: '#1e2749' },
+                    { label: 'In Progress', value: stats.total - stats.stalled - (dashboardData.creators.filter((c: EnrichedCreator) => c.publish_status === 'published' || c.lifecycle_state === 'paused').length), color: '#2563EB' },
+                    { label: 'Stalled (14d+)', value: stats.stalled, color: stats.stalled > 10 ? '#DC2626' : '#D97706' },
+                    { label: 'Published', value: dashboardData.creators.filter((c: EnrichedCreator) => c.publish_status === 'published').length, color: '#059669' },
+                  ].map((stat) => (
+                    <div key={stat.label} className="p-4 text-center">
+                      <p className="text-2xl font-bold" style={{ color: stat.color, fontFamily: "'DM Sans', sans-serif" }}>{stat.value}</p>
+                      <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+
+              {/* Closest to Launch + Recently Active side by side */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                {/* Closest to Launch */}
+                {closestToLaunch.length > 0 && (
+                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+                    <h3 className="flex items-center gap-2 mb-4" style={{ fontSize: 15, fontWeight: 700, color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>
+                      <Trophy className="w-5 h-5 text-yellow-500" />
+                      Closest to Launch
+                    </h3>
+                    <div className="space-y-3">
+                      {closestToLaunch.slice(0, 5).map((creator) => (
+                        <Link
+                          key={creator.id}
+                          href={`/tdi-admin/creators/${creator.id}`}
+                          className="flex items-center gap-3 group hover:bg-gray-50 rounded-lg p-2 -mx-2 transition-colors"
+                        >
+                          <div
+                            className="w-9 h-9 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0 shadow-sm"
+                            style={{ background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent}dd)` }}
+                          >
+                            {creator.name.charAt(0)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate text-gray-900 group-hover:text-yellow-600 transition-colors">
+                              {creator.name}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <div className="w-20 h-2 bg-gray-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full transition-all"
+                                style={{
+                                  width: `${creator.progress}%`,
+                                  background: creator.progress >= 90 ? '#F59E0B' : creator.progress >= 60 ? '#1e2749' : '#6B7280',
+                                }}
+                              />
+                            </div>
+                            <span className="text-xs font-medium" style={{ color: creator.progress >= 90 ? '#F59E0B' : '#6B7280' }}>
+                              {creator.progress >= 90 && <Check className="w-3 h-3 inline mr-0.5" />}
+                              {creator.progress}%
+                            </span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Recently Active */}
+                <div className="bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+                  <h3 className="flex items-center gap-2 mb-4" style={{ fontSize: 15, fontWeight: 700, color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>
+                    <Activity className="w-5 h-5 text-blue-500" />
+                    Recently Active
+                  </h3>
+                  {(() => {
+                    const recentlyActive = dashboardData.creators
+                      .filter((c: EnrichedCreator) => c.status !== 'archived' && c.publish_status !== 'published' && c.lifecycle_state !== 'paused')
+                      .sort((a: EnrichedCreator, b: EnrichedCreator) => new Date(b.lastActivityDate || 0).getTime() - new Date(a.lastActivityDate || 0).getTime())
+                      .slice(0, 5);
+
+                    return recentlyActive.length === 0 ? (
+                      <p className="text-sm text-gray-400">No recent creator activity</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {recentlyActive.map((creator: EnrichedCreator) => {
+                          const daysAgo = Math.floor((Date.now() - new Date(creator.lastActivityDate || 0).getTime()) / (1000 * 60 * 60 * 24));
+                          return (
+                            <Link
+                              key={creator.id}
+                              href={`/tdi-admin/creators/${creator.id}`}
+                              className="flex items-center gap-3 group hover:bg-gray-50 rounded-lg p-2 -mx-2 transition-colors"
+                            >
+                              <div
+                                className="w-9 h-9 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0 shadow-sm"
+                                style={{ background: daysAgo <= 14 ? 'linear-gradient(135deg, #2563EB, #3B82F6)' : 'linear-gradient(135deg, #6B7280, #9CA3AF)' }}
+                              >
+                                {creator.name.charAt(0)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate text-gray-900 group-hover:text-blue-600 transition-colors">
+                                  {creator.name}
+                                </p>
+                                <p className="text-xs text-gray-400 truncate">{creator.current_phase || 'Onboarding'} -- {creator.content_path || 'Path not set'}</p>
+                              </div>
+                              <span className={`text-xs font-medium flex-shrink-0 ${daysAgo <= 7 ? 'text-green-600' : daysAgo <= 14 ? 'text-blue-600' : daysAgo <= 30 ? 'text-amber-600' : 'text-gray-400'}`}>
+                                {daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo}d ago`}
+                              </span>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            </>
           )}
         </div>
       )}
