@@ -64,11 +64,11 @@ export async function GET(request: NextRequest) {
   if (milestoneIds.length > 0) {
     const { data: milestones } = await supabase
       .from('milestones')
-      .select('id, title')
+      .select('id, name')
       .in('id', milestoneIds)
 
     milestoneNames = Object.fromEntries(
-      (milestones || []).map((m: any) => [m.id, m.title])
+      (milestones || []).map((m: any) => [m.id, m.name])
     )
   }
 
