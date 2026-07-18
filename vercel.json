@@ -54,7 +54,7 @@
     },
     {
       "path": "/api/cron/olivia-daily-briefing",
-      "schedule": "0 12 * * 1-5"
+      "schedule": "0 12 * * *"
     },
     {
       "path": "/api/cron/olivia-weekly-briefing",
