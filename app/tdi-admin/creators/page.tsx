@@ -1363,6 +1363,7 @@ export default function CreatorStudioPage() {
 
   // Feedback review queue state
   const [feedbackQueue, setFeedbackQueue] = useState<any[]>([]);
+  const [newSubmissions, setNewSubmissions] = useState<any[]>([]);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [editingFeedbackId, setEditingFeedbackId] = useState<string | null>(null);
   const [editedFeedbackContent, setEditedFeedbackContent] = useState('');
@@ -1407,10 +1408,20 @@ export default function CreatorStudioPage() {
         .then(res => res.json())
         .then(data => setRecentEmails(data.emails || []))
         .catch(() => {});
-      // Load feedback review queue
+      // Load feedback review queue (Anne Marie drafts waiting for Bella)
       fetch('/api/admin/creator-feedback?status=pending_review')
         .then(res => res.json())
         .then(data => setFeedbackQueue(data.feedback || []))
+        .catch(() => {});
+      // Load new submissions waiting for review (before Anne Marie acts)
+      fetch('/api/admin/creator-feedback?status=all')
+        .then(res => res.json())
+        .then(data => {
+          const submitted = (data.feedback || []).filter(
+            (f: any) => !f.feedback_content && !f.feedback_draft_status
+          );
+          setNewSubmissions(submitted);
+        })
         .catch(() => {});
       // Get admin email from session
       import('@/lib/supabase').then(({ supabase }) => {
@@ -2283,6 +2294,50 @@ export default function CreatorStudioPage() {
                     )}
                   </div>
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* New Submissions -- creators submitted work, waiting for review */}
+          {newSubmissions.length > 0 && (
+            <div className="mb-5 bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
+              <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between" style={{ backgroundColor: '#fafbfc' }}>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-semibold tracking-wide uppercase" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>
+                    New Submissions
+                  </h2>
+                  <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold text-white" style={{ backgroundColor: '#2563EB' }}>
+                    {newSubmissions.length}
+                  </span>
+                </div>
+                <span className="text-xs text-gray-400">Waiting for review -- write feedback or wait for Anne Marie</span>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {newSubmissions.map((item: any) => (
+                  <Link
+                    key={item.id}
+                    href={`/tdi-admin/creators/${item.creator_id}`}
+                    className="block p-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-semibold" style={{ color: '#1e2749' }}>{item.creator_name}</span>
+                          <span className="text-xs text-gray-400">v{item.submission_version}</span>
+                          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-700">New</span>
+                        </div>
+                        <p className="text-xs text-gray-500 mb-2">{item.milestone_title}</p>
+                        {item.submitted_value && (
+                          <div className="px-3 py-2 bg-gray-50 rounded-lg text-xs text-gray-600 line-clamp-2">
+                            <span className="font-medium text-gray-500">Submitted: </span>
+                            {item.submitted_value.length > 120 ? item.submitted_value.substring(0, 120) + '...' : item.submitted_value}
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-xs text-blue-600 font-medium whitespace-nowrap flex-shrink-0">View &rarr;</span>
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
           )}

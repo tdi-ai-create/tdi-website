@@ -571,11 +571,11 @@ export async function POST(request: NextRequest) {
         .eq('id', milestone_record_id)
         .single()
       const { data: milestone } = milestoneInfo?.milestone_id
-        ? await supabase.from('milestones').select('title').eq('id', milestoneInfo.milestone_id).single()
+        ? await supabase.from('milestones').select('name').eq('id', milestoneInfo.milestone_id).single()
         : { data: null }
       feedbackDraftReady(
         creator?.name || 'Unknown creator',
-        milestone?.title || `Milestone ${milestoneInfo?.milestone_id || '?'}`,
+        milestone?.name || `Milestone ${milestoneInfo?.milestone_id || '?'}`,
         body.feedback_drafted_by || 'Anne Marie'
       ).catch(() => {})
     } catch { /* non-blocking */ }
@@ -627,7 +627,7 @@ export async function POST(request: NextRequest) {
         .eq('id', feedback.milestone_record_id)
         .single()
       const { data: milestone } = milestoneInfo?.milestone_id
-        ? await supabase.from('milestones').select('title').eq('id', milestoneInfo.milestone_id).single()
+        ? await supabase.from('milestones').select('name').eq('id', milestoneInfo.milestone_id).single()
         : { data: null }
       const { data: creatorForSlack } = await supabase
         .from('creators')
@@ -636,7 +636,7 @@ export async function POST(request: NextRequest) {
         .single()
       feedbackApproved(
         creatorForSlack?.name || 'Unknown creator',
-        milestone?.title || `Milestone ${milestoneInfo?.milestone_id || '?'}`,
+        milestone?.name || `Milestone ${milestoneInfo?.milestone_id || '?'}`,
         approved_by || 'admin'
       ).catch(() => {})
     } catch { /* non-blocking */ }
@@ -682,6 +682,71 @@ export async function POST(request: NextRequest) {
           console.error('[creator-studio-sync] Email error:', emailErr)
         }
       }
+    }
+
+    // Auto-complete skippable milestones between this one and the next real milestone
+    // This handles meeting milestones that are no longer required when feedback happens through the portal
+    try {
+      const { data: approvedMilestoneRecord } = await supabase
+        .from('creator_milestones')
+        .select('milestone_id')
+        .eq('id', feedback.milestone_record_id)
+        .single()
+
+      if (approvedMilestoneRecord) {
+        const { data: approvedMilestone } = await supabase
+          .from('milestones')
+          .select('phase_id, sort_order')
+          .eq('id', approvedMilestoneRecord.milestone_id)
+          .single()
+
+        if (approvedMilestone) {
+          // Find skippable milestones in the same phase that come after this one
+          const { data: skippableMilestones } = await supabase
+            .from('milestones')
+            .select('id, name, sort_order')
+            .eq('phase_id', approvedMilestone.phase_id)
+            .eq('skippable', true)
+            .gt('sort_order', approvedMilestone.sort_order)
+            .order('sort_order', { ascending: true })
+
+          if (skippableMilestones && skippableMilestones.length > 0) {
+            const now = new Date().toISOString()
+            for (const skip of skippableMilestones) {
+              // Only auto-complete if the milestone is currently locked or available (not already completed)
+              const { data: existing } = await supabase
+                .from('creator_milestones')
+                .select('status')
+                .eq('creator_id', feedback.creator_id)
+                .eq('milestone_id', skip.id)
+                .single()
+
+              if (existing && (existing.status === 'locked' || existing.status === 'available')) {
+                await supabase
+                  .from('creator_milestones')
+                  .update({
+                    status: 'completed',
+                    completed_at: now,
+                    completed_by: 'system:feedback-portal-skip',
+                    submission_data: {
+                      type: 'auto_skipped',
+                      reason: 'Resolved via portal feedback loop',
+                      skipped_at: now,
+                      feedback_id: feedback.id,
+                    },
+                    updated_at: now,
+                  })
+                  .eq('creator_id', feedback.creator_id)
+                  .eq('milestone_id', skip.id)
+
+                console.log(`[creator-studio-sync] Auto-skipped milestone: ${skip.name} for creator ${feedback.creator_id}`)
+              }
+            }
+          }
+        }
+      }
+    } catch (skipErr) {
+      console.error('[creator-studio-sync] Auto-skip error (non-fatal):', skipErr)
     }
 
     return NextResponse.json({ success: true, feedback_id: feedback.id, approved_by })
