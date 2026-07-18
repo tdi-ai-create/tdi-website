@@ -25,12 +25,18 @@ import HubFilterBar from '@/components/hub/HubFilterBar';
 const FILTER_CATEGORIES = [
   'All',
   'Saved',
-  'Games',
-  'Stress Relief',
-  'Time Savers',
-  'Classroom Tools',
+  'Instructional Strategies',
+  'Lesson Planning',
+  'Assessment',
+  'Classroom Setup',
+  'Classroom Management',
   'Communication',
+  'Time Savers',
+  'Leadership',
   'Self-Care',
+  'Stress Relief',
+  'Games',
+  'Vocational',
 ];
 
 // Interactive practice tools (migrated from paragametools)
