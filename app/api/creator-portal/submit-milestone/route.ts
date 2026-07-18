@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { creatorSubmittedDeliverable } from '@/lib/creator-slack'
 
 function db() {
   return createClient(
@@ -84,6 +85,25 @@ export async function POST(request: NextRequest) {
       .from('creators')
       .update({ updated_at: new Date().toISOString() })
       .eq('id', milestoneRecord.creator_id)
+
+    // Slack notification -- get creator name and milestone label for context
+    try {
+      const { data: creator } = await supabase
+        .from('creators')
+        .select('name')
+        .eq('id', milestoneRecord.creator_id)
+        .single()
+      const { data: milestone } = await supabase
+        .from('milestones')
+        .select('title')
+        .eq('id', milestoneRecord.milestone_id)
+        .single()
+      creatorSubmittedDeliverable(
+        creator?.name || 'Unknown creator',
+        milestone?.title || `Milestone ${milestoneRecord.milestone_id}`,
+        submissionVersion
+      ).catch(() => {})
+    } catch { /* non-blocking */ }
 
     return NextResponse.json({
       success: true,

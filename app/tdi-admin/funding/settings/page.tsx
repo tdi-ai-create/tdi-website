@@ -109,6 +109,39 @@ export default function FundingSettingsPage() {
           </div>
         </Field>
 
+        {/* Creator Studio Webhook */}
+        <Field label="Creator Studio Webhook URL" description="Slack webhook for Creator Studio events (e.g. #bella-actions)">
+          <input
+            value={settings?.creator_webhook_url || ''}
+            onChange={e => setSettings((s: any) => ({ ...s, creator_webhook_url: e.target.value }))}
+            onBlur={e => save({ creator_webhook_url: e.target.value })}
+            placeholder="https://hooks.slack.com/services/..."
+            style={inputStyle}
+          />
+        </Field>
+
+        {/* Sales Webhook */}
+        <Field label="Sales Webhook URL" description="Slack webhook for Sales events (e.g. #sales)">
+          <input
+            value={settings?.sales_webhook_url || ''}
+            onChange={e => setSettings((s: any) => ({ ...s, sales_webhook_url: e.target.value }))}
+            onBlur={e => save({ sales_webhook_url: e.target.value })}
+            placeholder="https://hooks.slack.com/services/..."
+            style={inputStyle}
+          />
+        </Field>
+
+        {/* Partner Health Webhook */}
+        <Field label="Partner Health Webhook URL" description="Slack webhook for Partner Health events (e.g. #rae-actions)">
+          <input
+            value={settings?.partner_webhook_url || ''}
+            onChange={e => setSettings((s: any) => ({ ...s, partner_webhook_url: e.target.value }))}
+            onBlur={e => save({ partner_webhook_url: e.target.value })}
+            placeholder="https://hooks.slack.com/services/..."
+            style={inputStyle}
+          />
+        </Field>
+
         {/* Slack handles */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
           <Field label="Bella's Slack handle" description="For @mentions on Bella items">

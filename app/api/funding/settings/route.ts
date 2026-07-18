@@ -27,7 +27,7 @@ export async function PATCH(request: NextRequest) {
   const supabase = db()
 
   const fields: Record<string, unknown> = { updated_at: new Date().toISOString() }
-  const allowed = ['slack_enabled', 'slack_webhook_url', 'slack_channel', 'verbosity', 'bella_slack_handle', 'rae_slack_handle']
+  const allowed = ['slack_enabled', 'slack_webhook_url', 'slack_channel', 'verbosity', 'bella_slack_handle', 'rae_slack_handle', 'creator_webhook_url', 'sales_webhook_url', 'partner_webhook_url']
   for (const f of allowed) {
     if (body[f] !== undefined) fields[f] = body[f]
   }
