@@ -1256,8 +1256,8 @@ export default function TDIAdminCreatorDetailPage() {
         </div>
       )}
 
-      {/* Submissions & Feedback History */}
-      {(showFeedbackSection || creatorFeedback.length > 0) && (
+      {/* Submissions & Feedback History -- always visible so Bella can add direct feedback */}
+      {(
         <div className="mb-6 bg-white rounded-xl border border-gray-200 overflow-hidden">
           <button
             onClick={() => setShowFeedbackSection(!showFeedbackSection)}
