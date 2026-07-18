@@ -101,7 +101,7 @@ export default function QuickWinCard({
       {onToggleFavorite && (
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavorite(quickWin.id, 'quick_win') }}
-          className="absolute top-3 right-3 p-1.5 rounded-full transition-all z-10"
+          className="absolute top-3 left-3 p-1.5 rounded-full transition-all z-10"
           style={{
             background: isFavorited ? '#FEE2E2' : 'rgba(0,0,0,0.04)',
             border: 'none',
