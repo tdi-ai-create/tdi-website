@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
+import { leadStageChanged } from '@/lib/sales-slack'
 
 const ALLOWED_PATCH_FIELDS = new Set([
   'name', 'stage', 'value', 'heat', 'assigned_to_email',
@@ -131,6 +132,18 @@ export async function PATCH(
         .eq('id', id)
         .then(() => {})
     } catch { /* column may not exist */ }
+  }
+
+  // Slack notification for stage change
+  if (stageChanged) {
+    try {
+      leadStageChanged(
+        current.contact_name || current.name || 'Unknown',
+        current.contact_organization || '',
+        String(current.stage || 'unknown'),
+        String(updateFields.stage)
+      ).catch(() => {})
+    } catch { /* non-blocking */ }
   }
 
   // Log activity for tracked field changes

@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { feedbackDraftReady, feedbackApproved } from '@/lib/creator-slack'
 
 /**
  * Creator Studio Sync API -- Bridge between Paperclip agents and the Creator Portal
@@ -557,6 +558,28 @@ export async function POST(request: NextRequest) {
       .update({ review_status: 'under_review' })
       .eq('id', milestone_record_id)
 
+    // Slack notification for feedback draft
+    try {
+      const { data: creator } = await supabase
+        .from('creators')
+        .select('name')
+        .eq('id', creator_id)
+        .single()
+      const { data: milestoneInfo } = await supabase
+        .from('creator_milestones')
+        .select('milestone_id')
+        .eq('id', milestone_record_id)
+        .single()
+      const { data: milestone } = milestoneInfo?.milestone_id
+        ? await supabase.from('milestones').select('title').eq('id', milestoneInfo.milestone_id).single()
+        : { data: null }
+      feedbackDraftReady(
+        creator?.name || 'Unknown creator',
+        milestone?.title || `Milestone ${milestoneInfo?.milestone_id || '?'}`,
+        body.feedback_drafted_by || 'Anne Marie'
+      ).catch(() => {})
+    } catch { /* non-blocking */ }
+
     return NextResponse.json({ success: true, feedback_id: feedback.id })
   }
 
@@ -595,6 +618,28 @@ export async function POST(request: NextRequest) {
       .from('creator_milestones')
       .update({ review_status: 'feedback_ready' })
       .eq('id', feedback.milestone_record_id)
+
+    // Slack notification for feedback approval
+    try {
+      const { data: milestoneInfo } = await supabase
+        .from('creator_milestones')
+        .select('milestone_id')
+        .eq('id', feedback.milestone_record_id)
+        .single()
+      const { data: milestone } = milestoneInfo?.milestone_id
+        ? await supabase.from('milestones').select('title').eq('id', milestoneInfo.milestone_id).single()
+        : { data: null }
+      const { data: creatorForSlack } = await supabase
+        .from('creators')
+        .select('name')
+        .eq('id', feedback.creator_id)
+        .single()
+      feedbackApproved(
+        creatorForSlack?.name || 'Unknown creator',
+        milestone?.title || `Milestone ${milestoneInfo?.milestone_id || '?'}`,
+        approved_by || 'admin'
+      ).catch(() => {})
+    } catch { /* non-blocking */ }
 
     // Send email notification to creator
     const { data: creator } = await supabase

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { creatorRequestedCall } from '@/lib/creator-slack'
 
 function db() {
   return createClient(
@@ -33,6 +34,34 @@ export async function POST(request: NextRequest) {
     if (error || !data) {
       return NextResponse.json({ error: 'Feedback not found or not accessible' }, { status: 404 })
     }
+
+    // Slack notification for call request
+    try {
+      const { data: feedbackRow } = await supabase
+        .from('creator_milestone_feedback')
+        .select('creator_id, milestone_record_id')
+        .eq('id', feedback_id)
+        .single()
+      if (feedbackRow) {
+        const { data: creator } = await supabase
+          .from('creators')
+          .select('name')
+          .eq('id', feedbackRow.creator_id)
+          .single()
+        const { data: milestoneRec } = await supabase
+          .from('creator_milestones')
+          .select('milestone_id')
+          .eq('id', feedbackRow.milestone_record_id)
+          .single()
+        const { data: milestone } = milestoneRec?.milestone_id
+          ? await supabase.from('milestones').select('title').eq('id', milestoneRec.milestone_id).single()
+          : { data: null }
+        creatorRequestedCall(
+          creator?.name || 'Unknown creator',
+          milestone?.title || `Milestone ${milestoneRec?.milestone_id || '?'}`
+        ).catch(() => {})
+      }
+    } catch { /* non-blocking */ }
 
     return NextResponse.json({ success: true })
   } catch (err) {

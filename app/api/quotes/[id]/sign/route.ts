@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
 import { contractSigned } from '@/lib/billing-slack'
+import { quoteSigned } from '@/lib/sales-slack'
 
 export async function POST(
   request: NextRequest,
@@ -105,10 +106,11 @@ export async function POST(
     }
   }
 
-  // Slack notification
+  // Slack notifications
   if (fullQuote) {
     const amount = (fullQuote as any).quote_packages?.[0]?.total_amount || 0
     contractSigned(fullQuote.quote_number, fullQuote.contact_organization || '', signedByName, Number(amount)).catch(() => {})
+    quoteSigned(signedByName, fullQuote.contact_organization || '', fullQuote.quote_number || id, Number(amount)).catch(() => {})
   }
 
   return NextResponse.json({ success: true })
