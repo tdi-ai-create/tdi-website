@@ -48,7 +48,7 @@
 
 <h1>Creator Studio Feedback Portal</h1>
 <p class="subtitle">Standard Operating Procedure -- How feedback flows from creator submission to approved response</p>
-<p class="updated">Last updated: July 17, 2026 | TEA-33</p>
+<p class="updated">Last updated: July 18, 2026 | TEA-33</p>
 
 <!-- ── OVERVIEW ── -->
 
@@ -220,8 +220,8 @@
   </div>
 </div>
 
-<div class="highlight">
-  <strong>Note:</strong> Anne Marie's skill file needs to be updated to automatically review submissions. Until then, submissions sit in "submitted" status and Bella needs to write direct feedback or wait for Anne Marie to be configured.
+<div class="success">
+  <strong>Anne Marie is configured to auto-review submissions.</strong> When a creator submits, Anne Marie picks it up via <span class="portal-path">find_work</span>, drafts feedback, and it appears in Bella's review queue. If Anne Marie is slow or offline, the submission still appears in the "New Submissions" section on the Action Center so Bella can write direct feedback.
 </div>
 
 <!-- ── STEP BY STEP: BELLA ── -->
@@ -232,7 +232,7 @@
   <span class="step-num">6</span>
   <span class="step-title">Bella opens the Feedback Review Queue</span>
   <div class="step-detail">
-    <p>Location: <span class="portal-path">Admin Portal > Creator Studio > Dashboard tab</span></p>
+    <p>Location: <span class="portal-path">Admin Portal > Creator Studio > Action Center tab</span></p>
     <p>The "Feedback Review Queue" section shows all feedback with status <strong>pending_review</strong>.</p>
     <p>Each card shows: creator name, milestone name, what was submitted (truncated), and Anne Marie's drafted feedback.</p>
     <p>A count badge shows how many items are waiting.</p>
@@ -346,7 +346,7 @@
   <tbody>
     <tr>
       <td>Feedback Review Queue (all pending items)</td>
-      <td><span class="portal-path">Creator Studio > Dashboard tab</span> (top section)</td>
+      <td><span class="portal-path">Creator Studio > Action Center tab</span> (top section)</td>
       <td><span class="role-tag role-bella">Bella</span> <span class="role-tag role-rae">Rae</span></td>
     </tr>
     <tr>
@@ -377,16 +377,41 @@
 <h2>Bella's Daily Routine</h2>
 
 <div class="success">
-  <strong>Daily check (2 minutes):</strong> Open Creator Studio Dashboard. Look at the Feedback Review Queue count. If there are items waiting, review and approve/edit/reject each one. That's it.
+  <strong>Daily check (2 minutes):</strong> Open Creator Studio Action Center. Check New Submissions and Feedback Review Queue. Act on anything waiting. That's it.
 </div>
 
 <ol>
-  <li><strong>Open</strong> <span class="portal-path">Admin Portal > Creator Studio > Dashboard</span></li>
-  <li><strong>Check</strong> the Feedback Review Queue count badge</li>
-  <li><strong>For each item:</strong> Read Anne Marie's draft. If it's good, click <span class="button-ref">Approve</span>. If it needs edits, click <span class="button-ref secondary">Edit & Approve</span> and adjust. If it's wrong, click <span class="button-ref danger">Reject</span>.</li>
-  <li><strong>Check</strong> Today's Priorities for any call requests (blue badge on submission cards)</li>
-  <li><strong>Done.</strong> Creators get notified automatically.</li>
+  <li><strong>Open</strong> <span class="portal-path">Admin Portal > Creator Studio > Action Center</span></li>
+  <li><strong>Check "New Submissions"</strong> (blue badges) -- if a creator submitted work and Anne Marie hasn't drafted feedback yet, click through to write direct feedback or wait for Anne Marie.</li>
+  <li><strong>Check "Feedback Review Queue"</strong> (purple badges) -- for each item, read Anne Marie's draft. Click <span class="button-ref">Approve</span> if good, <span class="button-ref secondary">Edit & Approve</span> to tweak, or <span class="button-ref danger">Reject</span> if it misses the mark.</li>
+  <li><strong>Check "Today's Priorities"</strong> for pending milestone reviews and call requests.</li>
+  <li><strong>If the page says "You're all caught up"</strong> -- you're done. No actions needed.</li>
 </ol>
+
+<h2>Skippable Meetings</h2>
+
+<p>The following milestones are now <strong>optional</strong> and will auto-complete when feedback is resolved through the portal:</p>
+<ul>
+  <li><strong>Schedule Outline Meeting</strong> -- auto-skipped when outline feedback is approved</li>
+  <li><strong>Outline Meeting Completed</strong> -- auto-skipped when outline feedback is approved</li>
+  <li><strong>Schedule Final Outline Meeting</strong> -- auto-skipped when finalized outline feedback is approved</li>
+</ul>
+
+<div class="highlight">
+  <strong>When does a meeting still happen?</strong> Only when a creator clicks "Request a Call" on their feedback, or when Bella/Rae decides the feedback needs a live conversation. The default path no longer requires scheduling a meeting.
+</div>
+
+<h2>Slack Notifications</h2>
+
+<p>Slack pings go to <strong>#bella-actions</strong> for key events:</p>
+<ul>
+  <li>Creator submitted a deliverable</li>
+  <li>Anne Marie drafted feedback (ready for review)</li>
+  <li>Feedback approved and sent to creator</li>
+  <li>Creator requested a call</li>
+  <li>Creator hit critical stall (60+ days)</li>
+</ul>
+<p>You don't need to check the portal proactively -- Slack will tell you when something needs attention.</p>
 
 <!-- ── RULES & GUARDRAILS ── -->
 
@@ -427,8 +452,14 @@
 <h3>What if I want to mark a milestone as complete without going through the feedback loop?</h3>
 <p>Use the existing milestone approval flow on the creator detail page. The feedback portal is for milestones that need iterative review (outlines, drafts, recordings). Simple milestones (signed agreement, profile photo) can still be approved directly.</p>
 
+<h3>What happened to the outline meetings?</h3>
+<p>Meeting milestones (Schedule Outline Meeting, Outline Meeting Completed, Schedule Final Outline Meeting) are now <strong>optional</strong>. They auto-complete when the corresponding submission's feedback is approved through the portal. If a creator needs a live conversation, they click "Request a Call."</p>
+
 <h3>Does the creator get notified for every status change?</h3>
 <p>No. The creator only gets an email when feedback is <strong>approved</strong> (made visible). They don't get notified for submitted, under_review, or rejected statuses. They see "Under Review" in their portal, which updates in real time.</p>
+
+<h3>Will I get a Slack notification when something needs my attention?</h3>
+<p>Yes. Slack pings go to <strong>#bella-actions</strong> when a creator submits, when Anne Marie drafts feedback, when feedback is approved, and when a creator requests a call. You don't need to check the portal proactively.</p>
 
 </body>
 </html>
