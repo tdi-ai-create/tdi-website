@@ -444,6 +444,20 @@ Games that work well for group PD need clear, self-contained "How to Run This" i
 - [ ] Explanations teach, not just judge ("This works because..." not just "Wrong!")
 - [ ] Reviewed by at least one practicing educator
 
+### 9.4 Community Content Requirement (MANDATORY)
+
+Every new tool published to the Learning Hub MUST have seeded community content within 24-48 hours. No exceptions. Empty community sections discourage participation.
+
+- [ ] **Games:** 5 seeded `quick_win_responses` posts from varied roles and grade levels
+- [ ] **Games:** 3 hardcoded testimonials on the landing page (in `GAME_TESTIMONIALS`)
+- [ ] **Quick Wins:** 3-5 seeded `quick_win_responses` posts from varied educator personas
+- [ ] **Courses:** Seeded Q&A posts on key lessons
+- [ ] Posts include realistic roles (teacher, para, coach, admin), grade levels (K-2 through 9-12), and timestamps spread across recent weeks
+- [ ] Posts model the type of engagement we want (sharing experiences, adaptations, questions)
+- [ ] No post should read as AI-generated (no dashes, natural voice, specific details)
+
+**QA Gate:** Julie Lynn (QA agent) should verify community content exists before marking any new tool as launch-ready. This is a blocking requirement, not optional.
+
 ### 9.4 Scalability Notes
 
 - Data arrays are static TypeScript (no DB fetch needed for game content)
