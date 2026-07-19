@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
         const daysSinceInvite = Math.floor((now.getTime() - inviteSent.getTime()) / (1000 * 60 * 60 * 24));
 
         // Check if we already sent this reminder
-        const reminderKey = `login_reminder_day_${daysSinceInvite >= 14 ? 14 : daysSinceInvite >= 7 ? 7 : 3}`;
+        const reminderKey = `login_reminder_day_${daysSinceInvite >= 21 ? 21 : daysSinceInvite >= 14 ? 14 : daysSinceInvite >= 7 ? 7 : 3}`;
         const { data: existingLog } = await supabase
           .from('activity_log')
           .select('id')
@@ -112,6 +112,27 @@ Common questions we hear:
 <a href="${dashboardUrl}" style="display:inline-block;padding:12px 24px;background:#1e2749;color:white;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;margin:16px 0;">Log In Now</a>
 
 We are here whenever you are ready.
+
+The TDI Team`
+          };
+        } else if (daysSinceInvite === 21) {
+          reminderEmail = {
+            subject: `${firstName}, let's make sure your team gets the most from TDI`,
+            body: `${firstName},
+
+It has been three weeks since your partnership dashboard was set up and your team is missing out on tools that could make their days easier right now.
+
+Here is what is waiting for them:
+- ${p.staff_enrolled || 0} Hub accounts ready to activate
+- Quick Wins your teachers can use in 5 minutes
+- PD hours that count toward their requirements
+- Stress management tools for the hard days
+
+The setup takes less than 5 minutes. Upload your staff roster and they get access the same day.
+
+<a href="${dashboardUrl}" style="display:inline-block;padding:12px 24px;background:#2A9D8F;color:white;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;margin:16px 0;">Get Your Team Started</a>
+
+If something is not working or you have questions about the partnership, reply to this email. We will make it right.
 
 The TDI Team`
           };
