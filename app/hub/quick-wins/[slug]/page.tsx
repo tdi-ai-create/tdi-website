@@ -42,6 +42,7 @@ import { Gamepad2, Users, Timer, Target } from 'lucide-react';
 interface PracticeGameConfig {
   component: React.ComponentType<{ onBack: () => void }>;
   id: string;
+  contentUuid: string; // stable UUID for community posts (quick_win_responses.quick_win_id)
   title: string;
   description: string;
   howToPlay: string[];
@@ -57,6 +58,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
   'question-knockout': {
     component: QuestionKnockout,
     id: 'practice-question-knockout',
+    contentUuid: 'a1000001-0000-0000-0000-000000000001',
     title: 'Question Knockout',
     description: 'You see a real classroom scenario. Your only tool? Questions. No telling, no directing, no hinting. Just questions. If you slip and tell, hit the buzzer. It is harder than you think.',
     howToPlay: [
@@ -76,6 +78,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
   'tell-or-ask': {
     component: TellOrAsk,
     id: 'practice-tell-or-ask',
+    contentUuid: 'a1000002-0000-0000-0000-000000000002',
     title: 'Tell or Ask?',
     description: 'You will see statements educators say every day. Some are real questions that open thinking. Others are commands disguised with a question mark. Can you spot the difference? It is trickier than it sounds.',
     howToPlay: [
@@ -95,6 +98,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
   'feedback-level-up': {
     component: FeedbackLevelUp,
     id: 'practice-feedback-level-up',
+    contentUuid: 'a1000003-0000-0000-0000-000000000003',
     title: 'Feedback Level Up',
     description: 'Not all feedback is created equal. You will see real examples of feedback given to students and categorize them from Level 1 (vague) to Level 4 (exceptional). Watch out for the Level 2 trap -- it catches most people.',
     howToPlay: [
@@ -113,6 +117,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
   'feedback-madlibs': {
     component: FeedbackMadlibs,
     id: 'practice-feedback-madlibs',
+    contentUuid: 'a1000004-0000-0000-0000-000000000004',
     title: 'Feedback Madlibs',
     description: 'Learn the Notice + Name + Next Step feedback formula through play. First, you fill in blanks blindly for laughs. Then you practice the real formula with actual student scenarios. Silly first, serious second.',
     howToPlay: [
@@ -132,6 +137,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
   'feedback-makeover': {
     component: FeedbackMakeover,
     id: 'practice-feedback-makeover',
+    contentUuid: 'a1000005-0000-0000-0000-000000000005',
     title: 'Feedback Makeover',
     description: 'You get terrible feedback and the real context behind it. Your job: transform it into Level 3 feedback using Notice + Name + Next Step. You are on the clock -- 120 seconds per makeover.',
     howToPlay: [
@@ -152,6 +158,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
   'whats-your-move': {
     component: WhatsYourMove,
     id: 'practice-whats-your-move',
+    contentUuid: 'a1000006-0000-0000-0000-000000000006',
     title: "What's Your Move?",
     description: 'Real classroom scenarios with three response options. Only one is the best move. Choose wisely, get instant feedback on why it works (or why it does not), and sharpen your instincts for the moments that matter.',
     howToPlay: [
@@ -170,6 +177,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
   'classroom-shuffle': {
     component: ClassroomShuffle,
     id: 'practice-classroom-shuffle',
+    contentUuid: 'a1000007-0000-0000-0000-000000000007',
     title: 'Classroom Scenario Shuffle',
     description: 'Realistic classroom management scenarios drawn from real schools. Read the situation, choose your response, and learn why the best move works. Covers everything from student behavior to parent communication to colleague dynamics.',
     howToPlay: [
@@ -188,6 +196,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
   'prioritize-this': {
     component: PrioritizeThis,
     id: 'practice-prioritize-this',
+    contentUuid: 'a1000008-0000-0000-0000-000000000008',
     title: 'Prioritize This',
     description: 'You are given a real school situation and four tasks that all need to happen. Rank them from most to least urgent. Then see how experienced educators would prioritize and learn why order matters.',
     howToPlay: [
@@ -206,6 +215,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
   'energy-budget': {
     component: EnergyBudget,
     id: 'practice-energy-budget',
+    contentUuid: 'a1000009-0000-0000-0000-000000000009',
     title: 'Energy Budget',
     description: 'You have 100 energy points to spend across your day. How do you allocate them? Distribute your energy across competing demands, then see how experienced educators would budget theirs. The gaps reveal your growth areas.',
     howToPlay: [
@@ -594,32 +604,14 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                 </div>
               </div>
 
-              {/* Educator Experiences */}
-              <div className="bg-white p-6 md:p-8 mb-6" style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}>
-                <h3 className="font-semibold mb-4" style={{ fontSize: '16px', color: '#1e2749' }}>
-                  What Educators Are Saying
-                </h3>
-                <div className="space-y-4">
-                  {getGameTestimonials(slug).map((t, i) => (
-                    <div key={i} className="pl-3" style={{ borderLeft: `3px solid ${gameConfig.color}` }}>
-                      <p className="text-sm mb-1" style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontStyle: 'italic', color: '#374151', lineHeight: 1.5 }}>
-                        &ldquo;{t.quote}&rdquo;
-                      </p>
-                      <p className="text-xs" style={{ color: '#9CA3AF' }}>-- {t.role}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Q&A */}
-              <div className="bg-white p-6 md:p-8 mb-6" style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}>
-                <LessonQA
-                  contentId={gameConfig.id}
-                  userId={user?.id || null}
-                  isAdmin={!!user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')}
-                  apiBasePath={`/api/hub/quick-wins/${gameConfig.id}/qa`}
-                />
-              </div>
+              {/* Community: Conversation + Q&A */}
+              <CommunityTabs
+                contentId={gameConfig.contentUuid}
+                userId={user?.id}
+                isAdmin={!!user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')}
+                conversationApiPath={`/api/hub/quick-wins/${gameConfig.contentUuid}/conversation`}
+                qaApiPath={`/api/hub/quick-wins/${gameConfig.contentUuid}/qa`}
+              />
             </div>
 
             {/* Right column */}
@@ -645,6 +637,28 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     <div className="flex items-center gap-2 text-xs" style={{ color: '#9CA3AF' }}>
                       <FormatIcon size={14} /> {formatLabel}
                     </div>
+                  </div>
+                </div>
+
+                {/* Testimonials */}
+                <div className="bg-white rounded-2xl p-5" style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}>
+                  <p
+                    className="mb-3"
+                    style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.05em', textTransform: 'uppercase' as const, fontSize: '11px', fontWeight: 600 }}
+                  >
+                    What educators are saying
+                  </p>
+                  <div className="space-y-4">
+                    {getGameTestimonials(slug).map((testimonial, i) => (
+                      <div key={i} className="pl-3" style={{ borderLeft: `3px solid ${gameConfig.color}` }}>
+                        <p className="text-sm mb-1" style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontStyle: 'italic', color: '#374151', lineHeight: 1.5 }}>
+                          &ldquo;{testimonial.quote}&rdquo;
+                        </p>
+                        <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                          {testimonial.role}
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
