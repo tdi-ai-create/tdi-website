@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import QuickWinCard from '@/components/hub/QuickWinCard';
 import EmptyState from '@/components/hub/EmptyState';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
@@ -17,7 +18,7 @@ import { useFavorites } from '@/lib/hub/useFavorites';
 import { useMembership, type ContentAccess } from '@/lib/hub/use-membership';
 import { useLanguage } from '@/lib/hub/useLanguage';
 import { useTranslation } from '@/lib/hub/useTranslation';
-import { Zap } from 'lucide-react';
+import { Zap, Gamepad2, ChevronRight } from 'lucide-react';
 import QuizNudge from '@/components/hub/QuizNudge';
 import HubFilterBar from '@/components/hub/HubFilterBar';
 
@@ -169,8 +170,12 @@ interface QuickWin {
 }
 
 export default function QuickWinsPage() {
+  const searchParams = useSearchParams();
+  const initialFilter = searchParams.get('filter') ?? 'All';
   const [quickWins, setQuickWins] = useState<QuickWin[]>([]);
-  const [activeFilter, setActiveFilter] = useState('All');
+  const [activeFilter, setActiveFilter] = useState(
+    FILTER_CATEGORIES.includes(initialFilter) ? initialFilter : 'All'
+  );
   const [capacityFilter, setCapacityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [danielsonFilter, setDanielsonFilter] = useState<string[]>([]);
@@ -360,6 +365,34 @@ export default function QuickWinsPage() {
           itemLabel="quick wins"
           subtitle="Short, practical tools you can use right now"
         />
+
+        {/* Games Discovery Banner -- shown when not already filtering by Games */}
+        {activeFilter !== 'Games' && activeFilter !== 'Saved' && (
+          <button
+            onClick={() => setActiveFilter('Games')}
+            className="w-full mb-5 rounded-2xl p-5 flex items-center gap-4 transition-all hover:shadow-md group text-left"
+            style={{
+              background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: 'rgba(232, 184, 75, 0.15)' }}
+            >
+              <Gamepad2 size={24} style={{ color: '#E8B84B' }} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-white mb-0.5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                {tUI('Practice Games')}
+              </p>
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: "'DM Sans', sans-serif" }}>
+                {tUI('9 interactive games to sharpen your classroom skills. Play solo or with your team.')}
+              </p>
+            </div>
+            <ChevronRight size={20} className="flex-shrink-0 group-hover:translate-x-1 transition-transform" style={{ color: '#E8B84B' }} />
+          </button>
+        )}
 
         {/* Quick Wins Grid or Empty State */}
         {filteredQuickWins.length > 0 ? (

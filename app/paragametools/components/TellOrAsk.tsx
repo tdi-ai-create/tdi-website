@@ -9,6 +9,9 @@ import { COLORS, shuffleAndPick } from '../data/gameConfig';
 import { useLanguage } from '../context/LanguageContext';
 import { UI_TRANSLATIONS } from '../data/translations';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
+import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
+import { GameSettingsPanel } from './GameSettingsPanel';
+import { type GameSettings, DEFAULT_SETTINGS, filterBySettings } from '../data/gameSettings';
 
 type Screen = 'intro' | 'play' | 'done';
 
@@ -22,44 +25,69 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
   const [revealed, setRevealed] = useState(false);
   const [userGuess, setUserGuess] = useState<'TELL' | 'ASK' | null>(null);
   const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [confidence, setConfidence] = useState<number | null>(null);
+  const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
 
-  const { logCompletion } = useGameTracking();
+  const { logCompletion, startSession, logGameResponse, completeSession } = useGameTracking();
   const { language } = useLanguage();
   const t = UI_TRANSLATIONS;
 
-  // Shuffle statements on mount
-  const statements = useMemo(
-    () => shuffleAndPick(TELL_OR_ASK_STATEMENTS, TELL_OR_ASK_ROUNDS),
-    []
-  );
+  // Filter and shuffle statements based on settings, preserving original indices
+  const statementsWithIds = useMemo(() => {
+    const indexed = TELL_OR_ASK_STATEMENTS.map((s, i) => ({ ...s, _origIndex: i }));
+    const filtered = filterBySettings(indexed, settings);
+    // Ensure we have enough items — fall back to all if filter is too narrow
+    const pool = filtered.length >= 6 ? filtered : indexed;
+    return shuffleAndPick(pool, Math.min(TELL_OR_ASK_ROUNDS, pool.length));
+  }, [settings]);
 
-  const handleStart = () => {
+  const handleStart = async () => {
     setScreen('play');
     setCurrentRound(0);
     setRevealed(false);
     setUserGuess(null);
     setStreak(0);
+    setBestStreak(0);
     setConfidence(null);
+    await startSession('tell-or-ask', statementsWithIds.length, {
+      language,
+      difficulty: settings.difficulty,
+      gradeBand: settings.gradeBand,
+      role: settings.role,
+    });
   };
 
   const handleGuess = (guess: 'TELL' | 'ASK') => {
     setUserGuess(guess);
     setRevealed(true);
 
-    const isCorrect = guess === statements[currentRound].type;
+    const current = statementsWithIds[currentRound];
+    const isCorrect = guess === current.type;
+    const newStreak = isCorrect ? streak + 1 : 0;
+
     if (isCorrect) {
-      setStreak((prev) => prev + 1);
+      setStreak(newStreak);
       setCorrectCount((prev) => prev + 1);
+      setBestStreak((prev) => Math.max(prev, newStreak));
     } else {
       setStreak(0);
     }
+
+    logGameResponse('tell-or-ask', {
+      itemId: `tellorask_${current._origIndex}`,
+      roundNumber: currentRound + 1,
+      userAnswer: guess,
+      correctAnswer: current.type,
+      isCorrect,
+      confidence: confidence ?? undefined,
+    });
   };
 
-  const handleNext = () => {
-    if (currentRound < statements.length - 1) {
+  const handleNext = async () => {
+    if (currentRound < statementsWithIds.length - 1) {
       setIsAnimating(true);
       setTimeout(() => {
         setCurrentRound((prev) => prev + 1);
@@ -70,18 +98,21 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
       }, 200);
     } else {
       setScreen('done');
-      logCompletion({ tool: 'tell-or-ask', score: correctCount, totalRounds: statements.length, streak });
+      logCompletion({ tool: 'tell-or-ask', score: correctCount, totalRounds: statementsWithIds.length, streak });
+      await completeSession(correctCount, bestStreak);
     }
   };
 
   const colorConfig = COLORS.yellow;
-  const current = statements[currentRound];
+  const current = statementsWithIds[currentRound];
   const isCorrect = userGuess === current.type;
 
   const gameTitle = t.games.tellorask.title[language];
+  const badgeCelebration = useGameBadgeCheck(screen === 'done');
 
   return (
     <GameWrapper gameId="tellorask" title={gameTitle} color="yellow" onBack={onBack}>
+      {badgeCelebration}
       {screen === 'intro' && (
         <IntroScreen
           gameId="tellorask"
@@ -90,10 +121,19 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
           rules={t.tellorask_rules[language]}
           onStart={handleStart}
           extraContent={
-            <div className="flex items-center gap-2 mb-4 text-yellow-400">
-              <AlertTriangle size={18} />
-              <span className="text-sm">{t.tellorask_warning[language]}</span>
-            </div>
+            <>
+              <GameSettingsPanel
+                settings={settings}
+                onChange={setSettings}
+                language={language}
+                accentColor="#F1C40F"
+                show={['difficulty', 'gradeBand']}
+              />
+              <div className="flex items-center gap-2 mb-4 text-yellow-400">
+                <AlertTriangle size={18} />
+                <span className="text-sm">{t.tellorask_warning[language]}</span>
+              </div>
+            </>
           }
         />
       )}
@@ -105,7 +145,7 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
             className="text-xs uppercase tracking-widest mb-2"
             style={{ color: 'rgba(241, 196, 15, 0.5)' }}
           >
-            {t.round[language]} {currentRound + 1} {t.of[language]} {statements.length}
+            {t.round[language]} {currentRound + 1} {t.of[language]} {statementsWithIds.length}
           </p>
 
           {/* Streak counter */}
@@ -214,7 +254,7 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
                 className="flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
                 style={{ backgroundColor: colorConfig.accent, color: '#0a1628' }}
               >
-                {currentRound < statements.length - 1 ? t.next[language] : t.finish[language]}
+                {currentRound < statementsWithIds.length - 1 ? t.next[language] : t.finish[language]}
                 <ChevronRight size={20} />
               </button>
             </div>

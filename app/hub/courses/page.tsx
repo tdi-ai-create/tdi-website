@@ -10,7 +10,8 @@ import { enrollInCourse } from '@/lib/hooks/useEnrollment';
 import { useFavorites } from '@/lib/hub/useFavorites';
 import { useLanguage } from '@/lib/hub/useLanguage';
 import { useTranslation } from '@/lib/hub/useTranslation';
-import { BookOpen, CheckCircle, AlertCircle } from 'lucide-react';
+import { BookOpen, CheckCircle, AlertCircle, Gamepad2, ChevronRight, Zap, Target, TrendingUp } from 'lucide-react';
+import Link from 'next/link';
 import QuizNudge from '@/components/hub/QuizNudge';
 import HubFilterBar from '@/components/hub/HubFilterBar';
 
@@ -383,6 +384,77 @@ export default function CourseCatalogPage() {
                 />
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Practice Games Section */}
+        {activeFilter === 'All' && (
+          <div className="mt-10 mb-6">
+            <h2
+              className="text-[11px] font-bold tracking-wider mb-4"
+              style={{
+                color: '#1B2A4A',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {tUI('PRACTICE GAMES')}
+            </h2>
+            <Link
+              href="/hub/quick-wins?filter=Games"
+              className="block rounded-2xl p-6 transition-all hover:shadow-md group"
+              style={{
+                background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)',
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}
+            >
+              <div className="flex items-start gap-5">
+                <div
+                  className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: 'rgba(232, 184, 75, 0.15)' }}
+                >
+                  <Gamepad2 size={28} style={{ color: '#E8B84B' }} />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="text-lg font-bold text-white" style={{ fontFamily: "'Source Serif 4', serif" }}>
+                      {tUI('Practice Games')}
+                    </h3>
+                    <ChevronRight size={18} className="text-white/40 group-hover:translate-x-1 group-hover:text-white/70 transition-all" />
+                  </div>
+                  <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.65)', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6 }}>
+                    {tUI('9 interactive games designed to build real classroom skills. Practice questioning techniques, feedback strategies, scenario responses, and more.')}
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {[
+                      { icon: Zap, label: tUI('Tell or Ask?'), color: '#F1C40F' },
+                      { icon: TrendingUp, label: tUI('Feedback Level Up'), color: '#27AE60' },
+                      { icon: Target, label: tUI('Question Knockout'), color: '#FF7847' },
+                    ].map((game) => (
+                      <div
+                        key={game.label}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg"
+                        style={{ backgroundColor: `${game.color}15`, border: `1px solid ${game.color}30` }}
+                      >
+                        <game.icon size={12} style={{ color: game.color }} />
+                        <span className="text-xs font-medium" style={{ color: game.color }}>
+                          {game.label}
+                        </span>
+                      </div>
+                    ))}
+                    <div
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg"
+                      style={{ backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}
+                    >
+                      <span className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                        +6 {tUI('more')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Link>
           </div>
         )}
 

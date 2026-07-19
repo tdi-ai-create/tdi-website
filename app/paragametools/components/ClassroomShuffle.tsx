@@ -8,6 +8,9 @@ import { CLASSROOM_SCENARIOS, SCENARIO_COUNT } from '../data/classroomScenarios'
 import { GameWrapper, IntroScreen, DoneScreen } from './GameWrapper';
 import { ConfettiBurst } from './ConfettiBurst';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
+import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
+import { GameSettingsPanel } from './GameSettingsPanel';
+import { type GameSettings, DEFAULT_SETTINGS, filterBySettings } from '../data/gameSettings';
 
 type Screen = 'intro' | 'play' | 'results';
 
@@ -17,44 +20,74 @@ interface ClassroomShuffleProps {
 
 export function ClassroomShuffle({ onBack }: ClassroomShuffleProps) {
   const { language } = useLanguage();
-  const { logCompletion } = useGameTracking();
+  const { logCompletion, startSession, logGameResponse, completeSession } = useGameTracking();
+  const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
 
-  const scenarios = useMemo(() => shuffle(CLASSROOM_SCENARIOS).slice(0, SCENARIO_COUNT), []);
+  const scenariosWithIds = useMemo(() => {
+    const indexed = CLASSROOM_SCENARIOS.map((s, i) => ({ ...s, _origIndex: i }));
+    const filtered = filterBySettings(indexed, settings);
+    const pool = filtered.length >= 4 ? filtered : indexed;
+    return shuffle(pool).slice(0, Math.min(SCENARIO_COUNT, pool.length));
+  }, [settings]);
 
   const [screen, setScreen] = useState<Screen>('intro');
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
 
-  const scenario = scenarios[current];
+  const scenario = scenariosWithIds[current];
   const data = scenario[language === 'es' ? 'es' : 'en'];
-  const isLast = current === scenarios.length - 1;
+  const isLast = current === scenariosWithIds.length - 1;
 
   const handleSelect = (idx: number) => {
     if (selected !== null) return;
     setSelected(idx);
-    if (scenario.choices[idx].correct) setScore((s) => s + 1);
+    const isCorrect = scenario.choices[idx].correct;
+    if (isCorrect) {
+      setScore((s) => s + 1);
+      const newStreak = streak + 1;
+      setStreak(newStreak);
+      setBestStreak((prev) => Math.max(prev, newStreak));
+    } else {
+      setStreak(0);
+    }
+
+    const correctIdx = scenario.choices.findIndex(c => c.correct);
+    logGameResponse('classroom-shuffle', {
+      itemId: `classroomshuffle_${scenario._origIndex}`,
+      roundNumber: current + 1,
+      userAnswer: String(idx),
+      correctAnswer: String(correctIdx),
+      isCorrect,
+    });
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (isLast) {
       setScreen('results');
-      logCompletion({ tool: 'classroom-shuffle', score, totalRounds: scenarios.length });
+      logCompletion({ tool: 'classroom-shuffle', score, totalRounds: scenariosWithIds.length });
+      await completeSession(score, bestStreak);
     } else {
       setCurrent((c) => c + 1);
       setSelected(null);
     }
   };
 
-  const handlePlayAgain = () => {
+  const handlePlayAgain = async () => {
     setCurrent(0);
     setSelected(null);
     setScore(0);
+    setStreak(0);
+    setBestStreak(0);
     setScreen('intro');
+    await startSession('classroom-shuffle', scenariosWithIds.length, { language });
   };
 
   const colorConfig = COLORS.blue;
   const confettiColors = ['#3498DB', '#2980B9', '#5DADE2', '#AED6F1', '#FFFFFF'];
+  const badgeCelebration = useGameBadgeCheck(screen === 'results');
 
   // ── Intro ──
   if (screen === 'intro') {
@@ -78,7 +111,15 @@ export function ClassroomShuffle({ onBack }: ClassroomShuffleProps) {
                 `${SCENARIO_COUNT} real classroom situations`,
               ]
           }
-          onStart={() => setScreen('play')}
+          onStart={() => { setScreen('play'); startSession('classroom-shuffle', scenariosWithIds.length, { language, difficulty: settings.difficulty, gradeBand: settings.gradeBand, role: settings.role }); }}
+          extraContent={
+            <GameSettingsPanel
+              settings={settings}
+              onChange={setSettings}
+              language={language}
+              accentColor="#3498DB"
+            />
+          }
         />
       </GameWrapper>
     );
@@ -98,6 +139,7 @@ export function ClassroomShuffle({ onBack }: ClassroomShuffleProps) {
 
     return (
       <GameWrapper gameId="classroomshuffle" title={language === 'es' ? 'Escenario de Aula' : 'Classroom Scenario Shuffle'} color="blue" onBack={onBack}>
+        {badgeCelebration}
         {score >= 6 && <ConfettiBurst colors={confettiColors} particleCount={60} />}
         <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
           {/* Score ring */}
@@ -106,7 +148,7 @@ export function ClassroomShuffle({ onBack }: ClassroomShuffleProps) {
             <span className="text-4xl md:text-5xl font-black text-white">{score}</span>
           </div>
           <div className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: colorConfig.accent }}>
-            {score}/{scenarios.length}
+            {score}/{scenariosWithIds.length}
           </div>
           <h2 className="text-2xl md:text-3xl font-black text-white mb-3">{title}</h2>
           <p className="text-sm md:text-base text-white/70 max-w-md mb-8" style={{ lineHeight: 1.6 }}>{message}</p>
@@ -140,7 +182,7 @@ export function ClassroomShuffle({ onBack }: ClassroomShuffleProps) {
       <div className="max-w-2xl mx-auto px-4 py-6">
         {/* Progress dots */}
         <div className="flex justify-center gap-2 mb-6">
-          {scenarios.map((_, i) => (
+          {scenariosWithIds.map((_, i) => (
             <div
               key={i}
               className="w-2.5 h-2.5 rounded-full transition-all"

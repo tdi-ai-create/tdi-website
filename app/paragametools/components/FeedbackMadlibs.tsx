@@ -9,6 +9,7 @@ import { COLORS, shuffle } from '../data/gameConfig';
 import { useLanguage } from '../context/LanguageContext';
 import { UI_TRANSLATIONS } from '../data/translations';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
+import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
 
 type Screen = 'intro' | 'play' | 'done';
 
@@ -34,7 +35,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
   // Real feedback inputs for practice rounds
   const [realInputs, setRealInputs] = useState({ notice: '', name: '', nextStep: '' });
 
-  const { logCompletion } = useGameTracking();
+  const { logCompletion, startSession, completeSession } = useGameTracking();
   const { language } = useLanguage();
   const t = UI_TRANSLATIONS;
 
@@ -49,13 +50,15 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
   const currentPrompts = isSillyRound ? SILLY_ROUND_PROMPTS[currentRound % SILLY_ROUND_PROMPTS.length].prompts : [];
 
   const gameTitle = t.games.madlibs.title[language];
+  const badgeCelebration = useGameBadgeCheck(screen === 'done');
 
-  const handleStart = () => {
+  const handleStart = async () => {
     setScreen('play');
     setCurrentRound(0);
     setSillyPhase('blind_input');
     setRealPhase('scenario');
     resetInputs();
+    await startSession('feedback-madlibs', scenarios.length, { language });
   };
 
   const resetInputs = () => {
@@ -99,6 +102,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
     } else {
       setScreen('done');
       logCompletion({ tool: 'feedback-madlibs', totalRounds: scenarios.length });
+      completeSession(0, 0);
     }
   };
 
@@ -111,6 +115,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
 
   return (
     <GameWrapper gameId="madlibs" title={gameTitle} color="purple" onBack={onBack}>
+      {badgeCelebration}
       {/* INTRO SCREEN */}
       {screen === 'intro' && (
         <div className="flex flex-col items-center text-center animate-fade-in">
