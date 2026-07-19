@@ -207,9 +207,9 @@ export async function GET(request: NextRequest) {
       notSet: activeCreators.filter((c) => !c.content_path).length,
     };
 
-    // Closest to launch (top 4 not at 100%, only active creators)
+    // Closest to launch (top 4 not at 100%, exclude published/paused creators)
     const closestToLaunch = activeCreators
-      .filter((c) => c.progressPercentage < 100)
+      .filter((c) => c.progressPercentage < 100 && c.publish_status !== 'published' && c.lifecycle_state !== 'paused')
       .sort((a, b) => b.progressPercentage - a.progressPercentage)
       .slice(0, 4)
       .map((c) => ({
