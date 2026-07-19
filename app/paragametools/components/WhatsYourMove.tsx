@@ -8,6 +8,7 @@ import { SCENARIOS, SCENARIO_COUNT } from '../data/whatsYourMove';
 import { GameWrapper } from './GameWrapper';
 import { ConfettiBurst } from './ConfettiBurst';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
+import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
 
 // ── Toggle: set to false to hide survey for general community use ──
 const SURVEY_ACTIVE = true;
@@ -34,11 +35,13 @@ interface SurveyResponse {
 // ─── Main component ───
 export function WhatsYourMove({ onBack }: { onBack: () => void }) {
   const { language } = useLanguage();
-  const { logCompletion } = useGameTracking();
+  const { logCompletion, startSession, logGameResponse, completeSession } = useGameTracking();
   const [screen, setScreen] = useState<Screen>('intro');
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
+  const [streak, setStreak] = useState(0);
 
   const scenario = SCENARIOS[current];
   const data = scenario[language];
@@ -47,32 +50,55 @@ export function WhatsYourMove({ onBack }: { onBack: () => void }) {
   const handleSelect = (idx: number) => {
     if (selected !== null) return; // locked
     setSelected(idx);
-    if (data.choices[idx].correct) setScore((s) => s + 1);
+    const isCorrect = data.choices[idx].correct;
+    if (isCorrect) {
+      setScore((s) => s + 1);
+      const newStreak = streak + 1;
+      setStreak(newStreak);
+      setBestStreak((prev) => Math.max(prev, newStreak));
+    } else {
+      setStreak(0);
+    }
+
+    const correctIdx = data.choices.findIndex(c => c.correct);
+    logGameResponse('whats-your-move', {
+      itemId: `whatsyourmove_${current}`,
+      roundNumber: current + 1,
+      userAnswer: String(idx),
+      correctAnswer: String(correctIdx),
+      isCorrect,
+    });
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (isLast) {
       setScreen('results');
       logCompletion({ tool: 'whats-your-move', score, totalRounds: SCENARIO_COUNT });
+      await completeSession(score, bestStreak);
     } else {
       setCurrent((c) => c + 1);
       setSelected(null);
     }
   };
 
-  const handlePlayAgain = () => {
+  const handlePlayAgain = async () => {
     setCurrent(0);
     setSelected(null);
     setScore(0);
+    setStreak(0);
+    setBestStreak(0);
     setScreen('intro');
+    await startSession('whats-your-move', SCENARIO_COUNT, { language });
   };
 
   const gameTitle = language === 'es' ? '¿Cuál Es Tu Movimiento?' : "What's Your Move?";
+  const badgeCelebration = useGameBadgeCheck(screen === 'results');
 
   return (
     <GameWrapper gameId="whatsyourmove" title={gameTitle} color="teal" onBack={onBack}>
+      {badgeCelebration}
       {screen === 'intro' && (
-        <IntroScreen onStart={() => setScreen('play')} language={language} />
+        <IntroScreen onStart={() => { setScreen('play'); startSession('whats-your-move', SCENARIO_COUNT, { language }); }} language={language} />
       )}
       {screen === 'play' && (
         <PlayScreen

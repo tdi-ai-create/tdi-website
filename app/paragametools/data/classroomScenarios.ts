@@ -1,5 +1,7 @@
 // Classroom Scenario Shuffle -- general classroom management scenarios for all educators
 
+import type { Difficulty, GradeBand, EducatorRole } from './gameSettings'
+
 export interface ScenarioChoice {
   en: string
   es: string
@@ -11,6 +13,9 @@ export interface ClassroomScenario {
   en: { context: string; question: string }
   es: { context: string; question: string }
   choices: ScenarioChoice[]
+  difficulty?: Difficulty
+  gradeBand?: GradeBand | GradeBand[]
+  roles?: EducatorRole | EducatorRole[]
 }
 
 export const CLASSROOM_SCENARIOS: ClassroomScenario[] = [
@@ -23,6 +28,8 @@ export const CLASSROOM_SCENARIOS: ClassroomScenario[] = [
       context: 'Un estudiante que generalmente participa de repente baja la cabeza y se niega a participar. Solo han pasado 10 minutos de clase.',
       question: 'Cual es tu mejor primer movimiento?',
     },
+    difficulty: 'easy',
+    gradeBand: 'all',
     choices: [
       {
         en: 'Quietly approach and say "I notice you are having a tough moment. I am here when you are ready."',
@@ -62,6 +69,8 @@ export const CLASSROOM_SCENARIOS: ClassroomScenario[] = [
       context: 'Dos estudiantes estan susurrando y riendose durante tu leccion. Esta distrayendo a otros estudiantes cercanos.',
       question: 'Que haces?',
     },
+    difficulty: 'easy',
+    gradeBand: 'all',
     choices: [
       {
         en: 'Move closer to them while continuing to teach (proximity).',
@@ -101,6 +110,9 @@ export const CLASSROOM_SCENARIOS: ClassroomScenario[] = [
       context: 'Un padre te envia un correo molesto porque su hijo dice "la maestra no me quiere." Sabes que has sido firme con este estudiante sobre su comportamiento.',
       question: 'Como respondes?',
     },
+    difficulty: 'hard',
+    gradeBand: 'all',
+    roles: ['teacher', 'coach'],
     choices: [
       {
         en: 'Acknowledge the parent\'s concern, share something positive about the student, then explain the behavior expectations.',
@@ -140,6 +152,8 @@ export const CLASSROOM_SCENARIOS: ClassroomScenario[] = [
       context: 'Planeaste una actividad grupal pero la mitad de tu clase esta ausente hoy por una excursion de otro grado.',
       question: 'Que haces?',
     },
+    difficulty: 'medium',
+    gradeBand: 'all',
     choices: [
       {
         en: 'Pivot to a meaningful independent or partner activity that does not require the full class.',
@@ -179,6 +193,8 @@ export const CLASSROOM_SCENARIOS: ClassroomScenario[] = [
       context: 'Un estudiante entrega un trabajo que claramente fue copiado de internet. Es la primera vez que sucede con este estudiante.',
       question: 'Como lo manejas?',
     },
+    difficulty: 'hard',
+    gradeBand: ['6-8', '9-12'],
     choices: [
       {
         en: 'Have a private conversation: "I noticed this matches something online. What happened? Let us figure out a plan."',
@@ -218,6 +234,9 @@ export const CLASSROOM_SCENARIOS: ClassroomScenario[] = [
       context: 'Estas en una reunion de personal y un colega critica publicamente tu enfoque de ensenanza frente al equipo.',
       question: 'Cual es tu movimiento?',
     },
+    difficulty: 'expert',
+    gradeBand: 'all',
+    roles: ['teacher', 'coach', 'leader'],
     choices: [
       {
         en: 'Stay calm. Say "I appreciate the feedback. I would love to talk more about this one-on-one after the meeting."',
@@ -257,6 +276,8 @@ export const CLASSROOM_SCENARIOS: ClassroomScenario[] = [
       context: 'Es viernes por la tarde y tus estudiantes estan completamente desconectados. Todavia tienes 30 minutos de contenido que cubrir.',
       question: 'Que haces?',
     },
+    difficulty: 'medium',
+    gradeBand: 'all',
     choices: [
       {
         en: 'Shift the format -- turn the content into a quick game, discussion, or partner challenge.',
@@ -296,6 +317,8 @@ export const CLASSROOM_SCENARIOS: ClassroomScenario[] = [
       context: 'Un nuevo estudiante se une a tu clase a mitad de ano. Parece ansioso, se sienta solo y no ha hablado con nadie despues de dos dias.',
       question: 'Cual es tu enfoque?',
     },
+    difficulty: 'medium',
+    gradeBand: 'all',
     choices: [
       {
         en: 'Quietly assign a trusted student buddy and check in with the new student privately.',

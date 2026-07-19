@@ -7,6 +7,8 @@ import { useTranslation } from '@/lib/hub/useTranslation';
 import AvatarDisplay from '@/components/hub/AvatarDisplay';
 import AvatarPicker from '@/components/hub/AvatarPicker';
 import AchievementInsights from '@/components/hub/AchievementInsights';
+import GameStatsCard from '@/components/hub/GameStatsCard';
+import GameBadgeGrid from '@/components/hub/GameBadgeGrid';
 import QuizEngine, { QuizResultBadge, QuizInviteCard } from '@/components/hub/QuizEngine';
 import ShareableProfileCard from '@/components/hub/ShareableProfileCard';
 import { ALL_QUIZZES, getQuizById } from '@/lib/hub/quizConfigs';
@@ -1555,6 +1557,12 @@ export default function ProfileSettingsPage() {
               </div>
             ))}
           </div>
+
+          {/* ── Practice Game Stats ── */}
+          <GameStatsCard />
+
+          {/* ── Game Badges ── */}
+          <GameBadgeGrid />
 
           {/* Recent Activity */}
           {/* Activity Heatmap -- last 12 weeks */}

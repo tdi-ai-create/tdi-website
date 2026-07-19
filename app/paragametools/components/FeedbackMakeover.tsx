@@ -9,6 +9,7 @@ import { COLORS, shuffle } from '../data/gameConfig';
 import { useLanguage } from '../context/LanguageContext';
 import { UI_TRANSLATIONS } from '../data/translations';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
+import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
 
 type Screen = 'intro' | 'play' | 'done';
 
@@ -27,7 +28,7 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
   const [showBeforeAfter, setShowBeforeAfter] = useState(false);
   const [savedMakeovers, setSavedMakeovers] = useState<{ bad: string; after: string }[]>([]);
 
-  const { logCompletion } = useGameTracking();
+  const { logCompletion, startSession, completeSession } = useGameTracking();
   const { language } = useLanguage();
   const t = UI_TRANSLATIONS;
 
@@ -37,7 +38,7 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
     []
   );
 
-  const handleStart = () => {
+  const handleStart = async () => {
     setScreen('play');
     setCurrentRound(0);
     setTimerRunning(false);
@@ -46,6 +47,7 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
     setUserMakeover('');
     setShowBeforeAfter(false);
     setSavedMakeovers([]);
+    await startSession('feedback-makeover', makeovers.length, { language });
   };
 
   const handleNext = () => {
@@ -68,6 +70,7 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
     } else {
       setScreen('done');
       logCompletion({ tool: 'feedback-makeover', totalRounds: makeovers.length });
+      completeSession(0, 0);
     }
   };
 
@@ -86,6 +89,7 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
   const current = makeovers[currentRound];
 
   const gameTitle = t.games.makeover.title[language];
+  const badgeCelebration = useGameBadgeCheck(screen === 'done');
 
   // Step labels
   const stepLabels = language === 'es'
@@ -94,6 +98,7 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
 
   return (
     <GameWrapper gameId="makeover" title={gameTitle} color="red" onBack={onBack}>
+      {badgeCelebration}
       {screen === 'intro' && (
         <IntroScreen
           gameId="makeover"

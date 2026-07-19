@@ -8,6 +8,7 @@ import { ENERGY_ROUNDS, ENERGY_ROUND_COUNT, TOTAL_ENERGY } from '../data/energyB
 import { GameWrapper, IntroScreen } from './GameWrapper';
 import { ConfettiBurst } from './ConfettiBurst';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
+import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
 
 type Screen = 'intro' | 'allocate' | 'reveal' | 'results';
 
@@ -17,10 +18,13 @@ interface EnergyBudgetProps {
 
 export function EnergyBudget({ onBack }: EnergyBudgetProps) {
   const { language } = useLanguage();
-  const { logCompletion } = useGameTracking();
+  const { logCompletion, startSession, logGameResponse, completeSession } = useGameTracking();
   const lang = language === 'es' ? 'es' : 'en';
 
-  const rounds = useMemo(() => shuffle(ENERGY_ROUNDS).slice(0, ENERGY_ROUND_COUNT), []);
+  const roundsWithIds = useMemo(() => {
+    const indexed = ENERGY_ROUNDS.map((r, i) => ({ ...r, _origIndex: i }));
+    return shuffle(indexed).slice(0, ENERGY_ROUND_COUNT);
+  }, []);
 
   const [screen, setScreen] = useState<Screen>('intro');
   const [current, setCurrent] = useState(0);
@@ -28,8 +32,8 @@ export function EnergyBudget({ onBack }: EnergyBudgetProps) {
   const [totalScore, setTotalScore] = useState(0);
   const [roundScore, setRoundScore] = useState(0);
 
-  const round = rounds[current];
-  const isLast = current === rounds.length - 1;
+  const round = roundsWithIds[current];
+  const isLast = current === roundsWithIds.length - 1;
   const remaining = TOTAL_ENERGY - allocations.reduce((sum, v) => sum + v, 0);
 
   const initRound = () => {
@@ -65,33 +69,44 @@ export function EnergyBudget({ onBack }: EnergyBudgetProps) {
     setRoundScore(score);
     setTotalScore((s) => s + score);
     setScreen('reveal');
+
+    logGameResponse('energy-budget', {
+      itemId: `energybudget_${round._origIndex}`,
+      roundNumber: current + 1,
+      userAnswer: allocations.join(','),
+      correctAnswer: round.tasks.map(t => t.expertAllocation).join(','),
+      isCorrect: score >= 70,
+    });
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (isLast) {
       setScreen('results');
-      logCompletion({ tool: 'energy-budget', score: totalScore, totalRounds: rounds.length });
+      logCompletion({ tool: 'energy-budget', score: totalScore, totalRounds: roundsWithIds.length });
+      await completeSession(totalScore, 0);
     } else {
       setCurrent((c) => c + 1);
       setScreen('allocate');
       setTimeout(() => {
-        const taskCount = rounds[current + 1].tasks.length;
+        const taskCount = roundsWithIds[current + 1].tasks.length;
         const base = Math.floor(TOTAL_ENERGY / taskCount);
         const rem = TOTAL_ENERGY - (base * taskCount);
-        setAllocations(rounds[current + 1].tasks.map((_, i) => i === 0 ? base + rem : base));
+        setAllocations(roundsWithIds[current + 1].tasks.map((_, i) => i === 0 ? base + rem : base));
       }, 0);
     }
   };
 
-  const handlePlayAgain = () => {
+  const handlePlayAgain = async () => {
     setCurrent(0);
     setTotalScore(0);
     setRoundScore(0);
     setScreen('intro');
+    await startSession('energy-budget', roundsWithIds.length, { language });
   };
 
   const colorConfig = COLORS.teal;
   const confettiColors = ['#22b8bd', '#14b8a6', '#5eead4', '#99f6e4', '#FFFFFF'];
+  const badgeCelebration = useGameBadgeCheck(screen === 'results');
 
   // ── Intro ──
   if (screen === 'intro') {
@@ -115,7 +130,7 @@ export function EnergyBudget({ onBack }: EnergyBudgetProps) {
                 `${ENERGY_ROUND_COUNT} real scenarios`,
               ]
           }
-          onStart={() => { setScreen('allocate'); initRound(); }}
+          onStart={() => { setScreen('allocate'); initRound(); startSession('energy-budget', roundsWithIds.length, { language }); }}
         />
       </GameWrapper>
     );
@@ -123,7 +138,7 @@ export function EnergyBudget({ onBack }: EnergyBudgetProps) {
 
   // ── Results ──
   if (screen === 'results') {
-    const avgScore = Math.round(totalScore / rounds.length);
+    const avgScore = Math.round(totalScore / roundsWithIds.length);
     const title = avgScore >= 80 ? (lang === 'es' ? 'Maestro del equilibrio' : 'Balance Master')
       : avgScore >= 60 ? (lang === 'es' ? 'Buen equilibrio' : 'Good Balance')
       : (lang === 'es' ? 'Sigue ajustando' : 'Keep Adjusting');
@@ -136,6 +151,7 @@ export function EnergyBudget({ onBack }: EnergyBudgetProps) {
 
     return (
       <GameWrapper gameId="energybudget" title={lang === 'es' ? 'Presupuesto de Energia' : 'Energy Budget'} color="teal" onBack={onBack}>
+        {badgeCelebration}
         {avgScore >= 70 && <ConfettiBurst colors={confettiColors} particleCount={60} />}
         <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
           <div className="w-28 h-28 rounded-full flex items-center justify-center mb-6"
@@ -167,7 +183,7 @@ export function EnergyBudget({ onBack }: EnergyBudgetProps) {
         <div className="max-w-2xl mx-auto px-4 py-6">
           {/* Progress */}
           <div className="flex justify-center gap-2 mb-6">
-            {rounds.map((_, i) => (
+            {roundsWithIds.map((_, i) => (
               <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: i === current ? colorConfig.accent : i < current ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.15)' }} />
             ))}
           </div>

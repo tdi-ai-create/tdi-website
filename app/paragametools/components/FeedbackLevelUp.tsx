@@ -9,6 +9,9 @@ import { COLORS, shuffle } from '../data/gameConfig';
 import { useLanguage } from '../context/LanguageContext';
 import { UI_TRANSLATIONS } from '../data/translations';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
+import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
+import { GameSettingsPanel } from './GameSettingsPanel';
+import { type GameSettings, DEFAULT_SETTINGS, filterBySettings } from '../data/gameSettings';
 
 type Screen = 'intro' | 'play' | 'done';
 
@@ -22,41 +25,55 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
   const [revealed, setRevealed] = useState(false);
   const [userGuess, setUserGuess] = useState<number | null>(null);
   const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [trapCount, setTrapCount] = useState(0);
   const [showTrapMessage, setShowTrapMessage] = useState(false);
+  const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
 
-  const { logCompletion } = useGameTracking();
+  const { logCompletion, startSession, logGameResponse, completeSession } = useGameTracking();
   const { language } = useLanguage();
   const t = UI_TRANSLATIONS;
 
-  // Shuffle feedback examples on mount
-  const feedbacks = useMemo(
-    () => shuffle(FEEDBACK_LEVELS),
-    []
-  );
+  // Filter and shuffle feedback examples, preserving original indices
+  const feedbacks = useMemo(() => {
+    const indexed = FEEDBACK_LEVELS.map((f, i) => ({ ...f, _origIndex: i }));
+    const filtered = filterBySettings(indexed, settings);
+    const pool = filtered.length >= 6 ? filtered : indexed;
+    return shuffle(pool);
+  }, [settings]);
 
-  const handleStart = () => {
+  const handleStart = async () => {
     setScreen('play');
     setCurrentRound(0);
     setRevealed(false);
     setUserGuess(null);
     setStreak(0);
+    setBestStreak(0);
     setTrapCount(0);
     setShowTrapMessage(false);
+    await startSession('feedback-level-up', feedbacks.length, {
+      language,
+      difficulty: settings.difficulty,
+      gradeBand: settings.gradeBand,
+      role: settings.role,
+    });
   };
 
   const handleGuess = (level: number) => {
     setUserGuess(level);
     setRevealed(true);
 
-    const actualLevel = feedbacks[currentRound].level;
+    const current = feedbacks[currentRound];
+    const actualLevel = current.level;
     const isCorrect = level === actualLevel;
+    const newStreak = isCorrect ? streak + 1 : 0;
 
     if (isCorrect) {
-      setStreak((prev) => prev + 1);
+      setStreak(newStreak);
       setCorrectCount((prev) => prev + 1);
+      setBestStreak((prev) => Math.max(prev, newStreak));
     } else {
       setStreak(0);
     }
@@ -68,9 +85,17 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
     } else {
       setShowTrapMessage(false);
     }
+
+    logGameResponse('feedback-level-up', {
+      itemId: `levelup_${current._origIndex}`,
+      roundNumber: currentRound + 1,
+      userAnswer: String(level),
+      correctAnswer: String(actualLevel),
+      isCorrect,
+    });
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentRound < feedbacks.length - 1) {
       setIsAnimating(true);
       setTimeout(() => {
@@ -83,6 +108,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
     } else {
       setScreen('done');
       logCompletion({ tool: 'feedback-level-up', score: correctCount, totalRounds: feedbacks.length, streak });
+      await completeSession(correctCount, bestStreak);
     }
   };
 
@@ -92,9 +118,11 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
   const isCorrect = userGuess === current.level;
 
   const gameTitle = t.games.levelup.title[language];
+  const badgeCelebration = useGameBadgeCheck(screen === 'done');
 
   return (
     <GameWrapper gameId="levelup" title={gameTitle} color="green" onBack={onBack}>
+      {badgeCelebration}
       {screen === 'intro' && (
         <IntroScreen
           gameId="levelup"
@@ -103,6 +131,14 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
           rules={t.levelup_rules[language]}
           onStart={handleStart}
           extraContent={
+            <>
+            <GameSettingsPanel
+              settings={settings}
+              onChange={setSettings}
+              language={language}
+              accentColor="#27AE60"
+              show={['difficulty', 'gradeBand']}
+            />
             <div className="w-full max-w-lg mb-6">
               {/* Level reference grid */}
               <div className="grid grid-cols-4 gap-2 mb-4">
@@ -129,6 +165,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
                 {t.levelup_formula[language]}
               </p>
             </div>
+            </>
           }
         />
       )}

@@ -9,6 +9,9 @@ import { COLORS, shuffleAndPick } from '../data/gameConfig';
 import { useLanguage } from '../context/LanguageContext';
 import { UI_TRANSLATIONS } from '../data/translations';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
+import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
+import { GameSettingsPanel } from './GameSettingsPanel';
+import { type GameSettings, DEFAULT_SETTINGS, filterBySettings } from '../data/gameSettings';
 
 type Screen = 'intro' | 'play' | 'done';
 
@@ -24,23 +27,26 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [switches, setSwitches] = useState(0);
   const [showBuzzerEffect, setShowBuzzerEffect] = useState(false);
+  const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
 
-  const { logCompletion } = useGameTracking();
+  const { logCompletion, startSession, completeSession } = useGameTracking();
   const { language } = useLanguage();
   const t = UI_TRANSLATIONS;
 
-  // Shuffle scenarios on mount
-  const scenarios = useMemo(
-    () => shuffleAndPick(KNOCKOUT_SCENARIOS, KNOCKOUT_ROUNDS),
-    []
-  );
+  // Filter and shuffle scenarios based on settings
+  const scenarios = useMemo(() => {
+    const filtered = filterBySettings(KNOCKOUT_SCENARIOS, settings);
+    const pool = filtered.length >= 6 ? filtered : KNOCKOUT_SCENARIOS;
+    return shuffleAndPick(pool, Math.min(KNOCKOUT_ROUNDS, pool.length));
+  }, [settings]);
 
-  const handleStart = () => {
+  const handleStart = async () => {
     setScreen('play');
     setCurrentRound(0);
     setTimerRunning(false);
     setTimerKey(0);
     setSwitches(0);
+    await startSession('question-knockout', scenarios.length, { language, difficulty: settings.difficulty, gradeBand: settings.gradeBand, role: settings.role });
   };
 
   const triggerBuzzer = () => {
@@ -61,6 +67,7 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
     } else {
       setScreen('done');
       logCompletion({ tool: 'question-knockout', totalRounds: scenarios.length });
+      completeSession(0, 0);
     }
   };
 
@@ -74,9 +81,11 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
   const showSwitchReminder = currentRound === 4;
 
   const gameTitle = t.games.knockout.title[language];
+  const badgeCelebration = useGameBadgeCheck(screen === 'done');
 
   return (
     <GameWrapper gameId="knockout" title={gameTitle} color="orange" onBack={onBack}>
+      {badgeCelebration}
       {screen === 'intro' && (
         <IntroScreen
           gameId="knockout"
@@ -85,10 +94,19 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
           rules={t.knockout_rules[language]}
           onStart={handleStart}
           extraContent={
-            <div className="flex items-center gap-2 mb-4 text-orange-400">
-              <Bell size={18} />
-              <span className="text-sm">{t.knockout_bellHint[language]}</span>
-            </div>
+            <>
+              <GameSettingsPanel
+                settings={settings}
+                onChange={setSettings}
+                language={language}
+                accentColor="#FF7847"
+                show={['difficulty', 'gradeBand']}
+              />
+              <div className="flex items-center gap-2 mb-4 text-orange-400">
+                <Bell size={18} />
+                <span className="text-sm">{t.knockout_bellHint[language]}</span>
+              </div>
+            </>
           }
         />
       )}
