@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
         const daysSinceInvite = Math.floor((now.getTime() - inviteSent.getTime()) / (1000 * 60 * 60 * 24));
 
         // Check if we already sent this reminder
-        const reminderKey = `login_reminder_day_${daysSinceInvite >= 21 ? 21 : daysSinceInvite >= 14 ? 14 : daysSinceInvite >= 7 ? 7 : 3}`;
+        const reminderKey = `login_reminder_day_${daysSinceInvite >= 45 ? 45 : daysSinceInvite >= 30 ? 30 : daysSinceInvite >= 21 ? 21 : daysSinceInvite >= 14 ? 14 : daysSinceInvite >= 7 ? 7 : 3}`;
         const { data: existingLog } = await supabase
           .from('activity_log')
           .select('id')
@@ -133,6 +133,42 @@ The setup takes less than 5 minutes. Upload your staff roster and they get acces
 <a href="${dashboardUrl}" style="display:inline-block;padding:12px 24px;background:#2A9D8F;color:white;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;margin:16px 0;">Get Your Team Started</a>
 
 If something is not working or you have questions about the partnership, reply to this email. We will make it right.
+
+The TDI Team`
+          };
+        } else if (daysSinceInvite === 30) {
+          reminderEmail = {
+            subject: `${firstName}, your TDI dashboard is ready when you are`,
+            body: `${firstName},
+
+We know summer is busy. Your TDI partnership dashboard is set up and ready whenever you have a few minutes.
+
+Everything your team needs for the new school year is in one place. When you are ready to get started, log in and upload your staff roster. It takes about 5 minutes and your educators get access the same day.
+
+<a href="${dashboardUrl}" style="display:inline-block;padding:12px 24px;background:#1e2749;color:white;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;margin:16px 0;">Open Your Dashboard</a>
+
+No rush. We will be here when you are ready.
+
+The TDI Team`
+          };
+        } else if (daysSinceInvite === 45) {
+          reminderEmail = {
+            subject: `${firstName}, your team is heading back. Let's get them set up.`,
+            body: `${firstName},
+
+The school year is right around the corner and your TDI partnership is ready to go. This is the perfect time to get your team set up so they have tools on Day 1.
+
+Here is what takes 5 minutes and makes a big difference:
+
+1. Log into your dashboard
+2. Upload your staff roster (or verify it if you already have one)
+3. Your team gets Learning Hub access the same day
+
+145+ Quick Wins, PD courses, practice games, and wellness tools are all waiting for them.
+
+<a href="${dashboardUrl}" style="display:inline-block;padding:12px 24px;background:#E8B84B;color:#1e2749;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;margin:16px 0;">Get Your Team Started</a>
+
+Want to walk through it together? Reply to this email and we will set up a quick call.
 
 The TDI Team`
           };
