@@ -100,26 +100,52 @@ export async function GET(request: NextRequest) {
 
       if (memberEmails.length === 0) continue;
 
+      // Check which emails have already been sent for this contract
+      const { data: sentEmails } = await portalSupabase
+        .from('activity_log')
+        .select('action')
+        .eq('partnership_id', p.id)
+        .like('action', `contract_expiration_%_${p.contract_end}`);
+
+      const sent = new Set((sentEmails || []).map(e => e.action));
+      const headsUpKey = `contract_expiration_heads_up_${p.contract_end}`;
+      const reminderKey = `contract_expiration_reminder_${p.contract_end}`;
+      const finalKey = `contract_expiration_final_notice_${p.contract_end}`;
+      const downgradeKey = `contract_expiration_downgrade_${p.contract_end}`;
+
       // Determine which email to send based on days remaining
+      // Supports compressed timelines: if no heads_up sent yet and
+      // contract is expiring within 14 days, send heads_up first
       let emailType: 'heads_up' | 'reminder' | 'final_notice' | 'downgrade' | null = null;
 
-      if (daysRemaining === 30) emailType = 'heads_up';
-      else if (daysRemaining === 14) emailType = 'reminder';
-      else if (daysRemaining === 3) emailType = 'final_notice';
-      else if (daysRemaining <= 0 && daysRemaining >= -1) emailType = 'downgrade';
+      if (daysRemaining <= 0 && !sent.has(downgradeKey)) {
+        // Expiration day or past -- downgrade
+        emailType = 'downgrade';
+      } else if (daysRemaining <= 3 && daysRemaining > 0 && !sent.has(finalKey)) {
+        // 3 days or less -- final notice (skip if heads_up never sent, send that first)
+        if (!sent.has(headsUpKey)) {
+          emailType = 'heads_up';
+        } else {
+          emailType = 'final_notice';
+        }
+      } else if (daysRemaining <= 14 && daysRemaining > 3 && !sent.has(headsUpKey)) {
+        // Within 14 days and never notified -- send heads_up (compressed)
+        emailType = 'heads_up';
+      } else if (daysRemaining <= 14 && daysRemaining > 3 && sent.has(headsUpKey) && !sent.has(reminderKey)) {
+        // Heads up sent, within 14 days -- send reminder
+        emailType = 'reminder';
+      } else if (daysRemaining === 30 && !sent.has(headsUpKey)) {
+        emailType = 'heads_up';
+      } else if (daysRemaining === 14 && !sent.has(reminderKey)) {
+        emailType = 'reminder';
+      } else if (daysRemaining === 3 && !sent.has(finalKey)) {
+        emailType = 'final_notice';
+      }
 
       if (!emailType) continue;
 
-      // Check if we already sent this email type for this partnership
       const actionKey = `contract_expiration_${emailType}_${p.contract_end}`;
-      const { data: existingLog } = await portalSupabase
-        .from('activity_log')
-        .select('id')
-        .eq('partnership_id', p.id)
-        .eq('action', actionKey)
-        .limit(1);
-
-      if (existingLog && existingLog.length > 0) continue;
+      if (sent.has(actionKey)) continue;
 
       // Build email content
       const { subject, html } = buildExpirationEmail(emailType, {
