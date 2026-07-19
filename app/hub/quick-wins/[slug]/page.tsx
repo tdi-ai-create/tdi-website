@@ -25,6 +25,34 @@ import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components
 import CommunityTabs from '@/components/hub/CommunityTabs';
 import AchievementInsights from '@/components/hub/AchievementInsights';
 
+// ─── Practice Game imports ──────────────────────────────────────────────────
+import { LanguageProvider } from '@/app/paragametools/context/LanguageContext';
+import { QuestionKnockout } from '@/app/paragametools/components/QuestionKnockout';
+import { TellOrAsk } from '@/app/paragametools/components/TellOrAsk';
+import { FeedbackLevelUp } from '@/app/paragametools/components/FeedbackLevelUp';
+import { FeedbackMadlibs } from '@/app/paragametools/components/FeedbackMadlibs';
+import { FeedbackMakeover } from '@/app/paragametools/components/FeedbackMakeover';
+import { WhatsYourMove } from '@/app/paragametools/components/WhatsYourMove';
+import { ClassroomShuffle } from '@/app/paragametools/components/ClassroomShuffle';
+import { PrioritizeThis } from '@/app/paragametools/components/PrioritizeThis';
+import { EnergyBudget } from '@/app/paragametools/components/EnergyBudget';
+
+const PRACTICE_GAME_MAP: Record<string, {
+  component: React.ComponentType<{ onBack: () => void }>;
+  id: string;
+  title: string;
+}> = {
+  'question-knockout': { component: QuestionKnockout, id: 'practice-question-knockout', title: 'Question Knockout' },
+  'tell-or-ask': { component: TellOrAsk, id: 'practice-tell-or-ask', title: 'Tell or Ask?' },
+  'feedback-level-up': { component: FeedbackLevelUp, id: 'practice-feedback-level-up', title: 'Feedback Level Up' },
+  'feedback-madlibs': { component: FeedbackMadlibs, id: 'practice-feedback-madlibs', title: 'Feedback Madlibs' },
+  'feedback-makeover': { component: FeedbackMakeover, id: 'practice-feedback-makeover', title: 'Feedback Makeover' },
+  'whats-your-move': { component: WhatsYourMove, id: 'practice-whats-your-move', title: "What's Your Move?" },
+  'classroom-shuffle': { component: ClassroomShuffle, id: 'practice-classroom-shuffle', title: 'Classroom Scenario Shuffle' },
+  'prioritize-this': { component: PrioritizeThis, id: 'practice-prioritize-this', title: 'Prioritize This' },
+  'energy-budget': { component: EnergyBudget, id: 'practice-energy-budget', title: 'Energy Budget' },
+};
+
 // ─── Breathing Exercise Component ───────────────────────────────────────────
 
 function BreathingExercise() {
@@ -205,6 +233,34 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const { slug } = resolvedParams;
   const router = useRouter();
   const { user } = useHub();
+
+  // ─── Practice Game Route ─────────────────────────────────────────────────
+  const gameConfig = PRACTICE_GAME_MAP[slug];
+  if (gameConfig) {
+    const GameComponent = gameConfig.component;
+    return (
+      <LanguageProvider>
+        <div>
+          <GameComponent onBack={() => router.push('/hub/quick-wins?filter=Games')} />
+          {/* Community section below the game */}
+          <div
+            className="px-4 md:px-8 pb-12"
+            style={{ backgroundColor: '#F5F7FA' }}
+          >
+            <div className="max-w-3xl mx-auto">
+              <CommunityTabs
+                contentId={gameConfig.id}
+                userId={user?.id}
+                isAdmin={!!user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')}
+                conversationApiPath={`/api/hub/quick-wins/${gameConfig.id}/conversation`}
+                qaApiPath={`/api/hub/quick-wins/${gameConfig.id}/qa`}
+              />
+            </div>
+          </div>
+        </div>
+      </LanguageProvider>
+    );
+  }
 
   const [quickWin, setQuickWin] = useState<QuickWin | null>(null);
   const [isLoading, setIsLoading] = useState(true);
