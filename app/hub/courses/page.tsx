@@ -10,10 +10,11 @@ import { enrollInCourse } from '@/lib/hooks/useEnrollment';
 import { useFavorites } from '@/lib/hub/useFavorites';
 import { useLanguage } from '@/lib/hub/useLanguage';
 import { useTranslation } from '@/lib/hub/useTranslation';
-import { BookOpen, CheckCircle, AlertCircle, Gamepad2, Play, Zap, Target, TrendingUp } from 'lucide-react';
+import { BookOpen, CheckCircle, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import QuizNudge from '@/components/hub/QuizNudge';
 import HubFilterBar from '@/components/hub/HubFilterBar';
+import QuickWinCard from '@/components/hub/QuickWinCard';
 
 // Filter categories
 const FILTER_CATEGORIES = [
@@ -28,17 +29,17 @@ const FILTER_CATEGORIES = [
   'Games',
 ];
 
-// Practice game cards for Games filter
+// Practice game cards for Games filter -- same data as Quick Wins page
 const PRACTICE_GAME_CARDS = [
-  { slug: 'question-knockout', title: 'Question Knockout', description: 'Real scenarios. Questions only. Can you resist telling?', time: '~15 min', color: '#FF7847' },
-  { slug: 'tell-or-ask', title: 'Tell or Ask?', description: 'Is it really a question... or a command in disguise?', time: '~10 min', color: '#F1C40F' },
-  { slug: 'feedback-level-up', title: 'Feedback Level Up', description: 'What level is this feedback? Debate it out.', time: '~12 min', color: '#27AE60' },
-  { slug: 'feedback-madlibs', title: 'Feedback Madlibs', description: 'Practice the feedback formula... with a twist!', time: '~10 min', color: '#9333EA' },
-  { slug: 'feedback-makeover', title: 'Feedback Makeover', description: 'Terrible feedback + real context. Race to fix it.', time: '~15 min', color: '#E74C3C' },
-  { slug: 'whats-your-move', title: "What's Your Move?", description: 'Classroom scenarios. Three options. Only one is the best move.', time: '~10 min', color: '#22b8bd' },
-  { slug: 'classroom-shuffle', title: 'Classroom Scenario Shuffle', description: 'Real classroom management scenarios. Choose your response.', time: '~12 min', color: '#3498DB' },
-  { slug: 'prioritize-this', title: 'Prioritize This', description: 'Rank tasks by priority. See how experienced educators would do it.', time: '~10 min', color: '#9333EA' },
-  { slug: 'energy-budget', title: 'Energy Budget', description: '100 energy points. How do you spend your day?', time: '~10 min', color: '#22b8bd' },
+  { id: 'practice-question-knockout', slug: 'question-knockout', title: 'Question Knockout', description: 'Real scenarios. Questions only. Can you resist telling? Practice responding with ONLY questions.', category: 'Games', estimated_minutes: 15, content_type: 'activity' as const, access_tier: 'essentials', capacity: 'medium' as const },
+  { id: 'practice-tell-or-ask', slug: 'tell-or-ask', title: 'Tell or Ask?', description: 'Is it really a question... or a command in disguise? Test your ear for the difference.', category: 'Games', estimated_minutes: 10, content_type: 'activity' as const, access_tier: 'free', capacity: 'low' as const },
+  { id: 'practice-feedback-level-up', slug: 'feedback-level-up', title: 'Feedback Level Up', description: 'Rate feedback on a 1-4 scale. Can you spot the Level 2 trap?', category: 'Games', estimated_minutes: 12, content_type: 'activity' as const, access_tier: 'essentials', capacity: 'low' as const },
+  { id: 'practice-feedback-madlibs', slug: 'feedback-madlibs', title: 'Feedback Madlibs', description: 'Learn the Notice, Name, Next Step formula through silly and real practice rounds.', category: 'Games', estimated_minutes: 10, content_type: 'activity' as const, access_tier: 'essentials', capacity: 'low' as const },
+  { id: 'practice-feedback-makeover', slug: 'feedback-makeover', title: 'Feedback Makeover', description: 'Terrible feedback + real context. Race the clock to transform it.', category: 'Games', estimated_minutes: 15, content_type: 'activity' as const, access_tier: 'essentials', capacity: 'medium' as const },
+  { id: 'practice-whats-your-move', slug: 'whats-your-move', title: "What's Your Move?", description: 'Real classroom scenarios with 3 choices. Pick the best response and see why.', category: 'Games', estimated_minutes: 10, content_type: 'activity' as const, access_tier: 'free', capacity: 'low' as const },
+  { id: 'practice-classroom-shuffle', slug: 'classroom-shuffle', title: 'Classroom Scenario Shuffle', description: '8 real classroom situations. Pick the best response. Learn why it works.', category: 'Games', estimated_minutes: 10, content_type: 'activity' as const, access_tier: 'free', capacity: 'low' as const },
+  { id: 'practice-prioritize-this', slug: 'prioritize-this', title: 'Prioritize This', description: 'Rank 4 tasks by priority. See how experienced educators would handle it.', category: 'Games', estimated_minutes: 10, content_type: 'activity' as const, access_tier: 'free', capacity: 'medium' as const },
+  { id: 'practice-energy-budget', slug: 'energy-budget', title: 'Energy Budget', description: 'You have 100 energy points. How do you spend your day? Compare with experienced educators.', category: 'Games', estimated_minutes: 10, content_type: 'activity' as const, access_tier: 'free', capacity: 'low' as const },
 ];
 
 
@@ -335,46 +336,18 @@ export default function CourseCatalogPage() {
           subtitle="Practical PD built by teachers, for teachers"
         />
 
-        {/* Games Filter View */}
+        {/* Games Filter View -- uses same QuickWinCard as Quick Wins page */}
         {activeFilter === 'Games' && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
             {PRACTICE_GAME_CARDS.map((game) => (
-              <Link
-                key={game.slug}
-                href={`/hub/quick-wins/${game.slug}`}
-                className="bg-white rounded-2xl overflow-hidden transition-all hover:shadow-md group"
-                style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
-              >
-                {/* Color header */}
-                <div className="h-2" style={{ backgroundColor: game.color }} />
-                <div className="p-5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Gamepad2 size={16} style={{ color: game.color }} />
-                    <span
-                      className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
-                      style={{ backgroundColor: `${game.color}15`, color: game.color }}
-                    >
-                      {game.time}
-                    </span>
-                  </div>
-                  <h3
-                    className="font-bold text-base mb-2 group-hover:opacity-80 transition-opacity"
-                    style={{ color: '#1B2A4A', fontFamily: "'Source Serif 4', serif" }}
-                  >
-                    {game.title}
-                  </h3>
-                  <p className="text-sm mb-4" style={{ color: '#6B7280', lineHeight: 1.5 }}>
-                    {game.description}
-                  </p>
-                  <div
-                    className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all group-hover:scale-[1.02]"
-                    style={{ backgroundColor: game.color, color: 'white' }}
-                  >
-                    <Play size={16} />
-                    {tUI('Play')}
-                  </div>
-                </div>
-              </Link>
+              <QuickWinCard
+                key={game.id}
+                quickWin={game}
+                isFavorited={isFavorite(game.id)}
+                onToggleFavorite={toggleFavorite}
+                displayTitle={game.title}
+                displayDescription={game.description}
+              />
             ))}
           </div>
         )}

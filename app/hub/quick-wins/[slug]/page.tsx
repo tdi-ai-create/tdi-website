@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
 import CommunityTabs from '@/components/hub/CommunityTabs';
+import LessonQA from '@/components/hub/LessonQA';
 import AchievementInsights from '@/components/hub/AchievementInsights';
 
 // ─── Practice Game imports ──────────────────────────────────────────────────
@@ -222,6 +223,57 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     format: 'both',
   },
 };
+
+// ─── Game Testimonials ──────────────────────────────────────────────────────
+
+const GAME_TESTIMONIALS: Record<string, { quote: string; role: string }[]> = {
+  'question-knockout': [
+    { quote: "I thought I was good at asking questions until this game humbled me. I was telling disguised as asking the whole time.", role: "3rd grade teacher" },
+    { quote: "We played this at our PLC and it got SO competitive. My AP kept hitting the buzzer on herself.", role: "Instructional coach" },
+    { quote: "As a para, this completely changed how I talk to students during small group. I catch myself now.", role: "Paraprofessional, K-2" },
+  ],
+  'tell-or-ask': [
+    { quote: "The confidence meter is what got me. I was SO sure 'Sound it out' was an ask. It's not.", role: "1st grade teacher" },
+    { quote: "I use this in every new teacher training now. The reveals always spark the best discussions.", role: "Mentor teacher" },
+    { quote: "Played this solo on my commute and genuinely learned something about my own language patterns.", role: "5th grade teacher" },
+  ],
+  'feedback-level-up': [
+    { quote: "The Level 2 trap is REAL. I fell for it 4 times. Now I catch myself giving vague praise in class.", role: "Middle school math teacher" },
+    { quote: "Our team played this and then rewrote our report card comments. Night and day difference.", role: "Grade-level lead" },
+    { quote: "I thought 'Nice details!' was great feedback. This game showed me it's not even close.", role: "2nd grade teacher" },
+  ],
+  'feedback-madlibs': [
+    { quote: "The silly rounds had us crying laughing. Then the real rounds hit different because we already had the formula in our heads.", role: "4th grade teacher" },
+    { quote: "Notice, Name, Next Step. I say it in my sleep now. This game drilled it in without feeling like a drill.", role: "New teacher, year 1" },
+  ],
+  'feedback-makeover': [
+    { quote: "The timer makes it real. You can't overthink it. Just Notice, Name, Next Step. Go.", role: "8th grade ELA teacher" },
+    { quote: "I started screenshotting my before/afters and sharing them with my team. We turned it into a weekly challenge.", role: "Department head" },
+  ],
+  'whats-your-move': [
+    { quote: "Every scenario felt like something that happened to me last week. The explanations for why the wrong answers don't work -- that's where the real learning is.", role: "Paraprofessional, 3-5" },
+    { quote: "I got 4 out of 6 right and the two I missed completely changed how I think about proximity.", role: "First-year teacher" },
+    { quote: "We use this to onboard new paras. Better than any handbook.", role: "Special education coordinator" },
+  ],
+  'classroom-shuffle': [
+    { quote: "The parent email scenario -- I've literally been in that exact situation. Wish I had this game before I responded.", role: "6th grade teacher" },
+    { quote: "I thought the staff meeting scenario was hard until I realized the answer is always 'redirect to private.' Changed my whole approach to conflict.", role: "Assistant principal" },
+  ],
+  'prioritize-this': [
+    { quote: "I ranked 'greet students at the door' as #1 every time. The game showed me why that's not always right. Context matters.", role: "High school teacher" },
+    { quote: "We used this at our leadership team retreat. The debates were incredible.", role: "Principal" },
+  ],
+  'energy-budget': [
+    { quote: "I gave personal reset 5 points. The expert gave it 15. That one number told me everything about why I'm burned out.", role: "7th grade science teacher" },
+    { quote: "This is the game that made me actually take a lunch break. Not joking.", role: "3rd grade teacher" },
+  ],
+};
+
+function getGameTestimonials(slug: string): { quote: string; role: string }[] {
+  return GAME_TESTIMONIALS[slug] || [
+    { quote: "This game changed how I think about my classroom practice.", role: "Educator" },
+  ];
+}
 
 // ─── Breathing Exercise Component ───────────────────────────────────────────
 
@@ -542,14 +594,32 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                 </div>
               </div>
 
-              {/* Community */}
-              <CommunityTabs
-                contentId={gameConfig.id}
-                userId={user?.id}
-                isAdmin={!!user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')}
-                conversationApiPath={`/api/hub/quick-wins/${gameConfig.id}/conversation`}
-                qaApiPath={`/api/hub/quick-wins/${gameConfig.id}/qa`}
-              />
+              {/* Educator Experiences */}
+              <div className="bg-white p-6 md:p-8 mb-6" style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}>
+                <h3 className="font-semibold mb-4" style={{ fontSize: '16px', color: '#1e2749' }}>
+                  What Educators Are Saying
+                </h3>
+                <div className="space-y-4">
+                  {getGameTestimonials(slug).map((t, i) => (
+                    <div key={i} className="pl-3" style={{ borderLeft: `3px solid ${gameConfig.color}` }}>
+                      <p className="text-sm mb-1" style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontStyle: 'italic', color: '#374151', lineHeight: 1.5 }}>
+                        &ldquo;{t.quote}&rdquo;
+                      </p>
+                      <p className="text-xs" style={{ color: '#9CA3AF' }}>-- {t.role}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Q&A */}
+              <div className="bg-white p-6 md:p-8 mb-6" style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}>
+                <LessonQA
+                  contentId={gameConfig.id}
+                  userId={user?.id || null}
+                  isAdmin={!!user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')}
+                  apiBasePath={`/api/hub/quick-wins/${gameConfig.id}/qa`}
+                />
+              </div>
             </div>
 
             {/* Right column */}
