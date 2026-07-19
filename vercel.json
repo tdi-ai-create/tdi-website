@@ -107,6 +107,10 @@
     {
       "path": "/api/cron/send-scheduled-onboarding",
       "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/paid-subscriber-welcome",
+      "schedule": "0 13 * * 2"
     }
   ]
 }
