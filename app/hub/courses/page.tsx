@@ -10,7 +10,7 @@ import { enrollInCourse } from '@/lib/hooks/useEnrollment';
 import { useFavorites } from '@/lib/hub/useFavorites';
 import { useLanguage } from '@/lib/hub/useLanguage';
 import { useTranslation } from '@/lib/hub/useTranslation';
-import { BookOpen, CheckCircle, AlertCircle, Gamepad2, ChevronRight, Zap, Target, TrendingUp } from 'lucide-react';
+import { BookOpen, CheckCircle, AlertCircle, Gamepad2, Play, Zap, Target, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import QuizNudge from '@/components/hub/QuizNudge';
 import HubFilterBar from '@/components/hub/HubFilterBar';
@@ -25,6 +25,20 @@ const FILTER_CATEGORIES = [
   'Time Savers',
   'Leadership',
   'Communication',
+  'Games',
+];
+
+// Practice game cards for Games filter
+const PRACTICE_GAME_CARDS = [
+  { slug: 'question-knockout', title: 'Question Knockout', description: 'Real scenarios. Questions only. Can you resist telling?', time: '~15 min', color: '#FF7847' },
+  { slug: 'tell-or-ask', title: 'Tell or Ask?', description: 'Is it really a question... or a command in disguise?', time: '~10 min', color: '#F1C40F' },
+  { slug: 'feedback-level-up', title: 'Feedback Level Up', description: 'What level is this feedback? Debate it out.', time: '~12 min', color: '#27AE60' },
+  { slug: 'feedback-madlibs', title: 'Feedback Madlibs', description: 'Practice the feedback formula... with a twist!', time: '~10 min', color: '#9333EA' },
+  { slug: 'feedback-makeover', title: 'Feedback Makeover', description: 'Terrible feedback + real context. Race to fix it.', time: '~15 min', color: '#E74C3C' },
+  { slug: 'whats-your-move', title: "What's Your Move?", description: 'Classroom scenarios. Three options. Only one is the best move.', time: '~10 min', color: '#22b8bd' },
+  { slug: 'classroom-shuffle', title: 'Classroom Scenario Shuffle', description: 'Real classroom management scenarios. Choose your response.', time: '~12 min', color: '#3498DB' },
+  { slug: 'prioritize-this', title: 'Prioritize This', description: 'Rank tasks by priority. See how experienced educators would do it.', time: '~10 min', color: '#9333EA' },
+  { slug: 'energy-budget', title: 'Energy Budget', description: '100 energy points. How do you spend your day?', time: '~10 min', color: '#22b8bd' },
 ];
 
 
@@ -321,6 +335,50 @@ export default function CourseCatalogPage() {
           subtitle="Practical PD built by teachers, for teachers"
         />
 
+        {/* Games Filter View */}
+        {activeFilter === 'Games' && (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+            {PRACTICE_GAME_CARDS.map((game) => (
+              <Link
+                key={game.slug}
+                href={`/hub/quick-wins/${game.slug}`}
+                className="bg-white rounded-2xl overflow-hidden transition-all hover:shadow-md group"
+                style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+              >
+                {/* Color header */}
+                <div className="h-2" style={{ backgroundColor: game.color }} />
+                <div className="p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Gamepad2 size={16} style={{ color: game.color }} />
+                    <span
+                      className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                      style={{ backgroundColor: `${game.color}15`, color: game.color }}
+                    >
+                      {game.time}
+                    </span>
+                  </div>
+                  <h3
+                    className="font-bold text-base mb-2 group-hover:opacity-80 transition-opacity"
+                    style={{ color: '#1B2A4A', fontFamily: "'Source Serif 4', serif" }}
+                  >
+                    {game.title}
+                  </h3>
+                  <p className="text-sm mb-4" style={{ color: '#6B7280', lineHeight: 1.5 }}>
+                    {game.description}
+                  </p>
+                  <div
+                    className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all group-hover:scale-[1.02]"
+                    style={{ backgroundColor: game.color, color: 'white' }}
+                  >
+                    <Play size={16} />
+                    {tUI('Play')}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+
         {/* In Progress Section - only show when filter is All */}
         {inProgressCourses.length > 0 && activeFilter === 'All' && (
           <div className="mb-10">
@@ -354,7 +412,7 @@ export default function CourseCatalogPage() {
         )}
 
         {/* All Courses Section */}
-        {filteredCourses.length > 0 && (
+        {filteredCourses.length > 0 && activeFilter !== 'Games' && (
           <div>
             {inProgressCourses.length > 0 && activeFilter === 'All' && (
               <h2
@@ -384,77 +442,6 @@ export default function CourseCatalogPage() {
                 />
               ))}
             </div>
-          </div>
-        )}
-
-        {/* Practice Games Section */}
-        {activeFilter === 'All' && (
-          <div className="mt-10 mb-6">
-            <h2
-              className="text-[11px] font-bold tracking-wider mb-4"
-              style={{
-                color: '#1B2A4A',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
-              {tUI('PRACTICE GAMES')}
-            </h2>
-            <Link
-              href="/hub/quick-wins?filter=Games"
-              className="block rounded-2xl p-6 transition-all hover:shadow-md group"
-              style={{
-                background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)',
-                border: '1px solid rgba(255,255,255,0.08)',
-              }}
-            >
-              <div className="flex items-start gap-5">
-                <div
-                  className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: 'rgba(232, 184, 75, 0.15)' }}
-                >
-                  <Gamepad2 size={28} style={{ color: '#E8B84B' }} />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-lg font-bold text-white" style={{ fontFamily: "'Source Serif 4', serif" }}>
-                      {tUI('Practice Games')}
-                    </h3>
-                    <ChevronRight size={18} className="text-white/40 group-hover:translate-x-1 group-hover:text-white/70 transition-all" />
-                  </div>
-                  <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.65)', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6 }}>
-                    {tUI('9 interactive games designed to build real classroom skills. Practice questioning techniques, feedback strategies, scenario responses, and more.')}
-                  </p>
-                  <div className="flex flex-wrap gap-3">
-                    {[
-                      { icon: Zap, label: tUI('Tell or Ask?'), color: '#F1C40F' },
-                      { icon: TrendingUp, label: tUI('Feedback Level Up'), color: '#27AE60' },
-                      { icon: Target, label: tUI('Question Knockout'), color: '#FF7847' },
-                    ].map((game) => (
-                      <div
-                        key={game.label}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg"
-                        style={{ backgroundColor: `${game.color}15`, border: `1px solid ${game.color}30` }}
-                      >
-                        <game.icon size={12} style={{ color: game.color }} />
-                        <span className="text-xs font-medium" style={{ color: game.color }}>
-                          {game.label}
-                        </span>
-                      </div>
-                    ))}
-                    <div
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg"
-                      style={{ backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}
-                    >
-                      <span className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                        +6 {tUI('more')}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Link>
           </div>
         )}
 
