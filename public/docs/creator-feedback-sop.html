@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Creator Studio Feedback Portal -- SOP</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; line-height: 1.6; padding: 40px 48px; max-width: 900px; }
+  h1 { font-family: 'Source Serif 4', Georgia, serif; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  h2 { font-family: 'Source Serif 4', Georgia, serif; font-size: 20px; font-weight: 700; margin: 36px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
+  h3 { font-size: 15px; font-weight: 700; margin: 20px 0 8px; color: #2B3A67; }
+  p { font-size: 14px; margin-bottom: 12px; color: #374151; }
+  .subtitle { font-size: 14px; color: #6B7280; margin-bottom: 24px; }
+  .updated { font-size: 11px; color: #9CA3AF; margin-bottom: 32px; }
+  ul, ol { font-size: 14px; margin: 8px 0 16px 24px; color: #374151; }
+  li { margin-bottom: 6px; }
+  .role-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.03em; margin-right: 6px; }
+  .role-bella { background: #FCE7F3; color: #9D174D; }
+  .role-rae { background: #DBEAFE; color: #1E40AF; }
+  .role-agent { background: #EDE9FE; color: #7C3AED; }
+  .role-creator { background: #D1FAE5; color: #065F46; }
+  .role-system { background: #F3F4F6; color: #374151; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; background: #F9FAFB; border-bottom: 2px solid #E5E7EB; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #6B7280; }
+  td { padding: 10px 12px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+  .step-box { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 10px; padding: 18px 20px; margin: 16px 0; }
+  .step-box .step-num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #1e2749; color: white; font-size: 13px; font-weight: 700; margin-right: 10px; }
+  .step-box .step-title { font-size: 15px; font-weight: 700; color: #1e2749; display: inline; }
+  .step-box .step-detail { margin-top: 10px; padding-left: 38px; }
+  .step-box .step-detail p { margin-bottom: 8px; }
+  .highlight { background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 14px 18px; margin: 16px 0; }
+  .highlight strong { color: #854D0E; }
+  .rule { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 14px 18px; margin: 16px 0; }
+  .rule strong { color: #991B1B; }
+  .success { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 14px 18px; margin: 16px 0; }
+  .success strong { color: #065F46; }
+  .portal-path { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; background: #F3F4F6; padding: 2px 6px; border-radius: 4px; color: #6B7280; }
+  .button-ref { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 6px; background: #1e2749; color: white; margin: 0 2px; }
+  .button-ref.secondary { background: #F3F4F6; color: #374151; border: 1px solid #D1D5DB; }
+  .button-ref.danger { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+  .flow-diagram { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 16px 0; padding: 16px; background: #F9FAFB; border-radius: 10px; border: 1px solid #E5E7EB; }
+  .flow-step { font-size: 12px; padding: 6px 12px; border-radius: 8px; font-weight: 600; white-space: nowrap; }
+  .flow-arrow { color: #9CA3AF; font-size: 14px; }
+  .status-table td:first-child { font-weight: 600; white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<h1>Creator Studio Feedback Portal</h1>
+<p class="subtitle">Standard Operating Procedure -- How feedback flows from creator submission to approved response</p>
+<p class="updated">Last updated: July 18, 2026 | TEA-33</p>
+
+<!-- ── OVERVIEW ── -->
+
+<h2>Overview</h2>
+<p>The Creator Studio Feedback Portal replaces email as the primary way creators submit work and receive feedback. Every piece of feedback goes through a human approval gate before a creator sees it.</p>
+
+<div class="flow-diagram">
+  <span class="flow-step" style="background: #D1FAE5; color: #065F46;">Creator Submits</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step" style="background: #EDE9FE; color: #7C3AED;">Anne Marie Drafts Feedback</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step" style="background: #FCE7F3; color: #9D174D;">Bella Reviews</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step" style="background: #D1FAE5; color: #065F46;">Creator Sees Feedback</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step" style="background: #DBEAFE; color: #1E40AF;">Revise or Approve</span>
+</div>
+
+<div class="rule">
+  <strong>Golden Rule:</strong> Nothing reaches a creator without a human clicking "Approve." Anne Marie drafts. Bella (or Rae) decides what ships.
+</div>
+
+<!-- ── ROLES ── -->
+
+<h2>Who Does What</h2>
+
+<table>
+  <thead>
+    <tr><th>Role</th><th>Who</th><th>Responsibilities</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="role-tag role-creator">Creator</span></td>
+      <td>The educator building content</td>
+      <td>Submits deliverables per milestone, reads feedback, revises work, requests calls if needed</td>
+    </tr>
+    <tr>
+      <td><span class="role-tag role-agent">Anne Marie</span></td>
+      <td>AI Agent (Paperclip)</td>
+      <td>Auto-detects new submissions, drafts quality feedback, flags issues. Never sends anything to creators directly.</td>
+    </tr>
+    <tr>
+      <td><span class="role-tag role-bella">Bella</span></td>
+      <td>Special Projects Lead</td>
+      <td>Reviews all feedback drafts, edits if needed, approves or rejects. The human gate.</td>
+    </tr>
+    <tr>
+      <td><span class="role-tag role-rae">Rae</span></td>
+      <td>CEO</td>
+      <td>Can do everything Bella can. Also handles escalations and call requests.</td>
+    </tr>
+    <tr>
+      <td><span class="role-tag role-system">System</span></td>
+      <td>Portal automation</td>
+      <td>Sends email notifications when feedback is approved, tracks versions, manages statuses</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ── STATUS REFERENCE ── -->
+
+<h2>Status Reference</h2>
+<p>Every milestone submission moves through these statuses. The <span class="portal-path">review_status</span> field on each milestone tracks this.</p>
+
+<table class="status-table">
+  <thead>
+    <tr><th>Status</th><th>What It Means</th><th>Who Sees It</th><th>Next Action</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color: #2563EB;">submitted</td>
+      <td>Creator submitted a deliverable. Waiting for review.</td>
+      <td>Admin portal, Anne Marie via find_work</td>
+      <td>Anne Marie drafts feedback (auto) or Bella writes direct feedback</td>
+    </tr>
+    <tr>
+      <td style="color: #D97706;">under_review</td>
+      <td>Anne Marie has drafted feedback. Waiting for Bella's approval.</td>
+      <td>Admin portal (Feedback Review Queue)</td>
+      <td>Bella approves, edits, or rejects the draft</td>
+    </tr>
+    <tr>
+      <td style="color: #059669;">feedback_ready</td>
+      <td>Feedback approved and visible to creator.</td>
+      <td>Creator portal + Admin portal</td>
+      <td>Creator reads feedback, revises, or marks complete</td>
+    </tr>
+    <tr>
+      <td style="color: #7C3AED;">revised</td>
+      <td>Creator resubmitted after receiving feedback.</td>
+      <td>Admin portal, Anne Marie via find_work</td>
+      <td>New review cycle begins</td>
+    </tr>
+    <tr>
+      <td style="color: #065F46;">approved</td>
+      <td>Deliverable accepted. Milestone can be marked complete.</td>
+      <td>Everyone</td>
+      <td>Milestone advances to next phase</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ── STEP BY STEP: CREATOR ── -->
+
+<h2>Step-by-Step: Creator Submits Work</h2>
+
+<div class="step-box">
+  <span class="step-num">1</span>
+  <span class="step-title">Creator logs into Creator Portal</span>
+  <div class="step-detail">
+    <p>URL: <span class="portal-path">teachersdeserveit.com/creator-portal/dashboard</span></p>
+    <p>They see the "Submissions & Feedback" section on their dashboard.</p>
+  </div>
+</div>
+
+<div class="step-box">
+  <span class="step-num">2</span>
+  <span class="step-title">Creator clicks a milestone under "Ready to Submit"</span>
+  <div class="step-detail">
+    <p>Only milestones with status <strong>available</strong> or <strong>in_progress</strong> appear here.</p>
+    <p>A submission form opens with two fields:</p>
+    <ul>
+      <li><strong>Deliverable</strong> (required) -- link to their work, text description, or file reference</li>
+      <li><strong>Notes</strong> (optional) -- context or questions for the review team</li>
+    </ul>
+  </div>
+</div>
+
+<div class="step-box">
+  <span class="step-num">3</span>
+  <span class="step-title">Creator clicks <span class="button-ref">Submit for Review</span></span>
+  <div class="step-detail">
+    <p><strong>What happens when they click:</strong></p>
+    <ul>
+      <li>A new row is created in <span class="portal-path">creator_milestone_feedback</span> with their submission</li>
+      <li>The milestone status changes to <strong>waiting_approval</strong></li>
+      <li>The milestone review_status changes to <strong>submitted</strong></li>
+      <li>Submission version auto-increments (1, 2, 3...)</li>
+      <li>Creator's <span class="portal-path">updated_at</span> timestamp bumps (cancels any active re-engagement drip)</li>
+    </ul>
+    <p>The milestone now appears under "Under Review" in their portal with the message: <em>"Submitted -- your team is reviewing this."</em></p>
+  </div>
+</div>
+
+<!-- ── STEP BY STEP: ANNE MARIE ── -->
+
+<h2>Step-by-Step: Anne Marie Reviews (Automated)</h2>
+
+<div class="step-box">
+  <span class="step-num">4</span>
+  <span class="step-title">Anne Marie discovers the submission via find_work</span>
+  <div class="step-detail">
+    <p>Anne Marie calls the Sync API periodically. When <span class="portal-path">find_work</span> returns a <strong>submission_review</strong> work item, she picks it up.</p>
+    <p>She sees: creator name, milestone, what was submitted, submission version, and any notes.</p>
+  </div>
+</div>
+
+<div class="step-box">
+  <span class="step-num">5</span>
+  <span class="step-title">Anne Marie drafts feedback via <span class="portal-path">draft_feedback</span></span>
+  <div class="step-detail">
+    <p><strong>What happens:</strong></p>
+    <ul>
+      <li>Feedback is saved with <span class="portal-path">feedback_draft_status = 'pending_review'</span></li>
+      <li>Milestone review_status changes to <strong>under_review</strong></li>
+      <li><span class="portal-path">visible_to_creator</span> remains <strong>false</strong> -- creator cannot see this yet</li>
+      <li>Duplicate guard: only one pending draft per milestone at a time</li>
+    </ul>
+  </div>
+</div>
+
+<div class="success">
+  <strong>Anne Marie is configured to auto-review submissions.</strong> When a creator submits, Anne Marie picks it up via <span class="portal-path">find_work</span>, drafts feedback, and it appears in Bella's review queue. If Anne Marie is slow or offline, the submission still appears in the "New Submissions" section on the Action Center so Bella can write direct feedback.
+</div>
+
+<!-- ── STEP BY STEP: BELLA ── -->
+
+<h2>Step-by-Step: Bella Reviews Feedback</h2>
+
+<div class="step-box">
+  <span class="step-num">6</span>
+  <span class="step-title">Bella opens the Feedback Review Queue</span>
+  <div class="step-detail">
+    <p>Location: <span class="portal-path">Admin Portal > Creator Studio > Action Center tab</span></p>
+    <p>The "Feedback Review Queue" section shows all feedback with status <strong>pending_review</strong>.</p>
+    <p>Each card shows: creator name, milestone name, what was submitted (truncated), and Anne Marie's drafted feedback.</p>
+    <p>A count badge shows how many items are waiting.</p>
+  </div>
+</div>
+
+<div class="step-box">
+  <span class="step-num">7</span>
+  <span class="step-title">Bella chooses an action on each feedback item</span>
+  <div class="step-detail">
+    <p>Three options:</p>
+
+    <h3><span class="button-ref">Approve</span> -- Feedback is good as-is</h3>
+    <ul>
+      <li>Feedback becomes visible to the creator immediately</li>
+      <li>Creator receives an email: "You have new feedback on your submission!"</li>
+      <li>Milestone review_status changes to <strong>feedback_ready</strong></li>
+    </ul>
+
+    <h3><span class="button-ref secondary">Edit & Approve</span> -- Feedback needs tweaking</h3>
+    <ul>
+      <li>An inline text editor opens with Anne Marie's draft pre-filled</li>
+      <li>Bella edits the feedback to her liking</li>
+      <li>Clicks <span class="button-ref">Save & Approve</span></li>
+      <li>Same result as Approve, but with Bella's edited version</li>
+    </ul>
+
+    <h3><span class="button-ref danger">Reject</span> -- Feedback misses the mark</h3>
+    <ul>
+      <li>Draft is discarded (creator never sees it)</li>
+      <li>Milestone review_status resets to <strong>submitted</strong></li>
+      <li>Anne Marie can try again on the next find_work cycle, or Bella can write direct feedback instead</li>
+    </ul>
+  </div>
+</div>
+
+<div class="step-box">
+  <span class="step-num">7b</span>
+  <span class="step-title">Alternative: Bella writes direct feedback (bypass Anne Marie)</span>
+  <div class="step-detail">
+    <p>Location: <span class="portal-path">Admin Portal > Creator Studio > [Creator Detail] > Submissions & Feedback</span></p>
+    <p>Bella can select a milestone from the dropdown, type feedback directly, and click <span class="button-ref">Send Feedback</span>.</p>
+    <p>This skips the AI draft entirely -- feedback is immediately approved and visible to the creator. Use this when:</p>
+    <ul>
+      <li>Anne Marie hasn't drafted anything yet and the creator is waiting</li>
+      <li>The feedback is simple enough that AI review isn't needed</li>
+      <li>Anne Marie's draft was rejected and you want to write it yourself</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ── STEP BY STEP: CREATOR READS FEEDBACK ── -->
+
+<h2>Step-by-Step: Creator Reads Feedback & Responds</h2>
+
+<div class="step-box">
+  <span class="step-num">8</span>
+  <span class="step-title">Creator receives email notification</span>
+  <div class="step-detail">
+    <p>Subject: <em>"Creator Studio | New feedback on your submission!"</em></p>
+    <p>CTA button links to <span class="portal-path">teachersdeserveit.com/creator-portal/dashboard</span></p>
+  </div>
+</div>
+
+<div class="step-box">
+  <span class="step-num">9</span>
+  <span class="step-title">Creator reads feedback in the portal</span>
+  <div class="step-detail">
+    <p>Under "Feedback Received," they see a card with:</p>
+    <ul>
+      <li>Green status badge: "Feedback Ready"</li>
+      <li>The feedback text from their team</li>
+      <li>Date the feedback was approved</li>
+      <li>Expandable section showing what they originally submitted</li>
+    </ul>
+  </div>
+</div>
+
+<div class="step-box">
+  <span class="step-num">10</span>
+  <span class="step-title">Creator takes action</span>
+  <div class="step-detail">
+    <p>Two options:</p>
+
+    <h3><span class="button-ref secondary">Revise & Resubmit</span></h3>
+    <ul>
+      <li>Opens the submission form pre-filled with their previous deliverable</li>
+      <li>They update their work and resubmit</li>
+      <li>Submission version increments (v2, v3, etc.)</li>
+      <li>The review cycle starts again from Step 4</li>
+    </ul>
+
+    <h3><span class="button-ref secondary">Request a Call</span></h3>
+    <ul>
+      <li>If the feedback needs discussion, creator clicks this button</li>
+      <li>A "Call Requested" flag appears on the admin side</li>
+      <li>Bella or Rae schedules a call at their discretion</li>
+      <li>This is optional -- most feedback should be resolvable in writing</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ── WHERE TO FIND THINGS ── -->
+
+<h2>Where to Find Things in the Portal</h2>
+
+<table>
+  <thead>
+    <tr><th>What You Need</th><th>Where It Is</th><th>Who Can Access</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Feedback Review Queue (all pending items)</td>
+      <td><span class="portal-path">Creator Studio > Action Center tab</span> (top section)</td>
+      <td><span class="role-tag role-bella">Bella</span> <span class="role-tag role-rae">Rae</span></td>
+    </tr>
+    <tr>
+      <td>One creator's full submission history</td>
+      <td><span class="portal-path">Creator Studio > [Creator Name] > Submissions & Feedback</span></td>
+      <td><span class="role-tag role-bella">Bella</span> <span class="role-tag role-rae">Rae</span></td>
+    </tr>
+    <tr>
+      <td>Add direct feedback (bypass AI)</td>
+      <td><span class="portal-path">Creator Studio > [Creator Name] > Submissions & Feedback > "Add Direct Feedback"</span></td>
+      <td><span class="role-tag role-bella">Bella</span> <span class="role-tag role-rae">Rae</span></td>
+    </tr>
+    <tr>
+      <td>Creator's view of their feedback</td>
+      <td><span class="portal-path">Creator Portal > Dashboard > Submissions & Feedback</span></td>
+      <td><span class="role-tag role-creator">Creator</span></td>
+    </tr>
+    <tr>
+      <td>Call requests from creators</td>
+      <td><span class="portal-path">Creator Studio > [Creator Name] > Submissions & Feedback</span> (blue "Call Requested" badge)</td>
+      <td><span class="role-tag role-bella">Bella</span> <span class="role-tag role-rae">Rae</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ── DAILY ROUTINE ── -->
+
+<h2>Bella's Daily Routine</h2>
+
+<div class="success">
+  <strong>Daily check (2 minutes):</strong> Open Creator Studio Action Center. Check New Submissions and Feedback Review Queue. Act on anything waiting. That's it.
+</div>
+
+<ol>
+  <li><strong>Open</strong> <span class="portal-path">Admin Portal > Creator Studio > Action Center</span></li>
+  <li><strong>Check "New Submissions"</strong> (blue badges) -- if a creator submitted work and Anne Marie hasn't drafted feedback yet, click through to write direct feedback or wait for Anne Marie.</li>
+  <li><strong>Check "Feedback Review Queue"</strong> (purple badges) -- for each item, read Anne Marie's draft. Click <span class="button-ref">Approve</span> if good, <span class="button-ref secondary">Edit & Approve</span> to tweak, or <span class="button-ref danger">Reject</span> if it misses the mark.</li>
+  <li><strong>Check "Today's Priorities"</strong> for pending milestone reviews and call requests.</li>
+  <li><strong>If the page says "You're all caught up"</strong> -- you're done. No actions needed.</li>
+</ol>
+
+<h2>Skippable Meetings</h2>
+
+<p>The following milestones are now <strong>optional</strong> and will auto-complete when feedback is resolved through the portal:</p>
+<ul>
+  <li><strong>Schedule Outline Meeting</strong> -- auto-skipped when outline feedback is approved</li>
+  <li><strong>Outline Meeting Completed</strong> -- auto-skipped when outline feedback is approved</li>
+  <li><strong>Schedule Final Outline Meeting</strong> -- auto-skipped when finalized outline feedback is approved</li>
+</ul>
+
+<div class="highlight">
+  <strong>When does a meeting still happen?</strong> Only when a creator clicks "Request a Call" on their feedback, or when Bella/Rae decides the feedback needs a live conversation. The default path no longer requires scheduling a meeting.
+</div>
+
+<h2>Slack Notifications</h2>
+
+<p>Slack pings go to <strong>#bella-actions</strong> for key events:</p>
+<ul>
+  <li>Creator submitted a deliverable</li>
+  <li>Anne Marie drafted feedback (ready for review)</li>
+  <li>Feedback approved and sent to creator</li>
+  <li>Creator requested a call</li>
+  <li>Creator hit critical stall (60+ days)</li>
+</ul>
+<p>You don't need to check the portal proactively -- Slack will tell you when something needs attention.</p>
+
+<!-- ── RULES & GUARDRAILS ── -->
+
+<h2>Rules & Guardrails</h2>
+
+<div class="rule">
+  <strong>Rule 1: No feedback reaches creators without human approval.</strong><br>
+  Anne Marie drafts. Bella or Rae approves. The system enforces this -- <span class="portal-path">visible_to_creator</span> stays false until someone clicks Approve.
+</div>
+
+<div class="rule">
+  <strong>Rule 2: One pending draft per milestone.</strong><br>
+  Anne Marie can't pile on. If she already has a pending draft for a milestone, the system blocks a second one. Reject the first to let her try again.
+</div>
+
+<div class="rule">
+  <strong>Rule 3: Reject resets, it doesn't delete.</strong><br>
+  When you reject a draft, the milestone goes back to "submitted" status. Anne Marie can draft again, or you can write direct feedback. The creator never knows a draft was rejected.
+</div>
+
+<div class="highlight">
+  <strong>Tip:</strong> Use "Edit & Approve" more than "Reject." It's faster to tweak Anne Marie's draft than to reject and start over. Only reject if the draft completely misses the point.
+</div>
+
+<!-- ── FAQ ── -->
+
+<h2>FAQ</h2>
+
+<h3>What if a creator submits but Anne Marie doesn't draft feedback?</h3>
+<p>This can happen if Anne Marie's skill file hasn't been updated or if she's offline. The submission will sit in "submitted" status. Bella can write direct feedback from the creator detail page at any time -- no need to wait for Anne Marie.</p>
+
+<h3>What if a creator requests a call?</h3>
+<p>The "Call Requested" badge appears on the submission card in the admin portal. Bella or Rae schedules a call at their discretion. There's a <span class="portal-path">call_notes</span> field in the database to log what was discussed.</p>
+
+<h3>Can a creator resubmit without waiting for feedback?</h3>
+<p>Yes. The "Revise & Resubmit" button appears on any milestone in "Under Review" status. The new submission creates a new version and restarts the review cycle.</p>
+
+<h3>What if I want to mark a milestone as complete without going through the feedback loop?</h3>
+<p>Use the existing milestone approval flow on the creator detail page. The feedback portal is for milestones that need iterative review (outlines, drafts, recordings). Simple milestones (signed agreement, profile photo) can still be approved directly.</p>
+
+<h3>What happened to the outline meetings?</h3>
+<p>Meeting milestones (Schedule Outline Meeting, Outline Meeting Completed, Schedule Final Outline Meeting) are now <strong>optional</strong>. They auto-complete when the corresponding submission's feedback is approved through the portal. If a creator needs a live conversation, they click "Request a Call."</p>
+
+<h3>Does the creator get notified for every status change?</h3>
+<p>No. The creator only gets an email when feedback is <strong>approved</strong> (made visible). They don't get notified for submitted, under_review, or rejected statuses. They see "Under Review" in their portal, which updates in real time.</p>
+
+<h3>Will I get a Slack notification when something needs my attention?</h3>
+<p>Yes. Slack pings go to <strong>#bella-actions</strong> when a creator submits, when Anne Marie drafts feedback, when feedback is approved, and when a creator requests a call. You don't need to check the portal proactively.</p>
+
+</body>
+</html>

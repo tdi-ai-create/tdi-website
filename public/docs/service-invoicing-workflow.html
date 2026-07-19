@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Service Delivery + Invoicing Workflow</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; line-height: 1.6; padding: 40px 48px; max-width: 900px; }
+  h1 { font-family: 'Source Serif 4', Georgia, serif; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  h2 { font-family: 'Source Serif 4', Georgia, serif; font-size: 20px; font-weight: 700; margin: 32px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
+  h3 { font-size: 15px; font-weight: 700; margin: 20px 0 8px; color: #2B3A67; }
+  p { font-size: 14px; margin-bottom: 12px; color: #374151; }
+  .subtitle { font-size: 14px; color: #6B7280; margin-bottom: 24px; }
+  .updated { font-size: 11px; color: #9CA3AF; margin-bottom: 32px; }
+  ul, ol { font-size: 14px; margin: 8px 0 16px 24px; color: #374151; }
+  li { margin-bottom: 6px; }
+  .flow-box { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 10px; padding: 16px 20px; margin: 16px 0; }
+  .flow-arrow { text-align: center; font-size: 18px; color: #9CA3AF; margin: 8px 0; }
+  .role-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.03em; margin-right: 6px; }
+  .role-rae { background: #DBEAFE; color: #1E40AF; }
+  .role-bella { background: #FCE7F3; color: #9D174D; }
+  .role-trainer { background: #D1FAE5; color: #065F46; }
+  .role-system { background: #F3F4F6; color: #6B7280; }
+  .role-funding { background: #EDE9FE; color: #7C3AED; }
+  .status-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+  .status-pending { background: #F3F4F6; color: #6B7280; }
+  .status-grant { background: #EDE9FE; color: #7C3AED; }
+  .status-delivered { background: #FEF3C7; color: #854D0E; }
+  .status-invoiced { background: #DBEAFE; color: #1E40AF; }
+  .status-paid { background: #D1FAE5; color: #065F46; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
+  th { text-align: left; padding: 8px 12px; background: #F9FAFB; border-bottom: 2px solid #E5E7EB; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #6B7280; }
+  td { padding: 8px 12px; border-bottom: 1px solid #F3F4F6; }
+  .highlight { background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 12px 16px; margin: 12px 0; }
+  .highlight strong { color: #854D0E; }
+  code { font-family: 'SF Mono', monospace; font-size: 12px; background: #F3F4F6; padding: 1px 6px; border-radius: 4px; }
+  hr { border: none; border-top: 1px solid #E5E7EB; margin: 32px 0; }
+</style>
+</head>
+<body>
+
+<h1>Service Delivery + Invoicing Workflow</h1>
+<p class="subtitle">How a signed contract becomes delivered services and paid invoices.</p>
+<p class="updated">Last updated: July 14, 2026 | Created by Rae Hughart</p>
+
+<hr>
+
+<h2>The Big Picture</h2>
+
+<div class="flow-box">
+  <strong>Contract Signed</strong> &rarr; Deliverables Created &rarr; Services Delivered &rarr; Invoice Sent &rarr; Payment Received
+</div>
+
+<p>Every signed contract gets broken into individual <strong>deliverables</strong> -- one row per service (each observation day, each executive session, hub memberships as a batch, etc.). Each deliverable has a lifecycle status that tells you exactly where it stands.</p>
+
+<h3>Deliverable Statuses</h3>
+<table>
+  <tr><th>Status</th><th>What it means</th><th>Who acts next</th></tr>
+  <tr><td><span class="status-badge status-pending">Pending</span></td><td>Service is contracted but not yet scheduled or delivered</td><td><span class="role-tag role-rae">Rae</span> Schedule with client</td></tr>
+  <tr><td><span class="status-badge status-grant">Awaiting Grant</span></td><td>Service depends on grant funding that hasn't landed yet</td><td><span class="role-tag role-funding">Funding Team</span> Pursue grants</td></tr>
+  <tr><td><span class="status-badge status-delivered">Delivered</span></td><td>Service was delivered on-site or virtually</td><td><span class="role-tag role-bella">Bella</span> Send invoice</td></tr>
+  <tr><td><span class="status-badge status-invoiced">Invoiced</span></td><td>Invoice has been created and/or sent to client</td><td><span class="role-tag role-bella">Bella</span> Track payment</td></tr>
+  <tr><td><span class="status-badge status-paid">Paid</span></td><td>Payment received</td><td>Done</td></tr>
+</table>
+
+<hr>
+
+<h2>Step-by-Step Workflow</h2>
+
+<h3>Step 1: Contract is Signed</h3>
+<p><span class="role-tag role-rae">Rae</span> closes the deal. Contract is created in the Contracts tab (Sales page) or via Anchor.</p>
+<ul>
+  <li>Each contract has line items: Hub memberships, observation days, executive sessions, virtual sessions, books</li>
+  <li>Line items are automatically broken into individual <strong>deliverables</strong> in the system</li>
+  <li>Direct-pay items start as <span class="status-badge status-pending">Pending</span></li>
+  <li>Grant-funded items start as <span class="status-badge status-grant">Awaiting Grant</span></li>
+</ul>
+
+<div class="highlight">
+  <strong>Where to see it:</strong> Leadership Dashboard &rarr; [Client Name] &rarr; Billing tab &rarr; Service Deliverables section
+</div>
+
+<h3>Step 2: Grant Funding (if applicable)</h3>
+<p><span class="role-tag role-funding">Funding Team</span> pursues grants for grant-funded deliverables.</p>
+<ul>
+  <li>Grant pursuits are tracked in the Funding dashboard</li>
+  <li>When a grant is awarded, the system automatically unlocks those deliverables from "Awaiting Grant" to "Pending"</li>
+  <li>The client's service totals on their dashboard update automatically</li>
+</ul>
+
+<h3>Step 3: Service is Delivered</h3>
+<p><span class="role-tag role-trainer">Trainer / Rae</span> delivers the service (observation day, executive session, etc.).</p>
+<ul>
+  <li>Go to <strong>Leadership Dashboard &rarr; [Client Name] &rarr; Service Tracker</strong></li>
+  <li>Click the "Complete Session" button for the service type</li>
+  <li>Fill in: session date, notes, teacher quotes, love notes count</li>
+  <li>Click "Mark Complete"</li>
+</ul>
+
+<p>When you mark complete, the system automatically:</p>
+<ol>
+  <li>Creates a session record with all the details</li>
+  <li>Updates the client's used/total service counts (client sees progress on their dashboard)</li>
+  <li>Marks the matching contract deliverable as <span class="status-badge status-delivered">Delivered</span></li>
+  <li>Adds a timeline event to the partnership history</li>
+  <li>The deliverable appears in Bella's <strong>Invoice Queue</strong></li>
+</ol>
+
+<div class="highlight">
+  <strong>Important:</strong> Complimentary services (100% off) still get marked as delivered for tracking, but they do NOT appear in the Invoice Queue since there's nothing to bill.
+</div>
+
+<h3>Step 4: Invoice is Created</h3>
+<p><span class="role-tag role-bella">Bella</span> creates and sends the invoice.</p>
+<ul>
+  <li>Go to <strong>Ops Dashboard &rarr; Invoice Queue</strong></li>
+  <li>You'll see all delivered-but-not-invoiced services grouped by client</li>
+  <li>Each shows: service name, delivery date, dollar amount</li>
+  <li>Click <strong>"Create Invoice"</strong> to generate the invoice</li>
+  <li>The system auto-generates an invoice number (TDI-INV-2026-XXX)</li>
+  <li>Deliverables flip to <span class="status-badge status-invoiced">Invoiced</span></li>
+</ul>
+
+<h3>Step 5: Payment Tracking</h3>
+<p><span class="role-tag role-bella">Bella</span> tracks payment through the collections process.</p>
+<ul>
+  <li>When payment is received, mark the invoice as paid</li>
+  <li>Deliverables update to <span class="status-badge status-paid">Paid</span></li>
+</ul>
+
+<hr>
+
+<h2>Where Things Live</h2>
+
+<table>
+  <tr><th>What</th><th>Where</th><th>Who uses it</th></tr>
+  <tr><td>Contract line items + deliverable status</td><td>Leadership Dashboard &rarr; Billing tab</td><td>Rae, Bella</td></tr>
+  <tr><td>Mark service as delivered</td><td>Leadership Dashboard &rarr; Service Tracker</td><td>Trainer, Rae</td></tr>
+  <tr><td>Invoice Queue (ready to bill)</td><td>Ops Dashboard &rarr; Invoice Queue</td><td>Bella</td></tr>
+  <tr><td>Contracts + line items</td><td>Sales &rarr; Contracts tab</td><td>Rae</td></tr>
+  <tr><td>Grant pursuit status</td><td>Funding Dashboard</td><td>Funding Team</td></tr>
+  <tr><td>Client-facing progress</td><td>Partner Dashboard (client sees)</td><td>Principal / Superintendent</td></tr>
+</table>
+
+<hr>
+
+<h2>Two Types of Contracts</h2>
+
+<h3>Direct Pay (Minimum Contract)</h3>
+<p>The client pays for these services directly. Invoice when delivered.</p>
+<ul>
+  <li>Shows with a <span style="color: #10B981; font-weight: 700;">green</span> indicator in the Billing tab</li>
+  <li>Deliverables start as <span class="status-badge status-pending">Pending</span></li>
+  <li>Follow the standard deliver &rarr; invoice &rarr; paid flow</li>
+</ul>
+
+<h3>Grant Funded</h3>
+<p>TDI pursues grant funding to cover these services. Only invoiceable when funding is confirmed.</p>
+<ul>
+  <li>Shows with a <span style="color: #8B5CF6; font-weight: 700;">purple</span> indicator in the Billing tab</li>
+  <li>Deliverables start as <span class="status-badge status-grant">Awaiting Grant</span></li>
+  <li>Cannot be delivered or invoiced until the grant is confirmed</li>
+  <li>When the grant lands, the system automatically unlocks these services</li>
+</ul>
+
+<div class="highlight">
+  <strong>Dual-contract clients:</strong> Saunemin, Glen Ellyn, St. Peter Chanel, and Allenwood all have BOTH a direct-pay contract AND a grant-funded contract. The Billing tab shows both, clearly separated.
+</div>
+
+<hr>
+
+<h2>Contract Numbers</h2>
+
+<table>
+  <tr><th>Format</th><th>Meaning</th><th>Example</th></tr>
+  <tr><td><code>TDI-2026-XXX</code></td><td>Direct-pay partnership agreement</td><td>TDI-2026-009 (Oak Grove)</td></tr>
+  <tr><td><code>TDI-GF-2026-XXX</code></td><td>Grant-funded services agreement</td><td>TDI-GF-2026-006 (Saunemin grant)</td></tr>
+  <tr><td><code>TDI-INV-2026-XXX</code></td><td>Invoice</td><td>TDI-INV-2026-001</td></tr>
+</table>
+
+<hr>
+
+<h2>FAQ</h2>
+
+<h3>What if a service was delivered but I forgot to mark it complete?</h3>
+<p>Go to Leadership Dashboard &rarr; Service Tracker and mark it complete with the correct date. The system will find the next undelivered deliverable and update it.</p>
+
+<h3>What if a client doesn't want the grant-funded services anymore?</h3>
+<p>The deliverables can be marked as cancelled. This won't affect the base/direct-pay contract.</p>
+
+<h3>How do I know what's been invoiced vs. what hasn't?</h3>
+<p>Leadership Dashboard &rarr; Billing tab shows every deliverable with its current status. Or check Ops Dashboard &rarr; Invoice Queue for items ready to bill.</p>
+
+<h3>What if the contract value needs to change?</h3>
+<p>Talk to Rae. Contract changes go through the Contracts tab in Sales. The deliverables will need to be updated to match.</p>
+
+<h3>How does the client see their progress?</h3>
+<p>The Partner Dashboard (what the client logs into) shows service utilization: "2 of 3 observation days used." This updates automatically when sessions are marked complete -- no separate step needed.</p>
+
+</body>
+</html>

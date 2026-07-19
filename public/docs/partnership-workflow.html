@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TDI Partnership Workflow -- Complete System Documentation v2</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif; color: #1e2749; background: #F8F9FA; line-height: 1.7; }
+  .page { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+  h2 { font-size: 22px; font-weight: 700; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
+  h3 { font-size: 16px; font-weight: 700; margin: 24px 0 8px; }
+  h4 { font-size: 14px; font-weight: 600; margin: 16px 0 6px; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { margin-bottom: 12px; font-size: 15px; }
+  ul, ol { margin: 8px 0 16px 24px; font-size: 15px; }
+  li { margin-bottom: 6px; }
+  .subtitle { color: #6B7280; font-size: 15px; margin-bottom: 32px; }
+  .updated { color: #9CA3AF; font-size: 12px; margin-bottom: 24px; }
+  .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 16px; border: 1px solid #E5E7EB; }
+  .card-navy { background: linear-gradient(135deg, #1e2749, #2d3a5c); color: white; border: none; }
+  .card-navy p { color: rgba(255,255,255,0.8); }
+  .card-amber { background: #FFFBEB; border-color: #FDE68A; }
+  .card-teal { background: #F0FDFA; border-color: #99F6E4; }
+  .card-red { background: #FEF2F2; border-color: #FECACA; }
+  .card-purple { background: #F5F3FF; border-color: #C4B5FD; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .badge-navy { background: #1e2749; color: white; }
+  .badge-teal { background: #D1FAE5; color: #065F46; }
+  .badge-amber { background: #FEF3C7; color: #92400E; }
+  .badge-blue { background: #DBEAFE; color: #1E40AF; }
+  .badge-red { background: #FEE2E2; color: #991B1B; }
+  .badge-purple { background: #EDE9FE; color: #6D28D9; }
+  .badge-gray { background: #F3F4F6; color: #374151; }
+  .flow-step { display: flex; gap: 16px; margin-bottom: 20px; }
+  .flow-num { width: 32px; height: 32px; border-radius: 50%; background: #1e2749; color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+  .flow-content { flex: 1; }
+  .flow-content strong { color: #1e2749; }
+  .arrow { text-align: center; font-size: 24px; color: #D1D5DB; margin: 12px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 14px; }
+  th { text-align: left; padding: 10px 12px; background: #F9FAFB; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151; }
+  td { padding: 10px 12px; border-bottom: 1px solid #F3F4F6; }
+  tr:last-child td { border-bottom: none; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+  .toc { background: white; border-radius: 12px; padding: 20px 24px; margin-bottom: 32px; border: 1px solid #E5E7EB; }
+  .toc a { color: #2563EB; text-decoration: none; font-size: 14px; }
+  .toc a:hover { text-decoration: underline; }
+  .toc ul { list-style: none; margin: 0; padding: 0; }
+  .toc li { padding: 4px 0; }
+  code { background: #F3F4F6; padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'SF Mono', monospace; }
+  .url { font-size: 13px; color: #6B7280; word-break: break-all; }
+  hr { border: none; border-top: 1px solid #E5E7EB; margin: 32px 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>TDI Partnership Workflow</h1>
+<p class="subtitle">Complete system documentation: Sales to Leadership to Operations to Hub to Funding</p>
+<p class="updated">Last updated: June 6, 2026 | Version 3.0</p>
+
+<div class="toc">
+  <h4 style="margin-top:0">Contents</h4>
+  <ul>
+    <li><a href="#overview">1. System overview</a></li>
+    <li><a href="#deal-signed">2. Deal signed: the automation</a></li>
+    <li><a href="#phase0">3. Phase 0: Pre-launch onboarding</a></li>
+    <li><a href="#principal">4. What the principal sees</a></li>
+    <li><a href="#admin">5. What admin sees (Leadership detail)</a></li>
+    <li><a href="#kpis">6. KPI goal setting system</a></li>
+    <li><a href="#educator-goals">7. Hub educator goals</a></li>
+    <li><a href="#grants">8. Grant-funded partnerships</a></li>
+    <li><a href="#exports">9. Reports and exports</a></li>
+    <li><a href="#hub">10. Hub integration</a></li>
+    <li><a href="#cross-links">11. Cross-portal navigation</a></li>
+    <li><a href="#attention-flags">12. Partner attention flags</a></li>
+    <li><a href="#renewal">13. Renewal flow</a></li>
+    <li><a href="#database">14. Database tables</a></li>
+    <li><a href="#api">15. API endpoints</a></li>
+    <li><a href="#automation">16. Automation and AI</a></li>
+    <li><a href="#notifications">17. Notification system</a></li>
+    <li><a href="#guidance">18. Tooltips and guidance</a></li>
+    <li><a href="#crons">19. Scheduled jobs (crons)</a></li>
+    <li><a href="#migrations">20. Required migrations</a></li>
+  </ul>
+</div>
+
+<!-- 1 -->
+<h2 id="overview">1. System overview</h2>
+<div class="card card-navy">
+  <p style="font-size:17px; color:white; font-weight:600; margin-bottom:8px;">The lifecycle of a TDI partnership</p>
+  <p>Every school moves through one pipeline: Sales (close the deal) to Leadership (manage the partnership) to Hub (educator engagement). Operations sits behind Leadership as the internal documentation layer. Funding manages grant work for grant-supported schools. The principal sees their Leadership Dashboard. Your team sees everything.</p>
+</div>
+<div class="flow-step"><div class="flow-num">1</div><div class="flow-content"><strong>Sales</strong> -- Lead, demos, proposal, contract signed</div></div>
+<div class="arrow">&#8595;</div>
+<div class="flow-step"><div class="flow-num">2</div><div class="flow-content"><strong>Deal signed (automation)</strong> -- One click creates partnership, dashboard, Hub access, onboarding items, welcome email. Grant-funded deals also create a funding pursuit.</div></div>
+<div class="arrow">&#8595;</div>
+<div class="flow-step"><div class="flow-num">3</div><div class="flow-content"><strong>Phase 0: Pre-launch</strong> -- Roster, photos, champion, kickoff, Hub provisioning, KPI setting</div></div>
+<div class="arrow">&#8595;</div>
+<div class="flow-step"><div class="flow-num">4</div><div class="flow-content"><strong>Phase 1-4: Active partnership</strong> -- Days 1-90 framework, Hub engagement, observations, virtual sessions</div></div>
+<div class="arrow">&#8595;</div>
+<div class="flow-step"><div class="flow-num">5</div><div class="flow-content"><strong>Renewal</strong> -- AI summary, KPI progress, engagement data, Year 2 vision</div></div>
+
+<!-- 2 -->
+<h2 id="deal-signed">2. Deal signed: the automation</h2>
+<p>When you mark a deal as <span class="badge badge-teal">Signed (w/o Grant)</span> or <span class="badge badge-purple">Signed (w/ Grant)</span> in Sales, a "Create Partnership + Dashboard" button appears.</p>
+
+<h3>Modal fields</h3>
+<table>
+  <tr><th>Field</th><th>Pre-filled?</th><th>Default</th></tr>
+  <tr><td>School/district name, contact</td><td>Yes (from deal)</td><td>--</td></tr>
+  <tr><td>Partnership type</td><td>No</td><td>School</td></tr>
+  <tr><td>Staff count (Hub memberships)</td><td>No</td><td>0</td></tr>
+  <tr><td>Observation days / Virtual sessions / Executive sessions</td><td>No</td><td>2 / 4 / 2</td></tr>
+  <tr><td>Contract start/end dates</td><td>No</td><td>Today / empty</td></tr>
+  <tr><td>Building count (districts)</td><td>No</td><td>1</td></tr>
+</table>
+
+<h3>What happens on click</h3>
+<ol>
+  <li>Partnership record created in Leadership</li>
+  <li>Organization record created (name, city, state, website)</li>
+  <li>Dashboard generated at <code>/partners/[slug]</code></li>
+  <li>9 onboarding action items created (5 partner-visible, 4 admin-only)</li>
+  <li>Hub All-Access provisioned for contact</li>
+  <li>Welcome email sent from Rae</li>
+  <li>Sales deal linked to partnership</li>
+  <li>Activity logged</li>
+  <li><strong>If grant-funded:</strong> Funding pursuit auto-created with Plan A/B/C/D paths + 4 grant action items</li>
+</ol>
+<p class="url">API: <code>POST /api/admin/deal-to-partnership</code></p>
+
+<!-- 3 -->
+<h2 id="phase0">3. Phase 0: Pre-launch onboarding</h2>
+<h4>Partner-visible action items</h4>
+<div class="card card-teal">
+<table>
+  <tr><th>Item</th><th>How it works</th></tr>
+  <tr><td>Upload staff roster</td><td>CSV paste form. Auto-creates staff records, marks item complete.</td></tr>
+  <tr><td>Upload roster photos</td><td>Share or skip confirmation.</td></tr>
+  <tr><td>Identify staff champion</td><td>Name + email form. Creates partnership_users record.</td></tr>
+  <tr><td>Schedule kickoff walkthrough</td><td>Calendly link button.</td></tr>
+  <tr><td>Distribute Hub access to staff</td><td>Instructions + "I've shared access" confirmation.</td></tr>
+</table>
+</div>
+<h4>Admin-only action items</h4>
+<div class="card card-amber">
+<table>
+  <tr><th>Item</th><th>How it works</th></tr>
+  <tr><td>Provision staff Hub accounts</td><td>Batch provisioning button on Internal tab. Creates Hub All-Access for all roster staff.</td></tr>
+  <tr><td>Verify principal dashboard login</td><td>Manual check before walkthrough.</td></tr>
+  <tr><td>Prepare Day 1 Win insight</td><td>New school: cohort reference. Returning school: stress trend.</td></tr>
+  <tr><td>Review Phase 0 gate</td><td>All items green before kickoff.</td></tr>
+</table>
+</div>
+<h4>Grant-funded additional items (admin-only)</h4>
+<div class="card card-purple">
+<table>
+  <tr><th>Item</th></tr>
+  <tr><td>Build school funding profile</td></tr>
+  <tr><td>Research and map funding paths (Plan A/B/C/D)</td></tr>
+  <tr><td>Draft and submit narratives</td></tr>
+  <tr><td>Track submissions and follow up</td></tr>
+</table>
+</div>
+
+<!-- 4 -->
+<h2 id="principal">4. What the principal sees</h2>
+<p>Client-facing dashboard at <code>/partners/[slug]</code></p>
+<ul>
+  <li><strong>AI Summary</strong> -- one paragraph, real-time</li>
+  <li><strong>Gauge rings</strong> -- KPI-driven when set (shows their actual targets + progress), generic fallback (Hub %, Deliverables, Wellness, Phase)</li>
+  <li><strong>Partnership Health bar</strong> -- momentum calculated from deliverables + Hub + pending items</li>
+  <li><strong>Quick Actions</strong> -- Open Hub, Schedule, Quiz, Tools</li>
+  <li><strong>Popular Tools + Educator Types</strong></li>
+  <li><strong>Teacher quote</strong></li>
+  <li><strong>Collapsible sections</strong> -- Hub Intelligence, Timeline, Data & Impact, Actions, Leadership Tools, Community & FAQ</li>
+  <li><strong>Interactive action items</strong> -- upload roster, schedule walkthrough, identify champion</li>
+</ul>
+
+<!-- 5 -->
+<h2 id="admin">5. What admin sees (Leadership detail)</h2>
+<p>Admin view at <code>/tdi-admin/leadership/[id]</code></p>
+<table>
+  <tr><th>Tab</th><th>Purpose</th></tr>
+  <tr><td>Overview</td><td>Preview of what principal sees</td></tr>
+  <tr><td>90 Days</td><td>Activation Readiness Score, onboarding checklist, staff engagement roster, login trends</td></tr>
+  <tr><td><strong>Internal</strong></td><td>KPI selection, grant tracking, batch provisioning, export reports, notes, meetings. Never visible to principal.</td></tr>
+  <tr><td>Our Partnership</td><td>Goal, observations, surveys</td></tr>
+  <tr><td>Blueprint</td><td>Contract deliverables, schedule</td></tr>
+  <tr><td>Next Year</td><td>Renewal planning</td></tr>
+  <tr><td>Team</td><td>TDI team contacts</td></tr>
+  <tr><td>Billing</td><td>Contract dates, phase, staff count</td></tr>
+</table>
+
+<h3>Internal tab sections</h3>
+<ol>
+  <li><strong>Partnership KPIs</strong> -- pick 3-5 from curated menu, set targets, see benchmarks</li>
+  <li><strong>Grant tracking</strong> -- shows linked funding pursuits with Plan A/B/C/D status (only for grant-funded partnerships)</li>
+  <li><strong>Hub provisioning</strong> -- one-click batch create Hub accounts for all roster staff</li>
+  <li><strong>Reports and exports</strong> -- 7 report types: roster, board summary, KPI standings, engagement, courses, wellness (anonymized), full export. Smart empty states with email CTAs.</li>
+  <li><strong>Notes</strong> -- types: general, strategy, concern, win, follow up. Timestamped, attributed.</li>
+  <li><strong>Meetings</strong> -- date, type, attendees, summary, action items. Types: check-in, onboarding, observation debrief, renewal, strategy, escalation.</li>
+</ol>
+
+<!-- 6 -->
+<h2 id="kpis">6. KPI goal setting system</h2>
+<p>Principals pick 3-5 KPIs from a curated menu. Every KPI has benchmarks, targets, and a "how TDI delivers" explanation tied to contract deliverables.</p>
+
+<h4>Implementation KPIs (strongest signals)</h4>
+<table>
+  <tr><th>KPI</th><th>Data source</th><th>Benchmark</th></tr>
+  <tr><td>Strategy implementation in classrooms</td><td>Observation reports + surveys</td><td>74% TDI vs 10% national</td></tr>
+  <tr><td>Classroom application of PD</td><td>Quick Win reflections + surveys</td><td>55-75%</td></tr>
+  <tr><td>Course completion rate</td><td>Hub enrollments</td><td>30-50%</td></tr>
+  <tr><td>Field Notes earned</td><td>Hub recognition system</td><td>2-5 per educator/year</td></tr>
+  <tr><td>PD hours completed</td><td>Hub course completions</td><td>2-5 hrs/educator/year</td></tr>
+  <tr><td>District-mandated course</td><td>Hub enrollments</td><td>Set by district</td></tr>
+</table>
+<h4>Wellness KPIs</h4>
+<table>
+  <tr><th>KPI</th><th>Data source</th><th>Benchmark</th></tr>
+  <tr><td>Team wellness (5 dimensions)</td><td>Vibe Check</td><td>3.8-4.2/5</td></tr>
+  <tr><td>Stress reduction</td><td>Surveys</td><td>5-7/10 vs 8-9 industry</td></tr>
+  <tr><td>Retention intent</td><td>Surveys</td><td>7-9/10 vs 2-4 industry</td></tr>
+</table>
+<h4>Baseline</h4>
+<table>
+  <tr><td>Hub login rate</td><td>Hub logins</td><td>65-85%. "Logging in is step one. Implementation is the goal."</td></tr>
+</table>
+<p>When KPIs are set, the client dashboard gauge rings show those KPIs instead of generic metrics.</p>
+<p class="url">API: <code>GET/POST/PATCH /api/tdi-admin/leadership/[id]/kpis</code></p>
+
+<!-- 7 -->
+<h2 id="educator-goals">7. Hub educator goals</h2>
+<p>Teachers set 3-5 personal goals in their Hub profile (Growth tab > "Get specific" section). 1-2 can be mandated by the district.</p>
+<h4>Guided prompts (5 categories)</h4>
+<ol>
+  <li><strong>Classroom:</strong> "What is one strategy you want to consistently use?"</li>
+  <li><strong>Growth:</strong> "What skill do you want to develop?"</li>
+  <li><strong>Wellness:</strong> "What will you do to protect your well-being?"</li>
+  <li><strong>Connection:</strong> "How will you connect with colleagues?"</li>
+  <li><strong>Impact:</strong> "What student outcome do you want to improve?"</li>
+</ol>
+<p><strong>Quarterly check-ins:</strong> August, October, January, March, May. Teachers review and adjust goals.</p>
+<p>Aggregated goal data available in Leadership Dashboard exports.</p>
+<p class="url">API: <code>GET/POST /api/hub/goals</code></p>
+
+<!-- 8 -->
+<h2 id="grants">8. Grant-funded partnerships</h2>
+<p>When a deal moves to "Signed (w/ Grant)", the automation additionally creates a funding pursuit in the Funding tab.</p>
+
+<h3>Funding Playbook integration</h3>
+<p>Based on the TDI Funding Playbook v2. Every pursuit starts with default Plan A/B/C/D paths:</p>
+<table>
+  <tr><th>Plan</th><th>Type</th><th>Default paths</th></tr>
+  <tr><td style="color:#0F766E; font-weight:700;">A</td><td>Federal formula</td><td>Title II-A, IDEA/CEIS, Title I Part A</td></tr>
+  <tr><td style="color:#1B365D; font-weight:700;">B</td><td>State formula</td><td>State discretionary dollars</td></tr>
+  <tr><td style="color:#7C3AED; font-weight:700;">C</td><td>Foundation/corporate</td><td>Competitive applications</td></tr>
+  <tr><td style="color:#B45309; font-weight:700;">D</td><td>Crowdfunding/direct</td><td>Teacher-led, local sponsors</td></tr>
+</table>
+
+<h3>What's tracked per path</h3>
+<p>Label, amount, status, deadline, contact, notes. Editable inline on the pursuit detail panel.</p>
+<p>Status options: not started, researching, pursuing, submitted, awarded, denied, on hold.</p>
+
+<h3>Where grant data appears</h3>
+<ul>
+  <li><strong>Funding tab</strong> -- full pursuit management with phase tracking</li>
+  <li><strong>Leadership Internal tab</strong> -- grant tracking section shows linked pursuit with Plan A/B/C/D status</li>
+  <li><strong>Admin action items</strong> -- 4 grant-specific items auto-created</li>
+</ul>
+<p class="url">API: <code>POST/PATCH /api/funding/pursuits</code></p>
+
+<!-- 9 -->
+<h2 id="exports">9. Reports and exports</h2>
+<p>Available on the Internal tab of any partnership detail page. 7 report types:</p>
+<table>
+  <tr><th>Report</th><th>What it contains</th><th>Empty state</th></tr>
+  <tr><td>Staff roster</td><td>Names, emails, Hub status, login dates</td><td>Prompts to request roster from principal</td></tr>
+  <tr><td>Board summary</td><td>AI-ready data: staff count, Hub engagement, KPIs, deliverables</td><td>Suggests setting KPIs first</td></tr>
+  <tr><td>KPI standings</td><td>All KPIs with targets, current values, benchmarks, how TDI delivers</td><td>Points to KPI selector</td></tr>
+  <tr><td>Hub engagement</td><td>Login rates, activity counts, enrolled vs active</td><td>Suggests encouraging Hub use</td></tr>
+  <tr><td>Course completions</td><td>Enrollment and completion data per educator</td><td>Suggests exploring course library</td></tr>
+  <tr><td>Wellness summary</td><td>Anonymized vibe check data, score distribution (never individual names)</td><td>Suggests encouraging Vibe Check use</td></tr>
+  <tr><td>Full export</td><td>Everything: partnership, org, staff, KPIs, items, notes, meetings, timeline</td><td>Always available</td></tr>
+</table>
+<p><strong>Smart empty states:</strong> When data is missing, explains what to do and offers to draft an email to the principal requesting the data.</p>
+<p class="url">API: <code>GET /api/tdi-admin/leadership/[id]/reports?type=roster</code></p>
+
+<!-- 10 -->
+<h2 id="hub">10. Hub integration</h2>
+
+<h3>Partnership linkage (updated July 2026)</h3>
+<div class="card card-teal">
+  <p>When staff are provisioned via <code>POST /api/admin/provision-roster</code>, the system writes <code>partnership_id</code> to both <code>hub_memberships</code> and <code>hub_profiles</code>. This links each educator to their partnership so all Hub activity flows into the correct Leadership Dashboard.</p>
+  <p>The Hub connections API (<code>/api/tdi-admin/hub-connections?section=leadership</code>) groups data by <code>partnership_id</code> for direct, reliable matching. Falls back to school name matching for legacy data.</p>
+</div>
+
+<h3>Data that flows from Hub to Leadership</h3>
+<table>
+  <tr><th>Metric</th><th>Source</th><th>Status</th></tr>
+  <tr><td>Login %, active users</td><td>hub_activity_log</td><td><span class="badge badge-teal">Live</span></td></tr>
+  <tr><td>Tools explored (Quick Wins)</td><td>hub_activity_log (quick_win_viewed)</td><td><span class="badge badge-teal">Live</span></td></tr>
+  <tr><td>Lesson completions</td><td>hub_lesson_progress</td><td><span class="badge badge-teal">Live</span></td></tr>
+  <tr><td>Course completions, PD hours</td><td>hub_enrollments, hub_certificates</td><td><span class="badge badge-teal">Live</span></td></tr>
+  <tr><td>Wellness score (5 dimensions)</td><td>hub_activity_log (wellbeing_check)</td><td><span class="badge badge-teal">Live</span></td></tr>
+  <tr><td>Field Notes earned</td><td>hub_earned_recognitions</td><td><span class="badge badge-teal">Live</span></td></tr>
+  <tr><td>Community posts, Q&A</td><td>hub_qa_posts</td><td><span class="badge badge-teal">Live</span></td></tr>
+  <tr><td>Popular tools, educator types</td><td>hub_activity_log, hub_quiz_results</td><td><span class="badge badge-teal">Live</span></td></tr>
+  <tr><td>Teacher quotes (for digest)</td><td>hub_qa_posts (by partnership)</td><td><span class="badge badge-teal">Live</span></td></tr>
+</table>
+
+<h3>PD hours calculation</h3>
+<div class="card card-amber">
+  <p><strong>PD hours = 2x course duration.</strong> A 45-minute course earns 1.5 PD hours. This accounts for implementation time between and after the course. Certificates auto-generate with a unique verification code (TDI-XXXXXXXX) when all lessons in a course are completed.</p>
+</div>
+
+<h3>Quick Win tagging</h3>
+<p>All Quick Wins must be fully tagged before publishing. A database trigger (<code>enforce_quick_win_tags_before_publish</code>) rejects any publish attempt with missing required fields: <code>lift</code>, <code>category</code>, <code>topic_tags</code>, <code>roles</code>, <code>danielson_domains</code>. Full tagging spec: <code>tdi-paperclip-skills/quick-win-tagging/SKILL.md</code>.</p>
+<p>Quick Win categories (updated July 2026): Instructional Strategies, Lesson Planning, Assessment, Classroom Setup, Classroom Management, Communication, Time Savers, Leadership, Self-Care, Stress Relief, Games, Vocational. "Classroom Tools" is retired.</p>
+
+<h3>Automated outreach</h3>
+<table>
+  <tr><th>Email</th><th>Schedule</th><th>Recipient</th><th>What it does</th></tr>
+  <tr><td>Staff welcome + Quick Win recommendation</td><td>On roster provision</td><td>Each educator</td><td>Role-based first resource recommendation (para, teacher, leader, coach). Direct link to specific Quick Win.</td></tr>
+  <tr><td>Onboarding reminders</td><td>Day 3, 7, 14</td><td>Principal</td><td>Nudges if principal hasn't logged into their dashboard yet.</td></tr>
+  <tr><td>Weekly leadership digest</td><td>Monday 8 AM CT</td><td>Principal</td><td>Featured resource with copy-paste newsletter blurb, team topics, rotating challenge (leader/staff), optional staff quote.</td></tr>
+  <tr><td>Daily wellness check</td><td>10 AM CT</td><td>Educators with negative vibes</td><td>Personal check-in. Names never shared with principal.</td></tr>
+  <tr><td>Partner attention flags</td><td>8 AM CT daily</td><td>Internal (admin)</td><td>Flags at Day 7/14/21/45 for inactive partnerships.</td></tr>
+</table>
+
+<!-- 11 -->
+<h2 id="cross-links">11. Cross-portal navigation</h2>
+<div class="two-col">
+  <div class="card">
+    <h4 style="margin-top:0">From Leadership</h4>
+    <ul>
+      <li>"Sales" button -- jumps to Sales filtered by school</li>
+      <li>"Dashboard" button -- opens client dashboard</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4 style="margin-top:0">From Sales</h4>
+    <ul>
+      <li>"Leadership" pill -- jumps to Leadership filtered by school</li>
+      <li>"Hub Data" pill -- jumps to Hub admin filtered by school</li>
+      <li>"Create Partnership" button -- runs the automation</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 12 -->
+<h2 id="attention-flags">12. Partner attention flags</h2>
+<p>Daily cron (8 AM CT) checks all active partnerships within their first 90 days:</p>
+<table>
+  <tr><th>Signal</th><th>Threshold</th><th>When</th></tr>
+  <tr><td>Principal not logged in</td><td>0 logins</td><td>Day 7</td></tr>
+  <tr><td>Staff below target</td><td>&lt;50% logged in</td><td>Day 14</td></tr>
+  <tr><td>Principal still not logged in</td><td>0 logins in 14 days</td><td>Day 21 (escalation)</td></tr>
+  <tr><td>Active usage below floor</td><td>&lt;40% staff active</td><td>Day 45+</td></tr>
+</table>
+<p>Flags create internal "concern" notes on the partnership's Internal tab. Seasonal threshold extensions apply during testing windows and breaks.</p>
+
+<!-- 13 -->
+<h2 id="renewal">13. Renewal flow</h2>
+<ul>
+  <li><strong>Day 45:</strong> Plant Year 2 vision (not a renewal ask)</li>
+  <li><strong>Day 80:</strong> Partnership continuation check-in</li>
+  <li><strong>Day 90:</strong> Impact Report (shareable with board)</li>
+</ul>
+<p>The KPI gauge rings, AI summary, and export reports provide renewal-ready data.</p>
+
+<!-- 14 -->
+<h2 id="database">14. Database tables</h2>
+<h4>Creator Portal Supabase</h4>
+<table>
+  <tr><th>Table</th><th>Purpose</th></tr>
+  <tr><td><code>partnerships</code></td><td>Core partnership records (sales_deal_id links to Sales)</td></tr>
+  <tr><td><code>organizations</code></td><td>School/district details</td></tr>
+  <tr><td><code>buildings</code></td><td>Buildings within a district</td></tr>
+  <tr><td><code>staff_members</code></td><td>Staff roster per partnership</td></tr>
+  <tr><td><code>action_items</code></td><td>Onboarding + action items (visible_to_partner flag)</td></tr>
+  <tr><td><code>partnership_notes</code></td><td>Internal notes (typed, timestamped)</td></tr>
+  <tr><td><code>partnership_meetings</code></td><td>Meeting logs</td></tr>
+  <tr><td><code>partnership_kpis</code></td><td>Selected KPIs with targets and benchmarks</td></tr>
+  <tr><td><code>educator_goals</code></td><td>Per-educator goals (personal + mandated)</td></tr>
+  <tr><td><code>timeline_events</code></td><td>Milestones (done/in progress/upcoming)</td></tr>
+  <tr><td><code>activity_log</code></td><td>Automated activity tracking</td></tr>
+  <tr><td><code>sales_opportunities</code></td><td>Sales pipeline</td></tr>
+  <tr><td><code>funding_pursuits</code></td><td>Grant pursuits with Plan A/B/C/D paths</td></tr>
+  <tr><td><code>funding_pursuit_timeline</code></td><td>Grant timeline events</td></tr>
+</table>
+
+<!-- 15 -->
+<h2 id="api">15. API endpoints</h2>
+<h4>Deal to Partnership</h4>
+<table>
+  <tr><td><code>POST /api/admin/deal-to-partnership</code></td><td>Create partnership from signed deal</td></tr>
+</table>
+<h4>Partnership Management</h4>
+<table>
+  <tr><td><code>GET/POST /api/admin/partnerships</code></td><td>List/create partnerships</td></tr>
+  <tr><td><code>GET/POST/PATCH/DELETE /api/tdi-admin/leadership/[id]/action-items</code></td><td>Action items</td></tr>
+  <tr><td><code>GET/POST/PATCH/DELETE /api/tdi-admin/leadership/[id]/notes</code></td><td>Internal notes</td></tr>
+  <tr><td><code>GET/POST/PATCH/DELETE /api/tdi-admin/leadership/[id]/meetings</code></td><td>Meeting logs</td></tr>
+  <tr><td><code>GET/POST/PATCH /api/tdi-admin/leadership/[id]/kpis</code></td><td>KPI goal setting</td></tr>
+  <tr><td><code>GET /api/tdi-admin/leadership/[id]/reports?type=</code></td><td>Export reports</td></tr>
+  <tr><td><code>GET /api/tdi-admin/leadership/[id]/briefing</code></td><td>Prepare for Call briefing</td></tr>
+</table>
+<h4>Partner-Facing</h4>
+<table>
+  <tr><td><code>GET /api/partners/dashboard/[id]</code></td><td>Dashboard data (filtered by visible_to_partner)</td></tr>
+  <tr><td><code>POST /api/partners/roster</code></td><td>Staff roster upload</td></tr>
+  <tr><td><code>POST /api/partners/champion</code></td><td>Identify staff champion</td></tr>
+  <tr><td><code>PATCH /api/partners/action-items</code></td><td>Complete action items</td></tr>
+</table>
+<h4>Hub</h4>
+<table>
+  <tr><td><code>GET /api/partnerships/[id]/hub-stats</code></td><td>Per-partnership Hub data</td></tr>
+  <tr><td><code>GET /api/partnerships/[id]/hub-intelligence</code></td><td>Popular tools, types, community</td></tr>
+  <tr><td><code>GET/POST /api/hub/goals</code></td><td>Educator goal setting</td></tr>
+</table>
+<h4>Funding</h4>
+<table>
+  <tr><td><code>POST/PATCH /api/funding/pursuits</code></td><td>Create/update pursuits</td></tr>
+  <tr><td><code>GET /api/funding/dashboard</code></td><td>All pursuits + alerts</td></tr>
+</table>
+<h4>Admin Utilities</h4>
+<table>
+  <tr><td><code>POST /api/admin/provision-roster</code></td><td>Batch Hub provisioning</td></tr>
+  <tr><td><code>POST /api/admin/resend-welcome</code></td><td>Resend welcome email</td></tr>
+  <tr><td><code>POST /api/admin/bulk-enable-creators</code></td><td>Enable creators on website</td></tr>
+</table>
+
+<!-- 16 -->
+<h2 id="automation">16. Automation and AI</h2>
+<p>The system runs on autopilot where possible. Here is what happens without anyone clicking anything:</p>
+<table>
+  <tr><th>What</th><th>When</th><th>How it works</th></tr>
+  <tr><td><strong>KPI values auto-update</strong></td><td>Daily</td><td>Cron pulls Hub engagement, course completions, field notes, PD hours and writes to partnership_kpis.current_value. KPIs at less than 50% of target flagged as at_risk.</td></tr>
+  <tr><td><strong>Attention flags</strong></td><td>Daily</td><td>Checks Day 7/14/21/45 thresholds for all partnerships in first 90 days. Creates internal concern notes + sends admin email.</td></tr>
+  <tr><td><strong>Wellness outreach</strong></td><td>Daily</td><td>Scans for educators with 2+ negative vibe scores in 7 days. Sends personal email from Rae. Names never shared with principal.</td></tr>
+  <tr><td><strong>Weekly digest</strong></td><td>Monday AM</td><td>Single email to Rae: all partnerships with health status, Hub %, flags, pending items. Color-coded summary.</td></tr>
+  <tr><td><strong>Monthly principal email</strong></td><td>First Monday</td><td>AI-written in Rae's voice (Claude API with fallback). Personalized with real Hub data. Links to their dashboard.</td></tr>
+  <tr><td><strong>Onboarding item auto-complete</strong></td><td>On action</td><td>When principal uploads roster, identifies champion, or distributes Hub access, the corresponding action item auto-completes with timestamp.</td></tr>
+</table>
+
+<h3>AI-powered features</h3>
+<table>
+  <tr><th>Feature</th><th>Where</th><th>What it does</th></tr>
+  <tr><td>Partnership AI Summary</td><td>Client dashboard (top)</td><td>Real-time paragraph summarizing engagement, written dynamically from Hub data</td></tr>
+  <tr><td>AI Partnership Insight</td><td>Admin detail page</td><td>Claude-generated 2-3 sentence insight per partnership</td></tr>
+  <tr><td>Monthly principal email</td><td>Email (automated)</td><td>Claude writes the email in Rae's voice with real data. Falls back to template.</td></tr>
+  <tr><td>Prepare for Call</td><td>Internal tab</td><td>Auto-generates talking points from KPI data, flags, and partnership stage</td></tr>
+</table>
+
+<!-- 17 -->
+<h2 id="notifications">17. Notification system</h2>
+<p>Admin notifications via <code>POST /api/admin/notify</code>. Sends to Rae when partnership events occur.</p>
+<table>
+  <tr><th>Event</th><th>Urgency</th><th>Trigger</th></tr>
+  <tr><td>Roster uploaded</td><td><span class="badge badge-amber">Action</span></td><td>Principal uploads staff list</td></tr>
+  <tr><td>Attention flag</td><td><span class="badge badge-amber">Action</span> or <span class="badge badge-red">Urgent</span></td><td>Daily cron detects threshold breach</td></tr>
+  <tr><td>KPI at risk</td><td><span class="badge badge-amber">Action</span></td><td>Daily KPI cron detects below 50% of target</td></tr>
+  <tr><td>Champion identified</td><td><span class="badge badge-gray">Info</span></td><td>Principal submits champion form</td></tr>
+  <tr><td>Partnership created</td><td><span class="badge badge-gray">Info</span></td><td>Deal-to-partnership automation runs</td></tr>
+  <tr><td>Grant path awarded</td><td><span class="badge badge-teal">Info</span></td><td>Funding path status changed to awarded</td></tr>
+</table>
+
+<!-- 18 -->
+<h2 id="guidance">18. Tooltips and guidance</h2>
+<p>Reusable guidance components in <code>components/tdi-admin/ui/Guidance.tsx</code>:</p>
+<table>
+  <tr><th>Component</th><th>Purpose</th><th>Example</th></tr>
+  <tr><td><code>Tooltip</code></td><td>Hover/tap contextual help</td><td>Wrap any element with explanatory text</td></tr>
+  <tr><td><code>InfoDot</code></td><td>Small ? icon with tooltip</td><td>"Hub-connected KPIs update automatically every day"</td></tr>
+  <tr><td><code>ConnectionBadge</code></td><td>Shows data flow between systems</td><td>"Sales -> Leadership" with explanation</td></tr>
+  <tr><td><code>FirstTimeHint</code></td><td>Dismissable suggestion (persists)</td><td>"Welcome to the Internal tab. Here's what each section does..."</td></tr>
+  <tr><td><code>ConfirmAction</code></td><td>Wraps buttons with confirmation modal</td><td>"This will provision Hub accounts for 45 staff. Continue?"</td></tr>
+</table>
+<p>All guidance text is centralized in the <code>GUIDANCE</code> constant, organized by section (Sales, Leadership, Dashboard, Funding, Hub). Update text in one place, reflects everywhere.</p>
+
+<!-- 19 -->
+<h2 id="crons">19. Scheduled jobs (crons)</h2>
+<table>
+  <tr><th>Job</th><th>Schedule</th><th>What it does</th></tr>
+  <tr><td><code>/api/cron/update-kpis</code></td><td>Daily 6 AM CT</td><td>Auto-calculates KPI current values from Hub data. Flags at-risk KPIs.</td></tr>
+  <tr><td><code>/api/cron/partner-attention-flags</code></td><td>Daily 8 AM CT</td><td>Checks partnerships for onboarding risks. Creates concern notes + sends admin email.</td></tr>
+  <tr><td><code>/api/cron/creator-reminders</code></td><td>Daily 9 AM</td><td>Creator milestone reminders</td></tr>
+  <tr><td><code>/api/cron/wellness-check</code></td><td>Daily 10 AM CT</td><td>Educator wellness outreach for negative vibe streaks</td></tr>
+  <tr><td><code>/api/cron/daily-alerts</code></td><td>Daily 1 PM</td><td>Admin alerts digest</td></tr>
+  <tr><td><code>/api/cron/weekly-digest</code></td><td>Monday 7 AM CT</td><td>Rae's weekly partnership summary email</td></tr>
+  <tr><td><code>/api/cron/monthly-principal-email</code></td><td>1st Monday</td><td>AI-written engagement email to each principal</td></tr>
+</table>
+
+<!-- 20 -->
+<h2 id="migrations">20. Required migrations</h2>
+<div class="card card-amber">
+  <h4 style="margin-top:0">Migration 083</h4>
+  <p>Adds to <code>action_items</code>: visible_to_partner, cta_label, cta_url, completed_by, resurface_at. Adds <code>sales_deal_id</code> to partnerships.</p>
+</div>
+<div class="card card-amber">
+  <h4 style="margin-top:0">Migration 084</h4>
+  <p>Creates <code>partnership_notes</code> and <code>partnership_meetings</code> tables.</p>
+</div>
+<div class="card card-amber">
+  <h4 style="margin-top:0">Migration 085</h4>
+  <p>Creates <code>partnership_kpis</code> and <code>educator_goals</code> tables.</p>
+</div>
+<div class="card card-amber">
+  <h4 style="margin-top:0">Migration 086</h4>
+  <p>Links <code>funding_pursuits</code> to partnerships. Adds funding_paths (JSONB), school_profile, contract_gap, implementation_date.</p>
+</div>
+
+<hr>
+<p style="color: #9CA3AF; font-size: 13px; text-align: center;">
+  TDI Partnership Workflow v3.0 | Generated June 6, 2026<br>
+  For internal TDI team use. Do not share with partners.
+</p>
+
+</div>
+</body>
+</html>
