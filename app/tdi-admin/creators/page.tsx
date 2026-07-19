@@ -1367,6 +1367,7 @@ export default function CreatorStudioPage() {
   // Feedback review queue state
   const [feedbackQueue, setFeedbackQueue] = useState<any[]>([]);
   const [newSubmissions, setNewSubmissions] = useState<any[]>([]);
+  const [pendingRecruitment, setPendingRecruitment] = useState<any[]>([]);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [editingFeedbackId, setEditingFeedbackId] = useState<string | null>(null);
   const [editedFeedbackContent, setEditedFeedbackContent] = useState('');
@@ -1530,6 +1531,11 @@ export default function CreatorStudioPage() {
           );
           setNewSubmissions(submitted);
         })
+        .catch(() => {});
+      // Load suggested recruitment candidates for Action Center
+      fetch('/api/admin/creator-recruitment?action=pipeline&stage=suggested')
+        .then(res => res.json())
+        .then(data => setPendingRecruitment(data.candidates || []))
         .catch(() => {});
       // Get admin email from session
       import('@/lib/supabase').then(({ supabase }) => {
@@ -2363,7 +2369,7 @@ export default function CreatorStudioPage() {
                     </div>
                     {stalledCreators.length > 0 ? (
                       <p className="mt-1 text-xs text-amber-600 font-medium">
-                        Auto-emails active -- reply to Bella if they respond
+                        Auto-emails active. Reply to Bella if they respond.
                       </p>
                     ) : (
                       <p className="mt-1 text-xs text-gray-400">
@@ -2392,7 +2398,7 @@ export default function CreatorStudioPage() {
                     </div>
                     {followedUpApproachingRestall.length > 0 && (
                       <p className="mt-1 text-xs text-orange-600 font-medium">
-                        Followed up but no creator activity -- check in again
+                        Followed up but no creator activity. Check in again.
                       </p>
                     )}
                     {followedUpApproachingRestall.length === 0 && stats.followedUp > 0 && (
@@ -2418,7 +2424,7 @@ export default function CreatorStudioPage() {
                     {newSubmissions.length}
                   </span>
                 </div>
-                <span className="text-xs text-gray-400">Waiting for review -- write feedback or wait for Anne Marie</span>
+                <span className="text-xs text-gray-400">Waiting for review. Write feedback or wait for Anne Marie.</span>
               </div>
               <div className="divide-y divide-gray-100">
                 {newSubmissions.map((item: any) => (
@@ -2711,8 +2717,60 @@ export default function CreatorStudioPage() {
             </div>
           )}
 
-          {/* Calm State -- shown when no submissions or feedback to act on. Provides context. */}
-          {newSubmissions.length === 0 && feedbackQueue.length === 0 && needsAttention.length === 0 && (
+          {/* Recruitment Candidates Awaiting Outreach Approval */}
+          {pendingRecruitment.length > 0 && (
+            <div className="mb-5 bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
+              <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between" style={{ backgroundColor: '#fafbfc' }}>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-semibold tracking-wide uppercase" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>
+                    Recruitment: Outreach Ready
+                  </h2>
+                  <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold text-white" style={{ backgroundColor: '#059669' }}>
+                    {pendingRecruitment.length}
+                  </span>
+                </div>
+                <button
+                  onClick={() => {
+                    const el = document.querySelector('[data-tab="recruitment"]') as HTMLElement;
+                    if (el) el.click();
+                  }}
+                  className="text-xs font-medium text-gray-500 hover:text-gray-700"
+                >
+                  View in Recruitment tab &rarr;
+                </button>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {pendingRecruitment.slice(0, 5).map((candidate: any) => (
+                  <div key={candidate.id} className="p-4 flex items-start justify-between gap-4">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-semibold" style={{ color: '#1e2749' }}>{candidate.name}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{
+                          background: candidate.source === 'hub_user' ? '#DBEAFE' : candidate.source === 'social_media' ? '#FCE7F3' : candidate.source === 'substack' ? '#FEF3C7' : candidate.source === 'sales_nomination' ? '#D1FAE5' : '#F3F4F6',
+                          color: candidate.source === 'hub_user' ? '#1E40AF' : candidate.source === 'social_media' ? '#9D174D' : candidate.source === 'substack' ? '#92400E' : candidate.source === 'sales_nomination' ? '#065F46' : '#374151',
+                        }}>
+                          {(candidate.source || '').replace(/_/g, ' ')}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 mb-1">{candidate.expertise_area}</p>
+                      {candidate.gap_category && (
+                        <span className="text-xs text-gray-400">Fills: {candidate.gap_category}</span>
+                      )}
+                    </div>
+                    <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{
+                      background: candidate.content_path === 'course' ? '#DBEAFE' : candidate.content_path === 'download' ? '#D1FAE5' : '#FEF3C7',
+                      color: candidate.content_path === 'course' ? '#1E40AF' : candidate.content_path === 'download' ? '#065F46' : '#92400E',
+                    }}>
+                      {candidate.content_path || 'TBD'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Calm State -- shown when no submissions, feedback, or recruitment to act on. Provides context. */}
+          {newSubmissions.length === 0 && feedbackQueue.length === 0 && needsAttention.length === 0 && pendingRecruitment.length === 0 && (
             <>
               {/* All caught up + quick pulse */}
               <div className="mb-5 bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
@@ -2824,7 +2882,7 @@ export default function CreatorStudioPage() {
                                 <p className="text-sm font-medium truncate text-gray-900 group-hover:text-blue-600 transition-colors">
                                   {creator.name}
                                 </p>
-                                <p className="text-xs text-gray-400 truncate">{creator.current_phase || 'Onboarding'} -- {creator.content_path || 'Path not set'}</p>
+                                <p className="text-xs text-gray-400 truncate">{creator.current_phase || 'Onboarding'} &middot; {creator.content_path || 'Path not set'}</p>
                               </div>
                               <span className={`text-xs font-medium flex-shrink-0 ${daysAgo <= 7 ? 'text-green-600' : daysAgo <= 14 ? 'text-blue-600' : daysAgo <= 30 ? 'text-amber-600' : 'text-gray-400'}`}>
                                 {daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo}d ago`}
