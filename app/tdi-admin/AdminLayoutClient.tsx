@@ -110,18 +110,7 @@ const SUB_NAV_ITEMS = [
       </svg>
     ),
   },
-  {
-    id: 'connections',
-    label: 'Portal Connections',
-    href: '/tdi-admin/connections',
-    section: '_owner_only',
-    accent: '#E8B84B',
-    icon: (active: boolean) => (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
-      </svg>
-    ),
-  },
+  // Portal Connections removed -- content moved to Team Docs > Data Flow Map
   {
     id: 'docs',
     label: 'Team Docs',

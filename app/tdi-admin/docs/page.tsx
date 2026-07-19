@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Search, Download, Printer, ExternalLink } from 'lucide-react';
 
-type DocId = 'admin-guide' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'hub-engagement' | 'engagement-workflow' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'communication-map';
+type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'hub-engagement' | 'engagement-workflow' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'communication-map';
 
 interface Doc {
   id: DocId;
@@ -33,6 +33,16 @@ const DOC_GROUPS: DocGroup[] = [
         tags: ['admin', 'portal', 'overview', 'getting started', 'team', 'roles', 'who does what'],
         relatedSections: [
           { label: 'Open Admin Portal', href: '/tdi-admin' },
+        ],
+      },
+      {
+        id: 'data-flow',
+        label: 'Data Flow Map',
+        desc: 'How data moves between all systems',
+        tags: ['data flow', 'connections', 'hub', 'leadership', 'sales', 'cmo', 'funding', 'operations', 'system map', 'integration'],
+        relatedSections: [
+          { label: 'Leadership Dashboard', href: '/tdi-admin/leadership' },
+          { label: 'Sales', href: '/tdi-admin/sales' },
         ],
       },
     ],

@@ -25,6 +25,7 @@ export async function GET(
     'creator-feedback-sop': 'creator-feedback-sop.html',
     'creator-recruitment-sop': 'creator-recruitment-sop.html',
     'communication-map': 'communication-map.html',
+    'data-flow': 'data-flow.html',
   };
 
   const filename = allowedDocs[slug];

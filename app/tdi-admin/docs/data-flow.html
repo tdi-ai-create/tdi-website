@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TDI Data Flow Map -- How Systems Connect</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; background: #F8F9FA; line-height: 1.6; }
+  .page { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 20px; font-weight: 700; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
+  .subtitle { color: #6B7280; font-size: 14px; margin-bottom: 8px; }
+  .updated { color: #9CA3AF; font-size: 12px; margin-bottom: 32px; }
+  table { width: 100%; border-collapse: collapse; margin: 0 0 24px; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; background: #1e2749; color: white; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  td { padding: 10px 12px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+  tr:hover td { background: #F9FAFB; }
+  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; text-transform: uppercase; }
+  .b-live { background: #D1FAE5; color: #065F46; }
+  .b-building { background: #FEF3C7; color: #92400E; }
+  .b-planned { background: #F3F4F6; color: #6B7280; }
+  .arrow { color: #E8B84B; font-weight: 700; }
+  .node-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 32px; }
+  .node { padding: 16px; border-radius: 12px; text-align: center; }
+  .node-label { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .node-desc { font-size: 11px; color: #6B7280; }
+  .hub-node { background: linear-gradient(135deg, #E8B84B, #F0C75E); color: #1e2749; padding: 20px; border-radius: 14px; text-align: center; margin-bottom: 16px; }
+  .hub-node .node-label { font-size: 18px; }
+  .hub-node .node-desc { color: rgba(30,39,73,0.6); }
+  .section-note { background: #F8FAFC; border-left: 3px solid #2A9D8F; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; color: #334155; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>TDI Data Flow Map</h1>
+<p class="subtitle">How data moves between systems to create intelligence</p>
+<p class="updated">Last updated: July 19, 2026</p>
+
+<div class="section-note">
+  The Learning Hub is the central data source. Educator activity flows outward to Leadership (for principals), Sales (for leads), CMO (for marketing), Creator Studio (for content strategy), and Funding (for grant impact metrics).
+</div>
+
+<!-- System Map -->
+<div class="hub-node">
+  <p class="node-label">Learning Hub</p>
+  <p class="node-desc">Central data source -- educator activity, engagement, PD tracking</p>
+</div>
+
+<div class="node-grid">
+  <div class="node" style="background: #D1FAE520; border: 1px solid #2A9D8F30;">
+    <p class="node-label" style="color: #2A9D8F;">Leadership</p>
+    <p class="node-desc">Partner dashboards, engagement tracking, KPIs</p>
+  </div>
+  <div class="node" style="background: #7C3AED10; border: 1px solid #7C3AED30;">
+    <p class="node-label" style="color: #7C3AED;">Sales</p>
+    <p class="node-desc">Pipeline, opportunities, deal management</p>
+  </div>
+  <div class="node" style="background: #DC262610; border: 1px solid #DC262630;">
+    <p class="node-label" style="color: #DC2626;">CMO Dashboard</p>
+    <p class="node-desc">Marketing funnel, Substack, campaigns</p>
+  </div>
+  <div class="node" style="background: #0891B210; border: 1px solid #0891B230;">
+    <p class="node-label" style="color: #0891B2;">Creator Studio</p>
+    <p class="node-desc">Content creators, production pipeline</p>
+  </div>
+  <div class="node" style="background: #D9770610; border: 1px solid #D9770630;">
+    <p class="node-label" style="color: #D97706;">Funding</p>
+    <p class="node-desc">Grant pursuits, narratives, follow-up</p>
+  </div>
+  <div class="node" style="background: #1e274910; border: 1px solid #1e274930;">
+    <p class="node-label" style="color: #1e2749;">Operations</p>
+    <p class="node-desc">Contracts, billing, renewals</p>
+  </div>
+</div>
+
+<h2>All Data Connections</h2>
+
+<table>
+  <tr><th>From</th><th></th><th>To</th><th>What Flows</th><th>Why It Matters</th><th>Status</th></tr>
+
+  <tr><td colspan="6" style="background:#F8FAFC;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#059669;padding:12px;">Hub to Leadership</td></tr>
+  <tr><td>Learning Hub</td><td class="arrow">&rarr;</td><td>Leadership</td><td>Educator activity, tools explored, PD hours, vibe scores per building</td><td>Principals see their team engagement in real-time</td><td><span class="badge b-live">Live</span></td></tr>
+  <tr><td>Learning Hub</td><td class="arrow">&rarr;</td><td>Leadership</td><td>Certificate completions, active rate per school</td><td>Contract delivery evidence for renewals</td><td><span class="badge b-live">Live</span></td></tr>
+
+  <tr><td colspan="6" style="background:#F8FAFC;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#7C3AED;padding:12px;">Hub to Sales</td></tr>
+  <tr><td>Learning Hub</td><td class="arrow">&rarr;</td><td>Sales</td><td>Free user signups by school email domain</td><td>Warm leads from schools already exploring TDI</td><td><span class="badge b-live">Live</span></td></tr>
+  <tr><td>Learning Hub</td><td class="arrow">&rarr;</td><td>Sales</td><td>District adoption metrics (paid vs free per district)</td><td>Renewal evidence: "Your 15 educators saved 50+ hours"</td><td><span class="badge b-live">Live</span></td></tr>
+
+  <tr><td colspan="6" style="background:#F8FAFC;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#DC2626;padding:12px;">Hub to CMO</td></tr>
+  <tr><td>Learning Hub</td><td class="arrow">&rarr;</td><td>CMO</td><td>Hub signup sources, membership breakdown, Substack perks</td><td>Know which marketing channels drive real engagement</td><td><span class="badge b-live">Live</span></td></tr>
+  <tr><td>Learning Hub</td><td class="arrow">&rarr;</td><td>CMO</td><td>Top content by views, signup trends, community engagement</td><td>Feed content strategy with real usage data</td><td><span class="badge b-live">Live</span></td></tr>
+
+  <tr><td colspan="6" style="background:#F8FAFC;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#0891B2;padding:12px;">Hub to Creator Studio</td></tr>
+  <tr><td>Learning Hub</td><td class="arrow">&rarr;</td><td>Creator Studio</td><td>Views per tool, Q&A engagement, community response counts</td><td>Creator impact scores and performance ranking</td><td><span class="badge b-live">Live</span></td></tr>
+  <tr><td>Learning Hub</td><td class="arrow">&rarr;</td><td>Creator Studio</td><td>Content requests from educators, category performance</td><td>"Educators are asking for X" -- direct content pipeline</td><td><span class="badge b-live">Live</span></td></tr>
+
+  <tr><td colspan="6" style="background:#F8FAFC;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#D97706;padding:12px;">Funding Connections</td></tr>
+  <tr><td>Learning Hub</td><td class="arrow">&rarr;</td><td>Funding</td><td>Total educators, states reached, PD hours, certificates</td><td>Auto-generated impact metrics for grant applications</td><td><span class="badge b-live">Live</span></td></tr>
+  <tr><td>Funding</td><td class="arrow">&rarr;</td><td>Agents</td><td>Draft requests, research assignments via find_work API</td><td>Agents draft grant narratives, push results back</td><td><span class="badge b-live">Live</span></td></tr>
+  <tr><td>Funding</td><td class="arrow">&rarr;</td><td>Google Drive</td><td>Grant narratives saved as Google Docs</td><td>Team reviews narratives directly in Google Docs</td><td><span class="badge b-live">Live</span></td></tr>
+  <tr><td>Sales</td><td class="arrow">&rarr;</td><td>Funding</td><td>Signed deal creates funding pursuit with contract lines</td><td>Funding pipeline auto-populates when a deal closes</td><td><span class="badge b-live">Live</span></td></tr>
+  <tr><td>Funding</td><td class="arrow">&rarr;</td><td>Operations</td><td>Award amounts, grant allocation to contract lines</td><td>Invoicing knows which services are grant-funded</td><td><span class="badge b-live">Live</span></td></tr>
+
+  <tr><td colspan="6" style="background:#F8FAFC;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#1e2749;padding:12px;">Other Connections</td></tr>
+  <tr><td>Learning Hub</td><td class="arrow">&rarr;</td><td>Operations</td><td>Hub access vs actual usage per partner district</td><td>Identify underutilized partnerships before renewal</td><td><span class="badge b-live">Live</span></td></tr>
+  <tr><td>Sales</td><td class="arrow">&rarr;</td><td>Learning Hub</td><td>"Provision Hub Access" on deal close</td><td>One-click provisioning when a deal closes</td><td><span class="badge b-live">Live</span></td></tr>
+  <tr><td>Leadership</td><td class="arrow">&rarr;</td><td>Learning Hub</td><td>Principals recommend Quick Wins to their team</td><td>Leaders can push specific tools to their educators</td><td><span class="badge b-live">Live</span></td></tr>
+  <tr><td>Substack</td><td class="arrow">&rarr;</td><td>Learning Hub</td><td>New subscriber auto-creates free Hub account</td><td>Every Substack subscriber has a Hub account ready</td><td><span class="badge b-building">Building</span></td></tr>
+  <tr><td>Learning Hub</td><td class="arrow">&rarr;</td><td>Substack</td><td>Hub paid members get Substack paid access</td><td>Two-way perks (requires manual Substack grant)</td><td><span class="badge b-planned">Planned</span></td></tr>
+</table>
+
+</div>
+</body>
+</html>
