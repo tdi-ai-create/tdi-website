@@ -240,6 +240,19 @@ export async function GET(request: NextRequest) {
             </tr>
           </table>
 
+          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:20px;">
+            <tr>
+              <td style="padding:20px 24px;background:#F8FAFC;border-radius:12px;border:1px solid #E5E7EB;">
+                <p style="margin:0 0 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94A3B8;">Explore More from TDI</p>
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr><td style="padding:6px 0;"><a href="https://raehughart.substack.com" style="color:#1e2749;font-size:14px;font-weight:600;text-decoration:none;">Read the Blog</a> <span style="color:#94A3B8;font-size:13px;">-- Stories and strategies from the field</span></td></tr>
+                  <tr><td style="padding:6px 0;"><a href="https://www.facebook.com/groups/tdimovement" style="color:#1e2749;font-size:14px;font-weight:600;text-decoration:none;">Join the Community</a> <span style="color:#94A3B8;font-size:13px;">-- 100K+ educators sharing what works</span></td></tr>
+                  <tr><td style="padding:6px 0;"><a href="https://www.teachersdeserveit.com/hub/moment" style="color:#1e2749;font-size:14px;font-weight:600;text-decoration:none;">I Need a Moment</a> <span style="color:#94A3B8;font-size:13px;">-- A reset tool for the hard days</span></td></tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+
           <hr style="border:none;border-top:1px solid #E5E7EB;margin:32px 0 16px;" />
           <p style="font-size:12px;color:#9CA3AF;margin:0;text-align:center;">
             Sent by the Teachers Deserve It Team as part of your partnership with ${p.org_name || p.contact_name || 'your school'}.
