@@ -140,6 +140,7 @@ interface EnrichedCreator {
   published_date: string | null;
   // Archive and post-launch fields
   status: 'active' | 'archived';
+  lifecycle_state: 'active' | 'paused' | null;
   post_launch_notes: string | null;
   previous_project_id: string | null;
   progress?: {
@@ -2666,14 +2667,14 @@ export default function CreatorStudioPage() {
                               <div
                                 className="h-full rounded-full transition-all"
                                 style={{
-                                  width: `${creator.progress}%`,
-                                  background: creator.progress >= 90 ? '#F59E0B' : creator.progress >= 60 ? '#1e2749' : '#6B7280',
+                                  width: `${creator.progressPercentage}%`,
+                                  background: creator.progressPercentage >= 90 ? '#F59E0B' : creator.progressPercentage >= 60 ? '#1e2749' : '#6B7280',
                                 }}
                               />
                             </div>
-                            <span className="text-xs font-medium" style={{ color: creator.progress >= 90 ? '#F59E0B' : '#6B7280' }}>
-                              {creator.progress >= 90 && <Check className="w-3 h-3 inline mr-0.5" />}
-                              {creator.progress}%
+                            <span className="text-xs font-medium" style={{ color: creator.progressPercentage >= 90 ? '#F59E0B' : '#6B7280' }}>
+                              {creator.progressPercentage >= 90 && <Check className="w-3 h-3 inline mr-0.5" />}
+                              {creator.progressPercentage}%
                             </span>
                           </div>
                         </Link>
