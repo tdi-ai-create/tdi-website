@@ -39,17 +39,19 @@ import { PrioritizeThis } from '@/app/paragametools/components/PrioritizeThis';
 import { EnergyBudget } from '@/app/paragametools/components/EnergyBudget';
 import { Gamepad2, Users, Timer, Target } from 'lucide-react';
 
+type Bilingual = { en: string; es: string };
+
 interface PracticeGameConfig {
   component: React.ComponentType<{ onBack: () => void }>;
   id: string;
-  contentUuid: string; // stable UUID for community posts (quick_win_responses.quick_win_id)
-  title: string;
-  description: string;
-  howToPlay: string[];
-  whatYouNeed: string[];
-  bestFor: string;
+  contentUuid: string;
+  title: Bilingual;
+  description: Bilingual;
+  howToPlay: Bilingual[];
+  whatYouNeed: Bilingual[];
+  bestFor: Bilingual;
   time: string;
-  rounds: string;
+  rounds: Bilingual;
   color: string;
   format: 'solo' | 'group' | 'both';
 }
@@ -59,19 +61,22 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     component: QuestionKnockout,
     id: 'practice-question-knockout',
     contentUuid: 'a1000001-0000-0000-0000-000000000001',
-    title: 'Question Knockout',
-    description: 'You see a real classroom scenario. Your only tool? Questions. No telling, no directing, no hinting. Just questions. If you slip and tell, hit the buzzer. It is harder than you think.',
+    title: { en: 'Question Knockout', es: 'Nocaut de Preguntas' },
+    description: { en: 'You see a real classroom scenario. Your only tool? Questions. No telling, no directing, no hinting. Just questions. If you slip and tell, hit the buzzer. It is harder than you think.', es: 'Ves un escenario real del salon. Tu unica herramienta? Preguntas. Sin decir, sin dirigir, sin insinuar. Solo preguntas. Si se te escapa una orden, presiona el timbre. Es mas dificil de lo que crees.' },
     howToPlay: [
-      'Read each classroom scenario',
-      'Respond using ONLY questions -- no commands, no hints',
-      'You have 90 seconds per scenario',
-      'If you catch yourself telling, hit the buzzer',
-      'At round 5, switch roles with your partner',
+      { en: 'Read each classroom scenario', es: 'Lee cada escenario del salon' },
+      { en: 'Respond using ONLY questions', es: 'Responde usando SOLO preguntas' },
+      { en: 'You have 90 seconds per scenario', es: 'Tienes 90 segundos por escenario' },
+      { en: 'If you catch yourself telling, hit the buzzer', es: 'Si te descubres dando ordenes, presiona el timbre' },
+      { en: 'At round 5, switch roles with your partner', es: 'En la ronda 5, cambia de rol con tu companero' },
     ],
-    whatYouNeed: ['A partner (or play solo to practice internally)', 'A quiet space to think out loud'],
-    bestFor: 'Paraprofessionals, teachers, coaches -- anyone who works directly with students',
+    whatYouNeed: [
+      { en: 'A partner (or play solo to practice internally)', es: 'Un companero (o juega solo para practicar internamente)' },
+      { en: 'A quiet space to think out loud', es: 'Un espacio tranquilo para pensar en voz alta' },
+    ],
+    bestFor: { en: 'Paraprofessionals, teachers, coaches -- anyone who works directly with students', es: 'Paraprofesionales, maestros, coaches -- cualquiera que trabaje directamente con estudiantes' },
     time: '~15 min',
-    rounds: '10 rounds',
+    rounds: { en: '10 rounds', es: '10 rondas' },
     color: '#FF7847',
     format: 'both',
   },
@@ -79,19 +84,22 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     component: TellOrAsk,
     id: 'practice-tell-or-ask',
     contentUuid: 'a1000002-0000-0000-0000-000000000002',
-    title: 'Tell or Ask?',
-    description: 'You will see statements educators say every day. Some are real questions that open thinking. Others are commands disguised with a question mark. Can you spot the difference? It is trickier than it sounds.',
+    title: { en: 'Tell or Ask?', es: 'Decir o Preguntar?' },
+    description: { en: 'You will see statements educators say every day. Some are real questions that open thinking. Others are commands disguised with a question mark. Can you spot the difference? It is trickier than it sounds.', es: 'Veras frases que los educadores dicen todos los dias. Algunas son preguntas reales que abren el pensamiento. Otras son ordenes disfrazadas con un signo de interrogacion. Puedes notar la diferencia? Es mas complicado de lo que parece.' },
     howToPlay: [
-      'Read each statement an educator might say',
-      'Rate your confidence (1-5) before answering',
-      'Decide: is this a TELL (command) or an ASK (real question)?',
-      'See the reveal and learn why',
-      'Build a streak of correct answers',
+      { en: 'Read each statement an educator might say', es: 'Lee cada frase que un educador podria decir' },
+      { en: 'Rate your confidence (1-5) before answering', es: 'Califica tu confianza (1-5) antes de responder' },
+      { en: 'Decide: is this a TELL (command) or an ASK (real question)?', es: 'Decide: es DECIR (orden) o PREGUNTAR (pregunta real)?' },
+      { en: 'See the reveal and learn why', es: 'Ve la respuesta y aprende por que' },
+      { en: 'Build a streak of correct answers', es: 'Construye una racha de respuestas correctas' },
     ],
-    whatYouNeed: ['Just yourself -- this is a solo game', 'Optional: play with a partner and debate before revealing'],
-    bestFor: 'All educators -- especially powerful for paraprofessionals learning questioning techniques',
+    whatYouNeed: [
+      { en: 'Just yourself -- this is a solo game', es: 'Solo tu -- este es un juego individual' },
+      { en: 'Optional: play with a partner and debate before revealing', es: 'Opcional: juega con un companero y debatan antes de revelar' },
+    ],
+    bestFor: { en: 'All educators -- especially powerful for paraprofessionals learning questioning techniques', es: 'Todos los educadores -- especialmente poderoso para paraprofesionales aprendiendo tecnicas de cuestionamiento' },
     time: '~10 min',
-    rounds: '14 rounds',
+    rounds: { en: '14 rounds', es: '14 rondas' },
     color: '#F1C40F',
     format: 'both',
   },
@@ -99,18 +107,21 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     component: FeedbackLevelUp,
     id: 'practice-feedback-level-up',
     contentUuid: 'a1000003-0000-0000-0000-000000000003',
-    title: 'Feedback Level Up',
-    description: 'Not all feedback is created equal. You will see real examples of feedback given to students and categorize them from Level 1 (vague) to Level 4 (exceptional). Watch out for the Level 2 trap -- it catches most people.',
+    title: { en: 'Feedback Level Up', es: 'Sube de Nivel tu Retroalimentacion' },
+    description: { en: 'Not all feedback is created equal. You will see real examples of feedback given to students and categorize them from Level 1 (vague) to Level 4 (exceptional). Watch out for the Level 2 trap -- it catches most people.', es: 'No toda la retroalimentacion es igual. Veras ejemplos reales de retroalimentacion dada a estudiantes y los categorizaras del Nivel 1 (vago) al Nivel 4 (excepcional). Cuidado con la trampa del Nivel 2 -- atrapa a la mayoria.' },
     howToPlay: [
-      'Read each piece of student feedback',
-      'Categorize it: Level 1 (Vague), 2 (Partial), 3 (Complete), or 4 (Exceptional)',
-      'See the correct level and learn why',
-      'Watch for the "Level 2 trap" -- vague praise that feels specific',
+      { en: 'Read each piece of student feedback', es: 'Lee cada ejemplo de retroalimentacion' },
+      { en: 'Categorize it: Level 1 (Vague), 2 (Partial), 3 (Complete), or 4 (Exceptional)', es: 'Clasificalo: Nivel 1 (Vago), 2 (Parcial), 3 (Completo) o 4 (Excepcional)' },
+      { en: 'See the correct level and learn why', es: 'Ve el nivel correcto y aprende por que' },
+      { en: 'Watch for the "Level 2 trap" -- vague praise that feels specific', es: 'Cuidado con la "trampa del Nivel 2" -- elogios vagos que parecen especificos' },
     ],
-    whatYouNeed: ['Just yourself', 'Optional: play at a table group and debate levels before revealing'],
-    bestFor: 'Teachers and paras who give feedback to students daily',
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Optional: play at a table group and debate levels before revealing', es: 'Opcional: juega en grupo y debatan los niveles antes de revelar' },
+    ],
+    bestFor: { en: 'Teachers and paras who give feedback to students daily', es: 'Maestros y paraprofesionales que dan retroalimentacion a estudiantes diariamente' },
     time: '~12 min',
-    rounds: '12 rounds',
+    rounds: { en: '12 rounds', es: '12 rondas' },
     color: '#27AE60',
     format: 'both',
   },
@@ -118,19 +129,22 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     component: FeedbackMadlibs,
     id: 'practice-feedback-madlibs',
     contentUuid: 'a1000004-0000-0000-0000-000000000004',
-    title: 'Feedback Madlibs',
-    description: 'Learn the Notice + Name + Next Step feedback formula through play. First, you fill in blanks blindly for laughs. Then you practice the real formula with actual student scenarios. Silly first, serious second.',
+    title: { en: 'Feedback Madlibs', es: 'Retroalimentacion Loca' },
+    description: { en: 'Learn the Notice + Name + Next Step feedback formula through play. First, you fill in blanks blindly for laughs. Then you practice the real formula with actual student scenarios. Silly first, serious second.', es: 'Aprende la formula de retroalimentacion Observar + Nombrar + Siguiente Paso a traves del juego. Primero, llenas espacios en blanco a ciegas para reir. Luego practicas la formula real con escenarios de estudiantes.' },
     howToPlay: [
-      'Silly rounds: fill in blanks WITHOUT seeing the sentence (like real Mad Libs)',
-      'Reveal your silly version and laugh',
-      'Then see the real Level 3 feedback version',
-      'Real rounds: practice writing Notice + Name + Next Step feedback',
-      'Compare your version to the expert example',
+      { en: 'Silly rounds: fill in blanks WITHOUT seeing the sentence', es: 'Rondas divertidas: llena los espacios SIN ver la oracion' },
+      { en: 'Reveal your silly version and laugh', es: 'Revela tu version divertida y rie' },
+      { en: 'Then see the real Level 3 feedback version', es: 'Luego ve la version real de retroalimentacion Nivel 3' },
+      { en: 'Real rounds: practice writing Notice + Name + Next Step feedback', es: 'Rondas reales: practica escribir retroalimentacion Observar + Nombrar + Siguiente Paso' },
+      { en: 'Compare your version to the expert example', es: 'Compara tu version con el ejemplo experto' },
     ],
-    whatYouNeed: ['Just yourself', 'Best played in a group for the silly rounds -- more laughs'],
-    bestFor: 'Educators learning the feedback formula for the first time, or anyone who wants a refresher',
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Best played in a group for the silly rounds -- more laughs', es: 'Mejor en grupo para las rondas divertidas -- mas risas' },
+    ],
+    bestFor: { en: 'Educators learning the feedback formula for the first time, or anyone who wants a refresher', es: 'Educadores aprendiendo la formula de retroalimentacion por primera vez, o cualquiera que quiera repasarla' },
     time: '~10 min',
-    rounds: '6 rounds (3 silly + 3 real)',
+    rounds: { en: '6 rounds (3 silly + 3 real)', es: '6 rondas (3 divertidas + 3 reales)' },
     color: '#9333EA',
     format: 'both',
   },
@@ -138,20 +152,23 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     component: FeedbackMakeover,
     id: 'practice-feedback-makeover',
     contentUuid: 'a1000005-0000-0000-0000-000000000005',
-    title: 'Feedback Makeover',
-    description: 'You get terrible feedback and the real context behind it. Your job: transform it into Level 3 feedback using Notice + Name + Next Step. You are on the clock -- 120 seconds per makeover.',
+    title: { en: 'Feedback Makeover', es: 'Transformacion de Retroalimentacion' },
+    description: { en: 'You get terrible feedback and the real context behind it. Your job: transform it into Level 3 feedback using Notice + Name + Next Step. You are on the clock -- 120 seconds per makeover.', es: 'Recibes retroalimentacion terrible y el contexto real detras de ella. Tu trabajo: transformarla en retroalimentacion Nivel 3 usando Observar + Nombrar + Siguiente Paso. Tienes 120 segundos por transformacion.' },
     howToPlay: [
-      'Read the bad feedback an educator gave',
-      'Read the context of what the student actually did',
-      'Start the timer -- you have 120 seconds',
-      'Write your Level 3 makeover (Notice + Name + Next Step)',
-      'Use the hint if you get stuck',
-      'View your before/after transformation',
+      { en: 'Read the bad feedback an educator gave', es: 'Lee la mala retroalimentacion que dio un educador' },
+      { en: 'Read the context of what the student actually did', es: 'Lee el contexto de lo que el estudiante realmente hizo' },
+      { en: 'Start the timer -- you have 120 seconds', es: 'Inicia el temporizador -- tienes 120 segundos' },
+      { en: 'Write your Level 3 makeover (Notice + Name + Next Step)', es: 'Escribe tu transformacion Nivel 3 (Observar + Nombrar + Siguiente Paso)' },
+      { en: 'Use the hint if you get stuck', es: 'Usa la pista si te atascas' },
+      { en: 'View your before/after transformation', es: 'Ve tu transformacion antes/despues' },
     ],
-    whatYouNeed: ['A device to type on', 'Best solo, but can be done as a table challenge'],
-    bestFor: 'Educators who know the feedback formula and want to practice applying it under pressure',
+    whatYouNeed: [
+      { en: 'A device to type on', es: 'Un dispositivo para escribir' },
+      { en: 'Best solo, but can be done as a table challenge', es: 'Mejor individual, pero puede hacerse como desafio en mesa' },
+    ],
+    bestFor: { en: 'Educators who know the feedback formula and want to practice applying it under pressure', es: 'Educadores que conocen la formula y quieren practicar aplicandola bajo presion' },
     time: '~15 min',
-    rounds: '6 rounds',
+    rounds: { en: '6 rounds', es: '6 rondas' },
     color: '#E74C3C',
     format: 'both',
   },
@@ -159,18 +176,21 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     component: WhatsYourMove,
     id: 'practice-whats-your-move',
     contentUuid: 'a1000006-0000-0000-0000-000000000006',
-    title: "What's Your Move?",
-    description: 'Real classroom scenarios with three response options. Only one is the best move. Choose wisely, get instant feedback on why it works (or why it does not), and sharpen your instincts for the moments that matter.',
+    title: { en: "What's Your Move?", es: 'Cual Es Tu Movimiento?' },
+    description: { en: 'Real classroom scenarios with three response options. Only one is the best move. Choose wisely, get instant feedback on why it works (or why it does not), and sharpen your instincts for the moments that matter.', es: 'Escenarios reales del salon con tres opciones de respuesta. Solo una es el mejor movimiento. Elige sabiamente, recibe retroalimentacion instantanea sobre por que funciona (o no), y afila tus instintos para los momentos que importan.' },
     howToPlay: [
-      'Read a real classroom scenario',
-      'Choose the best response from three options',
-      'See instant feedback on your choice',
-      'Learn the reasoning behind the best move',
+      { en: 'Read a real classroom scenario', es: 'Lee un escenario real del salon' },
+      { en: 'Choose the best response from three options', es: 'Elige la mejor respuesta de tres opciones' },
+      { en: 'See instant feedback on your choice', es: 'Ve retroalimentacion instantanea sobre tu eleccion' },
+      { en: 'Learn the reasoning behind the best move', es: 'Aprende el razonamiento detras del mejor movimiento' },
     ],
-    whatYouNeed: ['Just yourself', 'Great for table discussions in PD sessions'],
-    bestFor: 'Paraprofessionals and new teachers building classroom instincts',
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great for table discussions in PD sessions', es: 'Excelente para discusiones en mesa durante sesiones de PD' },
+    ],
+    bestFor: { en: 'Paraprofessionals and new teachers building classroom instincts', es: 'Paraprofesionales y maestros nuevos construyendo instintos del salon' },
     time: '~10 min',
-    rounds: '6 scenarios',
+    rounds: { en: '6 scenarios', es: '6 escenarios' },
     color: '#22b8bd',
     format: 'both',
   },
@@ -178,18 +198,21 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     component: ClassroomShuffle,
     id: 'practice-classroom-shuffle',
     contentUuid: 'a1000007-0000-0000-0000-000000000007',
-    title: 'Classroom Scenario Shuffle',
-    description: 'Realistic classroom management scenarios drawn from real schools. Read the situation, choose your response, and learn why the best move works. Covers everything from student behavior to parent communication to colleague dynamics.',
+    title: { en: 'Classroom Scenario Shuffle', es: 'Escenarios del Salon' },
+    description: { en: 'Realistic classroom management scenarios drawn from real schools. Read the situation, choose your response, and learn why the best move works. Covers everything from student behavior to parent communication to colleague dynamics.', es: 'Escenarios realistas de manejo del salon tomados de escuelas reales. Lee la situacion, elige tu respuesta, y aprende por que funciona el mejor movimiento. Cubre desde comportamiento estudiantil hasta comunicacion con padres y dinamicas con colegas.' },
     howToPlay: [
-      'Read the classroom scenario',
-      'Choose the best response from three options',
-      'See whether you were right and learn why',
-      'Track your score across all scenarios',
+      { en: 'Read the classroom scenario', es: 'Lee el escenario del salon' },
+      { en: 'Choose the best response from three options', es: 'Elige la mejor respuesta de tres opciones' },
+      { en: 'See whether you were right and learn why', es: 'Ve si acertaste y aprende por que' },
+      { en: 'Track your score across all scenarios', es: 'Sigue tu puntuacion en todos los escenarios' },
     ],
-    whatYouNeed: ['Just yourself', 'Powerful as a group discussion tool in PD'],
-    bestFor: 'All educators -- scenarios range from K-2 to high school, teacher to admin',
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Powerful as a group discussion tool in PD', es: 'Poderoso como herramienta de discusion grupal en PD' },
+    ],
+    bestFor: { en: 'All educators -- scenarios range from K-2 to high school, teacher to admin', es: 'Todos los educadores -- escenarios desde K-2 hasta preparatoria, maestros hasta administradores' },
     time: '~12 min',
-    rounds: '8 scenarios',
+    rounds: { en: '8 scenarios', es: '8 escenarios' },
     color: '#3498DB',
     format: 'both',
   },
@@ -197,18 +220,21 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     component: PrioritizeThis,
     id: 'practice-prioritize-this',
     contentUuid: 'a1000008-0000-0000-0000-000000000008',
-    title: 'Prioritize This',
-    description: 'You are given a real school situation and four tasks that all need to happen. Rank them from most to least urgent. Then see how experienced educators would prioritize and learn why order matters.',
+    title: { en: 'Prioritize This', es: 'Prioriza Esto' },
+    description: { en: 'You are given a real school situation and four tasks that all need to happen. Rank them from most to least urgent. Then see how experienced educators would prioritize and learn why order matters.', es: 'Te dan una situacion real de escuela y cuatro tareas que todas necesitan hacerse. Ordenalas de mas a menos urgente. Luego ve como educadores experimentados priorizarian y aprende por que el orden importa.' },
     howToPlay: [
-      'Read the situation',
-      'Use the up/down arrows to rank 4 tasks by priority',
-      'Lock in your ranking',
-      'See the expert ranking with explanations for each position',
+      { en: 'Read the situation', es: 'Lee la situacion' },
+      { en: 'Use the up/down arrows to rank 4 tasks by priority', es: 'Usa las flechas arriba/abajo para ordenar 4 tareas por prioridad' },
+      { en: 'Lock in your ranking', es: 'Confirma tu orden' },
+      { en: 'See the expert ranking with explanations for each position', es: 'Ve el orden experto con explicaciones para cada posicion' },
     ],
-    whatYouNeed: ['Just yourself', 'Great debate starter for team meetings'],
-    bestFor: 'Teachers, paras, and leaders practicing triage and decision-making',
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great debate starter for team meetings', es: 'Excelente para iniciar debates en reuniones de equipo' },
+    ],
+    bestFor: { en: 'Teachers, paras, and leaders practicing triage and decision-making', es: 'Maestros, paraprofesionales y lideres practicando triaje y toma de decisiones' },
     time: '~10 min',
-    rounds: '3 rounds',
+    rounds: { en: '3 rounds', es: '3 rondas' },
     color: '#9333EA',
     format: 'both',
   },
@@ -216,19 +242,22 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     component: EnergyBudget,
     id: 'practice-energy-budget',
     contentUuid: 'a1000009-0000-0000-0000-000000000009',
-    title: 'Energy Budget',
-    description: 'You have 100 energy points to spend across your day. How do you allocate them? Distribute your energy across competing demands, then see how experienced educators would budget theirs. The gaps reveal your growth areas.',
+    title: { en: 'Energy Budget', es: 'Presupuesto de Energia' },
+    description: { en: 'You have 100 energy points to spend across your day. How do you allocate them? Distribute your energy across competing demands, then see how experienced educators would budget theirs. The gaps reveal your growth areas.', es: 'Tienes 100 puntos de energia para gastar en tu dia. Como los distribuyes? Reparte tu energia entre demandas competidoras, luego ve como educadores experimentados distribuirian la suya. Las diferencias revelan tus areas de crecimiento.' },
     howToPlay: [
-      'Read the day scenario',
-      'Distribute 100 energy points across the tasks using + and - buttons',
-      'Use all 100 points (no leftovers)',
-      'Lock in your budget',
-      'Compare your allocation to the expert recommendation',
+      { en: 'Read the day scenario', es: 'Lee el escenario del dia' },
+      { en: 'Distribute 100 energy points across the tasks using + and - buttons', es: 'Distribuye 100 puntos de energia entre las tareas usando los botones + y -' },
+      { en: 'Use all 100 points (no leftovers)', es: 'Usa todos los 100 puntos (sin sobrantes)' },
+      { en: 'Lock in your budget', es: 'Confirma tu presupuesto' },
+      { en: 'Compare your allocation to the expert recommendation', es: 'Compara tu distribucion con la recomendacion experta' },
     ],
-    whatYouNeed: ['Just yourself', 'Helpful for self-care and sustainability conversations in PD'],
-    bestFor: 'All educators -- especially those struggling with burnout or overcommitment',
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Helpful for self-care and sustainability conversations in PD', es: 'Util para conversaciones de autocuidado y sostenibilidad en PD' },
+    ],
+    bestFor: { en: 'All educators -- especially those struggling with burnout or overcommitment', es: 'Todos los educadores -- especialmente quienes luchan con el agotamiento o el exceso de compromisos' },
     time: '~10 min',
-    rounds: '3 rounds',
+    rounds: { en: '3 rounds', es: '3 rondas' },
     color: '#22b8bd',
     format: 'both',
   },
@@ -465,6 +494,8 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const { slug } = resolvedParams;
   const router = useRouter();
   const { user } = useHub();
+  const { language, t } = useLanguage();
+  const lang = language === 'es' ? 'es' : 'en';
 
   // ─── Practice Game Route ─────────────────────────────────────────────────
   const gameConfig = PRACTICE_GAME_MAP[slug];
@@ -484,7 +515,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
     // Game landing page
     const FormatIcon = gameConfig.format === 'solo' ? Target : gameConfig.format === 'group' ? Users : Users;
-    const formatLabel = gameConfig.format === 'solo' ? 'Solo' : gameConfig.format === 'group' ? 'Group activity' : 'Solo or group';
+    const formatLabel = gameConfig.format === 'solo' ? 'Solo' : gameConfig.format === 'group' ? (lang === 'es' ? 'Actividad grupal' : 'Group activity') : (lang === 'es' ? 'Solo o en grupo' : 'Solo or group');
 
     return (
       <div className="min-h-screen" style={{ backgroundColor: '#F5F7FA', fontFamily: "'DM Sans', sans-serif" }}>
@@ -498,7 +529,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
             onMouseLeave={(e) => (e.currentTarget.style.color = '#6B7280')}
           >
             <ArrowLeft size={16} />
-            Games
+            {lang === 'es' ? 'Juegos' : 'Games'}
           </Link>
 
           {/* Hero */}
@@ -514,7 +545,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', marginBottom: 8,
                   }}
                 >
-                  PRACTICE GAME
+                  {lang === 'es' ? 'JUEGO DE PRACTICA' : 'PRACTICE GAME'}
                 </p>
                 <h1
                   className="font-bold mb-3"
@@ -523,10 +554,10 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     fontSize: 'clamp(26px, 3.5vw, 34px)', color: 'white', lineHeight: '1.2',
                   }}
                 >
-                  {gameConfig.title}
+                  {gameConfig.title[lang]}
                 </h1>
                 <p className="mb-5" style={{ fontSize: '15px', color: 'rgba(255,255,255,0.65)', lineHeight: '1.6' }}>
-                  {gameConfig.description}
+                  {gameConfig.description[lang]}
                 </p>
                 <div className="flex flex-wrap items-center gap-3">
                   <div className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}>
@@ -535,7 +566,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   </div>
                   <div className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}>
                     <Gamepad2 size={12} />
-                    {gameConfig.rounds}
+                    {gameConfig.rounds[lang]}
                   </div>
                   <div className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}>
                     <FormatIcon size={12} />
@@ -552,7 +583,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   style={{ backgroundColor: gameConfig.color, color: 'white' }}
                 >
                   <Play size={22} />
-                  Play Now
+                  {lang === 'es' ? 'Jugar Ahora' : 'Play Now'}
                 </button>
               </div>
             </div>
@@ -567,7 +598,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               {/* How to Play */}
               <div className="bg-white p-6 md:p-8 mb-6" style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}>
                 <h3 className="font-semibold mb-4" style={{ fontSize: '16px', color: '#1e2749' }}>
-                  How to Play
+                  {lang === 'es' ? 'Como Jugar' : 'How to Play'}
                 </h3>
                 <div className="space-y-3">
                   {gameConfig.howToPlay.map((step, i) => (
@@ -578,7 +609,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                       >
                         {i + 1}
                       </div>
-                      <p className="text-sm" style={{ color: '#374151', lineHeight: 1.6 }}>{step}</p>
+                      <p className="text-sm" style={{ color: '#374151', lineHeight: 1.6 }}>{step[lang]}</p>
                     </div>
                   ))}
                 </div>
@@ -587,19 +618,19 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               {/* What You Need */}
               <div className="bg-white p-6 md:p-8 mb-6" style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}>
                 <h3 className="font-semibold mb-3" style={{ fontSize: '16px', color: '#1e2749' }}>
-                  What You Need
+                  {lang === 'es' ? 'Lo Que Necesitas' : 'What You Need'}
                 </h3>
                 <ul className="space-y-2">
                   {gameConfig.whatYouNeed.map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm" style={{ color: '#374151' }}>
                       <span style={{ color: gameConfig.color }}>--</span>
-                      {item}
+                      {item[lang]}
                     </li>
                   ))}
                 </ul>
                 <div className="mt-4 px-4 py-3 rounded-xl" style={{ backgroundColor: '#FFF8E7' }}>
                   <p className="text-sm" style={{ color: '#92400E' }}>
-                    <strong>Best for:</strong> {gameConfig.bestFor}
+                    <strong>{lang === 'es' ? 'Ideal para:' : 'Best for:'}</strong> {gameConfig.bestFor[lang]}
                   </p>
                 </div>
               </div>
@@ -625,14 +656,14 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     style={{ backgroundColor: gameConfig.color, color: 'white' }}
                   >
                     <Play size={18} />
-                    Play Now
+                    {lang === 'es' ? 'Jugar Ahora' : 'Play Now'}
                   </button>
                   <div className="mt-4 space-y-2">
                     <div className="flex items-center gap-2 text-xs" style={{ color: '#9CA3AF' }}>
-                      <Timer size={14} /> {gameConfig.time} to play
+                      <Timer size={14} /> {gameConfig.time} {lang === 'es' ? 'para jugar' : 'to play'}
                     </div>
                     <div className="flex items-center gap-2 text-xs" style={{ color: '#9CA3AF' }}>
-                      <Gamepad2 size={14} /> {gameConfig.rounds}
+                      <Gamepad2 size={14} /> {gameConfig.rounds[lang]}
                     </div>
                     <div className="flex items-center gap-2 text-xs" style={{ color: '#9CA3AF' }}>
                       <FormatIcon size={14} /> {formatLabel}
@@ -646,7 +677,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     className="mb-3"
                     style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.05em', textTransform: 'uppercase' as const, fontSize: '11px', fontWeight: 600 }}
                   >
-                    What educators are saying
+                    {lang === 'es' ? 'Lo que dicen los educadores' : 'What educators are saying'}
                   </p>
                   <div className="space-y-4">
                     {getGameTestimonials(slug).map((testimonial, i) => (
@@ -674,7 +705,6 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const [isCompleted, setIsCompleted] = useState(false);
   const [showCapacityFeedback, setShowCapacityFeedback] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
-  const { language, t } = useLanguage();
   const { tUI } = useTranslation();
 
   // For "do" type - action step checkboxes
