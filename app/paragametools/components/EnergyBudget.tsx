@@ -9,6 +9,7 @@ import { GameWrapper, IntroScreen } from './GameWrapper';
 import { ConfettiBurst } from './ConfettiBurst';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
 import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
+import { CommunityNudge } from './CommunityNudge';
 
 type Screen = 'intro' | 'allocate' | 'reveal' | 'results';
 
@@ -171,6 +172,7 @@ export function EnergyBudget({ onBack }: EnergyBudgetProps) {
               {lang === 'es' ? 'Volver' : 'Back to Quick Wins'}
             </button>
           </div>
+          <CommunityNudge gameSlug="energy-budget" score={totalScore} totalRounds={roundsWithIds.length} />
         </div>
       </GameWrapper>
     );

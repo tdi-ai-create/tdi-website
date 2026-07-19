@@ -289,6 +289,9 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
           color="green"
           onBack={onBack}
           onPlayAgain={handleStart}
+          gameSlug="feedback-level-up"
+          score={correctCount}
+          totalRounds={feedbacks.length}
           extraContent={
             <div
               className="w-full max-w-lg rounded-xl p-5 mb-4 text-center"

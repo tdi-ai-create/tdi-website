@@ -9,6 +9,7 @@ import { GameWrapper, IntroScreen, DoneScreen } from './GameWrapper';
 import { ConfettiBurst } from './ConfettiBurst';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
 import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
+import { CommunityNudge } from './CommunityNudge';
 import { GameSettingsPanel } from './GameSettingsPanel';
 import { type GameSettings, DEFAULT_SETTINGS, filterBySettings } from '../data/gameSettings';
 
@@ -168,6 +169,7 @@ export function ClassroomShuffle({ onBack }: ClassroomShuffleProps) {
               {language === 'es' ? 'Volver' : 'Back to Quick Wins'}
             </button>
           </div>
+          <CommunityNudge gameSlug="classroom-shuffle" score={score} totalRounds={scenariosWithIds.length} />
         </div>
       </GameWrapper>
     );

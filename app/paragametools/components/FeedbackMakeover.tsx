@@ -313,6 +313,7 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
           color="red"
           onBack={onBack}
           onPlayAgain={handleStart}
+          gameSlug="feedback-makeover"
           extraContent={
             <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
               {stepLabels.map((step, i) => (

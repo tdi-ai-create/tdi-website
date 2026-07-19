@@ -9,6 +9,7 @@ import { GameWrapper } from './GameWrapper';
 import { ConfettiBurst } from './ConfettiBurst';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
 import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
+import { CommunityNudge } from './CommunityNudge';
 
 // ── Toggle: set to false to hide survey for general community use ──
 const SURVEY_ACTIVE = true;
@@ -409,6 +410,7 @@ function ResultsScreen({
         <ArrowLeft size={18} />
         {language === 'es' ? 'Volver a Juegos' : 'Back to Games'}
       </button>
+      <CommunityNudge gameSlug="whats-your-move" score={score} totalRounds={6} />
     </div>
   );
 }

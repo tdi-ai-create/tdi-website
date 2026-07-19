@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { Smile, ChevronRight, Sparkles, Award, RotateCcw, Volume2, ArrowLeft } from 'lucide-react';
+import { CommunityNudge } from './CommunityNudge';
 import { GameWrapper } from './GameWrapper';
 import { ConfettiBurst } from './ConfettiBurst';
 import { MADLIBS_SCENARIOS, MADLIBS_SILLY_ROUNDS, SILLY_ROUND_PROMPTS } from '../data/madlibsData';
@@ -571,6 +572,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
               {t.backToGames[language]}
             </button>
           </div>
+          <CommunityNudge gameSlug="feedback-madlibs" />
         </div>
       )}
     </GameWrapper>

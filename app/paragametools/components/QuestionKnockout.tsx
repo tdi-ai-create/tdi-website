@@ -211,6 +211,7 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
           color="orange"
           onBack={onBack}
           onPlayAgain={handleStart}
+          gameSlug="question-knockout"
           extraContent={
             <>
               {switches > 0 && (

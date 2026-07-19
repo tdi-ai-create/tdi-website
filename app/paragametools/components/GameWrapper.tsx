@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowLeft, RotateCcw, Target, Zap, TrendingUp, Smile, Wrench, Crosshair, Award, Check, X, Shuffle, ListOrdered, Battery } from 'lucide-react';
+import { CommunityNudge } from './CommunityNudge';
 import { COLORS, type GameId } from '../data/gameConfig';
 import { ConfettiBurst } from './ConfettiBurst';
 import { useLanguage } from '../context/LanguageContext';
@@ -147,6 +148,9 @@ interface DoneScreenProps {
   onBack: () => void;
   onPlayAgain?: () => void;
   extraContent?: React.ReactNode;
+  gameSlug?: string;
+  score?: number;
+  totalRounds?: number;
 }
 
 export function DoneScreen({
@@ -158,6 +162,9 @@ export function DoneScreen({
   onBack,
   onPlayAgain,
   extraContent,
+  gameSlug,
+  score,
+  totalRounds,
 }: DoneScreenProps) {
   const colorConfig = COLORS[color];
   const confettiColors = [colorConfig.accent, '#FFD700', '#FFFFFF'];
@@ -214,6 +221,10 @@ export function DoneScreen({
           {t.backToGames[language]}
         </button>
       </div>
+
+      {gameSlug && (
+        <CommunityNudge gameSlug={gameSlug} score={score} totalRounds={totalRounds} />
+      )}
     </div>
   );
 }

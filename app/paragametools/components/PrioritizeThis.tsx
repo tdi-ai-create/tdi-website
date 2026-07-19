@@ -9,6 +9,7 @@ import { GameWrapper, IntroScreen } from './GameWrapper';
 import { ConfettiBurst } from './ConfettiBurst';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
 import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
+import { CommunityNudge } from './CommunityNudge';
 
 type Screen = 'intro' | 'rank' | 'reveal' | 'results';
 
@@ -168,6 +169,7 @@ export function PrioritizeThis({ onBack }: PrioritizeThisProps) {
               {lang === 'es' ? 'Volver' : 'Back to Quick Wins'}
             </button>
           </div>
+          <CommunityNudge gameSlug="prioritize-this" score={score} totalRounds={roundsWithIds.length * 4} />
         </div>
       </GameWrapper>
     );

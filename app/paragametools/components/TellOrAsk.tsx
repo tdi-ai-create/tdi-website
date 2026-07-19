@@ -301,6 +301,9 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
           color="yellow"
           onBack={onBack}
           onPlayAgain={handleStart}
+          gameSlug="tell-or-ask"
+          score={correctCount}
+          totalRounds={activeStatements.length}
         />
       )}
     </GameWrapper>
