@@ -71,6 +71,16 @@ export async function POST(request: NextRequest) {
         }, { onConflict: 'email' });
 
       if (!membershipError) {
+        // Link Hub profile to partnership (so Leadership Dashboard can group by partner)
+        await hubSupabase
+          .from('hub_profiles')
+          .update({
+            partnership_id: partnershipId,
+            first_name: member.first_name || undefined,
+            last_name: member.last_name || undefined,
+          })
+          .eq('email', member.email.toLowerCase());
+
         // Mark as enrolled in portal
         await portalSupabase
           .from('staff_members')

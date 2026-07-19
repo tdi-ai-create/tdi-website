@@ -17,11 +17,11 @@ type Section = 'leadership' | 'sales' | 'cmo' | 'creators' | 'funding' | 'operat
 
 // ── Leadership: educator engagement per school/district ──
 async function getLeadershipData(hub: ReturnType<typeof createClient>) {
-  // Get all profiles with school info
+  // Get all profiles with school info OR partnership link
   const { data: profiles } = await hub
     .from('hub_profiles')
-    .select('id, school_name, district, state, role, created_at')
-    .not('school_name', 'is', null)
+    .select('id, school_name, district, state, role, created_at, partnership_id')
+    .or('school_name.not.is.null,partnership_id.not.is.null')
     .limit(10000);
 
   // Get activity counts per user (last 30 days)
@@ -103,7 +103,37 @@ async function getLeadershipData(hub: ReturnType<typeof createClient>) {
     educators: { id: string; role: string; logins: number; toolsViewed: number; activeDays: number; pdHours: number; vibeScore: number | null; completions: number; tier: string; source: string }[];
   }> = {};
 
-  (profiles || []).forEach((p: { id: string; school_name: string | null; district: string | null; state: string | null; role: string | null }) => {
+  // Also group by partnership_id for direct partnership lookup
+  const partnershipMap: Record<string, typeof schoolMap[string] & { partnershipId: string }> = {};
+
+  (profiles || []).forEach((p: { id: string; school_name: string | null; district: string | null; state: string | null; role: string | null; partnership_id: string | null }) => {
+    // Group by partnership_id when available
+    if (p.partnership_id) {
+      if (!partnershipMap[p.partnership_id]) {
+        partnershipMap[p.partnership_id] = {
+          name: p.school_name || p.district || 'Unknown',
+          district: p.district || '',
+          state: p.state || '',
+          educators: [],
+          partnershipId: p.partnership_id,
+        };
+      }
+      const ua = userActivity[p.id];
+      const membership = userMembership[p.id];
+      partnershipMap[p.partnership_id].educators.push({
+        id: p.id,
+        role: p.role || 'unknown',
+        logins: ua?.logins || 0,
+        toolsViewed: ua?.toolsViewed || 0,
+        activeDays: ua?.days.size || 0,
+        pdHours: userPdHours[p.id] || 0,
+        vibeScore: userVibeScore[p.id] ?? null,
+        completions: userCompletions[p.id] || 0,
+        tier: membership?.tier || 'free',
+        source: membership?.source || 'organic',
+      });
+    }
+
     if (!p.school_name) return;
     const key = p.school_name;
     if (!schoolMap[key]) schoolMap[key] = { name: p.school_name, district: p.district || '', state: p.state || '', educators: [] };
@@ -153,7 +183,34 @@ async function getLeadershipData(hub: ReturnType<typeof createClient>) {
     .sort((a, b) => b.totalEducators - a.totalEducators)
     .slice(0, 50);
 
-  return { schools };
+  // Build partnership summaries (same shape as schools but keyed by partnership_id)
+  const partnerships = Object.values(partnershipMap)
+    .map(partner => {
+      const total = partner.educators.length;
+      const active = partner.educators.filter(e => e.activeDays > 0).length;
+      const vibeScores = partner.educators.filter(e => e.vibeScore !== null).map(e => e.vibeScore as number);
+      const avgVibe = vibeScores.length > 0 ? +(vibeScores.reduce((s, v) => s + v, 0) / vibeScores.length).toFixed(1) : null;
+      const totalPdHours = partner.educators.reduce((s, e) => s + e.pdHours, 0);
+      const totalToolsViewed = partner.educators.reduce((s, e) => s + e.toolsViewed, 0);
+      const totalCompletions = partner.educators.reduce((s, e) => s + e.completions, 0);
+
+      return {
+        partnershipId: partner.partnershipId,
+        name: partner.name,
+        district: partner.district,
+        state: partner.state,
+        totalEducators: total,
+        activeEducators: active,
+        activeRate: total > 0 ? +((active / total) * 100).toFixed(0) : 0,
+        avgVibeScore: avgVibe,
+        totalPdHours,
+        totalToolsViewed,
+        totalCompletions,
+      };
+    })
+    .sort((a, b) => b.totalEducators - a.totalEducators);
+
+  return { schools, partnerships };
 }
 
 // ── Sales: warm leads from Hub signups ──
