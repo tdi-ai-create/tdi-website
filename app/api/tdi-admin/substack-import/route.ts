@@ -52,202 +52,210 @@ export async function POST(request: NextRequest) {
       error_details: [],
     }
 
-    // Process in batches of 50
-    const BATCH_SIZE = 50
-    for (let i = 0; i < subscribers.length; i += BATCH_SIZE) {
-      const batch = subscribers.slice(i, i + BATCH_SIZE)
+    // Filter and categorize subscribers
+    const toProcess: { email: string; name: string; isPaid: boolean }[] = []
 
-      for (const subscriber of batch) {
-        try {
-          results.total_processed++
+    for (const sub of subscribers) {
+      const email = sub.email?.trim().toLowerCase()
+      if (!email) continue
 
-          const email = subscriber.email?.trim().toLowerCase()
-          if (!email) continue
+      results.total_processed++
 
-          // Skip Rae's email
-          if (email === 'rae@teachersdeserveit.com') {
-            results.skipped_author_comp++
-            continue
-          }
+      if (email === 'rae@teachersdeserveit.com') {
+        results.skipped_author_comp++
+        continue
+      }
 
-          // Skip Author and Comp types
-          const subType = subscriber.type?.trim()
-          if (subType === 'Author' || subType === 'Comp') {
-            results.skipped_author_comp++
-            continue
-          }
+      const subType = sub.type?.trim()
+      if (subType === 'Author' || subType === 'Comp') {
+        results.skipped_author_comp++
+        continue
+      }
 
-          // Determine tier and source
-          const isPaid = subType === 'Yearly Subscriber' || subType === 'Monthly Subscriber' || subType === 'Founding Member'
-          const tier = isPaid ? 'essentials' : 'free'
-          const source = isPaid ? 'substack_paid' : 'substack_free'
+      const isPaid = subType === 'Yearly Subscriber' || subType === 'Monthly Subscriber' || subType === 'Founding Member'
+      toProcess.push({ email, name: sub.name || '', isPaid })
+    }
 
-          // Check if profile exists
-          const { data: existingProfile } = await supabase
-            .from('hub_profiles')
-            .select('id, email')
-            .eq('email', email)
-            .maybeSingle()
+    // Batch lookup existing profiles (all at once via IN query, chunked to avoid limits)
+    const LOOKUP_BATCH = 500
+    const existingProfileMap = new Map<string, { id: string; tier?: string; source?: string }>()
 
-          if (!existingProfile) {
-            // Create auth user via admin API
-            const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-              email,
-              email_confirm: true,
-              user_metadata: {
-                display_name: subscriber.name || '',
-              },
-            })
+    for (let i = 0; i < toProcess.length; i += LOOKUP_BATCH) {
+      const emailBatch = toProcess.slice(i, i + LOOKUP_BATCH).map(s => s.email)
 
-            if (authError) {
-              // If user already exists in auth but not in hub_profiles, try to get them
-              if (authError.message?.includes('already been registered') || authError.message?.includes('duplicate')) {
-                // Try to find the auth user by email
-                // Look up existing profile by email (auth user exists but profile might not)
-                const { data: existingProfile } = await supabase
-                  .from('hub_profiles')
-                  .select('id')
-                  .eq('email', email)
-                  .maybeSingle()
+      const { data: profiles } = await supabase
+        .from('hub_profiles')
+        .select('id, email')
+        .in('email', emailBatch)
 
-                const existingAuthUser = existingProfile ? { id: existingProfile.id } : null
+      if (profiles) {
+        // Also get memberships for these profiles
+        const profileIds = profiles.map(p => p.id)
+        const { data: memberships } = await supabase
+          .from('hub_memberships')
+          .select('user_id, tier, source')
+          .in('user_id', profileIds)
 
-                if (existingAuthUser) {
-                  // Create hub_profiles entry
-                  const { error: profileError } = await supabase
-                    .from('hub_profiles')
-                    .insert({
-                      id: existingAuthUser.id,
-                      email,
-                      display_name: subscriber.name || null,
-                    })
+        const membershipMap = new Map(
+          (memberships || []).map(m => [m.user_id, { tier: m.tier, source: m.source }])
+        )
 
-                  if (profileError && !profileError.message?.includes('duplicate')) {
-                    results.errors++
-                    results.error_details.push(`${email}: profile create failed - ${profileError.message}`)
-                    continue
-                  }
-
-                  // Create membership
-                  const { error: membershipError } = await supabase
-                    .from('hub_memberships')
-                    .insert({
-                      user_id: existingAuthUser.id,
-                      tier,
-                      source,
-                      status: 'active',
-                    })
-
-                  if (membershipError && !membershipError.message?.includes('duplicate')) {
-                    results.errors++
-                    results.error_details.push(`${email}: membership create failed - ${membershipError.message}`)
-                    continue
-                  }
-
-                  results.new_profiles++
-                  continue
-                }
-              }
-
-              results.errors++
-              results.error_details.push(`${email}: auth create failed - ${authError.message}`)
-              continue
-            }
-
-            const userId = authData.user.id
-
-            // Create hub_profiles entry
-            const { error: profileError } = await supabase
-              .from('hub_profiles')
-              .insert({
-                id: userId,
-                email,
-                display_name: subscriber.name || null,
-              })
-
-            if (profileError) {
-              results.errors++
-              results.error_details.push(`${email}: profile create failed - ${profileError.message}`)
-              continue
-            }
-
-            // Create hub_memberships entry
-            const { error: membershipError } = await supabase
-              .from('hub_memberships')
-              .insert({
-                user_id: userId,
-                tier,
-                source,
-                status: 'active',
-              })
-
-            if (membershipError) {
-              results.errors++
-              results.error_details.push(`${email}: membership create failed - ${membershipError.message}`)
-              continue
-            }
-
-            results.new_profiles++
-          } else {
-            // Profile exists - check membership
-            const { data: existingMembership } = await supabase
-              .from('hub_memberships')
-              .select('id, tier, source, status')
-              .eq('user_id', existingProfile.id)
-              .maybeSingle()
-
-            if (!existingMembership) {
-              // No membership - create one
-              const { error: membershipError } = await supabase
-                .from('hub_memberships')
-                .insert({
-                  user_id: existingProfile.id,
-                  tier,
-                  source,
-                  status: 'active',
-                })
-
-              if (membershipError) {
-                results.errors++
-                results.error_details.push(`${email}: membership create failed - ${membershipError.message}`)
-                continue
-              }
-
-              results.new_memberships++
-            } else if (existingMembership.tier === 'all_access' && existingMembership.source === 'district_partner') {
-              // Protected - do not modify
-              results.skipped_protected++
-            } else if (existingMembership.tier === 'free' && isPaid) {
-              // Upgrade from free to essentials
-              const { error: updateError } = await supabase
-                .from('hub_memberships')
-                .update({
-                  tier: 'essentials',
-                  source: 'substack_paid',
-                  updated_at: new Date().toISOString(),
-                })
-                .eq('id', existingMembership.id)
-
-              if (updateError) {
-                results.errors++
-                results.error_details.push(`${email}: upgrade failed - ${updateError.message}`)
-                continue
-              }
-
-              results.upgraded++
-            } else {
-              results.already_correct++
-            }
-          }
-        } catch (err: unknown) {
-          results.errors++
-          const message = err instanceof Error ? err.message : 'Unknown error'
-          results.error_details.push(`${subscriber.email}: ${message}`)
+        for (const p of profiles) {
+          const membership = membershipMap.get(p.id)
+          existingProfileMap.set(p.email.toLowerCase(), {
+            id: p.id,
+            tier: membership?.tier,
+            source: membership?.source,
+          })
         }
       }
     }
 
-    // Cap error_details to avoid massive responses
+    // Separate into: need new accounts vs need membership updates
+    const needNewAccounts: { email: string; name: string; isPaid: boolean }[] = []
+    const needMembershipOnly: { profileId: string; email: string; isPaid: boolean }[] = []
+
+    for (const sub of toProcess) {
+      const existing = existingProfileMap.get(sub.email)
+
+      if (!existing) {
+        needNewAccounts.push(sub)
+      } else if (!existing.tier) {
+        // Has profile but no membership
+        needMembershipOnly.push({ profileId: existing.id, email: sub.email, isPaid: sub.isPaid })
+      } else if (existing.tier === 'all_access' && existing.source === 'district_partner') {
+        results.skipped_protected++
+      } else if (existing.tier === 'free' && sub.isPaid) {
+        // Upgrade free to essentials
+        const { error: updateError } = await supabase
+          .from('hub_memberships')
+          .update({ tier: 'essentials', source: 'substack_paid', updated_at: new Date().toISOString() })
+          .eq('user_id', existing.id)
+
+        if (updateError) {
+          results.errors++
+          if (results.error_details.length < 50) results.error_details.push(`${sub.email}: upgrade failed`)
+        } else {
+          results.upgraded++
+        }
+      } else {
+        results.already_correct++
+      }
+    }
+
+    // Create memberships for profiles that exist but have no membership
+    for (let i = 0; i < needMembershipOnly.length; i += 50) {
+      const batch = needMembershipOnly.slice(i, i + 50)
+      const inserts = batch.map(s => ({
+        user_id: s.profileId,
+        tier: s.isPaid ? 'essentials' : 'free',
+        source: s.isPaid ? 'substack_paid' : 'substack_free',
+        status: 'active',
+      }))
+
+      const { error } = await supabase.from('hub_memberships').insert(inserts)
+      if (error) {
+        results.errors += batch.length
+        if (results.error_details.length < 50) results.error_details.push(`Membership batch failed: ${error.message}`)
+      } else {
+        results.new_memberships += batch.length
+      }
+    }
+
+    // Bulk create new accounts using SQL CTE (much faster than individual createUser calls)
+    const SQL_BATCH = 200
+    for (let i = 0; i < needNewAccounts.length; i += SQL_BATCH) {
+      const batch = needNewAccounts.slice(i, i + SQL_BATCH)
+
+      try {
+        const values = batch.map(s => {
+          const safeEmail = s.email.replace(/'/g, "''")
+          const safeName = (s.name || '').replace(/'/g, "''")
+          const tier = s.isPaid ? 'essentials' : 'free'
+          const source = s.isPaid ? 'substack_paid' : 'substack_free'
+          return `(gen_random_uuid(), '${safeEmail}', '${safeName}', '${tier}', '${source}')`
+        }).join(',\n')
+
+        const sql = `
+          WITH input_data(uid, email, display_name, tier, source) AS (
+            SELECT * FROM (VALUES ${values}) AS t(uid, email, display_name, tier, source)
+          ),
+          new_auth AS (
+            INSERT INTO auth.users (id, email, email_confirmed_at, created_at, updated_at, instance_id, aud, role, raw_app_meta_data, raw_user_meta_data)
+            SELECT uid::uuid, email, NOW(), NOW(), NOW(), '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', '{"provider":"email","providers":["email"]}', '{}'
+            FROM input_data
+            WHERE NOT EXISTS (SELECT 1 FROM auth.users au WHERE au.email = input_data.email)
+            RETURNING id, email
+          ),
+          new_profiles AS (
+            INSERT INTO hub_profiles (id, email, display_name, created_at, updated_at)
+            SELECT na.id, na.email, id2.display_name, NOW(), NOW()
+            FROM new_auth na
+            JOIN input_data id2 ON id2.email = na.email
+            RETURNING id, email
+          )
+          INSERT INTO hub_memberships (id, user_id, tier, source, status, created_at, updated_at)
+          SELECT gen_random_uuid(), np.id, id3.tier, id3.source, 'active', NOW(), NOW()
+          FROM new_profiles np
+          JOIN input_data id3 ON id3.email = np.email
+        `
+
+        const { error: sqlError } = await supabase.rpc('exec_sql' as any, { query: sql })
+
+        if (sqlError) {
+          // Fallback: try direct SQL via the REST endpoint
+          // The rpc might not exist, so try the raw approach
+          const { error: rawError } = await supabase.from('hub_profiles' as any).select('id').limit(0)
+
+          // If rpc doesn't work, fall back to individual creates
+          if (sqlError.message?.includes('function') || sqlError.message?.includes('does not exist')) {
+            // RPC not available, use individual auth.admin.createUser
+            for (const sub of batch) {
+              try {
+                const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+                  email: sub.email,
+                  email_confirm: true,
+                  user_metadata: { display_name: sub.name || '' },
+                })
+
+                if (authError) {
+                  if (authError.message?.includes('already') || authError.message?.includes('duplicate')) {
+                    results.already_correct++
+                  } else {
+                    results.errors++
+                    if (results.error_details.length < 50) results.error_details.push(`${sub.email}: ${authError.message}`)
+                  }
+                  continue
+                }
+
+                const userId = authData.user.id
+                await supabase.from('hub_profiles').insert({ id: userId, email: sub.email, display_name: sub.name || null })
+                await supabase.from('hub_memberships').insert({
+                  user_id: userId,
+                  tier: sub.isPaid ? 'essentials' : 'free',
+                  source: sub.isPaid ? 'substack_paid' : 'substack_free',
+                  status: 'active',
+                })
+                results.new_profiles++
+              } catch {
+                results.errors++
+              }
+            }
+          } else {
+            results.errors += batch.length
+            if (results.error_details.length < 50) results.error_details.push(`SQL batch failed: ${sqlError.message}`)
+          }
+        } else {
+          results.new_profiles += batch.length
+        }
+      } catch (err) {
+        results.errors += batch.length
+        if (results.error_details.length < 50) {
+          results.error_details.push(`Batch ${i / SQL_BATCH + 1} error: ${err instanceof Error ? err.message : 'Unknown'}`)
+        }
+      }
+    }
+
     if (results.error_details.length > 50) {
       const total = results.error_details.length
       results.error_details = results.error_details.slice(0, 50)

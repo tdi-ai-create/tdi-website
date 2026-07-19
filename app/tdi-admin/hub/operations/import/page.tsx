@@ -92,6 +92,8 @@ export default function SubstackImportPage() {
   const [progress, setProgress] = useState({ current: 0, total: 0, batch: 0, totalBatches: 0 });
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [cancelled, setCancelled] = useState(false);
+  const cancelledRef = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback((file: File) => {
@@ -128,9 +130,16 @@ export default function SubstackImportPage() {
     if (file) handleFile(file);
   }, [handleFile]);
 
+  const cancelImport = () => {
+    cancelledRef.current = true;
+    setCancelled(true);
+  };
+
   const startImport = async () => {
     setState('processing');
     setError(null);
+    setCancelled(false);
+    cancelledRef.current = false;
 
     const CHUNK_SIZE = 500;
     const chunks: ParsedSubscriber[][] = [];
@@ -153,6 +162,8 @@ export default function SubstackImportPage() {
     };
 
     for (let i = 0; i < chunks.length; i++) {
+      if (cancelledRef.current) break;
+
       setProgress(prev => ({ ...prev, batch: i + 1, current: i * CHUNK_SIZE }));
 
       try {
@@ -354,6 +365,14 @@ export default function SubstackImportPage() {
                 {progress.current.toLocaleString()} of {progress.total.toLocaleString()} subscribers
               </p>
             </div>
+
+            <button
+              onClick={cancelImport}
+              disabled={cancelled}
+              className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              {cancelled ? 'Cancelling after current batch...' : 'Cancel Import'}
+            </button>
           </div>
         )}
 
