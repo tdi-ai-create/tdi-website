@@ -79,3 +79,35 @@ export async function creatorReengagementComplete(creatorName: string, outcome: 
     `*Re-engagement Complete* -- ${creatorName}\nOutcome: ${outcome}`
   )
 }
+
+// -- Recruitment Events --
+
+export async function recruitmentCandidateSuggested(candidateName: string, gapCategory: string, source: string) {
+  await postToSlack(
+    `*New Recruitment Candidate* -- ${candidateName}\nGap: ${gapCategory || 'none specified'} | Source: ${source || 'unknown'}\nCandidate suggested for content gap.`
+  )
+}
+
+export async function recruitmentOutreachApproved(candidateName: string, approvedBy: string) {
+  await postToSlack(
+    `*Outreach Approved* -- ${candidateName}\nApproved by: ${approvedBy}\nReady to send outreach.`
+  )
+}
+
+export async function recruitmentCandidateResponded(candidateName: string, newStage: string) {
+  await postToSlack(
+    `*Candidate Responded* -- ${candidateName}\nMoved to: ${newStage}\nCandidate responded to outreach.`
+  )
+}
+
+export async function recruitmentCandidateConverted(candidateName: string, creatorName: string, contentPath: string) {
+  await postToSlack(
+    `*Candidate Converted to Creator* -- ${candidateName}\nCreator: ${creatorName} | Content path: ${contentPath}\nRecruitment pipeline conversion complete.`
+  )
+}
+
+export async function recruitmentRevisitDue(candidateName: string, reason: string) {
+  await postToSlack(
+    `*Revisit Candidate Due* -- ${candidateName}\nReason: ${reason}\nCandidate is due for re-engagement.`
+  )
+}

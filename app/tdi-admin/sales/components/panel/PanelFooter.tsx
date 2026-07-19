@@ -24,6 +24,62 @@ export function PanelFooter({ opp, onPatch, onClose, onDelete, showToast }: Prop
   const [showPartnershipModal, setShowPartnershipModal] = useState(false)
   const [partnershipCreated, setPartnershipCreated] = useState(false)
 
+  // Nominate as Creator state
+  const [showNominateModal, setShowNominateModal] = useState(false)
+  const [nominating, setNominating] = useState(false)
+  const [nominated, setNominated] = useState(false)
+  const [nomName, setNomName] = useState('')
+  const [nomEmail, setNomEmail] = useState('')
+  const [nomSchool, setNomSchool] = useState('')
+  const [nomExpertise, setNomExpertise] = useState('')
+  const [nomNotes, setNomNotes] = useState('')
+
+  function openNominateModal() {
+    setNomName(String(opp.contact_name || ''))
+    setNomEmail(String(opp.contact_email || ''))
+    setNomSchool(opp.name || '')
+    setNomExpertise('')
+    setNomNotes('')
+    setShowNominateModal(true)
+  }
+
+  async function submitNomination() {
+    if (!nomName.trim()) {
+      showToast('Name is required', 'error')
+      return
+    }
+    setNominating(true)
+    try {
+      const res = await fetch('/api/admin/creator-recruitment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'nominate',
+          name: nomName.trim(),
+          email: nomEmail.trim() || null,
+          school_org: nomSchool.trim() || null,
+          expertise_area: nomExpertise.trim() || null,
+          source: 'sales_nomination',
+          nominated_by: 'admin',
+          nominated_from: 'sales_portal',
+          notes: nomNotes.trim() || null,
+        }),
+      })
+      const result = await res.json()
+      if (res.ok && result.success) {
+        showToast(`${nomName} nominated as creator candidate`, 'success')
+        setNominated(true)
+        setShowNominateModal(false)
+      } else {
+        showToast(result.error || 'Failed to nominate', 'error')
+      }
+    } catch {
+      showToast('Failed to nominate', 'error')
+    } finally {
+      setNominating(false)
+    }
+  }
+
   // Partnership creation form state
   const [pType, setPType] = useState<'school' | 'district'>('school')
   const [pStaff, setPStaff] = useState('')
@@ -161,6 +217,23 @@ export function PanelFooter({ opp, onPatch, onClose, onDelete, showToast }: Prop
         </div>
       )}
 
+      {/* Nominate as Creator */}
+      {!nominated && (
+        <div className="border-t border-gray-100 px-5 py-2">
+          <button
+            onClick={openNominateModal}
+            className="w-full text-xs py-2 rounded-lg font-medium transition-colors border border-purple-200 text-purple-700 hover:bg-purple-50"
+          >
+            Nominate as Creator
+          </button>
+        </div>
+      )}
+      {nominated && (
+        <div className="border-t border-gray-100 px-5 py-2 text-center">
+          <p className="text-xs font-medium" style={{ color: '#7C3AED' }}>Nominated as creator candidate</p>
+        </div>
+      )}
+
       <div className="border-t border-gray-100 px-5 py-3 flex items-center gap-3">
         {opp.stage !== 'paid' && (
           <button
@@ -292,6 +365,52 @@ export function PanelFooter({ opp, onPatch, onClose, onDelete, showToast }: Prop
                 className="flex-1 text-sm bg-red-600 text-white py-2 rounded-xl hover:bg-red-700 font-medium"
               >
                 Confirm Lost
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showNominateModal && (
+        <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 space-y-3">
+            <h3 className="font-semibold text-gray-900">Nominate as Creator</h3>
+            <p className="text-xs text-gray-500">Submit this contact as a creator candidate for the recruitment pipeline.</p>
+            <div>
+              <label className="text-xs text-gray-500 font-medium">Name *</label>
+              <input type="text" value={nomName} onChange={e => setNomName(e.target.value)}
+                className="mt-1 block w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 font-medium">Email</label>
+              <input type="email" value={nomEmail} onChange={e => setNomEmail(e.target.value)}
+                className="mt-1 block w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 font-medium">School / Org</label>
+              <input type="text" value={nomSchool} onChange={e => setNomSchool(e.target.value)}
+                className="mt-1 block w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 font-medium">Expertise Area</label>
+              <input type="text" value={nomExpertise} onChange={e => setNomExpertise(e.target.value)}
+                placeholder="e.g. STEM, SEL, Literacy"
+                className="mt-1 block w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 font-medium">Notes</label>
+              <textarea value={nomNotes} onChange={e => setNomNotes(e.target.value)}
+                rows={2} placeholder="Why would they be a good creator?"
+                className="mt-1 block w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400 resize-none" />
+            </div>
+            <div className="flex gap-3 pt-1">
+              <button onClick={() => setShowNominateModal(false)}
+                className="flex-1 text-sm border border-gray-200 text-gray-600 py-2 rounded-xl hover:bg-gray-50">
+                Cancel
+              </button>
+              <button onClick={submitNomination} disabled={nominating}
+                className="flex-1 text-sm bg-purple-600 text-white py-2 rounded-xl hover:bg-purple-700 font-medium disabled:opacity-50">
+                {nominating ? 'Submitting...' : 'Nominate'}
               </button>
             </div>
           </div>

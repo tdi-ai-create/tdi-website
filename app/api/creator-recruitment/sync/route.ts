@@ -1,5 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import {
+  recruitmentCandidateSuggested,
+  recruitmentOutreachApproved,
+  recruitmentCandidateResponded,
+  recruitmentCandidateConverted,
+} from '@/lib/creator-slack'
 
 /**
  * Creator Recruitment Sync API -- Bridge between Paperclip agents and the Creator Recruitment Pipeline
@@ -353,6 +359,12 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    // Slack notification (non-blocking)
+    try {
+      recruitmentCandidateSuggested(name, expertise_area || 'unspecified', source || 'agent').catch(() => {})
+    } catch {}
+
     return NextResponse.json({ success: true, candidate_id: candidate.id })
   }
 
@@ -385,6 +397,12 @@ export async function POST(request: NextRequest) {
       author: approved_by || 'admin',
       note_type: 'stage_change',
     })
+
+    // Slack notification (non-blocking) -- fetch candidate name
+    try {
+      const { data: cand } = await supabase.from('creator_recruitment_candidates').select('name').eq('id', candidate_id).single()
+      if (cand) recruitmentOutreachApproved(cand.name, approved_by || 'admin').catch(() => {})
+    } catch {}
 
     return NextResponse.json({ success: true })
   }
@@ -440,6 +458,12 @@ export async function POST(request: NextRequest) {
       author: 'system',
       note_type: 'response',
     })
+
+    // Slack notification (non-blocking)
+    try {
+      const { data: cand } = await supabase.from('creator_recruitment_candidates').select('name').eq('id', candidate_id).single()
+      if (cand) recruitmentCandidateResponded(cand.name, new_stage).catch(() => {})
+    } catch {}
 
     return NextResponse.json({ success: true })
   }
@@ -513,16 +537,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Create new creator
+    const finalContentPath = content_path || candidate.content_path || 'course'
     const { data: creator, error: creatorErr } = await supabase
       .from('creators')
       .insert({
         name: candidate.name,
         email: candidate.email,
-        content_path: content_path || candidate.content_path || 'course',
+        content_path: finalContentPath,
         topic: topic || candidate.expertise_area || null,
         status: 'active',
         lifecycle_state: 'active',
         current_phase: 'onboarding',
+        recruitment_source: candidate.source,
+        recruitment_candidate_id: candidate.id,
       })
       .select()
       .single()
@@ -563,6 +590,11 @@ export async function POST(request: NextRequest) {
       author: 'system',
       note_type: 'stage_change',
     })
+
+    // Slack notification (non-blocking)
+    try {
+      recruitmentCandidateConverted(candidate.name, candidate.name, finalContentPath).catch(() => {})
+    } catch {}
 
     return NextResponse.json({ success: true, creator_id: creator.id })
   }
