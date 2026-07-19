@@ -3151,32 +3151,32 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               </div>
             )}
 
-            {/* ─── PREVIEW MODE BANNER ─── show when preview data is active */}
-            {staffStats.hubLoggedIn === 0 && !hubStats?.has_real_data && showPreviewData && (
-              <div className="flex items-center justify-between bg-purple-50 rounded-2xl px-5 py-3 border border-purple-100">
-                <div className="flex items-center gap-2">
-                  <Eye className="w-4 h-4 text-purple-500" />
-                  <span className="text-xs text-purple-700 font-medium">
-                    Showing example data so you can see what this dashboard will look like once your team is active.
-                  </span>
+            {/* ─── EXAMPLE DASHBOARD BANNER ─── show when no real Hub data yet */}
+            {staffStats.hubLoggedIn === 0 && !hubStats?.has_real_data && (
+              <div className="flex items-center justify-between bg-[#F0FDFA] rounded-2xl px-5 py-4 border border-[#99F6E4]">
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-[#134E4A] mb-0.5">Your dashboard is ready and waiting for your team</p>
+                  <p className="text-xs text-[#5F9EA0]">Once your educators log into the Hub, real engagement data will appear here automatically.</p>
                 </div>
-                <button
-                  onClick={() => setShowPreviewData(false)}
-                  className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors"
+                <a
+                  href="/Example-Dashboard"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-semibold px-4 py-2 rounded-lg bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors whitespace-nowrap ml-4"
                 >
-                  Hide Preview
-                </button>
+                  See an Example Dashboard
+                </a>
               </div>
             )}
 
             {/* ─── AI SUMMARY ─── replaces data overload */}
             {(() => {
-              // Use preview data when toggled on and no real data exists
-              const isPreview = showPreviewData && staffStats.hubLoggedIn === 0;
-              const hubPct = isPreview ? 72 : (hubStats?.hub_login_pct ?? (staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0));
-              const toolsExplored = isPreview ? 47 : (hubStats?.quick_wins_completed ?? 0);
-              const wellnessScore = isPreview ? 4.2 : (metricsRange === 'month' ? (hubStats?.mood_avg_30d ?? hubStats?.mood_avg_7d ?? null) : (hubStats?.mood_avg_7d ?? null));
-              const activeUsers = isPreview ? 14 : (metricsRange === 'month' ? (hubStats?.logins_this_month ?? hubStats?.active_users_7d ?? 0) : (hubStats?.active_users_7d ?? 0));
+              // Always show real data -- no fake preview numbers
+              const isPreview = false;
+              const hubPct = hubStats?.hub_login_pct ?? (staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0);
+              const toolsExplored = hubStats?.quick_wins_completed ?? 0;
+              const wellnessScore = metricsRange === 'month' ? (hubStats?.mood_avg_30d ?? hubStats?.mood_avg_7d ?? null) : (hubStats?.mood_avg_7d ?? null);
+              const activeUsers = metricsRange === 'month' ? (hubStats?.logins_this_month ?? hubStats?.active_users_7d ?? 0) : (hubStats?.active_users_7d ?? 0);
               const totalDeliverables = (partnership.observation_days_total || 0) + (partnership.virtual_sessions_total || 0);
               const completedDeliverables = (partnership.observation_days_completed || 0) + (partnership.virtual_sessions_completed || 0);
               const phaseNum = partnership.contract_phase === 'IGNITE' ? 1 : partnership.contract_phase === 'ACCELERATE' ? 2 : 3;
