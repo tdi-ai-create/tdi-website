@@ -26,6 +26,7 @@ export async function GET(
     'creator-recruitment-sop': 'creator-recruitment-sop.html',
     'communication-map': 'communication-map.html',
     'data-flow': 'data-flow.html',
+    'hub-content-standards': 'hub-content-standards.html',
   };
 
   const filename = allowedDocs[slug];

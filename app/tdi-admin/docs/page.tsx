@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Search, Download, Printer, ExternalLink } from 'lucide-react';
 
-type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'hub-engagement' | 'engagement-workflow' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'communication-map';
+type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'communication-map';
 
 interface Doc {
   id: DocId;
@@ -109,6 +109,16 @@ const DOC_GROUPS: DocGroup[] = [
     name: 'Hub & Content',
     color: '#2563EB',
     docs: [
+      {
+        id: 'hub-content-standards',
+        label: 'Content Standards',
+        desc: 'Categories, tagging, lift system, PD hours, card design',
+        tags: ['content', 'standards', 'tagging', 'categories', 'lift', 'PD hours', 'quick wins', 'card design', 'thumbnail', 'category colors', 'danielson'],
+        relatedSections: [
+          { label: 'Learning Hub', href: '/hub' },
+          { label: 'Hub Admin', href: '/tdi-admin/hub' },
+        ],
+      },
       {
         id: 'hub-engagement',
         label: 'Hub Engagement',

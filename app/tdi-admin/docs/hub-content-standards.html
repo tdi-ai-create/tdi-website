@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TDI Hub Content Standards</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; background: #F8F9FA; line-height: 1.6; }
+  .page { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 20px; font-weight: 700; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
+  h3 { font-size: 16px; font-weight: 700; margin: 24px 0 8px; }
+  .subtitle { color: #6B7280; font-size: 14px; margin-bottom: 8px; }
+  .updated { color: #9CA3AF; font-size: 12px; margin-bottom: 32px; }
+  p { margin-bottom: 12px; font-size: 14px; }
+  ul, ol { margin: 8px 0 16px 24px; font-size: 14px; }
+  li { margin-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; margin: 0 0 20px; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; background: #1e2749; color: white; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  td { padding: 10px 12px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+  tr:hover td { background: #F9FAFB; }
+  .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 1px solid #E5E7EB; }
+  .card-navy { background: #1e2749; color: white; border: none; }
+  .card-navy p, .card-navy li { color: rgba(255,255,255,0.85); }
+  .card-teal { background: #F0FDFA; border-color: #99F6E4; }
+  .card-amber { background: #FFFBEB; border-color: #FDE68A; }
+  .card-red { background: #FEF2F2; border-color: #FECACA; }
+  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
+  code { background: #F3F4F6; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>Hub Content Standards</h1>
+<p class="subtitle">How Quick Wins, courses, and content are categorized, tagged, and displayed</p>
+<p class="updated">Last updated: July 19, 2026 | Version 1.0</p>
+
+<!-- CARD DESIGN -->
+<h2>1. Quick Win Card Design (Option C)</h2>
+
+<div class="card card-navy">
+  <p style="font-weight:600; color:white; margin-bottom:8px;">Design Decision (July 2026)</p>
+  <p>Quick Win cards use a <strong>color-dot design with no thumbnail images</strong>. Each category has a unique color. The card shows: category dot + name, title, description (light gray), lift pill, time estimate, and action button. Cards have shadow at rest and lift on hover.</p>
+  <p>This eliminates the thumbnail bottleneck -- new Quick Wins can publish instantly without waiting for design work. Courses still use photo thumbnails.</p>
+</div>
+
+<h3>Category Colors</h3>
+<table>
+  <tr><th>Category</th><th>Color</th><th>Use When</th></tr>
+  <tr><td><span class="dot" style="background:#059669;"></span>Instructional Strategies</td><td><code>#059669</code></td><td>Teaching moves during instruction: questioning, modeling, grouping, scaffolding</td></tr>
+  <tr><td><span class="dot" style="background:#6366F1;"></span>Assessment</td><td><code>#6366F1</code></td><td>Checking understanding, evaluating, auditing assessments</td></tr>
+  <tr><td><span class="dot" style="background:#0891B2;"></span>Classroom Setup</td><td><code>#0891B2</code></td><td>Environment, routines, culture, physical space, systems</td></tr>
+  <tr><td><span class="dot" style="background:#EA580C;"></span>Communication</td><td><code>#EA580C</code></td><td>Parent contact, feedback, interpersonal, community building</td></tr>
+  <tr><td><span class="dot" style="background:#2563EB;"></span>Lesson Planning</td><td><code>#2563EB</code></td><td>Designing lessons, units, objectives, curriculum</td></tr>
+  <tr><td><span class="dot" style="background:#7C3AED;"></span>Self-Care</td><td><code>#7C3AED</code></td><td>Educator wellness, rest, sustainability (proactive)</td></tr>
+  <tr><td><span class="dot" style="background:#BE123C;"></span>Stress Relief</td><td><code>#BE123C</code></td><td>Immediate relief, coping, scripts for hard moments (reactive)</td></tr>
+  <tr><td><span class="dot" style="background:#1e2749;"></span>Classroom Management</td><td><code>#1e2749</code></td><td>Behavior, de-escalation, conduct, intervention</td></tr>
+  <tr><td><span class="dot" style="background:#E8553A;"></span>Games</td><td><code>#E8553A</code></td><td>Interactive practice tools, quizzes, gamified activities</td></tr>
+  <tr><td><span class="dot" style="background:#0E7490;"></span>Time Savers</td><td><code>#0E7490</code></td><td>Reduces prep time, automates, streamlines workflow</td></tr>
+  <tr><td><span class="dot" style="background:#4D7C0F;"></span>Vocational</td><td><code>#4D7C0F</code></td><td>CTE, career-tech, trade-specific resources</td></tr>
+  <tr><td><span class="dot" style="background:#4338CA;"></span>Leadership</td><td><code>#4338CA</code></td><td>For admins, coaches, org-level planning, onboarding, funding</td></tr>
+</table>
+
+<div class="card card-red">
+  <p style="margin:0;"><strong>"Classroom Tools" is retired.</strong> Do not use this category. It was split into Instructional Strategies, Lesson Planning, Assessment, Classroom Setup, and Leadership in July 2026.</p>
+</div>
+
+<!-- TAGGING -->
+<h2>2. Quick Win Tagging Requirements</h2>
+
+<div class="card card-teal">
+  <p style="margin:0;"><strong>Database enforcement:</strong> A trigger (<code>enforce_quick_win_tags_before_publish</code>) prevents any Quick Win from being published with missing required fields. The publish will fail with a clear error message telling you which field is missing.</p>
+</div>
+
+<h3>Required Fields (all must be set before publishing)</h3>
+<table>
+  <tr><th>Field</th><th>Column</th><th>Values</th></tr>
+  <tr><td>Title</td><td><code>title</code></td><td>Clear, specific name</td></tr>
+  <tr><td>Description</td><td><code>description</code></td><td>1-2 sentences: what it is + why it helps</td></tr>
+  <tr><td>Category</td><td><code>category</code></td><td>One of the 12 categories above</td></tr>
+  <tr><td>Lift</td><td><code>lift</code></td><td><code>LOW</code>, <code>MED</code>, or <code>HIGH</code></td></tr>
+  <tr><td>Type</td><td><code>quick_win_type</code></td><td><code>download</code>, <code>game</code>, <code>quiz</code>, or <code>quick_win</code></td></tr>
+  <tr><td>Topic Tags</td><td><code>topic_tags</code></td><td>At least 1, max 5 from approved list</td></tr>
+  <tr><td>Roles</td><td><code>roles</code></td><td>At least 1: <code>teacher</code>, <code>para</code>, <code>leader</code>, <code>coach</code></td></tr>
+  <tr><td>Danielson Domains</td><td><code>danielson_domains</code></td><td>At least 1: <code>1-planning</code>, <code>2-environment</code>, <code>3-instruction</code>, <code>4-professional</code></td></tr>
+</table>
+
+<!-- LIFT SYSTEM -->
+<h2>3. Lift Rating System</h2>
+
+<p>Lift = how action-ready a resource is. This determines the colored pill on the card.</p>
+
+<table>
+  <tr><th>Value</th><th>Label</th><th>Pill Color</th><th>Definition</th><th>Decision Test</th></tr>
+  <tr><td><code>LOW</code></td><td>Grab & Go</td><td style="background:#D9E8E2;color:#0F4438;text-align:center;border-radius:4px;">Green</td><td>Open it, use it, done. Zero prep.</td><td>Can an educator use this by 8 AM if they download it at 7:45?</td></tr>
+  <tr><td><code>MED</code></td><td>Short Prep</td><td style="background:#F4E9D0;color:#6B4A0F;text-align:center;border-radius:4px;">Amber</td><td>Needs a planning period to think, customize, then implement.</td><td>Does this require sitting down to think before using?</td></tr>
+  <tr><td><code>HIGH</code></td><td>Deep Dive</td><td style="background:#F0D8CE;color:#6B2E1A;text-align:center;border-radius:4px;">Coral</td><td>Multiple sessions, deeper reflection, sustained effort.</td><td>Does this require work across multiple days?</td></tr>
+</table>
+
+<p>If uncertain, set <code>lift_uncertain = true</code> and assign your best guess. This flags it for human review.</p>
+
+<!-- PD HOURS -->
+<h2>4. PD Hours Formula</h2>
+
+<div class="card card-amber">
+  <p style="margin:0 0 8px;"><strong>PD Hours = 2x Course Duration</strong></p>
+  <p style="margin:0;">A 45-minute course earns 1.5 PD hours. This accounts for implementation time -- the real learning happens when educators apply strategies in their classroom, not just when they watch the content. Rounded to nearest 0.25 hours.</p>
+</div>
+
+<table>
+  <tr><th>Course Duration</th><th>PD Hours Earned</th><th>Example</th></tr>
+  <tr><td>5-6 min</td><td>0.25 hrs</td><td>Quick Plays</td></tr>
+  <tr><td>20-24 min</td><td>0.75 hrs</td><td>Deep Dives</td></tr>
+  <tr><td>45 min</td><td>1.5 hrs</td><td>Escape Rooms</td></tr>
+</table>
+
+<p>Certificates auto-generate with a unique verification code (TDI-XXXXXXXX) when all lessons in a course are completed.</p>
+
+<!-- DISPLAY -->
+<h2>5. Quick Wins Page Behavior</h2>
+
+<ul>
+  <li><strong>Default sort:</strong> Interleaved by category (round-robin) so the page shows variety, not a wall of one category</li>
+  <li><strong>Pagination:</strong> Shows 18 items at a time with a "Show More" button. Resets when filters change.</li>
+  <li><strong>Filters:</strong> Category tabs, Lift filter (All/Low/Medium/High), Role filter, Danielson domain filter, Saved/favorites</li>
+  <li><strong>Card hover:</strong> Lifts 3px with deeper shadow on hover</li>
+  <li><strong>Background:</strong> Cool blue-gray (<code>#F5F7FA</code>), not warm beige</li>
+</ul>
+
+<!-- COURSES -->
+<h2>6. Course Standards</h2>
+
+<ul>
+  <li>Courses still use <strong>photo thumbnails</strong> (unlike Quick Wins which use color dots)</li>
+  <li>Lesson completion: educator marks complete via button, or passes engagement check</li>
+  <li>Course completion = all lessons complete. Auto-generates certificate.</li>
+  <li>PD hours stored in <code>hub_courses.pd_hours</code> (2x formula applied)</li>
+</ul>
+
+<!-- WHO DOES WHAT -->
+<h2>7. Who Manages What</h2>
+
+<table>
+  <tr><th>Task</th><th>Who</th><th>Notes</th></tr>
+  <tr><td>Create Quick Win content</td><td>Content creators / Rae</td><td>Must follow tagging spec</td></tr>
+  <tr><td>Tag Quick Wins</td><td>Maya (Educator UX agent) or Rae + Claude Code</td><td>Database blocks publishing without tags</td></tr>
+  <tr><td>QA before publish</td><td>Julie Lynn (QA agent)</td><td>Pre-publish gate checks all required fields</td></tr>
+  <tr><td>Quick Win thumbnails</td><td>Nobody -- not needed</td><td>Card design uses color dots, no images</td></tr>
+  <tr><td>Course thumbnails</td><td>Lily (Design agent)</td><td>Courses still need real photos</td></tr>
+  <tr><td>Category changes</td><td>Rae + Claude Code</td><td>Update DB, filter list, color map, and this doc</td></tr>
+  <tr><td>Engagement checks</td><td>Jasmine (Hub Engagement agent)</td><td>Generates inline checks for lessons</td></tr>
+</table>
+
+</div>
+</body>
+</html>
