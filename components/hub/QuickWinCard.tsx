@@ -8,17 +8,17 @@ import { useTranslation } from '@/lib/hub/useTranslation';
 // Category color map -- dot + text color (bolder, each unique)
 const CATEGORY_COLORS: Record<string, { dot: string; bg: string; text: string }> = {
   'Instructional Strategies': { dot: '#059669', bg: '#D1FAE5', text: '#059669' },
-  'Assessment':               { dot: '#6366F1', bg: '#E0E7FF', text: '#6366F1' },
+  'Assessment':               { dot: '#8B5CF6', bg: '#EDE9FE', text: '#8B5CF6' },
   'Classroom Setup':          { dot: '#0891B2', bg: '#CFFAFE', text: '#0891B2' },
   'Communication':            { dot: '#EA580C', bg: '#FFEDD5', text: '#EA580C' },
   'Lesson Planning':          { dot: '#2563EB', bg: '#DBEAFE', text: '#2563EB' },
-  'Self-Care':                { dot: '#7C3AED', bg: '#F3E8FF', text: '#7C3AED' },
-  'Stress Relief':            { dot: '#BE123C', bg: '#FFE4E6', text: '#BE123C' },
-  'Classroom Management':     { dot: '#1e2749', bg: '#E2E4EA', text: '#1e2749' },
+  'Self-Care':                { dot: '#D946EF', bg: '#FAE8FF', text: '#D946EF' },
+  'Stress Relief':            { dot: '#E11D48', bg: '#FFE4E6', text: '#E11D48' },
+  'Classroom Management':     { dot: '#1B6B93', bg: '#E0F2FE', text: '#1B6B93' },
   'Games':                    { dot: '#E8553A', bg: '#FFF1EE', text: '#E8553A' },
-  'Time Savers':              { dot: '#0E7490', bg: '#CFFAFE', text: '#0E7490' },
-  'Vocational':               { dot: '#4D7C0F', bg: '#ECFCCB', text: '#4D7C0F' },
-  'Leadership':               { dot: '#4338CA', bg: '#E0E7FF', text: '#4338CA' },
+  'Time Savers':              { dot: '#0EA5E9', bg: '#E0F7FF', text: '#0EA5E9' },
+  'Vocational':               { dot: '#15803D', bg: '#DCFCE7', text: '#15803D' },
+  'Leadership':               { dot: '#7C3AED', bg: '#F3E8FF', text: '#7C3AED' },
 };
 
 // Lift pill styles
