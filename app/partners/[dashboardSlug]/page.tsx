@@ -2861,14 +2861,14 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 // Always: staff roster
                 {
                   id: 'roster',
-                  title: 'Add Your Educators',
+                  title: staffStats.total > 0 ? 'Verify Your Team for the New Year' : 'Set Up Your Team\'s Access',
                   description: staffStats.total > 0
-                    ? `${staffStats.total} educators added. They\'ll get Learning Hub access automatically.`
-                    : `Upload your staff list so your team gets Learning Hub access. CSV, spreadsheet, or even a list of names and emails works.`,
+                    ? `${staffStats.total} educators on your roster. Review for any changes (new hires, departures) and assign Hub memberships and complimentary blog access.`
+                    : `Upload your staff list to give your team Learning Hub access and complimentary blog subscriptions. CSV, spreadsheet, or a list of names and emails works.`,
                   done: staffStats.total > 0,
                   icon: Users,
                   action: staffStats.total > 0 ? undefined : () => navigateToTab('team'),
-                  actionLabel: 'Add Staff',
+                  actionLabel: staffStats.total > 0 ? 'Review Team' : 'Add Staff',
                 },
                 // Only if contract includes in-person observations
                 ...(hasObservations ? [{
@@ -4850,8 +4850,8 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                               );
                             }
 
-                            // Onboarding: Upload staff roster - CSV paste or manual
-                            if (titleLower.includes('staff roster') || titleLower.includes('upload roster')) {
+                            // Onboarding: Upload staff roster + assign access
+                            if (titleLower.includes('staff roster') || titleLower.includes('upload roster') || titleLower.includes('team') || titleLower.includes('educator')) {
                               if (!isFormExpanded) {
                                 return (
                                   <div className="mt-3">
@@ -4860,20 +4860,33 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                                       className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
                                     >
                                       <Upload className="w-4 h-4" />
-                                      Upload Roster
+                                      {staffStats.total > 0 ? 'Review & Update Team' : 'Upload Roster'}
                                     </button>
                                   </div>
                                 );
                               }
                               return (
                                 <div className="mt-3 space-y-3">
-                                  <p className="text-xs text-gray-500">Paste CSV data (First Name, Last Name, Email, Role) or add staff one at a time.</p>
+                                  <p className="text-xs text-gray-500">
+                                    {staffStats.total > 0
+                                      ? 'Add new staff or paste an updated CSV. Existing staff will not be duplicated.'
+                                      : 'Paste CSV data (First Name, Last Name, Email, Role) or add staff one at a time.'}
+                                  </p>
                                   <textarea
                                     placeholder={"First Name,Last Name,Email,Role\nJane,Smith,jane@school.edu,Teacher\nJohn,Doe,john@school.edu,Para"}
                                     rows={5}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     id={`roster-csv-${item.id}`}
                                   />
+
+                                  {/* Access type info */}
+                                  <div className="bg-[#F8FAFC] rounded-lg p-3 text-xs text-gray-600 space-y-1">
+                                    <p className="font-semibold text-gray-800">What your team gets:</p>
+                                    <p><strong>Hub Membership</strong> -- Full access to courses, Quick Wins, PD hours, and certificates ({partnership.base_staff_enrolled || partnership.staff_enrolled || '?'} seats included in your contract)</p>
+                                    <p><strong>Blog Access</strong> -- Complimentary paid blog subscription for your entire team (unlimited)</p>
+                                    <p className="text-gray-400 mt-1">After uploading, you can manage access levels in the Team tab.</p>
+                                  </div>
+
                                   <div className="flex gap-2">
                                     <button
                                       onClick={async () => {
@@ -4888,7 +4901,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                                           });
                                           const data = await res.json();
                                           if (data.success) {
-                                            setToastMessage(data.message);
+                                            setToastMessage(data.message + ' Manage access levels in the Team tab.');
                                             if (data.added > 0) {
                                               setActionItems(prev => prev.map(ai => ai.id === item.id ? { ...ai, status: 'completed', completed_at: new Date().toISOString() } : ai));
                                             }
