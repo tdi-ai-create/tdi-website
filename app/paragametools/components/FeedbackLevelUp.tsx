@@ -8,9 +8,11 @@ import { FEEDBACK_LEVELS, LEVEL_INFO } from '../data/feedbackLevels';
 import { COLORS, shuffle } from '../data/gameConfig';
 import { useLanguage } from '../context/LanguageContext';
 import { UI_TRANSLATIONS } from '../data/translations';
-import { useGameTracking } from '@/lib/hub/useGameTracking';
+import { useGameTracking, type WeakItem } from '@/lib/hub/useGameTracking';
 import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
 import { GameSettingsPanel } from './GameSettingsPanel';
+import { ReviewModeBanner } from './ReviewModeBanner';
+import { buildReviewPool } from '@/lib/hub/gameReviewMode';
 import { type GameSettings, DEFAULT_SETTINGS, filterBySettings } from '../data/gameSettings';
 
 type Screen = 'intro' | 'play' | 'done';
@@ -31,6 +33,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
   const [trapCount, setTrapCount] = useState(0);
   const [showTrapMessage, setShowTrapMessage] = useState(false);
   const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
+  const [reviewItems, setReviewItems] = useState<(typeof FEEDBACK_LEVELS[number] & { _origIndex: number })[] | null>(null);
 
   const { logCompletion, startSession, logGameResponse, completeSession } = useGameTracking();
   const { language } = useLanguage();
@@ -44,7 +47,10 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
     return shuffle(pool);
   }, [settings]);
 
+  const activeFeedbacks = reviewItems ?? feedbacks;
+
   const handleStart = async () => {
+    setReviewItems(null);
     setScreen('play');
     setCurrentRound(0);
     setRevealed(false);
@@ -61,11 +67,26 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
     });
   };
 
+  const handleStartReview = async (weakItems: WeakItem[]) => {
+    const indexed = FEEDBACK_LEVELS.map((f, i) => ({ ...f, _origIndex: i }));
+    const { items } = buildReviewPool(indexed, weakItems, indexed.length, (item) => `levelup_${item._origIndex}`);
+    setReviewItems(items);
+    setScreen('play');
+    setCurrentRound(0);
+    setRevealed(false);
+    setUserGuess(null);
+    setStreak(0);
+    setBestStreak(0);
+    setTrapCount(0);
+    setShowTrapMessage(false);
+    await startSession('feedback-level-up', items.length, { language, isReviewMode: true });
+  };
+
   const handleGuess = (level: number) => {
     setUserGuess(level);
     setRevealed(true);
 
-    const current = feedbacks[currentRound];
+    const current = activeFeedbacks[currentRound];
     const actualLevel = current.level;
     const isCorrect = level === actualLevel;
     const newStreak = isCorrect ? streak + 1 : 0;
@@ -96,7 +117,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
   };
 
   const handleNext = async () => {
-    if (currentRound < feedbacks.length - 1) {
+    if (currentRound < activeFeedbacks.length - 1) {
       setIsAnimating(true);
       setTimeout(() => {
         setCurrentRound((prev) => prev + 1);
@@ -107,7 +128,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
       }, 200);
     } else {
       setScreen('done');
-      logCompletion({ tool: 'feedback-level-up', score: correctCount, totalRounds: feedbacks.length, streak });
+      logCompletion({ tool: 'feedback-level-up', score: correctCount, totalRounds: activeFeedbacks.length, streak });
       await completeSession(correctCount, bestStreak);
     }
   };
@@ -138,6 +159,11 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
               language={language}
               accentColor="#27AE60"
               show={['difficulty', 'gradeBand']}
+            />
+            <ReviewModeBanner
+              gameId="feedback-level-up"
+              accentColor="#27AE60"
+              onStartReview={handleStartReview}
             />
             <div className="w-full max-w-lg mb-6">
               {/* Level reference grid */}
@@ -177,7 +203,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
             className="text-xs uppercase tracking-widest mb-2"
             style={{ color: 'rgba(39, 174, 96, 0.5)' }}
           >
-            {t.round[language]} {currentRound + 1} {t.of[language]} {feedbacks.length}
+            {t.round[language]} {currentRound + 1} {t.of[language]} {activeFeedbacks.length}
           </p>
 
           {/* Streak counter */}
@@ -273,7 +299,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
                 className="flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
                 style={{ backgroundColor: colorConfig.accent, color: '#ffffff' }}
               >
-                {currentRound < feedbacks.length - 1 ? t.next[language] : t.finish[language]}
+                {currentRound < activeFeedbacks.length - 1 ? t.next[language] : t.finish[language]}
                 <ChevronRight size={20} />
               </button>
             </div>
@@ -291,7 +317,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
           onPlayAgain={handleStart}
           gameSlug="feedback-level-up"
           score={correctCount}
-          totalRounds={feedbacks.length}
+          totalRounds={activeFeedbacks.length}
           extraContent={
             <div
               className="w-full max-w-lg rounded-xl p-5 mb-4 text-center"

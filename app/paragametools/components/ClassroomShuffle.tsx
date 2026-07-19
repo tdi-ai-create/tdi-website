@@ -7,10 +7,12 @@ import { useLanguage } from '../context/LanguageContext';
 import { CLASSROOM_SCENARIOS, SCENARIO_COUNT } from '../data/classroomScenarios';
 import { GameWrapper, IntroScreen, DoneScreen } from './GameWrapper';
 import { ConfettiBurst } from './ConfettiBurst';
-import { useGameTracking } from '@/lib/hub/useGameTracking';
+import { useGameTracking, type WeakItem } from '@/lib/hub/useGameTracking';
 import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
 import { CommunityNudge } from './CommunityNudge';
 import { GameSettingsPanel } from './GameSettingsPanel';
+import { ReviewModeBanner } from './ReviewModeBanner';
+import { buildReviewPool } from '@/lib/hub/gameReviewMode';
 import { type GameSettings, DEFAULT_SETTINGS, filterBySettings } from '../data/gameSettings';
 
 type Screen = 'intro' | 'play' | 'results';
