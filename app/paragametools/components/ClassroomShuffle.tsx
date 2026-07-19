@@ -25,6 +25,7 @@ export function ClassroomShuffle({ onBack }: ClassroomShuffleProps) {
   const { language } = useLanguage();
   const { logCompletion, startSession, logGameResponse, completeSession } = useGameTracking();
   const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
+  const [reviewItems, setReviewItems] = useState<(typeof CLASSROOM_SCENARIOS[number] & { _origIndex: number })[] | null>(null);
 
   const scenariosWithIds = useMemo(() => {
     const indexed = CLASSROOM_SCENARIOS.map((s, i) => ({ ...s, _origIndex: i }));
@@ -33,6 +34,8 @@ export function ClassroomShuffle({ onBack }: ClassroomShuffleProps) {
     return shuffle(pool).slice(0, Math.min(SCENARIO_COUNT, pool.length));
   }, [settings]);
 
+  const activeScenarios = reviewItems ?? scenariosWithIds;
+
   const [screen, setScreen] = useState<Screen>('intro');
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -40,9 +43,9 @@ export function ClassroomShuffle({ onBack }: ClassroomShuffleProps) {
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
 
-  const scenario = scenariosWithIds[current];
+  const scenario = activeScenarios[current];
   const data = scenario[language === 'es' ? 'es' : 'en'];
-  const isLast = current === scenariosWithIds.length - 1;
+  const isLast = current === activeScenarios.length - 1;
 
   const handleSelect = (idx: number) => {
     if (selected !== null) return;
@@ -70,7 +73,7 @@ export function ClassroomShuffle({ onBack }: ClassroomShuffleProps) {
   const handleNext = async () => {
     if (isLast) {
       setScreen('results');
-      logCompletion({ tool: 'classroom-shuffle', score, totalRounds: scenariosWithIds.length });
+      logCompletion({ tool: 'classroom-shuffle', score, totalRounds: activeScenarios.length });
       await completeSession(score, bestStreak);
     } else {
       setCurrent((c) => c + 1);
@@ -79,6 +82,7 @@ export function ClassroomShuffle({ onBack }: ClassroomShuffleProps) {
   };
 
   const handlePlayAgain = async () => {
+    setReviewItems(null);
     setCurrent(0);
     setSelected(null);
     setScore(0);
@@ -86,6 +90,19 @@ export function ClassroomShuffle({ onBack }: ClassroomShuffleProps) {
     setBestStreak(0);
     setScreen('intro');
     await startSession('classroom-shuffle', scenariosWithIds.length, { language });
+  };
+
+  const handleStartReview = async (weakItems: WeakItem[]) => {
+    const indexed = CLASSROOM_SCENARIOS.map((s, i) => ({ ...s, _origIndex: i }));
+    const { items } = buildReviewPool(indexed, weakItems, Math.min(SCENARIO_COUNT, indexed.length), (item) => `classroomshuffle_${item._origIndex}`);
+    setReviewItems(items);
+    setCurrent(0);
+    setSelected(null);
+    setScore(0);
+    setStreak(0);
+    setBestStreak(0);
+    setScreen('play');
+    await startSession('classroom-shuffle', items.length, { language, isReviewMode: true });
   };
 
   const colorConfig = COLORS.blue;
@@ -116,12 +133,19 @@ export function ClassroomShuffle({ onBack }: ClassroomShuffleProps) {
           }
           onStart={() => { setScreen('play'); startSession('classroom-shuffle', scenariosWithIds.length, { language, difficulty: settings.difficulty, gradeBand: settings.gradeBand, role: settings.role }); }}
           extraContent={
-            <GameSettingsPanel
-              settings={settings}
-              onChange={setSettings}
-              language={language}
-              accentColor="#3498DB"
-            />
+            <>
+              <GameSettingsPanel
+                settings={settings}
+                onChange={setSettings}
+                language={language}
+                accentColor="#3498DB"
+              />
+              <ReviewModeBanner
+                gameId="classroom-shuffle"
+                accentColor="#3498DB"
+                onStartReview={handleStartReview}
+              />
+            </>
           }
         />
       </GameWrapper>
@@ -151,7 +175,7 @@ export function ClassroomShuffle({ onBack }: ClassroomShuffleProps) {
             <span className="text-4xl md:text-5xl font-black text-white">{score}</span>
           </div>
           <div className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: colorConfig.accent }}>
-            {score}/{scenariosWithIds.length}
+            {score}/{activeScenarios.length}
           </div>
           <h2 className="text-2xl md:text-3xl font-black text-white mb-3">{title}</h2>
           <p className="text-sm md:text-base text-white/70 max-w-md mb-8" style={{ lineHeight: 1.6 }}>{message}</p>
@@ -171,7 +195,7 @@ export function ClassroomShuffle({ onBack }: ClassroomShuffleProps) {
               {language === 'es' ? 'Volver' : 'Back to Quick Wins'}
             </button>
           </div>
-          <CommunityNudge gameSlug="classroom-shuffle" score={score} totalRounds={scenariosWithIds.length} />
+          <CommunityNudge gameSlug="classroom-shuffle" score={score} totalRounds={activeScenarios.length} />
         </div>
       </GameWrapper>
     );
@@ -186,7 +210,7 @@ export function ClassroomShuffle({ onBack }: ClassroomShuffleProps) {
       <div className="max-w-2xl mx-auto px-4 py-6">
         {/* Progress dots */}
         <div className="flex justify-center gap-2 mb-6">
-          {scenariosWithIds.map((_, i) => (
+          {activeScenarios.map((_, i) => (
             <div
               key={i}
               className="w-2.5 h-2.5 rounded-full transition-all"

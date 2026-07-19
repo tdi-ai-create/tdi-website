@@ -7,9 +7,11 @@ import { useLanguage } from '../context/LanguageContext';
 import { PRIORITIZE_ROUNDS, PRIORITIZE_ROUND_COUNT } from '../data/prioritizeData';
 import { GameWrapper, IntroScreen } from './GameWrapper';
 import { ConfettiBurst } from './ConfettiBurst';
-import { useGameTracking } from '@/lib/hub/useGameTracking';
+import { useGameTracking, type WeakItem } from '@/lib/hub/useGameTracking';
 import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
 import { CommunityNudge } from './CommunityNudge';
+import { ReviewModeBanner } from './ReviewModeBanner';
+import { buildReviewPool } from '@/lib/hub/gameReviewMode';
 
 type Screen = 'intro' | 'rank' | 'reveal' | 'results';
 
@@ -21,11 +23,14 @@ export function PrioritizeThis({ onBack }: PrioritizeThisProps) {
   const { language } = useLanguage();
   const { logCompletion, startSession, logGameResponse, completeSession } = useGameTracking();
   const lang = language === 'es' ? 'es' : 'en';
+  const [reviewItems, setReviewItems] = useState<(typeof PRIORITIZE_ROUNDS[number] & { _origIndex: number })[] | null>(null);
 
   const roundsWithIds = useMemo(() => {
     const indexed = PRIORITIZE_ROUNDS.map((r, i) => ({ ...r, _origIndex: i }));
     return shuffle(indexed).slice(0, PRIORITIZE_ROUND_COUNT);
   }, []);
+
+  const activeRounds = reviewItems ?? roundsWithIds;
 
   const [screen, setScreen] = useState<Screen>('intro');
   const [current, setCurrent] = useState(0);
@@ -33,8 +38,8 @@ export function PrioritizeThis({ onBack }: PrioritizeThisProps) {
   const [score, setScore] = useState(0);
   const [roundScore, setRoundScore] = useState(0);
 
-  const round = roundsWithIds[current];
-  const isLast = current === roundsWithIds.length - 1;
+  const round = activeRounds[current];
+  const isLast = current === activeRounds.length - 1;
 
   const initRound = () => {
     // Shuffle task indices for user to reorder
@@ -80,25 +85,39 @@ export function PrioritizeThis({ onBack }: PrioritizeThisProps) {
   const handleNext = async () => {
     if (isLast) {
       setScreen('results');
-      logCompletion({ tool: 'prioritize-this', score, totalRounds: roundsWithIds.length * 4 });
+      logCompletion({ tool: 'prioritize-this', score, totalRounds: activeRounds.length * 4 });
       await completeSession(score, 0);
     } else {
       setCurrent((c) => c + 1);
       setScreen('rank');
       // Init next round after state update
       setTimeout(() => {
-        const indices = roundsWithIds[current + 1].tasks.map((_, i) => i);
+        const indices = activeRounds[current + 1].tasks.map((_, i) => i);
         setUserOrder(shuffle(indices));
       }, 0);
     }
   };
 
   const handlePlayAgain = async () => {
+    setReviewItems(null);
     setCurrent(0);
     setScore(0);
     setRoundScore(0);
     setScreen('intro');
     await startSession('prioritize-this', roundsWithIds.length, { language });
+  };
+
+  const handleStartReview = async (weakItems: WeakItem[]) => {
+    const indexed = PRIORITIZE_ROUNDS.map((r, i) => ({ ...r, _origIndex: i }));
+    const { items } = buildReviewPool(indexed, weakItems, Math.min(PRIORITIZE_ROUND_COUNT, indexed.length), (item) => `prioritize_${item._origIndex}`);
+    setReviewItems(items);
+    setCurrent(0);
+    setScore(0);
+    setRoundScore(0);
+    setScreen('rank');
+    const indices = items[0].tasks.map((_, i) => i);
+    setUserOrder(shuffle(indices));
+    await startSession('prioritize-this', items.length, { language, isReviewMode: true });
   };
 
   const colorConfig = COLORS.purple;
@@ -128,6 +147,13 @@ export function PrioritizeThis({ onBack }: PrioritizeThisProps) {
               ]
           }
           onStart={() => { setScreen('rank'); initRound(); startSession('prioritize-this', roundsWithIds.length, { language }); }}
+          extraContent={
+            <ReviewModeBanner
+              gameId="prioritize-this"
+              accentColor="#9333EA"
+              onStartReview={handleStartReview}
+            />
+          }
         />
       </GameWrapper>
     );
@@ -135,7 +161,7 @@ export function PrioritizeThis({ onBack }: PrioritizeThisProps) {
 
   // ── Results ──
   if (screen === 'results') {
-    const maxScore = roundsWithIds.length * 4;
+    const maxScore = activeRounds.length * 4;
     const pct = Math.round((score / maxScore) * 100);
     const title = pct >= 80 ? (lang === 'es' ? 'Experto en prioridades' : 'Priority Pro')
       : pct >= 50 ? (lang === 'es' ? 'Buen juicio' : 'Good Judgment')
@@ -169,7 +195,7 @@ export function PrioritizeThis({ onBack }: PrioritizeThisProps) {
               {lang === 'es' ? 'Volver' : 'Back to Quick Wins'}
             </button>
           </div>
-          <CommunityNudge gameSlug="prioritize-this" score={score} totalRounds={roundsWithIds.length * 4} />
+          <CommunityNudge gameSlug="prioritize-this" score={score} totalRounds={activeRounds.length * 4} />
         </div>
       </GameWrapper>
     );
@@ -182,7 +208,7 @@ export function PrioritizeThis({ onBack }: PrioritizeThisProps) {
         <div className="max-w-2xl mx-auto px-4 py-6">
           {/* Progress */}
           <div className="flex justify-center gap-2 mb-6">
-            {roundsWithIds.map((_, i) => (
+            {activeRounds.map((_, i) => (
               <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: i === current ? colorConfig.accent : i < current ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.15)' }} />
             ))}
           </div>

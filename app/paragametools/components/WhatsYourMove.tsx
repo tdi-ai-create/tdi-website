@@ -7,9 +7,11 @@ import { useLanguage } from '../context/LanguageContext';
 import { SCENARIOS, SCENARIO_COUNT } from '../data/whatsYourMove';
 import { GameWrapper } from './GameWrapper';
 import { ConfettiBurst } from './ConfettiBurst';
-import { useGameTracking } from '@/lib/hub/useGameTracking';
+import { useGameTracking, type WeakItem } from '@/lib/hub/useGameTracking';
 import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
 import { CommunityNudge } from './CommunityNudge';
+import { ReviewModeBanner } from './ReviewModeBanner';
+import { buildReviewPool } from '@/lib/hub/gameReviewMode';
 
 // ── Toggle: set to false to hide survey for general community use ──
 const SURVEY_ACTIVE = true;
@@ -43,10 +45,12 @@ export function WhatsYourMove({ onBack }: { onBack: () => void }) {
   const [score, setScore] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
   const [streak, setStreak] = useState(0);
+  const [reviewScenarios, setReviewScenarios] = useState<(typeof SCENARIOS[number] & { _origIndex: number })[] | null>(null);
 
-  const scenario = SCENARIOS[current];
+  const activeScenarios = reviewScenarios ?? SCENARIOS.map((s, i) => ({ ...s, _origIndex: i }));
+  const scenario = activeScenarios[current];
   const data = scenario[language];
-  const isLast = current === SCENARIO_COUNT - 1;
+  const isLast = current === activeScenarios.length - 1;
 
   const handleSelect = (idx: number) => {
     if (selected !== null) return; // locked
@@ -74,7 +78,7 @@ export function WhatsYourMove({ onBack }: { onBack: () => void }) {
   const handleNext = async () => {
     if (isLast) {
       setScreen('results');
-      logCompletion({ tool: 'whats-your-move', score, totalRounds: SCENARIO_COUNT });
+      logCompletion({ tool: 'whats-your-move', score, totalRounds: activeScenarios.length });
       await completeSession(score, bestStreak);
     } else {
       setCurrent((c) => c + 1);
@@ -83,6 +87,7 @@ export function WhatsYourMove({ onBack }: { onBack: () => void }) {
   };
 
   const handlePlayAgain = async () => {
+    setReviewScenarios(null);
     setCurrent(0);
     setSelected(null);
     setScore(0);
@@ -92,6 +97,19 @@ export function WhatsYourMove({ onBack }: { onBack: () => void }) {
     await startSession('whats-your-move', SCENARIO_COUNT, { language });
   };
 
+  const handleStartReview = async (weakItems: WeakItem[]) => {
+    const indexed = SCENARIOS.map((s, i) => ({ ...s, _origIndex: i }));
+    const { items } = buildReviewPool(indexed, weakItems, Math.min(SCENARIO_COUNT, indexed.length), (item) => `whatsyourmove_${item._origIndex}`);
+    setReviewScenarios(items);
+    setCurrent(0);
+    setSelected(null);
+    setScore(0);
+    setStreak(0);
+    setBestStreak(0);
+    setScreen('play');
+    await startSession('whats-your-move', items.length, { language, isReviewMode: true });
+  };
+
   const gameTitle = language === 'es' ? '¿Cuál Es Tu Movimiento?' : "What's Your Move?";
   const badgeCelebration = useGameBadgeCheck(screen === 'results');
 
@@ -99,7 +117,14 @@ export function WhatsYourMove({ onBack }: { onBack: () => void }) {
     <GameWrapper gameId="whatsyourmove" title={gameTitle} color="teal" onBack={onBack}>
       {badgeCelebration}
       {screen === 'intro' && (
-        <IntroScreen onStart={() => { setScreen('play'); startSession('whats-your-move', SCENARIO_COUNT, { language }); }} language={language} />
+        <>
+          <IntroScreen onStart={() => { setScreen('play'); startSession('whats-your-move', SCENARIO_COUNT, { language }); }} language={language} />
+          <ReviewModeBanner
+            gameId="whats-your-move"
+            accentColor="#22b8bd"
+            onStartReview={handleStartReview}
+          />
+        </>
       )}
       {screen === 'play' && (
         <PlayScreen
@@ -110,6 +135,7 @@ export function WhatsYourMove({ onBack }: { onBack: () => void }) {
           onSelect={handleSelect}
           onNext={handleNext}
           isLast={isLast}
+          totalCount={activeScenarios.length}
         />
       )}
       {screen === 'results' && (
@@ -189,6 +215,7 @@ function PlayScreen({
   onSelect,
   onNext,
   isLast,
+  totalCount,
 }: {
   language: 'en' | 'es';
   current: number;
@@ -196,13 +223,14 @@ function PlayScreen({
   selected: number | null;
   onSelect: (idx: number) => void;
   onNext: () => void;
+  totalCount: number;
   isLast: boolean;
 }) {
   return (
     <div className="animate-fade-in">
       {/* Progress pips */}
       <div className="flex items-center justify-center gap-2 mb-4">
-        {Array.from({ length: SCENARIO_COUNT }).map((_, i) => (
+        {Array.from({ length: totalCount }).map((_, i) => (
           <div
             key={i}
             className="w-3 h-3 rounded-full transition-all duration-300"
@@ -215,7 +243,7 @@ function PlayScreen({
 
       {/* Counter */}
       <p className="text-center text-sm mb-6" style={{ color: '#8899aa' }}>
-        {language === 'es' ? `Escenario ${current + 1} de ${SCENARIO_COUNT}` : `Scenario ${current + 1} of ${SCENARIO_COUNT}`}
+        {language === 'es' ? `Escenario ${current + 1} de ${totalCount}` : `Scenario ${current + 1} of ${totalCount}`}
       </p>
 
       {/* Scenario card */}
