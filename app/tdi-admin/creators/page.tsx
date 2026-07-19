@@ -4889,6 +4889,99 @@ export default function CreatorStudioPage() {
             );
           })()}
 
+          {/* Recruitment Source Quality */}
+          {(() => {
+            const [sourceData, setSourceData] = useState<any>(null);
+            useEffect(() => {
+              if (activeTab === 'analytics' && !sourceData) {
+                fetch('/api/admin/recruitment-analytics')
+                  .then(res => res.json())
+                  .then(data => setSourceData(data))
+                  .catch(() => {});
+              }
+            }, [activeTab, sourceData]);
+
+            if (!sourceData) return null;
+
+            const sources = sourceData.creators_by_source || {};
+            const conversions = sourceData.conversion_rates || {};
+            const sourceEntries = Object.entries(sources).filter(([key]) => key !== 'unknown');
+
+            // Don't show section if no recruitment-sourced creators exist yet
+            if (sourceEntries.length === 0 && Object.keys(conversions).length === 0) {
+              return (
+                <div className="mb-5 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2 pb-2 border-b border-gray-100">
+                    Recruitment Source Quality
+                  </h2>
+                  <p className="text-sm text-gray-400 py-4">No creators have been recruited through the pipeline yet. Source quality data will appear here as candidates convert to creators.</p>
+                </div>
+              );
+            }
+
+            const sourceColors: Record<string, string> = {
+              hub_user: '#2563EB',
+              social_media: '#EC4899',
+              substack: '#F59E0B',
+              sales_nomination: '#059669',
+              referral: '#D97706',
+              inbound: '#0891B2',
+              other: '#6B7280',
+            };
+
+            return (
+              <div className="mb-5 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+                <h2 className="text-xl font-semibold text-gray-900 mb-1 pb-2 border-b border-gray-100">
+                  Recruitment Source Quality
+                </h2>
+                <p className="text-sm text-gray-400 mb-4">Which recruitment sources produce the most creators, and how well do they convert.</p>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                  {/* Creators by source */}
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Creators by Source</p>
+                    <div className="space-y-2">
+                      {sourceEntries.map(([source, data]: [string, any]) => (
+                        <div key={source} className="flex items-center gap-3">
+                          <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: sourceColors[source] || '#6B7280' }} />
+                          <span className="text-sm text-gray-700 w-32 truncate">{source.replace(/_/g, ' ')}</span>
+                          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-full rounded-full" style={{ width: `${Math.min((data.count / Math.max(...sourceEntries.map(([,d]: [string, any]) => d.count), 1)) * 100, 100)}%`, background: sourceColors[source] || '#6B7280' }} />
+                          </div>
+                          <span className="text-sm font-medium text-gray-900 w-8 text-right">{data.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Conversion rates */}
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Conversion Rate by Source</p>
+                    {Object.keys(conversions).length === 0 ? (
+                      <p className="text-sm text-gray-400">No conversion data yet.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {Object.entries(conversions).map(([source, data]: [string, any]) => (
+                          <div key={source} className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2.5 h-2.5 rounded-full" style={{ background: sourceColors[source] || '#6B7280' }} />
+                              <span className="text-sm text-gray-700">{source.replace(/_/g, ' ')}</span>
+                            </div>
+                            <div className="flex items-center gap-3 text-xs">
+                              <span className="text-gray-400">{data.candidates} candidates</span>
+                              <span className="text-gray-400">{data.converted} converted</span>
+                              <span className="font-semibold" style={{ color: data.rate > 30 ? '#059669' : data.rate > 15 ? '#D97706' : '#6B7280' }}>{data.rate}%</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
           {/* Reference & Details -- collapsed by default */}
           {dashboardData && (
           <DashboardRefSection>
