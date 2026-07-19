@@ -201,10 +201,9 @@ export function SortItOut({ onBack }: SortItOutProps) {
             {set.buckets.map(bucket => {
               const bucketPlacements = placements.filter(p => p.bucketId === bucket.id);
               return (
-                <button
+                <div
                   key={bucket.id}
-                  onClick={() => handlePlaceInBucket(bucket.id)}
-                  disabled={selectedItem === null}
+                  onClick={() => { if (selectedItem !== null) handlePlaceInBucket(bucket.id); }}
                   className="rounded-xl p-4 text-left transition-all min-h-[120px]"
                   style={{
                     border: `2px dashed ${selectedItem !== null ? `${bucket.color}60` : 'rgba(255,255,255,0.12)'}`,
@@ -217,17 +216,19 @@ export function SortItOut({ onBack }: SortItOutProps) {
                   <p className="text-[10px] mb-3" style={{ color: 'rgba(255,255,255,0.35)' }}>{bucket.description[lang]}</p>
                   <div className="flex flex-col gap-1.5">
                     {bucketPlacements.map((p, pi) => (
-                      <div
+                      <button
                         key={pi}
-                        onClick={(e) => { e.stopPropagation(); handleRemoveFromBucket(placements.indexOf(p)); }}
-                        className="text-xs p-2 rounded-lg cursor-pointer hover:opacity-70"
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); e.preventDefault(); handleRemoveFromBucket(placements.indexOf(p)); }}
+                        className="w-full text-left text-xs p-2.5 rounded-lg transition-all hover:opacity-70 flex items-center gap-2"
                         style={{ background: `${bucket.color}15`, border: `1px solid ${bucket.color}25`, color: 'rgba(255,255,255,0.7)' }}
                       >
-                        {p.item.text[lang]}
-                      </div>
+                        <span className="flex-1">{p.item.text[lang]}</span>
+                        <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>x</span>
+                      </button>
                     ))}
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
