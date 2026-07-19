@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import InviteLeader from '@/components/partners/InviteLeader';
+import RosterAccessManager from '@/components/partners/RosterAccessManager';
 import Link from 'next/link';
 import FooterSymbol from '@/components/FooterSymbol';
 import {
@@ -5284,6 +5285,14 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
 
             {/* Invite leaders to dashboard */}
             {partnership?.id && <InviteLeader partnershipId={partnership.id} />}
+
+            {/* Roster access management: Hub membership + blog access checkboxes */}
+            {partnership?.id && (
+              <RosterAccessManager
+                partnershipId={partnership.id}
+                baseStaffEnrolled={partnership.base_staff_enrolled || partnership.staff_enrolled || null}
+              />
+            )}
 
             {/* School info card */}
             <div className="bg-white rounded-xl border border-gray-100 p-6"
