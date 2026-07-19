@@ -292,7 +292,7 @@ export default function LessonPage({ params }: LessonPageProps) {
 
   if (isLoading || !course || !currentLesson) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: '#F0EEE9' }}>
+      <div className="min-h-screen" style={{ backgroundColor: '#F5F7FA' }}>
         <div className="h-1 bg-gray-200" />
         <div className="p-4 md:p-8 max-w-[1200px] mx-auto">
           <div className="h-5 bg-gray-200 rounded w-64 mb-4 animate-pulse" />
@@ -306,7 +306,7 @@ export default function LessonPage({ params }: LessonPageProps) {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F0EEE9' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F5F7FA' }}>
       {/* Progress bar at top */}
       <div className="h-1 w-full" style={{ background: '#E5E7EB' }}>
         <div

@@ -124,9 +124,9 @@ export default function HubFilterBar({
                 onClick={() => setActiveFilter(category)}
                 className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5"
                 style={{
-                  backgroundColor: isActive ? '#1B2A4A' : 'white',
-                  color: isActive ? 'white' : '#6B7280',
-                  border: isActive ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                  backgroundColor: isActive ? '#1a1f4e' : '#EEF1F5',
+                  color: isActive ? 'white' : '#475569',
+                  border: isActive ? 'none' : '1px solid rgba(0,0,0,0.04)',
                   fontFamily: "'DM Sans', sans-serif",
                 }}
               >
@@ -173,7 +173,7 @@ export default function HubFilterBar({
           {hasAdvancedFilters && !moreFiltersOpen && (
             <span
               className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full"
-              style={{ backgroundColor: '#E53935', border: '2px solid #F0EEE9' }}
+              style={{ backgroundColor: '#E53935', border: '2px solid #F5F7FA' }}
             />
           )}
         </button>

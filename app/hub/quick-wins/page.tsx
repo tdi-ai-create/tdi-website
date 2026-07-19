@@ -278,7 +278,7 @@ export default function QuickWinsPage() {
     return (
       <div
         className="p-4 md:p-8"
-        style={{ backgroundColor: '#F0EEE9', minHeight: 'calc(100vh - 54px)' }}
+        style={{ backgroundColor: '#F5F7FA', minHeight: 'calc(100vh - 54px)' }}
       >
         <div className="max-w-6xl mx-auto">
           {/* Header skeleton */}
@@ -315,7 +315,7 @@ export default function QuickWinsPage() {
   return (
     <div
       className="p-4 md:p-8"
-      style={{ backgroundColor: '#F0EEE9', minHeight: 'calc(100vh - 54px)' }}
+      style={{ backgroundColor: '#F5F7FA', minHeight: 'calc(100vh - 54px)' }}
     >
       <div className="max-w-6xl mx-auto">
         <QuizNudge />

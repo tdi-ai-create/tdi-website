@@ -546,7 +546,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: '#F0EEE9' }}>
+      <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: '#F5F7FA' }}>
         <div className="max-w-[600px] mx-auto">
           <div className="h-4 bg-gray-200 rounded w-32 mb-8 animate-pulse" />
           <div className="h-6 bg-gray-100 rounded w-24 mb-4 animate-pulse" />
@@ -559,7 +559,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
   if (!quickWin) {
     return (
-      <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: '#F0EEE9' }}>
+      <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: '#F5F7FA' }}>
         <div className="max-w-[600px] mx-auto text-center py-16">
           <p className="text-gray-500">{tUI('Quick Win not found.')}</p>
           <Link href="/hub/quick-wins" className="text-[#ffba06] hover:underline mt-4 inline-block">
@@ -580,7 +580,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   // ─── Render ───────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F0EEE9', fontFamily: "'DM Sans', sans-serif" }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F5F7FA', fontFamily: "'DM Sans', sans-serif" }}>
       {/* ─── HERO HEADER ───────────────────────────────────────────────── */}
       <div className="max-w-[1100px] mx-auto px-4 md:px-8 pt-6 md:pt-10">
         {/* Back link */}

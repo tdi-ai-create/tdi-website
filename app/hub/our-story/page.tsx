@@ -55,7 +55,7 @@ export default function OurStoryPage() {
     <div
       style={{
         fontFamily: "'DM Sans', sans-serif",
-        backgroundColor: '#F0EEE9',
+        backgroundColor: '#F5F7FA',
         minHeight: '100vh',
       }}
     >

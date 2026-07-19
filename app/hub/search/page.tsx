@@ -152,7 +152,7 @@ export default function HubSearchPage() {
   const totalResults = quickWins.length + courses.length + conversations.length;
 
   return (
-    <div style={{ background: '#F0EEE9', minHeight: '100vh' }}>
+    <div style={{ background: '#F5F7FA', minHeight: '100vh' }}>
       {/* Search hero */}
       <div style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)' }}>
         <div className="max-w-3xl mx-auto px-4 md:px-8 py-10">

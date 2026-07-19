@@ -190,21 +190,21 @@ export default function QuickWinCard({
                 {tUI(liftStyle.label)}
               </span>
             )}
-            <span style={{ fontSize: 12, color: '#9CA3AF' }}>
+            <span style={{ fontSize: 12, color: '#94A3B8' }}>
               {quickWin.estimated_minutes} {tUI('min')} &middot; {getTypeLabel()}
             </span>
           </div>
           {hasAccess ? (
             <span
               className="text-xs font-semibold rounded-lg px-4 py-2 inline-block"
-              style={{ backgroundColor: '#1e2749', color: 'white' }}
+              style={{ backgroundColor: '#1a1f4e', color: 'white' }}
             >
               {tUI('Try it')}
             </span>
           ) : (
             <span
               className="text-xs font-medium px-3 py-1.5 rounded-lg inline-flex items-center gap-1"
-              style={{ border: '1px solid #9CA3AF', color: '#6B7280' }}
+              style={{ border: '1px solid #CBD5E1', color: '#64748B' }}
             >
               <Lock size={10} />
               {tUI('Upgrade')}

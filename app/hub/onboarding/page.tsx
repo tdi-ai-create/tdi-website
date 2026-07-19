@@ -1191,7 +1191,7 @@ export default function OnboardingPage() {
 
       {/* Quiz Invite -- shows after onboarding saves, before redirect */}
       {showQuizInvite && !showQuizActive && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #F0EEE9 0%, #E8E4DD 100%)' }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #F5F7FA 0%, #E8E4DD 100%)' }}>
           <div className="max-w-md w-full text-center">
             <div
               className="w-16 h-16 rounded-full mx-auto mb-5 flex items-center justify-center"
@@ -1230,7 +1230,7 @@ export default function OnboardingPage() {
 
       {/* Quiz Active -- full quiz experience */}
       {showQuizInvite && showQuizActive && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto" style={{ background: 'linear-gradient(135deg, #F0EEE9 0%, #E8E4DD 100%)' }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto" style={{ background: 'linear-gradient(135deg, #F5F7FA 0%, #E8E4DD 100%)' }}>
           <div className="max-w-lg w-full my-8">
             <QuizEngine
               quiz={educatorTypeQuiz}

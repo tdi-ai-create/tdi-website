@@ -122,7 +122,7 @@ export default function HelpPage() {
   const { tUI } = useTranslation();
 
   return (
-    <div style={{ background: '#F0EEE9', minHeight: '100vh' }}>
+    <div style={{ background: '#F5F7FA', minHeight: '100vh' }}>
       {/* Header */}
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-3xl mx-auto px-4 md:px-8 pt-8 pb-6">

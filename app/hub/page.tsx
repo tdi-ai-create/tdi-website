@@ -853,7 +853,7 @@ export default function HubDashboard() {
   // Loading skeleton
   if (isLoading) {
     return (
-      <div style={{ background: '#F0EEE9', minHeight: '100vh' }}>
+      <div style={{ background: '#F5F7FA', minHeight: '100vh' }}>
         <div
           className="animate-pulse"
           style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)' }}
@@ -900,7 +900,7 @@ export default function HubDashboard() {
   }
 
   return (
-    <div style={{ background: '#F0EEE9', minHeight: '100vh' }}>
+    <div style={{ background: '#F5F7FA', minHeight: '100vh' }}>
       {/* ============ HERO ============ */}
       <section
         className="relative text-white"

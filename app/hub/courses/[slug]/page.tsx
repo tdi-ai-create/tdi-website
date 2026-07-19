@@ -474,7 +474,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const progressPct = progress.progressPct || 0;
 
   return (
-    <div style={{ background: '#F0EEE9', minHeight: '100vh' }}>
+    <div style={{ background: '#F5F7FA', minHeight: '100vh' }}>
     <div className="p-4 md:p-8 max-w-[1100px] mx-auto">
       {/* Toast notification */}
       {toast && (
