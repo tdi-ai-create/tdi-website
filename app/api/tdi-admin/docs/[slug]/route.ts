@@ -23,6 +23,7 @@ export async function GET(
     'hub-engagement': 'learning-hub-engagement.html',
     'engagement-workflow': 'engagement-workflow.html',
     'creator-feedback-sop': 'creator-feedback-sop.html',
+    'creator-recruitment-sop': 'creator-recruitment-sop.html',
   };
 
   const filename = allowedDocs[slug];
