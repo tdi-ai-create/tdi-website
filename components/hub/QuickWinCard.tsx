@@ -5,20 +5,20 @@ import { Lock, Heart } from 'lucide-react';
 import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
 import { useTranslation } from '@/lib/hub/useTranslation';
 
-// Category color map -- dot color and pill styling
+// Category color map -- dot + text color (bolder, each unique)
 const CATEGORY_COLORS: Record<string, { dot: string; bg: string; text: string }> = {
-  'Lesson Planning':          { dot: '#2563EB', bg: '#DBEAFE', text: '#1E40AF' },
-  'Assessment':               { dot: '#7C3AED', bg: '#EDE9FE', text: '#5B21B6' },
-  'Instructional Strategies': { dot: '#059669', bg: '#D1FAE5', text: '#065F46' },
-  'Classroom Setup':          { dot: '#0891B2', bg: '#CFFAFE', text: '#155E75' },
+  'Instructional Strategies': { dot: '#059669', bg: '#D1FAE5', text: '#059669' },
+  'Assessment':               { dot: '#6366F1', bg: '#E0E7FF', text: '#6366F1' },
+  'Classroom Setup':          { dot: '#0891B2', bg: '#CFFAFE', text: '#0891B2' },
+  'Communication':            { dot: '#EA580C', bg: '#FFEDD5', text: '#EA580C' },
+  'Lesson Planning':          { dot: '#2563EB', bg: '#DBEAFE', text: '#2563EB' },
+  'Self-Care':                { dot: '#7C3AED', bg: '#F3E8FF', text: '#7C3AED' },
+  'Stress Relief':            { dot: '#BE123C', bg: '#FFE4E6', text: '#BE123C' },
   'Classroom Management':     { dot: '#1e2749', bg: '#E2E4EA', text: '#1e2749' },
-  'Communication':            { dot: '#B45309', bg: '#FEF3C7', text: '#92400E' },
-  'Time Savers':              { dot: '#2563EB', bg: '#DBEAFE', text: '#1E40AF' },
-  'Self-Care':                { dot: '#7C3AED', bg: '#EDE9FE', text: '#5B21B6' },
-  'Stress Relief':            { dot: '#C2410C', bg: '#FEE4D6', text: '#9A3412' },
-  'Games':                    { dot: '#B45309', bg: '#FEF3C7', text: '#92400E' },
-  'Vocational':               { dot: '#4D7C0F', bg: '#ECFCCB', text: '#3F6212' },
-  'Leadership':               { dot: '#6D28D9', bg: '#EDE9FE', text: '#4C1D95' },
+  'Games':                    { dot: '#B45309', bg: '#FEF9C3', text: '#B45309' },
+  'Time Savers':              { dot: '#0E7490', bg: '#CFFAFE', text: '#0E7490' },
+  'Vocational':               { dot: '#4D7C0F', bg: '#ECFCCB', text: '#4D7C0F' },
+  'Leadership':               { dot: '#4338CA', bg: '#E0E7FF', text: '#4338CA' },
 };
 
 // Lift pill styles
@@ -121,14 +121,14 @@ export default function QuickWinCard({
           <div className="flex items-center gap-2">
             <span
               style={{
-                width: 10, height: 10, borderRadius: '50%',
+                width: 11, height: 11, borderRadius: '50%',
                 background: catColors.dot, flexShrink: 0,
               }}
             />
             <span
               style={{
-                fontSize: 11, fontWeight: 600, textTransform: 'uppercase',
-                letterSpacing: '0.5px', color: catColors.dot,
+                fontSize: 12, fontWeight: 700, textTransform: 'uppercase',
+                letterSpacing: '0.5px', color: catColors.text,
               }}
             >
               {tUI(quickWin.category)}
@@ -168,7 +168,7 @@ export default function QuickWinCard({
         <div
           className="mb-3"
           style={{
-            fontSize: 13, color: '#6B7280', lineHeight: 1.45,
+            fontSize: 12, color: '#B8BCC5', lineHeight: 1.4,
             display: '-webkit-box', WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical', overflow: 'hidden',
           }}
