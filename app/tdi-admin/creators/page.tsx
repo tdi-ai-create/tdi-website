@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { getTopicConfig, TOPIC_MAP } from '@/lib/data/creator-topics';
 import dynamic from 'next/dynamic';
@@ -4551,6 +4551,220 @@ export default function CreatorStudioPage() {
               )}
             </>
           )}
+
+          {/* ==========================================
+              CONTENT CALENDAR (Phase 3)
+              ========================================== */}
+          {dashboardData && (() => {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            // Build 3-month window
+            const months: { month: number; year: number; label: string }[] = [];
+            for (let i = 0; i < 3; i++) {
+              const m = (currentMonth + i) % 12;
+              const y = currentYear + Math.floor((currentMonth + i) / 12);
+              months.push({
+                month: m,
+                year: y,
+                label: new Date(y, m, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+              });
+            }
+
+            type CalendarEntry = {
+              id: string;
+              name: string;
+              contentPath: string | null;
+              topic: string | null;
+              confidence: 'Planned' | 'Target Set' | 'Estimated' | 'Projected' | 'Pipeline';
+              monthIndex: number; // 0, 1, or 2
+            };
+
+            const entries: CalendarEntry[] = [];
+
+            // Process active creators
+            dashboardData.creators
+              .filter(c => c.publish_status !== 'published' && c.status === 'active')
+              .forEach(c => {
+                let targetMonth: number | null = null;
+                let targetYear: number | null = null;
+                let confidence: CalendarEntry['confidence'] | null = null;
+
+                // 1. Has target_publish_month set (e.g. "August 2026" or "July")
+                if (c.target_publish_month) {
+                  const parsed = new Date(c.target_publish_month + ' 1');
+                  if (!isNaN(parsed.getTime())) {
+                    targetMonth = parsed.getMonth();
+                    targetYear = parsed.getFullYear();
+                    confidence = 'Planned';
+                  } else {
+                    // Try parsing month name only
+                    const monthNames = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+                    const idx = monthNames.indexOf(c.target_publish_month.toLowerCase().split(' ')[0]);
+                    if (idx >= 0) {
+                      targetMonth = idx;
+                      // Check if year is in the string
+                      const yearMatch = c.target_publish_month.match(/\d{4}/);
+                      targetYear = yearMatch ? parseInt(yearMatch[0]) : currentYear;
+                      confidence = 'Planned';
+                    }
+                  }
+                }
+
+                // 2-4. Estimate based on progress
+                if (confidence === null) {
+                  const progress = c.progressPercentage || 0;
+                  const path = c.content_path?.toLowerCase() || '';
+
+                  if (progress >= 70) {
+                    const offset = path.includes('course') ? 2 : path.includes('download') ? 1 : 0;
+                    const estMonth = (currentMonth + offset) % 12;
+                    const estYear = currentYear + Math.floor((currentMonth + offset) / 12);
+                    targetMonth = estMonth;
+                    targetYear = estYear;
+                    confidence = 'Estimated';
+                  } else if (progress >= 30) {
+                    const offset = path.includes('course') ? 4 : path.includes('download') ? 2 : 1;
+                    const estMonth = (currentMonth + offset) % 12;
+                    const estYear = currentYear + Math.floor((currentMonth + offset) / 12);
+                    targetMonth = estMonth;
+                    targetYear = estYear;
+                    confidence = 'Projected';
+                  }
+                  // progress < 30 -- skip
+                }
+
+                if (targetMonth !== null && targetYear !== null && confidence) {
+                  // Check if it falls within our 3-month window
+                  const monthIdx = months.findIndex(m => m.month === targetMonth && m.year === targetYear);
+                  if (monthIdx >= 0) {
+                    entries.push({
+                      id: c.id,
+                      name: c.name,
+                      contentPath: c.content_path,
+                      topic: c.course_title || c.topic || null,
+                      confidence,
+                      monthIndex: monthIdx,
+                    });
+                  }
+                }
+              });
+
+            // Summary stats
+            const totalProjected = entries.length;
+            const courseCount = entries.filter(e => e.contentPath?.toLowerCase().includes('course')).length;
+            const downloadCount = entries.filter(e => e.contentPath?.toLowerCase().includes('download')).length;
+            const blogCount = entries.filter(e => e.contentPath?.toLowerCase().includes('blog')).length;
+
+            // Content path badge colors
+            const pathBadgeStyle = (path: string | null) => {
+              const p = (path || '').toLowerCase();
+              if (p.includes('course')) return { background: '#DBEAFE', color: '#1D4ED8' };
+              if (p.includes('download')) return { background: '#DCFCE7', color: '#166534' };
+              if (p.includes('blog')) return { background: '#FEF3C7', color: '#92400E' };
+              return { background: '#F3F4F6', color: '#6B7280' };
+            };
+
+            // Confidence badge colors
+            const confidenceBadgeStyle = (confidence: string) => {
+              switch (confidence) {
+                case 'Planned': return { background: '#DCFCE7', color: '#166534' };
+                case 'Target Set': return { background: '#DBEAFE', color: '#1D4ED8' };
+                case 'Estimated': return { background: '#FEF3C7', color: '#92400E' };
+                case 'Projected': return { background: '#F3F4F6', color: '#6B7280' };
+                case 'Pipeline': return { background: '#F3E8FF', color: '#7C3AED' };
+                default: return { background: '#F3F4F6', color: '#6B7280' };
+              }
+            };
+
+            const pathLabel = (path: string | null) => {
+              const p = (path || '').toLowerCase();
+              if (p.includes('course')) return 'Course';
+              if (p.includes('download')) return 'Download';
+              if (p.includes('blog')) return 'Blog';
+              return 'TBD';
+            };
+
+            return (
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
+                  Content Calendar
+                </h2>
+                <p className="text-sm text-gray-500 mb-4">Forward-looking view of projected content publishes based on targets, progress, and content path.</p>
+
+                {/* Summary stats row */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+                  <div className="bg-white rounded-xl p-4 shadow-[0_1px_4px_rgba(0,0,0,0.04)] text-center">
+                    <p style={{ fontSize: 22, fontWeight: 700, color: '#1e2749' }}>{totalProjected}</p>
+                    <p style={{ fontSize: 11, color: '#6B7280', fontWeight: 500 }}>Projected (3 months)</p>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 shadow-[0_1px_4px_rgba(0,0,0,0.04)] text-center">
+                    <p style={{ fontSize: 22, fontWeight: 700, color: '#1D4ED8' }}>{courseCount}</p>
+                    <p style={{ fontSize: 11, color: '#6B7280', fontWeight: 500 }}>Courses</p>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 shadow-[0_1px_4px_rgba(0,0,0,0.04)] text-center">
+                    <p style={{ fontSize: 22, fontWeight: 700, color: '#166534' }}>{downloadCount}</p>
+                    <p style={{ fontSize: 11, color: '#6B7280', fontWeight: 500 }}>Downloads</p>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 shadow-[0_1px_4px_rgba(0,0,0,0.04)] text-center">
+                    <p style={{ fontSize: 22, fontWeight: 700, color: '#92400E' }}>{blogCount}</p>
+                    <p style={{ fontSize: 11, color: '#6B7280', fontWeight: 500 }}>Blogs</p>
+                  </div>
+                </div>
+
+                {/* 3-month calendar columns */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {months.map((month, idx) => {
+                    const monthEntries = entries.filter(e => e.monthIndex === idx);
+                    return (
+                      <div key={month.label} className="bg-white rounded-2xl p-5 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+                        <h3 style={{ fontSize: 14, fontWeight: 700, color: '#1e2749', marginBottom: 12 }}>
+                          {month.label}
+                        </h3>
+                        {monthEntries.length === 0 ? (
+                          <p style={{ fontSize: 13, color: '#9CA3AF', padding: '16px 0', textAlign: 'center' }}>
+                            Nothing projected for {month.label.split(' ')[0]}
+                          </p>
+                        ) : (
+                          <div className="space-y-3">
+                            {monthEntries.map(entry => (
+                              <div key={entry.id} style={{ padding: '10px 12px', borderRadius: 10, background: '#F9FAFB', border: '1px solid #F3F4F6' }}>
+                                <p style={{ fontSize: 13, fontWeight: 600, color: '#1e2749', marginBottom: 4 }}>{entry.name}</p>
+                                {entry.topic && (
+                                  <p style={{ fontSize: 11, color: '#6B7280', marginBottom: 6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{entry.topic}</p>
+                                )}
+                                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                                  <span style={{
+                                    fontSize: 10,
+                                    fontWeight: 600,
+                                    padding: '2px 8px',
+                                    borderRadius: 99,
+                                    ...pathBadgeStyle(entry.contentPath),
+                                  }}>
+                                    {pathLabel(entry.contentPath)}
+                                  </span>
+                                  <span style={{
+                                    fontSize: 10,
+                                    fontWeight: 600,
+                                    padding: '2px 8px',
+                                    borderRadius: 99,
+                                    ...confidenceBadgeStyle(entry.confidence),
+                                  }}>
+                                    {entry.confidence}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Reference & Details -- collapsed by default */}
           {dashboardData && (
