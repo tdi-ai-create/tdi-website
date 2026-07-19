@@ -37,6 +37,10 @@
       "schedule": "0 12 * * 1"
     },
     {
+      "path": "/api/cron/partner-weekly-digest",
+      "schedule": "0 13 * * 1"
+    },
+    {
       "path": "/api/cron/monthly-principal-email",
       "schedule": "0 14 1 * *"
     },
