@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
 import CommunityTabs from '@/components/hub/CommunityTabs';
+import CommunityNudge from '@/components/hub/CommunityNudge';
 import LessonQA from '@/components/hub/LessonQA';
 import AchievementInsights from '@/components/hub/AchievementInsights';
 
@@ -1466,6 +1467,13 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               conversationApiPath={`/api/hub/quick-wins/${quickWin.id}/conversation`}
               qaApiPath={`/api/hub/quick-wins/${quickWin.id}/qa`}
             />
+
+            {/* Community nudge after marking as done */}
+            {isCompleted && (
+              <div className="mt-4">
+                <CommunityNudge contentSlug={quickWin.slug} contentType="quick_win" />
+              </div>
+            )}
 
             {/* AI Growth Insights */}
             <div className="mt-8">
