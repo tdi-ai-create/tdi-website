@@ -41,17 +41,15 @@ export async function POST(request: NextRequest) {
     const firstName = (name || '').split(' ')[0] || 'there';
     const dashboardUrl = `https://www.teachersdeserveit.com/partners/${partnership.slug}`;
 
-    // Create Supabase auth account via invite
-    const { data: inviteData, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(
-      email,
-      {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com'}/partners/login`,
-        data: {
-          partnership_id: partnershipId,
-          name: name || email,
-        },
-      }
-    );
+    // Create user silently (no Supabase email -- our branded invite handles it)
+    const { data: inviteData, error: inviteError } = await supabase.auth.admin.createUser({
+      email: email.toLowerCase(),
+      email_confirm: true,
+      user_metadata: {
+        partnership_id: partnershipId,
+        name: name || email,
+      },
+    });
 
     if (inviteError) {
       // If user already exists, just link them

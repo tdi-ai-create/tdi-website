@@ -39,17 +39,15 @@ export async function POST(request: NextRequest) {
 
     const supabase = getServiceSupabase();
 
-    // Send Supabase invite
-    const { data: inviteData, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(
-      inviteEmail,
-      {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/partners/login`,
-        data: {
-          partnership_id: partnershipId,
-          name: name || inviteEmail,
-        }
-      }
-    );
+    // Create user silently (no Supabase email sent -- our branded welcome handles it)
+    const { data: inviteData, error: inviteError } = await supabase.auth.admin.createUser({
+      email: inviteEmail,
+      email_confirm: true,
+      user_metadata: {
+        partnership_id: partnershipId,
+        name: name || inviteEmail,
+      },
+    });
 
     if (inviteError) {
       // If user already exists, just link them
