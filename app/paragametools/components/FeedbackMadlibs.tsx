@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Smile, ChevronRight, Sparkles, Award, RotateCcw, Volume2 } from 'lucide-react';
+import { Smile, ChevronRight, Sparkles, Award, RotateCcw, Volume2, ArrowLeft } from 'lucide-react';
 import { GameWrapper } from './GameWrapper';
 import { ConfettiBurst } from './ConfettiBurst';
 import { MADLIBS_SCENARIOS, MADLIBS_SILLY_ROUNDS, SILLY_ROUND_PROMPTS } from '../data/madlibsData';
@@ -553,14 +553,24 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
             </div>
           </div>
 
-          <button
-            onClick={onBack}
-            className="flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#ffffff' }}
-          >
-            <RotateCcw size={20} />
-            {t.backToGames[language]}
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={handleStart}
+              className="flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
+              style={{ backgroundColor: colorConfig.accent, color: '#ffffff' }}
+            >
+              <RotateCcw size={20} />
+              {language === 'es' ? 'Jugar de nuevo' : 'Play Again'}
+            </button>
+            <button
+              onClick={onBack}
+              className="flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#ffffff' }}
+            >
+              <ArrowLeft size={20} />
+              {t.backToGames[language]}
+            </button>
+          </div>
         </div>
       )}
     </GameWrapper>

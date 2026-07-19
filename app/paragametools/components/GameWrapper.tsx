@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Target, Zap, TrendingUp, Smile, Wrench, Crosshair, Award, Check, X, Shuffle, ListOrdered, Battery } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Target, Zap, TrendingUp, Smile, Wrench, Crosshair, Award, Check, X, Shuffle, ListOrdered, Battery } from 'lucide-react';
 import { COLORS, type GameId } from '../data/gameConfig';
 import { ConfettiBurst } from './ConfettiBurst';
 import { useLanguage } from '../context/LanguageContext';
@@ -145,6 +145,7 @@ interface DoneScreenProps {
   tableTalk: string;
   color: keyof typeof COLORS;
   onBack: () => void;
+  onPlayAgain?: () => void;
   extraContent?: React.ReactNode;
 }
 
@@ -155,6 +156,7 @@ export function DoneScreen({
   tableTalk,
   color,
   onBack,
+  onPlayAgain,
   extraContent,
 }: DoneScreenProps) {
   const colorConfig = COLORS[color];
@@ -192,14 +194,26 @@ export function DoneScreen({
         <p className="text-white text-lg">{tableTalk}</p>
       </div>
 
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
-        style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#ffffff' }}
-      >
-        <ArrowLeft size={20} />
-        {t.backToGames[language]}
-      </button>
+      <div className="flex gap-3">
+        {onPlayAgain && (
+          <button
+            onClick={onPlayAgain}
+            className="flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
+            style={{ backgroundColor: colorConfig.accent, color: color === 'yellow' ? '#0a1628' : '#ffffff' }}
+          >
+            <RotateCcw size={20} />
+            {language === 'es' ? 'Jugar de nuevo' : 'Play Again'}
+          </button>
+        )}
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
+          style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#ffffff' }}
+        >
+          <ArrowLeft size={20} />
+          {t.backToGames[language]}
+        </button>
+      </div>
     </div>
   );
 }

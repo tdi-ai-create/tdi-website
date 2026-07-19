@@ -270,6 +270,7 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
           tableTalk={t.tellorask_tableTalk[language]}
           color="yellow"
           onBack={onBack}
+          onPlayAgain={handleStart}
         />
       )}
     </GameWrapper>

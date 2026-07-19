@@ -288,6 +288,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
           tableTalk={t.levelup_tableTalk[language]}
           color="green"
           onBack={onBack}
+          onPlayAgain={handleStart}
           extraContent={
             <div
               className="w-full max-w-lg rounded-xl p-5 mb-4 text-center"

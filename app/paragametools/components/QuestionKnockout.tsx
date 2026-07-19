@@ -210,6 +210,7 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
           tableTalk={t.knockout_tableTalk[language]}
           color="orange"
           onBack={onBack}
+          onPlayAgain={handleStart}
           extraContent={
             <>
               {switches > 0 && (
