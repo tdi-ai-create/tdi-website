@@ -8,9 +8,11 @@ import { TELL_OR_ASK_STATEMENTS, TELL_OR_ASK_ROUNDS } from '../data/tellOrAsk';
 import { COLORS, shuffleAndPick } from '../data/gameConfig';
 import { useLanguage } from '../context/LanguageContext';
 import { UI_TRANSLATIONS } from '../data/translations';
-import { useGameTracking } from '@/lib/hub/useGameTracking';
+import { useGameTracking, type WeakItem } from '@/lib/hub/useGameTracking';
 import { useGameBadgeCheck } from '@/components/hub/useGameBadgeCheck';
 import { GameSettingsPanel } from './GameSettingsPanel';
+import { ReviewModeBanner } from './ReviewModeBanner';
+import { buildReviewPool } from '@/lib/hub/gameReviewMode';
 import { type GameSettings, DEFAULT_SETTINGS, filterBySettings } from '../data/gameSettings';
 
 type Screen = 'intro' | 'play' | 'done';
@@ -30,6 +32,7 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [confidence, setConfidence] = useState<number | null>(null);
   const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
+  const [reviewItems, setReviewItems] = useState<(typeof TELL_OR_ASK_STATEMENTS[number] & { _origIndex: number })[] | null>(null);
 
   const { logCompletion, startSession, logGameResponse, completeSession } = useGameTracking();
   const { language } = useLanguage();
@@ -39,12 +42,15 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
   const statementsWithIds = useMemo(() => {
     const indexed = TELL_OR_ASK_STATEMENTS.map((s, i) => ({ ...s, _origIndex: i }));
     const filtered = filterBySettings(indexed, settings);
-    // Ensure we have enough items — fall back to all if filter is too narrow
     const pool = filtered.length >= 6 ? filtered : indexed;
     return shuffleAndPick(pool, Math.min(TELL_OR_ASK_ROUNDS, pool.length));
   }, [settings]);
 
+  // Use review items if set, otherwise use normal shuffled items
+  const activeStatements = reviewItems ?? statementsWithIds;
+
   const handleStart = async () => {
+    setReviewItems(null);
     setScreen('play');
     setCurrentRound(0);
     setRevealed(false);
@@ -60,11 +66,30 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
     });
   };
 
+  const handleStartReview = async (weakItems: WeakItem[]) => {
+    const indexed = TELL_OR_ASK_STATEMENTS.map((s, i) => ({ ...s, _origIndex: i }));
+    const { items } = buildReviewPool(
+      indexed,
+      weakItems,
+      Math.min(TELL_OR_ASK_ROUNDS, indexed.length),
+      (item) => `tellorask_${item._origIndex}`
+    );
+    setReviewItems(items);
+    setScreen('play');
+    setCurrentRound(0);
+    setRevealed(false);
+    setUserGuess(null);
+    setStreak(0);
+    setBestStreak(0);
+    setConfidence(null);
+    await startSession('tell-or-ask', items.length, { language, isReviewMode: true });
+  };
+
   const handleGuess = (guess: 'TELL' | 'ASK') => {
     setUserGuess(guess);
     setRevealed(true);
 
-    const current = statementsWithIds[currentRound];
+    const current = activeStatements[currentRound];
     const isCorrect = guess === current.type;
     const newStreak = isCorrect ? streak + 1 : 0;
 
@@ -87,7 +112,7 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
   };
 
   const handleNext = async () => {
-    if (currentRound < statementsWithIds.length - 1) {
+    if (currentRound < activeStatements.length - 1) {
       setIsAnimating(true);
       setTimeout(() => {
         setCurrentRound((prev) => prev + 1);
@@ -98,13 +123,13 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
       }, 200);
     } else {
       setScreen('done');
-      logCompletion({ tool: 'tell-or-ask', score: correctCount, totalRounds: statementsWithIds.length, streak });
+      logCompletion({ tool: 'tell-or-ask', score: correctCount, totalRounds: activeStatements.length, streak });
       await completeSession(correctCount, bestStreak);
     }
   };
 
   const colorConfig = COLORS.yellow;
-  const current = statementsWithIds[currentRound];
+  const current = activeStatements[currentRound];
   const isCorrect = userGuess === current.type;
 
   const gameTitle = t.games.tellorask.title[language];
@@ -129,6 +154,11 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
                 accentColor="#F1C40F"
                 show={['difficulty', 'gradeBand']}
               />
+              <ReviewModeBanner
+                gameId="tell-or-ask"
+                accentColor="#F1C40F"
+                onStartReview={handleStartReview}
+              />
               <div className="flex items-center gap-2 mb-4 text-yellow-400">
                 <AlertTriangle size={18} />
                 <span className="text-sm">{t.tellorask_warning[language]}</span>
@@ -145,7 +175,7 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
             className="text-xs uppercase tracking-widest mb-2"
             style={{ color: 'rgba(241, 196, 15, 0.5)' }}
           >
-            {t.round[language]} {currentRound + 1} {t.of[language]} {statementsWithIds.length}
+            {t.round[language]} {currentRound + 1} {t.of[language]} {activeStatements.length}
           </p>
 
           {/* Streak counter */}
@@ -254,7 +284,7 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
                 className="flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
                 style={{ backgroundColor: colorConfig.accent, color: '#0a1628' }}
               >
-                {currentRound < statementsWithIds.length - 1 ? t.next[language] : t.finish[language]}
+                {currentRound < activeStatements.length - 1 ? t.next[language] : t.finish[language]}
                 <ChevronRight size={20} />
               </button>
             </div>
