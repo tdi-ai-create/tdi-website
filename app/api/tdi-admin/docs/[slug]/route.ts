@@ -24,6 +24,7 @@ export async function GET(
     'engagement-workflow': 'engagement-workflow.html',
     'creator-feedback-sop': 'creator-feedback-sop.html',
     'creator-recruitment-sop': 'creator-recruitment-sop.html',
+    'communication-map': 'communication-map.html',
   };
 
   const filename = allowedDocs[slug];
