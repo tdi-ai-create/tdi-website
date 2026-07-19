@@ -41,6 +41,7 @@ const PRACTICE_GAME_CARDS = [
   { id: 'practice-prioritize-this', slug: 'prioritize-this', title: 'Prioritize This', description: 'Rank 4 tasks by priority. See how experienced educators would handle it.', category: 'Games', estimated_minutes: 10, content_type: 'activity' as const, access_tier: 'free', capacity: 'medium' as const },
   { id: 'practice-energy-budget', slug: 'energy-budget', title: 'Energy Budget', description: 'You have 100 energy points. How do you spend your day? Compare with experienced educators.', category: 'Games', estimated_minutes: 10, content_type: 'activity' as const, access_tier: 'free', capacity: 'low' as const },
   { id: 'practice-this-or-that', slug: 'this-or-that', title: 'This or That', description: 'Two approaches. No right answer. Pick yours, then see how other educators respond.', category: 'Games', estimated_minutes: 12, content_type: 'activity' as const, access_tier: 'free', capacity: 'low' as const },
+  { id: 'practice-sort-it-out', slug: 'sort-it-out', title: 'Sort It Out', description: 'Drag items into the right category. Feedback vs praise, proactive vs reactive, and more.', category: 'Games', estimated_minutes: 15, content_type: 'activity' as const, access_tier: 'free', capacity: 'low' as const },
 ];
 
 

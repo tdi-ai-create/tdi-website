@@ -39,6 +39,7 @@ import { ClassroomShuffle } from '@/app/paragametools/components/ClassroomShuffl
 import { PrioritizeThis } from '@/app/paragametools/components/PrioritizeThis';
 import { EnergyBudget } from '@/app/paragametools/components/EnergyBudget';
 import { ThisOrThat } from '@/app/paragametools/components/ThisOrThat';
+import { SortItOut } from '@/app/paragametools/components/SortItOut';
 import { Gamepad2, Users, Timer, Target } from 'lucide-react';
 
 type Bilingual = { en: string; es: string };
@@ -287,6 +288,29 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     color: '#E8B84B',
     format: 'both',
   },
+  'sort-it-out': {
+    component: SortItOut,
+    id: 'practice-sort-it-out',
+    contentUuid: 'a1000011-0000-0000-0000-000000000011',
+    title: { en: 'Sort It Out', es: 'Clasifica Esto' },
+    description: { en: 'Items appear. Buckets wait. Drag each one into the right category. Sounds simple until you hit the tricky ones. Covers feedback, mindset, management strategies, accommodations, and para responsibilities.', es: 'Aparecen items. Los cubos esperan. Arrastra cada uno a la categoria correcta. Suena simple hasta que llegas a los complicados. Cubre retroalimentacion, mentalidad, estrategias de manejo, acomodaciones y responsabilidades del para.' },
+    howToPlay: [
+      { en: 'Read each item carefully', es: 'Lee cada item con cuidado' },
+      { en: 'Tap to select, then tap a bucket to place it', es: 'Toca para seleccionar, luego toca un cubo para colocarlo' },
+      { en: 'You can move items between buckets before submitting', es: 'Puedes mover items entre cubos antes de enviar' },
+      { en: 'Submit when all items are sorted', es: 'Envia cuando todos los items esten clasificados' },
+      { en: 'See which ones you got right, with explanations for wrong placements', es: 'Ve cuales acertaste, con explicaciones para los que no' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great for team discussions about where items belong and why', es: 'Excelente para discusiones en equipo sobre donde pertenecen los items y por que' },
+    ],
+    bestFor: { en: 'All educators. The para responsibilities set is specifically designed for paraprofessionals. Accommodation vs modification set is essential for anyone supporting IEP students.', es: 'Todos los educadores. El set de responsabilidades del para esta especificamente disenado para paraprofesionales.' },
+    time: '~15 min',
+    rounds: { en: '5 categories, 10 items each', es: '5 categorias, 10 items cada una' },
+    color: '#2563EB',
+    format: 'both',
+  },
 };
 
 // ─── Game Testimonials ──────────────────────────────────────────────────────
@@ -336,6 +360,11 @@ const GAME_TESTIMONIALS: Record<string, { quote: string; role: string }[]> = {
     { quote: "No right answer means no pressure. I was more honest about my instincts than in any other PD I have done.", role: "5th grade teacher" },
     { quote: "The 50/50 splits started the best team conversations. We realized we approach the same situations completely differently.", role: "Instructional coach" },
     { quote: "Seeing that 70% of K-2 teachers agreed with me but only 40% of high school teachers did. That gap taught me more than any lecture.", role: "3rd grade teacher" },
+  ],
+  'sort-it-out': [
+    { quote: "The accommodation vs modification set finally made the difference click. I have been confusing them for years.", role: "Special education teacher" },
+    { quote: "Our whole team played the Feedback or Praise set and then rewrote our report card comments. Transformative.", role: "Grade-level lead" },
+    { quote: "The para responsibilities set should be required for every new para orientation. Finally someone made it clear.", role: "Paraprofessional, K-2" },
   ],
 };
 

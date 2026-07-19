@@ -159,6 +159,17 @@ const PRACTICE_TOOLS: QuickWin[] = [
     access_tier: 'free',
     capacity: 'low',
   },
+  {
+    id: 'practice-sort-it-out',
+    slug: 'sort-it-out',
+    title: 'Sort It Out',
+    description: 'Drag items into the right category. Feedback vs praise, proactive vs reactive, and more.',
+    category: 'Games',
+    estimated_minutes: 15,
+    content_type: 'activity',
+    access_tier: 'free',
+    capacity: 'low',
+  },
 ];
 
 
