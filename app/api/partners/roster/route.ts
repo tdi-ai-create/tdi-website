@@ -171,6 +171,7 @@ export async function POST(request: NextRequest) {
               email: s.email,
               firstName: s.firstName || s.email.split('@')[0],
               schoolName: partnership.contact_name || 'your school',
+              roleTitle: s.roleTitle || null,
             }),
           }).catch(() => {});
         } else {

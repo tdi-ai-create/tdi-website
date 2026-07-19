@@ -235,7 +235,7 @@ export async function POST(
             fetch(`${baseUrl}/api/hub/emails/staff-welcome`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email: s.email, firstName: s.first_name || s.email.split('@')[0], schoolName }),
+              body: JSON.stringify({ email: s.email, firstName: s.first_name || s.email.split('@')[0], schoolName, roleTitle: s.role_title || null }),
             }).catch(() => {});
           }
         } catch { /* non-fatal */ }
