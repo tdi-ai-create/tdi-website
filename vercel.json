@@ -95,6 +95,10 @@
     {
       "path": "/api/cron/hub-content-health",
       "schedule": "30 12 * * *"
+    },
+    {
+      "path": "/api/cron/recruitment-followup",
+      "schedule": "0 10 * * *"
     }
   ]
 }
