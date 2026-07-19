@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     // Verify partnership exists
     const { data: partnership } = await supabase
       .from('partnerships')
-      .select('id, status, contact_name')
+      .select('id, status, contact_name, org_name, base_staff_enrolled, slug')
       .eq('id', partnershipId)
       .single();
 
@@ -124,6 +124,53 @@ export async function POST(request: NextRequest) {
       .from('partnerships')
       .update({ staff_enrolled: totalCount, updated_at: new Date().toISOString() })
       .eq('id', partnershipId);
+
+    // Flag if roster exceeds contracted seats
+    if (partnership.base_staff_enrolled && totalCount > partnership.base_staff_enrolled) {
+      const overCount = totalCount - partnership.base_staff_enrolled;
+      const schoolName = partnership.org_name || partnership.contact_name || 'A partnership';
+
+      // Create internal action item for trainer follow-up
+      await supabase.from('action_items').insert({
+        partnership_id: partnershipId,
+        title: `Roster exceeds contract: ${totalCount} staff vs ${partnership.base_staff_enrolled} contracted seats (+${overCount})`,
+        description: `${schoolName} added ${overCount} staff beyond their ${partnership.base_staff_enrolled}-seat contract. Follow up to determine if this is a replacement, expansion, or grant opportunity.`,
+        category: 'follow_up',
+        priority: 'medium',
+        status: 'pending',
+        visible_to_partner: false,
+      });
+
+      // Notify Rae via email
+      if (process.env.RESEND_API_KEY) {
+        fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: 'TDI Admin <noreply@teachersdeserveit.com>',
+            to: 'rae@teachersdeserveit.com',
+            subject: `Roster over contract: ${schoolName} (+${overCount} staff)`,
+            html: `<div style="font-family:sans-serif;color:#1e2749;font-size:15px;line-height:1.6;">
+              <p><strong>${schoolName}</strong> just updated their roster with <strong>${totalCount} staff</strong>, which is <strong>${overCount} more</strong> than their contracted ${partnership.base_staff_enrolled} seats.</p>
+              <p>This could be:</p>
+              <ul>
+                <li>A replacement for staff who left (no action needed)</li>
+                <li>A genuine expansion (contract amendment opportunity)</li>
+                <li>A grant expansion conversation</li>
+              </ul>
+              <p><a href="https://www.teachersdeserveit.com/tdi-admin/leadership/${partnershipId}">Open Partnership Dashboard</a></p>
+            </div>`,
+          }),
+        }).catch(() => {});
+      }
+
+      // Log it
+      await supabase.from('activity_log').insert({
+        partnership_id: partnershipId,
+        action: 'roster_over_contract',
+        details: { total: totalCount, contracted: partnership.base_staff_enrolled, over: overCount },
+      });
+    }
 
     // Mark the "Upload staff roster" action item as completed if it exists
     await supabase
