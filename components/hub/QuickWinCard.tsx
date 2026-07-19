@@ -15,7 +15,7 @@ const CATEGORY_COLORS: Record<string, { dot: string; bg: string; text: string }>
   'Self-Care':                { dot: '#7C3AED', bg: '#F3E8FF', text: '#7C3AED' },
   'Stress Relief':            { dot: '#BE123C', bg: '#FFE4E6', text: '#BE123C' },
   'Classroom Management':     { dot: '#1e2749', bg: '#E2E4EA', text: '#1e2749' },
-  'Games':                    { dot: '#B45309', bg: '#FEF9C3', text: '#B45309' },
+  'Games':                    { dot: '#E8553A', bg: '#FFF1EE', text: '#E8553A' },
   'Time Savers':              { dot: '#0E7490', bg: '#CFFAFE', text: '#0E7490' },
   'Vocational':               { dot: '#4D7C0F', bg: '#ECFCCB', text: '#4D7C0F' },
   'Leadership':               { dot: '#4338CA', bg: '#E0E7FF', text: '#4338CA' },
