@@ -46,11 +46,12 @@ export async function GET(request: NextRequest) {
     // Get active partnerships
     const { data: partnerships } = await portalSupabase
       .from('partnerships')
-      .select('id, slug, contact_name, contact_email, org_name, contract_phase, staff_enrolled')
-      .eq('status', 'active');
+      .select('id, slug, contact_name, contact_email, org_name, contract_phase, staff_enrolled, invite_accepted_at')
+      .eq('status', 'active')
+      .not('invite_accepted_at', 'is', null);
 
     if (!partnerships || partnerships.length === 0) {
-      return NextResponse.json({ success: true, sent: 0, message: 'No active partnerships' });
+      return NextResponse.json({ success: true, sent: 0, message: 'No partnerships with active logins yet' });
     }
 
     // Get curated Quick Wins for the "Share With Your Team" section
