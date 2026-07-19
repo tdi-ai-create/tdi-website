@@ -36,21 +36,191 @@ import { WhatsYourMove } from '@/app/paragametools/components/WhatsYourMove';
 import { ClassroomShuffle } from '@/app/paragametools/components/ClassroomShuffle';
 import { PrioritizeThis } from '@/app/paragametools/components/PrioritizeThis';
 import { EnergyBudget } from '@/app/paragametools/components/EnergyBudget';
+import { Gamepad2, Users, Timer, Target } from 'lucide-react';
 
-const PRACTICE_GAME_MAP: Record<string, {
+interface PracticeGameConfig {
   component: React.ComponentType<{ onBack: () => void }>;
   id: string;
   title: string;
-}> = {
-  'question-knockout': { component: QuestionKnockout, id: 'practice-question-knockout', title: 'Question Knockout' },
-  'tell-or-ask': { component: TellOrAsk, id: 'practice-tell-or-ask', title: 'Tell or Ask?' },
-  'feedback-level-up': { component: FeedbackLevelUp, id: 'practice-feedback-level-up', title: 'Feedback Level Up' },
-  'feedback-madlibs': { component: FeedbackMadlibs, id: 'practice-feedback-madlibs', title: 'Feedback Madlibs' },
-  'feedback-makeover': { component: FeedbackMakeover, id: 'practice-feedback-makeover', title: 'Feedback Makeover' },
-  'whats-your-move': { component: WhatsYourMove, id: 'practice-whats-your-move', title: "What's Your Move?" },
-  'classroom-shuffle': { component: ClassroomShuffle, id: 'practice-classroom-shuffle', title: 'Classroom Scenario Shuffle' },
-  'prioritize-this': { component: PrioritizeThis, id: 'practice-prioritize-this', title: 'Prioritize This' },
-  'energy-budget': { component: EnergyBudget, id: 'practice-energy-budget', title: 'Energy Budget' },
+  description: string;
+  howToPlay: string[];
+  whatYouNeed: string[];
+  bestFor: string;
+  time: string;
+  rounds: string;
+  color: string;
+  format: 'solo' | 'group' | 'both';
+}
+
+const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
+  'question-knockout': {
+    component: QuestionKnockout,
+    id: 'practice-question-knockout',
+    title: 'Question Knockout',
+    description: 'You see a real classroom scenario. Your only tool? Questions. No telling, no directing, no hinting. Just questions. If you slip and tell, hit the buzzer. It is harder than you think.',
+    howToPlay: [
+      'Read each classroom scenario',
+      'Respond using ONLY questions -- no commands, no hints',
+      'You have 90 seconds per scenario',
+      'If you catch yourself telling, hit the buzzer',
+      'At round 5, switch roles with your partner',
+    ],
+    whatYouNeed: ['A partner (or play solo to practice internally)', 'A quiet space to think out loud'],
+    bestFor: 'Paraprofessionals, teachers, coaches -- anyone who works directly with students',
+    time: '~15 min',
+    rounds: '10 rounds',
+    color: '#FF7847',
+    format: 'both',
+  },
+  'tell-or-ask': {
+    component: TellOrAsk,
+    id: 'practice-tell-or-ask',
+    title: 'Tell or Ask?',
+    description: 'You will see statements educators say every day. Some are real questions that open thinking. Others are commands disguised with a question mark. Can you spot the difference? It is trickier than it sounds.',
+    howToPlay: [
+      'Read each statement an educator might say',
+      'Rate your confidence (1-5) before answering',
+      'Decide: is this a TELL (command) or an ASK (real question)?',
+      'See the reveal and learn why',
+      'Build a streak of correct answers',
+    ],
+    whatYouNeed: ['Just yourself -- this is a solo game', 'Optional: play with a partner and debate before revealing'],
+    bestFor: 'All educators -- especially powerful for paraprofessionals learning questioning techniques',
+    time: '~10 min',
+    rounds: '14 rounds',
+    color: '#F1C40F',
+    format: 'both',
+  },
+  'feedback-level-up': {
+    component: FeedbackLevelUp,
+    id: 'practice-feedback-level-up',
+    title: 'Feedback Level Up',
+    description: 'Not all feedback is created equal. You will see real examples of feedback given to students and categorize them from Level 1 (vague) to Level 4 (exceptional). Watch out for the Level 2 trap -- it catches most people.',
+    howToPlay: [
+      'Read each piece of student feedback',
+      'Categorize it: Level 1 (Vague), 2 (Partial), 3 (Complete), or 4 (Exceptional)',
+      'See the correct level and learn why',
+      'Watch for the "Level 2 trap" -- vague praise that feels specific',
+    ],
+    whatYouNeed: ['Just yourself', 'Optional: play at a table group and debate levels before revealing'],
+    bestFor: 'Teachers and paras who give feedback to students daily',
+    time: '~12 min',
+    rounds: '12 rounds',
+    color: '#27AE60',
+    format: 'both',
+  },
+  'feedback-madlibs': {
+    component: FeedbackMadlibs,
+    id: 'practice-feedback-madlibs',
+    title: 'Feedback Madlibs',
+    description: 'Learn the Notice + Name + Next Step feedback formula through play. First, you fill in blanks blindly for laughs. Then you practice the real formula with actual student scenarios. Silly first, serious second.',
+    howToPlay: [
+      'Silly rounds: fill in blanks WITHOUT seeing the sentence (like real Mad Libs)',
+      'Reveal your silly version and laugh',
+      'Then see the real Level 3 feedback version',
+      'Real rounds: practice writing Notice + Name + Next Step feedback',
+      'Compare your version to the expert example',
+    ],
+    whatYouNeed: ['Just yourself', 'Best played in a group for the silly rounds -- more laughs'],
+    bestFor: 'Educators learning the feedback formula for the first time, or anyone who wants a refresher',
+    time: '~10 min',
+    rounds: '6 rounds (3 silly + 3 real)',
+    color: '#9333EA',
+    format: 'both',
+  },
+  'feedback-makeover': {
+    component: FeedbackMakeover,
+    id: 'practice-feedback-makeover',
+    title: 'Feedback Makeover',
+    description: 'You get terrible feedback and the real context behind it. Your job: transform it into Level 3 feedback using Notice + Name + Next Step. You are on the clock -- 120 seconds per makeover.',
+    howToPlay: [
+      'Read the bad feedback an educator gave',
+      'Read the context of what the student actually did',
+      'Start the timer -- you have 120 seconds',
+      'Write your Level 3 makeover (Notice + Name + Next Step)',
+      'Use the hint if you get stuck',
+      'View your before/after transformation',
+    ],
+    whatYouNeed: ['A device to type on', 'Best solo, but can be done as a table challenge'],
+    bestFor: 'Educators who know the feedback formula and want to practice applying it under pressure',
+    time: '~15 min',
+    rounds: '6 rounds',
+    color: '#E74C3C',
+    format: 'both',
+  },
+  'whats-your-move': {
+    component: WhatsYourMove,
+    id: 'practice-whats-your-move',
+    title: "What's Your Move?",
+    description: 'Real classroom scenarios with three response options. Only one is the best move. Choose wisely, get instant feedback on why it works (or why it does not), and sharpen your instincts for the moments that matter.',
+    howToPlay: [
+      'Read a real classroom scenario',
+      'Choose the best response from three options',
+      'See instant feedback on your choice',
+      'Learn the reasoning behind the best move',
+    ],
+    whatYouNeed: ['Just yourself', 'Great for table discussions in PD sessions'],
+    bestFor: 'Paraprofessionals and new teachers building classroom instincts',
+    time: '~10 min',
+    rounds: '6 scenarios',
+    color: '#22b8bd',
+    format: 'both',
+  },
+  'classroom-shuffle': {
+    component: ClassroomShuffle,
+    id: 'practice-classroom-shuffle',
+    title: 'Classroom Scenario Shuffle',
+    description: 'Realistic classroom management scenarios drawn from real schools. Read the situation, choose your response, and learn why the best move works. Covers everything from student behavior to parent communication to colleague dynamics.',
+    howToPlay: [
+      'Read the classroom scenario',
+      'Choose the best response from three options',
+      'See whether you were right and learn why',
+      'Track your score across all scenarios',
+    ],
+    whatYouNeed: ['Just yourself', 'Powerful as a group discussion tool in PD'],
+    bestFor: 'All educators -- scenarios range from K-2 to high school, teacher to admin',
+    time: '~12 min',
+    rounds: '8 scenarios',
+    color: '#3498DB',
+    format: 'both',
+  },
+  'prioritize-this': {
+    component: PrioritizeThis,
+    id: 'practice-prioritize-this',
+    title: 'Prioritize This',
+    description: 'You are given a real school situation and four tasks that all need to happen. Rank them from most to least urgent. Then see how experienced educators would prioritize and learn why order matters.',
+    howToPlay: [
+      'Read the situation',
+      'Use the up/down arrows to rank 4 tasks by priority',
+      'Lock in your ranking',
+      'See the expert ranking with explanations for each position',
+    ],
+    whatYouNeed: ['Just yourself', 'Great debate starter for team meetings'],
+    bestFor: 'Teachers, paras, and leaders practicing triage and decision-making',
+    time: '~10 min',
+    rounds: '3 rounds',
+    color: '#9333EA',
+    format: 'both',
+  },
+  'energy-budget': {
+    component: EnergyBudget,
+    id: 'practice-energy-budget',
+    title: 'Energy Budget',
+    description: 'You have 100 energy points to spend across your day. How do you allocate them? Distribute your energy across competing demands, then see how experienced educators would budget theirs. The gaps reveal your growth areas.',
+    howToPlay: [
+      'Read the day scenario',
+      'Distribute 100 energy points across the tasks using + and - buttons',
+      'Use all 100 points (no leftovers)',
+      'Lock in your budget',
+      'Compare your allocation to the expert recommendation',
+    ],
+    whatYouNeed: ['Just yourself', 'Helpful for self-care and sustainability conversations in PD'],
+    bestFor: 'All educators -- especially those struggling with burnout or overcommitment',
+    time: '~10 min',
+    rounds: '3 rounds',
+    color: '#22b8bd',
+    format: 'both',
+  },
 };
 
 // ─── Breathing Exercise Component ───────────────────────────────────────────
@@ -236,18 +406,143 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
   // ─── Practice Game Route ─────────────────────────────────────────────────
   const gameConfig = PRACTICE_GAME_MAP[slug];
+  const [isPlaying, setIsPlaying] = useState(false);
+
   if (gameConfig) {
     const GameComponent = gameConfig.component;
+
+    // Full-screen game mode
+    if (isPlaying) {
+      return (
+        <LanguageProvider>
+          <GameComponent onBack={() => setIsPlaying(false)} />
+        </LanguageProvider>
+      );
+    }
+
+    // Game landing page
+    const FormatIcon = gameConfig.format === 'solo' ? Target : gameConfig.format === 'group' ? Users : Users;
+    const formatLabel = gameConfig.format === 'solo' ? 'Solo' : gameConfig.format === 'group' ? 'Group activity' : 'Solo or group';
+
     return (
-      <LanguageProvider>
-        <div>
-          <GameComponent onBack={() => router.push('/hub/quick-wins?filter=Games')} />
-          {/* Community section below the game */}
-          <div
-            className="px-4 md:px-8 pb-12"
-            style={{ backgroundColor: '#F5F7FA' }}
+      <div className="min-h-screen" style={{ backgroundColor: '#F5F7FA', fontFamily: "'DM Sans', sans-serif" }}>
+        <div className="max-w-[1100px] mx-auto px-4 md:px-8 pt-6 md:pt-10">
+          {/* Back link */}
+          <Link
+            href="/hub/quick-wins?filter=Games"
+            className="inline-flex items-center gap-2 text-sm mb-6 transition-colors"
+            style={{ color: '#6B7280' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#1e2749')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#6B7280')}
           >
-            <div className="max-w-3xl mx-auto">
+            <ArrowLeft size={16} />
+            Games
+          </Link>
+
+          {/* Hero */}
+          <div
+            className="relative mb-8"
+            style={{ backgroundColor: '#1e2749', borderRadius: '20px' }}
+          >
+            <div className="flex flex-col md:flex-row">
+              <div className="flex-1 p-6 md:p-10">
+                <p
+                  style={{
+                    fontSize: '11px', fontWeight: 600, letterSpacing: '0.15em',
+                    textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', marginBottom: 8,
+                  }}
+                >
+                  PRACTICE GAME
+                </p>
+                <h1
+                  className="font-bold mb-3"
+                  style={{
+                    fontFamily: "'Source Serif 4', Georgia, serif",
+                    fontSize: 'clamp(26px, 3.5vw, 34px)', color: 'white', lineHeight: '1.2',
+                  }}
+                >
+                  {gameConfig.title}
+                </h1>
+                <p className="mb-5" style={{ fontSize: '15px', color: 'rgba(255,255,255,0.65)', lineHeight: '1.6' }}>
+                  {gameConfig.description}
+                </p>
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}>
+                    <Timer size={12} />
+                    {gameConfig.time}
+                  </div>
+                  <div className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}>
+                    <Gamepad2 size={12} />
+                    {gameConfig.rounds}
+                  </div>
+                  <div className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}>
+                    <FormatIcon size={12} />
+                    {formatLabel}
+                  </div>
+                </div>
+              </div>
+
+              {/* Play button column */}
+              <div className="md:w-[280px] flex-shrink-0 p-6 md:p-8 flex flex-col justify-center gap-3">
+                <button
+                  onClick={() => setIsPlaying(true)}
+                  className="flex items-center justify-center gap-2 py-4 px-4 font-bold text-lg rounded-xl transition-all hover:scale-105 active:scale-95"
+                  style={{ backgroundColor: gameConfig.color, color: 'white' }}
+                >
+                  <Play size={22} />
+                  Play Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Two-column layout */}
+        <div className="max-w-[1100px] mx-auto px-4 md:px-8 pb-12">
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Left column */}
+            <div className="w-full lg:w-[62%]">
+              {/* How to Play */}
+              <div className="bg-white p-6 md:p-8 mb-6" style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}>
+                <h3 className="font-semibold mb-4" style={{ fontSize: '16px', color: '#1e2749' }}>
+                  How to Play
+                </h3>
+                <div className="space-y-3">
+                  {gameConfig.howToPlay.map((step, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div
+                        className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                        style={{ backgroundColor: `${gameConfig.color}15`, color: gameConfig.color, fontSize: 12, fontWeight: 700 }}
+                      >
+                        {i + 1}
+                      </div>
+                      <p className="text-sm" style={{ color: '#374151', lineHeight: 1.6 }}>{step}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* What You Need */}
+              <div className="bg-white p-6 md:p-8 mb-6" style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}>
+                <h3 className="font-semibold mb-3" style={{ fontSize: '16px', color: '#1e2749' }}>
+                  What You Need
+                </h3>
+                <ul className="space-y-2">
+                  {gameConfig.whatYouNeed.map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm" style={{ color: '#374151' }}>
+                      <span style={{ color: gameConfig.color }}>--</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-4 px-4 py-3 rounded-xl" style={{ backgroundColor: '#FFF8E7' }}>
+                  <p className="text-sm" style={{ color: '#92400E' }}>
+                    <strong>Best for:</strong> {gameConfig.bestFor}
+                  </p>
+                </div>
+              </div>
+
+              {/* Community */}
               <CommunityTabs
                 contentId={gameConfig.id}
                 userId={user?.id}
@@ -256,9 +551,37 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                 qaApiPath={`/api/hub/quick-wins/${gameConfig.id}/qa`}
               />
             </div>
+
+            {/* Right column */}
+            <div className="w-full lg:w-[38%]">
+              <div className="lg:sticky lg:top-24 space-y-6">
+                {/* Play card */}
+                <div className="bg-white p-6" style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}>
+                  <button
+                    onClick={() => setIsPlaying(true)}
+                    className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold rounded-xl transition-all hover:scale-105 active:scale-95"
+                    style={{ backgroundColor: gameConfig.color, color: 'white' }}
+                  >
+                    <Play size={18} />
+                    Play Now
+                  </button>
+                  <div className="mt-4 space-y-2">
+                    <div className="flex items-center gap-2 text-xs" style={{ color: '#9CA3AF' }}>
+                      <Timer size={14} /> {gameConfig.time} to play
+                    </div>
+                    <div className="flex items-center gap-2 text-xs" style={{ color: '#9CA3AF' }}>
+                      <Gamepad2 size={14} /> {gameConfig.rounds}
+                    </div>
+                    <div className="flex items-center gap-2 text-xs" style={{ color: '#9CA3AF' }}>
+                      <FormatIcon size={14} /> {formatLabel}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </LanguageProvider>
+      </div>
     );
   }
 
