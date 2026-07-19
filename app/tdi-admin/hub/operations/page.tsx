@@ -79,6 +79,7 @@ import {
   UserPlus,
   Copy,
   Gift,
+  Upload,
 } from 'lucide-react';
 import {
   TYPE_PAGE_TITLE,
@@ -3332,9 +3333,19 @@ export default function HubOperationsPage() {
       {/* Page Content */}
       <div className="px-6 py-6">
         {/* Page Header */}
-        <div className="mb-6">
-          <h1 style={TYPE_PAGE_TITLE}>Operations</h1>
-          <p className="mt-1" style={TYPE_PAGE_SUBTITLE}>Manage accounts, enrollments, reports, and analytics</p>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 style={TYPE_PAGE_TITLE}>Operations</h1>
+            <p className="mt-1" style={TYPE_PAGE_SUBTITLE}>Manage accounts, enrollments, reports, and analytics</p>
+          </div>
+          <Link
+            href="/tdi-admin/hub/operations/import"
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all hover:opacity-90 text-white"
+            style={{ backgroundColor: theme.accent }}
+          >
+            <Upload className="w-4 h-4" />
+            Import Subscribers
+          </Link>
         </div>
           {/* Example data banner removed -- we're live now */}
           {false && showExampleNotice && (

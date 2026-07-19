@@ -103,12 +103,14 @@ export async function POST(request: NextRequest) {
               // If user already exists in auth but not in hub_profiles, try to get them
               if (authError.message?.includes('already been registered') || authError.message?.includes('duplicate')) {
                 // Try to find the auth user by email
-                const { data: listData } = await supabase.auth.admin.listUsers({
-                  filter: `email.eq.${email}`,
-                  page: 1,
-                  perPage: 1,
-                })
-                const existingAuthUser = listData?.users?.find(u => u.email === email)
+                // Look up existing profile by email (auth user exists but profile might not)
+                const { data: existingProfile } = await supabase
+                  .from('hub_profiles')
+                  .select('id')
+                  .eq('email', email)
+                  .maybeSingle()
+
+                const existingAuthUser = existingProfile ? { id: existingProfile.id } : null
 
                 if (existingAuthUser) {
                   // Create hub_profiles entry
