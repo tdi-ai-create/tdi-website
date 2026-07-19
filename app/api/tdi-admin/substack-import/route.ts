@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
+export const maxDuration = 60
+
 function getHubServiceClient() {
   const url = process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL || process.env.LEARNING_HUB_SUPABASE_URL
   const key = process.env.LEARNING_HUB_SUPABASE_SERVICE_ROLE_KEY || process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY

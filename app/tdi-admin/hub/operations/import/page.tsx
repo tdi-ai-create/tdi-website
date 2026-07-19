@@ -141,7 +141,7 @@ export default function SubstackImportPage() {
     setCancelled(false);
     cancelledRef.current = false;
 
-    const CHUNK_SIZE = 500;
+    const CHUNK_SIZE = 100;
     const chunks: ParsedSubscriber[][] = [];
     for (let i = 0; i < subscribers.length; i += CHUNK_SIZE) {
       chunks.push(subscribers.slice(i, i + CHUNK_SIZE));
