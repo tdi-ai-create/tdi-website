@@ -276,6 +276,11 @@ export default function LeadershipDashboardPage() {
     totalEducators: number; activeEducators: number; activeRate: number;
     avgVibeScore: number | null; totalPdHours: number; totalToolsViewed: number; totalCompletions: number;
   }[]>([]);
+  const [hubPartnerships, setHubPartnerships] = useState<{
+    partnershipId: string; name: string; district: string; state: string;
+    totalEducators: number; activeEducators: number; activeRate: number;
+    avgVibeScore: number | null; totalPdHours: number; totalToolsViewed: number; totalCompletions: number;
+  }[]>([]);
   const [hubLoading, setHubLoading] = useState(false);
 
   // Filter state
@@ -345,6 +350,7 @@ export default function LeadershipDashboardPage() {
       if (res.ok) {
         const data = await res.json();
         setHubSchools(data.schools || []);
+        setHubPartnerships(data.partnerships || []);
       }
     } catch (error) {
       console.error('Failed to load Hub data:', error);
@@ -361,7 +367,10 @@ export default function LeadershipDashboardPage() {
     }
   }, [hasAccess, loadPartnerships, loadActionItems, loadHubData]);
 
-  // Build Hub school lookup map for matching partnerships to Hub data
+  // Build Hub lookup maps: direct partnership_id match (preferred) + school name fallback
+  const hubPartnershipMap = new Map<string, typeof hubPartnerships[0]>();
+  hubPartnerships.forEach(p => hubPartnershipMap.set(p.partnershipId, p));
+
   const hubSchoolMap = new Map<string, typeof hubSchools[0]>();
   hubSchools.forEach(school => {
     hubSchoolMap.set(school.name.toLowerCase(), school);
@@ -369,6 +378,10 @@ export default function LeadershipDashboardPage() {
   });
 
   const getHubMetrics = (partnership: Partnership) => {
+    // Prefer direct partnership_id match (reliable, from backfilled hub_profiles)
+    const directMatch = hubPartnershipMap.get(partnership.id);
+    if (directMatch) return directMatch;
+    // Fall back to school name match (legacy)
     const orgName = (partnership.org_name || partnership.contact_name || '').toLowerCase();
     return hubSchoolMap.get(orgName) || null;
   };
