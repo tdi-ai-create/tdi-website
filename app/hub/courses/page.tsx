@@ -40,6 +40,7 @@ const PRACTICE_GAME_CARDS = [
   { id: 'practice-classroom-shuffle', slug: 'classroom-shuffle', title: 'Classroom Scenario Shuffle', description: '8 real classroom situations. Pick the best response. Learn why it works.', category: 'Games', estimated_minutes: 10, content_type: 'activity' as const, access_tier: 'free', capacity: 'low' as const },
   { id: 'practice-prioritize-this', slug: 'prioritize-this', title: 'Prioritize This', description: 'Rank 4 tasks by priority. See how experienced educators would handle it.', category: 'Games', estimated_minutes: 10, content_type: 'activity' as const, access_tier: 'free', capacity: 'medium' as const },
   { id: 'practice-energy-budget', slug: 'energy-budget', title: 'Energy Budget', description: 'You have 100 energy points. How do you spend your day? Compare with experienced educators.', category: 'Games', estimated_minutes: 10, content_type: 'activity' as const, access_tier: 'free', capacity: 'low' as const },
+  { id: 'practice-this-or-that', slug: 'this-or-that', title: 'This or That', description: 'Two approaches. No right answer. Pick yours, then see how other educators respond.', category: 'Games', estimated_minutes: 12, content_type: 'activity' as const, access_tier: 'free', capacity: 'low' as const },
 ];
 
 

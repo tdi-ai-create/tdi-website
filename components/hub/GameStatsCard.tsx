@@ -17,6 +17,7 @@ const GAME_DISPLAY: Record<string, { title: string; accent: string }> = {
   'classroom-shuffle': { title: 'Classroom Shuffle', accent: '#3498DB' },
   'prioritize-this': { title: 'Prioritize This', accent: '#9333EA' },
   'energy-budget': { title: 'Energy Budget', accent: '#22b8bd' },
+  'this-or-that': { title: 'This or That', accent: '#E8B84B' },
 }
 
 interface PerGameStats {

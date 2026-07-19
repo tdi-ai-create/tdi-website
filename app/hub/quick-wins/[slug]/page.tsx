@@ -38,6 +38,7 @@ import { WhatsYourMove } from '@/app/paragametools/components/WhatsYourMove';
 import { ClassroomShuffle } from '@/app/paragametools/components/ClassroomShuffle';
 import { PrioritizeThis } from '@/app/paragametools/components/PrioritizeThis';
 import { EnergyBudget } from '@/app/paragametools/components/EnergyBudget';
+import { ThisOrThat } from '@/app/paragametools/components/ThisOrThat';
 import { Gamepad2, Users, Timer, Target } from 'lucide-react';
 
 type Bilingual = { en: string; es: string };
@@ -262,6 +263,30 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     color: '#22b8bd',
     format: 'both',
   },
+  'this-or-that': {
+    component: ThisOrThat,
+    id: 'practice-this-or-that',
+    contentUuid: 'a1000010-0000-0000-0000-000000000010',
+    title: { en: 'This or That', es: 'Esto o Aquello' },
+    description: { en: 'Two approaches to the same classroom moment. No right answer. Pick yours, then see how other educators respond. The splits reveal what your instincts say about your teaching.', es: 'Dos enfoques para el mismo momento en el salon. Sin respuesta correcta. Elige el tuyo, luego ve como responden otros educadores. Las divisiones revelan lo que tus instintos dicen sobre tu ensenanza.' },
+    howToPlay: [
+      { en: 'Choose your grade band to compare with similar educators', es: 'Elige tu nivel de grado para comparar con educadores similares' },
+      { en: 'Read a real classroom scenario', es: 'Lee un escenario real del salon' },
+      { en: 'Pick between two legitimate approaches', es: 'Elige entre dos enfoques legitimos' },
+      { en: 'See how other educators responded', es: 'Ve como respondieron otros educadores' },
+      { en: 'Read research and reflection for each round', es: 'Lee investigacion y reflexion para cada ronda' },
+      { en: 'Discover your educator profile at the end', es: 'Descubre tu perfil de educador al final' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Powerful for group PD -- discuss the rounds where the room is most split', es: 'Poderoso para PD grupal -- discutan las rondas donde el grupo esta mas dividido' },
+    ],
+    bestFor: { en: 'All educators. The peer compare data makes every play unique. Great conversation starter for PD sessions.', es: 'Todos los educadores. Los datos de comparacion hacen cada partida unica. Excelente para iniciar conversaciones en sesiones de PD.' },
+    time: '~12 min',
+    rounds: { en: '8 rounds', es: '8 rondas' },
+    color: '#E8B84B',
+    format: 'both',
+  },
 };
 
 // ─── Game Testimonials ──────────────────────────────────────────────────────
@@ -306,6 +331,11 @@ const GAME_TESTIMONIALS: Record<string, { quote: string; role: string }[]> = {
   'energy-budget': [
     { quote: "I gave personal reset 5 points. The expert gave it 15. That one number told me everything about why I'm burned out.", role: "7th grade science teacher" },
     { quote: "This is the game that made me actually take a lunch break. Not joking.", role: "3rd grade teacher" },
+  ],
+  'this-or-that': [
+    { quote: "No right answer means no pressure. I was more honest about my instincts than in any other PD I have done.", role: "5th grade teacher" },
+    { quote: "The 50/50 splits started the best team conversations. We realized we approach the same situations completely differently.", role: "Instructional coach" },
+    { quote: "Seeing that 70% of K-2 teachers agreed with me but only 40% of high school teachers did. That gap taught me more than any lecture.", role: "3rd grade teacher" },
   ],
 };
 

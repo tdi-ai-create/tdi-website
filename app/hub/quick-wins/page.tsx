@@ -148,6 +148,17 @@ const PRACTICE_TOOLS: QuickWin[] = [
     access_tier: 'free',
     capacity: 'low',
   },
+  {
+    id: 'practice-this-or-that',
+    slug: 'this-or-that',
+    title: 'This or That',
+    description: 'Two approaches. No right answer. Pick yours, then see how other educators respond.',
+    category: 'Games',
+    estimated_minutes: 12,
+    content_type: 'activity',
+    access_tier: 'free',
+    capacity: 'low',
+  },
 ];
 
 
