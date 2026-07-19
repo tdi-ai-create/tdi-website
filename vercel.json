@@ -38,7 +38,7 @@
     },
     {
       "path": "/api/cron/partner-weekly-digest",
-      "schedule": "0 13 * * 1"
+      "schedule": "0 12 * * 4"
     },
     {
       "path": "/api/cron/monthly-principal-email",

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TDI Communication Map -- All Automated Emails</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; background: #F8F9FA; line-height: 1.6; }
+  .page { max-width: 1000px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 20px; font-weight: 700; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
+  .subtitle { color: #6B7280; font-size: 14px; margin-bottom: 8px; }
+  .updated { color: #9CA3AF; font-size: 12px; margin-bottom: 32px; }
+  table { width: 100%; border-collapse: collapse; margin: 0 0 24px; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; background: #1e2749; color: white; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  td { padding: 10px 12px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+  tr:hover td { background: #F9FAFB; }
+  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .b-partner { background: #D1FAE5; color: #065F46; }
+  .b-educator { background: #DBEAFE; color: #1E40AF; }
+  .b-internal { background: #FEF3C7; color: #92400E; }
+  .b-creator { background: #F3E8FF; color: #6B21A8; }
+  .b-sales { background: #FFE4E6; color: #BE123C; }
+  .schedule { font-family: 'SF Mono', monospace; font-size: 11px; color: #6B7280; }
+  .from { font-size: 12px; color: #6B7280; }
+  .note { font-size: 12px; color: #9CA3AF; font-style: italic; }
+  .section-note { background: #FFFBEB; border-left: 3px solid #F59E0B; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; color: #92400E; }
+  code { background: #F3F4F6; padding: 1px 5px; border-radius: 3px; font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>TDI Communication Map</h1>
+<p class="subtitle">Every automated email the system sends -- who gets it, when, and why</p>
+<p class="updated">Last updated: July 19, 2026 | Covers all cron jobs + triggered emails</p>
+
+<div class="section-note">
+  <strong>How to read this:</strong> Partner = principal/contact. Educator = teacher/para. Internal = Rae/team. Creator = course creator. All times are Central Time (CT). All emails send via Resend from @teachersdeserveit.com.
+</div>
+
+<!-- PARTNER EMAILS -->
+<h2>Partner Emails (Principals & Contacts)</h2>
+<table>
+  <tr><th>Email</th><th>When</th><th>From</th><th>What It Does</th><th>Code</th></tr>
+  <tr>
+    <td><strong>Weekly Leadership Digest</strong><br><span class="badge b-partner">Partner</span></td>
+    <td><span class="schedule">Thu 7 AM CT</span></td>
+    <td class="from">TDI Team<br>hello@</td>
+    <td>Featured resource with copy-paste blurb, team topics, rotating challenge (leader/staff weeks), staff quote if available. Thursday so principals can prep for Friday meetings.</td>
+    <td><code>cron/partner-weekly-digest</code></td>
+  </tr>
+  <tr>
+    <td><strong>Monthly Principal Email</strong><br><span class="badge b-partner">Partner</span></td>
+    <td><span class="schedule">1st of month, 9 AM CT</span></td>
+    <td class="from">Rae Hughart<br>notifications@</td>
+    <td>Monthly engagement summary in Rae's voice. Hub highlights, educator growth.</td>
+    <td><code>cron/monthly-principal-email</code></td>
+  </tr>
+  <tr>
+    <td><strong>Seasonal Partner Email</strong><br><span class="badge b-partner">Partner</span></td>
+    <td><span class="schedule">15th of month, 9 AM CT</span></td>
+    <td class="from">TDI Team<br>hello@</td>
+    <td>Seasonal content -- back to school, winter break, spring refresh, summer planning</td>
+    <td><code>cron/seasonal-partner-email</code></td>
+  </tr>
+  <tr>
+    <td><strong>Onboarding Reminders</strong><br><span class="badge b-partner">Partner</span></td>
+    <td><span class="schedule">Daily 9 AM CT</span><br>Day 3, 7, 14</td>
+    <td class="from">TDI Team<br>hello@</td>
+    <td>Nudges if principal hasn't logged into dashboard. Also sends session date reminders (60/14/2 days before).</td>
+    <td><code>cron/partner-onboarding-reminders</code></td>
+  </tr>
+  <tr>
+    <td><strong>Welcome Email (Deal Signed)</strong><br><span class="badge b-partner">Partner</span></td>
+    <td><span class="schedule">On deal conversion</span></td>
+    <td class="from">TDI Team<br>hello@</td>
+    <td>Dashboard link, setup checklist overview, kickoff scheduling CTA</td>
+    <td><code>admin/resend-welcome</code></td>
+  </tr>
+</table>
+
+<!-- EDUCATOR EMAILS -->
+<h2>Educator Emails (Teachers & Staff)</h2>
+<table>
+  <tr><th>Email</th><th>When</th><th>From</th><th>What It Does</th><th>Code</th></tr>
+  <tr>
+    <td><strong>Staff Welcome + Quick Win Rec</strong><br><span class="badge b-educator">Educator</span></td>
+    <td><span class="schedule">On roster provision</span></td>
+    <td class="from">TDI Team<br>hello@</td>
+    <td>Hub access notification with role-based Quick Win recommendation (para/teacher/leader/coach). Direct link to specific resource.</td>
+    <td><code>hub/emails/staff-welcome</code></td>
+  </tr>
+  <tr>
+    <td><strong>Hub Welcome (Self-signup)</strong><br><span class="badge b-educator">Educator</span></td>
+    <td><span class="schedule">On signup</span></td>
+    <td class="from">TDI Team<br>hello@</td>
+    <td>Welcome for educators who sign up directly (not through a partnership)</td>
+    <td><code>hub/emails/welcome</code></td>
+  </tr>
+  <tr>
+    <td><strong>Hub Nudge</strong><br><span class="badge b-educator">Educator</span></td>
+    <td><span class="schedule">Triggered</span></td>
+    <td class="from">TDI Team<br>hello@</td>
+    <td>Re-engagement nudge for inactive educators</td>
+    <td><code>hub/emails/nudge</code></td>
+  </tr>
+  <tr>
+    <td><strong>Wellness Check</strong><br><span class="badge b-educator">Educator</span></td>
+    <td><span class="schedule">Daily 10 AM CT</span></td>
+    <td class="from">TDI Team<br>hello@</td>
+    <td>Personal check-in for educators with 2+ negative vibe scores. Names never shared with principal.</td>
+    <td><code>cron/wellness-check</code></td>
+  </tr>
+  <tr>
+    <td><strong>Hub Digest</strong><br><span class="badge b-educator">Educator</span></td>
+    <td><span class="schedule">Triggered</span></td>
+    <td class="from">TDI Team<br>hello@</td>
+    <td>Content digest for Hub members</td>
+    <td><code>hub/emails/digest</code></td>
+  </tr>
+</table>
+
+<!-- INTERNAL EMAILS -->
+<h2>Internal Emails (Rae & Team)</h2>
+<table>
+  <tr><th>Email</th><th>When</th><th>From</th><th>What It Does</th><th>Code</th></tr>
+  <tr>
+    <td><strong>Weekly Digest (Rae)</strong><br><span class="badge b-internal">Internal</span></td>
+    <td><span class="schedule">Mon 7 AM CT</span></td>
+    <td class="from">TDI System<br>notifications@</td>
+    <td>All partnerships summary: health status, attention flags, KPI risks, overdue items</td>
+    <td><code>cron/weekly-digest</code></td>
+  </tr>
+  <tr>
+    <td><strong>Daily Alerts</strong><br><span class="badge b-internal">Internal</span></td>
+    <td><span class="schedule">Daily 8 AM CT</span></td>
+    <td class="from">TDI Admin<br>noreply@</td>
+    <td>Daily system alerts -- overdue items, attention flags, system health</td>
+    <td><code>cron/daily-alerts</code></td>
+  </tr>
+  <tr>
+    <td><strong>Olivia Daily Briefing</strong><br><span class="badge b-internal">Internal</span></td>
+    <td><span class="schedule">Daily 7 AM CT</span></td>
+    <td class="from">Olivia Smith<br>noreply@</td>
+    <td>AI-generated daily briefing for Rae from Olivia (EA agent)</td>
+    <td><code>cron/olivia-daily-briefing</code></td>
+  </tr>
+  <tr>
+    <td><strong>Olivia Weekly Briefing</strong><br><span class="badge b-internal">Internal</span></td>
+    <td><span class="schedule">Mon 7:30 AM CT</span></td>
+    <td class="from">Olivia Smith<br>noreply@</td>
+    <td>Weekly summary briefing from Olivia</td>
+    <td><code>cron/olivia-weekly-briefing</code></td>
+  </tr>
+  <tr>
+    <td><strong>Partner Attention Flags</strong><br><span class="badge b-internal">Internal</span></td>
+    <td><span class="schedule">Daily 8 AM CT</span></td>
+    <td class="from">TDI Admin<br>noreply@</td>
+    <td>Flags partnerships at Day 7/14/21/45 thresholds for inactivity</td>
+    <td><code>cron/partner-attention-flags</code></td>
+  </tr>
+  <tr>
+    <td><strong>Hub Content Health</strong><br><span class="badge b-internal">Internal</span></td>
+    <td><span class="schedule">Daily 7:30 AM CT</span></td>
+    <td class="from">TDI Admin<br>noreply@</td>
+    <td>Content health check -- missing thumbnails, broken links, unpublished items</td>
+    <td><code>cron/hub-content-health</code></td>
+  </tr>
+  <tr>
+    <td><strong>Stripe Health</strong><br><span class="badge b-internal">Internal</span></td>
+    <td><span class="schedule">Daily 7 AM CT</span></td>
+    <td class="from">TDI Admin<br>noreply@</td>
+    <td>Stripe subscription health -- failed payments, expiring cards</td>
+    <td><code>cron/stripe-health</code></td>
+  </tr>
+  <tr>
+    <td><strong>Paperclip Watchdog</strong><br><span class="badge b-internal">Internal</span></td>
+    <td><span class="schedule">Every 30 min</span></td>
+    <td class="from">TDI Admin<br>noreply@</td>
+    <td>Checks Paperclip agent health, alerts if down</td>
+    <td><code>cron/paperclip-watchdog</code></td>
+  </tr>
+  <tr>
+    <td><strong>Pipeline Snapshot</strong><br><span class="badge b-internal">Internal</span></td>
+    <td><span class="schedule">Mon 3 AM CT</span></td>
+    <td class="from">TDI Admin<br>noreply@</td>
+    <td>Weekly sales pipeline snapshot</td>
+    <td><code>cron/pipeline-snapshot</code></td>
+  </tr>
+</table>
+
+<!-- CREATOR EMAILS -->
+<h2>Creator Studio Emails</h2>
+<table>
+  <tr><th>Email</th><th>When</th><th>From</th><th>What It Does</th><th>Code</th></tr>
+  <tr>
+    <td><strong>Creator Weekly Digest</strong><br><span class="badge b-creator">Creator</span></td>
+    <td><span class="schedule">Mon 3 AM CT</span></td>
+    <td class="from">TDI Creator Studio<br>notifications@</td>
+    <td>Weekly progress digest for active creators</td>
+    <td><code>cron/creator-email-digest</code></td>
+  </tr>
+  <tr>
+    <td><strong>Creator First Week</strong><br><span class="badge b-creator">Creator</span></td>
+    <td><span class="schedule">Daily 4:30 AM CT</span></td>
+    <td class="from">Bella from TDI<br>creatorstudio@</td>
+    <td>Day 1-7 onboarding drip for new creators</td>
+    <td><code>cron/creator-first-week</code></td>
+  </tr>
+  <tr>
+    <td><strong>Creator Monthly Newsletter</strong><br><span class="badge b-creator">Creator</span></td>
+    <td><span class="schedule">1st of month, 5 AM CT</span></td>
+    <td class="from">Bella from TDI<br>creatorstudio@</td>
+    <td>Monthly newsletter for all creators</td>
+    <td><code>cron/creator-monthly-newsletter</code></td>
+  </tr>
+  <tr>
+    <td><strong>Creator Re-engagement</strong><br><span class="badge b-creator">Creator</span></td>
+    <td><span class="schedule">Daily 5 AM CT</span></td>
+    <td class="from">TDI Creator Studio<br>notifications@</td>
+    <td>7-step sequence for stalled/inactive creators</td>
+    <td><code>cron/creator-reengagement</code></td>
+  </tr>
+  <tr>
+    <td><strong>Creator Reminders</strong><br><span class="badge b-creator">Creator</span></td>
+    <td><span class="schedule">Daily 4 AM CT</span></td>
+    <td class="from">TDI Creator Studio<br>notifications@</td>
+    <td>Milestone deadline reminders for active creators</td>
+    <td><code>cron/creator-reminders</code></td>
+  </tr>
+</table>
+
+<!-- SALES / FUNDING -->
+<h2>Sales & Funding Emails</h2>
+<table>
+  <tr><th>Email</th><th>When</th><th>From</th><th>What It Does</th><th>Code</th></tr>
+  <tr>
+    <td><strong>Quote Expiry</strong><br><span class="badge b-sales">Sales</span></td>
+    <td><span class="schedule">Daily 9 AM CT</span></td>
+    <td class="from">Rae Hughart<br>rae@</td>
+    <td>Nudge when a sales quote is about to expire</td>
+    <td><code>cron/quote-expiry</code></td>
+  </tr>
+  <tr>
+    <td><strong>Funding Follow-up</strong><br><span class="badge b-sales">Sales</span></td>
+    <td><span class="schedule">Hourly</span></td>
+    <td class="from">TDI Funding<br>noreply@</td>
+    <td>Grant follow-up reminders based on funding pursuit timelines</td>
+    <td><code>cron/funding-followup</code></td>
+  </tr>
+</table>
+
+<h2>Quick Reference: Weekly Email Calendar</h2>
+<table>
+  <tr><th>Day</th><th>Time (CT)</th><th>Email</th><th>Audience</th></tr>
+  <tr><td rowspan="4"><strong>Monday</strong></td><td>3:00 AM</td><td>Creator Weekly Digest + Pipeline Snapshot</td><td><span class="badge b-creator">Creator</span> <span class="badge b-internal">Internal</span></td></tr>
+  <tr><td>7:00 AM</td><td>Weekly Digest (Rae) + Olivia Daily Briefing</td><td><span class="badge b-internal">Internal</span></td></tr>
+  <tr><td>7:30 AM</td><td>Olivia Weekly Briefing</td><td><span class="badge b-internal">Internal</span></td></tr>
+  <tr><td>8:00 AM</td><td>Daily Alerts + Attention Flags</td><td><span class="badge b-internal">Internal</span></td></tr>
+  <tr><td><strong>Thursday</strong></td><td>7:00 AM</td><td>Weekly Leadership Digest</td><td><span class="badge b-partner">Partner</span></td></tr>
+  <tr><td rowspan="3"><strong>Tue-Fri</strong></td><td>4:00-5:00 AM</td><td>Creator Reminders, First Week, Re-engagement</td><td><span class="badge b-creator">Creator</span></td></tr>
+  <tr><td>7:00-8:00 AM</td><td>Olivia Briefing, Daily Alerts, Attention Flags</td><td><span class="badge b-internal">Internal</span></td></tr>
+  <tr><td>9:00-10:00 AM</td><td>Onboarding Reminders, Wellness Check, Quote Expiry</td><td><span class="badge b-partner">Partner</span> <span class="badge b-educator">Educator</span></td></tr>
+  <tr><td><strong>1st of Month</strong></td><td>5:00-9:00 AM</td><td>Creator Newsletter + Monthly Principal Email</td><td><span class="badge b-creator">Creator</span> <span class="badge b-partner">Partner</span></td></tr>
+  <tr><td><strong>15th of Month</strong></td><td>9:00 AM</td><td>Seasonal Partner Email</td><td><span class="badge b-partner">Partner</span></td></tr>
+</table>
+
+</div>
+</body>
+</html>
