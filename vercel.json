@@ -38,7 +38,7 @@
     },
     {
       "path": "/api/cron/partner-weekly-digest",
-      "schedule": "0 0 1 1 *"
+      "schedule": "0 12 * * 4"
     },
     {
       "path": "/api/cron/monthly-principal-email",
@@ -54,7 +54,7 @@
     },
     {
       "path": "/api/cron/partner-onboarding-reminders",
-      "schedule": "0 0 1 1 *"
+      "schedule": "0 14 * * *"
     },
     {
       "path": "/api/cron/olivia-daily-briefing",
@@ -102,7 +102,7 @@
     },
     {
       "path": "/api/cron/contract-expiration",
-      "schedule": "0 0 1 1 *"
+      "schedule": "0 13 * * *"
     },
     {
       "path": "/api/cron/send-scheduled-onboarding",
