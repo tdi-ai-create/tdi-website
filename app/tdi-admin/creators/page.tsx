@@ -2604,8 +2604,8 @@ export default function CreatorStudioPage() {
             </div>
           )}
 
-          {/* Calm State -- shown when no action items. Still useful. */}
-          {newSubmissions.length === 0 && feedbackQueue.length === 0 && needsAttention.length === 0 && !(pendingReviewsWithWait.length > 0 || stalledCreators.length > 0 || followedUpApproachingRestall.length > 0) && (
+          {/* Calm State -- shown when no submissions or feedback to act on. Provides context. */}
+          {newSubmissions.length === 0 && feedbackQueue.length === 0 && needsAttention.length === 0 && (
             <>
               {/* All caught up + quick pulse */}
               <div className="mb-5 bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
