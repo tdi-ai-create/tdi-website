@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
               </td>
               <td style="vertical-align:top;padding-left:12px;">
                 <p style="margin:0 0 2px;font-size:15px;font-weight:700;">Add your team</p>
-                <p style="margin:0;font-size:14px;color:#64748B;">Upload your staff roster (CSV or type names in) and choose who gets Learning Hub access and who gets complimentary blog access. Your educators get a welcome email the same day.</p>
+                <p style="margin:0;font-size:14px;color:#64748B;">Upload your staff roster (CSV or type names in) and choose who gets full Learning Hub access. Your educators get a welcome email the same day.</p>
               </td>
             </tr>
           </table>
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
           </table>
 
           <div style="text-align:center;margin:0 0 28px;">
-            <a href="${loginUrl}" style="display:inline-block;padding:16px 44px;background:#E8B84B;color:#1e2749;text-decoration:none;border-radius:10px;font-size:16px;font-weight:700;">Get Started</a>
+            <a href="${loginUrl}" style="display:inline-block;padding:18px 48px;background:#E8B84B;color:#1e2749;text-decoration:none;border-radius:10px;font-size:16px;font-weight:700;">Get Started</a>
           </div>
 
           <div style="background:#F8FAFC;border-radius:10px;padding:20px;margin:0 0 24px;">
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
           </div>
 
           <div style="border-left:3px solid #E8B84B;padding-left:16px;margin:0 0 24px;">
-            <p style="margin:0;font-size:14px;color:#64748B;">This new onboarding process was designed to make getting started as simple as possible. Need help at any step? Reply to this email or <a href="mailto:rae@teachersdeserveit.com" style="color:#2A9D8F;font-weight:600;">email Rae directly</a>. We are here for you every step of the way.</p>
+            <p style="margin:0;font-size:14px;color:#64748B;">This new onboarding process was designed to make getting started as simple as possible. Need help at any step? Reply to this email or reach us at <a href="mailto:info@teachersdeserveit.com" style="color:#2A9D8F;font-weight:600;">info@teachersdeserveit.com</a>. We are here for you every step of the way.</p>
           </div>
 
           <p style="margin:0;">The TDI Team</p>
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         from: 'Teachers Deserve It Team <hello@teachersdeserveit.com>',
         to: [email.toLowerCase()],
-        subject: `${name}, your new TDI dashboard is ready`,
+        subject: `${name}, everything is ready for your team`,
         html,
       }),
     });
