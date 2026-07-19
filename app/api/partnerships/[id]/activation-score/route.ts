@@ -28,11 +28,11 @@ export async function GET(
         .eq('id', partnershipId)
         .single(),
 
-      supabase.from('hub_org_members').select('user_id').eq('partnership_id', partnershipId),
+      supabase.from('hub_profiles').select('id').eq('partnership_id', partnershipId),
     ])
 
     const partnership = partnershipRes.data
-    const userIds = (membersRes.data || []).map((m) => m.user_id)
+    const userIds = (membersRes.data || []).map((m: { id: string }) => m.id)
 
     const inviteAccepted =
       !!partnership?.invite_accepted_at || partnership?.status === 'active'
