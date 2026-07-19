@@ -210,6 +210,88 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    // === INDIVIDUAL MEMBERSHIP EXPIRATIONS ===
+    // Handle non-partnership all_access members with expires_at set
+    const { data: expiringMembers } = await hubSupabase
+      .from('hub_memberships')
+      .select('id, user_id, tier, expires_at')
+      .eq('tier', 'all_access')
+      .not('expires_at', 'is', null);
+
+    for (const mem of (expiringMembers || [])) {
+      if (!mem.expires_at) continue;
+      const expDate = new Date(mem.expires_at);
+      const daysLeft = Math.floor((expDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+      // Get email
+      const { data: profile } = await hubSupabase
+        .from('hub_profiles')
+        .select('email')
+        .eq('id', mem.user_id)
+        .single();
+
+      if (!profile?.email) continue;
+
+      // Check if already notified
+      const expKey = `individual_expiration_${daysLeft <= 0 ? 'downgrade' : daysLeft <= 3 ? 'final' : 'heads_up'}_${mem.id}`;
+      const { data: alreadySent } = await hubSupabase
+        .from('hub_activity_log')
+        .select('id')
+        .eq('user_id', mem.user_id)
+        .eq('action', expKey)
+        .limit(1);
+
+      if (alreadySent && alreadySent.length > 0) continue;
+
+      let sendEmail = false;
+      const expirationDate = expDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+      if (daysLeft <= 0) {
+        // Downgrade to free
+        await hubSupabase
+          .from('hub_memberships')
+          .update({ tier: 'free', updated_at: new Date().toISOString() })
+          .eq('id', mem.id);
+        downgraded++;
+        sendEmail = true;
+
+        const { subject, html } = buildExpirationEmail('downgrade', {
+          schoolName: 'your organization',
+          expirationDate,
+          contactName: '',
+        });
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ from: 'Teachers Deserve It Team <hello@teachersdeserveit.com>', to: profile.email, subject, html }),
+        });
+        emailsSent++;
+      } else if (daysLeft <= 3 || daysLeft <= 14) {
+        // Send heads_up or final notice
+        const type = daysLeft <= 3 ? 'final_notice' : 'heads_up';
+        const { subject, html } = buildExpirationEmail(type as 'heads_up' | 'final_notice', {
+          schoolName: 'your organization',
+          expirationDate,
+          contactName: '',
+        });
+        const resp = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ from: 'Teachers Deserve It Team <hello@teachersdeserveit.com>', to: profile.email, subject, html }),
+        });
+        if (resp.ok) emailsSent++;
+        sendEmail = true;
+      }
+
+      if (sendEmail) {
+        await hubSupabase.from('hub_activity_log').insert({
+          user_id: mem.user_id,
+          action: expKey,
+          metadata: { expires_at: mem.expires_at, days_left: daysLeft },
+        });
+      }
+    }
+
     return NextResponse.json({ success: true, emailsSent, downgraded });
   } catch (error) {
     console.error('[contract-expiration] Error:', error);
