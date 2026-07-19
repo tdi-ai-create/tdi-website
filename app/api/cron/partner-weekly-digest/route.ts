@@ -133,6 +133,7 @@ export async function GET(request: NextRequest) {
 
       // Get topics this partnership's team has been exploring
       let teamTopics = trending;
+      let staffQuote: string | null = null;
 
       // If we have partnership-linked profiles, get their specific activity
       const { data: partnerProfiles } = await hubSupabase
@@ -143,6 +144,20 @@ export async function GET(request: NextRequest) {
 
       if (partnerProfiles && partnerProfiles.length > 0) {
         const userIds = partnerProfiles.map(pp => pp.id);
+
+        // Look for a recent QA post from this partnership's staff to use as a quote
+        const { data: staffPosts } = await hubSupabase
+          .from('hub_qa_posts')
+          .select('body, user_id')
+          .in('user_id', userIds.slice(0, 100))
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        // Pick the first post that's short enough to be a good quote
+        staffQuote = (staffPosts || [])
+          .map((sp: { body: string }) => sp.body?.trim())
+          .filter((b: string) => b && b.length > 20 && b.length < 250)
+          [0] || null;
 
         const { data: partnerActivity } = await hubSupabase
           .from('hub_activity_log')
@@ -231,6 +246,18 @@ export async function GET(request: NextRequest) {
               </td>
             </tr>
           </table>
+
+          ${staffQuote ? `
+          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:20px;">
+            <tr>
+              <td style="padding:20px 24px;background:white;border-radius:12px;border:1px solid #E5E7EB;">
+                <p style="margin:0 0 8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94A3B8;">From Your Team</p>
+                <p style="margin:0;font-size:15px;color:#334155;line-height:1.6;font-style:italic;">"${staffQuote}"</p>
+                <p style="margin:8px 0 0;font-size:13px;color:#94A3B8;">-- A teacher on your team</p>
+              </td>
+            </tr>
+          </table>
+          ` : ''}
 
           <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:24px;">
             <tr>
