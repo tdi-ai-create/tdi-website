@@ -291,20 +291,45 @@
 
 <!-- 10 -->
 <h2 id="hub">10. Hub integration</h2>
+
+<h3>Partnership linkage (updated July 2026)</h3>
+<div class="card card-teal">
+  <p>When staff are provisioned via <code>POST /api/admin/provision-roster</code>, the system writes <code>partnership_id</code> to both <code>hub_memberships</code> and <code>hub_profiles</code>. This links each educator to their partnership so all Hub activity flows into the correct Leadership Dashboard.</p>
+  <p>The Hub connections API (<code>/api/tdi-admin/hub-connections?section=leadership</code>) groups data by <code>partnership_id</code> for direct, reliable matching. Falls back to school name matching for legacy data.</p>
+</div>
+
 <h3>Data that flows from Hub to Leadership</h3>
 <table>
-  <tr><th>Metric</th><th>Source</th></tr>
-  <tr><td>Login %, active users</td><td>hub_activity_log</td></tr>
-  <tr><td>Tools explored</td><td>hub_activity_log (quick_win_viewed)</td></tr>
-  <tr><td>Wellness score (5 dimensions)</td><td>hub_activity_log (wellbeing_check)</td></tr>
-  <tr><td>Course completions, PD hours</td><td>hub_enrollments</td></tr>
-  <tr><td>Field Notes earned</td><td>hub_earned_recognitions</td></tr>
-  <tr><td>Community posts, Q&A</td><td>hub_community_posts</td></tr>
-  <tr><td>Popular tools, educator types</td><td>hub_activity_log, hub_quiz_results</td></tr>
-  <tr><td>Teacher quotes</td><td>quick_win_responses</td></tr>
+  <tr><th>Metric</th><th>Source</th><th>Status</th></tr>
+  <tr><td>Login %, active users</td><td>hub_activity_log</td><td><span class="badge badge-teal">Live</span></td></tr>
+  <tr><td>Tools explored (Quick Wins)</td><td>hub_activity_log (quick_win_viewed)</td><td><span class="badge badge-teal">Live</span></td></tr>
+  <tr><td>Lesson completions</td><td>hub_lesson_progress</td><td><span class="badge badge-teal">Live</span></td></tr>
+  <tr><td>Course completions, PD hours</td><td>hub_enrollments, hub_certificates</td><td><span class="badge badge-teal">Live</span></td></tr>
+  <tr><td>Wellness score (5 dimensions)</td><td>hub_activity_log (wellbeing_check)</td><td><span class="badge badge-teal">Live</span></td></tr>
+  <tr><td>Field Notes earned</td><td>hub_earned_recognitions</td><td><span class="badge badge-teal">Live</span></td></tr>
+  <tr><td>Community posts, Q&A</td><td>hub_qa_posts</td><td><span class="badge badge-teal">Live</span></td></tr>
+  <tr><td>Popular tools, educator types</td><td>hub_activity_log, hub_quiz_results</td><td><span class="badge badge-teal">Live</span></td></tr>
+  <tr><td>Teacher quotes (for digest)</td><td>hub_qa_posts (by partnership)</td><td><span class="badge badge-teal">Live</span></td></tr>
 </table>
+
+<h3>PD hours calculation</h3>
+<div class="card card-amber">
+  <p><strong>PD hours = 2x course duration.</strong> A 45-minute course earns 1.5 PD hours. This accounts for implementation time between and after the course. Certificates auto-generate with a unique verification code (TDI-XXXXXXXX) when all lessons in a course are completed.</p>
+</div>
+
+<h3>Quick Win tagging</h3>
+<p>All Quick Wins must be fully tagged before publishing. A database trigger (<code>enforce_quick_win_tags_before_publish</code>) rejects any publish attempt with missing required fields: <code>lift</code>, <code>category</code>, <code>topic_tags</code>, <code>roles</code>, <code>danielson_domains</code>. Full tagging spec: <code>tdi-paperclip-skills/quick-win-tagging/SKILL.md</code>.</p>
+<p>Quick Win categories (updated July 2026): Instructional Strategies, Lesson Planning, Assessment, Classroom Setup, Classroom Management, Communication, Time Savers, Leadership, Self-Care, Stress Relief, Games, Vocational. "Classroom Tools" is retired.</p>
+
 <h3>Automated outreach</h3>
-<p>Daily wellness cron (10 AM CT) sends personal check-in from Rae to educators with 2+ negative vibe scores. Names never shared with principal.</p>
+<table>
+  <tr><th>Email</th><th>Schedule</th><th>Recipient</th><th>What it does</th></tr>
+  <tr><td>Staff welcome + Quick Win recommendation</td><td>On roster provision</td><td>Each educator</td><td>Role-based first resource recommendation (para, teacher, leader, coach). Direct link to specific Quick Win.</td></tr>
+  <tr><td>Onboarding reminders</td><td>Day 3, 7, 14</td><td>Principal</td><td>Nudges if principal hasn't logged into their dashboard yet.</td></tr>
+  <tr><td>Weekly leadership digest</td><td>Monday 8 AM CT</td><td>Principal</td><td>Featured resource with copy-paste newsletter blurb, team topics, rotating challenge (leader/staff), optional staff quote.</td></tr>
+  <tr><td>Daily wellness check</td><td>10 AM CT</td><td>Educators with negative vibes</td><td>Personal check-in. Names never shared with principal.</td></tr>
+  <tr><td>Partner attention flags</td><td>8 AM CT daily</td><td>Internal (admin)</td><td>Flags at Day 7/14/21/45 for inactive partnerships.</td></tr>
+</table>
 
 <!-- 11 -->
 <h2 id="cross-links">11. Cross-portal navigation</h2>
