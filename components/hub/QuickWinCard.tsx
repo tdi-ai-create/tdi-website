@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Lock, Heart } from 'lucide-react';
+import { Lock, Heart, Flame, RotateCcw } from 'lucide-react';
 import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
 import { useTranslation } from '@/lib/hub/useTranslation';
 
@@ -48,6 +48,12 @@ interface QuickWinCardProps {
   onToggleFavorite?: (id: string, type: 'course' | 'quick_win') => void;
   displayTitle?: string;
   displayDescription?: string;
+  gameStats?: {
+    plays: number;
+    bestScore: number;
+    bestStreak: number;
+    avgAccuracy: number;
+  } | null;
 }
 
 export default function QuickWinCard({
@@ -56,6 +62,7 @@ export default function QuickWinCard({
   onToggleFavorite,
   displayTitle,
   displayDescription,
+  gameStats,
 }: QuickWinCardProps) {
   const catColors = CATEGORY_COLORS[quickWin.category] || { dot: '#6B7280', bg: '#F3F4F6', text: '#374151' };
   const liftStyle = quickWin.capacity ? LIFT_STYLES[quickWin.capacity] : null;
@@ -176,6 +183,38 @@ export default function QuickWinCard({
           {description}
         </div>
 
+        {/* Game stats row (only for Games with play history) */}
+        {gameStats && gameStats.plays > 0 && quickWin.category === 'Games' && (
+          <div className="flex items-center gap-3 mb-3 pb-2" style={{ borderBottom: '1px solid #F3F4F6' }}>
+            <span className="flex items-center gap-1" style={{ fontSize: 11, color: '#9CA3AF' }}>
+              <RotateCcw size={11} />
+              {gameStats.plays}x
+            </span>
+            {gameStats.bestScore > 0 && (
+              <div className="flex items-center gap-1.5 flex-1">
+                <div style={{ flex: 1, height: 4, borderRadius: 2, background: '#F3F4F6', overflow: 'hidden' }}>
+                  <div style={{
+                    height: '100%', borderRadius: 2,
+                    width: `${Math.round(gameStats.avgAccuracy * 100)}%`,
+                    backgroundColor: gameStats.avgAccuracy >= 0.8 ? '#27AE60' : gameStats.avgAccuracy >= 0.5 ? '#F1C40F' : '#E74C3C',
+                  }} />
+                </div>
+                <span style={{
+                  fontSize: 11, fontWeight: 600, minWidth: 28, textAlign: 'right' as const,
+                  color: gameStats.avgAccuracy >= 0.8 ? '#27AE60' : gameStats.avgAccuracy >= 0.5 ? '#F1C40F' : '#E74C3C',
+                }}>
+                  {Math.round(gameStats.avgAccuracy * 100)}%
+                </span>
+              </div>
+            )}
+            {gameStats.bestStreak > 0 && (
+              <span className="flex items-center gap-1" style={{ fontSize: 11, fontWeight: 600, color: '#F59E0B' }}>
+                <Flame size={11} /> {gameStats.bestStreak}
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Bottom row: lift pill + meta, action button */}
         <div className="flex items-center justify-between mt-auto pt-1">
           <div className="flex items-center gap-2.5">
@@ -197,9 +236,12 @@ export default function QuickWinCard({
           {hasAccess ? (
             <span
               className="text-xs font-semibold rounded-lg px-4 py-2 inline-block"
-              style={{ backgroundColor: '#1a1f4e', color: 'white' }}
+              style={{
+                backgroundColor: gameStats && gameStats.plays > 0 ? '#E8B84B' : '#1a1f4e',
+                color: gameStats && gameStats.plays > 0 ? '#1B2A4A' : 'white',
+              }}
             >
-              {tUI('Try it')}
+              {gameStats && gameStats.plays > 0 ? tUI('Play') : tUI('Try it')}
             </span>
           ) : (
             <span

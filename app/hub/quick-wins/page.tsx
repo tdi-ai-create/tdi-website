@@ -21,6 +21,7 @@ import { useTranslation } from '@/lib/hub/useTranslation';
 import { Zap, Gamepad2, ChevronRight } from 'lucide-react';
 import QuizNudge from '@/components/hub/QuizNudge';
 import HubFilterBar from '@/components/hub/HubFilterBar';
+import { useGameTracking } from '@/lib/hub/useGameTracking';
 
 // Filter categories for Quick Wins
 const FILTER_CATEGORIES = [
@@ -185,6 +186,8 @@ export default function QuickWinsPage() {
   const { canAccess } = useMembership();
   const { language, t } = useLanguage();
   const { tUI } = useTranslation();
+  const { getGameStats } = useGameTracking();
+  const [gameStatsMap, setGameStatsMap] = useState<Record<string, { plays: number; bestScore: number; bestStreak: number; avgAccuracy: number }>>({});
 
   const loadQuickWins = useCallback(async () => {
     const supabase = getSupabase();
@@ -232,6 +235,19 @@ export default function QuickWinsPage() {
   useEffect(() => {
     loadQuickWins();
   }, [loadQuickWins]);
+
+  // Fetch game stats once for browse card display
+  useEffect(() => {
+    getGameStats().then((stats) => {
+      if (!stats) return;
+      // Map game_id (e.g. 'tell-or-ask') to practice tool id (e.g. 'practice-tell-or-ask')
+      const mapped: Record<string, { plays: number; bestScore: number; bestStreak: number; avgAccuracy: number }> = {};
+      for (const [gameId, data] of Object.entries(stats.perGame)) {
+        mapped[`practice-${gameId}`] = data;
+      }
+      setGameStatsMap(mapped);
+    });
+  }, [getGameStats]);
 
   // Auto-translate quick wins when Spanish is selected
   useEffect(() => {
@@ -441,6 +457,7 @@ export default function QuickWinsPage() {
                   onToggleFavorite={toggleFavorite}
                   displayTitle={t(qw.title, qw.title_es)}
                   displayDescription={t(qw.description, qw.description_es)}
+                  gameStats={qw.category === 'Games' ? gameStatsMap[qw.id] || null : null}
                 />
               ))}
             </div>
