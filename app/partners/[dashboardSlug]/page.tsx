@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
+import InviteLeader from '@/components/partners/InviteLeader';
 import Link from 'next/link';
 import FooterSymbol from '@/components/FooterSymbol';
 import {
@@ -5281,6 +5282,9 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               </div>
             </div>
 
+            {/* Invite leaders to dashboard */}
+            {partnership?.id && <InviteLeader partnershipId={partnership.id} />}
+
             {/* School info card */}
             <div className="bg-white rounded-xl border border-gray-100 p-6"
               style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
@@ -6670,7 +6674,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                               { q: 'How do my teachers get Hub access?', a: 'Once you upload your staff roster, each educator receives an email invitation to create their Learning Hub account. They can log in with email or Google.' },
                               { q: 'What happens during an observation day?', a: 'Our team visits classrooms for 10-15 minutes each, takes notes on strengths, and leaves every teacher a personalized Love Note. We end the day with a leadership debrief. No evaluation, no judgment.' },
                               { q: 'Can I add more staff members later?', a: 'Yes. Go to the Team tab anytime to upload additional staff via CSV or add them one by one. They will receive Hub access automatically.' },
-                              { q: 'How do I share this dashboard with my admin team?', a: 'Contact us and we will add additional leadership accounts to your dashboard. Each person gets their own login.' },
+                              { q: 'How do I share this dashboard with my admin team?', a: 'Go to the Team tab and click "Invite a Leader." Enter their name and email, and they will receive an invite to create their own login. You can add assistant principals, department heads, or anyone who should see your team\'s data.' },
                               { q: 'What if a teacher is struggling with the Hub?', a: 'The Hub is designed to be intuitive, but if someone needs help, they can use the "I need a moment" button or email hello@teachersdeserveit.com.' },
                             ].map((faq, i) => (
                               <details key={i} className="group">
