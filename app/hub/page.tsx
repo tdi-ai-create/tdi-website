@@ -1757,6 +1757,47 @@ export default function HubDashboard() {
             </div>
           )}
 
+          {/* 5. Practice Games */}
+          <div
+            className="rounded-2xl overflow-hidden"
+            style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)', border: '1px solid rgba(255,255,255,0.08)' }}
+          >
+            <div className="p-5">
+              <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#E8B84B', letterSpacing: '0.08em' }}>
+                {tUI('Practice Games')}
+              </div>
+              <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>
+                {tUI('Sharpen your classroom skills with interactive games. Play solo or with your team.')}
+              </p>
+              <div className="space-y-2">
+                {[
+                  { slug: 'tell-or-ask', title: 'Tell or Ask?', time: '10 min', color: '#F1C40F' },
+                  { slug: 'feedback-level-up', title: 'Feedback Level Up', time: '12 min', color: '#27AE60' },
+                  { slug: 'whats-your-move', title: "What's Your Move?", time: '10 min', color: '#22b8bd' },
+                ].map((game) => (
+                  <Link
+                    key={game.slug}
+                    href={`/hub/quick-wins/${game.slug}`}
+                    className="flex items-center gap-3 px-3.5 py-3 rounded-xl transition-colors hover:bg-white/10"
+                    style={{ border: '1px solid rgba(255,255,255,0.08)' }}
+                  >
+                    <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: game.color }} />
+                    <span className="text-sm font-medium text-white flex-1">{game.title}</span>
+                    <span className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>{game.time}</span>
+                  </Link>
+                ))}
+              </div>
+              <Link
+                href="/hub/quick-wins?filter=Games"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold mt-3 hover:underline"
+                style={{ color: '#E8B84B' }}
+              >
+                {tUI('All 9 games')}
+                <ArrowRight size={12} />
+              </Link>
+            </div>
+          </div>
+
           {/* LIFT + Vibe Check moved to tour card and Profile settings */}
         </div>
       </div>
