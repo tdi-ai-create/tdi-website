@@ -69,6 +69,50 @@ export const ENERGY_ROUNDS: EnergyRound[] = [
       { en: 'Assessing where students are academically', es: 'Evaluar donde estan los estudiantes academicamente', expertAllocation: 15, explanation: { en: 'Informal observation this week, formal assessment next. Watch, listen, and take notes. Standardized pre-tests can wait.', es: 'Observacion informal esta semana, evaluacion formal la siguiente.' } },
     ],
   },
+  {
+    en: { situation: 'You are a paraprofessional supporting three classrooms today. One teacher is absent with no sub plans, another has a student in crisis, and the third has a scheduled assessment you were supposed to help proctor.' },
+    es: { situation: 'Eres un paraprofesional apoyando tres salones hoy. Un maestro esta ausente sin planes de suplente, otro tiene un estudiante en crisis, y el tercero tiene una evaluacion programada que se suponia que ayudarias a administrar.' },
+    tasks: [
+      { en: 'Support the student in crisis', es: 'Apoyar al estudiante en crisis', expertAllocation: 35, explanation: { en: 'Safety and emotional well-being come first. A student in crisis cannot wait. Everything else can be rearranged.', es: 'La seguridad y el bienestar emocional van primero. Un estudiante en crisis no puede esperar.' } },
+      { en: 'Cover the absent teacher classroom', es: 'Cubrir el salon del maestro ausente', expertAllocation: 25, explanation: { en: 'Keep students safe and engaged with a simple independent activity. You do not need sub plans to maintain a productive environment.', es: 'Mantener a los estudiantes seguros y ocupados con una actividad independiente simple.' } },
+      { en: 'Help proctor the scheduled assessment', es: 'Ayudar a administrar la evaluacion programada', expertAllocation: 20, explanation: { en: 'Communicate with the teacher that you will be late. Assessments can start without you if the teacher knows the situation.', es: 'Comunicar al maestro que llegaras tarde. Las evaluaciones pueden empezar sin ti.' } },
+      { en: 'Check in with admin about the absent teacher', es: 'Hablar con administracion sobre el maestro ausente', expertAllocation: 10, explanation: { en: 'A quick heads-up to admin is important but should not eat your whole morning. One message, then act.', es: 'Un aviso rapido a administracion es importante pero no deberia consumir toda tu manana.' } },
+      { en: 'Personal reset between transitions', es: 'Recarga personal entre transiciones', expertAllocation: 10, explanation: { en: 'Even 2 minutes of intentional breathing between rooms keeps you effective. Running on empty helps no one.', es: 'Incluso 2 minutos de respiracion intencional entre salones te mantiene efectivo.' } },
+    ],
+  },
+  {
+    en: { situation: 'It is a testing week. You have state assessments Monday through Wednesday, parent conferences Thursday, and your own evaluation observation on Friday.' },
+    es: { situation: 'Es semana de examenes. Tienes evaluaciones estatales de lunes a miercoles, conferencias con padres el jueves, y tu propia observacion de evaluacion el viernes.' },
+    tasks: [
+      { en: 'Preparing students emotionally for testing', es: 'Preparar emocionalmente a los estudiantes para los examenes', expertAllocation: 25, explanation: { en: 'Anxious students do not perform. A calm, confident message about testing matters more than last-minute review. They need to hear they are ready.', es: 'Los estudiantes ansiosos no rinden. Un mensaje tranquilo y seguro importa mas que un repaso de ultimo minuto.' } },
+      { en: 'Prepping for parent conferences', es: 'Prepararse para conferencias con padres', expertAllocation: 20, explanation: { en: 'Batch prep: one positive note and one growth area per student. Do not over-prepare. Conferences are conversations, not presentations.', es: 'Preparacion por lotes: una nota positiva y un area de crecimiento por estudiante.' } },
+      { en: 'Planning your observation lesson', es: 'Planear tu leccion de observacion', expertAllocation: 20, explanation: { en: 'Teach a lesson you are confident in, not a dog-and-pony show. Evaluators see through performance. Authenticity scores higher than flash.', es: 'Ensena una leccion en la que tengas confianza, no un espectaculo. La autenticidad puntua mas alto.' } },
+      { en: 'Maintaining normal instruction', es: 'Mantener la instruccion normal', expertAllocation: 20, explanation: { en: 'Testing week is not lost-instruction week. Keep routines running in the time you have. Students need normalcy more than ever.', es: 'La semana de examenes no es una semana de instruccion perdida. Mantener las rutinas.' } },
+      { en: 'Self-care and stress management', es: 'Autocuidado y manejo del estres', expertAllocation: 15, explanation: { en: 'This is the week people skip lunch, stay until 7, and crash by Friday. Protect your basics: eat, sleep, move. Your Friday observation depends on it.', es: 'Esta es la semana en que la gente salta el almuerzo y se queda hasta las 7. Protege lo basico.' } },
+    ],
+  },
+  {
+    en: { situation: 'A fight broke out during lunch. Two of your students were involved. You have them back in your classroom for the afternoon. Emotions are high and the rest of the class is buzzing about it.' },
+    es: { situation: 'Hubo una pelea durante el almuerzo. Dos de tus estudiantes estuvieron involucrados. Los tienes de regreso en tu salon para la tarde. Las emociones estan altas y el resto de la clase esta hablando de ello.' },
+    tasks: [
+      { en: 'Creating a calm re-entry for the whole class', es: 'Crear una reentrada tranquila para toda la clase', expertAllocation: 30, explanation: { en: 'Everyone is dysregulated, not just the two students. A calm, structured re-entry (breathing exercise, journal prompt, quiet independent work) resets the room.', es: 'Todos estan desregulados, no solo los dos estudiantes. Una reentrada tranquila y estructurada resetea el salon.' } },
+      { en: 'Private check-in with the involved students', es: 'Hablar en privado con los estudiantes involucrados', expertAllocation: 25, explanation: { en: 'Brief, human check-in: "Are you okay? Do you need anything right now?" Not an investigation. That is admin\'s job.', es: 'Una conversacion breve y humana: "Estas bien? Necesitas algo ahora?" No una investigacion.' } },
+      { en: 'Maintaining the afternoon lesson plan', es: 'Mantener el plan de leccion de la tarde', expertAllocation: 15, explanation: { en: 'Pivot to something low-stakes. The original plan may not work today. Meet the energy where it is.', es: 'Cambiar a algo de baja presion. El plan original puede no funcionar hoy.' } },
+      { en: 'Communicating with admin and parents', es: 'Comunicarse con administracion y padres', expertAllocation: 15, explanation: { en: 'A brief factual email or message to admin. Do not call parents about the fight -- that is admin\'s role. Focus on your classroom.', es: 'Un mensaje breve y factual a administracion. No llamar a los padres sobre la pelea -- eso le toca a admin.' } },
+      { en: 'Processing your own emotional response', es: 'Procesar tu propia respuesta emocional', expertAllocation: 15, explanation: { en: 'Witnessing student conflict is stressful. Acknowledge that. A 2-minute pause before the afternoon starts is not selfish -- it is strategic.', es: 'Presenciar conflicto estudiantil es estresante. Reconoce eso. Una pausa de 2 minutos no es egoista -- es estrategica.' } },
+    ],
+  },
+  {
+    en: { situation: 'It is June. You have 8 school days left. Grades are due in 3 days. Students are checked out. You still have one unit to finish and 4 students who might not pass.' },
+    es: { situation: 'Es junio. Quedan 8 dias de clases. Las calificaciones se entregan en 3 dias. Los estudiantes estan desconectados. Todavia tienes una unidad por terminar y 4 estudiantes que podrian no pasar.' },
+    tasks: [
+      { en: 'Supporting the 4 at-risk students', es: 'Apoyar a los 4 estudiantes en riesgo', expertAllocation: 30, explanation: { en: 'These students need targeted support NOW. A personal check-in, a modified assignment, or a makeup opportunity could change their trajectory.', es: 'Estos estudiantes necesitan apoyo dirigido AHORA. Una conversacion personal o una oportunidad de recuperacion podria cambiar su trayectoria.' } },
+      { en: 'Finishing grades and documentation', es: 'Terminar calificaciones y documentacion', expertAllocation: 25, explanation: { en: 'Grades are a deadline, not optional. Block focused time for this. Do not grade at home at midnight -- that is how errors happen.', es: 'Las calificaciones son una fecha limite, no opcionales. Bloquea tiempo enfocado para esto.' } },
+      { en: 'Covering the remaining content', es: 'Cubrir el contenido restante', expertAllocation: 15, explanation: { en: 'Let go of perfection. Cover the essentials, skip the extras. A rushed unit teaches less than a shortened but focused one.', es: 'Deja ir la perfeccion. Cubre lo esencial, salta lo extra.' } },
+      { en: 'End-of-year celebrations and closure', es: 'Celebraciones y cierre de fin de ano', expertAllocation: 15, explanation: { en: 'Students remember how the year ended. A meaningful closure activity takes 20 minutes and stays with them all summer.', es: 'Los estudiantes recuerdan como termino el ano. Una actividad de cierre significativa toma 20 minutos y se queda con ellos.' } },
+      { en: 'Organizing your own end-of-year tasks', es: 'Organizar tus propias tareas de fin de ano', expertAllocation: 15, explanation: { en: 'Checkout procedures, room cleanup, returning materials. Start early so the last day is not chaos.', es: 'Procedimientos de salida, limpieza del salon, devolucion de materiales. Empieza temprano.' } },
+    ],
+  },
 ]
 
 export const ENERGY_ROUND_COUNT = 5

@@ -72,6 +72,46 @@ export const PRIORITIZE_ROUNDS: PrioritizeRound[] = [
       { en: 'Say yes but quietly stop showing up to the PLC', es: 'Decir que si pero dejar de asistir al PLC silenciosamente', rank: 4, explanation: { en: 'Dropping commitments without communicating it damages trust with your team. If something has to give, be transparent about it.', es: 'Dejar compromisos sin comunicarlo dana la confianza con tu equipo.' } },
     ],
   },
+  {
+    en: { situation: 'You discover a student posted something hurtful about another student on social media. The targeted student does not know yet. It is the last period of the day.' },
+    es: { situation: 'Descubres que un estudiante publico algo hiriente sobre otro estudiante en redes sociales. El estudiante afectado no lo sabe todavia. Es el ultimo periodo del dia.' },
+    tasks: [
+      { en: 'Report it to admin or counselor immediately', es: 'Reportarlo a administracion o consejeria inmediatamente', rank: 1, explanation: { en: 'This is a safety and policy issue. Admin needs to know before the end of the day. Do not try to handle social media situations alone.', es: 'Este es un asunto de seguridad y politica. Admin necesita saberlo antes del final del dia.' } },
+      { en: 'Have a private conversation with the student who posted', es: 'Tener una conversacion privada con el estudiante que publico', rank: 2, explanation: { en: 'After reporting, a brief private conversation lets the student know you saw it. Keep it factual, not accusatory.', es: 'Despues de reportar, una conversacion breve y privada le hace saber al estudiante que lo viste.' } },
+      { en: 'Check in with the targeted student before they leave', es: 'Hablar con el estudiante afectado antes de que se vaya', rank: 3, explanation: { en: 'They may not know yet, so do not show them the post. But a warm check-in at dismissal plants a seed of support for when they find out.', es: 'Puede que no lo sepan todavia. No les muestres la publicacion. Pero una conversacion calida planta una semilla de apoyo.' } },
+      { en: 'Screenshot the post as evidence before it gets deleted', es: 'Capturar la publicacion como evidencia antes de que se borre', rank: 4, explanation: { en: 'Important but not the first move. Report to admin first, then document. Admin may have their own process for evidence collection.', es: 'Importante pero no es el primer paso. Reporta primero, luego documenta.' } },
+    ],
+  },
+  {
+    en: { situation: 'You are 10 minutes into your best lesson of the year. The fire alarm goes off. It is a drill, not real. You will lose 20 minutes.' },
+    es: { situation: 'Llevas 10 minutos en tu mejor leccion del ano. La alarma de incendio se activa. Es un simulacro, no real. Perderas 20 minutos.' },
+    tasks: [
+      { en: 'Lead your class out safely and calmly', es: 'Guiar a tu clase afuera de manera segura y tranquila', rank: 1, explanation: { en: 'Safety first, always. Your calm sets the tone. Students who see you relaxed during a drill learn to be relaxed during a real emergency.', es: 'La seguridad primero, siempre. Tu calma establece el tono.' } },
+      { en: 'Use the outdoor time for a quick discussion related to the lesson', es: 'Usar el tiempo afuera para una discusion rapida relacionada con la leccion', rank: 2, explanation: { en: 'The learning does not have to stop. A turn-and-talk outside can actually deepen engagement because the setting change resets attention.', es: 'El aprendizaje no tiene que detenerse. Una conversacion rapida afuera puede profundizar la participacion.' } },
+      { en: 'Plan how to pick up the lesson when you return', es: 'Planear como retomar la leccion cuando regresen', rank: 3, explanation: { en: 'Use the walk back to mentally identify the one key point you need to land. You probably cannot finish the whole lesson, so pick the essential.', es: 'Usa la caminata de regreso para identificar mentalmente el punto clave que necesitas aterrizar.' } },
+      { en: 'Let students have free time since the lesson is ruined', es: 'Dar tiempo libre a los estudiantes ya que la leccion se arruino', rank: 4, explanation: { en: 'The lesson is not ruined -- it is interrupted. Treat it as a pivot, not a loss. Students take their cue from you.', es: 'La leccion no esta arruinada -- esta interrumpida. Tratala como un cambio, no como una perdida.' } },
+    ],
+  },
+  {
+    en: { situation: 'You are a new para. The lead teacher gives you conflicting instructions throughout the day. You are confused about your role and where you should be.' },
+    es: { situation: 'Eres un para nuevo. La maestra principal te da instrucciones contradictorias durante el dia. Estas confundido sobre tu rol y donde deberias estar.' },
+    tasks: [
+      { en: 'Ask for a 5-minute planning conversation at a natural break', es: 'Pedir una conversacion de 5 minutos en un descanso natural', rank: 1, explanation: { en: 'A quick clarifying conversation solves this. Frame it as "I want to support you well" not "you are confusing me." Timing matters -- find a calm moment.', es: 'Una conversacion rapida de aclaracion resuelve esto. Enmarcalo como "quiero apoyarte bien."' } },
+      { en: 'Follow the most recent instruction and adapt', es: 'Seguir la instruccion mas reciente y adaptarse', rank: 2, explanation: { en: 'In the moment, default to the latest direction. This keeps things moving while you work toward a longer-term solution.', es: 'En el momento, sigue la direccion mas reciente. Esto mantiene las cosas en movimiento.' } },
+      { en: 'Write down each instruction so you have a record', es: 'Anotar cada instruccion para tener un registro', rank: 3, explanation: { en: 'Good practice for your own clarity. It also gives you something concrete to reference during your planning conversation.', es: 'Buena practica para tu propia claridad. Tambien te da algo concreto para referenciar.' } },
+      { en: 'Go to admin and explain the situation', es: 'Ir a administracion y explicar la situacion', rank: 4, explanation: { en: 'Skipping straight to admin without talking to the teacher first creates a triangle. Direct communication first, always.', es: 'Ir directo a admin sin hablar con la maestra primero crea un triangulo. Comunicacion directa primero, siempre.' } },
+    ],
+  },
+  {
+    en: { situation: 'Three parents have emailed you this morning. One is angry about a grade, one is asking about a field trip, and one is reporting their child is being bullied. You have 15 minutes before students arrive.' },
+    es: { situation: 'Tres padres te enviaron correo esta manana. Uno esta enojado por una calificacion, otro pregunta sobre una excursion, y otro reporta que su hijo esta siendo acosado. Tienes 15 minutos antes de que lleguen los estudiantes.' },
+    tasks: [
+      { en: 'Reply to the bullying report and loop in admin', es: 'Responder al reporte de acoso e incluir a administracion', rank: 1, explanation: { en: 'Safety concern gets first response. A brief acknowledgment ("I received this and am looking into it. I have also notified admin.") takes 60 seconds.', es: 'La preocupacion de seguridad recibe la primera respuesta. Un reconocimiento breve toma 60 segundos.' } },
+      { en: 'Quick reply to the field trip question', es: 'Respuesta rapida a la pregunta de la excursion', rank: 2, explanation: { en: 'This is a factual, easy reply. Knock it out in 30 seconds so it does not sit in your inbox all day taking up mental space.', es: 'Esta es una respuesta factual y facil. Eliminala en 30 segundos.' } },
+      { en: 'Draft a thoughtful reply to the angry parent about the grade', es: 'Redactar una respuesta pensada al padre enojado por la calificacion', rank: 3, explanation: { en: 'Angry emails deserve thoughtful responses, not rushed ones. Draft it now but do not send until you have re-read it after lunch.', es: 'Los correos enojados merecen respuestas pensadas, no apresuradas. Redactalo ahora pero no lo envies hasta despues del almuerzo.' } },
+      { en: 'Greet students at the door', es: 'Recibir a los estudiantes en la puerta', rank: 4, explanation: { en: 'Connection matters but 15 minutes of email triage keeps your afternoon clear. Greet them when they walk in -- you do not need to be at the door every single day.', es: 'La conexion importa pero 15 minutos de triaje de correo mantiene tu tarde libre.' } },
+    ],
+  },
 ]
 
 export const PRIORITIZE_ROUND_COUNT = 6
