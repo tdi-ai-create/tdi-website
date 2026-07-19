@@ -179,6 +179,7 @@ export default function QuickWinsPage() {
   const [capacityFilter, setCapacityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [danielsonFilter, setDanielsonFilter] = useState<string[]>([]);
+  const [visibleCount, setVisibleCount] = useState(18);
   const [isLoading, setIsLoading] = useState(true);
   const { isFavorite, toggleFavorite } = useFavorites();
   const { canAccess } = useMembership();
@@ -277,6 +278,40 @@ export default function QuickWinsPage() {
     const roleMatch = roleFilter === 'all' || qw.roles?.includes(roleFilter);
     return categoryMatch && capacityMatch && danielsonMatch && roleMatch;
   });
+
+  // Interleave by category for variety when showing "All" unfiltered
+  const interleaveByCategory = (items: QuickWin[]): QuickWin[] => {
+    const buckets = new Map<string, QuickWin[]>();
+    for (const item of items) {
+      const cat = item.category || 'Other';
+      if (!buckets.has(cat)) buckets.set(cat, []);
+      buckets.get(cat)!.push(item);
+    }
+    const result: QuickWin[] = [];
+    const keys = Array.from(buckets.keys());
+    let placed = true;
+    while (placed) {
+      placed = false;
+      for (const key of keys) {
+        const bucket = buckets.get(key)!;
+        if (bucket.length > 0) {
+          result.push(bucket.shift()!);
+          placed = true;
+        }
+      }
+    }
+    return result;
+  };
+
+  const displayQuickWins = activeFilter === 'All' && capacityFilter === 'all' && roleFilter === 'all' && danielsonFilter.length === 0
+    ? interleaveByCategory(filteredQuickWins)
+    : filteredQuickWins;
+
+  const visibleQuickWins = displayQuickWins.slice(0, visibleCount);
+  const hasMore = visibleCount < displayQuickWins.length;
+
+  // Reset visible count when filters change
+  useEffect(() => { setVisibleCount(18); }, [activeFilter, capacityFilter, roleFilter, danielsonFilter.length]);
 
   // Loading skeleton
   if (isLoading) {
@@ -396,18 +431,38 @@ export default function QuickWinsPage() {
 
         {/* Quick Wins Grid or Empty State */}
         {filteredQuickWins.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {filteredQuickWins.map((qw) => (
-              <QuickWinCard
-                key={qw.id}
-                quickWin={qw}
-                isFavorited={isFavorite(qw.id)}
-                onToggleFavorite={toggleFavorite}
-                displayTitle={t(qw.title, qw.title_es)}
-                displayDescription={t(qw.description, qw.description_es)}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {visibleQuickWins.map((qw) => (
+                <QuickWinCard
+                  key={qw.id}
+                  quickWin={qw}
+                  isFavorited={isFavorite(qw.id)}
+                  onToggleFavorite={toggleFavorite}
+                  displayTitle={t(qw.title, qw.title_es)}
+                  displayDescription={t(qw.description, qw.description_es)}
+                />
+              ))}
+            </div>
+            {hasMore && (
+              <div className="flex justify-center mt-6">
+                <button
+                  onClick={() => setVisibleCount((prev) => prev + 18)}
+                  className="px-8 py-3 rounded-full font-semibold text-sm transition-all hover:opacity-90"
+                  style={{
+                    backgroundColor: '#1a1f4e',
+                    color: '#ffffff',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}
+                >
+                  {tUI('Show More')} ({displayQuickWins.length - visibleCount} {tUI('remaining')})
+                </button>
+              </div>
+            )}
+          </>
+
         ) : quickWins.length === 0 ? (
           <div
             className="rounded-2xl py-16"
