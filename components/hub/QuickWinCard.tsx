@@ -23,9 +23,9 @@ const CATEGORY_COLORS: Record<string, { dot: string; bg: string; text: string }>
 
 // Lift pill styles
 const LIFT_STYLES: Record<string, { bg: string; text: string; label: string }> = {
-  low:    { bg: '#D9E8E2', text: '#0F4438', label: 'Grab & Go' },
-  medium: { bg: '#F4E9D0', text: '#6B4A0F', label: 'Short Prep' },
-  high:   { bg: '#F0D8CE', text: '#6B2E1A', label: 'Deep Dive' },
+  low:    { bg: '#A7F3D0', text: '#065F46', label: 'Grab & Go' },
+  medium: { bg: '#FDE68A', text: '#92400E', label: 'Short Prep' },
+  high:   { bg: '#FECACA', text: '#991B1B', label: 'Deep Dive' },
 };
 
 interface QuickWinCardProps {
