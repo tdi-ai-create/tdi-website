@@ -49,21 +49,19 @@ export async function GET(request: NextRequest) {
     let emailsSent = 0;
     let downgraded = 0;
 
-    // Get all active partnerships with contract_end dates
+    // Get all active/expiring partnerships with contract_end dates
     const { data: partnerships } = await portalSupabase
       .from('partnerships')
-      .select('id, slug, contact_name, contact_email, org_name, contract_end, staff_enrolled')
-      .eq('status', 'active')
+      .select('id, slug, contact_name, contact_email, contract_end, staff_enrolled')
+      .in('status', ['active', 'expiring'])
       .not('contract_end', 'is', null);
 
-    if (!partnerships || partnerships.length === 0) {
-      return NextResponse.json({ success: true, emailsSent: 0, downgraded: 0, message: 'No partnerships with contract dates' });
-    }
+    // Don't return early -- individual membership expirations still need to run below
 
-    for (const p of partnerships) {
+    for (const p of (partnerships || [])) {
       const contractEnd = new Date(p.contract_end + 'T00:00:00');
       const daysRemaining = Math.floor((contractEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      const schoolName = p.org_name || p.contact_name || 'your school';
+      const schoolName = p.contact_name || 'your school';
       const expirationDate = contractEnd.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
       // Get all_access members for this partnership
