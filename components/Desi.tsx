@@ -27,6 +27,18 @@ export default function Desi() {
   const [showContactForm, setShowContactForm] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
+  // Hide Desi when a Hub popup is active (set via data attribute on body)
+  const [hubPopupActive, setHubPopupActive] = useState(false)
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setHubPopupActive(document.body.hasAttribute('data-hub-popup-active'))
+    })
+    observer.observe(document.body, { attributes: true, attributeFilter: ['data-hub-popup-active'] })
+    // Check initial state
+    setHubPopupActive(document.body.hasAttribute('data-hub-popup-active'))
+    return () => observer.disconnect()
+  }, [])
+
   const greeting = "Hi! I'm Desi, your TDI guide. Whether you're a teacher looking for better PD or a school leader exploring partnerships - I'm here to help. What can I answer for you?"
 
   // Pulse behavior (no auto-open)
@@ -164,6 +176,12 @@ ${transcript}
     }
   }
 
+  if (hubPopupActive) {
+    // Close the chat window if open when a hub popup activates
+    if (isOpen) setIsOpen(false)
+    return null
+  }
+
   return (
     <>
       <style>{`
@@ -185,7 +203,7 @@ ${transcript}
       {isPulsing && !isOpen && (
         <div style={{
           position: 'fixed',
-          bottom: '88px',
+          bottom: 'calc(88px + env(safe-area-inset-bottom, 0px))',
           right: '24px',
           background: 'white',
           borderRadius: '12px',
@@ -206,7 +224,7 @@ ${transcript}
         data-tour="desi-chat"
         style={{
           position: 'fixed',
-          bottom: '24px',
+          bottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
           right: '24px',
           width: '56px',
           height: '56px',
@@ -250,7 +268,7 @@ ${transcript}
       {isOpen && (
         <div style={{
           position: 'fixed',
-          bottom: '92px',
+          bottom: 'calc(92px + env(safe-area-inset-bottom, 0px))',
           right: '24px',
           width: '360px',
           maxWidth: 'calc(100vw - 32px)',

@@ -84,7 +84,7 @@ export default function AddToHomeScreen() {
     <div
       style={{
         position: 'fixed',
-        bottom: 20,
+        bottom: 'calc(20px + env(safe-area-inset-bottom, 0px))',
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: 9999,

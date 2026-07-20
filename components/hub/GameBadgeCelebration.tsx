@@ -96,6 +96,7 @@ export default function GameBadgeCelebration({ badges, onDismiss }: GameBadgeCel
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
+          position: 'relative',
           background: 'white',
           borderRadius: 24,
           maxWidth: 400,

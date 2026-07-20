@@ -126,7 +126,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
 
         {/* Scrollable feature grid */}
         <div style={{ overflowY: 'auto', flex: 1, padding: '0 28px 8px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
             {ALL_FEATURES.map((feature, i) => {
               const iconPath = FEATURE_ICONS[feature.title];
               const color = FEATURE_COLORS[i % FEATURE_COLORS.length];

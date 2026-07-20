@@ -121,7 +121,7 @@ export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
 
   return (
     <div
-      className={`fixed bottom-4 right-4 z-40 w-[320px] bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 ${
+      className={`fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-[320px] z-40 bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 ${
         isAnimatingOut ? 'translate-y-4 opacity-0' : 'translate-y-0 opacity-100'
       }`}
       style={{

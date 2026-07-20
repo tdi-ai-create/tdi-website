@@ -123,8 +123,8 @@ export default function CourseCompletionModal({
     >
       {/* Modal Card */}
       <div
-        className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden animate-scale-in"
-        style={{ maxHeight: '90vh' }}
+        className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl animate-scale-in"
+        style={{ maxHeight: '90vh', overflowY: 'auto' }}
       >
         {/* Close button */}
         <button

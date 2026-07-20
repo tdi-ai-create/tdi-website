@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useCallback,
+  useEffect,
   useRef,
   useSyncExternalStore,
   type ReactNode,
@@ -140,6 +141,19 @@ export function PopupQueueProvider({ children }: { children: ReactNode }) {
     // SSR fallback
     () => null,
   )
+
+  // Signal to components outside the Hub (e.g. Desi) that a popup is active
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    if (currentActive) {
+      document.body.setAttribute('data-hub-popup-active', 'true')
+    } else {
+      document.body.removeAttribute('data-hub-popup-active')
+    }
+    return () => {
+      document.body.removeAttribute('data-hub-popup-active')
+    }
+  }, [currentActive])
 
   const enqueue = useCallback(
     (id: string, priority: number) => store.enqueue(id, priority),

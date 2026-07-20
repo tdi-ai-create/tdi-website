@@ -180,7 +180,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
           style={{
             borderRadius: '24px 24px 0 0',
             maxWidth: '520px',
-            padding: '20px 28px 40px',
+            padding: '20px 28px calc(40px + env(safe-area-inset-bottom, 0px))',
             position: 'relative',
           }}
         >

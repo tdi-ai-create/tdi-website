@@ -20,6 +20,7 @@ import {
   Bookmark,
   ExternalLink,
   Info,
+  X,
 } from 'lucide-react';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
 import CommunityTabs from '@/components/hub/CommunityTabs';
@@ -1881,9 +1882,10 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   <h3 className="text-base font-bold text-white">{tUI('Share this tool')}</h3>
                   <button
                     onClick={() => setShowShareModal(false)}
-                    className="text-white/60 hover:text-white text-lg leading-none"
+                    className="text-white/60 hover:text-white transition-colors"
+                    aria-label="Close"
                   >
-                    x
+                    <X size={18} />
                   </button>
                 </div>
                 <p className="text-sm text-white/60">{tUI('Help another educator find something great')}</p>
