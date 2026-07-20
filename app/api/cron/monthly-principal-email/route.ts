@@ -2,14 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
 /**
  * GET /api/cron/monthly-principal-email
  *
  * First Monday of each month, 9 AM CT. Sends each principal a warm,
- * personalized email highlighting their team's engagement. Written
- * by AI in Rae's voice, with real data points from the Hub.
+ * personalized email highlighting their team's engagement, with
+ * real data points from the Hub.
  *
  * Tone: warm, direct, honest, no fluff. Like a friend who happens
  * to be an expert. No em dashes. No emojis. 2026 for dates.
@@ -66,66 +65,7 @@ export async function GET(request: NextRequest) {
         .eq('status', 'active')
         .limit(3);
 
-      // Build data context for AI
-      const dataContext = {
-        firstName,
-        totalStaff,
-        loggedIn,
-        loginPct,
-        phase: p.contract_phase,
-        kpis: (kpis || []).map(k => `${k.kpi_label}: ${k.current_value}${k.target_unit} (target: ${k.target_value}${k.target_unit})`),
-      };
-
-      let emailBody: string;
-
-      // Try AI-generated email if API key available
-      if (ANTHROPIC_API_KEY) {
-        try {
-          const aiResponse = await fetch('https://api.anthropic.com/v1/messages', {
-            method: 'POST',
-            headers: {
-              'x-api-key': ANTHROPIC_API_KEY,
-              'anthropic-version': '2023-06-01',
-              'content-type': 'application/json',
-            },
-            body: JSON.stringify({
-              model: 'claude-sonnet-4-6',
-              max_tokens: 400,
-              messages: [{
-                role: 'user',
-                content: `Write a short email (3-4 paragraphs) from Rae Hughart, CEO of Teachers Deserve It, to a school principal named ${firstName}. This is a monthly check-in about their TDI partnership.
-
-Data: ${totalStaff} staff enrolled, ${loggedIn} have logged into the Hub (${loginPct}%), phase: ${dataContext.phase}.
-${dataContext.kpis.length > 0 ? 'KPIs: ' + dataContext.kpis.join(', ') : 'No KPIs set yet.'}
-
-Tone rules:
-- Warm, direct, honest, no fluff
-- Like a friend who happens to be an expert
-- Never use em dashes. Use commas or periods instead.
-- No emojis anywhere
-- Lead with something positive
-- End with a soft next step (not a hard ask)
-- Sign off as just "Rae"
-- Keep it under 150 words
-- Do not use "Dear" or "Sincerely"
-
-Write ONLY the email body, no subject line.`
-              }],
-            }),
-          });
-
-          const aiData = await aiResponse.json();
-          emailBody = aiData.content?.[0]?.text || '';
-        } catch {
-          emailBody = '';
-        }
-      } else {
-        emailBody = '';
-      }
-
-      // Fallback if AI fails
-      if (!emailBody) {
-        emailBody = `${firstName},
+      const emailBody = `${firstName},
 
 Just wanted to share a quick update on your team's TDI partnership.
 
@@ -140,7 +80,6 @@ ${kpis && kpis.length > 0
 Your dashboard is always live at teachersdeserveit.com/partners/${p.slug}. Take a look when you have a minute. And if anything comes up or you want to talk through what you are seeing, reply to this email. I read every one.
 
 Rae`;
-      }
 
       // Send the email
       const emailResponse = await fetch('https://api.resend.com/emails', {

@@ -93,11 +93,15 @@ export default function QuickWinCard({
     : quickWin.access_tier === 'professional' ? 'PROFESSIONAL'
     : 'ESSENTIALS';
 
+  const contentHref = quickWin.course_slug
+    ? `/hub/courses/${quickWin.course_slug}/${quickWin.slug}`
+    : `/hub/quick-wins/${quickWin.slug}`;
+
   return (
     <Link
-      href={quickWin.course_slug
-        ? `/hub/courses/${quickWin.course_slug}/${quickWin.slug}`
-        : `/hub/quick-wins/${quickWin.slug}`}
+      href={hasAccess ? contentHref : '/hub/membership'}
+      target={hasAccess ? undefined : '_blank'}
+      rel={hasAccess ? undefined : 'noopener noreferrer'}
       className="block"
       style={{ textDecoration: 'none' }}
     >

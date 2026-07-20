@@ -555,6 +555,8 @@ interface QuickWin {
   title_es?: string | null;
   description_es?: string | null;
   content_es?: string | null;
+  access_tier?: string;
+  is_free_rotating?: boolean;
 }
 
 interface QuickWinPageProps {
@@ -861,6 +863,8 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           title_es: data.title_es || null,
           description_es: data.description_es || null,
           content_es: data.content_es || null,
+          access_tier: data.access_tier || 'all_access',
+          is_free_rotating: data.is_free_rotating || false,
         };
 
         setQuickWin(quickWinData);
@@ -1158,6 +1162,48 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           <Link href="/hub/quick-wins" className="text-[#ffba06] hover:underline mt-4 inline-block">
             {tUI('Browse Quick Wins')}
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Tier Access Check ────────────────────────────────────────────────────
+  const canAccessQuickWin = canAccessGame({
+    access_tier: quickWin.access_tier || 'all_access',
+    is_free_rotating: quickWin.is_free_rotating,
+  });
+
+  if (!canAccessQuickWin) {
+    const title = lang === 'es' ? (quickWin.title_es || quickWin.title) : quickWin.title;
+    return (
+      <div className="min-h-screen" style={{ backgroundColor: '#F5F7FA', fontFamily: "'DM Sans', sans-serif" }}>
+        <div className="max-w-[600px] mx-auto px-4 md:px-8 pt-10 pb-16 text-center">
+          <Link
+            href="/hub/quick-wins"
+            className="inline-flex items-center gap-2 text-sm mb-8 transition-colors"
+            style={{ color: '#6B7280' }}
+          >
+            <ArrowLeft size={16} />
+            {lang === 'es' ? 'Herramientas' : 'Quick Wins'}
+          </Link>
+          <div className="bg-white p-8 md:p-12" style={{ borderRadius: '16px', border: '0.5px solid rgba(0,0,0,0.06)' }}>
+            <Lock size={48} className="mx-auto mb-4 text-gray-300" />
+            <h2 className="text-xl font-bold mb-2" style={{ color: '#1e2749' }}>{title}</h2>
+            <p className="text-sm mb-6" style={{ color: '#6B7280' }}>
+              {lang === 'es'
+                ? 'Este recurso requiere una membresia superior. Actualiza tu plan para acceder a esta herramienta y muchas mas.'
+                : 'This resource is available on a higher plan. Upgrade to unlock this tool and many more.'}
+            </p>
+            <a
+              href="/hub/membership"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 py-3 px-8 font-bold rounded-xl transition-all hover:scale-105 active:scale-95"
+              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            >
+              {lang === 'es' ? 'Ver Planes' : 'View Plans'}
+            </a>
+          </div>
         </div>
       </div>
     );

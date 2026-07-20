@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import Anthropic from '@anthropic-ai/sdk';
 
 // POST /api/admin/creators/[id]/ai-summary
-// Generates an on-demand AI summary of a creator's profile for the admin team.
+// Generates an on-demand summary of a creator's profile for the admin team.
 // Pulls milestones, notes, activity, and re-engagement status to produce
 // a concise briefing Bella can use for quick context or communication.
 
@@ -51,7 +50,6 @@ export async function POST(
     const notes = notesRes.data || [];
     const reengagement = reengagementRes.data || [];
 
-    // Build context for the AI
     const completedCount = milestones.filter((m: any) => m.status === 'completed').length;
     const inProgressCount = milestones.filter((m: any) => m.status === 'in_progress').length;
     const waitingCount = milestones.filter((m: any) => m.status === 'waiting_approval').length;
@@ -61,52 +59,51 @@ export async function POST(
       ? Math.floor((Date.now() - new Date(creator.updated_at).getTime()) / (1000 * 60 * 60 * 24))
       : null;
 
-    const noteSummary = notes
-      .slice(0, 10)
-      .map((n: any) => `[${new Date(n.created_at).toLocaleDateString()}] ${n.author}${n.visible_to_creator ? '' : ' (internal)'}: ${n.content.slice(0, 200)}`)
-      .join('\n');
-
     const reengagementInfo = reengagement.length > 0
       ? reengagement.map((r: any) => `Sequence ${r.status}: started ${new Date(r.started_at).toLocaleDateString()}, step ${r.current_step}/6${r.cancelled_reason ? `, cancelled: ${r.cancelled_reason}` : ''}`).join('; ')
       : 'No re-engagement sequences';
 
-    const prompt = `You are a concise assistant helping Bella, who manages creator relationships at Teachers Deserve It (TDI). Generate a brief, warm summary of this creator's status. Write as if you're briefing a colleague — direct, clear, actionable.
+    const latestNote = notes.length > 0
+      ? `${notes[0].author} on ${new Date(notes[0].created_at).toLocaleDateString()}: "${notes[0].content.slice(0, 120)}${notes[0].content.length > 120 ? '...' : ''}"`
+      : null;
 
-CREATOR PROFILE:
-- Name: ${creator.name}
-- Email: ${creator.email}
-- Content path: ${creator.content_path || 'Not set'}
-- Course title: ${creator.course_title || 'Not set'}
-- Current phase: ${creator.current_phase}
-- Status: ${creator.status}
-- Lifecycle: ${creator.lifecycle_state || 'active'}
-- Progress: ${completedCount}/${totalCount} milestones completed, ${inProgressCount} in progress, ${waitingCount} waiting approval
-- Target completion: ${creator.target_completion_date || 'Not set'}
-- Last activity: ${daysSinceActive !== null ? `${daysSinceActive} days ago` : 'Unknown'}
-- Created: ${new Date(creator.created_at).toLocaleDateString()}
-- Agreement signed: ${creator.agreement_signed ? 'Yes' : 'No'}
+    // Build Status Snapshot
+    const activityLabel = daysSinceActive !== null
+      ? (daysSinceActive <= 7 ? 'active this week' : daysSinceActive <= 30 ? `active ${daysSinceActive} days ago` : `inactive for ${daysSinceActive} days`)
+      : 'unknown activity';
+    const lifecycleLabel = creator.lifecycle_state || 'active';
+    const statusSnapshot = `**Status Snapshot**\n${creator.name} is in the ${creator.current_phase} phase (${creator.status}, lifecycle: ${lifecycleLabel}), ${activityLabel}. ${completedCount} of ${totalCount} milestones completed.`;
 
-RE-ENGAGEMENT STATUS:
-${reengagementInfo}
+    // Build Key Details
+    const keyDetails: string[] = [];
+    keyDetails.push(`Course: ${creator.course_title || 'Not set'} | Content path: ${creator.content_path || 'Not set'}`);
+    keyDetails.push(`Progress: ${completedCount} completed, ${inProgressCount} in progress, ${waitingCount} waiting approval`);
+    keyDetails.push(`Target completion: ${creator.target_completion_date || 'Not set'}`);
+    keyDetails.push(`Agreement signed: ${creator.agreement_signed ? 'Yes' : 'No'}`);
+    keyDetails.push(`Re-engagement: ${reengagementInfo}`);
+    if (latestNote) {
+      keyDetails.push(`Latest note: ${latestNote}`);
+    }
+    const keyDetailsSection = `**Key Details**\n${keyDetails.map(d => `- ${d}`).join('\n')}`;
 
-RECENT NOTES (most recent first):
-${noteSummary || 'No notes yet'}
+    // Build Suggested Action
+    let suggestedAction: string;
+    if (waitingCount > 0) {
+      suggestedAction = `Review ${waitingCount} milestone${waitingCount > 1 ? 's' : ''} waiting for approval.`;
+    } else if (daysSinceActive !== null && daysSinceActive > 30) {
+      suggestedAction = `${creator.name} has been inactive for ${daysSinceActive} days. Consider a personal check-in.`;
+    } else if (inProgressCount > 0) {
+      suggestedAction = `${inProgressCount} milestone${inProgressCount > 1 ? 's are' : ' is'} in progress. Check in to see if anything is blocked.`;
+    } else if (completedCount === 0) {
+      suggestedAction = `No milestones completed yet. Reach out to help ${creator.name} get started.`;
+    } else if (completedCount === totalCount && totalCount > 0) {
+      suggestedAction = `All milestones complete. Confirm launch readiness and next steps.`;
+    } else {
+      suggestedAction = `No urgent action needed. Keep monitoring progress.`;
+    }
+    const suggestedActionSection = `**Suggested Action**\n${suggestedAction}`;
 
-FORMAT YOUR RESPONSE AS:
-1. **Status snapshot** (1-2 sentences: where they are, how active)
-2. **Key details** (bullet points: what's done, what's next, any blockers)
-3. **Suggested action** (1 sentence: what Bella should do next, if anything)
-
-Keep it under 150 words. Be warm but direct. No filler.`;
-
-    const anthropic = new Anthropic();
-    const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 400,
-      messages: [{ role: 'user', content: prompt }],
-    });
-
-    const summary = message.content[0].type === 'text' ? message.content[0].text : '';
+    const summary = `${statusSnapshot}\n\n${keyDetailsSection}\n\n${suggestedActionSection}`;
 
     return NextResponse.json({ success: true, summary });
   } catch (error: any) {
