@@ -1394,6 +1394,7 @@ export default function CreatorStudioPage() {
   const [recruitmentExpandedFit, setRecruitmentExpandedFit] = useState<Set<string>>(new Set());
   const [recruitmentExpandedDraft, setRecruitmentExpandedDraft] = useState<Set<string>>(new Set());
   const [recruitmentQuickNotes, setRecruitmentQuickNotes] = useState<Record<string, string>>({});
+  const [recruitmentSourceData, setRecruitmentSourceData] = useState<any>(null);
   const [nominateForm, setNominateForm] = useState({
     name: '', email: '', school_org: '', expertise_area: '', source: 'sales_nomination', notes: ''
   });
@@ -1624,6 +1625,16 @@ export default function CreatorStudioPage() {
         .finally(() => setAnalyticsLoading(false));
     }
   }, [activeTab, analyticsData, analyticsLoading]);
+
+  // Load recruitment source analytics when analytics tab is active
+  useEffect(() => {
+    if (activeTab === 'analytics' && !recruitmentSourceData) {
+      fetch('/api/admin/recruitment-analytics')
+        .then(res => res.json())
+        .then(data => setRecruitmentSourceData(data))
+        .catch(() => {});
+    }
+  }, [activeTab, recruitmentSourceData]);
 
   // Filter and sort creators
   useEffect(() => {
@@ -4891,20 +4902,10 @@ export default function CreatorStudioPage() {
 
           {/* Recruitment Source Quality */}
           {(() => {
-            const [sourceData, setSourceData] = useState<any>(null);
-            useEffect(() => {
-              if (activeTab === 'analytics' && !sourceData) {
-                fetch('/api/admin/recruitment-analytics')
-                  .then(res => res.json())
-                  .then(data => setSourceData(data))
-                  .catch(() => {});
-              }
-            }, [activeTab, sourceData]);
+            if (!recruitmentSourceData) return null;
 
-            if (!sourceData) return null;
-
-            const sources = sourceData.creators_by_source || {};
-            const conversions = sourceData.conversion_rates || {};
+            const sources = recruitmentSourceData.creators_by_source || {};
+            const conversions = recruitmentSourceData.conversion_rates || {};
             const sourceEntries = Object.entries(sources).filter(([key]) => key !== 'unknown');
 
             // Don't show section if no recruitment-sourced creators exist yet
