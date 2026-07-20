@@ -33,9 +33,9 @@ export async function GET(request: NextRequest) {
     // Get active partnerships that haven't been welcomed yet
     const { data: partnerships } = await supabase
       .from('partnerships')
-      .select('id, slug, contact_name, contact_email, org_name')
+      .select('id, slug, contact_name, contact_email')
       .eq('status', 'active')
-      .not('contract_end', 'lt', new Date().toISOString().split('T')[0]); // Not expired
+      .gte('contract_end', new Date().toISOString().split('T')[0]);
 
     if (!partnerships || partnerships.length === 0) {
       return NextResponse.json({ success: true, sent: 0, message: 'No partnerships to welcome' });
@@ -60,7 +60,15 @@ export async function GET(request: NextRequest) {
       if (p.slug === 'demo-elementary') continue;
 
       const firstName = (p.contact_name || '').split(' ')[0] || 'there';
-      const schoolName = p.org_name || p.contact_name || 'your school';
+
+      // Get school name from organizations table
+      const { data: org } = await supabase
+        .from('organizations')
+        .select('name')
+        .eq('partnership_id', p.id)
+        .maybeSingle();
+
+      const schoolName = org?.name || p.contact_name || 'your school';
       const dashboardUrl = `https://www.teachersdeserveit.com/partners/${p.slug}`;
 
       const resp = await fetch('https://www.teachersdeserveit.com/api/partners/welcome-email', {
