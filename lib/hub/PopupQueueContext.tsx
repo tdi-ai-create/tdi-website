@@ -167,10 +167,15 @@ export function PopupQueueProvider({ children }: { children: ReactNode }) {
 // Hook
 // ---------------------------------------------------------------------------
 
+// Safe no-op fallback so components never crash if rendered outside the provider
+const NOOP_QUEUE: PopupQueueAPI = {
+  enqueue: () => {},
+  dequeue: () => {},
+  isActive: () => true,
+}
+
 export function usePopupQueue() {
   const ctx = useContext(PopupQueueContext)
-  if (!ctx) {
-    throw new Error('usePopupQueue must be used within a PopupQueueProvider')
-  }
+  if (!ctx) return NOOP_QUEUE
   return ctx
 }
