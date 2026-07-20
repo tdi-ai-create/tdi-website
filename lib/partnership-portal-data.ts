@@ -696,22 +696,26 @@ export async function getPartnershipStats(): Promise<{
 }> {
   const supabase = getServiceSupabase();
 
-  // Get counts by status
+  // Get counts using both status AND invite acceptance state
   const { data: partnerships } = await supabase
     .from('partnerships')
-    .select('status');
+    .select('status, invite_sent_at, invite_accepted_at, staff_enrolled');
 
-  const activeCount = partnerships?.filter(p => p.status === 'active').length || 0;
-  const pendingSetup = partnerships?.filter(p => p.status === 'setup_in_progress').length || 0;
-  const awaitingAccept = partnerships?.filter(p => p.status === 'invited').length || 0;
+  const all = partnerships || [];
 
-  // Get total educators -- sum staff_enrolled from all active partnerships
-  const { data: allPartnerships } = await supabase
-    .from('partnerships')
-    .select('staff_enrolled')
-    .eq('status', 'active');
+  // Active = status is active AND principal has logged in (invite_accepted_at set)
+  const activeCount = all.filter(p => p.status === 'active' && p.invite_accepted_at).length;
 
-  const totalEducators = (allPartnerships || []).reduce((sum, p) => sum + (p.staff_enrolled || 0), 0);
+  // Awaiting Accept = invite sent but not accepted (regardless of status field)
+  const awaitingAccept = all.filter(p => p.invite_sent_at && !p.invite_accepted_at && p.status !== 'completed' && p.status !== 'paused').length;
+
+  // Pending Setup = status is setup_in_progress OR active but no invite sent yet
+  const pendingSetup = all.filter(p => p.status === 'setup_in_progress' || (p.status === 'active' && !p.invite_sent_at)).length;
+
+  // Total educators from all non-completed partnerships
+  const totalEducators = all
+    .filter(p => p.status !== 'completed' && p.status !== 'paused')
+    .reduce((sum, p) => sum + (p.staff_enrolled || 0), 0);
 
   return {
     activeCount,

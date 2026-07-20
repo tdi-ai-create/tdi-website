@@ -431,9 +431,9 @@ export default function LeadershipDashboardPage() {
 
   // Pipeline counts
   const pipelineCounts = {
-    invited: partnerships.filter((p) => p.status === 'invited').length,
-    setup: partnerships.filter((p) => p.status === 'setup_in_progress').length,
-    active: partnerships.filter((p) => p.status === 'active').length,
+    invited: partnerships.filter((p) => p.invite_sent_at && !p.invite_accepted_at && p.status !== 'completed' && p.status !== 'paused').length,
+    setup: partnerships.filter((p) => p.status === 'setup_in_progress' || (p.status === 'active' && !p.invite_sent_at)).length,
+    active: partnerships.filter((p) => p.status === 'active' && p.invite_accepted_at).length,
     paused: partnerships.filter((p) => p.status === 'paused').length,
     completed: partnerships.filter((p) => p.status === 'completed').length,
   };
@@ -1524,7 +1524,7 @@ export default function LeadershipDashboardPage() {
                 </h3>
                 <div className="space-y-2">
                   {partnerships
-                    .filter((p) => p.status === 'invited')
+                    .filter((p) => p.invite_sent_at && !p.invite_accepted_at && p.status !== 'completed' && p.status !== 'paused')
                     .slice(0, 5)
                     .map((p) => (
                       <Link
@@ -1556,7 +1556,7 @@ export default function LeadershipDashboardPage() {
                 </h3>
                 <div className="space-y-2">
                   {partnerships
-                    .filter((p) => p.status === 'setup_in_progress')
+                    .filter((p) => p.status === 'setup_in_progress' || (p.status === 'active' && !p.invite_sent_at))
                     .slice(0, 5)
                     .map((p) => (
                       <Link
@@ -1588,7 +1588,7 @@ export default function LeadershipDashboardPage() {
                 </h3>
                 <div className="space-y-2">
                   {partnerships
-                    .filter((p) => p.status === 'active')
+                    .filter((p) => p.status === 'active' && p.invite_accepted_at)
                     .slice(0, 5)
                     .map((p) => (
                       <Link
