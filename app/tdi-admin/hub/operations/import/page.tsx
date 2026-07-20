@@ -141,7 +141,9 @@ export default function SubstackImportPage() {
     setCancelled(false);
     cancelledRef.current = false;
 
-    const CHUNK_SIZE = 100;
+    const CHUNK_SIZE = 50;
+    const DELAY_MS = 500;
+    const MAX_RETRIES = 3;
     const chunks: ParsedSubscriber[][] = [];
     for (let i = 0; i < subscribers.length; i += CHUNK_SIZE) {
       chunks.push(subscribers.slice(i, i + CHUNK_SIZE));
@@ -166,34 +168,52 @@ export default function SubstackImportPage() {
 
       setProgress(prev => ({ ...prev, batch: i + 1, current: i * CHUNK_SIZE }));
 
-      try {
-        const res = await fetch('/api/tdi-admin/substack-import', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ subscribers: chunks[i] }),
-        });
+      let success = false;
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          const res = await fetch('/api/tdi-admin/substack-import', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subscribers: chunks[i] }),
+          });
 
-        const data = await res.json();
+          const data = await res.json();
 
-        if (!data.success) {
-          aggregated.errors += chunks[i].length;
-          aggregated.error_details.push(`Batch ${i + 1} failed: ${data.error}`);
-          continue;
+          if (!data.success) {
+            if (attempt === MAX_RETRIES) {
+              aggregated.errors += chunks[i].length;
+              aggregated.error_details.push(`Batch ${i + 1} failed after ${MAX_RETRIES} attempts: ${data.error}`);
+            }
+            // Wait longer before retry
+            await new Promise(r => setTimeout(r, DELAY_MS * attempt * 2));
+            continue;
+          }
+
+          const r = data.results;
+          aggregated.total_processed += r.total_processed;
+          aggregated.new_profiles += r.new_profiles;
+          aggregated.new_memberships += r.new_memberships;
+          aggregated.upgraded += r.upgraded;
+          aggregated.already_correct += r.already_correct;
+          aggregated.skipped_protected += r.skipped_protected;
+          aggregated.skipped_author_comp += r.skipped_author_comp;
+          aggregated.errors += r.errors;
+          aggregated.error_details.push(...r.error_details);
+          success = true;
+          break;
+        } catch (err) {
+          if (attempt === MAX_RETRIES) {
+            aggregated.errors += chunks[i].length;
+            aggregated.error_details.push(`Batch ${i + 1} network error after ${MAX_RETRIES} attempts`);
+          }
+          // Wait longer before retry
+          await new Promise(r => setTimeout(r, DELAY_MS * attempt * 2));
         }
+      }
 
-        const r = data.results;
-        aggregated.total_processed += r.total_processed;
-        aggregated.new_profiles += r.new_profiles;
-        aggregated.new_memberships += r.new_memberships;
-        aggregated.upgraded += r.upgraded;
-        aggregated.already_correct += r.already_correct;
-        aggregated.skipped_protected += r.skipped_protected;
-        aggregated.skipped_author_comp += r.skipped_author_comp;
-        aggregated.errors += r.errors;
-        aggregated.error_details.push(...r.error_details);
-      } catch (err) {
-        aggregated.errors += chunks[i].length;
-        aggregated.error_details.push(`Batch ${i + 1} network error`);
+      // Delay between batches to avoid rate limits
+      if (success && i < chunks.length - 1) {
+        await new Promise(r => setTimeout(r, DELAY_MS));
       }
     }
 
