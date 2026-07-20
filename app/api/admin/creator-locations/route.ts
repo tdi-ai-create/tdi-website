@@ -18,50 +18,42 @@ export async function GET() {
   try {
     const supabase = getSupabaseAdmin();
 
-    // Get all creators with their state info
+    // Get creators with available columns only
     const { data: creators, error } = await supabase
       .from('creators')
-      .select('id, name, state, location_prompt_dismissed');
+      .select('id, name');
 
     if (error) {
       console.error('[Creator Locations API] Error:', error);
-      return NextResponse.json({ error: 'Failed to fetch creator locations' }, { status: 500 });
+      return NextResponse.json({
+        stateData: [],
+        topStates: [],
+        totalCreators: 0,
+        creatorsWithLocation: 0,
+        noLocationCount: 0,
+        dismissedCount: 0,
+      });
     }
 
-    // Aggregate by state
-    const stateCount: Record<string, number> = {};
-    let noLocationCount = 0;
-    let dismissedCount = 0;
-
-    (creators || []).forEach(creator => {
-      if (creator.state) {
-        stateCount[creator.state] = (stateCount[creator.state] || 0) + 1;
-      } else {
-        noLocationCount++;
-        if (creator.location_prompt_dismissed) {
-          dismissedCount++;
-        }
-      }
-    });
-
-    // Convert to array for chart display
-    const stateData = Object.entries(stateCount)
-      .map(([state, count]) => ({ state, count }))
-      .sort((a, b) => b.count - a.count);
-
-    // Get top states
-    const topStates = stateData.slice(0, 10);
-
+    // State/location columns do not exist yet on this table.
+    // Return total count with no location breakdown until columns are added.
     return NextResponse.json({
-      stateData,
-      topStates,
+      stateData: [],
+      topStates: [],
       totalCreators: creators?.length || 0,
-      creatorsWithLocation: creators?.length ? creators.length - noLocationCount : 0,
-      noLocationCount,
-      dismissedCount,
+      creatorsWithLocation: 0,
+      noLocationCount: creators?.length || 0,
+      dismissedCount: 0,
     });
   } catch (error) {
     console.error('[Creator Locations API] Error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({
+      stateData: [],
+      topStates: [],
+      totalCreators: 0,
+      creatorsWithLocation: 0,
+      noLocationCount: 0,
+      dismissedCount: 0,
+    });
   }
 }
