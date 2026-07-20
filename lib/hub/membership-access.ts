@@ -6,10 +6,10 @@
  * Tier hierarchy: free < essentials < professional < all_access
  *
  * Pricing:
- * - free: $0 - rotating content only
- * - essentials: $5/mo - individual downloads and community access
- * - professional: $10/mo - comprehensive resource packs
- * - all_access: $25/mo - full course library
+ * - free: $0 - rotating tools each week, favorites, PD hour tracking
+ * - essentials: $5/mo - expanded Quick Wins, PDFs/templates, community, priority support
+ * - professional: $10/mo - full Quick Win library, practice games, new courses, monthly drops
+ * - all_access: $25/mo - full course library, PD certs, workshops, creator access, 1-on-1 coaching
  */
 
 // Tier hierarchy levels

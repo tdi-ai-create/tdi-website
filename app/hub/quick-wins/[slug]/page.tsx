@@ -40,7 +40,8 @@ import { PrioritizeThis } from '@/app/paragametools/components/PrioritizeThis';
 import { EnergyBudget } from '@/app/paragametools/components/EnergyBudget';
 import { ThisOrThat } from '@/app/paragametools/components/ThisOrThat';
 import { SortItOut } from '@/app/paragametools/components/SortItOut';
-import { Gamepad2, Users, Timer, Target } from 'lucide-react';
+import { Gamepad2, Users, Timer, Target, Lock } from 'lucide-react';
+import { useMembership, type MembershipTier, canAccessContent } from '@/lib/hub/use-membership';
 
 type Bilingual = { en: string; es: string };
 
@@ -57,6 +58,7 @@ interface PracticeGameConfig {
   rounds: Bilingual;
   color: string;
   format: 'solo' | 'group' | 'both';
+  requiredTier: MembershipTier;
 }
 
 const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
@@ -82,6 +84,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     rounds: { en: '10 rounds', es: '10 rondas' },
     color: '#FF7847',
     format: 'both',
+    requiredTier: 'professional',
   },
   'tell-or-ask': {
     component: TellOrAsk,
@@ -105,6 +108,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     rounds: { en: '14 rounds', es: '14 rondas' },
     color: '#F1C40F',
     format: 'both',
+    requiredTier: 'free',
   },
   'feedback-level-up': {
     component: FeedbackLevelUp,
@@ -127,6 +131,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     rounds: { en: '12 rounds', es: '12 rondas' },
     color: '#27AE60',
     format: 'both',
+    requiredTier: 'essentials',
   },
   'feedback-madlibs': {
     component: FeedbackMadlibs,
@@ -150,6 +155,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     rounds: { en: '6 rounds (3 silly + 3 real)', es: '6 rondas (3 divertidas + 3 reales)' },
     color: '#9333EA',
     format: 'both',
+    requiredTier: 'all_access',
   },
   'feedback-makeover': {
     component: FeedbackMakeover,
@@ -174,6 +180,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     rounds: { en: '6 rounds', es: '6 rondas' },
     color: '#E74C3C',
     format: 'both',
+    requiredTier: 'professional',
   },
   'whats-your-move': {
     component: WhatsYourMove,
@@ -196,6 +203,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     rounds: { en: '6 scenarios', es: '6 escenarios' },
     color: '#22b8bd',
     format: 'both',
+    requiredTier: 'free',
   },
   'classroom-shuffle': {
     component: ClassroomShuffle,
@@ -218,6 +226,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     rounds: { en: '8 scenarios', es: '8 escenarios' },
     color: '#3498DB',
     format: 'both',
+    requiredTier: 'essentials',
   },
   'prioritize-this': {
     component: PrioritizeThis,
@@ -240,6 +249,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     rounds: { en: '3 rounds', es: '3 rondas' },
     color: '#9333EA',
     format: 'both',
+    requiredTier: 'all_access',
   },
   'energy-budget': {
     component: EnergyBudget,
@@ -263,6 +273,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     rounds: { en: '3 rounds', es: '3 rondas' },
     color: '#22b8bd',
     format: 'both',
+    requiredTier: 'essentials',
   },
   'this-or-that': {
     component: ThisOrThat,
@@ -287,6 +298,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     rounds: { en: '8 rounds', es: '8 rondas' },
     color: '#E8B84B',
     format: 'both',
+    requiredTier: 'all_access',
   },
   'sort-it-out': {
     component: SortItOut,
@@ -310,6 +322,7 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     rounds: { en: '5 categories, 10 items each', es: '5 categorias, 10 items cada una' },
     color: '#2563EB',
     format: 'both',
+    requiredTier: 'all_access',
   },
 };
 
@@ -317,54 +330,59 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
 
 const GAME_TESTIMONIALS: Record<string, { quote: string; role: string }[]> = {
   'question-knockout': [
+    { quote: "As a para, this completely changed how I talk to students during small group. I catch myself redirecting without telling now.", role: "Paraprofessional, K-2" },
     { quote: "I thought I was good at asking questions until this game humbled me. I was telling disguised as asking the whole time.", role: "3rd grade teacher" },
     { quote: "We played this at our PLC and it got SO competitive. My AP kept hitting the buzzer on herself.", role: "Instructional coach" },
-    { quote: "As a para, this completely changed how I talk to students during small group. I catch myself now.", role: "Paraprofessional, K-2" },
   ],
   'tell-or-ask': [
+    { quote: "I do redirects all day in small groups. This game made me realize half of them are tells. Working on flipping that.", role: "Paraprofessional, 3-5" },
     { quote: "The confidence meter is what got me. I was SO sure 'Sound it out' was an ask. It's not.", role: "1st grade teacher" },
-    { quote: "I use this in every new teacher training now. The reveals always spark the best discussions.", role: "Mentor teacher" },
-    { quote: "Played this solo on my commute and genuinely learned something about my own language patterns.", role: "5th grade teacher" },
+    { quote: "I use this in every new teacher training now. The reveals always spark the best discussions.", role: "Instructional coach" },
   ],
   'feedback-level-up': [
+    { quote: "I support a high school math class and thought the feedback I give in small groups was solid. This game showed me I was stuck at Level 2.", role: "Paraprofessional, 9-12" },
     { quote: "The Level 2 trap is REAL. I fell for it 4 times. Now I catch myself giving vague praise in class.", role: "Middle school math teacher" },
     { quote: "Our team played this and then rewrote our report card comments. Night and day difference.", role: "Grade-level lead" },
-    { quote: "I thought 'Nice details!' was great feedback. This game showed me it's not even close.", role: "2nd grade teacher" },
   ],
   'feedback-madlibs': [
+    { quote: "As a para who works with the same small group every day, this formula is gold. The kids remember it because they laughed through it first.", role: "Paraprofessional, K-2" },
     { quote: "The silly rounds had us crying laughing. Then the real rounds hit different because we already had the formula in our heads.", role: "4th grade teacher" },
     { quote: "Notice, Name, Next Step. I say it in my sleep now. This game drilled it in without feeling like a drill.", role: "New teacher, year 1" },
   ],
   'feedback-makeover': [
+    { quote: "I started doing these during my planning breaks. 120 seconds to transform 'Good job' into real feedback. Harder than it sounds but SO good.", role: "Paraprofessional, middle school" },
     { quote: "The timer makes it real. You can't overthink it. Just Notice, Name, Next Step. Go.", role: "8th grade ELA teacher" },
     { quote: "I started screenshotting my before/afters and sharing them with my team. We turned it into a weekly challenge.", role: "Department head" },
   ],
   'whats-your-move': [
+    { quote: "First year as a para and this game gave me more confidence for Monday morning than anything else. The scenarios are realistic.", role: "Paraprofessional, 9-12" },
     { quote: "Every scenario felt like something that happened to me last week. The explanations for why the wrong answers don't work -- that's where the real learning is.", role: "Paraprofessional, 3-5" },
     { quote: "I got 4 out of 6 right and the two I missed completely changed how I think about proximity.", role: "First-year teacher" },
-    { quote: "We use this to onboard new paras. Better than any handbook.", role: "Special education coordinator" },
   ],
   'classroom-shuffle': [
+    { quote: "I work with a middle school team as a para. The staff meeting scenario tripped me up but now I know -- redirect to private is always the move.", role: "Paraprofessional, 6-8" },
     { quote: "The parent email scenario -- I've literally been in that exact situation. Wish I had this game before I responded.", role: "6th grade teacher" },
-    { quote: "I thought the staff meeting scenario was hard until I realized the answer is always 'redirect to private.' Changed my whole approach to conflict.", role: "Assistant principal" },
+    { quote: "We use the scenarios as discussion prompts at our staff meetings. The debates are incredible.", role: "Instructional coach" },
   ],
   'prioritize-this': [
+    { quote: "Played this with the other paras at lunch. We each ranked silently then compared. The disagreements showed how differently we support our classrooms.", role: "Paraprofessional, K-2" },
     { quote: "I ranked 'greet students at the door' as #1 every time. The game showed me why that's not always right. Context matters.", role: "High school teacher" },
     { quote: "We used this at our leadership team retreat. The debates were incredible.", role: "Principal" },
   ],
   'energy-budget': [
+    { quote: "Been a para for 20 years. I scored 42% alignment with the experts. Turns out I have been over investing in everyone else's needs for decades.", role: "Paraprofessional, 3-5" },
     { quote: "I gave personal reset 5 points. The expert gave it 15. That one number told me everything about why I'm burned out.", role: "7th grade science teacher" },
     { quote: "This is the game that made me actually take a lunch break. Not joking.", role: "3rd grade teacher" },
   ],
   'this-or-that': [
-    { quote: "No right answer means no pressure. I was more honest about my instincts than in any other PD I have done.", role: "5th grade teacher" },
+    { quote: "No right answer means no pressure. I was more honest about my instincts than in any other PD I have done.", role: "Paraprofessional, K-2" },
     { quote: "The 50/50 splits started the best team conversations. We realized we approach the same situations completely differently.", role: "Instructional coach" },
     { quote: "Seeing that 70% of K-2 teachers agreed with me but only 40% of high school teachers did. That gap taught me more than any lecture.", role: "3rd grade teacher" },
   ],
   'sort-it-out': [
-    { quote: "The accommodation vs modification set finally made the difference click. I have been confusing them for years.", role: "Special education teacher" },
-    { quote: "Our whole team played the Feedback or Praise set and then rewrote our report card comments. Transformative.", role: "Grade-level lead" },
     { quote: "The para responsibilities set should be required for every new para orientation. Finally someone made it clear.", role: "Paraprofessional, K-2" },
+    { quote: "The accommodation vs modification set finally made the difference click. I have been confusing them for years.", role: "Special education teacher" },
+    { quote: "Used the Feedback or Praise set with my lead teacher. We had the best conversation about what we actually say to kids in small group.", role: "Paraprofessional, 3-5" },
   ],
 };
 
@@ -560,12 +578,14 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   // ─── Practice Game Route ─────────────────────────────────────────────────
   const gameConfig = PRACTICE_GAME_MAP[slug];
   const [isPlaying, setIsPlaying] = useState(false);
+  const { canAccess: canAccessGame, effectiveTier } = useMembership();
 
   if (gameConfig) {
     const GameComponent = gameConfig.component;
+    const hasAccess = canAccessGame({ access_tier: gameConfig.requiredTier });
 
     // Full-screen game mode
-    if (isPlaying) {
+    if (isPlaying && hasAccess) {
       return (
         <LanguageProvider>
           <GameComponent onBack={() => setIsPlaying(false)} />
@@ -637,14 +657,24 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
               {/* Play button column */}
               <div className="md:w-[280px] flex-shrink-0 p-6 md:p-8 flex flex-col justify-center gap-3">
-                <button
-                  onClick={() => setIsPlaying(true)}
-                  className="flex items-center justify-center gap-2 py-4 px-4 font-bold text-lg rounded-xl transition-all hover:scale-105 active:scale-95"
-                  style={{ backgroundColor: gameConfig.color, color: 'white' }}
-                >
-                  <Play size={22} />
-                  {lang === 'es' ? 'Jugar Ahora' : 'Play Now'}
-                </button>
+                {hasAccess ? (
+                  <button
+                    onClick={() => setIsPlaying(true)}
+                    className="flex items-center justify-center gap-2 py-4 px-4 font-bold text-lg rounded-xl transition-all hover:scale-105 active:scale-95"
+                    style={{ backgroundColor: gameConfig.color, color: 'white' }}
+                  >
+                    <Play size={22} />
+                    {lang === 'es' ? 'Jugar Ahora' : 'Play Now'}
+                  </button>
+                ) : (
+                  <Link
+                    href="/hub/membership"
+                    className="flex items-center justify-center gap-2 py-4 px-4 font-bold text-lg rounded-xl transition-all hover:scale-105 active:scale-95 bg-gray-200 text-gray-600"
+                  >
+                    <Lock size={18} />
+                    {lang === 'es' ? 'Actualizar para Jugar' : 'Upgrade to Play'}
+                  </Link>
+                )}
               </div>
             </div>
           </div>
@@ -710,6 +740,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               <div className="lg:sticky lg:top-24 space-y-6">
                 {/* Play card */}
                 <div className="bg-white p-6" style={{ border: '0.5px solid rgba(0,0,0,0.06)', borderRadius: '16px' }}>
+                  {hasAccess ? (
                   <button
                     onClick={() => setIsPlaying(true)}
                     className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold rounded-xl transition-all hover:scale-105 active:scale-95"
@@ -718,6 +749,15 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     <Play size={18} />
                     {lang === 'es' ? 'Jugar Ahora' : 'Play Now'}
                   </button>
+                  ) : (
+                  <Link
+                    href="/hub/membership"
+                    className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold rounded-xl transition-all hover:scale-105 active:scale-95 bg-gray-200 text-gray-600"
+                  >
+                    <Lock size={18} />
+                    {lang === 'es' ? 'Actualizar para Jugar' : 'Upgrade to Play'}
+                  </Link>
+                  )}
                   <div className="mt-4 space-y-2">
                     <div className="flex items-center gap-2 text-xs" style={{ color: '#9CA3AF' }}>
                       <Timer size={14} /> {gameConfig.time} {lang === 'es' ? 'para jugar' : 'to play'}

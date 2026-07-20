@@ -52,7 +52,7 @@ const PRACTICE_TOOLS: QuickWin[] = [
     estimated_minutes: 15,
     content_type: 'activity',
     thumbnail_url: 'https://asdwpkcsbcnpknklchdq.supabase.co/storage/v1/object/public/cover-images/practice-tools/question-knockout/thumbnail.svg',
-    access_tier: 'essentials',
+    access_tier: 'professional',
     capacity: 'medium',
   },
   {
@@ -88,7 +88,7 @@ const PRACTICE_TOOLS: QuickWin[] = [
     estimated_minutes: 10,
     content_type: 'activity',
     thumbnail_url: 'https://asdwpkcsbcnpknklchdq.supabase.co/storage/v1/object/public/cover-images/practice-tools/feedback-madlibs/thumbnail.svg',
-    access_tier: 'essentials',
+    access_tier: 'all_access',
     capacity: 'low',
   },
   {
@@ -100,7 +100,7 @@ const PRACTICE_TOOLS: QuickWin[] = [
     estimated_minutes: 15,
     content_type: 'activity',
     thumbnail_url: 'https://asdwpkcsbcnpknklchdq.supabase.co/storage/v1/object/public/cover-images/practice-tools/feedback-makeover/thumbnail.svg',
-    access_tier: 'essentials',
+    access_tier: 'professional',
     capacity: 'medium',
   },
   {
@@ -123,7 +123,7 @@ const PRACTICE_TOOLS: QuickWin[] = [
     category: 'Games',
     estimated_minutes: 10,
     content_type: 'activity',
-    access_tier: 'free',
+    access_tier: 'essentials',
     capacity: 'low',
   },
   {
@@ -134,7 +134,7 @@ const PRACTICE_TOOLS: QuickWin[] = [
     category: 'Games',
     estimated_minutes: 10,
     content_type: 'activity',
-    access_tier: 'free',
+    access_tier: 'all_access',
     capacity: 'medium',
   },
   {
@@ -145,7 +145,7 @@ const PRACTICE_TOOLS: QuickWin[] = [
     category: 'Games',
     estimated_minutes: 10,
     content_type: 'activity',
-    access_tier: 'free',
+    access_tier: 'essentials',
     capacity: 'low',
   },
   {
@@ -156,7 +156,7 @@ const PRACTICE_TOOLS: QuickWin[] = [
     category: 'Games',
     estimated_minutes: 12,
     content_type: 'activity',
-    access_tier: 'free',
+    access_tier: 'all_access',
     capacity: 'low',
   },
   {
@@ -167,7 +167,7 @@ const PRACTICE_TOOLS: QuickWin[] = [
     category: 'Games',
     estimated_minutes: 15,
     content_type: 'activity',
-    access_tier: 'free',
+    access_tier: 'all_access',
     capacity: 'low',
   },
 ];

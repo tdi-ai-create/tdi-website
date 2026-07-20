@@ -436,11 +436,12 @@ export default function HubWelcomePage() {
  <div style={{ background: 'white', borderRadius: 16, padding: 24, border: '0.5px solid #E5E7EB' }}>
  <h3 style={{ fontSize: 24, fontWeight: 700, color: '#1e2749', margin: '0 0 4px 0' }}>Essentials</h3>
  <p style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 0 0' }}>$5<span style={{ fontSize: 14, fontWeight: 400, color: '#6B7280' }}>/mo</span></p>
- <p style={{ fontSize: 13, color: '#6B7280', margin: '8px 0 16px 0' }}>Download individual quick wins and resources.</p>
+ <p style={{ fontSize: 13, color: '#6B7280', margin: '8px 0 16px 0' }}>Quick wins, downloads, and your people.</p>
  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px 0', fontSize: 13, color: '#4B5563' }}>
  <li style={{ marginBottom: 8 }}>✓ Everything in Free</li>
- <li style={{ marginBottom: 8 }}>✓ All individual quick wins</li>
- <li style={{ marginBottom: 8 }}>✓ Download PDFs & templates</li>
+ <li style={{ marginBottom: 8 }}>✓ More Quick Wins than your tote bag can hold</li>
+ <li style={{ marginBottom: 8 }}>✓ PDFs and templates you will actually use</li>
+ <li style={{ marginBottom: 8 }}>✓ Community access (your people are here)</li>
  <li style={{ marginBottom: 8 }}>✓ Priority email support</li>
  </ul>
  <Link href="/hub" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#1e2749', color: 'white', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
@@ -452,13 +453,13 @@ export default function HubWelcomePage() {
  <span style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#2A9D8F', color: 'white', padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase' }}>Most Popular</span>
  <h3 style={{ fontSize: 24, fontWeight: 700, color: '#1e2749', margin: '0 0 4px 0' }}>Professional</h3>
  <p style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 0 0' }}>$10<span style={{ fontSize: 14, fontWeight: 400, color: '#6B7280' }}>/mo</span></p>
- <p style={{ fontSize: 13, color: '#6B7280', margin: '8px 0 16px 0' }}>Comprehensive resource packs for your classroom.</p>
+ <p style={{ fontSize: 13, color: '#6B7280', margin: '8px 0 16px 0' }}>The full toolkit for your classroom.</p>
  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px 0', fontSize: 13, color: '#4B5563' }}>
  <li style={{ marginBottom: 8 }}>✓ Everything in Essentials</li>
- <li style={{ marginBottom: 8 }}>✓ Comprehensive resource packs</li>
- <li style={{ marginBottom: 8 }}>✓ Monthly new content drops</li>
- <li style={{ marginBottom: 8 }}>✓ Early access to new courses</li>
- <li style={{ marginBottom: 8 }}>✓ Community discussion access</li>
+ <li style={{ marginBottom: 8 }}>✓ The full Quick Win library, always growing</li>
+ <li style={{ marginBottom: 8 }}>✓ Practice games that make PD feel like play</li>
+ <li style={{ marginBottom: 8 }}>✓ First dibs on new courses</li>
+ <li style={{ marginBottom: 8 }}>✓ Monthly content drops (like a subscription box, but useful)</li>
  </ul>
  <Link href="/hub" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#2A9D8F', color: 'white', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
  Choose Professional
@@ -471,11 +472,11 @@ export default function HubWelcomePage() {
  <p style={{ fontSize: 13, color: '#6B7280', margin: '8px 0 16px 0' }}>Unlock everything, including the full course library.</p>
  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px 0', fontSize: 13, color: '#4B5563' }}>
  <li style={{ marginBottom: 8 }}>✓ Everything in Professional</li>
- <li style={{ marginBottom: 8 }}>✓ Full course library access</li>
- <li style={{ marginBottom: 8 }}>✓ Earn PD certificates</li>
- <li style={{ marginBottom: 8 }}>✓ Exclusive workshops</li>
- <li style={{ marginBottom: 8 }}>✓ Direct creator access</li>
- <li style={{ marginBottom: 8 }}>✓ 1-on-1 coaching sessions</li>
+ <li style={{ marginBottom: 8 }}>✓ The entire course library, no limits</li>
+ <li style={{ marginBottom: 8 }}>✓ PD certificates your admin will love</li>
+ <li style={{ marginBottom: 8 }}>✓ Exclusive workshops you will not find anywhere else</li>
+ <li style={{ marginBottom: 8 }}>✓ Direct access to our creators</li>
+ <li style={{ marginBottom: 8 }}>✓ 1-on-1 coaching when you need a thought partner</li>
  </ul>
  <Link href="/hub" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#1e2749', color: 'white', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
  Choose All-Access

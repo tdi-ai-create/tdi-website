@@ -150,7 +150,7 @@ export default function SubscriberActivatePage() {
               Your Learning Hub has been upgraded to <strong>Essentials</strong> tier.
             </p>
             <p style={{ color: '#6B7280', marginBottom: '24px' }}>
-              You now have access to all Quick Wins, downloadable PDFs, and priority support.
+              You now have access to more Quick Wins than your tote bag can hold, downloadable PDFs, and priority support.
             </p>
             <a
               href="/hub"

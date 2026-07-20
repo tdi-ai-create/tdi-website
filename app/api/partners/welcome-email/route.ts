@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
           <div style="background:#F8FAFC;border-radius:10px;padding:20px;margin:0 0 24px;">
             <p style="margin:0 0 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94A3B8;">What is new this year</p>
             <table cellpadding="0" cellspacing="0" border="0" width="100%">
-              <tr><td style="padding:5px 0;font-size:14px;color:#334155;"><span style="color:#E8B84B;font-weight:700;margin-right:6px;">&#9679;</span> <strong>145+ Quick Wins</strong> that your teachers can use before their next class</td></tr>
+              <tr><td style="padding:5px 0;font-size:14px;color:#334155;"><span style="color:#E8B84B;font-weight:700;margin-right:6px;">&#9679;</span> <strong>100+ Quick Wins</strong> that your teachers can use before their next class</td></tr>
               <tr><td style="padding:5px 0;font-size:14px;color:#334155;"><span style="color:#E8B84B;font-weight:700;margin-right:6px;">&#9679;</span> <strong>9 Practice Games</strong> for team meetings or solo play</td></tr>
               <tr><td style="padding:5px 0;font-size:14px;color:#334155;"><span style="color:#E8B84B;font-weight:700;margin-right:6px;">&#9679;</span> <strong>PD Certificates</strong> from courses that earn verifiable professional development hours</td></tr>
               <tr><td style="padding:5px 0;font-size:14px;color:#334155;"><span style="color:#E8B84B;font-weight:700;margin-right:6px;">&#9679;</span> <strong>Wellness Tools</strong> including our "I Need a Moment" reset tool and weekly check-ins</td></tr>

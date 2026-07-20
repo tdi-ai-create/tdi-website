@@ -311,7 +311,7 @@ function buildExpirationEmail(
     <p style="margin:0 0 20px;font-size:14px;color:#64748B;">We have been building. A lot. Here is what is waiting for you.</p>
     <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:14px;"><tr>
       <td style="width:44px;vertical-align:top;padding-right:12px;"><div style="width:40px;height:40px;border-radius:10px;background:#DCFCE7;text-align:center;line-height:40px;font-size:18px;">&#9889;</div></td>
-      <td><p style="margin:0;font-size:14px;font-weight:700;color:#1e2749;">145+ Quick Wins</p><p style="margin:0;font-size:12px;color:#64748B;">5-minute tools across 12 categories.</p></td>
+      <td><p style="margin:0;font-size:14px;font-weight:700;color:#1e2749;">100+ Quick Wins</p><p style="margin:0;font-size:12px;color:#64748B;">5-minute tools across 12 categories.</p></td>
     </tr></table>
     <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:14px;"><tr>
       <td style="width:44px;vertical-align:top;padding-right:12px;"><div style="width:40px;height:40px;border-radius:10px;background:#FEF9C3;text-align:center;line-height:40px;font-size:18px;">&#127918;</div></td>
@@ -349,9 +349,9 @@ function buildExpirationEmail(
         <p style="margin:0 0 4px;font-size:15px;font-weight:700;color:#1e2749;">2. Keep your own membership</p>
         <p style="margin:0 0 6px;font-size:14px;color:#64748B;">We now offer individual membership tiers so you can keep full access on your own.</p>
         <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:10px 0;">
-          <tr><td style="padding:8px 12px;background:white;border:1px solid #E5E7EB;border-radius:8px 8px 0 0;"><p style="margin:0;font-size:13px;font-weight:700;color:#1e2749;">Free</p><p style="margin:0;font-size:12px;color:#94A3B8;">Select Quick Wins, community features, account access</p></td></tr>
-          <tr><td style="padding:8px 12px;background:white;border:1px solid #E5E7EB;border-top:none;"><p style="margin:0;font-size:13px;font-weight:700;color:#1e2749;">Essentials</p><p style="margin:0;font-size:12px;color:#94A3B8;">All Quick Wins, practice games, community Q&A</p></td></tr>
-          <tr><td style="padding:8px 12px;background:white;border:1px solid #E5E7EB;border-top:none;border-radius:0 0 8px 8px;"><p style="margin:0;font-size:13px;font-weight:700;color:#1e2749;">Professional</p><p style="margin:0;font-size:12px;color:#94A3B8;">Everything in Essentials + courses, PD hours, certificates</p></td></tr>
+          <tr><td style="padding:8px 12px;background:white;border:1px solid #E5E7EB;border-radius:8px 8px 0 0;"><p style="margin:0;font-size:13px;font-weight:700;color:#1e2749;">Free</p><p style="margin:0;font-size:12px;color:#94A3B8;">Rotating tools each week</p></td></tr>
+          <tr><td style="padding:8px 12px;background:white;border:1px solid #E5E7EB;border-top:none;"><p style="margin:0;font-size:13px;font-weight:700;color:#1e2749;">Essentials</p><p style="margin:0;font-size:12px;color:#94A3B8;">More Quick Wins than your tote bag can hold, practice games, community</p></td></tr>
+          <tr><td style="padding:8px 12px;background:white;border:1px solid #E5E7EB;border-top:none;border-radius:0 0 8px 8px;"><p style="margin:0;font-size:13px;font-weight:700;color:#1e2749;">Professional</p><p style="margin:0;font-size:12px;color:#94A3B8;">Everything in Essentials plus courses, first dibs on new content</p></td></tr>
         </table>
         <a href="${HUB_URL}/membership" style="color:#2A9D8F;font-size:14px;font-weight:600;text-decoration:none;">View Plans & Pricing &rarr;</a>
       </div>
