@@ -6,6 +6,7 @@ import { useHub } from '@/components/hub/HubContext';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { useMomentMode } from './MomentModeContext';
+import { usePopupQueue } from '@/lib/hub/PopupQueueContext';
 import {
   CHECK_IN_QUESTIONS,
   getNextQuestion,
@@ -13,6 +14,9 @@ import {
   type CheckInQuestion,
   type CheckInOption,
 } from '@/lib/hub/checkInQuestions';
+
+const POPUP_ID = 'wellbeing';
+const POPUP_PRIORITY = 10;
 
 /** Random interval between 5-20 minutes in ms */
 function randomInterval(): number {
@@ -23,6 +27,7 @@ export default function WellbeingPopup() {
   const { user } = useHub();
   const { tUI } = useTranslation();
   const { isMomentModeActive: momentModeActive } = useMomentMode();
+  const { enqueue, dequeue, isActive } = usePopupQueue();
 
   const [visible, setVisible] = useState(false);
   const [question, setQuestion] = useState<CheckInQuestion>(CHECK_IN_QUESTIONS[0]);
@@ -53,8 +58,9 @@ export default function WellbeingPopup() {
       pickNext();
       setThanking(false);
       setVisible(true);
+      enqueue(POPUP_ID, POPUP_PRIORITY);
     }, randomInterval());
-  }, [pickNext, momentModeActive]);
+  }, [pickNext, momentModeActive, enqueue]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -94,6 +100,7 @@ export default function WellbeingPopup() {
       setTimeout(() => {
         setVisible(false);
         setThanking(false);
+        dequeue(POPUP_ID);
         scheduleNext();
       }, 1500);
     },
@@ -118,10 +125,11 @@ export default function WellbeingPopup() {
   const handleDismiss = useCallback(() => {
     setVisible(false);
     setThanking(false);
+    dequeue(POPUP_ID);
     scheduleNext();
-  }, [scheduleNext]);
+  }, [scheduleNext, dequeue]);
 
-  if (!visible) return null;
+  if (!visible || !isActive(POPUP_ID)) return null;
 
   /* ---------- render question by type ---------- */
 

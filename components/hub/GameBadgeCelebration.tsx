@@ -6,6 +6,10 @@ import { ConfettiBurst } from '@/app/paragametools/components/ConfettiBurst'
 import type { EarnedBadge } from '@/lib/hub/gameBadges'
 import { useTranslation } from '@/lib/hub/useTranslation'
 import { getLucideIcon } from './gameBadgeIcons'
+import { usePopupQueue } from '@/lib/hub/PopupQueueContext'
+
+const POPUP_ID = 'game-badge'
+const POPUP_PRIORITY = 90
 
 const TIER_LABELS: Record<number, string> = {
   1: 'Bronze',
@@ -26,15 +30,26 @@ interface GameBadgeCelebrationProps {
 
 export default function GameBadgeCelebration({ badges, onDismiss }: GameBadgeCelebrationProps) {
   const { tUI } = useTranslation()
+  const { enqueue, dequeue, isActive: isQueueActive } = usePopupQueue()
   const [visible, setVisible] = useState(false)
   const [currentIdx, setCurrentIdx] = useState(0)
 
+  // Register with popup queue on mount
   useEffect(() => {
+    if (badges.length > 0) {
+      enqueue(POPUP_ID, POPUP_PRIORITY)
+    }
+    return () => { dequeue(POPUP_ID) }
+  }, [enqueue, dequeue, badges.length])
+
+  useEffect(() => {
+    if (!isQueueActive(POPUP_ID)) return
     const timer = setTimeout(() => setVisible(true), 100)
     return () => clearTimeout(timer)
-  }, [])
+  }, [isQueueActive])
 
   if (badges.length === 0) return null
+  if (!isQueueActive(POPUP_ID)) return null
 
   const badge = badges[currentIdx].badge
   const isLast = currentIdx >= badges.length - 1
@@ -43,6 +58,7 @@ export default function GameBadgeCelebration({ badges, onDismiss }: GameBadgeCel
   const handleNext = () => {
     if (isLast) {
       setVisible(false)
+      dequeue(POPUP_ID)
       setTimeout(onDismiss, 300)
     } else {
       setCurrentIdx((i) => i + 1)
@@ -51,6 +67,7 @@ export default function GameBadgeCelebration({ badges, onDismiss }: GameBadgeCel
 
   const handleDismiss = () => {
     setVisible(false)
+    dequeue(POPUP_ID)
     setTimeout(onDismiss, 300)
   }
 

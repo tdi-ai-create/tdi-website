@@ -1,9 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useHub } from './HubContext';
 import { useTranslation } from '@/lib/hub/useTranslation';
+import { usePopupQueue } from '@/lib/hub/PopupQueueContext';
+
+const POPUP_ID = 'capacity-feedback';
+const POPUP_PRIORITY = 40;
 
 const CAPACITY_COLORS: Record<string, string> = {
   low: '#6BA368',
@@ -28,13 +32,21 @@ export default function CapacityFeedbackPrompt({
 }: CapacityFeedbackPromptProps) {
   const { user } = useHub();
   const { tUI } = useTranslation();
+  const { enqueue, dequeue, isActive } = usePopupQueue();
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const [isDone, setIsDone] = useState(false);
+
+  // Register with popup queue on mount
+  useEffect(() => {
+    enqueue(POPUP_ID, POPUP_PRIORITY);
+    return () => { dequeue(POPUP_ID); };
+  }, [enqueue, dequeue]);
 
   const borderColor = CAPACITY_COLORS[officialCapacity] || '#E8B84B';
 
   const dismiss = () => {
     setIsAnimatingOut(true);
+    dequeue(POPUP_ID);
     setTimeout(onDismiss, 300);
   };
 
@@ -54,6 +66,8 @@ export default function CapacityFeedbackPrompt({
     setIsDone(true);
     setTimeout(dismiss, 1200);
   };
+
+  if (!isActive(POPUP_ID)) return null;
 
   return (
     <div

@@ -4,12 +4,17 @@ import { getHubSupabase as getSupabase } from '@/lib/supabase-hub'
 import { getNextQuestion, scoreResponse, type CheckInQuestion } from '@/lib/hub/checkInQuestions'
 import { useHub } from '@/components/hub/HubContext'
 import { useTranslation } from '@/lib/hub/useTranslation'
+import { usePopupQueue } from '@/lib/hub/PopupQueueContext'
+
+const POPUP_ID = 'vibe-check'
+const POPUP_PRIORITY = 50
 
 interface CheckInSlideUpProps {
   onDismiss: () => void
 }
 
 export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
+  const { enqueue, dequeue, isActive } = usePopupQueue()
   const { user } = useHub()
   const { tUI } = useTranslation()
   const [question, setQuestion] = useState<CheckInQuestion | null>(null)
@@ -17,6 +22,12 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
   const [blankValue, setBlankValue] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDone, setIsDone] = useState(false)
+
+  // Register with the popup queue
+  useEffect(() => {
+    enqueue(POPUP_ID, POPUP_PRIORITY)
+    return () => { dequeue(POPUP_ID) }
+  }, [enqueue, dequeue])
 
   useEffect(() => {
     if (!user?.id) return
@@ -83,7 +94,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
     })
 
     setIsDone(true)
-    setTimeout(onDismiss, 1800)
+    setTimeout(handleQueueDismiss, 1800)
   }
 
   async function handleSubmit() {
@@ -115,7 +126,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
     })
 
     setIsDone(true)
-    setTimeout(onDismiss, 1800)
+    setTimeout(handleQueueDismiss, 1800)
   }
 
   // Color scale submits immediately on tap
@@ -137,12 +148,18 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
     })
 
     setIsDone(true)
-    setTimeout(onDismiss, 1800)
+    setTimeout(handleQueueDismiss, 1800)
   }
 
   const canSubmit = selectedValues.length > 0 && !isSubmitting
 
+  const handleQueueDismiss = () => {
+    dequeue(POPUP_ID)
+    onDismiss()
+  }
+
   if (!question) return null
+  if (!isActive(POPUP_ID)) return null
 
   return (
     <>
@@ -150,7 +167,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
       <div
         className="fixed inset-0 z-40"
         style={{ background: 'rgba(15,20,35,0.5)' }}
-        onClick={onDismiss}
+        onClick={handleQueueDismiss}
       />
 
       {/* Sheet */}
@@ -175,7 +192,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
 
           {/* Skip button */}
           <button
-            onClick={onDismiss}
+            onClick={handleQueueDismiss}
             className="absolute top-5 right-6 text-xs font-medium"
             style={{ color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px' }}
           >

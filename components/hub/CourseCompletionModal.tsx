@@ -5,7 +5,11 @@ import Link from 'next/link';
 import { Award, Download, Share2, X } from 'lucide-react';
 import ShareMenu from './ShareMenu';
 import { useTranslation } from '@/lib/hub/useTranslation';
+import { usePopupQueue } from '@/lib/hub/PopupQueueContext';
 import confetti from 'canvas-confetti';
+
+const POPUP_ID = 'course-completion';
+const POPUP_PRIORITY = 80;
 
 interface CourseCompletionModalProps {
   isOpen: boolean;
@@ -27,6 +31,16 @@ export default function CourseCompletionModal({
   const hasConfetti = useRef(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const { tUI } = useTranslation();
+  const { enqueue, dequeue, isActive } = usePopupQueue();
+
+  // Enqueue/dequeue based on isOpen prop
+  useEffect(() => {
+    if (isOpen) {
+      enqueue(POPUP_ID, POPUP_PRIORITY);
+    } else {
+      dequeue(POPUP_ID);
+    }
+  }, [isOpen, enqueue, dequeue]);
 
   // Trigger confetti on mount
   useEffect(() => {
@@ -75,6 +89,7 @@ export default function CourseCompletionModal({
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !showShareMenu) {
+        dequeue(POPUP_ID);
         onClose();
       }
     };
@@ -88,9 +103,14 @@ export default function CourseCompletionModal({
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = '';
     };
-  }, [isOpen, showShareMenu, onClose]);
+  }, [isOpen, showShareMenu, onClose, dequeue]);
 
-  if (!isOpen) return null;
+  const handleClose = () => {
+    dequeue(POPUP_ID);
+    onClose();
+  };
+
+  if (!isOpen || !isActive(POPUP_ID)) return null;
 
   const shareMessage = `I just completed "${courseTitle}" and earned ${pdHours} PD hours on the TDI Learning Hub! 🎓`;
   const shareUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/hub/verify/${verificationCode}`;
@@ -99,7 +119,7 @@ export default function CourseCompletionModal({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ backgroundColor: 'rgba(43, 58, 103, 0.9)' }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      onClick={(e) => e.target === e.currentTarget && handleClose()}
     >
       {/* Modal Card */}
       <div
@@ -108,7 +128,7 @@ export default function CourseCompletionModal({
       >
         {/* Close button */}
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors z-10"
           aria-label={tUI("Close celebration")}
         >

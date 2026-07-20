@@ -5,6 +5,10 @@ import Link from 'next/link';
 import { X } from 'lucide-react';
 import type { Recognition } from '@/lib/hub/recognitions';
 import { useTranslation } from '@/lib/hub/useTranslation';
+import { usePopupQueue } from '@/lib/hub/PopupQueueContext';
+
+const POPUP_ID = 'recognition-celebration';
+const POPUP_PRIORITY = 90;
 
 interface RecognitionCelebrationProps {
   recognition: Recognition;
@@ -19,19 +23,30 @@ const CATEGORY_COLORS: Record<string, { bg: string; accent: string; glow: string
 
 export default function RecognitionCelebration({ recognition, onDismiss }: RecognitionCelebrationProps) {
   const { tUI } = useTranslation();
+  const { enqueue, dequeue, isActive: isQueueActive } = usePopupQueue();
   const [visible, setVisible] = useState(false);
   const colors = CATEGORY_COLORS[recognition.category] || CATEGORY_COLORS.growth;
 
+  // Register with popup queue on mount
   useEffect(() => {
-    // Animate in
+    enqueue(POPUP_ID, POPUP_PRIORITY);
+    return () => { dequeue(POPUP_ID); };
+  }, [enqueue, dequeue]);
+
+  useEffect(() => {
+    // Animate in only when queue says we are active
+    if (!isQueueActive(POPUP_ID)) return;
     const timer = setTimeout(() => setVisible(true), 100);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isQueueActive]);
 
   const handleDismiss = () => {
     setVisible(false);
+    dequeue(POPUP_ID);
     setTimeout(onDismiss, 300);
   };
+
+  if (!isQueueActive(POPUP_ID)) return null;
 
   return (
     <div

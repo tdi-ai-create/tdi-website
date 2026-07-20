@@ -5,6 +5,10 @@ import { X, Star, Send } from 'lucide-react';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import { useHub } from './HubContext';
 import { useMomentMode } from './MomentModeContext';
+import { usePopupQueue } from '@/lib/hub/PopupQueueContext';
+
+const POPUP_ID = 'feedback-prompt';
+const POPUP_PRIORITY = 40;
 import {
   FeedbackType,
   canShowFeedbackPrompt,
@@ -27,6 +31,7 @@ export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
   const { tUI } = useTranslation();
   const { user } = useHub();
   const { isMomentModeActive } = useMomentMode();
+  const { enqueue, dequeue, isActive } = usePopupQueue();
 
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
@@ -74,14 +79,16 @@ export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
       setFeedbackType(next.type);
       setFeedbackContext(next.context);
       setIsVisible(true);
+      enqueue(POPUP_ID, POPUP_PRIORITY);
       recordPromptShown(next.type);
     }, lessonContext ? 2000 : 5000); // Show faster after lesson completion
 
     return () => clearTimeout(timer);
-  }, [user?.id, isMomentModeActive, lessonContext, isVisible]);
+  }, [user?.id, isMomentModeActive, lessonContext, isVisible, enqueue]);
 
   const handleDismiss = () => {
     setIsAnimatingOut(true);
+    dequeue(POPUP_ID);
     setTimeout(() => {
       setIsVisible(false);
       setIsAnimatingOut(false);
@@ -110,7 +117,7 @@ export default function FeedbackPrompt({ lessonContext }: FeedbackPromptProps) {
     }
   };
 
-  if (!isVisible) return null;
+  if (!isVisible || !isActive(POPUP_ID)) return null;
 
   return (
     <div

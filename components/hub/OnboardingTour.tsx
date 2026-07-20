@@ -1,10 +1,14 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useHub } from '@/components/hub/HubContext';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { TOUR_STOPS } from '@/lib/tour-copy';
+import { usePopupQueue } from '@/lib/hub/PopupQueueContext';
+
+const POPUP_ID = 'onboarding-tour';
+const POPUP_PRIORITY = 100;
 
 const TOUR_STORAGE_KEY = 'tdi-hub-tour-step';
 
@@ -36,8 +40,15 @@ const FEATURE_COLORS = ['#E8B84B', '#2A9D8F', '#F97316', '#EC4899', '#8B5CF6', '
 export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
   const { user } = useHub();
   const { tUI } = useTranslation();
+  const { enqueue, dequeue, isActive } = usePopupQueue();
   const [dismissed, setDismissed] = useState(false);
   const hasLoggedRef = useRef(false);
+
+  // Register with popup queue on mount
+  useEffect(() => {
+    enqueue(POPUP_ID, POPUP_PRIORITY);
+    return () => { dequeue(POPUP_ID); };
+  }, [enqueue, dequeue]);
 
   const logCompletion = useCallback(async () => {
     if (!user?.id || hasLoggedRef.current) return;
@@ -53,11 +64,13 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
 
   const handleDismiss = useCallback(() => {
     setDismissed(true);
+    dequeue(POPUP_ID);
     logCompletion();
     onComplete(ALL_FEATURES.length);
-  }, [logCompletion, onComplete]);
+  }, [logCompletion, onComplete, dequeue]);
 
   if (dismissed) return null;
+  if (!isActive(POPUP_ID)) return null;
 
   return (
     <div

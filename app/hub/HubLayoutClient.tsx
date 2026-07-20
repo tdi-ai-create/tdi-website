@@ -8,6 +8,7 @@ import HubNavBar from '@/components/hub/HubNavBar';
 import HubFooter from '@/components/hub/HubFooter';
 import { useHub } from '@/components/hub/HubContext';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
+import { PopupQueueProvider } from '@/lib/hub/PopupQueueContext';
 
 const CheckInSlideUp = dynamic(() => import('@/components/hub/CheckInSlideUp'), { ssr: false });
 const AdminBanner = dynamic(() => import('@/components/hub/AdminBanner'), { ssr: false });
@@ -110,9 +111,11 @@ export default function HubLayoutClient({
   if (pathname.startsWith('/hub/onboarding')) {
     return (
       <HubAuthGuard>
-        <div className="min-h-screen">
-          {children}
-        </div>
+        <PopupQueueProvider>
+          <div className="min-h-screen">
+            {children}
+          </div>
+        </PopupQueueProvider>
       </HubAuthGuard>
     );
   }
@@ -121,7 +124,9 @@ export default function HubLayoutClient({
   if (pathname.startsWith('/hub/admin')) {
     return (
       <HubAuthGuard>
-        {children}
+        <PopupQueueProvider>
+          {children}
+        </PopupQueueProvider>
       </HubAuthGuard>
     );
   }
@@ -129,7 +134,9 @@ export default function HubLayoutClient({
   // All other routes go through auth guard
   return (
     <HubAuthGuard>
-      <HubLayoutInner>{children}</HubLayoutInner>
+      <PopupQueueProvider>
+        <HubLayoutInner>{children}</HubLayoutInner>
+      </PopupQueueProvider>
     </HubAuthGuard>
   );
 }

@@ -3,8 +3,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { useTranslation } from '@/lib/hub/useTranslation';
+import { usePopupQueue } from '@/lib/hub/PopupQueueContext';
 
 const DISMISSED_KEY = 'tdi-hub-a2hs-dismissed';
+const POPUP_ID = 'add-to-homescreen';
+const POPUP_PRIORITY = 20;
 
 /**
  * Subtle prompt to add the Hub to the home screen.
@@ -14,6 +17,7 @@ const DISMISSED_KEY = 'tdi-hub-a2hs-dismissed';
  */
 export default function AddToHomeScreen() {
   const { tUI } = useTranslation();
+  const { enqueue, dequeue, isActive } = usePopupQueue();
   const [show, setShow] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
@@ -45,15 +49,19 @@ export default function AddToHomeScreen() {
     window.addEventListener('beforeinstallprompt', handlePrompt);
 
     // Small delay so it doesn't flash immediately
-    const timer = setTimeout(() => setShow(true), 2000);
+    const timer = setTimeout(() => {
+      setShow(true);
+      enqueue(POPUP_ID, POPUP_PRIORITY);
+    }, 2000);
     return () => {
       clearTimeout(timer);
       window.removeEventListener('beforeinstallprompt', handlePrompt);
     };
-  }, []);
+  }, [enqueue]);
 
   const dismiss = () => {
     setShow(false);
+    dequeue(POPUP_ID);
     localStorage.setItem(DISMISSED_KEY, 'true');
   };
 
@@ -68,7 +76,7 @@ export default function AddToHomeScreen() {
     }
   };
 
-  if (!show) return null;
+  if (!show || !isActive(POPUP_ID)) return null;
 
   const hasNativePrompt = !!deferredPromptRef.current;
 
