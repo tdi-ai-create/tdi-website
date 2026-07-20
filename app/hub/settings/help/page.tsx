@@ -37,7 +37,7 @@ const FAQ_SECTIONS = [
     items: [
       {
         q: 'What are the membership tiers?',
-        a: 'Free gives you a rotating selection of content each week plus community access. Essentials ($5/mo) expands your course access. Professional ($10/mo) unlocks the full library. All-Access ($25/mo) gives you everything in the Hub.',
+        a: 'Free gives you a handful of rotating tools each week. Essentials ($5/mo) unlocks more Quick Wins than your tote bag can hold, plus community access. Professional ($10/mo) opens the full Quick Win library and practice games. All-Access ($25/mo) adds the complete course library, PD certificates, and 1-on-1 coaching.',
       },
       {
         q: 'Can I cancel or change my plan?',

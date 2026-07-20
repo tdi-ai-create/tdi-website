@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
             <p style="margin:0 0 16px;">This gives you access to tools that most educators do not have yet:</p>
 
             <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 20px;">
-              <tr><td style="padding:6px 0;font-size:14px;"><span style="color:#F5A623;font-weight:700;margin-right:6px;">&#9679;</span> <strong>145+ Quick Wins</strong> across 12 categories</td></tr>
+              <tr><td style="padding:6px 0;font-size:14px;"><span style="color:#F5A623;font-weight:700;margin-right:6px;">&#9679;</span> <strong>100+ Quick Wins</strong> across 12 categories</td></tr>
               <tr><td style="padding:6px 0;font-size:14px;"><span style="color:#F5A623;font-weight:700;margin-right:6px;">&#9679;</span> <strong>9 Practice Games</strong> to sharpen classroom instincts</td></tr>
               <tr><td style="padding:6px 0;font-size:14px;"><span style="color:#F5A623;font-weight:700;margin-right:6px;">&#9679;</span> <strong>Community Q&A</strong> with educators across the country</td></tr>
               <tr><td style="padding:6px 0;font-size:14px;"><span style="color:#F5A623;font-weight:700;margin-right:6px;">&#9679;</span> <strong>"I Need a Moment"</strong> wellness reset tool</td></tr>

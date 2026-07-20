@@ -164,7 +164,7 @@ Here is what takes 5 minutes and makes a big difference:
 2. Upload your staff roster (or verify it if you already have one)
 3. Your team gets Learning Hub access the same day
 
-145+ Quick Wins, PD courses, practice games, and wellness tools are all waiting for them.
+100+ Quick Wins, PD courses, practice games, and wellness tools are all waiting for them.
 
 <a href="${dashboardUrl}" style="display:inline-block;padding:12px 24px;background:#E8B84B;color:#1e2749;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;margin:16px 0;">Get Your Team Started</a>
 
