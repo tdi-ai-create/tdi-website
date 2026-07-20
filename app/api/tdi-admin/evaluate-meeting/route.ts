@@ -1,147 +1,107 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import Anthropic from '@anthropic-ai/sdk'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 
-const TDI_EVALUATION_PROMPT = `You are an expert sales and customer success analyst for Teachers Deserve It (TDI), an education wellness company. Your role is to evaluate meeting transcripts to help TDI improve district relationships and increase renewal rates.
+const DIMENSION_KEYS = [
+  'relationship',
+  'value_demonstration',
+  'next_steps',
+  'stakeholder_engagement',
+  'objection_handling',
+  'expansion_signals',
+  'risk_indicators',
+] as const
 
-TDI's offerings include:
-- ACCELERATE program: Teacher wellness and professional development
-- The Hub: Online platform for educator resources
-- Executive Impact Sessions: Leadership coaching for administrators
-- Observation Days: In-person school visits and coaching
-- Virtual Sessions: Remote professional development
-- Love Notes: Appreciation and recognition programs
+type DimensionKey = (typeof DIMENSION_KEYS)[number]
 
-EVALUATION FRAMEWORK:
-
-Score each dimension from 1-10 where:
-- 1-3: Poor/Missing - Significant improvement needed
-- 4-5: Below Average - Notable gaps
-- 6-7: Average - Meeting basic expectations
-- 8-9: Strong - Exceeding expectations
-- 10: Exceptional - Best practice example
-
-THE 7 DIMENSIONS:
-
-1. RELATIONSHIP STRENGTH
-   - Warmth and rapport in conversation
-   - Personal connections referenced
-   - Trust indicators (candor, vulnerability)
-   - History/continuity acknowledged
-
-2. VALUE DEMONSTRATION
-   - Specific impact mentioned (data, stories, outcomes)
-   - TDI services/programs referenced positively
-   - ROI or benefits articulated
-   - Comparison to alternatives
-
-3. NEXT STEPS CLARITY
-   - Clear action items identified
-   - Ownership assigned
-   - Timelines established
-   - Follow-up scheduled
-
-4. STAKEHOLDER ENGAGEMENT
-   - Decision makers present/referenced
-   - Multiple department buy-in
-   - Champion identification
-   - Influence mapping clues
-
-5. OBJECTION HANDLING
-   - Concerns raised and addressed
-   - Budget discussions navigated
-   - Timing/priority objections handled
-   - Competition addressed
-
-6. EXPANSION SIGNALS
-   - Interest in additional services
-   - Referral potential mentioned
-   - Multi-year discussion
-   - Scope expansion cues
-
-7. RISK INDICATORS (inverse scoring - lower risk = higher score)
-   - Budget concerns or constraints
-   - Leadership changes mentioned
-   - Dissatisfaction signals
-   - Competing priorities
-   - Non-renewal hints
-
-OUTPUT FORMAT (respond in valid JSON only):
-
-{
-  "overall_score": <1-10>,
-  "renewal_likelihood": "<high|medium|low|at_risk>",
-  "executive_summary": "<2-3 sentence summary>",
-
-  "dimensions": {
-    "relationship": {
-      "score": <1-10>,
-      "feedback": "<1-2 sentences explaining score>",
-      "quotes": ["<relevant quote 1>", "<relevant quote 2>"]
-    },
-    "value_demonstration": {
-      "score": <1-10>,
-      "feedback": "<1-2 sentences explaining score>",
-      "quotes": ["<relevant quote 1>", "<relevant quote 2>"]
-    },
-    "next_steps": {
-      "score": <1-10>,
-      "feedback": "<1-2 sentences explaining score>",
-      "quotes": ["<relevant quote 1>", "<relevant quote 2>"]
-    },
-    "stakeholder_engagement": {
-      "score": <1-10>,
-      "feedback": "<1-2 sentences explaining score>",
-      "quotes": ["<relevant quote 1>", "<relevant quote 2>"]
-    },
-    "objection_handling": {
-      "score": <1-10>,
-      "feedback": "<1-2 sentences explaining score>",
-      "quotes": ["<relevant quote 1>", "<relevant quote 2>"]
-    },
-    "expansion_signals": {
-      "score": <1-10>,
-      "feedback": "<1-2 sentences explaining score>",
-      "quotes": ["<relevant quote 1>", "<relevant quote 2>"]
-    },
-    "risk_indicators": {
-      "score": <1-10>,
-      "feedback": "<1-2 sentences explaining score>",
-      "quotes": ["<relevant quote 1>", "<relevant quote 2>"]
-    }
-  },
-
-  "key_wins": ["<win 1>", "<win 2>", "<win 3>"],
-  "areas_for_improvement": ["<area 1>", "<area 2>"],
-  "action_items": [
-    {"task": "<action>", "owner": "<who>", "deadline": "<when if mentioned>"}
-  ]
+interface DimensionScore {
+  score: number
+  feedback: string
+  quotes: string[]
 }
 
-IMPORTANT:
-- Only include quotes that actually appear in the transcript
-- If a dimension has insufficient evidence, give a lower score and note "insufficient evidence"
-- Be constructive in feedback - focus on actionable improvements
-- Flag any urgent risks that need immediate attention`
+interface EvaluationRequest {
+  meetingId?: string
+  districtId: string
+  transcript: string
+  scores: Record<DimensionKey, DimensionScore>
+  key_wins: string[]
+  areas_for_improvement: string[]
+  action_items: Array<{ task: string; owner: string; deadline?: string }>
+}
+
+function validateScore(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 1 && value <= 10
+}
+
+function computeRenewalLikelihood(overallScore: number): string {
+  if (overallScore > 7) return 'high'
+  if (overallScore > 5) return 'medium'
+  if (overallScore > 3) return 'low'
+  return 'at_risk'
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const auth = await requireAdminAuth();
-    if (auth instanceof NextResponse) return auth;
+    const auth = await requireAdminAuth()
+    if (auth instanceof NextResponse) return auth
 
-    const { meetingId, districtId, transcript } = await request.json()
+    const body: EvaluationRequest = await request.json()
+    const { meetingId, districtId, transcript, scores, key_wins, areas_for_improvement, action_items } = body
 
-    if (!transcript || transcript.trim().length < 50) {
+    if (!districtId) {
       return NextResponse.json(
-        { error: 'Transcript is too short or missing' },
+        { error: 'districtId is required' },
         { status: 400 }
       )
     }
 
+    if (!scores || typeof scores !== 'object') {
+      return NextResponse.json(
+        { error: 'scores object is required' },
+        { status: 400 }
+      )
+    }
+
+    // Validate all 7 dimension scores exist and are between 1-10
+    for (const key of DIMENSION_KEYS) {
+      const dimension = scores[key]
+      if (!dimension) {
+        return NextResponse.json(
+          { error: `Missing score for dimension: ${key}` },
+          { status: 400 }
+        )
+      }
+      if (!validateScore(dimension.score)) {
+        return NextResponse.json(
+          { error: `Score for ${key} must be a number between 1 and 10` },
+          { status: 400 }
+        )
+      }
+      if (typeof dimension.feedback !== 'string') {
+        return NextResponse.json(
+          { error: `Feedback for ${key} must be a string` },
+          { status: 400 }
+        )
+      }
+      if (!Array.isArray(dimension.quotes)) {
+        return NextResponse.json(
+          { error: `Quotes for ${key} must be an array` },
+          { status: 400 }
+        )
+      }
+    }
+
+    // Calculate overall score as the average of all 7 dimensions
+    const totalScore = DIMENSION_KEYS.reduce((sum, key) => sum + scores[key].score, 0)
+    const overallScore = Math.round((totalScore / DIMENSION_KEYS.length) * 10) / 10
+
+    const renewalLikelihood = computeRenewalLikelihood(overallScore)
+
+    const wordCount = transcript ? transcript.trim().split(/\s+/).length : 0
+
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    const anthropicApiKey = process.env.ANTHROPIC_API_KEY
 
     if (!supabaseUrl || !serviceRoleKey) {
       return NextResponse.json(
@@ -150,108 +110,53 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!anthropicApiKey) {
-      return NextResponse.json(
-        { error: 'Server config error - missing Anthropic API key' },
-        { status: 500 }
-      )
-    }
-
     const supabase = createClient(supabaseUrl, serviceRoleKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     })
 
-    const anthropic = new Anthropic({ apiKey: anthropicApiKey })
-
-    const wordCount = transcript.trim().split(/\s+/).length
-
-    // Call Claude API
-    const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4096,
-      messages: [
-        {
-          role: 'user',
-          content: `${TDI_EVALUATION_PROMPT}\n\n---\n\nMEETING TRANSCRIPT:\n\n${transcript}`,
-        },
-      ],
-    })
-
-    // Log AI usage
-    import('@/lib/ai-usage').then(({ logAIUsage }) => logAIUsage({
-      endpoint: 'meeting_eval',
-      model: 'claude-sonnet-4-20250514',
-      inputTokens: message.usage?.input_tokens || 0,
-      outputTokens: message.usage?.output_tokens || 0,
-      metadata: { wordCount },
-    })).catch(() => {});
-
-    // Extract text response
-    const responseText = message.content
-      .filter((block): block is Anthropic.TextBlock => block.type === 'text')
-      .map((block) => block.text)
-      .join('')
-
-    // Parse JSON from response
-    let evaluation
-    try {
-      // Handle potential markdown code blocks
-      const jsonMatch = responseText.match(/```json\s*([\s\S]*?)\s*```/)
-      const jsonStr = jsonMatch ? jsonMatch[1] : responseText
-      evaluation = JSON.parse(jsonStr.trim())
-    } catch {
-      console.error('[evaluate-meeting] Failed to parse Claude response:', responseText)
-      return NextResponse.json(
-        { error: 'Failed to parse AI evaluation response' },
-        { status: 500 }
-      )
-    }
-
-    // Map evaluation to database columns
     const evaluationRecord = {
       meeting_id: meetingId || null,
       district_id: districtId,
-      overall_score: evaluation.overall_score,
-      renewal_likelihood: evaluation.renewal_likelihood,
-      executive_summary: evaluation.executive_summary,
+      overall_score: overallScore,
+      renewal_likelihood: renewalLikelihood,
+      executive_summary: `Manual evaluation with overall score ${overallScore}/10. Renewal likelihood: ${renewalLikelihood}.`,
 
-      relationship_score: evaluation.dimensions?.relationship?.score,
-      relationship_feedback: evaluation.dimensions?.relationship?.feedback,
-      relationship_quotes: evaluation.dimensions?.relationship?.quotes || [],
+      relationship_score: scores.relationship.score,
+      relationship_feedback: scores.relationship.feedback,
+      relationship_quotes: scores.relationship.quotes,
 
-      value_demonstration_score: evaluation.dimensions?.value_demonstration?.score,
-      value_demonstration_feedback: evaluation.dimensions?.value_demonstration?.feedback,
-      value_demonstration_quotes: evaluation.dimensions?.value_demonstration?.quotes || [],
+      value_demonstration_score: scores.value_demonstration.score,
+      value_demonstration_feedback: scores.value_demonstration.feedback,
+      value_demonstration_quotes: scores.value_demonstration.quotes,
 
-      next_steps_score: evaluation.dimensions?.next_steps?.score,
-      next_steps_feedback: evaluation.dimensions?.next_steps?.feedback,
-      next_steps_quotes: evaluation.dimensions?.next_steps?.quotes || [],
+      next_steps_score: scores.next_steps.score,
+      next_steps_feedback: scores.next_steps.feedback,
+      next_steps_quotes: scores.next_steps.quotes,
 
-      stakeholder_engagement_score: evaluation.dimensions?.stakeholder_engagement?.score,
-      stakeholder_engagement_feedback: evaluation.dimensions?.stakeholder_engagement?.feedback,
-      stakeholder_engagement_quotes: evaluation.dimensions?.stakeholder_engagement?.quotes || [],
+      stakeholder_engagement_score: scores.stakeholder_engagement.score,
+      stakeholder_engagement_feedback: scores.stakeholder_engagement.feedback,
+      stakeholder_engagement_quotes: scores.stakeholder_engagement.quotes,
 
-      objection_handling_score: evaluation.dimensions?.objection_handling?.score,
-      objection_handling_feedback: evaluation.dimensions?.objection_handling?.feedback,
-      objection_handling_quotes: evaluation.dimensions?.objection_handling?.quotes || [],
+      objection_handling_score: scores.objection_handling.score,
+      objection_handling_feedback: scores.objection_handling.feedback,
+      objection_handling_quotes: scores.objection_handling.quotes,
 
-      expansion_signals_score: evaluation.dimensions?.expansion_signals?.score,
-      expansion_signals_feedback: evaluation.dimensions?.expansion_signals?.feedback,
-      expansion_signals_quotes: evaluation.dimensions?.expansion_signals?.quotes || [],
+      expansion_signals_score: scores.expansion_signals.score,
+      expansion_signals_feedback: scores.expansion_signals.feedback,
+      expansion_signals_quotes: scores.expansion_signals.quotes,
 
-      risk_indicators_score: evaluation.dimensions?.risk_indicators?.score,
-      risk_indicators_feedback: evaluation.dimensions?.risk_indicators?.feedback,
-      risk_indicators_quotes: evaluation.dimensions?.risk_indicators?.quotes || [],
+      risk_indicators_score: scores.risk_indicators.score,
+      risk_indicators_feedback: scores.risk_indicators.feedback,
+      risk_indicators_quotes: scores.risk_indicators.quotes,
 
-      key_wins: evaluation.key_wins || [],
-      areas_for_improvement: evaluation.areas_for_improvement || [],
-      action_items: evaluation.action_items || [],
+      key_wins: key_wins || [],
+      areas_for_improvement: areas_for_improvement || [],
+      action_items: action_items || [],
 
       transcript_word_count: wordCount,
-      model_used: 'claude-sonnet-4-20250514',
+      model_used: 'manual_rubric',
     }
 
-    // Insert into database
     const { data: savedEvaluation, error: insertError } = await supabase
       .from('meeting_evaluations')
       .insert(evaluationRecord)
@@ -273,7 +178,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[evaluate-meeting] Unexpected error:', error)
     return NextResponse.json(
-      { error: 'Failed to evaluate meeting transcript' },
+      { error: 'Failed to save meeting evaluation' },
       { status: 500 }
     )
   }
