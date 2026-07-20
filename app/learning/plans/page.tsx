@@ -200,7 +200,7 @@ export default function PlansPage() {
                       padding: '5px 14px', borderRadius: 999,
                       fontSize: 11, fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase',
                     }}>
-                      Most Popular
+                      Best Value
                     </span>
                   )}
 

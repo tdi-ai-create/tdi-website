@@ -450,7 +450,7 @@ export default function HubWelcomePage() {
  </div>
 
  <div style={{ background: 'white', borderRadius: 16, padding: 24, border: '2px solid #2A9D8F', position: 'relative' }}>
- <span style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#2A9D8F', color: 'white', padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase' }}>Most Popular</span>
+ <span style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#2A9D8F', color: 'white', padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase' }}>Best Value</span>
  <h3 style={{ fontSize: 24, fontWeight: 700, color: '#1e2749', margin: '0 0 4px 0' }}>Professional</h3>
  <p style={{ fontSize: 32, fontWeight: 700, color: '#1e2749', margin: '0 0 0 0' }}>$10<span style={{ fontSize: 14, fontWeight: 400, color: '#6B7280' }}>/mo</span></p>
  <p style={{ fontSize: 13, color: '#6B7280', margin: '8px 0 16px 0' }}>The full toolkit for your classroom.</p>

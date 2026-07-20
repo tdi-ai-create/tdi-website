@@ -111,7 +111,7 @@ export function PricingCard({
           className="text-xs font-semibold uppercase tracking-wide mb-4 px-3 py-1 rounded-full inline-block"
           style={{ backgroundColor: 'var(--tdi-yellow)', color: 'var(--tdi-charcoal)' }}
         >
-          Most Popular
+          Best Value
         </div>
       )}
       <div className="mb-4">
