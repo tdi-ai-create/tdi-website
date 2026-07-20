@@ -25,12 +25,7 @@ export default function UniversalShareModal({
 }: UniversalShareModalProps) {
   const { tUI } = useTranslation();
   const [copied, setCopied] = useState(false);
-
-  if (!isOpen) return null;
-
-  const encodedMessage = encodeURIComponent(message);
-  const encodedSubject = encodeURIComponent(emailSubject);
-
+  const [linkCopied, setLinkCopied] = useState(false);
   const { user } = useHub();
   const loggedRef = useRef(false);
 
@@ -54,9 +49,28 @@ export default function UniversalShareModal({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback
+      // Fallback: use a hidden textarea for older browsers
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = message;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch {
+        // Silent fail
+      }
     }
   };
+
+  if (!isOpen) return null;
+
+  const encodedMessage = encodeURIComponent(message);
+  const encodedSubject = encodeURIComponent(emailSubject);
 
   return (
     <div
@@ -165,10 +179,25 @@ export default function UniversalShareModal({
               <span style={{ fontSize: '20px', color: '#25D366' }}>W</span>{tUI('WhatsApp')}
             </a>
             <button
-              onClick={() => { navigator.clipboard.writeText('https://teachersdeserveit.com'); }}
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText('https://teachersdeserveit.com');
+                } catch {
+                  const ta = document.createElement('textarea');
+                  ta.value = 'https://teachersdeserveit.com';
+                  ta.style.position = 'fixed';
+                  ta.style.left = '-9999px';
+                  document.body.appendChild(ta);
+                  ta.select();
+                  document.execCommand('copy');
+                  document.body.removeChild(ta);
+                }
+                setLinkCopied(true);
+                setTimeout(() => setLinkCopied(false), 2000);
+              }}
               className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-              style={{ borderColor: '#E5E7EB', color: '#374151' }}>
-              <span style={{ fontSize: '20px' }}>~</span>{tUI('Link')}
+              style={{ borderColor: linkCopied ? '#D1FAE5' : '#E5E7EB', color: linkCopied ? '#065F46' : '#374151', backgroundColor: linkCopied ? '#D1FAE5' : undefined }}>
+              <span style={{ fontSize: '20px' }}>{linkCopied ? '\u2713' : '~'}</span>{linkCopied ? tUI('Copied!') : tUI('Link')}
             </button>
           </div>
         </div>

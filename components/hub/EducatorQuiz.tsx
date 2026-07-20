@@ -217,15 +217,13 @@ export default function EducatorQuiz({ onComplete }: EducatorQuizProps) {
               <Share2 size={14} />
               {tUI('Share My Result')}
             </button>
-            {shareOpen && (
-              <UniversalShareModal
-                isOpen={shareOpen}
-                onClose={() => setShareOpen(false)}
-                title="Share your educator type"
-                subtitle="Let other educators find out what kind they are"
-                message={`I just took the TDI Educator Quiz and I am "${result.title}" -- ${result.subtitle} What kind of educator are you? Find out at teachersdeserveit.com/hub`}
-              />
-            )}
+            <UniversalShareModal
+              isOpen={shareOpen}
+              onClose={() => setShareOpen(false)}
+              title="Share your educator type"
+              subtitle="Let other educators find out what kind they are"
+              message={`I just took the TDI Educator Quiz and I am "${result.title}" -- ${result.subtitle} What kind of educator are you? Find out at teachersdeserveit.com/hub`}
+            />
             <button
               onClick={restart}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all hover:bg-gray-100"

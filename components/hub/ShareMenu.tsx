@@ -151,17 +151,39 @@ export default function ShareMenu({
     return `${text}\n\n- Teachers Deserve It`;
   };
 
+  // Clipboard helper with fallback
+  const copyText = async (text: string): Promise<boolean> => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+  };
+
   // Share handlers
   const handleCopyLink = async () => {
     if (url) {
-      await navigator.clipboard.writeText(url);
-      setCopied('link');
+      const ok = await copyText(url);
+      if (ok) setCopied('link');
     }
   };
 
   const handleCopyText = async () => {
-    await navigator.clipboard.writeText(getCopyText());
-    setCopied('text');
+    const ok = await copyText(getCopyText());
+    if (ok) setCopied('text');
   };
 
   const handleFacebook = () => {
@@ -188,13 +210,13 @@ export default function ShareMenu({
   };
 
   const handleInstagram = async () => {
-    await navigator.clipboard.writeText(getInstagramText());
-    setCopied('instagram');
+    const ok = await copyText(getInstagramText());
+    if (ok) setCopied('instagram');
   };
 
   const handleTikTok = async () => {
-    await navigator.clipboard.writeText(getTikTokText());
-    setCopied('tiktok');
+    const ok = await copyText(getTikTokText());
+    if (ok) setCopied('tiktok');
   };
 
   const handleBluesky = () => {

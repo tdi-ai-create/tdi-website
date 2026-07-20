@@ -213,15 +213,13 @@ export default function QuizEngine({ quiz, onComplete }: QuizEngineProps) {
               <Share2 size={14} />
               {tUI('Share My Result')}
             </button>
-            {shareOpen && (
-              <UniversalShareModal
-                isOpen={shareOpen}
-                onClose={() => setShareOpen(false)}
-                title={`Share your ${quiz.shortTitle} result`}
-                subtitle={`Let other educators find out theirs`}
-                message={quiz.shareMessage(result.title, result.subtitle)}
-              />
-            )}
+            <UniversalShareModal
+              isOpen={shareOpen}
+              onClose={() => setShareOpen(false)}
+              title={`Share your ${quiz.shortTitle} result`}
+              subtitle={`Let other educators find out theirs`}
+              message={quiz.shareMessage(result.title, result.subtitle)}
+            />
             <button
               onClick={restart}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all hover:bg-gray-100"
