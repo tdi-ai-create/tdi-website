@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { useTranslation } from '@/lib/hub/useTranslation';
 
@@ -9,11 +9,14 @@ const DISMISSED_KEY = 'tdi-hub-a2hs-dismissed';
 /**
  * Subtle prompt to add the Hub to the home screen.
  * Shows once after 3+ visits, dismissible, remembers dismissal.
+ * On supported browsers, triggers the native install prompt.
+ * On iOS, shows share instructions.
  */
 export default function AddToHomeScreen() {
   const { tUI } = useTranslation();
   const [show, setShow] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
     // Don't show if already dismissed
@@ -34,9 +37,19 @@ export default function AddToHomeScreen() {
     const iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     setIsIOS(iOS);
 
+    // Listen for the browser install prompt (Chrome/Edge/Android)
+    const handlePrompt = (e: Event) => {
+      e.preventDefault();
+      deferredPromptRef.current = e as BeforeInstallPromptEvent;
+    };
+    window.addEventListener('beforeinstallprompt', handlePrompt);
+
     // Small delay so it doesn't flash immediately
     const timer = setTimeout(() => setShow(true), 2000);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('beforeinstallprompt', handlePrompt);
+    };
   }, []);
 
   const dismiss = () => {
@@ -44,7 +57,20 @@ export default function AddToHomeScreen() {
     localStorage.setItem(DISMISSED_KEY, 'true');
   };
 
+  const handleInstall = async () => {
+    if (deferredPromptRef.current) {
+      deferredPromptRef.current.prompt();
+      const result = await deferredPromptRef.current.userChoice;
+      if (result.outcome === 'accepted') {
+        dismiss();
+      }
+      deferredPromptRef.current = null;
+    }
+  };
+
   if (!show) return null;
+
+  const hasNativePrompt = !!deferredPromptRef.current;
 
   return (
     <div
@@ -92,9 +118,31 @@ export default function AddToHomeScreen() {
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: 1.4 }}>
           {isIOS
             ? tUI('Tap the share button, then "Add to Home Screen"')
-            : tUI('Quick access between classes -- no app store needed')}
+            : tUI('Quick access between classes, no app store needed')}
         </p>
       </div>
+
+      {/* Install button (non-iOS browsers with native prompt) */}
+      {hasNativePrompt && (
+        <button
+          onClick={handleInstall}
+          style={{
+            background: '#E8B84B',
+            border: 'none',
+            borderRadius: 10,
+            padding: '8px 16px',
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: 13,
+            fontWeight: 700,
+            color: '#1e2749',
+            cursor: 'pointer',
+            flexShrink: 0,
+            letterSpacing: '0.01em',
+          }}
+        >
+          {tUI('Add')}
+        </button>
+      )}
 
       {/* Dismiss */}
       <button
@@ -113,4 +161,10 @@ export default function AddToHomeScreen() {
       `}</style>
     </div>
   );
+}
+
+// Type for the beforeinstallprompt event (not in standard TS types)
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }

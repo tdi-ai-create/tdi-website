@@ -61,9 +61,29 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
     setSelectedValues([value])
   }
 
-  function handleBlankSelect(value: string) {
+  async function handleBlankSelect(value: string) {
     setBlankValue(value)
     setSelectedValues([value])
+
+    // Auto-submit after a brief pause so the user sees their selection
+    if (!question || !user?.id || isSubmitting) return
+    setIsSubmitting(true)
+
+    const score = scoreResponse(question, value)
+    const supabase = getSupabase()
+    await supabase.from('hub_assessments').insert({
+      user_id: user.id,
+      type: 'daily_check_in',
+      question_id: question.id,
+      question_category: question.category,
+      response_type: question.responseType,
+      stress_score: score,
+      response_text: value,
+      responses: { question_id: question.id, category: question.category, selected: [value] },
+    })
+
+    setIsDone(true)
+    setTimeout(onDismiss, 1800)
   }
 
   async function handleSubmit() {
