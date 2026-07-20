@@ -341,8 +341,46 @@ export default function QuickWinsPage() {
     return result;
   };
 
+  // Sort accessible items first, scatter locked items in every 3-4 cards
+  // so users see their tools up top but also see what they are missing
+  const sortByAccess = (items: QuickWin[]): QuickWin[] => {
+    const accessible: QuickWin[] = [];
+    const locked: QuickWin[] = [];
+    for (const item of items) {
+      const hasAccess = canAccess({
+        access_tier: item.access_tier || 'all_access',
+        is_free_rotating: item.is_free_rotating,
+      });
+      if (hasAccess) accessible.push(item);
+      else locked.push(item);
+    }
+
+    // If everything is accessible or locked, just return interleaved
+    if (locked.length === 0) return interleaveByCategory(accessible);
+    if (accessible.length === 0) return interleaveByCategory(locked);
+
+    // Interleave each group by category first
+    const sortedAccessible = interleaveByCategory(accessible);
+    const sortedLocked = interleaveByCategory(locked);
+
+    // Scatter locked items in: after every 3 accessible items, insert 1 locked item
+    const result: QuickWin[] = [];
+    let lockedIdx = 0;
+    for (let i = 0; i < sortedAccessible.length; i++) {
+      result.push(sortedAccessible[i]);
+      if ((i + 1) % 3 === 0 && lockedIdx < sortedLocked.length) {
+        result.push(sortedLocked[lockedIdx++]);
+      }
+    }
+    // Append remaining locked items at the end
+    while (lockedIdx < sortedLocked.length) {
+      result.push(sortedLocked[lockedIdx++]);
+    }
+    return result;
+  };
+
   const displayQuickWins = activeFilter === 'All' && capacityFilter === 'all' && roleFilter === 'all' && danielsonFilter.length === 0
-    ? interleaveByCategory(filteredQuickWins)
+    ? sortByAccess(filteredQuickWins)
     : filteredQuickWins;
 
   const visibleQuickWins = displayQuickWins.slice(0, visibleCount);
