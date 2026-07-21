@@ -22,6 +22,7 @@ import { Zap, Gamepad2, ChevronRight } from 'lucide-react';
 import QuizNudge from '@/components/hub/QuizNudge';
 import HubFilterBar from '@/components/hub/HubFilterBar';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
+import ToolRequestBoard from '@/components/hub/ToolRequestBoard';
 
 // Filter categories for Quick Wins
 const FILTER_CATEGORIES = [
@@ -567,6 +568,9 @@ export default function QuickWinsPage() {
             </p>
           </div>
         ) : null}
+
+        {/* Tool Request Board -- below the grid */}
+        <ToolRequestBoard />
       </div>
     </div>
   );

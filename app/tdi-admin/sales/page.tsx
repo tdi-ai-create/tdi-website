@@ -1513,6 +1513,18 @@ export default function SalesPage() {
                       >
                         Edit
                       </button>
+                      {(q.status === 'draft') && (
+                        <button
+                          onClick={async () => {
+                            await supabase.from('quotes').update({ status: 'sent', sent_at: new Date().toISOString(), expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), updated_at: new Date().toISOString() }).eq('id', q.id)
+                            setQuotes(prev => prev.map(qq => qq.id === q.id ? { ...qq, status: 'sent', sent_at: new Date().toISOString() } : qq))
+                            showToastMsg(`"${q.title}" marked as sent`, 'success')
+                          }}
+                          style={{ fontSize: 12, padding: '6px 12px', borderRadius: 6, border: '1px solid #10B981', background: 'white', color: '#10B981', cursor: 'pointer', fontWeight: 600 }}
+                        >
+                          Mark as Sent
+                        </button>
+                      )}
                       {q.status !== 'signed' && (
                         <button
                           onClick={async () => {

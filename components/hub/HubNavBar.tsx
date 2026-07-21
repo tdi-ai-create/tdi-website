@@ -8,6 +8,7 @@ import { Menu, Heart, Shield, Building, Search } from 'lucide-react';
 import AvatarDisplay from './AvatarDisplay';
 import HubMobileNav from './HubMobileNav';
 import MomentMode from './MomentMode';
+import NotificationBell from './NotificationBell';
 import { checkTrackerEligibility } from '@/lib/hub/transformation';
 import { isAdmin } from '@/lib/hub/admin';
 import { isChampion } from '@/lib/hub/champion';
@@ -210,6 +211,9 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
           >
             <Search size={18} />
           </Link>
+
+          {/* Notifications */}
+          <NotificationBell />
 
           {/* Language toggle */}
           <div
