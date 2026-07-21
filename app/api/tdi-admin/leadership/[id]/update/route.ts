@@ -137,6 +137,29 @@ export async function PATCH(
       return NextResponse.json({ error: `Field '${field}' not allowed` }, { status: 400 });
     }
 
+    // Log contract amendment for contract-related fields
+    const contractFields = [
+      'staff_enrolled', 'contract_phase', 'contract_start', 'contract_end',
+      'observation_days_total', 'virtual_sessions_total', 'executive_sessions_total',
+      'building_count', 'partnership_type', 'contact_name', 'contact_email',
+    ];
+    if (contractFields.includes(field)) {
+      // Get old value for the amendment log
+      const { data: current } = await supabase
+        .from('partnerships')
+        .select(field)
+        .eq('id', id)
+        .single();
+
+      await supabase.from('contract_amendments').insert({
+        partnership_id: id,
+        field_changed: field,
+        old_value: current?.[field]?.toString() || null,
+        new_value: value?.toString() || null,
+        changed_by: email,
+      });
+    }
+
     // Log the activity
     await supabase.from('activity_log').insert({
       partnership_id: id,
