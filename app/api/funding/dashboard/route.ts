@@ -16,6 +16,7 @@ export async function GET() {
     const { data: summaries, error: summaryErr } = await supabase
       .from('funding_pursuit_summary')
       .select('*')
+      .neq('archived', true)
       .order('created_at', { ascending: false })
 
     // Fallback to raw pursuits if view doesn't exist yet
