@@ -52,6 +52,41 @@ const nextConfig: NextConfig = {
         destination: 'https://docs.google.com/document/d/1yAcAKpz03pWdQ0A9ZvEFxcdgiUtEfwtn/view',
         permanent: false,
       },
+      {
+        source: '/wego-dashboard',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/asd4-dashboard',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/asd4-dashboard/:path*',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/stpchanel-dashboard',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/stpchanel-dashboard/:path*',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/tccs-dashboard',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/dashboard-creation-team-use',
+        destination: '/',
+        permanent: true,
+      },
     ];
   },
 };
