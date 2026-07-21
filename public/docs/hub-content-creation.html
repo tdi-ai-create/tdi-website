@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hub Content Creation Workflow</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; background: #F8F9FA; line-height: 1.6; }
+  .page { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 20px; font-weight: 700; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
+  .subtitle { color: #6B7280; font-size: 14px; margin-bottom: 8px; }
+  .updated { color: #9CA3AF; font-size: 12px; margin-bottom: 32px; }
+  p, li { font-size: 14px; margin-bottom: 8px; }
+  ul { margin: 8px 0 16px 24px; }
+  .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 1px solid #E5E7EB; }
+  .card-navy { background: #1e2749; color: white; border: none; }
+  .card-teal { background: #F0FDFA; border-color: #99F6E4; }
+  .card-amber { background: #FFFBEB; border-color: #FDE68A; }
+  .card-red { background: #FEF2F2; border-color: #FECACA; }
+  .flow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  .flow-step { background: white; border: 1px solid #E5E7EB; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; }
+  .flow-arrow { color: #E8B84B; font-weight: 700; font-size: 16px; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; background: #1e2749; color: white; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  td { padding: 10px 12px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+  code { background: #F3F4F6; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="page">
+<h1>Hub Content Creation Workflow</h1>
+<p class="subtitle">How new Quick Wins go from idea to live on the Learning Hub</p>
+<p class="updated">Last updated: July 21, 2026</p>
+
+<div class="card card-navy">
+  <p style="font-weight:600;color:white;margin-bottom:8px;">The Pipeline</p>
+  <div class="flow">
+    <span class="flow-step" style="color:#1e2749;">Rae requests</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step" style="color:#1e2749;">Izzy drafts</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step" style="color:#1e2749;">Julie Lynn QA</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step" style="color:#1e2749;">Rae approves</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step" style="color:#E8B84B;">[BUILD] Publish</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step" style="color:#1e2749;">Community seeded</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step" style="color:#1e2749;">Nora verifies</span>
+  </div>
+</div>
+
+<div class="card card-amber">
+  <p><strong>Hub content does NOT go through Kristin/CMO.</strong> Only social media posts about Hub content need CMO review. If Kristin is paused, Hub content creation is unaffected.</p>
+</div>
+
+<h2>Step by Step</h2>
+<table>
+  <tr><th>Step</th><th>Who</th><th>What</th><th>Deliverable</th></tr>
+  <tr><td>1. Request</td><td>Rae</td><td>Specifies topic, audience, category, priority</td><td>Paperclip task tagged [HUB CONTENT]</td></tr>
+  <tr><td>2. Draft</td><td>Izzy</td><td>Researches, writes content, creates PDF/template</td><td>Draft with title, description, suggested category/lift/roles</td></tr>
+  <tr><td>3. QA Gate</td><td>Julie Lynn</td><td>Verifies all Hub standards are met</td><td>Passed checklist or specific issues routed back to Izzy</td></tr>
+  <tr><td>4. Approve</td><td>Rae</td><td>Final review, may adjust category/lift/tier</td><td>[APPROVED] comment on task</td></tr>
+  <tr><td>5. Publish</td><td>Rae + Claude Code</td><td>Upload PDF, insert DB row, set is_published = true</td><td>Live Quick Win on the Hub</td></tr>
+  <tr><td>6. Community</td><td>Agents / Izzy</td><td>Seed 1-2 community posts within 24-48 hours</td><td>No empty community sections</td></tr>
+  <tr><td>7. Verify</td><td>Nora</td><td>Confirm live, card renders, community exists</td><td>Slack notification to team</td></tr>
+</table>
+
+<h2>QA Checklist (Step 3)</h2>
+<div class="card card-teal">
+  <ul>
+    <li>Title is clear and specific</li>
+    <li>Description is 1-2 sentences</li>
+    <li>Category is one of the 12 approved categories</li>
+    <li>Lift rating assigned (LOW/MED/HIGH)</li>
+    <li>Roles assigned (teacher/para/leader/coach)</li>
+    <li>Danielson domains assigned</li>
+    <li>Topic tags assigned (1-5 from approved list)</li>
+    <li>Access tier set (default: <code>professional</code>)</li>
+    <li>Content is actionable, not just theory</li>
+    <li>PDF is formatted and downloadable</li>
+  </ul>
+  <p style="margin-top:12px;font-size:13px;color:#064E3B;"><strong>Database enforces this:</strong> The trigger <code>enforce_quick_win_tags_before_publish</code> will reject any publish attempt with missing required fields.</p>
+</div>
+
+<h2>Hub Content vs Social Content</h2>
+<div class="card card-red">
+  <p><strong>These are DIFFERENT pipelines.</strong> Do not mix them.</p>
+  <table>
+    <tr><th>Type</th><th>What it is</th><th>Pipeline</th></tr>
+    <tr><td>Hub content</td><td>The Quick Win itself (PDF, template) on the Hub</td><td>Izzy &rarr; Julie Lynn &rarr; Rae &rarr; [BUILD]</td></tr>
+    <tr><td>Social content</td><td>Posts ABOUT the Quick Win for Buffer/social</td><td>Izzy &rarr; Zara &rarr; Kristin &rarr; Julie Lynn &rarr; Buffer</td></tr>
+  </table>
+</div>
+
+<h2>Default Settings for New Quick Wins</h2>
+<table>
+  <tr><th>Field</th><th>Default</th></tr>
+  <tr><td>access_tier</td><td><code>professional</code> (Rae manually promotes to essentials or free)</td></tr>
+  <tr><td>is_published</td><td><code>false</code> until all fields pass the trigger</td></tr>
+  <tr><td>Community posts</td><td>Required within 24-48 hours of publish</td></tr>
+</table>
+</div>
+</body>
+</html>

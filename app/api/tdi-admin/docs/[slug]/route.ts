@@ -27,6 +27,7 @@ export async function GET(
     'communication-map': 'communication-map.html',
     'data-flow': 'data-flow.html',
     'hub-content-standards': 'hub-content-standards.html',
+    'hub-content-creation': 'hub-content-creation.html',
   };
 
   const filename = allowedDocs[slug];
