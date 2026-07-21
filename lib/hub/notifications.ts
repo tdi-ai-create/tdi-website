@@ -27,6 +27,24 @@ export async function createNotification({
   // Don't notify yourself
   if (sourceUserId && sourceUserId === userId) return;
 
+  // Throttle: max 2 notifications per user per day
+  // High-priority types (certificate, badge) bypass throttle
+  const highPriority = ['certificate_ready', 'badge_earned', 'profile_quiz'];
+  if (!highPriority.includes(type)) {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const { count } = await hubSupabase
+        .from('hub_notifications')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .gte('created_at', today + 'T00:00:00Z');
+
+      if ((count || 0) >= 2) return; // Skip, already sent 2 today
+    } catch {
+      // If throttle check fails, still send
+    }
+  }
+
   try {
     await hubSupabase.from('hub_notifications').insert({
       user_id: userId,
