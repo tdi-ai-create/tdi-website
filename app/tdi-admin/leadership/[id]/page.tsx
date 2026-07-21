@@ -31,6 +31,7 @@ import ActivationReadinessScore from '@/components/dashboard/leadership/Activati
 import CourseCompletionFunnel from '@/components/dashboard/leadership/CourseCompletionFunnel'
 import LoginTrendChart from '@/components/dashboard/leadership/LoginTrendChart'
 import ObservationImpactScorecard from '@/components/dashboard/leadership/ObservationImpactScorecard'
+import BillingTab from '@/components/dashboard/admin/BillingTab'
 
 // Tab configuration - mirrors principal dashboard
 const ADMIN_TABS = [
@@ -1805,99 +1806,11 @@ export default function AdminPartnershipDetailPage() {
             BILLING TAB
             ═══════════════════════════════════════════════════════════════════ */}
         {activeTab === 'billing' && (
-          <>
-            <div className="bg-white rounded-xl border border-gray-100 p-6 mb-4">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-gray-900">Contract Details</h2>
-                <span className="text-xs text-gray-400">Click any field to edit</span>
-              </div>
-
-              <div className="grid sm:grid-cols-2 gap-4">
-                {[
-                  { label: 'Partnership Type', field: 'partnership_type', value: partnership.partnership_type || 'school', type: 'select', options: ['school', 'district'] },
-                  { label: 'Contract Phase', field: 'contract_phase', value: partnership.contract_phase || 'IGNITE', type: 'select', options: ['IGNITE', 'ACCELERATE', 'SUSTAIN'] },
-                  { label: 'Contract Start', field: 'contract_start', value: partnership.contract_start || '', type: 'date' },
-                  { label: 'Contract End', field: 'contract_end', value: partnership.contract_end || '', type: 'date' },
-                  { label: 'Staff Enrolled', field: 'staff_enrolled', value: partnership.staff_enrolled || 0, type: 'number' },
-                  { label: 'Building Count', field: 'building_count', value: partnership.building_count || 1, type: 'number' },
-                  { label: 'Observation Days (total)', field: 'observation_days_total', value: partnership.observation_days_total || 0, type: 'number' },
-                  { label: 'Virtual Sessions (total)', field: 'virtual_sessions_total', value: partnership.virtual_sessions_total || 0, type: 'number' },
-                  { label: 'Executive Sessions (total)', field: 'executive_sessions_total', value: partnership.executive_sessions_total || 0, type: 'number' },
-                  { label: 'Observation Days (used)', field: 'observation_days_used', value: (partnership as any).observation_days_used || 0, type: 'number' },
-                  { label: 'Virtual Sessions (used)', field: 'virtual_sessions_used', value: (partnership as any).virtual_sessions_used || 0, type: 'number' },
-                  { label: 'Executive Sessions (used)', field: 'executive_sessions_used', value: (partnership as any).executive_sessions_used || 0, type: 'number' },
-                ].map(item => (
-                  <div key={item.field} className="p-3 rounded-lg border border-gray-100 hover:border-gray-300 transition-colors">
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">{item.label}</p>
-                    {item.type === 'select' ? (
-                      <select
-                        defaultValue={String(item.value)}
-                        onChange={async (e) => {
-                          try {
-                            await fetch(`/api/admin/partnerships/${partnershipId}`, {
-                              method: 'PATCH',
-                              headers: { 'Content-Type': 'application/json', 'x-user-email': userEmail || '' },
-                              body: JSON.stringify({ [item.field]: e.target.value }),
-                            })
-                          } catch {}
-                        }}
-                        className="w-full text-sm font-medium text-[#1e2749] bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer capitalize"
-                      >
-                        {item.options?.map(o => <option key={o} value={o}>{o}</option>)}
-                      </select>
-                    ) : (
-                      <input
-                        type={item.type}
-                        defaultValue={String(item.value)}
-                        onBlur={async (e) => {
-                          const val = item.type === 'number' ? parseInt(e.target.value) || 0 : e.target.value;
-                          if (String(val) === String(item.value)) return;
-                          try {
-                            await fetch(`/api/admin/partnerships/${partnershipId}`, {
-                              method: 'PATCH',
-                              headers: { 'Content-Type': 'application/json', 'x-user-email': userEmail || '' },
-                              body: JSON.stringify({ [item.field]: val }),
-                            })
-                          } catch {}
-                        }}
-                        className="w-full text-sm font-medium text-[#1e2749] bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-blue-300 rounded px-1"
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Resend welcome email + archive */}
-              <div className="mt-6 pt-4 border-t border-gray-100 flex items-center gap-3">
-                <button
-                  onClick={async () => {
-                    if (!confirm('Send welcome email to ' + partnership.contact_email + '?')) return;
-                    try {
-                      const res = await fetch('/api/admin/resend-welcome', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ creatorId: partnershipId }),
-                      });
-                      const data = await res.json();
-                      alert(data.success ? 'Welcome email sent!' : (data.error || 'Failed'));
-                    } catch { alert('Failed to send'); }
-                  }}
-                  className="text-xs font-medium px-3 py-2 rounded-lg bg-[#1e2749] text-white hover:bg-[#2d3a5c] transition-colors"
-                >
-                  Send welcome email
-                </button>
-                <a href={`mailto:${partnership.contact_email}`} className="text-xs font-medium px-3 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
-                  Email contact
-                </a>
-                <p className="text-xs text-gray-400 ml-auto">
-                  Questions? <a href="mailto:Rae@TeachersDeserveIt.com" className="text-violet-600 hover:underline">Rae@TeachersDeserveIt.com</a>
-                </p>
-              </div>
-            </div>
-
-            {/* Contract Deliverables */}
-            <DeliverablesList partnershipId={partnershipId} userEmail={userEmail || ''} />
-          </>
+          <BillingTab
+            partnershipId={partnershipId}
+            userEmail={userEmail || ''}
+            partnership={partnership}
+          />
         )}
 
         {/* ═══════════════════════════════════════════════════════════════════

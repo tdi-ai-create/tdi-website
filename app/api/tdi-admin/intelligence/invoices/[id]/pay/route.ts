@@ -47,6 +47,13 @@ export async function POST(
       return NextResponse.json({ error: invoiceError.message }, { status: 500 })
     }
 
+    // Update any linked deliverables to paid
+    await supabase
+      .from('contract_deliverables')
+      .update({ delivery_status: 'paid', updated_at: new Date().toISOString() })
+      .eq('invoice_id', id)
+      .eq('invoice_type', 'intelligence_invoice')
+
     // Update collections_workflow to paid stage
     const { error: workflowError } = await supabase
       .from('collections_workflow')
