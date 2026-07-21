@@ -657,7 +657,7 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onPatch }:
         </span>
 
         {/* ── not_started / ready: request draft ── */}
-        {(ns === 'not_started' || ns === 'ready') && (
+        {(ns === 'not_started' || ns === 'ready') && opp.window_status === 'open' && (
           <>
             <select
               value={agentPick}
@@ -671,6 +671,11 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onPatch }:
             </button>
             {ns === 'ready' && <span style={{ fontSize: 10, fontWeight: 600, color: '#10B981' }}>Approved</span>}
           </>
+        )}
+        {(ns === 'not_started') && opp.window_status !== 'open' && (
+          <span style={{ fontSize: 10, color: '#DC2626', fontWeight: 600 }}>
+            Window must be verified open before requesting a draft
+          </span>
         )}
 
         {/* ── requested ── */}
