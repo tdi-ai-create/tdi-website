@@ -1303,7 +1303,7 @@ ${displayName}</div>
           </div>
 
           {/* How to Submit */}
-          <div className="p-5" style={{ borderBottom: '1px solid #F3F4F6' }}>
+          <div id="pd-credit-section" className="p-5" style={{ borderBottom: '1px solid #F3F4F6' }}>
             <h3 className="text-sm font-semibold mb-2" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
               {tUI('How to Submit for PD Credit')}
             </h3>
@@ -1362,23 +1362,44 @@ ${displayName}</div>
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {[
-                { icon: <Printer size={16} />, label: 'Print and hang in your classroom', color: '#DC2626' },
-                { icon: <BookOpen size={16} />, label: 'Add to your evaluation portfolio', color: '#7C3AED' },
-                { icon: <Award size={16} />, label: 'Submit for PD recertification hours', color: '#E8B84B' },
-                { icon: <ExternalLink size={16} />, label: 'Post on LinkedIn', color: '#0891B2' },
-                { icon: <FileText size={16} />, label: 'Include in annual review docs', color: '#2A9D8F' },
-                { icon: <Mail size={16} />, label: 'Forward to your principal', color: '#D97706' },
-                { icon: <Briefcase size={16} />, label: 'Add to your resume PD section', color: '#1B2A4A' },
-                { icon: <Heart size={16} />, label: 'Save for the tough days', color: '#EC4899' },
+                { icon: <Printer size={16} />, label: 'Print and hang in your classroom', color: '#DC2626', action: () => window.print() },
+                { icon: <BookOpen size={16} />, label: 'Add to your evaluation portfolio', color: '#7C3AED', action: () => window.print() },
+                { icon: <Award size={16} />, label: 'Submit for PD recertification hours', color: '#E8B84B', action: () => {
+                  const el = document.getElementById('pd-credit-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }},
+                { icon: <ExternalLink size={16} />, label: 'Post on LinkedIn', color: '#0891B2', action: () => {
+                  const totalHours = certificates.reduce((sum, c) => sum + (c.pd_hours || 0), 0);
+                  const text = encodeURIComponent(`I earned ${totalHours} PD hours through the Teachers Deserve It Learning Hub. Real tools, real growth, real impact. #TeachersDeserveIt #ProfessionalDevelopment`);
+                  window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://www.teachersdeserveit.com/hub')}&summary=${text}`, '_blank');
+                }},
+                { icon: <FileText size={16} />, label: 'Include in annual review docs', color: '#2A9D8F', action: () => window.print() },
+                { icon: <Mail size={16} />, label: 'Forward to your principal', color: '#D97706', action: () => {
+                  const totalHours = certificates.reduce((sum, c) => sum + (c.pd_hours || 0), 0);
+                  const subject = encodeURIComponent('My TDI Professional Development Certificates');
+                  const body = encodeURIComponent(`Hi,\n\nI completed professional development through the Teachers Deserve It Learning Hub. I have earned ${totalHours} PD hours with verifiable certificates.\n\nYou can view my achievements here: ${window.location.href}\n\nThank you for supporting my professional growth.`);
+                  window.open(`mailto:?subject=${subject}&body=${body}`);
+                }},
+                { icon: <Briefcase size={16} />, label: 'Add to your resume PD section', color: '#1B2A4A', action: () => {
+                  const codes = certificates.map(c => c.verification_code).filter(Boolean).join(', ');
+                  if (codes) {
+                    navigator.clipboard.writeText(codes);
+                    alert('Verification codes copied to clipboard: ' + codes);
+                  }
+                }},
+                { icon: <Heart size={16} />, label: 'Save for the tough days', color: '#EC4899', action: () => {
+                  alert('You earned this. Every certificate represents real growth. On the hard days, remember: you are doing meaningful work.');
+                }},
               ].map((item) => (
-                <div
+                <button
                   key={item.label}
-                  className="rounded-lg p-3 text-center transition-all hover:shadow-sm"
+                  onClick={item.action}
+                  className="rounded-lg p-3 text-center transition-all hover:shadow-md cursor-pointer"
                   style={{ backgroundColor: '#FAFAF8', border: '1px solid #F3F4F6' }}
                 >
                   <div className="flex justify-center mb-2" style={{ color: item.color }}>{item.icon}</div>
                   <p className="text-xs leading-snug" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>{tUI(item.label)}</p>
-                </div>
+                </button>
               ))}
             </div>
           </div>
