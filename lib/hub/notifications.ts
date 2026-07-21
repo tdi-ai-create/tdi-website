@@ -18,7 +18,7 @@ export async function createNotification({
   sourceUserId,
 }: {
   userId: string;
-  type: 'qa_reply' | 'helpful_marked' | 'post_pinned';
+  type: 'qa_reply' | 'helpful_marked' | 'post_pinned' | 'badge_earned' | 'certificate_ready' | 'new_content' | 'streak_milestone' | 'profile_quiz' | 'community_highlight';
   title: string;
   body?: string;
   link?: string;
@@ -126,4 +126,140 @@ export async function notifyHelpfulMarked({
   } catch (err) {
     console.error('[notifications] Failed to notify helpful:', err);
   }
+}
+
+/**
+ * Notify when a badge or Field Note is earned.
+ */
+export async function notifyBadgeEarned({
+  userId,
+  badgeName,
+  badgeDescription,
+}: {
+  userId: string;
+  badgeName: string;
+  badgeDescription?: string;
+}) {
+  await createNotification({
+    userId,
+    type: 'badge_earned',
+    title: `You earned: ${badgeName}`,
+    body: badgeDescription || 'Keep going! Your growth is being recognized.',
+    link: '/hub/certificates',
+  });
+}
+
+/**
+ * Notify when a PD certificate is ready.
+ */
+export async function notifyCertificateReady({
+  userId,
+  courseName,
+  pdHours,
+  verificationCode,
+}: {
+  userId: string;
+  courseName: string;
+  pdHours: number;
+  verificationCode: string;
+}) {
+  await createNotification({
+    userId,
+    type: 'certificate_ready',
+    title: `Certificate ready: ${courseName}`,
+    body: `You earned ${pdHours} PD hours. Verification code: ${verificationCode}`,
+    link: '/hub/certificates',
+  });
+}
+
+/**
+ * Notify when new content matches a user's interests.
+ */
+export async function notifyNewContent({
+  userId,
+  contentTitle,
+  category,
+  slug,
+  contentType,
+}: {
+  userId: string;
+  contentTitle: string;
+  category: string;
+  slug: string;
+  contentType: 'quick_win' | 'course';
+}) {
+  const link = contentType === 'quick_win' ? `/hub/quick-wins/${slug}` : `/hub/courses/${slug}`;
+  await createNotification({
+    userId,
+    type: 'new_content',
+    title: `New in ${category}: ${contentTitle}`,
+    body: 'A new tool was just added that matches your interests.',
+    link,
+  });
+}
+
+/**
+ * Notify on streak milestones.
+ */
+export async function notifyStreakMilestone({
+  userId,
+  days,
+}: {
+  userId: string;
+  days: number;
+}) {
+  const messages: Record<number, string> = {
+    3: 'Three days in a row! You are building a habit.',
+    7: 'A full week! Your consistency is making a difference.',
+    14: 'Two weeks strong! Your students are lucky to have you.',
+    30: 'One month streak! You are in the top 5% of educators on the Hub.',
+  };
+
+  await createNotification({
+    userId,
+    type: 'streak_milestone',
+    title: `${days}-day streak!`,
+    body: messages[days] || `${days} days of growth. Keep going.`,
+    link: '/hub',
+  });
+}
+
+/**
+ * Suggest profile quiz to a user.
+ */
+export async function notifyProfileQuiz({
+  userId,
+}: {
+  userId: string;
+}) {
+  await createNotification({
+    userId,
+    type: 'profile_quiz',
+    title: 'Personalize your Hub experience',
+    body: 'Take a 2-minute quiz so we can recommend tools that match your classroom, your role, and your goals.',
+    link: '/hub/settings/profile',
+  });
+}
+
+/**
+ * Notify when someone at their school posts in the community.
+ */
+export async function notifyCommunityHighlight({
+  userId,
+  posterName,
+  postSnippet,
+  link,
+}: {
+  userId: string;
+  posterName: string;
+  postSnippet: string;
+  link: string;
+}) {
+  await createNotification({
+    userId,
+    type: 'community_highlight',
+    title: `${posterName} from your school shared something`,
+    body: postSnippet.slice(0, 80),
+    link,
+  });
 }

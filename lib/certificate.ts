@@ -1,4 +1,5 @@
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
+import { notifyCertificateReady } from '@/lib/hub/notifications';
 
 // Characters for verification code (no I/O/0/1 to avoid confusion)
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -97,6 +98,14 @@ export async function createCertificate(
       console.error('Error creating certificate:', insertError);
       return { success: false, error: 'Failed to create certificate' };
     }
+
+    // Notify the user
+    notifyCertificateReady({
+      userId,
+      courseName: course.title || 'Course',
+      pdHours: course.pd_hours || 0,
+      verificationCode,
+    }).catch(() => {});
 
     return {
       success: true,
