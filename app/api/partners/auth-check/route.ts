@@ -92,6 +92,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Mark invite as accepted on first successful login
+    if (!partnership.invite_accepted_at) {
+      await supabase
+        .from('partnerships')
+        .update({
+          invite_accepted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', partnership.id);
+    }
+
     return NextResponse.json({
       success: true,
       partnership: enrichedPartnership,
