@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { notifyHelpfulMarked } from '@/lib/hub/notifications'
 
 const supabase = createClient(
   process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -40,6 +41,11 @@ export async function POST(request: NextRequest) {
 
       const newCount = count || 0
       await supabase.from('hub_qa_posts').update({ helpful_count: newCount }).eq('id', content_id)
+
+      // Notify post author when someone marks helpful (not when un-marking)
+      if (!existing) {
+        notifyHelpfulMarked({ postId: content_id, markedByUserId: user_id }).catch(() => {});
+      }
 
       return NextResponse.json({ marked: !existing, helpful_count: newCount })
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendReplyNotificationEmail } from '@/lib/hub/email-sender'
+import { createNotification } from '@/lib/hub/notifications'
 
 const supabase = createClient(
   process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -102,6 +103,16 @@ export async function POST(request: NextRequest) {
             .select('display_name, email')
             .eq('id', parent.user_id)
             .single()
+
+          // In-app notification
+          await createNotification({
+            userId: parent.user_id,
+            type: 'qa_reply',
+            title: `${profile?.display_name || 'A teacher'} replied to your post`,
+            body: body.trim().slice(0, 80),
+            link: 'https://www.teachersdeserveit.com/hub',
+            sourceUserId: user_id,
+          });
 
           if (originalAuthor?.email) {
             await sendReplyNotificationEmail(
