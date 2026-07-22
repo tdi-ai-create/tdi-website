@@ -56,7 +56,7 @@ export function PanelHeader({ opp, onClose, onPatch }: Props) {
   return (
     <div>
       {/* Navy header band */}
-      <div style={{ background: 'linear-gradient(135deg, #1B2A4A, #2d3f66)', padding: '20px 24px 16px', position: 'relative' }}>
+      <div style={{ background: 'linear-gradient(135deg, #1B2A4A, #2d3f66)', padding: '28px 28px 24px', position: 'relative' }}>
         {/* Close button */}
         <button
           onClick={onClose}
@@ -92,20 +92,20 @@ export function PanelHeader({ opp, onClose, onPatch }: Props) {
           <h2
             onClick={() => setEditingName(true)}
             title="Click to edit"
-            style={{ fontSize: 16, fontWeight: 700, color: 'white', lineHeight: 1.3, cursor: 'text', margin: 0, paddingRight: 32 }}
+            style={{ fontSize: 18, fontWeight: 700, color: 'white', lineHeight: 1.3, cursor: 'text', margin: 0, paddingRight: 32 }}
           >
             {opp.name}
           </h2>
         )}
 
         {/* Contact + location */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6, flexWrap: 'wrap' }}>
-          {contactName && <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>{contactName}</span>}
-          {location && <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{location}</span>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+          {contactName && <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{contactName}</span>}
+          {location && <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>{location}</span>}
         </div>
 
         {/* Email + phone */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 8 }}>
           {contactEmail && (
             <a href={`mailto:${contactEmail}`} style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', textDecoration: 'none' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.9)' }}
@@ -126,7 +126,7 @@ export function PanelHeader({ opp, onClose, onPatch }: Props) {
       </div>
 
       {/* Tags + heat bar */}
-      <div style={{ padding: '10px 24px', borderBottom: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
+      <div style={{ padding: '12px 28px', borderBottom: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
           {typeLabel && (
             <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: opp.type === 'renewal' ? '#FEF3C7' : '#EFF6FF', color: opp.type === 'renewal' ? '#854D0E' : '#1E40AF' }}>
