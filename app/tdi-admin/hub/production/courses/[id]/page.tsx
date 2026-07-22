@@ -2378,6 +2378,33 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                 }}
               />
 
+              {/* Remove All Videos */}
+              <button
+                onClick={async () => {
+                  if (!course) return;
+                  const videoLessons = course.modules.flatMap(m => m.lessons.filter(l => l.video_id || (l.content as any)?.video_id));
+                  if (videoLessons.length === 0) {
+                    alert('No videos to remove.');
+                    return;
+                  }
+                  if (!confirm(`Remove all ${videoLessons.length} videos from this course? Video files stay on Cloudflare but will be unlinked from lessons. You can then bulk re-upload.`)) return;
+                  for (const lesson of videoLessons) {
+                    await fetch('/api/tdi-admin/lessons', {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ id: lesson.id, video_id: '' }),
+                    });
+                  }
+                  alert(`${videoLessons.length} videos removed. Reloading...`);
+                  window.location.reload();
+                }}
+                className="text-xs font-medium px-3 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors flex items-center gap-1.5"
+                title="Remove all videos from every lesson in this course. Files stay on Cloudflare."
+              >
+                <Trash2 size={12} />
+                Remove All Videos
+              </button>
+
               {/* Bulk Transcribe (EN + ES) */}
               <button
                 onClick={async () => {
