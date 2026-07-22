@@ -135,6 +135,9 @@ export function SalesCard({ opp, onClick, draggable = false, onContextMenu, onFi
           {opp.type === 'renewal' && (
             <span style={{ marginLeft: 6, fontSize: 9, padding: '1px 5px', borderRadius: 4, background: '#FEF3C7', color: '#854D0E', fontWeight: 700 }}>renewal</span>
           )}
+          {opp.source && /pd.plan|website/i.test(opp.source) && (
+            <span style={{ marginLeft: 6, fontSize: 9, padding: '1px 5px', borderRadius: 4, background: '#DBEAFE', color: '#1E40AF', fontWeight: 700 }}>PD Plan</span>
+          )}
         </p>
         <div style={{ display: 'flex', gap: 4, flexShrink: 0, marginLeft: 6 }} onClick={(e) => e.stopPropagation()}>
           {/* Notes button */}
