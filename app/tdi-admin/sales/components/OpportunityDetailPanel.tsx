@@ -49,6 +49,14 @@ export interface FullOpportunity {
 const NOTE_TYPES = ['call', 'email', 'meeting', 'demo', 'update'] as const
 type NoteType = typeof NOTE_TYPES[number]
 
+const NOTE_TYPE_TOOLTIPS: Record<string, string> = {
+  call: 'Log a phone call with this lead',
+  email: 'Log an email sent or received',
+  meeting: 'Log a meeting (virtual or in-person)',
+  demo: 'Log a product demo or Hub walkthrough',
+  update: 'Log a general status update or internal note',
+}
+
 const STAGE_OPTIONS = [
   { id: 'unassigned', name: 'Unassigned' },
   { id: 'targeting', name: 'Targeting (5%)' },
@@ -377,7 +385,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
                       onKeyDown={e => {
                         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleNoteSave() }
                       }}
-                      placeholder="Add a note..."
+                      placeholder="Add a note about a call, email, meeting, or update..."
                       style={{
                         flex: 1, height: 36, border: '1px solid #D1D5DB', borderRadius: 8,
                         padding: '0 12px', fontSize: 13, background: 'white', outline: 'none',
@@ -389,6 +397,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
                           key={t}
                           type="button"
                           onClick={() => setNoteType(t)}
+                          title={NOTE_TYPE_TOOLTIPS[t] || ''}
                           style={{
                             fontSize: 11, padding: '4px 10px', borderRadius: 20, fontWeight: 500,
                             whiteSpace: 'nowrap', cursor: 'pointer',
@@ -405,6 +414,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
                       type="button"
                       onClick={handleNoteSave}
                       disabled={noteSaving || !noteText.trim()}
+                      title="Save note (or press Cmd+Enter)"
                       style={{
                         height: 36, padding: '0 16px', borderRadius: 8, border: 'none',
                         background: '#2A9D8F', color: 'white', fontSize: 13, fontWeight: 600,
@@ -461,6 +471,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
                         ) : (
                           <div
                             onClick={() => { setValueInput(String(opp.value ?? '')); setEditingValue(true) }}
+                            title="Expected deal value. Click to edit."
                             style={{ fontSize: 22, fontWeight: 800, color: '#1B2A4A', cursor: 'text' }}
                           >
                             {opp.value ? `$${opp.value.toLocaleString()}` : '$0'}
@@ -473,6 +484,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
                         <select
                           value={opp.stage}
                           onChange={e => patchOpp({ stage: e.target.value })}
+                          title="Where is this lead in the sales pipeline? Moves left to right as the deal progresses."
                           style={{
                             background: '#1B2A4A', color: 'white', padding: '5px 14px',
                             borderRadius: 20, fontSize: 13, fontWeight: 600, border: 'none',
@@ -492,7 +504,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
                       {/* Factored */}
                       <div style={{ textAlign: 'center', flex: 1 }}>
                         <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#9CA3AF', fontWeight: 600, marginBottom: 4 }}>Factored</div>
-                        <div style={{ fontSize: 18, fontWeight: 700, color: '#6B7280' }}>
+                        <div title="Value multiplied by stage probability. Represents weighted pipeline contribution." style={{ fontSize: 18, fontWeight: 700, color: '#6B7280' }}>
                           {factored !== null ? `$${factored.toLocaleString()}` : '$0'}
                         </div>
                       </div>
@@ -503,7 +515,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
                 {/* Contracts section */}
                 <div style={{ borderTop: '1px solid #E5E7EB' }}>
                   <div style={{ padding: '14px 16px 0' }}>
-                    <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#9CA3AF', fontWeight: 700, marginBottom: 4 }}>Contracts</div>
+                    <div title="Quotes and proposals sent to this contact. Matched by email address." style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#9CA3AF', fontWeight: 700, marginBottom: 4 }}>Contracts</div>
                   </div>
                   <ContractsTab opp={opp} />
                 </div>
@@ -512,7 +524,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
 
                 {/* Contact section */}
                 <div style={{ padding: '14px 16px' }}>
-                  <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#9CA3AF', fontWeight: 700, marginBottom: 10 }}>Contact</div>
+                  <div title="Contact information. Click any field to edit." style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#9CA3AF', fontWeight: 700, marginBottom: 10 }}>Contact</div>
 
                   {/* Contact Name */}
                   <div style={{ marginBottom: 8 }}>
@@ -578,7 +590,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
 
                 {/* Details section */}
                 <div style={{ padding: '14px 16px' }}>
-                  <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#9CA3AF', fontWeight: 700, marginBottom: 10 }}>Details</div>
+                  <div title="Deal metadata. Type, source, dates, and assignment." style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#9CA3AF', fontWeight: 700, marginBottom: 10 }}>Details</div>
 
                   {/* Type */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
@@ -706,6 +718,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
               {opp.stage !== 'paid' && opp.stage !== 'lost' && (
                 <button
                   onClick={markWon}
+                  title="This lead signed a contract. Move to Won."
                   style={{ fontSize: 12, color: '#0F766E', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}
                 >
                   Mark as Won
@@ -714,6 +727,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
               {opp.stage !== 'lost' && (
                 <button
                   onClick={() => setShowLostModal(true)}
+                  title="This lead is no longer pursuing. Record why."
                   style={{ fontSize: 12, color: '#EF4444', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}
                 >
                   Mark as Lost
@@ -722,6 +736,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
               {onDelete && (
                 <button
                   onClick={() => { onDelete(opp.id); onClose() }}
+                  title="Move to trash. Can be restored later."
                   style={{ fontSize: 12, color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer' }}
                 >
                   Trash

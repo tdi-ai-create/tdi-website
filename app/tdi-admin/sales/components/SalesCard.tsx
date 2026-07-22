@@ -136,7 +136,7 @@ export function SalesCard({ opp, onClick, draggable = false, onContextMenu, onFi
             <span style={{ marginLeft: 6, fontSize: 9, padding: '1px 5px', borderRadius: 4, background: '#FEF3C7', color: '#854D0E', fontWeight: 700 }}>renewal</span>
           )}
           {opp.source && /pd.plan|website/i.test(opp.source) && (
-            <span style={{ marginLeft: 6, fontSize: 9, padding: '1px 5px', borderRadius: 4, background: '#DBEAFE', color: '#1E40AF', fontWeight: 700 }}>PD Plan</span>
+            <span title="Submitted a PD Plan Request via the website" style={{ marginLeft: 6, fontSize: 9, padding: '1px 5px', borderRadius: 4, background: '#DBEAFE', color: '#1E40AF', fontWeight: 700 }}>PD Plan</span>
           )}
         </p>
         <div style={{ display: 'flex', gap: 4, flexShrink: 0, marginLeft: 6 }} onClick={(e) => e.stopPropagation()}>
@@ -214,7 +214,7 @@ export function SalesCard({ opp, onClick, draggable = false, onContextMenu, onFi
         </span>
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
           {opp.tier && TIER_STYLES[opp.tier] && (
-            <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: TIER_STYLES[opp.tier].bg, color: TIER_STYLES[opp.tier].color, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+            <span title="Tier 1 = highest priority, best fit. Tier 2 = good fit, worth pursuing. Tier 3 = lower fit, consider parking." style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: TIER_STYLES[opp.tier].bg, color: TIER_STYLES[opp.tier].color, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
               <span style={{ width: 5, height: 5, borderRadius: '50%', background: TIER_STYLES[opp.tier].dot, display: 'inline-block' }} />
               {opp.tier}
             </span>
@@ -229,7 +229,7 @@ export function SalesCard({ opp, onClick, draggable = false, onContextMenu, onFi
             options={HEAT_OPTIONS}
             onSaved={handleSaved}
             renderValue={(val) => (
-              <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 6px', borderRadius: 6, background: (HEAT_STYLES[val || 'warm'] || HEAT_STYLES.warm).bg, color: (HEAT_STYLES[val || 'warm'] || HEAT_STYLES.warm).color, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <span title="How responsive is this lead right now? Hot = replied recently or meeting booked. Warm = engaged but no recent reply. Cold = multiple outreach attempts with no response. Parked = not pursuing right now." style={{ fontSize: 10, fontWeight: 600, padding: '2px 6px', borderRadius: 6, background: (HEAT_STYLES[val || 'warm'] || HEAT_STYLES.warm).bg, color: (HEAT_STYLES[val || 'warm'] || HEAT_STYLES.warm).color, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: (HEAT_STYLES[val || 'warm'] || HEAT_STYLES.warm).dot, display: 'inline-block' }} />
                 {val || 'warm'}
               </span>

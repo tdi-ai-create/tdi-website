@@ -107,7 +107,7 @@ export function PanelHeader({ opp, onClose, onPatch }: Props) {
         {/* Email + phone */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 8 }}>
           {contactEmail && (
-            <a href={`mailto:${contactEmail}`} style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', textDecoration: 'none' }}
+            <a href={`mailto:${contactEmail}`} title="Click to send email" style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', textDecoration: 'none' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.9)' }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.6)' }}
             >
@@ -115,7 +115,7 @@ export function PanelHeader({ opp, onClose, onPatch }: Props) {
             </a>
           )}
           {contactPhone && (
-            <a href={`tel:${contactPhone}`} style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', textDecoration: 'none', whiteSpace: 'nowrap' }}
+            <a href={`tel:${contactPhone}`} title="Click to call" style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', textDecoration: 'none', whiteSpace: 'nowrap' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.9)' }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.6)' }}
             >
@@ -129,28 +129,30 @@ export function PanelHeader({ opp, onClose, onPatch }: Props) {
       <div style={{ padding: '12px 28px', borderBottom: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
           {typeLabel && (
-            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: opp.type === 'renewal' ? '#FEF3C7' : '#EFF6FF', color: opp.type === 'renewal' ? '#854D0E' : '#1E40AF' }}>
+            <span title={opp.type === 'new_business' ? 'This is a new potential partnership, not a renewal or expansion.' : `Deal type: ${typeLabel}`} style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: opp.type === 'renewal' ? '#FEF3C7' : '#EFF6FF', color: opp.type === 'renewal' ? '#854D0E' : '#1E40AF' }}>
               {typeLabel}
             </span>
           )}
           {isPdPlan && (
-            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#DBEAFE', color: '#1E40AF' }}>
+            <span title="This lead submitted a PD Plan Request through the website." style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#DBEAFE', color: '#1E40AF' }}>
               PD Plan
             </span>
           )}
           {recencyLabel && (
-            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: `${recencyColor}15`, color: recencyColor }}>
+            <span title="Days since last recorded activity on this lead. Green = active (under 7 days). Amber = getting stale (7 to 14 days). Red = needs attention (over 14 days)." style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: `${recencyColor}15`, color: recencyColor }}>
               {recencyLabel}
             </span>
           )}
           <Link
             href={`/tdi-admin/leadership?search=${encodeURIComponent(opp.name)}`}
+            title="View this lead in the Leadership Dashboard"
             style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#F0FDFA', color: '#0F766E', textDecoration: 'none' }}
           >
             Leadership
           </Link>
           <Link
             href={`/tdi-admin/hub?tab=schools&search=${encodeURIComponent(opp.name)}`}
+            title="View Hub engagement data for this school"
             style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#FFFBEB', color: '#A16207', textDecoration: 'none' }}
           >
             Hub Data
@@ -158,12 +160,12 @@ export function PanelHeader({ opp, onClose, onPatch }: Props) {
         </div>
         {/* Heat selector */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          {heat && <span style={{ width: 8, height: 8, borderRadius: '50%', background: heat.color, display: 'inline-block' }} />}
+          {heat && <span title="How responsive is this lead right now? Hot = replied recently or meeting booked. Warm = engaged but no recent reply. Cold = multiple outreach attempts with no response. Parked = not pursuing right now." style={{ width: 8, height: 8, borderRadius: '50%', background: heat.color, display: 'inline-block' }} />}
           <select
             value={(opp as any).heat ?? ''}
             onChange={e => onPatch({ heat: e.target.value || null } as any)}
             style={{ fontSize: 12, border: '1px solid #E5E7EB', borderRadius: 6, padding: '3px 8px', background: 'white', color: heat?.color || '#6B7280', fontWeight: 600, outline: 'none', cursor: 'pointer' }}
-            title="Heat"
+            title="How responsive is this lead right now? Hot = replied recently or meeting booked. Warm = engaged but no recent reply. Cold = multiple outreach attempts with no response. Parked = not pursuing right now."
           >
             <option value="">Heat</option>
             {HEAT_OPTIONS.map(h => (
