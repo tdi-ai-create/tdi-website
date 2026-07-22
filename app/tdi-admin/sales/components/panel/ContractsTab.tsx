@@ -18,6 +18,7 @@ interface Quote {
   sent_at: string | null
   expires_at: string | null
   created_at: string
+  po_number: string | null
   quote_packages: QuotePackage[]
 }
 
@@ -55,7 +56,7 @@ export function ContractsTab({ opp }: Props) {
       const supabase = getSupabase()
       const { data } = await supabase
         .from('quotes')
-        .select('id, quote_number, title, status, sent_at, expires_at, created_at, quote_packages(package_name, total_amount, line_items)')
+        .select('id, quote_number, title, status, sent_at, expires_at, created_at, po_number, quote_packages(package_name, total_amount, line_items)')
         .ilike('contact_email', email)
         .order('created_at', { ascending: false })
       setQuotes((data as Quote[]) || [])
@@ -145,6 +146,23 @@ export function ContractsTab({ opp }: Props) {
                 </span>
               )}
               {!q.sent_at && <span>Created {formatDate(q.created_at)}</span>}
+            </div>
+
+            {/* PO Number inline edit */}
+            <div className="flex items-center gap-2 mt-2">
+              <span className="text-xs font-medium text-gray-400 shrink-0">PO #</span>
+              <input
+                defaultValue={q.po_number || ''}
+                placeholder="None"
+                onBlur={async (e) => {
+                  const val = e.target.value.trim() || null
+                  if (val === (q.po_number || null)) return
+                  const supabase = getSupabase()
+                  await supabase.from('quotes').update({ po_number: val, updated_at: new Date().toISOString() }).eq('id', q.id)
+                  setQuotes(prev => prev.map(qq => qq.id === q.id ? { ...qq, po_number: val } : qq))
+                }}
+                className="text-xs border border-gray-200 rounded px-2 py-1 w-36 text-gray-700 focus:outline-none focus:ring-1 focus:ring-amber-400"
+              />
             </div>
 
             {/* Packages / line items */}

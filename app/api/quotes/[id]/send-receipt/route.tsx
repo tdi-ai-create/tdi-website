@@ -129,6 +129,14 @@ function QuoteReceiptPDF({ quote, pkg }: { quote: any; pkg: any }) {
           </View>
         )}
 
+        {/* PO Number */}
+        {quote.po_number && (
+          <View style={{ marginTop: 16, padding: '10 16', border: '1px solid #e5e7eb', borderRadius: 6 }}>
+            <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold', color: '#6b7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>Purchase Order Number</Text>
+            <Text style={{ fontSize: 13, fontFamily: 'Helvetica-Bold', color: '#111827' }}>{quote.po_number}</Text>
+          </View>
+        )}
+
         {/* Signature */}
         <View style={styles.signatureBlock}>
           <Text style={styles.signatureTitle}>Electronic Signature</Text>

@@ -8,7 +8,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-  const { signedByName, signedByEmail, signatureTyped, signatureDrawn, selectedPackageIndex } = await request.json()
+  const { signedByName, signedByEmail, signatureTyped, signatureDrawn, selectedPackageIndex, poNumber } = await request.json()
 
   if (!signedByName?.trim()) {
     return NextResponse.json({ error: 'Name is required' }, { status: 400 })
@@ -38,6 +38,7 @@ export async function POST(
     signature_drawn: signatureDrawn ?? null,
     selected_package_index: selectedPackageIndex ?? 0,
     signed_at: new Date().toISOString(),
+    po_number: poNumber?.trim() ?? null,
   }).eq('id', id)
 
   if (error) return NextResponse.json({ error: 'Failed to save signature' }, { status: 500 })

@@ -39,6 +39,7 @@ interface QuoteRow {
   signed_at: string | null
   expires_at: string | null
   created_at: string
+  po_number: string | null
   quote_packages: { total_amount: number; package_name: string }[]
 }
 
@@ -290,7 +291,7 @@ export default function SalesPage() {
     setQuotesLoading(true)
     const { data } = await supabase
       .from('quotes')
-      .select('id, quote_number, title, contact_name, contact_email, contact_organization, status, sent_at, viewed_at, view_count, signed_by_name, signed_at, expires_at, created_at, quote_packages(total_amount, package_name)')
+      .select('id, quote_number, title, contact_name, contact_email, contact_organization, status, sent_at, viewed_at, view_count, signed_by_name, signed_at, expires_at, created_at, po_number, quote_packages(total_amount, package_name)')
       .order('created_at', { ascending: false })
     setQuotes((data as QuoteRow[]) || [])
     setQuotesLoading(false)
@@ -1492,6 +1493,22 @@ export default function SalesPage() {
                         </span>
                       </div>
                     </div>
+                    {/* PO Number inline edit */}
+                    <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', whiteSpace: 'nowrap' }}>PO #</label>
+                      <input
+                        defaultValue={q.po_number || ''}
+                        placeholder="None"
+                        onBlur={async (e) => {
+                          const val = e.target.value.trim() || null
+                          if (val === (q.po_number || null)) return
+                          await supabase.from('quotes').update({ po_number: val, updated_at: new Date().toISOString() }).eq('id', q.id)
+                          setQuotes(prev => prev.map(qq => qq.id === q.id ? { ...qq, po_number: val } : qq))
+                        }}
+                        style={{ fontSize: 12, padding: '4px 8px', border: '1px solid #E5E7EB', borderRadius: 6, width: 180, color: '#374151' }}
+                      />
+                    </div>
+
                     <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
                       <button
                         onClick={() => { navigator.clipboard.writeText(url); setCopiedQuoteId(q.id); setTimeout(() => setCopiedQuoteId(null), 2000) }}

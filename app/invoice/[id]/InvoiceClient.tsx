@@ -164,6 +164,7 @@ export default function InvoiceClient({ quote: initialQuote }: { quote: Quote })
         signatureTyped: signedName,
         signatureDrawn,
         selectedPackageIndex: selectedPackage,
+        poNumber: poNumber.trim() || null,
       }),
     })
 
@@ -494,17 +495,17 @@ export default function InvoiceClient({ quote: initialQuote }: { quote: Quote })
             )}
 
             {/* PO Number */}
-            {quote.po_required && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">PO Number (required)</label>
-                <input
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                  value={poNumber}
-                  onChange={e => setPoNumber(e.target.value)}
-                  placeholder="Enter your PO number"
-                />
-              </div>
-            )}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {quote.po_required ? 'PO Number (required)' : 'PO Number'}
+              </label>
+              <input
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                value={poNumber}
+                onChange={e => setPoNumber(e.target.value)}
+                placeholder="Enter your PO number"
+              />
+            </div>
 
             {/* Typed name */}
             <div>
