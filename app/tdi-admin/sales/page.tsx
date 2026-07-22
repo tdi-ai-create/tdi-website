@@ -278,6 +278,7 @@ export default function SalesPage() {
   const [quotes, setQuotes] = useState<QuoteRow[]>([])
   const [quotesLoading, setQuotesLoading] = useState(false)
   const [copiedQuoteId, setCopiedQuoteId] = useState<string | null>(null)
+  const [contractSearch, setContractSearch] = useState('')
   const [contractModalOpen, setContractModalOpen] = useState(false)
   const [contractForm, setContractForm] = useState<QuoteFormData>({
     title: '', contact_name: '', contact_email: '', contact_organization: '',
@@ -1437,10 +1438,17 @@ export default function SalesPage() {
       {/* Contracts Tab */}
       {pageTab === 'contracts' && (
         <div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, gap: 12 }}>
+            <input
+              type="text"
+              placeholder="Search contracts by name, school, email, or quote number..."
+              value={contractSearch}
+              onChange={e => setContractSearch(e.target.value)}
+              style={{ flex: 1, padding: '8px 14px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 13, outline: 'none' }}
+            />
             <button
               onClick={openNewContract}
-              style={{ fontSize: 13, padding: '8px 16px', borderRadius: 8, border: 'none', background: '#10B981', color: 'white', cursor: 'pointer', fontWeight: 700 }}
+              style={{ fontSize: 13, padding: '8px 16px', borderRadius: 8, border: 'none', background: '#10B981', color: 'white', cursor: 'pointer', fontWeight: 700, whiteSpace: 'nowrap' }}
             >
               + Create Contract
             </button>
@@ -1451,7 +1459,11 @@ export default function SalesPage() {
             <p style={{ textAlign: 'center', color: '#9CA3AF', padding: 40 }}>No contracts created yet.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {quotes.map(q => {
+              {quotes.filter(q => {
+                if (!contractSearch.trim()) return true
+                const s = contractSearch.toLowerCase()
+                return (q.title?.toLowerCase().includes(s) || q.contact_name?.toLowerCase().includes(s) || q.contact_email?.toLowerCase().includes(s) || q.contact_organization?.toLowerCase().includes(s) || q.quote_number?.toLowerCase().includes(s))
+              }).map(q => {
                 const pkg = q.quote_packages?.[0]
                 const amount = pkg?.total_amount || 0
                 const url = `https://www.teachersdeserveit.com/invoice/${q.id}`
@@ -1545,7 +1557,7 @@ export default function SalesPage() {
                             await supabase.from('quotes').update({ status: 'sent', sent_at: new Date().toISOString(), expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), updated_at: new Date().toISOString() }).eq('id', q.id)
                             setQuotes(prev => prev.map(qq => qq.id === q.id ? { ...qq, status: 'sent', sent_at: new Date().toISOString() } : qq))
                             showToastMsg(`"${q.title}" marked as sent`, 'success')
-                            fetch('/api/sales/slack-notify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'sent', org: q.contact_organization, title: q.title, amount: 0, contactName: q.contact_name, quoteNumber: q.quote_number }) }).catch(() => {})
+                            fetch('/api/sales/slack-notify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'sent', org: q.contact_organization, title: q.title, amount: q.quote_packages?.[0]?.total_amount || 0, contactName: q.contact_name, quoteNumber: q.quote_number }) }).catch(() => {})
                           }}
                           style={{ fontSize: 12, padding: '6px 12px', borderRadius: 6, border: '1px solid #10B981', background: 'white', color: '#10B981', cursor: 'pointer', fontWeight: 600 }}
                         >
