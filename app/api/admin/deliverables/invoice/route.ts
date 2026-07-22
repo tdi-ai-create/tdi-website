@@ -255,8 +255,8 @@ function buildInvoiceHtml(invoiceNumber: string, serviceLabel: string, deliveryD
             Please make checks payable to <strong>Teachers Deserve It, LLC</strong> and mail to:<br/>
             Teachers Deserve It, LLC<br/>
             c/o Secure Plus Financial<br/>
-            3s111 Rockwell St PO 30<br/>
-            Warrenville, IL 60555<br/>
+            4002 Paredes In Rd, Ste 15<br/>
+            Brownsville, TX 78526<br/>
             Please reply to this email with any questions about this invoice.
           </p>
         </div>
