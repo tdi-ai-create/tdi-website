@@ -1,47 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { requireAdminAuth } from '@/lib/tdi-admin/auth'
+import { getServiceSupabase } from '@/lib/supabase'
 
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error('Missing Supabase credentials')
-  }
-
-  return createClient(supabaseUrl, serviceRoleKey, {
-    auth: { autoRefreshToken: false, persistSession: false }
-  })
-}
-
-// GET - Get payment events timeline for an invoice
-export async function GET(
+export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
-    const auth = await requireAdminAuth();
-    if (auth instanceof NextResponse) return auth;
+  const { id } = await params
+  const { event_type, event_date, summary } = await request.json()
 
-    const { id } = await params
-    const supabase = getSupabaseAdmin()
-
-    const { data, error } = await supabase
-      .from('payment_events')
-      .select('*')
-      .eq('invoice_id', id)
-      .order('event_date', { ascending: false })
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      console.error('[Invoices API] Events fetch error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json(data || [])
-  } catch (error) {
-    console.error('[Invoices API] Error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  if (!summary?.trim()) {
+    return NextResponse.json({ error: 'Summary is required' }, { status: 400 })
   }
+
+  const supabase = getServiceSupabase()
+
+  const { data, error } = await supabase.from('payment_events').insert({
+    invoice_id: id,
+    event_type: event_type || 'note',
+    event_date: event_date || new Date().toISOString().split('T')[0],
+    summary: summary.trim(),
+  }).select().single()
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json(data)
 }
