@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
     // Enrich partnerships using maps (O(n) instead of O(n*2))
     const enrichedPartnerships = partnershipsResult.map(p => ({
       ...p,
-      org_name: orgMap.get(p.id) || null,
+      org_name: orgMap.get(p.id) || (p as any).org_name || null,
       staff_count: (p as any).staff_enrolled || staffCountMap.get(p.id) || 0,
     }));
 
