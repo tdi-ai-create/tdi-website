@@ -332,6 +332,7 @@ export async function POST(request: NextRequest) {
       from: 'Teachers Deserve It <hello@teachersdeserveit.com>',
       replyTo: 'Info@TeachersDeserveIt.com',
       to: [recipientEmail],
+      cc: ['hello@teachersdeserveit.com'],
       subject: `Invoice ${invoiceNumber} from Teachers Deserve It`,
       html: `
         <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;color:#1e2749;font-size:15px;line-height:1.7;">
