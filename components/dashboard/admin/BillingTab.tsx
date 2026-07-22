@@ -302,8 +302,7 @@ export default function BillingTab({
   async function addNote(invoiceId: string) {
     if (!noteForm?.text.trim()) return;
     try {
-      // Log as payment event with type 'note'
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      // Save to invoice notes field
       await fetch(`/api/tdi-admin/intelligence/invoices/${invoiceId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -311,6 +310,21 @@ export default function BillingTab({
           notes: noteForm.text.trim(),
         }),
       });
+      // Also log as a payment event so it shows in the timeline
+      await fetch(`/api/tdi-admin/intelligence/invoices/${invoiceId}/events`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_type: 'note',
+          event_date: new Date().toISOString().split('T')[0],
+          summary: noteForm.text.trim(),
+        }),
+      }).catch(() => {});
+      // Update local state immediately so note appears
+      setInvoices(prev => ({
+        ...prev,
+        [invoiceId]: prev[invoiceId] ? { ...prev[invoiceId], notes: noteForm.text.trim() } : prev[invoiceId],
+      }));
       showToast('Note saved');
       setNoteForm(null);
       fetchInvoiceDetails(invoiceId);
@@ -447,7 +461,7 @@ export default function BillingTab({
                 </label>
                 <textarea
                   value={invoicePreview.notes}
-                  onChange={e => setInvoicePreview({ ...invoicePreview, notes: e.target.value })}
+                  onChange={e => setInvoicePreview(prev => prev ? { ...prev, notes: e.target.value } : prev)}
                   placeholder="e.g., Please reference contract #ABC for processing"
                   rows={3}
                   style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 13, color: '#1e2749', resize: 'vertical', fontFamily: "'DM Sans', sans-serif" }}
