@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { PanelHeader } from './panel/PanelHeader'
 import { ContractsTab } from './panel/ContractsTab'
 import { IntelligenceTab } from './panel/IntelligenceTab'
+import { IntelligenceBar } from './panel/IntelligenceBar'
 
 export interface OppNote {
   id: string
@@ -91,6 +92,8 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
   const [fetchError, setFetchError] = useState('')
   const [expanded, setExpanded] = useState(false)
   const prevIdRef = useRef<string | null>(null)
+  const intelSectionRef = useRef<HTMLDivElement>(null)
+  const rightColRef = useRef<HTMLDivElement>(null)
 
   // Note input state
   const [noteText, setNoteText] = useState('')
@@ -345,6 +348,20 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
           <>
             <PanelHeader opp={opp} onClose={onClose} onPatch={patchOpp} />
 
+            {/* Intelligence summary bar */}
+            <IntelligenceBar
+              opp={opp}
+              onExpandIntelligence={() => {
+                if (!intelOpen) setIntelOpen(true)
+                // Scroll the right column to the intelligence section after a tick
+                setTimeout(() => {
+                  if (intelSectionRef.current && rightColRef.current) {
+                    intelSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }
+                }, 100)
+              }}
+            />
+
             {/* Two-column body */}
             <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
 
@@ -421,7 +438,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
               </div>
 
               {/* ===== RIGHT COLUMN: Context (40%) ===== */}
-              <div style={{ flex: '0 0 40%', overflowY: 'auto', height: '100%' }}>
+              <div ref={rightColRef} style={{ flex: '0 0 40%', overflowY: 'auto', height: '100%' }}>
 
                 {/* Status card */}
                 <div style={{ padding: 16 }}>
@@ -625,7 +642,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
                 <div style={{ margin: '0 16px', height: 1, background: '#E5E7EB' }} />
 
                 {/* Intelligence (collapsible) */}
-                <div style={{ padding: '14px 16px' }}>
+                <div ref={intelSectionRef} style={{ padding: '14px 16px' }}>
                   <button
                     onClick={() => setIntelOpen(!intelOpen)}
                     style={{
