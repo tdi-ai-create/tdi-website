@@ -57,7 +57,10 @@ export async function GET(request: NextRequest) {
     // --- 3. Partnership Health ---
     const partnerships = await gatherPartnershipData(supabase);
 
-    // --- 4. Paperclip Health ---
+    // --- 4. Social Media (from Buffer via Zara) ---
+    const social = await gatherSocialData();
+
+    // --- 5. Paperclip Health ---
     const paperclip = await checkPaperclipHealth();
 
     // --- Build the report ---
@@ -70,7 +73,7 @@ export async function GET(request: NextRequest) {
 
     const subject = `Daily Briefing -- ${now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
 
-    const content = buildDailyReport(dateLabel, hub, sales, partnerships, paperclip);
+    const content = buildDailyReport(dateLabel, hub, sales, partnerships, social, paperclip);
 
     // --- Send directly via Resend ---
     const resendApiKey = process.env.RESEND_API_KEY;
@@ -340,6 +343,110 @@ async function gatherPartnershipData(
   }
 }
 
+interface SocialData {
+  available: boolean;
+  scheduledToday: number;
+  sentYesterday: number;
+  channels: { name: string; type: string }[];
+  recentPosts: { text: string; channel: string; sentAt: string; clicks?: number; impressions?: number; likes?: number }[];
+  error?: string;
+}
+
+const BUFFER_ORG_ID = '6724a7b63acbdfaad841bc3c';
+
+async function gatherSocialData(): Promise<SocialData> {
+  const empty: SocialData = { available: false, scheduledToday: 0, sentYesterday: 0, channels: [], recentPosts: [] };
+
+  const bufferKey = process.env.BUFFER_API_KEY;
+  if (!bufferKey) return { ...empty, error: 'BUFFER_API_KEY not configured' };
+
+  try {
+    // Get channels
+    const channelsRes = await fetch('https://api.buffer.com/graphql', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${bufferKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `query { organization(id: "${BUFFER_ORG_ID}") { channels { id name service } } }`,
+      }),
+      signal: AbortSignal.timeout(10000),
+    });
+
+    const channelsData = await channelsRes.json();
+    const channels = channelsData?.data?.organization?.channels || [];
+
+    // Get recent posts (sent in last 48 hours)
+    const postsRes = await fetch('https://api.buffer.com/graphql', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${bufferKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `query { organization(id: "${BUFFER_ORG_ID}") { channels { name service posts(status: "sent", limit: 5) { id text sentAt statistics { clicks impressions likes } } } } }`,
+      }),
+      signal: AbortSignal.timeout(10000),
+    });
+
+    const postsData = await postsRes.json();
+    const allChannels = postsData?.data?.organization?.channels || [];
+
+    const now = new Date();
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const recentPosts: SocialData['recentPosts'] = [];
+    let sentYesterday = 0;
+
+    for (const ch of allChannels) {
+      for (const post of (ch.posts || [])) {
+        const sentDate = new Date(post.sentAt);
+        if (sentDate >= yesterday) {
+          sentYesterday++;
+          recentPosts.push({
+            text: (post.text || '').substring(0, 120) + ((post.text || '').length > 120 ? '...' : ''),
+            channel: `${ch.name} (${ch.service})`,
+            sentAt: post.sentAt,
+            clicks: post.statistics?.clicks || 0,
+            impressions: post.statistics?.impressions || 0,
+            likes: post.statistics?.likes || 0,
+          });
+        }
+      }
+    }
+
+    // Get scheduled/queued posts
+    const queueRes = await fetch('https://api.buffer.com/graphql', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${bufferKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `query { organization(id: "${BUFFER_ORG_ID}") { channels { posts(status: "scheduled", limit: 10) { id scheduledAt } } } }`,
+      }),
+      signal: AbortSignal.timeout(10000),
+    });
+
+    const queueData = await queueRes.json();
+    const queueChannels = queueData?.data?.organization?.channels || [];
+    let scheduledToday = 0;
+
+    for (const ch of queueChannels) {
+      for (const post of (ch.posts || [])) {
+        const schedDate = new Date(post.scheduledAt);
+        if (schedDate >= todayStart && schedDate < new Date(todayStart.getTime() + 86400000)) {
+          scheduledToday++;
+        }
+      }
+    }
+
+    return {
+      available: true,
+      scheduledToday,
+      sentYesterday,
+      channels: channels.map((c: { name: string; service: string }) => ({ name: c.name, type: c.service })),
+      recentPosts: recentPosts.slice(0, 5),
+    };
+  } catch (err) {
+    console.error('[olivia-daily-briefing] Buffer/social query error:', err);
+    return { ...empty, error: String(err) };
+  }
+}
+
 interface PaperclipHealth {
   status: 'healthy' | 'degraded' | 'down';
   latencyMs: number;
@@ -375,6 +482,7 @@ function buildDailyReport(
   hub: HubData,
   sales: SalesData,
   partnerships: PartnershipData,
+  social: SocialData,
   paperclip: PaperclipHealth,
 ): string {
   const sections: string[] = [];
@@ -470,9 +578,55 @@ function buildDailyReport(
     sections.push('');
   }
 
+  // --- Social Media ---
+  sections.push(`## 4. Social Media (via Zara)`);
+  sections.push('');
+
+  if (!social.available) {
+    sections.push(`> **What:** Social data unavailable. ${social.error || 'Buffer connection issue.'}`);
+    sections.push('');
+    sections.push(`> **Now What:** Check Buffer API key and connection.`);
+  } else {
+    const totalClicks = social.recentPosts.reduce((s, p) => s + (p.clicks || 0), 0);
+    const totalImpressions = social.recentPosts.reduce((s, p) => s + (p.impressions || 0), 0);
+    const totalLikes = social.recentPosts.reduce((s, p) => s + (p.likes || 0), 0);
+
+    sections.push(`> **What:** ${social.sentYesterday} post${social.sentYesterday !== 1 ? 's' : ''} went out yesterday across ${social.channels.length} channels. ${social.scheduledToday} scheduled for today.${totalImpressions > 0 ? ` Yesterday's reach: ${totalImpressions.toLocaleString()} impressions, ${totalLikes} likes, ${totalClicks} clicks.` : ''}`);
+    sections.push('');
+
+    if (social.sentYesterday === 0 && social.scheduledToday === 0) {
+      sections.push(`> **So What:** No posts went out and nothing is scheduled. The social queue may be empty.`);
+      sections.push('');
+      sections.push(`> **Now What:** Check Buffer queue. Zara may need new content to schedule. Flag to Kristin if this persists.`);
+    } else if (social.scheduledToday === 0) {
+      sections.push(`> **So What:** Posts went out yesterday but nothing is queued for today.`);
+      sections.push('');
+      sections.push(`> **Now What:** Zara should add posts for today. If this is a planned rest day, no action needed.`);
+    } else {
+      sections.push(`> **So What:** Social pipeline is active and healthy.`);
+      sections.push('');
+      sections.push(`> **Now What:** No action needed. Posts are flowing.`);
+    }
+
+    if (social.recentPosts.length > 0) {
+      sections.push('');
+      sections.push(`**Recent Posts:**`);
+      sections.push('');
+      social.recentPosts.forEach(p => {
+        const stats = [
+          p.impressions ? `${p.impressions.toLocaleString()} impressions` : null,
+          p.likes ? `${p.likes} likes` : null,
+          p.clicks ? `${p.clicks} clicks` : null,
+        ].filter(Boolean).join(', ');
+        sections.push(`- **${p.channel}:** "${p.text}"${stats ? ` (${stats})` : ''}`);
+      });
+    }
+  }
+  sections.push('');
+
   // --- Paperclip ---
   if (paperclip.status !== 'healthy') {
-    sections.push(`## 4. Paperclip Agent Health`);
+    sections.push(`## 5. Paperclip Agent Health`);
     sections.push('');
     sections.push(`> **What:** Paperclip is ${paperclip.status}: ${paperclip.detail}.`);
     sections.push('');
