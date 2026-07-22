@@ -545,6 +545,7 @@ function GrantFitScoring({ opp }: { opp: FullOpportunity }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ [field]: value, score_total: newTotal, score_tier: newTier }),
       })
+      onRefresh()
     } finally {
       setSaving(false)
     }
