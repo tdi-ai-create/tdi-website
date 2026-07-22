@@ -85,3 +85,15 @@ export async function emailBounced(contactName: string, email: string, reason: s
     `*Email Bounced* -- ${contactName}\n${email} | ${reason}`
   )
 }
+
+export async function quoteDrafted(quoteNumber: string, org: string, title: string, amount: number) {
+  await postToSlack(
+    `*Quote Drafted* -- ${quoteNumber}\n${org} | ${title} | $${amount.toLocaleString()}\nReady for review and sending.`
+  )
+}
+
+export async function quoteSent(quoteNumber: string, org: string, contactName: string, amount: number) {
+  await postToSlack(
+    `*Quote Sent* -- ${quoteNumber}\n${org} | Sent to ${contactName} | $${amount.toLocaleString()}\nWaiting for signature.`
+  )
+}
