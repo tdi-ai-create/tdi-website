@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
   }
 
-  const { deliverableId, partnershipId, sendEmail = true } = await request.json();
+  const { deliverableId, partnershipId, sendEmail = true, resend = false, resendTo } = await request.json();
 
   if (!deliverableId || !partnershipId) {
     return NextResponse.json({ error: 'deliverableId and partnershipId required' }, { status: 400 });
@@ -37,8 +37,63 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Deliverable not found' }, { status: 404 });
   }
 
-  if (deliverable.invoice_id) {
+  if (deliverable.invoice_id && !resend) {
     return NextResponse.json({ error: 'Already invoiced' }, { status: 400 });
+  }
+
+  // Handle resend: just re-send the email for existing invoice
+  if (resend && deliverable.invoice_id) {
+    const { data: existingInvoice } = await supabase
+      .from('intelligence_invoices')
+      .select('invoice_number, amount, due_date, service_date_exact')
+      .eq('id', deliverable.invoice_id)
+      .single();
+
+    if (!existingInvoice) {
+      return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
+    }
+
+    const { data: p } = await supabase
+      .from('partnerships')
+      .select('contact_name, contact_email, primary_contact_email, org_name')
+      .eq('id', partnershipId)
+      .single();
+
+    if (!p) {
+      return NextResponse.json({ error: 'Partnership not found' }, { status: 404 });
+    }
+
+    const recipientEmail = resendTo || p.primary_contact_email || p.contact_email;
+    const firstName = (p.contact_name || '').split(' ')[0] || 'there';
+    const amount = Number(existingInvoice.amount || 0);
+    const dueDate = existingInvoice.due_date;
+
+    // Reuse same email template (defined below in the main flow)
+    const html = buildInvoiceHtml(existingInvoice.invoice_number, deliverable.label, deliverable.delivery_date, amount, dueDate, firstName);
+
+    if (RESEND_API_KEY && recipientEmail) {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: 'Teachers Deserve It <hello@teachersdeserveit.com>',
+          reply_to: 'Rae@TeachersDeserveIt.com',
+          to: recipientEmail,
+          subject: `Invoice ${existingInvoice.invoice_number} from Teachers Deserve It`,
+          html,
+        }),
+      });
+    }
+
+    // Log the resend
+    await supabase.from('payment_events').insert({
+      invoice_id: deliverable.invoice_id,
+      event_type: 'invoice_resent',
+      event_date: new Date().toISOString().split('T')[0],
+      summary: `Invoice resent to ${recipientEmail}`,
+    });
+
+    return NextResponse.json({ success: true, resent_to: recipientEmail });
   }
 
   if (deliverable.is_complimentary) {
@@ -123,74 +178,7 @@ export async function POST(request: NextRequest) {
   if (sendEmail && RESEND_API_KEY && recipientEmail) {
     const firstName = (partnership.contact_name || '').split(' ')[0] || 'there';
     const amount = Number(deliverable.total_amount || 0);
-
-    const html = `
-      <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;color:#1e2749;font-size:15px;line-height:1.7;">
-        <div style="background:#1e2749;border-radius:12px 12px 0 0;padding:32px 24px;text-align:center;">
-          <p style="margin:0;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#E8B84B;">Invoice</p>
-          <p style="margin:8px 0 0;font-size:28px;font-weight:700;color:white;">${invoiceNumber}</p>
-        </div>
-
-        <div style="background:white;border:1px solid #E5E7EB;border-top:none;border-radius:0 0 12px 12px;padding:32px 24px;">
-          <p style="margin:0 0 20px;font-size:15px;">${firstName},</p>
-
-          <p style="margin:0 0 24px;font-size:15px;color:#64748B;">Thank you for your partnership with Teachers Deserve It. Below is an invoice for a recent service.</p>
-
-          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:24px;">
-            <tr>
-              <td style="padding:16px 20px;background:#F8FAFC;border-radius:10px;">
-                <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                  <tr>
-                    <td style="padding:6px 0;font-size:13px;color:#64748B;">Service</td>
-                    <td style="padding:6px 0;font-size:14px;font-weight:600;color:#1e2749;text-align:right;">${deliverable.label}</td>
-                  </tr>
-                  ${deliverable.delivery_date ? `
-                  <tr>
-                    <td style="padding:6px 0;font-size:13px;color:#64748B;">Date of Service</td>
-                    <td style="padding:6px 0;font-size:14px;font-weight:600;color:#1e2749;text-align:right;">${new Date(deliverable.delivery_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</td>
-                  </tr>
-                  ` : ''}
-                  <tr>
-                    <td style="padding:6px 0;font-size:13px;color:#64748B;">Invoice Date</td>
-                    <td style="padding:6px 0;font-size:14px;font-weight:600;color:#1e2749;text-align:right;">${now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding:6px 0;font-size:13px;color:#64748B;">Due Date</td>
-                    <td style="padding:6px 0;font-size:14px;font-weight:600;color:#1e2749;text-align:right;">${new Date(dueDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</td>
-                  </tr>
-                  <tr>
-                    <td colspan="2" style="padding:12px 0 0;border-top:1px solid #E5E7EB;"></td>
-                  </tr>
-                  <tr>
-                    <td style="padding:6px 0;font-size:15px;font-weight:700;color:#1e2749;">Amount Due</td>
-                    <td style="padding:6px 0;font-size:20px;font-weight:700;color:#1e2749;text-align:right;">$${amount.toLocaleString()}</td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-
-          <div style="background:#F0FDFA;border-radius:10px;padding:16px 20px;border:1px solid #99F6E4;margin-bottom:24px;">
-            <p style="margin:0 0 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#0D9488;">Payment Information</p>
-            <p style="margin:0;font-size:14px;color:#134E4A;line-height:1.6;">
-              Please make checks payable to <strong>Teachers Deserve It, LLC</strong> and mail to:<br/>
-              Teachers Deserve It<br/>
-              Rae Hughart<br/>
-              Please reply to this email with any questions about this invoice.
-            </p>
-          </div>
-
-          <p style="margin:0;font-size:14px;color:#64748B;">
-            If you need a W-9 or have specific AP requirements, just reply to this email and we will get that to you right away.
-          </p>
-
-          <hr style="border:none;border-top:1px solid #E5E7EB;margin:24px 0 16px;" />
-          <p style="font-size:12px;color:#9CA3AF;margin:0;text-align:center;">
-            Teachers Deserve It | ${invoiceNumber}
-          </p>
-        </div>
-      </div>
-    `;
+    const html = buildInvoiceHtml(invoiceNumber, deliverable.label, deliverable.delivery_date, amount, dueDate, firstName);
 
     try {
       const resp = await fetch('https://api.resend.com/emails', {
@@ -223,4 +211,44 @@ export async function POST(request: NextRequest) {
       sent_to: recipientEmail,
     },
   });
+}
+
+function buildInvoiceHtml(invoiceNumber: string, serviceLabel: string, deliveryDate: string | null, amount: number, dueDate: string, firstName: string): string {
+  const now = new Date();
+  return `
+    <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;color:#1e2749;font-size:15px;line-height:1.7;">
+      <div style="background:#1e2749;border-radius:12px 12px 0 0;padding:32px 24px;text-align:center;">
+        <p style="margin:0;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#E8B84B;">Invoice</p>
+        <p style="margin:8px 0 0;font-size:28px;font-weight:700;color:white;">${invoiceNumber}</p>
+      </div>
+      <div style="background:white;border:1px solid #E5E7EB;border-top:none;border-radius:0 0 12px 12px;padding:32px 24px;">
+        <p style="margin:0 0 20px;font-size:15px;">${firstName},</p>
+        <p style="margin:0 0 24px;font-size:15px;color:#64748B;">Thank you for your partnership with Teachers Deserve It. Below is an invoice for a recent service.</p>
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:24px;">
+          <tr><td style="padding:16px 20px;background:#F8FAFC;border-radius:10px;">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+              <tr><td style="padding:6px 0;font-size:13px;color:#64748B;">Service</td><td style="padding:6px 0;font-size:14px;font-weight:600;color:#1e2749;text-align:right;">${serviceLabel}</td></tr>
+              ${deliveryDate ? `<tr><td style="padding:6px 0;font-size:13px;color:#64748B;">Date of Service</td><td style="padding:6px 0;font-size:14px;font-weight:600;color:#1e2749;text-align:right;">${new Date(deliveryDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</td></tr>` : ''}
+              <tr><td style="padding:6px 0;font-size:13px;color:#64748B;">Invoice Date</td><td style="padding:6px 0;font-size:14px;font-weight:600;color:#1e2749;text-align:right;">${now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</td></tr>
+              <tr><td style="padding:6px 0;font-size:13px;color:#64748B;">Due Date</td><td style="padding:6px 0;font-size:14px;font-weight:600;color:#1e2749;text-align:right;">${new Date(dueDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</td></tr>
+              <tr><td colspan="2" style="padding:12px 0 0;border-top:1px solid #E5E7EB;"></td></tr>
+              <tr><td style="padding:6px 0;font-size:15px;font-weight:700;color:#1e2749;">Amount Due</td><td style="padding:6px 0;font-size:20px;font-weight:700;color:#1e2749;text-align:right;">$${amount.toLocaleString()}</td></tr>
+            </table>
+          </td></tr>
+        </table>
+        <div style="background:#F0FDFA;border-radius:10px;padding:16px 20px;border:1px solid #99F6E4;margin-bottom:24px;">
+          <p style="margin:0 0 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#0D9488;">Payment Information</p>
+          <p style="margin:0;font-size:14px;color:#134E4A;line-height:1.6;">
+            Please make checks payable to <strong>Teachers Deserve It, LLC</strong> and mail to:<br/>
+            Teachers Deserve It<br/>
+            Rae Hughart<br/>
+            Please reply to this email with any questions about this invoice.
+          </p>
+        </div>
+        <p style="margin:0;font-size:14px;color:#64748B;">If you need a W-9 or have specific AP requirements, just reply to this email and we will get that to you right away.</p>
+        <hr style="border:none;border-top:1px solid #E5E7EB;margin:24px 0 16px;" />
+        <p style="font-size:12px;color:#9CA3AF;margin:0;text-align:center;">Teachers Deserve It | ${invoiceNumber}</p>
+      </div>
+    </div>
+  `;
 }

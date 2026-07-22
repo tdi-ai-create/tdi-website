@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { DollarSign, Send, CheckCircle2, Clock, AlertCircle, ChevronDown, ChevronUp, Plus, X } from 'lucide-react';
+import { DollarSign, Send, CheckCircle2, Clock, AlertCircle, ChevronDown, ChevronUp, Plus, X, RotateCcw } from 'lucide-react';
 
 interface Deliverable {
   id: string;
@@ -497,11 +497,12 @@ export default function BillingTab({
                       </div>
                     )}
 
-                    {/* Add note */}
+                    {/* Actions row */}
                     {d.invoice_id && (
-                      <div>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        {/* Add note */}
                         {noteForm?.id === d.id ? (
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 w-full">
                             <input
                               type="text"
                               placeholder="Add a follow-up note..."
@@ -524,12 +525,32 @@ export default function BillingTab({
                             </button>
                           </div>
                         ) : (
-                          <button
-                            onClick={() => setNoteForm({ id: d.id, text: '' })}
-                            className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
-                          >
-                            <Plus size={10} /> Add note
-                          </button>
+                          <>
+                            <button
+                              onClick={() => setNoteForm({ id: d.id, text: '' })}
+                              className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
+                            >
+                              <Plus size={10} /> Add note
+                            </button>
+                            {d.delivery_status === 'invoiced' && (
+                              <button
+                                onClick={async () => {
+                                  const altEmail = prompt('Resend invoice to (leave blank for original recipient):');
+                                  try {
+                                    await fetch('/api/admin/deliverables/invoice', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json', 'x-user-email': userEmail },
+                                      body: JSON.stringify({ deliverableId: d.id, partnershipId, resendTo: altEmail || undefined, resend: true }),
+                                    });
+                                    showToast(altEmail ? `Invoice resent to ${altEmail}` : 'Invoice resent');
+                                  } catch { showToast('Failed to resend'); }
+                                }}
+                                className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1"
+                              >
+                                <RotateCcw size={10} /> Resend invoice
+                              </button>
+                            )}
+                          </>
                         )}
                       </div>
                     )}

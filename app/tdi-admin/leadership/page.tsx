@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission } from '@/lib/tdi-admin/permissions';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
+import InvoicingOverview from '@/components/tdi-admin/leadership/InvoicingOverview';
 import { HorizontalBarChart, DonutChart, DonutLegend, ProgressRing, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts';
 import {
   Building2,
@@ -104,7 +105,7 @@ const TABS = [
   { id: 'reports', label: 'School Reports' },
   { id: 'actions', label: 'Action Items' },
   { id: 'pipeline', label: 'Onboarding Pipeline' },
-  { id: 'billing', label: 'Billing' },
+  { id: 'billing', label: 'Invoicing' },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -1620,175 +1621,7 @@ export default function LeadershipDashboardPage() {
 
         {/* =========== BILLING TAB =========== */}
         {activeTab === 'billing' && (
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2
-                  style={TYPE_SECTION_HEADER}
-                >
-                  Billing & Contracts
-                </h2>
-                <p className="text-sm text-gray-500">
-                  Track contract periods and service allocations
-                </p>
-              </div>
-            </div>
-
-            {isLoading ? (
-              <div className="flex items-center justify-center py-16">
-                <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
-              </div>
-            ) : partnerships.filter((p) => p.status === 'active').length === 0 ? (
-              <div className="text-center py-16 text-gray-500">
-                <DollarSign className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <p>No active contracts to display.</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-100">
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
-                        Organization
-                      </th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
-                        Phase
-                      </th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
-                        Contract Period
-                      </th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
-                        Observation Days
-                      </th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
-                        Virtual Sessions
-                      </th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
-                        Exec Sessions
-                      </th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {partnerships
-                      .filter(
-                        (p) =>
-                          p.status === 'active' || p.status === 'setup_in_progress'
-                      )
-                      .map((partnership) => {
-                        // Check if contract is expiring soon (within 60 days)
-                        const isExpiringSoon =
-                          partnership.contract_end &&
-                          new Date(partnership.contract_end).getTime() -
-                            new Date().getTime() <
-                            60 * 24 * 60 * 60 * 1000;
-
-                        return (
-                          <tr key={partnership.id} className="hover:bg-gray-50">
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-3">
-                                <div
-                                  className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                    partnership.partnership_type === 'district'
-                                      ? 'bg-purple-100 text-purple-600'
-                                      : 'bg-blue-100 text-blue-600'
-                                  }`}
-                                >
-                                  {partnership.partnership_type === 'district' ? (
-                                    <Building2 className="w-4 h-4" />
-                                  ) : (
-                                    <School className="w-4 h-4" />
-                                  )}
-                                </div>
-                                <span
-                                  className="font-medium"
-                                  style={{ color: '#2B3A67' }}
-                                >
-                                  {partnership.org_name || partnership.contact_name}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="px-4 py-3">
-                              <span
-                                className={`text-xs px-2 py-1 rounded-full font-medium ${
-                                  phaseColors[partnership.contract_phase]
-                                }`}
-                              >
-                                {partnership.contract_phase}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="text-sm">
-                                <p className="text-gray-700">
-                                  {partnership.contract_start
-                                    ? new Date(
-                                        partnership.contract_start
-                                      ).toLocaleDateString()
-                                    : '--'}{' '}
-                                  -{' '}
-                                  {partnership.contract_end
-                                    ? new Date(
-                                        partnership.contract_end
-                                      ).toLocaleDateString()
-                                    : '--'}
-                                </p>
-                                {isExpiringSoon && (
-                                  <p className="text-xs text-orange-600 flex items-center gap-1">
-                                    <AlertCircle className="w-3 h-3" />
-                                    Expiring soon
-                                  </p>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-4 py-3">
-                              <span className="text-sm">
-                                <span className="font-medium" style={{ color: '#2B3A67' }}>
-                                  {partnership.observation_days_used || 0}
-                                </span>
-                                <span className="text-gray-400">
-                                  /{partnership.observation_days_total || 0}
-                                </span>
-                              </span>
-                            </td>
-                            <td className="px-4 py-3">
-                              <span className="text-sm">
-                                <span className="font-medium" style={{ color: '#2B3A67' }}>
-                                  {partnership.virtual_sessions_used || 0}
-                                </span>
-                                <span className="text-gray-400">
-                                  /{partnership.virtual_sessions_total || 0}
-                                </span>
-                              </span>
-                            </td>
-                            <td className="px-4 py-3">
-                              <span className="text-sm">
-                                <span className="font-medium" style={{ color: '#2B3A67' }}>
-                                  {partnership.executive_sessions_used || 0}
-                                </span>
-                                <span className="text-gray-400">
-                                  /{partnership.executive_sessions_total || 0}
-                                </span>
-                              </span>
-                            </td>
-                            <td className="px-4 py-3">
-                              <span
-                                className={`inline-flex text-xs px-2 py-1 rounded-full border ${
-                                  statusColors[partnership.status]
-                                }`}
-                              >
-                                {statusLabels[partnership.status]}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+          <InvoicingOverview userEmail={teamMember?.email || ''} />
         )}
       </div>
     </div>
