@@ -146,10 +146,16 @@ export async function POST(
       .limit(1)
       .maybeSingle()
 
-    if (!existingPartnership && orgName) {
+    if (existingPartnership) {
+      // Link deliverables to existing partnership
+      await supabase.from('contract_deliverables')
+        .update({ partnership_id: existingPartnership.id })
+        .eq('quote_id', id)
+        .is('partnership_id', null)
+    } else if (orgName) {
       const slug = orgName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
       try {
-        await supabase.from('partnerships').insert({
+        const { data: newPartnership } = await supabase.from('partnerships').insert({
           org_name: orgName,
           partnership_type: 'school',
           contact_name: signedByName,
@@ -167,7 +173,15 @@ export async function POST(
           virtual_sessions_total: 0, virtual_sessions_used: 0,
           executive_sessions_total: 0, executive_sessions_used: 0,
           sales_deal_id: null,
-        })
+        }).select('id').single()
+
+        // Link deliverables to the new partnership
+        if (newPartnership?.id && districtId) {
+          await supabase.from('contract_deliverables')
+            .update({ partnership_id: newPartnership.id })
+            .eq('quote_id', id)
+            .is('partnership_id', null)
+        }
       } catch (err) { console.error('Partnership auto-create failed:', err) }
     }
   }
