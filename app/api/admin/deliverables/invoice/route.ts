@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
         headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           from: 'Teachers Deserve It <hello@teachersdeserveit.com>',
-          reply_to: 'Rae@TeachersDeserveIt.com',
+          reply_to: 'Info@TeachersDeserveIt.com',
           to: recipientEmail,
           subject: `Invoice ${existingInvoice.invoice_number} from Teachers Deserve It`,
           html,
@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
         headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           from: 'Teachers Deserve It <hello@teachersdeserveit.com>',
-          reply_to: 'Rae@TeachersDeserveIt.com',
+          reply_to: 'Info@TeachersDeserveIt.com',
           to: recipientEmail,
           subject: `Invoice ${invoiceNumber} from Teachers Deserve It`,
           html,

@@ -83,7 +83,7 @@ function InvoicePDF({ data }: { data: InvoiceData }) {
             <Text style={styles.partyDetail}>c/o Secure Plus Financial</Text>
             <Text style={styles.partyDetail}>4002 Paredes In Rd, Ste 15</Text>
             <Text style={styles.partyDetail}>Brownsville, TX 78526</Text>
-            <Text style={[styles.partyDetail, { marginTop: 4 }]}>Rae@TeachersDeserveIt.com</Text>
+            <Text style={[styles.partyDetail, { marginTop: 4 }]}>Billing: Info@TeachersDeserveIt.com</Text>
           </View>
           <View style={styles.partyBlock}>
             <Text style={styles.partyLabel}>Bill To</Text>
@@ -130,7 +130,7 @@ function InvoicePDF({ data }: { data: InvoiceData }) {
           <Text style={styles.paymentTitle}>Payment Information</Text>
           <Text style={styles.paymentText}>Please make checks payable to Teachers Deserve It, LLC</Text>
           <Text style={styles.paymentText}>Mail to: 4002 Paredes In Rd, Ste 15, Brownsville, TX 78526</Text>
-          <Text style={[styles.paymentText, { marginTop: 6 }]}>Questions? Reply to Rae@TeachersDeserveIt.com</Text>
+          <Text style={[styles.paymentText, { marginTop: 6 }]}>Billing questions? Email Info@TeachersDeserveIt.com</Text>
         </View>
 
         {data.notes ? (
@@ -330,7 +330,7 @@ export async function POST(request: NextRequest) {
   try {
     await getResend().emails.send({
       from: 'Teachers Deserve It <hello@teachersdeserveit.com>',
-      replyTo: 'Rae@TeachersDeserveIt.com',
+      replyTo: 'Info@TeachersDeserveIt.com',
       to: [recipientEmail],
       subject: `Invoice ${invoiceNumber} from Teachers Deserve It`,
       html: `
