@@ -57,8 +57,9 @@ const STAGE_OPTIONS = [
   { id: 'targeting', name: 'Targeting (5%)' },
   { id: 'engaged', name: 'Engaged (20%)' },
   { id: 'qualified', name: 'Qualified (45%)' },
+  { id: 'in_conversation', name: 'In Conversation (55%)' },
   { id: 'likely_yes', name: 'Likely Yes (65%)' },
-  { id: 'proposal_sent', name: 'Quote Sent (80%)' },
+  { id: 'proposal_sent', name: 'Proposal Sent (80%)' },
   { id: 'signed', name: 'Signed (95%)' },
   { id: 'paid', name: 'Paid (100%)' },
   { id: 'lost', name: 'Lost' },
@@ -66,7 +67,7 @@ const STAGE_OPTIONS = [
 
 const STAGE_PROBABILITY: Record<string, number> = {
   unassigned: 0, targeting: 5, engaged: 20, qualified: 45,
-  likely_yes: 65, proposal_sent: 80, signed: 95, paid: 100, lost: 0,
+  in_conversation: 55, likely_yes: 65, proposal_sent: 80, signed: 95, paid: 100, lost: 0,
 }
 
 interface Props {
