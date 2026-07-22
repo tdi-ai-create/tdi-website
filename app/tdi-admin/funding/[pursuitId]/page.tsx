@@ -369,8 +369,15 @@ function ActionCards({ actions, onCardClick, pursuitId, onActionDone }: { action
                   {action.why}
                 </div>
               </div>
+              {/* Verify window buttons */}
+              {action.actionType === 'verify_window' && action.targetId && (
+                <VerifyWindowBtns
+                  opportunityId={action.targetId}
+                  onDone={onActionDone}
+                />
+              )}
               {/* Done button — only for DB action items with a targetId */}
-              {action.targetId && pursuitId && (
+              {action.actionType !== 'verify_window' && action.targetId && pursuitId && (
                 <ActionCardDoneBtn
                   pursuitId={pursuitId}
                   actionId={action.targetId}
@@ -488,6 +495,50 @@ function CollapsibleSection({ title, children, defaultOpen = false, onToggle, co
 }
 
 // ── Toast notification ──
+
+function VerifyWindowBtns({ opportunityId, onDone }: { opportunityId: string; onDone?: () => void }) {
+  const [loading, setLoading] = useState(false)
+  const [done, setDone] = useState('')
+
+  const verify = async (status: string) => {
+    setLoading(true)
+    await fetch('/api/funding/opportunities', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: opportunityId, window_status: status }),
+    })
+    setDone(status)
+    setLoading(false)
+    onDone?.()
+  }
+
+  if (done) return <span style={{ fontSize: 11, color: done === 'open' ? '#065F46' : '#991B1B', fontWeight: 600 }}>{done === 'open' ? 'Marked open' : 'Marked closed'}</span>
+
+  return (
+    <div style={{ display: 'flex', gap: 6, flexShrink: 0, alignSelf: 'flex-start', marginTop: 4 }}>
+      <button
+        onClick={(e) => { e.stopPropagation(); verify('open') }}
+        disabled={loading}
+        style={{
+          fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8,
+          border: 'none', background: '#10B981', color: 'white', cursor: 'pointer',
+        }}
+      >
+        Open
+      </button>
+      <button
+        onClick={(e) => { e.stopPropagation(); verify('closed_missed') }}
+        disabled={loading}
+        style={{
+          fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8,
+          border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer',
+        }}
+      >
+        Closed
+      </button>
+    </div>
+  )
+}
 
 function ActionCardDoneBtn({ pursuitId, actionId, onDone }: { pursuitId: string; actionId: string; onDone?: () => void }) {
   const [loading, setLoading] = useState(false)

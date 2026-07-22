@@ -206,18 +206,19 @@ export function computeNextActions(
     }
   }
 
-  // Funding windows unverified
+  // Funding windows unverified — show each grant individually with verify action
   const unverifiedWindows = opportunities.filter(
     (o: any) => !['awarded', 'denied'].includes(o.status) && (o.window_status || 'unknown') === 'unknown'
   )
-  if (unverifiedWindows.length > 0) {
+  for (const opp of unverifiedWindows) {
     result.push({
-      id: 'verify-windows',
-      label: `${unverifiedWindows.length} funding window${unverifiedWindows.length !== 1 ? 's' : ''} unverified`,
-      why: 'Nothing can proceed — agents won\'t draft and the engine won\'t nudge until a window is confirmed open',
+      id: `verify-window-${opp.id}`,
+      label: `Verify window: ${opp.name}`,
+      why: 'Is this grant currently accepting applications? Mark it open or closed so agents can start drafting.',
       owner: 'bella',
       urgency: 'high',
       actionType: 'verify_window',
+      targetId: opp.id,
       tab: 'opportunities',
     })
   }
