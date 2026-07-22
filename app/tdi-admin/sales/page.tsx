@@ -1008,7 +1008,7 @@ export default function SalesPage() {
       totalPipeline: pipelineOpps.reduce((s, o) => s + (o.value ?? 0), 0),
       activeCount: pipelineOpps.length,
       hotCount: pipelineOpps.filter(o => o.heat === 'hot').length,
-      invoiceCount: opportunities.filter(o => o.needs_invoice && !o.deleted_at).length,
+      invoiceCount: opportunities.filter(o => o.needs_invoice && !o.deleted_at && !o.grantSupport).length,
       callSheetCount: callSheetOpps.length,
       callSheetValue: callSheetOpps.reduce((s, o) => s + (o.value ?? 0), 0),
       tier1Count: pipelineOpps.filter(o => o.tier === 'T1').length,

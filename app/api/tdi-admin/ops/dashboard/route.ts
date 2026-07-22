@@ -71,8 +71,9 @@ export async function GET() {
     );
 
     // Process invoices from sales_opportunities (same source as Operations page)
+    // Exclude grant-funded deals -- those only become invoiceable when a grant is awarded
     const allOpps = oppsRes.data || [];
-    const invoicesOwed = allOpps.filter((o: any) => o.needs_invoice);
+    const invoicesOwed = allOpps.filter((o: any) => o.needs_invoice && !o.grant_support);
     const totalInvoiceAmount = invoicesOwed.reduce((s: number, o: any) => s + (o.invoice_amount || 0), 0);
     const tbdCount = invoicesOwed.filter((o: any) => !o.invoice_amount).length;
 
