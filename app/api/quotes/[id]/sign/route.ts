@@ -118,20 +118,22 @@ export async function POST(
   // 1. Update sales opportunity to "signed"
   const contactEmail = signedByEmail?.trim()
   if (contactEmail) {
-    await supabase.from('sales_opportunities')
-      .update({ stage: 'signed', heat: 'hot', last_activity_at: new Date().toISOString(), updated_at: new Date().toISOString() })
-      .ilike('contact_email', contactEmail)
-      .is('deleted_at', null)
-      .catch(() => {})
+    try {
+      await supabase.from('sales_opportunities')
+        .update({ stage: 'signed', heat: 'hot', last_activity_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+        .ilike('contact_email', contactEmail)
+        .is('deleted_at', null)
+    } catch {}
   }
 
   // 2. Update district status to "active"
   const districtId = (fullQuote as any)?.district_id
   if (districtId) {
-    await supabase.from('districts')
-      .update({ status: 'active' })
-      .eq('id', districtId)
-      .catch(() => {})
+    try {
+      await supabase.from('districts')
+        .update({ status: 'active' })
+        .eq('id', districtId)
+    } catch {}
   }
 
   // 3. Auto-create partnership if one doesn't exist for this contact
@@ -146,25 +148,27 @@ export async function POST(
 
     if (!existingPartnership && orgName) {
       const slug = orgName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-      await supabase.from('partnerships').insert({
-        org_name: orgName,
-        partnership_type: 'school',
-        contact_name: signedByName,
-        contact_email: contactEmail,
-        primary_contact_name: signedByName,
-        primary_contact_email: contactEmail,
-        contract_phase: 'IGNITE',
-        status: 'active',
-        slug: slug,
-        contract_start: new Date().toISOString().split('T')[0],
-        contract_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        staff_enrolled: 0,
-        base_staff_enrolled: 0,
-        observation_days_total: 0, observation_days_used: 0,
-        virtual_sessions_total: 0, virtual_sessions_used: 0,
-        executive_sessions_total: 0, executive_sessions_used: 0,
-        sales_deal_id: null,
-      }).catch(err => console.error('Partnership auto-create failed:', err))
+      try {
+        await supabase.from('partnerships').insert({
+          org_name: orgName,
+          partnership_type: 'school',
+          contact_name: signedByName,
+          contact_email: contactEmail,
+          primary_contact_name: signedByName,
+          primary_contact_email: contactEmail,
+          contract_phase: 'IGNITE',
+          status: 'active',
+          slug: slug,
+          contract_start: new Date().toISOString().split('T')[0],
+          contract_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          staff_enrolled: 0,
+          base_staff_enrolled: 0,
+          observation_days_total: 0, observation_days_used: 0,
+          virtual_sessions_total: 0, virtual_sessions_used: 0,
+          executive_sessions_total: 0, executive_sessions_used: 0,
+          sales_deal_id: null,
+        })
+      } catch (err) { console.error('Partnership auto-create failed:', err) }
     }
   }
 

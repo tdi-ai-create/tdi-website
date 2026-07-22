@@ -1545,7 +1545,7 @@ export default function SalesPage() {
                             await supabase.from('quotes').update({ status: 'sent', sent_at: new Date().toISOString(), expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), updated_at: new Date().toISOString() }).eq('id', q.id)
                             setQuotes(prev => prev.map(qq => qq.id === q.id ? { ...qq, status: 'sent', sent_at: new Date().toISOString() } : qq))
                             showToastMsg(`"${q.title}" marked as sent`, 'success')
-                            fetch('/api/sales/slack-notify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'sent', org: q.contact_organization, title: q.title, amount: q.total_amount, contactName: q.contact_name, quoteNumber: q.quote_number }) }).catch(() => {})
+                            fetch('/api/sales/slack-notify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'sent', org: q.contact_organization, title: q.title, amount: 0, contactName: q.contact_name, quoteNumber: q.quote_number }) }).catch(() => {})
                           }}
                           style={{ fontSize: 12, padding: '6px 12px', borderRadius: 6, border: '1px solid #10B981', background: 'white', color: '#10B981', cursor: 'pointer', fontWeight: 600 }}
                         >
