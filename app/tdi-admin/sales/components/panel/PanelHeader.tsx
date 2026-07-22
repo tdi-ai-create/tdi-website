@@ -68,7 +68,8 @@ export function PanelHeader({ opp, onClose, onPatch }: Props) {
             />
           ) : (
             <h2
-              className="text-sm font-bold text-gray-900 leading-snug cursor-text hover:text-indigo-700"
+              className="font-bold text-gray-900 leading-snug cursor-text hover:text-indigo-700"
+              style={{ fontSize: '15px', lineHeight: '1.3' }}
               onClick={() => setEditingName(true)}
               title="Click to edit"
             >
