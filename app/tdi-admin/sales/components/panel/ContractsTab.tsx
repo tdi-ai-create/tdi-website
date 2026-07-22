@@ -38,6 +38,7 @@ export function ContractsTab({ opp }: Props) {
   const [quotes, setQuotes] = useState<Quote[]>([])
   const [loading, setLoading] = useState(true)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [duplicating, setDuplicating] = useState<string | null>(null)
 
   const contactEmail = (opp as any).contact_email as string | null | undefined
 
@@ -200,6 +201,27 @@ export function ContractsTab({ opp }: Props) {
               >
                 Preview
               </a>
+              <button
+                onClick={async () => {
+                  setDuplicating(q.id)
+                  try {
+                    const res = await fetch('/api/funding/duplicate-quote', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ quoteId: q.id }),
+                    })
+                    const result = await res.json()
+                    if (result.success && contactEmail) {
+                      await loadQuotes(contactEmail)
+                    }
+                  } catch {}
+                  setDuplicating(null)
+                }}
+                disabled={duplicating === q.id}
+                className="text-xs px-2.5 py-1.5 rounded-md border border-gray-200 text-amber-600 hover:bg-amber-50 transition-colors font-medium"
+              >
+                {duplicating === q.id ? 'Duplicating...' : 'Duplicate Contract'}
+              </button>
             </div>
           </div>
         )
