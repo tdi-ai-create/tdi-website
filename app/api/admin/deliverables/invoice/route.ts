@@ -14,8 +14,21 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
  */
 export async function POST(request: NextRequest) {
   const email = request.headers.get('x-user-email');
-  if (!email || !email.toLowerCase().endsWith('@teachersdeserveit.com')) {
+  if (!email) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+  }
+  // Verify team member access
+  if (!email.toLowerCase().endsWith('@teachersdeserveit.com')) {
+    const supabase = getServiceSupabase();
+    const { data: member } = await supabase
+      .from('tdi_team_members')
+      .select('id')
+      .ilike('email', email.toLowerCase())
+      .eq('is_active', true)
+      .limit(1);
+    if (!member || member.length === 0) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
   }
 
   const { deliverableId, partnershipId, sendEmail = true, resend = false, resendTo } = await request.json();
@@ -240,8 +253,10 @@ function buildInvoiceHtml(invoiceNumber: string, serviceLabel: string, deliveryD
           <p style="margin:0 0 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#0D9488;">Payment Information</p>
           <p style="margin:0;font-size:14px;color:#134E4A;line-height:1.6;">
             Please make checks payable to <strong>Teachers Deserve It, LLC</strong> and mail to:<br/>
-            Teachers Deserve It<br/>
-            Rae Hughart<br/>
+            Teachers Deserve It, LLC<br/>
+            c/o Secure Plus Financial<br/>
+            3s111 Rockwell St PO 30<br/>
+            Warrenville, IL 60555<br/>
             Please reply to this email with any questions about this invoice.
           </p>
         </div>

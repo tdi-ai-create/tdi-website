@@ -1,14 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
 
-function isTDIAdmin(email: string) {
-  return email.toLowerCase().endsWith('@teachersdeserveit.com')
+async function isTDIAdmin(email: string) {
+  // Check if email belongs to a team member
+  if (email.toLowerCase().endsWith('@teachersdeserveit.com')) return true
+  const supabase = getServiceSupabase()
+  const { data } = await supabase
+    .from('tdi_team_members')
+    .select('id')
+    .ilike('email', email.toLowerCase())
+    .eq('is_active', true)
+    .limit(1)
+  return data && data.length > 0
 }
 
 // GET: List deliverables with filtering
 export async function GET(request: NextRequest) {
   const email = request.headers.get('x-user-email')
-  if (!email || !isTDIAdmin(email)) {
+  if (!email || !(await isTDIAdmin(email))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }
 
@@ -55,7 +64,7 @@ export async function GET(request: NextRequest) {
 // PATCH: Update deliverable status (manual overrides)
 export async function PATCH(request: NextRequest) {
   const email = request.headers.get('x-user-email')
-  if (!email || !isTDIAdmin(email)) {
+  if (!email || !(await isTDIAdmin(email))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }
 
