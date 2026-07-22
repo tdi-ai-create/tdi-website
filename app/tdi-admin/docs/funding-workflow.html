@@ -7,227 +7,164 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; line-height: 1.6; padding: 40px 48px; max-width: 900px; }
   h1 { font-family: 'Source Serif 4', Georgia, serif; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
-  h2 { font-family: 'Source Serif 4', Georgia, serif; font-size: 20px; font-weight: 700; margin: 32px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
+  h2 { font-family: 'Source Serif 4', Georgia, serif; font-size: 20px; font-weight: 700; margin: 36px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
   h3 { font-size: 15px; font-weight: 700; margin: 20px 0 8px; color: #2B3A67; }
   p { font-size: 14px; margin-bottom: 12px; color: #374151; }
   .subtitle { font-size: 14px; color: #6B7280; margin-bottom: 24px; }
   .updated { font-size: 11px; color: #9CA3AF; margin-bottom: 32px; }
   ul, ol { font-size: 14px; margin: 8px 0 16px 24px; color: #374151; }
   li { margin-bottom: 6px; }
-  .flow-box { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 10px; padding: 16px 20px; margin: 16px 0; }
-  .flow-arrow { text-align: center; font-size: 18px; color: #9CA3AF; margin: 8px 0; }
   .role-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.03em; margin-right: 6px; }
   .role-bella { background: #FCE7F3; color: #9D174D; }
   .role-rae { background: #DBEAFE; color: #1E40AF; }
   .role-agent { background: #EDE9FE; color: #7C3AED; }
   .role-school { background: #FEF3C7; color: #854D0E; }
-  .role-system { background: #F3F4F6; color: #6B7280; }
-  .role-qa { background: #D1FAE5; color: #065F46; }
   table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
-  th { text-align: left; padding: 8px 12px; background: #F9FAFB; border-bottom: 2px solid #E5E7EB; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #6B7280; }
-  td { padding: 8px 12px; border-bottom: 1px solid #F3F4F6; }
-  .highlight { background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 12px 16px; margin: 12px 0; }
+  th { text-align: left; padding: 10px 12px; background: #F9FAFB; border-bottom: 2px solid #E5E7EB; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #6B7280; }
+  td { padding: 10px 12px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+  .flow-box { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 10px; padding: 16px 20px; margin: 16px 0; }
+  .highlight { background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 14px 18px; margin: 16px 0; }
   .highlight strong { color: #854D0E; }
-  .safety { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 12px 16px; margin: 12px 0; }
+  .safety { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 14px 18px; margin: 16px 0; }
   .safety strong { color: #991B1B; }
-  .checklist { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 12px 16px; margin: 12px 0; }
-  .checklist strong { color: #065F46; }
-  code { font-family: 'SF Mono', monospace; font-size: 12px; background: #F3F4F6; padding: 1px 6px; border-radius: 4px; }
+  .success { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 14px 18px; margin: 16px 0; }
+  .success strong { color: #065F46; }
   hr { border: none; border-top: 1px solid #E5E7EB; margin: 32px 0; }
 </style>
 </head>
 <body>
 
 <h1>Funding System Workflow</h1>
-<p class="subtitle">How TDI manages grant pursuits from school enrollment through award allocation.</p>
-<p class="updated">Last updated: July 14, 2026 | Created by Rae Hughart</p>
+<p class="subtitle">How TDI manages grant pursuits from signed contract through award.</p>
+<p class="updated">Last updated: July 22, 2026</p>
 
 <hr>
 
-<h2>The Big Picture</h2>
+<h2>How It Works</h2>
 
 <div class="flow-box">
-  <strong>School Enrolled</strong> &rarr; Research Grants &rarr; Write Narratives &rarr; QA + Approve &rarr; Deliver to School &rarr; School Submits &rarr; Award Decision &rarr; Allocate Funds
+  <strong>Signed Grant Contract</strong> &rarr; Verify Windows &rarr; Request Drafts &rarr; Review Narratives &rarr; Deliver to School &rarr; School Submits &rarr; Wait for Decision &rarr; Award
 </div>
 
-<p>The funding system coordinates three groups: <span class="role-tag role-bella">Bella</span> owns all school contact and manages the pipeline daily -- calls, emails, follow-ups, nudges, draft reviews, and deadline tracking. <span class="role-tag role-rae">Rae</span> handles strategy approvals, system configuration, and escalations Bella can't resolve. <span class="role-tag role-agent">Agents</span> (Vanessa, Amara) research grant sources and draft narratives. <span class="role-tag role-school">Schools</span> provide information and submit applications.</p>
+<p><span class="role-tag role-bella">Bella</span> owns all school contact and manages the pipeline daily. <span class="role-tag role-rae">Rae</span> handles strategy approvals, system configuration, and escalations Bella can't resolve. <span class="role-tag role-agent">Agents</span> (Vanessa, Amara) research grant sources and draft narratives. <span class="role-tag role-school">Schools</span> provide information and submit applications.</p>
 
 <hr>
 
-<h2>The 9-Phase Pipeline</h2>
+<h2>The Landing Page</h2>
 
-<table>
-  <tr><th>Phase</th><th>What Happens</th><th>Who Owns It</th></tr>
-  <tr><td><strong>Intake</strong></td><td>School enrolled. Gather contacts, sign contracts, verify employment.</td><td><span class="role-tag role-bella">Bella</span></td></tr>
-  <tr><td><strong>Research</strong></td><td>Find matching grant opportunities for this school.</td><td><span class="role-tag role-agent">Amara</span></td></tr>
-  <tr><td><strong>Strategy</strong></td><td>Map funding paths, set A/B/C/D priorities, build timeline.</td><td><span class="role-tag role-bella">Bella</span></td></tr>
-  <tr><td><strong>Writing</strong></td><td>Draft grant narratives and application materials.</td><td><span class="role-tag role-agent">Vanessa</span></td></tr>
-  <tr><td><strong>Review</strong></td><td>QA check + Bella approval on all narratives before delivery.</td><td><span class="role-tag role-qa">Julie</span> <span class="role-tag role-bella">Bella</span></td></tr>
-  <tr><td><strong>Delivered</strong></td><td>Approved materials sent to school contact for submission.</td><td><span class="role-tag role-bella">Bella</span></td></tr>
-  <tr><td><strong>Submitted</strong></td><td>Application submitted by school. Waiting on funder decision.</td><td><span class="role-tag role-school">School</span></td></tr>
-  <tr><td><strong>Awaiting</strong></td><td>Funder reviewing. Automated follow-up monitors for decision.</td><td><span class="role-tag role-system">Auto</span></td></tr>
-  <tr><td><strong>Awarded</strong></td><td>Grant awarded. Allocate funds to contract line items.</td><td><span class="role-tag role-bella">Bella</span> <span class="role-tag role-rae">Rae</span></td></tr>
-</table>
-
-<p>Each pursuit card in the portal shows a phase chain -- colored pills that track progress. Hover any pill for a description of what that phase means.</p>
+<p>Open <strong>Admin Portal &gt; Funding</strong> to see the school-by-school dashboard. Each school shows:</p>
+<ul>
+  <li>School name, contact, email, pipeline value</li>
+  <li><strong>Next Step banner</strong> telling you exactly what to do</li>
+  <li>All grants with status badges (Draft ready, Window open, Agent drafting, Not started)</li>
+  <li>Action buttons: Draft Email, Review Drafts, Request Drafts</li>
+  <li>Google Doc links on drafted narratives ("Open Doc")</li>
+</ul>
 
 <hr>
 
-<h2>Bella's Daily Workflow</h2>
+<h2>Step-by-Step Process</h2>
 
-<h3>Step 1: Open the Work Queue</h3>
-<p>Go to <strong>Funding &gt; My Queue</strong>. This is your command center. It shows four buckets:</p>
+<h3>1. Send Intro Email</h3>
+<p>Each new school needs an introduction from Bella. Click <strong>Draft Email</strong> on the landing page. The system pre-writes the email with the contact's name and school. Edit if needed, then send. The system logs it and removes the task.</p>
 
-<table>
-  <tr><th>Bucket</th><th>What's in it</th></tr>
-  <tr><td><strong>Needs Bella</strong></td><td>Items waiting for your action -- start here every day</td></tr>
-  <tr><td><strong>Needs Rae</strong></td><td>Strategy approvals and escalations Bella couldn't resolve</td></tr>
-  <tr><td><strong>With Agents</strong></td><td>Work the AI agents are doing (drafting, researching)</td></tr>
-  <tr><td><strong>Waiting on School</strong></td><td>Items where the school needs to respond</td></tr>
-</table>
-
-<p>Items are sorted by urgency. A red dot means critical (overdue or deadline this week). Blue is normal. Gray is low priority.</p>
-
-<h3>Step 2: Work the Queue Top-to-Bottom</h3>
-<p>Each item has an action button. Here's what they do:</p>
-
-<table>
-  <tr><th>Button</th><th>What It Does</th></tr>
-  <tr><td><strong>Verify employed</strong></td><td>Confirms the school contact still works there (required before any outreach)</td></tr>
-  <tr><td><strong>Request draft</strong></td><td>Assigns a narrative to Vanessa or Amara to write</td></tr>
-  <tr><td><strong>Send to QA</strong></td><td>Sends a completed draft to Julie for quality review</td></tr>
-  <tr><td><strong>Approve</strong></td><td>Marks a reviewed draft as ready to deliver to the school</td></tr>
-  <tr><td><strong>Done</strong></td><td>Marks an action item complete</td></tr>
-  <tr><td><strong>Send nudge</strong></td><td>Sends a follow-up email to the school contact</td></tr>
-  <tr><td><strong>Open pursuit</strong></td><td>Opens the full detail page for that school</td></tr>
-</table>
+<h3>2. Verify Grant Windows</h3>
+<p>Each school starts with 6 standard grants. Before agents can draft, you need to verify which windows are open. On the school's detail page, each unverified grant shows as a card:</p>
+<p><strong>"Verify window: Title II-A"</strong> with <strong>[Open]</strong> and <strong>[Closed]</strong> buttons. Click one. That's it.</p>
+<ul>
+  <li><strong>Walmart Spark Good</strong> - Annual cycle, typically Aug-Sep. Mark as Open.</li>
+  <li><strong>NEA Learning & Leadership</strong> - Rolling deadlines, always open. Mark as Open.</li>
+  <li><strong>Title II-A, IDEA, Title I, Community Schools</strong> - Check with the school's district office. These are federal/state formula grants that the district handles.</li>
+</ul>
 
 <div class="highlight">
-  <strong>Tip:</strong> After every action, a green confirmation message appears in the bottom-right corner so you know it worked.
+  <strong>If you don't know whether a window is open:</strong> Email the school contact and ask. Use the "Request missing info" button on the school's briefing section to generate the email.
 </div>
 
-<h3>Step 3: Check the Dashboard Alerts</h3>
-<p>The four cards at the top of the Funding page show at-a-glance priorities:</p>
-<ul>
-  <li><strong>Waiting on Client</strong> -- how many opportunities need the school to act</li>
-  <li><strong>Deadlines This Week</strong> -- applications closing in the next 7 days</li>
-  <li><strong>Overdue Actions</strong> -- action items past their due date</li>
-  <li><strong>Awarded YTD</strong> -- total grant dollars awarded this year</li>
-</ul>
-<p>Cards with a red or orange left border need attention. Green means everything's on track.</p>
-
-<hr>
-
-<h2>How Agent Drafting Works</h2>
-
-<p>When Bella clicks <strong>Request draft</strong> on an opportunity:</p>
-
+<h3>3. Request Narrative Drafts</h3>
+<p>Once a window is verified open, click <strong>Request Draft</strong> on the landing page. Choose Vanessa or Amara. The agent will:</p>
 <ol>
-  <li>The portal sets the opportunity status to "requested" and assigns it to Vanessa (or Amara)</li>
-  <li>On her next check-in, Vanessa picks up the assignment automatically</li>
-  <li>Vanessa drafts the narrative using TDI's grant knowledge base for that specific funder</li>
-  <li>Vanessa creates a Google Doc in the "TDI Grant Narratives" Drive folder</li>
-  <li>Vanessa pushes the Doc link + plain text back to the portal</li>
-  <li>The draft appears in the opportunity's narrative panel for review</li>
-  <li>Bella reviews, sends to QA (Julie), then approves</li>
+  <li>Research the school's profile and the grant requirements</li>
+  <li>Write an A+ narrative with specific budget tables, measurable outcomes, and emotional hooks</li>
+  <li>Create a Google Doc in the "TDI Grant Narratives" Drive folder</li>
+  <li>Push the Doc link back to the portal</li>
 </ol>
+<p>The grant shows "Agent drafting" while in progress.</p>
+
+<h3>4. Review and Approve Narratives</h3>
+<p>When a draft is ready, the landing page shows <strong>"Draft ready"</strong> with an <strong>"Open Doc"</strong> link. Click it to read the Google Doc. If it looks good, approve it in the portal. If it needs changes, edit directly in the Google Doc.</p>
 
 <div class="safety">
-  <strong>Safety rules:</strong> Agents never mark a narrative as "ready" -- that is always Bella's approval. Agents never send anything directly to a school. All client-facing sends are human-gated.
+  <strong>Quality standard:</strong> Every narrative must have a specific budget table, measurable outcomes, an emotional opening, and TDI positioned as partner (not applicant). If a draft doesn't meet this bar, send it back. See the Grant Writing Standards skill for details.
 </div>
 
-<hr>
+<h3>5. Deliver to School Contact</h3>
+<p>After approving, email the narrative to the school contact with submission instructions. Use the Draft Email button to generate the email with the Google Doc link attached.</p>
 
-<h2>The Alignment Gate</h2>
+<h3>6. School Submits</h3>
+<p>The school contact submits the application. TDI cannot submit on behalf of schools. Mark the opportunity as "Submitted" in the portal.</p>
 
-<p>Before any outreach can happen for a pursuit, four checks must pass:</p>
+<h3>7. Wait for Decision</h3>
+<p>The follow-up engine automatically monitors deadlines and sends reminders. Track the decision date on the opportunity.</p>
 
-<table>
-  <tr><th>Check</th><th>What It Means</th></tr>
-  <tr><td><strong>Submitter named</strong></td><td>A school contact is designated to submit applications</td></tr>
-  <tr><td><strong>Backup named</strong></td><td>A second contact in case the submitter is unavailable</td></tr>
-  <tr><td><strong>Admin sponsor named</strong></td><td>A school admin who approved participation</td></tr>
-  <tr><td><strong>Employment verified</strong></td><td>Confirmed the submitter still works at the school</td></tr>
-</table>
-
-<p>The gate shows <span style="color: #065F46; font-weight: 700;">OPEN</span> (green) or <span style="color: #DC2626; font-weight: 700;">BLOCKED</span> (red) on the pursuit detail page. Agents cannot draft for a pursuit with a blocked gate.</p>
+<h3>8. Award Allocation</h3>
+<p>If awarded, update the opportunity status and allocate funds to contract line items.</p>
 
 <hr>
 
-<h2>The Follow-Up Engine</h2>
+<h2>Key Features</h2>
 
-<p>An automated system monitors all pending action items and sends reminders on a schedule:</p>
+<h3>NCES Auto-fill</h3>
+<p>On any school's detail page, expand School Profile, click Edit, then click <strong>"Auto-fill from NCES"</strong>. The system searches the national school database and fills in enrollment, Title I status, FRL%, address, and NCES ID automatically.</p>
 
+<h3>Draft Email Modal</h3>
+<p>Every email action opens a pre-written email with editable Subject and Body fields. Bella can customize before sending. Emails log automatically.</p>
+
+<h3>Notes on Action Items</h3>
+<p>Click <strong>"+ Add notes"</strong> on any action item to log activity. Nudge sends auto-log with timestamps. Notes persist and show a green "Notes" button when content exists.</p>
+
+<h3>Follow-up Engine</h3>
+<p>Automated reminders and nudges run hourly. Three safety gates:</p>
 <ul>
-  <li><strong>3-5 business days before due:</strong> Sends a reminder to the assigned person</li>
-  <li><strong>After due date:</strong> Sends daily escalating nudges</li>
-  <li><strong>Escalation ladder:</strong> Contact &rarr; Backup &rarr; Admin Sponsor &rarr; Rae</li>
+  <li><strong>Window gate:</strong> Only sends for open-window opportunities</li>
+  <li><strong>Allowlist gate:</strong> Only sends to approved email addresses</li>
+  <li><strong>Prerequisite gate:</strong> Skips items whose previous steps aren't done</li>
 </ul>
 
-<h3>Three Safety Gates</h3>
-<p>Every email must pass all three gates before it sends:</p>
-
-<table>
-  <tr><th>Gate</th><th>What It Checks</th><th>Current Status</th></tr>
-  <tr><td><strong>DRY_RUN gate</strong></td><td>Master switch. When ON, emails are logged but not actually sent.</td><td><span style="color: #DC2626; font-weight: 600;">ON (no sends)</span></td></tr>
-  <tr><td><strong>Window gate</strong></td><td>Only sends for opportunities where the grant funding window is open.</td><td><span style="color: #065F46; font-weight: 600;">Active</span></td></tr>
-  <tr><td><strong>Allowlist gate</strong></td><td>Only sends to approved email addresses.</td><td><span style="color: #DC2626; font-weight: 600;">TDI staff only</span></td></tr>
-</table>
-
-<h3>Email Tones</h3>
-<ul>
-  <li><strong>Client emails</strong> (to schools): Warm, from Bella, encouraging, with clear next steps</li>
-  <li><strong>Internal emails</strong> (to Rae/team): Crisp, data-focused, action-oriented</li>
-</ul>
+<h3>Google Docs Integration</h3>
+<p>Every narrative produces a Google Doc in the "TDI Grant Narratives" Drive folder. Docs are shareable, editable, and client-ready.</p>
 
 <hr>
 
-<h2>Two-Contract Model</h2>
-
-<p>Each pursuit uses two contracts:</p>
-
-<div class="flow-box">
-  <p><strong>Contract 1 -- Minimum (Starting Point Agreement)</strong><br>The guaranteed scope, paid from the school's own budget. This is what the school gets regardless of grant outcomes.</p>
-</div>
-
-<div class="flow-box">
-  <p><strong>Contract 2 -- Grant Funded (Master Service Agreement)</strong><br>The expanded scope, contingent on grant awards. Each line item (PD sessions, memberships, books, campus visits) has a price that agents use when writing grant narratives.</p>
-</div>
-
-<p>The <strong>Remaining Gap</strong> metric on pursuit cards shows how much of Contract 2 still needs funding. The progress bar fills as grants are awarded.</p>
-
-<hr>
-
-<h2>Key Terminology</h2>
+<h2>Who Does What</h2>
 
 <table>
-  <tr><th>Term</th><th>Meaning</th></tr>
-  <tr><td><strong>Pursuit</strong></td><td>A school's entire funding journey (contains multiple opportunities)</td></tr>
-  <tr><td><strong>Opportunity</strong></td><td>A specific grant source being pursued (e.g., "Walmart Spark Good")</td></tr>
-  <tr><td><strong>Action Item</strong></td><td>A task with a due date, owner, and status</td></tr>
-  <tr><td><strong>Narrative</strong></td><td>The grant application text written by agents</td></tr>
-  <tr><td><strong>Plan Category</strong></td><td>A/B/C/D priority rating for each opportunity (A = fast local, D = long-shot)</td></tr>
-  <tr><td><strong>Window</strong></td><td>The application period for a grant (open/close dates)</td></tr>
-  <tr><td><strong>Nudge</strong></td><td>An automated follow-up email sent to a school contact</td></tr>
-  <tr><td><strong>Gate</strong></td><td>The four-check safety requirement before outreach can begin</td></tr>
+  <tr><th>Action</th><th>Who</th></tr>
+  <tr><td>Send intro emails to school contacts</td><td><span class="role-tag role-bella">Bella</span></td></tr>
+  <tr><td>Verify grant windows (Open/Closed)</td><td><span class="role-tag role-bella">Bella</span></td></tr>
+  <tr><td>Request narrative drafts</td><td><span class="role-tag role-bella">Bella</span></td></tr>
+  <tr><td>Draft grant narratives</td><td><span class="role-tag role-agent">Agents</span></td></tr>
+  <tr><td>Review and approve narratives</td><td><span class="role-tag role-bella">Bella</span></td></tr>
+  <tr><td>Send narratives to school contacts</td><td><span class="role-tag role-bella">Bella</span></td></tr>
+  <tr><td>Submit grant applications</td><td><span class="role-tag role-school">School</span></td></tr>
+  <tr><td>Review funding strategy</td><td><span class="role-tag role-rae">Rae</span></td></tr>
+  <tr><td>Allocate awarded funds</td><td><span class="role-tag role-rae">Rae</span></td></tr>
+  <tr><td>System configuration (allowlist, engine)</td><td><span class="role-tag role-rae">Rae</span></td></tr>
 </table>
 
 <hr>
 
-<h2>Go-Live Checklist</h2>
+<h2>Where Things Live</h2>
 
-<div class="checklist">
-  <strong>Before taking the system live with real schools:</strong>
-  <ul style="margin-top: 8px;">
-    <li>Flip DRY_RUN to false in the follow-up engine</li>
-    <li>Add client email addresses to the send allowlist</li>
-    <li>Verify the agent loop works end-to-end (find_work &rarr; draft &rarr; Google Doc &rarr; push back)</li>
-    <li>Bella reviews and approves the email templates</li>
-    <li>Test a nudge send to a TDI staff address</li>
-    <li>Confirm the Alignment Gate blocks correctly when incomplete</li>
-    <li>Review the escalation ladder contacts for each pursuit</li>
-  </ul>
-</div>
+<table>
+  <tr><th>What</th><th>Where</th></tr>
+  <tr><td>School-by-school dashboard</td><td>Admin Portal &gt; Funding</td></tr>
+  <tr><td>Work Queue (action items)</td><td>Funding &gt; Work Queue button</td></tr>
+  <tr><td>School detail page</td><td>Click any school name</td></tr>
+  <tr><td>Grant narratives (Google Docs)</td><td>Google Drive &gt; TDI Grant Narratives</td></tr>
+  <tr><td>This documentation</td><td>Admin Portal &gt; Team Docs &gt; Funding System</td></tr>
+  <tr><td>Grant writing quality standards</td><td>Paperclip Skills &gt; grant-writing-standards</td></tr>
+</table>
 
 </body>
 </html>
