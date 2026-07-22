@@ -57,7 +57,7 @@ import {
  * VideoPlayer -- polls Cloudflare Stream until video is ready, then shows iframe.
  * Shows a friendly "processing" message instead of a 404 iframe.
  */
-function VideoPlayer({ videoId, cfAccountId: cfSubdomain }: { videoId: string; cfAccountId: string }) {
+function VideoPlayer({ videoId, cfAccountId: cfSubdomain, onRemove }: { videoId: string; cfAccountId: string; onRemove?: () => void }) {
   const [ready, setReady] = useState(false);
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState(false);
@@ -113,13 +113,22 @@ function VideoPlayer({ videoId, cfAccountId: cfSubdomain }: { videoId: string; c
   }
 
   return (
-    <div className="mb-3 rounded-lg overflow-hidden border border-gray-200">
+    <div className="mb-3 rounded-lg overflow-hidden border border-gray-200 relative group">
       <iframe
         src={`https://${cfSubdomain}.cloudflarestream.com/${videoId}/iframe`}
         style={{ width: '100%', aspectRatio: '16/9', border: 'none' }}
         allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
         allowFullScreen
       />
+      {onRemove && (
+        <button
+          onClick={onRemove}
+          className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+          title="Remove video from this lesson"
+        >
+          x
+        </button>
+      )}
     </div>
   );
 }
@@ -420,7 +429,11 @@ function VideoUploadSection({
         <label className="block text-sm font-medium text-gray-700 mb-1">Video</label>
 
         {/* Show player if video exists -- check if ready before showing iframe */}
-        {videoId && <VideoPlayer videoId={videoId} cfAccountId={cfCustomerSubdomain} />}
+        {videoId && <VideoPlayer videoId={videoId} cfAccountId={cfCustomerSubdomain} onRemove={() => {
+          if (confirm('Remove this video from the lesson? The video file will remain on Cloudflare but will be unlinked from this lesson.')) {
+            onUpdate({ video_id: '' })
+          }
+        }} />}
 
         {/* Upload area */}
         {!uploading && uploadStatus !== 'processing' && (
