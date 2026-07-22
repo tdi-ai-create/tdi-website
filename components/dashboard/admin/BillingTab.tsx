@@ -96,7 +96,9 @@ export default function BillingTab({
     poNumber: string;
     recipientEmail: string;
     resend: boolean;
+    items?: { id: string; label: string; amount: number }[];
   } | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const fetchDeliverables = useCallback(async () => {
     try {
@@ -145,9 +147,86 @@ export default function BillingTab({
     });
   }
 
-  // Send invoice with PDF
+  // Toggle selection for multi-select invoicing
+  function toggleSelect(id: string) {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  // Check if a deliverable is selectable (not already invoiced or paid)
+  function isSelectable(d: Deliverable) {
+    return d.delivery_status !== 'invoiced' && d.delivery_status !== 'paid' && !d.is_complimentary;
+  }
+
+  // Open multi-select invoice preview
+  function openMultiInvoicePreview() {
+    const selected = deliverables.filter(d => selectedIds.has(d.id));
+    if (selected.length === 0) return;
+    const items = selected.map(d => ({ id: d.id, label: d.label, amount: Number(d.total_amount || 0) }));
+    const totalAmount = items.reduce((s, i) => s + i.amount, 0);
+    setInvoicePreview({
+      deliverableId: items[0].id,
+      label: items.length === 1 ? items[0].label : `${items.length} services`,
+      amount: totalAmount,
+      notes: '',
+      poNumber: '',
+      recipientEmail: partnership.contact_email || '',
+      resend: false,
+      items,
+    });
+  }
+
+  // Send invoice with PDF (handles single or multi-item)
   async function sendInvoice() {
     if (!invoicePreview) return;
+    const items = invoicePreview.items;
+
+    // Multi-item: send each deliverable as its own invoice
+    if (items && items.length > 1) {
+      setInvoicingId('multi');
+      let successCount = 0;
+      let lastInvoiceNumber = '';
+      try {
+        for (const item of items) {
+          const res = await fetch('/api/admin/deliverables/send-invoice', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-user-email': userEmail },
+            body: JSON.stringify({
+              deliverableId: item.id,
+              partnershipId,
+              notes: invoicePreview.notes || null,
+              poNumber: invoicePreview.poNumber || null,
+              recipientEmail: invoicePreview.recipientEmail || null,
+              resend: false,
+            }),
+          });
+          const data = await res.json();
+          if (data.success) {
+            successCount++;
+            lastInvoiceNumber = data.invoice.invoice_number;
+          }
+        }
+        if (successCount > 0) {
+          showToast(`${successCount} invoice${successCount > 1 ? 's' : ''} sent to ${invoicePreview.recipientEmail}`);
+          setInvoicePreview(null);
+          setSelectedIds(new Set());
+          fetchDeliverables();
+        } else {
+          showToast('Failed to send invoices');
+        }
+      } catch {
+        showToast('Failed to send invoices');
+      } finally {
+        setInvoicingId(null);
+      }
+      return;
+    }
+
+    // Single item
     setInvoicingId(invoicePreview.deliverableId);
     try {
       const res = await fetch('/api/admin/deliverables/send-invoice', {
@@ -166,6 +245,7 @@ export default function BillingTab({
       if (data.success) {
         showToast(`Invoice ${data.invoice.invoice_number} sent to ${data.invoice.sent_to} with PDF`);
         setInvoicePreview(null);
+        setSelectedIds(new Set());
         fetchDeliverables();
       } else {
         showToast(data.error || 'Failed to send invoice');
@@ -301,13 +381,38 @@ export default function BillingTab({
             </div>
 
             <div style={{ padding: '20px 24px' }}>
-              {/* Service summary */}
-              <div style={{ background: '#F8FAFC', borderRadius: 10, padding: '14px 16px', marginBottom: 16 }}>
-                <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e2749' }}>{invoicePreview.label}</p>
-                <p style={{ margin: '4px 0 0', fontSize: 20, fontWeight: 700, color: '#1e2749' }}>
-                  ${invoicePreview.amount.toLocaleString()}
-                </p>
-              </div>
+              {/* Service summary - multi-item or single */}
+              {invoicePreview.items && invoicePreview.items.length > 1 ? (
+                <div style={{ background: '#F8FAFC', borderRadius: 10, padding: '14px 16px', marginBottom: 16 }}>
+                  <p style={{ margin: '0 0 8px', fontSize: 12, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    {invoicePreview.items.length} Line Items
+                  </p>
+                  {invoicePreview.items.map((item, idx) => (
+                    <div key={item.id} style={{
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      padding: '6px 0',
+                      borderTop: idx > 0 ? '1px solid #E5E7EB' : 'none',
+                    }}>
+                      <span style={{ fontSize: 13, color: '#374151' }}>{item.label}</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: '#1e2749' }}>${item.amount.toLocaleString()}</span>
+                    </div>
+                  ))}
+                  <div style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    padding: '10px 0 0', marginTop: 8, borderTop: '2px solid #1e2749',
+                  }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#1e2749' }}>Total</span>
+                    <span style={{ fontSize: 20, fontWeight: 700, color: '#1e2749' }}>${invoicePreview.amount.toLocaleString()}</span>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ background: '#F8FAFC', borderRadius: 10, padding: '14px 16px', marginBottom: 16 }}>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e2749' }}>{invoicePreview.label}</p>
+                  <p style={{ margin: '4px 0 0', fontSize: 20, fontWeight: 700, color: '#1e2749' }}>
+                    ${invoicePreview.amount.toLocaleString()}
+                  </p>
+                </div>
+              )}
 
               {/* Editable fields */}
               <div style={{ marginBottom: 14 }}>
@@ -368,16 +473,22 @@ export default function BillingTab({
               </button>
               <button
                 onClick={sendInvoice}
-                disabled={invoicingId === invoicePreview.deliverableId || !invoicePreview.recipientEmail}
+                disabled={!!(invoicingId) || !invoicePreview.recipientEmail}
                 style={{
                   padding: '8px 20px', borderRadius: 8, border: 'none',
-                  background: invoicingId === invoicePreview.deliverableId ? '#94A3B8' : '#2563EB',
+                  background: invoicingId ? '#94A3B8' : '#2563EB',
                   color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer',
                   display: 'flex', alignItems: 'center', gap: 6,
                 }}
               >
                 <Send size={12} />
-                {invoicingId === invoicePreview.deliverableId ? 'Sending...' : (invoicePreview.resend ? 'Resend with PDF' : 'Send Invoice with PDF')}
+                {invoicingId
+                  ? 'Sending...'
+                  : invoicePreview.items && invoicePreview.items.length > 1
+                    ? `Send ${invoicePreview.items.length} Invoices with PDF`
+                    : invoicePreview.resend
+                      ? 'Resend with PDF'
+                      : 'Send Invoice with PDF'}
               </button>
             </div>
           </div>
@@ -407,7 +518,7 @@ export default function BillingTab({
       )}
 
       {/* Service deliverables */}
-      <div className="bg-white rounded-xl border border-gray-100 p-6">
+      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ position: 'relative' }}>
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-lg font-bold text-gray-900">Service Deliverables</h2>
@@ -423,6 +534,50 @@ export default function BillingTab({
             {renderGroup(grantItems, 'Grant Funded', '#8B5CF6')}
           </>
         )}
+
+        {/* Sticky bottom bar for multi-select invoicing */}
+        {selectedIds.size > 0 && (
+          <div style={{
+            position: 'sticky', bottom: 0, background: '#1B2A4A', color: 'white',
+            padding: '12px 20px', borderRadius: '8px 8px 0 0',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            boxShadow: '0 -4px 12px rgba(0,0,0,0.1)',
+            marginLeft: -24, marginRight: -24, marginBottom: -24,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 13, fontWeight: 600 }}>
+                {selectedIds.size} item{selectedIds.size > 1 ? 's' : ''} selected
+              </span>
+              <span style={{ fontSize: 13, opacity: 0.6 }}>|</span>
+              <span style={{ fontSize: 13, fontWeight: 700 }}>
+                ${deliverables
+                  .filter(d => selectedIds.has(d.id))
+                  .reduce((s, d) => s + Number(d.total_amount || 0), 0)
+                  .toLocaleString()}
+              </span>
+              <button
+                onClick={() => setSelectedIds(new Set())}
+                style={{
+                  background: 'rgba(255,255,255,0.15)', border: 'none', color: 'white',
+                  fontSize: 11, padding: '2px 8px', borderRadius: 4, cursor: 'pointer', marginLeft: 4,
+                }}
+              >
+                Clear
+              </button>
+            </div>
+            <button
+              onClick={openMultiInvoicePreview}
+              style={{
+                background: '#C9A84C', color: '#1B2A4A', border: 'none',
+                padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 700,
+                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+              }}
+            >
+              <Send size={12} />
+              Create Invoice
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
@@ -436,6 +591,44 @@ export default function BillingTab({
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
+            {(() => {
+              const selectableInGroup = items.filter(isSelectable);
+              if (selectableInGroup.length === 0) return null;
+              const allSelected = selectableInGroup.every(d => selectedIds.has(d.id));
+              const someSelected = selectableInGroup.some(d => selectedIds.has(d.id));
+              return (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedIds(prev => {
+                      const next = new Set(prev);
+                      if (allSelected) {
+                        selectableInGroup.forEach(d => next.delete(d.id));
+                      } else {
+                        selectableInGroup.forEach(d => next.add(d.id));
+                      }
+                      return next;
+                    });
+                  }}
+                  style={{
+                    width: 16, height: 16, borderRadius: 3, border: `2px solid ${allSelected || someSelected ? '#2A9D8F' : '#D1D5DB'}`,
+                    background: allSelected ? '#2A9D8F' : someSelected ? '#D5F0ED' : 'white',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', flexShrink: 0, padding: 0,
+                  }}
+                  title="Select all in group"
+                >
+                  {allSelected && (
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                      <path d="M2 5L4.5 7.5L8 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                  {someSelected && !allSelected && (
+                    <div style={{ width: 8, height: 2, background: '#2A9D8F', borderRadius: 1 }} />
+                  )}
+                </button>
+              );
+            })()}
             <div style={{ width: 8, height: 8, borderRadius: '50%', background: accentColor }} />
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{title}</span>
           </div>
@@ -457,6 +650,26 @@ export default function BillingTab({
                   className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
                   onClick={() => toggleExpand(d)}
                 >
+                  {/* Multi-select checkbox */}
+                  {isSelectable(d) && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleSelect(d.id); }}
+                      style={{
+                        width: 16, height: 16, borderRadius: 3,
+                        border: `2px solid ${selectedIds.has(d.id) ? '#2A9D8F' : '#D1D5DB'}`,
+                        background: selectedIds.has(d.id) ? '#2A9D8F' : 'white',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', flexShrink: 0, marginRight: 10, padding: 0,
+                      }}
+                      title="Select for batch invoicing"
+                    >
+                      {selectedIds.has(d.id) && (
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                          <path d="M2 5L4.5 7.5L8 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </button>
+                  )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-gray-800">{d.label}</span>
