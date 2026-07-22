@@ -186,7 +186,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
 
       {/* Slide-in panel */}
       <div
-        className={`fixed right-0 top-0 h-full w-full ${expanded ? 'sm:w-[720px]' : 'sm:w-[560px]'} bg-white z-50 shadow-2xl flex flex-col transition-all duration-200`}
+        className={`fixed right-0 top-0 h-full w-full ${expanded ? 'sm:w-[95vw]' : 'sm:w-[80vw]'} bg-white z-50 shadow-2xl flex flex-col transition-all duration-200`}
         role="dialog"
         aria-modal="true"
       >
