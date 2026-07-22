@@ -88,6 +88,15 @@ export default function BillingTab({
   const [events, setEvents] = useState<Record<string, PaymentEvent[]>>({});
   const [invoices, setInvoices] = useState<Record<string, Invoice>>({});
   const [toast, setToast] = useState('');
+  const [invoicePreview, setInvoicePreview] = useState<{
+    deliverableId: string;
+    label: string;
+    amount: number;
+    notes: string;
+    poNumber: string;
+    recipientEmail: string;
+    resend: boolean;
+  } | null>(null);
 
   const fetchDeliverables = useCallback(async () => {
     try {
@@ -123,18 +132,40 @@ export default function BillingTab({
     showToast('Marked as delivered');
   }
 
-  // Send invoice (one click)
-  async function sendInvoice(deliverableId: string) {
-    setInvoicingId(deliverableId);
+  // Open invoice preview for editing before sending
+  function openInvoicePreview(d: Deliverable, resend = false) {
+    setInvoicePreview({
+      deliverableId: d.id,
+      label: d.label,
+      amount: Number(d.total_amount || 0),
+      notes: '',
+      poNumber: '',
+      recipientEmail: partnership.contact_email || '',
+      resend,
+    });
+  }
+
+  // Send invoice with PDF
+  async function sendInvoice() {
+    if (!invoicePreview) return;
+    setInvoicingId(invoicePreview.deliverableId);
     try {
-      const res = await fetch('/api/admin/deliverables/invoice', {
+      const res = await fetch('/api/admin/deliverables/send-invoice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-user-email': userEmail },
-        body: JSON.stringify({ deliverableId, partnershipId }),
+        body: JSON.stringify({
+          deliverableId: invoicePreview.deliverableId,
+          partnershipId,
+          notes: invoicePreview.notes || null,
+          poNumber: invoicePreview.poNumber || null,
+          recipientEmail: invoicePreview.recipientEmail || null,
+          resend: invoicePreview.resend,
+        }),
       });
       const data = await res.json();
       if (data.success) {
-        showToast(`Invoice ${data.invoice.invoice_number} sent to ${data.invoice.sent_to}`);
+        showToast(`Invoice ${data.invoice.invoice_number} sent to ${data.invoice.sent_to} with PDF`);
+        setInvoicePreview(null);
         fetchDeliverables();
       } else {
         showToast(data.error || 'Failed to send invoice');
@@ -245,6 +276,114 @@ export default function BillingTab({
         </div>
       )}
 
+      {/* Invoice Preview Modal */}
+      {invoicePreview && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 9999,
+          background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{
+            background: 'white', borderRadius: 16, width: 520, maxHeight: '90vh', overflow: 'auto',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+          }}>
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid #F3F4F6' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#1e2749' }}>
+                  {invoicePreview.resend ? 'Resend Invoice' : 'Review Invoice'}
+                </h3>
+                <button onClick={() => setInvoicePreview(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8' }}>
+                  <X size={18} />
+                </button>
+              </div>
+              <p style={{ margin: '4px 0 0', fontSize: 12, color: '#6B7280' }}>
+                Review and edit before sending. A branded PDF will be attached to the email.
+              </p>
+            </div>
+
+            <div style={{ padding: '20px 24px' }}>
+              {/* Service summary */}
+              <div style={{ background: '#F8FAFC', borderRadius: 10, padding: '14px 16px', marginBottom: 16 }}>
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e2749' }}>{invoicePreview.label}</p>
+                <p style={{ margin: '4px 0 0', fontSize: 20, fontWeight: 700, color: '#1e2749' }}>
+                  ${invoicePreview.amount.toLocaleString()}
+                </p>
+              </div>
+
+              {/* Editable fields */}
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>
+                  Send To
+                </label>
+                <input
+                  type="email"
+                  value={invoicePreview.recipientEmail}
+                  onChange={e => setInvoicePreview({ ...invoicePreview, recipientEmail: e.target.value })}
+                  placeholder="recipient@school.edu"
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 13, color: '#1e2749' }}
+                />
+              </div>
+
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>
+                  PO Number (optional)
+                </label>
+                <input
+                  type="text"
+                  value={invoicePreview.poNumber}
+                  onChange={e => setInvoicePreview({ ...invoicePreview, poNumber: e.target.value })}
+                  placeholder="e.g., PO-2026-1234"
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 13, color: '#1e2749' }}
+                />
+              </div>
+
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>
+                  Notes (optional, appears on invoice)
+                </label>
+                <textarea
+                  value={invoicePreview.notes}
+                  onChange={e => setInvoicePreview({ ...invoicePreview, notes: e.target.value })}
+                  placeholder="e.g., Please reference contract #ABC for processing"
+                  rows={3}
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 13, color: '#1e2749', resize: 'vertical', fontFamily: "'DM Sans', sans-serif" }}
+                />
+              </div>
+
+              {/* What gets sent */}
+              <div style={{ background: '#F0FDFA', borderRadius: 8, padding: '12px 14px', border: '1px solid #99F6E4', marginBottom: 20 }}>
+                <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: '#0D9488' }}>What gets sent:</p>
+                <p style={{ margin: '4px 0 0', fontSize: 12, color: '#134E4A' }}>
+                  A branded email with the invoice summary, plus a PDF attachment with the full invoice. Checks payable to Teachers Deserve It, LLC, mailed to 4002 Paredes In Rd, Ste 15, Brownsville, TX 78526.
+                </p>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div style={{ padding: '16px 24px', borderTop: '1px solid #F3F4F6', display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+              <button
+                onClick={() => setInvoicePreview(null)}
+                style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #E5E7EB', background: 'white', color: '#374151', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={sendInvoice}
+                disabled={invoicingId === invoicePreview.deliverableId || !invoicePreview.recipientEmail}
+                style={{
+                  padding: '8px 20px', borderRadius: 8, border: 'none',
+                  background: invoicingId === invoicePreview.deliverableId ? '#94A3B8' : '#2563EB',
+                  color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}
+              >
+                <Send size={12} />
+                {invoicingId === invoicePreview.deliverableId ? 'Sending...' : (invoicePreview.resend ? 'Resend with PDF' : 'Send Invoice with PDF')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
         <SummaryCard label="Contract Value" value={`$${totalValue.toLocaleString()}`} color="#1e2749" />
@@ -347,12 +486,11 @@ export default function BillingTab({
                     )}
                     {d.delivery_status === 'delivered' && !d.is_complimentary && !d.invoice_id && (
                       <button
-                        onClick={(e) => { e.stopPropagation(); sendInvoice(d.id); }}
-                        disabled={invoicingId === d.id}
+                        onClick={(e) => { e.stopPropagation(); openInvoicePreview(d); }}
                         className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white transition-colors flex items-center gap-1.5"
-                        style={{ background: invoicingId === d.id ? '#94A3B8' : '#2563EB' }}
+                        style={{ background: '#2563EB' }}
                       >
-                        <Send size={11} /> {invoicingId === d.id ? 'Sending...' : 'Send Invoice'}
+                        <Send size={11} /> Send Invoice
                       </button>
                     )}
                     {d.delivery_status === 'invoiced' && d.invoice_id && (
@@ -534,17 +672,7 @@ export default function BillingTab({
                             </button>
                             {d.delivery_status === 'invoiced' && (
                               <button
-                                onClick={async () => {
-                                  const altEmail = prompt('Resend invoice to (leave blank for original recipient):');
-                                  try {
-                                    await fetch('/api/admin/deliverables/invoice', {
-                                      method: 'POST',
-                                      headers: { 'Content-Type': 'application/json', 'x-user-email': userEmail },
-                                      body: JSON.stringify({ deliverableId: d.id, partnershipId, resendTo: altEmail || undefined, resend: true }),
-                                    });
-                                    showToast(altEmail ? `Invoice resent to ${altEmail}` : 'Invoice resent');
-                                  } catch { showToast('Failed to resend'); }
-                                }}
+                                onClick={() => openInvoicePreview(d, true)}
                                 className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1"
                               >
                                 <RotateCcw size={10} /> Resend invoice
