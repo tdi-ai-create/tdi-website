@@ -8,6 +8,7 @@ import { ContactTab } from './panel/ContactTab'
 import { DetailsTab } from './panel/DetailsTab'
 import { ActivityTab } from './panel/ActivityTab'
 import { IntelligenceTab } from './panel/IntelligenceTab'
+import { ContractsTab } from './panel/ContractsTab'
 import { PanelFooter } from './panel/PanelFooter'
 
 export interface OppNote {
@@ -50,7 +51,7 @@ export interface FullOpportunity {
   [key: string]: unknown
 }
 
-type TabId = 'notes' | 'contact' | 'details' | 'intelligence' | 'activity'
+type TabId = 'notes' | 'contracts' | 'contact' | 'details' | 'intelligence' | 'activity'
 
 const STAGE_OPTIONS = [
   { id: 'unassigned', name: 'Unassigned' },
@@ -239,7 +240,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
 
             {/* Tabs */}
             <div className="flex border-b border-gray-200 px-4 shrink-0">
-              {(['notes', 'contact', 'details', 'intelligence', 'activity'] as TabId[]).map(tab => (
+              {(['notes', 'contracts', 'contact', 'details', 'intelligence', 'activity'] as TabId[]).map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -262,6 +263,9 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
                   onAddNote={addNote}
                   onDeleteNote={deleteNote}
                 />
+              )}
+              {activeTab === 'contracts' && (
+                <ContractsTab opp={opp} />
               )}
               {activeTab === 'contact' && (
                 <ContactTab opp={opp} onPatch={patchOpp} />
