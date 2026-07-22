@@ -83,20 +83,28 @@
   <p style="color:#6B7280;font-size:13px;">Do this the same day the service happens. Don't let it pile up.</p>
 </div>
 
-<h3>Step 2: Send Invoice (One Click)</h3>
+<h3>Step 2: Send Invoice</h3>
 <div class="card card-teal">
   <p><strong>Who:</strong> Bella or Omar (anyone with admin access)</p>
   <p><strong>Where:</strong> Same Billing tab, on the delivered service</p>
-  <p><strong>Action:</strong> Click <strong>"Send Invoice"</strong></p>
-  <p>This automatically:</p>
+  <p><strong>Action:</strong> Click <strong>"Send Invoice"</strong>. A preview modal opens.</p>
+  <p><strong>Before sending, you can edit:</strong></p>
+  <ul>
+    <li><strong>Recipient email:</strong> defaults to the school's primary contact. Change it to send to AP, a different administrator, etc.</li>
+    <li><strong>PO Number:</strong> if the school requires a PO reference on invoices, enter it here. It appears on the PDF.</li>
+    <li><strong>Notes:</strong> any special instructions, references, or context. Appears on the PDF invoice.</li>
+  </ul>
+  <p><strong>When you click "Send Invoice with PDF":</strong></p>
   <ul>
     <li>Generates invoice number (format: <code>TDI-YYMM-NNN</code>)</li>
-    <li>Emails the invoice to the school's primary contact</li>
+    <li>Creates a branded PDF invoice and attaches it to the email</li>
+    <li>Emails the invoice to the recipient with a summary + the PDF</li>
     <li>Sets a 30-day payment due date</li>
     <li>Changes status from <span class="status status-delivered">Delivered</span> to <span class="status status-invoiced">Invoiced</span></li>
     <li>Creates a collections workflow record for tracking</li>
   </ul>
-  <p style="color:#064E3B;font-size:13px;margin-top:8px;"><strong>The email includes:</strong> invoice number, service description, date of service, amount due, payment instructions, and TDI contact info. Reply-to goes to Rae.</p>
+  <p style="color:#064E3B;font-size:13px;margin-top:8px;"><strong>The PDF includes:</strong> TDI branding, From/Bill To addresses, invoice number, service description, date of service, amount due, due date, payment instructions (checks to Omar's address), PO number if provided, and notes if provided.</p>
+  <p style="color:#064E3B;font-size:13px;"><strong>Resending:</strong> You can resend any invoiced service with the same editable preview. Use this when a school loses the invoice or you need to send it to a different email.</p>
 </div>
 
 <h3>Step 3: Follow Up on Payment</h3>
