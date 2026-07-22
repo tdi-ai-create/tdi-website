@@ -497,7 +497,7 @@ export function IntelligenceTab({ opp, onRefresh }: { opp: FullOpportunity; onRe
       )}
 
       {/* ── Grant Fit Scoring (four-factor, additive to sales scoring) ── */}
-      <GrantFitScoring opp={opp} />
+      <GrantFitScoring opp={opp} onRefresh={onRefresh} />
 
       {/* ── Start Funding Pursuit (lead → pursuit conversion) ── */}
       <StartPursuitAction opp={opp} />
@@ -520,7 +520,7 @@ const GRANT_FACTORS = [
   { key: 'score_funding', label: 'Funding', description: 'Realistic path to money (low = creative hunt, not rejection)' },
 ]
 
-function GrantFitScoring({ opp }: { opp: FullOpportunity }) {
+function GrantFitScoring({ opp, onRefresh }: { opp: FullOpportunity; onRefresh: () => void }) {
   const [scores, setScores] = useState({
     score_fit: (opp.score_fit as number) || 0,
     score_pain: (opp.score_pain as number) || 0,
