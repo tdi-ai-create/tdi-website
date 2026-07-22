@@ -3,10 +3,10 @@
 import type { FullOpportunity } from '../OpportunityDetailPanel'
 
 const SCORE_DIMENSIONS = [
-  { key: 'score_fit', breakdownKey: 'fit', label: 'Fit', max: 25 },
-  { key: 'score_pain', breakdownKey: 'pain', label: 'Pain Signals', max: 25 },
-  { key: 'score_funding', breakdownKey: 'funding', label: 'Funding', max: 25 },
-  { key: 'score_warmth', breakdownKey: 'warmth', label: 'Warmth', max: 25 },
+  { key: 'score_fit', breakdownKey: 'fit_score', label: 'Fit', max: 25 },
+  { key: 'score_pain', breakdownKey: 'pain_score', label: 'Pain Signals', max: 25 },
+  { key: 'score_funding', breakdownKey: 'funding_score', label: 'Funding', max: 25 },
+  { key: 'score_warmth', breakdownKey: 'warmth_score', label: 'Warmth', max: 25 },
 ] as const
 
 const DIMENSION_TOOLTIPS: Record<string, string> = {
