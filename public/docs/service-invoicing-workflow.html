@@ -41,7 +41,7 @@
 
 <h1>Service Delivery + Invoicing Workflow</h1>
 <p class="subtitle">How a signed contract becomes delivered services and paid invoices.</p>
-<p class="updated">Last updated: July 14, 2026 | Created by Rae Hughart</p>
+<p class="updated">Last updated: July 22, 2026 | Created by Rae Hughart</p>
 
 <hr>
 
@@ -69,11 +69,32 @@
 
 <h3>Step 1: Contract is Signed</h3>
 <p><span class="role-tag role-rae">Rae</span> closes the deal. Contract is created in the Contracts tab (Sales page) or via Anchor.</p>
+<p>When a contract is signed, the system <strong>automatically</strong>:</p>
 <ul>
-  <li>Each contract has line items: Hub memberships, observation days, executive sessions, virtual sessions, books</li>
-  <li>Line items are automatically broken into individual <strong>deliverables</strong> in the system</li>
+  <li>Updates the Sales CRM opportunity to "Signed" stage</li>
+  <li>Updates the district status to "Active"</li>
+  <li>Creates a new partnership in the Leadership Dashboard (if one does not exist)</li>
+  <li>Breaks line items into individual <strong>deliverables</strong></li>
+  <li>Sends Slack notification to #sales</li>
+  <li>Sends email to Rae with signed PDF</li>
   <li>Direct-pay items start as <span class="status-badge status-pending">Pending</span></li>
   <li>Grant-funded items start as <span class="status-badge status-grant">Awaiting Grant</span></li>
+</ul>
+
+<h3>Step 1b: PO Number (if applicable)</h3>
+<p>Some districts require a Purchase Order number on invoices. The PO number field is available:</p>
+<ul>
+  <li><strong>Client side:</strong> The signer can enter the PO number when signing the contract. It is required when "PO Required" is checked on the quote, optional otherwise.</li>
+  <li><strong>Admin side:</strong> PO number can be added or edited on the contract card in the Sales Contracts tab or in the lead detail panel Contracts section.</li>
+  <li>The PO number appears on the invoice PDF and receipt automatically.</li>
+</ul>
+
+<h3>Step 1c: Onboarding (Manual Trigger)</h3>
+<p><span class="role-tag role-rae">Rae</span> reviews the new partnership in the Leadership Dashboard and manually triggers the welcome/onboarding email. This is intentionally not automated so Rae can review before the client is contacted.</p>
+<ul>
+  <li>Go to Leadership Dashboard, find the new partnership</li>
+  <li>Click "Send Invite" to trigger the onboarding email</li>
+  <li>Invoice should be sent AFTER the welcome email is received and the client is onboarded</li>
 </ul>
 
 <div class="highlight">
