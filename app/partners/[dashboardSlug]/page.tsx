@@ -4853,7 +4853,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                             }
 
                             // Onboarding: Upload staff roster + assign access
-                            if (titleLower.includes('staff roster') || titleLower.includes('upload roster') || titleLower.includes('team') || titleLower.includes('educator')) {
+                            if (titleLower.includes('staff roster') || titleLower.includes('upload roster') || titleLower.includes('team') || titleLower.includes('educator') || titleLower.includes('staff onboarding') || titleLower.includes('staff list')) {
                               if (!isFormExpanded) {
                                 return (
                                   <div className="mt-3">
