@@ -26,6 +26,7 @@ import { GoogleDrivePicker, downloadDriveFile } from './components/GoogleDrivePi
 import ProductionDashboard from './components/ProductionDashboard';
 import QuizQuestionBuilder from './components/QuizQuestionBuilder';
 import BulkVideoUpload from './components/BulkVideoUpload';
+import BulkContentUpload from './components/BulkContentUpload';
 import {
   ArrowLeft,
   Plus,
@@ -2374,6 +2375,23 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                           })),
                         }
                       : null
+                  );
+                }}
+              />
+
+              {/* Unified Content Upload (Videos + PDFs) */}
+              <BulkContentUpload
+                course={{ id: course.id, modules: course.modules }}
+                onComplete={() => window.location.reload()}
+                onLessonUploaded={(lessonId, videoId) => {
+                  setCourse(prev =>
+                    prev ? {
+                      ...prev,
+                      modules: prev.modules.map(m => ({
+                        ...m,
+                        lessons: m.lessons.map(l => l.id === lessonId ? { ...l, video_id: videoId } : l),
+                      })),
+                    } : null
                   );
                 }}
               />
