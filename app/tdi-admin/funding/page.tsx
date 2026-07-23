@@ -28,7 +28,7 @@ interface SchoolData {
 export default function FundingPage() {
   const [schools, setSchools] = useState<SchoolData[]>([])
   const [loading, setLoading] = useState(true)
-  const [draftEmail, setDraftEmail] = useState<any>(null)
+  const [draftEmail, setDraftEmail] = useState<any & { opportunityId?: string; windowOpens?: string; windowCloses?: string } | null>(null)
   const [toast, setToast] = useState<string | null>(null)
 
   useEffect(() => {
@@ -58,6 +58,7 @@ export default function FundingPage() {
                 hasDraft: !!o.narrative_content,
                 narrativeStatus: o.narrative_status,
                 narrativeUrl: o.narrative_url,
+                forwardingStatus: o.forwarding_email_status,
               })),
             }))
         )).then(data => {
@@ -92,7 +93,27 @@ export default function FundingPage() {
     <div style={{ padding: '32px 48px', fontFamily: "'DM Sans', sans-serif", maxWidth: 1000 }}>
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       {draftEmail && (
-        <DraftEmailModal {...draftEmail} onClose={() => setDraftEmail(null)} onSent={() => { setDraftEmail(null); setToast('Email sent') }} />
+        <DraftEmailModal {...draftEmail} onClose={() => setDraftEmail(null)} onSent={async () => {
+          // If this was a grant send, mark opportunity as sent and create milestones
+          if (draftEmail.opportunityId) {
+            await fetch('/api/funding/send-to-client', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                opportunityId: draftEmail.opportunityId,
+                pursuitId: draftEmail.pursuitId,
+                contactName: draftEmail.toName,
+                contactEmail: draftEmail.to,
+                windowOpens: draftEmail.windowOpens,
+                windowCloses: draftEmail.windowCloses,
+              }),
+            }).catch(() => {})
+          }
+          setDraftEmail(null)
+          setToast('Application sent. Follow-up milestones created.')
+          // Refresh after short delay
+          setTimeout(() => window.location.reload(), 1500)
+        }} />
       )}
 
       {/* Header */}
@@ -117,8 +138,8 @@ export default function FundingPage() {
           <SchoolCard
             key={school.id}
             school={school}
-            onDraftEmail={(to, toName, subject, body, schoolName, pursuitId) => {
-              setDraftEmail({ to, toName, subject, body, schoolName, pursuitId })
+            onDraftEmail={(to, toName, subject, body, schoolName, pursuitId, extra) => {
+              setDraftEmail({ to, toName, subject, body, schoolName, pursuitId, ...extra })
             }}
             onToast={setToast}
           />
@@ -130,7 +151,7 @@ export default function FundingPage() {
 
 function SchoolCard({ school, onDraftEmail, onToast }: {
   school: SchoolData
-  onDraftEmail: (to: string, toName: string, subject: string, body: string, schoolName: string, pursuitId: string) => void
+  onDraftEmail: (to: string, toName: string, subject: string, body: string, schoolName: string, pursuitId: string, extra?: any) => void
   onToast: (msg: string) => void
 }) {
   const activeGrants = school.grants.filter(g => g.status !== 'denied')
@@ -276,12 +297,13 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
 function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
   grant: SchoolData['grants'][0]
   school: SchoolData
-  onDraftEmail: (to: string, toName: string, subject: string, body: string, schoolName: string, pursuitId: string) => void
+  onDraftEmail: (to: string, toName: string, subject: string, body: string, schoolName: string, pursuitId: string, extra?: any) => void
   onToast: (msg: string) => void
   onRefresh: () => void
 }) {
   const [approving, setApproving] = useState(false)
   const [approved, setApproved] = useState(grant.narrativeStatus === 'ready')
+  const [sent, setSent] = useState(grant.status === 'applied' || (grant as any).forwardingStatus === 'sent')
 
   const handleApprove = async () => {
     setApproving(true)
@@ -308,13 +330,15 @@ function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
     const windowOpensStr = windowOpens ? windowOpens.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) : 'soon'
     const windowClosesStr = windowCloses ? windowCloses.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) : ''
 
+    // Pass extra tracking fields for post-send processing
     onDraftEmail(
       school.email,
       school.contact,
       `Your ${grant.name} application is ready. Here is your timeline.`,
       `Hi ${firstName},\n\nYour ${grant.name} grant application for ${schoolName} is complete. We wrote everything for you. You will copy, paste, and submit. Nothing to write from scratch.\n\nHere is your application package:\n${docLink}\n\nHere is your timeline:\n\nTHIS WEEK: Set up your Deed account (Step 1 in the document). This takes about 5 minutes but verification takes 1 to 2 weeks, so please do this now. Your deadline to have Deed set up is ${deedDeadlineStr}.\n\n${windowOpensStr.toUpperCase()}: The application window opens. We will email you a reminder that day with a link to your application package so you can submit. Submitting takes about 15 minutes.\n\n${windowClosesStr ? windowClosesStr.toUpperCase() + ': The window closes. We need to submit before this date.\n\n' : ''}You do not need to remember any of these dates. We will follow up at every step. If you miss something, we will reach out.\n\nIf you want to set up your Deed account together on a call this week, reply to this email and I will schedule 15 minutes. I am happy to walk you through it.\n\nBest,\nBella\nTeachers Deserve It`,
       school.name,
-      school.id
+      school.id,
+      { opportunityId: grant.id, windowOpens: grant.windowOpens, windowCloses: grant.windowCloses }
     )
   }
 
@@ -363,7 +387,7 @@ function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
             </>
           )}
 
-          {isApproved && (
+          {isApproved && !sent && (
             <>
               <span style={{ fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 6, background: '#D1FAE5', color: '#065F46' }}>
                 Approved
@@ -378,6 +402,17 @@ function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
                 style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8, border: 'none', background: '#3B82F6', color: 'white', cursor: 'pointer' }}>
                 Send to {school.contact.split(' ')[0]}
               </button>
+            </>
+          )}
+
+          {sent && (
+            <>
+              <span style={{ fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 6, background: '#DBEAFE', color: '#1D4ED8' }}>
+                Sent to {school.contact.split(' ')[0]}
+              </span>
+              <span style={{ fontSize: 11, color: '#6B7280' }}>
+                Waiting on Deed setup
+              </span>
             </>
           )}
 
