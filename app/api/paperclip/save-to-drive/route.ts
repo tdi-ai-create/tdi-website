@@ -205,9 +205,25 @@ export async function POST(request: NextRequest) {
       fileUrl = `https://docs.google.com/document/d/${file.id}/edit`;
     }
 
-    // Share the file: anyone with the link can edit
+    // Share the file with TDI team
     const fileId = fileUrl.match(/\/d\/([^/]+)/)?.[1]
     if (fileId) {
+      const shareEmails = ['rae@teachersdeserveit.com', 'bella@teachersdeserveit.com']
+      for (const email of shareEmails) {
+        await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions?sendNotificationEmail=false`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            role: 'writer',
+            type: 'user',
+            emailAddress: email,
+          }),
+        }).catch(() => {})
+      }
+      // Also try "anyone with link" as fallback
       await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
         method: 'POST',
         headers: {
@@ -218,7 +234,7 @@ export async function POST(request: NextRequest) {
           role: 'writer',
           type: 'anyone',
         }),
-      }).catch(() => {}) // Don't fail if sharing fails
+      }).catch(() => {})
     }
 
     console.log(`[save-to-drive] Created: ${docTitle} -> ${fileUrl}`);
