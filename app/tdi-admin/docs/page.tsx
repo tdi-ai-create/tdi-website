@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Search, Download, Printer, ExternalLink } from 'lucide-react';
 
-type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'communication-map';
+type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'communication-map';
 
 interface Doc {
   id: DocId;
@@ -96,9 +96,18 @@ const DOC_GROUPS: DocGroup[] = [
       },
       {
         id: 'funding-launch',
-        label: 'Funding Launch Plan',
-        desc: 'Bella + Rae action guide with deadlines',
-        tags: ['funding', 'launch', 'bella', 'deadlines', 'action plan', 'grants'],
+        label: 'Funding Status',
+        desc: 'Current state and next steps for all schools',
+        tags: ['funding', 'launch', 'bella', 'deadlines', 'action plan', 'grants', 'status'],
+        relatedSections: [
+          { label: 'Funding Portal', href: '/tdi-admin/funding' },
+        ],
+      },
+      {
+        id: 'grant-application-spec',
+        label: 'Application Standards',
+        desc: 'White-glove spec for grant application packages',
+        tags: ['grant', 'application', 'standards', 'spec', 'writing', 'quality', 'walmart', 'NEA', 'form fields', 'character limits'],
         relatedSections: [
           { label: 'Funding Portal', href: '/tdi-admin/funding' },
         ],

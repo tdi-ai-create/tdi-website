@@ -28,6 +28,7 @@ export async function GET(
     'data-flow': 'data-flow.html',
     'hub-content-standards': 'hub-content-standards.html',
     'hub-content-creation': 'hub-content-creation.html',
+    'grant-application-spec': 'grant-application-spec.html',
   };
 
   const filename = allowedDocs[slug];
