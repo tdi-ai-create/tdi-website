@@ -9,6 +9,7 @@ export interface QueueItem {
   lessonTitle: string;
   status: 'waiting' | 'compressing' | 'uploading' | 'processing' | 'done' | 'error';
   progress: number;
+  errorMessage?: string;
 }
 
 interface UploadQueueProps {
@@ -137,6 +138,9 @@ export default function UploadQueue({ queue }: UploadQueueProps) {
                     {STATUS_LABELS[item.status]}
                   </span>
                 </div>
+                {item.status === 'error' && item.errorMessage && (
+                  <p className="text-[10px] text-red-600">{item.errorMessage}</p>
+                )}
                 {item.status !== 'waiting' && item.status !== 'done' && item.status !== 'error' && (
                   <div className="w-full bg-gray-100 rounded-full h-1">
                     <div

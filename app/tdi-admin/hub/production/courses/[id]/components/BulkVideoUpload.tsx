@@ -318,11 +318,15 @@ export default function BulkVideoUpload({ course, onComplete, onLessonUploaded }
         updateQueueItem(i, { status: 'processing', progress: 80 });
 
         // Save video_id to lesson
-        await fetch('/api/tdi-admin/lessons', {
+        const saveRes = await fetch('/api/tdi-admin/lessons', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: mapping.lessonId, video_id: videoUid }),
         });
+        if (!saveRes.ok) {
+          const errBody = await saveRes.json().catch(() => ({}));
+          throw new Error(`Failed to save video to lesson: ${errBody.error || saveRes.statusText}`);
+        }
 
         // Update parent state so green dot appears immediately
         onLessonUploaded?.(mapping.lessonId, videoUid);
@@ -352,7 +356,8 @@ export default function BulkVideoUpload({ course, onComplete, onLessonUploaded }
         updateQueueItem(i, { status: 'done', progress: 100 });
       } catch (err) {
         console.error(`Bulk upload error for ${mapping.file.name}:`, err);
-        updateQueueItem(i, { status: 'error', progress: 0 });
+        const errorMessage = err instanceof Error ? err.message : 'Upload failed';
+        updateQueueItem(i, { status: 'error', progress: 0, errorMessage });
       }
     }
 
