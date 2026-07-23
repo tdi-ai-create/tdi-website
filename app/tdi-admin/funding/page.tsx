@@ -22,6 +22,7 @@ interface SchoolData {
     hasDraft: boolean
     narrativeStatus: string
     narrativeUrl: string | null
+    forwardingStatus: string | null
   }[]
 }
 
@@ -163,7 +164,10 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
 
   // Determine next action
   let nextAction = ''
-  let nextActionType: 'email' | 'review' | 'draft' | 'info' | 'none' = 'none'
+  let nextActionType: 'email' | 'review' | 'draft' | 'info' | 'waiting' | 'none' = 'none'
+
+  const sentGrants = activeGrants.filter(g => g.forwardingStatus === 'sent')
+  const approvedNotSent = activeGrants.filter(g => g.narrativeStatus === 'ready' && g.forwardingStatus !== 'sent')
 
   if (!school.introSent && school.email) {
     nextAction = `Send intro email to ${school.contact.split(' ')[0]}`
@@ -171,6 +175,12 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
   } else if (draftsReady.length > 0) {
     nextAction = `Review ${draftsReady.length} narrative${draftsReady.length > 1 ? 's' : ''} and approve`
     nextActionType = 'review'
+  } else if (approvedNotSent.length > 0) {
+    nextAction = `Send ${approvedNotSent.length} approved application${approvedNotSent.length > 1 ? 's' : ''} to ${school.contact.split(' ')[0]}`
+    nextActionType = 'review'
+  } else if (sentGrants.length > 0) {
+    nextAction = `Application${sentGrants.length > 1 ? 's' : ''} sent to ${school.contact.split(' ')[0]}. Waiting on Deed setup and submission.`
+    nextActionType = 'waiting'
   } else if (needsDraft.length > 0) {
     nextAction = `Request narrative drafts for ${needsDraft.length} open-window grant${needsDraft.length > 1 ? 's' : ''}`
     nextActionType = 'draft'
@@ -212,7 +222,7 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
       {nextAction && (
         <div style={{
           padding: '12px 22px',
-          background: nextActionType === 'review' ? '#F5F3FF' : nextActionType === 'email' ? '#EFF6FF' : '#F9FAFB',
+          background: nextActionType === 'review' ? '#F5F3FF' : nextActionType === 'email' ? '#EFF6FF' : nextActionType === 'waiting' ? '#F0FDF4' : '#F9FAFB',
           borderBottom: '1px solid #F3F4F6',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
@@ -303,7 +313,7 @@ function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
 }) {
   const [approving, setApproving] = useState(false)
   const [approved, setApproved] = useState(grant.narrativeStatus === 'ready')
-  const [sent, setSent] = useState(grant.status === 'applied' || (grant as any).forwardingStatus === 'sent')
+  const [sent, setSent] = useState(grant.forwardingStatus === 'sent')
 
   const handleApprove = async () => {
     setApproving(true)
