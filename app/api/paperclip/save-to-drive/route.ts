@@ -205,6 +205,22 @@ export async function POST(request: NextRequest) {
       fileUrl = `https://docs.google.com/document/d/${file.id}/edit`;
     }
 
+    // Share the file: anyone with the link can edit
+    const fileId = fileUrl.match(/\/d\/([^/]+)/)?.[1]
+    if (fileId) {
+      await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          role: 'writer',
+          type: 'anyone',
+        }),
+      }).catch(() => {}) // Don't fail if sharing fails
+    }
+
     console.log(`[save-to-drive] Created: ${docTitle} -> ${fileUrl}`);
 
     return NextResponse.json({
