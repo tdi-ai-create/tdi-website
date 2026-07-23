@@ -251,52 +251,139 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
         </div>
       )}
 
-      {/* Grant list */}
+      {/* Grant list with inline actions */}
       <div style={{ padding: '12px 22px' }}>
         {activeGrants.map(grant => (
-          <div key={grant.id} style={{
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            padding: '8px 0', borderBottom: '1px solid #F9FAFB',
-          }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#1e2749' }}>{grant.name}</span>
-                {grant.amount > 0 && (
-                  <span style={{ fontSize: 11, color: '#6B7280' }}>${grant.amount.toLocaleString()}</span>
-                )}
-              </div>
-              {grant.windowOpens && (
-                <span style={{ fontSize: 11, color: '#6B7280' }}>
-                  Window: {new Date(grant.windowOpens + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  {grant.windowCloses && ` - ${new Date(grant.windowCloses + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
-                </span>
-              )}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              {/* Status badge */}
-              <GrantStatusBadge grant={grant} />
-              {/* Doc link — prominent */}
-              {grant.narrativeUrl && (
-                <a
-                  href={grant.narrativeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8,
-                    background: '#8B5CF6', color: 'white', textDecoration: 'none',
-                  }}
-                >
-                  Open Doc
-                </a>
-              )}
-            </div>
-          </div>
+          <GrantRow
+            key={grant.id}
+            grant={grant}
+            school={school}
+            onDraftEmail={onDraftEmail}
+            onToast={onToast}
+            onRefresh={() => window.location.reload()}
+          />
         ))}
         {deniedGrants.length > 0 && (
           <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8 }}>
             {deniedGrants.length} denied grant{deniedGrants.length > 1 ? 's' : ''} (not shown)
           </div>
         )}
+      </div>
+    </div>
+  )
+}
+
+function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
+  grant: SchoolData['grants'][0]
+  school: SchoolData
+  onDraftEmail: (to: string, toName: string, subject: string, body: string, schoolName: string, pursuitId: string) => void
+  onToast: (msg: string) => void
+  onRefresh: () => void
+}) {
+  const [approving, setApproving] = useState(false)
+  const [approved, setApproved] = useState(grant.narrativeStatus === 'ready')
+
+  const handleApprove = async () => {
+    setApproving(true)
+    await fetch('/api/funding/opportunities', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: grant.id, narrative_status: 'ready' }),
+    })
+    setApproved(true)
+    setApproving(false)
+    onToast('Narrative approved')
+  }
+
+  const handleSendToClient = () => {
+    const firstName = school.contact.split(' ')[0]
+    const schoolName = school.name.replace(/ - Grant Funding$/, '').replace(/ - Grant Funded Funding$/, '')
+    const docLink = grant.narrativeUrl || ''
+    onDraftEmail(
+      school.email,
+      school.contact,
+      `Your ${grant.name} application is ready to submit`,
+      `Hi ${firstName},\n\nGreat news! Your ${grant.name} grant application for ${schoolName} is complete and ready for you to submit.\n\nHere is your application package:\n${docLink}\n\nEverything is pre-written. Open the document, follow the steps, copy and paste each section into the application form, and submit. It should take about 15 minutes.\n\nIf you would like to walk through it together on a quick call, just reply to this email and we will set it up.\n\nBest,\nBella\nTeachers Deserve It`,
+      school.name,
+      school.id
+    )
+  }
+
+  const isReviewable = ['review', 'qa_review'].includes(grant.narrativeStatus) && !approved
+  const isApproved = approved || grant.narrativeStatus === 'ready'
+  const isDrafting = grant.narrativeStatus === 'drafting' || grant.narrativeStatus === 'requested'
+
+  return (
+    <div style={{
+      padding: '10px 0', borderBottom: '1px solid #F3F4F6',
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 14, fontWeight: 600, color: '#1e2749' }}>{grant.name}</span>
+            {grant.amount > 0 && (
+              <span style={{ fontSize: 12, color: '#6B7280' }}>${grant.amount.toLocaleString()}</span>
+            )}
+          </div>
+          {grant.windowOpens && (
+            <span style={{ fontSize: 11, color: '#6B7280' }}>
+              Window: {new Date(grant.windowOpens + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              {grant.windowCloses && ` - ${new Date(grant.windowCloses + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+            </span>
+          )}
+        </div>
+
+        {/* Action buttons — ALL steps visible */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+          {isDrafting && (
+            <span style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: '#DBEAFE', color: '#1D4ED8' }}>
+              Agent drafting
+            </span>
+          )}
+
+          {isReviewable && grant.narrativeUrl && (
+            <>
+              <a href={grant.narrativeUrl} target="_blank" rel="noopener noreferrer"
+                style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8, background: '#8B5CF6', color: 'white', textDecoration: 'none' }}>
+                Open Doc
+              </a>
+              <button onClick={handleApprove} disabled={approving}
+                style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8, border: 'none', background: approving ? '#9CA3AF' : '#10B981', color: 'white', cursor: 'pointer' }}>
+                {approving ? '...' : 'Approve'}
+              </button>
+            </>
+          )}
+
+          {isApproved && (
+            <>
+              <span style={{ fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 6, background: '#D1FAE5', color: '#065F46' }}>
+                Approved
+              </span>
+              {grant.narrativeUrl && (
+                <a href={grant.narrativeUrl} target="_blank" rel="noopener noreferrer"
+                  style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', textDecoration: 'none' }}>
+                  View Doc
+                </a>
+              )}
+              <button onClick={handleSendToClient}
+                style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8, border: 'none', background: '#3B82F6', color: 'white', cursor: 'pointer' }}>
+                Send to {school.contact.split(' ')[0]}
+              </button>
+            </>
+          )}
+
+          {!isDrafting && !isReviewable && !isApproved && grant.windowOpen && (
+            <span style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: '#D1FAE5', color: '#065F46' }}>
+              Window open
+            </span>
+          )}
+
+          {!isDrafting && !isReviewable && !isApproved && !grant.windowOpen && (
+            <span style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: '#F3F4F6', color: '#6B7280' }}>
+              Not started
+            </span>
+          )}
+        </div>
       </div>
     </div>
   )
