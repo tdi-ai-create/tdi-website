@@ -72,11 +72,12 @@ export async function GET(
       .select('id, first_name, last_name, role_title, hub_enrolled, hub_login_date')
       .eq('partnership_id', partnershipId);
 
-    // Use staff_enrolled from partnerships table for total count
-    // Use staff_members for hub login tracking
+    // Use actual staff_members count for total (not staff_enrolled from partnership table)
+    // staff_enrolled is the contract number, staff_members is the actual roster
     const staffStats = {
-      total: partnership?.staff_enrolled || 0,
+      total: staffMembers?.length || 0,
       hubLoggedIn: staffMembers?.filter(s => s.hub_login_date).length || 0,
+      contractedTotal: partnership?.staff_enrolled || 0,
     };
 
     // Get latest metric snapshots
