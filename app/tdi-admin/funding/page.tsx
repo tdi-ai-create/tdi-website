@@ -299,11 +299,20 @@ function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
     const firstName = school.contact.split(' ')[0]
     const schoolName = school.name.replace(/ - Grant Funding$/, '').replace(/ - Grant Funded Funding$/, '')
     const docLink = grant.narrativeUrl || ''
+
+    // Calculate dates
+    const windowOpens = grant.windowOpens ? new Date(grant.windowOpens + 'T00:00:00') : null
+    const windowCloses = grant.windowCloses ? new Date(grant.windowCloses + 'T00:00:00') : null
+    const deedDeadline = windowOpens ? new Date(windowOpens.getTime() - 14 * 86400000) : null // 2 weeks before
+    const deedDeadlineStr = deedDeadline ? deedDeadline.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) : 'as soon as possible'
+    const windowOpensStr = windowOpens ? windowOpens.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) : 'soon'
+    const windowClosesStr = windowCloses ? windowCloses.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) : ''
+
     onDraftEmail(
       school.email,
       school.contact,
-      `Your ${grant.name} application is ready to submit`,
-      `Hi ${firstName},\n\nGreat news! Your ${grant.name} grant application for ${schoolName} is complete and ready for you to submit.\n\nHere is your application package:\n${docLink}\n\nEverything is pre-written. Open the document, follow the steps, copy and paste each section into the application form, and submit. It should take about 15 minutes.\n\nIf you would like to walk through it together on a quick call, just reply to this email and we will set it up.\n\nBest,\nBella\nTeachers Deserve It`,
+      `Your ${grant.name} application is ready. Here is your timeline.`,
+      `Hi ${firstName},\n\nYour ${grant.name} grant application for ${schoolName} is complete. We wrote everything for you. You will copy, paste, and submit. Nothing to write from scratch.\n\nHere is your application package:\n${docLink}\n\nHere is your timeline:\n\nTHIS WEEK: Set up your Deed account (Step 1 in the document). This takes about 5 minutes but verification takes 1 to 2 weeks, so please do this now. Your deadline to have Deed set up is ${deedDeadlineStr}.\n\n${windowOpensStr.toUpperCase()}: The application window opens. We will email you a reminder that day with a link to your application package so you can submit. Submitting takes about 15 minutes.\n\n${windowClosesStr ? windowClosesStr.toUpperCase() + ': The window closes. We need to submit before this date.\n\n' : ''}You do not need to remember any of these dates. We will follow up at every step. If you miss something, we will reach out.\n\nIf you want to set up your Deed account together on a call this week, reply to this email and I will schedule 15 minutes. I am happy to walk you through it.\n\nBest,\nBella\nTeachers Deserve It`,
       school.name,
       school.id
     )
