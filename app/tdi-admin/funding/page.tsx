@@ -24,6 +24,15 @@ interface SchoolData {
     narrativeUrl: string | null
     forwardingStatus: string | null
   }[]
+  actions: {
+    id: string
+    title: string
+    description: string | null
+    dueDate: string | null
+    ownerName: string | null
+    ownerType: string
+    category: string | null
+  }[]
 }
 
 export default function FundingPage() {
@@ -39,9 +48,13 @@ export default function FundingPage() {
         const pursuits = (d.pursuits || []).filter((p: any) => !p.archived)
         // Fetch opportunities for each pursuit
         Promise.all(pursuits.map((p: any) =>
-          fetch(`/api/funding/opportunities?pursuitId=${p.id}`)
-            .then(r => r.json())
-            .then(od => ({
+          Promise.all([
+            fetch(`/api/funding/opportunities?pursuitId=${p.id}`).then(r => r.json()),
+            fetch(`/api/funding/pursuits/${p.id}/actions`).then(r => r.json()).catch(() => []),
+          ]).then(([od, actionsData]) => {
+            const actions = (Array.isArray(actionsData) ? actionsData : actionsData.actions || [])
+              .filter((a: any) => a.status === 'pending')
+            return {
               id: p.id,
               name: p.pursuit_name || p.district_name,
               contact: p.client_contact_name || 'No contact',
@@ -61,7 +74,16 @@ export default function FundingPage() {
                 narrativeUrl: o.narrative_url,
                 forwardingStatus: o.forwarding_email_status,
               })),
-            }))
+              actions: actions.map((a: any) => ({
+                id: a.id,
+                title: a.title,
+                description: a.description,
+                dueDate: a.due_date,
+                ownerName: a.owner_name,
+                ownerType: a.owner_type,
+                category: a.category,
+              })),
+            }})
         )).then(data => {
           // Sort: schools with drafts ready first, then by pipeline value
           data.sort((a: SchoolData, b: SchoolData) => {
@@ -297,6 +319,51 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
         {deniedGrants.length > 0 && (
           <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8 }}>
             {deniedGrants.length} denied grant{deniedGrants.length > 1 ? 's' : ''} (not shown)
+          </div>
+        )}
+
+        {/* Pending action items for this school */}
+        {school.actions.length > 0 && (
+          <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #F3F4F6' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>
+              To Do ({school.actions.length})
+            </div>
+            {school.actions.slice(0, 5).map(action => {
+              const daysUntil = action.dueDate ? Math.ceil((new Date(action.dueDate + 'T00:00:00').getTime() - Date.now()) / 86400000) : null
+              return (
+                <div key={action.id} style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  padding: '6px 0', borderBottom: '1px solid #FAFAFA',
+                }}>
+                  <div style={{ flex: 1 }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: '#1e2749' }}>{action.title}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                    {daysUntil !== null && (
+                      <span style={{
+                        fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
+                        background: daysUntil <= 3 ? '#FEF2F2' : '#F3F4F6',
+                        color: daysUntil <= 3 ? '#DC2626' : '#6B7280',
+                      }}>
+                        {daysUntil <= 0 ? 'Overdue' : `${daysUntil}d`}
+                      </span>
+                    )}
+                    <span style={{
+                      fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
+                      background: action.ownerType === 'client' ? '#FEF3C7' : '#F5F3FF',
+                      color: action.ownerType === 'client' ? '#92400E' : '#6D28D9',
+                    }}>
+                      {action.ownerType === 'client' ? 'School' : 'Bella'}
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
+            {school.actions.length > 5 && (
+              <Link href={`/tdi-admin/funding/${school.id}`} style={{ fontSize: 11, color: '#8B5CF6', textDecoration: 'none', marginTop: 4, display: 'block' }}>
+                +{school.actions.length - 5} more
+              </Link>
+            )}
           </div>
         )}
       </div>
