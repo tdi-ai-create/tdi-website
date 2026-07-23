@@ -61,6 +61,14 @@ export default function FundingPage() {
               })),
             }))
         )).then(data => {
+          // Sort: schools with drafts ready first, then by pipeline value
+          data.sort((a: SchoolData, b: SchoolData) => {
+            const aReady = a.grants.filter(g => ['review', 'qa_review'].includes(g.narrativeStatus)).length
+            const bReady = b.grants.filter(g => ['review', 'qa_review'].includes(g.narrativeStatus)).length
+            if (aReady > 0 && bReady === 0) return -1
+            if (bReady > 0 && aReady === 0) return 1
+            return b.pipeline - a.pipeline
+          })
           setSchools(data)
           setLoading(false)
         })
@@ -210,15 +218,24 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
             </button>
           )}
           {nextActionType === 'review' && (
-            <Link
-              href={`/tdi-admin/funding/${school.id}`}
-              style={{
-                fontSize: 12, fontWeight: 700, padding: '8px 16px', borderRadius: 8,
-                border: 'none', background: '#8B5CF6', color: 'white', textDecoration: 'none',
-              }}
-            >
-              Review Drafts
-            </Link>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {draftsReady.map(g => (
+                g.narrativeUrl ? (
+                  <a
+                    key={g.id}
+                    href={g.narrativeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      fontSize: 12, fontWeight: 700, padding: '8px 16px', borderRadius: 8,
+                      border: 'none', background: '#8B5CF6', color: 'white', textDecoration: 'none',
+                    }}
+                  >
+                    Open {g.name.split(' ')[0]} Doc
+                  </a>
+                ) : null
+              ))}
+            </div>
           )}
           {nextActionType === 'draft' && (
             <Link
@@ -258,15 +275,15 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               {/* Status badge */}
               <GrantStatusBadge grant={grant} />
-              {/* Doc link */}
+              {/* Doc link — prominent */}
               {grant.narrativeUrl && (
                 <a
                   href={grant.narrativeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 6,
-                    background: '#F5F3FF', color: '#6D28D9', textDecoration: 'none',
+                    fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8,
+                    background: '#8B5CF6', color: 'white', textDecoration: 'none',
                   }}
                 >
                   Open Doc
