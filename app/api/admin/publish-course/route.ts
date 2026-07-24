@@ -258,6 +258,38 @@ export async function POST(request: Request) {
         link: `/admin/creators/${creatorId}`,
       });
 
+    // 10. Sync publish status to Learning Hub (hub_courses table)
+    // Courses live in a separate Supabase project from the Creator Portal
+    const hubUrl = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL;
+    const hubKey = process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY;
+    if (hubUrl && hubKey) {
+      try {
+        const hubSupabase = createClient(hubUrl, hubKey, {
+          auth: { autoRefreshToken: false, persistSession: false },
+        });
+        // Find the course in Hub by matching creator name
+        const { data: hubCourses } = await hubSupabase
+          .from('hub_courses')
+          .select('id, title, is_published')
+          .eq('creator_name', creator.name)
+          .eq('is_published', false);
+
+        // If we find a matching unpublished course, publish it
+        if (hubCourses && hubCourses.length > 0) {
+          for (const hc of hubCourses) {
+            await hubSupabase
+              .from('hub_courses')
+              .update({ is_published: true })
+              .eq('id', hc.id);
+            console.log('[publish-course] Hub course synced:', hc.title);
+          }
+        }
+      } catch (hubErr) {
+        // Non-blocking: log but don't fail the main publish
+        console.error('[publish-course] Hub sync failed (non-blocking):', hubErr);
+      }
+    }
+
     console.log('[publish-course] Successfully published course for', creator.name);
 
     return NextResponse.json({
