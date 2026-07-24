@@ -293,8 +293,58 @@ export async function GET(request: NextRequest) {
     })
   }
 
+  // ─── get_hub_impact: Hub performance data for a creator ───
+  if (action === 'get_hub_impact') {
+    const creatorName = url.searchParams.get('creator_name')
+    if (!creatorName) return NextResponse.json({ error: 'creator_name param required' }, { status: 400 })
+
+    const hubUrl = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL
+    const hubKey = process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY
+    if (!hubUrl || !hubKey) {
+      return NextResponse.json({ error: 'Hub Supabase not configured' }, { status: 500 })
+    }
+
+    const hubClient = createClient(hubUrl, hubKey, { auth: { autoRefreshToken: false, persistSession: false } })
+
+    // Find their Quick Wins on the Hub
+    const { data: quickWins } = await hubClient
+      .from('hub_quick_wins')
+      .select('id, title, slug, category, is_published, created_at')
+      .eq('creator_name', creatorName)
+
+    // Find their courses on the Hub
+    const { data: courses } = await hubClient
+      .from('hub_courses')
+      .select('id, title, slug, is_published, created_at')
+      .eq('creator_name', creatorName)
+
+    const contentIds = (quickWins || []).map(q => q.id)
+
+    // Get community responses
+    let responseCounts: Record<string, number> = {}
+    if (contentIds.length > 0) {
+      const { data: responses } = await hubClient
+        .from('quick_win_responses')
+        .select('quick_win_id')
+        .in('quick_win_id', contentIds.map(id => id.toString()))
+      ;(responses || []).forEach((r: { quick_win_id: string }) => {
+        responseCounts[r.quick_win_id] = (responseCounts[r.quick_win_id] || 0) + 1
+      })
+    }
+
+    return NextResponse.json({
+      creator_name: creatorName,
+      quick_wins: (quickWins || []).map(q => ({
+        ...q,
+        community_responses: responseCounts[q.id] || 0,
+      })),
+      courses: courses || [],
+      total_published: (quickWins || []).filter(q => q.is_published).length + (courses || []).filter(c => c.is_published).length,
+    })
+  }
+
   return NextResponse.json(
-    { error: 'Unknown action. Use: find_work, get_creator, get_dashboard' },
+    { error: 'Unknown action. Use: find_work, get_creator, get_dashboard, get_hub_impact' },
     { status: 400 }
   )
 }
