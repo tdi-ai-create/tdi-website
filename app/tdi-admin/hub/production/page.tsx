@@ -217,12 +217,7 @@ function QuickWinsTab() {
   const handleSave = async () => {
     if (!form.title.trim() || !form.slug.trim()) return;
 
-    // Validate: cannot publish without thumbnail
-    const hasThumbnail = !!thumbnailFile || !!form.thumbnail_url;
-    if (form.is_published && !hasThumbnail) {
-      setPublishWarning('A thumbnail image is required before publishing. Please upload a thumbnail or uncheck "Published".');
-      return;
-    }
+    // Note: thumbnails are optional. Quick Win cards use colored category dots (Option C design).
 
     setIsSubmitting(true);
     setPublishWarning('');

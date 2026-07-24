@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
       total: items.length,
       published: published.length,
       drafts: drafts.length,
-      drafts_missing_thumbnail: drafts.filter(d => !d.thumbnail_url).length,
+      drafts_ready: drafts.filter(d => !!d.file_url).length,
       drafts_missing_pdf: drafts.filter(d => !d.file_url).length,
     })
   }
@@ -268,7 +268,7 @@ export async function POST(request: NextRequest) {
       if (!qw.title?.trim()) errors.push('title is required')
       if (!qw.description?.trim()) errors.push('description is required')
       if (!qw.category) errors.push('category is required')
-      if (!qw.thumbnail_url) errors.push('thumbnail is required before publishing')
+      // Note: thumbnails are NOT required. Quick Win cards use colored category dots (Option C design).
       if (!Array.isArray(qw.danielson_domains) || qw.danielson_domains.length === 0) errors.push('at least one danielson_domain is required')
       if (!Array.isArray(qw.roles) || qw.roles.length === 0) errors.push('at least one role is required')
 

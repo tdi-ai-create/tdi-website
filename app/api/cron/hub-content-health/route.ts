@@ -52,23 +52,8 @@ export async function GET() {
     issues.push(`Quick Wins check failed: ${String(err)}`);
   }
 
-  // Check 2: Quick Wins without thumbnails
-  try {
-    const { count, error } = await supabase
-      .from('hub_quick_wins')
-      .select('*', { count: 'exact', head: true })
-      .eq('is_published', true)
-      .or('thumbnail_url.is.null,thumbnail_url.eq.');
-
-    if (!error && (count || 0) > 0) {
-      issues.push(
-        `WARNING: ${count} published Quick Win(s) missing thumbnails. ` +
-        `These will appear blank to users.`
-      );
-    }
-  } catch (err) {
-    // Non-critical
-  }
+  // Check 2: Removed. Quick Win cards use colored category dots (Option C design).
+  // Thumbnails are no longer required or expected.
 
   // Check 3: Courses count
   try {
