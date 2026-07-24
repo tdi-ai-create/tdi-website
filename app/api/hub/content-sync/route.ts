@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
   if (action === 'list_drafts') {
     const { data: drafts, error } = await supabase
       .from('hub_quick_wins')
-      .select('id, title, slug, category, type, description, thumbnail_url, file_url, danielson_domains, roles, created_at, updated_at')
+      .select('id, title, slug, category, description, thumbnail_url, file_url, danielson_domains, roles, created_at, updated_at')
       .eq('is_published', false)
       .order('created_at', { ascending: false })
 
@@ -69,7 +69,6 @@ export async function GET(request: NextRequest) {
       title: d.title,
       slug: d.slug,
       category: d.category,
-      type: d.type,
       description: d.description,
       has_thumbnail: !!d.thumbnail_url,
       has_pdf: !!d.file_url,
@@ -136,7 +135,6 @@ export async function POST(request: NextRequest) {
         slug: cleanSlug,
         description: description.trim(),
         category: category || null,
-        type: VALID_TYPES.includes(body.type) ? body.type : 'download',
         duration_minutes: body.duration_minutes || null,
         capacity: VALID_CAPACITIES.includes(body.capacity) ? body.capacity : null,
         danielson_domains: Array.isArray(body.danielson_domains) ? body.danielson_domains : [],
