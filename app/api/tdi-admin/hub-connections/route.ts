@@ -372,12 +372,34 @@ async function getCmoData(hub: ReturnType<typeof createClient>) {
   };
 }
 
+// Creator Portal client (separate Supabase project from Hub)
+let cachedPortalClient: ReturnType<typeof createClient> | null = null;
+function getPortalClient() {
+  if (cachedPortalClient) return cachedPortalClient;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  cachedPortalClient = createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
+  return cachedPortalClient;
+}
+
 // ── Creators: content impact scores ──
 async function getCreatorsData(hub: ReturnType<typeof createClient>) {
-  // Get all quick wins with their categories
+  // Get creators from Creator Portal (separate database)
+  const portal = getPortalClient();
+  let creators: Array<{ id: string; name: string; email: string; content_path: string | null; current_phase: string | null; publish_status: string | null }> = [];
+  if (portal) {
+    const { data } = await portal
+      .from('creators')
+      .select('id, name, email, content_path, current_phase, publish_status')
+      .eq('status', 'active');
+    creators = data || [];
+  }
+
+  // Get all quick wins with their categories from Hub
   const { data: quickWins } = await hub
     .from('hub_quick_wins')
-    .select('id, title, category, creator_name')
+    .select('id, title, category, creator_name, is_published')
     .limit(500);
 
   // Get view counts
@@ -446,9 +468,32 @@ async function getCreatorsData(hub: ReturnType<typeof createClient>) {
     .order('created_at', { ascending: false })
     .limit(20);
 
+  // Link creators from Portal to their Hub content by name
+  const creatorProfiles = creators.map(c => {
+    const myContent = contentScores.filter((cs: { creator: string }) =>
+      cs.creator.toLowerCase() === c.name.toLowerCase()
+    );
+    const totalViews = myContent.reduce((sum: number, cs: { views: number }) => sum + cs.views, 0);
+    const totalResponses = myContent.reduce((sum: number, cs: { communityResponses: number }) => sum + cs.communityResponses, 0);
+    const totalQA = myContent.reduce((sum: number, cs: { qaThreads: number }) => sum + cs.qaThreads, 0);
+    return {
+      id: c.id,
+      name: c.name,
+      content_path: c.content_path,
+      current_phase: c.current_phase,
+      publish_status: c.publish_status,
+      hubContentCount: myContent.length,
+      totalViews,
+      totalResponses,
+      totalQA,
+      impactScore: totalViews + (totalResponses * 5) + (totalQA * 3),
+    };
+  }).sort((a, b) => b.impactScore - a.impactScore);
+
   return {
     topContent: contentScores.slice(0, 20),
     categoryPerformance,
+    creatorProfiles,
     contentRequests: (contentRequests || []).map((r: { metadata: Record<string, unknown> | null; created_at: string }) => ({
       request: r.metadata?.request || r.metadata?.description || 'Unknown',
       date: r.created_at,
