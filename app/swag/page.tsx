@@ -317,7 +317,7 @@ export default function SwagPage() {
               <p style={{ fontSize: 14, fontWeight: 700, color: C.navy, margin: 0 }}>Ordering for your team?</p>
               <p style={{ fontSize: 13, color: C.muted, margin: '2px 0 0' }}>We do bulk orders for schools and districts. Let's talk about what works for your team.</p>
             </div>
-            <a href="mailto:hello@teachersdeserveit.com?subject=Bulk%20Swag%20Order%20Inquiry" style={{
+            <a href="/contact" style={{
               background: C.yellow, color: C.navy, padding: '10px 20px', borderRadius: 6,
               fontSize: 13, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap',
             }}>
@@ -366,7 +366,7 @@ export default function SwagPage() {
         <p style={{ fontSize: 14, color: C.blue, margin: '0 0 20px' }}>
           We work with schools and districts on staff appreciation, onboarding kits, and PD day swag.
         </p>
-        <a href="mailto:hello@teachersdeserveit.com?subject=Swag%20Inquiry" style={{
+        <a href="/contact" style={{
           display: 'inline-flex', alignItems: 'center', gap: 8,
           background: C.yellow, color: C.navy, padding: '14px 28px',
           borderRadius: 6, fontSize: 14, fontWeight: 700, textDecoration: 'none',
