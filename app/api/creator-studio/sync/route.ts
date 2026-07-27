@@ -314,11 +314,10 @@ export async function GET(request: NextRequest) {
       .eq('name', creatorName)
       .single()
 
-    let quickWins: Array<Record<string, unknown>> = []
-    // hub_quick_wins has no creator column, so we can't filter by creator
-    // Quick Wins are TDI-authored, not individual creator content
+    // hub_quick_wins has no creator column, so Quick Wins are TDI-authored
+    // Only courses have creator_id linking to Creator Portal
 
-    let courses: Array<Record<string, unknown>> = []
+    let courses: Array<{ id: string; title: string; slug: string; is_published: boolean; created_at: string }>  = []
     if (portalCreator) {
       const { data: courseData } = await hubClient
         .from('hub_courses')
@@ -327,28 +326,11 @@ export async function GET(request: NextRequest) {
       courses = courseData || []
     }
 
-    const contentIds = (quickWins || []).map(q => q.id)
-
-    // Get community responses
-    let responseCounts: Record<string, number> = {}
-    if (contentIds.length > 0) {
-      const { data: responses } = await hubClient
-        .from('quick_win_responses')
-        .select('quick_win_id')
-        .in('quick_win_id', contentIds.map(id => id.toString()))
-      ;(responses || []).forEach((r: { quick_win_id: string }) => {
-        responseCounts[r.quick_win_id] = (responseCounts[r.quick_win_id] || 0) + 1
-      })
-    }
-
     return NextResponse.json({
       creator_name: creatorName,
-      quick_wins: (quickWins || []).map(q => ({
-        ...q,
-        community_responses: responseCounts[q.id] || 0,
-      })),
-      courses: courses || [],
-      total_published: (quickWins || []).filter(q => q.is_published).length + (courses || []).filter(c => c.is_published).length,
+      quick_wins: [],
+      courses,
+      total_published: courses.filter(c => c.is_published).length,
     })
   }
 
