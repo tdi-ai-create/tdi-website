@@ -37,7 +37,7 @@ export const SWAG_PRODUCTS: SwagProduct[] = [
   },
   {
     id: 'room-hat',
-    name: 'Room',
+    name: 'The Room',
     price: 32.00,
     category: 'hats',
     description: 'Embroidered dad hat',
@@ -66,7 +66,7 @@ export const SWAG_PRODUCTS: SwagProduct[] = [
   },
   {
     id: 'good-pens-tumbler',
-    name: 'Good Pens',
+    name: 'The Good Pens',
     price: 34.00,
     category: 'drinkware',
     description: '20 oz insulated tumbler',
@@ -77,7 +77,7 @@ export const SWAG_PRODUCTS: SwagProduct[] = [
   },
   {
     id: 'best-part-mug',
-    name: "Somebody's Day",
+    name: "Somebody's Best Part",
     price: 26.00,
     category: 'drinkware',
     description: 'Black glossy mug, 11oz',
@@ -107,7 +107,7 @@ export const SWAG_PRODUCTS: SwagProduct[] = [
   },
   {
     id: 'hard-parts-tote',
-    name: 'Here for the Hard Parts',
+    name: 'The Hard Parts',
     price: 36.50,
     category: 'bags',
     description: 'Organic denim tote',
@@ -117,7 +117,7 @@ export const SWAG_PRODUCTS: SwagProduct[] = [
   },
   {
     id: 'same-team-tote',
-    name: 'Same Team Tote',
+    name: 'Same Team',
     price: 28.00,
     category: 'bags',
     description: 'Eco recycled cotton',
@@ -127,7 +127,7 @@ export const SWAG_PRODUCTS: SwagProduct[] = [
   },
   {
     id: 'pa-hat',
-    name: 'PA Cap',
+    name: 'The PA',
     price: 16.00,
     category: 'hats',
     description: '5-panel, adjustable',
@@ -137,7 +137,7 @@ export const SWAG_PRODUCTS: SwagProduct[] = [
   },
   {
     id: 'same-team-magnet',
-    name: 'Same Team Magnet',
+    name: 'Same Team',
     price: 8.00,
     category: 'accessories',
     description: 'Round magnet',
