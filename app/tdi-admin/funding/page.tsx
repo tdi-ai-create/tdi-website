@@ -177,7 +177,9 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
   onDraftEmail: (to: string, toName: string, subject: string, body: string, schoolName: string, pursuitId: string, extra?: any) => void
   onToast: (msg: string) => void
 }) {
-  const activeGrants = school.grants.filter(g => g.status !== 'denied')
+  const [showCompleted, setShowCompleted] = useState(false)
+  const completedGrants = school.grants.filter(g => g.status !== 'denied' && g.forwardingStatus === 'sent' && g.narrativeStatus === 'ready')
+  const activeGrants = school.grants.filter(g => g.status !== 'denied' && !(g.forwardingStatus === 'sent' && g.narrativeStatus === 'ready'))
   const deniedGrants = school.grants.filter(g => g.status === 'denied')
   const openWindowGrants = activeGrants.filter(g => g.windowOpen)
   const draftsReady = activeGrants.filter(g => ['review', 'qa_review'].includes(g.narrativeStatus))
@@ -316,6 +318,34 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
             onRefresh={() => window.location.reload()}
           />
         ))}
+        {completedGrants.length > 0 && (
+          <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #F3F4F6' }}>
+            <button
+              onClick={() => setShowCompleted(!showCompleted)}
+              style={{
+                fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5,
+                background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: 4,
+              }}
+            >
+              <span style={{ transform: showCompleted ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.15s', display: 'inline-block', fontSize: 10 }}>&#9654;</span>
+              Completed ({completedGrants.length})
+            </button>
+            {showCompleted && (
+              <div style={{ marginTop: 8 }}>
+                {completedGrants.map(grant => (
+                  <GrantRow
+                    key={grant.id}
+                    grant={grant}
+                    school={school}
+                    onDraftEmail={onDraftEmail}
+                    onToast={onToast}
+                    onRefresh={() => window.location.reload()}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
         {deniedGrants.length > 0 && (
           <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8 }}>
             {deniedGrants.length} denied grant{deniedGrants.length > 1 ? 's' : ''} (not shown)
