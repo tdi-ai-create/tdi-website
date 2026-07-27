@@ -399,7 +399,7 @@ async function getCreatorsData(hub: ReturnType<typeof createClient>) {
   // Get all quick wins with their categories from Hub
   const { data: quickWins } = await hub
     .from('hub_quick_wins')
-    .select('id, title, category, creator_name, is_published')
+    .select('id, title, category, is_published')
     .limit(500);
 
   // Get view counts
@@ -439,11 +439,11 @@ async function getCreatorsData(hub: ReturnType<typeof createClient>) {
   });
 
   // Build content impact scores
-  const contentScores = (quickWins || []).map((qw: { id: string; title: string; category: string | null; creator_name: string | null }) => ({
+  const contentScores = (quickWins || []).map((qw: { id: string; title: string; category: string | null }) => ({
     id: qw.id,
     title: qw.title,
     category: qw.category || 'uncategorized',
-    creator: qw.creator_name || 'TDI',
+    creator: 'TDI',
     views: viewCounts[qw.id] || 0,
     communityResponses: responseCounts[qw.id] || 0,
     qaThreads: qaCounts[qw.id] || 0,

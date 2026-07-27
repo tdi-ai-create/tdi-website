@@ -130,6 +130,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: `Invalid category. Must be one of: ${VALID_CATEGORIES.join(', ')}` }, { status: 400 })
       }
 
+      // Actual hub_quick_wins columns (verified against schema):
+      // id, slug, title, description, category, duration_minutes, quick_win_type,
+      // access_tier, capacity, is_published, tier, resource_type, topic_tags,
+      // file_url, file_path, file_type, storage_path, lift, danielson_domains, roles
       const insertPayload: Record<string, unknown> = {
         title: title.trim(),
         slug: cleanSlug,
@@ -137,10 +141,14 @@ export async function POST(request: NextRequest) {
         category: category || null,
         duration_minutes: body.duration_minutes || null,
         capacity: VALID_CAPACITIES.includes(body.capacity) ? body.capacity : null,
+        lift: body.lift || (body.capacity === 'low' ? 'LOW' : body.capacity === 'medium' ? 'MED' : body.capacity === 'high' ? 'HIGH' : null),
+        quick_win_type: body.quick_win_type || 'download',
+        resource_type: body.resource_type || body.quick_win_type || 'download',
+        topic_tags: Array.isArray(body.topic_tags) ? body.topic_tags : [],
         danielson_domains: Array.isArray(body.danielson_domains) ? body.danielson_domains : [],
         roles: Array.isArray(body.roles) ? body.roles : [],
         access_tier: VALID_TIERS.includes(body.access_tier) ? body.access_tier : 'professional',
-        creator_name: body.creator_name || null,
+        tier: body.access_tier === 'essentials' ? 'Essentials' : body.access_tier === 'free_rotating' ? 'Free' : body.access_tier === 'all_access' ? 'All-Access' : 'Professional',
         is_published: false,
       }
 

@@ -306,17 +306,26 @@ export async function GET(request: NextRequest) {
 
     const hubClient = createClient(hubUrl, hubKey, { auth: { autoRefreshToken: false, persistSession: false } })
 
-    // Find their Quick Wins on the Hub
-    const { data: quickWins } = await hubClient
-      .from('hub_quick_wins')
-      .select('id, title, slug, category, is_published, created_at')
-      .eq('creator_name', creatorName)
+    // Find their courses on the Hub (hub_courses has creator_id, not creator_name)
+    // Look up creator in portal first to get their ID for course matching
+    const { data: portalCreator } = await supabase
+      .from('creators')
+      .select('id')
+      .eq('name', creatorName)
+      .single()
 
-    // Find their courses on the Hub
-    const { data: courses } = await hubClient
-      .from('hub_courses')
-      .select('id, title, slug, is_published, created_at')
-      .eq('creator_name', creatorName)
+    let quickWins: Array<Record<string, unknown>> = []
+    // hub_quick_wins has no creator column, so we can't filter by creator
+    // Quick Wins are TDI-authored, not individual creator content
+
+    let courses: Array<Record<string, unknown>> = []
+    if (portalCreator) {
+      const { data: courseData } = await hubClient
+        .from('hub_courses')
+        .select('id, title, slug, is_published, created_at')
+        .eq('creator_id', portalCreator.id)
+      courses = courseData || []
+    }
 
     const contentIds = (quickWins || []).map(q => q.id)
 

@@ -267,11 +267,11 @@ export async function POST(request: Request) {
         const hubSupabase = createClient(hubUrl, hubKey, {
           auth: { autoRefreshToken: false, persistSession: false },
         });
-        // Find the course in Hub by matching creator name
+        // Find the course in Hub by matching creator_id
         const { data: hubCourses } = await hubSupabase
           .from('hub_courses')
           .select('id, title, is_published')
-          .eq('creator_name', creator.name)
+          .eq('creator_id', creatorId)
           .eq('is_published', false);
 
         // If we find a matching unpublished course, publish it
