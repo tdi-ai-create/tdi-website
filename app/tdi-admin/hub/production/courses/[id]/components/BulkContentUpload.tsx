@@ -186,6 +186,8 @@ export default function BulkContentUpload({ course, onComplete, onLessonUploaded
     for (let i = 0; i < matchedFiles.length; i++) {
       const mapping = matchedFiles[i];
 
+      let videoUid = '';
+      let uploadSucceeded = false;
       try {
         if (mapping.fileType === 'video') {
           // ── Video upload (Cloudflare Stream) ──
@@ -202,7 +204,9 @@ export default function BulkContentUpload({ course, onComplete, onLessonUploaded
             throw new Error(err.error || `Upload failed (${urlRes.status})`);
           }
 
-          const { uploadUrl, videoUid } = await urlRes.json();
+          const urlData = await urlRes.json();
+          const uploadUrl = urlData.uploadUrl;
+          videoUid = urlData.videoUid;
 
           await new Promise<void>((resolve, reject) => {
             const xhr = new XMLHttpRequest();
@@ -219,6 +223,7 @@ export default function BulkContentUpload({ course, onComplete, onLessonUploaded
             xhr.send(formData);
           });
 
+          uploadSucceeded = true;
           updateQueueItem(i, { status: 'processing', progress: 80 });
 
           const saveRes = await fetch('/api/tdi-admin/lessons', {
@@ -280,6 +285,10 @@ export default function BulkContentUpload({ course, onComplete, onLessonUploaded
         console.error(`Bulk upload error for ${mapping.file.name}:`, err);
         const errorMessage = err instanceof Error ? err.message : 'Upload failed';
         updateQueueItem(i, { status: 'error', progress: 0, errorMessage });
+        // Clean up orphaned Cloudflare entry to prevent storage bloat
+        if (videoUid && !uploadSucceeded) {
+          fetch(`/api/tdi-admin/videos/upload?uid=${videoUid}`, { method: 'DELETE' }).catch(() => {});
+        }
       }
     }
 

@@ -264,6 +264,8 @@ export default function BulkVideoUpload({ course, onComplete, onLessonUploaded }
     for (let i = 0; i < matchedFiles.length; i++) {
       const mapping = matchedFiles[i];
 
+      let videoUid = '';
+      let uploadSucceeded = false;
       try {
         // Skip compression (disabled to preserve audio)
         const uploadFile = mapping.file;
@@ -288,7 +290,9 @@ export default function BulkVideoUpload({ course, onComplete, onLessonUploaded }
           throw new Error(errMsg);
         }
 
-        const { uploadUrl, videoUid } = await urlRes.json();
+        const urlData = await urlRes.json();
+        const uploadUrl = urlData.uploadUrl;
+        videoUid = urlData.videoUid;
 
         // Upload to Cloudflare via XHR for progress
         await new Promise<void>((resolve, reject) => {
@@ -313,6 +317,8 @@ export default function BulkVideoUpload({ course, onComplete, onLessonUploaded }
           xhr.open('POST', uploadUrl);
           xhr.send(formData);
         });
+
+        uploadSucceeded = true;
 
         // Processing
         updateQueueItem(i, { status: 'processing', progress: 80 });
@@ -358,6 +364,10 @@ export default function BulkVideoUpload({ course, onComplete, onLessonUploaded }
         console.error(`Bulk upload error for ${mapping.file.name}:`, err);
         const errorMessage = err instanceof Error ? err.message : 'Upload failed';
         updateQueueItem(i, { status: 'error', progress: 0, errorMessage });
+        // Clean up orphaned Cloudflare entry to prevent storage bloat
+        if (videoUid && !uploadSucceeded) {
+          fetch(`/api/tdi-admin/videos/upload?uid=${videoUid}`, { method: 'DELETE' }).catch(() => {});
+        }
       }
     }
 

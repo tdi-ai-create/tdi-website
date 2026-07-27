@@ -315,6 +315,8 @@ function VideoUploadSection({
     setUploadSpeed('');
     setTimeRemaining('');
 
+    let videoUid = '';
+    let videoUploadSucceeded = false;
     try {
       // Step 0: Compress if needed
       const uploadFile = await compressVideo(file);
@@ -336,7 +338,9 @@ function VideoUploadSection({
         throw new Error(errMsg);
       }
 
-      const { uploadUrl, videoUid } = await urlRes.json();
+      const urlData = await urlRes.json();
+      const { uploadUrl } = urlData;
+      videoUid = urlData.videoUid;
 
       // Step 2: Upload with real progress tracking using XMLHttpRequest
       await new Promise<void>((resolve, reject) => {
@@ -374,6 +378,7 @@ function VideoUploadSection({
         xhr.send(formData);
       });
 
+      videoUploadSucceeded = true;
       setUploadProgress(80);
       setUploadStatus('processing');
       setUploadSpeed('');
@@ -419,6 +424,10 @@ function VideoUploadSection({
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Upload failed');
       setUploadStatus('error');
+      // Clean up orphaned Cloudflare entry to prevent storage bloat
+      if (videoUid && !videoUploadSucceeded) {
+        fetch(`/api/tdi-admin/videos/upload?uid=${videoUid}`, { method: 'DELETE' }).catch(() => {});
+      }
     } finally {
       setUploading(false);
     }

@@ -141,3 +141,47 @@ export async function GET(request: Request) {
     );
   }
 }
+
+/**
+ * DELETE /api/tdi-admin/videos/upload?uid=VIDEO_UID
+ *
+ * Clean up a failed/orphaned upload from Cloudflare Stream.
+ * Called by the client when an upload fails after getting a direct upload URL,
+ * to prevent pendingupload entries from consuming storage quota.
+ */
+export async function DELETE(request: Request) {
+  try {
+    const cfToken = process.env.CLOUDFLARE_STREAM_API_TOKEN;
+    const cfAccountId = process.env.CF_ACCOUNT_ID;
+    const { searchParams } = new URL(request.url);
+    const uid = searchParams.get('uid');
+
+    if (!cfToken || !cfAccountId) {
+      return NextResponse.json({ error: 'Cloudflare not configured' }, { status: 500 });
+    }
+
+    if (!uid) {
+      return NextResponse.json({ error: 'Video uid required' }, { status: 400 });
+    }
+
+    const cfResponse = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/stream/${uid}`,
+      {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${cfToken}` },
+      }
+    );
+
+    if (!cfResponse.ok && cfResponse.status !== 404) {
+      return NextResponse.json({ error: 'Failed to delete video' }, { status: 502 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('[video-upload] Delete error:', error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Delete failed' },
+      { status: 500 }
+    );
+  }
+}
