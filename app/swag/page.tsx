@@ -328,9 +328,12 @@ function SwagPageInner() {
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '10px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', gap: 16 }}>
             <a href="#contract" style={{ fontSize: 13, fontWeight: 700, color: C.navy, textDecoration: 'none' }}>Contract Hours</a>
+            <span style={{ color: C.border }}>.</span>
             <a href="#after" style={{ fontSize: 13, fontWeight: 700, color: C.muted, textDecoration: 'none' }}>After Hours</a>
-            <a href="#stickers" style={{ fontSize: 13, fontWeight: 600, color: C.muted, textDecoration: 'none' }}>Stickers</a>
-            <a href="#summer" style={{ fontSize: 13, fontWeight: 600, color: C.muted, textDecoration: 'none' }}>Summer</a>
+            <span style={{ color: C.border }}>.</span>
+            <a href="#stickers" style={{ fontSize: 13, fontWeight: 600, color: C.muted, textDecoration: 'none' }}>Sticker Bar</a>
+            <span style={{ color: C.border }}>.</span>
+            <a href="#summer" style={{ fontSize: 13, fontWeight: 600, color: C.muted, textDecoration: 'none' }}>Summer Transition</a>
           </div>
           <button onClick={openCart} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: C.navy, fontFamily: "'DM Sans', sans-serif" }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.navy} strokeWidth="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
