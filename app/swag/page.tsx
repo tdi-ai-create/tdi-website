@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
-import { SWAG_PRODUCTS, getContractProducts, getAfterProducts, getStickers } from '@/lib/swag/products';
+import { SWAG_PRODUCTS, getContractProducts, getAfterProducts, getSummerTransition, getStickers } from '@/lib/swag/products';
 import type { SwagProduct, ColorVariant } from '@/lib/swag/types';
 import { useCart } from '@/lib/swag/CartContext';
 
@@ -276,6 +276,7 @@ function SwagPageInner() {
   // Get products by section
   const contract = getContractProducts();
   const afterProducts = getAfterProducts();
+  const summerProducts = getSummerTransition();
   const allStickers = getStickers();
 
   return (
@@ -351,6 +352,17 @@ function SwagPageInner() {
       </div>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px 48px' }}>
         <Section title="Shirts &amp; Loungewear" products={afterProducts} onOpen={setDrawerProduct} />
+      </div>
+
+      {/* ─── THE SUMMER TRANSITION ─── */}
+      <div style={{ borderTop: `1px solid ${C.border}`, background: C.warmBg }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 24px 48px' }}>
+          <h2 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 26, fontWeight: 700, color: C.navy, margin: '0 0 6px' }}>The Summer Transition</h2>
+          <p style={{ fontSize: 14, color: C.muted, margin: '0 0 28px' }}>Where school-year stress meets summer-ready fashion. Proceed with caution.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 20 }}>
+            {summerProducts.map(p => <ProductTile key={p.id} product={p} onOpen={() => setDrawerProduct(p)} />)}
+          </div>
+        </div>
       </div>
 
       {/* Teams CTA */}

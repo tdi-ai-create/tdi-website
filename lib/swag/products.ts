@@ -382,6 +382,49 @@ const AFTER_SHIRTS: SwagProduct[] = [
 ];
 
 // ════════════════════════════════════════════════════════════
+// THE SUMMER TRANSITION
+// ════════════════════════════════════════════════════════════
+
+const SUMMER_TRANSITION: SwagProduct[] = [
+  {
+    id: 'postit-hunt',
+    name: 'The PostIt Hunt',
+    price: 36.00,
+    category: 'apparel',
+    description: 'Oversized boxy tee',
+    blurb: 'Sub plans. Copier code. Find my lanyard. Lunch (lol). The to-do list that never made it off the chest.',
+    images: fb('postit-hunt'),
+    printfulUrl: 'https://tdi.printful.me',
+    variants: TEE_SIZES,
+    drop: 'after-hours',
+  },
+  {
+    id: 'badge-fall',
+    name: 'The Badge Fall',
+    price: 36.00,
+    category: 'apparel',
+    description: 'Oversized boxy tee',
+    blurb: 'Team player. Off duty. The lanyard finally let go and honestly, same.',
+    images: fb('badge-fall'),
+    printfulUrl: 'https://tdi.printful.me',
+    variants: TEE_SIZES,
+    drop: 'after-hours',
+  },
+  {
+    id: 'ac-nightmare',
+    name: 'The AC Nightmare',
+    price: 36.00,
+    category: 'apparel',
+    description: 'Oversized boxy tee',
+    blurb: 'The AC finally kicked in. Unfortunately, it kicked in everywhere.',
+    images: fb('ac-nightmare'),
+    printfulUrl: 'https://tdi.printful.me',
+    variants: TEE_SIZES,
+    drop: 'after-hours',
+  },
+];
+
+// ════════════════════════════════════════════════════════════
 // STICKERS
 // ════════════════════════════════════════════════════════════
 
@@ -407,6 +450,7 @@ export const SWAG_PRODUCTS: SwagProduct[] = [
   ...CONTRACT_BAGS,
   ...CONTRACT_ACCESSORIES,
   ...AFTER_SHIRTS,
+  ...SUMMER_TRANSITION,
   ...STICKERS,
 ];
 
@@ -426,6 +470,10 @@ export function getContractProducts(): { shirts: SwagProduct[]; hats: SwagProduc
 
 export function getAfterProducts(): SwagProduct[] {
   return AFTER_SHIRTS;
+}
+
+export function getSummerTransition(): SwagProduct[] {
+  return SUMMER_TRANSITION;
 }
 
 export function getStickers(): SwagProduct[] {
