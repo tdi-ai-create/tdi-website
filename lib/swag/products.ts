@@ -361,18 +361,6 @@ const STICKERS: SwagProduct[] = [
   { id: 'glad-sticker', name: 'Glad', price: 4.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/glad-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
   { id: 'same-team-sticker-lg', name: 'Same Team (Large)', price: 6.00, category: 'stickers', description: 'Large die-cut vinyl sticker', images: multi('same-team-sticker-lg', 2), printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
   { id: 'intermission-sticker', name: 'The Intermission', price: 4.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/intermission-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
-  // ── The Closed Q&A (4 colors) ──
-  ...(['white', 'green', 'lightblue', 'blue'] as const).map(color => ({
-    id: `qa-sticker-${color}`,
-    name: 'The Closed Q&A',
-    colorName: color === 'lightblue' ? 'Light Blue' : color.charAt(0).toUpperCase() + color.slice(1),
-    price: 4.50,
-    category: 'stickers' as const,
-    description: 'Die-cut vinyl sticker',
-    images: single(`qa-sticker-${color}`),
-    printfulUrl: 'https://tdi.printful.me',
-    drop: 'both' as const,
-  })),
 ];
 
 // ════════════════════════════════════════════════════════════

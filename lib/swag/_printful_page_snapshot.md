@@ -1,0 +1,156 @@
+- main [ref=f44e3]:
+  - navigation "Global" [ref=f44e5]:
+    - generic [ref=f44e6]:
+      - link "Teachers Deserve It Store logo" [ref=f44e7] [cursor=pointer]:
+        - /url: /
+        - generic [ref=f44e8]: Teachers Deserve It
+        - img "Store logo" [ref=f44e9]
+      - generic [ref=f44e10]:
+        - link "All products" [ref=f44e11] [cursor=pointer]:
+          - /url: /
+        - link "Men's clothing" [ref=f44e12] [cursor=pointer]:
+          - /url: /mens-clothing
+        - link "Women's clothing" [ref=f44e13] [cursor=pointer]:
+          - /url: /womens-clothing
+        - link "Home & living" [ref=f44e14] [cursor=pointer]:
+          - /url: /home-living
+        - link "Accessories" [ref=f44e15] [cursor=pointer]:
+          - /url: /accessories
+        - link "Hats" [ref=f44e16] [cursor=pointer]:
+          - /url: /hats
+    - button "Shopping cart" [ref=f44e19] [cursor=pointer]
+  - generic [ref=f44e23]:
+    - generic [ref=f44e24]:
+      - link "All products" [ref=f44e25] [cursor=pointer]:
+        - /url: /
+      - text: /Ask Me - Unisex Garment Dyed Creator 2.0 Vintage T-Shirt | Stanley/Stella SATU041
+    - generic [ref=f44e26]:
+      - generic [ref=f44e27]:
+        - generic [ref=f44e29]:
+          - button "Mockup 0" [ref=f44e31] [cursor=pointer]:
+            - img "Mockup" [ref=f44e32]
+          - button "Mockup 1" [ref=f44e35] [cursor=pointer]:
+            - img "Mockup" [ref=f44e36]
+          - button "Mockup 2" [ref=f44e38] [cursor=pointer]:
+            - img "Mockup" [ref=f44e39]
+        - generic [ref=f44e41]:
+          - img "Ask Me - Unisex Garment Dyed Creator 2.0 Vintage T-Shirt | Stanley/Stella SATU041" [ref=f44e157]
+          - button [ref=f44e46] [cursor=pointer]
+      - generic [ref=f44e49]:
+        - heading "Ask Me - Unisex Garment Dyed Creator 2.0 Vintage T-Shirt | Stanley/Stella SATU041" [level=1] [ref=f44e50]
+        - generic [ref=f44e51]:
+          - text: Choose color
+          - list [ref=f44e52]:
+            - listitem [ref=f44e53]:
+              - button "G. Dyed Black Rock" [ref=f44e54] [cursor=pointer]
+              - generic: G. Dyed Black Rock
+            - listitem [ref=f44e57]:
+              - button "G. Dyed Anthracite" [ref=f44e58] [cursor=pointer]
+              - generic: G. Dyed Anthracite
+            - listitem [ref=f44e59]:
+              - button "G. Dyed Deep Teal" [ref=f44e60] [cursor=pointer]
+              - generic: G. Dyed Deep Teal
+            - listitem [ref=f44e61]:
+              - button "G. Dyed Green Bay" [ref=f44e62] [cursor=pointer]
+              - generic: G. Dyed Green Bay
+            - listitem [ref=f44e63]:
+              - button "G. Dyed Kaffa Coffee" [ref=f44e64] [cursor=pointer]
+              - generic: G. Dyed Kaffa Coffee
+            - listitem [ref=f44e65]:
+              - button "G. Dyed Misty Grey" [ref=f44e66] [cursor=pointer]
+              - generic: G. Dyed Misty Grey
+            - listitem [ref=f44e67]:
+              - button "G. Dyed Stone" [ref=f44e68] [cursor=pointer]
+              - generic: G. Dyed Stone
+        - generic [ref=f44e69]:
+          - text: Size
+          - list [ref=f44e70]:
+            - listitem [ref=f44e71]:
+              - button "S" [ref=f44e72] [cursor=pointer]
+            - listitem [ref=f44e73]:
+              - button "M" [ref=f44e74] [cursor=pointer]
+            - listitem [ref=f44e75]:
+              - button "L" [ref=f44e76] [cursor=pointer]
+            - listitem [ref=f44e77]:
+              - button "XL" [ref=f44e78] [cursor=pointer]
+            - listitem [ref=f44e79]:
+              - button "2XL" [ref=f44e80] [cursor=pointer]
+            - listitem [ref=f44e81]:
+              - button "3XL" [ref=f44e82] [cursor=pointer]
+        - button "Size guide" [ref=f44e84] [cursor=pointer]
+        - generic [ref=f44e85]:
+          - generic [ref=f44e86]: Quantity
+          - generic [ref=f44e87]:
+            - button "Decrement quantity" [disabled] [ref=f44e88]
+            - textbox "Number input" [ref=f44e93]: "1"
+            - button "Increment quantity" [ref=f44e94] [cursor=pointer]
+        - separator [ref=f44e97]
+        - generic [ref=f44e98]: $33.50
+        - button "Add to cart" [ref=f44e99] [cursor=pointer]
+    - generic [ref=f44e101]:
+      - generic [ref=f44e102]: About product
+      - generic [ref=f44e103]:
+        - generic [ref=f44e104]: "This vintage-style t-shirt has that soft, worn-in look people love from day one. The garment-dyed finish creates subtle color variations, making every piece feel unique and relaxed. It’s an easy everyday tee that works just as well styled up or worn casually. • 100% organic ring-spun cotton • Fabric weight: 5.6 oz./yd.² (190 g/m²) • Relaxed fit with a comfortable drape • Garment-dyed finish with a washed, vintage look • Side-seamed construction for a clean shape • Set-in sleeves • Ribbed collar for a classic finish • Blank product sourced from Bangladesh"
+        - link "Report this product" [ref=f44e109] [cursor=pointer]:
+          - /url: https://www.printful.com/policies/dmca-notice
+  - generic [ref=f44e110]:
+    - generic [ref=f44e112]:
+      - link [ref=f44e113] [cursor=pointer]:
+        - /url: /
+        - img "Store logo" [ref=f44e114]
+      - list [ref=f44e115]:
+        - listitem [ref=f44e116]:
+          - link "All products" [ref=f44e117] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=f44e118]:
+          - link "Men's clothing" [ref=f44e119] [cursor=pointer]:
+            - /url: /mens-clothing
+        - listitem [ref=f44e120]:
+          - link "Women's clothing" [ref=f44e121] [cursor=pointer]:
+            - /url: /womens-clothing
+        - listitem [ref=f44e122]:
+          - link "Home & living" [ref=f44e123] [cursor=pointer]:
+            - /url: /home-living
+        - listitem [ref=f44e124]:
+          - link "Accessories" [ref=f44e125] [cursor=pointer]:
+            - /url: /accessories
+        - listitem [ref=f44e126]:
+          - link "Hats" [ref=f44e127] [cursor=pointer]:
+            - /url: /hats
+      - list [ref=f44e128]:
+        - listitem [ref=f44e129]:
+          - link "Privacy policy" [ref=f44e130] [cursor=pointer]:
+            - /url: https://printful.com/policies/privacy
+        - listitem [ref=f44e131]:
+          - link [ref=f44e132] [cursor=pointer]:
+            - /url: https://www.printful.com/policies/privacy#personal-data-request-form
+            - img "privacy options logo" [ref=f44e133]
+            - text: Your Privacy Choices
+        - listitem [ref=f44e134]:
+          - link "Cookie policy" [ref=f44e135] [cursor=pointer]:
+            - /url: https://www.printful.com/policies/cookies
+        - listitem [ref=f44e136]:
+          - link "Terms & Conditions" [ref=f44e137] [cursor=pointer]:
+            - /url: /terms-and-conditions
+        - listitem [ref=f44e138]:
+          - link "Help & Contact us" [ref=f44e139] [cursor=pointer]:
+            - /url: /help-and-contact-us
+    - generic [ref=f44e141]:
+      - generic [ref=f44e142]:
+        - text: "Payment methods we accept:"
+        - img "payment methods" [ref=f44e143]
+      - generic [ref=f44e144]:
+        - generic [ref=f44e145]:
+          - text: "We deliver with:"
+          - img "payment methods" [ref=f44e146]
+        - generic [ref=f44e147]: Powered by Printful
+  - generic [ref=f44e149]:
+    - paragraph [ref=f44e150]:
+      - text: This website uses essential cookies that are required for the website to function properly. These cookies do not collect any personal information and are crucial for providing you with a seamless browsing experience. By using this website, you agree to the use of these essential cookies. Please refer to our
+      - link "Privacy Policy" [ref=f44e151] [cursor=pointer]:
+        - /url: https://printful.com/policies/privacy
+      - text: and
+      - link "Cookie Policy" [ref=f44e152] [cursor=pointer]:
+        - /url: https://printful.com/policies/cookies
+      - text: for more information on how we handle data and cookies.
+    - button "close cookie banner" [ref=f44e153] [cursor=pointer]

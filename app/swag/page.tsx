@@ -290,6 +290,16 @@ function SwagPageInner() {
         <Section title="Accessories" products={contract.accessories} onOpen={setDrawerProduct} />
       </div>
 
+      {/* ─── STICKER BAR (between sections) ─── */}
+      <div id="stickers" style={{ borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, background: C.white }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '28px 24px' }}>
+          <h2 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 22, fontWeight: 700, color: C.navy, margin: '0 0 14px' }}>The Sticker Bar</h2>
+          <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 8, WebkitOverflowScrolling: 'touch' as never }}>
+            {allStickers.map(p => <StickerTile key={p.id} product={p} onOpen={() => setDrawerProduct(p)} />)}
+          </div>
+        </div>
+      </div>
+
       {/* ─── AFTER HOURS ─── */}
       <div id="after" style={{ position: 'relative', width: '100%', height: 280, overflow: 'hidden', marginTop: 32 }}>
         <img src="/images/swag/hero-after.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
@@ -301,16 +311,6 @@ function SwagPageInner() {
       </div>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px 48px' }}>
         <Section title="Shirts &amp; Loungewear" products={afterProducts} onOpen={setDrawerProduct} />
-      </div>
-
-      {/* ─── STICKER BAR (all stickers) ─── */}
-      <div id="stickers" style={{ borderTop: `1px solid ${C.border}`, background: C.white }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '28px 24px' }}>
-          <h2 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 22, fontWeight: 700, color: C.navy, margin: '0 0 14px' }}>The Sticker Bar</h2>
-          <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 8, WebkitOverflowScrolling: 'touch' as const }}>
-            {allStickers.map(p => <StickerTile key={p.id} product={p} onOpen={() => setDrawerProduct(p)} />)}
-          </div>
-        </div>
       </div>
 
       {/* Teams CTA */}
