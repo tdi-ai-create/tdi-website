@@ -374,7 +374,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
     category: 'apparel' as const,
     description: 'Knitted classic tee',
     blurb: 'Halftime for humans.',
-    images: single('intermission-knit'),
+    images: fb('intermission-knit'),
     printfulUrl: 'https://tdi.printful.me/product/intermission-knitted-classic-tee',
     variants: TEE_SIZES,
     drop: 'after-hours' as const,
