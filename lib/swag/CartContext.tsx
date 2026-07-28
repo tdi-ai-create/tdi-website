@@ -9,6 +9,13 @@ export interface CartItem {
   variant?: string;
 }
 
+// Discount system: only one code at a time, no stacking
+export const PROMO_CODES: Record<string, { percent: number; label: string }> = {
+  SAMETEAM: { percent: 20, label: '20% off with SAMETEAM' },
+};
+
+const AUTO_APPLY_CODE = 'SAMETEAM';
+
 interface CartContextType {
   items: CartItem[];
   isOpen: boolean;
@@ -20,6 +27,12 @@ interface CartContextType {
   closeCart: () => void;
   totalItems: number;
   subtotal: number;
+  discountCode: string | null;
+  discountPercent: number;
+  discountAmount: number;
+  discountedTotal: number;
+  applyCode: (code: string) => boolean;
+  removeCode: () => void;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -27,6 +40,7 @@ const CartContext = createContext<CartContextType | null>(null);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [discountCode, setDiscountCode] = useState<string | null>(AUTO_APPLY_CODE);
 
   const cartKey = (id: string, variant?: string) => variant ? `${id}__${variant}` : id;
 
@@ -68,13 +82,29 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
 
+  const applyCode = useCallback((code: string): boolean => {
+    const upper = code.toUpperCase().trim();
+    if (PROMO_CODES[upper]) {
+      setDiscountCode(upper);
+      return true;
+    }
+    return false;
+  }, []);
+
+  const removeCode = useCallback(() => setDiscountCode(null), []);
+
   const totalItems = items.reduce((s, i) => s + i.quantity, 0);
   const subtotal = items.reduce((s, i) => s + i.product.price * i.quantity, 0);
+  const discountPercent = discountCode && PROMO_CODES[discountCode] ? PROMO_CODES[discountCode].percent : 0;
+  const discountAmount = subtotal * (discountPercent / 100);
+  const discountedTotal = subtotal - discountAmount;
 
   return (
     <CartContext.Provider value={{
       items, isOpen, addItem, removeItem, updateQuantity,
       clearCart, openCart, closeCart, totalItems, subtotal,
+      discountCode, discountPercent, discountAmount, discountedTotal,
+      applyCode, removeCode,
     }}>
       {children}
     </CartContext.Provider>

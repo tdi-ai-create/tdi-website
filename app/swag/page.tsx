@@ -46,7 +46,10 @@ function ProductTile({ product, onOpen }: { product: SwagProduct; onOpen: () => 
             ))}
           </div>
         )}
-        <p style={{ fontSize: 14, fontWeight: 700, color: C.navy, margin: '4px 0 0' }}>${product.price.toFixed(2)}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: C.navy, margin: 0 }}>${(product.price * 0.8).toFixed(2)}</p>
+          <p style={{ fontSize: 12, color: C.muted, margin: 0, textDecoration: 'line-through' }}>${product.price.toFixed(2)}</p>
+        </div>
       </div>
     </div>
   );
@@ -136,7 +139,11 @@ function ProductDrawer({ product, onClose }: { product: SwagProduct; onClose: ()
             </div>
           )}
           {product.blurb && <p style={{ fontSize: 14, color: C.charcoal, margin: '0 0 12px', lineHeight: 1.5 }}>{product.blurb}</p>}
-          <div style={{ fontSize: 24, fontWeight: 800, color: C.navy, margin: '0 0 20px' }}>${product.price.toFixed(2)}</div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, margin: '0 0 20px' }}>
+            <span style={{ fontSize: 24, fontWeight: 800, color: C.navy }}>${(product.price * 0.8).toFixed(2)}</span>
+            <span style={{ fontSize: 16, color: C.muted, textDecoration: 'line-through' }}>${product.price.toFixed(2)}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#16A34A', background: '#ECFDF5', padding: '2px 8px', borderRadius: 4 }}>20% OFF</span>
+          </div>
           {product.variants && (
             <div style={{ marginBottom: 20 }}>
               <p style={{ fontSize: 12, fontWeight: 700, color: sizeError ? '#DC2626' : C.navy, margin: '0 0 8px' }}>{sizeError ? 'Pick a size' : 'Size'}</p>
@@ -175,7 +182,7 @@ function ProductDrawer({ product, onClose }: { product: SwagProduct; onClose: ()
 
 /* ─── Cart Drawer ─── */
 function CartDrawer() {
-  const { items, isOpen, closeCart, updateQuantity, removeItem, subtotal, totalItems } = useCart();
+  const { items, isOpen, closeCart, updateQuantity, removeItem, subtotal, totalItems, discountCode, discountPercent, discountAmount, discountedTotal } = useCart();
   const [checkingOut, setCheckingOut] = useState(false);
   const handleCheckout = async () => {
     setCheckingOut(true);
@@ -223,9 +230,19 @@ function CartDrawer() {
         </div>
         {items.length > 0 && (
           <div style={{ padding: '16px 24px', borderTop: `1px solid ${C.border}` }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
               <span style={{ fontSize: 13, color: C.muted }}>Subtotal</span>
-              <span style={{ fontSize: 18, fontWeight: 800, color: C.navy }}>${subtotal.toFixed(2)}</span>
+              <span style={{ fontSize: 13, color: C.muted, textDecoration: discountCode ? 'line-through' : 'none' }}>${subtotal.toFixed(2)}</span>
+            </div>
+            {discountCode && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+                <span style={{ fontSize: 13, color: '#16A34A', fontWeight: 600 }}>SAMETEAM ({discountPercent}% off)</span>
+                <span style={{ fontSize: 13, color: '#16A34A', fontWeight: 600 }}>-${discountAmount.toFixed(2)}</span>
+              </div>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <span style={{ fontSize: 15, fontWeight: 800, color: C.navy }}>Total</span>
+              <span style={{ fontSize: 18, fontWeight: 800, color: C.navy }}>${discountedTotal.toFixed(2)}</span>
             </div>
             <p style={{ fontSize: 11, color: C.muted, margin: '0 0 14px' }}>Shipping + tax at checkout</p>
             <button onClick={handleCheckout} disabled={checkingOut} style={{ width: '100%', background: checkingOut ? C.muted : C.navy, color: C.white, padding: 14, borderRadius: 6, border: 'none', fontSize: 14, fontWeight: 700, cursor: checkingOut ? 'not-allowed' : 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
@@ -261,7 +278,7 @@ export default function SwagPage() {
 }
 
 function SwagPageInner() {
-  const { openCart, totalItems } = useCart();
+  const { openCart, totalItems, discountCode, discountPercent } = useCart();
   const [drawerProduct, setDrawerProduct] = useState<SwagProduct | null>(null);
 
   // Sticky nav
@@ -283,6 +300,15 @@ function SwagPageInner() {
     <div style={{ fontFamily: "'DM Sans', sans-serif", background: C.warmBg, minHeight: '100vh' }}>
       <CartDrawer />
       {drawerProduct && <ProductDrawer product={drawerProduct} onClose={() => setDrawerProduct(null)} />}
+
+      {/* Discount Banner */}
+      {discountCode && (
+        <div style={{ background: C.yellow, padding: '10px 24px', textAlign: 'center' }}>
+          <p style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: 0 }}>
+            Back to School Sale: Code <span style={{ fontFamily: 'monospace', background: 'rgba(30,42,74,0.1)', padding: '2px 8px', borderRadius: 4 }}>SAMETEAM</span> for {discountPercent}% off everything. Auto-applied at checkout.
+          </p>
+        </div>
+      )}
 
       {/* Hero */}
       <div ref={heroRef} style={{ background: C.navy, textAlign: 'center', padding: '48px 24px' }}>

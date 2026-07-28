@@ -35,7 +35,7 @@ const CONTRACT_SHIRTS: SwagProduct[] = [
   {
     id: 'ask-me',
     name: 'Ask Me',
-    price: 38.00,
+    price: 47.50,
     category: 'apparel',
     description: 'Pigment-dyed heavyweight tee',
     blurb: 'The one that starts conversations in the grocery store.',
@@ -56,7 +56,7 @@ const CONTRACT_SHIRTS: SwagProduct[] = [
   {
     id: 'para-ask',
     name: 'Ask the Para',
-    price: 33.50,
+    price: 52.50,
     category: 'apparel',
     description: 'Vintage fit tee',
     blurb: 'Because they always know.',
@@ -79,7 +79,7 @@ const CONTRACT_SHIRTS: SwagProduct[] = [
   {
     id: 'staff-tee',
     name: 'The Staff',
-    price: 33.50,
+    price: 52.50,
     category: 'apparel',
     description: 'Vintage fit tee',
     blurb: 'The title that covers everything.',
@@ -101,7 +101,7 @@ const CONTRACT_SHIRTS: SwagProduct[] = [
   {
     id: 'good-stuff',
     name: 'The Good Stuff',
-    price: 36.00,
+    price: 45.00,
     category: 'apparel',
     description: 'Heather vintage tee',
     blurb: 'For the quiet list of things that should have been obvious.',
@@ -126,7 +126,7 @@ const CONTRACT_HATS: SwagProduct[] = [
     id: `room-hat-${color}`,
     name: 'The Room',
     colorName: color.charAt(0).toUpperCase() + color.slice(1),
-    price: 26.00,
+    price: 32.50,
     category: 'hats' as const,
     description: 'Two-tone trucker cap',
     blurb: 'Your room. Your rules.',
@@ -141,7 +141,7 @@ const CONTRACT_HATS: SwagProduct[] = [
     id: `pa-hat-${color}`,
     name: 'The PA',
     colorName: color.charAt(0).toUpperCase() + color.slice(1),
-    price: 26.00,
+    price: 32.50,
     category: 'hats' as const,
     description: 'Two-tone trucker cap',
     blurb: 'Para pride on the brim.',
@@ -157,7 +157,7 @@ const CONTRACT_DRINKWARE: SwagProduct[] = [
   {
     id: 'good-pens-tumbler',
     name: 'The Good Pens',
-    price: 28.00,
+    price: 35.00,
     category: 'drinkware' as const,
     description: '20oz insulated tumbler',
     details: 'Reads: "The is in the good pens."',
@@ -169,7 +169,7 @@ const CONTRACT_DRINKWARE: SwagProduct[] = [
   {
     id: 'best-part-mug',
     name: 'The Why',
-    price: 18.00,
+    price: 22.50,
     category: 'drinkware' as const,
     description: 'Ceramic coffee mug',
     details: 'Reads: "You are the best part of somebody\'s day."',
@@ -182,7 +182,7 @@ const CONTRACT_DRINKWARE: SwagProduct[] = [
   {
     id: 'tumbler-eval',
     name: 'The No Evaluation',
-    price: 28.00,
+    price: 35.00,
     category: 'drinkware' as const,
     description: '20oz insulated tumbler',
     details: 'Reads: "I\'m not here to evaluate you."',
@@ -197,7 +197,7 @@ const CONTRACT_BAGS: SwagProduct[] = [
   {
     id: 'same-team-tote',
     name: 'Same Team',
-    price: 22.00,
+    price: 27.50,
     category: 'bags' as const,
     description: 'Organic cotton tote',
     details: 'Reads: "Same Team" repeated pattern.',
@@ -209,7 +209,7 @@ const CONTRACT_BAGS: SwagProduct[] = [
   {
     id: 'hard-parts-tote',
     name: 'The Hard Parts',
-    price: 22.00,
+    price: 27.50,
     category: 'bags' as const,
     description: 'Organic cotton tote',
     details: 'Reads: "Here for the hard parts."',
@@ -221,7 +221,7 @@ const CONTRACT_BAGS: SwagProduct[] = [
   {
     id: 'eco-tote-tan',
     name: 'The No Eval Tote',
-    price: 22.00,
+    price: 27.50,
     category: 'bags' as const,
     description: 'Eco-friendly tote',
     details: 'Reads: "I\'m not here to evaluate you."',
@@ -236,7 +236,7 @@ const CONTRACT_ACCESSORIES: SwagProduct[] = [
   {
     id: 'notebook-orange',
     name: 'The Hallway Notes',
-    price: 16.00,
+    price: 20.00,
     category: 'accessories' as const,
     description: 'Hardcover journal',
     blurb: 'Where the real lesson plans live.',
@@ -257,7 +257,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
   {
     id: 'questions-hoodie',
     name: 'The Question Drop',
-    price: 58.00,
+    price: 72.50,
     category: 'apparel' as const,
     description: 'Heavyweight hoodie',
     blurb: 'The hoodie that answers nothing.',
@@ -277,7 +277,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
   {
     id: 'sleepy-dress',
     name: 'The Sleepy Dress',
-    price: 42.00,
+    price: 52.50,
     category: 'apparel' as const,
     description: 'T-shirt dress',
     blurb: 'From couch to brunch without trying.',
@@ -291,7 +291,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
   {
     id: 'shows-pants',
     name: 'The Binge Watch',
-    price: 44.00,
+    price: 55.00,
     category: 'apparel' as const,
     description: 'Lounge pants',
     blurb: 'Three more episodes. Minimum.',
@@ -305,7 +305,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
   {
     id: 'closed-tee',
     name: 'The Closed Sign',
-    price: 33.50,
+    price: 52.50,
     category: 'apparel' as const,
     description: 'Classic fit tee',
     blurb: 'Office hours are over.',
@@ -321,7 +321,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
   {
     id: 'thought-tee',
     name: 'The Inner Thought',
-    price: 33.50,
+    price: 52.50,
     category: 'apparel' as const,
     description: 'Classic fit tee',
     blurb: 'The one you think but never say out loud.',
@@ -340,7 +340,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
   {
     id: 'calendar-tee',
     name: 'The Empty Calendar',
-    price: 33.50,
+    price: 52.50,
     category: 'apparel' as const,
     description: 'Classic fit tee',
     blurb: 'Nothing on the schedule and proud of it.',
@@ -359,7 +359,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
   {
     id: 'silence-tee',
     name: 'The Needed Silence',
-    price: 33.50,
+    price: 52.50,
     category: 'apparel' as const,
     description: 'Classic fit tee',
     blurb: 'Volume: off.',
@@ -378,12 +378,12 @@ const AFTER_SHIRTS: SwagProduct[] = [
   {
     id: 'intermission-knit',
     name: 'The Needed Intermission',
-    price: 36.00,
+    price: 45.00,
     category: 'apparel' as const,
     description: 'Knitted classic tee',
     details: 'Front: "Inter mission." Back: full graphic design.',
     blurb: 'Halftime for humans.',
-    images: [`${IMG}/intermission-knit-front.webp`, `${IMG}/intermission-knit-back.webp`, `${IMG}/intermission-knit-detail.webp`, `${IMG}/intermission-knit.webp`],
+    images: [`${IMG}/intermission-knit-back.webp`, `${IMG}/intermission-knit-front.webp`, `${IMG}/intermission-knit-detail.webp`, `${IMG}/intermission-knit.webp`],
     printfulUrl: 'https://tdi.printful.me/product/intermission-knitted-classic-tee',
     variants: TEE_SIZES,
     drop: 'after-hours' as const,
@@ -398,7 +398,7 @@ const SUMMER_TRANSITION: SwagProduct[] = [
   {
     id: 'postit-hunt',
     name: 'The PostIt Hunt',
-    price: 36.00,
+    price: 45.00,
     category: 'apparel',
     description: 'Oversized boxy tee',
     blurb: 'Sub plans. Copier code. Find my lanyard. Lunch (lol). The to-do list that never made it off the chest.',
@@ -410,7 +410,7 @@ const SUMMER_TRANSITION: SwagProduct[] = [
   {
     id: 'badge-fall',
     name: 'The Badge Fall',
-    price: 36.00,
+    price: 45.00,
     category: 'apparel',
     description: 'Oversized boxy tee',
     blurb: 'Team player. Off duty. The lanyard finally let go and honestly, same.',
@@ -422,7 +422,7 @@ const SUMMER_TRANSITION: SwagProduct[] = [
   {
     id: 'ac-nightmare',
     name: 'The AC Nightmare',
-    price: 36.00,
+    price: 45.00,
     category: 'apparel',
     description: 'Oversized boxy tee',
     blurb: 'The AC finally kicked in. Unfortunately, it kicked in everywhere.',
@@ -438,14 +438,14 @@ const SUMMER_TRANSITION: SwagProduct[] = [
 // ════════════════════════════════════════════════════════════
 
 const STICKERS: SwagProduct[] = [
-  { id: 'same-team-sticker', name: 'Same Team', price: 4.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/same-team-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
-  { id: 'job-varies-sticker', name: 'Job Varies', price: 4.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/job-varies-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
-  { id: 'someone-sticker', name: 'Someone', price: 4.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/someone-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
-  { id: 'tdi-sticker', name: 'TDI', price: 4.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/tdi-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
-  { id: 'glad-sticker', name: 'Glad', price: 4.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/glad-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
-  { id: 'same-team-sticker-lg', name: 'Same Team (Large)', price: 6.00, category: 'stickers', description: 'Large die-cut vinyl sticker', images: multi('same-team-sticker-lg', 2), printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
-  { id: 'intermission-sticker', name: 'The Intermission', price: 4.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/intermission-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
-  { id: 'same-team-magnet', name: 'Same Team (Magnet)', price: 6.00, category: 'stickers', description: 'Refrigerator magnet', blurb: 'For the fridge, the filing cabinet, or the whiteboard.', images: multi('same-team-magnet', 3), printfulUrl: 'https://tdi.printful.me/product/same-team-magnet', drop: 'both' as const },
+  { id: 'same-team-sticker', name: 'Same Team', price: 5.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/same-team-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
+  { id: 'job-varies-sticker', name: 'Job Varies', price: 5.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/job-varies-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
+  { id: 'someone-sticker', name: 'Someone', price: 5.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/someone-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
+  { id: 'tdi-sticker', name: 'TDI', price: 5.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/tdi-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
+  { id: 'glad-sticker', name: 'Glad', price: 5.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/glad-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
+  { id: 'same-team-sticker-lg', name: 'Same Team (Large)', price: 7.50, category: 'stickers', description: 'Large die-cut vinyl sticker', images: multi('same-team-sticker-lg', 2), printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
+  { id: 'intermission-sticker', name: 'The Intermission', price: 5.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/intermission-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
+  { id: 'same-team-magnet', name: 'Same Team (Magnet)', price: 7.50, category: 'stickers', description: 'Refrigerator magnet', blurb: 'For the fridge, the filing cabinet, or the whiteboard.', images: multi('same-team-magnet', 3), printfulUrl: 'https://tdi.printful.me/product/same-team-magnet', drop: 'both' as const },
 ];
 
 // ════════════════════════════════════════════════════════════
