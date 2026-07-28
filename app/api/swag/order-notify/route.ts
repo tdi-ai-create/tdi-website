@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
                   <p style="font-size: 12px; color: #6B7280; margin: 0 0 8px;">When Printful asks for a personalized message, paste this:</p>
                   <div style="background: white; border: 1px solid #E5E7EB; border-radius: 6px; padding: 12px; font-size: 13px; color: #2D2D2D;">
                     <p style="margin: 0 0 4px;"><strong>Subject:</strong> TDI Team</p>
-                    <p style="margin: 0;"><strong>Message:</strong> Thanks for being a part of the team. You deserve this.</p>
+                    <p style="margin: 0;"><strong>Message:</strong> We packed this one ourselves (okay, not literally, but emotionally). Every time you wear this, just know there's a whole team of people who get it. Wear it loud. You earned it.</p>
                   </div>
                   <p style="font-size: 12px; color: #6B7280; margin: 8px 0 0;">
                     <strong>Phone for shipping:</strong> ${customerPhone}
