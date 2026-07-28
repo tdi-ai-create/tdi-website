@@ -62,9 +62,9 @@ function StickerTile({ product, onOpen }: { product: SwagProduct; onOpen: () => 
       <div style={{ width: 140, height: 140, borderRadius: 4, background: C.gray, overflow: 'hidden', marginBottom: 8 }}>
         <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
       </div>
-      <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>{product.name}</div>
-      <div style={{ fontSize: 13, color: C.muted }}>${product.price.toFixed(2)}</div>
-      <button onClick={handleAdd} style={{ marginTop: 4, fontSize: 11, fontWeight: 600, color: added ? C.navy : C.muted, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: C.white }}>{product.name}</div>
+      <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>${product.price.toFixed(2)}</div>
+      <button onClick={handleAdd} style={{ marginTop: 4, fontSize: 11, fontWeight: 600, color: added ? C.yellow : 'rgba(255,255,255,0.5)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
         {added ? 'Added' : '+ Add'}
       </button>
     </div>
@@ -324,15 +324,16 @@ function SwagPageInner() {
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px 48px' }}>
         <Section title="Shirts" products={contract.shirts} onOpen={setDrawerProduct} />
         <Section title="Hats" products={contract.hats} onOpen={setDrawerProduct} />
-        <Section title="Bags" products={contract.bags} onOpen={setDrawerProduct} />
-        <Section title="Drinkware" products={contract.drinkware} onOpen={setDrawerProduct} />
-        <Section title="Accessories" products={contract.accessories} onOpen={setDrawerProduct} />
+        <Section title="The Essentials" products={[...contract.bags, ...contract.drinkware, ...contract.accessories]} onOpen={setDrawerProduct} />
       </div>
 
       {/* ─── STICKER BAR (between sections) ─── */}
-      <div id="stickers" style={{ borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, background: C.white }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '28px 24px' }}>
-          <h2 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 22, fontWeight: 700, color: C.navy, margin: '0 0 14px' }}>The Sticker Bar</h2>
+      <div id="stickers" style={{ background: C.navy }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 16 }}>
+            <h2 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 22, fontWeight: 700, color: C.white, margin: 0 }}>The Sticker Bar</h2>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: 0 }}>Scroll for more</p>
+          </div>
           <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 8, WebkitOverflowScrolling: 'touch' as never }}>
             {allStickers.map(p => <StickerTile key={p.id} product={p} onOpen={() => setDrawerProduct(p)} />)}
           </div>

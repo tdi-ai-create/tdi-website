@@ -60,7 +60,7 @@ const CONTRACT_SHIRTS: SwagProduct[] = [
     category: 'apparel',
     description: 'Vintage fit tee',
     blurb: 'Because they always know.',
-    images: fb('para-ask-blue'),
+    images: fb('para-ask-green'),
     colorVariants: [
       { colorName: 'Black', colorHex: HEX.black, images: fb('para-ask-black') },
       { colorName: 'Blue', colorHex: HEX.blue, images: fb('para-ask-blue') },
@@ -82,7 +82,7 @@ const CONTRACT_SHIRTS: SwagProduct[] = [
     category: 'apparel',
     description: 'Vintage fit tee',
     blurb: 'The title that covers everything.',
-    images: fb('staff-tee-stone'),
+    images: fb('staff-tee-blue'),
     colorVariants: [
       { colorName: 'Stone', colorHex: HEX.stone, images: fb('staff-tee-stone') },
       { colorName: 'Grey', colorHex: HEX.grey, images: fb('staff-tee-grey') },
@@ -103,7 +103,7 @@ const CONTRACT_SHIRTS: SwagProduct[] = [
     category: 'apparel',
     description: 'Heather vintage tee',
     blurb: 'For the quiet list of things that should have been obvious.',
-    images: single('good-stuff-tee-green'),
+    images: single('good-stuff-tee-pink'),
     colorVariants: [
       { colorName: 'Anthracite', colorHex: HEX.anth, images: single('good-stuff-tee-anth') },
       { colorName: 'Blue', colorHex: HEX.blue, images: single('good-stuff-tee-blue') },
@@ -236,18 +236,6 @@ const CONTRACT_ACCESSORIES: SwagProduct[] = [
     printfulUrl: 'https://tdi.printful.me/product/notebook',
     drop: 'contract-hours' as const,
   },
-  {
-    id: 'same-team-magnet',
-    name: 'Same Team',
-    colorName: 'Magnet',
-    price: 6.00,
-    category: 'accessories' as const,
-    description: 'Refrigerator magnet',
-    blurb: 'For the fridge, the filing cabinet, or the whiteboard.',
-    images: multi('same-team-magnet', 3),
-    printfulUrl: 'https://tdi.printful.me/product/same-team-magnet',
-    drop: 'contract-hours' as const,
-  },
 ];
 
 // ════════════════════════════════════════════════════════════
@@ -255,84 +243,27 @@ const CONTRACT_ACCESSORIES: SwagProduct[] = [
 // ════════════════════════════════════════════════════════════
 
 const AFTER_SHIRTS: SwagProduct[] = [
-  // ── The Closed Sign ──
+  // ── Top row: 4 hero products (most visual variety) ──
+
+  // ── The Question Drop (hoodie, lead: Sand) ──
   {
-    id: 'closed-tee',
-    name: 'The Closed Sign',
-    price: 33.50,
-    category: 'apparel' as const,
-    description: 'Classic fit tee',
-    blurb: 'Office hours are over.',
-    images: single('closed-tee'),
-    printfulUrl: 'https://tdi.printful.me/product/closed-sign-tee',
-    variants: TEE_SIZES,
-    drop: 'after-hours' as const,
-  },
-
-  // ── The Inner Thought (3 colors, single view) ──
-  ...(['black', 'blue', 'white'] as const).map(color => ({
-    id: `thought-tee-${color}`,
-    name: 'The Inner Thought',
-    colorName: color.charAt(0).toUpperCase() + color.slice(1),
-    price: 33.50,
-    category: 'apparel' as const,
-    description: 'Classic fit tee',
-    blurb: 'The one you think but never say out loud.',
-    images: single(`thought-tee-${color}`),
-    printfulUrl: 'https://tdi.printful.me/product/inner-thought-tee',
-    variants: TEE_SIZES,
-    drop: 'after-hours' as const,
-  })),
-
-  // ── The Empty Calendar (3 colors, single view) ──
-  ...(['black', 'blue', 'white'] as const).map(color => ({
-    id: `calendar-tee-${color}`,
-    name: 'The Empty Calendar',
-    colorName: color.charAt(0).toUpperCase() + color.slice(1),
-    price: 33.50,
-    category: 'apparel' as const,
-    description: 'Classic fit tee',
-    blurb: 'Nothing on the schedule and proud of it.',
-    images: single(`calendar-tee-${color}`),
-    printfulUrl: 'https://tdi.printful.me/product/empty-calendar-tee',
-    variants: TEE_SIZES,
-    drop: 'after-hours' as const,
-  })),
-
-  // ── The Needed Silence (3 colors, single view) ──
-  ...(['black', 'blue', 'white'] as const).map(color => ({
-    id: `silence-tee-${color}`,
-    name: 'The Needed Silence',
-    colorName: color.charAt(0).toUpperCase() + color.slice(1),
-    price: 33.50,
-    category: 'apparel' as const,
-    description: 'Classic fit tee',
-    blurb: 'Volume: off.',
-    images: single(`silence-tee-${color}`),
-    printfulUrl: 'https://tdi.printful.me/product/needed-silence-tee',
-    variants: TEE_SIZES,
-    drop: 'after-hours' as const,
-  })),
-
-  // ── The Question Drop (hoodie, 4 colors) ──
-  ...([
-    { color: 'blue', label: 'Blue', imgs: [single('questions-hoodie-blue')[0], single('questions-hoodie-blue-back')[0]] },
-    { color: 'gray', label: 'Gray', imgs: single('questions-hoodie-gray') },
-    { color: 'sand', label: 'Sand', imgs: single('questions-hoodie-sand') },
-    { color: 'sage', label: 'Sage', imgs: single('questions-hoodie-sage') },
-  ]).map(({ color, label, imgs }) => ({
-    id: `questions-hoodie-${color}`,
+    id: 'questions-hoodie',
     name: 'The Question Drop',
-    colorName: label,
     price: 58.00,
     category: 'apparel' as const,
     description: 'Heavyweight hoodie',
     blurb: 'The hoodie that answers nothing.',
-    images: imgs,
+    images: single('questions-hoodie-sand'),
+    colorVariants: [
+      { colorName: 'Blue', colorHex: '#3B5998', images: [single('questions-hoodie-blue')[0], single('questions-hoodie-blue-back')[0]] },
+      { colorName: 'Gray', colorHex: '#9CA3AF', images: single('questions-hoodie-gray') },
+      { colorName: 'Sand', colorHex: '#C2B280', images: single('questions-hoodie-sand') },
+      { colorName: 'Sage', colorHex: '#87A878', images: single('questions-hoodie-sage') },
+    ],
     printfulUrl: 'https://tdi.printful.me/product/questions-hoodie',
     variants: HOODIE_SIZES,
     drop: 'after-hours' as const,
-  })),
+  },
 
   // ── The Sleepy Dress ──
   {
@@ -359,6 +290,79 @@ const AFTER_SHIRTS: SwagProduct[] = [
     images: fb('shows-pants'),
     printfulUrl: 'https://tdi.printful.me/product/shows-pants',
     variants: PANTS_SIZES,
+    drop: 'after-hours' as const,
+  },
+
+  // ── The Closed Sign ──
+  {
+    id: 'closed-tee',
+    name: 'The Closed Sign',
+    price: 33.50,
+    category: 'apparel' as const,
+    description: 'Classic fit tee',
+    blurb: 'Office hours are over.',
+    images: single('closed-tee'),
+    printfulUrl: 'https://tdi.printful.me/product/closed-sign-tee',
+    variants: TEE_SIZES,
+    drop: 'after-hours' as const,
+  },
+
+  // ── Row 2: grouped tees ──
+
+  // ── The Inner Thought (lead: Blue) ──
+  {
+    id: 'thought-tee',
+    name: 'The Inner Thought',
+    price: 33.50,
+    category: 'apparel' as const,
+    description: 'Classic fit tee',
+    blurb: 'The one you think but never say out loud.',
+    images: single('thought-tee-blue'),
+    colorVariants: [
+      { colorName: 'Black', colorHex: '#2D2D2D', images: single('thought-tee-black') },
+      { colorName: 'Blue', colorHex: '#3B5998', images: single('thought-tee-blue') },
+      { colorName: 'White', colorHex: '#F5F5F5', images: single('thought-tee-white') },
+    ],
+    printfulUrl: 'https://tdi.printful.me/product/inner-thought-tee',
+    variants: TEE_SIZES,
+    drop: 'after-hours' as const,
+  },
+
+  // ── The Empty Calendar (lead: Black) ──
+  {
+    id: 'calendar-tee',
+    name: 'The Empty Calendar',
+    price: 33.50,
+    category: 'apparel' as const,
+    description: 'Classic fit tee',
+    blurb: 'Nothing on the schedule and proud of it.',
+    images: single('calendar-tee-black'),
+    colorVariants: [
+      { colorName: 'Black', colorHex: '#2D2D2D', images: single('calendar-tee-black') },
+      { colorName: 'Blue', colorHex: '#3B5998', images: single('calendar-tee-blue') },
+      { colorName: 'White', colorHex: '#F5F5F5', images: single('calendar-tee-white') },
+    ],
+    printfulUrl: 'https://tdi.printful.me/product/empty-calendar-tee',
+    variants: TEE_SIZES,
+    drop: 'after-hours' as const,
+  },
+
+  // ── The Needed Silence (lead: White) ──
+  {
+    id: 'silence-tee',
+    name: 'The Needed Silence',
+    price: 33.50,
+    category: 'apparel' as const,
+    description: 'Classic fit tee',
+    blurb: 'Volume: off.',
+    images: single('silence-tee-white'),
+    colorVariants: [
+      { colorName: 'Black', colorHex: '#2D2D2D', images: single('silence-tee-black') },
+      { colorName: 'Blue', colorHex: '#3B5998', images: single('silence-tee-blue') },
+      { colorName: 'White', colorHex: '#F5F5F5', images: single('silence-tee-white') },
+    ],
+    printfulUrl: 'https://tdi.printful.me/product/needed-silence-tee',
+    variants: TEE_SIZES,
     drop: 'after-hours' as const,
   },
 
@@ -389,6 +393,7 @@ const STICKERS: SwagProduct[] = [
   { id: 'glad-sticker', name: 'Glad', price: 4.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/glad-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
   { id: 'same-team-sticker-lg', name: 'Same Team (Large)', price: 6.00, category: 'stickers', description: 'Large die-cut vinyl sticker', images: multi('same-team-sticker-lg', 2), printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
   { id: 'intermission-sticker', name: 'The Intermission', price: 4.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/intermission-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
+  { id: 'same-team-magnet', name: 'Same Team (Magnet)', price: 6.00, category: 'stickers', description: 'Refrigerator magnet', blurb: 'For the fridge, the filing cabinet, or the whiteboard.', images: multi('same-team-magnet', 3), printfulUrl: 'https://tdi.printful.me/product/same-team-magnet', drop: 'both' as const },
 ];
 
 // ════════════════════════════════════════════════════════════
