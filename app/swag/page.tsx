@@ -282,7 +282,7 @@ function SwagPageInner() {
           <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.8)', margin: 0 }}>For the building. For the mission. For the job.</p>
         </div>
       </div>
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px 48px' }}>
         <Section title="Shirts" products={contract.shirts} onOpen={setDrawerProduct} />
         <Section title="Hats" products={contract.hats} onOpen={setDrawerProduct} />
         <Section title="Bags" products={contract.bags} onOpen={setDrawerProduct} />
@@ -299,7 +299,7 @@ function SwagPageInner() {
           <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.8)', margin: 0 }}>The bell rang. Now breathe.</p>
         </div>
       </div>
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px 48px' }}>
         <Section title="Shirts &amp; Loungewear" products={afterProducts} onOpen={setDrawerProduct} />
       </div>
 
