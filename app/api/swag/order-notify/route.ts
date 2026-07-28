@@ -25,8 +25,8 @@ export async function POST(request: NextRequest) {
     const customerName = session.customer_details?.name || shipping?.name || 'Unknown';
     const items = session.line_items?.data || [];
     const total = (session.amount_total || 0) / 100;
+    const discountCode = session.metadata?.discount_code || 'None';
 
-    // Build order summary for notification email
     const itemLines = items.map(i =>
       `${i.quantity}x ${i.description} - $${((i.amount_total || 0) / 100).toFixed(2)}`
     ).join('\n');
@@ -38,7 +38,6 @@ export async function POST(request: NextRequest) {
       shipping.address.country,
     ].filter(Boolean).join('\n') : 'No shipping address';
 
-    // Send notification via Resend
     const resendKey = process.env.RESEND_API_KEY;
     if (resendKey) {
       await fetch('https://api.resend.com/emails', {
@@ -51,28 +50,56 @@ export async function POST(request: NextRequest) {
           from: 'TDI Swag Shop <notifications@teachersdeserveit.com>',
           to: ['hello@teachersdeserveit.com'],
           cc: ['rae@teachersdeserveit.com'],
-          subject: `New Swag Order: $${total.toFixed(2)} from ${customerName}`,
+          subject: `New Swag Order #${sessionId.slice(-6).toUpperCase()}: $${total.toFixed(2)} from ${customerName}`,
           html: `
-            <div style="font-family: 'DM Sans', Arial, sans-serif; max-width: 600px; color: #1e2749;">
-              <h2 style="margin-bottom: 4px;">New Swag Shop Order</h2>
-              <p style="color: #6B7280; margin-top: 0;">A new order just came in from the TDI Swag Shop.</p>
+            <div style="font-family: Arial, sans-serif; max-width: 640px; color: #1e2749; line-height: 1.6;">
 
-              <div style="background: #F5F0EB; border-radius: 12px; padding: 20px; margin: 20px 0;">
-                <p style="margin: 0 0 4px;"><strong>Customer:</strong> ${customerName}</p>
-                <p style="margin: 0 0 4px;"><strong>Email:</strong> ${customerEmail}</p>
-                <p style="margin: 0 0 12px;"><strong>Total:</strong> $${total.toFixed(2)}</p>
-
-                <p style="margin: 0 0 4px; font-weight: 700;">Items:</p>
-                <pre style="background: white; padding: 12px; border-radius: 8px; font-size: 13px; white-space: pre-wrap;">${itemLines}</pre>
-
-                <p style="margin: 12px 0 4px; font-weight: 700;">Ship to:</p>
-                <pre style="background: white; padding: 12px; border-radius: 8px; font-size: 13px; white-space: pre-wrap;">${customerName}\n${addressLines}</pre>
+              <div style="background: #1E2A4A; color: white; padding: 20px 24px; border-radius: 8px 8px 0 0;">
+                <h2 style="margin: 0; font-size: 18px;">New Swag Shop Order</h2>
+                <p style="margin: 4px 0 0; font-size: 13px; color: rgba(255,255,255,0.7);">Paid via Stripe. Ready for Printful fulfillment.</p>
               </div>
 
-              <p style="color: #6B7280; font-size: 13px;">
-                <strong>Next step:</strong> Create this order in Printful with the items and shipping address above.
-                Stripe payment ID: ${session.payment_intent}
-              </p>
+              <div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-top: none; padding: 24px; border-radius: 0 0 8px 8px;">
+
+                <table style="width: 100%; font-size: 14px; margin-bottom: 16px;">
+                  <tr><td style="color: #6B7280; padding: 4px 0;">Customer</td><td style="font-weight: 700;">${customerName}</td></tr>
+                  <tr><td style="color: #6B7280; padding: 4px 0;">Email</td><td>${customerEmail}</td></tr>
+                  <tr><td style="color: #6B7280; padding: 4px 0;">Discount Code</td><td>${discountCode}</td></tr>
+                  <tr><td style="color: #6B7280; padding: 4px 0;">Total Charged</td><td style="font-weight: 700; font-size: 16px;">$${total.toFixed(2)}</td></tr>
+                </table>
+
+                <div style="background: white; border: 1px solid #E5E7EB; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
+                  <p style="font-weight: 700; margin: 0 0 8px; font-size: 13px; color: #1E2A4A;">ITEMS ORDERED</p>
+                  <pre style="font-family: monospace; font-size: 13px; white-space: pre-wrap; margin: 0; color: #2D2D2D;">${itemLines}</pre>
+                </div>
+
+                <div style="background: white; border: 1px solid #E5E7EB; border-radius: 6px; padding: 16px; margin-bottom: 20px;">
+                  <p style="font-weight: 700; margin: 0 0 8px; font-size: 13px; color: #1E2A4A;">SHIP TO</p>
+                  <pre style="font-family: monospace; font-size: 13px; white-space: pre-wrap; margin: 0; color: #2D2D2D;">${customerName}\n${addressLines}</pre>
+                </div>
+
+                <div style="background: #FEF3C7; border: 1px solid #F9B91B; border-radius: 6px; padding: 16px;">
+                  <p style="font-weight: 700; margin: 0 0 12px; font-size: 14px; color: #1E2A4A;">FULFILLMENT STEPS (Bella)</p>
+                  <ol style="margin: 0; padding-left: 20px; font-size: 13px; color: #2D2D2D;">
+                    <li style="margin-bottom: 8px;">Go to <a href="https://tdi.printful.me" style="color: #1E2A4A; font-weight: 700;">tdi.printful.me</a> and log in</li>
+                    <li style="margin-bottom: 8px;">Click <strong>New Order</strong> (or Orders > Create Order)</li>
+                    <li style="margin-bottom: 8px;">Search for each product by name. Select the correct size/color from the items above.</li>
+                    <li style="margin-bottom: 8px;">Enter the shipping address exactly as shown above</li>
+                    <li style="margin-bottom: 8px;">Review the order total. Printful charges us the base cost (lower than what the customer paid). This is normal.</li>
+                    <li style="margin-bottom: 8px;">Submit the order. Printful will print, pack, and ship directly to the customer.</li>
+                    <li style="margin-bottom: 8px;">Customer will receive a shipping confirmation email from Printful with tracking info.</li>
+                  </ol>
+                  <p style="margin: 12px 0 0; font-size: 12px; color: #6B7280;">
+                    <strong>Do NOT</strong> create a new Printful order if the Stripe payment shows as refunded or disputed. Check Stripe first.
+                  </p>
+                </div>
+
+                <p style="margin: 16px 0 0; font-size: 12px; color: #9CA3AF;">
+                  Stripe Payment ID: ${session.payment_intent}<br>
+                  Session: ${sessionId}
+                </p>
+
+              </div>
             </div>
           `,
         }),

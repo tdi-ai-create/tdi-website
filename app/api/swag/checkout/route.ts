@@ -16,7 +16,7 @@ interface CartItem {
 
 export async function POST(request: NextRequest) {
   try {
-    const { items } = (await request.json()) as { items: CartItem[] };
+    const { items, discountCode } = (await request.json()) as { items: CartItem[]; discountCode?: string };
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
       cancel_url: `${origin}/swag`,
       metadata: {
         source: 'tdi_swag_shop',
+        discount_code: discountCode || 'none',
         items_json: JSON.stringify(items.map(i => ({
           id: i.productId,
           name: i.name,

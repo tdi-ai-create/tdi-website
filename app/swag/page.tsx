@@ -193,7 +193,9 @@ function CartDrawer() {
   const handleCheckout = async () => {
     setCheckingOut(true);
     try {
-      const res = await fetch('/api/swag/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: items.map(i => ({ productId: i.product.id, name: i.product.name, price: i.product.price, quantity: i.quantity, variant: i.variant, image: i.product.images[0] })) }) });
+      // Apply discount to prices sent to Stripe
+      const discountMultiplier = discountPercent > 0 ? (1 - discountPercent / 100) : 1;
+      const res = await fetch('/api/swag/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: items.map(i => ({ productId: i.product.id, name: i.product.name, price: Math.round(i.product.price * discountMultiplier * 100) / 100, quantity: i.quantity, variant: i.variant, image: i.product.images[0] })), discountCode: discountCode }) });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
     } catch (err) { console.error(err); }
