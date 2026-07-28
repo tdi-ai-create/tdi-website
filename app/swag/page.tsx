@@ -304,6 +304,7 @@ function SwagPageInner() {
             <a href="#contract" style={{ fontSize: 13, fontWeight: 700, color: C.navy, textDecoration: 'none' }}>Contract Hours</a>
             <a href="#after" style={{ fontSize: 13, fontWeight: 700, color: C.muted, textDecoration: 'none' }}>After Hours</a>
             <a href="#stickers" style={{ fontSize: 13, fontWeight: 600, color: C.muted, textDecoration: 'none' }}>Stickers</a>
+            <a href="#summer" style={{ fontSize: 13, fontWeight: 600, color: C.muted, textDecoration: 'none' }}>Summer</a>
           </div>
           <button onClick={openCart} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: C.navy, fontFamily: "'DM Sans', sans-serif" }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.navy} strokeWidth="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
@@ -355,10 +356,16 @@ function SwagPageInner() {
       </div>
 
       {/* ─── THE SUMMER TRANSITION ─── */}
-      <div style={{ borderTop: `1px solid ${C.border}`, background: C.warmBg }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 24px 48px' }}>
-          <h2 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 26, fontWeight: 700, color: C.navy, margin: '0 0 6px' }}>The Summer Transition</h2>
-          <p style={{ fontSize: 14, color: C.muted, margin: '0 0 28px' }}>Where school-year stress meets summer-ready fashion. Proceed with caution.</p>
+      <div id="summer" style={{ position: 'relative', width: '100%', height: 280, overflow: 'hidden' }}>
+        <img src="/images/swag/hero-summer.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(30,42,74,0.85) 0%, rgba(30,42,74,0.5) 50%, rgba(30,42,74,0.1) 100%)' }} />
+        <div style={{ position: 'absolute', bottom: 40, left: 0, right: 0, maxWidth: 1100, margin: '0 auto', padding: '0 24px' }}>
+          <h2 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 'clamp(28px, 4vw, 38px)', fontWeight: 700, color: C.white, margin: '0 0 6px' }}>The Summer Transition</h2>
+          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.8)', margin: 0 }}>Where school-year stress meets summer-ready fashion.</p>
+        </div>
+      </div>
+      <div style={{ background: C.warmBg }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px 48px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 20 }}>
             {summerProducts.map(p => <ProductTile key={p.id} product={p} onOpen={() => setDrawerProduct(p)} />)}
           </div>
