@@ -366,7 +366,7 @@ function SwagPageInner() {
       </div>
       <div style={{ background: C.warmBg }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px 48px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, maxWidth: 740, margin: '0 auto' }}>
             {summerProducts.map(p => <ProductTile key={p.id} product={p} onOpen={() => setDrawerProduct(p)} />)}
           </div>
         </div>
