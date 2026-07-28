@@ -6,18 +6,20 @@ const single = (name: string) => [`${IMG}/${name}.webp`];
 const multi = (base: string, count: number) => Array.from({ length: count }, (_, i) => `${IMG}/${base}-${i + 1}.webp`);
 
 const TEE_SIZES = [
+  { label: '3XS', value: '3xs' }, { label: '2XS', value: '2xs' }, { label: 'XS', value: 'xs' },
   { label: 'S', value: 's' }, { label: 'M', value: 'm' }, { label: 'L', value: 'l' },
   { label: 'XL', value: 'xl' }, { label: '2XL', value: '2xl' }, { label: '3XL', value: '3xl' },
 ];
 const HOODIE_SIZES = TEE_SIZES;
 const HAT_SIZES = [{ label: 'One Size', value: 'one-size' }];
 const DRESS_SIZES = [
-  { label: 'XS', value: 'xs' }, { label: 'S', value: 's' }, { label: 'M', value: 'm' },
-  { label: 'L', value: 'l' }, { label: 'XL', value: 'xl' },
+  { label: '3XS', value: '3xs' }, { label: '2XS', value: '2xs' }, { label: 'XS', value: 'xs' },
+  { label: 'S', value: 's' }, { label: 'M', value: 'm' }, { label: 'L', value: 'l' },
+  { label: 'XL', value: 'xl' }, { label: '2XL', value: '2xl' }, { label: '3XL', value: '3xl' },
 ];
 const PANTS_SIZES = [
-  { label: 'S', value: 's' }, { label: 'M', value: 'm' }, { label: 'L', value: 'l' },
-  { label: 'XL', value: 'xl' },
+  { label: 'XS', value: 'xs' }, { label: 'S', value: 's' }, { label: 'M', value: 'm' },
+  { label: 'L', value: 'l' }, { label: 'XL', value: 'xl' }, { label: '2XL', value: '2xl' },
 ];
 
 // ════════════════════════════════════════════════════════════
