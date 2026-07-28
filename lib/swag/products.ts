@@ -4,6 +4,8 @@ export interface SwagProduct {
   price: number;
   category: 'apparel' | 'stickers' | 'drinkware' | 'bags' | 'hats' | 'accessories';
   collection?: string;
+  colorName?: string;
+  subBand?: string;
   description: string;
   details?: string;
   blurb?: string;
