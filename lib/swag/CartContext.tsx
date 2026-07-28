@@ -11,10 +11,10 @@ export interface CartItem {
 
 // Discount system: only one code at a time, no stacking
 export const PROMO_CODES: Record<string, { percent: number; label: string }> = {
-  SAMETEAM: { percent: 20, label: '20% off with SAMETEAM' },
+  TEAMTDI: { percent: 20, label: '20% off with TEAMTDI' },
 };
 
-const AUTO_APPLY_CODE = 'SAMETEAM';
+const AUTO_APPLY_CODE = 'TEAMTDI';
 
 interface CartContextType {
   items: CartItem[];

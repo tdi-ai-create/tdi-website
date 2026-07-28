@@ -13,6 +13,7 @@ import { MainSiteWrapper } from "@/components/layout/MainSiteWrapper";
 import { MomentModeProvider } from "@/components/hub/MomentModeContext";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import DesiWrapper from "@/components/DesiWrapper";
+import { SwagPopup } from "@/components/SwagPopup";
 
 export const metadata: Metadata = {
   title: {
@@ -105,6 +106,7 @@ export default function RootLayout({
             <EmailPopup />
             <SubstackPopup />
             <SocialProofPopup />
+            <SwagPopup />
           </MainSiteWrapper>
           <DesiWrapper />
         </MomentModeProvider>

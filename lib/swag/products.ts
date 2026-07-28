@@ -162,7 +162,7 @@ const CONTRACT_DRINKWARE: SwagProduct[] = [
     description: '20oz insulated tumbler',
     details: 'Reads: "The is in the good pens."',
     blurb: 'The one you hide in your desk drawer.',
-    images: multi('good-pens-tumbler-new', 2),
+    images: [`${IMG}/good-pens-new-front.png`, `${IMG}/good-pens-new-back.png`, `${IMG}/good-pens-new-left.png`, `${IMG}/good-pens-new-right.png`],
     printfulUrl: 'https://tdi.printful.me/product/good-pens-tumbler',
     drop: 'contract-hours' as const,
   },

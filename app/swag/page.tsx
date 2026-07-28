@@ -242,7 +242,7 @@ function CartDrawer() {
             </div>
             {discountCode && (
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
-                <span style={{ fontSize: 13, color: '#16A34A', fontWeight: 600 }}>SAMETEAM ({discountPercent}% off)</span>
+                <span style={{ fontSize: 13, color: '#16A34A', fontWeight: 600 }}>TEAMTDI ({discountPercent}% off)</span>
                 <span style={{ fontSize: 13, color: '#16A34A', fontWeight: 600 }}>-${discountAmount.toFixed(2)}</span>
               </div>
             )}
@@ -311,14 +311,14 @@ function SwagPageInner() {
       {discountCode && (
         <div style={{ background: C.yellow, padding: '10px 24px', textAlign: 'center' }}>
           <p style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: 0 }}>
-            Back to School Sale: Code <span style={{ fontFamily: 'monospace', background: 'rgba(30,42,74,0.1)', padding: '2px 8px', borderRadius: 4 }}>SAMETEAM</span> for {discountPercent}% off everything. Auto-applied at checkout.
+            Back to School Sale: Code <span style={{ fontFamily: 'monospace', background: 'rgba(30,42,74,0.1)', padding: '2px 8px', borderRadius: 4 }}>TEAMTDI</span> for {discountPercent}% off everything. Auto-applied at checkout.
           </p>
         </div>
       )}
 
       {/* Hero */}
       <div ref={heroRef} style={{ background: C.navy, textAlign: 'center', padding: '48px 24px' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase', color: C.yellow, margin: '0 0 8px' }}>Back to School 2026</p>
+        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase', color: C.yellow, margin: '0 0 8px' }}>TDI Swag Drop</p>
         <h1 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 700, color: C.white, margin: '0 0 12px', lineHeight: 1.2 }}>TDI Swag Shop</h1>
         <div style={{ maxWidth: 600, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <a href="#contract" style={{ padding: '12px 20px', borderRadius: 6, border: `1px solid rgba(255,255,255,0.3)`, color: C.white, textDecoration: 'none', fontSize: 14, fontWeight: 700 }}>Contract Hours</a>
