@@ -1,481 +1,423 @@
-export interface SwagProduct {
-  id: string;
-  name: string;
-  price: number;
-  category: 'apparel' | 'stickers' | 'drinkware' | 'bags' | 'hats' | 'accessories';
-  collection?: string;
-  colorName?: string;
-  subBand?: string;
-  description: string;
-  details?: string;
-  blurb?: string;
-  images: string[];
-  printfulUrl: string;
-  tag?: string;
-  variants?: { label: string; value: string }[];
-  colors?: string[];
-  drop: 'contract-hours' | 'after-hours' | 'both';
-}
+import type { SwagProduct } from './types';
 
-function imgs(id: string, count: number): string[] {
-  const result = [`/images/swag/${id}.webp`];
-  for (let i = 1; i <= count; i++) {
-    result.push(`/images/swag/${id}-${i}.webp`);
-  }
-  return result;
-}
+const IMG = '/images/swag';
+const fb = (base: string) => [`${IMG}/${base}-front.webp`, `${IMG}/${base}-back.webp`];
+const single = (name: string) => [`${IMG}/${name}.webp`];
+const multi = (base: string, count: number) => Array.from({ length: count }, (_, i) => `${IMG}/${base}-${i + 1}.webp`);
 
-export const SWAG_PRODUCTS: SwagProduct[] = [
-  // ─── The Ask Me Drop ───
-  {
-    id: 'ask-me-tee',
+const TEE_SIZES = [
+  { label: 'S', value: 's' }, { label: 'M', value: 'm' }, { label: 'L', value: 'l' },
+  { label: 'XL', value: 'xl' }, { label: '2XL', value: '2xl' }, { label: '3XL', value: '3xl' },
+];
+const HOODIE_SIZES = TEE_SIZES;
+const HAT_SIZES = [{ label: 'One Size', value: 'one-size' }];
+const DRESS_SIZES = [
+  { label: 'XS', value: 'xs' }, { label: 'S', value: 's' }, { label: 'M', value: 'm' },
+  { label: 'L', value: 'l' }, { label: 'XL', value: 'xl' },
+];
+const PANTS_SIZES = [
+  { label: 'S', value: 's' }, { label: 'M', value: 'm' }, { label: 'L', value: 'l' },
+  { label: 'XL', value: 'xl' },
+];
+
+// ════════════════════════════════════════════════════════════
+// CONTRACT HOURS
+// ════════════════════════════════════════════════════════════
+
+const CONTRACT_SHIRTS: SwagProduct[] = [
+  // ── Ask Me (5 colors) ──
+  ...(['black', 'blue', 'green', 'grey', 'sand'] as const).map(color => ({
+    id: `ask-me-${color}`,
     name: 'Ask Me',
+    colorName: color.charAt(0).toUpperCase() + color.slice(1),
     price: 38.00,
-    category: 'apparel',
-    collection: 'The Ask Me Drop',
+    category: 'apparel' as const,
     description: 'Pigment-dyed heavyweight tee',
-    details: '100% organic ring-spun cotton. Relaxed fit with a comfortable drape. Garment-dyed finish with a washed, vintage look. Side-seamed construction.',
     blurb: 'The one that starts conversations in the grocery store.',
-    images: imgs('ask-me-tee', 3),
+    images: fb(`ask-me-${color}`),
     printfulUrl: 'https://tdi.printful.me/product/ask-me-unisex-garment-dyed-creator-20-vintage-t-shirt-stanleystella-satu041',
-    variants: [
-      { label: 'S', value: 's' }, { label: 'M', value: 'm' }, { label: 'L', value: 'l' },
-      { label: 'XL', value: 'xl' }, { label: '2XL', value: '2xl' }, { label: '3XL', value: '3xl' },
-    ],
-    colors: ['Black Rock', 'Anthracite', 'Deep Teal', 'Green Bay', 'Kaffa Coffee', 'Misty Grey', 'Stone'],
-    drop: 'contract-hours',
-  },
-  {
-    id: 'para-ask-tee',
+    variants: TEE_SIZES,
+    drop: 'contract-hours' as const,
+  })),
+
+  // ── Ask the Para (5 colors) ──
+  ...(['black', 'blue', 'green', 'grey', 'sand'] as const).map(color => ({
+    id: `para-ask-${color}`,
     name: 'Ask the Para',
+    colorName: color.charAt(0).toUpperCase() + color.slice(1),
     price: 33.50,
-    category: 'apparel',
-    collection: 'The Ask Me Drop',
+    category: 'apparel' as const,
     description: 'Vintage fit tee',
-    details: '100% organic ring-spun cotton. Relaxed fit. Garment-dyed finish with a washed, vintage look.',
     blurb: 'Because they always know.',
-    images: imgs('para-ask-tee', 3),
+    images: fb(`para-ask-${color}`),
     printfulUrl: 'https://tdi.printful.me/product/para-ask-unisex-garment-dyed-creator-20-vintage-t-shirt-stanleystella-satu041',
     tag: 'Para Line',
-    variants: [
-      { label: 'S', value: 's' }, { label: 'M', value: 'm' }, { label: 'L', value: 'l' },
-      { label: 'XL', value: 'xl' }, { label: '2XL', value: '2xl' }, { label: '3XL', value: '3xl' },
-    ],
-    colors: ['Black Rock', 'Anthracite', 'Deep Teal', 'Green Bay', 'Kaffa Coffee', 'Misty Grey', 'Stone'],
-    drop: 'contract-hours',
-  },
-  {
-    id: 'staff-tee',
+    variants: TEE_SIZES,
+    drop: 'contract-hours' as const,
+  })),
+
+  // ── The Staff (5 colors) ──
+  ...(['stone', 'grey', 'green', 'blue', 'black'] as const).map(color => ({
+    id: `staff-tee-${color}`,
     name: 'The Staff',
+    colorName: color.charAt(0).toUpperCase() + color.slice(1),
     price: 33.50,
-    category: 'apparel',
-    collection: 'The Ask Me Drop',
+    category: 'apparel' as const,
     description: 'Vintage fit tee',
-    details: '100% organic ring-spun cotton. Relaxed fit. Garment-dyed finish with a washed, vintage look.',
     blurb: 'The title that covers everything.',
-    images: imgs('staff-tee', 3),
+    images: fb(`staff-tee-${color}`),
     printfulUrl: 'https://tdi.printful.me/product/staff-unisex-garment-dyed-creator-20-vintage-t-shirt-stanleystella-satu041',
-    variants: [
-      { label: 'S', value: 's' }, { label: 'M', value: 'm' }, { label: 'L', value: 'l' },
-      { label: 'XL', value: 'xl' }, { label: '2XL', value: '2xl' }, { label: '3XL', value: '3xl' },
-    ],
-    colors: ['Black Rock', 'Anthracite', 'Deep Teal', 'Green Bay', 'Kaffa Coffee', 'Misty Grey', 'Stone'],
-    drop: 'contract-hours',
-  },
-  // ─── The Good Stuff ───
-  {
-    id: 'good-stuff-tee',
-    name: 'The Good Stuff',
-    price: 36.00,
-    category: 'apparel',
-    collection: 'The Good Stuff',
-    description: 'Heather Olive tee',
-    details: '100% organic ring-spun cotton. Relaxed fit. Garment-dyed vintage look.',
-    blurb: 'For the quiet list of things that should have been obvious.',
-    images: imgs('good-stuff-tee', 1),
-    printfulUrl: 'https://tdi.printful.me/product/the-good-stuff-unisex-garment-dyed-creator-20-vintage-t-shirt-stanleystella-satu041',
-    variants: [
-      { label: 'S', value: 's' }, { label: 'M', value: 'm' }, { label: 'L', value: 'l' },
-      { label: 'XL', value: 'xl' }, { label: '2XL', value: '2xl' }, { label: '3XL', value: '3xl' },
-    ],
-    colors: ['Black Rock', 'Anthracite', 'Deep Teal', 'Green Bay', 'Kaffa Coffee', 'Misty Grey', 'Stone'],
-    drop: 'contract-hours',
-  },
+    variants: TEE_SIZES,
+    drop: 'contract-hours' as const,
+  })),
+
+  // ── The Good Stuff (6 colors, single view each) ──
+  ...(['anth', 'blue', 'green', 'pink', 'grey', 'sand'] as const).map(color => {
+    const labels: Record<string, string> = { anth: 'Anthracite', blue: 'Blue', green: 'Green', pink: 'Pink', grey: 'Grey', sand: 'Sand' };
+    return {
+      id: `good-stuff-${color}`,
+      name: 'The Good Stuff',
+      colorName: labels[color],
+      price: 36.00,
+      category: 'apparel' as const,
+      description: 'Heather vintage tee',
+      blurb: 'For the quiet list of things that should have been obvious.',
+      images: single(`good-stuff-tee-${color}`),
+      printfulUrl: 'https://tdi.printful.me/product/the-good-stuff-unisex-garment-dyed-creator-20-vintage-t-shirt-stanleystella-satu041',
+      variants: TEE_SIZES,
+      drop: 'contract-hours' as const,
+    };
+  }),
+];
+
+const CONTRACT_HATS: SwagProduct[] = [
+  // ── The Room (4 colors) ──
+  ...(['blue', 'red', 'green', 'navy'] as const).map(color => ({
+    id: `room-hat-${color}`,
+    name: 'The Room',
+    colorName: color.charAt(0).toUpperCase() + color.slice(1),
+    price: 26.00,
+    category: 'hats' as const,
+    description: 'Two-tone trucker cap',
+    blurb: 'Your room. Your rules.',
+    images: fb(`room-hat-${color}`),
+    printfulUrl: 'https://tdi.printful.me/product/the-room-otto-trucker-hat',
+    variants: HAT_SIZES,
+    drop: 'contract-hours' as const,
+  })),
+
+  // ── The PA (4 colors) ──
+  ...(['red', 'navy', 'blue', 'green'] as const).map(color => ({
+    id: `pa-hat-${color}`,
+    name: 'The PA',
+    colorName: color.charAt(0).toUpperCase() + color.slice(1),
+    price: 26.00,
+    category: 'hats' as const,
+    description: 'Two-tone trucker cap',
+    blurb: 'Para pride on the brim.',
+    images: fb(`pa-hat-${color}`),
+    printfulUrl: 'https://tdi.printful.me/product/the-pa-otto-trucker-hat',
+    tag: 'Para Line',
+    variants: HAT_SIZES,
+    drop: 'contract-hours' as const,
+  })),
+];
+
+const CONTRACT_DRINKWARE: SwagProduct[] = [
   {
     id: 'good-pens-tumbler',
     name: 'The Good Pens',
-    price: 34.00,
-    category: 'drinkware',
-    collection: 'The Good Stuff',
-    description: '20 oz insulated tumbler',
-    details: 'Clear acrylic plastic. Double wall-insulated. Comes with plastic straw and screw-on lid. 16 oz capacity.',
-    blurb: 'Holds ice through a double period.',
-    images: imgs('good-pens-tumbler', 3),
-    printfulUrl: 'https://tdi.printful.me/product/the-good-pens-clear-plastic-tumbler',
-    drop: 'contract-hours',
+    price: 28.00,
+    category: 'drinkware' as const,
+    description: '20oz insulated tumbler',
+    blurb: 'The one you hide in your desk drawer.',
+    images: multi('good-pens-tumbler-new', 2),
+    printfulUrl: 'https://tdi.printful.me/product/good-pens-tumbler',
+    drop: 'contract-hours' as const,
   },
   {
-    id: 'notebook',
-    name: 'The Notebook',
-    price: 17.50,
-    category: 'accessories',
-    collection: 'The Good Stuff',
-    description: 'Hardcover bound',
-    details: 'UltraHyde hardcover. 80 pages of lined, cream-colored paper. Elastic closure, ribbon marker, expandable inner pocket. 5.5" x 8.5".',
-    blurb: 'For the plans that actually matter.',
-    images: imgs('notebook', 3),
-    printfulUrl: 'https://tdi.printful.me/product/hardcover-bound-notebook',
-    drop: 'contract-hours',
+    id: 'best-part-mug',
+    name: "Somebody's Best Part",
+    price: 18.00,
+    category: 'drinkware' as const,
+    description: 'Ceramic coffee mug',
+    blurb: 'For the mornings when coffee is the personality.',
+    images: multi('best-part-mug-new', 3),
+    printfulUrl: 'https://tdi.printful.me/product/best-part-mug',
+    drop: 'contract-hours' as const,
   },
-  // ─── Same Team ───
+  // ── The Sleeve (eval tumbler) ──
+  {
+    id: 'tumbler-eval',
+    name: 'The Sleeve',
+    price: 28.00,
+    category: 'drinkware' as const,
+    description: '20oz insulated tumbler',
+    blurb: 'Hydration with a point of view.',
+    images: multi('tumbler-eval', 3),
+    printfulUrl: 'https://tdi.printful.me/product/eval-tumbler',
+    drop: 'contract-hours' as const,
+  },
+];
+
+const CONTRACT_BAGS: SwagProduct[] = [
   {
     id: 'same-team-tote',
     name: 'Same Team',
-    price: 28.00,
-    category: 'bags',
-    collection: 'Same Team',
-    description: 'Eco recycled cotton tote',
-    details: '100% certified organic cotton. 16" x 14.5" x 5". Weight limit: 30 lbs. Open main compartment.',
-    images: imgs('same-team-tote', 3),
-    printfulUrl: 'https://tdi.printful.me/product/same-team-eco-tote-bag',
-    drop: 'contract-hours',
+    price: 22.00,
+    category: 'bags' as const,
+    description: 'Organic cotton tote',
+    blurb: 'Carry the message.',
+    images: multi('same-team-tote-new', 3),
+    printfulUrl: 'https://tdi.printful.me/product/same-team-tote',
+    drop: 'contract-hours' as const,
+  },
+  {
+    id: 'hard-parts-tote',
+    name: 'The Hard Parts',
+    price: 22.00,
+    category: 'bags' as const,
+    description: 'Organic cotton tote',
+    blurb: 'The bag that gets it.',
+    images: multi('hard-parts-tote-new', 3),
+    printfulUrl: 'https://tdi.printful.me/product/hard-parts-tote',
+    drop: 'contract-hours' as const,
+  },
+  {
+    id: 'eco-tote-tan',
+    name: 'The Carry',
+    price: 22.00,
+    category: 'bags' as const,
+    description: 'Eco-friendly tote',
+    blurb: 'Simple. Clean. Ready.',
+    images: fb('eco-tote-tan'),
+    printfulUrl: 'https://tdi.printful.me/product/eco-tote',
+    drop: 'contract-hours' as const,
+  },
+];
+
+const CONTRACT_ACCESSORIES: SwagProduct[] = [
+  {
+    id: 'notebook-orange',
+    name: 'The Notebook',
+    price: 16.00,
+    category: 'accessories' as const,
+    description: 'Hardcover journal',
+    blurb: 'Where the real lesson plans live.',
+    images: multi('notebook-orange', 4),
+    printfulUrl: 'https://tdi.printful.me/product/notebook',
+    drop: 'contract-hours' as const,
   },
   {
     id: 'same-team-magnet',
     name: 'Same Team',
-    price: 8.00,
-    category: 'accessories',
-    collection: 'Same Team',
-    description: '6" round magnet',
-    details: '0.5mm flexible vinyl. Premium matte finish. Magnetic black backing.',
-    images: imgs('same-team-magnet', 3),
+    colorName: 'Magnet',
+    price: 6.00,
+    category: 'accessories' as const,
+    description: 'Refrigerator magnet',
+    blurb: 'For the fridge, the filing cabinet, or the whiteboard.',
+    images: multi('same-team-magnet', 3),
     printfulUrl: 'https://tdi.printful.me/product/same-team-magnet',
-    drop: 'contract-hours',
-  },
-  // ─── The Hard Parts ───
-  {
-    id: 'hard-parts-tote',
-    name: 'The Hard Parts',
-    price: 36.50,
-    category: 'bags',
-    collection: 'The Hard Parts',
-    description: 'Organic denim tote',
-    details: '100% organic cotton denim. 19.6" x 18.1". Weight limit: 30 lbs. Double-stitched top seam. Inside pocket.',
-    images: imgs('hard-parts-tote', 3),
-    printfulUrl: 'https://tdi.printful.me/product/hard-parts-organic-denim-tote-bag',
-    drop: 'contract-hours',
-  },
-  {
-    id: 'laptop-sleeve',
-    name: 'The Sleeve',
-    price: 28.00,
-    category: 'accessories',
-    collection: 'The Hard Parts',
-    description: 'Padded laptop sleeve',
-    details: '100% neoprene. Resistant to water, oil, and heat. Faux fur interior lining. Padded zipper binding.',
-    blurb: 'Protect the thing that holds everything.',
-    images: imgs('laptop-sleeve', 3),
-    printfulUrl: 'https://tdi.printful.me/product/laptop-sleeve',
-    variants: [{ label: '13"', value: '13' }, { label: '15"', value: '15' }],
-    drop: 'contract-hours',
-  },
-  // ─── Your Space ───
-  {
-    id: 'room-hat',
-    name: 'The Room',
-    price: 32.00,
-    category: 'hats',
-    collection: 'Your Space',
-    description: 'Embroidered dad hat',
-    details: '65% polyester, 35% cotton. Structured front panel. Adjustable snap closure. Matching fabric undervisor.',
-    blurb: 'Stitched, not printed.',
-    images: imgs('room-hat', 3),
-    printfulUrl: 'https://tdi.printful.me/product/room-5-panel-cap',
-    colors: ['Red/Natural', 'Navy/Natural', 'Royal/Natural', 'Dark Green/Natural'],
-    drop: 'contract-hours',
-  },
-  {
-    id: 'pa-hat',
-    name: 'The PA',
-    price: 16.00,
-    category: 'hats',
-    collection: 'Your Space',
-    description: '5-panel, adjustable',
-    details: '65% polyester, 35% cotton. Structured front panel. Adjustable snap closure.',
-    images: imgs('pa-hat', 3),
-    printfulUrl: 'https://tdi.printful.me/product/pa-hat-5-panel-cap',
-    colors: ['Red/Natural', 'Navy/Natural', 'Royal/Natural', 'Dark Green/Natural'],
-    drop: 'contract-hours',
-  },
-  // ─── The Gift ───
-  {
-    id: 'best-part-mug',
-    name: "Somebody's Best Part",
-    price: 26.00,
-    category: 'drinkware',
-    collection: 'The Gift',
-    description: 'Black glossy mug',
-    details: '11oz ceramic mug. Dishwasher and microwave safe.',
-    blurb: 'For the teacher you would like to keep.',
-    images: imgs('best-part-mug', 3),
-    printfulUrl: 'https://tdi.printful.me/product/best-part-black-glossy-mug',
-    drop: 'contract-hours',
-  },
-  {
-    id: 'eco-tote-new',
-    name: 'The Carry',
-    price: 30.00,
-    category: 'bags',
-    collection: 'The Gift',
-    description: 'Eco tote bag',
-    details: '100% certified organic cotton. 16" x 14.5" x 5". Weight limit: 30 lbs.',
-    images: imgs('eco-tote-new', 3),
-    printfulUrl: 'https://tdi.printful.me/product/eco-tote-bag',
-    drop: 'contract-hours',
-  },
-  {
-    id: 'tumbler-new',
-    name: 'The Tumbler',
-    price: 13.50,
-    category: 'drinkware',
-    collection: 'The Gift',
-    description: 'Clear plastic, 16oz',
-    details: 'Clear acrylic plastic. Double wall-insulated. Comes with straw and screw-on lid.',
-    blurb: 'See what you are drinking. Stay hydrated.',
-    images: imgs('tumbler-new', 3),
-    printfulUrl: 'https://tdi.printful.me/product/clear-plastic-tumbler',
-    drop: 'contract-hours',
-  },
-  // ─── Stickers ───
-  {
-    id: 'same-team-sticker-sm',
-    name: 'Same Team',
-    price: 3.00,
-    category: 'stickers',
-    description: 'Bubble-free vinyl',
-    details: 'High opacity adhesive vinyl. Bubble-free application. Durable.',
-    images: imgs('same-team-sticker-sm', 3),
-    printfulUrl: 'https://tdi.printful.me/product/same-team-bubble-free-stickers-6a67cb7a75b74',
-    variants: [{ label: '3"x3"', value: '3x3' }, { label: '4"x4"', value: '4x4' }],
-    drop: 'contract-hours',
-  },
-  {
-    id: 'job-varies-sticker',
-    name: 'Job Varies',
-    price: 3.00,
-    category: 'stickers',
-    description: 'Bubble-free vinyl',
-    images: imgs('job-varies-sticker', 3),
-    printfulUrl: 'https://tdi.printful.me/product/job-varies-bubble-free-stickers',
-    variants: [{ label: '3"x3"', value: '3x3' }, { label: '4"x4"', value: '4x4' }],
-    drop: 'contract-hours',
-  },
-  {
-    id: 'someone-sticker',
-    name: 'Someone',
-    price: 3.00,
-    category: 'stickers',
-    description: 'Bubble-free vinyl',
-    images: imgs('someone-sticker', 3),
-    printfulUrl: 'https://tdi.printful.me/product/someone-bubble-free-stickers',
-    variants: [{ label: '3"x3"', value: '3x3' }, { label: '4"x4"', value: '4x4' }],
-    drop: 'contract-hours',
-  },
-  {
-    id: 'tdi-sticker',
-    name: 'TDI',
-    price: 3.00,
-    category: 'stickers',
-    description: 'Bubble-free vinyl',
-    images: imgs('tdi-sticker', 3),
-    printfulUrl: 'https://tdi.printful.me/product/tdi-bubble-free-stickers',
-    variants: [{ label: '3"x3"', value: '3x3' }, { label: '4"x4"', value: '4x4' }],
-    drop: 'contract-hours',
-  },
-  {
-    id: 'glad-sticker',
-    name: 'Glad',
-    price: 3.00,
-    category: 'stickers',
-    description: 'Bubble-free vinyl',
-    images: imgs('glad-sticker', 3),
-    printfulUrl: 'https://tdi.printful.me/product/glad-bubble-free-stickers',
-    variants: [{ label: '3"x3"', value: '3x3' }, { label: '4"x4"', value: '4x4' }],
-    drop: 'contract-hours',
-  },
-  {
-    id: 'same-team-sticker-lg',
-    name: 'Same Team (Large)',
-    price: 7.00,
-    category: 'stickers',
-    description: 'Bubble-free vinyl, large',
-    images: imgs('same-team-sticker-lg', 2),
-    printfulUrl: 'https://tdi.printful.me/product/same-team-bubble-free-stickers',
-    drop: 'contract-hours',
-  },
-  // ─── After Hours ───
-  {
-    id: 'closed-tee',
-    name: 'The Closed Sign',
-    price: 32.50,
-    category: 'apparel',
-    description: 'Garment-dyed heavyweight tee',
-    details: '100% ring-spun cotton. 6.1 oz fabric weight. Garment-dyed. Relaxed fit. Double-needle hems.',
-    images: imgs('closed-tee', 0),
-    printfulUrl: 'https://tdi.printful.me/product/closed-unisex-garment-dyed-heavyweight-t-shirt',
-    variants: [
-      { label: 'S', value: 's' }, { label: 'M', value: 'm' }, { label: 'L', value: 'l' },
-      { label: 'XL', value: 'xl' }, { label: '2XL', value: '2xl' }, { label: '3XL', value: '3xl' },
-    ],
-    colors: ['Midnight', 'Blue Jean', 'Washed Denim', 'Bay', 'White'],
-    drop: 'after-hours',
-  },
-  {
-    id: 'shows-pants',
-    name: 'The Binge Watch',
-    price: 42.50,
-    category: 'apparel',
-    description: 'Wide-leg lounge pants',
-    details: 'Stretchy knit fabric. Relaxed unisex fit. Side pockets. Elastic waistband with drawstring.',
-    blurb: 'The bell rang. Now breathe.',
-    images: imgs('shows-pants', 2),
-    printfulUrl: 'https://tdi.printful.me/product/shows-all-over-print-unisex-wide-leg-pants',
-    variants: [
-      { label: 'XS', value: 'xs' }, { label: 'S', value: 's' }, { label: 'M', value: 'm' },
-      { label: 'L', value: 'l' }, { label: 'XL', value: 'xl' }, { label: '2XL', value: '2xl' },
-    ],
-    drop: 'after-hours',
-  },
-  {
-    id: 'intermission-knit',
-    name: 'The Needed Intermission',
-    price: 57.50,
-    category: 'apparel',
-    description: 'Premium knitted tee',
-    details: '55% cotton, 45% polyester. Lightweight and soft. Classic fit, unisex sizing. 4-color jacquard knit.',
-    images: imgs('intermission-knit', 0),
-    printfulUrl: 'https://tdi.printful.me/product/intermission-knitted-classic-tee',
-    variants: [
-      { label: 'XS', value: 'xs' }, { label: 'S', value: 's' }, { label: 'M', value: 'm' },
-      { label: 'L', value: 'l' }, { label: 'XL', value: 'xl' }, { label: '2XL', value: '2xl' },
-    ],
-    drop: 'after-hours',
-  },
-  {
-    id: 'thought-tee',
-    name: 'The Inner Thought',
-    price: 24.00,
-    category: 'apparel',
-    description: 'Soft lightweight tee',
-    details: '100% combed and ring-spun cotton. 4.2 oz fabric weight. Pre-shrunk. Side-seamed construction.',
-    images: imgs('thought-tee', 0),
-    printfulUrl: 'https://tdi.printful.me/product/thought-unisex-t-shirt',
-    variants: [
-      { label: 'S', value: 's' }, { label: 'M', value: 'm' }, { label: 'L', value: 'l' },
-      { label: 'XL', value: 'xl' }, { label: '2XL', value: '2xl' },
-    ],
-    colors: ['Black Heather', 'Heather Navy', 'True Royal', 'Athletic Heather', 'White'],
-    drop: 'after-hours',
-  },
-  {
-    id: 'calendar-tee',
-    name: 'The Empty Calendar',
-    price: 24.00,
-    category: 'apparel',
-    description: 'Soft lightweight tee',
-    details: '100% combed and ring-spun cotton. 4.2 oz fabric weight. Pre-shrunk.',
-    images: imgs('calendar-tee', 0),
-    printfulUrl: 'https://tdi.printful.me/product/calendar-unisex-t-shirt',
-    variants: [
-      { label: 'S', value: 's' }, { label: 'M', value: 'm' }, { label: 'L', value: 'l' },
-      { label: 'XL', value: 'xl' }, { label: '2XL', value: '2xl' },
-    ],
-    colors: ['Black Heather', 'Heather Navy', 'True Royal', 'Athletic Heather', 'White'],
-    drop: 'after-hours',
-  },
-  {
-    id: 'silence-tee',
-    name: 'The Needed Silence',
-    price: 18.50,
-    category: 'apparel',
-    description: 'Soft lightweight tee',
-    details: '100% combed and ring-spun cotton. 4.2 oz fabric weight. Pre-shrunk.',
-    images: imgs('silence-tee', 0),
-    printfulUrl: 'https://tdi.printful.me/product/silence-unisex-t-shirt',
-    variants: [
-      { label: 'S', value: 's' }, { label: 'M', value: 'm' }, { label: 'L', value: 'l' },
-      { label: 'XL', value: 'xl' }, { label: '2XL', value: '2xl' },
-    ],
-    colors: ['Black Heather', 'Heather Navy', 'True Royal', 'Athletic Heather', 'White'],
-    drop: 'after-hours',
-  },
-  {
-    id: 'questions-hoodie',
-    name: 'The Question Drop',
-    price: 50.50,
-    category: 'apparel',
-    description: 'Midweight hoodie',
-    details: '80% cotton, 20% polyester blend fleece. 8.5 oz fabric weight. Jersey-lined hood. Metal eyelets.',
-    images: imgs('questions-hoodie', 1),
-    printfulUrl: 'https://tdi.printful.me/product/questions-unisex-midweight-hoodie',
-    variants: [
-      { label: 'S', value: 's' }, { label: 'M', value: 'm' }, { label: 'L', value: 'l' },
-      { label: 'XL', value: 'xl' }, { label: '2XL', value: '2xl' },
-    ],
-    colors: ['Black', 'Classic Navy', 'Charcoal Heather', 'Alpine Green', 'Storm Blue', 'Dusty Sage', 'Sandstone'],
-    drop: 'after-hours',
-  },
-  {
-    id: 'sleepy-dress',
-    name: 'The Sleepy Dress',
-    price: 36.50,
-    category: 'apparel',
-    description: 'Comfortable t-shirt dress',
-    details: 'Stretchy fabric. Drop shoulder. Comfortable oversize fit. Works as a nightie or street style.',
-    images: imgs('sleepy-dress', 2),
-    printfulUrl: 'https://tdi.printful.me/product/sleepy-t-shirt-dress',
-    variants: [
-      { label: 'XS', value: 'xs' }, { label: 'S', value: 's' }, { label: 'M', value: 'm' },
-      { label: 'L', value: 'l' }, { label: 'XL', value: 'xl' }, { label: '2XL', value: '2xl' },
-    ],
-    drop: 'after-hours',
-  },
-  {
-    id: 'intermission-sticker',
-    name: 'The Intermission',
-    price: 3.00,
-    category: 'stickers',
-    description: 'Bubble-free vinyl',
-    images: imgs('intermission-sticker', 2),
-    printfulUrl: 'https://tdi.printful.me/product/intermission-bubble-free-stickers',
-    variants: [{ label: '3"x3"', value: '3x3' }, { label: '4"x4"', value: '4x4' }],
-    drop: 'after-hours',
-  },
-  {
-    id: 'qa-sticker',
-    name: 'The Closed Q&A',
-    price: 3.00,
-    category: 'stickers',
-    description: 'Bubble-free vinyl',
-    images: imgs('qa-sticker', 2),
-    printfulUrl: 'https://tdi.printful.me/product/qa-bubble-free-stickers',
-    variants: [{ label: '3"x3"', value: '3x3' }, { label: '4"x4"', value: '4x4' }],
-    drop: 'after-hours',
+    drop: 'contract-hours' as const,
   },
 ];
 
-export const PRODUCT_TYPES = ['apparel', 'hats', 'bags', 'drinkware', 'accessories', 'stickers'] as const;
+// ════════════════════════════════════════════════════════════
+// AFTER HOURS
+// ════════════════════════════════════════════════════════════
+
+const AFTER_SHIRTS: SwagProduct[] = [
+  // ── The Closed Sign ──
+  {
+    id: 'closed-tee',
+    name: 'The Closed Sign',
+    price: 33.50,
+    category: 'apparel' as const,
+    description: 'Classic fit tee',
+    blurb: 'Office hours are over.',
+    images: single('closed-tee'),
+    printfulUrl: 'https://tdi.printful.me/product/closed-sign-tee',
+    variants: TEE_SIZES,
+    drop: 'after-hours' as const,
+  },
+
+  // ── The Inner Thought (3 colors, single view) ──
+  ...(['black', 'blue', 'white'] as const).map(color => ({
+    id: `thought-tee-${color}`,
+    name: 'The Inner Thought',
+    colorName: color.charAt(0).toUpperCase() + color.slice(1),
+    price: 33.50,
+    category: 'apparel' as const,
+    description: 'Classic fit tee',
+    blurb: 'The one you think but never say out loud.',
+    images: single(`thought-tee-${color}`),
+    printfulUrl: 'https://tdi.printful.me/product/inner-thought-tee',
+    variants: TEE_SIZES,
+    drop: 'after-hours' as const,
+  })),
+
+  // ── The Empty Calendar (3 colors, single view) ──
+  ...(['black', 'blue', 'white'] as const).map(color => ({
+    id: `calendar-tee-${color}`,
+    name: 'The Empty Calendar',
+    colorName: color.charAt(0).toUpperCase() + color.slice(1),
+    price: 33.50,
+    category: 'apparel' as const,
+    description: 'Classic fit tee',
+    blurb: 'Nothing on the schedule and proud of it.',
+    images: single(`calendar-tee-${color}`),
+    printfulUrl: 'https://tdi.printful.me/product/empty-calendar-tee',
+    variants: TEE_SIZES,
+    drop: 'after-hours' as const,
+  })),
+
+  // ── The Needed Silence (3 colors, single view) ──
+  ...(['black', 'blue', 'white'] as const).map(color => ({
+    id: `silence-tee-${color}`,
+    name: 'The Needed Silence',
+    colorName: color.charAt(0).toUpperCase() + color.slice(1),
+    price: 33.50,
+    category: 'apparel' as const,
+    description: 'Classic fit tee',
+    blurb: 'Volume: off.',
+    images: single(`silence-tee-${color}`),
+    printfulUrl: 'https://tdi.printful.me/product/needed-silence-tee',
+    variants: TEE_SIZES,
+    drop: 'after-hours' as const,
+  })),
+
+  // ── The Question Drop (hoodie, 4 colors) ──
+  ...([
+    { color: 'blue', label: 'Blue', imgs: [single('questions-hoodie-blue')[0], single('questions-hoodie-blue-back')[0]] },
+    { color: 'gray', label: 'Gray', imgs: single('questions-hoodie-gray') },
+    { color: 'sand', label: 'Sand', imgs: single('questions-hoodie-sand') },
+    { color: 'sage', label: 'Sage', imgs: single('questions-hoodie-sage') },
+  ]).map(({ color, label, imgs }) => ({
+    id: `questions-hoodie-${color}`,
+    name: 'The Question Drop',
+    colorName: label,
+    price: 58.00,
+    category: 'apparel' as const,
+    description: 'Heavyweight hoodie',
+    blurb: 'The hoodie that answers nothing.',
+    images: imgs,
+    printfulUrl: 'https://tdi.printful.me/product/questions-hoodie',
+    variants: HOODIE_SIZES,
+    drop: 'after-hours' as const,
+  })),
+
+  // ── The Sleepy Dress ──
+  {
+    id: 'sleepy-dress',
+    name: 'The Sleepy Dress',
+    price: 42.00,
+    category: 'apparel' as const,
+    description: 'T-shirt dress',
+    blurb: 'From couch to brunch without trying.',
+    images: multi('sleepy-dress', 3),
+    printfulUrl: 'https://tdi.printful.me/product/sleepy-dress',
+    variants: DRESS_SIZES,
+    drop: 'after-hours' as const,
+  },
+
+  // ── The Binge Watch (shows pants) ──
+  {
+    id: 'shows-pants',
+    name: 'The Binge Watch',
+    price: 44.00,
+    category: 'apparel' as const,
+    description: 'Lounge pants',
+    blurb: 'Three more episodes. Minimum.',
+    images: fb('shows-pants'),
+    printfulUrl: 'https://tdi.printful.me/product/shows-pants',
+    variants: PANTS_SIZES,
+    drop: 'after-hours' as const,
+  },
+
+  // ── The Needed Intermission (knit tee) ──
+  {
+    id: 'intermission-knit',
+    name: 'The Needed Intermission',
+    price: 36.00,
+    category: 'apparel' as const,
+    description: 'Knitted classic tee',
+    blurb: 'Halftime for humans.',
+    images: single('intermission-knit'),
+    printfulUrl: 'https://tdi.printful.me/product/intermission-knitted-classic-tee',
+    variants: TEE_SIZES,
+    drop: 'after-hours' as const,
+  },
+];
+
+// ════════════════════════════════════════════════════════════
+// STICKERS
+// ════════════════════════════════════════════════════════════
+
+const STICKERS: SwagProduct[] = [
+  { id: 'same-team-sticker', name: 'Same Team', price: 4.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/same-team-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
+  { id: 'job-varies-sticker', name: 'Job Varies', price: 4.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/job-varies-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
+  { id: 'someone-sticker', name: 'Someone', price: 4.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/someone-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
+  { id: 'tdi-sticker', name: 'TDI', price: 4.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/tdi-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
+  { id: 'glad-sticker', name: 'Glad', price: 4.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/glad-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
+  { id: 'same-team-sticker-lg', name: 'Same Team (Large)', price: 6.00, category: 'stickers', description: 'Large die-cut vinyl sticker', images: multi('same-team-sticker-lg', 2), printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
+  { id: 'intermission-sticker', name: 'The Intermission', price: 4.50, category: 'stickers', description: 'Die-cut vinyl sticker', images: ['/images/swag/intermission-sticker-new.png'], printfulUrl: 'https://tdi.printful.me', drop: 'both' as const },
+  // ── The Closed Q&A (4 colors) ──
+  ...(['white', 'green', 'lightblue', 'blue'] as const).map(color => ({
+    id: `qa-sticker-${color}`,
+    name: 'The Closed Q&A',
+    colorName: color === 'lightblue' ? 'Light Blue' : color.charAt(0).toUpperCase() + color.slice(1),
+    price: 4.50,
+    category: 'stickers' as const,
+    description: 'Die-cut vinyl sticker',
+    images: single(`qa-sticker-${color}`),
+    printfulUrl: 'https://tdi.printful.me',
+    drop: 'both' as const,
+  })),
+];
+
+// ════════════════════════════════════════════════════════════
+// EXPORTS
+// ════════════════════════════════════════════════════════════
+
+export const SWAG_PRODUCTS: SwagProduct[] = [
+  ...CONTRACT_SHIRTS,
+  ...CONTRACT_HATS,
+  ...CONTRACT_DRINKWARE,
+  ...CONTRACT_BAGS,
+  ...CONTRACT_ACCESSORIES,
+  ...AFTER_SHIRTS,
+  ...STICKERS,
+];
 
 export function getProductsByDrop(drop: 'contract-hours' | 'after-hours'): SwagProduct[] {
   return SWAG_PRODUCTS.filter(p => p.drop === drop || p.drop === 'both');
 }
 
-export function getProductsByType(products: SwagProduct[], type: string): SwagProduct[] {
-  return products.filter(p => p.category === type);
+export function getContractProducts(): { shirts: SwagProduct[]; hats: SwagProduct[]; drinkware: SwagProduct[]; bags: SwagProduct[]; accessories: SwagProduct[] } {
+  return {
+    shirts: CONTRACT_SHIRTS,
+    hats: CONTRACT_HATS,
+    drinkware: CONTRACT_DRINKWARE,
+    bags: CONTRACT_BAGS,
+    accessories: CONTRACT_ACCESSORIES,
+  };
 }
 
-export function getStickers(drop?: 'contract-hours' | 'after-hours'): SwagProduct[] {
-  const stickers = SWAG_PRODUCTS.filter(p => p.category === 'stickers');
-  if (!drop) return stickers;
-  return stickers.filter(p => p.drop === drop || p.drop === 'both');
+export function getAfterProducts(): SwagProduct[] {
+  return AFTER_SHIRTS;
+}
+
+export function getStickers(): SwagProduct[] {
+  return STICKERS;
+}
+
+export function getProductsByType(drop: 'contract-hours' | 'after-hours'): Record<string, SwagProduct[]> {
+  const products = getProductsByDrop(drop).filter(p => p.category !== 'stickers');
+  const groups: Record<string, SwagProduct[]> = {};
+  for (const p of products) {
+    const key = p.category;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(p);
+  }
+  return groups;
 }

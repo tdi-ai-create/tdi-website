@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import type { SwagProduct } from './products';
+import type { SwagProduct } from './types';
 
 export interface CartItem {
   product: SwagProduct;
