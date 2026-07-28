@@ -383,7 +383,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
     description: 'Knitted classic tee',
     details: 'Front: "Inter mission." Back: full graphic design.',
     blurb: 'Halftime for humans.',
-    images: [`${IMG}/intermission-knit-back.webp`, `${IMG}/intermission-knit-front.webp`, `${IMG}/intermission-knit-detail.webp`, `${IMG}/intermission-knit.webp`],
+    images: [`${IMG}/intermission-knit.webp`, `${IMG}/intermission-knit-front.webp`, `${IMG}/intermission-knit-back.webp`, `${IMG}/intermission-knit-detail.webp`],
     printfulUrl: 'https://tdi.printful.me/product/intermission-knitted-classic-tee',
     variants: TEE_SIZES,
     drop: 'after-hours' as const,
