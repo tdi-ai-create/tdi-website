@@ -165,7 +165,7 @@ const CONTRACT_DRINKWARE: SwagProduct[] = [
   },
   {
     id: 'best-part-mug',
-    name: "Somebody's Best Part",
+    name: 'The Why',
     price: 18.00,
     category: 'drinkware' as const,
     description: 'Ceramic coffee mug',
@@ -177,7 +177,7 @@ const CONTRACT_DRINKWARE: SwagProduct[] = [
   // ── The Sleeve (eval tumbler) ──
   {
     id: 'tumbler-eval',
-    name: 'The Sleeve',
+    name: 'The No Evaluation',
     price: 28.00,
     category: 'drinkware' as const,
     description: '20oz insulated tumbler',
@@ -213,7 +213,7 @@ const CONTRACT_BAGS: SwagProduct[] = [
   },
   {
     id: 'eco-tote-tan',
-    name: 'The Carry',
+    name: 'The No Eval Tote',
     price: 22.00,
     category: 'bags' as const,
     description: 'Eco-friendly tote',
@@ -227,7 +227,7 @@ const CONTRACT_BAGS: SwagProduct[] = [
 const CONTRACT_ACCESSORIES: SwagProduct[] = [
   {
     id: 'notebook-orange',
-    name: 'The Notebook',
+    name: 'The Hallway Notes',
     price: 16.00,
     category: 'accessories' as const,
     description: 'Hardcover journal',
@@ -317,7 +317,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
     category: 'apparel' as const,
     description: 'Classic fit tee',
     blurb: 'The one you think but never say out loud.',
-    images: single('thought-tee-blue'),
+    images: single('thought-tee-white'),
     colorVariants: [
       { colorName: 'Black', colorHex: '#2D2D2D', images: single('thought-tee-black') },
       { colorName: 'Blue', colorHex: '#3B5998', images: single('thought-tee-blue') },
