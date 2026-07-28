@@ -193,7 +193,8 @@ function CartDrawer() {
   const handleCheckout = async () => {
     setCheckingOut(true);
     try {
-      const discountMultiplier = discountPercent > 0 ? (1 - discountPercent / 100) : 1;
+      const pct = typeof discountPercent === 'number' ? discountPercent : 0;
+      const discountMultiplier = pct > 0 ? (1 - pct / 100) : 1;
       const origin = window.location.origin;
       const res = await fetch('/api/swag/checkout', {
         method: 'POST',
@@ -205,7 +206,7 @@ function CartDrawer() {
             price: Math.round(i.product.price * discountMultiplier * 100) / 100,
             quantity: i.quantity,
             variant: i.variant,
-            image: i.product.images[0]?.startsWith('http') ? i.product.images[0] : `${origin}${i.product.images[0]}`,
+            image: i.product.images[0] ? (i.product.images[0].startsWith('http') ? i.product.images[0] : `${origin}${i.product.images[0]}`) : undefined,
           })),
           discountCode: discountCode,
         }),
