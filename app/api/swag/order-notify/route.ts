@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
 
     const shipping = session.shipping_details;
     const customerEmail = session.customer_details?.email || 'Unknown';
+    const customerPhone = session.customer_details?.phone || 'Not provided';
     const customerName = session.customer_details?.name || shipping?.name || 'Unknown';
     const items = session.line_items?.data || [];
     const total = (session.amount_total || 0) / 100;
@@ -64,6 +65,7 @@ export async function POST(request: NextRequest) {
                 <table style="width: 100%; font-size: 14px; margin-bottom: 16px;">
                   <tr><td style="color: #6B7280; padding: 4px 0;">Customer</td><td style="font-weight: 700;">${customerName}</td></tr>
                   <tr><td style="color: #6B7280; padding: 4px 0;">Email</td><td>${customerEmail}</td></tr>
+                  <tr><td style="color: #6B7280; padding: 4px 0;">Phone</td><td>${customerPhone}</td></tr>
                   <tr><td style="color: #6B7280; padding: 4px 0;">Discount Code</td><td>${discountCode}</td></tr>
                   <tr><td style="color: #6B7280; padding: 4px 0;">Total Charged</td><td style="font-weight: 700; font-size: 16px;">$${total.toFixed(2)}</td></tr>
                 </table>
@@ -91,6 +93,18 @@ export async function POST(request: NextRequest) {
                   </ol>
                   <p style="margin: 12px 0 0; font-size: 12px; color: #6B7280;">
                     <strong>Do NOT</strong> create a new Printful order if the Stripe payment shows as refunded or disputed. Check Stripe first.
+                  </p>
+                </div>
+
+                <div style="background: #EFF6FF; border: 1px solid #3B82F6; border-radius: 6px; padding: 16px; margin-top: 16px;">
+                  <p style="font-weight: 700; margin: 0 0 8px; font-size: 14px; color: #1E2A4A;">COPY-PASTE FOR PRINTFUL ORDER</p>
+                  <p style="font-size: 12px; color: #6B7280; margin: 0 0 8px;">When Printful asks for a personalized message, paste this:</p>
+                  <div style="background: white; border: 1px solid #E5E7EB; border-radius: 6px; padding: 12px; font-size: 13px; color: #2D2D2D;">
+                    <p style="margin: 0 0 4px;"><strong>Subject:</strong> TDI Team</p>
+                    <p style="margin: 0;"><strong>Message:</strong> Thanks for being a part of the team. You deserve this.</p>
+                  </div>
+                  <p style="font-size: 12px; color: #6B7280; margin: 8px 0 0;">
+                    <strong>Phone for shipping:</strong> ${customerPhone}
                   </p>
                 </div>
 
