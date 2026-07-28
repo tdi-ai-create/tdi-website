@@ -110,7 +110,7 @@ function ProductDrawer({ product, onClose }: { product: SwagProduct; onClose: ()
       )}
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 300 }} />
       <div ref={drawerRef} tabIndex={-1} style={{
-        position: 'fixed', top: 0, right: 0, width: '100%', maxWidth: 420, height: '100vh',
+        position: 'fixed', top: 0, right: 0, width: '100%', maxWidth: 420, height: '100dvh',
         background: C.white, zIndex: 301, borderLeft: `1px solid ${C.border}`,
         display: 'flex', flexDirection: 'column', outline: 'none',
       }}>
@@ -193,12 +193,31 @@ function CartDrawer() {
   const handleCheckout = async () => {
     setCheckingOut(true);
     try {
-      // Apply discount to prices sent to Stripe
       const discountMultiplier = discountPercent > 0 ? (1 - discountPercent / 100) : 1;
-      const res = await fetch('/api/swag/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: items.map(i => ({ productId: i.product.id, name: i.product.name, price: Math.round(i.product.price * discountMultiplier * 100) / 100, quantity: i.quantity, variant: i.variant, image: i.product.images[0] })), discountCode: discountCode }) });
+      const origin = window.location.origin;
+      const res = await fetch('/api/swag/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map(i => ({
+            productId: i.product.id,
+            name: i.product.name,
+            price: Math.round(i.product.price * discountMultiplier * 100) / 100,
+            quantity: i.quantity,
+            variant: i.variant,
+            image: i.product.images[0]?.startsWith('http') ? i.product.images[0] : `${origin}${i.product.images[0]}`,
+          })),
+          discountCode: discountCode,
+        }),
+      });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
-    } catch (err) { console.error(err); }
+      if (data.url) {
+        window.location.href = data.url;
+      } else if (data.error) {
+        console.error('Checkout error:', data.error);
+        alert('Checkout failed. Please try again.');
+      }
+    } catch (err) { console.error('Checkout error:', err); alert('Checkout failed. Please try again.'); }
     finally { setCheckingOut(false); }
   };
   if (!isOpen) return null;
@@ -206,7 +225,7 @@ function CartDrawer() {
   return (
     <>
       <div onClick={closeCart} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 400 }} />
-      <div style={{ position: 'fixed', top: 0, right: 0, width: '100%', maxWidth: 400, height: '100vh', background: C.white, borderLeft: `1px solid ${C.border}`, zIndex: 401, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'fixed', top: 0, right: 0, width: '100%', maxWidth: 400, height: '100dvh', background: C.white, borderLeft: `1px solid ${C.border}`, zIndex: 401, display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '16px 24px', borderBottom: `1px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 18, fontWeight: 700, color: C.navy, margin: 0 }}>Cart ({totalItems})</h3>
           <button onClick={closeCart} style={{ width: 28, height: 28, borderRadius: 4, background: C.gray, border: 'none', cursor: 'pointer', fontSize: 14, color: C.muted, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>x</button>

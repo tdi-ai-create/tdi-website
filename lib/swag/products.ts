@@ -427,7 +427,7 @@ const SUMMER_TRANSITION: SwagProduct[] = [
     category: 'apparel',
     description: 'Oversized boxy tee',
     blurb: 'The AC finally kicked in. Unfortunately, it kicked in everywhere.',
-    images: fb('ac-nightmare'),
+    images: [`${IMG}/ac-nightmare-1.png`, `${IMG}/ac-nightmare-2.png`, `${IMG}/ac-nightmare-3.png`, `${IMG}/ac-nightmare-4.png`],
     printfulUrl: 'https://tdi.printful.me',
     variants: TEE_SIZES,
     drop: 'after-hours',
