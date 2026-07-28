@@ -37,7 +37,7 @@ const CONTRACT_SHIRTS: SwagProduct[] = [
   {
     id: 'ask-me',
     name: 'Ask Me',
-    price: 47.50,
+    price: 40.00,
     category: 'apparel',
     description: 'Pigment-dyed heavyweight tee',
     blurb: 'The one that starts conversations in the grocery store.',
@@ -58,7 +58,7 @@ const CONTRACT_SHIRTS: SwagProduct[] = [
   {
     id: 'para-ask',
     name: 'Ask the Para',
-    price: 52.50,
+    price: 44.00,
     category: 'apparel',
     description: 'Vintage fit tee',
     blurb: 'Because they always know.',
@@ -81,7 +81,7 @@ const CONTRACT_SHIRTS: SwagProduct[] = [
   {
     id: 'staff-tee',
     name: 'The Staff',
-    price: 52.50,
+    price: 44.00,
     category: 'apparel',
     description: 'Vintage fit tee',
     blurb: 'The title that covers everything.',
@@ -103,7 +103,7 @@ const CONTRACT_SHIRTS: SwagProduct[] = [
   {
     id: 'good-stuff',
     name: 'The Good Stuff',
-    price: 45.00,
+    price: 48.00,
     category: 'apparel',
     description: 'Heather vintage tee',
     blurb: 'For the quiet list of things that should have been obvious.',
@@ -128,7 +128,7 @@ const CONTRACT_HATS: SwagProduct[] = [
     id: `room-hat-${color}`,
     name: 'The Room',
     colorName: color.charAt(0).toUpperCase() + color.slice(1),
-    price: 32.50,
+    price: 30.00,
     category: 'hats' as const,
     description: 'Two-tone trucker cap',
     blurb: 'Your room. Your rules.',
@@ -143,7 +143,7 @@ const CONTRACT_HATS: SwagProduct[] = [
     id: `pa-hat-${color}`,
     name: 'The PA',
     colorName: color.charAt(0).toUpperCase() + color.slice(1),
-    price: 32.50,
+    price: 30.00,
     category: 'hats' as const,
     description: 'Two-tone trucker cap',
     blurb: 'Para pride on the brim.',
@@ -159,7 +159,7 @@ const CONTRACT_DRINKWARE: SwagProduct[] = [
   {
     id: 'good-pens-tumbler',
     name: 'The Good Pens',
-    price: 35.00,
+    price: 30.00,
     category: 'drinkware' as const,
     description: '20oz insulated tumbler',
     details: 'Reads: "The is in the good pens."',
@@ -171,7 +171,7 @@ const CONTRACT_DRINKWARE: SwagProduct[] = [
   {
     id: 'best-part-mug',
     name: 'The Why',
-    price: 22.50,
+    price: 23.00,
     category: 'drinkware' as const,
     description: 'Ceramic coffee mug',
     details: 'Reads: "You are the best part of somebody\'s day."',
@@ -184,7 +184,7 @@ const CONTRACT_DRINKWARE: SwagProduct[] = [
   {
     id: 'tumbler-eval',
     name: 'The No Evaluation',
-    price: 35.00,
+    price: 30.00,
     category: 'drinkware' as const,
     description: '20oz insulated tumbler',
     details: 'Reads: "I\'m not here to evaluate you."',
@@ -199,7 +199,7 @@ const CONTRACT_BAGS: SwagProduct[] = [
   {
     id: 'same-team-tote',
     name: 'Same Team',
-    price: 27.50,
+    price: 25.00,
     category: 'bags' as const,
     description: 'Organic cotton tote',
     details: 'Reads: "Same Team" repeated pattern.',
@@ -211,7 +211,7 @@ const CONTRACT_BAGS: SwagProduct[] = [
   {
     id: 'hard-parts-tote',
     name: 'The Hard Parts',
-    price: 27.50,
+    price: 25.00,
     category: 'bags' as const,
     description: 'Organic cotton tote',
     details: 'Reads: "Here for the hard parts."',
@@ -223,7 +223,7 @@ const CONTRACT_BAGS: SwagProduct[] = [
   {
     id: 'eco-tote-tan',
     name: 'The No Eval Tote',
-    price: 27.50,
+    price: 25.00,
     category: 'bags' as const,
     description: 'Eco-friendly tote',
     details: 'Reads: "I\'m not here to evaluate you."',
@@ -238,7 +238,7 @@ const CONTRACT_ACCESSORIES: SwagProduct[] = [
   {
     id: 'notebook-orange',
     name: 'The Hallway Notes',
-    price: 20.00,
+    price: 23.00,
     category: 'accessories' as const,
     description: 'Hardcover journal',
     blurb: 'Where the real lesson plans live.',
@@ -259,7 +259,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
   {
     id: 'questions-hoodie',
     name: 'The Question Drop',
-    price: 72.50,
+    price: 60.00,
     category: 'apparel' as const,
     description: 'Heavyweight hoodie',
     blurb: 'The hoodie that answers nothing.',
@@ -279,7 +279,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
   {
     id: 'sleepy-dress',
     name: 'The Sleepy Dress',
-    price: 52.50,
+    price: 44.00,
     category: 'apparel' as const,
     description: 'T-shirt dress',
     blurb: 'From couch to brunch without trying.',
@@ -293,7 +293,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
   {
     id: 'shows-pants',
     name: 'Between Shows',
-    price: 55.00,
+    price: 48.00,
     category: 'apparel' as const,
     description: 'Lounge pants',
     details: 'Reads: "between shows."',
@@ -308,7 +308,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
   {
     id: 'closed-tee',
     name: 'The Closed Sign',
-    price: 52.50,
+    price: 44.00,
     category: 'apparel' as const,
     description: 'Classic fit tee',
     blurb: 'Office hours are over.',
@@ -324,7 +324,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
   {
     id: 'thought-tee',
     name: 'The Inner Thought',
-    price: 52.50,
+    price: 44.00,
     category: 'apparel' as const,
     description: 'Classic fit tee',
     blurb: 'The one you think but never say out loud.',
@@ -343,7 +343,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
   {
     id: 'calendar-tee',
     name: 'The Empty Calendar',
-    price: 52.50,
+    price: 44.00,
     category: 'apparel' as const,
     description: 'Classic fit tee',
     blurb: 'Nothing on the schedule and proud of it.',
@@ -362,7 +362,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
   {
     id: 'silence-tee',
     name: 'The Needed Silence',
-    price: 52.50,
+    price: 44.00,
     category: 'apparel' as const,
     description: 'Classic fit tee',
     blurb: 'Volume: off.',
@@ -381,7 +381,7 @@ const AFTER_SHIRTS: SwagProduct[] = [
   {
     id: 'intermission-knit',
     name: 'The Needed Intermission',
-    price: 45.00,
+    price: 48.00,
     category: 'apparel' as const,
     description: 'Knitted classic tee',
     details: 'Front: "Inter mission." Back: full graphic design.',
@@ -401,7 +401,7 @@ const SUMMER_TRANSITION: SwagProduct[] = [
   {
     id: 'postit-hunt',
     name: 'The PostIt Hunt',
-    price: 45.00,
+    price: 48.00,
     category: 'apparel',
     description: 'Oversized boxy tee',
     blurb: 'Sub plans. Copier code. Find my lanyard. Lunch (lol). The to-do list that never made it off the chest.',
@@ -413,7 +413,7 @@ const SUMMER_TRANSITION: SwagProduct[] = [
   {
     id: 'badge-fall',
     name: 'The Badge Fall',
-    price: 45.00,
+    price: 48.00,
     category: 'apparel',
     description: 'Oversized boxy tee',
     blurb: 'Team player. Off duty. The lanyard finally let go and honestly, same.',
@@ -425,7 +425,7 @@ const SUMMER_TRANSITION: SwagProduct[] = [
   {
     id: 'ac-nightmare',
     name: 'The AC Nightmare',
-    price: 45.00,
+    price: 48.00,
     category: 'apparel',
     description: 'Oversized boxy tee',
     blurb: 'The AC finally kicked in. Unfortunately, it kicked in everywhere.',

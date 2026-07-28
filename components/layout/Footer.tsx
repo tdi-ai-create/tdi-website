@@ -105,6 +105,11 @@ export function Footer() {
                     FAQ
                   </Link>
                 </li>
+                <li>
+                  <Link href="/swag" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
+                    Swag Shop
+                  </Link>
+                </li>
               </ul>
             </div>
 

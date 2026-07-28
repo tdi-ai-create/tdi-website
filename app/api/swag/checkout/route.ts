@@ -46,11 +46,14 @@ export async function POST(request: NextRequest) {
       shipping_address_collection: {
         allowed_countries: ['US'],
       },
+      phone_number_collection: {
+        enabled: true,
+      },
       shipping_options: [
         {
           shipping_rate_data: {
             type: 'fixed_amount',
-            fixed_amount: { amount: 799, currency: 'usd' },
+            fixed_amount: { amount: 999, currency: 'usd' },
             display_name: 'Standard Shipping',
             delivery_estimate: {
               minimum: { unit: 'business_day', value: 5 },

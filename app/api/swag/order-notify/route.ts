@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
                 <div style="background: #FEF3C7; border: 1px solid #F9B91B; border-radius: 6px; padding: 16px;">
                   <p style="font-weight: 700; margin: 0 0 12px; font-size: 14px; color: #1E2A4A;">FULFILLMENT STEPS (Bella)</p>
                   <ol style="margin: 0; padding-left: 20px; font-size: 13px; color: #2D2D2D;">
-                    <li style="margin-bottom: 8px;">Go to <a href="https://tdi.printful.me" style="color: #1E2A4A; font-weight: 700;">tdi.printful.me</a> and log in</li>
+                    <li style="margin-bottom: 8px;">Go to <a href="https://www.printful.com/dashboard" style="color: #1E2A4A; font-weight: 700;">printful.com/dashboard</a> and log in (NOT tdi.printful.me, that's the retail storefront)</li>
                     <li style="margin-bottom: 8px;">Click <strong>New Order</strong> (or Orders > Create Order)</li>
                     <li style="margin-bottom: 8px;">Search for each product by name. Select the correct size/color from the items above.</li>
                     <li style="margin-bottom: 8px;">Enter the shipping address exactly as shown above</li>
