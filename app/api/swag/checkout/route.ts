@@ -46,6 +46,19 @@ export async function POST(request: NextRequest) {
       shipping_address_collection: {
         allowed_countries: ['US'],
       },
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            fixed_amount: { amount: 799, currency: 'usd' },
+            display_name: 'Standard Shipping',
+            delivery_estimate: {
+              minimum: { unit: 'business_day', value: 5 },
+              maximum: { unit: 'business_day', value: 10 },
+            },
+          },
+        },
+      ],
       success_url: `${origin}/swag/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/swag`,
       metadata: {
