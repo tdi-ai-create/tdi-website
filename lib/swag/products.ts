@@ -287,14 +287,15 @@ const AFTER_SHIRTS: SwagProduct[] = [
     drop: 'after-hours' as const,
   },
 
-  // ── The Binge Watch (shows pants) ──
+  // ── Between Shows (lounge pants) ──
   {
     id: 'shows-pants',
-    name: 'The Binge Watch',
+    name: 'Between Shows',
     price: 55.00,
     category: 'apparel' as const,
     description: 'Lounge pants',
-    blurb: 'Three more episodes. Minimum.',
+    details: 'Reads: "between shows."',
+    blurb: 'Because teaching is a performance. These are for intermission.',
     images: fb('shows-pants'),
     printfulUrl: 'https://tdi.printful.me/product/shows-pants',
     variants: PANTS_SIZES,

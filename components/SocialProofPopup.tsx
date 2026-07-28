@@ -67,6 +67,7 @@ export function SocialProofPopup() {
     '/admin',
     '/partner-setup',
     '/partners',
+    '/swag',
     '/hub',
     '/paragametools',
     '/saunemin-dashboard',

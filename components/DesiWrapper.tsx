@@ -13,7 +13,8 @@ export default function DesiWrapper() {
     pathname?.startsWith('/creator-portal') ||
     pathname?.startsWith('/hub/admin') ||
     pathname?.startsWith('/admin') ||
-    pathname?.startsWith('/invoice')
+    pathname?.startsWith('/invoice') ||
+    pathname?.startsWith('/swag')
   ) {
     return null
   }

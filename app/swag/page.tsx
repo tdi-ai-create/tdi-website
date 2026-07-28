@@ -81,6 +81,7 @@ function ProductDrawer({ product, onClose }: { product: SwagProduct; onClose: ()
   const [sizeError, setSizeError] = useState(false);
   const [addedState, setAddedState] = useState(false);
   const [activeColorIdx, setActiveColorIdx] = useState(0);
+  const [zoomedImg, setZoomedImg] = useState<string | null>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
 
   const hasColorVariants = product.colorVariants && product.colorVariants.length > 0;
@@ -102,6 +103,11 @@ function ProductDrawer({ product, onClose }: { product: SwagProduct; onClose: ()
 
   return (
     <>
+      {zoomedImg && (
+        <div onClick={() => setZoomedImg(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out', padding: 24 }}>
+          <img src={zoomedImg} alt="Zoomed view" style={{ maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 8 }} />
+        </div>
+      )}
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 300 }} />
       <div ref={drawerRef} tabIndex={-1} style={{
         position: 'fixed', top: 0, right: 0, width: '100%', maxWidth: 420, height: '100vh',
@@ -115,7 +121,7 @@ function ProductDrawer({ product, onClose }: { product: SwagProduct; onClose: ()
         <div style={{ flex: 1, overflowY: 'auto', padding: '0 24px 24px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 20, paddingTop: 20 }}>
             {drawerImages.map((img, i) => (
-              <div key={`${activeColorIdx}-${i}`} style={{ width: '100%', aspectRatio: '1', borderRadius: 4, background: C.gray, overflow: 'hidden' }}>
+              <div key={`${activeColorIdx}-${i}`} onClick={() => setZoomedImg(img)} style={{ width: '100%', aspectRatio: '1', borderRadius: 4, background: C.gray, overflow: 'hidden', cursor: 'zoom-in' }}>
                 <img src={img} alt={`${product.name} view ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             ))}
