@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swag Shop Order Fulfillment</title>
+<style>
+body { font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 0 auto; padding: 40px 24px; color: #1e2749; line-height: 1.7; }
+h1 { font-size: 28px; margin-bottom: 8px; }
+h2 { font-size: 20px; margin-top: 32px; margin-bottom: 12px; border-bottom: 2px solid #E5E7EB; padding-bottom: 6px; }
+h3 { font-size: 16px; margin-top: 24px; margin-bottom: 8px; }
+p, li { font-size: 15px; color: #2D2D2D; }
+.meta { font-size: 13px; color: #6B7280; margin-bottom: 24px; }
+.highlight { background: #FEF3C7; border-left: 4px solid #F9B91B; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0; }
+.highlight p { margin: 0; }
+.danger { background: #FEE2E2; border-left: 4px solid #EF4444; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0; }
+.danger p { margin: 0; color: #991B1B; }
+.info { background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0; }
+.info p { margin: 0; }
+table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+th, td { text-align: left; padding: 10px 12px; border: 1px solid #E5E7EB; font-size: 14px; }
+th { background: #F9FAFB; font-weight: 700; }
+code { background: #F3F4F6; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+ol li { margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<h1>Swag Shop Order Fulfillment</h1>
+<p class="meta">Owner: Bella Dailey | Last updated: July 2026 | Location: teachersdeserveit.com/swag</p>
+
+<h2>Overview</h2>
+<p>When a customer places an order on the TDI Swag Shop, Stripe processes the payment and an email notification is sent to the team. <strong>Bella</strong> is responsible for creating the order in Printful so it gets printed and shipped to the customer.</p>
+
+<div class="highlight">
+<p><strong>Key concept:</strong> We do NOT hold inventory. Printful prints each item on demand and ships directly to the customer. Our job is to transfer the order details from the notification email into Printful.</p>
+</div>
+
+<h2>The Full Workflow</h2>
+
+<h3>What happens automatically:</h3>
+<ol>
+<li>Customer browses the swag shop at <code>/swag</code></li>
+<li>Discount code <strong>TEAMTDI</strong> (20% off) is auto-applied</li>
+<li>Customer adds items to cart and clicks Checkout</li>
+<li>Stripe processes the payment at the discounted price</li>
+<li>Customer sees "Order confirmed!" success page</li>
+<li>Notification email is sent to <code>hello@teachersdeserveit.com</code> (cc: <code>rae@teachersdeserveit.com</code>)</li>
+</ol>
+
+<h3>What Bella does (manual steps):</h3>
+<ol>
+<li><strong>Check your email.</strong> You'll receive an email with subject "New Swag Order #XXXXXX" from TDI Swag Shop. This email has everything you need.</li>
+
+<li><strong>Log into Printful.</strong> Go to <a href="https://tdi.printful.me">tdi.printful.me</a> and log in with TDI credentials.</li>
+
+<li><strong>Create a new order.</strong> Click "New Order" or go to Orders > Create Order.</li>
+
+<li><strong>Add each product.</strong> Search for the product by name. Select the correct:
+  <ul>
+    <li>Product (match the name exactly)</li>
+    <li>Color (if specified in the email)</li>
+    <li>Size (S, M, L, XL, 2XL, 3XL as listed)</li>
+    <li>Quantity</li>
+  </ul>
+</li>
+
+<li><strong>Enter shipping address.</strong> Copy the shipping address from the email exactly as shown.</li>
+
+<li><strong>Review the order.</strong> Printful will show you their base cost. This will be LOWER than what the customer paid. That difference is our margin. This is normal.</li>
+
+<li><strong>Submit the order.</strong> Printful will charge the TDI account for the base cost, then print, pack, and ship.</li>
+
+<li><strong>Customer gets tracking.</strong> Printful automatically sends a shipping confirmation email with tracking info to the customer. You don't need to do anything for this step.</li>
+</ol>
+
+<h2>Pricing Structure</h2>
+
+<table>
+<tr><th>What</th><th>Example (tee)</th><th>Who pays</th></tr>
+<tr><td>Displayed price</td><td>$47.50</td><td>Shown on site (before discount)</td></tr>
+<tr><td>Customer pays (with TEAMTDI)</td><td>$38.00</td><td>Charged via Stripe</td></tr>
+<tr><td>Printful base cost</td><td>~$18-22</td><td>Charged to TDI account</td></tr>
+<tr><td>Our margin</td><td>~$16-20</td><td>The difference</td></tr>
+</table>
+
+<div class="info">
+<p><strong>Discount code:</strong> TEAMTDI gives 20% off. It auto-applies at checkout. This is the only active code. Do not create additional codes without checking with Rae first. Codes cannot be stacked.</p>
+</div>
+
+<h2>Timing</h2>
+
+<table>
+<tr><th>Step</th><th>Target</th></tr>
+<tr><td>Order notification received</td><td>Immediate (after customer pays)</td></tr>
+<tr><td>Bella creates Printful order</td><td>Within 24 hours of notification</td></tr>
+<tr><td>Printful prints + ships</td><td>3-5 business days after order created</td></tr>
+<tr><td>Customer receives package</td><td>5-10 business days total</td></tr>
+</table>
+
+<h2>What NOT to Do</h2>
+
+<div class="danger">
+<p><strong>Do NOT</strong> fulfill an order if the Stripe payment shows as refunded or disputed. Check Stripe first.</p>
+</div>
+
+<ul>
+<li>Do NOT create discount codes in Printful or Stripe without Rae's approval</li>
+<li>Do NOT change product prices on the website</li>
+<li>Do NOT respond to customer shipping questions directly. Printful handles all shipping communications.</li>
+<li>Do NOT fulfill orders for products we don't carry. If a product name in the email doesn't match anything in Printful, flag it to Rae.</li>
+</ul>
+
+<h2>Common Situations</h2>
+
+<h3>Customer wants a refund</h3>
+<p>Escalate to Rae. Refunds are processed through Stripe, and the Printful order may need to be cancelled if it hasn't shipped yet.</p>
+
+<h3>Customer says they didn't get tracking</h3>
+<p>Check the order in Printful. If it shows "shipped," the tracking email may have gone to spam. You can resend the tracking info from Printful.</p>
+
+<h3>Wrong size/item ordered</h3>
+<p>If it hasn't shipped in Printful, cancel and recreate with the correct details. If it already shipped, escalate to Rae for a replacement order decision.</p>
+
+<h3>Bulk order inquiry</h3>
+<p>These come through <code>/contact</code> and are handled by Rae directly. Do not process bulk orders through the regular swag flow.</p>
+
+<h2>Access Needed</h2>
+
+<table>
+<tr><th>System</th><th>URL</th><th>Who has access</th></tr>
+<tr><td>Printful (order creation)</td><td><a href="https://tdi.printful.me">tdi.printful.me</a></td><td>Rae, Bella</td></tr>
+<tr><td>Stripe (payment verification)</td><td><a href="https://dashboard.stripe.com">dashboard.stripe.com</a></td><td>Rae, Omar</td></tr>
+<tr><td>Notification emails</td><td>hello@teachersdeserveit.com</td><td>Rae, Bella</td></tr>
+</table>
+
+</body>
+</html>

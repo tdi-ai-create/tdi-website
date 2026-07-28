@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Search, Download, Printer, ExternalLink } from 'lucide-react';
 
-type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'communication-map';
+type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'communication-map' | 'swag-fulfillment';
 
 interface Doc {
   id: DocId;
@@ -179,6 +179,21 @@ const DOC_GROUPS: DocGroup[] = [
         tags: ['creator', 'recruitment', 'outreach', 'gap analysis', 'research', 'convert', 'pipeline'],
         relatedSections: [
           { label: 'Creator Studio', href: '/tdi-admin/creators' },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Swag Shop',
+    color: '#F9B91B',
+    docs: [
+      {
+        id: 'swag-fulfillment',
+        label: 'Order Fulfillment',
+        desc: 'How to fulfill swag orders via Printful when notifications come in',
+        tags: ['swag', 'shop', 'printful', 'order', 'fulfillment', 'bella', 'stripe', 'shipping', 'tshirt'],
+        relatedSections: [
+          { label: 'Swag Shop', href: '/swag' },
         ],
       },
     ],
