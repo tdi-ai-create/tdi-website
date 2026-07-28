@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { SWAG_PRODUCTS, getProductsByDrop, getStickers, type SwagProduct } from '@/lib/swag/products';
 import { useCart } from '@/lib/swag/CartContext';
 import type { World } from '@/lib/swag/types';
-import { SUB_BANDS } from '@/lib/swag/types';
 
 const C = {
   navy: '#1E2A4A', yellow: '#F9B91B', charcoal: '#2D2D2D', gray: '#F5F5F5',
@@ -433,6 +432,14 @@ const qtyBtnStyle: React.CSSProperties = {
    MAIN PAGE
    ═══════════════════════════════════════════════════════════════ */
 export default function SwagPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#FAFAF8' }} />}>
+      <SwagPageInner />
+    </Suspense>
+  );
+}
+
+function SwagPageInner() {
   const { openCart, totalItems } = useCart();
   const router = useRouter();
   const searchParams = useSearchParams();
