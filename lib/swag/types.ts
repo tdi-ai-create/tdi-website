@@ -1,3 +1,9 @@
+export interface ColorVariant {
+  colorName: string;
+  colorHex: string;
+  images: string[];       // [front, back]
+}
+
 export interface SwagProduct {
   id: string;
   name: string;
@@ -8,7 +14,8 @@ export interface SwagProduct {
   description: string;
   details?: string;
   blurb?: string;
-  images: string[];         // [front, back] — 2 images max
+  images: string[];         // [front, back] — 2 images max (default/lead color)
+  colorVariants?: ColorVariant[];  // all available colors (for grouped cards)
   printfulUrl: string;
   tag?: string;
   variants?: { label: string; value: string }[];

@@ -24,70 +24,98 @@ const PANTS_SIZES = [
 // CONTRACT HOURS
 // ════════════════════════════════════════════════════════════
 
+// Color hex values for dots
+const HEX: Record<string, string> = {
+  black: '#2D2D2D', blue: '#5B7B9A', green: '#6B8F71', grey: '#9CA3AF', sand: '#C2B280',
+  stone: '#B8B0A0', anth: '#4A4A4A', pink: '#D4A0A0',
+};
+
 const CONTRACT_SHIRTS: SwagProduct[] = [
-  // ── Ask Me (5 colors) ──
-  ...(['black', 'blue', 'green', 'grey', 'sand'] as const).map(color => ({
-    id: `ask-me-${color}`,
+  // ── Ask Me (lead: Black) ──
+  {
+    id: 'ask-me',
     name: 'Ask Me',
-    colorName: color.charAt(0).toUpperCase() + color.slice(1),
     price: 38.00,
-    category: 'apparel' as const,
+    category: 'apparel',
     description: 'Pigment-dyed heavyweight tee',
     blurb: 'The one that starts conversations in the grocery store.',
-    images: fb(`ask-me-${color}`),
+    images: fb('ask-me-black'),
+    colorVariants: [
+      { colorName: 'Black', colorHex: HEX.black, images: fb('ask-me-black') },
+      { colorName: 'Blue', colorHex: HEX.blue, images: fb('ask-me-blue') },
+      { colorName: 'Green', colorHex: HEX.green, images: fb('ask-me-green') },
+      { colorName: 'Grey', colorHex: HEX.grey, images: fb('ask-me-grey') },
+      { colorName: 'Sand', colorHex: HEX.sand, images: fb('ask-me-sand') },
+    ],
     printfulUrl: 'https://tdi.printful.me/product/ask-me-unisex-garment-dyed-creator-20-vintage-t-shirt-stanleystella-satu041',
     variants: TEE_SIZES,
-    drop: 'contract-hours' as const,
-  })),
+    drop: 'contract-hours',
+  },
 
-  // ── Ask the Para (5 colors) ──
-  ...(['black', 'blue', 'green', 'grey', 'sand'] as const).map(color => ({
-    id: `para-ask-${color}`,
+  // ── Ask the Para (lead: Blue) ──
+  {
+    id: 'para-ask',
     name: 'Ask the Para',
-    colorName: color.charAt(0).toUpperCase() + color.slice(1),
     price: 33.50,
-    category: 'apparel' as const,
+    category: 'apparel',
     description: 'Vintage fit tee',
     blurb: 'Because they always know.',
-    images: fb(`para-ask-${color}`),
-    printfulUrl: 'https://tdi.printful.me/product/para-ask-unisex-garment-dyed-creator-20-vintage-t-shirt-stanleystella-satu041',
+    images: fb('para-ask-blue'),
+    colorVariants: [
+      { colorName: 'Black', colorHex: HEX.black, images: fb('para-ask-black') },
+      { colorName: 'Blue', colorHex: HEX.blue, images: fb('para-ask-blue') },
+      { colorName: 'Green', colorHex: HEX.green, images: fb('para-ask-green') },
+      { colorName: 'Grey', colorHex: HEX.grey, images: fb('para-ask-grey') },
+      { colorName: 'Sand', colorHex: HEX.sand, images: fb('para-ask-sand') },
+    ],
     tag: 'Para Line',
+    printfulUrl: 'https://tdi.printful.me/product/para-ask-unisex-garment-dyed-creator-20-vintage-t-shirt-stanleystella-satu041',
     variants: TEE_SIZES,
-    drop: 'contract-hours' as const,
-  })),
+    drop: 'contract-hours',
+  },
 
-  // ── The Staff (5 colors) ──
-  ...(['stone', 'grey', 'green', 'blue', 'black'] as const).map(color => ({
-    id: `staff-tee-${color}`,
+  // ── The Staff (lead: Stone) ──
+  {
+    id: 'staff-tee',
     name: 'The Staff',
-    colorName: color.charAt(0).toUpperCase() + color.slice(1),
     price: 33.50,
-    category: 'apparel' as const,
+    category: 'apparel',
     description: 'Vintage fit tee',
     blurb: 'The title that covers everything.',
-    images: fb(`staff-tee-${color}`),
+    images: fb('staff-tee-stone'),
+    colorVariants: [
+      { colorName: 'Stone', colorHex: HEX.stone, images: fb('staff-tee-stone') },
+      { colorName: 'Grey', colorHex: HEX.grey, images: fb('staff-tee-grey') },
+      { colorName: 'Green', colorHex: HEX.green, images: fb('staff-tee-green') },
+      { colorName: 'Blue', colorHex: HEX.blue, images: fb('staff-tee-blue') },
+      { colorName: 'Black', colorHex: HEX.black, images: fb('staff-tee-black') },
+    ],
     printfulUrl: 'https://tdi.printful.me/product/staff-unisex-garment-dyed-creator-20-vintage-t-shirt-stanleystella-satu041',
     variants: TEE_SIZES,
-    drop: 'contract-hours' as const,
-  })),
+    drop: 'contract-hours',
+  },
 
-  // ── The Good Stuff (6 colors, single view each) ──
-  ...(['anth', 'blue', 'green', 'pink', 'grey', 'sand'] as const).map(color => {
-    const labels: Record<string, string> = { anth: 'Anthracite', blue: 'Blue', green: 'Green', pink: 'Pink', grey: 'Grey', sand: 'Sand' };
-    return {
-      id: `good-stuff-${color}`,
-      name: 'The Good Stuff',
-      colorName: labels[color],
-      price: 36.00,
-      category: 'apparel' as const,
-      description: 'Heather vintage tee',
-      blurb: 'For the quiet list of things that should have been obvious.',
-      images: single(`good-stuff-tee-${color}`),
-      printfulUrl: 'https://tdi.printful.me/product/the-good-stuff-unisex-garment-dyed-creator-20-vintage-t-shirt-stanleystella-satu041',
-      variants: TEE_SIZES,
-      drop: 'contract-hours' as const,
-    };
-  }),
+  // ── The Good Stuff (lead: Green) ──
+  {
+    id: 'good-stuff',
+    name: 'The Good Stuff',
+    price: 36.00,
+    category: 'apparel',
+    description: 'Heather vintage tee',
+    blurb: 'For the quiet list of things that should have been obvious.',
+    images: single('good-stuff-tee-green'),
+    colorVariants: [
+      { colorName: 'Anthracite', colorHex: HEX.anth, images: single('good-stuff-tee-anth') },
+      { colorName: 'Blue', colorHex: HEX.blue, images: single('good-stuff-tee-blue') },
+      { colorName: 'Green', colorHex: HEX.green, images: single('good-stuff-tee-green') },
+      { colorName: 'Pink', colorHex: HEX.pink, images: single('good-stuff-tee-pink') },
+      { colorName: 'Grey', colorHex: HEX.grey, images: single('good-stuff-tee-grey') },
+      { colorName: 'Sand', colorHex: HEX.sand, images: single('good-stuff-tee-sand') },
+    ],
+    printfulUrl: 'https://tdi.printful.me/product/the-good-stuff-unisex-garment-dyed-creator-20-vintage-t-shirt-stanleystella-satu041',
+    variants: TEE_SIZES,
+    drop: 'contract-hours',
+  },
 ];
 
 const CONTRACT_HATS: SwagProduct[] = [

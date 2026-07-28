@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { SWAG_PRODUCTS, getContractProducts, getAfterProducts, getStickers } from '@/lib/swag/products';
-import type { SwagProduct } from '@/lib/swag/types';
+import type { SwagProduct, ColorVariant } from '@/lib/swag/types';
 import { useCart } from '@/lib/swag/CartContext';
 
 const C = {
@@ -15,19 +15,37 @@ const C = {
 /* ─── Product Tile ─── */
 function ProductTile({ product, onOpen }: { product: SwagProduct; onOpen: () => void }) {
   const [hovered, setHovered] = useState(false);
-  const hasTwoImages = product.images.length >= 2;
+  const [activeColorIdx, setActiveColorIdx] = useState(0);
+  const hasVariants = product.colorVariants && product.colorVariants.length > 0;
+  const activeImages = hasVariants ? product.colorVariants![activeColorIdx].images : product.images;
+  const activeColorName = hasVariants ? product.colorVariants![activeColorIdx].colorName : product.colorName;
+  const hasTwoImages = activeImages.length >= 2;
+
   return (
     <div onClick={onOpen} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
       style={{ cursor: 'pointer' }} role="button" tabIndex={0} onKeyDown={e => e.key === 'Enter' && onOpen()}>
       <div style={{ width: '100%', aspectRatio: '1', borderRadius: 4, background: C.gray, overflow: 'hidden', position: 'relative' }}>
-        <img src={product.images[0]} alt={product.name} loading="lazy"
+        <img src={activeImages[0]} alt={product.name} loading="lazy"
           style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0, opacity: hovered && hasTwoImages ? 0 : 1, transition: 'opacity 0.35s ease' }} />
-        {hasTwoImages && <img src={product.images[1]} alt="" loading="lazy"
+        {hasTwoImages && <img src={activeImages[1]} alt="" loading="lazy"
           style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0, opacity: hovered ? 1 : 0, transition: 'opacity 0.35s ease' }} />}
       </div>
       <div style={{ marginTop: 10 }}>
         <h3 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 15, fontWeight: 700, color: C.navy, margin: 0, lineHeight: 1.3 }}>{product.name}</h3>
-        {product.colorName && <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>{product.colorName}</p>}
+        {activeColorName && <p style={{ fontSize: 12, color: C.muted, margin: '2px 0 0' }}>{activeColorName}</p>}
+        {hasVariants && (
+          <div style={{ display: 'flex', gap: 5, marginTop: 6 }}>
+            {product.colorVariants!.map((cv, i) => (
+              <div key={cv.colorName}
+                onClick={e => { e.stopPropagation(); setActiveColorIdx(i); }}
+                style={{
+                  width: 16, height: 16, borderRadius: '50%', background: cv.colorHex, cursor: 'pointer',
+                  border: i === activeColorIdx ? '2px solid #1E2A4A' : '2px solid transparent',
+                  transition: 'border-color 0.15s',
+                }} />
+            ))}
+          </div>
+        )}
         <p style={{ fontSize: 14, fontWeight: 700, color: C.navy, margin: '4px 0 0' }}>${product.price.toFixed(2)}</p>
       </div>
     </div>
@@ -59,7 +77,12 @@ function ProductDrawer({ product, onClose }: { product: SwagProduct; onClose: ()
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [sizeError, setSizeError] = useState(false);
   const [addedState, setAddedState] = useState(false);
+  const [activeColorIdx, setActiveColorIdx] = useState(0);
   const drawerRef = useRef<HTMLDivElement>(null);
+
+  const hasColorVariants = product.colorVariants && product.colorVariants.length > 0;
+  const drawerImages = hasColorVariants ? product.colorVariants![activeColorIdx].images : product.images;
+  const drawerColorName = hasColorVariants ? product.colorVariants![activeColorIdx].colorName : product.colorName;
 
   useEffect(() => {
     drawerRef.current?.focus();
@@ -88,14 +111,30 @@ function ProductDrawer({ product, onClose }: { product: SwagProduct; onClose: ()
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: '0 24px 24px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 20, paddingTop: 20 }}>
-            {product.images.map((img, i) => (
-              <div key={i} style={{ width: '100%', aspectRatio: '1', borderRadius: 4, background: C.gray, overflow: 'hidden' }}>
+            {drawerImages.map((img, i) => (
+              <div key={`${activeColorIdx}-${i}`} style={{ width: '100%', aspectRatio: '1', borderRadius: 4, background: C.gray, overflow: 'hidden' }}>
                 <img src={img} alt={`${product.name} view ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             ))}
           </div>
           <h2 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 24, fontWeight: 700, color: C.navy, margin: '0 0 4px' }}>{product.name}</h2>
+          {drawerColorName && <p style={{ fontSize: 13, color: C.muted, margin: '0 0 2px' }}>{drawerColorName}</p>}
           <p style={{ fontSize: 13, color: C.muted, margin: '0 0 4px' }}>{product.description}</p>
+          {hasColorVariants && (
+            <div style={{ marginBottom: 12 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>Color</p>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {product.colorVariants!.map((cv, i) => (
+                  <div key={cv.colorName} onClick={() => setActiveColorIdx(i)} title={cv.colorName}
+                    style={{
+                      width: 28, height: 28, borderRadius: '50%', background: cv.colorHex, cursor: 'pointer',
+                      border: i === activeColorIdx ? `2px solid ${C.navy}` : '2px solid transparent',
+                      transition: 'border-color 0.15s',
+                    }} />
+                ))}
+              </div>
+            </div>
+          )}
           {product.blurb && <p style={{ fontSize: 14, color: C.charcoal, margin: '0 0 12px', lineHeight: 1.5 }}>{product.blurb}</p>}
           <div style={{ fontSize: 24, fontWeight: 800, color: C.navy, margin: '0 0 20px' }}>${product.price.toFixed(2)}</div>
           {product.variants && (
