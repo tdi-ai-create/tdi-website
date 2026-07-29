@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
 
         let reminderEmail: { subject: string; body: string } | null = null;
 
-        if (daysSinceInvite === 3) {
+        if (daysSinceInvite >= 3 && daysSinceInvite < 7) {
           reminderEmail = {
             subject: `${firstName}, your TDI dashboard is waiting`,
             body: `${firstName},
@@ -82,7 +82,7 @@ If you are having trouble logging in, just reply to this email and we will help.
 
 The TDI Team`
           };
-        } else if (daysSinceInvite === 7) {
+        } else if (daysSinceInvite >= 7 && daysSinceInvite < 14) {
           reminderEmail = {
             subject: `${firstName}, quick check-in from TDI`,
             body: `${firstName},
@@ -97,7 +97,7 @@ Need help? Reply to this email or schedule a call and we will walk through it to
 
 The TDI Team`
           };
-        } else if (daysSinceInvite === 14) {
+        } else if (daysSinceInvite >= 14 && daysSinceInvite < 21) {
           reminderEmail = {
             subject: `${firstName}, we want to make sure you are all set`,
             body: `${firstName},
@@ -115,7 +115,7 @@ We are here whenever you are ready.
 
 The TDI Team`
           };
-        } else if (daysSinceInvite === 21) {
+        } else if (daysSinceInvite >= 21 && daysSinceInvite < 30) {
           reminderEmail = {
             subject: `${firstName}, let's make sure your team gets the most from TDI`,
             body: `${firstName},
@@ -136,7 +136,7 @@ If something is not working or you have questions about the partnership, reply t
 
 The TDI Team`
           };
-        } else if (daysSinceInvite === 30) {
+        } else if (daysSinceInvite >= 30 && daysSinceInvite < 45) {
           reminderEmail = {
             subject: `${firstName}, your TDI dashboard is ready when you are`,
             body: `${firstName},
@@ -151,7 +151,7 @@ No rush. We will be here when you are ready.
 
 The TDI Team`
           };
-        } else if (daysSinceInvite === 45) {
+        } else if (daysSinceInvite >= 45) {
           reminderEmail = {
             subject: `${firstName}, your team is heading back. Let's get them set up.`,
             body: `${firstName},
