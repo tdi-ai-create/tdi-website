@@ -85,7 +85,10 @@ export async function GET(request: NextRequest) {
         remindersChecked++;
 
         // Only send if we're at exactly this interval (or within 1 day to account for cron timing)
-        if (daysUntilTarget === interval.days || daysUntilTarget === interval.days - 1) {
+        // Use ranges to avoid missing reminders if cron skips a day
+        const nextInterval = REMINDER_INTERVALS[REMINDER_INTERVALS.indexOf(interval) + 1];
+        const lowerBound = nextInterval ? nextInterval.days + 1 : 0;
+        if (daysUntilTarget >= lowerBound && daysUntilTarget <= interval.days) {
           // Check if this reminder was already sent for this target date
           const { data: existingReminder, error: reminderError } = await supabase
             .from('creator_reminder_log')
