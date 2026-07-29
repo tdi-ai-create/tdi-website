@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { InfoDot, FirstTimeHint, GUIDANCE } from '@/components/tdi-admin/ui/Guidance'
@@ -23,7 +23,7 @@ import { TDISuggestions } from '@/components/dashboard/shared/TDISuggestions'
 import { STATIC_DEFAULTS } from '@/lib/dashboard/dashboardDefaults'
 import { generateSuggestions, type TDISuggestion } from '@/lib/dashboard/generateSuggestions'
 import { StaffRosterWithPhotos, StaffPhotoUpload, FindStaffSearch } from '@/components/tdi-admin/leadership/staff'
-import { ArrowLeft, Loader2, Building2, Upload, ExternalLink, Calendar, Mail, Phone, MessageCircle, CheckCircle2, Circle, Clock, Eye, EyeOff, Trash2, Plus, ChevronDown } from 'lucide-react'
+import { ArrowLeft, Loader2, Building2, Upload, ExternalLink, Calendar, Mail, Phone, MessageCircle, CheckCircle2, Circle, Clock, Eye, EyeOff, Trash2, Plus, ChevronDown, FileText, BarChart3, Users, AlertTriangle, Target, TrendingUp, Send, Briefcase, Edit3, ChevronRight, X } from 'lucide-react'
 import Image from 'next/image'
 import OnboardingChecklist from '@/components/dashboard/leadership/OnboardingChecklist'
 import StaffEngagementRoster from '@/components/dashboard/leadership/StaffEngagementRoster'
@@ -32,18 +32,6 @@ import CourseCompletionFunnel from '@/components/dashboard/leadership/CourseComp
 import LoginTrendChart from '@/components/dashboard/leadership/LoginTrendChart'
 import ObservationImpactScorecard from '@/components/dashboard/leadership/ObservationImpactScorecard'
 import BillingTab from '@/components/dashboard/admin/BillingTab'
-
-// Tab configuration - mirrors principal dashboard
-const ADMIN_TABS = [
-  { key: 'internal', label: 'Internal' },
-  { key: '90-days', label: '90 Days' },
-  { key: 'overview', label: 'Overview' },
-  { key: 'our-partnership', label: 'Our Partnership' },
-  { key: 'blueprint', label: 'Blueprint' },
-  { key: 'next-year', label: 'Next Year' },
-  { key: 'team', label: 'Team' },
-  { key: 'billing', label: 'Billing' },
-]
 
 interface UploadedFile {
   id: string
@@ -77,7 +65,7 @@ function DeliverablesList({ partnershipId, userEmail }: { partnershipId: string;
       .catch(() => setLoading(false))
   }, [partnershipId, userEmail])
 
-  if (loading) return <div className="bg-white rounded-xl border border-gray-100 p-6 mt-4 text-center text-gray-400 text-sm">Loading deliverables...</div>
+  if (loading) return <div className="text-center text-gray-400 text-xs py-3">Loading deliverables...</div>
   if (deliverables.length === 0) return null
 
   const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
@@ -99,22 +87,22 @@ function DeliverablesList({ partnershipId, userEmail }: { partnershipId: string;
     const deliveredCount = items.filter((d: any) => ['delivered', 'invoiced', 'paid'].includes(d.delivery_status)).length
 
     return (
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-2">
+      <div className="mb-3">
+        <div className="flex items-center justify-between mb-1.5">
           <div className="flex items-center gap-2">
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: accentColor }} />
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{title}</span>
+            <div style={{ width: 7, height: 7, borderRadius: '50%', background: accentColor }} />
+            <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">{title}</span>
           </div>
-          <span className="text-xs text-gray-400">{deliveredCount}/{items.length} delivered -- ${totalValue.toLocaleString()}</span>
+          <span className="text-[10px] text-gray-400">{deliveredCount}/{items.length} delivered, ${totalValue.toLocaleString()}</span>
         </div>
         <div className="space-y-1">
           {items.map((d: any) => {
             const sc = statusConfig[d.delivery_status] || statusConfig.pending
             return (
-              <div key={d.id} className="flex items-center justify-between px-3 py-2 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors" style={{ borderLeft: `3px solid ${accentColor}` }}>
+              <div key={d.id} className="flex items-center justify-between px-2.5 py-1.5 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors" style={{ borderLeft: `3px solid ${accentColor}` }}>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-gray-800 truncate">{d.label}</div>
-                  <div className="text-xs text-gray-400 mt-0.5">
+                  <div className="text-xs font-medium text-gray-800 truncate">{d.label}</div>
+                  <div className="text-[10px] text-gray-400 mt-0.5">
                     {d.delivery_date && `Delivered ${new Date(d.delivery_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
                     {d.delivered_by && ` by ${d.delivered_by.split('@')[0]}`}
                     {!d.delivery_date && d.is_complimentary && 'Complimentary'}
@@ -122,11 +110,11 @@ function DeliverablesList({ partnershipId, userEmail }: { partnershipId: string;
                     {!d.delivery_date && d.delivery_status === 'pending_funding' && 'Waiting on grant funding'}
                   </div>
                 </div>
-                <div className="flex items-center gap-3 flex-shrink-0">
+                <div className="flex items-center gap-2 flex-shrink-0">
                   {!d.is_complimentary && Number(d.total_amount) > 0 && (
-                    <span className="text-sm font-bold text-gray-700">${Number(d.total_amount).toLocaleString()}</span>
+                    <span className="text-xs font-bold text-gray-700">${Number(d.total_amount).toLocaleString()}</span>
                   )}
-                  <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4, background: sc.bg, color: sc.text }}>
+                  <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: sc.bg, color: sc.text }}>
                     {sc.label}
                   </span>
                 </div>
@@ -139,17 +127,13 @@ function DeliverablesList({ partnershipId, userEmail }: { partnershipId: string;
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-6 mt-4">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-lg font-bold text-gray-900">Service Deliverables</h2>
-          <p className="text-xs text-gray-400 mt-0.5">Contract line items with delivery and invoicing status</p>
-        </div>
+    <div>
+      <div className="flex items-center justify-between mb-3">
         <div className="text-right">
-          <div className="text-lg font-bold text-gray-900">
+          <div className="text-sm font-bold text-gray-900">
             ${deliverables.filter((d: any) => !d.is_complimentary).reduce((s: number, d: any) => s + Number(d.total_amount || 0), 0).toLocaleString()}
           </div>
-          <div className="text-xs text-gray-400">total contract value</div>
+          <div className="text-[10px] text-gray-400">total contract value</div>
         </div>
       </div>
 
@@ -234,7 +218,6 @@ export default function AdminPartnershipDetailPage() {
   // UI state
   const [loading, setLoading] = useState(true)
   const [editMode, setEditMode] = useState(false)
-  const [activeTab, setActiveTab] = useState('internal')
   const [addEventOpen, setAddEventOpen] = useState(false)
   const [newEvent, setNewEvent] = useState({
     event_title: '',
@@ -275,9 +258,26 @@ export default function AdminPartnershipDetailPage() {
   const [provisionResult, setProvisionResult] = useState('')
   const [grantPursuits, setGrantPursuits] = useState<{ id: string; pursuit_name: string; current_phase: string; total_amount: number; total_awarded: number; funding_paths: string; contract_gap: number }[]>([])
 
-  // Load internal notes/meetings/kpis when tab is active
+  // V2 state: Timeline filter, expanded sidebar sections, slide-out panels
+  const [timelineFilter, setTimelineFilter] = useState<'all' | 'notes' | 'meetings' | 'alerts'>('all')
+  const [showBillingPanel, setShowBillingPanel] = useState(false)
+  const [showTeamPanel, setShowTeamPanel] = useState(false)
+  const [show90DaysPanel, setShow90DaysPanel] = useState(false)
+  const [showOverviewPanel, setShowOverviewPanel] = useState(false)
+  const [showKpiSelector, setShowKpiSelector] = useState(false)
+  const [showSchoolInfo, setShowSchoolInfo] = useState(false)
+
+  // Session records state (for Our Partnership tab)
+  const [sessionRecords, setSessionRecords] = useState<any[]>([])
+
+  // Inline editing state for partnership goal
+  const [editingField, setEditingField] = useState<string | null>(null)
+  const [localGoal, setLocalGoal] = useState('')
+  const [localYear2Notes, setLocalYear2Notes] = useState('')
+
+  // Load internal notes/meetings/kpis on mount (no longer tab-gated)
   useEffect(() => {
-    if (activeTab !== 'internal' || !partnershipId) return
+    if (!partnershipId) return
     fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`)
       .then(r => r.json())
       .then(d => { if (d.notes) setInternalNotes(d.notes) })
@@ -309,15 +309,7 @@ export default function AdminPartnershipDetailPage() {
         }
       })
       .catch(() => {})
-  }, [activeTab, partnershipId])
-
-  // Inline editing state for partnership goal
-  const [editingField, setEditingField] = useState<string | null>(null)
-  const [localGoal, setLocalGoal] = useState('')
-  const [localYear2Notes, setLocalYear2Notes] = useState('')
-
-  // Session records state (for Our Partnership tab)
-  const [sessionRecords, setSessionRecords] = useState<any[]>([])
+  }, [partnershipId])
 
   const hasAccess = isOwner || hasAnySectionPermission(permissions, 'leadership')
   const userEmail = teamMember?.email || ''
@@ -523,7 +515,7 @@ export default function AdminPartnershipDetailPage() {
       showToast('Event added to timeline', 'success')
     } else {
       const err = await res.json().catch(() => ({}))
-      showToast(err.message || 'Failed to add event - please try again', 'error')
+      showToast(err.message || 'Failed to add event. Please try again.', 'error')
     }
   }
 
@@ -542,7 +534,7 @@ export default function AdminPartnershipDetailPage() {
       setTimelineEvents((prev) => prev.filter((e) => e.id !== eventId))
       showToast('Event removed', 'success')
     } else {
-      showToast('Failed to delete event - please try again', 'error')
+      showToast('Failed to delete event. Please try again.', 'error')
     }
   }
 
@@ -571,7 +563,7 @@ export default function AdminPartnershipDetailPage() {
           prev.map((e) => (e.id === eventId ? originalEvent : e))
         )
       }
-      showToast('Failed to move event - please try again', 'error')
+      showToast('Failed to move event. Please try again.', 'error')
     }
   }
 
@@ -615,6 +607,171 @@ export default function AdminPartnershipDetailPage() {
       setUploadedFiles(fData.files || [])
     }
   }
+
+  // ─── Computed: Smart Actions ───────────────────────────────────────
+  const smartActions = useMemo(() => {
+    if (!partnership) return []
+    const actions: { label: string; description: string; variant: 'urgent' | 'primary' | 'secondary'; onClick: () => void }[] = []
+
+    // Check last login
+    const lastLogin = partnership.last_principal_login
+    const daysSinceLogin = lastLogin
+      ? Math.floor((Date.now() - new Date(lastLogin).getTime()) / (1000 * 60 * 60 * 24))
+      : null
+
+    if (daysSinceLogin !== null && daysSinceLogin > 14) {
+      actions.push({
+        label: 'Schedule check-in',
+        description: `Principal hasn't logged in for ${daysSinceLogin} days.`,
+        variant: 'urgent',
+        onClick: () => {
+          window.open('https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat', '_blank')
+        },
+      })
+    }
+
+    // Prep for call
+    actions.push({
+      label: 'Prep for Next Call',
+      description: 'Generate a briefing with engagement data and talking points.',
+      variant: 'primary',
+      onClick: async () => {
+        try {
+          const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/briefing`)
+          const data = await res.json()
+          const w = window.open('', '_blank')
+          if (!w) return
+          const b = data.briefing
+          const kpiRows = (data.kpis || []).map((k: { label: string; current: string; target: string; pct: number; status: string }) => `<tr><td style="padding:6px 10px;">${k.label}</td><td style="padding:6px 10px;font-weight:700;">${k.current}</td><td style="padding:6px 10px;">${k.target}</td><td style="padding:6px 10px;color:${k.status === 'at_risk' ? '#EF4444' : k.pct >= 70 ? '#22c55e' : '#EAB308'}">${k.pct}%</td></tr>`).join('')
+          const tpList = (data.talkingPoints || []).map((t: string) => `<li style="margin-bottom:6px;">${t}</li>`).join('')
+          const pendingList = (data.pendingItems || []).map((t: string) => `<li>${t}</li>`).join('')
+          w.document.write(`<!DOCTYPE html><html><head><title>Briefing: ${b.orgName}</title><style>body{font-family:sans-serif;max-width:700px;margin:0 auto;padding:32px;color:#1e2749;font-size:14px;}h1{font-size:22px;margin:0;}h2{font-size:16px;margin:24px 0 8px;color:#374151;border-bottom:1px solid #E5E7EB;padding-bottom:4px;}table{width:100%;border-collapse:collapse;font-size:13px;}th{text-align:left;background:#F9FAFB;padding:8px 10px;font-weight:600;}td{padding:6px 10px;border-bottom:1px solid #F3F4F6;}.stat{display:inline-block;text-align:center;padding:12px 20px;background:#F9FAFB;border-radius:8px;margin-right:8px;}.stat-val{font-size:24px;font-weight:700;}.stat-label{font-size:10px;color:#6B7280;}@media print{body{padding:16px;}}</style></head><body><div style="display:flex;justify-content:space-between;"><div><h1>${b.orgName}</h1><p style="color:#6B7280;margin:4px 0;">${b.location || ''} | ${b.phase} | Day ${b.daysSinceStart || '?'}</p></div><div style="text-align:right;font-size:11px;color:#9CA3AF;">Generated ${new Date().toLocaleDateString()}<br>TDI Internal</div></div><div style="margin:16px 0;"><div class="stat"><div class="stat-val">${b.loginPct}%</div><div class="stat-label">Hub engagement</div></div><div class="stat"><div class="stat-val">${b.totalStaff}</div><div class="stat-label">Staff</div></div><div class="stat"><div class="stat-val">${b.observationsUsed}/${b.observationsTotal}</div><div class="stat-label">Observations</div></div><div class="stat"><div class="stat-val">${b.virtualSessionsUsed}/${b.virtualSessionsTotal}</div><div class="stat-label">Virtual</div></div></div>${kpiRows ? `<h2>KPI Progress</h2><table><thead><tr><th>KPI</th><th>Current</th><th>Target</th><th>Progress</th></tr></thead><tbody>${kpiRows}</tbody></table>` : ''}${tpList ? `<h2>Talking Points</h2><ul>${tpList}</ul>` : ''}${pendingList ? `<h2>Open Items</h2><ul>${pendingList}</ul>` : ''}${data.recentNotes?.length > 0 ? `<h2>Recent Notes</h2>${data.recentNotes.map((n: { type: string; content: string }) => `<p style="margin:8px 0;padding:8px;background:#F9FAFB;border-radius:6px;font-size:13px;"><strong style="color:#6B7280;text-transform:uppercase;font-size:10px;">${n.type}</strong><br>${n.content}</p>`).join('')}` : ''}</body></html>`)
+          w.document.close()
+        } catch { /* */ }
+      },
+    })
+
+    // Overdue action items
+    const overdueCount = actionItems.filter(a => a.status !== 'completed' && a.due_date && new Date(a.due_date) < new Date()).length
+    if (overdueCount > 0) {
+      actions.push({
+        label: `${overdueCount} overdue item${overdueCount > 1 ? 's' : ''}`,
+        description: 'Review and update overdue action items.',
+        variant: 'urgent',
+        onClick: () => {
+          // Scroll to action items
+          document.getElementById('sidebar-action-items')?.scrollIntoView({ behavior: 'smooth' })
+        },
+      })
+    }
+
+    return actions.slice(0, 3)
+  }, [partnership, actionItems, partnershipId])
+
+  // ─── Computed: Unified Timeline ────────────────────────────────────
+  const unifiedTimeline = useMemo(() => {
+    type UnifiedEntry = {
+      id: string
+      type: 'note' | 'meeting' | 'alert' | 'system'
+      date: string
+      author: string
+      content: string
+      meta?: any
+      dotColor: string
+    }
+
+    const entries: UnifiedEntry[] = []
+
+    // Notes
+    internalNotes.forEach(n => {
+      entries.push({
+        id: `note-${n.id}`,
+        type: 'note',
+        date: n.created_at,
+        author: n.author,
+        content: n.content,
+        meta: { note_type: n.note_type, visible_to_partner: n.visible_to_partner, noteId: n.id },
+        dotColor: n.note_type === 'concern' ? '#EF4444' : n.note_type === 'win' ? '#10B981' : n.note_type === 'strategy' ? '#8B5CF6' : n.note_type === 'follow_up' ? '#F59E0B' : '#3B82F6',
+      })
+    })
+
+    // Meetings
+    internalMeetings.forEach(m => {
+      entries.push({
+        id: `meeting-${m.id}`,
+        type: 'meeting',
+        date: m.meeting_date,
+        author: m.logged_by,
+        content: m.summary || `${m.meeting_type.replace('_', ' ')} meeting`,
+        meta: { meeting_type: m.meeting_type, attendees: m.attendees, action_items: m.action_items },
+        dotColor: '#10B981',
+      })
+    })
+
+    // Completed action items as system entries
+    actionItems.filter(a => a.status === 'completed' && a.completed_at).forEach(a => {
+      entries.push({
+        id: `action-${a.id}`,
+        type: 'system',
+        date: a.completed_at || a.updated_at || a.created_at,
+        author: 'System',
+        content: `Action item completed: ${a.title}`,
+        meta: { category: a.category },
+        dotColor: '#D4AF37',
+      })
+    })
+
+    // Sort by date, newest first
+    entries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+
+    // Filter
+    if (timelineFilter === 'notes') return entries.filter(e => e.type === 'note')
+    if (timelineFilter === 'meetings') return entries.filter(e => e.type === 'meeting')
+    if (timelineFilter === 'alerts') return entries.filter(e => e.type === 'alert' || e.type === 'system')
+    return entries
+  }, [internalNotes, internalMeetings, actionItems, timelineFilter])
+
+  // ─── Computed: Health Metrics ──────────────────────────────────────
+  const healthMetrics = useMemo(() => {
+    if (!partnership) return []
+    const metrics: { label: string; value: string; color: string }[] = []
+
+    // Last login
+    const lastLogin = partnership.last_principal_login
+    if (lastLogin) {
+      const days = Math.floor((Date.now() - new Date(lastLogin).getTime()) / (1000 * 60 * 60 * 24))
+      const color = days <= 3 ? '#10B981' : days <= 14 ? '#EAB308' : '#EF4444'
+      metrics.push({ label: 'Last Login', value: `${days}d`, color })
+    } else {
+      metrics.push({ label: 'Last Login', value: 'Never', color: '#EF4444' })
+    }
+
+    // Items due
+    const pendingItems = actionItems.filter(a => a.status !== 'completed').length
+    metrics.push({ label: 'Items Due', value: String(pendingItems), color: pendingItems > 5 ? '#EF4444' : pendingItems > 2 ? '#EAB308' : '#10B981' })
+
+    // Direct Pay
+    const directPay = partnership.direct_pay_amount || partnership.contract_value || 0
+    metrics.push({ label: 'Direct Pay', value: directPay > 0 ? `$${Number(directPay).toLocaleString()}` : '$0', color: '#3B82F6' })
+
+    // Grant
+    const grantTotal = grantPursuits.reduce((s, g) => s + (g.total_awarded || 0), 0)
+    metrics.push({ label: 'Grant', value: grantTotal > 0 ? `$${grantTotal.toLocaleString()}` : '$0', color: '#8B5CF6' })
+
+    // Provisioned
+    const enrolled = partnership.staff_enrolled || 0
+    const totalStaff = hubStats?.member_count || enrolled
+    metrics.push({ label: 'Provisioned', value: `${enrolled}/${totalStaff}`, color: enrolled >= totalStaff && totalStaff > 0 ? '#10B981' : '#EAB308' })
+
+    // Hub Login %
+    const loginPct = hubStats?.hub_login_pct ?? partnership.hub_login_pct
+    if (loginPct !== null && loginPct !== undefined) {
+      const lColor = loginPct >= 60 ? '#10B981' : loginPct >= 30 ? '#EAB308' : '#EF4444'
+      metrics.push({ label: 'Hub Login', value: `${loginPct}%`, color: lColor })
+    }
+
+    return metrics
+  }, [partnership, actionItems, grantPursuits, hubStats])
 
   // Access denied
   if (!hasAccess) {
@@ -673,11 +830,74 @@ export default function AdminPartnershipDetailPage() {
   const observationsDone = timelineEvents.filter(
     (e) => e.event_type === 'observation' && e.status === 'completed'
   ).length
-
   const contactName = partnership.primary_contact_name || partnership.contact_name || 'the principal'
+  const location = organization?.address_city && organization?.address_state
+    ? `${organization.address_city}, ${organization.address_state}`
+    : partnership.address || ''
+
+  const phaseColors: Record<string, { bg: string; text: string }> = {
+    IGNITE: { bg: '#FEF3C7', text: '#92400E' },
+    ACCELERATE: { bg: '#DBEAFE', text: '#1E40AF' },
+    SUSTAIN: { bg: '#D1FAE5', text: '#065F46' },
+  }
+
+  // ─── Action Items helper functions (pulled from render) ────────
+  const statusIcon = (status: string) => {
+    if (status === 'completed') return <CheckCircle2 size={16} style={{ color: '#10B981' }} />
+    if (status === 'in_progress') return <Clock size={16} style={{ color: '#EAB308' }} />
+    return <Circle size={16} style={{ color: '#9CA3AF' }} />
+  }
+
+  const nextStatus = (s: string) => s === 'pending' ? 'in_progress' : s === 'in_progress' ? 'completed' : 'pending'
+
+  const categoryColors: Record<string, string> = {
+    general: '#6B7280', onboarding: '#8B5CF6', hub: '#3B82F6',
+    coaching: '#F59E0B', billing: '#EF4444', follow_up: '#10B981',
+  }
+
+  const updateActionItem = async (id: string, fields: Record<string, any>) => {
+    try {
+      const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/action-items`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, ...fields }),
+      })
+      if (res.ok) {
+        setActionItems(prev => prev.map(a => a.id === id ? { ...a, ...fields } : a))
+      }
+    } catch { /* */ }
+  }
+
+  const deleteActionItem = async (id: string) => {
+    try {
+      const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/action-items`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      })
+      if (res.ok) {
+        setActionItems(prev => prev.filter(a => a.id !== id))
+        setDeletingActionId(null)
+      }
+    } catch { /* */ }
+  }
+
+  const noteTypeColors: Record<string, string> = {
+    general: 'bg-gray-100 text-gray-700',
+    strategy: 'bg-blue-100 text-blue-700',
+    concern: 'bg-red-100 text-red-700',
+    win: 'bg-green-100 text-green-700',
+    follow_up: 'bg-amber-100 text-amber-700',
+  }
+
+  const meetingTypeLabels: Record<string, string> = {
+    check_in: 'Check-in', onboarding: 'Onboarding', observation_debrief: 'Observation debrief',
+    renewal: 'Renewal', strategy: 'Strategy', escalation: 'Escalation', other: 'Other',
+  }
 
   return (
-    <div className="min-h-screen" style={{ background: '#F4F4F2' }}>
+    <>
+      <div className="min-h-screen" style={{ background: '#F3F4F6' }}>
       {/* Toast notifications */}
       {(submitSuccess || submitError) && (
         <div
@@ -688,85 +908,90 @@ export default function AdminPartnershipDetailPage() {
         </div>
       )}
 
-      <div className="max-w-5xl mx-auto px-6 py-8">
-        {/* Back link */}
+      <div className="max-w-[1200px] mx-auto px-5 py-5">
+        {/* Breadcrumb */}
         <Link
           href="/tdi-admin/leadership"
-          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-6"
+          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4"
         >
           <ArrowLeft size={16} />
-          Back to Leadership Dashboard
+          Leadership Dashboard
         </Link>
 
-        {/* Admin Header Bar */}
-        <div className="flex items-center justify-between mb-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-bold text-violet-700 bg-violet-100 px-2.5 py-1 rounded-full">
-              Admin View
-            </span>
-            <span className="text-sm font-semibold text-gray-900">{schoolName}</span>
-            {partnership.data_updated_at && (
-              <span className="text-xs text-gray-400">
-                Last updated: {new Date(partnership.data_updated_at).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setEditMode(!editMode)}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                editMode
-                  ? 'bg-violet-600 text-white'
-                  : 'bg-violet-100 text-violet-700 hover:bg-violet-200'
-              }`}
-            >
-              {editMode ? '✎ Editing' : '✎ Edit Data'}
-            </button>
-            <a
-              href={`/partners/${partnership.slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
-            >
-              View Client Dashboard
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-          </div>
-        </div>
-
-        {/* Header with school info */}
-        <DashboardHeader
-          schoolName={schoolName}
-          location={
-            organization?.address_city && organization?.address_state
-              ? `${organization.address_city}, ${organization.address_state}`
-              : partnership.address
-          }
-          phase={phase}
-          dataUpdatedAt={undefined}
-          isAdminView={true}
-          showAdminControls={false}
-        />
-
-        {/* Tab Bar - mirrors principal dashboard */}
-        <div className="mb-6">
-          <div className="flex gap-1 p-1 bg-gray-100 rounded-xl">
-            {ADMIN_TABS.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                  activeTab === tab.key
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
+        {/* ═════════════════════════════════════════════════════════════
+            HEADER CARD (dark)
+            ═════════════════════════════════════════════════════════════ */}
+        <div style={{ background: '#1e2749' }} className="rounded-2xl p-7 mb-4">
+          {/* Top row: name + phase + buttons */}
+          <div className="flex items-start justify-between mb-5">
+            <div>
+              <h1
+                className="text-2xl font-bold text-white mb-1"
+                style={{ fontFamily: "'Source Serif 4', 'Source Serif Pro', Georgia, serif" }}
               >
-                {tab.label}
+                {schoolName}
+              </h1>
+              <p className="text-sm text-gray-400">
+                {location && <>{location} &middot; </>}
+                {partnership.contract_start && (
+                  <>
+                    {new Date(partnership.contract_start).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                    {partnership.contract_end && (
+                      <> to {new Date(partnership.contract_end).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</>
+                    )}
+                  </>
+                )}
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              {/* Phase badge */}
+              <span
+                className="px-3 py-1.5 rounded-full text-xs font-bold"
+                style={{
+                  background: phaseColors[phase]?.bg || '#F3F4F6',
+                  color: phaseColors[phase]?.text || '#374151',
+                }}
+              >
+                {phase}
+              </span>
+              {/* Client Dashboard link */}
+              <a
+                href={`/partners/${partnership.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.85)' }}
+              >
+                Client Dashboard
+                <ExternalLink size={12} />
+              </a>
+              {/* Edit toggle */}
+              <button
+                onClick={() => setEditMode(!editMode)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                style={{
+                  background: editMode ? '#8B5CF6' : 'rgba(255,255,255,0.1)',
+                  color: editMode ? '#FFFFFF' : 'rgba(255,255,255,0.85)',
+                }}
+              >
+                <Edit3 size={12} />
+                {editMode ? 'Editing' : 'Edit'}
               </button>
+            </div>
+          </div>
+
+          {/* Health metrics chips */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {healthMetrics.map((m, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+                style={{ background: 'rgba(255,255,255,0.07)' }}
+              >
+                <div style={{ width: 7, height: 7, borderRadius: '50%', background: m.color }} />
+                <span className="text-[10px] font-medium text-gray-400">{m.label}</span>
+                <span className="text-xs font-bold text-white">{m.value}</span>
+              </div>
             ))}
           </div>
         </div>
@@ -774,471 +999,619 @@ export default function AdminPartnershipDetailPage() {
         {/* Edit Mode Banner */}
         {editMode && (
           <div className="flex items-center gap-2 mb-4 p-3 bg-violet-50 rounded-xl border border-violet-200">
-            <span className="text-xs text-violet-700 font-semibold">✎ Edit Mode:</span>
-            <span className="text-xs text-violet-600">Click edit buttons to modify fields. Changes save immediately and update what the client sees.</span>
+            <Edit3 size={12} style={{ color: '#8B5CF6' }} />
+            <span className="text-xs text-violet-700 font-semibold">Edit Mode:</span>
+            <span className="text-xs text-violet-600">Click fields to modify. Changes save immediately and update what the client sees.</span>
           </div>
         )}
 
-        {/* ═══════════════════════════════════════════════════════════════════
-            OVERVIEW TAB
-            ═══════════════════════════════════════════════════════════════════ */}
-        {activeTab === 'overview' && (
-          <>
-            {/* AI Guidance for Overview */}
-            {editMode && (
-              <div className="mb-4 p-4 rounded-xl border border-violet-200 bg-violet-50">
-                <div className="flex items-start gap-2">
-                  <span className="text-violet-500 text-lg flex-shrink-0">✦</span>
-                  <div>
-                    <p className="text-sm font-semibold text-violet-800 mb-1">AI Tip: Overview Tab</p>
-                    <p className="text-sm text-violet-700 leading-relaxed">
-                      The Overview is the first thing {contactName} sees when they log in.
-                      Keep momentum status current and make sure the TDI Suggestions
-                      reflect where this partnership actually is. If hub login % is low,
-                      update it so the suggestion fires correctly.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Stat Cards */}
-        <SectionHighlight
-          sectionKey="stat_cards"
-          highlights={highlights}
-          isAdminView={editMode}
-          onEdit={(key) => setEditingHighlight(key)}
-        >
-          <StatCards
-            staffEnrolled={partnership.staff_enrolled}
-            hubLoginPct={partnership.hub_login_pct}
-            observationsUsed={partnership.observation_days_used || 0}
-            observationsTotal={partnership.observation_days_total || 6}
-            virtualUsed={partnership.virtual_sessions_used || 0}
-            virtualTotal={partnership.virtual_sessions_total || 4}
-            executiveUsed={partnership.executive_sessions_used || 0}
-            executiveTotal={partnership.executive_sessions_total || 2}
-            phase={phase}
-            defaults={defaults}
-            hubStats={hubStats}
-          />
-        </SectionHighlight>
-
-        {/* Momentum Bar */}
-        <SectionHighlight
-          sectionKey="momentum"
-          highlights={highlights}
-          isAdminView={editMode}
-          onEdit={(key) => setEditingHighlight(key)}
-        >
-          <MomentumBar
-            status={partnership.momentum_status}
-            detail={partnership.momentum_detail}
-            defaults={defaults}
-          />
-        </SectionHighlight>
-
-        {/* AI Partnership Insight */}
-        {(aiInsight || aiInsightLoading) && (
-          <div
-            className="rounded-xl p-5 mb-4"
-            style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #263554 100%)', borderLeft: '3px solid #E8B84B' }}
-          >
-            <div className="flex items-center gap-1.5 mb-2">
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8B84B', display: 'inline-block', animation: aiInsightLoading ? 'pulse 2s infinite' : 'none' }} />
-              <span style={{ fontSize: 10, fontWeight: 700, color: '#E8B84B', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                AI Partnership Insight
-              </span>
-            </div>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, margin: 0 }}>
-              {aiInsightLoading ? 'Generating insight for this partnership...' : aiInsight}
-            </p>
-            <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
-          </div>
-        )}
-
-        {/* Edit mode - momentum fields */}
-        {editMode && (
-          <div
-            className="bg-white rounded-xl border border-violet-200 p-5 mb-4"
-            style={{ boxShadow: '0 1px 4px rgba(139,92,246,0.08)' }}
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-2 h-2 rounded-full bg-violet-500" />
-              <span className="text-sm font-semibold text-gray-900">Edit Momentum</span>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">
-                  Status
-                </label>
-                <InlineEditField
-                  partnershipId={partnershipId}
-                  field="momentum_status"
-                  value={partnership.momentum_status}
-                  type="select"
-                  options={['Strong', 'Building', 'Needs Attention']}
-                  onSaved={(v) => setPartnership((p: any) => ({ ...p, momentum_status: v }))}
-                />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">
-                  Detail Text
-                </label>
-                <InlineEditField
-                  partnershipId={partnershipId}
-                  field="momentum_detail"
-                  value={partnership.momentum_detail}
-                  type="textarea"
-                  onSaved={(v) => setPartnership((p: any) => ({ ...p, momentum_detail: v }))}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TDI Suggestions */}
-        <TDISuggestions suggestions={suggestions} isAdminView={true} />
-
-        {/* Teacher Voice - reflections from Quick Wins */}
-        {reflections.has_data && reflections.reflections.length > 0 && (
-          <div
-            className="bg-white rounded-xl border border-gray-100 p-5 mb-4"
-            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900">Teacher Voice</h3>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  What teachers wrote after Quick Wins - unfiltered and unprompted
-                </p>
-              </div>
-              <span
-                className="text-xs font-semibold px-2 py-1 rounded-full"
-                style={{ background: '#F0FDF4', color: '#16A34A' }}
-              >
-                {reflections.reflections.length} reflections
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              {reflections.reflections.slice(0, 5).map((r, i) => (
-                <div
+        {/* ═════════════════════════════════════════════════════════════
+            SMART ACTIONS BAR
+            ═════════════════════════════════════════════════════════════ */}
+        {smartActions.length > 0 && (
+          <div className="flex items-center gap-3 mb-4">
+            {smartActions.map((action, i) => {
+              const variantStyles = {
+                urgent: { bg: '#FEE2E2', border: '#FECACA', text: '#991B1B' },
+                primary: { bg: '#1e2749', border: '#1e2749', text: '#FFFFFF' },
+                secondary: { bg: '#FFFFFF', border: '#E5E7EB', text: '#374151' },
+              }
+              const s = variantStyles[action.variant]
+              return (
+                <button
                   key={i}
-                  className="rounded-lg p-3"
-                  style={{ background: '#FAFAF8', border: '0.5px solid #E9E7E2' }}
+                  onClick={action.onClick}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all hover:opacity-90"
+                  style={{ background: s.bg, border: `1px solid ${s.border}`, color: s.text }}
                 >
-                  <p className="text-sm text-gray-700 leading-relaxed italic">
-                    &quot;{r.text}&quot;
-                  </p>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-gray-400">{r.quick_win_title}</span>
-                    <span className="text-xs text-gray-400">
-                      {new Date(r.created_at).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </span>
+                  {action.variant === 'urgent' && <AlertTriangle size={14} />}
+                  {action.variant === 'primary' && <Briefcase size={14} />}
+                  <div className="text-left">
+                    <div className="font-semibold text-xs">{action.label}</div>
+                    <div className="text-[10px] opacity-70">{action.description}</div>
                   </div>
-                </div>
-              ))}
-            </div>
-
-            <p className="text-xs text-gray-400 mt-3 text-center">
-              Use these as talking points before your next observation day
-            </p>
+                </button>
+              )
+            })}
           </div>
         )}
 
-        {/* Observation Impact - before/after Hub data around observation days */}
-        {observationImpact.has_data && observationImpact.observations.length > 0 && (
-          <div
-            className="bg-white rounded-xl border border-gray-100 p-5 mb-4"
-            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900">Observation Impact</h3>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  Hub activity 7 days before vs 7 days after each observation
-                </p>
+        {/* ═════════════════════════════════════════════════════════════
+            TWO COLUMN LAYOUT
+            ═════════════════════════════════════════════════════════════ */}
+        <div className="grid gap-4" style={{ gridTemplateColumns: '1fr 340px' }}>
+
+          {/* ═══════════════════════════════════════════════════════════
+              MAIN COLUMN: UNIFIED TIMELINE
+              ═══════════════════════════════════════════════════════════ */}
+          <div>
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
+              {/* Filter tabs */}
+              <div className="flex items-center border-b border-gray-100 px-5 pt-4 pb-0">
+                {(['all', 'notes', 'meetings', 'alerts'] as const).map(f => (
+                  <button
+                    key={f}
+                    onClick={() => setTimelineFilter(f)}
+                    className="px-4 py-2.5 text-xs font-semibold capitalize transition-all border-b-2"
+                    style={{
+                      borderColor: timelineFilter === f ? '#1e2749' : 'transparent',
+                      color: timelineFilter === f ? '#1e2749' : '#9CA3AF',
+                    }}
+                  >
+                    {f}
+                  </button>
+                ))}
+                <div className="ml-auto flex items-center gap-2">
+                  <button
+                    onClick={() => setShowMeetingForm(!showMeetingForm)}
+                    className="text-[10px] font-medium px-2.5 py-1 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100"
+                  >
+                    + Log meeting
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-3">
-              {observationImpact.observations.map((obs) => (
-                <div
-                  key={obs.observation_id}
-                  className="rounded-lg p-4"
-                  style={{ background: '#FAFAF8', border: '0.5px solid #E9E7E2' }}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
-                      {obs.observation_title}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {new Date(obs.observation_date).toLocaleDateString('en-US', {
-                        month: 'short', day: 'numeric', year: 'numeric'
-                      })}
-                    </span>
+              {/* Note input area */}
+              <div className="px-5 pt-4 pb-3 border-b border-gray-50">
+                <div className="flex gap-3">
+                  <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-white text-xs font-bold" style={{ background: '#1e2749' }}>
+                    {(userEmail || 'U')[0].toUpperCase()}
                   </div>
-
-                  <div className="grid grid-cols-3 gap-3">
-                    {/* Engagement change */}
-                    <div className="text-center">
-                      <div
-                        className="text-lg font-bold"
-                        style={{
-                          color: obs.engagement_change_pct === null ? '#9CA3AF'
-                            : obs.engagement_change_pct > 0 ? '#16A34A'
-                            : obs.engagement_change_pct < 0 ? '#DC2626'
-                            : '#6B7280'
-                        }}
+                  <div className="flex-1">
+                    <textarea
+                      value={newNoteContent}
+                      onChange={(e) => setNewNoteContent(e.target.value)}
+                      placeholder="Add a note about this partnership..."
+                      rows={2}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                    />
+                    <div className="flex items-center gap-2 mt-2">
+                      <select
+                        value={newNoteType}
+                        onChange={(e) => setNewNoteType(e.target.value)}
+                        className="border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
                       >
-                        {obs.engagement_change_pct === null ? '-'
-                          : obs.engagement_change_pct > 0 ? `+${obs.engagement_change_pct}%`
-                          : `${obs.engagement_change_pct}%`}
-                      </div>
-                      <div className="text-xs text-gray-400 mt-0.5">Hub engagement</div>
-                      <div className="text-xs text-gray-300 mt-0.5">
-                        {obs.active_users_before} → {obs.active_users_after} active users
-                      </div>
+                        <option value="general">General</option>
+                        <option value="strategy">Strategy</option>
+                        <option value="concern">Concern</option>
+                        <option value="win">Win</option>
+                        <option value="follow_up">Follow up</option>
+                      </select>
+                      <button
+                        onClick={async () => {
+                          if (!newNoteContent.trim()) return
+                          setAddingNote(true)
+                          try {
+                            const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ content: newNoteContent, noteType: newNoteType }),
+                            })
+                            const data = await res.json()
+                            if (data.success && data.note) {
+                              setInternalNotes(prev => [data.note, ...prev])
+                              setNewNoteContent('')
+                            }
+                          } catch {} finally { setAddingNote(false) }
+                        }}
+                        disabled={!newNoteContent.trim() || addingNote}
+                        className="ml-auto px-4 py-1.5 text-xs font-semibold text-white rounded-lg transition-colors disabled:opacity-50"
+                        style={{ background: '#1e2749' }}
+                      >
+                        {addingNote ? 'Saving...' : 'Post'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Meeting form (inline, toggleable) */}
+              {showMeetingForm && (
+                <div className="px-5 py-4 border-b border-gray-100 bg-gray-50">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-xs font-bold text-gray-700">Log a meeting</h4>
+                    <button onClick={() => setShowMeetingForm(false)} className="text-gray-400 hover:text-gray-600">
+                      <X size={14} />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <label className="text-[10px] text-gray-500 font-medium">Date</label>
+                      <input type="datetime-local" value={newMeeting.date} onChange={e => setNewMeeting(m => ({ ...m, date: e.target.value }))}
+                        className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-gray-500 font-medium">Type</label>
+                      <select value={newMeeting.type} onChange={e => setNewMeeting(m => ({ ...m, type: e.target.value }))}
+                        className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400">
+                        <option value="check_in">Check-in</option>
+                        <option value="onboarding">Onboarding</option>
+                        <option value="observation_debrief">Observation debrief</option>
+                        <option value="renewal">Renewal conversation</option>
+                        <option value="strategy">Strategy session</option>
+                        <option value="escalation">Escalation</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="mb-3">
+                    <label className="text-[10px] text-gray-500 font-medium">Attendees</label>
+                    <input type="text" value={newMeeting.attendees} onChange={e => setNewMeeting(m => ({ ...m, attendees: e.target.value }))}
+                      placeholder="Names of attendees"
+                      className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400" />
+                  </div>
+                  <div className="mb-3">
+                    <label className="text-[10px] text-gray-500 font-medium">Summary</label>
+                    <textarea value={newMeeting.summary} onChange={e => setNewMeeting(m => ({ ...m, summary: e.target.value }))}
+                      placeholder="What was discussed?"
+                      rows={2}
+                      className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 resize-none" />
+                  </div>
+                  <div className="mb-3">
+                    <label className="text-[10px] text-gray-500 font-medium">Action items</label>
+                    <textarea value={newMeeting.actionItems} onChange={e => setNewMeeting(m => ({ ...m, actionItems: e.target.value }))}
+                      placeholder="What needs to happen next?"
+                      rows={2}
+                      className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 resize-none" />
+                  </div>
+                  <button
+                    onClick={async () => {
+                      if (!newMeeting.date) return
+                      setAddingMeeting(true)
+                      try {
+                        const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/meetings`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            meetingDate: newMeeting.date,
+                            meetingType: newMeeting.type,
+                            attendees: newMeeting.attendees || null,
+                            summary: newMeeting.summary || null,
+                            actionItems: newMeeting.actionItems || null,
+                          }),
+                        })
+                        const data = await res.json()
+                        if (data.success && data.meeting) {
+                          setInternalMeetings(prev => [data.meeting, ...prev])
+                          setNewMeeting({ date: '', type: 'check_in', attendees: '', summary: '', actionItems: '' })
+                          setShowMeetingForm(false)
+                        }
+                      } catch {} finally { setAddingMeeting(false) }
+                    }}
+                    disabled={!newMeeting.date || addingMeeting}
+                    className="px-4 py-1.5 text-xs font-medium text-white rounded-lg transition-colors disabled:opacity-50"
+                    style={{ background: '#1e2749' }}
+                  >
+                    {addingMeeting ? 'Saving...' : 'Log meeting'}
+                  </button>
+                </div>
+              )}
+
+              {/* Timeline entries */}
+              <div className="px-5 py-3">
+                {unifiedTimeline.length === 0 && (
+                  <p className="text-sm text-gray-400 text-center py-8">No timeline entries yet. Add a note or log a meeting above.</p>
+                )}
+                {unifiedTimeline.map((entry) => (
+                  <div key={entry.id} className="flex gap-3 py-3 group" style={{ borderBottom: '1px solid #F9FAFB' }}>
+                    {/* Colored dot */}
+                    <div className="mt-1.5 flex-shrink-0">
+                      <div style={{ width: 9, height: 9, borderRadius: '50%', background: entry.dotColor }} />
                     </div>
 
-                    {/* Mood change */}
-                    <div className="text-center">
-                      <div
-                        className="text-lg font-bold"
-                        style={{
-                          color: obs.mood_change === null ? '#9CA3AF'
-                            : obs.mood_change > 0 ? '#16A34A'
-                            : obs.mood_change < 0 ? '#DC2626'
-                            : '#6B7280'
-                        }}
-                      >
-                        {obs.mood_change === null ? '-'
-                          : obs.mood_change > 0 ? `+${obs.mood_change}`
-                          : `${obs.mood_change}`}
+                    <div className="flex-1 min-w-0">
+                      {/* Header */}
+                      <div className="flex items-center gap-2 mb-1">
+                        {entry.type === 'note' && entry.meta?.note_type && (
+                          <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${noteTypeColors[entry.meta.note_type] || noteTypeColors.general}`}>
+                            {entry.meta.note_type}
+                          </span>
+                        )}
+                        {entry.type === 'meeting' && (
+                          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
+                            {meetingTypeLabels[entry.meta?.meeting_type] || 'Meeting'}
+                          </span>
+                        )}
+                        {entry.type === 'system' && (
+                          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700">
+                            system
+                          </span>
+                        )}
+                        <span className="text-[10px] text-gray-400">{entry.author}</span>
+                        <span className="text-[10px] text-gray-300">
+                          {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                        </span>
+                        {entry.type === 'note' && entry.meta?.visible_to_partner && (
+                          <Eye size={11} style={{ color: '#3B82F6' }} />
+                        )}
+                        {/* Edit/delete for notes */}
+                        {entry.type === 'note' && (
+                          <span className="ml-auto flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={async () => {
+                                const newContent = prompt('Edit note:', entry.content)
+                                if (newContent && newContent !== entry.content) {
+                                  try {
+                                    await fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`, {
+                                      method: 'PATCH',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ id: entry.meta.noteId, content: newContent }),
+                                    })
+                                    setInternalNotes(prev => prev.map(n => n.id === entry.meta.noteId ? { ...n, content: newContent } : n))
+                                  } catch {}
+                                }
+                              }}
+                              className="text-[10px] text-gray-400 hover:text-blue-600 px-1"
+                            >edit</button>
+                            <button
+                              onClick={async () => {
+                                if (!confirm('Delete this note?')) return
+                                try {
+                                  await fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`, {
+                                    method: 'DELETE',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ id: entry.meta.noteId }),
+                                  })
+                                  setInternalNotes(prev => prev.filter(n => n.id !== entry.meta.noteId))
+                                } catch {}
+                              }}
+                              className="text-[10px] text-gray-400 hover:text-red-600 px-1"
+                            >delete</button>
+                          </span>
+                        )}
                       </div>
-                      <div className="text-xs text-gray-400 mt-0.5">Avg mood score</div>
-                      {obs.mood_before !== null && obs.mood_after !== null && (
-                        <div className="text-xs text-gray-300 mt-0.5">
-                          {obs.mood_before} → {obs.mood_after} /5
+
+                      {/* Content */}
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{entry.content}</p>
+
+                      {/* Meeting details */}
+                      {entry.type === 'meeting' && entry.meta?.attendees && (
+                        <p className="text-[10px] text-gray-400 mt-1">Attendees: {entry.meta.attendees}</p>
+                      )}
+                      {entry.type === 'meeting' && entry.meta?.action_items && (
+                        <div className="mt-1.5 pl-3 border-l-2 border-gray-200">
+                          <p className="text-[10px] font-medium text-gray-500 mb-0.5">Follow-up:</p>
+                          <p className="text-xs text-gray-600 whitespace-pre-wrap">{entry.meta.action_items}</p>
                         </div>
                       )}
                     </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-                    {/* Quick wins */}
-                    <div className="text-center">
-                      <div
-                        className="text-lg font-bold"
-                        style={{
-                          color: obs.quick_wins_after > obs.quick_wins_before ? '#16A34A'
-                            : obs.quick_wins_after < obs.quick_wins_before ? '#DC2626'
-                            : '#6B7280'
-                        }}
+            {/* AI Insight below timeline */}
+            {(aiInsight || aiInsightLoading) && (
+              <div
+                className="rounded-2xl p-5 mt-4"
+                style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #263554 100%)', borderLeft: '3px solid #E8B84B' }}
+              >
+                <div className="flex items-center gap-1.5 mb-2">
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8B84B', display: 'inline-block', animation: aiInsightLoading ? 'pulse 2s infinite' : 'none' }} />
+                  <span style={{ fontSize: 10, fontWeight: 700, color: '#E8B84B', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    AI Partnership Insight
+                  </span>
+                </div>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, margin: 0 }}>
+                  {aiInsightLoading ? 'Generating insight for this partnership...' : aiInsight}
+                </p>
+                <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
+              </div>
+            )}
+          </div>
+
+          {/* ═══════════════════════════════════════════════════════════
+              SIDEBAR (340px)
+              ═══════════════════════════════════════════════════════════ */}
+          <div className="flex flex-col gap-3">
+
+            {/* ─── 1. Action Items ───────────────────────────────────── */}
+            <div id="sidebar-action-items" className="bg-white rounded-2xl shadow-sm p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Target size={14} style={{ color: '#1e2749' }} />
+                  <h3 className="text-sm font-bold text-gray-900">Action Items</h3>
+                  {actionItems.length > 0 && (
+                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{actionItems.filter(a => a.status !== 'completed').length} open</span>
+                  )}
+                </div>
+                <button
+                  onClick={() => setShowAddAction(!showAddAction)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
+
+              {/* Add action form */}
+              {showAddAction && (
+                <div className="border border-gray-200 rounded-lg p-3 mb-3 bg-gray-50">
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      placeholder="Title"
+                      value={newAction.title}
+                      onChange={e => setNewAction({ ...newAction, title: e.target.value })}
+                      className="w-full text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                    />
+                    <textarea
+                      placeholder="Description (optional)"
+                      value={newAction.description}
+                      onChange={e => setNewAction({ ...newAction, description: e.target.value })}
+                      className="w-full text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                      rows={2}
+                    />
+                    <div className="flex gap-2 items-center flex-wrap">
+                      <input
+                        type="date"
+                        value={newAction.due_date}
+                        onChange={e => setNewAction({ ...newAction, due_date: e.target.value })}
+                        className="text-[10px] border border-gray-200 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                      />
+                      <select
+                        value={newAction.category}
+                        onChange={e => setNewAction({ ...newAction, category: e.target.value })}
+                        className="text-[10px] border border-gray-200 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
                       >
-                        {obs.quick_wins_after > obs.quick_wins_before
-                          ? `+${obs.quick_wins_after - obs.quick_wins_before}`
-                          : obs.quick_wins_after - obs.quick_wins_before}
-                      </div>
-                      <div className="text-xs text-gray-400 mt-0.5">Quick wins</div>
-                      <div className="text-xs text-gray-300 mt-0.5">
-                        {obs.quick_wins_before} → {obs.quick_wins_after} completed
-                      </div>
+                        <option value="general">General</option>
+                        <option value="onboarding">Onboarding</option>
+                        <option value="hub">Hub</option>
+                        <option value="coaching">Coaching</option>
+                        <option value="billing">Billing</option>
+                        <option value="follow_up">Follow-up</option>
+                      </select>
+                      <label className="flex items-center gap-1 text-[10px] text-gray-600 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newAction.visible_to_partner}
+                          onChange={e => setNewAction({ ...newAction, visible_to_partner: e.target.checked })}
+                          className="rounded border-gray-300"
+                        />
+                        Visible
+                      </label>
+                    </div>
+                    <div className="flex gap-2 justify-end pt-1">
+                      <button
+                        onClick={() => { setShowAddAction(false); setNewAction({ title: '', description: '', due_date: '', category: 'general', visible_to_partner: false }) }}
+                        className="text-[10px] px-2.5 py-1.5 rounded-md text-gray-500 hover:bg-gray-100"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        disabled={!newAction.title.trim() || savingAction}
+                        onClick={async () => {
+                          setSavingAction(true)
+                          try {
+                            const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/action-items`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify(newAction),
+                            })
+                            if (res.ok) {
+                              const data = await res.json()
+                              setActionItems(prev => [data.item || data, ...prev])
+                              setNewAction({ title: '', description: '', due_date: '', category: 'general', visible_to_partner: false })
+                              setShowAddAction(false)
+                            }
+                          } catch { /* */ }
+                          setSavingAction(false)
+                        }}
+                        className="text-[10px] px-2.5 py-1.5 rounded-md text-white font-medium disabled:opacity-40"
+                        style={{ background: '#1e2749' }}
+                      >
+                        {savingAction ? 'Saving...' : 'Add'}
+                      </button>
                     </div>
                   </div>
                 </div>
-              ))}
+              )}
+
+              {/* Action items list */}
+              {actionItems.length === 0 && !showAddAction && (
+                <p className="text-[10px] text-gray-400 text-center py-3">No action items yet.</p>
+              )}
+
+              {(() => {
+                const inProgress = actionItems.filter(a => a.status === 'in_progress')
+                const pending = actionItems.filter(a => a.status === 'pending')
+                const completed = actionItems.filter(a => a.status === 'completed')
+
+                const renderItem = (item: any) => {
+                  const isOverdue = item.status !== 'completed' && item.due_date && new Date(item.due_date) < new Date()
+                  return (
+                    <div key={item.id} className="group flex items-start gap-2 py-1.5 px-1 rounded-lg hover:bg-gray-50 transition" style={{ borderBottom: '1px solid #F9FAFB' }}>
+                      <button
+                        onClick={() => updateActionItem(item.id, { status: nextStatus(item.status) })}
+                        className="mt-0.5 flex-shrink-0 hover:opacity-70"
+                      >
+                        {statusIcon(item.status)}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1">
+                          {editingActionField?.id === item.id && editingActionField?.field === 'title' ? (
+                            <input
+                              autoFocus
+                              className="text-xs font-medium bg-white border border-blue-300 rounded px-1 py-0.5 flex-1"
+                              value={editingActionValue}
+                              onChange={e => setEditingActionValue(e.target.value)}
+                              onBlur={() => {
+                                if (editingActionValue.trim() && editingActionValue !== item.title) {
+                                  updateActionItem(item.id, { title: editingActionValue })
+                                }
+                                setEditingActionField(null)
+                              }}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter') { (e.target as HTMLInputElement).blur() }
+                                if (e.key === 'Escape') { setEditingActionField(null) }
+                              }}
+                            />
+                          ) : (
+                            <span
+                              className="text-xs font-medium text-gray-900 cursor-pointer hover:text-blue-600 truncate"
+                              style={item.status === 'completed' ? { textDecoration: 'line-through', color: '#9CA3AF' } : isOverdue ? { color: '#DC2626' } : {}}
+                              onClick={() => { setEditingActionField({ id: item.id, field: 'title' }); setEditingActionValue(item.title) }}
+                            >
+                              {item.title}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          {editingActionField?.id === item.id && editingActionField?.field === 'due_date' ? (
+                            <input
+                              autoFocus
+                              type="date"
+                              className="text-[10px] bg-white border border-blue-300 rounded px-1 py-0.5"
+                              value={editingActionValue}
+                              onChange={e => setEditingActionValue(e.target.value)}
+                              onBlur={() => {
+                                updateActionItem(item.id, { due_date: editingActionValue || null })
+                                setEditingActionField(null)
+                              }}
+                            />
+                          ) : (
+                            <span
+                              className="text-[10px] cursor-pointer hover:text-blue-500"
+                              style={{ color: isOverdue ? '#DC2626' : '#9CA3AF' }}
+                              onClick={() => { setEditingActionField({ id: item.id, field: 'due_date' }); setEditingActionValue(item.due_date || '') }}
+                            >
+                              {item.due_date ? new Date(item.due_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'No due date'}
+                            </span>
+                          )}
+                          <span
+                            className="text-[9px] font-medium px-1 py-0.5 rounded-full"
+                            style={{ background: (categoryColors[item.category] || '#6B7280') + '18', color: categoryColors[item.category] || '#6B7280' }}
+                          >
+                            {(item.category || 'general').replace('_', '-')}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-0.5 flex-shrink-0 mt-0.5">
+                        <button
+                          onClick={() => updateActionItem(item.id, { visible_to_partner: !item.visible_to_partner })}
+                          className="p-0.5 rounded hover:bg-gray-100"
+                        >
+                          {item.visible_to_partner ? <Eye size={12} style={{ color: '#3B82F6' }} /> : <EyeOff size={12} style={{ color: '#D1D5DB' }} />}
+                        </button>
+                        {deletingActionId === item.id ? (
+                          <div className="flex items-center gap-0.5">
+                            <button onClick={() => deleteActionItem(item.id)} className="text-[9px] text-red-600 font-medium px-1 py-0.5 rounded bg-red-50 hover:bg-red-100">Delete</button>
+                            <button onClick={() => setDeletingActionId(null)} className="text-[9px] text-gray-500 px-1 py-0.5">No</button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setDeletingActionId(item.id)}
+                            className="p-0.5 rounded hover:bg-red-50 opacity-0 group-hover:opacity-100 transition"
+                          >
+                            <Trash2 size={11} style={{ color: '#EF4444' }} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )
+                }
+
+                return (
+                  <div>
+                    {inProgress.length > 0 && (
+                      <div className="mb-1">
+                        <p className="text-[9px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5 px-1">In Progress</p>
+                        {inProgress.map(renderItem)}
+                      </div>
+                    )}
+                    {pending.length > 0 && (
+                      <div className="mb-1">
+                        <p className="text-[9px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5 px-1">Pending</p>
+                        {pending.map(renderItem)}
+                      </div>
+                    )}
+                    {completed.length > 0 && (
+                      <div className="mt-1">
+                        <button
+                          onClick={() => setShowCompletedActions(!showCompletedActions)}
+                          className="flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5 px-1 hover:text-gray-600"
+                        >
+                          <ChevronDown size={10} style={{ transform: showCompletedActions ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
+                          Completed ({completed.length})
+                        </button>
+                        {showCompletedActions && completed.map(renderItem)}
+                      </div>
+                    )}
+                  </div>
+                )
+              })()}
             </div>
 
-            <p className="text-xs text-gray-400 mt-3 text-center">
-              Use this data in renewal conversations to show the impact of in-person visits
-            </p>
-          </div>
-        )}
-
-        {/* Partnership Timeline */}
-        <SectionHighlight
-          sectionKey="timeline"
-          highlights={highlights}
-          isAdminView={editMode}
-          onEdit={(key) => setEditingHighlight(key)}
-        >
-          <PartnershipTimeline
-            events={timelineEvents}
-            isAdminView={editMode}
-            onAddEvent={() => setAddEventOpen(true)}
-            onEditEvent={handleEditEvent}
-            onDeleteEvent={handleDeleteEvent}
-            onMoveEvent={handleMoveEvent}
-          />
-        </SectionHighlight>
-
-            {/* Investment Numbers */}
-        <SectionHighlight
-          sectionKey="investment"
-          highlights={highlights}
-          isAdminView={editMode}
-          onEdit={(key) => setEditingHighlight(key)}
-        >
-          <InvestmentNumbers
-            costPerEducator={partnership.cost_per_educator}
-            hubLoginPct={partnership.hub_login_pct}
-            loveNotesCount={partnership.love_notes_count}
-            highEngagementPct={partnership.high_engagement_pct}
-            perEducatorNote={partnership.per_educator_value_note}
-            defaults={defaults}
-            hubStats={hubStats}
-          />
-        </SectionHighlight>
-
-        {/* Love Notes Callout */}
-        <SectionHighlight
-          sectionKey="love_notes"
-          highlights={highlights}
-          isAdminView={editMode}
-          onEdit={(key) => setEditingHighlight(key)}
-        >
-          <LoveNotesCallout
-            loveNotesCount={partnership.love_notes_count}
-            schoolName={schoolName}
-            observationDays={observationsDone || 1}
-            defaults={defaults}
-          />
-        </SectionHighlight>
-
-            {/* Leading Indicators */}
-            <SectionHighlight
-              sectionKey="leading_indicators"
-              highlights={highlights}
-              isAdminView={editMode}
-              onEdit={(key) => setEditingHighlight(key)}
-            >
-              <LeadingIndicators
-                teacherStress={partnership.teacher_stress_score}
-                strategyImplementation={partnership.strategy_implementation_pct}
-                retentionIntent={partnership.retention_intent_score}
-                defaults={defaults}
-                hubStats={hubStats}
-              />
-            </SectionHighlight>
-          </>
-        )}
-
-        {/* ═══════════════════════════════════════════════════════════════════
-            OUR PARTNERSHIP TAB
-            ═══════════════════════════════════════════════════════════════════ */}
-        {activeTab === 'our-partnership' && (
-          <>
-            {/* AI Guidance for Our Partnership */}
-            {editMode && (
-              <div className="mb-4 p-4 rounded-xl border border-violet-200 bg-violet-50">
-                <div className="flex items-start gap-2">
-                  <span className="text-violet-500 text-lg flex-shrink-0">✦</span>
-                  <div>
-                    <p className="text-sm font-semibold text-violet-800 mb-1">AI Tip: Our Partnership Tab</p>
-                    <p className="text-sm text-violet-700 leading-relaxed">
-                      This tab shows the full partnership story. Make sure the Partnership Goal
-                      is specific and measurable. Timeline events should be celebratory - instead of
-                      &quot;Virtual Session 1&quot; try &quot;Virtual Session 1 - Hub onboarding + goals set.&quot;
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Partnership Goal - Editable */}
-            <div
-              className="bg-white rounded-xl border p-6 mb-4"
-              style={{ borderColor: editMode ? '#8B5CF6' : '#F3F4F6' }}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full" style={{ background: '#2D7D78' }} />
-                  <h2 className="text-base font-semibold text-gray-900">Our Partnership Goal</h2>
-                </div>
-                {editMode && editingField !== 'partnership_goal' && (
-                  <button
-                    onClick={() => setEditingField('partnership_goal')}
-                    className="text-xs font-semibold text-violet-600 hover:text-violet-800"
-                  >
-                    ✎ Edit
+            {/* ─── 2. Contract Card ──────────────────────────────────── */}
+            <div className="bg-white rounded-2xl shadow-sm p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <FileText size={14} style={{ color: '#1e2749' }} />
+                <h3 className="text-sm font-bold text-gray-900">Contract</h3>
+                {editMode && (
+                  <button onClick={() => setShowBillingPanel(!showBillingPanel)} className="ml-auto text-[10px] font-medium text-violet-600 hover:text-violet-800">
+                    Full billing
                   </button>
                 )}
               </div>
 
-              {editMode && editingField === 'partnership_goal' ? (
-                <div>
-                  <textarea
-                    value={localGoal}
-                    onChange={(e) => setLocalGoal(e.target.value)}
-                    rows={3}
-                    className="w-full border border-violet-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 mb-2"
-                    placeholder="e.g. Support 19 educators with Hub access, building classroom strategies and reducing teacher stress during a 3-month pilot."
-                  />
-                  <div className="flex items-center gap-2 mb-3">
-                    <button
-                      onClick={async () => {
-                        await handleFieldUpdate('partnership_goal', localGoal)
-                        setEditingField(null)
-                      }}
-                      className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white"
-                      style={{ background: '#8B5CF6' }}
-                    >
-                      Save Goal
-                    </button>
-                    <button
-                      onClick={() => {
-                        setLocalGoal(partnership?.partnership_goal || '')
-                        setEditingField(null)
-                      }}
-                      className="text-xs text-gray-400 hover:text-gray-600"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                  {/* AI Guidance */}
-                  <div className="p-3 rounded-lg bg-violet-50 border border-violet-100">
-                    <p className="text-xs font-semibold text-violet-700 mb-1">✦ AI Guidance</p>
-                    <p className="text-xs text-violet-600 leading-relaxed">
-                      A strong partnership goal includes: (1) who is being served (staff count + role),
-                      (2) the main outcome (what changes for them), and (3) the timeframe.
-                      Keep it to 1-2 sentences. The principal will see this at the top of their Our Partnership tab.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-base text-gray-700 leading-relaxed font-medium">
-                  {partnership.partnership_goal || (
-                    <span className="text-gray-400 italic text-sm">No goal set yet. Click Edit to add one.</span>
-                  )}
-                </p>
-              )}
-            </div>
+              {/* Deliverables summary */}
+              <DeliverablesList partnershipId={partnershipId} userEmail={userEmail} />
 
-            {/* Service Delivery Tracking - Admin Only, moved to Our Partnership tab */}
-            {editMode && ((partnership.observation_days_total || 0) > 0 ||
-              (partnership.virtual_sessions_total || 0) > 0 ||
-              (partnership.executive_sessions_total || 0) > 0) && (
-              <SectionHighlight
-                sectionKey="service_delivery"
-                highlights={highlights}
-                isAdminView={editMode}
-                onEdit={(key) => setEditingHighlight(key)}
-              >
-                <div
-                  className="bg-white rounded-xl border border-violet-200 p-6 mb-4"
-                  style={{ boxShadow: '0 1px 4px rgba(139,92,246,0.08)' }}
-                >
-                  <div className="flex items-center gap-2 mb-5">
-                    <div className="w-2 h-2 rounded-full bg-violet-500" />
-                    <h2 className="text-base font-semibold text-gray-900">Mark Session Complete</h2>
-                    <span className="ml-auto text-xs bg-violet-50 text-violet-700 px-2 py-0.5 rounded-full font-semibold">
-                      Admin Only
-                    </span>
+              {/* Grant Pursuits */}
+              {grantPursuits.length > 0 && (
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#8B5CF6' }} />
+                    <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Grants</span>
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
+                  {grantPursuits.map(pursuit => {
+                    const phaseLabels: Record<string, string> = {
+                      intake: 'Intake', researching: 'Researching', strategy: 'Strategy', writing: 'Writing',
+                      in_review: 'In review', delivered: 'Delivered', submitted: 'Submitted',
+                      awaiting_decision: 'Awaiting decision', awarded: 'Awarded', denied: 'Denied', on_hold: 'On hold',
+                    }
+                    return (
+                      <div key={pursuit.id} className="flex items-center justify-between py-1.5">
+                        <div className="min-w-0">
+                          <p className="text-xs font-medium text-gray-800 truncate">{pursuit.pursuit_name}</p>
+                          <p className="text-[10px] text-gray-400">${(pursuit.total_amount || 0).toLocaleString()}</p>
+                        </div>
+                        <span className="text-[9px] font-medium px-1.5 py-0.5 rounded-full bg-purple-50 text-purple-700">
+                          {phaseLabels[pursuit.current_phase] || pursuit.current_phase}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              {/* Service delivery (edit mode) */}
+              {editMode && ((partnership.observation_days_total || 0) > 0 ||
+                (partnership.virtual_sessions_total || 0) > 0 ||
+                (partnership.executive_sessions_total || 0) > 0) && (
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Mark Session Complete</p>
+                  <div className="space-y-2">
                     <ServiceTracker
                       partnershipId={partnershipId}
                       label="Observation Days"
@@ -1251,8 +1624,7 @@ export default function AdminPartnershipDetailPage() {
                         setPartnership((p: any) => ({
                           ...p,
                           observation_days_used: (p.observation_days_used || 0) + 1,
-                          love_notes_count:
-                            (p.love_notes_count || 0) + (result.sessionRecord?.love_notes_count || 0),
+                          love_notes_count: (p.love_notes_count || 0) + (result.sessionRecord?.love_notes_count || 0),
                         }))
                         fetchData()
                       }}
@@ -1291,1024 +1663,130 @@ export default function AdminPartnershipDetailPage() {
                     />
                   </div>
                 </div>
-              </SectionHighlight>
-            )}
-
-            {/* Partnership Timeline with AI tip */}
-            {editMode && (
-              <div className="p-3 rounded-lg bg-violet-50 border border-violet-100 mb-3">
-                <p className="text-xs font-semibold text-violet-700 mb-1">✦ AI Guidance</p>
-                <p className="text-xs text-violet-600 leading-relaxed">
-                  Great timeline events are specific and celebratory. Instead of &quot;Virtual Session 1&quot;
-                  try &quot;Virtual Session 1 - Hub onboarding + partnership goals set.&quot;
-                  The Done column builds momentum for the principal. Keep Coming Soon honest -
-                  only add dates you&apos;re confident about.
-                </p>
-              </div>
-            )}
-
-            <SectionHighlight
-              sectionKey="timeline"
-              highlights={highlights}
-              isAdminView={editMode}
-              onEdit={(key) => setEditingHighlight(key)}
-            >
-              <PartnershipTimeline
-                events={timelineEvents}
-                isAdminView={editMode}
-                onAddEvent={() => setAddEventOpen(true)}
-                onDeleteEvent={handleDeleteEvent}
-                onMoveEvent={handleMoveEvent}
-              />
-            </SectionHighlight>
-          </>
-        )}
-
-        {/* ═══════════════════════════════════════════════════════════════════
-            BLUEPRINT TAB
-            ═══════════════════════════════════════════════════════════════════ */}
-        {activeTab === 'blueprint' && (
-          <>
-            {editMode && (
-              <div className="p-4 rounded-xl bg-violet-50 border border-violet-200 mb-4">
-                <p className="text-xs text-violet-700">
-                  ✦ Blueprint tab content is standard across all partnerships.
-                  The &quot;You Are Here&quot; phase updates automatically when you change the contract phase
-                  in School Information on the Team tab.
-                </p>
-              </div>
-            )}
-
-            {/* Blueprint content - simplified for admin view */}
-            <div className="bg-white rounded-xl border border-gray-100 p-6 mb-4">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">The TDI Blueprint</h2>
-              <p className="text-gray-600 mb-6">
-                Our partnership follows a proven three-phase framework designed to create lasting change.
-              </p>
-
-              {/* Phase Cards */}
-              <div className="grid md:grid-cols-3 gap-4">
-                {[
-                  { phase: 'IGNITE', title: 'Build the Foundation', desc: 'Hub onboarding, first observations, baseline data collection' },
-                  { phase: 'ACCELERATE', title: 'Scale to Full Staff', desc: 'Growth groups, expanded observations, mid-year review' },
-                  { phase: 'SUSTAIN', title: 'Embed for Lasting Change', desc: 'Internal coaching capacity, full implementation, annual impact' },
-                ].map((p) => (
-                  <div
-                    key={p.phase}
-                    className={`p-5 rounded-xl border-2 ${
-                      partnership.contract_phase === p.phase
-                        ? 'border-[#4ecdc4] bg-[#4ecdc4]/10'
-                        : 'border-gray-200 bg-gray-50'
-                    }`}
-                  >
-                    {partnership.contract_phase === p.phase && (
-                      <span className="text-xs font-bold text-[#4ecdc4] mb-2 block">YOU ARE HERE</span>
-                    )}
-                    <h3 className="font-bold text-gray-900 mb-1">{p.phase}</h3>
-                    <p className="text-sm font-medium text-gray-700 mb-2">{p.title}</p>
-                    <p className="text-xs text-gray-500">{p.desc}</p>
-                  </div>
-                ))}
-              </div>
+              )}
             </div>
-          </>
-        )}
 
-        {/* ═══════════════════════════════════════════════════════════════════
-            NEXT YEAR TAB
-            ═══════════════════════════════════════════════════════════════════ */}
-        {activeTab === 'next-year' && (
-          <>
-            {/* Admin-only Year 2 Planning Notes */}
-            {editMode && (
-              <div className="bg-white rounded-xl border border-violet-200 p-5 mb-4">
+            {/* ─── 3. Sales Coach Card ───────────────────────────────── */}
+            {/* Observation Impact summary */}
+            {observationImpact.has_data && observationImpact.observations.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-sm p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-violet-500">✦</span>
-                  <h3 className="text-sm font-semibold text-violet-900">Year 2 Planning Notes</h3>
-                  <span className="text-xs text-violet-500 ml-auto">Admin only</span>
+                  <TrendingUp size={14} style={{ color: '#1e2749' }} />
+                  <h3 className="text-sm font-bold text-gray-900">Observation Impact</h3>
                 </div>
-                <InlineEditField
-                  partnershipId={partnershipId}
-                  field="year2_planning_notes"
-                  value={partnership.year2_planning_notes}
-                  type="textarea"
-                  onSaved={(v) => setPartnership((p: any) => ({ ...p, year2_planning_notes: v }))}
-                />
-                <div className="mt-3 p-3 rounded-lg bg-violet-50">
-                  <p className="text-xs text-violet-600 leading-relaxed">
-                    ✦ AI Guidance: Note the renewal conversation status, any pricing discussions,
-                    what phase they&apos;d move to, and any concerns. This is internal only -
-                    the principal sees the standard Next Year content.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Standard Next Year content */}
-            <div className="bg-white rounded-xl border border-gray-100 p-6 mb-4">
-              <h2 className="text-lg font-bold text-gray-900 mb-2">Your Growth Plan</h2>
-              <p className="text-gray-600 mb-6">
-                Building on this year&apos;s momentum, here&apos;s what Year 2 can look like for {schoolName}.
-              </p>
-
-              {/* Proposed Timeline */}
-              <div className="bg-gray-50 rounded-xl p-5">
-                <h3 className="font-semibold text-gray-900 mb-4">Proposed 2026-27 Timeline</h3>
-                <div className="space-y-3">
-                  {[
-                    { month: 'Aug', event: 'Leadership Planning Session' },
-                    { month: 'Sep', event: 'On-Site Kickoff (full team)' },
-                    { month: 'Oct', event: 'Virtual Session: Advanced strategies' },
-                    { month: 'Nov', event: 'Observation Day: Expanded groups' },
-                    { month: 'Jan', event: 'Mid-Year Check-in + Growth Group refresh' },
-                    { month: 'Mar', event: 'Observation Day: Full implementation' },
-                    { month: 'May', event: 'Executive Impact Session: Annual results + Year 3' },
-                  ].map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-3 text-sm">
-                      <span className="font-semibold text-gray-900 w-10">{item.month}</span>
-                      <span className="text-gray-600">{item.event}</span>
+                <div className="space-y-2">
+                  {observationImpact.observations.slice(0, 3).map((obs) => (
+                    <div key={obs.observation_id} className="rounded-lg p-2.5" style={{ background: '#FAFAF8', border: '0.5px solid #E9E7E2' }}>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xs font-medium text-gray-800">{obs.observation_title}</span>
+                        <span className="text-[10px] text-gray-400">
+                          {new Date(obs.observation_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div>
+                          <div className="text-sm font-bold" style={{ color: obs.engagement_change_pct === null ? '#9CA3AF' : obs.engagement_change_pct > 0 ? '#16A34A' : obs.engagement_change_pct < 0 ? '#DC2626' : '#6B7280' }}>
+                            {obs.engagement_change_pct === null ? '-' : obs.engagement_change_pct > 0 ? `+${obs.engagement_change_pct}%` : `${obs.engagement_change_pct}%`}
+                          </div>
+                          <div className="text-[9px] text-gray-400">Engagement</div>
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold" style={{ color: obs.mood_change === null ? '#9CA3AF' : obs.mood_change > 0 ? '#16A34A' : obs.mood_change < 0 ? '#DC2626' : '#6B7280' }}>
+                            {obs.mood_change === null ? '-' : obs.mood_change > 0 ? `+${obs.mood_change}` : `${obs.mood_change}`}
+                          </div>
+                          <div className="text-[9px] text-gray-400">Mood</div>
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold" style={{ color: obs.quick_wins_after > obs.quick_wins_before ? '#16A34A' : '#6B7280' }}>
+                            {obs.quick_wins_after > obs.quick_wins_before ? `+${obs.quick_wins_after - obs.quick_wins_before}` : obs.quick_wins_after - obs.quick_wins_before}
+                          </div>
+                          <div className="text-[9px] text-gray-400">Quick Wins</div>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
-          </>
-        )}
-
-        {/* ═══════════════════════════════════════════════════════════════════
-            TEAM TAB
-            ═══════════════════════════════════════════════════════════════════ */}
-        {activeTab === 'team' && (
-          <>
-            {/* AI Guidance for Team */}
-            {editMode && (
-              <div className="p-3 rounded-lg bg-violet-50 border border-violet-100 mb-4">
-                <p className="text-xs font-semibold text-violet-700 mb-1">✦ AI Guidance</p>
-                <p className="text-xs text-violet-600 leading-relaxed">
-                  Make sure the primary contact name and email are correct -
-                  these show on the principal&apos;s Team tab. The phone number is helpful
-                  for your records but isn&apos;t shown to the principal.
-                </p>
-              </div>
             )}
 
-            {/* TDI Team */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-4">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Your TDI Team</h2>
-              <div className="flex flex-col sm:flex-row items-start gap-6">
-                <div className="w-28 h-28 bg-gray-200 rounded-full overflow-hidden flex-shrink-0 shadow-md">
-                  <Image
-                    src="/images/rae-headshot.webp"
-                    alt="Rae Hughart"
-                    width={112}
-                    height={112}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex-1">
-                  <p className="text-base font-semibold text-[#1e2749]">Rae Hughart</p>
-                  <p className="text-gray-500">Founder & CEO</p>
-                  <div className="mt-4 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-gray-400" />
-                      <a href="mailto:Rae@TeachersDeserveIt.com" className="text-blue-600 hover:underline">
-                        Rae@TeachersDeserveIt.com
-                      </a>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-gray-400" />
-                      <a href="tel:+18477215503" className="text-blue-600 hover:underline">847-721-5503</a>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MessageCircle className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">Also available by text!</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-3 mt-5">
-                    <a
-                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FFBA06] text-[#1e2749] rounded-lg font-medium hover:bg-[#e5a805] transition-colors"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      Schedule a Call
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* School Information - editable in edit mode */}
-            <div
-              className="bg-white rounded-xl border border-gray-100 p-5 mb-4"
-              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-2 h-2 rounded-full" style={{ background: '#16A34A' }} />
-                <h2 className="text-sm font-semibold text-gray-900">School Information</h2>
-                {editMode && (
-                  <span className="ml-auto text-xs text-violet-500">Click any field to edit</span>
-                )}
-              </div>
-
-              <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-                {/* School Name */}
-                <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                    School / District Name
-                  </label>
-                  {editMode ? (
-                    <InlineEditField
-                      partnershipId={partnershipId}
-                      field="name"
-                      value={organization?.name}
-                      type="text"
-                      onSaved={(v) => setOrganization((o: any) => ({ ...o, name: v }))}
-                    />
-                  ) : (
-                    <p className="text-sm text-gray-700">{organization?.name || '—'}</p>
-                  )}
-                </div>
-
-                {/* Primary Contact Name */}
-                <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                    Primary Contact
-                  </label>
-                  {editMode ? (
-                    <InlineEditField
-                      partnershipId={partnershipId}
-                      field="primary_contact_name"
-                      value={partnership?.primary_contact_name}
-                      type="text"
-                      onSaved={(v) => setPartnership((p: any) => ({ ...p, primary_contact_name: v }))}
-                    />
-                  ) : (
-                    <p className="text-sm text-gray-700">{partnership?.primary_contact_name || '—'}</p>
-                  )}
-                </div>
-
-                {/* Contact Email */}
-                <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                    Contact Email
-                  </label>
-                  {editMode ? (
-                    <InlineEditField
-                      partnershipId={partnershipId}
-                      field="primary_contact_email"
-                      value={partnership?.primary_contact_email}
-                      type="text"
-                      onSaved={(v) => setPartnership((p: any) => ({ ...p, primary_contact_email: v }))}
-                    />
-                  ) : (
-                    <p className="text-sm text-gray-700">{partnership?.primary_contact_email || '—'}</p>
-                  )}
-                </div>
-
-                {/* Phone */}
-                <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                    Phone
-                  </label>
-                  {editMode ? (
-                    <InlineEditField
-                      partnershipId={partnershipId}
-                      field="phone"
-                      value={partnership?.phone}
-                      type="text"
-                      onSaved={(v) => setPartnership((p: any) => ({ ...p, phone: v }))}
-                    />
-                  ) : (
-                    <p className="text-sm text-gray-700">{partnership?.phone || '—'}</p>
-                  )}
-                </div>
-
-                {/* Contract Phase */}
-                <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                    Contract Phase
-                  </label>
-                  {editMode ? (
-                    <InlineEditField
-                      partnershipId={partnershipId}
-                      field="contract_phase"
-                      value={partnership?.contract_phase}
-                      type="select"
-                      options={['IGNITE', 'ACCELERATE', 'SUSTAIN']}
-                      onSaved={(v) => setPartnership((p: any) => ({ ...p, contract_phase: v }))}
-                    />
-                  ) : (
-                    <p className="text-sm text-gray-700">{partnership?.contract_phase || '—'}</p>
-                  )}
-                </div>
-
-                {/* Contract Start */}
-                <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                    Contract Start
-                  </label>
-                  {editMode ? (
-                    <InlineEditField
-                      partnershipId={partnershipId}
-                      field="contract_start"
-                      value={partnership?.contract_start}
-                      type="date"
-                      onSaved={(v) => setPartnership((p: any) => ({ ...p, contract_start: v }))}
-                    />
-                  ) : (
-                    <p className="text-sm text-gray-700">{partnership?.contract_start || 'Not set'}</p>
-                  )}
-                </div>
-
-                {/* Contract End */}
-                <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                    Contract End
-                  </label>
-                  {editMode ? (
-                    <InlineEditField
-                      partnershipId={partnershipId}
-                      field="contract_end"
-                      value={partnership?.contract_end}
-                      type="date"
-                      onSaved={(v) => setPartnership((p: any) => ({ ...p, contract_end: v }))}
-                    />
-                  ) : (
-                    <p className="text-sm text-gray-700">{partnership?.contract_end || 'Not set'}</p>
-                  )}
-                </div>
-
-                {/* Dashboard URL */}
-                <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                    Dashboard URL
-                  </label>
-                  {editMode ? (
-                    <InlineEditField
-                      partnershipId={partnershipId}
-                      field="slug"
-                      value={partnership?.slug}
-                      type="text"
-                      onSaved={(v) => setPartnership((p: any) => ({ ...p, slug: v }))}
-                    />
-                  ) : (
-                    <p className="text-sm text-gray-700">{partnership?.slug ? `/partners/${partnership.slug}` : 'Not set'}</p>
-                  )}
-                </div>
-
-                {/* Address */}
-                <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                    Address
-                  </label>
-                  {editMode ? (
-                    <InlineEditField
-                      partnershipId={partnershipId}
-                      field="address"
-                      value={partnership?.address}
-                      type="text"
-                      onSaved={(v) => setPartnership((p: any) => ({ ...p, address: v }))}
-                    />
-                  ) : (
-                    <p className="text-sm text-gray-700">{partnership?.address || '—'}</p>
-                  )}
-                </div>
-
-                {/* City */}
-                <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                    City
-                  </label>
-                  {editMode ? (
-                    <InlineEditField
-                      partnershipId={partnershipId}
-                      field="address_city"
-                      value={(organization as any)?.address_city}
-                      type="text"
-                      onSaved={(v) => setOrganization((o: any) => ({ ...o, address_city: v }))}
-                    />
-                  ) : (
-                    <p className="text-sm text-gray-700">{(organization as any)?.address_city || '—'}</p>
-                  )}
-                </div>
-
-                {/* State */}
-                <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                    State
-                  </label>
-                  {editMode ? (
-                    <InlineEditField
-                      partnershipId={partnershipId}
-                      field="address_state"
-                      value={(organization as any)?.address_state}
-                      type="text"
-                      onSaved={(v) => setOrganization((o: any) => ({ ...o, address_state: v }))}
-                    />
-                  ) : (
-                    <p className="text-sm text-gray-700">{(organization as any)?.address_state || '—'}</p>
-                  )}
-                </div>
-
-                {/* Website */}
-                <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">
-                    Website
-                  </label>
-                  {editMode ? (
-                    <InlineEditField
-                      partnershipId={partnershipId}
-                      field="website"
-                      value={partnership?.website}
-                      type="text"
-                      onSaved={(v) => setPartnership((p: any) => ({ ...p, website: v }))}
-                    />
-                  ) : (
-                    <p className="text-sm text-gray-700">
-                      {partnership?.website ? (
-                        <a href={partnership.website.startsWith('http') ? partnership.website : `https://${partnership.website}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{partnership.website}</a>
-                      ) : '—'}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Partnership Actions (edit mode only) */}
-            {editMode && (
-              <div className="bg-white rounded-xl border border-red-100 p-5 mb-4">
-                <h2 className="text-sm font-semibold text-gray-900 mb-3">Partnership Actions</h2>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={async () => {
-                      const newStatus = partnership?.status === 'active' ? 'paused' : 'active';
-                      const label = newStatus === 'paused' ? 'Pause' : 'Reactivate';
-                      if (!confirm(`${label} this partnership?`)) return;
-                      await handleFieldUpdate('status', newStatus);
-                    }}
-                    className="px-4 py-2 text-xs font-medium rounded-lg border transition-colors"
-                    style={{ borderColor: '#EAB308', color: '#92400E', background: '#FFFBEB' }}
-                  >
-                    {partnership?.status === 'active' ? 'Pause partnership' : 'Reactivate partnership'}
-                  </button>
-                  <button
-                    onClick={async () => {
-                      if (!confirm('Are you sure you want to permanently delete this partnership? This cannot be undone.')) return;
-                      if (!confirm('This will delete all action items, timeline events, notes, meetings, and KPIs. Type "delete" in the next prompt to confirm.')) return;
-                      const typed = prompt('Type "delete" to confirm:');
-                      if (typed !== 'delete') return;
-                      try {
-                        const res = await fetch(`/api/admin/partnerships/${partnershipId}/delete`, {
-                          method: 'DELETE',
-                          headers: { 'Content-Type': 'application/json', 'x-user-email': userEmail || '' },
-                        });
-                        if (res.ok) {
-                          window.location.href = '/tdi-admin/leadership';
-                        }
-                      } catch {}
-                    }}
-                    className="px-4 py-2 text-xs font-medium rounded-lg border transition-colors"
-                    style={{ borderColor: '#EF4444', color: '#991B1B', background: '#FEF2F2' }}
-                  >
-                    Delete partnership
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Staff Roster with Photos */}
-            <StaffRosterWithPhotos
-              partnershipId={partnershipId}
-              userEmail={userEmail}
-              editMode={editMode}
-            />
-
-            {/* Bulk Photo Upload (edit mode only) */}
-            {editMode && (
-              <StaffPhotoUpload
-                partnershipId={partnershipId}
-                userEmail={userEmail}
-              />
-            )}
-
-            {/* Find Staff - Walkthrough Search */}
-            <FindStaffSearch
-              partnershipId={partnershipId}
-              userEmail={userEmail}
-            />
-          </>
-        )}
-
-        {/* ═══════════════════════════════════════════════════════════════════
-            BILLING TAB
-            ═══════════════════════════════════════════════════════════════════ */}
-        {activeTab === 'billing' && (
-          <BillingTab
-            partnershipId={partnershipId}
-            userEmail={userEmail || ''}
-            partnership={partnership}
-          />
-        )}
-
-        {/* ═══════════════════════════════════════════════════════════════════
-            90 DAYS TAB — First 90 Days Framework Quick Wins
-            ═══════════════════════════════════════════════════════════════════ */}
-        {activeTab === '90-days' && (
-          <>
-            <div className="mb-4 p-4 rounded-xl border border-teal-200 bg-teal-50">
-              <div className="flex items-start gap-2">
-                <span className="text-teal-500 text-lg flex-shrink-0">✦</span>
-                <div>
-                  <p className="text-sm font-semibold text-teal-800 mb-1">First 90 Days Dashboard</p>
-                  <p className="text-sm text-teal-700 leading-relaxed">
-                    Live Hub signals for the onboarding activation framework. Use the Activation
-                    Readiness Score as the single readiness number for Phase 0 gate reviews.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Row 1: Activation Score + Onboarding Checklist */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-0">
-              <ActivationReadinessScore partnershipId={partnershipId} />
-              <OnboardingChecklist partnershipId={partnershipId} />
-            </div>
-
-            {/* Row 2: Staff Engagement Roster (full width) */}
-            <StaffEngagementRoster partnershipId={partnershipId} />
-
-            {/* Row 3: Course Funnel + Login Trend */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-0">
-              <CourseCompletionFunnel partnershipId={partnershipId} />
-              <LoginTrendChart partnershipId={partnershipId} />
-            </div>
-
-            {/* Row 4: Observation Impact Scorecard */}
-            <ObservationImpactScorecard observations={observationImpact.observations} />
-          </>
-        )}
-
-        {/* ═══════════════════════════════════════════════════════════════════
-            INTERNAL TAB -- Notes, Meetings, Internal Strategy (TDI team only)
-            ═══════════════════════════════════════════════════════════════════ */}
-        {activeTab === 'internal' && (
-          <>
-            <div className="mb-4 p-4 rounded-xl border border-amber-200 bg-amber-50">
-              <div className="flex items-start gap-2">
-                <span className="text-amber-500 text-lg flex-shrink-0">&#9671;</span>
-                <div>
-                  <p className="text-sm font-semibold text-amber-800 mb-1">Internal only</p>
-                  <p className="text-sm text-amber-700">This tab is visible to the TDI team only. Nothing here shows on the principal's dashboard.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* First-time guidance */}
-            <FirstTimeHint id="internal-tab-intro">
-              <strong>Welcome to the Internal tab.</strong> This is your command center for this partnership. Set KPIs, log meetings, generate call briefings, track grants, export reports, and manage Hub provisioning. Everything here is invisible to the principal.
-            </FirstTimeHint>
-
-            {/* Prepare for Call */}
-            <div className="bg-white rounded-xl border border-blue-200 p-5 mb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-bold text-gray-900">Prepare for call <InfoDot text={GUIDANCE.leadership.prepareForCall} /></h3>
-                  <p className="text-xs text-gray-500 mt-0.5">One-click briefing with engagement data, KPIs, notes, and talking points.</p>
-                </div>
-                <button
-                  onClick={async () => {
-                    try {
-                      const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/briefing`)
-                      const data = await res.json()
-                      const w = window.open('', '_blank')
-                      if (!w) return
-                      const b = data.briefing
-                      const kpiRows = (data.kpis || []).map((k: { label: string; current: string; target: string; pct: number; status: string }) => `<tr><td style="padding:6px 10px;">${k.label}</td><td style="padding:6px 10px;font-weight:700;">${k.current}</td><td style="padding:6px 10px;">${k.target}</td><td style="padding:6px 10px;color:${k.status === 'at_risk' ? '#EF4444' : k.pct >= 70 ? '#22c55e' : '#EAB308'}">${k.pct}%</td></tr>`).join('')
-                      const tpList = (data.talkingPoints || []).map((t: string) => `<li style="margin-bottom:6px;">${t}</li>`).join('')
-                      const pendingList = (data.pendingItems || []).map((t: string) => `<li>${t}</li>`).join('')
-                      w.document.write(`<!DOCTYPE html><html><head><title>Briefing: ${b.orgName}</title><style>body{font-family:sans-serif;max-width:700px;margin:0 auto;padding:32px;color:#1e2749;font-size:14px;}h1{font-size:22px;margin:0;}h2{font-size:16px;margin:24px 0 8px;color:#374151;border-bottom:1px solid #E5E7EB;padding-bottom:4px;}table{width:100%;border-collapse:collapse;font-size:13px;}th{text-align:left;background:#F9FAFB;padding:8px 10px;font-weight:600;}td{padding:6px 10px;border-bottom:1px solid #F3F4F6;}.stat{display:inline-block;text-align:center;padding:12px 20px;background:#F9FAFB;border-radius:8px;margin-right:8px;}.stat-val{font-size:24px;font-weight:700;}.stat-label{font-size:10px;color:#6B7280;}@media print{body{padding:16px;}}</style></head><body><div style="display:flex;justify-content:space-between;"><div><h1>${b.orgName}</h1><p style="color:#6B7280;margin:4px 0;">${b.location || ''} | ${b.phase} | Day ${b.daysSinceStart || '?'}</p></div><div style="text-align:right;font-size:11px;color:#9CA3AF;">Generated ${new Date().toLocaleDateString()}<br>TDI Internal</div></div><div style="margin:16px 0;"><div class="stat"><div class="stat-val">${b.loginPct}%</div><div class="stat-label">Hub engagement</div></div><div class="stat"><div class="stat-val">${b.totalStaff}</div><div class="stat-label">Staff</div></div><div class="stat"><div class="stat-val">${b.observationsUsed}/${b.observationsTotal}</div><div class="stat-label">Observations</div></div><div class="stat"><div class="stat-val">${b.virtualSessionsUsed}/${b.virtualSessionsTotal}</div><div class="stat-label">Virtual</div></div></div>${kpiRows ? `<h2>KPI Progress</h2><table><thead><tr><th>KPI</th><th>Current</th><th>Target</th><th>Progress</th></tr></thead><tbody>${kpiRows}</tbody></table>` : ''}${tpList ? `<h2>Talking Points</h2><ul>${tpList}</ul>` : ''}${pendingList ? `<h2>Open Items</h2><ul>${pendingList}</ul>` : ''}${data.recentNotes?.length > 0 ? `<h2>Recent Notes</h2>${data.recentNotes.map((n: { type: string; content: string }) => `<p style="margin:8px 0;padding:8px;background:#F9FAFB;border-radius:6px;font-size:13px;"><strong style="color:#6B7280;text-transform:uppercase;font-size:10px;">${n.type}</strong><br>${n.content}</p>`).join('')}` : ''}</body></html>`)
-                      w.document.close()
-                    } catch { /* */ }
-                  }}
-                  className="px-4 py-2 text-sm font-medium text-white rounded-lg"
-                  style={{ background: '#1e2749' }}
-                >
-                  Generate briefing
-                </button>
-              </div>
-            </div>
-
-            {/* Action Items */}
-            <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
+            {/* ─── 4. Partnership KPIs ───────────────────────────────── */}
+            <div className="bg-white rounded-2xl shadow-sm p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold text-gray-900">Action Items</h3>
-                  {actionItems.length > 0 && (
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{actionItems.filter(a => a.status !== 'completed').length} open</span>
+                  <BarChart3 size={14} style={{ color: '#1e2749' }} />
+                  <h3 className="text-sm font-bold text-gray-900">KPIs</h3>
+                  {activeKpis.length > 0 && (
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-700">{activeKpis.length}</span>
                   )}
                 </div>
                 <button
-                  onClick={() => setShowAddAction(!showAddAction)}
-                  className="flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg hover:bg-gray-50 transition"
-                  style={{ color: '#1e2749' }}
+                  onClick={() => setShowKpiSelector(!showKpiSelector)}
+                  className="text-[10px] font-medium text-blue-600 hover:underline"
                 >
-                  <Plus size={14} />
-                  Add item
+                  {showKpiSelector ? 'Close' : activeKpis.length > 0 ? 'Edit' : 'Select'}
                 </button>
-              </div>
-
-              {/* Add action form */}
-              {showAddAction && (
-                <div className="border border-gray-200 rounded-lg p-3 mb-3 bg-gray-50">
-                  <div className="space-y-2">
-                    <input
-                      type="text"
-                      placeholder="Title"
-                      value={newAction.title}
-                      onChange={e => setNewAction({ ...newAction, title: e.target.value })}
-                      className="w-full text-sm border border-gray-200 rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                    />
-                    <textarea
-                      placeholder="Description (optional)"
-                      value={newAction.description}
-                      onChange={e => setNewAction({ ...newAction, description: e.target.value })}
-                      className="w-full text-sm border border-gray-200 rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                      rows={2}
-                    />
-                    <div className="flex gap-2 items-center flex-wrap">
-                      <input
-                        type="date"
-                        value={newAction.due_date}
-                        onChange={e => setNewAction({ ...newAction, due_date: e.target.value })}
-                        className="text-xs border border-gray-200 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                      />
-                      <select
-                        value={newAction.category}
-                        onChange={e => setNewAction({ ...newAction, category: e.target.value })}
-                        className="text-xs border border-gray-200 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                      >
-                        <option value="general">General</option>
-                        <option value="onboarding">Onboarding</option>
-                        <option value="hub">Hub</option>
-                        <option value="coaching">Coaching</option>
-                        <option value="billing">Billing</option>
-                        <option value="follow_up">Follow-up</option>
-                      </select>
-                      <label className="flex items-center gap-1 text-xs text-gray-600 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={newAction.visible_to_partner}
-                          onChange={e => setNewAction({ ...newAction, visible_to_partner: e.target.checked })}
-                          className="rounded border-gray-300"
-                        />
-                        Visible to partner
-                      </label>
-                    </div>
-                    <div className="flex gap-2 justify-end pt-1">
-                      <button
-                        onClick={() => { setShowAddAction(false); setNewAction({ title: '', description: '', due_date: '', category: 'general', visible_to_partner: false }) }}
-                        className="text-xs px-3 py-1.5 rounded-md text-gray-500 hover:bg-gray-100"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        disabled={!newAction.title.trim() || savingAction}
-                        onClick={async () => {
-                          setSavingAction(true)
-                          try {
-                            const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/action-items`, {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify(newAction),
-                            })
-                            if (res.ok) {
-                              const data = await res.json()
-                              setActionItems(prev => [data.item || data, ...prev])
-                              setNewAction({ title: '', description: '', due_date: '', category: 'general', visible_to_partner: false })
-                              setShowAddAction(false)
-                            }
-                          } catch { /* */ }
-                          setSavingAction(false)
-                        }}
-                        className="text-xs px-3 py-1.5 rounded-md text-white font-medium disabled:opacity-40"
-                        style={{ background: '#1e2749' }}
-                      >
-                        {savingAction ? 'Saving...' : 'Add'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Action items list */}
-              {actionItems.length === 0 && !showAddAction && (
-                <p className="text-xs text-gray-400 text-center py-4">No action items yet. Click &quot;Add item&quot; to create one.</p>
-              )}
-
-              {(() => {
-                const inProgress = actionItems.filter(a => a.status === 'in_progress')
-                const pending = actionItems.filter(a => a.status === 'pending')
-                const completed = actionItems.filter(a => a.status === 'completed')
-
-                const statusIcon = (status: string) => {
-                  if (status === 'completed') return <CheckCircle2 size={16} style={{ color: '#10B981' }} />
-                  if (status === 'in_progress') return <Clock size={16} style={{ color: '#EAB308' }} />
-                  return <Circle size={16} style={{ color: '#9CA3AF' }} />
-                }
-
-                const nextStatus = (s: string) => s === 'pending' ? 'in_progress' : s === 'in_progress' ? 'completed' : 'pending'
-
-                const categoryColors: Record<string, string> = {
-                  general: '#6B7280', onboarding: '#8B5CF6', hub: '#3B82F6',
-                  coaching: '#F59E0B', billing: '#EF4444', follow_up: '#10B981',
-                }
-
-                const updateItem = async (id: string, fields: Record<string, any>) => {
-                  try {
-                    const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/action-items`, {
-                      method: 'PATCH',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ id, ...fields }),
-                    })
-                    if (res.ok) {
-                      setActionItems(prev => prev.map(a => a.id === id ? { ...a, ...fields } : a))
-                    }
-                  } catch { /* */ }
-                }
-
-                const deleteItem = async (id: string) => {
-                  try {
-                    const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/action-items`, {
-                      method: 'DELETE',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ id }),
-                    })
-                    if (res.ok) {
-                      setActionItems(prev => prev.filter(a => a.id !== id))
-                      setDeletingActionId(null)
-                    }
-                  } catch { /* */ }
-                }
-
-                const renderItem = (item: any) => (
-                  <div key={item.id} className="group flex items-start gap-2 py-2 px-2 rounded-lg hover:bg-gray-50 transition" style={{ borderBottom: '1px solid #F3F4F6' }}>
-                    {/* Status toggle */}
-                    <button
-                      onClick={() => updateItem(item.id, { status: nextStatus(item.status) })}
-                      className="mt-0.5 flex-shrink-0 hover:opacity-70"
-                      title={`Status: ${item.status} (click to change)`}
-                    >
-                      {statusIcon(item.status)}
-                    </button>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        {/* Title - inline edit */}
-                        {editingActionField?.id === item.id && editingActionField?.field === 'title' ? (
-                          <input
-                            autoFocus
-                            className="text-sm font-medium bg-white border border-blue-300 rounded px-1.5 py-0.5 flex-1"
-                            value={editingActionValue}
-                            onChange={e => setEditingActionValue(e.target.value)}
-                            onBlur={() => {
-                              if (editingActionValue.trim() && editingActionValue !== item.title) {
-                                updateItem(item.id, { title: editingActionValue })
-                              }
-                              setEditingActionField(null)
-                            }}
-                            onKeyDown={e => {
-                              if (e.key === 'Enter') { (e.target as HTMLInputElement).blur() }
-                              if (e.key === 'Escape') { setEditingActionField(null) }
-                            }}
-                          />
-                        ) : (
-                          <span
-                            className="text-sm font-medium text-gray-900 cursor-pointer hover:text-blue-600 truncate"
-                            style={item.status === 'completed' ? { textDecoration: 'line-through', color: '#9CA3AF' } : {}}
-                            onClick={() => { setEditingActionField({ id: item.id, field: 'title' }); setEditingActionValue(item.title) }}
-                          >
-                            {item.title}
-                          </span>
-                        )}
-
-                        {/* Category badge */}
-                        <span
-                          className="text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0"
-                          style={{ background: (categoryColors[item.category] || '#6B7280') + '18', color: categoryColors[item.category] || '#6B7280' }}
-                        >
-                          {(item.category || 'general').replace('_', '-')}
-                        </span>
-                      </div>
-
-                      {/* Due date */}
-                      <div className="flex items-center gap-3 mt-0.5">
-                        {editingActionField?.id === item.id && editingActionField?.field === 'due_date' ? (
-                          <input
-                            autoFocus
-                            type="date"
-                            className="text-[11px] bg-white border border-blue-300 rounded px-1 py-0.5"
-                            value={editingActionValue}
-                            onChange={e => setEditingActionValue(e.target.value)}
-                            onBlur={() => {
-                              updateItem(item.id, { due_date: editingActionValue || null })
-                              setEditingActionField(null)
-                            }}
-                          />
-                        ) : (
-                          <span
-                            className="text-[11px] text-gray-400 cursor-pointer hover:text-blue-500"
-                            onClick={() => { setEditingActionField({ id: item.id, field: 'due_date' }); setEditingActionValue(item.due_date || '') }}
-                          >
-                            {item.due_date ? new Date(item.due_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'No due date'}
-                          </span>
-                        )}
-
-                        {/* Expand description toggle */}
-                        {item.description && (
-                          <button
-                            onClick={() => setExpandedActionId(expandedActionId === item.id ? null : item.id)}
-                            className="text-[11px] text-gray-400 hover:text-gray-600"
-                          >
-                            <ChevronDown size={12} style={{ transform: expandedActionId === item.id ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
-                          </button>
-                        )}
-                      </div>
-
-                      {/* Expanded description */}
-                      {expandedActionId === item.id && (
-                        <div className="mt-1.5">
-                          {editingActionField?.id === item.id && editingActionField?.field === 'description' ? (
-                            <textarea
-                              autoFocus
-                              className="w-full text-xs bg-white border border-blue-300 rounded px-2 py-1"
-                              value={editingActionValue}
-                              rows={2}
-                              onChange={e => setEditingActionValue(e.target.value)}
-                              onBlur={() => {
-                                if (editingActionValue !== item.description) {
-                                  updateItem(item.id, { description: editingActionValue })
-                                }
-                                setEditingActionField(null)
-                              }}
-                            />
-                          ) : (
-                            <p
-                              className="text-xs text-gray-500 cursor-pointer hover:text-gray-700"
-                              onClick={() => { setEditingActionField({ id: item.id, field: 'description' }); setEditingActionValue(item.description || '') }}
-                            >
-                              {item.description || 'Click to add description'}
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Right side controls */}
-                    <div className="flex items-center gap-1 flex-shrink-0 mt-0.5">
-                      {/* Visibility toggle */}
-                      <button
-                        onClick={() => updateItem(item.id, { visible_to_partner: !item.visible_to_partner })}
-                        className="p-1 rounded hover:bg-gray-100"
-                        title={item.visible_to_partner ? 'Visible to partner' : 'Hidden from partner'}
-                      >
-                        {item.visible_to_partner ? <Eye size={14} style={{ color: '#3B82F6' }} /> : <EyeOff size={14} style={{ color: '#D1D5DB' }} />}
-                      </button>
-
-                      {/* Delete */}
-                      {deletingActionId === item.id ? (
-                        <div className="flex items-center gap-1">
-                          <button onClick={() => deleteItem(item.id)} className="text-[10px] text-red-600 font-medium px-1.5 py-0.5 rounded bg-red-50 hover:bg-red-100">Delete</button>
-                          <button onClick={() => setDeletingActionId(null)} className="text-[10px] text-gray-500 px-1.5 py-0.5">Cancel</button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setDeletingActionId(item.id)}
-                          className="p-1 rounded hover:bg-red-50 opacity-0 group-hover:opacity-100 transition"
-                        >
-                          <Trash2 size={13} style={{ color: '#EF4444' }} />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )
-
-                return (
-                  <div>
-                    {/* In Progress */}
-                    {inProgress.length > 0 && (
-                      <div className="mb-1">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1 px-2">In Progress</p>
-                        {inProgress.map(renderItem)}
-                      </div>
-                    )}
-
-                    {/* Pending */}
-                    {pending.length > 0 && (
-                      <div className="mb-1">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1 px-2">Pending</p>
-                        {pending.map(renderItem)}
-                      </div>
-                    )}
-
-                    {/* Completed - collapsed by default */}
-                    {completed.length > 0 && (
-                      <div className="mt-2">
-                        <button
-                          onClick={() => setShowCompletedActions(!showCompletedActions)}
-                          className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1 px-2 hover:text-gray-600"
-                        >
-                          <ChevronDown size={12} style={{ transform: showCompletedActions ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
-                          Completed ({completed.length})
-                        </button>
-                        {showCompletedActions && completed.map(renderItem)}
-                      </div>
-                    )}
-                  </div>
-                )
-              })()}
-            </div>
-
-            {/* KPI Goal Setting */}
-            <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-sm font-bold text-gray-900">Partnership KPIs <InfoDot text={GUIDANCE.leadership.kpiAutoUpdate} /></h3>
-                  <p className="text-xs text-gray-500 mt-0.5">Pick 3-5 implementation-focused KPIs. Each maps to your contract deliverables.</p>
-                </div>
-                {activeKpis.length > 0 && (
-                  <span className="text-xs font-medium px-2 py-1 rounded-full bg-teal-100 text-teal-700">{activeKpis.length} active</span>
-                )}
               </div>
 
               {/* Active KPIs display */}
               {activeKpis.length > 0 && (
-                <div className="space-y-2 mb-4">
+                <div className="space-y-2 mb-2">
                   {activeKpis.map(kpi => {
-                    const pct = kpi.target_value > 0 ? Math.min(Math.round((kpi.current_value / kpi.target_value) * 100), 100) : 0;
-                    const barColor = pct >= 70 ? '#10B981' : pct >= 40 ? '#EAB308' : '#EF4444';
+                    const pct = kpi.target_value > 0 ? Math.min(Math.round((kpi.current_value / kpi.target_value) * 100), 100) : 0
+                    const barColor = pct >= 70 ? '#10B981' : pct >= 40 ? '#EAB308' : '#EF4444'
                     return (
-                    <div key={kpi.id} className="p-3 rounded-lg bg-gray-50 border border-gray-100">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900">{kpi.kpi_label}</p>
-                          <p className="text-xs text-gray-500 mt-0.5">{kpi.benchmark_label}</p>
-                        </div>
-                        <div className="text-right flex-shrink-0 ml-4">
-                          <div className="flex items-baseline gap-1.5">
+                      <div key={kpi.id} className="p-2.5 rounded-lg bg-gray-50 border border-gray-100">
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="text-xs font-medium text-gray-900 truncate flex-1">{kpi.kpi_label}</p>
+                          <div className="flex items-baseline gap-1 flex-shrink-0 ml-2">
                             <button
                               onClick={async () => {
-                                const val = prompt(`Override current value for "${kpi.kpi_label}":`, String(kpi.current_value));
-                                if (val === null) return;
-                                const num = parseFloat(val);
-                                if (isNaN(num)) return;
+                                const val = prompt(`Override current value for "${kpi.kpi_label}":`, String(kpi.current_value))
+                                if (val === null) return
+                                const num = parseFloat(val)
+                                if (isNaN(num)) return
                                 try {
                                   await fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`, {
                                     method: 'PATCH',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ kpiId: kpi.id, currentValue: num }),
-                                  });
-                                  setActiveKpis(prev => prev.map(k => k.id === kpi.id ? { ...k, current_value: num } : k));
+                                  })
+                                  setActiveKpis(prev => prev.map(k => k.id === kpi.id ? { ...k, current_value: num } : k))
                                 } catch {}
                               }}
-                              className="text-lg font-bold text-[#1e2749] hover:text-blue-600 cursor-pointer"
-                              title="Click to override current value"
+                              className="text-sm font-bold text-[#1e2749] hover:text-blue-600 cursor-pointer"
                             >{kpi.current_value}{kpi.target_unit}</button>
-                            <span className="text-xs text-gray-400">/</span>
-                            <span className="text-sm text-gray-500">{kpi.target_value}{kpi.target_unit}</span>
+                            <span className="text-[10px] text-gray-400">/</span>
+                            <span className="text-xs text-gray-500">{kpi.target_value}{kpi.target_unit}</span>
                           </div>
-                          <p className="text-[10px] text-gray-400">{pct}% of target</p>
+                        </div>
+                        <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: barColor }} />
                         </div>
                       </div>
-                      <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: barColor }} />
-                      </div>
-                    </div>
-                    );
+                    )
                   })}
                 </div>
               )}
 
-              {/* KPI selector */}
-              {kpiMenu.length > 0 && (
-                <details className="group">
-                  <summary className="text-xs font-medium text-blue-600 cursor-pointer hover:underline">
-                    {activeKpis.length > 0 ? 'Change KPIs' : 'Select KPIs'}
-                  </summary>
-                  <div className="mt-3 space-y-2">
+              {activeKpis.length === 0 && !showKpiSelector && (
+                <p className="text-[10px] text-gray-400 text-center py-2">No KPIs set yet.</p>
+              )}
+
+              {/* KPI selector (expandable) */}
+              {showKpiSelector && kpiMenu.length > 0 && (
+                <div className="mt-2 border-t border-gray-100 pt-3">
+                  <div className="space-y-1.5 max-h-64 overflow-y-auto">
                     {['implementation', 'wellness', 'baseline'].map(category => {
-                      const categoryKpis = kpiMenu.filter(k => k.category === category)
-                      if (categoryKpis.length === 0) return null
-                      const categoryLabels: Record<string, string> = { implementation: 'Implementation (strongest signals)', wellness: 'Wellness (team health)', baseline: 'Baseline (hygiene metrics)' }
+                      const catKpis = kpiMenu.filter(k => k.category === category)
+                      if (catKpis.length === 0) return null
+                      const catLabels: Record<string, string> = { implementation: 'Implementation', wellness: 'Wellness', baseline: 'Baseline' }
                       return (
                         <div key={category}>
-                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-3 mb-1">{categoryLabels[category]}</p>
-                          {categoryKpis.map(kpi => {
+                          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mt-2 mb-1">{catLabels[category]}</p>
+                          {catKpis.map(kpi => {
                             const isSelected = selectedKpiKeys.has(kpi.key)
                             return (
-                              <div key={kpi.key} className={`p-3 rounded-lg border transition-all cursor-pointer ${isSelected ? 'border-blue-300 bg-blue-50' : 'border-gray-100 hover:border-gray-200'}`}
+                              <div key={kpi.key} className={`p-2 rounded-lg border transition-all cursor-pointer mb-1 ${isSelected ? 'border-blue-300 bg-blue-50' : 'border-gray-100 hover:border-gray-200'}`}
                                 onClick={() => {
                                   const next = new Set(selectedKpiKeys)
                                   if (next.has(kpi.key)) { next.delete(kpi.key) } else if (next.size < 5) { next.add(kpi.key) }
@@ -2316,11 +1794,11 @@ export default function AdminPartnershipDetailPage() {
                                   if (!kpiTargets[kpi.key]) setKpiTargets(prev => ({ ...prev, [kpi.key]: kpi.suggestedTarget }))
                                 }}>
                                 <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${isSelected ? 'border-blue-500 bg-blue-500' : 'border-gray-300'}`}>
-                                      {isSelected && <span className="text-white text-[10px]">&#10003;</span>}
+                                  <div className="flex items-center gap-1.5">
+                                    <div className={`w-3.5 h-3.5 rounded border-2 flex items-center justify-center ${isSelected ? 'border-blue-500 bg-blue-500' : 'border-gray-300'}`}>
+                                      {isSelected && <span className="text-white text-[8px]">&#10003;</span>}
                                     </div>
-                                    <p className="text-sm font-medium text-gray-900">{kpi.label}</p>
+                                    <p className="text-xs font-medium text-gray-900">{kpi.label}</p>
                                   </div>
                                   {isSelected && (
                                     <input
@@ -2328,165 +1806,63 @@ export default function AdminPartnershipDetailPage() {
                                       value={kpiTargets[kpi.key] || ''}
                                       onChange={(e) => { e.stopPropagation(); setKpiTargets(prev => ({ ...prev, [kpi.key]: parseFloat(e.target.value) || 0 })) }}
                                       onClick={(e) => e.stopPropagation()}
-                                      className="w-20 text-right text-sm font-bold border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                      className="w-16 text-right text-xs font-bold border border-gray-200 rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
                                       placeholder="Target"
                                     />
                                   )}
                                 </div>
-                                <p className="text-[10px] text-gray-500 mt-1 ml-6">{kpi.benchmarkLabel}</p>
-                                {isSelected && (
-                                  <p className="text-[10px] text-blue-600 mt-1 ml-6">How TDI delivers: {kpi.howTdiDelivers.slice(0, 120)}...</p>
-                                )}
                               </div>
                             )
                           })}
                         </div>
                       )
                     })}
-                    <div className="flex items-center gap-3 mt-3">
-                      <button
-                        onClick={async () => {
-                          if (selectedKpiKeys.size === 0) return
-                          setSavingKpis(true)
-                          try {
-                            const selected = Array.from(selectedKpiKeys).map(key => ({ key, target: kpiTargets[key] || 0 }))
-                            const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`, {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ selectedKpis: selected }),
-                            })
-                            const data = await res.json()
-                            if (data.success) {
-                              // Reload KPIs
-                              const reload = await fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`)
-                              const reloadData = await reload.json()
-                              if (reloadData.kpis) setActiveKpis(reloadData.kpis)
-                            }
-                          } catch {} finally { setSavingKpis(false) }
-                        }}
-                        disabled={selectedKpiKeys.size === 0 || savingKpis}
-                        className="px-4 py-2 text-sm font-medium text-white rounded-lg disabled:opacity-50"
-                        style={{ background: '#1e2749' }}
-                      >
-                        {savingKpis ? 'Saving...' : `Save ${selectedKpiKeys.size} KPI${selectedKpiKeys.size !== 1 ? 's' : ''}`}
-                      </button>
-                      <span className="text-xs text-gray-400">{selectedKpiKeys.size}/5 selected</span>
-                    </div>
                   </div>
-                </details>
-              )}
-            </div>
-
-            {/* Batch Provision Hub Accounts */}
-            <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-2">Hub provisioning <InfoDot text={GUIDANCE.leadership.batchProvision} /></h3>
-              <p className="text-xs text-gray-500 mb-3">Batch create Hub All-Access accounts for all staff in this partnership's roster who don't have one yet.</p>
-              <button
-                onClick={async () => {
-                  setProvisioningRoster(true)
-                  setProvisionResult('')
-                  try {
-                    const res = await fetch('/api/admin/provision-roster', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ partnershipId }),
-                    })
-                    const data = await res.json()
-                    setProvisionResult(data.message || data.error || 'Done')
-                  } catch { setProvisionResult('Failed') }
-                  finally { setProvisioningRoster(false) }
-                }}
-                disabled={provisioningRoster}
-                className="px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
-                style={{ background: '#E8B84B', color: '#1e2749' }}
-              >
-                {provisioningRoster ? 'Provisioning...' : 'Provision Hub accounts for all staff'}
-              </button>
-              {provisionResult && (
-                <p className="text-xs text-gray-600 mt-2">{provisionResult}</p>
-              )}
-            </div>
-
-            {/* Grant Tracking (if any pursuits linked) */}
-            {grantPursuits.length > 0 && (
-              <div className="bg-white rounded-xl border border-purple-200 p-5 mb-4">
-                <h3 className="text-sm font-bold text-gray-900 mb-3">Grant tracking</h3>
-                <div className="space-y-3">
-                  {grantPursuits.map(pursuit => {
-                    const phaseLabels: Record<string, string> = {
-                      intake: 'Intake', researching: 'Researching', strategy: 'Strategy', writing: 'Writing',
-                      in_review: 'In review', delivered: 'Delivered', submitted: 'Submitted',
-                      awaiting_decision: 'Awaiting decision', awarded: 'Awarded', denied: 'Denied', on_hold: 'On hold',
-                    }
-                    const phaseColors: Record<string, string> = {
-                      intake: 'bg-gray-100 text-gray-700', researching: 'bg-blue-100 text-blue-700',
-                      strategy: 'bg-purple-100 text-purple-700', writing: 'bg-amber-100 text-amber-700',
-                      in_review: 'bg-yellow-100 text-yellow-700', delivered: 'bg-teal-100 text-teal-700',
-                      submitted: 'bg-green-100 text-green-700', awaiting_decision: 'bg-orange-100 text-orange-700',
-                      awarded: 'bg-green-200 text-green-800', denied: 'bg-red-100 text-red-700',
-                      on_hold: 'bg-gray-100 text-gray-600',
-                    }
-                    let paths: { plan: string; label: string; amount: number; status: string }[] = []
-                    try { paths = typeof pursuit.funding_paths === 'string' ? JSON.parse(pursuit.funding_paths) : (pursuit.funding_paths || []) } catch {}
-
-                    return (
-                      <div key={pursuit.id} className="border border-purple-100 rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <div>
-                            <p className="text-sm font-semibold text-gray-900">{pursuit.pursuit_name}</p>
-                            <p className="text-xs text-gray-500">Gap: ${(pursuit.contract_gap || 0).toLocaleString()} | Total: ${(pursuit.total_amount || 0).toLocaleString()}</p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className={`text-[10px] font-medium px-2 py-1 rounded-full ${phaseColors[pursuit.current_phase] || 'bg-gray-100 text-gray-700'}`}>
-                              {phaseLabels[pursuit.current_phase] || pursuit.current_phase}
-                            </span>
-                            <a href="/tdi-admin/funding" className="text-[10px] text-purple-600 hover:underline">View in Funding</a>
-                          </div>
-                        </div>
-                        {paths.length > 0 && (
-                          <div className="space-y-1.5">
-                            {paths.map((path, i) => {
-                              const planColors: Record<string, string> = { A: '#0F766E', B: '#1B365D', C: '#7C3AED', D: '#B45309' }
-                              const statusIcons: Record<string, string> = {
-                                not_started: '\u25CB', researching: '\u25D4', pursuing: '\u25D0',
-                                submitted: '\u25CF', awarded: '\u2714', denied: '\u2718',
-                              }
-                              return (
-                                <div key={i} className="flex items-center gap-2 text-xs">
-                                  <span className="font-bold" style={{ color: planColors[path.plan] || '#6B7280', width: 28 }}>Plan {path.plan}</span>
-                                  <span className="flex-1 text-gray-700">{path.label}</span>
-                                  {path.amount > 0 && <span className="text-gray-500">${path.amount.toLocaleString()}</span>}
-                                  <span className="text-gray-400">{statusIcons[path.status] || '\u25CB'} {path.status}</span>
-                                </div>
-                              )
-                            })}
-                          </div>
-                        )}
-                        {pursuit.total_awarded > 0 && (
-                          <div className="mt-2 pt-2 border-t border-purple-100">
-                            <p className="text-xs font-bold text-green-700">Awarded: ${pursuit.total_awarded.toLocaleString()}</p>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
+                  <div className="flex items-center gap-2 mt-3">
+                    <button
+                      onClick={async () => {
+                        if (selectedKpiKeys.size === 0) return
+                        setSavingKpis(true)
+                        try {
+                          const selected = Array.from(selectedKpiKeys).map(key => ({ key, target: kpiTargets[key] || 0 }))
+                          const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ selectedKpis: selected }),
+                          })
+                          const data = await res.json()
+                          if (data.success) {
+                            const reload = await fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`)
+                            const reloadData = await reload.json()
+                            if (reloadData.kpis) setActiveKpis(reloadData.kpis)
+                            setShowKpiSelector(false)
+                          }
+                        } catch {} finally { setSavingKpis(false) }
+                      }}
+                      disabled={selectedKpiKeys.size === 0 || savingKpis}
+                      className="px-3 py-1.5 text-[10px] font-medium text-white rounded-lg disabled:opacity-50"
+                      style={{ background: '#1e2749' }}
+                    >
+                      {savingKpis ? 'Saving...' : `Save ${selectedKpiKeys.size} KPI${selectedKpiKeys.size !== 1 ? 's' : ''}`}
+                    </button>
+                    <span className="text-[10px] text-gray-400">{selectedKpiKeys.size}/5</span>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
-            {/* Reports & Exports */}
-            <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-2">Reports and exports <InfoDot text={GUIDANCE.leadership.exportReports} /></h3>
-              <p className="text-xs text-gray-500 mb-4">Generate and download reports for this partnership. If data is missing, you'll see what to do next.</p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            {/* ─── 5. Reports Card ───────────────────────────────────── */}
+            <div className="bg-white rounded-2xl shadow-sm p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <BarChart3 size={14} style={{ color: '#1e2749' }} />
+                <h3 className="text-sm font-bold text-gray-900">Reports</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-1.5">
                 {[
-                  { type: 'roster', label: 'Staff roster', desc: 'Names, emails, Hub status' },
-                  { type: 'board_summary', label: 'Board summary', desc: 'AI-ready data for presentations' },
-                  { type: 'kpi_standings', label: 'KPI standings', desc: 'Current progress on all KPIs' },
-                  { type: 'engagement', label: 'Hub engagement', desc: 'Login rates, activity depth' },
-                  { type: 'courses', label: 'Course completions', desc: 'Enrollment and completion data' },
-                  { type: 'wellness', label: 'Wellness summary', desc: 'Anonymized team wellness' },
-                  { type: 'full_export', label: 'Full export', desc: 'Everything in one file' },
+                  { type: 'roster', label: 'Staff Roster', icon: Users },
+                  { type: 'engagement', label: 'Hub Engagement', icon: BarChart3 },
+                  { type: 'board_summary', label: 'Board Summary', icon: FileText },
+                  { type: 'full_export', label: 'Full Export', icon: FileText },
                 ].map(report => (
                   <button
                     key={report.type}
@@ -2495,7 +1871,6 @@ export default function AdminPartnershipDetailPage() {
                         const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/reports?type=${report.type}`)
                         const data = await res.json()
                         if (!data.hasData && data.emptyMessage) {
-                          // Show empty state with action
                           const action = data.emptyAction || ''
                           const doEmail = data.emailSubject && confirm(`${data.emptyMessage}\n\n${action}\n\nWould you like to send an email requesting this data?`)
                           if (doEmail && data.emailSubject) {
@@ -2503,7 +1878,6 @@ export default function AdminPartnershipDetailPage() {
                           }
                           return
                         }
-                        // Download as JSON (can be opened in Excel or processed)
                         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
                         const url = URL.createObjectURL(blob)
                         const a = document.createElement('a')
@@ -2515,356 +1889,669 @@ export default function AdminPartnershipDetailPage() {
                         alert('Failed to generate report')
                       }
                     }}
-                    className="text-left p-3 rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all"
+                    className="flex items-center gap-2 p-2.5 rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all text-left"
                   >
-                    <p className="text-xs font-semibold text-gray-900">{report.label}</p>
-                    <p className="text-[10px] text-gray-500 mt-0.5">{report.desc}</p>
+                    <report.icon size={13} style={{ color: '#6B7280' }} />
+                    <span className="text-xs font-medium text-gray-800">{report.label}</span>
                   </button>
                 ))}
               </div>
-            </div>
 
-            {/* Add Note Form */}
-            <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-3">Add a note <InfoDot text={GUIDANCE.leadership.notes} /></h3>
-              <textarea
-                value={newNoteContent}
-                onChange={(e) => setNewNoteContent(e.target.value)}
-                placeholder="Log a note about this partnership..."
-                rows={3}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"
-              />
-              <div className="flex items-center gap-3 mt-3">
-                <select
-                  value={newNoteType}
-                  onChange={(e) => setNewNoteType(e.target.value)}
-                  className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+              {/* Quick view panels */}
+              <div className="mt-3 space-y-1.5">
+                <button
+                  onClick={() => setShowTeamPanel(!showTeamPanel)}
+                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-left transition"
                 >
-                  <option value="general">General</option>
-                  <option value="strategy">Strategy</option>
-                  <option value="concern">Concern</option>
-                  <option value="win">Win</option>
-                  <option value="follow_up">Follow up</option>
-                </select>
+                  <span className="text-xs font-medium text-gray-700">Staff Roster & Team</span>
+                  <ChevronRight size={12} style={{ color: '#9CA3AF', transform: showTeamPanel ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
+                </button>
+                <button
+                  onClick={() => setShow90DaysPanel(!show90DaysPanel)}
+                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-left transition"
+                >
+                  <span className="text-xs font-medium text-gray-700">90 Days Framework</span>
+                  <ChevronRight size={12} style={{ color: '#9CA3AF', transform: show90DaysPanel ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
+                </button>
+                <button
+                  onClick={() => setShowBillingPanel(!showBillingPanel)}
+                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-left transition"
+                >
+                  <span className="text-xs font-medium text-gray-700">Billing</span>
+                  <ChevronRight size={12} style={{ color: '#9CA3AF', transform: showBillingPanel ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
+                </button>
+                <button
+                  onClick={() => setShowOverviewPanel(!showOverviewPanel)}
+                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-left transition"
+                >
+                  <span className="text-xs font-medium text-gray-700">Overview (Client View)</span>
+                  <ChevronRight size={12} style={{ color: '#9CA3AF', transform: showOverviewPanel ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
+                </button>
+                <button
+                  onClick={() => setShowSchoolInfo(!showSchoolInfo)}
+                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-left transition"
+                >
+                  <span className="text-xs font-medium text-gray-700">School Info & Settings</span>
+                  <ChevronRight size={12} style={{ color: '#9CA3AF', transform: showSchoolInfo ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
+                </button>
+              </div>
+
+              {/* Hub provisioning */}
+              <div className="mt-3 pt-3 border-t border-gray-100">
                 <button
                   onClick={async () => {
-                    if (!newNoteContent.trim()) return
-                    setAddingNote(true)
+                    setProvisioningRoster(true)
+                    setProvisionResult('')
                     try {
-                      const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`, {
+                      const res = await fetch('/api/admin/provision-roster', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ content: newNoteContent, noteType: newNoteType }),
+                        body: JSON.stringify({ partnershipId }),
                       })
                       const data = await res.json()
-                      if (data.success && data.note) {
-                        setInternalNotes(prev => [data.note, ...prev])
-                        setNewNoteContent('')
-                      }
-                    } catch {} finally { setAddingNote(false) }
+                      setProvisionResult(data.message || data.error || 'Done')
+                    } catch { setProvisionResult('Failed') }
+                    finally { setProvisioningRoster(false) }
                   }}
-                  disabled={!newNoteContent.trim() || addingNote}
-                  className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50"
-                  style={{ background: '#1e2749' }}
+                  disabled={provisioningRoster}
+                  className="w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
+                  style={{ background: '#E8B84B', color: '#1e2749' }}
                 >
-                  {addingNote ? 'Saving...' : 'Save note'}
+                  {provisioningRoster ? 'Provisioning...' : 'Provision Hub Accounts'}
                 </button>
+                {provisionResult && (
+                  <p className="text-[10px] text-gray-600 mt-1.5">{provisionResult}</p>
+                )}
               </div>
             </div>
 
-            {/* Notes List */}
-            <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-3">Notes ({internalNotes.length})</h3>
-              {internalNotes.length === 0 ? (
-                <p className="text-sm text-gray-500">No notes yet. Add your first note above.</p>
-              ) : (
-                <div className="space-y-3">
-                  {internalNotes.map((note) => {
-                    const typeColors: Record<string, string> = {
-                      general: 'bg-gray-100 text-gray-700',
-                      strategy: 'bg-blue-100 text-blue-700',
-                      concern: 'bg-red-100 text-red-700',
-                      win: 'bg-green-100 text-green-700',
-                      follow_up: 'bg-amber-100 text-amber-700',
+            {/* ─── 6. Documents Card ─────────────────────────────────── */}
+            <div className="bg-white rounded-2xl shadow-sm p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <FileText size={14} style={{ color: '#1e2749' }} />
+                <h3 className="text-sm font-bold text-gray-900">Documents</h3>
+              </div>
+
+              <FileUploadZone
+                  partnershipId={partnershipId}
+                  userEmail={userEmail}
+                  files={uploadedFiles}
+                  onFilesChange={async () => {
+                    const fRes = await fetch(`/api/tdi-admin/leadership/${partnershipId}/upload`, {
+                      headers: { 'x-user-email': userEmail },
+                    })
+                    if (fRes.ok) {
+                      const fData = await fRes.json()
+                      setUploadedFiles(fData.files || [])
                     }
-                    return (
-                      <div key={note.id} className="border border-gray-100 rounded-lg p-3 group">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${typeColors[note.note_type] || typeColors.general}`}>
-                            {note.note_type}
-                          </span>
-                          <span className="text-[10px] text-gray-400">{note.author}</span>
-                          <span className="text-[10px] text-gray-400">
-                            {new Date(note.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}
-                          </span>
-                          {note.visible_to_partner && (
-                            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-teal-100 text-teal-700">shared with partner</span>
-                          )}
-                          <span className="ml-auto flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={async () => {
-                                const newContent = prompt('Edit note:', note.content)
-                                if (newContent && newContent !== note.content) {
-                                  try {
-                                    await fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`, {
-                                      method: 'PATCH',
-                                      headers: { 'Content-Type': 'application/json' },
-                                      body: JSON.stringify({ id: note.id, content: newContent }),
-                                    })
-                                    setInternalNotes(prev => prev.map(n => n.id === note.id ? { ...n, content: newContent } : n))
-                                  } catch {}
-                                }
-                              }}
-                              className="text-[10px] text-gray-400 hover:text-blue-600 px-1"
-                            >edit</button>
-                            <button
-                              onClick={async () => {
-                                if (!confirm('Delete this note?')) return
-                                try {
-                                  await fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`, {
-                                    method: 'DELETE',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ id: note.id }),
-                                  })
-                                  setInternalNotes(prev => prev.filter(n => n.id !== note.id))
-                                } catch {}
-                              }}
-                              className="text-[10px] text-gray-400 hover:text-red-600 px-1"
-                            >delete</button>
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{note.content}</p>
+                  }}
+                  onExtract={(fileId, filename) => setExtractModal({ open: true, fileId, filename })}
+                />
+              </div>
+            </div>
+
+            {/* Teacher Voice (sidebar) */}
+            {reflections.has_data && reflections.reflections.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-sm p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <MessageCircle size={14} style={{ color: '#1e2749' }} />
+                  <h3 className="text-sm font-bold text-gray-900">Teacher Voice</h3>
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full" style={{ background: '#F0FDF4', color: '#16A34A' }}>
+                    {reflections.reflections.length}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {reflections.reflections.slice(0, 3).map((r, i) => (
+                    <div key={i} className="rounded-lg p-2.5" style={{ background: '#FAFAF8', border: '0.5px solid #E9E7E2' }}>
+                      <p className="text-xs text-gray-700 leading-relaxed italic">&quot;{r.text}&quot;</p>
+                      <div className="flex items-center justify-between mt-1">
+                        <span className="text-[10px] text-gray-400">{r.quick_win_title}</span>
+                        <span className="text-[10px] text-gray-400">
+                          {new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
                       </div>
-                    )
-                  })}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ═════════════════════════════════════════════════════════════
+            EXPANDABLE PANELS (below two-column grid)
+            ═════════════════════════════════════════════════════════════ */}
+
+        {/* Billing Panel */}
+        {showBillingPanel && (
+          <div className="mt-4">
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-gray-900">Billing</h2>
+                <button onClick={() => setShowBillingPanel(false)} className="text-gray-400 hover:text-gray-600">
+                  <X size={18} />
+                </button>
+              </div>
+              <BillingTab
+                partnershipId={partnershipId}
+                userEmail={userEmail || ''}
+                partnership={partnership}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Team Panel */}
+        {showTeamPanel && (
+          <div className="mt-4">
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-gray-900">Staff Roster & Team</h2>
+                <button onClick={() => setShowTeamPanel(false)} className="text-gray-400 hover:text-gray-600">
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* TDI Team */}
+              <div className="mb-6 p-4 bg-gray-50 rounded-xl">
+                <div className="flex items-start gap-4">
+                  <div className="w-16 h-16 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
+                    <Image
+                      src="/images/rae-headshot.webp"
+                      alt="Rae Hughart"
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#1e2749]">Rae Hughart</p>
+                    <p className="text-xs text-gray-500">Founder & CEO</p>
+                    <div className="flex items-center gap-3 mt-2">
+                      <a href="mailto:Rae@TeachersDeserveIt.com" className="text-xs text-blue-600 hover:underline flex items-center gap-1">
+                        <Mail size={11} /> Email
+                      </a>
+                      <a href="tel:+18477215503" className="text-xs text-blue-600 hover:underline flex items-center gap-1">
+                        <Phone size={11} /> Call
+                      </a>
+                      <a
+                        href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+                      >
+                        <Calendar size={11} /> Schedule
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <StaffRosterWithPhotos
+                partnershipId={partnershipId}
+                userEmail={userEmail}
+                editMode={editMode}
+              />
+
+              {editMode && (
+                <StaffPhotoUpload
+                  partnershipId={partnershipId}
+                  userEmail={userEmail}
+                />
+              )}
+
+              <FindStaffSearch
+                partnershipId={partnershipId}
+                userEmail={userEmail}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* 90 Days Panel */}
+        {show90DaysPanel && (
+          <div className="mt-4">
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-gray-900">First 90 Days</h2>
+                <button onClick={() => setShow90DaysPanel(false)} className="text-gray-400 hover:text-gray-600">
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-0">
+                <ActivationReadinessScore partnershipId={partnershipId} />
+                <OnboardingChecklist partnershipId={partnershipId} />
+              </div>
+
+              <StaffEngagementRoster partnershipId={partnershipId} />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-0">
+                <CourseCompletionFunnel partnershipId={partnershipId} />
+                <LoginTrendChart partnershipId={partnershipId} />
+              </div>
+
+              <ObservationImpactScorecard observations={observationImpact.observations} />
+            </div>
+          </div>
+        )}
+
+        {/* Overview Panel (Client View) */}
+        {showOverviewPanel && (
+          <div className="mt-4">
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-gray-900">Overview (Client View)</h2>
+                <button onClick={() => setShowOverviewPanel(false)} className="text-gray-400 hover:text-gray-600">
+                  <X size={18} />
+                </button>
+              </div>
+
+              {editMode && (
+                <div className="bg-violet-50 rounded-xl p-4 mb-4 border border-violet-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-2 h-2 rounded-full bg-violet-500" />
+                    <span className="text-sm font-semibold text-gray-900">Edit Momentum</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Status</label>
+                      <InlineEditField
+                        partnershipId={partnershipId}
+                        field="momentum_status"
+                        value={partnership.momentum_status}
+                        type="select"
+                        options={['Strong', 'Building', 'Needs Attention']}
+                        onSaved={(v) => setPartnership((p: any) => ({ ...p, momentum_status: v }))}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Detail Text</label>
+                      <InlineEditField
+                        partnershipId={partnershipId}
+                        field="momentum_detail"
+                        value={partnership.momentum_detail}
+                        type="textarea"
+                        onSaved={(v) => setPartnership((p: any) => ({ ...p, momentum_detail: v }))}
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
-            </div>
 
-            {/* Meetings */}
-            <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-bold text-gray-900">Meetings ({internalMeetings.length})</h3>
-                <button
-                  onClick={() => setShowMeetingForm(!showMeetingForm)}
-                  className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
-                  style={{ background: '#1e274910', color: '#1e2749' }}
-                >
-                  {showMeetingForm ? 'Cancel' : '+ Log meeting'}
-                </button>
-              </div>
+              <StatCards
+                staffEnrolled={partnership.staff_enrolled}
+                hubLoginPct={partnership.hub_login_pct}
+                observationsUsed={partnership.observation_days_used || 0}
+                observationsTotal={partnership.observation_days_total || 6}
+                virtualUsed={partnership.virtual_sessions_used || 0}
+                virtualTotal={partnership.virtual_sessions_total || 4}
+                executiveUsed={partnership.executive_sessions_used || 0}
+                executiveTotal={partnership.executive_sessions_total || 2}
+                phase={phase}
+                defaults={defaults}
+                hubStats={hubStats}
+              />
 
-              {showMeetingForm && (
-                <div className="border border-gray-200 rounded-lg p-4 mb-4 space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-xs text-gray-500 font-medium">Date</label>
-                      <input type="datetime-local" value={newMeeting.date} onChange={e => setNewMeeting(m => ({ ...m, date: e.target.value }))}
-                        className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" />
-                    </div>
-                    <div>
-                      <label className="text-xs text-gray-500 font-medium">Type</label>
-                      <select value={newMeeting.type} onChange={e => setNewMeeting(m => ({ ...m, type: e.target.value }))}
-                        className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
-                        <option value="check_in">Check-in</option>
-                        <option value="onboarding">Onboarding</option>
-                        <option value="observation_debrief">Observation debrief</option>
-                        <option value="renewal">Renewal conversation</option>
-                        <option value="strategy">Strategy session</option>
-                        <option value="escalation">Escalation</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
-                  </div>
+              <MomentumBar
+                status={partnership.momentum_status}
+                detail={partnership.momentum_detail}
+                defaults={defaults}
+              />
+
+              <TDISuggestions suggestions={suggestions} isAdminView={true} />
+
+              <InvestmentNumbers
+                costPerEducator={partnership.cost_per_educator}
+                hubLoginPct={partnership.hub_login_pct}
+                loveNotesCount={partnership.love_notes_count}
+                highEngagementPct={partnership.high_engagement_pct}
+                perEducatorNote={partnership.per_educator_value_note}
+                defaults={defaults}
+                hubStats={hubStats}
+              />
+
+              <LoveNotesCallout
+                loveNotesCount={partnership.love_notes_count}
+                schoolName={schoolName}
+                observationDays={observationsDone || 1}
+                defaults={defaults}
+              />
+
+              <LeadingIndicators
+                teacherStress={partnership.teacher_stress_score}
+                strategyImplementation={partnership.strategy_implementation_pct}
+                retentionIntent={partnership.retention_intent_score}
+                defaults={defaults}
+                hubStats={hubStats}
+              />
+
+              {/* Partnership Goal */}
+              <div className="bg-gray-50 rounded-xl p-5 mt-4" style={{ borderColor: editMode ? '#8B5CF6' : '#F3F4F6' }}>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-sm font-semibold text-gray-900">Partnership Goal</h2>
+                  {editMode && editingField !== 'partnership_goal' && (
+                    <button onClick={() => setEditingField('partnership_goal')} className="text-xs font-semibold text-violet-600 hover:text-violet-800">Edit</button>
+                  )}
+                </div>
+                {editMode && editingField === 'partnership_goal' ? (
                   <div>
-                    <label className="text-xs text-gray-500 font-medium">Attendees</label>
-                    <input type="text" value={newMeeting.attendees} onChange={e => setNewMeeting(m => ({ ...m, attendees: e.target.value }))}
-                      placeholder="Names of attendees"
-                      className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-500 font-medium">Summary</label>
-                    <textarea value={newMeeting.summary} onChange={e => setNewMeeting(m => ({ ...m, summary: e.target.value }))}
-                      placeholder="What was discussed?"
+                    <textarea
+                      value={localGoal}
+                      onChange={(e) => setLocalGoal(e.target.value)}
                       rows={3}
-                      className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none" />
+                      className="w-full border border-violet-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 mb-2"
+                    />
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={async () => { await handleFieldUpdate('partnership_goal', localGoal); setEditingField(null) }}
+                        className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white"
+                        style={{ background: '#8B5CF6' }}
+                      >Save Goal</button>
+                      <button
+                        onClick={() => { setLocalGoal(partnership?.partnership_goal || ''); setEditingField(null) }}
+                        className="text-xs text-gray-400 hover:text-gray-600"
+                      >Cancel</button>
+                    </div>
                   </div>
-                  <div>
-                    <label className="text-xs text-gray-500 font-medium">Action items</label>
-                    <textarea value={newMeeting.actionItems} onChange={e => setNewMeeting(m => ({ ...m, actionItems: e.target.value }))}
-                      placeholder="What needs to happen next?"
-                      rows={2}
-                      className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none" />
-                  </div>
-                  <button
-                    onClick={async () => {
-                      if (!newMeeting.date) return
-                      setAddingMeeting(true)
-                      try {
-                        const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/meetings`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            meetingDate: newMeeting.date,
-                            meetingType: newMeeting.type,
-                            attendees: newMeeting.attendees || null,
-                            summary: newMeeting.summary || null,
-                            actionItems: newMeeting.actionItems || null,
-                          }),
-                        })
-                        const data = await res.json()
-                        if (data.success && data.meeting) {
-                          setInternalMeetings(prev => [data.meeting, ...prev])
-                          setNewMeeting({ date: '', type: 'check_in', attendees: '', summary: '', actionItems: '' })
-                          setShowMeetingForm(false)
-                        }
-                      } catch {} finally { setAddingMeeting(false) }
-                    }}
-                    disabled={!newMeeting.date || addingMeeting}
-                    className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50"
-                    style={{ background: '#1e2749' }}
-                  >
-                    {addingMeeting ? 'Saving...' : 'Log meeting'}
-                  </button>
-                </div>
-              )}
-
-              {internalMeetings.length === 0 && !showMeetingForm ? (
-                <p className="text-sm text-gray-500">No meetings logged yet.</p>
-              ) : (
-                <div className="space-y-3">
-                  {internalMeetings.map((m) => {
-                    const typeLabels: Record<string, string> = {
-                      check_in: 'Check-in', onboarding: 'Onboarding', observation_debrief: 'Observation debrief',
-                      renewal: 'Renewal', strategy: 'Strategy', escalation: 'Escalation', other: 'Other',
-                    }
-                    return (
-                      <div key={m.id} className="border border-gray-100 rounded-lg p-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
-                            {typeLabels[m.meeting_type] || m.meeting_type}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {new Date(m.meeting_date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
-                          </span>
-                          <span className="text-[10px] text-gray-400">logged by {m.logged_by}</span>
-                        </div>
-                        {m.attendees && <p className="text-xs text-gray-500 mb-1">Attendees: {m.attendees}</p>}
-                        {m.summary && <p className="text-sm text-gray-700 mb-1">{m.summary}</p>}
-                        {m.action_items && (
-                          <div className="mt-2 pt-2 border-t border-gray-100">
-                            <p className="text-xs font-medium text-gray-500 mb-1">Action items:</p>
-                            <p className="text-sm text-gray-700 whitespace-pre-wrap">{m.action_items}</p>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-          </>
-        )}
-
-        {/* AI Extract Modal */}
-        {extractModal.open && (
-          <AIExtractModal
-            partnershipId={partnershipId}
-            fileId={extractModal.fileId}
-            filename={extractModal.filename}
-            userEmail={userEmail}
-            onClose={() => setExtractModal({ open: false, fileId: '', filename: '' })}
-            onApply={handleApplyExtracted}
-          />
-        )}
-
-        {/* Highlight Controls Modal */}
-        {editingHighlight && (
-          <HighlightControls
-            partnershipId={partnershipId}
-            sectionKey={editingHighlight}
-            sectionLabel={editingHighlight}
-            highlights={highlights}
-            userEmail={userEmail}
-            onUpdate={setHighlights}
-            onClose={() => setEditingHighlight(null)}
-          />
-        )}
-
-        {/* Add Event Modal */}
-        {addEventOpen && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
-              <h3 className="font-semibold text-gray-900 mb-4">Add Timeline Event</h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 mb-1 block">Event Title</label>
-                  <input
-                    type="text"
-                    value={newEvent.event_title}
-                    onChange={(e) => setNewEvent((n) => ({ ...n, event_title: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-                    placeholder="e.g. Virtual Session 4 - Growth Group strategies"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-semibold text-gray-500 mb-1 block">Type</label>
-                    <select
-                      value={newEvent.event_type}
-                      onChange={(e) => setNewEvent((n) => ({ ...n, event_type: e.target.value }))}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-                    >
-                      <option value="custom">Custom</option>
-                      <option value="observation">Observation</option>
-                      <option value="virtual_session">Virtual Session</option>
-                      <option value="executive_session">Executive Session</option>
-                      <option value="love_notes">Love Notes</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-gray-500 mb-1 block">Status</label>
-                    <select
-                      value={newEvent.status}
-                      onChange={(e) => setNewEvent((n) => ({ ...n, status: e.target.value }))}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-                    >
-                      <option value="completed">Done</option>
-                      <option value="in_progress">In Progress</option>
-                      <option value="upcoming">Coming Soon</option>
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 mb-1 block">Date (optional)</label>
-                  <input
-                    type="date"
-                    value={newEvent.event_date}
-                    onChange={(e) => setNewEvent((n) => ({ ...n, event_date: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-                  />
-                </div>
+                ) : (
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    {partnership.partnership_goal || <span className="text-gray-400 italic text-sm">No goal set yet.</span>}
+                  </p>
+                )}
               </div>
-              <div className="flex gap-3 mt-5">
-                <button
-                  onClick={handleAddEvent}
-                  disabled={!newEvent.event_title}
-                  className="flex-1 py-2 rounded-lg text-sm font-semibold text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
-                  style={{ background: '#8B5CF6' }}
-                >
-                  Add Event
-                </button>
-                <button
-                  onClick={() => setAddEventOpen(false)}
-                  className="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200"
-                >
-                  Cancel
-                </button>
+
+              {/* Year 2 Planning (edit mode) */}
+              {editMode && (
+                <div className="bg-violet-50 rounded-xl p-5 mt-4 border border-violet-200">
+                  <h3 className="text-sm font-semibold text-violet-900 mb-2">Year 2 Planning Notes (admin only)</h3>
+                  <InlineEditField
+                    partnershipId={partnershipId}
+                    field="year2_planning_notes"
+                    value={partnership.year2_planning_notes}
+                    type="textarea"
+                    onSaved={(v) => setPartnership((p: any) => ({ ...p, year2_planning_notes: v }))}
+                  />
+                </div>
+              )}
+
+              {/* Partnership Timeline */}
+              <div className="mt-4">
+                <PartnershipTimeline
+                  events={timelineEvents}
+                  isAdminView={editMode}
+                  onAddEvent={() => setAddEventOpen(true)}
+                  onEditEvent={handleEditEvent}
+                  onDeleteEvent={handleDeleteEvent}
+                  onMoveEvent={handleMoveEvent}
+                />
               </div>
             </div>
           </div>
         )}
-      </div>
+
+        {/* School Info Panel */}
+        {showSchoolInfo && (
+          <div className="mt-4">
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-gray-900">School Information</h2>
+                <button onClick={() => setShowSchoolInfo(false)} className="text-gray-400 hover:text-gray-600">
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">School / District Name</label>
+                  {editMode ? (
+                    <InlineEditField partnershipId={partnershipId} field="name" value={organization?.name} type="text" onSaved={(v) => setOrganization((o: any) => ({ ...o, name: v }))} />
+                  ) : (
+                    <p className="text-sm text-gray-700">{organization?.name || '—'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">Primary Contact</label>
+                  {editMode ? (
+                    <InlineEditField partnershipId={partnershipId} field="primary_contact_name" value={partnership?.primary_contact_name} type="text" onSaved={(v) => setPartnership((p: any) => ({ ...p, primary_contact_name: v }))} />
+                  ) : (
+                    <p className="text-sm text-gray-700">{partnership?.primary_contact_name || '—'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">Contact Email</label>
+                  {editMode ? (
+                    <InlineEditField partnershipId={partnershipId} field="primary_contact_email" value={partnership?.primary_contact_email} type="text" onSaved={(v) => setPartnership((p: any) => ({ ...p, primary_contact_email: v }))} />
+                  ) : (
+                    <p className="text-sm text-gray-700">{partnership?.primary_contact_email || '—'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">Phone</label>
+                  {editMode ? (
+                    <InlineEditField partnershipId={partnershipId} field="phone" value={partnership?.phone} type="text" onSaved={(v) => setPartnership((p: any) => ({ ...p, phone: v }))} />
+                  ) : (
+                    <p className="text-sm text-gray-700">{partnership?.phone || '—'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">Contract Phase</label>
+                  {editMode ? (
+                    <InlineEditField partnershipId={partnershipId} field="contract_phase" value={partnership?.contract_phase} type="select" options={['IGNITE', 'ACCELERATE', 'SUSTAIN']} onSaved={(v) => setPartnership((p: any) => ({ ...p, contract_phase: v }))} />
+                  ) : (
+                    <p className="text-sm text-gray-700">{partnership?.contract_phase || '—'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">Contract Start</label>
+                  {editMode ? (
+                    <InlineEditField partnershipId={partnershipId} field="contract_start" value={partnership?.contract_start} type="date" onSaved={(v) => setPartnership((p: any) => ({ ...p, contract_start: v }))} />
+                  ) : (
+                    <p className="text-sm text-gray-700">{partnership?.contract_start || 'Not set'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">Contract End</label>
+                  {editMode ? (
+                    <InlineEditField partnershipId={partnershipId} field="contract_end" value={partnership?.contract_end} type="date" onSaved={(v) => setPartnership((p: any) => ({ ...p, contract_end: v }))} />
+                  ) : (
+                    <p className="text-sm text-gray-700">{partnership?.contract_end || 'Not set'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">Dashboard URL</label>
+                  {editMode ? (
+                    <InlineEditField partnershipId={partnershipId} field="slug" value={partnership?.slug} type="text" onSaved={(v) => setPartnership((p: any) => ({ ...p, slug: v }))} />
+                  ) : (
+                    <p className="text-sm text-gray-700">{partnership?.slug ? `/partners/${partnership.slug}` : 'Not set'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">Address</label>
+                  {editMode ? (
+                    <InlineEditField partnershipId={partnershipId} field="address" value={partnership?.address} type="text" onSaved={(v) => setPartnership((p: any) => ({ ...p, address: v }))} />
+                  ) : (
+                    <p className="text-sm text-gray-700">{partnership?.address || '—'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">City</label>
+                  {editMode ? (
+                    <InlineEditField partnershipId={partnershipId} field="address_city" value={(organization as any)?.address_city} type="text" onSaved={(v) => setOrganization((o: any) => ({ ...o, address_city: v }))} />
+                  ) : (
+                    <p className="text-sm text-gray-700">{(organization as any)?.address_city || '—'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">State</label>
+                  {editMode ? (
+                    <InlineEditField partnershipId={partnershipId} field="address_state" value={(organization as any)?.address_state} type="text" onSaved={(v) => setOrganization((o: any) => ({ ...o, address_state: v }))} />
+                  ) : (
+                    <p className="text-sm text-gray-700">{(organization as any)?.address_state || '—'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">Website</label>
+                  {editMode ? (
+                    <InlineEditField partnershipId={partnershipId} field="website" value={partnership?.website} type="text" onSaved={(v) => setPartnership((p: any) => ({ ...p, website: v }))} />
+                  ) : (
+                    <p className="text-sm text-gray-700">
+                      {partnership?.website ? (
+                        <a href={partnership.website.startsWith('http') ? partnership.website : `https://${partnership.website}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{partnership.website}</a>
+                      ) : '—'}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Partnership Actions (edit mode only) */}
+              {editMode && (
+                <div className="mt-6 pt-4 border-t border-red-100">
+                  <h2 className="text-sm font-semibold text-gray-900 mb-3">Partnership Actions</h2>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={async () => {
+                        const newStatus = partnership?.status === 'active' ? 'paused' : 'active';
+                        const label = newStatus === 'paused' ? 'Pause' : 'Reactivate';
+                        if (!confirm(`${label} this partnership?`)) return;
+                        await handleFieldUpdate('status', newStatus);
+                      }}
+                      className="px-4 py-2 text-xs font-medium rounded-lg border transition-colors"
+                      style={{ borderColor: '#EAB308', color: '#92400E', background: '#FFFBEB' }}
+                    >
+                      {partnership?.status === 'active' ? 'Pause partnership' : 'Reactivate partnership'}
+                    </button>
+                    <button
+                      onClick={async () => {
+                        if (!confirm('Are you sure you want to permanently delete this partnership? This cannot be undone.')) return;
+                        if (!confirm('This will delete all action items, timeline events, notes, meetings, and KPIs. Type "delete" in the next prompt to confirm.')) return;
+                        const typed = prompt('Type "delete" to confirm:');
+                        if (typed !== 'delete') return;
+                        try {
+                          const res = await fetch(`/api/admin/partnerships/${partnershipId}/delete`, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json', 'x-user-email': userEmail || '' },
+                          });
+                          if (res.ok) {
+                            window.location.href = '/tdi-admin/leadership';
+                          }
+                        } catch {}
+                      }}
+                      className="px-4 py-2 text-xs font-medium rounded-lg border transition-colors"
+                      style={{ borderColor: '#EF4444', color: '#991B1B', background: '#FEF2F2' }}
+                    >
+                      Delete partnership
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+      {/* ═════════════════════════════════════════════════════════════
+          MODALS
+          ═════════════════════════════════════════════════════════════ */}
+
+      {/* AI Extract Modal */}
+      {extractModal.open && (
+        <AIExtractModal
+          partnershipId={partnershipId}
+          fileId={extractModal.fileId}
+          filename={extractModal.filename}
+          userEmail={userEmail}
+          onClose={() => setExtractModal({ open: false, fileId: '', filename: '' })}
+          onApply={handleApplyExtracted}
+        />
+      )}
+
+      {/* Highlight Controls Modal */}
+      {editingHighlight && (
+        <HighlightControls
+          partnershipId={partnershipId}
+          sectionKey={editingHighlight}
+          sectionLabel={editingHighlight}
+          highlights={highlights}
+          userEmail={userEmail}
+          onUpdate={setHighlights}
+          onClose={() => setEditingHighlight(null)}
+        />
+      )}
+
+      {/* Add Event Modal */}
+      {addEventOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+            <h3 className="font-semibold text-gray-900 mb-4">Add Timeline Event</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-gray-500 mb-1 block">Event Title</label>
+                <input
+                  type="text"
+                  value={newEvent.event_title}
+                  onChange={(e) => setNewEvent((n) => ({ ...n, event_title: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  placeholder="e.g. Virtual Session 4, Growth Group strategies"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 mb-1 block">Type</label>
+                  <select
+                    value={newEvent.event_type}
+                    onChange={(e) => setNewEvent((n) => ({ ...n, event_type: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  >
+                    <option value="custom">Custom</option>
+                    <option value="observation">Observation</option>
+                    <option value="virtual_session">Virtual Session</option>
+                    <option value="executive_session">Executive Session</option>
+                    <option value="love_notes">Love Notes</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 mb-1 block">Status</label>
+                  <select
+                    value={newEvent.status}
+                    onChange={(e) => setNewEvent((n) => ({ ...n, status: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  >
+                    <option value="completed">Done</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="upcoming">Coming Soon</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-500 mb-1 block">Date (optional)</label>
+                <input
+                  type="date"
+                  value={newEvent.event_date}
+                  onChange={(e) => setNewEvent((n) => ({ ...n, event_date: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-5">
+              <button
+                onClick={handleAddEvent}
+                disabled={!newEvent.event_title}
+                className="flex-1 py-2 rounded-lg text-sm font-semibold text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
+                style={{ background: '#8B5CF6' }}
+              >
+                Add Event
+              </button>
+              <button
+                onClick={() => setAddEventOpen(false)}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+    </>
   )
 }
