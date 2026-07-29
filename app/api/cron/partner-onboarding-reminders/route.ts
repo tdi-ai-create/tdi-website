@@ -212,7 +212,7 @@ The TDI Team`
           let subject = '';
           let body = '';
 
-          if (daysUntil === 60) {
+          if (daysUntil >= 55 && daysUntil <= 65) {
             reminderType = 'date_reminder_2mo';
             subject = `${firstName}, ${event.event_title || 'your TDI session'} is 2 months out`;
             body = `${firstName},
@@ -222,7 +222,7 @@ Just a heads up that your ${event.event_title || 'TDI session'} is scheduled for
 No action needed right now. We will send you everything you need closer to the date. If you need to reschedule, just reply to this email.
 
 The TDI Team`;
-          } else if (daysUntil === 14) {
+          } else if (daysUntil >= 12 && daysUntil <= 16) {
             reminderType = 'date_reminder_2wk';
             subject = `${firstName}, ${event.event_title || 'your TDI session'} is in 2 weeks`;
             body = `${firstName},
@@ -234,7 +234,7 @@ ${(event.event_title || '').toLowerCase().includes('observation') ? `Here is all
 If you need to move the date, just reply.
 
 The TDI Team`;
-          } else if (daysUntil === 2) {
+          } else if (daysUntil >= 1 && daysUntil <= 3) {
             reminderType = 'date_reminder_2day';
             subject = `${firstName}, ${event.event_title || 'your TDI session'} is this ${eventDate.toLocaleDateString('en-US', { weekday: 'long' })}`;
             body = `${firstName},

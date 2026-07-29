@@ -86,14 +86,14 @@ export async function GET(request: NextRequest) {
       const schoolName = partnership.org_name || partnership.contact_name || 'your school';
 
       // Day 14: Friendly reminder
-      if (daysSinceInvoice >= 14 && daysSinceInvoice < 15 && daysOverdue < 0) {
+      if (daysSinceInvoice >= 14 && daysSinceInvoice < 30 && daysOverdue < 0) {
         await sendReminder(inv, recipientEmail, firstName, schoolName, 'friendly', deliverable.label);
         await logEvent(supabase, inv.id, 'reminder_14d', `14-day reminder sent to ${recipientEmail}`);
         reminders++;
       }
 
       // Day 30 (due date): Firmer reminder + mark overdue
-      if (daysOverdue >= 0 && daysOverdue < 1) {
+      if (daysOverdue >= 0 && daysOverdue < 15) {
         await supabase.from('intelligence_invoices').update({ status: 'overdue' }).eq('id', inv.id);
         await sendReminder(inv, recipientEmail, firstName, schoolName, 'due', deliverable.label);
         await logEvent(supabase, inv.id, 'reminder_due', `Due date reminder sent. Invoice marked overdue.`);
@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
       }
 
       // Day 45: Escalate to Omar
-      if (daysOverdue >= 15 && daysOverdue < 16) {
+      if (daysOverdue >= 15 && daysOverdue < 30) {
         await sendInternalAlert(
           'omar@secureplusfinancial.com',
           `Invoice ${inv.invoice_number} is 45 days old`,
@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
       }
 
       // Day 60: Escalate to Rae
-      if (daysOverdue >= 30 && daysOverdue < 31) {
+      if (daysOverdue >= 30) {
         await sendInternalAlert(
           'Rae@TeachersDeserveIt.com',
           `Invoice ${inv.invoice_number} is 60+ days overdue`,

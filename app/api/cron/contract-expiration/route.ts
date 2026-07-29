@@ -132,11 +132,11 @@ export async function GET(request: NextRequest) {
       } else if (daysRemaining <= 14 && daysRemaining > 3 && sent.has(headsUpKey) && !sent.has(reminderKey)) {
         // Heads up sent, within 14 days -- send reminder
         emailType = 'reminder';
-      } else if (daysRemaining === 30 && !sent.has(headsUpKey)) {
+      } else if (daysRemaining <= 30 && daysRemaining > 14 && !sent.has(headsUpKey)) {
         emailType = 'heads_up';
-      } else if (daysRemaining === 14 && !sent.has(reminderKey)) {
+      } else if (daysRemaining <= 14 && daysRemaining > 3 && !sent.has(reminderKey)) {
         emailType = 'reminder';
-      } else if (daysRemaining === 3 && !sent.has(finalKey)) {
+      } else if (daysRemaining <= 3 && daysRemaining >= 0 && !sent.has(finalKey)) {
         emailType = 'final_notice';
       }
 
