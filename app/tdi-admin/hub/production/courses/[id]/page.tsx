@@ -317,88 +317,50 @@ function VideoUploadSection({
 
     let videoUid = '';
     try {
-      // Step 0: Compress if needed
       const uploadFile = await compressVideo(file);
 
-      // Step 1+2: Upload to Cloudflare with retry (gets fresh URL each attempt)
+      // Step 1: Get tus upload URL from our API
       setUploadStatus('uploading');
-      const MAX_RETRIES = 3;
-      let lastError: Error | null = null;
-      let lastUid = '';
-      let uploadDone = false;
+      const urlRes = await fetch('/api/tdi-admin/videos/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: uploadFile.name, fileSize: uploadFile.size, maxDurationSeconds: 7200 }),
+      });
 
-      for (let attempt = 0; attempt < MAX_RETRIES && !uploadDone; attempt++) {
-        if (lastUid) {
-          fetch(`/api/tdi-admin/videos/upload?uid=${lastUid}`, { method: 'DELETE' }).catch(() => {});
-          lastUid = '';
-        }
-        if (attempt > 0) {
-          await new Promise(r => setTimeout(r, 2000 * attempt));
-          setUploadProgress(0);
-          setUploadSpeed('');
-          setTimeRemaining(`Retrying upload (attempt ${attempt + 1}/${MAX_RETRIES})...`);
-        }
-
-        try {
-          const urlRes = await fetch('/api/tdi-admin/videos/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ filename: uploadFile.name, maxDurationSeconds: 7200 }),
-          });
-
-          if (!urlRes.ok) {
-            const err = await urlRes.json().catch(() => ({}));
-            throw new Error(err.error || `Upload URL failed (${urlRes.status})`);
-          }
-
-          const urlData = await urlRes.json();
-          lastUid = urlData.videoUid;
-
-          await new Promise<void>((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.timeout = 10 * 60 * 1000; // 10 min timeout
-            const startTime = Date.now();
-
-            xhr.upload.addEventListener('progress', (e) => {
-              if (e.lengthComputable) {
-                const rawPct = (e.loaded / e.total) * 100;
-                setUploadProgress(Math.round(rawPct * 0.8));
-                const elapsed = (Date.now() - startTime) / 1000;
-                if (elapsed > 1) {
-                  const bytesPerSec = e.loaded / elapsed;
-                  const remaining = (e.total - e.loaded) / bytesPerSec;
-                  setUploadSpeed(`${formatFileSize(bytesPerSec)}/s`);
-                  setTimeRemaining(remaining > 1 ? `${formatTime(remaining)} remaining` : 'Almost done...');
-                }
-              }
-            });
-
-            xhr.addEventListener('load', () => {
-              if (xhr.status >= 200 && xhr.status < 300) resolve();
-              else reject(new Error(`Cloudflare returned ${xhr.status}: ${xhr.statusText}`));
-            });
-
-            xhr.addEventListener('error', () => reject(new Error('Connection to Cloudflare was reset')));
-            xhr.addEventListener('timeout', () => reject(new Error('Upload timed out after 10 minutes')));
-
-            const formData = new FormData();
-            formData.append('file', uploadFile);
-            xhr.open('POST', urlData.uploadUrl);
-            xhr.send(formData);
-          });
-
-          videoUid = urlData.videoUid;
-          uploadDone = true;
-        } catch (err) {
-          lastError = err instanceof Error ? err : new Error('Upload failed');
-          console.error(`[video-upload] Attempt ${attempt + 1}/${MAX_RETRIES} failed:`, lastError.message);
-        }
+      if (!urlRes.ok) {
+        const err = await urlRes.json().catch(() => ({}));
+        throw new Error(err.error || `Upload URL failed (${urlRes.status})`);
       }
 
-      if (!uploadDone) {
-        if (lastUid) fetch(`/api/tdi-admin/videos/upload?uid=${lastUid}`, { method: 'DELETE' }).catch(() => {});
-        throw lastError || new Error('Upload failed after retries');
-      }
+      const urlData = await urlRes.json();
+      videoUid = urlData.videoUid;
+
+      // Step 2: Upload via tus (resumable, no 200MB limit)
+      const tus = await import('tus-js-client');
+      await new Promise<void>((resolve, reject) => {
+        const startTime = Date.now();
+        const upload = new tus.Upload(uploadFile, {
+          endpoint: urlData.uploadUrl,
+          uploadUrl: urlData.uploadUrl,
+          chunkSize: 50 * 1024 * 1024, // 50MB chunks
+          retryDelays: [0, 1000, 3000, 5000],
+          metadata: { filename: uploadFile.name, filetype: uploadFile.type },
+          onError: (err) => reject(new Error(err.message || 'Upload failed')),
+          onProgress: (bytesUploaded, bytesTotal) => {
+            const rawPct = (bytesUploaded / bytesTotal) * 100;
+            setUploadProgress(Math.round(rawPct * 0.8));
+            const elapsed = (Date.now() - startTime) / 1000;
+            if (elapsed > 1) {
+              const bytesPerSec = bytesUploaded / elapsed;
+              const remaining = (bytesTotal - bytesUploaded) / bytesPerSec;
+              setUploadSpeed(`${formatFileSize(bytesPerSec)}/s`);
+              setTimeRemaining(remaining > 1 ? `${formatTime(remaining)} remaining` : 'Almost done...');
+            }
+          },
+          onSuccess: () => resolve(),
+        });
+        upload.start();
+      });
 
       setUploadProgress(80);
       setUploadStatus('processing');
@@ -1187,18 +1149,28 @@ function SortableModule({
                       if (action === 'delete') onDeleteLesson(lesson.id);
                     }}
                     onVideoDrop={async (lessonId, file) => {
-                      // Direct upload from drag-and-drop on sidebar
+                      // Direct upload from drag-and-drop on sidebar (tus)
                       try {
                         const urlRes = await fetch('/api/tdi-admin/videos/upload', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ filename: file.name, maxDurationSeconds: 7200 }),
+                          body: JSON.stringify({ filename: file.name, fileSize: file.size, maxDurationSeconds: 7200 }),
                         });
                         if (!urlRes.ok) return;
                         const { uploadUrl, videoUid } = await urlRes.json();
-                        const formData = new FormData();
-                        formData.append('file', file);
-                        await fetch(uploadUrl, { method: 'POST', body: formData });
+                        const tus = await import('tus-js-client');
+                        await new Promise<void>((resolve, reject) => {
+                          const upload = new tus.Upload(file, {
+                            endpoint: uploadUrl,
+                            uploadUrl: uploadUrl,
+                            chunkSize: 50 * 1024 * 1024,
+                            retryDelays: [0, 1000, 3000, 5000],
+                            metadata: { filename: file.name, filetype: file.type },
+                            onError: (err) => reject(err),
+                            onSuccess: () => resolve(),
+                          });
+                          upload.start();
+                        });
                         const patchRes = await fetch('/api/tdi-admin/lessons', {
                           method: 'PATCH',
                           headers: { 'Content-Type': 'application/json' },
@@ -1206,7 +1178,6 @@ function SortableModule({
                         });
                         const patchData = await patchRes.json();
                         const updatedLesson = patchData.lesson || { ...lesson, video_id: videoUid };
-                        // Update course state so green dot appears immediately
                         onLessonVideoUploaded(lessonId, videoUid, updatedLesson);
                       } catch (err) {
                         console.error('Drag-drop upload failed:', err);

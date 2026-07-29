@@ -3,15 +3,13 @@ import { NextResponse } from 'next/server'
 /**
  * POST /api/tdi-admin/videos/upload
  *
- * Two-step Cloudflare Stream upload:
- * 1. Client calls this endpoint to get a direct upload URL
- * 2. Client uploads the file directly to Cloudflare using that URL
+ * Creates a tus resumable upload URL for Cloudflare Stream.
+ * Direct uploads have a 200MB limit; tus has no practical limit.
  *
- * This keeps large video files off our server -- they go straight to Cloudflare.
- * Auth note: The admin layout protects page access. The Cloudflare API token
- * is the real security gate for uploads. requireAdminAuth was removed because
- * the Supabase SSR cookie check fails for some team members whose sessions
- * are client-side only (known Next.js + Supabase SSR gap).
+ * Flow:
+ * 1. Client calls this endpoint with { filename, fileSize }
+ * 2. Server initializes a tus upload with Cloudflare, gets upload URL + video UID
+ * 3. Client uploads using tus-js-client directly to Cloudflare
  */
 export async function POST(request: Request) {
   const cfToken = process.env.CLOUDFLARE_STREAM_API_TOKEN;
@@ -26,61 +24,68 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { filename, maxDurationSeconds } = body;
+    const { filename, fileSize, maxDurationSeconds } = body;
 
-    // Request a direct upload URL from Cloudflare Stream
+    if (!fileSize) {
+      return NextResponse.json({ error: 'fileSize is required' }, { status: 400 });
+    }
+
+    // Build Upload-Metadata header (base64-encoded key-value pairs)
+    const metadata: string[] = [];
+    if (filename) {
+      metadata.push(`name ${Buffer.from(filename).toString('base64')}`);
+    }
+    if (maxDurationSeconds) {
+      metadata.push(`maxDurationSeconds ${Buffer.from(String(maxDurationSeconds)).toString('base64')}`);
+    }
+    // requiresignedurls and allowedorigins can be added here if needed
+
+    // Initialize tus upload with Cloudflare Stream
     const cfResponse = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/stream/direct_upload`,
+      `https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/stream?direct_user=true`,
       {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${cfToken}`,
-          'Content-Type': 'application/json',
+          'Tus-Resumable': '1.0.0',
+          'Upload-Length': String(fileSize),
+          'Upload-Metadata': metadata.join(','),
         },
-        body: JSON.stringify({
-          maxDurationSeconds: maxDurationSeconds || 3600,
-          maxSizeBytes: 2147483648, // 2GB - matches client-side limit
-          creator: filename || 'tdi-hub-admin',
-        }),
       }
     );
 
     if (!cfResponse.ok) {
       const errText = await cfResponse.text();
-      console.error('[video-upload] Cloudflare error:', errText);
+      console.error('[video-upload] Cloudflare tus init error:', cfResponse.status, errText);
       return NextResponse.json(
         { error: `Cloudflare Stream error: ${cfResponse.status}` },
         { status: 502 }
       );
     }
 
-    const cfData = await cfResponse.json();
+    // Cloudflare returns the tus upload URL in the Location header
+    // and the video UID in the stream-media-id header
+    const tusUploadUrl = cfResponse.headers.get('location');
+    const videoUid = cfResponse.headers.get('stream-media-id');
 
-    if (!cfData.success) {
-      console.error('[video-upload] Cloudflare error:', cfData.errors);
+    if (!tusUploadUrl || !videoUid) {
+      console.error('[video-upload] Missing tus headers:', {
+        location: tusUploadUrl,
+        mediaId: videoUid,
+        headers: Object.fromEntries(cfResponse.headers.entries()),
+      });
       return NextResponse.json(
-        { error: 'Failed to create upload URL' },
-        { status: 502 }
-      );
-    }
-
-    // Return the upload URL and video UID to the client
-    const uploadUrl = cfData.result?.uploadURL;
-    const videoUid = cfData.result?.uid;
-
-    if (!uploadUrl || !videoUid) {
-      return NextResponse.json(
-        { error: 'Missing upload URL from Cloudflare' },
+        { error: 'Failed to initialize upload with Cloudflare' },
         { status: 502 }
       );
     }
 
     return NextResponse.json({
-      uploadUrl,
+      uploadUrl: tusUploadUrl,
       videoUid,
-      // The iframe embed URL for playback
-      playerUrl: `https://customer-${cfAccountId}.cloudflarestream.com/${videoUid}/iframe`,
-      streamUrl: `https://customer-${cfAccountId}.cloudflarestream.com/${videoUid}`,
+      uploadType: 'tus',
+      playerUrl: `https://customer-4n38x6badamh5yps.cloudflarestream.com/${videoUid}/iframe`,
+      streamUrl: `https://customer-4n38x6badamh5yps.cloudflarestream.com/${videoUid}`,
     });
   } catch (error) {
     console.error('[video-upload] Error:', error);
@@ -98,7 +103,6 @@ export async function POST(request: Request) {
  */
 export async function GET(request: Request) {
   try {
-
     const cfToken = process.env.CLOUDFLARE_STREAM_API_TOKEN;
     const cfAccountId = process.env.CF_ACCOUNT_ID;
     const { searchParams } = new URL(request.url);
@@ -128,7 +132,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       uid: video?.uid,
-      status: video?.status?.state || 'unknown', // 'queued', 'inprogress', 'ready', 'error'
+      status: video?.status?.state || 'unknown',
       readyToStream: video?.readyToStream || false,
       duration: video?.duration || 0,
       thumbnail: video?.thumbnail || null,
@@ -147,8 +151,6 @@ export async function GET(request: Request) {
  * DELETE /api/tdi-admin/videos/upload?uid=VIDEO_UID
  *
  * Clean up a failed/orphaned upload from Cloudflare Stream.
- * Called by the client when an upload fails after getting a direct upload URL,
- * to prevent pendingupload entries from consuming storage quota.
  */
 export async function DELETE(request: Request) {
   try {

@@ -189,64 +189,37 @@ export default function BulkContentUpload({ course, onComplete, onLessonUploaded
       let videoUid = '';
       try {
         if (mapping.fileType === 'video') {
-          // ── Video upload (Cloudflare Stream with retry) ──
+          // ── Video upload via tus (resumable, no 200MB limit) ──
           updateQueueItem(i, { status: 'uploading', progress: 0 });
 
-          const MAX_RETRIES = 3;
-          let lastError: Error | null = null;
-          let lastUid = '';
-          let uploadDone = false;
-
-          for (let attempt = 0; attempt < MAX_RETRIES && !uploadDone; attempt++) {
-            if (lastUid) {
-              fetch(`/api/tdi-admin/videos/upload?uid=${lastUid}`, { method: 'DELETE' }).catch(() => {});
-              lastUid = '';
-            }
-            if (attempt > 0) {
-              await new Promise(r => setTimeout(r, 2000 * attempt));
-              updateQueueItem(i, { progress: 0 });
-            }
-
-            try {
-              const urlRes = await fetch('/api/tdi-admin/videos/upload', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ filename: mapping.file.name, maxDurationSeconds: 7200 }),
-              });
-              if (!urlRes.ok) {
-                const err = await urlRes.json().catch(() => ({}));
-                throw new Error(err.error || `Upload URL failed (${urlRes.status})`);
-              }
-              const urlData = await urlRes.json();
-              lastUid = urlData.videoUid;
-
-              await new Promise<void>((resolve, reject) => {
-                const xhr = new XMLHttpRequest();
-                xhr.timeout = 10 * 60 * 1000;
-                xhr.upload.addEventListener('progress', e => {
-                  if (e.lengthComputable) updateQueueItem(i, { progress: Math.round((e.loaded / e.total) * 80) });
-                });
-                xhr.addEventListener('load', () => xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`Cloudflare returned ${xhr.status}`)));
-                xhr.addEventListener('error', () => reject(new Error('Connection to Cloudflare was reset')));
-                xhr.addEventListener('timeout', () => reject(new Error('Upload timed out')));
-                const fd = new FormData();
-                fd.append('file', mapping.file);
-                xhr.open('POST', urlData.uploadUrl);
-                xhr.send(fd);
-              });
-
-              videoUid = urlData.videoUid;
-              uploadDone = true;
-            } catch (err) {
-              lastError = err instanceof Error ? err : new Error('Upload failed');
-              console.error(`[content-upload] Video attempt ${attempt + 1}/${MAX_RETRIES} failed:`, lastError.message);
-            }
+          const urlRes = await fetch('/api/tdi-admin/videos/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: mapping.file.name, fileSize: mapping.file.size, maxDurationSeconds: 7200 }),
+          });
+          if (!urlRes.ok) {
+            const err = await urlRes.json().catch(() => ({}));
+            throw new Error(err.error || `Upload URL failed (${urlRes.status})`);
           }
+          const urlData = await urlRes.json();
+          videoUid = urlData.videoUid;
 
-          if (!uploadDone) {
-            if (lastUid) fetch(`/api/tdi-admin/videos/upload?uid=${lastUid}`, { method: 'DELETE' }).catch(() => {});
-            throw lastError || new Error('Upload failed after retries');
-          }
+          const tus = await import('tus-js-client');
+          await new Promise<void>((resolve, reject) => {
+            const upload = new tus.Upload(mapping.file, {
+              endpoint: urlData.uploadUrl,
+              uploadUrl: urlData.uploadUrl,
+              chunkSize: 50 * 1024 * 1024,
+              retryDelays: [0, 1000, 3000, 5000],
+              metadata: { filename: mapping.file.name, filetype: mapping.file.type },
+              onError: (err) => reject(new Error(err.message || 'Upload failed')),
+              onProgress: (bytesUploaded, bytesTotal) => {
+                updateQueueItem(i, { progress: Math.round((bytesUploaded / bytesTotal) * 80) });
+              },
+              onSuccess: () => resolve(),
+            });
+            upload.start();
+          });
 
           updateQueueItem(i, { status: 'processing', progress: 80 });
 

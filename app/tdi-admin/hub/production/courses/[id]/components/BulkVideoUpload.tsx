@@ -241,80 +241,44 @@ export default function BulkVideoUpload({ course, onComplete, onLessonUploaded }
   const assignedLessonIds = new Set(files.map((f) => f.lessonId).filter(Boolean));
 
   // Upload a file to Cloudflare with retry (gets fresh upload URL on each attempt)
+  // Upload a file to Cloudflare via tus (resumable, no 200MB limit)
   const uploadToCloudflare = async (
     file: File,
     onProgress: (pct: number) => void
   ): Promise<{ videoUid: string }> => {
-    const MAX_RETRIES = 3;
-    let lastError: Error | null = null;
-    let lastUid = '';
+    // Get tus upload URL
+    const urlRes = await fetch('/api/tdi-admin/videos/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: file.name, fileSize: file.size, maxDurationSeconds: 7200 }),
+    });
 
-    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-      // Clean up previous failed attempt's orphaned entry
-      if (lastUid) {
-        fetch(`/api/tdi-admin/videos/upload?uid=${lastUid}`, { method: 'DELETE' }).catch(() => {});
-        lastUid = '';
-      }
-
-      if (attempt > 0) {
-        // Wait before retry (2s, then 4s)
-        await new Promise(r => setTimeout(r, 2000 * attempt));
-        onProgress(0);
-      }
-
-      try {
-        // Get fresh upload URL each attempt
-        const urlRes = await fetch('/api/tdi-admin/videos/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ filename: file.name, maxDurationSeconds: 7200 }),
-        });
-
-        if (!urlRes.ok) {
-          const err = await urlRes.json().catch(() => ({}));
-          throw new Error(err.error || `Upload URL request failed (${urlRes.status})`);
-        }
-
-        const urlData = await urlRes.json();
-        lastUid = urlData.videoUid;
-
-        // Upload to Cloudflare via XHR
-        await new Promise<void>((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.timeout = 10 * 60 * 1000; // 10 minute timeout for large files
-
-          xhr.upload.addEventListener('progress', (e) => {
-            if (e.lengthComputable) {
-              onProgress(Math.round((e.loaded / e.total) * 80));
-            }
-          });
-
-          xhr.addEventListener('load', () => {
-            if (xhr.status >= 200 && xhr.status < 300) resolve();
-            else reject(new Error(`Cloudflare returned ${xhr.status}: ${xhr.statusText}`));
-          });
-
-          xhr.addEventListener('error', () => reject(new Error('Connection to Cloudflare was reset. This usually means the upload URL expired or there is a network issue.')));
-          xhr.addEventListener('timeout', () => reject(new Error('Upload timed out after 10 minutes')));
-
-          const formData = new FormData();
-          formData.append('file', file);
-          xhr.open('POST', urlData.uploadUrl);
-          xhr.send(formData);
-        });
-
-        return { videoUid: urlData.videoUid };
-      } catch (err) {
-        lastError = err instanceof Error ? err : new Error('Upload failed');
-        console.error(`[video-upload] Attempt ${attempt + 1}/${MAX_RETRIES} failed:`, lastError.message);
-      }
+    if (!urlRes.ok) {
+      const err = await urlRes.json().catch(() => ({}));
+      throw new Error(err.error || `Upload URL request failed (${urlRes.status})`);
     }
 
-    // Clean up last attempt's orphaned entry
-    if (lastUid) {
-      fetch(`/api/tdi-admin/videos/upload?uid=${lastUid}`, { method: 'DELETE' }).catch(() => {});
-    }
-    throw lastError || new Error('Upload failed after retries');
+    const urlData = await urlRes.json();
+
+    // Upload via tus
+    const tus = await import('tus-js-client');
+    await new Promise<void>((resolve, reject) => {
+      const upload = new tus.Upload(file, {
+        endpoint: urlData.uploadUrl,
+        uploadUrl: urlData.uploadUrl,
+        chunkSize: 50 * 1024 * 1024, // 50MB chunks
+        retryDelays: [0, 1000, 3000, 5000],
+        metadata: { filename: file.name, filetype: file.type },
+        onError: (err) => reject(new Error(err.message || 'Upload failed')),
+        onProgress: (bytesUploaded, bytesTotal) => {
+          onProgress(Math.round((bytesUploaded / bytesTotal) * 80));
+        },
+        onSuccess: () => resolve(),
+      });
+      upload.start();
+    });
+
+    return { videoUid: urlData.videoUid };
   };
 
   const startUpload = async () => {
