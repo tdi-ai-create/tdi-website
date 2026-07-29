@@ -55,9 +55,10 @@ export async function POST(request: NextRequest) {
       }),
     })
 
+    const resData = await res.json().catch(() => ({}))
+
     if (!res.ok) {
-      const err = await res.text()
-      return NextResponse.json({ error: `Email send failed: ${err}`, sent: false })
+      return NextResponse.json({ error: `Email send failed: ${JSON.stringify(resData)}`, sent: false })
     }
 
     // Mark intro_sent_at + log to email timeline
@@ -73,21 +74,21 @@ export async function POST(request: NextRequest) {
         .eq('id', pursuitId)
 
       // Log to email log so it shows in the Emails tab
-      try {
-        await supabase
-          .from('funding_email_log')
-          .insert({
-            pursuit_id: pursuitId,
-            to_email: to,
-            to_name: toName,
-            subject,
-            body_text: body,
-            tone: 'client',
-            sent_at: new Date().toISOString(),
-            sent_by: 'bella',
-            email_type: 'custom',
-          })
-      } catch {}
+      await supabase
+        .from('funding_email_log')
+        .insert({
+          pursuit_id: pursuitId,
+          to_email: to,
+          to_name: toName,
+          subject,
+          body,
+          from_email: 'noreply@teachersdeserveit.com',
+          status: 'sent',
+          sent_at: new Date().toISOString(),
+          sent_by: auth.user?.email || 'bella@teachersdeserveit.com',
+          resend_id: resData?.id || null,
+          email_type: 'custom',
+        })
     }
 
     return NextResponse.json({ sent: true })
