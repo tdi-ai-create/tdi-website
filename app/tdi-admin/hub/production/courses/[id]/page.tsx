@@ -316,69 +316,90 @@ function VideoUploadSection({
     setTimeRemaining('');
 
     let videoUid = '';
-    let videoUploadSucceeded = false;
     try {
       // Step 0: Compress if needed
       const uploadFile = await compressVideo(file);
 
-      // Step 1: Get direct upload URL from our API
+      // Step 1+2: Upload to Cloudflare with retry (gets fresh URL each attempt)
       setUploadStatus('uploading');
-      const urlRes = await fetch('/api/tdi-admin/videos/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          filename: uploadFile.name,
-          maxDurationSeconds: 7200,
-        }),
-      });
+      const MAX_RETRIES = 3;
+      let lastError: Error | null = null;
+      let lastUid = '';
+      let uploadDone = false;
 
-      if (!urlRes.ok) {
-        let errMsg = `Upload failed (${urlRes.status})`;
-        try { const err = await urlRes.json(); errMsg = err.error || errMsg; } catch { /* non-JSON response */ }
-        throw new Error(errMsg);
+      for (let attempt = 0; attempt < MAX_RETRIES && !uploadDone; attempt++) {
+        if (lastUid) {
+          fetch(`/api/tdi-admin/videos/upload?uid=${lastUid}`, { method: 'DELETE' }).catch(() => {});
+          lastUid = '';
+        }
+        if (attempt > 0) {
+          await new Promise(r => setTimeout(r, 2000 * attempt));
+          setUploadProgress(0);
+          setUploadSpeed('');
+          setTimeRemaining(`Retrying upload (attempt ${attempt + 1}/${MAX_RETRIES})...`);
+        }
+
+        try {
+          const urlRes = await fetch('/api/tdi-admin/videos/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: uploadFile.name, maxDurationSeconds: 7200 }),
+          });
+
+          if (!urlRes.ok) {
+            const err = await urlRes.json().catch(() => ({}));
+            throw new Error(err.error || `Upload URL failed (${urlRes.status})`);
+          }
+
+          const urlData = await urlRes.json();
+          lastUid = urlData.videoUid;
+
+          await new Promise<void>((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.timeout = 10 * 60 * 1000; // 10 min timeout
+            const startTime = Date.now();
+
+            xhr.upload.addEventListener('progress', (e) => {
+              if (e.lengthComputable) {
+                const rawPct = (e.loaded / e.total) * 100;
+                setUploadProgress(Math.round(rawPct * 0.8));
+                const elapsed = (Date.now() - startTime) / 1000;
+                if (elapsed > 1) {
+                  const bytesPerSec = e.loaded / elapsed;
+                  const remaining = (e.total - e.loaded) / bytesPerSec;
+                  setUploadSpeed(`${formatFileSize(bytesPerSec)}/s`);
+                  setTimeRemaining(remaining > 1 ? `${formatTime(remaining)} remaining` : 'Almost done...');
+                }
+              }
+            });
+
+            xhr.addEventListener('load', () => {
+              if (xhr.status >= 200 && xhr.status < 300) resolve();
+              else reject(new Error(`Cloudflare returned ${xhr.status}: ${xhr.statusText}`));
+            });
+
+            xhr.addEventListener('error', () => reject(new Error('Connection to Cloudflare was reset')));
+            xhr.addEventListener('timeout', () => reject(new Error('Upload timed out after 10 minutes')));
+
+            const formData = new FormData();
+            formData.append('file', uploadFile);
+            xhr.open('POST', urlData.uploadUrl);
+            xhr.send(formData);
+          });
+
+          videoUid = urlData.videoUid;
+          uploadDone = true;
+        } catch (err) {
+          lastError = err instanceof Error ? err : new Error('Upload failed');
+          console.error(`[video-upload] Attempt ${attempt + 1}/${MAX_RETRIES} failed:`, lastError.message);
+        }
       }
 
-      const urlData = await urlRes.json();
-      const { uploadUrl } = urlData;
-      videoUid = urlData.videoUid;
+      if (!uploadDone) {
+        if (lastUid) fetch(`/api/tdi-admin/videos/upload?uid=${lastUid}`, { method: 'DELETE' }).catch(() => {});
+        throw lastError || new Error('Upload failed after retries');
+      }
 
-      // Step 2: Upload with real progress tracking using XMLHttpRequest
-      await new Promise<void>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        const startTime = Date.now();
-
-        xhr.upload.addEventListener('progress', (e) => {
-          if (e.lengthComputable) {
-            const rawPct = (e.loaded / e.total) * 100;
-            // Upload is 0-80%, processing is 80-100%
-            setUploadProgress(Math.round(rawPct * 0.8));
-
-            // Calculate speed and ETA
-            const elapsed = (Date.now() - startTime) / 1000;
-            if (elapsed > 1) {
-              const bytesPerSec = e.loaded / elapsed;
-              const remaining = (e.total - e.loaded) / bytesPerSec;
-              setUploadSpeed(`${formatFileSize(bytesPerSec)}/s`);
-              setTimeRemaining(remaining > 1 ? `${formatTime(remaining)} remaining` : 'Almost done...');
-            }
-          }
-        });
-
-        xhr.addEventListener('load', () => {
-          if (xhr.status >= 200 && xhr.status < 300) resolve();
-          else reject(new Error(`Upload failed (${xhr.status})`));
-        });
-
-        xhr.addEventListener('error', () => reject(new Error('Upload to Cloudflare failed')));
-
-        const formData = new FormData();
-        formData.append('file', uploadFile);
-
-        xhr.open('POST', uploadUrl);
-        xhr.send(formData);
-      });
-
-      videoUploadSucceeded = true;
       setUploadProgress(80);
       setUploadStatus('processing');
       setUploadSpeed('');
@@ -424,10 +445,6 @@ function VideoUploadSection({
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Upload failed');
       setUploadStatus('error');
-      // Clean up orphaned Cloudflare entry to prevent storage bloat
-      if (videoUid && !videoUploadSucceeded) {
-        fetch(`/api/tdi-admin/videos/upload?uid=${videoUid}`, { method: 'DELETE' }).catch(() => {});
-      }
     } finally {
       setUploading(false);
     }
@@ -1547,18 +1564,49 @@ function ResourceUploadSection({
     setUploading(true);
     setUploadError('');
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('lesson_id', lessonId);
-
-      const res = await fetch('/api/tdi-admin/resources/upload', {
+      // Step 1: Get signed upload URL
+      const urlRes = await fetch('/api/tdi-admin/resources/upload', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lesson_id: lessonId,
+          filename: file.name,
+          content_type: file.type,
+          file_size: file.size,
+        }),
       });
-      const data = await res.json();
+      const urlData = await urlRes.json();
+      if (!urlRes.ok) {
+        setUploadError(urlData.error || 'Failed to get upload URL');
+        return;
+      }
 
-      if (!res.ok) {
-        setUploadError(data.error || 'Upload failed');
+      // Step 2: Upload directly to Supabase Storage
+      const uploadRes = await fetch(urlData.uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      });
+      if (!uploadRes.ok) {
+        setUploadError('Direct upload failed. Please try again.');
+        return;
+      }
+
+      // Step 3: Save metadata to lesson
+      const saveRes = await fetch('/api/tdi-admin/resources/upload', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lesson_id: lessonId,
+          storage_path: urlData.storagePath,
+          filename: file.name,
+          content_type: file.type,
+          file_size: file.size,
+        }),
+      });
+      const data = await saveRes.json();
+      if (!saveRes.ok) {
+        setUploadError(data.error || 'Failed to save file record');
         return;
       }
 

@@ -1,3 +1,4 @@
+import { isTDIAdmin } from '@/lib/tdi-admin/auth-check'
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { serviceDelivered } from '@/lib/billing-slack';
@@ -20,9 +21,9 @@ function getServiceSupabase() {
 }
 
 // Check if TDI admin
-function isTDIAdmin(email: string) {
-  return email.toLowerCase().endsWith('@teachersdeserveit.com');
-}
+// function isTDIAdmin(email: string) {
+//   return email.toLowerCase().endsWith('@teachersdeserveit.com');
+// }
 
 export async function POST(
   request: NextRequest,
@@ -32,7 +33,7 @@ export async function POST(
     const { id } = await params;
     const email = request.headers.get('x-user-email');
 
-    if (!email || !isTDIAdmin(email)) {
+    if (!email || !(await isTDIAdmin(email))) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 

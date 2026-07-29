@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+export const maxDuration = 60;
+
 function getHubServiceSupabase() {
   const url = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL;
   const key = process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY;
@@ -24,30 +26,33 @@ const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 
 /**
  * POST /api/tdi-admin/resources/upload
- * Upload a resource file (PDF, doc, image) for a lesson
+ *
+ * Two-step upload (like Cloudflare videos):
+ * 1. Client sends metadata (lesson_id, filename, content_type, file_size) as JSON
+ * 2. Server returns a signed upload URL for direct-to-Supabase upload
+ *
+ * This keeps large files off the serverless function (Vercel 4.5MB body limit).
  */
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
-    const lessonId = formData.get('lesson_id') as string;
+    const body = await request.json();
+    const { lesson_id, filename, content_type, file_size } = body;
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
-    }
-
-    if (!lessonId) {
+    if (!lesson_id) {
       return NextResponse.json({ error: 'lesson_id is required' }, { status: 400 });
     }
+    if (!filename) {
+      return NextResponse.json({ error: 'filename is required' }, { status: 400 });
+    }
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    if (content_type && !ALLOWED_TYPES.includes(content_type)) {
       return NextResponse.json(
         { error: 'Invalid file type. Allowed: PDF, Word, PowerPoint, Excel, PNG, JPG' },
         { status: 400 }
       );
     }
 
-    if (file.size > MAX_FILE_SIZE) {
+    if (file_size && file_size > MAX_FILE_SIZE) {
       return NextResponse.json(
         { error: 'File too large. Maximum size is 25MB.' },
         { status: 400 }
@@ -60,7 +65,7 @@ export async function POST(request: NextRequest) {
     const { data: lesson, error: lessonError } = await supabase
       .from('hub_lessons')
       .select('id, title')
-      .eq('id', lessonId)
+      .eq('id', lesson_id)
       .single();
 
     if (lessonError || !lesson) {
@@ -69,29 +74,49 @@ export async function POST(request: NextRequest) {
 
     // Generate storage path
     const timestamp = Date.now();
-    const sanitizedFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const storagePath = `${lessonId}/${timestamp}-${sanitizedFilename}`;
+    const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const storagePath = `${lesson_id}/${timestamp}-${sanitizedFilename}`;
 
-    // Upload to Supabase Storage
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    const { error: uploadError } = await supabase.storage
+    // Create signed upload URL (valid for 2 minutes)
+    const { data: signedData, error: signedError } = await supabase.storage
       .from('lesson-resources')
-      .upload(storagePath, buffer, {
-        contentType: file.type,
-        upsert: false,
-      });
+      .createSignedUploadUrl(storagePath);
 
-    if (uploadError) {
-      console.error('[resources/upload] Storage error:', uploadError);
-      return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
+    if (signedError || !signedData) {
+      console.error('[resources/upload] Signed URL error:', signedError);
+      return NextResponse.json({ error: 'Failed to create upload URL' }, { status: 500 });
     }
 
-    // Get public URL
+    return NextResponse.json({
+      uploadUrl: signedData.signedUrl,
+      token: signedData.token,
+      storagePath,
+    });
+  } catch (error) {
+    console.error('[resources/upload] Error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+/**
+ * PATCH /api/tdi-admin/resources/upload
+ * After client uploads directly to Supabase Storage, save metadata to lesson record
+ */
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { lesson_id, storage_path, filename, content_type, file_size } = body;
+
+    if (!lesson_id || !storage_path) {
+      return NextResponse.json({ error: 'lesson_id and storage_path are required' }, { status: 400 });
+    }
+
+    const supabase = getHubServiceSupabase();
+
+    // Get public URL for the uploaded file
     const { data: urlData } = supabase.storage
       .from('lesson-resources')
-      .getPublicUrl(storagePath);
+      .getPublicUrl(storage_path);
 
     const publicUrl = urlData.publicUrl;
 
@@ -99,7 +124,7 @@ export async function POST(request: NextRequest) {
     const { data: current } = await supabase
       .from('hub_lessons')
       .select('content')
-      .eq('id', lessonId)
+      .eq('id', lesson_id)
       .single();
 
     const existingContent = (current?.content && typeof current.content === 'object')
@@ -109,21 +134,19 @@ export async function POST(request: NextRequest) {
     const updatedContent = {
       ...existingContent,
       resource_url: publicUrl,
-      resource_filename: file.name,
-      resource_content_type: file.type,
-      resource_file_size: file.size,
-      resource_storage_path: storagePath,
+      resource_filename: filename || storage_path.split('/').pop(),
+      resource_content_type: content_type || 'application/octet-stream',
+      resource_file_size: file_size || 0,
+      resource_storage_path: storage_path,
     };
 
     const { error: updateError } = await supabase
       .from('hub_lessons')
       .update({ content: updatedContent })
-      .eq('id', lessonId);
+      .eq('id', lesson_id);
 
     if (updateError) {
       console.error('[resources/upload] DB update error:', updateError);
-      // Clean up uploaded file
-      await supabase.storage.from('lesson-resources').remove([storagePath]);
       return NextResponse.json({ error: 'Failed to save file record' }, { status: 500 });
     }
 
@@ -131,13 +154,13 @@ export async function POST(request: NextRequest) {
       success: true,
       file: {
         url: publicUrl,
-        filename: file.name,
-        content_type: file.type,
-        file_size: file.size,
+        filename: filename,
+        content_type: content_type,
+        file_size: file_size,
       },
     });
   } catch (error) {
-    console.error('[resources/upload] Error:', error);
+    console.error('[resources/upload] Confirm error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

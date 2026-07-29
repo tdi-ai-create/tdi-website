@@ -1,9 +1,10 @@
+import { isTDIAdmin } from '@/lib/tdi-admin/auth-check'
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
 
-function isTDIAdmin(email: string) {
-  return email.toLowerCase().endsWith('@teachersdeserveit.com')
-}
+// function isTDIAdmin(email: string) {
+//   return email.toLowerCase().endsWith('@teachersdeserveit.com')
+// }
 
 export async function GET(
   request: NextRequest,
@@ -13,7 +14,7 @@ export async function GET(
     const { id } = await params
     const email = request.headers.get('x-user-email')
 
-    if (!email || !isTDIAdmin(email)) {
+    if (!email || !(await isTDIAdmin(email))) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 

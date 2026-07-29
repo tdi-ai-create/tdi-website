@@ -187,43 +187,67 @@ export default function BulkContentUpload({ course, onComplete, onLessonUploaded
       const mapping = matchedFiles[i];
 
       let videoUid = '';
-      let uploadSucceeded = false;
       try {
         if (mapping.fileType === 'video') {
-          // ── Video upload (Cloudflare Stream) ──
+          // ── Video upload (Cloudflare Stream with retry) ──
           updateQueueItem(i, { status: 'uploading', progress: 0 });
 
-          const urlRes = await fetch('/api/tdi-admin/videos/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ filename: mapping.file.name, maxDurationSeconds: 7200 }),
-          });
+          const MAX_RETRIES = 3;
+          let lastError: Error | null = null;
+          let lastUid = '';
+          let uploadDone = false;
 
-          if (!urlRes.ok) {
-            const err = await urlRes.json().catch(() => ({}));
-            throw new Error(err.error || `Upload failed (${urlRes.status})`);
+          for (let attempt = 0; attempt < MAX_RETRIES && !uploadDone; attempt++) {
+            if (lastUid) {
+              fetch(`/api/tdi-admin/videos/upload?uid=${lastUid}`, { method: 'DELETE' }).catch(() => {});
+              lastUid = '';
+            }
+            if (attempt > 0) {
+              await new Promise(r => setTimeout(r, 2000 * attempt));
+              updateQueueItem(i, { progress: 0 });
+            }
+
+            try {
+              const urlRes = await fetch('/api/tdi-admin/videos/upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename: mapping.file.name, maxDurationSeconds: 7200 }),
+              });
+              if (!urlRes.ok) {
+                const err = await urlRes.json().catch(() => ({}));
+                throw new Error(err.error || `Upload URL failed (${urlRes.status})`);
+              }
+              const urlData = await urlRes.json();
+              lastUid = urlData.videoUid;
+
+              await new Promise<void>((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.timeout = 10 * 60 * 1000;
+                xhr.upload.addEventListener('progress', e => {
+                  if (e.lengthComputable) updateQueueItem(i, { progress: Math.round((e.loaded / e.total) * 80) });
+                });
+                xhr.addEventListener('load', () => xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`Cloudflare returned ${xhr.status}`)));
+                xhr.addEventListener('error', () => reject(new Error('Connection to Cloudflare was reset')));
+                xhr.addEventListener('timeout', () => reject(new Error('Upload timed out')));
+                const fd = new FormData();
+                fd.append('file', mapping.file);
+                xhr.open('POST', urlData.uploadUrl);
+                xhr.send(fd);
+              });
+
+              videoUid = urlData.videoUid;
+              uploadDone = true;
+            } catch (err) {
+              lastError = err instanceof Error ? err : new Error('Upload failed');
+              console.error(`[content-upload] Video attempt ${attempt + 1}/${MAX_RETRIES} failed:`, lastError.message);
+            }
           }
 
-          const urlData = await urlRes.json();
-          const uploadUrl = urlData.uploadUrl;
-          videoUid = urlData.videoUid;
+          if (!uploadDone) {
+            if (lastUid) fetch(`/api/tdi-admin/videos/upload?uid=${lastUid}`, { method: 'DELETE' }).catch(() => {});
+            throw lastError || new Error('Upload failed after retries');
+          }
 
-          await new Promise<void>((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.upload.addEventListener('progress', e => {
-              if (e.lengthComputable) {
-                updateQueueItem(i, { progress: Math.round((e.loaded / e.total) * 80) });
-              }
-            });
-            xhr.addEventListener('load', () => xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`Upload failed (${xhr.status})`)));
-            xhr.addEventListener('error', () => reject(new Error('Upload to Cloudflare failed')));
-            const formData = new FormData();
-            formData.append('file', mapping.file);
-            xhr.open('POST', uploadUrl);
-            xhr.send(formData);
-          });
-
-          uploadSucceeded = true;
           updateQueueItem(i, { status: 'processing', progress: 80 });
 
           const saveRes = await fetch('/api/tdi-admin/lessons', {
@@ -260,23 +284,58 @@ export default function BulkContentUpload({ course, onComplete, onLessonUploaded
           updateQueueItem(i, { status: 'done', progress: 100 });
 
         } else {
-          // ── PDF/Document upload (Supabase Storage) ──
-          updateQueueItem(i, { status: 'uploading', progress: 10 });
+          // ── PDF/Document upload (direct to Supabase Storage) ──
+          updateQueueItem(i, { status: 'uploading', progress: 5 });
 
-          const formData = new FormData();
-          formData.append('file', mapping.file);
-          formData.append('lessonId', mapping.lessonId);
-
-          const res = await fetch('/api/tdi-admin/resources/upload', {
+          // Step 1: Get signed upload URL
+          const urlRes = await fetch('/api/tdi-admin/resources/upload', {
             method: 'POST',
-            body: formData,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              lesson_id: mapping.lessonId,
+              filename: mapping.file.name,
+              content_type: mapping.file.type,
+              file_size: mapping.file.size,
+            }),
           });
+
+          if (!urlRes.ok) {
+            const err = await urlRes.json().catch(() => ({}));
+            throw new Error(err.error || `Failed to get upload URL (${urlRes.status})`);
+          }
+
+          const { uploadUrl, storagePath } = await urlRes.json();
+          updateQueueItem(i, { progress: 20 });
+
+          // Step 2: Upload file directly to Supabase Storage
+          const uploadRes = await fetch(uploadUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': mapping.file.type },
+            body: mapping.file,
+          });
+
+          if (!uploadRes.ok) {
+            throw new Error(`Direct upload failed (${uploadRes.status})`);
+          }
 
           updateQueueItem(i, { progress: 80 });
 
-          if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            throw new Error(err.error || `Resource upload failed (${res.status})`);
+          // Step 3: Save metadata to lesson record
+          const saveRes = await fetch('/api/tdi-admin/resources/upload', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              lesson_id: mapping.lessonId,
+              storage_path: storagePath,
+              filename: mapping.file.name,
+              content_type: mapping.file.type,
+              file_size: mapping.file.size,
+            }),
+          });
+
+          if (!saveRes.ok) {
+            const err = await saveRes.json().catch(() => ({}));
+            throw new Error(err.error || `Failed to save file record (${saveRes.status})`);
           }
 
           updateQueueItem(i, { status: 'done', progress: 100 });
@@ -285,10 +344,6 @@ export default function BulkContentUpload({ course, onComplete, onLessonUploaded
         console.error(`Bulk upload error for ${mapping.file.name}:`, err);
         const errorMessage = err instanceof Error ? err.message : 'Upload failed';
         updateQueueItem(i, { status: 'error', progress: 0, errorMessage });
-        // Clean up orphaned Cloudflare entry to prevent storage bloat
-        if (videoUid && !uploadSucceeded) {
-          fetch(`/api/tdi-admin/videos/upload?uid=${videoUid}`, { method: 'DELETE' }).catch(() => {});
-        }
       }
     }
 
