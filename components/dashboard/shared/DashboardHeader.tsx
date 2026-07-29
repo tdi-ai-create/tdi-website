@@ -13,6 +13,7 @@ interface DashboardHeaderProps {
   legacyUrl?: string
   onEditToggle?: () => void
   editMode?: boolean
+  dashboardSlug?: string
   // Legacy props for backward compatibility
   dataUpdatedAt?: string
 }
@@ -60,6 +61,7 @@ export function DashboardHeader({
   legacyUrl,
   onEditToggle,
   editMode = false,
+  dashboardSlug,
 }: DashboardHeaderProps) {
   const phaseConfig = PHASE_CONFIG[phase] || PHASE_CONFIG.IGNITE
 
@@ -144,6 +146,22 @@ export function DashboardHeader({
             </p>
           </div>
           <div className="flex items-center gap-3">
+            {/* Hub Access toggle - partner-facing only */}
+            {!isAdminView && (
+              <a
+                href="/hub"
+                className="px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all hover:bg-white/20"
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: '#fff',
+                  textDecoration: 'none',
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                Learning Hub
+              </a>
+            )}
             {/* Phase badge with glow */}
             <div
               className="px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2"

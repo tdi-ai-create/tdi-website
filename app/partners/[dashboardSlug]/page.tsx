@@ -477,6 +477,23 @@ export default function PartnerDashboard() {
     { name: '', building_type: 'elementary', lead_name: '', lead_email: '', staff_count: 0 },
   ]);
 
+  // Semester toggle state
+  const [semesterList, setSemesterList] = useState<{ id: string; semester: string; semester_label: string; is_current: boolean }[]>([]);
+  const [activeSemester, setActiveSemester] = useState<string>('fall-2026'); // default to current
+  const [semesterData, setSemesterData] = useState<{
+    id: string;
+    semester: string;
+    semester_label: string;
+    is_current: boolean;
+    metrics: Record<string, unknown>;
+    highlights: unknown[];
+    observation_notes: unknown[];
+    para_quotes: { text: string; role?: string; building?: string }[];
+    building_data: { name: string; staff_count?: number; hub_logins?: number; quick_wins?: number }[];
+    timeline_events: { title: string; date?: string; status: string; notes?: string }[];
+  } | null>(null);
+  const [semesterLoading, setSemesterLoading] = useState(false);
+
   // View tracking refs
   const tabStartTime = useRef<number>(Date.now());
   const currentTab = useRef<string>('overview');
@@ -486,6 +503,52 @@ export default function PartnerDashboard() {
     const timer = setTimeout(() => setTimerDone(true), 4500);
     return () => clearTimeout(timer);
   }, []);
+
+  // Fetch semester list when our-partnership tab is activated
+  useEffect(() => {
+    if (activeTab !== 'our-partnership' || !partnership?.id) return;
+    const fetchSemesters = async () => {
+      try {
+        const res = await fetch(`/api/partners/semester-data?partnershipId=${partnership.id}`);
+        if (!res.ok) return;
+        const json = await res.json();
+        if (json.semesters && json.semesters.length > 0) {
+          setSemesterList(json.semesters);
+          // Set default to current semester if one is flagged
+          const current = json.semesters.find((s: { is_current: boolean; semester: string }) => s.is_current);
+          if (current) setActiveSemester(current.semester);
+          if (json.current) setSemesterData(json.current);
+        }
+      } catch {
+        // Semester data is optional - don't block the tab on failure
+      }
+    };
+    fetchSemesters();
+  }, [activeTab, partnership?.id]);
+
+  // Fetch specific semester data when activeSemester changes (and partnership exists)
+  useEffect(() => {
+    if (activeTab !== 'our-partnership' || !partnership?.id || semesterList.length === 0) return;
+    const target = semesterList.find((s) => s.semester === activeSemester);
+    if (!target) return;
+    const fetchSemesterData = async () => {
+      setSemesterLoading(true);
+      try {
+        const res = await fetch(
+          `/api/partners/semester-data?partnershipId=${partnership.id}&semester=${activeSemester}`
+        );
+        if (!res.ok) { setSemesterLoading(false); return; }
+        const json = await res.json();
+        if (json.current) setSemesterData(json.current);
+      } catch {
+        // ignore
+      } finally {
+        setSemesterLoading(false);
+      }
+    };
+    fetchSemesterData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSemester]);
 
   // Triple gate: ALL THREE must be true before showing dashboard
   const showDashboard = animationComplete && timerDone && dataReady;
@@ -6922,6 +6985,228 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               </div>
             </div>
 
+            {/* Semester Toggle - only shown when there are multiple semesters */}
+            {semesterList.length > 1 && (
+              <div className="flex flex-wrap items-center gap-2">
+                {semesterList.map((s) => (
+                  <button
+                    key={s.semester}
+                    onClick={() => setActiveSemester(s.semester)}
+                    className="text-sm font-semibold px-4 py-2 rounded-full transition-colors"
+                    style={
+                      activeSemester === s.semester
+                        ? { background: '#1e2749', color: '#ffffff' }
+                        : { background: '#F3F4F6', color: '#6B7280' }
+                    }
+                  >
+                    {s.semester_label}
+                    {s.is_current && (
+                      <span className="ml-1.5 text-[10px] font-bold uppercase tracking-wide opacity-60">Current</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Historical semester view */}
+            {semesterList.length > 1 && !semesterList.find((s) => s.semester === activeSemester)?.is_current && (
+              <>
+                {/* "Viewing past semester" banner */}
+                <div
+                  className="rounded-xl px-4 py-3 flex items-center gap-3 text-sm"
+                  style={{ background: '#FEF3C7', border: '1px solid #FDE68A', color: '#92400E' }}
+                >
+                  <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#D97706' }} />
+                  <span>
+                    Viewing {semesterList.find((s) => s.semester === activeSemester)?.semester_label} data. This semester has ended.
+                  </span>
+                </div>
+
+                {semesterLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-6 h-6 animate-spin text-gray-300" />
+                  </div>
+                ) : semesterData ? (
+                  <div className="space-y-4">
+
+                    {/* Historical Metrics */}
+                    {semesterData.metrics && Object.keys(semesterData.metrics).length > 0 && (
+                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                        <h2 className="text-base font-semibold text-gray-900 mb-4">
+                          {semesterData.semester_label} Metrics
+                        </h2>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          {Object.entries(semesterData.metrics as Record<string, { label: string; value: string | number; color?: string }>).map(([key, metric]) => (
+                            <div key={key} className="rounded-xl bg-gray-50 p-4 text-center">
+                              <p className="text-2xl font-bold" style={{ color: metric.color || '#1e2749' }}>
+                                {metric.value}
+                              </p>
+                              <p className="text-[10px] text-gray-500 font-medium mt-1">{metric.label}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Historical Highlights */}
+                    {semesterData.highlights && (semesterData.highlights as string[]).length > 0 && (
+                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                        <h2 className="text-base font-semibold text-gray-900 mb-4">Semester Highlights</h2>
+                        <div className="space-y-2">
+                          {(semesterData.highlights as string[]).map((h, i) => (
+                            <div key={i} className="flex items-start gap-2.5">
+                              <div className="w-2 h-2 rounded-full flex-shrink-0 mt-1.5" style={{ background: '#2A9D8F' }} />
+                              <p className="text-sm text-gray-700 leading-relaxed">{h}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Historical Building Data */}
+                    {semesterData.building_data && semesterData.building_data.length > 0 && (
+                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                        <h2 className="text-base font-semibold text-gray-900 mb-4">Building Engagement</h2>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b border-gray-100">
+                                <th className="text-left text-xs font-semibold text-gray-500 pb-2 pr-4">Building</th>
+                                <th className="text-right text-xs font-semibold text-gray-500 pb-2 px-4">Staff</th>
+                                <th className="text-right text-xs font-semibold text-gray-500 pb-2 px-4">Hub Logins</th>
+                                <th className="text-right text-xs font-semibold text-gray-500 pb-2 pl-4">Quick Wins</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {semesterData.building_data.map((b, i) => (
+                                <tr key={i} className="border-b border-gray-50">
+                                  <td className="py-2.5 pr-4 font-medium text-[#1e2749]">{b.name}</td>
+                                  <td className="py-2.5 px-4 text-right text-gray-600">{b.staff_count ?? '—'}</td>
+                                  <td className="py-2.5 px-4 text-right text-gray-600">{b.hub_logins ?? '—'}</td>
+                                  <td className="py-2.5 pl-4 text-right text-gray-600">{b.quick_wins ?? '—'}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Historical Observation Notes */}
+                    {semesterData.observation_notes && (semesterData.observation_notes as { title: string; date?: string; notes?: string }[]).length > 0 && (
+                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                        <h2 className="text-base font-semibold text-gray-900 mb-4">Observation Notes</h2>
+                        <div className="space-y-4">
+                          {(semesterData.observation_notes as { title: string; date?: string; notes?: string }[]).map((note, i) => (
+                            <div key={i} className="flex items-start gap-3">
+                              <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: '#EFF6FF' }}>
+                                <Eye className="w-3.5 h-3.5" style={{ color: '#2563EB' }} />
+                              </div>
+                              <div>
+                                <p className="text-sm font-semibold text-[#1e2749]">{note.title}</p>
+                                {note.date && (
+                                  <p className="text-xs text-gray-400 mt-0.5">
+                                    {new Date(note.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                                  </p>
+                                )}
+                                {note.notes && (
+                                  <p className="text-sm text-gray-600 mt-1 leading-relaxed">{note.notes}</p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Historical Para Quotes */}
+                    {semesterData.para_quotes && semesterData.para_quotes.length > 0 && (
+                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                        <h2 className="text-base font-semibold text-gray-900 mb-4">Voices From Your School</h2>
+                        <div className="space-y-3">
+                          {semesterData.para_quotes.map((q, i) => (
+                            <div
+                              key={i}
+                              className="p-4 rounded-xl border-l-4"
+                              style={{ background: '#F9FAFB', borderLeftColor: '#2A9D8F' }}
+                            >
+                              <p className="text-sm text-gray-700 italic leading-relaxed">
+                                &ldquo;{q.text}&rdquo;
+                              </p>
+                              {(q.role || q.building) && (
+                                <p className="text-xs text-gray-400 mt-2 font-medium">
+                                  {[q.role, q.building].filter(Boolean).join(', ')}
+                                </p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Historical Timeline */}
+                    {semesterData.timeline_events && semesterData.timeline_events.length > 0 && (
+                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                        <h2 className="text-base font-semibold text-gray-900 mb-5">
+                          {semesterData.semester_label} Timeline
+                        </h2>
+                        <div className="grid grid-cols-3 gap-6">
+                          {(['completed', 'in_progress', 'upcoming'] as const).map((status) => {
+                            const cfg = {
+                              completed: { label: 'Done', color: '#16A34A' },
+                              in_progress: { label: 'In Progress', color: '#D97706' },
+                              upcoming: { label: 'Coming Soon', color: '#2563EB' },
+                            }[status];
+                            const events = semesterData.timeline_events.filter((e) => e.status === status);
+                            return (
+                              <div key={status}>
+                                <div className="flex items-center gap-1.5 mb-3">
+                                  <div className="w-2 h-2 rounded-full" style={{ background: cfg.color }} />
+                                  <span className="text-xs font-bold uppercase tracking-wide" style={{ color: cfg.color }}>
+                                    {cfg.label}
+                                  </span>
+                                  <span className="text-xs text-gray-400 ml-auto">{events.length}</span>
+                                </div>
+                                {events.length === 0 ? (
+                                  <p className="text-xs text-gray-300 italic">Nothing here</p>
+                                ) : (
+                                  events.map((ev, j) => (
+                                    <div key={j} className="flex items-start gap-2 mb-3">
+                                      <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5" style={{ background: cfg.color }} />
+                                      <div>
+                                        <p className="text-sm text-gray-700 leading-snug">{ev.title}</p>
+                                        {ev.date && (
+                                          <p className="text-xs text-gray-400 mt-0.5">
+                                            {new Date(ev.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                          </p>
+                                        )}
+                                        {ev.notes && (
+                                          <p className="text-xs text-gray-500 mt-0.5">{ev.notes}</p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-xl border border-gray-100 p-8 text-center" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                    <p className="text-sm text-gray-400">No data has been recorded for this semester yet.</p>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Current semester content - only shown when viewing the current semester (or no semesters configured) */}
+            {(semesterList.length <= 1 || !!semesterList.find((s) => s.semester === activeSemester)?.is_current) && (
+              <>
+
             {/* What's Included Summary */}
             <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
               <h2 className="text-base font-semibold text-gray-900 mb-4">What Your Partnership Includes</h2>
@@ -7271,6 +7556,9 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                   ))}
                 </div>
               </div>
+            )}
+
+              </>
             )}
 
           </div>

@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     const supabase = getServiceSupabase();
 
     // Fetch all data in parallel with single queries (no N+1!)
-    const [partnershipsResult, statsResult, orgsResult, staffCountsResult] = await Promise.all([
+    const [partnershipsResult, statsResult, orgsResult, staffCountsResult, directContractsResult, grantContractsResult] = await Promise.all([
       getAllPartnerships(),
       getPartnershipStats(),
       // Single query for all organizations
@@ -47,6 +47,20 @@ export async function GET(request: NextRequest) {
       supabase
         .from('staff_members')
         .select('partnership_id'),
+      // Contract values: direct pay (no grant support)
+      supabase
+        .from('sales_opportunities')
+        .select('value')
+        .in('stage', ['signed', 'signed_no_grant', 'signed_with_grant', 'paid'])
+        .eq('grant_support', false)
+        .is('deleted_at', null),
+      // Contract values: grant funded
+      supabase
+        .from('sales_opportunities')
+        .select('value')
+        .in('stage', ['signed', 'signed_no_grant', 'signed_with_grant', 'paid'])
+        .eq('grant_support', true)
+        .is('deleted_at', null),
     ]);
 
     // Build lookup maps for O(1) access
@@ -71,10 +85,18 @@ export async function GET(request: NextRequest) {
       staff_count: (p as any).staff_enrolled || staffCountMap.get(p.id) || 0,
     }));
 
+    const directPayTotal = (directContractsResult.data || []).reduce((sum, o) => sum + (Number(o.value) || 0), 0);
+    const grantFundedTotal = (grantContractsResult.data || []).reduce((sum, o) => sum + (Number(o.value) || 0), 0);
+
     return NextResponse.json({
       success: true,
       partnerships: enrichedPartnerships,
       stats: statsResult,
+      contractValues: {
+        directPay: Math.round(directPayTotal * 100) / 100,
+        grantFunded: Math.round(grantFundedTotal * 100) / 100,
+        total: Math.round((directPayTotal + grantFundedTotal) * 100) / 100,
+      },
     });
   } catch (error) {
     console.error('Error fetching partnerships:', error);

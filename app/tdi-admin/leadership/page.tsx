@@ -268,6 +268,7 @@ export default function LeadershipDashboardPage() {
   const [partnerships, setPartnerships] = useState<Partnership[]>([]);
   const [filteredPartnerships, setFilteredPartnerships] = useState<Partnership[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
+  const [contractValues, setContractValues] = useState<{ directPay: number; grantFunded: number; total: number } | null>(null);
   const [actionItems, setActionItems] = useState<ActionItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -312,6 +313,7 @@ export default function LeadershipDashboardPage() {
           setPartnerships(data.partnerships);
           setFilteredPartnerships(data.partnerships);
           setStats(data.stats);
+          if (data.contractValues) setContractValues(data.contractValues);
         }
       }
     } catch (error) {
@@ -636,6 +638,45 @@ export default function LeadershipDashboardPage() {
               >
                 <Mail className="w-6 h-6" style={{ color: theme.accent }} />
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contract Value Cards */}
+      {contractValues && (
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="bg-white rounded-xl border border-gray-100 overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+            <div className="h-0.5 w-full" style={{ background: '#10B981' }} />
+            <div className="p-5">
+              <p className="font-bold mb-1" style={{ ...TYPE_STAT_VALUE, color: '#10B981' }}>
+                ${contractValues.directPay.toLocaleString()}
+              </p>
+              <p className="text-sm text-gray-500 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                Direct Pay Contracts
+              </p>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-100 overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+            <div className="h-0.5 w-full" style={{ background: '#8B5CF6' }} />
+            <div className="p-5">
+              <p className="font-bold mb-1" style={{ ...TYPE_STAT_VALUE, color: '#8B5CF6' }}>
+                ${contractValues.grantFunded.toLocaleString()}
+              </p>
+              <p className="text-sm text-gray-500 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                Grant-Funded Contracts
+              </p>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-100 overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+            <div className="h-0.5 w-full" style={{ background: theme.accent }} />
+            <div className="p-5">
+              <p className="font-bold mb-1" style={{ ...TYPE_STAT_VALUE, color: theme.accent }}>
+                ${contractValues.total.toLocaleString()}
+              </p>
+              <p className="text-sm text-gray-500 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                Total Contract Value
+              </p>
             </div>
           </div>
         </div>
