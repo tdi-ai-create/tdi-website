@@ -39,6 +39,7 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({
           maxDurationSeconds: maxDurationSeconds || 3600,
+          maxSizeBytes: 2147483648, // 2GB - matches client-side limit
           creator: filename || 'tdi-hub-admin',
         }),
       }
