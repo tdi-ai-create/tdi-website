@@ -15,6 +15,8 @@ export interface HubProfile {
   onboarding_data: Record<string, unknown>;
   preferences: Record<string, unknown>;
   preferred_language?: string | null;
+  partnership_id?: string | null;
+  partnership_slug?: string | null;
   created_at: string;
   updated_at: string;
 }

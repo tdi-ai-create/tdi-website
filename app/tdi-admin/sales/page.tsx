@@ -1,6 +1,7 @@
 'use client'
 // v2 - sales intelligence with fit scoring
 import { useEffect, useState, useMemo, useCallback } from 'react'
+import SalesCoachTab from './components/SalesCoachTab'
 import { useSearchParams } from 'next/navigation'
 import { getSupabase } from '@/lib/supabase'
 import { AnalyticsTab } from './components/AnalyticsTab'
@@ -22,7 +23,7 @@ import {
 import { HorizontalBarChart, DonutChart, DonutLegend, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts'
 
 type ViewMode = 'kanban' | 'list'
-type PageTab = 'pipeline' | 'outreach' | 'analytics' | 'contracts' | 'hub-leads' | 'trash' | 'invoices'
+type PageTab = 'pipeline' | 'outreach' | 'analytics' | 'contracts' | 'hub-leads' | 'trash' | 'invoices' | 'coaching'
 
 interface QuoteRow {
   id: string
@@ -1118,6 +1119,7 @@ export default function SalesPage() {
           { id: 'outreach' as PageTab, label: 'Outreach Queue' },
           { id: 'analytics' as PageTab, label: 'Analytics' },
           { id: 'contracts' as PageTab, label: `Contracts (${quotes.length})${outstandingInvoices.length > 0 ? ` \u00b7 ${outstandingInvoices.length} unpaid` : ''}` },
+          { id: 'coaching' as PageTab, label: 'Sales Coach' },
         ]).map(tab => (
           <button
             key={tab.id}
@@ -1919,6 +1921,9 @@ export default function SalesPage() {
       />
 
       {/* Toast */}
+      {/* Sales Coach Tab */}
+      {pageTab === 'coaching' && <SalesCoachTab />}
+
       {toast && (
         <div style={{
           position: 'fixed', bottom: 24, right: 24, zIndex: 200,

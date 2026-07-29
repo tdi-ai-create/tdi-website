@@ -267,6 +267,34 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
             {tUI('I need a moment')}
           </button>
 
+          {/* My Dashboard - for users with a partnership */}
+          {profile?.partnership_slug && (
+            <a
+              href={`/partners/${profile.partnership_slug}`}
+              className="transition-opacity hover:opacity-80 relative group"
+              style={{
+                background: 'rgba(78,205,196,0.12)',
+                border: '1px solid rgba(78,205,196,0.35)',
+                color: '#4ecdc4',
+                padding: '6px',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              title="School Dashboard"
+            >
+              <Building size={16} />
+              <span
+                className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                style={{ background: '#1B2A4A', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+              >
+                School Dashboard
+              </span>
+            </a>
+          )}
+
           {/* User Avatar and Name */}
           <Link href="/hub/settings/profile" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <AvatarDisplay

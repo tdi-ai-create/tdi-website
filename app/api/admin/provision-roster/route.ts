@@ -38,6 +38,15 @@ export async function POST(request: NextRequest) {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
+    // Get partnership slug for Hub nav toggle
+    const { data: partnershipInfo } = await portalSupabase
+      .from('partnerships')
+      .select('slug')
+      .eq('id', partnershipId)
+      .single();
+
+    const partnershipSlug = partnershipInfo?.slug || null;
+
     // Get all staff who aren't provisioned yet
     const { data: staff, error: staffError } = await portalSupabase
       .from('staff_members')
@@ -76,6 +85,7 @@ export async function POST(request: NextRequest) {
           .from('hub_profiles')
           .update({
             partnership_id: partnershipId,
+            partnership_slug: partnershipSlug,
             first_name: member.first_name || undefined,
             last_name: member.last_name || undefined,
           })
