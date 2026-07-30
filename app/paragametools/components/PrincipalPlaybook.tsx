@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { COLORS } from '../data/gameConfig';
 import { useLanguage } from '../context/LanguageContext';
-import { PLAYBOOK_SCENARIOS, PLAYBOOK_SCENARIO_COUNT } from '../data/principalPlaybook';
+import { PLAYBOOK_SCENARIOS, PLAYBOOK_SCENARIO_COUNT, type PlaybookScenario } from '../data/principalPlaybook';
 import { GameWrapper } from './GameWrapper';
 import { ConfettiBurst } from './ConfettiBurst';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
@@ -25,13 +25,24 @@ export function PrincipalPlaybook({ onBack }: { onBack: () => void }) {
   const [bestStreak, setBestStreak] = useState(0);
   const [streak, setStreak] = useState(0);
   const [lensResults, setLensResults] = useState<Record<string, { total: number; correct: number }>>({});
+  const [gameScenarios, setGameScenarios] = useState<PlaybookScenario[]>([]);
 
-  const scenario = PLAYBOOK_SCENARIOS[current];
-  const data = scenario[language];
+  // Shuffle and pick SCENARIO_COUNT scenarios for each playthrough
+  const shuffleScenarios = () => {
+    const shuffled = [...PLAYBOOK_SCENARIOS];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    setGameScenarios(shuffled.slice(0, PLAYBOOK_SCENARIO_COUNT));
+  };
+
+  const scenario = gameScenarios[current];
+  const data = scenario ? scenario[language] : null;
   const isLast = current === PLAYBOOK_SCENARIO_COUNT - 1;
 
   const handleSelect = (idx: number) => {
-    if (selected !== null) return;
+    if (selected !== null || !data) return;
     setSelected(idx);
     const isCorrect = data.choices[idx].best;
     if (isCorrect) {
@@ -84,6 +95,7 @@ export function PrincipalPlaybook({ onBack }: { onBack: () => void }) {
     setStreak(0);
     setBestStreak(0);
     setLensResults({});
+    shuffleScenarios();
     setScreen('intro');
     await startSession('principal-playbook', PLAYBOOK_SCENARIO_COUNT, { language });
   };
@@ -97,13 +109,14 @@ export function PrincipalPlaybook({ onBack }: { onBack: () => void }) {
       {screen === 'intro' && (
         <IntroScreen
           onStart={() => {
+            shuffleScenarios();
             setScreen('play');
             startSession('principal-playbook', PLAYBOOK_SCENARIO_COUNT, { language });
           }}
           language={language}
         />
       )}
-      {screen === 'play' && (
+      {screen === 'play' && data && (
         <PlayScreen
           language={language}
           current={current}
