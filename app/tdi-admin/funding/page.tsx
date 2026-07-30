@@ -352,50 +352,83 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
           </div>
         )}
 
-        {/* Pending action items for this school */}
-        {school.actions.length > 0 && (
-          <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #F3F4F6' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>
-              To Do ({school.actions.length})
-            </div>
-            {school.actions.slice(0, 5).map(action => {
-              const daysUntil = action.dueDate ? Math.ceil((new Date(action.dueDate + 'T00:00:00').getTime() - Date.now()) / 86400000) : null
-              return (
-                <div key={action.id} style={{
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  padding: '6px 0', borderBottom: '1px solid #FAFAFA',
-                }}>
-                  <div style={{ flex: 1 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: '#1e2749' }}>{action.title}</span>
+        {/* Pending action items for this school - separated by owner */}
+        {school.actions.length > 0 && (() => {
+          const bellaActions = school.actions.filter((a: { ownerType: string; category: string }) => a.ownerType === 'tdi' && ['submission', 'follow_up', 'approval'].includes(a.category))
+          const clientActions = school.actions.filter((a: { ownerType: string }) => a.ownerType === 'client')
+          const agentActions = school.actions.filter((a: { ownerType: string; category: string }) => a.ownerType === 'tdi' && !['submission', 'follow_up', 'approval'].includes(a.category))
+          const myActions = [...bellaActions, ...clientActions]
+
+          const ownerBadge = (ownerType: string, category?: string) => {
+            if (ownerType === 'client') return { bg: '#FEF3C7', color: '#92400E', label: 'School' }
+            if (['research', 'writing'].includes(category || '')) return { bg: '#DBEAFE', color: '#1E40AF', label: 'Agent' }
+            return { bg: '#F5F3FF', color: '#6D28D9', label: 'You' }
+          }
+
+          return (
+            <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #F3F4F6' }}>
+              {myActions.length > 0 && (
+                <>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>
+                    Ready for You ({myActions.length})
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                    {daysUntil !== null && (
-                      <span style={{
-                        fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
-                        background: daysUntil <= 3 ? '#FEF2F2' : '#F3F4F6',
-                        color: daysUntil <= 3 ? '#DC2626' : '#6B7280',
+                  {myActions.slice(0, 5).map(action => {
+                    const daysUntil = action.dueDate ? Math.ceil((new Date(action.dueDate + 'T00:00:00').getTime() - Date.now()) / 86400000) : null
+                    const badge = ownerBadge(action.ownerType, action.category)
+                    return (
+                      <div key={action.id} style={{
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        padding: '6px 0', borderBottom: '1px solid #FAFAFA',
                       }}>
-                        {daysUntil <= 0 ? 'Overdue' : `${daysUntil}d`}
-                      </span>
-                    )}
-                    <span style={{
-                      fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
-                      background: action.ownerType === 'client' ? '#FEF3C7' : '#F5F3FF',
-                      color: action.ownerType === 'client' ? '#92400E' : '#6D28D9',
-                    }}>
-                      {action.ownerType === 'client' ? 'School' : 'Bella'}
-                    </span>
+                        <div style={{ flex: 1 }}>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: '#1e2749' }}>{action.title}</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                          {daysUntil !== null && (
+                            <span style={{
+                              fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
+                              background: daysUntil <= 3 ? '#FEF2F2' : '#F3F4F6',
+                              color: daysUntil <= 3 ? '#DC2626' : '#6B7280',
+                            }}>
+                              {daysUntil <= 0 ? 'Overdue' : `${daysUntil}d`}
+                            </span>
+                          )}
+                          <span style={{
+                            fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
+                            background: badge.bg, color: badge.color,
+                          }}>
+                            {badge.label}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </>
+              )}
+              {agentActions.length > 0 && (
+                <>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, marginTop: myActions.length > 0 ? 12 : 0 }}>
+                    Agent Pipeline ({agentActions.length})
                   </div>
-                </div>
-              )
-            })}
-            {school.actions.length > 5 && (
-              <Link href={`/tdi-admin/funding/${school.id}`} style={{ fontSize: 11, color: '#8B5CF6', textDecoration: 'none', marginTop: 4, display: 'block' }}>
-                +{school.actions.length - 5} more
-              </Link>
-            )}
-          </div>
-        )}
+                  {agentActions.slice(0, 3).map(action => (
+                    <div key={action.id} style={{
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      padding: '4px 0', borderBottom: '1px solid #FAFAFA', opacity: 0.6,
+                    }}>
+                      <span style={{ fontSize: 12, color: '#6B7280' }}>{action.title}</span>
+                      <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#DBEAFE', color: '#1E40AF' }}>Agent</span>
+                    </div>
+                  ))}
+                </>
+              )}
+              {school.actions.length > 8 && (
+                <Link href={`/tdi-admin/funding/${school.id}`} style={{ fontSize: 11, color: '#8B5CF6', textDecoration: 'none', marginTop: 4, display: 'block' }}>
+                  +{school.actions.length - 8} more
+                </Link>
+              )}
+            </div>
+          )
+        })()}
       </div>
     </div>
   )

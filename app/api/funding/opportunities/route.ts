@@ -180,6 +180,21 @@ export async function PATCH(request: NextRequest) {
     if (body.narrative_status && body.narrative_status !== before.narrative_status) {
       const fromNs = before.narrative_status || 'not_started'
       postFundingEvent(narrativeEvent(pId, pName, oName, fromNs, body.narrative_status, oppNow?.assigned_agent)).catch(() => {})
+
+      // Push notification to agents when a draft is requested
+      if (body.narrative_status === 'requested') {
+        const agentName = oppNow?.assigned_agent || 'Unassigned agent'
+        const slackWebhook = process.env.SLACK_WEBHOOK_INTERNAL
+        if (slackWebhook) {
+          fetch(slackWebhook, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text: `New draft requested: "${oName}" for ${pName}. Assigned to ${agentName}. 72-hour deadline.`,
+            }),
+          }).catch(() => {})
+        }
+      }
     }
     // Window status change
     if (body.window_status) {
@@ -200,6 +215,41 @@ export async function PATCH(request: NextRequest) {
     // Research status change
     if (body.research_status) {
       postFundingEvent(researchEvent(pId, pName, oName, body.research_status, oppNow?.assigned_agent)).catch(() => {})
+    }
+
+    // Auto-compute and update pursuit phase based on opportunity states
+    try {
+      const { data: allOpps } = await supabase
+        .from('funding_opportunities')
+        .select('status, narrative_status, client_submitted, forwarding_email_status')
+        .eq('pursuit_id', pId)
+
+      if (allOpps && allOpps.length > 0) {
+        // Allowed phases: intake, researching, strategy, writing, in_review, delivered, submitted, awaiting_decision, awarded, denied, on_hold
+        let computedPhase = 'intake'
+        const hasDrafting = allOpps.some((o: { narrative_status: string }) => ['requested', 'drafting'].includes(o.narrative_status))
+        const hasReview = allOpps.some((o: { narrative_status: string }) => ['review', 'qa_review'].includes(o.narrative_status))
+        const hasReady = allOpps.some((o: { narrative_status: string }) => o.narrative_status === 'ready')
+        const hasSent = allOpps.some((o: { forwarding_email_status: string }) => o.forwarding_email_status === 'sent')
+        const hasSubmitted = allOpps.some((o: { client_submitted: boolean }) => o.client_submitted === true)
+        const hasAwarded = allOpps.some((o: { status: string }) => o.status === 'awarded')
+        const allDecided = allOpps.every((o: { status: string }) => ['awarded', 'denied', 'closed'].includes(o.status))
+
+        if (allDecided) computedPhase = hasAwarded ? 'awarded' : 'denied'
+        else if (hasSubmitted) computedPhase = 'submitted'
+        else if (hasSent) computedPhase = 'delivered'
+        else if (hasReview) computedPhase = 'in_review'
+        else if (hasReady) computedPhase = 'in_review'
+        else if (hasDrafting) computedPhase = 'writing'
+        else computedPhase = 'intake'
+
+        await supabase
+          .from('funding_pursuits')
+          .update({ current_phase: computedPhase, updated_at: new Date().toISOString() })
+          .eq('id', pId)
+      }
+    } catch (phaseErr) {
+      console.error('[funding-opportunities] Phase auto-update failed:', phaseErr)
     }
   }
 
