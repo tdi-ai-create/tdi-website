@@ -109,7 +109,7 @@ export default function BulkContentUpload({ course, onComplete, onLessonUploaded
   );
 
   const handleFiles = (fileList: FileList) => {
-    const MAX_VIDEO_SIZE = 2 * 1024 * 1024 * 1024; // 2GB
+    const MAX_VIDEO_SIZE = 500 * 1024 * 1024; // 500MB storage limit
     const MAX_DOC_SIZE = 25 * 1024 * 1024; // 25MB
 
     const usedLessonIds = new Set(files.map(f => f.lessonId).filter(Boolean));
@@ -120,7 +120,7 @@ export default function BulkContentUpload({ course, onComplete, onLessonUploaded
       if (!fileType) continue;
 
       if (fileType === 'video' && file.size > MAX_VIDEO_SIZE) {
-        alert(`"${file.name}" is too large (${(file.size / (1024 * 1024 * 1024)).toFixed(1)}GB). Max video size is 2GB.`);
+        alert(`"${file.name}" is too large (${(file.size / (1024 * 1024)).toFixed(0)}MB). Max video size is 500MB. Try compressing the video.`);
         continue;
       }
       if (fileType === 'pdf' && file.size > MAX_DOC_SIZE) {
@@ -383,7 +383,7 @@ export default function BulkContentUpload({ course, onComplete, onLessonUploaded
                     {files.length > 0 ? 'Drop more files or click to add' : 'Drop videos and documents here'}
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
-                    Videos (MP4, MOV, WebM, max 2GB) and Documents (PDF, Word, PPT, max 25MB)
+                    Videos (MP4, MOV, WebM, max 500MB) and Documents (PDF, Word, PPT, max 25MB)
                   </p>
                   <input
                     ref={fileInputRef}

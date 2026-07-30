@@ -188,11 +188,11 @@ export default function BulkVideoUpload({ course, onComplete, onLessonUploaded }
   );
 
   const handleFiles = (fileList: FileList) => {
-    const MAX_SIZE = 2 * 1024 * 1024 * 1024; // 2GB
+    const MAX_SIZE = 500 * 1024 * 1024; // 500MB storage limit
     const videoFiles = Array.from(fileList).filter((f) => {
       if (!f.type.startsWith('video/')) return false;
       if (f.size > MAX_SIZE) {
-        alert(`"${f.name}" is too large (${(f.size / (1024 * 1024 * 1024)).toFixed(1)}GB). Maximum is 2GB. Skipped.`);
+        alert(`"${f.name}" is too large (${(f.size / (1024 * 1024)).toFixed(0)}MB). Maximum is 500MB. Try compressing the video.`);
         return false;
       }
       return true;
@@ -434,7 +434,7 @@ export default function BulkVideoUpload({ course, onComplete, onLessonUploaded }
                       : 'Drop video files here or click to select'}
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
-                    MP4, MOV, MKV, or WebM -- max 2GB per file
+                    MP4, MOV, MKV, or WebM -- max 500MB per file
                   </p>
                   <input
                     ref={fileInputRef}

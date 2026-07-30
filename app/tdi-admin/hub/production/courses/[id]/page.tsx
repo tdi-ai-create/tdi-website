@@ -287,10 +287,10 @@ function VideoUploadSection({
       return;
     }
 
-    // Enforce max file size (2GB)
-    const MAX_SIZE = 2 * 1024 * 1024 * 1024;
+    // Enforce max file size (500MB storage limit)
+    const MAX_SIZE = 500 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
-      setErrorMsg(`File is too large (${(file.size / (1024 * 1024 * 1024)).toFixed(1)}GB). Maximum size is 2GB.`);
+      setErrorMsg(`File is too large (${(file.size / (1024 * 1024)).toFixed(0)}MB). Maximum size is 500MB. Try compressing the video or contact Rae to increase the limit.`);
       setUploadStatus('error');
       return;
     }
@@ -2465,6 +2465,9 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                 <Trash2 size={12} />
                 Remove All Videos
               </button>
+
+              {/* Upload limit indicator */}
+              <span className="text-xs text-gray-400 ml-auto">Max file: 500 MB</span>
 
               {/* Bulk Transcribe (EN + ES) */}
               <button
