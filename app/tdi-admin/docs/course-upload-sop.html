@@ -35,7 +35,7 @@
 <div class="page">
 <h1>Course Video & PDF Upload SOP</h1>
 <p class="subtitle">How to upload videos and documents to Learning Hub courses</p>
-<p class="updated">Last updated: July 29, 2026</p>
+<p class="updated">Last updated: July 30, 2026</p>
 
 <div class="card card-navy">
   <p style="font-weight:600;color:white;margin-bottom:8px;">How It Works</p>
@@ -82,9 +82,9 @@
 
 <div class="card card-teal">
   <p><strong>Accepted video formats:</strong> MP4, MOV, MKV, WebM</p>
-  <p><strong>Max file size:</strong> 2GB per video</p>
-  <p><strong>Upload method:</strong> Tus resumable protocol (uploads in 50MB chunks, auto-retries on failure)</p>
-  <p><strong>Processing:</strong> Cloudflare transcodes after upload. Takes 30-60 seconds for most videos.</p>
+  <p><strong>Max file size:</strong> 500MB per video (shown next to upload buttons)</p>
+  <p><strong>Upload method:</strong> Videos upload to our storage first, then Cloudflare pulls them for processing. You never connect directly to Cloudflare.</p>
+  <p><strong>Processing:</strong> Cloudflare transcodes after pulling the video. Takes 1-3 minutes for most videos. The player will show "Preparing your video..." during this time.</p>
 </div>
 
 <h2>Uploading PDFs & Documents</h2>
@@ -150,7 +150,7 @@
 <table>
   <tr><th>Component</th><th>Technology</th><th>Details</th></tr>
   <tr><td>Video hosting</td><td>Cloudflare Stream</td><td>Account: a559fc0dc4cb (1000 min storage). Videos stored and transcoded by Cloudflare.</td></tr>
-  <tr><td>Video upload protocol</td><td>tus v1.0.0</td><td>Resumable uploads in 50MB chunks via tus-js-client. No 200MB limit.</td></tr>
+  <tr><td>Video upload protocol</td><td>Storage-first + Cloudflare copy</td><td>Videos upload to Supabase Storage via signed URL, then Cloudflare pulls server-to-server. Browser never connects to Cloudflare directly.</td></tr>
   <tr><td>Document storage</td><td>Supabase Storage</td><td>Bucket: lesson-resources. Public read access. Signed URL upload (bypasses Vercel body limit).</td></tr>
   <tr><td>Upload API</td><td>Next.js API Routes</td><td><code>/api/tdi-admin/videos/upload</code> (POST/GET/DELETE) and <code>/api/tdi-admin/resources/upload</code> (POST/PATCH/DELETE)</td></tr>
   <tr><td>Video player</td><td>Cloudflare Stream iframe</td><td>Auto-polls for readiness. Shows processing state until ready.</td></tr>

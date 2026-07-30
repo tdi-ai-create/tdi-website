@@ -39,7 +39,7 @@
 <div class="page">
 <h1>Service Delivery + Invoicing Workflow</h1>
 <p class="subtitle">From contract signing to payment received. Every step, every role, every system.</p>
-<p class="updated">Last updated: July 21, 2026</p>
+<p class="updated">Last updated: July 30, 2026</p>
 
 <div class="card card-navy">
   <p style="font-weight:600;color:white;margin-bottom:8px;">The Pipeline</p>
@@ -120,13 +120,14 @@
 </div>
 
 <div class="card card-amber">
-  <p><strong>Follow-up cadence:</strong></p>
+  <p><strong>Automated follow-up cadence</strong> (runs daily via cron, no manual action needed):</p>
   <ul>
-    <li><strong>Day 14:</strong> If not paid, send a friendly email reminder</li>
-    <li><strong>Day 30:</strong> Due date. If not paid, call the AP contact directly</li>
-    <li><strong>Day 45:</strong> Escalate to principal contact if AP is unresponsive</li>
-    <li><strong>Day 60:</strong> Escalate to Rae for direct outreach</li>
+    <li><strong>Day 14:</strong> System sends a friendly reminder email to the school automatically</li>
+    <li><strong>Day 30:</strong> System sends a "payment due" email and marks the invoice overdue</li>
+    <li><strong>Day 45:</strong> System escalates to Omar via internal alert email</li>
+    <li><strong>Day 60+:</strong> System escalates to Rae via internal alert email</li>
   </ul>
+  <p style="font-size:13px;color:#92400E;margin-top:8px;">These emails go out automatically. You do not need to send them manually. You should still make personal follow-up calls alongside the automated emails, especially at Day 30+.</p>
 </div>
 
 <h3>Step 4: Record Payment</h3>
@@ -145,6 +146,8 @@
     <li>Changes status to <span class="status status-paid">Paid</span></li>
     <li>Logs the payment event with all details</li>
     <li>Updates the collections workflow</li>
+    <li><strong>Sends a "Payment Received" confirmation email to the school contact</strong> thanking them for their partnership</li>
+    <li>Sends a Slack notification to the billing channel</li>
   </ul>
 </div>
 
