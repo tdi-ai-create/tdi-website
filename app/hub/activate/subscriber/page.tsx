@@ -50,26 +50,50 @@ export default function SubscriberActivatePage() {
           return;
         }
 
-        // Grant Essentials tier for 35 days (covers monthly renewal with buffer)
+        // Upgrade the base membership tier to essentials (permanent, not temp grant)
+        const { error: membershipError } = await supabase
+          .from('hub_memberships')
+          .update({
+            tier: 'essentials',
+            source: 'substack_paid',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('user_id', user.id);
+
+        if (membershipError) {
+          console.error('[Subscriber Activate] Membership update error:', membershipError);
+          // If no membership exists yet, create one
+          const { error: insertError } = await supabase
+            .from('hub_memberships')
+            .insert({
+              user_id: user.id,
+              tier: 'essentials',
+              source: 'substack_paid',
+              status: 'active',
+            });
+
+          if (insertError) {
+            setErrorMsg(insertError.message);
+            setStatus('error');
+            return;
+          }
+        }
+
+        // Also create/refresh the comped access grant as a backup
         const grantedAt = new Date().toISOString().slice(0, 10);
         const expiresAt = new Date(Date.now() + 35 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-        const { error } = await supabase
+        await supabase
           .from('comped_access_grants')
-          .insert({
+          .upsert({
             user_id: user.id,
             tier_granted: 'Essentials',
             granted_at: grantedAt,
             expires_at: expiresAt,
             reason: 'substack_paid_subscriber',
-          });
-
-        if (error) {
-          console.error('[Subscriber Activate] Error:', error);
-          setErrorMsg(error.message);
-          setStatus('error');
-          return;
-        }
+          }, { onConflict: 'user_id,reason' })
+          .then(() => {})
+          .catch(() => {}); // Non-critical, membership tier is the real source of truth
 
         setStatus('success');
       } catch (err) {

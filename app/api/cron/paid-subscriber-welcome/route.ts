@@ -31,6 +31,25 @@ export async function GET(request: NextRequest) {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
+    // First: fix any paid subscribers stuck on free tier
+    // This catches people who activated via the link before we fixed the upgrade flow
+    const { data: stuckFree } = await hubSupabase
+      .from('hub_memberships')
+      .select('id, user_id')
+      .eq('source', 'substack_paid')
+      .eq('tier', 'free');
+
+    let upgraded = 0;
+    if (stuckFree && stuckFree.length > 0) {
+      for (const m of stuckFree) {
+        await hubSupabase
+          .from('hub_memberships')
+          .update({ tier: 'essentials', updated_at: new Date().toISOString() })
+          .eq('id', m.id);
+        upgraded++;
+      }
+    }
+
     // Get paid Substack subscribers who haven't been notified
     const { data: members } = await hubSupabase
       .from('hub_memberships')
@@ -39,7 +58,7 @@ export async function GET(request: NextRequest) {
       .eq('tier', 'essentials');
 
     if (!members || members.length === 0) {
-      return NextResponse.json({ success: true, sent: 0, message: 'No paid subscribers to notify' });
+      return NextResponse.json({ success: true, sent: 0, upgraded, message: 'No paid subscribers to notify' });
     }
 
     let sent = 0;
@@ -121,7 +140,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true, sent });
+    return NextResponse.json({ success: true, sent, upgraded });
   } catch (error) {
     console.error('[paid-subscriber-welcome] Error:', error);
     return NextResponse.json({ error: String(error) }, { status: 500 });
