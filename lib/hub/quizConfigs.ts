@@ -925,6 +925,723 @@ export const creatorQuiz: QuizConfig = {
     `I took TDI's Creator Quiz and got "${title}" -- ${subtitle} Should you become a TDI creator? Find out at teachersdeserveit.com/hub`,
 }
 
+// ── 9. What's Your Communication Style? ─────────────────────────────
+
+export const communicationStyleQuiz: QuizConfig = {
+  id: 'communication_style',
+  title: "What's Your Communication Style?",
+  shortTitle: 'Communication Style',
+  description: 'How do you handle the tough conversations? 10 questions to find your default mode.',
+  questionCount: 10,
+  durationLabel: '3 min',
+  category: 'identity',
+  accentColor: '#22B8BD',
+  accentBg: '#E0F7F8',
+  accentGradient: 'linear-gradient(135deg, #22B8BD 0%, #5EEAD4 100%)',
+  results: {
+    fixer: {
+      key: 'fixer',
+      title: 'The Fixer',
+      subtitle: 'You jump to solutions.',
+      description: 'Your instinct is to make it better right now. When someone brings you a problem, your brain immediately starts building a plan. Strength: people trust you to act. Growth edge: sometimes people need to be heard before they need help.',
+      color: '#0891B2',
+      bg: '#E0F7F8',
+      icon: 'F',
+    },
+    listener: {
+      key: 'listener',
+      title: 'The Listener',
+      subtitle: 'You lead with empathy and space.',
+      description: 'You are the person people seek out when they need to talk. You do not rush to fill silence and you do not jump to fix. Strength: people feel safe with you. Growth edge: sometimes clarity requires directness, even when it feels uncomfortable.',
+      color: '#7C3AED',
+      bg: '#F3E8FF',
+      icon: 'L',
+    },
+    redirector: {
+      key: 'redirector',
+      title: 'The Redirector',
+      subtitle: 'You reframe and pivot.',
+      description: 'Tension rises and you instinctively find a way to shift the energy. You reframe, ask a different question, or find the angle nobody else saw. Strength: you defuse tension naturally. Growth edge: some conversations need to stay in the discomfort to reach resolution.',
+      color: '#D97706',
+      bg: '#FEF3C7',
+      icon: 'R',
+    },
+    direct: {
+      key: 'direct',
+      title: 'The Direct Dealer',
+      subtitle: 'You name it clearly.',
+      description: 'No sugarcoating, no dancing around the issue. You say what needs to be said because you respect people enough to be honest. Strength: people always know where they stand. Growth edge: delivery matters as much as content.',
+      color: '#DC2626',
+      bg: '#FEE2E2',
+      icon: 'D',
+    },
+  },
+  questions: [
+    {
+      question: 'A colleague is venting about a frustrating situation. You...',
+      answers: [
+        { text: 'Start brainstorming solutions before they finish talking', types: ['fixer'] },
+        { text: 'Listen quietly and let them get it all out', types: ['listener'] },
+        { text: 'Gently reframe the situation to help them see another angle', types: ['redirector'] },
+        { text: 'Ask them directly: "What do you actually want to do about it?"', types: ['direct'] },
+      ],
+    },
+    {
+      question: 'You need to give tough feedback to someone on your team. Your approach?',
+      answers: [
+        { text: 'Lead with a specific suggestion for how to fix the issue', types: ['fixer'] },
+        { text: 'Start by asking how they think things are going', types: ['listener'] },
+        { text: 'Frame the feedback around a shared goal so it feels collaborative', types: ['redirector'] },
+        { text: 'Say it clearly, kindly, and without unnecessary padding', types: ['direct'] },
+      ],
+    },
+    {
+      question: 'A parent emails you with a complaint. Your first instinct is to...',
+      answers: [
+        { text: 'Reply with a plan of action and next steps', types: ['fixer'] },
+        { text: 'Acknowledge their feelings and ask if they want to talk more', types: ['listener'] },
+        { text: 'Reframe the concern to highlight what is going well alongside the issue', types: ['redirector'] },
+        { text: 'Address the concern head-on with facts and transparency', types: ['direct'] },
+      ],
+    },
+    {
+      question: 'Two colleagues are in a conflict. You step in by...',
+      answers: [
+        { text: 'Proposing a compromise or solution that could work for both', types: ['fixer'] },
+        { text: 'Giving each person space to share their side without interruption', types: ['listener'] },
+        { text: 'Shifting the conversation from blame to shared purpose', types: ['redirector'] },
+        { text: 'Naming the tension honestly: "Here is what I am seeing"', types: ['direct'] },
+      ],
+    },
+    {
+      question: 'In a staff meeting, an unpopular decision is announced. You...',
+      answers: [
+        { text: 'Immediately think of ways to make it work better for your team', types: ['fixer'] },
+        { text: 'Notice who looks upset and check in with them after', types: ['listener'] },
+        { text: 'Try to find the reasoning behind the decision and share that perspective', types: ['redirector'] },
+        { text: 'Ask the hard question that everyone is thinking but nobody will say', types: ['direct'] },
+      ],
+    },
+    {
+      question: 'A student is upset and refusing to work. Your move?',
+      answers: [
+        { text: 'Offer an alternative task or modified assignment right away', types: ['fixer'] },
+        { text: 'Sit near them quietly and wait until they are ready to talk', types: ['listener'] },
+        { text: 'Redirect the moment by changing the activity or environment', types: ['redirector'] },
+        { text: 'Privately and calmly say: "I can see something is wrong. Talk to me."', types: ['direct'] },
+      ],
+    },
+    {
+      question: 'You disagree with your principal about a new policy. You...',
+      answers: [
+        { text: 'Bring a revised version of the policy that addresses your concerns', types: ['fixer'] },
+        { text: 'Ask questions to understand their perspective before sharing yours', types: ['listener'] },
+        { text: 'Find common ground and build your case from there', types: ['redirector'] },
+        { text: 'Schedule a meeting and state your position respectfully but clearly', types: ['direct'] },
+      ],
+    },
+    {
+      question: 'Someone takes credit for your idea in a meeting. You...',
+      answers: [
+        { text: 'Let it go and focus on making the idea succeed regardless', types: ['fixer'] },
+        { text: 'Process it internally and maybe mention it privately later', types: ['listener'] },
+        { text: 'Find a natural way to reference your original contribution', types: ['redirector'] },
+        { text: 'Say it in the moment: "Thanks for building on what I shared earlier"', types: ['direct'] },
+      ],
+    },
+    {
+      question: 'Your team is stuck on a difficult decision. You help by...',
+      answers: [
+        { text: 'Laying out the options and recommending one', types: ['fixer'] },
+        { text: 'Making sure everyone has been heard before anyone decides', types: ['listener'] },
+        { text: 'Asking a question that shifts the group toward a new perspective', types: ['redirector'] },
+        { text: 'Cutting through the noise: "Here is what I think we should do and why"', types: ['direct'] },
+      ],
+    },
+    {
+      question: 'After a tough conversation, you feel most satisfied when...',
+      answers: [
+        { text: 'We left with a clear action plan', types: ['fixer'] },
+        { text: 'The other person felt truly heard', types: ['listener'] },
+        { text: 'The tension dissolved and we found a better way to see the issue', types: ['redirector'] },
+        { text: 'We said what needed to be said, even though it was hard', types: ['direct'] },
+      ],
+    },
+  ],
+  shareMessage: (title, subtitle) =>
+    `My communication style is "${title}" -- ${subtitle} What is yours? Find out at teachersdeserveit.com/hub`,
+}
+
+// ── 10. Back to School Readiness Check ──────────────────────────────
+
+export const btsReadinessQuiz: QuizConfig = {
+  id: 'bts_readiness',
+  title: 'Back to School Readiness Check',
+  shortTitle: 'BTS Readiness',
+  description: 'A quick self-assessment across the domains that matter most for day one.',
+  questionCount: 10,
+  durationLabel: '3 min',
+  category: 'needs',
+  accentColor: '#F59E0B',
+  accentBg: '#FEF3C7',
+  accentGradient: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
+  results: {
+    ready_to_go: {
+      key: 'ready_to_go',
+      title: 'Ready to Go',
+      subtitle: 'You are set for day one.',
+      description: 'Your routines are planned, your space is set, and you have a first-week game plan. You have put in the work and it shows. Just remember to leave room for the unexpected. The best first weeks have structure and flexibility.',
+      color: '#059669',
+      bg: '#D1FAE5',
+      icon: 'R',
+    },
+    almost_there: {
+      key: 'almost_there',
+      title: 'Almost There',
+      subtitle: 'A few key areas need attention.',
+      description: 'You have the big things covered but a few key areas need attention before day one. That is normal. Focus there and you will feel solid. Do not try to perfect everything. Nail the essentials and give yourself grace on the rest.',
+      color: '#2563EB',
+      bg: '#DBEAFE',
+      icon: 'A',
+    },
+    building_momentum: {
+      key: 'building_momentum',
+      title: 'Building Momentum',
+      subtitle: 'Ideas need to become plans.',
+      description: 'You have ideas but need to turn them into plans. That gap between thinking and doing is where the stress lives. Pick the 3 most important things and do those well. Everything else can wait. Seriously.',
+      color: '#D97706',
+      bg: '#FEF3C7',
+      icon: 'B',
+    },
+    fresh_start: {
+      key: 'fresh_start',
+      title: 'Fresh Start',
+      subtitle: 'Starting from scratch is valid.',
+      description: 'You are starting from scratch and that is OK. New year, new approach. Maybe new school, new grade, new role. Focus on relationships first, routines second, content third. The curriculum will be there. The kids need you present.',
+      color: '#7C3AED',
+      bg: '#F3E8FF',
+      icon: 'F',
+    },
+  },
+  questions: [
+    {
+      question: 'Your physical classroom or workspace. Where are you?',
+      answers: [
+        { text: 'Set up and ready. I could open the doors tomorrow', types: ['ready_to_go'] },
+        { text: 'Mostly done. A few things still need organizing', types: ['almost_there'] },
+        { text: 'I have a vision but have not started setting up yet', types: ['building_momentum'] },
+        { text: 'I do not even have access to my room yet or I am in a new space', types: ['fresh_start'] },
+      ],
+    },
+    {
+      question: 'First-week routines and procedures. How confident are you?',
+      answers: [
+        { text: 'I have my routines planned and practiced in my head', types: ['ready_to_go'] },
+        { text: 'I know the big ones. A few still need to be finalized', types: ['almost_there'] },
+        { text: 'I have a general idea but nothing written down yet', types: ['building_momentum'] },
+        { text: 'I am not sure what routines I even need this year', types: ['fresh_start'] },
+      ],
+    },
+    {
+      question: 'Your first week of lesson plans. Status?',
+      answers: [
+        { text: 'Planned, prepped, and materials are ready', types: ['ready_to_go'] },
+        { text: 'Outlined but not fully fleshed out', types: ['almost_there'] },
+        { text: 'I know the topics but have not planned the actual lessons', types: ['building_momentum'] },
+        { text: 'I am still figuring out what I am teaching', types: ['fresh_start'] },
+      ],
+    },
+    {
+      question: 'Relationship-building plans for the first week?',
+      answers: [
+        { text: 'I have specific activities and get-to-know-you strategies ready', types: ['ready_to_go'] },
+        { text: 'I know I want to prioritize it but need to choose my activities', types: ['almost_there'] },
+        { text: 'I plan to wing it and just be present', types: ['building_momentum'] },
+        { text: 'Honestly this is where I need the most help', types: ['fresh_start'] },
+      ],
+    },
+    {
+      question: 'Communication with families. Where do you stand?',
+      answers: [
+        { text: 'Welcome letters or emails are drafted and ready to send', types: ['ready_to_go'] },
+        { text: 'I know what I want to say but have not written it yet', types: ['almost_there'] },
+        { text: 'I will get to it once school starts', types: ['building_momentum'] },
+        { text: 'I am still figuring out my communication system', types: ['fresh_start'] },
+      ],
+    },
+    {
+      question: 'Your own mental and emotional readiness. Be honest.',
+      answers: [
+        { text: 'Excited and energized. I feel good about this year', types: ['ready_to_go'] },
+        { text: 'A mix of excitement and anxiety but mostly positive', types: ['almost_there'] },
+        { text: 'Anxious. There is a lot I still need to figure out', types: ['building_momentum'] },
+        { text: 'Dreading it or feeling overwhelmed. I need support', types: ['fresh_start'] },
+      ],
+    },
+    {
+      question: 'Technology setup. Devices, LMS, apps, logins?',
+      answers: [
+        { text: 'Everything is set up, tested, and I have backup plans', types: ['ready_to_go'] },
+        { text: 'Most things are set up. A few logins or tools need attention', types: ['almost_there'] },
+        { text: 'I know what I need but have not set it up yet', types: ['building_momentum'] },
+        { text: 'I am still learning the systems my school uses', types: ['fresh_start'] },
+      ],
+    },
+    {
+      question: 'Behavior management plan. How solid?',
+      answers: [
+        { text: 'Clear expectations, consequences, and positive systems are planned', types: ['ready_to_go'] },
+        { text: 'I have a general framework but need to work out the details', types: ['almost_there'] },
+        { text: 'I know what did not work last year but have not built the new plan', types: ['building_momentum'] },
+        { text: 'This is my biggest question mark right now', types: ['fresh_start'] },
+      ],
+    },
+    {
+      question: 'Collaboration with your team or partner. Where are things?',
+      answers: [
+        { text: 'We have already met, planned, and divided responsibilities', types: ['ready_to_go'] },
+        { text: 'We have connected but need more planning time together', types: ['almost_there'] },
+        { text: 'I know who I am working with but we have not met yet', types: ['building_momentum'] },
+        { text: 'I do not know my team yet or I am working solo', types: ['fresh_start'] },
+      ],
+    },
+    {
+      question: 'Overall, how would you rate your readiness right now?',
+      answers: [
+        { text: 'Confident. I have done the prep and I trust my plan', types: ['ready_to_go'] },
+        { text: 'Close. A focused weekend could get me there', types: ['almost_there'] },
+        { text: 'Behind. I need to pick a few priorities and go', types: ['building_momentum'] },
+        { text: 'Honestly starting over. And I need that to be OK', types: ['fresh_start'] },
+      ],
+    },
+  ],
+  shareMessage: (title, subtitle) =>
+    `I took TDI's Back to School Readiness Check and got "${title}" -- ${subtitle} How ready are you? Find out at teachersdeserveit.com/hub`,
+}
+
+// ── 11. What's Your Coaching Stance? ────────────────────────────────
+
+export const coachingStanceQuiz: QuizConfig = {
+  id: 'coaching_stance',
+  title: "What's Your Coaching Stance?",
+  shortTitle: 'Coaching Stance',
+  description: 'How do you show up when you are supporting another educator? 8 questions to find out.',
+  questionCount: 8,
+  durationLabel: '3 min',
+  category: 'identity',
+  accentColor: '#8B5CF6',
+  accentBg: '#F3E8FF',
+  accentGradient: 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)',
+  results: {
+    consultant: {
+      key: 'consultant',
+      title: 'The Consultant',
+      subtitle: 'You share expertise directly.',
+      description: 'You have answers and you give them. When someone is struggling, your instinct is to share what has worked for you. You are efficient, knowledgeable, and people come to you because you deliver. Best for: new teachers who need concrete strategies. Growth edge: shift to questions more often. Let people find their own answers when they are ready.',
+      color: '#2563EB',
+      bg: '#DBEAFE',
+      icon: 'C',
+    },
+    collaborator: {
+      key: 'collaborator',
+      title: 'The Collaborator',
+      subtitle: 'You think alongside people.',
+      description: 'You do not tell people what to do. You sit beside them and figure it out together. You co-create solutions and make people feel like equal partners in the process. Best for: experienced teachers who want a thinking partner. Growth edge: sometimes people need you to just tell them what works. Read the room.',
+      color: '#059669',
+      bg: '#D1FAE5',
+      icon: 'C',
+    },
+    mirror: {
+      key: 'mirror',
+      title: 'The Mirror',
+      subtitle: 'You reflect back what you see.',
+      description: 'You help people see their own patterns by describing what you observe without judgment. You hold up the mirror so they can make their own decisions. Best for: teachers ready for deep reflection. Growth edge: not everyone is ready for this level of vulnerability. Meet people where they are.',
+      color: '#7C3AED',
+      bg: '#F3E8FF',
+      icon: 'M',
+    },
+    facilitator: {
+      key: 'facilitator',
+      title: 'The Facilitator',
+      subtitle: 'You create conditions for others to find answers.',
+      description: 'You design the space, ask the right questions, and trust the process. You believe people have the answers inside them and your job is to create the conditions for those answers to surface. Best for: teams and group learning. Growth edge: individual coaching sometimes needs more direction. Do not be afraid to step in.',
+      color: '#D97706',
+      bg: '#FEF3C7',
+      icon: 'F',
+    },
+  },
+  questions: [
+    {
+      question: 'A teacher asks you for help with classroom management. You...',
+      answers: [
+        { text: 'Share three specific strategies that have worked for you', types: ['consultant'] },
+        { text: 'Ask what they have tried and brainstorm together', types: ['collaborator'] },
+        { text: 'Describe the patterns you noticed during your last visit', types: ['mirror'] },
+        { text: 'Ask questions to help them identify the root cause themselves', types: ['facilitator'] },
+      ],
+    },
+    {
+      question: 'You are observing a lesson that is going sideways. After, you...',
+      answers: [
+        { text: 'Name what went wrong and suggest specific fixes', types: ['consultant'] },
+        { text: 'Debrief together: "What did you notice? Here is what I noticed."', types: ['collaborator'] },
+        { text: 'Share exactly what you saw without interpreting it', types: ['mirror'] },
+        { text: 'Ask: "If you could teach that lesson again right now, what would you change?"', types: ['facilitator'] },
+      ],
+    },
+    {
+      question: 'A first-year teacher is overwhelmed and near tears. Your instinct?',
+      answers: [
+        { text: 'Give them a survival toolkit: "Do these 3 things this week"', types: ['consultant'] },
+        { text: 'Sit with them and say: "Let us figure this out together"', types: ['collaborator'] },
+        { text: 'Acknowledge the emotion and reflect back what you are hearing', types: ['mirror'] },
+        { text: 'Help them name one thing they can control and focus there', types: ['facilitator'] },
+      ],
+    },
+    {
+      question: 'During a PLC or team meeting, your role tends to be...',
+      answers: [
+        { text: 'The one with the research and the recommendation', types: ['consultant'] },
+        { text: 'The one building on everyone else\'s ideas', types: ['collaborator'] },
+        { text: 'The one who names what the group is doing well and where they are stuck', types: ['mirror'] },
+        { text: 'The one asking the questions that move the conversation forward', types: ['facilitator'] },
+      ],
+    },
+    {
+      question: 'A veteran teacher pushes back on your feedback. You...',
+      answers: [
+        { text: 'Stand by your recommendation and explain your reasoning', types: ['consultant'] },
+        { text: 'Adjust your approach and find a middle ground together', types: ['collaborator'] },
+        { text: 'Pause and reflect their concern back: "It sounds like you feel..."', types: ['mirror'] },
+        { text: 'Ask what approach would feel right to them and build from there', types: ['facilitator'] },
+      ],
+    },
+    {
+      question: 'You believe the best coaching happens when...',
+      answers: [
+        { text: 'People get clear, actionable guidance they can use immediately', types: ['consultant'] },
+        { text: 'Two professionals think through a challenge as equals', types: ['collaborator'] },
+        { text: 'Someone sees themselves clearly, maybe for the first time', types: ['mirror'] },
+        { text: 'The right questions unlock something the person already knew', types: ['facilitator'] },
+      ],
+    },
+    {
+      question: 'A teacher keeps repeating the same mistake. Your approach?',
+      answers: [
+        { text: 'Be more direct: "Here is specifically what needs to change"', types: ['consultant'] },
+        { text: 'Explore the pattern together and co-create a different approach', types: ['collaborator'] },
+        { text: 'Name the pattern you are seeing without judgment and let them sit with it', types: ['mirror'] },
+        { text: 'Ask: "What do you think is getting in the way?"', types: ['facilitator'] },
+      ],
+    },
+    {
+      question: 'Your coaching style in one sentence would be...',
+      answers: [
+        { text: '"I will tell you what works because I have been there"', types: ['consultant'] },
+        { text: '"Let us figure this out side by side"', types: ['collaborator'] },
+        { text: '"Let me show you what I see so you can decide what to do"', types: ['mirror'] },
+        { text: '"The answer is already in you. I just help you find it"', types: ['facilitator'] },
+      ],
+    },
+  ],
+  shareMessage: (title, subtitle) =>
+    `My coaching stance is "${title}" -- ${subtitle} What is yours? Find out at teachersdeserveit.com/hub`,
+}
+
+// ── 12. Para Partnership Pulse Check ────────────────────────────────
+
+export const paraPartnershipQuiz: QuizConfig = {
+  id: 'para_partnership',
+  title: 'Para Partnership Pulse Check',
+  shortTitle: 'Partnership Pulse',
+  description: 'A quick check on the health of your teacher-para partnership. Both roles can take this.',
+  questionCount: 10,
+  durationLabel: '3 min',
+  category: 'needs',
+  accentColor: '#10B981',
+  accentBg: '#D1FAE5',
+  accentGradient: 'linear-gradient(135deg, #10B981 0%, #34D399 100%)',
+  results: {
+    thriving: {
+      key: 'thriving',
+      title: 'Thriving Partnership',
+      subtitle: 'You and your partner are in sync.',
+      description: 'You and your partner communicate clearly, share responsibility, and genuinely support each other. This is not an accident. It is the result of mutual respect and intentional effort. Keep investing in what is working. Partnerships like this are rare and worth protecting.',
+      color: '#059669',
+      bg: '#D1FAE5',
+      icon: 'T',
+    },
+    growing: {
+      key: 'growing',
+      title: 'Growing Partnership',
+      subtitle: 'The foundation is there.',
+      description: 'The foundation is there but some areas need more intentional communication. You probably get along well but there are moments of confusion about roles or expectations. One honest conversation could unlock the next level. Start with: "How can we make this work even better?"',
+      color: '#2563EB',
+      bg: '#DBEAFE',
+      icon: 'G',
+    },
+    developing: {
+      key: 'developing',
+      title: 'Developing Partnership',
+      subtitle: 'Some gaps need attention.',
+      description: 'There are gaps in how you work together. Maybe roles are unclear, communication is inconsistent, or one person feels underutilized. This is fixable. Start with role clarity: who does what, when, and how you will check in about it. Small agreements make a big difference.',
+      color: '#D97706',
+      bg: '#FEF3C7',
+      icon: 'D',
+    },
+    needs_reset: {
+      key: 'needs_reset',
+      title: 'Needs a Reset',
+      subtitle: 'An honest starting point.',
+      description: 'The partnership is not functioning the way either of you needs it to. No blame. Just an honest starting point. This happens more often than people talk about. A structured conversation with your coach or admin could help. Sometimes a reset is the most productive thing you can do.',
+      color: '#DC2626',
+      bg: '#FEE2E2',
+      icon: 'N',
+    },
+  },
+  questions: [
+    {
+      question: 'How clearly defined are the roles in your partnership?',
+      answers: [
+        { text: 'Crystal clear. We both know who does what and when', types: ['thriving'] },
+        { text: 'Mostly clear but there are gray areas we have not discussed', types: ['growing'] },
+        { text: 'Fuzzy. We figure it out day to day', types: ['developing'] },
+        { text: 'Unclear. I am often unsure what I should be doing or what they expect', types: ['needs_reset'] },
+      ],
+    },
+    {
+      question: 'When something goes wrong in the classroom, you and your partner...',
+      answers: [
+        { text: 'Handle it seamlessly. We read each other well', types: ['thriving'] },
+        { text: 'Usually manage it but sometimes step on each other', types: ['growing'] },
+        { text: 'One of us takes over while the other watches', types: ['developing'] },
+        { text: 'It gets tense or we avoid addressing it', types: ['needs_reset'] },
+      ],
+    },
+    {
+      question: 'How often do you and your partner check in about how things are going?',
+      answers: [
+        { text: 'Regularly. We have built-in time to talk', types: ['thriving'] },
+        { text: 'Sometimes, usually when something comes up', types: ['growing'] },
+        { text: 'Rarely. We just kind of go with it', types: ['developing'] },
+        { text: 'Never. We do not have that kind of relationship', types: ['needs_reset'] },
+      ],
+    },
+    {
+      question: 'Does your partner know your strengths and how to use them?',
+      answers: [
+        { text: 'Yes. They lean into what I am good at and I do the same for them', types: ['thriving'] },
+        { text: 'Somewhat. They know some of my strengths but not all', types: ['growing'] },
+        { text: 'Not really. I feel underutilized or mismatched in my tasks', types: ['developing'] },
+        { text: 'No. I do not think they have asked or noticed', types: ['needs_reset'] },
+      ],
+    },
+    {
+      question: 'How do you feel walking into the classroom each morning?',
+      answers: [
+        { text: 'Glad I have a partner. We make each other better', types: ['thriving'] },
+        { text: 'Fine. It is a good working relationship most days', types: ['growing'] },
+        { text: 'Uncertain. I do not always know what the day will look like', types: ['developing'] },
+        { text: 'Stressed. The dynamic adds tension instead of support', types: ['needs_reset'] },
+      ],
+    },
+    {
+      question: 'When it comes to planning, your partnership looks like...',
+      answers: [
+        { text: 'We plan together and both contribute ideas', types: ['thriving'] },
+        { text: 'One of us plans and shares with the other, and that works OK', types: ['growing'] },
+        { text: 'One of us plans and the other finds out in the moment', types: ['developing'] },
+        { text: 'There is no shared planning. We are winging it separately', types: ['needs_reset'] },
+      ],
+    },
+    {
+      question: 'How respected do you feel in this partnership?',
+      answers: [
+        { text: 'Completely. My input is valued and my role matters', types: ['thriving'] },
+        { text: 'Mostly. But there are moments I feel overlooked', types: ['growing'] },
+        { text: 'Sometimes. I wonder if my contributions are noticed', types: ['developing'] },
+        { text: 'Not enough. I feel invisible or undervalued', types: ['needs_reset'] },
+      ],
+    },
+    {
+      question: 'If you had a concern about the partnership, would you feel safe raising it?',
+      answers: [
+        { text: 'Absolutely. We have that kind of trust', types: ['thriving'] },
+        { text: 'Probably, but I would be careful about how I said it', types: ['growing'] },
+        { text: 'Maybe, but I would worry about how it would be received', types: ['developing'] },
+        { text: 'No. It does not feel safe or worth the risk', types: ['needs_reset'] },
+      ],
+    },
+    {
+      question: 'Students interact with both of you. How does that look?',
+      answers: [
+        { text: 'Students see us as a team and go to either of us for help', types: ['thriving'] },
+        { text: 'Students mostly go to one of us but respect both', types: ['growing'] },
+        { text: 'Students are confused about our roles or only trust one of us', types: ['developing'] },
+        { text: 'The dynamic between us is visible to students and it is not positive', types: ['needs_reset'] },
+      ],
+    },
+    {
+      question: 'If you could change one thing about the partnership, it would be...',
+      answers: [
+        { text: 'Honestly nothing major. I would just want more time together', types: ['thriving'] },
+        { text: 'More consistent communication about expectations', types: ['growing'] },
+        { text: 'Clearer roles so we both know where we stand', types: ['developing'] },
+        { text: 'Everything. We need to start over with a real conversation', types: ['needs_reset'] },
+      ],
+    },
+  ],
+  shareMessage: (title, subtitle) =>
+    `I took TDI's Para Partnership Pulse Check and got "${title}" -- ${subtitle} Check yours at teachersdeserveit.com/hub`,
+}
+
+// ── 13. Burnout Early Warning System ────────────────────────────────
+
+export const burnoutWarningQuiz: QuizConfig = {
+  id: 'burnout_warning',
+  title: 'Burnout Early Warning System',
+  shortTitle: 'Burnout Check',
+  description: 'An honest check-in on where you are right now. No judgment. Just information.',
+  questionCount: 10,
+  durationLabel: '3 min',
+  category: 'needs',
+  accentColor: '#F43F5E',
+  accentBg: '#FFE4E6',
+  accentGradient: 'linear-gradient(135deg, #F43F5E 0%, #FB7185 100%)',
+  results: {
+    energized: {
+      key: 'energized',
+      title: 'Energized',
+      subtitle: 'You are in a good place right now.',
+      description: 'You are in a good place right now. Protect it. The habits you have are working. Do not let a busy season erode them. Pay attention to what is sustaining you and keep doing those things on purpose. This state is not permanent unless you actively maintain it.',
+      color: '#059669',
+      bg: '#D1FAE5',
+      icon: 'E',
+    },
+    workload: {
+      key: 'workload',
+      title: 'Workload Burnout',
+      subtitle: 'Too much on your plate.',
+      description: 'You are overwhelmed by the volume, not the work itself. You still care but there is too much on your plate. The love is there. The capacity is not. The fix is boundaries and delegation, not motivation. Something has to come off the list and it is OK if you are the one who decides what.',
+      color: '#D97706',
+      bg: '#FEF3C7',
+      icon: 'W',
+    },
+    emotional: {
+      key: 'emotional',
+      title: 'Emotional Exhaustion',
+      subtitle: 'Giving more than you are getting back.',
+      description: 'You are giving more than you are getting back emotionally. The work still matters to you but it is draining you. You feel deeply and that is a gift, but it is also costly. The fix is connection, recognition, and filling your own cup first. You cannot pour from empty.',
+      color: '#7C3AED',
+      bg: '#F3E8FF',
+      icon: 'E',
+    },
+    disconnect: {
+      key: 'disconnect',
+      title: 'Growing Disconnect',
+      subtitle: 'You are pulling back.',
+      description: 'You are pulling back from the work. This is not a character flaw. It is your body protecting you. The passion that brought you here may feel distant and that can be scary. The fix: reconnect with why you started, or give yourself permission to reimagine what is next. Both are valid.',
+      color: '#DC2626',
+      bg: '#FEE2E2',
+      icon: 'D',
+    },
+  },
+  questions: [
+    {
+      question: 'How do you feel when your alarm goes off on a school day?',
+      answers: [
+        { text: 'Ready. I may not love mornings but I am looking forward to the day', types: ['energized'] },
+        { text: 'Already running through my to-do list before my feet hit the floor', types: ['workload'] },
+        { text: 'Heavy. Like I am carrying something before the day even starts', types: ['emotional'] },
+        { text: 'Nothing. I just go through the motions', types: ['disconnect'] },
+      ],
+    },
+    {
+      question: 'When a student has a breakthrough moment, you feel...',
+      answers: [
+        { text: 'Genuinely thrilled. This is exactly why I do this', types: ['energized'] },
+        { text: 'Happy but I barely have time to enjoy it before the next thing', types: ['workload'] },
+        { text: 'Emotional in a way that surprises me. I feel too much lately', types: ['emotional'] },
+        { text: 'Less than I used to. I notice it but it does not hit the same way', types: ['disconnect'] },
+      ],
+    },
+    {
+      question: 'Your weekends lately look like...',
+      answers: [
+        { text: 'A real break. I disconnect and come back refreshed', types: ['energized'] },
+        { text: 'Catching up on everything I could not finish during the week', types: ['workload'] },
+        { text: 'Recovering emotionally from the week that just happened', types: ['emotional'] },
+        { text: 'Dreading Monday before Sunday even starts', types: ['disconnect'] },
+      ],
+    },
+    {
+      question: 'How do you feel about your colleagues right now?',
+      answers: [
+        { text: 'Connected. I have people I trust and lean on', types: ['energized'] },
+        { text: 'We are all too busy to really connect. Ships passing', types: ['workload'] },
+        { text: 'I am absorbing their stress on top of my own', types: ['emotional'] },
+        { text: 'Distant. I have been pulling away without meaning to', types: ['disconnect'] },
+      ],
+    },
+    {
+      question: 'When someone adds one more thing to your plate, your reaction is...',
+      answers: [
+        { text: 'I can handle it. My capacity feels manageable right now', types: ['energized'] },
+        { text: 'Internal screaming. I am already maxed out', types: ['workload'] },
+        { text: 'Resentment that I try to hide because I do not want to seem ungrateful', types: ['emotional'] },
+        { text: 'Indifference. Sure. Whatever. Add it to the pile', types: ['disconnect'] },
+      ],
+    },
+    {
+      question: 'How often do you do something just for yourself during the week?',
+      answers: [
+        { text: 'Regularly. I protect that time and it makes a difference', types: ['energized'] },
+        { text: 'I try but it keeps getting bumped by work obligations', types: ['workload'] },
+        { text: 'Rarely. I feel guilty taking time for myself when others need me', types: ['emotional'] },
+        { text: 'I have stopped trying. I do not have the energy for it', types: ['disconnect'] },
+      ],
+    },
+    {
+      question: 'When you think about next school year, you feel...',
+      answers: [
+        { text: 'Excited. I have ideas and plans I want to try', types: ['energized'] },
+        { text: 'Tired already. How am I going to do all of this again?', types: ['workload'] },
+        { text: 'Anxious. I do not know if I can keep giving at this level', types: ['emotional'] },
+        { text: 'Uncertain whether I will even be doing this next year', types: ['disconnect'] },
+      ],
+    },
+    {
+      question: 'Your body is telling you...',
+      answers: [
+        { text: 'I feel mostly good. Normal tired but nothing concerning', types: ['energized'] },
+        { text: 'Tension headaches, back pain, or sleep issues from overwork', types: ['workload'] },
+        { text: 'Emotional symptoms: crying easily, short fuse, trouble sleeping', types: ['emotional'] },
+        { text: 'Numbness or flatness. I do not feel much of anything lately', types: ['disconnect'] },
+      ],
+    },
+    {
+      question: 'When someone asks how you are, you say...',
+      answers: [
+        { text: 'Good! And I mean it', types: ['energized'] },
+        { text: 'Busy. Always busy. So, so busy', types: ['workload'] },
+        { text: 'Fine. But if they really pushed I might fall apart', types: ['emotional'] },
+        { text: 'Fine. And I change the subject', types: ['disconnect'] },
+      ],
+    },
+    {
+      question: 'Right now, the thing you need most is...',
+      answers: [
+        { text: 'To keep doing what I am doing. Things are working', types: ['energized'] },
+        { text: 'Someone to take something off my plate. Anything', types: ['workload'] },
+        { text: 'Someone to see me and say: "You are doing enough"', types: ['emotional'] },
+        { text: 'Permission to step back without it meaning I have failed', types: ['disconnect'] },
+      ],
+    },
+  ],
+  shareMessage: (title, subtitle) =>
+    `I took TDI's Burnout Early Warning System and got "${title}" -- ${subtitle} Check yours at teachersdeserveit.com/hub`,
+}
+
 // ── All Quizzes Registry ──────────────────────────────────────────────
 
 export const ALL_QUIZZES: QuizConfig[] = [
@@ -936,6 +1653,11 @@ export const ALL_QUIZZES: QuizConfig[] = [
   careerSeasonQuiz,
   energyDrainQuiz,
   creatorQuiz,
+  communicationStyleQuiz,
+  btsReadinessQuiz,
+  coachingStanceQuiz,
+  paraPartnershipQuiz,
+  burnoutWarningQuiz,
 ]
 
 export function getQuizById(id: string): QuizConfig | undefined {

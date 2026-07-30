@@ -130,6 +130,126 @@ export const RESULT_RECOMMENDATIONS: Record<string, Record<string, QuizRecommend
     },
   },
 
+  // Communication Style quiz
+  communication_style: {
+    fixer: {
+      categories: ['Communication', 'Time Savers'],
+      message: 'You jump to solutions. These tools help you act quickly and effectively.',
+      message_es: 'Tu saltas a las soluciones. Estas herramientas te ayudan a actuar rapido.',
+    },
+    listener: {
+      categories: ['Communication', 'Self-Care'],
+      message: 'You lead with empathy. These tools support the deep relational work you do.',
+      message_es: 'Tu lideras con empatia. Estas herramientas apoyan tu trabajo relacional.',
+    },
+    redirector: {
+      categories: ['Communication', 'Classroom Tools'],
+      message: 'You reframe and redirect. These tools give you more ways to shift the energy.',
+      message_es: 'Tu reencuadras y redireccionas. Estas herramientas te dan mas opciones.',
+    },
+    direct: {
+      categories: ['Communication', 'Classroom Tools'],
+      message: 'You name it clearly. These tools help you deliver with impact and care.',
+      message_es: 'Tu lo nombras claramente. Estas herramientas te ayudan a comunicar con impacto.',
+    },
+  },
+
+  // BTS Readiness quiz
+  bts_readiness: {
+    ready_to_go: {
+      categories: ['Classroom Tools', 'Games'],
+      message: 'You are ready! These tools add the finishing touches to an already strong plan.',
+      message_es: 'Estas listo! Estas herramientas agregan los toques finales a un plan solido.',
+    },
+    almost_there: {
+      categories: ['Classroom Tools', 'Time Savers'],
+      message: 'Almost there. These tools can help you close the gaps before day one.',
+      message_es: 'Casi listo. Estas herramientas te ayudan a cerrar las brechas antes del primer dia.',
+    },
+    building_momentum: {
+      categories: ['Classroom Tools', 'Time Savers'],
+      message: 'You need plans, not ideas. These tools turn thinking into doing.',
+      message_es: 'Necesitas planes, no ideas. Estas herramientas convierten el pensar en hacer.',
+    },
+    fresh_start: {
+      categories: ['Classroom Tools', 'Communication'],
+      message: 'Fresh start energy. Focus on relationships first. These tools help.',
+      message_es: 'Energia de nuevo comienzo. Enfocate en relaciones primero. Estas herramientas ayudan.',
+    },
+  },
+
+  // Coaching Stance quiz
+  coaching_stance: {
+    consultant: {
+      categories: ['Communication', 'Classroom Tools'],
+      message: 'You lead with expertise. These tools give you more strategies to share.',
+      message_es: 'Tu lideras con experiencia. Estas herramientas te dan mas estrategias.',
+    },
+    collaborator: {
+      categories: ['Communication', 'Games'],
+      message: 'You co-create solutions. These tools are great to explore with a partner.',
+      message_es: 'Tu co-creas soluciones. Estas herramientas son ideales para explorar con un colega.',
+    },
+    mirror: {
+      categories: ['Communication', 'Self-Care'],
+      message: 'You reflect what you see. These tools support deep reflection and growth.',
+      message_es: 'Tu reflejas lo que ves. Estas herramientas apoyan la reflexion profunda.',
+    },
+    facilitator: {
+      categories: ['Communication', 'Classroom Tools'],
+      message: 'You create the conditions. These tools help you design better learning spaces.',
+      message_es: 'Tu creas las condiciones. Estas herramientas te ayudan a disenar mejores espacios.',
+    },
+  },
+
+  // Para Partnership quiz
+  para_partnership: {
+    thriving: {
+      categories: ['Communication', 'Games'],
+      message: 'Your partnership is thriving. These tools help you keep growing together.',
+      message_es: 'Tu asociacion prospera. Estas herramientas les ayudan a seguir creciendo juntos.',
+    },
+    growing: {
+      categories: ['Communication', 'Classroom Tools'],
+      message: 'Your partnership is growing. These tools support better communication and teamwork.',
+      message_es: 'Tu asociacion esta creciendo. Estas herramientas apoyan mejor comunicacion.',
+    },
+    developing: {
+      categories: ['Communication', 'Time Savers'],
+      message: 'Your partnership needs clarity. These tools help define roles and routines.',
+      message_es: 'Tu asociacion necesita claridad. Estas herramientas ayudan a definir roles.',
+    },
+    needs_reset: {
+      categories: ['Communication', 'Self-Care'],
+      message: 'Your partnership needs a reset. These tools support honest conversations and fresh starts.',
+      message_es: 'Tu asociacion necesita un reinicio. Estas herramientas apoyan conversaciones honestas.',
+    },
+  },
+
+  // Burnout Warning quiz
+  burnout_warning: {
+    energized: {
+      categories: ['Games', 'Classroom Tools'],
+      message: 'You are energized. These tools help you maintain what is working.',
+      message_es: 'Estas energizado. Estas herramientas te ayudan a mantener lo que funciona.',
+    },
+    workload: {
+      categories: ['Time Savers', 'Self-Care'],
+      message: 'Workload burnout. These tools help you reclaim time and set boundaries.',
+      message_es: 'Agotamiento por carga de trabajo. Estas herramientas te ayudan a recuperar tiempo.',
+    },
+    emotional: {
+      categories: ['Self-Care', 'Stress Relief'],
+      message: 'Emotional exhaustion. These tools are for you, not your classroom.',
+      message_es: 'Agotamiento emocional. Estas herramientas son para ti, no para tu salon.',
+    },
+    disconnect: {
+      categories: ['Self-Care', 'Stress Relief'],
+      message: 'Growing disconnect. These tools help you reconnect or reimagine what is next.',
+      message_es: 'Desconexion creciente. Estas herramientas te ayudan a reconectar.',
+    },
+  },
+
   // Growth Style quiz
   growth_style: {
     deep_diver: {
