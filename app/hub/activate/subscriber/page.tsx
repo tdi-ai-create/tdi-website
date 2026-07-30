@@ -83,6 +83,7 @@ export default function SubscriberActivatePage() {
         const grantedAt = new Date().toISOString().slice(0, 10);
         const expiresAt = new Date(Date.now() + 35 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
+        // Non-critical backup grant. Membership tier is the real source of truth.
         await supabase
           .from('comped_access_grants')
           .upsert({
@@ -91,9 +92,7 @@ export default function SubscriberActivatePage() {
             granted_at: grantedAt,
             expires_at: expiresAt,
             reason: 'substack_paid_subscriber',
-          }, { onConflict: 'user_id,reason' })
-          .then(() => {})
-          .catch(() => {}); // Non-critical, membership tier is the real source of truth
+          }, { onConflict: 'user_id,reason' });
 
         setStatus('success');
       } catch (err) {

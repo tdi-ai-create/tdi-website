@@ -463,6 +463,7 @@ export async function GET(request: NextRequest) {
       dry_run_skipped: 0,
       window_skipped: 0,
       allowlist_skipped: 0,
+      agentOverdue: 0,
       dry_run: DRY_RUN,
       allowlist_enabled: ALLOWLIST_ENABLED,
       allowlist: SEND_ALLOWLIST,
