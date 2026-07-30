@@ -958,6 +958,60 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // ── Agent timeout check (Layer 3) ──
+    // If a narrative was requested > 72 hours ago and never completed, alert Rae
+    const { data: staleAgentWork } = await supabase
+      .from('funding_opportunities')
+      .select('id, name, pursuit_id, narrative_status, assigned_agent, updated_at')
+      .eq('narrative_status', 'requested')
+      .lt('updated_at', new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString())
+
+    if (staleAgentWork && staleAgentWork.length > 0) {
+      for (const opp of staleAgentWork) {
+        // Get pursuit name for context
+        const { data: pursuit } = await supabase
+          .from('funding_pursuits')
+          .select('district_name')
+          .eq('id', opp.pursuit_id)
+          .single()
+
+        const schoolName = pursuit?.district_name || 'Unknown school'
+        const agentName = opp.assigned_agent || 'Unassigned'
+        const hoursAgo = Math.round((Date.now() - new Date(opp.updated_at).getTime()) / (1000 * 60 * 60))
+
+        console.warn(LOG, `AGENT OVERDUE: "${opp.name}" for ${schoolName} assigned to ${agentName}, requested ${hoursAgo}h ago`)
+
+        // Send Slack alert if webhook exists
+        const slackWebhook = process.env.SLACK_WEBHOOK_INTERNAL
+        if (slackWebhook) {
+          await fetch(slackWebhook, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text: `Agent overdue: "${opp.name}" narrative for ${schoolName} was requested ${hoursAgo} hours ago and assigned to ${agentName}. No draft submitted.`,
+            }),
+          }).catch(() => {})
+        }
+
+        // Send email alert to Rae
+        const resendKey = process.env.RESEND_API_KEY
+        if (resendKey && !DRY_RUN) {
+          await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              from: 'TDI System <hello@teachersdeserveit.com>',
+              to: 'rae@teachersdeserveit.com',
+              subject: `[Agent Overdue] ${opp.name} for ${schoolName}`,
+              html: `<p>The narrative for <strong>${opp.name}</strong> (${schoolName}) was requested ${hoursAgo} hours ago and assigned to <strong>${agentName}</strong>. No draft has been submitted.</p><p>Either re-trigger through Paperclip or draft manually.</p>`,
+            }),
+          }).catch(() => {})
+        }
+
+        summary.agentOverdue = (summary.agentOverdue || 0) + 1
+      }
+    }
+
     console.log(LOG, 'Run complete:', JSON.stringify(summary))
 
     return NextResponse.json({ success: true, ...summary })

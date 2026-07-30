@@ -13,6 +13,12 @@ export interface TemplateOpportunity {
   waiting_on: string
   narrative_status: string
   notes: string
+  // Window metadata: federal formula funds are always open, no verification needed
+  window_status_default: 'open' | 'unknown'
+  // Who verifies the window if unknown: always 'agent', never Bella
+  window_verifier: 'auto' | 'agent'
+  // Default agent assignment for narrative drafting
+  default_agent: 'vanessa' | 'amara'
 }
 
 export interface TemplateAction {
@@ -37,6 +43,9 @@ export const STANDARD_OPPORTUNITIES: TemplateOpportunity[] = [
     waiting_on: 'tdi',
     narrative_status: 'not_started',
     notes: 'Federal formula funding for PD. School submits through district Title II-A consolidated application.',
+    window_status_default: 'open',
+    window_verifier: 'auto',
+    default_agent: 'vanessa',
   },
   {
     name: 'IDEA/CEIS (Special Ed PD)',
@@ -46,6 +55,9 @@ export const STANDARD_OPPORTUNITIES: TemplateOpportunity[] = [
     waiting_on: 'tdi',
     narrative_status: 'not_started',
     notes: 'Coordinated Early Intervening Services. For schools with IEP populations. District special ed office approves.',
+    window_status_default: 'open',
+    window_verifier: 'auto',
+    default_agent: 'vanessa',
   },
   {
     name: 'Title I Section 1003 (School Improvement)',
@@ -55,6 +67,9 @@ export const STANDARD_OPPORTUNITIES: TemplateOpportunity[] = [
     waiting_on: 'tdi',
     narrative_status: 'not_started',
     notes: 'For ATSI/CSI/TSI identified schools. Uses school improvement funds already allocated.',
+    window_status_default: 'unknown',
+    window_verifier: 'agent',
+    default_agent: 'vanessa',
   },
   {
     name: 'NEA Learning & Leadership Grant',
@@ -64,6 +79,9 @@ export const STANDARD_OPPORTUNITIES: TemplateOpportunity[] = [
     waiting_on: 'tdi',
     narrative_status: 'not_started',
     notes: 'Requires an NEA member teacher at the school as applicant. Up to $5,000. Three cycles per year.',
+    window_status_default: 'unknown',
+    window_verifier: 'agent',
+    default_agent: 'amara',
   },
   {
     name: 'Community Schools Budget',
@@ -73,6 +91,9 @@ export const STANDARD_OPPORTUNITIES: TemplateOpportunity[] = [
     waiting_on: 'tdi',
     narrative_status: 'not_started',
     notes: 'If school has a Community Schools designation. Varies by district.',
+    window_status_default: 'unknown',
+    window_verifier: 'agent',
+    default_agent: 'amara',
   },
   {
     name: 'Walmart Spark Good Grant',
@@ -81,7 +102,10 @@ export const STANDARD_OPPORTUNITIES: TemplateOpportunity[] = [
     status: 'not_started',
     waiting_on: 'tdi',
     narrative_status: 'not_started',
-    notes: 'School registers via walmart.com/nonprofits. Deed verification with NCES number. Annual cycle.',
+    notes: 'School registers via walmart.com/nonprofits. Deed verification with NCES number. Annual cycle Aug 1-31.',
+    window_status_default: 'unknown',
+    window_verifier: 'agent',
+    default_agent: 'amara',
   },
 ]
 

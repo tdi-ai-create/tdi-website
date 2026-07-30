@@ -206,7 +206,9 @@ export function computeNextActions(
     }
   }
 
-  // Funding windows unverified — show each grant individually with verify action
+  // Funding windows unverified — assigned to agents, not Bella
+  // Federal formula funds (Title II-A, IDEA/CEIS) should auto-mark as open on creation.
+  // Remaining unknown windows are agent research tasks.
   const unverifiedWindows = opportunities.filter(
     (o: any) => !['awarded', 'denied'].includes(o.status) && (o.window_status || 'unknown') === 'unknown'
   )
@@ -214,8 +216,8 @@ export function computeNextActions(
     result.push({
       id: `verify-window-${opp.id}`,
       label: `Verify window: ${opp.name}`,
-      why: 'Is this grant currently accepting applications? Mark it open or closed so agents can start drafting.',
-      owner: 'bella',
+      why: 'Agent research task: determine if this grant is currently accepting applications.',
+      owner: 'agent',
       urgency: 'high',
       actionType: 'verify_window',
       targetId: opp.id,
@@ -304,8 +306,8 @@ export function computeNextActions(
     result.push({
       id: 'diversify',
       label: 'No fast funding sources (Plan C/D)',
-      why: 'Consider requesting research for a local/foundation source to hedge the timeline',
-      owner: 'bella',
+      why: 'Agents should research a local/foundation source to hedge the timeline',
+      owner: 'agent',
       urgency: 'normal',
       actionType: 'request_research',
       tab: 'opportunities',
@@ -327,7 +329,7 @@ export function computeNextActions(
         id: 'complete-profile',
         label: `School profile ${Math.round((profileFilled / profileFields) * 100)}% complete`,
         why: `${profileFields - profileFilled} field${profileFields - profileFilled !== 1 ? 's' : ''} need verification`,
-        owner: 'bella',
+        owner: 'agent',
         urgency: 'normal',
         actionType: 'complete_profile',
         tab: 'overview',
