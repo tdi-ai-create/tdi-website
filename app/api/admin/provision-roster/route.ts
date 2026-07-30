@@ -67,31 +67,86 @@ export async function POST(request: NextRequest) {
 
     for (const member of staff) {
       if (!member.email) continue;
+      const email = member.email.toLowerCase();
 
-      // Create Hub membership
-      const { error: membershipError } = await hubSupabase
-        .from('hub_memberships')
-        .upsert({
-          email: member.email.toLowerCase(),
-          tier: 'all_access',
-          source: 'district_partner',
-          partnership_id: partnershipId,
-          is_active: true,
-        }, { onConflict: 'email' });
-
-      if (!membershipError) {
-        // Link Hub profile to partnership (so Leadership Dashboard can group by partner)
-        await hubSupabase
+      try {
+        // Step 1: Find or create Hub user
+        const { data: existingProfile } = await hubSupabase
           .from('hub_profiles')
-          .update({
+          .select('id')
+          .ilike('email', email)
+          .maybeSingle();
+
+        let userId: string;
+
+        if (existingProfile) {
+          userId = existingProfile.id;
+        } else {
+          // Create auth user in Hub
+          const { data: authUser, error: authError } = await hubSupabase.auth.admin.createUser({
+            email,
+            email_confirm: true,
+            user_metadata: {
+              display_name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || email.split('@')[0],
+              source: 'district_partner',
+            },
+          });
+
+          if (authError || !authUser?.user) {
+            console.error('[provision-roster] Auth error for:', email, authError?.message);
+            failed++;
+            continue;
+          }
+
+          userId = authUser.user.id;
+
+          // Create hub_profile
+          await hubSupabase.from('hub_profiles').upsert({
+            id: userId,
+            email,
+            display_name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || email.split('@')[0],
+            first_name: member.first_name || null,
+            last_name: member.last_name || null,
             partnership_id: partnershipId,
             partnership_slug: partnershipSlug,
-            first_name: member.first_name || undefined,
-            last_name: member.last_name || undefined,
-          })
-          .eq('email', member.email.toLowerCase());
+            onboarding_completed: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'id' });
+        }
 
-        // Mark as enrolled in portal
+        // Step 2: Create/update Hub membership using user_id (not email)
+        const { error: membershipError } = await hubSupabase
+          .from('hub_memberships')
+          .upsert({
+            user_id: userId,
+            tier: 'all_access',
+            source: 'district_partner',
+            status: 'active',
+            partnership_id: partnershipId,
+          }, { onConflict: 'user_id' });
+
+        if (membershipError) {
+          console.error('[provision-roster] Membership error for:', email, membershipError.message);
+          failed++;
+          continue;
+        }
+
+        // Step 3: Update existing profile with partnership info
+        if (existingProfile) {
+          await hubSupabase
+            .from('hub_profiles')
+            .update({
+              partnership_id: partnershipId,
+              partnership_slug: partnershipSlug,
+              first_name: member.first_name || undefined,
+              last_name: member.last_name || undefined,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', userId);
+        }
+
+        // Step 4: Mark as enrolled in portal
         await portalSupabase
           .from('staff_members')
           .update({
@@ -101,8 +156,8 @@ export async function POST(request: NextRequest) {
           .eq('id', member.id);
 
         provisioned++;
-      } else {
-        console.error('[provision-roster] Failed for:', member.email, membershipError.message);
+      } catch (err) {
+        console.error('[provision-roster] Error for:', email, err);
         failed++;
       }
     }
