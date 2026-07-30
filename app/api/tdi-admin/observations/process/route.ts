@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     // Fetch the partnership staff roster
     const { data: staff } = await supabase
-      .from('partnership_staff')
+      .from('staff_members')
       .select('id, first_name, last_name, email, role_title')
       .eq('partnership_id', visit.partnership_id)
 
@@ -178,14 +178,13 @@ Return ONLY the JSON. No markdown formatting, no explanation.`
     for (const edu of educators) {
       await supabase.from('observation_notes').insert({
         visit_id: visitId,
-        partnership_id: visit.partnership_id,
         educator_name: edu.name,
-        matched_staff_id: edu.matched_roster_id || null,
-        matched_email: edu.matched_email || null,
+        educator_id: edu.matched_roster_id || null,
+        educator_email: edu.matched_email || null,
         love_note_draft: edu.love_note,
         strategy_tags: edu.strategy_tags || [],
         growth_indicators: edu.growth_indicators || [],
-        hub_resources: edu.hub_resources || [],
+        hub_resources_spotted: edu.hub_resources || [],
       })
     }
 

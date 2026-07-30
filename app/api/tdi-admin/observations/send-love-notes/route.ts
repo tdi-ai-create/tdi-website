@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     for (const note of notes) {
       const loveNoteText = note.love_note_final || note.love_note_draft
-      const email = note.matched_email
+      const email = note.educator_email
 
       if (!loveNoteText || !email) {
         failed++

@@ -5,13 +5,13 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 interface ObservationNote {
   id: string
   educator_name: string
-  matched_staff_id: string | null
-  matched_email: string | null
+  educator_id: string | null
+  educator_email: string | null
   love_note_draft: string
   love_note_final: string | null
   strategy_tags: string[]
   growth_indicators: string[]
-  hub_resources: string[]
+  hub_resources_spotted: string[]
   email_sent_at: string | null
 }
 
@@ -515,14 +515,14 @@ export default function ObservationPanel({
                                 <div className="flex items-center gap-2 mb-3">
                                   <div
                                     className="w-2.5 h-2.5 rounded-full"
-                                    style={{ backgroundColor: note.matched_staff_id ? '#10B981' : '#9CA3AF' }}
-                                    title={note.matched_staff_id ? 'Matched to roster' : 'Not matched'}
+                                    style={{ backgroundColor: note.educator_id ? '#10B981' : '#9CA3AF' }}
+                                    title={note.educator_id ? 'Matched to roster' : 'Not matched'}
                                   />
                                   <span className="text-sm font-semibold text-gray-800">
                                     {note.educator_name}
                                   </span>
-                                  {note.matched_email && (
-                                    <span className="text-xs text-gray-400">{note.matched_email}</span>
+                                  {note.educator_email && (
+                                    <span className="text-xs text-gray-400">{note.educator_email}</span>
                                   )}
                                   {note.email_sent_at && (
                                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-100 text-green-700">
@@ -603,11 +603,11 @@ export default function ObservationPanel({
                                 </div>
 
                                 {/* Hub Resources */}
-                                {note.hub_resources && note.hub_resources.length > 0 && (
+                                {note.hub_resources_spotted && note.hub_resources_spotted.length > 0 && (
                                   <div className="mb-3">
                                     <label className="text-xs font-medium text-gray-500 mb-1 block">Suggested Hub Resources</label>
                                     <ul className="text-xs text-gray-600 space-y-0.5">
-                                      {note.hub_resources.map((r, i) => (
+                                      {note.hub_resources_spotted.map((r, i) => (
                                         <li key={i} className="flex items-start gap-1.5">
                                           <span className="w-1.5 h-1.5 rounded-full mt-1 flex-shrink-0" style={{ backgroundColor: '#E8B84B' }} />
                                           {r}
@@ -618,7 +618,7 @@ export default function ObservationPanel({
                                 )}
 
                                 {/* Send button per educator */}
-                                {!note.email_sent_at && note.matched_email && (
+                                {!note.email_sent_at && note.educator_email && (
                                   <button
                                     onClick={() => handleSendOne(visit.id, note.id)}
                                     disabled={sendingNoteId === note.id}
@@ -632,7 +632,7 @@ export default function ObservationPanel({
                             ))}
 
                             {/* Send All button */}
-                            {expandedNotes.some((n) => !n.email_sent_at && n.matched_email) && (
+                            {expandedNotes.some((n) => !n.email_sent_at && n.educator_email) && (
                               <button
                                 onClick={() => handleSendAll(visit.id)}
                                 disabled={sending}
