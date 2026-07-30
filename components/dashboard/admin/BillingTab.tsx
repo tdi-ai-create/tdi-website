@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { DollarSign, Send, CheckCircle2, Clock, AlertCircle, ChevronDown, ChevronUp, Plus, X, RotateCcw } from 'lucide-react';
+import { SectionGuide, GUIDE_CONTENT } from '@/components/tdi-admin/InlineGuide';
 
 interface Deliverable {
   id: string;
@@ -508,6 +509,8 @@ export default function BillingTab({
           </div>
         </div>
       )}
+
+      <SectionGuide items={GUIDE_CONTENT.billing} />
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">

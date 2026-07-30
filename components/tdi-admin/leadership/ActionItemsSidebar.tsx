@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { CheckCircle2, Circle, Clock, Eye, EyeOff, Trash2, Plus, ChevronDown, Target } from 'lucide-react'
+import { SectionGuide, GUIDE_CONTENT } from '@/components/tdi-admin/InlineGuide'
 
 const CATEGORY_COLORS: Record<string, string> = {
   general: '#6B7280', onboarding: '#8B5CF6', hub: '#3B82F6',
@@ -176,6 +177,7 @@ export default function ActionItemsSidebar({ partnershipId, actionItems, onActio
           <Plus size={16} />
         </button>
       </div>
+      <SectionGuide items={GUIDE_CONTENT.actionItems} />
 
       {/* Add action form */}
       {showAddAction && (

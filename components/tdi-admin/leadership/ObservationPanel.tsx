@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { SectionGuide, GUIDE_CONTENT } from '@/components/tdi-admin/InlineGuide'
 
 interface ObservationNote {
   id: string
@@ -327,6 +328,8 @@ export default function ObservationPanel({
 
   return (
     <div>
+      <SectionGuide items={GUIDE_CONTENT.observations} />
+
       {/* New Observation Form */}
       <div className="border border-gray-200 rounded-xl p-4 mb-6">
         <h3 className="text-sm font-semibold text-gray-800 mb-3">New Observation</h3>

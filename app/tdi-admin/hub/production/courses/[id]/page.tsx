@@ -27,6 +27,7 @@ import ProductionDashboard from './components/ProductionDashboard';
 import QuizQuestionBuilder from './components/QuizQuestionBuilder';
 import BulkVideoUpload from './components/BulkVideoUpload';
 import BulkContentUpload from './components/BulkContentUpload';
+import { SectionGuide, GUIDE_CONTENT } from '@/components/tdi-admin/InlineGuide';
 import {
   ArrowLeft,
   Plus,
@@ -2406,6 +2407,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
             <div className="mb-4">
               <ProductionDashboard course={course} />
             </div>
+
+            <SectionGuide items={GUIDE_CONTENT.videoUpload} title="How uploading works" />
 
             {/* Bulk Actions */}
             <div className="mb-4 flex flex-wrap items-center gap-3">
