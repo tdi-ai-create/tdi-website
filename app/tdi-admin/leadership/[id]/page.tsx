@@ -32,6 +32,7 @@ import DeliverablesList from '@/components/tdi-admin/leadership/DeliverablesList
 import BriefingModal from '@/components/tdi-admin/leadership/BriefingModal'
 import ActionItemsSidebar from '@/components/tdi-admin/leadership/ActionItemsSidebar'
 import ErrorBoundary from '@/components/tdi-admin/leadership/ErrorBoundary'
+import ObservationPanel from '@/components/tdi-admin/leadership/ObservationPanel'
 
 const NOTE_TYPE_COLORS: Record<string, string> = {
   general: 'bg-gray-100 text-gray-700',
@@ -180,6 +181,7 @@ export default function AdminPartnershipDetailPage() {
   const [showOverviewPanel, setShowOverviewPanel] = useState(false)
   const [showKpiSelector, setShowKpiSelector] = useState(false)
   const [showSchoolInfo, setShowSchoolInfo] = useState(false)
+  const [showObservationPanel, setShowObservationPanel] = useState(false)
 
   // Inline editing state for partnership goal
   const [editingField, setEditingField] = useState<string | null>(null)
@@ -1623,6 +1625,13 @@ export default function AdminPartnershipDetailPage() {
               {/* Quick view panels */}
               <div className="mt-3 space-y-1.5">
                 <button
+                  onClick={() => setShowObservationPanel(!showObservationPanel)}
+                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-left transition"
+                >
+                  <span className="text-xs font-medium text-gray-700">Observations & Love Notes</span>
+                  <ChevronRight size={12} style={{ color: '#9CA3AF', transform: showObservationPanel ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
+                </button>
+                <button
                   onClick={() => setShowTeamPanel(!showTeamPanel)}
                   className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-left transition"
                 >
@@ -2168,6 +2177,20 @@ export default function AdminPartnershipDetailPage() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {showObservationPanel && (
+          <div className="mt-4">
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-gray-900">Observations & Love Notes</h2>
+                <button onClick={() => setShowObservationPanel(false)} className="text-gray-400 hover:text-gray-600">
+                  <X size={18} />
+                </button>
+              </div>
+              <ObservationPanel partnershipId={partnershipId} showToast={showToast} />
             </div>
           </div>
         )}
