@@ -1,6 +1,6 @@
 // Game configuration and shared utilities
 
-export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook' | 'conversationcompass' | 'partnerup';
+export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook' | 'conversationcompass' | 'partnerup' | 'boundarygame';
 
 export interface GameConfig {
   id: GameId;
@@ -8,7 +8,7 @@ export interface GameConfig {
   description: string;
   time: string;
   duration: number; // default minutes for facilitator timer
-  color: 'orange' | 'yellow' | 'green' | 'purple' | 'red' | 'gold' | 'teal';
+  color: 'orange' | 'yellow' | 'green' | 'purple' | 'red' | 'gold' | 'teal' | 'rose';
   rounds: string;
 }
 
@@ -85,6 +85,15 @@ export const GAMES: GameConfig[] = [
     color: 'green',
     rounds: '10 scenarios, 2 perspectives each',
   },
+  {
+    id: 'boundarygame',
+    title: 'The Boundary Game',
+    description: 'Real dilemmas where you need to set a boundary but feel guilty about it.',
+    time: '~12 min',
+    duration: 12,
+    color: 'rose',
+    rounds: '10 scenarios',
+  },
 ];
 
 // Color system
@@ -136,6 +145,12 @@ export const COLORS = {
     bg: 'rgba(232, 184, 75, 0.1)',
     bgHover: 'rgba(232, 184, 75, 0.15)',
     border: 'rgba(232, 184, 75, 0.4)',
+  },
+  rose: {
+    accent: '#F43F5E',
+    bg: 'rgba(244, 63, 94, 0.1)',
+    bgHover: 'rgba(244, 63, 94, 0.15)',
+    border: 'rgba(244, 63, 94, 0.4)',
   },
 } as const;
 

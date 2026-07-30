@@ -20,6 +20,7 @@ const GAME_CARDS: {
   { id: 'principalplaybook', icon: '📋', color: 'gold' },
   { id: 'conversationcompass', icon: '🧭', color: 'teal' },
   { id: 'partnerup', icon: '🤝', color: 'green' },
+  { id: 'boundarygame', icon: '🛡️', color: 'rose' },
 ];
 
 const TIMES: Record<GameId, string> = {
@@ -35,6 +36,7 @@ const TIMES: Record<GameId, string> = {
   principalplaybook: '~15 min',
   conversationcompass: '~12 min',
   partnerup: '~15 min',
+  boundarygame: '~12 min',
 };
 
 interface HomeScreenProps {

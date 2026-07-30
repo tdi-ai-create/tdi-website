@@ -101,6 +101,14 @@ export const UI_TRANSLATIONS = {
       },
       format: { en: 'Dual Perspective', es: 'Perspectiva Dual' },
     },
+    boundarygame: {
+      title: { en: 'The Boundary Game', es: 'El Juego de Límites' },
+      description: {
+        en: 'Real dilemmas where you need to set a boundary but feel guilty about it.',
+        es: 'Dilemas reales donde necesitas establecer un límite pero te sientes culpable.',
+      },
+      format: { en: 'Solo Quiz', es: 'Quiz Individual' },
+    },
   },
 
   // Common Game UI
