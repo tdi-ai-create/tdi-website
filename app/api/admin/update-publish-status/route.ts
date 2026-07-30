@@ -115,6 +115,36 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Sync publish status to Learning Hub (hub_courses table)
+    if (['publish_now', 'mark_published', 'unpublish'].includes(action)) {
+      const hubUrl = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL;
+      const hubKey = process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY;
+      if (hubUrl && hubKey) {
+        try {
+          const hubSupabase = createClient(hubUrl, hubKey, {
+            auth: { autoRefreshToken: false, persistSession: false },
+          });
+          const isPublished = action !== 'unpublish';
+          const { data: hubCourses } = await hubSupabase
+            .from('hub_courses')
+            .select('id')
+            .eq('creator_id', creatorId);
+
+          if (hubCourses && hubCourses.length > 0) {
+            for (const hc of hubCourses) {
+              await hubSupabase
+                .from('hub_courses')
+                .update({ is_published: isPublished, updated_at: new Date().toISOString() })
+                .eq('id', hc.id);
+            }
+            console.log(`[update-publish-status] Hub sync: ${hubCourses.length} course(s) set is_published=${isPublished}`);
+          }
+        } catch (hubErr) {
+          console.error('[update-publish-status] Hub sync failed:', hubErr);
+        }
+      }
+    }
+
     // Send celebration email when content is published
     if ((action === 'publish_now' || action === 'mark_published') && data) {
       try {

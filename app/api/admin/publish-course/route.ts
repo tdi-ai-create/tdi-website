@@ -285,8 +285,8 @@ export async function POST(request: Request) {
           }
         }
       } catch (hubErr) {
-        // Non-blocking: log but don't fail the main publish
-        console.error('[publish-course] Hub sync failed (non-blocking):', hubErr);
+        // Non-blocking but logged clearly so we can track sync failures
+        console.error('[publish-course] Hub sync failed. Course published in Portal but NOT in Hub. Manual sync needed.', hubErr);
       }
     }
 
