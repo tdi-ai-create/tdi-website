@@ -7465,24 +7465,34 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     {/* Historical Building Data */}
                     {semesterData.building_data && semesterData.building_data.length > 0 && (
                       <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <h2 className="text-base font-semibold text-gray-900 mb-4">Building Engagement</h2>
+                        <h2 className="text-base font-semibold text-gray-900 mb-4">Building Spotlight</h2>
                         <div className="overflow-x-auto">
                           <table className="w-full text-sm">
                             <thead>
                               <tr className="border-b border-gray-100">
                                 <th className="text-left text-xs font-semibold text-gray-500 pb-2 pr-4">Building</th>
-                                <th className="text-right text-xs font-semibold text-gray-500 pb-2 px-4">Staff</th>
-                                <th className="text-right text-xs font-semibold text-gray-500 pb-2 px-4">Hub Logins</th>
-                                <th className="text-right text-xs font-semibold text-gray-500 pb-2 pl-4">Quick Wins</th>
+                                <th className="text-right text-xs font-semibold text-gray-500 pb-2 px-4">Paras</th>
+                                <th className="text-right text-xs font-semibold text-gray-500 pb-2 px-4">Login %</th>
+                                <th className="text-left text-xs font-semibold text-gray-500 pb-2 pl-4">Recognition</th>
                               </tr>
                             </thead>
                             <tbody>
-                              {semesterData.building_data.map((b, i) => (
+                              {semesterData.building_data.map((b: Record<string, unknown>, i: number) => (
                                 <tr key={i} className="border-b border-gray-50">
-                                  <td className="py-2.5 pr-4 font-medium text-[#1e2749]">{b.name}</td>
-                                  <td className="py-2.5 px-4 text-right text-gray-600">{b.staff_count ?? '—'}</td>
-                                  <td className="py-2.5 px-4 text-right text-gray-600">{b.hub_logins ?? '—'}</td>
-                                  <td className="py-2.5 pl-4 text-right text-gray-600">{b.quick_wins ?? '—'}</td>
+                                  <td className="py-2.5 pr-4 font-medium text-[#1e2749]">{b.name as string}</td>
+                                  <td className="py-2.5 px-4 text-right text-gray-600">{(b.staff_count as number) ?? '—'}</td>
+                                  <td className="py-2.5 px-4 text-right text-gray-600">{b.login_pct ? `${b.login_pct}%` : '—'}</td>
+                                  <td className="py-2.5 pl-4 text-left">
+                                    {(b.awards as string[])?.length > 0 ? (
+                                      <div className="flex flex-wrap gap-1">
+                                        {(b.awards as string[]).map((award: string, j: number) => (
+                                          <span key={j} className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold" style={{ background: '#FFF7ED', color: '#C2410C', border: '1px solid #FDBA74' }}>
+                                            {award}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    ) : '—'}
+                                  </td>
                                 </tr>
                               ))}
                             </tbody>
@@ -7492,26 +7502,49 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     )}
 
                     {/* Historical Observation Notes */}
-                    {semesterData.observation_notes && (semesterData.observation_notes as { title: string; date?: string; notes?: string }[]).length > 0 && (
+                    {semesterData.observation_notes && (semesterData.observation_notes as { title: string; date?: string; notes?: string; love_notes?: { para: string; school: string; highlights: string; para_replied?: boolean; reply_summary?: string }[] }[]).length > 0 && (
                       <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                         <h2 className="text-base font-semibold text-gray-900 mb-4">Observation Notes</h2>
-                        <div className="space-y-4">
-                          {(semesterData.observation_notes as { title: string; date?: string; notes?: string }[]).map((note, i) => (
-                            <div key={i} className="flex items-start gap-3">
-                              <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: '#EFF6FF' }}>
-                                <Eye className="w-3.5 h-3.5" style={{ color: '#2563EB' }} />
+                        <div className="space-y-6">
+                          {(semesterData.observation_notes as { title: string; date?: string; notes?: string; love_notes?: { para: string; school: string; highlights: string; para_replied?: boolean; reply_summary?: string }[] }[]).map((note, i) => (
+                            <div key={i}>
+                              <div className="flex items-start gap-3">
+                                <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: '#EFF6FF' }}>
+                                  <Eye className="w-3.5 h-3.5" style={{ color: '#2563EB' }} />
+                                </div>
+                                <div className="flex-1">
+                                  <p className="text-sm font-semibold text-[#1e2749]">{note.title}</p>
+                                  {note.date && (
+                                    <p className="text-xs text-gray-400 mt-0.5">
+                                      {new Date(note.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                                    </p>
+                                  )}
+                                  {note.notes && (
+                                    <p className="text-sm text-gray-600 mt-1 leading-relaxed">{note.notes}</p>
+                                  )}
+                                </div>
                               </div>
-                              <div>
-                                <p className="text-sm font-semibold text-[#1e2749]">{note.title}</p>
-                                {note.date && (
-                                  <p className="text-xs text-gray-400 mt-0.5">
-                                    {new Date(note.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                                  </p>
-                                )}
-                                {note.notes && (
-                                  <p className="text-sm text-gray-600 mt-1 leading-relaxed">{note.notes}</p>
-                                )}
-                              </div>
+                              {/* Individual Love Notes */}
+                              {note.love_notes && note.love_notes.length > 0 && (
+                                <div className="mt-4 ml-9 space-y-3">
+                                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Individual Feedback Sent</p>
+                                  {note.love_notes.map((ln, j) => (
+                                    <div key={j} className="rounded-lg p-3" style={{ background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-sm font-semibold text-[#1e2749]">{ln.para}</span>
+                                        <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: '#EFF6FF', color: '#2563EB' }}>{ln.school}</span>
+                                        {ln.para_replied && (
+                                          <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: '#ECFDF5', color: '#059669' }}>replied</span>
+                                        )}
+                                      </div>
+                                      <p className="text-xs text-gray-600 leading-relaxed">{ln.highlights}</p>
+                                      {ln.reply_summary && (
+                                        <p className="text-xs text-gray-500 mt-1.5 pl-3 italic" style={{ borderLeft: '2px solid #D1D5DB' }}>{ln.reply_summary}</p>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           ))}
                         </div>
