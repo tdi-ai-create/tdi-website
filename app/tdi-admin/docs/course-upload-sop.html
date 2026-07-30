@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Course Video & PDF Upload SOP</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; background: #F8F9FA; line-height: 1.6; }
+  .page { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 20px; font-weight: 700; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
+  h3 { font-size: 16px; font-weight: 700; margin: 20px 0 8px; }
+  .subtitle { color: #6B7280; font-size: 14px; margin-bottom: 8px; }
+  .updated { color: #9CA3AF; font-size: 12px; margin-bottom: 32px; }
+  p, li { font-size: 14px; margin-bottom: 8px; }
+  ul { margin: 8px 0 16px 24px; }
+  ol { margin: 8px 0 16px 24px; }
+  .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 1px solid #E5E7EB; }
+  .card-navy { background: #1e2749; color: white; border: none; }
+  .card-teal { background: #F0FDFA; border-color: #99F6E4; }
+  .card-amber { background: #FFFBEB; border-color: #FDE68A; }
+  .card-red { background: #FEF2F2; border-color: #FECACA; }
+  .card-green { background: #F0FDF4; border-color: #BBF7D0; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; background: #1e2749; color: white; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  td { padding: 10px 12px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+  code { background: #F3F4F6; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+  .dot-green { background: #22C55E; }
+  .dot-red { background: #F87171; }
+</style>
+</head>
+<body>
+<div class="page">
+<h1>Course Video & PDF Upload SOP</h1>
+<p class="subtitle">How to upload videos and documents to Learning Hub courses</p>
+<p class="updated">Last updated: July 29, 2026</p>
+
+<div class="card card-navy">
+  <p style="font-weight:600;color:white;margin-bottom:8px;">How It Works</p>
+  <p style="color:#D1D5DB;font-size:13px;margin-bottom:4px;">Videos upload directly to Cloudflare Stream using the tus resumable protocol. No file size limit (up to 2GB). Uploads happen in 50MB chunks with automatic retry if your connection drops.</p>
+  <p style="color:#D1D5DB;font-size:13px;">PDFs and documents upload directly to Supabase Storage via signed URLs. Max 25MB per file.</p>
+</div>
+
+<h2>Uploading Videos</h2>
+
+<h3>Option 1: Individual Upload (recommended for single lessons)</h3>
+<ol>
+  <li>Go to <strong>Learning Hub > Production > Courses</strong></li>
+  <li>Click on the course you want to edit</li>
+  <li>Click on a lesson in the sidebar (lessons with <span class="dot dot-red"></span> red dots need videos)</li>
+  <li>In the "VIDEO CONTENT" section, click <strong>"Click to upload video"</strong> or drag a file onto the drop zone</li>
+  <li>Wait for the upload to complete. You'll see progress, speed, and time remaining.</li>
+  <li>Once Cloudflare finishes processing (30-60 seconds after upload), the video player will appear</li>
+  <li>Click <strong>Save Lesson</strong></li>
+</ol>
+
+<h3>Option 2: Bulk Upload Videos</h3>
+<ol>
+  <li>Click the <strong>"Bulk Upload Videos"</strong> button below the course content list</li>
+  <li>Drag and drop multiple video files (or click to select)</li>
+  <li>The system auto-matches filenames to lesson titles. Review and adjust if needed.</li>
+  <li>Click <strong>"Start Upload"</strong>. Files process sequentially.</li>
+  <li>Each file shows its own progress bar. Green = done, red = error.</li>
+</ol>
+
+<h3>Option 3: Bulk Upload Content (Mixed videos + PDFs)</h3>
+<ol>
+  <li>Click the <strong>"Bulk Upload Content"</strong> button</li>
+  <li>Drop both video files AND PDF/document files together</li>
+  <li>The system detects file types and routes them to the correct storage</li>
+  <li>Review the auto-matching and click <strong>"Upload All"</strong></li>
+</ol>
+
+<h3>Option 4: Google Drive</h3>
+<ol>
+  <li>Click the <strong>"Google Drive"</strong> button in the lesson editor</li>
+  <li>Select a video from your Drive</li>
+  <li>The file downloads and uploads to Cloudflare automatically</li>
+</ol>
+
+<div class="card card-teal">
+  <p><strong>Accepted video formats:</strong> MP4, MOV, MKV, WebM</p>
+  <p><strong>Max file size:</strong> 2GB per video</p>
+  <p><strong>Upload method:</strong> Tus resumable protocol (uploads in 50MB chunks, auto-retries on failure)</p>
+  <p><strong>Processing:</strong> Cloudflare transcodes after upload. Takes 30-60 seconds for most videos.</p>
+</div>
+
+<h2>Uploading PDFs & Documents</h2>
+
+<h3>Individual Upload</h3>
+<ol>
+  <li>Click on a lesson in the sidebar</li>
+  <li>Scroll to the resource upload section</li>
+  <li>Click the drop zone or drag a file in</li>
+  <li>The file uploads directly to Supabase Storage (bypasses our server)</li>
+  <li>Click <strong>Save Lesson</strong></li>
+</ol>
+
+<h3>Bulk Upload</h3>
+<ol>
+  <li>Use the <strong>"Bulk Upload Content"</strong> button</li>
+  <li>Drop PDF/Word/PPT/Excel files along with videos if needed</li>
+  <li>Documents show a red file icon; videos show a blue play icon</li>
+</ol>
+
+<div class="card card-teal">
+  <p><strong>Accepted document formats:</strong> PDF, Word (doc/docx), PowerPoint (ppt/pptx), Excel (xls/xlsx), PNG, JPG</p>
+  <p><strong>Max file size:</strong> 25MB per document</p>
+  <p><strong>Storage:</strong> Supabase Storage (lesson-resources bucket)</p>
+</div>
+
+<h2>Understanding the Status Dots</h2>
+<table>
+  <tr><th>Dot</th><th>Meaning</th></tr>
+  <tr><td><span class="dot dot-green"></span> Green</td><td>Video is uploaded and ready</td></tr>
+  <tr><td><span class="dot dot-red"></span> Red/Pink</td><td>No video uploaded yet (for video-type lessons)</td></tr>
+</table>
+<p>The "Production Progress" bar at the top shows how many video lessons have videos (e.g., "10 of 17 video lessons have videos").</p>
+
+<h2>Troubleshooting</h2>
+
+<div class="card card-amber">
+  <h3 style="margin-top:0;">Upload seems stuck or fails</h3>
+  <ul>
+    <li><strong>Check your internet connection.</strong> The tus protocol auto-retries, but if your connection is completely down, it will eventually fail.</li>
+    <li><strong>Try refreshing the page</strong> (Cmd+Shift+R for hard refresh) and uploading again.</li>
+    <li><strong>Check file size.</strong> Videos must be under 2GB. Documents must be under 25MB.</li>
+    <li><strong>Check file format.</strong> Only video files (MP4, MOV, MKV, WebM) work for video lessons.</li>
+  </ul>
+</div>
+
+<div class="card card-amber">
+  <h3 style="margin-top:0;">Video shows "processing" for a long time</h3>
+  <p>Cloudflare usually processes videos in 30-60 seconds. For very long videos (1+ hours), it can take a few minutes. If it's been more than 5 minutes, try refreshing the page. The video may already be ready.</p>
+</div>
+
+<div class="card card-amber">
+  <h3 style="margin-top:0;">Video uploaded but lesson still shows red dot</h3>
+  <p>Make sure you clicked <strong>Save Lesson</strong> after the upload. The video_id needs to be saved to the lesson record.</p>
+</div>
+
+<div class="card card-red">
+  <h3 style="margin-top:0;">Error: "Cloudflare Stream error" or "Failed to initialize upload"</h3>
+  <p>This means Cloudflare's API had an issue. Wait a minute and try again. If it persists, check the diagnostic endpoint: <code>/api/tdi-admin/videos/diagnostic</code></p>
+</div>
+
+<h2>Technical Details (for reference)</h2>
+<table>
+  <tr><th>Component</th><th>Technology</th><th>Details</th></tr>
+  <tr><td>Video hosting</td><td>Cloudflare Stream</td><td>Account: a559fc0dc4cb (1000 min storage). Videos stored and transcoded by Cloudflare.</td></tr>
+  <tr><td>Video upload protocol</td><td>tus v1.0.0</td><td>Resumable uploads in 50MB chunks via tus-js-client. No 200MB limit.</td></tr>
+  <tr><td>Document storage</td><td>Supabase Storage</td><td>Bucket: lesson-resources. Public read access. Signed URL upload (bypasses Vercel body limit).</td></tr>
+  <tr><td>Upload API</td><td>Next.js API Routes</td><td><code>/api/tdi-admin/videos/upload</code> (POST/GET/DELETE) and <code>/api/tdi-admin/resources/upload</code> (POST/PATCH/DELETE)</td></tr>
+  <tr><td>Video player</td><td>Cloudflare Stream iframe</td><td>Auto-polls for readiness. Shows processing state until ready.</td></tr>
+</table>
+
+<div class="card card-green">
+  <h3 style="margin-top:0;">Diagnostic Check</h3>
+  <p>If uploads aren't working, visit <code>/api/tdi-admin/videos/diagnostic</code> in your browser. It checks:</p>
+  <ul style="margin-bottom:0;">
+    <li>Whether the Cloudflare API token is valid</li>
+    <li>Current storage usage (minutes used vs limit)</li>
+    <li>Whether new upload URLs can be created</li>
+  </ul>
+</div>
+
+</div>
+</body>
+</html>

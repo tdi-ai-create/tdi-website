@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Search, Download, Printer, ExternalLink } from 'lucide-react';
 
-type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'communication-map' | 'swag-fulfillment';
+type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'communication-map' | 'swag-fulfillment';
 
 interface Doc {
   id: DocId;
@@ -136,6 +136,15 @@ const DOC_GROUPS: DocGroup[] = [
         relatedSections: [
           { label: 'Learning Hub', href: '/hub' },
           { label: 'Hub Admin', href: '/tdi-admin/hub' },
+        ],
+      },
+      {
+        id: 'course-upload-sop',
+        label: 'Course Upload SOP',
+        desc: 'How to upload videos and PDFs to courses (tus protocol, troubleshooting)',
+        tags: ['upload', 'video', 'pdf', 'course', 'cloudflare', 'stream', 'tus', 'bulk upload', 'document', 'troubleshooting'],
+        relatedSections: [
+          { label: 'Hub Production', href: '/tdi-admin/hub/production' },
         ],
       },
       {
