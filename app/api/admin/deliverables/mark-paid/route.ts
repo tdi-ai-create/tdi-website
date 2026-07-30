@@ -84,6 +84,43 @@ export async function POST(request: NextRequest) {
   const org = (invoice as any).quotes?.contact_organization || ''
   invoicePaid(invoice.invoice_number, org, Number(invoice.amount)).catch(() => {})
 
+  // 6. Send payment confirmation email to school contact
+  const quoteForEmail = invoice.quote_id
+    ? (await supabase.from('quotes').select('contact_email, contact_name, contact_organization, quote_number').eq('id', invoice.quote_id).single()).data
+    : null
+
+  if (quoteForEmail?.contact_email) {
+    const resendKey = process.env.RESEND_API_KEY
+    if (resendKey) {
+      fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: 'Teachers Deserve It <noreply@teachersdeserveit.com>',
+          to: [quoteForEmail.contact_email],
+          subject: `Payment Received - ${quoteForEmail.contact_organization || 'Your Partnership'}`,
+          html: `
+            <div style="font-family: -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
+              <img src="https://www.teachersdeserveit.com/images/logo.webp" alt="Teachers Deserve It" style="height: 40px; margin-bottom: 24px;" />
+              <h2 style="color: #111827; margin: 0 0 12px;">Payment received. Thank you!</h2>
+              <p style="color: #4b5563; margin: 0 0 16px;">
+                Hi ${(quoteForEmail.contact_name || '').split(' ')[0] || 'there'},
+              </p>
+              <p style="color: #4b5563; margin: 0 0 16px;">
+                We have received your payment for invoice <strong>${invoice.invoice_number}</strong>. Your account is up to date.
+              </p>
+              <p style="color: #4b5563; margin: 0 0 16px;">
+                Thank you for your partnership with Teachers Deserve It. We are grateful to be working with ${quoteForEmail.contact_organization || 'your team'}.
+              </p>
+              <p style="color: #6b7280; font-size: 13px; margin: 24px 0 0;">
+                Questions about billing? Contact <a href="mailto:Billing@Teachersdeserveit.com" style="color: #d97706;">Billing@Teachersdeserveit.com</a>
+              </p>
+            </div>`,
+        }),
+      }).catch(err => console.error('[mark-paid] Payment confirmation email failed:', err))
+    }
+  }
+
   return NextResponse.json({
     success: true,
     message: `Invoice ${invoice.invoice_number} marked as paid. ${updated?.length || 0} deliverables updated.`,
