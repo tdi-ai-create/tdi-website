@@ -684,6 +684,11 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onPatch }:
             <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#FEF3C7', color: '#92400E' }}>
               Draft requested — waiting for {agent || 'agent'}
             </span>
+            {hasUrl && (
+              <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: 10, color: '#8B5CF6', textDecoration: 'underline' }}>
+                Open doc
+              </a>
+            )}
             {(!windowOpen || !gateOpen) && (
               <span style={{ fontSize: 9, color: '#9CA3AF', fontStyle: 'italic' }}>
                 {!gateOpen && !windowOpen
@@ -701,6 +706,11 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onPatch }:
             <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#DBEAFE', color: '#1D4ED8' }}>
               {agent || 'Agent'} is drafting...
             </span>
+            {hasUrl && (
+              <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: 10, color: '#8B5CF6', textDecoration: 'underline' }}>
+                Open doc
+              </a>
+            )}
             {/* Show QA feedback if returning from a fail */}
             {opp.qa_passed === false && opp.qa_notes && (
               <span style={{ fontSize: 9, color: '#DC2626', fontStyle: 'italic' }}>
