@@ -12,6 +12,7 @@ import { PopupQueueProvider } from '@/lib/hub/PopupQueueContext';
 
 const CheckInSlideUp = dynamic(() => import('@/components/hub/CheckInSlideUp'), { ssr: false });
 const AdminBanner = dynamic(() => import('@/components/hub/AdminBanner'), { ssr: false });
+const PartnershipBanner = dynamic(() => import('@/components/hub/PartnershipBanner'), { ssr: false });
 const AddToHomeScreen = dynamic(() => import('@/components/hub/AddToHomeScreen'), { ssr: false });
 
 // Routes that should NOT show the Hub nav bar
@@ -67,10 +68,11 @@ function HubLayoutInner({ children }: { children: React.ReactNode }) {
       style={{ backgroundColor: '#F5F7FA' }}
     >
       <AdminBanner />
+      <PartnershipBanner />
       {showNav && (
         <HubNavBar profile={profile} userEmail={user?.email} userId={user?.id} />
       )}
-      <main className="flex-1" style={showNav ? { paddingTop: 'calc(60px + var(--admin-banner-h, 0px))' } : undefined}>
+      <main className="flex-1" style={showNav ? { paddingTop: 'calc(60px + var(--admin-banner-h, 0px) + var(--partnership-banner-h, 0px))' } : undefined}>
         {children}
       </main>
       {showNav && <HubFooter />}

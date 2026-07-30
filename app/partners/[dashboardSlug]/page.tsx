@@ -448,6 +448,20 @@ export default function PartnerDashboard() {
   const [recentlyResurfacedIds, setRecentlyResurfacedIds] = useState<string[]>([]);
   const [activeMilestoneTooltip, setActiveMilestoneTooltip] = useState<string | null>(null);
 
+  // Roster update modal state
+  const [showRosterUpdateModal, setShowRosterUpdateModal] = useState(false);
+  const [rosterUpdateFile, setRosterUpdateFile] = useState<File | null>(null);
+  const [rosterUpdateParsed, setRosterUpdateParsed] = useState<{ firstName: string; lastName: string; email: string; roleTitle?: string; building?: string; department?: string }[] | null>(null);
+  const [rosterUpdatePreview, setRosterUpdatePreview] = useState<{
+    added: number; removed: number; unchanged: number;
+    addedList: { email: string; name: string; roleTitle?: string }[];
+    removedList: { id: string; email: string; name: string }[];
+    unchangedList: { email: string; name: string; roleTitle?: string }[];
+  } | null>(null);
+  const [rosterUpdateStep, setRosterUpdateStep] = useState<'upload' | 'preview' | 'applying' | 'done'>('upload');
+  const [rosterUpdateResult, setRosterUpdateResult] = useState<{ added: number; removed: number; unchanged: number; total: number } | null>(null);
+  const [rosterUpdateError, setRosterUpdateError] = useState<string | null>(null);
+
   // Cross-tab navigation helper
   const navigateToTab = (tab: string, sectionId?: string) => {
     setActiveTab(tab);
@@ -1147,6 +1161,118 @@ export default function PartnerDashboard() {
     } finally {
       setUploadingItemId(null);
     }
+  };
+
+  // Parse a roster CSV file into a staff array
+  const parseRosterCsv = (text: string): { firstName: string; lastName: string; email: string; roleTitle?: string; building?: string; department?: string }[] => {
+    const lines = text.split('\n').filter(l => l.trim());
+    if (lines.length < 2) return [];
+    const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/[^a-z0-9\s]/g, ''));
+    const fnIdx = headers.findIndex(h => (h.includes('first') && h.includes('name')) || h === 'firstname' || h === 'first');
+    const lnIdx = headers.findIndex(h => (h.includes('last') && h.includes('name')) || h === 'lastname' || h === 'last');
+    const emIdx = headers.findIndex(h => h.includes('email'));
+    const rlIdx = headers.findIndex(h => h.includes('role') || h.includes('title') || h.includes('position'));
+    const blIdx = headers.findIndex(h => h.includes('building') || h === 'school' || h === 'school name');
+    const dpIdx = headers.findIndex(h => h.includes('department') || h === 'dept' || h.includes('grade'));
+
+    const result = [];
+    for (let i = 1; i < lines.length; i++) {
+      const vals = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+      if (vals.length < 2) continue;
+      const firstName = fnIdx >= 0 ? vals[fnIdx] : vals[0] || '';
+      const lastName = lnIdx >= 0 ? vals[lnIdx] : vals[1] || '';
+      const email = (emIdx >= 0 ? vals[emIdx] : vals[2] || '').toLowerCase().trim();
+      if (!email.includes('@')) continue;
+      result.push({
+        firstName,
+        lastName,
+        email,
+        roleTitle: rlIdx >= 0 ? vals[rlIdx] : undefined,
+        building: blIdx >= 0 ? vals[blIdx] : undefined,
+        department: dpIdx >= 0 ? vals[dpIdx] : undefined,
+      });
+    }
+    return result;
+  };
+
+  // Handle roster update file selection
+  const handleRosterUpdateFileSelect = async (file: File) => {
+    setRosterUpdateFile(file);
+    setRosterUpdateError(null);
+    setRosterUpdatePreview(null);
+    try {
+      const text = await file.text();
+      const parsed = parseRosterCsv(text);
+      if (parsed.length === 0) {
+        setRosterUpdateError('No valid staff found in this CSV. Make sure each row has at least an email address.');
+        return;
+      }
+      setRosterUpdateParsed(parsed);
+    } catch {
+      setRosterUpdateError('Could not read this file. Make sure it is a valid CSV.');
+    }
+  };
+
+  // Preview roster diff
+  const handleRosterUpdatePreview = async () => {
+    if (!rosterUpdateParsed || !partnership?.id) return;
+    setRosterUpdateError(null);
+    setRosterUpdateStep('preview');
+    try {
+      const resp = await fetch('/api/partners/roster-update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ partnershipId: partnership.id, staff: rosterUpdateParsed, action: 'preview' }),
+      });
+      const data = await resp.json();
+      if (!resp.ok || data.error) {
+        setRosterUpdateError(data.error || 'Preview failed. Please try again.');
+        setRosterUpdateStep('upload');
+        return;
+      }
+      setRosterUpdatePreview(data);
+    } catch {
+      setRosterUpdateError('Something went wrong. Please try again.');
+      setRosterUpdateStep('upload');
+    }
+  };
+
+  // Apply roster update
+  const handleRosterUpdateApply = async () => {
+    if (!rosterUpdateParsed || !partnership?.id) return;
+    setRosterUpdateStep('applying');
+    setRosterUpdateError(null);
+    try {
+      const resp = await fetch('/api/partners/roster-update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ partnershipId: partnership.id, staff: rosterUpdateParsed, action: 'apply' }),
+      });
+      const data = await resp.json();
+      if (!resp.ok || data.error) {
+        setRosterUpdateError(data.error || 'Update failed. Please try again.');
+        setRosterUpdateStep('preview');
+        return;
+      }
+      setRosterUpdateResult({ added: data.added, removed: data.removed, unchanged: data.unchanged, total: data.total });
+      setRosterUpdateStep('done');
+      // Refresh staff stats after apply
+      setStaffStats(prev => ({ ...prev, total: data.total }));
+    } catch {
+      setRosterUpdateError('Something went wrong. Please try again.');
+      setRosterUpdateStep('preview');
+    }
+  };
+
+  // Reset roster update modal
+  const resetRosterUpdateModal = () => {
+    setShowRosterUpdateModal(false);
+    setRosterUpdateFile(null);
+    setRosterUpdateParsed(null);
+    setRosterUpdatePreview(null);
+    setRosterUpdateStep('upload');
+    setRosterUpdateResult(null);
+    setRosterUpdateError(null);
   };
 
   // Save action item form data
@@ -4935,10 +5061,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                                   <p className="text-xs text-gray-500">
                                     {staffStats.total > 0
                                       ? 'Add new staff or paste an updated CSV. Existing staff will not be duplicated.'
-                                      : 'Paste CSV data (First Name, Last Name, Email, Role) or add staff one at a time.'}
+                                      : 'Paste CSV data (First Name, Last Name, Email, Role, Building, Department) or add staff one at a time.'}
                                   </p>
                                   <textarea
-                                    placeholder={"First Name,Last Name,Email,Role\nJane,Smith,jane@school.edu,Teacher\nJohn,Doe,john@school.edu,Para"}
+                                    placeholder={"First Name,Last Name,Email,Role,Building,Department\nJane,Smith,jane@school.edu,Teacher,Lincoln Elementary,K-2\nJohn,Doe,john@school.edu,Para,Ardmore,Special Ed"}
                                     rows={5}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     id={`roster-csv-${item.id}`}
@@ -5395,6 +5521,15 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 <h2 className="text-base font-semibold text-gray-900">Your Educators</h2>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-500">{staffStats.hubLoggedIn}/{staffStats.total} on Hub</span>
+                  {staffStats.total > 0 && (
+                    <button
+                      onClick={() => { setShowRosterUpdateModal(true); setRosterUpdateStep('upload'); }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 text-gray-700 hover:border-[#1e2749] hover:text-[#1e2749] transition-colors"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      Update Roster
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -5525,6 +5660,22 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     <div className="rounded-xl bg-gray-50 p-3 text-center">
                       <p className="text-lg font-bold text-amber-600">{staffStats.total - staffStats.hubLoggedIn}</p>
                       <p className="text-[10px] text-gray-500">Not Yet Active</p>
+                    </div>
+                  </div>
+
+                  {/* New school year roster update prompt */}
+                  <div className="mt-3 rounded-xl bg-blue-50 border border-blue-100 p-4 flex items-start gap-3">
+                    <div className="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0 mt-1.5" />
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-blue-900">New school year?</p>
+                      <p className="text-xs text-blue-700 mt-0.5">Upload an updated roster to add new hires, remove departed staff, and keep Hub access current. We will show you a preview before making any changes.</p>
+                      <button
+                        onClick={() => { setShowRosterUpdateModal(true); setRosterUpdateStep('upload'); }}
+                        className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors"
+                      >
+                        <Upload className="w-3.5 h-3.5" />
+                        Upload Updated Roster
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -5670,6 +5821,254 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               Data Privacy: In your partnership dashboard, access is role-based.
               All data handling follows FERPA guidelines.
             </p>
+          </div>
+        )}
+
+        {/* ROSTER UPDATE MODAL */}
+        {showRosterUpdateModal && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: 'rgba(0,0,0,0.45)' }}
+            onClick={(e) => { if (e.target === e.currentTarget) resetRosterUpdateModal(); }}
+          >
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+              {/* Modal header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <div>
+                  <h3 className="text-base font-bold text-gray-900">Update Staff Roster</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">New hires, departures, and role changes for the new school year</p>
+                </div>
+                <button
+                  onClick={resetRosterUpdateModal}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="px-6 py-5">
+
+                {/* STEP: Upload */}
+                {(rosterUpdateStep === 'upload') && (
+                  <div className="space-y-4">
+                    {/* How it works */}
+                    <div className="rounded-xl bg-gray-50 p-4 space-y-2">
+                      <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">How this works</p>
+                      <div className="space-y-1.5">
+                        <div className="flex items-start gap-2">
+                          <div className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0 mt-1.5" />
+                          <p className="text-xs text-gray-600">Emails in the new roster that already exist: no change</p>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <div className="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0 mt-1.5" />
+                          <p className="text-xs text-gray-600">New emails get added and receive Hub access</p>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-1.5" />
+                          <p className="text-xs text-gray-600">Emails not in the new roster get marked inactive (not deleted)</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CSV format hint */}
+                    <p className="text-xs text-gray-500">
+                      CSV columns: <span className="font-mono bg-gray-100 px-1 rounded">First Name, Last Name, Email, Role, Building, Department</span>. Role, Building, and Department are optional. Header row required.
+                    </p>
+
+                    {/* Dropzone */}
+                    <label
+                      className="block border-2 border-dashed border-gray-200 rounded-xl p-8 text-center cursor-pointer hover:border-[#1e2749] hover:bg-gray-50 transition-colors"
+                    >
+                      <Upload className="w-7 h-7 mx-auto mb-2 text-gray-300" />
+                      {rosterUpdateFile ? (
+                        <div>
+                          <p className="text-sm font-semibold text-[#1e2749]">{rosterUpdateFile.name}</p>
+                          {rosterUpdateParsed && (
+                            <p className="text-xs text-gray-500 mt-1">{rosterUpdateParsed.length} staff rows detected</p>
+                          )}
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Drop your CSV here or click to browse</p>
+                          <p className="text-xs text-gray-400 mt-1">CSV files only</p>
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        accept=".csv"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleRosterUpdateFileSelect(file);
+                        }}
+                      />
+                    </label>
+
+                    {rosterUpdateError && (
+                      <div className="flex items-start gap-2 text-red-700 bg-red-50 border border-red-100 rounded-xl p-3">
+                        <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                        <p className="text-xs">{rosterUpdateError}</p>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-end gap-2 pt-1">
+                      <button
+                        onClick={resetRosterUpdateModal}
+                        className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleRosterUpdatePreview}
+                        disabled={!rosterUpdateParsed || rosterUpdateParsed.length === 0}
+                        className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                      >
+                        Preview Changes
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP: Preview */}
+                {rosterUpdateStep === 'preview' && rosterUpdatePreview && (
+                  <div className="space-y-4">
+                    {/* Summary badges */}
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="rounded-xl bg-blue-50 p-3 text-center">
+                        <p className="text-xl font-bold text-blue-700">{rosterUpdatePreview.added}</p>
+                        <p className="text-[10px] text-blue-600 font-medium mt-0.5">New Staff</p>
+                      </div>
+                      <div className="rounded-xl bg-amber-50 p-3 text-center">
+                        <p className="text-xl font-bold text-amber-700">{rosterUpdatePreview.removed}</p>
+                        <p className="text-[10px] text-amber-600 font-medium mt-0.5">Will Be Removed</p>
+                      </div>
+                      <div className="rounded-xl bg-green-50 p-3 text-center">
+                        <p className="text-xl font-bold text-green-700">{rosterUpdatePreview.unchanged}</p>
+                        <p className="text-[10px] text-green-600 font-medium mt-0.5">Unchanged</p>
+                      </div>
+                    </div>
+
+                    {/* Added list */}
+                    {rosterUpdatePreview.addedList.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5">
+                          <span className="inline-block w-2 h-2 rounded-full bg-blue-400" />
+                          Adding {rosterUpdatePreview.addedList.length} new staff
+                        </p>
+                        <div className="rounded-xl border border-blue-100 bg-blue-50/40 divide-y divide-blue-100 max-h-36 overflow-y-auto">
+                          {rosterUpdatePreview.addedList.map((s) => (
+                            <div key={s.email} className="px-3 py-2 flex items-center justify-between">
+                              <div>
+                                <p className="text-xs font-medium text-gray-800">{s.name || s.email}</p>
+                                <p className="text-[10px] text-gray-500">{s.email}{s.roleTitle ? ` · ${s.roleTitle}` : ''}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Removed list */}
+                    {rosterUpdatePreview.removedList.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5">
+                          <span className="inline-block w-2 h-2 rounded-full bg-amber-400" />
+                          Marking {rosterUpdatePreview.removedList.length} staff inactive
+                        </p>
+                        <div className="rounded-xl border border-amber-100 bg-amber-50/40 divide-y divide-amber-100 max-h-36 overflow-y-auto">
+                          {rosterUpdatePreview.removedList.map((s) => (
+                            <div key={s.id} className="px-3 py-2 flex items-center justify-between">
+                              <div>
+                                <p className="text-xs font-medium text-gray-800">{s.name || s.email}</p>
+                                <p className="text-[10px] text-gray-500">{s.email}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-[10px] text-gray-400 mt-1.5">Staff are marked inactive, not deleted. Their history is preserved.</p>
+                      </div>
+                    )}
+
+                    {rosterUpdatePreview.added === 0 && rosterUpdatePreview.removed === 0 && (
+                      <div className="rounded-xl bg-green-50 border border-green-100 p-4 text-center">
+                        <p className="text-sm font-semibold text-green-800">No changes detected</p>
+                        <p className="text-xs text-green-700 mt-1">Every email in this CSV already exists in your current roster. Nothing will change.</p>
+                      </div>
+                    )}
+
+                    {rosterUpdateError && (
+                      <div className="flex items-start gap-2 text-red-700 bg-red-50 border border-red-100 rounded-xl p-3">
+                        <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                        <p className="text-xs">{rosterUpdateError}</p>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between pt-1">
+                      <button
+                        onClick={() => { setRosterUpdateStep('upload'); setRosterUpdatePreview(null); }}
+                        className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors flex items-center gap-1.5"
+                      >
+                        <ChevronDown className="w-4 h-4 rotate-90" />
+                        Back
+                      </button>
+                      <button
+                        onClick={handleRosterUpdateApply}
+                        disabled={rosterUpdatePreview.added === 0 && rosterUpdatePreview.removed === 0}
+                        className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                      >
+                        <Check className="w-4 h-4" />
+                        Apply Changes
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP: Applying */}
+                {rosterUpdateStep === 'applying' && (
+                  <div className="py-10 text-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-[#1e2749] mx-auto mb-3" />
+                    <p className="text-sm font-semibold text-gray-800">Updating your roster...</p>
+                    <p className="text-xs text-gray-500 mt-1">Adding new staff, marking departures inactive, and provisioning Hub accounts.</p>
+                  </div>
+                )}
+
+                {/* STEP: Done */}
+                {rosterUpdateStep === 'done' && rosterUpdateResult && (
+                  <div className="space-y-4">
+                    <div className="text-center py-4">
+                      <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
+                        <CheckCircle className="w-6 h-6 text-green-600" />
+                      </div>
+                      <p className="text-base font-bold text-gray-900">Roster updated</p>
+                      <p className="text-xs text-gray-500 mt-1">New staff will receive Hub access within a few minutes.</p>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="rounded-xl bg-blue-50 p-3 text-center">
+                        <p className="text-xl font-bold text-blue-700">{rosterUpdateResult.added}</p>
+                        <p className="text-[10px] text-blue-600 font-medium mt-0.5">Added</p>
+                      </div>
+                      <div className="rounded-xl bg-amber-50 p-3 text-center">
+                        <p className="text-xl font-bold text-amber-700">{rosterUpdateResult.removed}</p>
+                        <p className="text-[10px] text-amber-600 font-medium mt-0.5">Removed</p>
+                      </div>
+                      <div className="rounded-xl bg-gray-50 p-3 text-center">
+                        <p className="text-xl font-bold text-gray-700">{rosterUpdateResult.total}</p>
+                        <p className="text-[10px] text-gray-500 font-medium mt-0.5">Active Total</p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => { resetRosterUpdateModal(); window.location.reload(); }}
+                      className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors"
+                    >
+                      Done
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 

@@ -40,13 +40,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Partnership not found' }, { status: 404 });
     }
 
-    let staffList: { firstName: string; lastName: string; email: string; roleTitle?: string }[] = [];
+    let staffList: { firstName: string; lastName: string; email: string; roleTitle?: string; building?: string; department?: string }[] = [];
 
     // Parse CSV if provided
     if (csv) {
       const lines = csv.trim().split('\n');
-      // Skip header row
+      // Header row determines column order
+      const header = lines[0].split(',').map((h: string) => h.trim().replace(/^"|"$/g, '').toLowerCase());
       const dataLines = lines.slice(1);
+
+      // Find column indexes by header name (flexible matching)
+      const buildingIdx = header.findIndex((h: string) => ['building', 'school', 'building name', 'school name'].includes(h));
+      const deptIdx = header.findIndex((h: string) => ['department', 'dept', 'dept.', 'grade level', 'grade'].includes(h));
+
       staffList = dataLines
         .map((line: string) => {
           const parts = line.split(',').map((p: string) => p.trim().replace(/^"|"$/g, ''));
@@ -56,15 +62,19 @@ export async function POST(request: NextRequest) {
             lastName: parts[1] || '',
             email: parts[2].toLowerCase(),
             roleTitle: parts[3] || null,
+            building: buildingIdx >= 0 ? (parts[buildingIdx] || null) : (parts[4] || null),
+            department: deptIdx >= 0 ? (parts[deptIdx] || null) : (parts[5] || null),
           };
         })
         .filter(Boolean) as typeof staffList;
     } else if (staff && Array.isArray(staff)) {
-      staffList = staff.map((s: { firstName?: string; lastName?: string; email?: string; roleTitle?: string }) => ({
+      staffList = staff.map((s: { firstName?: string; lastName?: string; email?: string; roleTitle?: string; building?: string; department?: string }) => ({
         firstName: s.firstName || '',
         lastName: s.lastName || '',
         email: (s.email || '').toLowerCase(),
         roleTitle: s.roleTitle || undefined,
+        building: s.building || undefined,
+        department: s.department || undefined,
       })).filter(s => s.email.includes('@'));
     }
 
@@ -99,6 +109,44 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Auto-create buildings from roster if they don't exist yet
+    const buildingNames = [...new Set(newStaff.map(s => s.building).filter(Boolean))] as string[];
+    const buildingIdMap = new Map<string, string>();
+
+    if (buildingNames.length > 0) {
+      // Get org_id for this partnership
+      const { data: org } = await supabase
+        .from('partnerships')
+        .select('organization_id')
+        .eq('id', partnershipId)
+        .single();
+
+      const orgId = org?.organization_id;
+
+      for (const bName of buildingNames) {
+        // Check if building exists
+        const { data: existing } = await supabase
+          .from('buildings')
+          .select('id')
+          .eq('organization_id', orgId)
+          .ilike('name', bName)
+          .limit(1)
+          .single();
+
+        if (existing) {
+          buildingIdMap.set(bName.toLowerCase(), existing.id);
+        } else if (orgId) {
+          // Create the building
+          const { data: created } = await supabase
+            .from('buildings')
+            .insert({ organization_id: orgId, name: bName })
+            .select('id')
+            .single();
+          if (created) buildingIdMap.set(bName.toLowerCase(), created.id);
+        }
+      }
+    }
+
     // Insert new staff
     const records = newStaff.map(s => ({
       partnership_id: partnershipId,
@@ -106,6 +154,9 @@ export async function POST(request: NextRequest) {
       last_name: s.lastName,
       email: s.email,
       role_title: s.roleTitle || null,
+      building_name: s.building || null,
+      building_id: s.building ? (buildingIdMap.get(s.building.toLowerCase()) || null) : null,
+      department: (s as { department?: string }).department || null,
       hub_enrolled: false,
     }));
 
@@ -161,7 +212,7 @@ export async function POST(request: NextRequest) {
               <p><a href="https://www.teachersdeserveit.com/tdi-admin/leadership/${partnershipId}">Open Partnership Dashboard</a></p>
             </div>`,
           }),
-        }).catch(() => {});
+        }).catch(err => console.error('[roster] Over-contract notification failed:', err));
       }
 
       // Log it
@@ -210,7 +261,7 @@ export async function POST(request: NextRequest) {
             .update({ hub_enrolled: true })
             .eq('partnership_id', partnershipId)
             .eq('email', s.email);
-          // Send staff welcome email (fire and forget)
+          // Send staff welcome email
           fetch(`${baseUrl}/api/hub/emails/staff-welcome`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -220,7 +271,7 @@ export async function POST(request: NextRequest) {
               schoolName: partnership.contact_name || 'your school',
               roleTitle: s.roleTitle || null,
             }),
-          }).catch(() => {});
+          }).catch(err => console.error(`[roster] Welcome email failed for ${s.email}:`, err));
         } else {
           provisionFailed++;
         }
@@ -247,7 +298,7 @@ export async function POST(request: NextRequest) {
         urgency: 'action',
         details: { 'Staff added': newStaff.length, 'Total roster': totalCount, 'Next step': 'Provision Hub accounts from the Internal tab' },
       }),
-    }).catch(() => {}); // Fire and forget
+    }).catch(err => console.error('[roster] Admin notification failed:', err));
 
     return NextResponse.json({
       success: true,
