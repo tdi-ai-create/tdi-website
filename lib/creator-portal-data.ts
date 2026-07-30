@@ -235,7 +235,7 @@ export async function createCreator(data: {
   const milestoneRecords = milestones.map((milestone, index) => ({
     creator_id: creator.id,
     milestone_id: milestone.id,
-    status: index === 0 ? 'completed' : index === 1 ? 'available' : 'locked',
+    status: index === 0 ? 'completed' : 'available',
     completed_at: index === 0 ? new Date().toISOString() : null,
   }));
 
@@ -380,7 +380,7 @@ async function unlockNextMilestone(
       .update({ status: 'available', updated_at: new Date().toISOString() })
       .eq('creator_id', creatorId)
       .eq('milestone_id', nextMilestone.id)
-      .eq('status', 'locked');
+      .neq('status', 'completed');
   } else {
     // This was the last milestone in the phase
     // Check if ALL milestones in this phase are completed
@@ -426,7 +426,7 @@ async function unlockNextMilestone(
             .update({ status: 'available', updated_at: new Date().toISOString() })
             .eq('creator_id', creatorId)
             .eq('milestone_id', nextPhaseMilestones[0].id)
-            .eq('status', 'locked');
+            .neq('status', 'completed');
         }
       }
     }
@@ -525,7 +525,7 @@ export async function getCreatorDashboardData(
     const milestoneRecords = sortedMilestones.map((milestone, index) => ({
       creator_id: creatorId,
       milestone_id: milestone.id,
-      status: index === 0 ? 'completed' : index === 1 ? 'available' : 'locked',
+      status: index === 0 ? 'completed' : 'available',
       completed_at: index === 0 ? new Date().toISOString() : null,
     }));
     const { error: initError } = await serviceSupabase
@@ -575,7 +575,7 @@ export async function getCreatorDashboardData(
         const isApplicable = milestoneAppliesTo(milestone);
         return {
           ...milestone,
-          status: (progress?.status || 'locked') as MilestoneStatus,
+          status: (progress?.status === 'locked' ? 'available' : (progress?.status || 'available')) as MilestoneStatus,
           completed_at: progress?.completed_at || null,
           progress_id: progress?.id || null,
           metadata: progress?.metadata || null,
