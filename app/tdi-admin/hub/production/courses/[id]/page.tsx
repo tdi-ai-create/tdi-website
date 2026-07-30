@@ -319,12 +319,12 @@ function VideoUploadSection({
     try {
       const uploadFile = await compressVideo(file);
 
-      // Step 1: Get tus upload URL from our API
+      // Step 1: Get signed URL to upload to Supabase Storage
       setUploadStatus('uploading');
       const urlRes = await fetch('/api/tdi-admin/videos/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: uploadFile.name, fileSize: uploadFile.size, maxDurationSeconds: 7200 }),
+        body: JSON.stringify({ filename: uploadFile.name, fileSize: uploadFile.size }),
       });
 
       if (!urlRes.ok) {
@@ -333,41 +333,55 @@ function VideoUploadSection({
       }
 
       const urlData = await urlRes.json();
-      videoUid = urlData.videoUid;
 
-      // Step 2: Upload via tus (resumable, no 200MB limit)
-      const tus = await import('tus-js-client');
-      await new Promise<void>((resolve, reject) => {
-        const startTime = Date.now();
-        const upload = new tus.Upload(uploadFile, {
-          endpoint: urlData.uploadUrl,
-          uploadUrl: urlData.uploadUrl,
-          chunkSize: 50 * 1024 * 1024, // 50MB chunks
-          retryDelays: [0, 1000, 3000, 5000],
-          metadata: { filename: uploadFile.name, filetype: uploadFile.type },
-          onError: (err) => reject(new Error(err.message || 'Upload failed')),
-          onProgress: (bytesUploaded, bytesTotal) => {
-            const rawPct = (bytesUploaded / bytesTotal) * 100;
-            setUploadProgress(Math.round(rawPct * 0.8));
+      // Step 2: Upload video to Supabase Storage via signed URL
+      const startTime = Date.now();
+      const xhr = await new Promise<void>((resolve, reject) => {
+        const x = new XMLHttpRequest();
+        x.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            const rawPct = (e.loaded / e.total) * 100;
+            setUploadProgress(Math.round(rawPct * 0.7)); // 0-70% for upload
             const elapsed = (Date.now() - startTime) / 1000;
             if (elapsed > 1) {
-              const bytesPerSec = bytesUploaded / elapsed;
-              const remaining = (bytesTotal - bytesUploaded) / bytesPerSec;
+              const bytesPerSec = e.loaded / elapsed;
+              const remaining = (e.total - e.loaded) / bytesPerSec;
               setUploadSpeed(`${formatFileSize(bytesPerSec)}/s`);
               setTimeRemaining(remaining > 1 ? `${formatTime(remaining)} remaining` : 'Almost done...');
             }
-          },
-          onSuccess: () => resolve(),
+          }
         });
-        upload.start();
+        x.addEventListener('load', () => x.status >= 200 && x.status < 300 ? resolve() : reject(new Error(`Storage upload failed (${x.status})`)));
+        x.addEventListener('error', () => reject(new Error('Upload to storage failed')));
+        x.open('PUT', urlData.uploadUrl);
+        x.setRequestHeader('Content-Type', uploadFile.type || 'video/mp4');
+        x.send(uploadFile);
       });
+
+      setUploadProgress(75);
+      setUploadSpeed('');
+      setTimeRemaining('Sending to Cloudflare for processing...');
+
+      // Step 3: Tell Cloudflare to pull the video from storage
+      const processRes = await fetch('/api/tdi-admin/videos/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ storagePath: urlData.storagePath, filename: uploadFile.name, step: 'process' }),
+      });
+
+      if (!processRes.ok) {
+        const err = await processRes.json().catch(() => ({}));
+        throw new Error(err.error || `Processing failed (${processRes.status})`);
+      }
+
+      const processData = await processRes.json();
+      videoUid = processData.videoUid;
 
       setUploadProgress(80);
       setUploadStatus('processing');
-      setUploadSpeed('');
       setTimeRemaining('Cloudflare is processing your video...');
 
-      // Step 3: Poll for processing completion
+      // Step 4: Poll for processing completion
       onUpdate({ video_id: videoUid });
 
       let ready = false;
@@ -1149,28 +1163,29 @@ function SortableModule({
                       if (action === 'delete') onDeleteLesson(lesson.id);
                     }}
                     onVideoDrop={async (lessonId, file) => {
-                      // Direct upload from drag-and-drop on sidebar (tus)
+                      // Upload to Supabase Storage, then Cloudflare pulls from there
                       try {
                         const urlRes = await fetch('/api/tdi-admin/videos/upload', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ filename: file.name, fileSize: file.size, maxDurationSeconds: 7200 }),
+                          body: JSON.stringify({ filename: file.name, fileSize: file.size }),
                         });
                         if (!urlRes.ok) return;
-                        const { uploadUrl, videoUid } = await urlRes.json();
-                        const tus = await import('tus-js-client');
-                        await new Promise<void>((resolve, reject) => {
-                          const upload = new tus.Upload(file, {
-                            endpoint: uploadUrl,
-                            uploadUrl: uploadUrl,
-                            chunkSize: 50 * 1024 * 1024,
-                            retryDelays: [0, 1000, 3000, 5000],
-                            metadata: { filename: file.name, filetype: file.type },
-                            onError: (err) => reject(err),
-                            onSuccess: () => resolve(),
-                          });
-                          upload.start();
+                        const urlData = await urlRes.json();
+                        // Upload to storage
+                        await fetch(urlData.uploadUrl, {
+                          method: 'PUT',
+                          headers: { 'Content-Type': file.type || 'video/mp4' },
+                          body: file,
                         });
+                        // Tell Cloudflare to pull from storage
+                        const processRes = await fetch('/api/tdi-admin/videos/upload', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ storagePath: urlData.storagePath, filename: file.name, step: 'process' }),
+                        });
+                        if (!processRes.ok) return;
+                        const { videoUid } = await processRes.json();
                         const patchRes = await fetch('/api/tdi-admin/lessons', {
                           method: 'PATCH',
                           headers: { 'Content-Type': 'application/json' },

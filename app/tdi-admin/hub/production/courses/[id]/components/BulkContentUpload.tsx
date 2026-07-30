@@ -189,37 +189,47 @@ export default function BulkContentUpload({ course, onComplete, onLessonUploaded
       let videoUid = '';
       try {
         if (mapping.fileType === 'video') {
-          // ── Video upload via tus (resumable, no 200MB limit) ──
+          // ── Video: upload to Supabase Storage, then Cloudflare pulls from there ──
           updateQueueItem(i, { status: 'uploading', progress: 0 });
 
           const urlRes = await fetch('/api/tdi-admin/videos/upload', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ filename: mapping.file.name, fileSize: mapping.file.size, maxDurationSeconds: 7200 }),
+            body: JSON.stringify({ filename: mapping.file.name, fileSize: mapping.file.size }),
           });
           if (!urlRes.ok) {
             const err = await urlRes.json().catch(() => ({}));
             throw new Error(err.error || `Upload URL failed (${urlRes.status})`);
           }
           const urlData = await urlRes.json();
-          videoUid = urlData.videoUid;
 
-          const tus = await import('tus-js-client');
+          // Upload to Supabase Storage
           await new Promise<void>((resolve, reject) => {
-            const upload = new tus.Upload(mapping.file, {
-              endpoint: urlData.uploadUrl,
-              uploadUrl: urlData.uploadUrl,
-              chunkSize: 50 * 1024 * 1024,
-              retryDelays: [0, 1000, 3000, 5000],
-              metadata: { filename: mapping.file.name, filetype: mapping.file.type },
-              onError: (err) => reject(new Error(err.message || 'Upload failed')),
-              onProgress: (bytesUploaded, bytesTotal) => {
-                updateQueueItem(i, { progress: Math.round((bytesUploaded / bytesTotal) * 80) });
-              },
-              onSuccess: () => resolve(),
+            const xhr = new XMLHttpRequest();
+            xhr.upload.addEventListener('progress', e => {
+              if (e.lengthComputable) updateQueueItem(i, { progress: Math.round((e.loaded / e.total) * 70) });
             });
-            upload.start();
+            xhr.addEventListener('load', () => xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`Storage upload failed (${xhr.status})`)));
+            xhr.addEventListener('error', () => reject(new Error('Upload to storage failed')));
+            xhr.open('PUT', urlData.uploadUrl);
+            xhr.setRequestHeader('Content-Type', mapping.file.type || 'video/mp4');
+            xhr.send(mapping.file);
           });
+
+          updateQueueItem(i, { progress: 75 });
+
+          // Tell Cloudflare to pull from storage
+          const processRes = await fetch('/api/tdi-admin/videos/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ storagePath: urlData.storagePath, filename: mapping.file.name, step: 'process' }),
+          });
+          if (!processRes.ok) {
+            const err = await processRes.json().catch(() => ({}));
+            throw new Error(err.error || `Processing failed (${processRes.status})`);
+          }
+          const processData = await processRes.json();
+          videoUid = processData.videoUid;
 
           updateQueueItem(i, { status: 'processing', progress: 80 });
 

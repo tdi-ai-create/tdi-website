@@ -241,44 +241,51 @@ export default function BulkVideoUpload({ course, onComplete, onLessonUploaded }
   const assignedLessonIds = new Set(files.map((f) => f.lessonId).filter(Boolean));
 
   // Upload a file to Cloudflare with retry (gets fresh upload URL on each attempt)
-  // Upload a file to Cloudflare via tus (resumable, no 200MB limit)
+  // Upload video: client -> Supabase Storage -> Cloudflare pulls from storage
   const uploadToCloudflare = async (
     file: File,
     onProgress: (pct: number) => void
   ): Promise<{ videoUid: string }> => {
-    // Get tus upload URL
+    // Step 1: Get signed URL for Supabase Storage
     const urlRes = await fetch('/api/tdi-admin/videos/upload', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ filename: file.name, fileSize: file.size, maxDurationSeconds: 7200 }),
+      body: JSON.stringify({ filename: file.name, fileSize: file.size }),
     });
-
     if (!urlRes.ok) {
       const err = await urlRes.json().catch(() => ({}));
       throw new Error(err.error || `Upload URL request failed (${urlRes.status})`);
     }
-
     const urlData = await urlRes.json();
 
-    // Upload via tus
-    const tus = await import('tus-js-client');
+    // Step 2: Upload to Supabase Storage with progress
     await new Promise<void>((resolve, reject) => {
-      const upload = new tus.Upload(file, {
-        endpoint: urlData.uploadUrl,
-        uploadUrl: urlData.uploadUrl,
-        chunkSize: 50 * 1024 * 1024, // 50MB chunks
-        retryDelays: [0, 1000, 3000, 5000],
-        metadata: { filename: file.name, filetype: file.type },
-        onError: (err) => reject(new Error(err.message || 'Upload failed')),
-        onProgress: (bytesUploaded, bytesTotal) => {
-          onProgress(Math.round((bytesUploaded / bytesTotal) * 80));
-        },
-        onSuccess: () => resolve(),
+      const xhr = new XMLHttpRequest();
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 70));
       });
-      upload.start();
+      xhr.addEventListener('load', () => xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`Storage upload failed (${xhr.status})`)));
+      xhr.addEventListener('error', () => reject(new Error('Upload to storage failed')));
+      xhr.open('PUT', urlData.uploadUrl);
+      xhr.setRequestHeader('Content-Type', file.type || 'video/mp4');
+      xhr.send(file);
     });
 
-    return { videoUid: urlData.videoUid };
+    onProgress(75);
+
+    // Step 3: Tell Cloudflare to pull from storage
+    const processRes = await fetch('/api/tdi-admin/videos/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ storagePath: urlData.storagePath, filename: file.name, step: 'process' }),
+    });
+    if (!processRes.ok) {
+      const err = await processRes.json().catch(() => ({}));
+      throw new Error(err.error || `Processing failed (${processRes.status})`);
+    }
+    const processData = await processRes.json();
+
+    return { videoUid: processData.videoUid };
   };
 
   const startUpload = async () => {
