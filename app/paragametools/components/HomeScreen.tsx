@@ -19,6 +19,7 @@ const GAME_CARDS: {
   { id: 'whatsyourmove', icon: '🎯', color: 'teal' },
   { id: 'principalplaybook', icon: '📋', color: 'gold' },
   { id: 'conversationcompass', icon: '🧭', color: 'teal' },
+  { id: 'partnerup', icon: '🤝', color: 'green' },
 ];
 
 const TIMES: Record<GameId, string> = {
@@ -33,6 +34,7 @@ const TIMES: Record<GameId, string> = {
   energybudget: '~10 min',
   principalplaybook: '~15 min',
   conversationcompass: '~12 min',
+  partnerup: '~15 min',
 };
 
 interface HomeScreenProps {

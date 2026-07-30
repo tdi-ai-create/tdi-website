@@ -93,6 +93,14 @@ export const UI_TRANSLATIONS = {
       },
       format: { en: 'Solo Quiz', es: 'Quiz Individual' },
     },
+    partnerup: {
+      title: { en: 'Partner Up', es: 'Alianza en Acción' },
+      description: {
+        en: 'Same moment. Two perspectives. Build empathy across the teacher-para relationship.',
+        es: 'Mismo momento. Dos perspectivas. Construye empatía en la relación maestra y para.',
+      },
+      format: { en: 'Dual Perspective', es: 'Perspectiva Dual' },
+    },
   },
 
   // Common Game UI

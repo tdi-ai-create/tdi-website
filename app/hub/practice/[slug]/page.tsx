@@ -14,6 +14,7 @@ import { PrioritizeThis } from '@/app/paragametools/components/PrioritizeThis'
 import { EnergyBudget } from '@/app/paragametools/components/EnergyBudget'
 import { PrincipalPlaybook } from '@/app/paragametools/components/PrincipalPlaybook'
 import { ConversationCompass } from '@/app/paragametools/components/ConversationCompass'
+import { PartnerUp } from '@/app/paragametools/components/PartnerUp'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub'
@@ -79,6 +80,11 @@ const PRACTICE_TOOLS: Record<string, {
     component: ConversationCompass,
     title: 'Conversation Compass',
     category: 'Communication',
+  },
+  'partner-up': {
+    component: PartnerUp,
+    title: 'Partner Up',
+    category: 'Instructional Strategies',
   },
 }
 

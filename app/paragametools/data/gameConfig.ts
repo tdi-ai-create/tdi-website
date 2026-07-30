@@ -1,6 +1,6 @@
 // Game configuration and shared utilities
 
-export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook' | 'conversationcompass';
+export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook' | 'conversationcompass' | 'partnerup';
 
 export interface GameConfig {
   id: GameId;
@@ -75,6 +75,15 @@ export const GAMES: GameConfig[] = [
     duration: 12,
     color: 'teal',
     rounds: '10 scenarios',
+  },
+  {
+    id: 'partnerup',
+    title: 'Partner Up',
+    description: 'Same moment. Two perspectives. Build empathy across the teacher-para relationship.',
+    time: '~15 min',
+    duration: 15,
+    color: 'green',
+    rounds: '10 scenarios, 2 perspectives each',
   },
 ];
 

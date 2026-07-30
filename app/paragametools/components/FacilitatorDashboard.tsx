@@ -18,6 +18,7 @@ import {
   Crosshair,
   ChevronRight,
   Briefcase,
+  Users as UsersIcon,
 } from 'lucide-react';
 import { GAMES, COLORS, type GameId } from '../data/gameConfig';
 import { TIPS_BY_GAME } from '../data/tips';
@@ -35,6 +36,7 @@ const GAME_ICONS: Record<GameId, typeof Target> = {
   energybudget: Target,
   principalplaybook: Briefcase,
   conversationcompass: MessageCircle,
+  partnerup: UsersIcon,
 };
 
 interface FacilitatorDashboardProps {

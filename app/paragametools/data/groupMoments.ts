@@ -47,4 +47,5 @@ export const GROUP_MOMENTS_BY_GAME = {
   energybudget: [] as string[],
   principalplaybook: [] as string[],
   conversationcompass: [] as string[],
+  partnerup: [] as string[],
 } as const;
