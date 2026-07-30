@@ -38,19 +38,20 @@ export async function POST(
   }
 
   // Update last_activity_at on the opportunity
-  await supabase
+  const { error: activityErr } = await supabase
     .from('sales_opportunities')
     .update({ last_activity_at: new Date().toISOString() })
     .eq('id', id)
-    .then(() => {})
+  if (activityErr) console.error('[notes] Failed to update last_activity_at:', activityErr.message)
 
   // Log activity
-  await supabase.from('opportunity_activity').insert({
+  const { error: logErr } = await supabase.from('opportunity_activity').insert({
     opportunity_id: id,
     actor_email: author_email,
     activity_type: 'note_added',
     description: `Note added (${safeType})`,
-  }).then(() => {})
+  })
+  if (logErr) console.error('[notes] Failed to log activity:', logErr.message)
 
   // Mirror note to sibling signed opportunities (same school, split grant/non-grant)
   const { data: thisOpp } = await supabase
@@ -80,13 +81,14 @@ export async function POST(
         note_text: `[Mirrored] ${note_text.trim()}`,
         note_type: safeType,
       }))
-      await supabase.from('opportunity_notes').insert(mirrorInserts).then(() => {})
+      const { error: mirrorErr } = await supabase.from('opportunity_notes').insert(mirrorInserts)
+      if (mirrorErr) console.error('[notes] Failed to mirror notes to siblings:', mirrorErr.message)
       // Update last_activity_at on siblings
-      await supabase
+      const { error: sibErr } = await supabase
         .from('sales_opportunities')
         .update({ last_activity_at: new Date().toISOString() })
         .in('id', siblings.map(s => s.id))
-        .then(() => {})
+      if (sibErr) console.error('[notes] Failed to update sibling timestamps:', sibErr.message)
     }
   }
 

@@ -225,6 +225,24 @@ export async function POST(
     return NextResponse.json({ sent: false, error: result.error }, { status: 500 })
   }
 
+  // Log to funding_email_log so it appears in the Emails tab
+  await supabase
+    .from('funding_email_log')
+    .insert({
+      pursuit_id: item.pursuit_id,
+      opportunity_id: item.opportunity_id || null,
+      subject: email.subject,
+      body: email.html,
+      to_email: recipientEmail,
+      to_name: contactName,
+      from_email: 'noreply@teachersdeserveit.com',
+      status: 'sent',
+      sent_at: new Date().toISOString(),
+      sent_by: auth.user?.email || auth.member?.email || 'bella@teachersdeserveit.com',
+      resend_id: result.id || null,
+      email_type: emailType === 'nudge' ? 'nudge' : 'deadline_reminder',
+    })
+
   // Update the action item + auto-log to notes
   const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   const noteEntry = `[${timestamp}] Nudge sent to ${recipientEmail}`

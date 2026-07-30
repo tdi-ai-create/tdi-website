@@ -124,14 +124,12 @@ export async function PATCH(
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  // Try to set stage_entered_at (non-blocking, column may not exist)
+  // Set stage_entered_at for pipeline tracking
   if (stageChanged) {
-    try {
-      supabase.from('sales_opportunities')
-        .update({ stage_entered_at: new Date().toISOString() })
-        .eq('id', id)
-        .then(() => {})
-    } catch { /* column may not exist */ }
+    const { error: stageErr } = await supabase.from('sales_opportunities')
+      .update({ stage_entered_at: new Date().toISOString() })
+      .eq('id', id)
+    if (stageErr) console.error('[opportunities] Failed to set stage_entered_at:', stageErr.message)
   }
 
   // Slack notification for stage change
@@ -149,14 +147,15 @@ export async function PATCH(
   // Log activity for tracked field changes
   for (const field of ACTIVITY_TRACKED) {
     if (rawFields[field] !== undefined && rawFields[field] !== current[field as keyof typeof current]) {
-      await supabase.from('opportunity_activity').insert({
+      const { error: actErr } = await supabase.from('opportunity_activity').insert({
         opportunity_id: id,
         actor_email,
         activity_type: `${field}_changed`,
         old_value: String(current[field as keyof typeof current] ?? ''),
         new_value: String(rawFields[field]),
         description: `${field.replace('_', ' ')} changed from "${current[field as keyof typeof current]}" to "${rawFields[field]}"`,
-      }).then(() => {})
+      })
+      if (actErr) console.error(`[opportunities] Failed to log ${field} change:`, actErr.message)
     }
   }
 
@@ -193,14 +192,18 @@ export async function DELETE(
     .eq('opportunity_id', id)
 
   // Archive to deleted_opportunities before hard delete
-  await supabase.from('deleted_opportunities').insert({
+  const { error: archiveErr } = await supabase.from('deleted_opportunities').insert({
     original_id: id,
     deleted_by_email,
     full_record: opp,
     notes_archive: notesArchive ?? [],
     activity_archive: activityArchive ?? [],
     reason,
-  }).then(() => {})
+  })
+  if (archiveErr) {
+    console.error('[opportunities] Failed to archive before delete:', archiveErr.message)
+    return NextResponse.json({ error: 'Failed to archive opportunity before deletion' }, { status: 500 })
+  }
 
   const { error } = await supabase
     .from('sales_opportunities')

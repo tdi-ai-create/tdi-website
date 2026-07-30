@@ -236,9 +236,9 @@ export async function POST(
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email: s.email, firstName: s.first_name || s.email.split('@')[0], schoolName, roleTitle: s.role_title || null }),
-            }).catch(() => {});
+            }).catch(err => console.error(`[partner-intake] Welcome email failed for ${s.email}:`, err));
           }
-        } catch { /* non-fatal */ }
+        } catch (err) { console.error(`[partner-intake] Hub provisioning failed for ${s.email}:`, err); }
       }
 
       // Create default action items (updated list with 10 items)

@@ -221,7 +221,7 @@ export async function POST(request: NextRequest) {
             type: 'user',
             emailAddress: email,
           }),
-        }).catch(() => {})
+        }).catch(err => console.error(`[save-to-drive] Failed to share with ${email}:`, err))
       }
       // Also try "anyone with link" as fallback
       await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
@@ -234,7 +234,7 @@ export async function POST(request: NextRequest) {
           role: 'writer',
           type: 'anyone',
         }),
-      }).catch(() => {})
+      }).catch(err => console.error('[save-to-drive] Failed to set link sharing:', err))
     }
 
     console.log(`[save-to-drive] Created: ${docTitle} -> ${fileUrl}`);

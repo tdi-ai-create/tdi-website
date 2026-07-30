@@ -207,7 +207,7 @@ export function generateFollowUpEmail(params: FollowUpEmailParams): GeneratedEma
 
 // ── Send via Resend ──
 
-export async function sendFollowUpEmail(email: GeneratedEmail): Promise<{ ok: boolean; error?: string }> {
+export async function sendFollowUpEmail(email: GeneratedEmail): Promise<{ ok: boolean; error?: string; id?: string | null }> {
   const resendKey = process.env.RESEND_API_KEY
   if (!resendKey) return { ok: false, error: 'RESEND_API_KEY not set' }
 
@@ -234,5 +234,6 @@ export async function sendFollowUpEmail(email: GeneratedEmail): Promise<{ ok: bo
     return { ok: false, error: JSON.stringify(err) }
   }
 
-  return { ok: true }
+  const data = await res.json().catch(() => ({}))
+  return { ok: true, id: data?.id || null }
 }

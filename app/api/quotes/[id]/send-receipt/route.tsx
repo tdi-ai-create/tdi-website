@@ -231,7 +231,8 @@ export async function POST(
         ],
       })
     } catch (err) {
-      console.error('Client email send error:', err)
+      console.error('[send-receipt] Client email failed:', err)
+      return NextResponse.json({ error: 'Failed to send receipt email to client', success: false }, { status: 500 })
     }
   }
 
@@ -265,7 +266,7 @@ export async function POST(
       ],
     })
   } catch (err) {
-    console.error('Admin email send error:', err)
+    console.error('[send-receipt] Admin notification email failed:', err)
   }
 
   return NextResponse.json({ success: true })
