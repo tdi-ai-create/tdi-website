@@ -3,10 +3,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
-import { InfoDot, FirstTimeHint, GUIDANCE } from '@/components/tdi-admin/ui/Guidance'
 import { useTDIAdmin } from '@/lib/tdi-admin/context'
 import { hasAnySectionPermission } from '@/lib/tdi-admin/permissions'
-import { DashboardHeader } from '@/components/dashboard/shared/DashboardHeader'
 import { StatCards } from '@/components/dashboard/shared/StatCards'
 import { MomentumBar } from '@/components/dashboard/shared/MomentumBar'
 import { PartnershipTimeline } from '@/components/dashboard/shared/PartnershipTimeline'
@@ -17,13 +15,11 @@ import { ServiceTracker } from '@/components/dashboard/admin/ServiceTracker'
 import { InlineEditField } from '@/components/dashboard/admin/InlineEditField'
 import { FileUploadZone } from '@/components/dashboard/admin/FileUploadZone'
 import { AIExtractModal } from '@/components/dashboard/admin/AIExtractModal'
-import { HighlightControls } from '@/components/dashboard/admin/HighlightControls'
-import { SectionHighlight } from '@/components/dashboard/shared/SectionHighlight'
 import { TDISuggestions } from '@/components/dashboard/shared/TDISuggestions'
 import { STATIC_DEFAULTS } from '@/lib/dashboard/dashboardDefaults'
 import { generateSuggestions, type TDISuggestion } from '@/lib/dashboard/generateSuggestions'
 import { StaffRosterWithPhotos, StaffPhotoUpload, FindStaffSearch } from '@/components/tdi-admin/leadership/staff'
-import { ArrowLeft, Loader2, Building2, Upload, ExternalLink, Calendar, Mail, Phone, MessageCircle, CheckCircle2, Circle, Clock, Eye, EyeOff, Trash2, Plus, ChevronDown, FileText, BarChart3, Users, AlertTriangle, Target, TrendingUp, Send, Briefcase, Edit3, ChevronRight, X } from 'lucide-react'
+import { ArrowLeft, Loader2, Building2, ExternalLink, Calendar, Mail, Phone, MessageCircle, CheckCircle2, Circle, Clock, Eye, EyeOff, Trash2, Plus, ChevronDown, FileText, BarChart3, Users, AlertTriangle, Target, TrendingUp, Briefcase, Edit3, ChevronRight, X } from 'lucide-react'
 import Image from 'next/image'
 import OnboardingChecklist from '@/components/dashboard/leadership/OnboardingChecklist'
 import StaffEngagementRoster from '@/components/dashboard/leadership/StaffEngagementRoster'
@@ -32,6 +28,30 @@ import CourseCompletionFunnel from '@/components/dashboard/leadership/CourseComp
 import LoginTrendChart from '@/components/dashboard/leadership/LoginTrendChart'
 import ObservationImpactScorecard from '@/components/dashboard/leadership/ObservationImpactScorecard'
 import BillingTab from '@/components/dashboard/admin/BillingTab'
+
+const CATEGORY_COLORS: Record<string, string> = {
+  general: '#6B7280', onboarding: '#8B5CF6', hub: '#3B82F6',
+  coaching: '#F59E0B', billing: '#EF4444', follow_up: '#10B981',
+}
+
+const NOTE_TYPE_COLORS: Record<string, string> = {
+  general: 'bg-gray-100 text-gray-700',
+  strategy: 'bg-blue-100 text-blue-700',
+  concern: 'bg-red-100 text-red-700',
+  win: 'bg-green-100 text-green-700',
+  follow_up: 'bg-amber-100 text-amber-700',
+}
+
+const MEETING_TYPE_LABELS: Record<string, string> = {
+  check_in: 'Check-in', onboarding: 'Onboarding', observation_debrief: 'Observation debrief',
+  renewal: 'Renewal', strategy: 'Strategy', escalation: 'Escalation', other: 'Other',
+}
+
+const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
+  IGNITE: { bg: '#FEF3C7', text: '#92400E' },
+  ACCELERATE: { bg: '#DBEAFE', text: '#1E40AF' },
+  SUSTAIN: { bg: '#D1FAE5', text: '#065F46' },
+}
 
 interface UploadedFile {
   id: string
@@ -156,7 +176,6 @@ export default function AdminPartnershipDetailPage() {
   const [actionItems, setActionItems] = useState<any[]>([])
   const [defaults, setDefaults] = useState<Record<string, string>>(STATIC_DEFAULTS)
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
-  const [highlights, setHighlights] = useState<any[]>([])
   const [suggestions, setSuggestions] = useState<TDISuggestion[]>([])
   const [hubStats, setHubStats] = useState<{
     has_real_data: boolean
@@ -200,9 +219,6 @@ export default function AdminPartnershipDetailPage() {
       quick_wins_after: number
     }[]
   }>({ has_data: false, observations: [] })
-
-  // Highlight controls modal state
-  const [editingHighlight, setEditingHighlight] = useState<string | null>(null)
 
   // AI Extract modal state
   const [extractModal, setExtractModal] = useState<{
@@ -259,16 +275,13 @@ export default function AdminPartnershipDetailPage() {
   const [grantPursuits, setGrantPursuits] = useState<{ id: string; pursuit_name: string; current_phase: string; total_amount: number; total_awarded: number; funding_paths: string; contract_gap: number }[]>([])
 
   // V2 state: Timeline filter, expanded sidebar sections, slide-out panels
-  const [timelineFilter, setTimelineFilter] = useState<'all' | 'notes' | 'meetings' | 'alerts'>('all')
+  const [timelineFilter, setTimelineFilter] = useState<'all' | 'notes' | 'meetings' | 'actions'>('all')
   const [showBillingPanel, setShowBillingPanel] = useState(false)
   const [showTeamPanel, setShowTeamPanel] = useState(false)
   const [show90DaysPanel, setShow90DaysPanel] = useState(false)
   const [showOverviewPanel, setShowOverviewPanel] = useState(false)
   const [showKpiSelector, setShowKpiSelector] = useState(false)
   const [showSchoolInfo, setShowSchoolInfo] = useState(false)
-
-  // Session records state (for Our Partnership tab)
-  const [sessionRecords, setSessionRecords] = useState<any[]>([])
 
   // Inline editing state for partnership goal
   const [editingField, setEditingField] = useState<string | null>(null)
@@ -331,7 +344,7 @@ export default function AdminPartnershipDetailPage() {
 
     setLoading(true)
     try {
-      const [pRes, tRes, aRes, dRes, fRes, hRes] = await Promise.all([
+      const [pRes, tRes, aRes, dRes, fRes] = await Promise.all([
         fetch(`/api/tdi-admin/leadership/${partnershipId}`, {
           headers: { 'x-user-email': userEmail },
         }),
@@ -343,9 +356,6 @@ export default function AdminPartnershipDetailPage() {
         }),
         fetch('/api/dashboard-defaults'),
         fetch(`/api/tdi-admin/leadership/${partnershipId}/upload`, {
-          headers: { 'x-user-email': userEmail },
-        }),
-        fetch(`/api/tdi-admin/leadership/${partnershipId}/highlights`, {
           headers: { 'x-user-email': userEmail },
         }),
       ])
@@ -377,11 +387,6 @@ export default function AdminPartnershipDetailPage() {
       if (fRes.ok) {
         const fData = await fRes.json()
         setUploadedFiles(fData.files || [])
-      }
-
-      if (hRes.ok) {
-        const hData = await hRes.json()
-        setHighlights(hData.highlights || [])
       }
 
       // Fetch Hub stats (separate from main data for real-time Hub analytics)
@@ -613,13 +618,19 @@ export default function AdminPartnershipDetailPage() {
     if (!partnership) return []
     const actions: { label: string; description: string; variant: 'urgent' | 'primary' | 'secondary'; onClick: () => void }[] = []
 
+    // Context-aware login threshold
+    const partnershipAge = partnership.contract_start
+      ? Math.floor((Date.now() - new Date(partnership.contract_start).getTime()) / (1000 * 60 * 60 * 24))
+      : 999
+    const loginThreshold = partnershipAge < 30 ? 7 : 14
+
     // Check last login
     const lastLogin = partnership.last_principal_login
     const daysSinceLogin = lastLogin
       ? Math.floor((Date.now() - new Date(lastLogin).getTime()) / (1000 * 60 * 60 * 24))
       : null
 
-    if (daysSinceLogin !== null && daysSinceLogin > 14) {
+    if (daysSinceLogin !== null && daysSinceLogin > loginThreshold) {
       actions.push({
         label: 'Schedule check-in',
         description: `Principal hasn't logged in for ${daysSinceLogin} days.`,
@@ -630,7 +641,13 @@ export default function AdminPartnershipDetailPage() {
       })
     }
 
-    // Prep for call
+    // Prep for call (only show when there's an upcoming meeting or > 3 days since last contact)
+    const lastNoteTs = internalNotes.length > 0 ? new Date(internalNotes[0].created_at).getTime() : 0
+    const lastMeetingTs = internalMeetings.length > 0 ? new Date(internalMeetings[0].meeting_date).getTime() : 0
+    const lastContactTs = Math.max(lastNoteTs, lastMeetingTs)
+    const daysSinceLastContact = lastContactTs > 0 ? Math.floor((Date.now() - lastContactTs) / (1000 * 60 * 60 * 24)) : 999
+    const hasUpcomingMeeting = internalMeetings.some(m => new Date(m.meeting_date).getTime() > Date.now())
+    if (hasUpcomingMeeting || daysSinceLastContact > 3) {
     actions.push({
       label: 'Prep for Next Call',
       description: 'Generate a briefing with engagement data and talking points.',
@@ -650,6 +667,24 @@ export default function AdminPartnershipDetailPage() {
         } catch { /* */ }
       },
     })
+    }
+
+    // Renewal warning action
+    if (partnership.contract_end) {
+      const daysUntilEnd = Math.floor((new Date(partnership.contract_end).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+      if (daysUntilEnd <= 60 && daysUntilEnd > 0) {
+        actions.push({
+          label: 'Start renewal conversation',
+          description: `Contract expires in ${daysUntilEnd} days.`,
+          variant: daysUntilEnd <= 30 ? 'urgent' : 'secondary',
+          onClick: () => {
+            setNewNoteType('strategy')
+            setNewNoteContent(`Renewal discussion: contract expires ${new Date(partnership.contract_end).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}. `)
+            document.querySelector('textarea')?.focus()
+          },
+        })
+      }
+    }
 
     // Overdue action items
     const overdueCount = actionItems.filter(a => a.status !== 'completed' && a.due_date && new Date(a.due_date) < new Date()).length
@@ -665,14 +700,14 @@ export default function AdminPartnershipDetailPage() {
       })
     }
 
-    return actions.slice(0, 3)
-  }, [partnership, actionItems, partnershipId])
+    return actions.slice(0, 4)
+  }, [partnership, actionItems, partnershipId, internalNotes, internalMeetings])
 
   // ─── Computed: Unified Timeline ────────────────────────────────────
   const unifiedTimeline = useMemo(() => {
     type UnifiedEntry = {
       id: string
-      type: 'note' | 'meeting' | 'alert' | 'system'
+      type: 'note' | 'meeting' | 'system'
       date: string
       author: string
       content: string
@@ -727,7 +762,7 @@ export default function AdminPartnershipDetailPage() {
     // Filter
     if (timelineFilter === 'notes') return entries.filter(e => e.type === 'note')
     if (timelineFilter === 'meetings') return entries.filter(e => e.type === 'meeting')
-    if (timelineFilter === 'alerts') return entries.filter(e => e.type === 'alert' || e.type === 'system')
+    if (timelineFilter === 'actions') return entries.filter(e => e.type === 'system')
     return entries
   }, [internalNotes, internalMeetings, actionItems, timelineFilter])
 
@@ -760,8 +795,8 @@ export default function AdminPartnershipDetailPage() {
 
     // Provisioned
     const enrolled = partnership.staff_enrolled || 0
-    const totalStaff = hubStats?.member_count || enrolled
-    metrics.push({ label: 'Provisioned', value: `${enrolled}/${totalStaff}`, color: enrolled >= totalStaff && totalStaff > 0 ? '#10B981' : '#EAB308' })
+    const totalStaff = hubStats?.member_count || partnership.total_staff || 0
+    metrics.push({ label: 'Provisioned', value: totalStaff > 0 ? `${enrolled}/${totalStaff}` : 'N/A', color: totalStaff === 0 ? '#9CA3AF' : enrolled >= totalStaff ? '#10B981' : '#EAB308' })
 
     // Hub Login %
     const loginPct = hubStats?.hub_login_pct ?? partnership.hub_login_pct
@@ -770,8 +805,27 @@ export default function AdminPartnershipDetailPage() {
       metrics.push({ label: 'Hub Login', value: `${loginPct}%`, color: lColor })
     }
 
+    // Contract renewal countdown
+    if (partnership.contract_end) {
+      const daysUntilEnd = Math.floor((new Date(partnership.contract_end).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+      if (daysUntilEnd <= 90) {
+        const rColor = daysUntilEnd <= 30 ? '#EF4444' : daysUntilEnd <= 60 ? '#EAB308' : '#3B82F6'
+        metrics.push({ label: 'Renewal', value: daysUntilEnd <= 0 ? 'Expired' : `${daysUntilEnd}d`, color: rColor })
+      }
+    }
+
+    // Last TDI contact
+    const lastNoteDate = internalNotes.length > 0 ? new Date(internalNotes[0].created_at).getTime() : 0
+    const lastMeetingDate = internalMeetings.length > 0 ? new Date(internalMeetings[0].meeting_date).getTime() : 0
+    const lastContactMs = Math.max(lastNoteDate, lastMeetingDate)
+    if (lastContactMs > 0) {
+      const daysSinceContact = Math.floor((Date.now() - lastContactMs) / (1000 * 60 * 60 * 24))
+      const cColor = daysSinceContact <= 7 ? '#10B981' : daysSinceContact <= 14 ? '#EAB308' : '#EF4444'
+      metrics.push({ label: 'Last Contact', value: `${daysSinceContact}d`, color: cColor })
+    }
+
     return metrics
-  }, [partnership, actionItems, grantPursuits, hubStats])
+  }, [partnership, actionItems, grantPursuits, hubStats, internalNotes, internalMeetings])
 
   // Access denied
   if (!hasAccess) {
@@ -835,11 +889,7 @@ export default function AdminPartnershipDetailPage() {
     ? `${organization.address_city}, ${organization.address_state}`
     : partnership.address || ''
 
-  const phaseColors: Record<string, { bg: string; text: string }> = {
-    IGNITE: { bg: '#FEF3C7', text: '#92400E' },
-    ACCELERATE: { bg: '#DBEAFE', text: '#1E40AF' },
-    SUSTAIN: { bg: '#D1FAE5', text: '#065F46' },
-  }
+
 
   // ─── Action Items helper functions (pulled from render) ────────
   const statusIcon = (status: string) => {
@@ -850,10 +900,7 @@ export default function AdminPartnershipDetailPage() {
 
   const nextStatus = (s: string) => s === 'pending' ? 'in_progress' : s === 'in_progress' ? 'completed' : 'pending'
 
-  const categoryColors: Record<string, string> = {
-    general: '#6B7280', onboarding: '#8B5CF6', hub: '#3B82F6',
-    coaching: '#F59E0B', billing: '#EF4444', follow_up: '#10B981',
-  }
+
 
   const updateActionItem = async (id: string, fields: Record<string, any>) => {
     try {
@@ -865,7 +912,7 @@ export default function AdminPartnershipDetailPage() {
       if (res.ok) {
         setActionItems(prev => prev.map(a => a.id === id ? { ...a, ...fields } : a))
       }
-    } catch { /* */ }
+    } catch { showToast('Failed to update', 'error') }
   }
 
   const deleteActionItem = async (id: string) => {
@@ -879,21 +926,12 @@ export default function AdminPartnershipDetailPage() {
         setActionItems(prev => prev.filter(a => a.id !== id))
         setDeletingActionId(null)
       }
-    } catch { /* */ }
+    } catch { showToast('Failed to delete', 'error') }
   }
 
-  const noteTypeColors: Record<string, string> = {
-    general: 'bg-gray-100 text-gray-700',
-    strategy: 'bg-blue-100 text-blue-700',
-    concern: 'bg-red-100 text-red-700',
-    win: 'bg-green-100 text-green-700',
-    follow_up: 'bg-amber-100 text-amber-700',
-  }
 
-  const meetingTypeLabels: Record<string, string> = {
-    check_in: 'Check-in', onboarding: 'Onboarding', observation_debrief: 'Observation debrief',
-    renewal: 'Renewal', strategy: 'Strategy', escalation: 'Escalation', other: 'Other',
-  }
+
+
 
   return (
     <>
@@ -948,8 +986,8 @@ export default function AdminPartnershipDetailPage() {
               <span
                 className="px-3 py-1.5 rounded-full text-xs font-bold"
                 style={{
-                  background: phaseColors[phase]?.bg || '#F3F4F6',
-                  color: phaseColors[phase]?.text || '#374151',
+                  background: PHASE_COLORS[phase]?.bg || '#F3F4F6',
+                  color: PHASE_COLORS[phase]?.text || '#374151',
                 }}
               >
                 {phase}
@@ -1048,7 +1086,7 @@ export default function AdminPartnershipDetailPage() {
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
               {/* Filter tabs */}
               <div className="flex items-center border-b border-gray-100 px-5 pt-4 pb-0">
-                {(['all', 'notes', 'meetings', 'alerts'] as const).map(f => (
+                {(['all', 'notes', 'meetings', 'actions'] as const).map(f => (
                   <button
                     key={f}
                     onClick={() => setTimelineFilter(f)}
@@ -1112,7 +1150,7 @@ export default function AdminPartnershipDetailPage() {
                               setInternalNotes(prev => [data.note, ...prev])
                               setNewNoteContent('')
                             }
-                          } catch {} finally { setAddingNote(false) }
+                          } catch { showToast('Failed to save note', 'error') } finally { setAddingNote(false) }
                         }}
                         disabled={!newNoteContent.trim() || addingNote}
                         className="ml-auto px-4 py-1.5 text-xs font-semibold text-white rounded-lg transition-colors disabled:opacity-50"
@@ -1196,7 +1234,7 @@ export default function AdminPartnershipDetailPage() {
                           setNewMeeting({ date: '', type: 'check_in', attendees: '', summary: '', actionItems: '' })
                           setShowMeetingForm(false)
                         }
-                      } catch {} finally { setAddingMeeting(false) }
+                      } catch { showToast('Failed to log meeting', 'error') } finally { setAddingMeeting(false) }
                     }}
                     disabled={!newMeeting.date || addingMeeting}
                     className="px-4 py-1.5 text-xs font-medium text-white rounded-lg transition-colors disabled:opacity-50"
@@ -1223,13 +1261,13 @@ export default function AdminPartnershipDetailPage() {
                       {/* Header */}
                       <div className="flex items-center gap-2 mb-1">
                         {entry.type === 'note' && entry.meta?.note_type && (
-                          <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${noteTypeColors[entry.meta.note_type] || noteTypeColors.general}`}>
+                          <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${NOTE_TYPE_COLORS[entry.meta.note_type] || NOTE_TYPE_COLORS.general}`}>
                             {entry.meta.note_type}
                           </span>
                         )}
                         {entry.type === 'meeting' && (
                           <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
-                            {meetingTypeLabels[entry.meta?.meeting_type] || 'Meeting'}
+                            {MEETING_TYPE_LABELS[entry.meta?.meeting_type] || 'Meeting'}
                           </span>
                         )}
                         {entry.type === 'system' && (
@@ -1307,7 +1345,7 @@ export default function AdminPartnershipDetailPage() {
                 style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #263554 100%)', borderLeft: '3px solid #E8B84B' }}
               >
                 <div className="flex items-center gap-1.5 mb-2">
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8B84B', display: 'inline-block', animation: aiInsightLoading ? 'pulse 2s infinite' : 'none' }} />
+                  <span className={aiInsightLoading ? 'animate-pulse' : ''} style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8B84B', display: 'inline-block' }} />
                   <span style={{ fontSize: 10, fontWeight: 700, color: '#E8B84B', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                     AI Partnership Insight
                   </span>
@@ -1315,7 +1353,6 @@ export default function AdminPartnershipDetailPage() {
                 <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, margin: 0 }}>
                   {aiInsightLoading ? 'Generating insight for this partnership...' : aiInsight}
                 </p>
-                <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
               </div>
             )}
           </div>
@@ -1413,7 +1450,7 @@ export default function AdminPartnershipDetailPage() {
                               setNewAction({ title: '', description: '', due_date: '', category: 'general', visible_to_partner: false })
                               setShowAddAction(false)
                             }
-                          } catch { /* */ }
+                          } catch { showToast('Failed to create action item', 'error') }
                           setSavingAction(false)
                         }}
                         className="text-[10px] px-2.5 py-1.5 rounded-md text-white font-medium disabled:opacity-40"
@@ -1499,7 +1536,7 @@ export default function AdminPartnershipDetailPage() {
                           )}
                           <span
                             className="text-[9px] font-medium px-1 py-0.5 rounded-full"
-                            style={{ background: (categoryColors[item.category] || '#6B7280') + '18', color: categoryColors[item.category] || '#6B7280' }}
+                            style={{ background: (CATEGORY_COLORS[item.category] || '#6B7280') + '18', color: CATEGORY_COLORS[item.category] || '#6B7280' }}
                           >
                             {(item.category || 'general').replace('_', '-')}
                           </span>
@@ -1837,7 +1874,7 @@ export default function AdminPartnershipDetailPage() {
                             if (reloadData.kpis) setActiveKpis(reloadData.kpis)
                             setShowKpiSelector(false)
                           }
-                        } catch {} finally { setSavingKpis(false) }
+                        } catch { showToast('Failed to save KPIs', 'error') } finally { setSavingKpis(false) }
                       }}
                       disabled={selectedKpiKeys.size === 0 || savingKpis}
                       className="px-3 py-1.5 text-[10px] font-medium text-white rounded-lg disabled:opacity-50"
@@ -2462,19 +2499,6 @@ export default function AdminPartnershipDetailPage() {
           userEmail={userEmail}
           onClose={() => setExtractModal({ open: false, fileId: '', filename: '' })}
           onApply={handleApplyExtracted}
-        />
-      )}
-
-      {/* Highlight Controls Modal */}
-      {editingHighlight && (
-        <HighlightControls
-          partnershipId={partnershipId}
-          sectionKey={editingHighlight}
-          sectionLabel={editingHighlight}
-          highlights={highlights}
-          userEmail={userEmail}
-          onUpdate={setHighlights}
-          onClose={() => setEditingHighlight(null)}
         />
       )}
 
