@@ -68,7 +68,7 @@ function VideoPlayer({ videoId, cfAccountId: cfSubdomain, onRemove }: { videoId:
     let attempts = 0;
 
     async function checkReady() {
-      while (!cancelled && attempts < 40) {
+      while (!cancelled && attempts < 120) { // Poll up to 6 minutes (copy API takes longer)
         try {
           const res = await fetch(`/api/tdi-admin/videos/upload?uid=${videoId}`);
           if (res.ok) {
@@ -86,7 +86,18 @@ function VideoPlayer({ videoId, cfAccountId: cfSubdomain, onRemove }: { videoId:
         attempts++;
         await new Promise(r => setTimeout(r, 3000));
       }
-      if (!cancelled) { setReady(true); setChecking(false); } // assume ready after timeout
+      // After timeout, check one more time before giving up
+      try {
+        const finalRes = await fetch(`/api/tdi-admin/videos/upload?uid=${videoId}`);
+        if (finalRes.ok) {
+          const finalData = await finalRes.json();
+          if (finalData.readyToStream) {
+            if (!cancelled) { setReady(true); setChecking(false); }
+            return;
+          }
+        }
+      } catch {}
+      if (!cancelled) { setError(true); setChecking(false); } // Don't assume ready, show error
     }
 
     checkReady();
@@ -386,7 +397,7 @@ function VideoUploadSection({
 
       let ready = false;
       let attempts = 0;
-      while (!ready && attempts < 60) {
+      while (!ready && attempts < 120) { // Poll up to 6 min (copy API takes longer)
         await new Promise(r => setTimeout(r, 3000));
         attempts++;
 
@@ -408,7 +419,7 @@ function VideoUploadSection({
             throw new Error('Video processing failed');
           } else {
             setUploadProgress(80 + Math.min(attempts, 18));
-            setTimeRemaining('Processing... this usually takes 30-60 seconds');
+            setTimeRemaining('Processing... this usually takes 1-3 minutes');
           }
         }
       }
