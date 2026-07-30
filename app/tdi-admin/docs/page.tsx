@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Search, Download, Printer, ExternalLink } from 'lucide-react';
 
-type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'communication-map' | 'swag-fulfillment';
+type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow';
 
 interface Doc {
   id: DocId;
@@ -68,6 +68,15 @@ const DOC_GROUPS: DocGroup[] = [
         tags: ['email', 'communication', 'cron', 'weekly digest', 'newsletter', 'automated', 'resend', 'principal', 'educator', 'welcome', 'reminder'],
         relatedSections: [
           { label: 'Leadership Dashboard', href: '/tdi-admin/leadership' },
+        ],
+      },
+      {
+        id: 'leadership-workflow',
+        label: 'Leadership Dashboard',
+        desc: 'White-glove partnership management: onboarding, sessions, observations, renewal',
+        tags: ['leadership', 'dashboard', 'partnership', 'observation', 'session', 'onboarding', 'roster', 'KPI', 'action items', 'billing', 'renewal', 'white glove', 'love notes'],
+        relatedSections: [
+          { label: 'Lead Dashboard', href: '/tdi-admin/leadership' },
         ],
       },
       {

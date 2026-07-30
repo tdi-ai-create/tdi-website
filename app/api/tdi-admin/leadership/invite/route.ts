@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
         schoolName: partnershipData?.org_name || partnershipData?.contact_name || 'your school',
         dashboardUrl: `${baseUrl}/partners/${partnershipData?.slug || 'login'}`,
       }),
-    }).catch(() => {}); // Fire and forget
+    }).catch(err => console.error(`[leadership-invite] Welcome email failed for ${inviteEmail}:`, err));
 
     return NextResponse.json({
       success: true,

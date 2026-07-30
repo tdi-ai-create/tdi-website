@@ -154,35 +154,39 @@ export async function POST(
         .is('partnership_id', null)
     } else if (orgName) {
       const slug = orgName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-      try {
-        const { data: newPartnership } = await supabase.from('partnerships').insert({
-          org_name: orgName,
-          partnership_type: 'school',
-          contact_name: signedByName,
-          contact_email: contactEmail,
-          primary_contact_name: signedByName,
-          primary_contact_email: contactEmail,
-          contract_phase: 'IGNITE',
-          status: 'active',
-          slug: slug,
-          contract_start: new Date().toISOString().split('T')[0],
-          contract_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          staff_enrolled: 0,
-          base_staff_enrolled: 0,
-          observation_days_total: 0, observation_days_used: 0,
-          virtual_sessions_total: 0, virtual_sessions_used: 0,
-          executive_sessions_total: 0, executive_sessions_used: 0,
-          sales_deal_id: null,
-        }).select('id').single()
+      const { data: newPartnership, error: partnershipErr } = await supabase.from('partnerships').insert({
+        org_name: orgName,
+        partnership_type: 'school',
+        contact_name: signedByName,
+        contact_email: contactEmail,
+        primary_contact_name: signedByName,
+        primary_contact_email: contactEmail,
+        contract_phase: 'IGNITE',
+        status: 'active',
+        slug: slug,
+        contract_start: new Date().toISOString().split('T')[0],
+        contract_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        staff_enrolled: 0,
+        base_staff_enrolled: 0,
+        observation_days_total: 0, observation_days_used: 0,
+        virtual_sessions_total: 0, virtual_sessions_used: 0,
+        executive_sessions_total: 0, executive_sessions_used: 0,
+        sales_deal_id: null,
+      }).select('id').single()
 
-        // Link deliverables to the new partnership
-        if (newPartnership?.id && districtId) {
-          await supabase.from('contract_deliverables')
-            .update({ partnership_id: newPartnership.id })
-            .eq('quote_id', id)
-            .is('partnership_id', null)
-        }
-      } catch (err) { console.error('Partnership auto-create failed:', err) }
+      if (partnershipErr) {
+        console.error('[quote-sign] Partnership auto-create failed:', partnershipErr.message)
+        // Still return success for signing, but log the issue so Bella can create manually
+      }
+
+      // Link deliverables to the new partnership
+      if (newPartnership?.id) {
+        const { error: linkErr } = await supabase.from('contract_deliverables')
+          .update({ partnership_id: newPartnership.id })
+          .eq('quote_id', id)
+          .is('partnership_id', null)
+        if (linkErr) console.error('[quote-sign] Failed to link deliverables to partnership:', linkErr.message)
+      }
     }
   }
 

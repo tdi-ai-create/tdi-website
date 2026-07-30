@@ -186,7 +186,7 @@ export async function DELETE(
       .remove([`${basePath}/thumb.webp`, `${basePath}/full.webp`])
 
     const { error: updateError } = await supabase
-      .from('staff_members')
+      .from('partnership_staff')
       .update({
         photo_url: null,
         photo_thumb_url: null,

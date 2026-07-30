@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leadership Dashboard Workflow</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; background: #F8F9FA; line-height: 1.6; }
+  .page { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 20px; font-weight: 700; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
+  h3 { font-size: 16px; font-weight: 700; margin: 20px 0 8px; }
+  .subtitle { color: #6B7280; font-size: 14px; margin-bottom: 8px; }
+  .updated { color: #9CA3AF; font-size: 12px; margin-bottom: 32px; }
+  p, li { font-size: 14px; margin-bottom: 8px; }
+  ul, ol { margin: 8px 0 16px 24px; }
+  .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 1px solid #E5E7EB; }
+  .card-navy { background: #1e2749; color: white; border: none; }
+  .card-teal { background: #F0FDFA; border-color: #99F6E4; }
+  .card-amber { background: #FFFBEB; border-color: #FDE68A; }
+  .card-red { background: #FEF2F2; border-color: #FECACA; }
+  .card-green { background: #F0FDF4; border-color: #BBF7D0; }
+  .flow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  .flow-step { background: white; border: 1px solid #E5E7EB; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; }
+  .flow-arrow { color: #E8B84B; font-weight: 700; font-size: 16px; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; background: #1e2749; color: white; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  td { padding: 10px 12px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+  code { background: #F3F4F6; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="page">
+<h1>Leadership Dashboard Workflow</h1>
+<p class="subtitle">White-glove partnership management from signing through renewal</p>
+<p class="updated">Last updated: July 30, 2026</p>
+
+<div class="card card-navy">
+  <p style="font-weight:600;color:white;margin-bottom:8px;">The Partnership Lifecycle</p>
+  <div class="flow">
+    <span class="flow-step" style="color:#1e2749;">Quote Signed</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step" style="color:#1e2749;">Partnership Created</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step" style="color:#1e2749;">Principal Invited</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step" style="color:#1e2749;">Roster Uploaded</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step" style="color:#1e2749;">Hub Provisioned</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step" style="color:#E8B84B;">Ongoing Support</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step" style="color:#1e2749;">Renewal</span>
+  </div>
+</div>
+
+<h2>Phase 1: After a Quote is Signed</h2>
+<div class="card card-teal">
+  <p><strong>What happens automatically:</strong></p>
+  <ul>
+    <li>Partnership record created (if new school)</li>
+    <li>Contract deliverables generated from the quote line items</li>
+    <li>Receipt email sent to the signer with PDF agreement attached</li>
+    <li>Slack notification to sales and billing channels</li>
+  </ul>
+  <p style="margin-top:12px;"><strong>What you need to do:</strong></p>
+  <ul style="margin-bottom:0;">
+    <li>Verify the partnership shows up in <strong>Lead Dashboard</strong></li>
+    <li>Set the contract phase (IGNITE, GROW, SUSTAIN, TRANSFORM)</li>
+    <li>Set session counts (observations, virtual, executive) based on the package</li>
+    <li>Add the contract start and end dates</li>
+  </ul>
+</div>
+
+<h2>Phase 2: Onboarding the Principal</h2>
+<ol>
+  <li>Go to <strong>Lead Dashboard > [School Name]</strong></li>
+  <li>Click the <strong>Invite</strong> button (top right area)</li>
+  <li>Enter the principal's name and email</li>
+  <li>The system creates their portal account and sends a welcome email</li>
+  <li>The principal gets a link to their Partner Dashboard where they can upload their roster</li>
+</ol>
+
+<div class="card card-amber">
+  <p><strong>Check invite status:</strong> The dashboard shows whether the principal has accepted their invite and logged in. If they haven't within a few days, follow up personally.</p>
+</div>
+
+<h2>Phase 3: Staff Roster & Hub Access</h2>
+<ol>
+  <li>The principal uploads their staff roster through their Partner Dashboard</li>
+  <li>The system automatically provisions Hub accounts for each staff member</li>
+  <li>Welcome emails are sent to each staff member</li>
+  <li>Staff appear in the <strong>Staff Roster</strong> section of the Leadership Dashboard</li>
+</ol>
+
+<div class="card card-amber">
+  <p><strong>Over-contract alert:</strong> If the roster has more staff than the contracted seat count, you'll get a notification. This could be a replacement (no action needed) or an expansion opportunity.</p>
+</div>
+
+<h3>Staff Photos</h3>
+<ul>
+  <li><strong>Individual:</strong> Click a staff member's photo area and upload</li>
+  <li><strong>Bulk:</strong> Use <strong>Bulk Upload Photos</strong> with a ZIP file of photos named by email or name</li>
+  <li>Photos are auto-resized to thumbnail (64px) and full (400px)</li>
+  <li>Consent checkbox required for bulk imports</li>
+</ul>
+
+<h2>Phase 4: Ongoing Partnership Support</h2>
+
+<h3>Dashboard Tabs</h3>
+<table>
+  <tr><th>Tab</th><th>What It's For</th><th>Who Uses It</th></tr>
+  <tr><td><strong>Overview</strong></td><td>Partnership health, phase, contract dates, quick stats</td><td>Everyone</td></tr>
+  <tr><td><strong>Action Items</strong></td><td>Track what needs to happen next. Priority and status tracking.</td><td>Bella, Rae</td></tr>
+  <tr><td><strong>Internal Notes</strong></td><td>Admin-only notes. Types: general, strategy, concern, win, follow-up.</td><td>Bella, Rae</td></tr>
+  <tr><td><strong>Meetings</strong></td><td>Log check-ins, onboarding calls, observations, renewal meetings</td><td>Bella, Rae</td></tr>
+  <tr><td><strong>Timeline</strong></td><td>Visual partnership journey. Auto-generated from sessions + manual entries.</td><td>Everyone</td></tr>
+  <tr><td><strong>KPIs</strong></td><td>Select and track 5-20 KPIs across implementation, wellness, baseline categories</td><td>Bella, Rae</td></tr>
+  <tr><td><strong>Staff & Team</strong></td><td>Staff roster with photos, roles, Hub enrollment status</td><td>Everyone</td></tr>
+  <tr><td><strong>Billing</strong></td><td>Service delivery tracking. Observations, virtual, executive sessions used vs total.</td><td>Bella</td></tr>
+  <tr><td><strong>Observations</strong></td><td>Visit notes, strategy tags, coaching themes, Love Notes</td><td>Rae</td></tr>
+  <tr><td><strong>Reports</strong></td><td>Export roster, board summary, KPI standings, engagement, wellness</td><td>Rae, principals</td></tr>
+</table>
+
+<h3>Recording a Session</h3>
+<ol>
+  <li>Go to the <strong>Billing</strong> tab</li>
+  <li>Click <strong>Record Session</strong> on the appropriate service type</li>
+  <li>Fill in the date, notes, and any teacher quotes</li>
+  <li>Click <strong>Complete</strong></li>
+  <li>The system updates the used count, creates a timeline event, and notifies the team via Slack</li>
+</ol>
+
+<h3>Observations</h3>
+<ol>
+  <li>Go to the <strong>Observations</strong> tab</li>
+  <li>Create a new observation visit entry</li>
+  <li>During the visit, take notes (can upload photos of your notepad)</li>
+  <li>After the visit, add strategy tags, growth indicators, and coaching themes</li>
+  <li>Draft <strong>Love Notes</strong> (positive teacher observations to share with the principal)</li>
+  <li>Review and finalize Love Notes before sending</li>
+</ol>
+
+<h3>Prepare for Call</h3>
+<p>Click <strong>"Prepare for Call"</strong> button to generate a one-pager with talking points based on:</p>
+<ul>
+  <li>Recent action items and their status</li>
+  <li>Staff engagement data from the Hub</li>
+  <li>KPI progress</li>
+  <li>Upcoming deliverables</li>
+</ul>
+
+<h2>Phase 5: Invoicing & Billing</h2>
+<p>See the <strong>Service Invoicing</strong> team doc for the full invoicing workflow. Key points:</p>
+<ul>
+  <li>Deliverables are auto-created when a quote is signed</li>
+  <li>Mark deliverables as "delivered" when sessions are completed</li>
+  <li>Generate and send invoices from the Billing tab</li>
+  <li>Follow-up emails go out automatically at 14, 30, 45, and 60 days</li>
+  <li>Record payments when received (method, check number, amount)</li>
+</ul>
+
+<h2>Phase 6: Renewal</h2>
+<div class="card card-green">
+  <p><strong>Start renewal conversations 60-90 days before contract end.</strong></p>
+  <ul style="margin-bottom:0;">
+    <li>Review KPI progress and impact data</li>
+    <li>Generate a Board Summary report for the principal to share with their board</li>
+    <li>Highlight engagement metrics, sessions completed, and teacher growth</li>
+    <li>Create a new quote with renewal terms</li>
+    <li>The system tracks contract expiration dates and sends alerts</li>
+  </ul>
+</div>
+
+<h2>White-Glove Standards</h2>
+<div class="card card-red">
+  <p><strong>Every touchpoint matters.</strong> These are non-negotiable:</p>
+  <ul style="margin-bottom:0;">
+    <li>Respond to partner emails within 24 hours (business days)</li>
+    <li>Log every interaction in Internal Notes or Meetings</li>
+    <li>Update action items after every call or email</li>
+    <li>Always prep with "Prepare for Call" before scheduled meetings</li>
+    <li>Send Love Notes after every observation visit</li>
+    <li>Follow up on overdue action items within 48 hours</li>
+    <li>Never let a principal feel forgotten. If nothing is happening, check in anyway.</li>
+  </ul>
+</div>
+
+<h2>Quick Reference: What's Where</h2>
+<table>
+  <tr><th>I need to...</th><th>Go to</th></tr>
+  <tr><td>See all partnerships</td><td>Lead Dashboard (list view)</td></tr>
+  <tr><td>Manage a specific school</td><td>Lead Dashboard > click school name</td></tr>
+  <tr><td>Invite a principal</td><td>School dashboard > Invite button</td></tr>
+  <tr><td>Upload staff roster</td><td>Principal does this from their Partner Dashboard</td></tr>
+  <tr><td>Track sessions used</td><td>School dashboard > Billing tab</td></tr>
+  <tr><td>Record an observation</td><td>School dashboard > Observations tab</td></tr>
+  <tr><td>Send an invoice</td><td>School dashboard > Billing tab > deliverable > Send Invoice</td></tr>
+  <tr><td>Check Hub engagement</td><td>School dashboard > KPIs or Reports</td></tr>
+  <tr><td>Prep for a call</td><td>School dashboard > Prepare for Call button</td></tr>
+  <tr><td>Create a renewal quote</td><td>Sales > create new quote for existing school</td></tr>
+</table>
+
+</div>
+</body>
+</html>

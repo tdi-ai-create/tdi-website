@@ -31,6 +31,7 @@ export async function GET(
     'grant-application-spec': 'grant-application-spec.html',
     'course-upload-sop': 'course-upload-sop.html',
     'swag-fulfillment': 'swag-fulfillment.html',
+    'leadership-workflow': 'leadership-workflow.html',
   };
 
   const filename = allowedDocs[slug];
