@@ -288,6 +288,25 @@ export default function AdminPartnershipDetailPage() {
   const [localGoal, setLocalGoal] = useState('')
   const [localYear2Notes, setLocalYear2Notes] = useState('')
 
+  // Inline editing state for timeline events (Fix 1)
+  const [editingEventId, setEditingEventId] = useState<string | null>(null)
+  const [editingEventTitle, setEditingEventTitle] = useState('')
+
+  // Inline editing state for notes (Fix 2)
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null)
+  const [editingNoteContent, setEditingNoteContent] = useState('')
+
+  // Inline editing state for KPI current value (Fix 3)
+  const [editingKpiId, setEditingKpiId] = useState<string | null>(null)
+  const [editingKpiValue, setEditingKpiValue] = useState('')
+
+  // Briefing modal state (Fix 4)
+  const [briefingData, setBriefingData] = useState<any>(null)
+  const [briefingLoading, setBriefingLoading] = useState(false)
+
+  // Timeline pagination (Fix 6)
+  const [timelineLimit, setTimelineLimit] = useState(20)
+
   // Load internal notes/meetings/kpis on mount (no longer tab-gated)
   useEffect(() => {
     if (!partnershipId) return
@@ -572,19 +591,29 @@ export default function AdminPartnershipDetailPage() {
     }
   }
 
-  async function handleEditEvent(event: { id: string; event_title: string; event_date?: string; notes?: string }) {
-    if (!userEmail) return
-    const newTitle = prompt('Edit event title:', event.event_title)
-    if (newTitle === null || newTitle === event.event_title) return
-    setTimelineEvents(prev => prev.map(e => e.id === event.id ? { ...e, event_title: newTitle } : e))
+  function handleEditEvent(event: { id: string; event_title: string; event_date?: string; notes?: string }) {
+    setEditingEventId(event.id)
+    setEditingEventTitle(event.event_title)
+  }
+
+  async function handleSaveEventTitle() {
+    if (!userEmail || !editingEventId || editingEventTitle === '') return
+    const originalEvent = timelineEvents.find(e => e.id === editingEventId)
+    if (!originalEvent || editingEventTitle === originalEvent.event_title) {
+      setEditingEventId(null)
+      return
+    }
+    setTimelineEvents(prev => prev.map(e => e.id === editingEventId ? { ...e, event_title: editingEventTitle } : e))
     const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/timeline`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'x-user-email': userEmail },
-      body: JSON.stringify({ event_id: event.id, event_title: newTitle }),
+      body: JSON.stringify({ event_id: editingEventId, event_title: editingEventTitle }),
     })
     if (!res.ok) {
-      setTimelineEvents(prev => prev.map(e => e.id === event.id ? { ...e, event_title: event.event_title } : e))
+      setTimelineEvents(prev => prev.map(e => e.id === editingEventId ? originalEvent : e))
+      showToast('Failed to update event title', 'error')
     }
+    setEditingEventId(null)
   }
 
   async function handleApplyExtracted(data: Record<string, any>) {
@@ -649,22 +678,17 @@ export default function AdminPartnershipDetailPage() {
     const hasUpcomingMeeting = internalMeetings.some(m => new Date(m.meeting_date).getTime() > Date.now())
     if (hasUpcomingMeeting || daysSinceLastContact > 3) {
     actions.push({
-      label: 'Prep for Next Call',
+      label: briefingLoading ? 'Loading...' : 'Prep for Next Call',
       description: 'Generate a briefing with engagement data and talking points.',
       variant: 'primary',
       onClick: async () => {
+        setBriefingLoading(true)
         try {
           const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/briefing`)
           const data = await res.json()
-          const w = window.open('', '_blank')
-          if (!w) return
-          const b = data.briefing
-          const kpiRows = (data.kpis || []).map((k: { label: string; current: string; target: string; pct: number; status: string }) => `<tr><td style="padding:6px 10px;">${k.label}</td><td style="padding:6px 10px;font-weight:700;">${k.current}</td><td style="padding:6px 10px;">${k.target}</td><td style="padding:6px 10px;color:${k.status === 'at_risk' ? '#EF4444' : k.pct >= 70 ? '#22c55e' : '#EAB308'}">${k.pct}%</td></tr>`).join('')
-          const tpList = (data.talkingPoints || []).map((t: string) => `<li style="margin-bottom:6px;">${t}</li>`).join('')
-          const pendingList = (data.pendingItems || []).map((t: string) => `<li>${t}</li>`).join('')
-          w.document.write(`<!DOCTYPE html><html><head><title>Briefing: ${b.orgName}</title><style>body{font-family:sans-serif;max-width:700px;margin:0 auto;padding:32px;color:#1e2749;font-size:14px;}h1{font-size:22px;margin:0;}h2{font-size:16px;margin:24px 0 8px;color:#374151;border-bottom:1px solid #E5E7EB;padding-bottom:4px;}table{width:100%;border-collapse:collapse;font-size:13px;}th{text-align:left;background:#F9FAFB;padding:8px 10px;font-weight:600;}td{padding:6px 10px;border-bottom:1px solid #F3F4F6;}.stat{display:inline-block;text-align:center;padding:12px 20px;background:#F9FAFB;border-radius:8px;margin-right:8px;}.stat-val{font-size:24px;font-weight:700;}.stat-label{font-size:10px;color:#6B7280;}@media print{body{padding:16px;}}</style></head><body><div style="display:flex;justify-content:space-between;"><div><h1>${b.orgName}</h1><p style="color:#6B7280;margin:4px 0;">${b.location || ''} | ${b.phase} | Day ${b.daysSinceStart || '?'}</p></div><div style="text-align:right;font-size:11px;color:#9CA3AF;">Generated ${new Date().toLocaleDateString()}<br>TDI Internal</div></div><div style="margin:16px 0;"><div class="stat"><div class="stat-val">${b.loginPct}%</div><div class="stat-label">Hub engagement</div></div><div class="stat"><div class="stat-val">${b.totalStaff}</div><div class="stat-label">Staff</div></div><div class="stat"><div class="stat-val">${b.observationsUsed}/${b.observationsTotal}</div><div class="stat-label">Observations</div></div><div class="stat"><div class="stat-val">${b.virtualSessionsUsed}/${b.virtualSessionsTotal}</div><div class="stat-label">Virtual</div></div></div>${kpiRows ? `<h2>KPI Progress</h2><table><thead><tr><th>KPI</th><th>Current</th><th>Target</th><th>Progress</th></tr></thead><tbody>${kpiRows}</tbody></table>` : ''}${tpList ? `<h2>Talking Points</h2><ul>${tpList}</ul>` : ''}${pendingList ? `<h2>Open Items</h2><ul>${pendingList}</ul>` : ''}${data.recentNotes?.length > 0 ? `<h2>Recent Notes</h2>${data.recentNotes.map((n: { type: string; content: string }) => `<p style="margin:8px 0;padding:8px;background:#F9FAFB;border-radius:6px;font-size:13px;"><strong style="color:#6B7280;text-transform:uppercase;font-size:10px;">${n.type}</strong><br>${n.content}</p>`).join('')}` : ''}</body></html>`)
-          w.document.close()
-        } catch { /* */ }
+          setBriefingData(data)
+        } catch { showToast('Failed to generate briefing', 'error') }
+        finally { setBriefingLoading(false) }
       },
     })
     }
@@ -701,7 +725,7 @@ export default function AdminPartnershipDetailPage() {
     }
 
     return actions.slice(0, 4)
-  }, [partnership, actionItems, partnershipId, internalNotes, internalMeetings])
+  }, [partnership, actionItems, partnershipId, internalNotes, internalMeetings, briefingLoading])
 
   // ─── Computed: Unified Timeline ────────────────────────────────────
   const unifiedTimeline = useMemo(() => {
@@ -1077,7 +1101,7 @@ export default function AdminPartnershipDetailPage() {
         {/* ═════════════════════════════════════════════════════════════
             TWO COLUMN LAYOUT
             ═════════════════════════════════════════════════════════════ */}
-        <div className="grid gap-4" style={{ gridTemplateColumns: '1fr 340px' }}>
+        <div className="grid gap-4 lg:grid-cols-[1fr_340px] grid-cols-1">
 
           {/* ═══════════════════════════════════════════════════════════
               MAIN COLUMN: UNIFIED TIMELINE
@@ -1250,7 +1274,7 @@ export default function AdminPartnershipDetailPage() {
                 {unifiedTimeline.length === 0 && (
                   <p className="text-sm text-gray-400 text-center py-8">No timeline entries yet. Add a note or log a meeting above.</p>
                 )}
-                {unifiedTimeline.map((entry) => (
+                {unifiedTimeline.slice(0, timelineLimit).map((entry) => (
                   <div key={entry.id} className="flex gap-3 py-3 group" style={{ borderBottom: '1px solid #F9FAFB' }}>
                     {/* Colored dot */}
                     <div className="mt-1.5 flex-shrink-0">
@@ -1286,18 +1310,9 @@ export default function AdminPartnershipDetailPage() {
                         {entry.type === 'note' && (
                           <span className="ml-auto flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
-                              onClick={async () => {
-                                const newContent = prompt('Edit note:', entry.content)
-                                if (newContent && newContent !== entry.content) {
-                                  try {
-                                    await fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`, {
-                                      method: 'PATCH',
-                                      headers: { 'Content-Type': 'application/json' },
-                                      body: JSON.stringify({ id: entry.meta.noteId, content: newContent }),
-                                    })
-                                    setInternalNotes(prev => prev.map(n => n.id === entry.meta.noteId ? { ...n, content: newContent } : n))
-                                  } catch {}
-                                }
+                              onClick={() => {
+                                setEditingNoteId(entry.meta.noteId)
+                                setEditingNoteContent(entry.content)
                               }}
                               className="text-[10px] text-gray-400 hover:text-blue-600 px-1"
                             >edit</button>
@@ -1320,7 +1335,34 @@ export default function AdminPartnershipDetailPage() {
                       </div>
 
                       {/* Content */}
-                      <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{entry.content}</p>
+                      {entry.type === 'note' && editingNoteId === entry.meta?.noteId ? (
+                        <textarea
+                          autoFocus
+                          value={editingNoteContent}
+                          onChange={(e) => setEditingNoteContent(e.target.value)}
+                          onBlur={async () => {
+                            if (editingNoteContent.trim() && editingNoteContent !== entry.content) {
+                              try {
+                                await fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`, {
+                                  method: 'PATCH',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ id: entry.meta.noteId, content: editingNoteContent }),
+                                })
+                                setInternalNotes(prev => prev.map(n => n.id === entry.meta.noteId ? { ...n, content: editingNoteContent } : n))
+                              } catch { showToast('Failed to update note', 'error') }
+                            }
+                            setEditingNoteId(null)
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); (e.target as HTMLTextAreaElement).blur() }
+                            if (e.key === 'Escape') { setEditingNoteId(null) }
+                          }}
+                          rows={3}
+                          className="w-full text-sm text-gray-700 border border-blue-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                        />
+                      ) : (
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{entry.content}</p>
+                      )}
 
                       {/* Meeting details */}
                       {entry.type === 'meeting' && entry.meta?.attendees && (
@@ -1335,6 +1377,14 @@ export default function AdminPartnershipDetailPage() {
                     </div>
                   </div>
                 ))}
+                {unifiedTimeline.length > timelineLimit && (
+                  <button
+                    onClick={() => setTimelineLimit(prev => prev + 20)}
+                    className="w-full py-3 text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition"
+                  >
+                    Show more ({unifiedTimeline.length - timelineLimit} remaining)
+                  </button>
+                )}
               </div>
             </div>
 
@@ -1775,23 +1825,38 @@ export default function AdminPartnershipDetailPage() {
                         <div className="flex items-center justify-between mb-1">
                           <p className="text-xs font-medium text-gray-900 truncate flex-1">{kpi.kpi_label}</p>
                           <div className="flex items-baseline gap-1 flex-shrink-0 ml-2">
-                            <button
-                              onClick={async () => {
-                                const val = prompt(`Override current value for "${kpi.kpi_label}":`, String(kpi.current_value))
-                                if (val === null) return
-                                const num = parseFloat(val)
-                                if (isNaN(num)) return
-                                try {
-                                  await fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`, {
-                                    method: 'PATCH',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ kpiId: kpi.id, currentValue: num }),
-                                  })
-                                  setActiveKpis(prev => prev.map(k => k.id === kpi.id ? { ...k, current_value: num } : k))
-                                } catch {}
-                              }}
-                              className="text-sm font-bold text-[#1e2749] hover:text-blue-600 cursor-pointer"
-                            >{kpi.current_value}{kpi.target_unit}</button>
+                            {editingKpiId === kpi.id ? (
+                              <input
+                                autoFocus
+                                type="number"
+                                value={editingKpiValue}
+                                onChange={(e) => setEditingKpiValue(e.target.value)}
+                                onBlur={async () => {
+                                  const num = parseFloat(editingKpiValue)
+                                  if (!isNaN(num) && num !== kpi.current_value) {
+                                    try {
+                                      await fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`, {
+                                        method: 'PATCH',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ kpiId: kpi.id, currentValue: num }),
+                                      })
+                                      setActiveKpis(prev => prev.map(k => k.id === kpi.id ? { ...k, current_value: num } : k))
+                                    } catch { showToast('Failed to update KPI value', 'error') }
+                                  }
+                                  setEditingKpiId(null)
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') { (e.target as HTMLInputElement).blur() }
+                                  if (e.key === 'Escape') { setEditingKpiId(null) }
+                                }}
+                                className="w-16 text-sm font-bold text-[#1e2749] border border-blue-300 rounded px-1.5 py-0.5 text-right focus:outline-none focus:ring-1 focus:ring-blue-400"
+                              />
+                            ) : (
+                              <button
+                                onClick={() => { setEditingKpiId(kpi.id); setEditingKpiValue(String(kpi.current_value)) }}
+                                className="text-sm font-bold text-[#1e2749] hover:text-blue-600 cursor-pointer"
+                              >{kpi.current_value}{kpi.target_unit}</button>
+                            )}
                             <span className="text-[10px] text-gray-400">/</span>
                             <span className="text-xs text-gray-500">{kpi.target_value}{kpi.target_unit}</span>
                           </div>
@@ -2571,6 +2636,117 @@ export default function AdminPartnershipDetailPage() {
               >
                 Cancel
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Briefing Modal */}
+      {briefingData && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">{briefingData.briefing?.orgName || schoolName}</h2>
+                <p className="text-xs text-gray-500">{briefingData.briefing?.location} | {briefingData.briefing?.phase} | Day {briefingData.briefing?.daysSinceStart || '?'}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+                >
+                  Print
+                </button>
+                <button onClick={() => setBriefingData(null)} className="text-gray-400 hover:text-gray-600">
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+            <div className="p-6 space-y-6">
+              {/* Quick stats */}
+              <div className="grid grid-cols-4 gap-3">
+                {[
+                  { label: 'Hub Engagement', value: `${briefingData.briefing?.loginPct || 0}%` },
+                  { label: 'Staff', value: briefingData.briefing?.totalStaff || 0 },
+                  { label: 'Observations', value: `${briefingData.briefing?.observationsUsed || 0}/${briefingData.briefing?.observationsTotal || 0}` },
+                  { label: 'Virtual', value: `${briefingData.briefing?.virtualSessionsUsed || 0}/${briefingData.briefing?.virtualSessionsTotal || 0}` },
+                ].map((stat, i) => (
+                  <div key={i} className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="text-xl font-bold text-gray-900">{stat.value}</div>
+                    <div className="text-[10px] text-gray-500 font-medium uppercase">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* KPI Progress */}
+              {briefingData.kpis?.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900 mb-3">KPI Progress</h3>
+                  <div className="border border-gray-100 rounded-lg overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="bg-gray-50 text-left">
+                          <th className="px-3 py-2 font-semibold text-gray-600">KPI</th>
+                          <th className="px-3 py-2 font-semibold text-gray-600">Current</th>
+                          <th className="px-3 py-2 font-semibold text-gray-600">Target</th>
+                          <th className="px-3 py-2 font-semibold text-gray-600">Progress</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {briefingData.kpis.map((k: any, i: number) => (
+                          <tr key={i} className="border-t border-gray-50">
+                            <td className="px-3 py-2 text-gray-700">{k.label}</td>
+                            <td className="px-3 py-2 font-bold text-gray-900">{k.current}</td>
+                            <td className="px-3 py-2 text-gray-500">{k.target}</td>
+                            <td className="px-3 py-2 font-bold" style={{ color: k.status === 'at_risk' ? '#EF4444' : k.pct >= 70 ? '#22c55e' : '#EAB308' }}>{k.pct}%</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Talking Points */}
+              {briefingData.talkingPoints?.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900 mb-3">Talking Points</h3>
+                  <ul className="space-y-2">
+                    {briefingData.talkingPoints.map((t: string, i: number) => (
+                      <li key={i} className="text-sm text-gray-700 flex gap-2">
+                        <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8B84B', marginTop: 6, flexShrink: 0 }} />
+                        {t}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Open Items */}
+              {briefingData.pendingItems?.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900 mb-3">Open Items</h3>
+                  <ul className="space-y-1">
+                    {briefingData.pendingItems.map((t: string, i: number) => (
+                      <li key={i} className="text-sm text-gray-600">{t}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Recent Notes */}
+              {briefingData.recentNotes?.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900 mb-3">Recent Notes</h3>
+                  <div className="space-y-2">
+                    {briefingData.recentNotes.map((n: { type: string; content: string }, i: number) => (
+                      <div key={i} className="p-3 bg-gray-50 rounded-lg">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase">{n.type}</span>
+                        <p className="text-sm text-gray-700 mt-1">{n.content}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
