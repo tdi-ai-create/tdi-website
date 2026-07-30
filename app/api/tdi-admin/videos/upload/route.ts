@@ -112,10 +112,9 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Missing video UID from Cloudflare' }, { status: 502 });
       }
 
-      // Schedule cleanup of the staging file (non-blocking)
-      supabase.storage.from('lesson-resources').remove([storagePath])
-        .then(() => console.log('[video-upload] Cleaned up staging file:', storagePath))
-        .catch(err => console.error('[video-upload] Failed to clean staging file:', err));
+      // NOTE: Do NOT delete the staging file here. Cloudflare needs time to
+      // download it (can take minutes for large files). Staging files in
+      // video-staging/ are cleaned up by the hub-content-health cron after 1 hour.
 
       return NextResponse.json({
         videoUid,
