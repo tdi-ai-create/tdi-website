@@ -384,6 +384,60 @@
 </ul>
 <p>The KPI gauge rings, AI summary, and export reports provide renewal-ready data.</p>
 
+<!-- 13b -->
+<h2 id="semester-data">13b. Semester data and year-over-year tracking</h2>
+<div class="card card-teal">
+  <p><strong>Purpose:</strong> Every multi-semester partnership should have a historical data record that the principal can toggle between on their dashboard. This is critical for renewals, board presentations, and showing growth over time.</p>
+</div>
+
+<h3>How it works</h3>
+<p>The "Our Partnership" tab on the partner dashboard includes a semester toggle (e.g. "Fall 2026 <span class="badge badge-teal">Current</span>" / "Spring 2026"). When a principal selects a past semester, the entire section swaps to show historical data from that period.</p>
+
+<h3>What to capture each semester</h3>
+<p>At the end of every semester (or when creating a historical record), the following data should be saved to <code>partnership_semester_data</code>:</p>
+
+<table>
+  <tr><th>Field</th><th>Type</th><th>What to include</th></tr>
+  <tr><td><code>metrics</code></td><td>JSONB</td><td>Key stats as <code>{ key: { label, value, color } }</code>. Examples: Paras Enrolled, Schools, Hub Login %, Implementation %, Survey Response Rate, Confidence Scores. These render as stat cards in a grid.</td></tr>
+  <tr><td><code>highlights</code></td><td>JSONB array</td><td>Array of strings. 5-7 bullet points summarizing the semester's wins. Example: "91% implementation rate after just 2 sessions, compared to 10% industry average."</td></tr>
+  <tr><td><code>building_data</code></td><td>JSONB array</td><td>Per-building objects: <code>{ name, staff_count, login_pct, awards: [] }</code>. Awards are short recognition labels (e.g. "First to 100%", "Confidence Leader", "100% Survey"). Renders as a table with orange award badges.</td></tr>
+  <tr><td><code>observation_notes</code></td><td>JSONB array</td><td>Each observation visit: <code>{ title, date, notes, love_notes: [] }</code>. Love notes are individual para feedback records: <code>{ para, school, highlights, para_replied, reply_summary }</code>. These show exactly who was observed, what was noticed, and how they responded.</td></tr>
+  <tr><td><code>para_quotes</code></td><td>JSONB array</td><td>Direct quotes: <code>{ text, building, role }</code>. Include session survey quotes, observation reply quotes, and any notable educator feedback. Include Spanish quotes when available.</td></tr>
+  <tr><td><code>timeline_events</code></td><td>JSONB array</td><td>All partnership events: <code>{ title, date, status }</code>. Status is "done", "in_progress", or "upcoming". Example: Exec Session 1, Part 1, Observation Day, Virtual Session, etc.</td></tr>
+</table>
+
+<h3>Data collection checklist (end of semester)</h3>
+<div class="card">
+  <ol>
+    <li><strong>Pull survey data</strong> from post-session surveys (implementation %, confidence scores, response rates)</li>
+    <li><strong>Pull Hub login data</strong> per building from Hub connections API</li>
+    <li><strong>Compile building awards</strong> based on login rates, survey responses, implementation, and confidence scores</li>
+    <li><strong>Gather observation love notes</strong> from Gmail (search: <code>from:rae to:[domain] subject:"Thanks for letting me visit"</code>)</li>
+    <li><strong>Collect para quotes</strong> from survey responses and observation email replies</li>
+    <li><strong>Build timeline</strong> from partnership meetings, session records, and observation dates</li>
+    <li><strong>Set <code>is_current = false</code></strong> on the completed semester and create the new current semester</li>
+  </ol>
+</div>
+
+<h3>Roster updates (new school year)</h3>
+<p>The partner dashboard Team tab includes an "Upload Updated Roster" feature for multi-year partnerships. CSV format:</p>
+<p><code>First Name, Last Name, Email, Role, Building, Department</code></p>
+<ul>
+  <li><strong>Building</strong> is required for multi-school districts. Maps to the <code>buildings</code> table and enables per-building reporting.</li>
+  <li><strong>Department</strong> is optional but useful for filtering (e.g. "K-2", "Special Ed", "Reading Intervention").</li>
+  <li>The system previews changes before applying: new hires get added and auto-provisioned with Hub All-Access. Departures are soft-deleted (never hard-deleted). Returning staff stay unchanged.</li>
+</ul>
+
+<h3>Hub/Dashboard toggle for educators</h3>
+<p>Partnership educators see a thin banner above the Hub nav: "<em>[School Name] | View School Dashboard</em>". This lets them switch between the Learning Hub and their school's partner dashboard. The link is powered by <code>partnership_slug</code> on <code>hub_profiles</code>, which is set automatically during roster provisioning.</p>
+
+<h3>API</h3>
+<ul>
+  <li><code>GET /api/partners/semester-data?partnershipId=X&semester=spring-2026</code> returns semester list + full data for the requested semester</li>
+  <li><code>POST /api/partners/roster-update</code> with <code>action: "preview"</code> or <code>"apply"</code> handles roster diff and provisioning</li>
+  <li><code>GET /api/partners/info?slug=X</code> returns org name for the Hub banner</li>
+</ul>
+
 <!-- 14 -->
 <h2 id="database">14. Database tables</h2>
 <h4>Creator Portal Supabase</h4>
@@ -403,6 +457,8 @@
   <tr><td><code>sales_opportunities</code></td><td>Sales pipeline</td></tr>
   <tr><td><code>funding_pursuits</code></td><td>Grant pursuits with Plan A/B/C/D paths</td></tr>
   <tr><td><code>funding_pursuit_timeline</code></td><td>Grant timeline events</td></tr>
+  <tr><td><code>partnership_semester_data</code></td><td>Semester snapshots (metrics, highlights, building awards, observation love notes, para quotes, timeline). One row per partnership per semester. Unique on (partnership_id, semester).</td></tr>
+  <tr><td><code>partnership_notes</code></td><td>Internal notes (typed: general, strategy, concern, win, follow_up). Visible_to_partner flag controls client visibility.</td></tr>
 </table>
 
 <!-- 15 -->
