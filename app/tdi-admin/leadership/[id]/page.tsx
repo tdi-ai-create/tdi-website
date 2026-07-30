@@ -19,7 +19,7 @@ import { TDISuggestions } from '@/components/dashboard/shared/TDISuggestions'
 import { STATIC_DEFAULTS } from '@/lib/dashboard/dashboardDefaults'
 import { generateSuggestions, type TDISuggestion } from '@/lib/dashboard/generateSuggestions'
 import { StaffRosterWithPhotos, StaffPhotoUpload, FindStaffSearch } from '@/components/tdi-admin/leadership/staff'
-import { ArrowLeft, Loader2, Building2, ExternalLink, Calendar, Mail, Phone, MessageCircle, CheckCircle2, Circle, Clock, Eye, EyeOff, Trash2, Plus, ChevronDown, FileText, BarChart3, Users, AlertTriangle, Target, TrendingUp, Briefcase, Edit3, ChevronRight, X } from 'lucide-react'
+import { ArrowLeft, Loader2, Building2, ExternalLink, Calendar, Mail, Phone, MessageCircle, Eye, FileText, BarChart3, Users, AlertTriangle, TrendingUp, Briefcase, Edit3, ChevronRight, X } from 'lucide-react'
 import Image from 'next/image'
 import OnboardingChecklist from '@/components/dashboard/leadership/OnboardingChecklist'
 import StaffEngagementRoster from '@/components/dashboard/leadership/StaffEngagementRoster'
@@ -28,11 +28,9 @@ import CourseCompletionFunnel from '@/components/dashboard/leadership/CourseComp
 import LoginTrendChart from '@/components/dashboard/leadership/LoginTrendChart'
 import ObservationImpactScorecard from '@/components/dashboard/leadership/ObservationImpactScorecard'
 import BillingTab from '@/components/dashboard/admin/BillingTab'
-
-const CATEGORY_COLORS: Record<string, string> = {
-  general: '#6B7280', onboarding: '#8B5CF6', hub: '#3B82F6',
-  coaching: '#F59E0B', billing: '#EF4444', follow_up: '#10B981',
-}
+import DeliverablesList from '@/components/tdi-admin/leadership/DeliverablesList'
+import BriefingModal from '@/components/tdi-admin/leadership/BriefingModal'
+import ActionItemsSidebar from '@/components/tdi-admin/leadership/ActionItemsSidebar'
 
 const NOTE_TYPE_COLORS: Record<string, string> = {
   general: 'bg-gray-100 text-gray-700',
@@ -70,97 +68,6 @@ interface TimelineEvent {
   event_type: string
   status: 'completed' | 'in_progress' | 'upcoming'
   notes?: string
-}
-
-function DeliverablesList({ partnershipId, userEmail }: { partnershipId: string; userEmail: string }) {
-  const [deliverables, setDeliverables] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetch(`/api/admin/deliverables?partnership_id=${partnershipId}`, {
-      headers: { 'x-user-email': userEmail },
-    })
-      .then(r => r.json())
-      .then(d => { setDeliverables(d.deliverables || []); setLoading(false) })
-      .catch(() => setLoading(false))
-  }, [partnershipId, userEmail])
-
-  if (loading) return <div className="text-center text-gray-400 text-xs py-3">Loading deliverables...</div>
-  if (deliverables.length === 0) return null
-
-  const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
-    pending: { bg: '#F3F4F6', text: '#6B7280', label: 'Pending' },
-    pending_funding: { bg: '#EDE9FE', text: '#7C3AED', label: 'Awaiting Grant' },
-    scheduled: { bg: '#DBEAFE', text: '#1E40AF', label: 'Scheduled' },
-    delivered: { bg: '#FEF3C7', text: '#854D0E', label: 'Delivered' },
-    invoiced: { bg: '#DBEAFE', text: '#1E40AF', label: 'Invoiced' },
-    paid: { bg: '#D1FAE5', text: '#065F46', label: 'Paid' },
-    cancelled: { bg: '#FEE2E2', text: '#991B1B', label: 'Cancelled' },
-  }
-
-  const directItems = deliverables.filter((d: any) => d.funding_type === 'direct')
-  const grantItems = deliverables.filter((d: any) => d.funding_type !== 'direct')
-
-  const renderGroup = (items: any[], title: string, accentColor: string) => {
-    if (items.length === 0) return null
-    const totalValue = items.reduce((s: number, d: any) => s + Number(d.total_amount || 0), 0)
-    const deliveredCount = items.filter((d: any) => ['delivered', 'invoiced', 'paid'].includes(d.delivery_status)).length
-
-    return (
-      <div className="mb-3">
-        <div className="flex items-center justify-between mb-1.5">
-          <div className="flex items-center gap-2">
-            <div style={{ width: 7, height: 7, borderRadius: '50%', background: accentColor }} />
-            <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">{title}</span>
-          </div>
-          <span className="text-[10px] text-gray-400">{deliveredCount}/{items.length} delivered, ${totalValue.toLocaleString()}</span>
-        </div>
-        <div className="space-y-1">
-          {items.map((d: any) => {
-            const sc = statusConfig[d.delivery_status] || statusConfig.pending
-            return (
-              <div key={d.id} className="flex items-center justify-between px-2.5 py-1.5 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors" style={{ borderLeft: `3px solid ${accentColor}` }}>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs font-medium text-gray-800 truncate">{d.label}</div>
-                  <div className="text-[10px] text-gray-400 mt-0.5">
-                    {d.delivery_date && `Delivered ${new Date(d.delivery_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
-                    {d.delivered_by && ` by ${d.delivered_by.split('@')[0]}`}
-                    {!d.delivery_date && d.is_complimentary && 'Complimentary'}
-                    {!d.delivery_date && !d.is_complimentary && d.delivery_status === 'pending' && 'Not yet scheduled'}
-                    {!d.delivery_date && d.delivery_status === 'pending_funding' && 'Waiting on grant funding'}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  {!d.is_complimentary && Number(d.total_amount) > 0 && (
-                    <span className="text-xs font-bold text-gray-700">${Number(d.total_amount).toLocaleString()}</span>
-                  )}
-                  <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: sc.bg, color: sc.text }}>
-                    {sc.label}
-                  </span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-3">
-        <div className="text-right">
-          <div className="text-sm font-bold text-gray-900">
-            ${deliverables.filter((d: any) => !d.is_complimentary).reduce((s: number, d: any) => s + Number(d.total_amount || 0), 0).toLocaleString()}
-          </div>
-          <div className="text-[10px] text-gray-400">total contract value</div>
-        </div>
-      </div>
-
-      {renderGroup(directItems, 'Direct Pay', '#10B981')}
-      {renderGroup(grantItems, 'Grant Funded', '#8B5CF6')}
-    </div>
-  )
 }
 
 export default function AdminPartnershipDetailPage() {
@@ -253,16 +160,6 @@ export default function AdminPartnershipDetailPage() {
   const [showMeetingForm, setShowMeetingForm] = useState(false)
   const [newMeeting, setNewMeeting] = useState({ date: '', type: 'check_in', attendees: '', summary: '', actionItems: '' })
   const [addingMeeting, setAddingMeeting] = useState(false)
-
-  // Action items UI state
-  const [showAddAction, setShowAddAction] = useState(false)
-  const [newAction, setNewAction] = useState({ title: '', description: '', due_date: '', category: 'general', visible_to_partner: false })
-  const [savingAction, setSavingAction] = useState(false)
-  const [expandedActionId, setExpandedActionId] = useState<string | null>(null)
-  const [editingActionField, setEditingActionField] = useState<{ id: string; field: string } | null>(null)
-  const [editingActionValue, setEditingActionValue] = useState('')
-  const [showCompletedActions, setShowCompletedActions] = useState(false)
-  const [deletingActionId, setDeletingActionId] = useState<string | null>(null)
 
   // KPI state
   const [kpiMenu, setKpiMenu] = useState<{ key: string; label: string; unit: string; benchmarkLow: number; benchmarkHigh: number; benchmarkLabel: string; dataSource: string; howTdiDelivers: string; suggestedTarget: number; category: string }[]>([])
@@ -915,46 +812,6 @@ export default function AdminPartnershipDetailPage() {
 
 
 
-  // ─── Action Items helper functions (pulled from render) ────────
-  const statusIcon = (status: string) => {
-    if (status === 'completed') return <CheckCircle2 size={16} style={{ color: '#10B981' }} />
-    if (status === 'in_progress') return <Clock size={16} style={{ color: '#EAB308' }} />
-    return <Circle size={16} style={{ color: '#9CA3AF' }} />
-  }
-
-  const nextStatus = (s: string) => s === 'pending' ? 'in_progress' : s === 'in_progress' ? 'completed' : 'pending'
-
-
-
-  const updateActionItem = async (id: string, fields: Record<string, any>) => {
-    try {
-      const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/action-items`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, ...fields }),
-      })
-      if (res.ok) {
-        setActionItems(prev => prev.map(a => a.id === id ? { ...a, ...fields } : a))
-      }
-    } catch { showToast('Failed to update', 'error') }
-  }
-
-  const deleteActionItem = async (id: string) => {
-    try {
-      const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/action-items`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
-      })
-      if (res.ok) {
-        setActionItems(prev => prev.filter(a => a.id !== id))
-        setDeletingActionId(null)
-      }
-    } catch { showToast('Failed to delete', 'error') }
-  }
-
-
-
 
 
   return (
@@ -1413,241 +1270,12 @@ export default function AdminPartnershipDetailPage() {
           <div className="flex flex-col gap-3">
 
             {/* ─── 1. Action Items ───────────────────────────────────── */}
-            <div id="sidebar-action-items" className="bg-white rounded-2xl shadow-sm p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Target size={14} style={{ color: '#1e2749' }} />
-                  <h3 className="text-sm font-bold text-gray-900">Action Items</h3>
-                  {actionItems.length > 0 && (
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{actionItems.filter(a => a.status !== 'completed').length} open</span>
-                  )}
-                </div>
-                <button
-                  onClick={() => setShowAddAction(!showAddAction)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <Plus size={16} />
-                </button>
-              </div>
-
-              {/* Add action form */}
-              {showAddAction && (
-                <div className="border border-gray-200 rounded-lg p-3 mb-3 bg-gray-50">
-                  <div className="space-y-2">
-                    <input
-                      type="text"
-                      placeholder="Title"
-                      value={newAction.title}
-                      onChange={e => setNewAction({ ...newAction, title: e.target.value })}
-                      className="w-full text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                    />
-                    <textarea
-                      placeholder="Description (optional)"
-                      value={newAction.description}
-                      onChange={e => setNewAction({ ...newAction, description: e.target.value })}
-                      className="w-full text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                      rows={2}
-                    />
-                    <div className="flex gap-2 items-center flex-wrap">
-                      <input
-                        type="date"
-                        value={newAction.due_date}
-                        onChange={e => setNewAction({ ...newAction, due_date: e.target.value })}
-                        className="text-[10px] border border-gray-200 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                      />
-                      <select
-                        value={newAction.category}
-                        onChange={e => setNewAction({ ...newAction, category: e.target.value })}
-                        className="text-[10px] border border-gray-200 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                      >
-                        <option value="general">General</option>
-                        <option value="onboarding">Onboarding</option>
-                        <option value="hub">Hub</option>
-                        <option value="coaching">Coaching</option>
-                        <option value="billing">Billing</option>
-                        <option value="follow_up">Follow-up</option>
-                      </select>
-                      <label className="flex items-center gap-1 text-[10px] text-gray-600 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={newAction.visible_to_partner}
-                          onChange={e => setNewAction({ ...newAction, visible_to_partner: e.target.checked })}
-                          className="rounded border-gray-300"
-                        />
-                        Visible
-                      </label>
-                    </div>
-                    <div className="flex gap-2 justify-end pt-1">
-                      <button
-                        onClick={() => { setShowAddAction(false); setNewAction({ title: '', description: '', due_date: '', category: 'general', visible_to_partner: false }) }}
-                        className="text-[10px] px-2.5 py-1.5 rounded-md text-gray-500 hover:bg-gray-100"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        disabled={!newAction.title.trim() || savingAction}
-                        onClick={async () => {
-                          setSavingAction(true)
-                          try {
-                            const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/action-items`, {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify(newAction),
-                            })
-                            if (res.ok) {
-                              const data = await res.json()
-                              setActionItems(prev => [data.item || data, ...prev])
-                              setNewAction({ title: '', description: '', due_date: '', category: 'general', visible_to_partner: false })
-                              setShowAddAction(false)
-                            }
-                          } catch { showToast('Failed to create action item', 'error') }
-                          setSavingAction(false)
-                        }}
-                        className="text-[10px] px-2.5 py-1.5 rounded-md text-white font-medium disabled:opacity-40"
-                        style={{ background: '#1e2749' }}
-                      >
-                        {savingAction ? 'Saving...' : 'Add'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Action items list */}
-              {actionItems.length === 0 && !showAddAction && (
-                <p className="text-[10px] text-gray-400 text-center py-3">No action items yet.</p>
-              )}
-
-              {(() => {
-                const inProgress = actionItems.filter(a => a.status === 'in_progress')
-                const pending = actionItems.filter(a => a.status === 'pending')
-                const completed = actionItems.filter(a => a.status === 'completed')
-
-                const renderItem = (item: any) => {
-                  const isOverdue = item.status !== 'completed' && item.due_date && new Date(item.due_date) < new Date()
-                  return (
-                    <div key={item.id} className="group flex items-start gap-2 py-1.5 px-1 rounded-lg hover:bg-gray-50 transition" style={{ borderBottom: '1px solid #F9FAFB' }}>
-                      <button
-                        onClick={() => updateActionItem(item.id, { status: nextStatus(item.status) })}
-                        className="mt-0.5 flex-shrink-0 hover:opacity-70"
-                      >
-                        {statusIcon(item.status)}
-                      </button>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1">
-                          {editingActionField?.id === item.id && editingActionField?.field === 'title' ? (
-                            <input
-                              autoFocus
-                              className="text-xs font-medium bg-white border border-blue-300 rounded px-1 py-0.5 flex-1"
-                              value={editingActionValue}
-                              onChange={e => setEditingActionValue(e.target.value)}
-                              onBlur={() => {
-                                if (editingActionValue.trim() && editingActionValue !== item.title) {
-                                  updateActionItem(item.id, { title: editingActionValue })
-                                }
-                                setEditingActionField(null)
-                              }}
-                              onKeyDown={e => {
-                                if (e.key === 'Enter') { (e.target as HTMLInputElement).blur() }
-                                if (e.key === 'Escape') { setEditingActionField(null) }
-                              }}
-                            />
-                          ) : (
-                            <span
-                              className="text-xs font-medium text-gray-900 cursor-pointer hover:text-blue-600 truncate"
-                              style={item.status === 'completed' ? { textDecoration: 'line-through', color: '#9CA3AF' } : isOverdue ? { color: '#DC2626' } : {}}
-                              onClick={() => { setEditingActionField({ id: item.id, field: 'title' }); setEditingActionValue(item.title) }}
-                            >
-                              {item.title}
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          {editingActionField?.id === item.id && editingActionField?.field === 'due_date' ? (
-                            <input
-                              autoFocus
-                              type="date"
-                              className="text-[10px] bg-white border border-blue-300 rounded px-1 py-0.5"
-                              value={editingActionValue}
-                              onChange={e => setEditingActionValue(e.target.value)}
-                              onBlur={() => {
-                                updateActionItem(item.id, { due_date: editingActionValue || null })
-                                setEditingActionField(null)
-                              }}
-                            />
-                          ) : (
-                            <span
-                              className="text-[10px] cursor-pointer hover:text-blue-500"
-                              style={{ color: isOverdue ? '#DC2626' : '#9CA3AF' }}
-                              onClick={() => { setEditingActionField({ id: item.id, field: 'due_date' }); setEditingActionValue(item.due_date || '') }}
-                            >
-                              {item.due_date ? new Date(item.due_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'No due date'}
-                            </span>
-                          )}
-                          <span
-                            className="text-[9px] font-medium px-1 py-0.5 rounded-full"
-                            style={{ background: (CATEGORY_COLORS[item.category] || '#6B7280') + '18', color: CATEGORY_COLORS[item.category] || '#6B7280' }}
-                          >
-                            {(item.category || 'general').replace('_', '-')}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-0.5 flex-shrink-0 mt-0.5">
-                        <button
-                          onClick={() => updateActionItem(item.id, { visible_to_partner: !item.visible_to_partner })}
-                          className="p-0.5 rounded hover:bg-gray-100"
-                        >
-                          {item.visible_to_partner ? <Eye size={12} style={{ color: '#3B82F6' }} /> : <EyeOff size={12} style={{ color: '#D1D5DB' }} />}
-                        </button>
-                        {deletingActionId === item.id ? (
-                          <div className="flex items-center gap-0.5">
-                            <button onClick={() => deleteActionItem(item.id)} className="text-[9px] text-red-600 font-medium px-1 py-0.5 rounded bg-red-50 hover:bg-red-100">Delete</button>
-                            <button onClick={() => setDeletingActionId(null)} className="text-[9px] text-gray-500 px-1 py-0.5">No</button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => setDeletingActionId(item.id)}
-                            className="p-0.5 rounded hover:bg-red-50 opacity-0 group-hover:opacity-100 transition"
-                          >
-                            <Trash2 size={11} style={{ color: '#EF4444' }} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  )
-                }
-
-                return (
-                  <div>
-                    {inProgress.length > 0 && (
-                      <div className="mb-1">
-                        <p className="text-[9px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5 px-1">In Progress</p>
-                        {inProgress.map(renderItem)}
-                      </div>
-                    )}
-                    {pending.length > 0 && (
-                      <div className="mb-1">
-                        <p className="text-[9px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5 px-1">Pending</p>
-                        {pending.map(renderItem)}
-                      </div>
-                    )}
-                    {completed.length > 0 && (
-                      <div className="mt-1">
-                        <button
-                          onClick={() => setShowCompletedActions(!showCompletedActions)}
-                          className="flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5 px-1 hover:text-gray-600"
-                        >
-                          <ChevronDown size={10} style={{ transform: showCompletedActions ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
-                          Completed ({completed.length})
-                        </button>
-                        {showCompletedActions && completed.map(renderItem)}
-                      </div>
-                    )}
-                  </div>
-                )
-              })()}
-            </div>
+            <ActionItemsSidebar
+              partnershipId={partnershipId}
+              actionItems={actionItems}
+              onActionItemsChange={setActionItems}
+              showToast={showToast}
+            />
 
             {/* ─── 2. Contract Card ──────────────────────────────────── */}
             <div className="bg-white rounded-2xl shadow-sm p-4">
@@ -2642,114 +2270,7 @@ export default function AdminPartnershipDetailPage() {
       )}
       {/* Briefing Modal */}
       {briefingData && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-              <div>
-                <h2 className="text-lg font-bold text-gray-900">{briefingData.briefing?.orgName || schoolName}</h2>
-                <p className="text-xs text-gray-500">{briefingData.briefing?.location} | {briefingData.briefing?.phase} | Day {briefingData.briefing?.daysSinceStart || '?'}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => window.print()}
-                  className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
-                >
-                  Print
-                </button>
-                <button onClick={() => setBriefingData(null)} className="text-gray-400 hover:text-gray-600">
-                  <X size={18} />
-                </button>
-              </div>
-            </div>
-            <div className="p-6 space-y-6">
-              {/* Quick stats */}
-              <div className="grid grid-cols-4 gap-3">
-                {[
-                  { label: 'Hub Engagement', value: `${briefingData.briefing?.loginPct || 0}%` },
-                  { label: 'Staff', value: briefingData.briefing?.totalStaff || 0 },
-                  { label: 'Observations', value: `${briefingData.briefing?.observationsUsed || 0}/${briefingData.briefing?.observationsTotal || 0}` },
-                  { label: 'Virtual', value: `${briefingData.briefing?.virtualSessionsUsed || 0}/${briefingData.briefing?.virtualSessionsTotal || 0}` },
-                ].map((stat, i) => (
-                  <div key={i} className="text-center p-3 bg-gray-50 rounded-lg">
-                    <div className="text-xl font-bold text-gray-900">{stat.value}</div>
-                    <div className="text-[10px] text-gray-500 font-medium uppercase">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-
-              {/* KPI Progress */}
-              {briefingData.kpis?.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-bold text-gray-900 mb-3">KPI Progress</h3>
-                  <div className="border border-gray-100 rounded-lg overflow-hidden">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="bg-gray-50 text-left">
-                          <th className="px-3 py-2 font-semibold text-gray-600">KPI</th>
-                          <th className="px-3 py-2 font-semibold text-gray-600">Current</th>
-                          <th className="px-3 py-2 font-semibold text-gray-600">Target</th>
-                          <th className="px-3 py-2 font-semibold text-gray-600">Progress</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {briefingData.kpis.map((k: any, i: number) => (
-                          <tr key={i} className="border-t border-gray-50">
-                            <td className="px-3 py-2 text-gray-700">{k.label}</td>
-                            <td className="px-3 py-2 font-bold text-gray-900">{k.current}</td>
-                            <td className="px-3 py-2 text-gray-500">{k.target}</td>
-                            <td className="px-3 py-2 font-bold" style={{ color: k.status === 'at_risk' ? '#EF4444' : k.pct >= 70 ? '#22c55e' : '#EAB308' }}>{k.pct}%</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-
-              {/* Talking Points */}
-              {briefingData.talkingPoints?.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-bold text-gray-900 mb-3">Talking Points</h3>
-                  <ul className="space-y-2">
-                    {briefingData.talkingPoints.map((t: string, i: number) => (
-                      <li key={i} className="text-sm text-gray-700 flex gap-2">
-                        <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8B84B', marginTop: 6, flexShrink: 0 }} />
-                        {t}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Open Items */}
-              {briefingData.pendingItems?.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-bold text-gray-900 mb-3">Open Items</h3>
-                  <ul className="space-y-1">
-                    {briefingData.pendingItems.map((t: string, i: number) => (
-                      <li key={i} className="text-sm text-gray-600">{t}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Recent Notes */}
-              {briefingData.recentNotes?.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-bold text-gray-900 mb-3">Recent Notes</h3>
-                  <div className="space-y-2">
-                    {briefingData.recentNotes.map((n: { type: string; content: string }, i: number) => (
-                      <div key={i} className="p-3 bg-gray-50 rounded-lg">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase">{n.type}</span>
-                        <p className="text-sm text-gray-700 mt-1">{n.content}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <BriefingModal data={briefingData} schoolName={schoolName} onClose={() => setBriefingData(null)} />
       )}
     </div>
     </>
