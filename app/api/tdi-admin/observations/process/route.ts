@@ -17,6 +17,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'visitId is required' }, { status: 400 })
     }
 
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return NextResponse.json({ error: 'AI processing not configured (missing API key)' }, { status: 503 })
+    }
+
     const supabase = getServiceSupabase()
 
     // Fetch the visit record
@@ -50,27 +54,34 @@ export async function POST(request: NextRequest) {
       role_title: s.role_title,
     }))
 
-    // Fetch notepad photos as base64
+    // Download notepad photos from storage as base64
     const photos = visit.notepad_photos || []
     const imageBlocks: Anthropic.ImageBlockParam[] = []
 
     for (const photo of photos) {
       try {
-        const response = await fetch(photo.url)
-        const arrayBuffer = await response.arrayBuffer()
+        const { data: fileData, error: downloadError } = await supabase.storage
+          .from('partnership-files')
+          .download(photo.storage_path)
+
+        if (downloadError || !fileData) {
+          console.error('[Observations] Failed to download photo:', photo.storage_path, downloadError)
+          continue
+        }
+
+        const arrayBuffer = await fileData.arrayBuffer()
         const base64 = Buffer.from(arrayBuffer).toString('base64')
-        const mediaType = response.headers.get('content-type') || 'image/jpeg'
 
         imageBlocks.push({
           type: 'image',
           source: {
             type: 'base64',
-            media_type: mediaType as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
+            media_type: 'image/jpeg',
             data: base64,
           },
         })
       } catch (err) {
-        console.error('[Observations] Failed to fetch photo:', photo.url, err)
+        console.error('[Observations] Failed to process photo:', photo.storage_path, err)
       }
     }
 
@@ -131,7 +142,7 @@ Return a JSON object with this exact structure:
 Return ONLY the JSON. No markdown formatting, no explanation.`
 
     // Call Claude with vision
-    const anthropic = new Anthropic()
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
