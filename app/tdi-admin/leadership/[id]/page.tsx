@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTDIAdmin } from '@/lib/tdi-admin/context'
@@ -31,6 +31,7 @@ import BillingTab from '@/components/dashboard/admin/BillingTab'
 import DeliverablesList from '@/components/tdi-admin/leadership/DeliverablesList'
 import BriefingModal from '@/components/tdi-admin/leadership/BriefingModal'
 import ActionItemsSidebar from '@/components/tdi-admin/leadership/ActionItemsSidebar'
+import ErrorBoundary from '@/components/tdi-admin/leadership/ErrorBoundary'
 
 const NOTE_TYPE_COLORS: Record<string, string> = {
   general: 'bg-gray-100 text-gray-700',
@@ -204,63 +205,36 @@ export default function AdminPartnershipDetailPage() {
   // Timeline pagination (Fix 6)
   const [timelineLimit, setTimelineLimit] = useState(20)
 
-  // Load internal notes/meetings/kpis on mount (no longer tab-gated)
-  useEffect(() => {
-    if (!partnershipId) return
-    fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`)
-      .then(r => r.json())
-      .then(d => { if (d.notes) setInternalNotes(d.notes) })
-      .catch(() => {})
-    fetch(`/api/tdi-admin/leadership/${partnershipId}/meetings`)
-      .then(r => r.json())
-      .then(d => { if (d.meetings) setInternalMeetings(d.meetings) })
-      .catch(() => {})
-    // Load grant pursuits linked to this partnership
-    fetch(`/api/funding/dashboard`)
-      .then(r => r.json())
-      .then(d => {
-        if (d.pursuits) {
-          const linked = d.pursuits.filter((p: { partnership_id?: string }) => p.partnership_id === partnershipId)
-          setGrantPursuits(linked)
-        }
-      })
-      .catch(() => {})
-    fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`)
-      .then(r => r.json())
-      .then(d => {
-        if (d.menu) setKpiMenu(d.menu)
-        if (d.kpis) {
-          setActiveKpis(d.kpis)
-          setSelectedKpiKeys(new Set(d.kpis.map((k: { kpi_key: string }) => k.kpi_key)))
-          const targets: Record<string, number> = {}
-          d.kpis.forEach((k: { kpi_key: string; target_value: number }) => { targets[k.kpi_key] = k.target_value })
-          setKpiTargets(targets)
-        }
-      })
-      .catch(() => {})
-  }, [partnershipId])
-
   const hasAccess = isOwner || hasAnySectionPermission(permissions, 'leadership')
   const userEmail = teamMember?.email || ''
 
+  const toastTimerRef = useRef<NodeJS.Timeout | null>(null)
+
   function showToast(message: string, type: 'success' | 'error') {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
     if (type === 'success') {
       setSubmitSuccess(message)
       setSubmitError(null)
-      setTimeout(() => setSubmitSuccess(null), 3000)
+      toastTimerRef.current = setTimeout(() => setSubmitSuccess(null), 3000)
     } else {
       setSubmitError(message)
       setSubmitSuccess(null)
-      setTimeout(() => setSubmitError(null), 4000)
+      toastTimerRef.current = setTimeout(() => setSubmitError(null), 4000)
     }
   }
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
+    }
+  }, [])
 
   const fetchData = useCallback(async () => {
     if (!userEmail) return
 
     setLoading(true)
     try {
-      const [pRes, tRes, aRes, dRes, fRes] = await Promise.all([
+      const [pRes, tRes, aRes, dRes, fRes, notesRes, meetingsRes, kpiRes] = await Promise.all([
         fetch(`/api/tdi-admin/leadership/${partnershipId}`, {
           headers: { 'x-user-email': userEmail },
         }),
@@ -274,6 +248,9 @@ export default function AdminPartnershipDetailPage() {
         fetch(`/api/tdi-admin/leadership/${partnershipId}/upload`, {
           headers: { 'x-user-email': userEmail },
         }),
+        fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`),
+        fetch(`/api/tdi-admin/leadership/${partnershipId}/meetings`),
+        fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`),
       ])
 
       if (pRes.ok) {
@@ -305,36 +282,47 @@ export default function AdminPartnershipDetailPage() {
         setUploadedFiles(fData.files || [])
       }
 
-      // Fetch Hub stats (separate from main data for real-time Hub analytics)
-      try {
-        const hubResponse = await fetch(`/api/partnerships/${partnershipId}/hub-stats`)
-        if (hubResponse.ok) {
-          const hubData = await hubResponse.json()
-          setHubStats(hubData)
+      if (notesRes.ok) {
+        const nd = await notesRes.json()
+        if (nd.notes) setInternalNotes(nd.notes)
+      }
+      if (meetingsRes.ok) {
+        const md = await meetingsRes.json()
+        if (md.meetings) setInternalMeetings(md.meetings)
+      }
+      if (kpiRes.ok) {
+        const kd = await kpiRes.json()
+        if (kd.menu) setKpiMenu(kd.menu)
+        if (kd.kpis) {
+          setActiveKpis(kd.kpis)
+          setSelectedKpiKeys(new Set(kd.kpis.map((k: { kpi_key: string }) => k.kpi_key)))
+          const targets: Record<string, number> = {}
+          kd.kpis.forEach((k: { kpi_key: string; target_value: number }) => { targets[k.kpi_key] = k.target_value })
+          setKpiTargets(targets)
         }
-      } catch (hubError) {
-        console.error('Error fetching hub stats:', hubError)
-        // Non-fatal - dashboard works without real-time Hub data
       }
 
-      // Fetch mood trend, reflections, and observation impact in parallel - non-blocking
+      // Secondary data (non-blocking, parallel)
+      setAiInsightLoading(true)
       Promise.all([
+        fetch(`/api/partnerships/${partnershipId}/hub-stats`).then(r => r.ok ? r.json() : null),
         fetch(`/api/partnerships/${partnershipId}/hub-mood`).then(r => r.ok ? r.json() : null),
         fetch(`/api/partnerships/${partnershipId}/hub-reflections`).then(r => r.ok ? r.json() : null),
         fetch(`/api/partnerships/${partnershipId}/hub-observation-impact`).then(r => r.ok ? r.json() : null),
-      ]).then(([mood, refs, obsImpact]) => {
+        fetch(`/api/partnerships/${partnershipId}/ai-insight`).then(r => r.ok ? r.json() : null),
+        fetch(`/api/funding/dashboard`).then(r => r.ok ? r.json() : null),
+      ]).then(([hub, mood, refs, obsImpact, insight, funding]) => {
+        if (hub) setHubStats(hub)
         if (mood) setMoodData(mood)
         if (refs) setReflections(refs)
         if (obsImpact) setObservationImpact(obsImpact)
-      }).catch(err => console.error('Hub signal fetch error:', err))
-
-      // Fetch AI insight for this partnership (non-blocking)
-      setAiInsightLoading(true)
-      fetch(`/api/partnerships/${partnershipId}/ai-insight`)
-        .then(r => r.json())
-        .then(data => { if (data.insight) setAiInsight(data.insight) })
-        .catch(() => {})
-        .finally(() => setAiInsightLoading(false))
+        if (insight?.insight) setAiInsight(insight.insight)
+        if (funding?.pursuits) {
+          const linked = funding.pursuits.filter((p: any) => p.partnership_id === partnershipId)
+          setGrantPursuits(linked)
+        }
+        setAiInsightLoading(false)
+      }).catch(() => setAiInsightLoading(false))
     } finally {
       setLoading(false)
     }
@@ -815,13 +803,15 @@ export default function AdminPartnershipDetailPage() {
 
 
   return (
+    <ErrorBoundary>
     <>
-      <div className="min-h-screen" style={{ background: '#F3F4F6' }}>
+      <div className="min-h-screen" style={{ background: '#F3F4F6' }} role="main">
       {/* Toast notifications */}
       {(submitSuccess || submitError) && (
         <div
           className="fixed bottom-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold text-white shadow-lg transition-all"
           style={{ background: submitSuccess ? '#16A34A' : '#DC2626' }}
+          aria-live="polite"
         >
           {submitSuccess || submitError}
         </div>
@@ -966,7 +956,7 @@ export default function AdminPartnershipDetailPage() {
           <div>
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
               {/* Filter tabs */}
-              <div className="flex items-center border-b border-gray-100 px-5 pt-4 pb-0">
+              <div className="flex items-center border-b border-gray-100 px-5 pt-4 pb-0" role="tablist" aria-label="Timeline filters">
                 {(['all', 'notes', 'meetings', 'actions'] as const).map(f => (
                   <button
                     key={f}
@@ -976,6 +966,9 @@ export default function AdminPartnershipDetailPage() {
                       borderColor: timelineFilter === f ? '#1e2749' : 'transparent',
                       color: timelineFilter === f ? '#1e2749' : '#9CA3AF',
                     }}
+                    role="tab"
+                    aria-selected={timelineFilter === f}
+                    aria-label={`Show ${f} entries`}
                   >
                     {f}
                   </button>
@@ -1127,7 +1120,7 @@ export default function AdminPartnershipDetailPage() {
               )}
 
               {/* Timeline entries */}
-              <div className="px-5 py-3">
+              <div className="px-5 py-3" role="feed" aria-label="Partnership timeline">
                 {unifiedTimeline.length === 0 && (
                   <p className="text-sm text-gray-400 text-center py-8">No timeline entries yet. Add a note or log a meeting above.</p>
                 )}
@@ -2274,5 +2267,6 @@ export default function AdminPartnershipDetailPage() {
       )}
     </div>
     </>
+    </ErrorBoundary>
   )
 }

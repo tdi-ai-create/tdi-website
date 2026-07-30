@@ -244,6 +244,9 @@ async function sendFollowUpEmail(params: {
   // Internal tone fields
   submitterName?: string
   nextRung?: string
+  // For email log tracking
+  pursuitId?: string
+  opportunityId?: string | null
 }): Promise<boolean> {
   const resendKey = process.env.RESEND_API_KEY
   if (!resendKey) {
@@ -407,9 +410,31 @@ async function sendFollowUpEmail(params: {
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     console.error(LOG, `Resend error sending to ${to}:`, err)
+    return false
   }
 
-  return res.ok
+  // Log to funding_email_log for the Emails tab
+  if (params.pursuitId) {
+    const resData = await res.json().catch(() => ({}))
+    const supabase = getServiceSupabase()
+    const { error: logError } = await supabase.from('funding_email_log').insert({
+      pursuit_id: params.pursuitId,
+      opportunity_id: params.opportunityId || null,
+      subject,
+      body: html,
+      to_email: to,
+      to_name: params.contactName || null,
+      from_email: 'noreply@teachersdeserveit.com',
+      status: 'sent',
+      sent_at: new Date().toISOString(),
+      sent_by: 'system (cron)',
+      resend_id: resData?.id || null,
+      email_type: type === 'nudge' ? 'nudge' : type === 'escalation' ? 'nudge' : 'deadline_reminder',
+    })
+    if (logError) console.error(LOG, 'Failed to log email:', logError)
+  }
+
+  return true
 }
 
 // ── Route handler ──
@@ -699,6 +724,8 @@ export async function GET(request: NextRequest) {
             contactName: ownerFirstName,
             schoolName,
             clientLabel: item.client_label,
+            pursuitId: item.pursuit_id,
+            opportunityId: item.opportunity_id,
           })
           summary.sent++
         }
@@ -758,6 +785,8 @@ export async function GET(request: NextRequest) {
               contactName: ownerFirstName,
               schoolName,
               clientLabel: item.client_label,
+              pursuitId: item.pursuit_id,
+              opportunityId: item.opportunity_id,
             })
             summary.sent++
           }
@@ -821,6 +850,8 @@ export async function GET(request: NextRequest) {
                 clientLabel: item.client_label,
                 submitterName: item.owner_name ?? ownerEmail ?? 'unknown',
                 nextRung: nextNextStep?.rung ?? 'none',
+                pursuitId: item.pursuit_id,
+                opportunityId: item.opportunity_id,
               })
               summary.sent++
             }
@@ -889,6 +920,8 @@ export async function GET(request: NextRequest) {
                     clientLabel: item.client_label,
                     submitterName: item.owner_name ?? ownerEmail ?? 'unknown',
                     nextRung: advNextStep?.rung ?? 'none',
+                    pursuitId: item.pursuit_id,
+                    opportunityId: item.opportunity_id,
                   })
                   summary.sent++
                 }
