@@ -29,6 +29,10 @@ function ProductTile({ product, onOpen }: { product: SwagProduct; onOpen: () => 
           style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0, opacity: hovered && hasTwoImages ? 0 : 1, transition: 'opacity 0.35s ease' }} />
         {hasTwoImages && <img src={activeImages[1]} alt="" loading="lazy"
           style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0, opacity: hovered ? 1 : 0, transition: 'opacity 0.35s ease' }} />}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(30,42,74,0.7))', padding: '20px 12px 10px', display: 'flex', justifyContent: 'center' }}
+          className="md:hidden">
+          <span style={{ fontSize: 11, fontWeight: 700, color: 'white', letterSpacing: 1, textTransform: 'uppercase' }}>Tap to shop</span>
+        </div>
       </div>
       <div style={{ marginTop: 10 }}>
         <h3 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 15, fontWeight: 700, color: C.navy, margin: 0, lineHeight: 1.3 }}>{product.name}</h3>
