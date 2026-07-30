@@ -311,6 +311,7 @@ interface QuizResultBadgeProps {
 }
 
 export function QuizResultBadge({ quiz, resultKey, compact }: QuizResultBadgeProps) {
+  const [expanded, setExpanded] = useState(false)
   const result = quiz.results[resultKey]
   if (!result) return null
 
@@ -342,8 +343,9 @@ export function QuizResultBadge({ quiz, resultKey, compact }: QuizResultBadgePro
 
   return (
     <div
-      className="rounded-2xl overflow-hidden"
+      className="rounded-2xl overflow-hidden cursor-pointer transition-all"
       style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 2px 8px rgba(27,42,74,0.06)' }}
+      onClick={() => setExpanded(!expanded)}
     >
       <div className="p-5 flex items-center gap-4" style={{ backgroundColor: result.bg }}>
         <div
@@ -354,7 +356,7 @@ export function QuizResultBadge({ quiz, resultKey, compact }: QuizResultBadgePro
             {result.icon}
           </span>
         </div>
-        <div>
+        <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wider mb-0.5" style={{ color: '#9CA3AF' }}>
             {quiz.shortTitle}
           </p>
@@ -365,7 +367,34 @@ export function QuizResultBadge({ quiz, resultKey, compact }: QuizResultBadgePro
             {result.subtitle}
           </p>
         </div>
+        <ChevronRight
+          size={16}
+          style={{
+            color: result.color,
+            opacity: 0.4,
+            transform: expanded ? 'rotate(90deg)' : 'none',
+            transition: 'transform 0.2s',
+            flexShrink: 0,
+          }}
+        />
       </div>
+      {expanded && (
+        <div className="px-5 pb-5 pt-0" style={{ backgroundColor: result.bg }}>
+          <p className="text-sm leading-relaxed" style={{ color: '#374151', fontFamily: "'DM Sans', sans-serif" }}>
+            {result.description}
+          </p>
+          {result.ctaLabel && result.ctaLink && (
+            <Link
+              href={result.ctaLink}
+              className="inline-block mt-3 px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90"
+              style={{ backgroundColor: result.color }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {result.ctaLabel}
+            </Link>
+          )}
+        </div>
+      )}
     </div>
   )
 }
