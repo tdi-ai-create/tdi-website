@@ -354,9 +354,9 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
 
         {/* Pending action items for this school - separated by owner */}
         {school.actions.length > 0 && (() => {
-          const bellaActions = school.actions.filter((a: { ownerType: string; category: string }) => a.ownerType === 'tdi' && ['submission', 'follow_up', 'approval'].includes(a.category))
-          const clientActions = school.actions.filter((a: { ownerType: string }) => a.ownerType === 'client')
-          const agentActions = school.actions.filter((a: { ownerType: string; category: string }) => a.ownerType === 'tdi' && !['submission', 'follow_up', 'approval'].includes(a.category))
+          const bellaActions = school.actions.filter(a => a.ownerType === 'tdi' && ['submission', 'follow_up', 'approval'].includes(a.category || ''))
+          const clientActions = school.actions.filter(a => a.ownerType === 'client')
+          const agentActions = school.actions.filter(a => a.ownerType === 'tdi' && !['submission', 'follow_up', 'approval'].includes(a.category || ''))
           const myActions = [...bellaActions, ...clientActions]
 
           const ownerBadge = (ownerType: string, category?: string) => {
@@ -374,7 +374,7 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
                   </div>
                   {myActions.slice(0, 5).map(action => {
                     const daysUntil = action.dueDate ? Math.ceil((new Date(action.dueDate + 'T00:00:00').getTime() - Date.now()) / 86400000) : null
-                    const badge = ownerBadge(action.ownerType, action.category)
+                    const badge = ownerBadge(action.ownerType, action.category || undefined)
                     return (
                       <div key={action.id} style={{
                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
