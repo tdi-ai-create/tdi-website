@@ -85,6 +85,14 @@ export const UI_TRANSLATIONS = {
       },
       format: { en: 'Solo Quiz', es: 'Quiz Individual' },
     },
+    conversationcompass: {
+      title: { en: 'Conversation Compass', es: 'Brújula de Conversación' },
+      description: {
+        en: 'The tough conversation just landed. You choose the direction.',
+        es: 'La conversación difícil llegó. Tú decides la dirección.',
+      },
+      format: { en: 'Solo Quiz', es: 'Quiz Individual' },
+    },
   },
 
   // Common Game UI

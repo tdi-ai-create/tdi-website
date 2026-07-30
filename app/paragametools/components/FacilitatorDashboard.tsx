@@ -34,6 +34,7 @@ const GAME_ICONS: Record<GameId, typeof Target> = {
   prioritize: TrendingUp,
   energybudget: Target,
   principalplaybook: Briefcase,
+  conversationcompass: MessageCircle,
 };
 
 interface FacilitatorDashboardProps {

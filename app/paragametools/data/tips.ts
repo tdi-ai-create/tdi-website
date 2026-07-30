@@ -56,4 +56,5 @@ export const TIPS_BY_GAME = {
   prioritize: [] as string[],
   energybudget: [] as string[],
   principalplaybook: [] as string[],
+  conversationcompass: [] as string[],
 } as const;

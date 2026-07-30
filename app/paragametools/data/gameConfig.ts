@@ -1,6 +1,6 @@
 // Game configuration and shared utilities
 
-export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook';
+export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook' | 'conversationcompass';
 
 export interface GameConfig {
   id: GameId;
@@ -8,7 +8,7 @@ export interface GameConfig {
   description: string;
   time: string;
   duration: number; // default minutes for facilitator timer
-  color: 'orange' | 'yellow' | 'green' | 'purple' | 'red' | 'gold';
+  color: 'orange' | 'yellow' | 'green' | 'purple' | 'red' | 'gold' | 'teal';
   rounds: string;
 }
 
@@ -65,6 +65,15 @@ export const GAMES: GameConfig[] = [
     time: '~15 min',
     duration: 15,
     color: 'gold',
+    rounds: '10 scenarios',
+  },
+  {
+    id: 'conversationcompass',
+    title: 'Conversation Compass',
+    description: 'The tough conversation just landed. You choose the direction.',
+    time: '~12 min',
+    duration: 12,
+    color: 'teal',
     rounds: '10 scenarios',
   },
 ];

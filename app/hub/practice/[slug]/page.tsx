@@ -13,6 +13,7 @@ import { ClassroomShuffle } from '@/app/paragametools/components/ClassroomShuffl
 import { PrioritizeThis } from '@/app/paragametools/components/PrioritizeThis'
 import { EnergyBudget } from '@/app/paragametools/components/EnergyBudget'
 import { PrincipalPlaybook } from '@/app/paragametools/components/PrincipalPlaybook'
+import { ConversationCompass } from '@/app/paragametools/components/ConversationCompass'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub'
@@ -73,6 +74,11 @@ const PRACTICE_TOOLS: Record<string, {
     component: PrincipalPlaybook,
     title: 'Principal Playbook',
     category: 'Leadership',
+  },
+  'conversation-compass': {
+    component: ConversationCompass,
+    title: 'Conversation Compass',
+    category: 'Communication',
   },
 }
 
