@@ -127,6 +127,14 @@ export async function POST(request: NextRequest) {
       const now = new Date().toISOString()
       const accessTier = body.access_tier || 'professional'
 
+      // Map access_tier to tier with correct casing for DB constraint
+      const tierMap: Record<string, string> = {
+        free: 'Free', essentials: 'Essentials',
+        professional: 'Professional', 'all-access': 'All-Access',
+        'all_access': 'All-Access',
+      }
+      const tier = tierMap[accessTier.toLowerCase()] || 'Professional'
+
       const insertPayload: Record<string, unknown> = {
         title: title.trim(),
         slug: cleanSlug,
@@ -146,7 +154,7 @@ export async function POST(request: NextRequest) {
         description_es: body.description_es || null,
         is_published: false,
         status: 'draft',
-        tier: accessTier,
+        tier,
         tier_source: 'agent_created',
         free_hero_candidate: false,
         lift_uncertain: true,
