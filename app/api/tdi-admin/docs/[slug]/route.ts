@@ -29,6 +29,8 @@ export async function GET(
     'hub-content-standards': 'hub-content-standards.html',
     'hub-content-creation': 'hub-content-creation.html',
     'grant-application-spec': 'grant-application-spec.html',
+    'course-upload-sop': 'course-upload-sop.html',
+    'swag-fulfillment': 'swag-fulfillment.html',
   };
 
   const filename = allowedDocs[slug];
