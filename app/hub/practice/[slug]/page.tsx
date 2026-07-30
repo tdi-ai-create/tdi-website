@@ -12,6 +12,7 @@ import { WhatsYourMove } from '@/app/paragametools/components/WhatsYourMove'
 import { ClassroomShuffle } from '@/app/paragametools/components/ClassroomShuffle'
 import { PrioritizeThis } from '@/app/paragametools/components/PrioritizeThis'
 import { EnergyBudget } from '@/app/paragametools/components/EnergyBudget'
+import { PrincipalPlaybook } from '@/app/paragametools/components/PrincipalPlaybook'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub'
@@ -67,6 +68,11 @@ const PRACTICE_TOOLS: Record<string, {
     component: EnergyBudget,
     title: 'Energy Budget',
     category: 'Self-Care',
+  },
+  'principal-playbook': {
+    component: PrincipalPlaybook,
+    title: 'Principal Playbook',
+    category: 'Leadership',
   },
 }
 

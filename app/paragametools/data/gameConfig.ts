@@ -1,6 +1,6 @@
 // Game configuration and shared utilities
 
-export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget';
+export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook';
 
 export interface GameConfig {
   id: GameId;
@@ -8,7 +8,7 @@ export interface GameConfig {
   description: string;
   time: string;
   duration: number; // default minutes for facilitator timer
-  color: 'orange' | 'yellow' | 'green' | 'purple' | 'red';
+  color: 'orange' | 'yellow' | 'green' | 'purple' | 'red' | 'gold';
   rounds: string;
 }
 
@@ -58,6 +58,15 @@ export const GAMES: GameConfig[] = [
     color: 'red',
     rounds: '6 rounds, 120 sec each',
   },
+  {
+    id: 'principalplaybook',
+    title: 'Principal Playbook',
+    description: 'Your building. Your call. Real scenarios, real research.',
+    time: '~15 min',
+    duration: 15,
+    color: 'gold',
+    rounds: '10 scenarios',
+  },
 ];
 
 // Color system
@@ -103,6 +112,12 @@ export const COLORS = {
     bg: 'rgba(52, 152, 219, 0.1)',
     bgHover: 'rgba(52, 152, 219, 0.15)',
     border: 'rgba(52, 152, 219, 0.4)',
+  },
+  gold: {
+    accent: '#E8B84B',
+    bg: 'rgba(232, 184, 75, 0.1)',
+    bgHover: 'rgba(232, 184, 75, 0.15)',
+    border: 'rgba(232, 184, 75, 0.4)',
   },
 } as const;
 

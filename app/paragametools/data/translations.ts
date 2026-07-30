@@ -77,6 +77,14 @@ export const UI_TRANSLATIONS = {
       },
       format: { en: 'Solo Quiz', es: 'Quiz Individual' },
     },
+    principalplaybook: {
+      title: { en: 'Principal Playbook', es: 'Manual del Director' },
+      description: {
+        en: 'Your building. Your call. Real scenarios, real research.',
+        es: 'Tu edificio. Tu decisión. Escenarios reales, investigación real.',
+      },
+      format: { en: 'Solo Quiz', es: 'Quiz Individual' },
+    },
   },
 
   // Common Game UI

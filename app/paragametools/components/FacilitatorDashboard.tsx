@@ -17,6 +17,7 @@ import {
   Wrench,
   Crosshair,
   ChevronRight,
+  Briefcase,
 } from 'lucide-react';
 import { GAMES, COLORS, type GameId } from '../data/gameConfig';
 import { TIPS_BY_GAME } from '../data/tips';
@@ -32,6 +33,7 @@ const GAME_ICONS: Record<GameId, typeof Target> = {
   classroomshuffle: Target,
   prioritize: TrendingUp,
   energybudget: Target,
+  principalplaybook: Briefcase,
 };
 
 interface FacilitatorDashboardProps {

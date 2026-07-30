@@ -17,6 +17,7 @@ const GAME_CARDS: {
   { id: 'madlibs', icon: '😂', color: 'purple' },
   { id: 'makeover', icon: '🔧', color: 'red' },
   { id: 'whatsyourmove', icon: '🎯', color: 'teal' },
+  { id: 'principalplaybook', icon: '📋', color: 'gold' },
 ];
 
 const TIMES: Record<GameId, string> = {
@@ -29,6 +30,7 @@ const TIMES: Record<GameId, string> = {
   classroomshuffle: '~10 min',
   prioritize: '~10 min',
   energybudget: '~10 min',
+  principalplaybook: '~15 min',
 };
 
 interface HomeScreenProps {

@@ -55,4 +55,5 @@ export const TIPS_BY_GAME = {
   classroomshuffle: [] as string[],
   prioritize: [] as string[],
   energybudget: [] as string[],
+  principalplaybook: [] as string[],
 } as const;

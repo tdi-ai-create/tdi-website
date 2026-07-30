@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, RotateCcw, Target, Zap, TrendingUp, Smile, Wrench, Crosshair, Award, Check, X, Shuffle, ListOrdered, Battery } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Target, Zap, TrendingUp, Smile, Wrench, Crosshair, Award, Check, X, Shuffle, ListOrdered, Battery, Briefcase } from 'lucide-react';
 import { CommunityNudge } from './CommunityNudge';
 import { COLORS, type GameId } from '../data/gameConfig';
 import { ConfettiBurst } from './ConfettiBurst';
@@ -18,6 +18,7 @@ export const GAME_ICONS = {
   classroomshuffle: Shuffle,
   prioritize: ListOrdered,
   energybudget: Battery,
+  principalplaybook: Briefcase,
 } as const;
 
 interface GameWrapperProps {

@@ -1,6 +1,6 @@
 'use client';
 
-import { Target, Zap, TrendingUp, Smile, Wrench, Crosshair, ArrowLeft, Monitor, Coffee } from 'lucide-react';
+import { Target, Zap, TrendingUp, Smile, Wrench, Crosshair, ArrowLeft, Monitor, Coffee, Briefcase } from 'lucide-react';
 import { GAMES, COLORS, type GameId } from '../data/gameConfig';
 
 // Icon map for home screen
@@ -14,6 +14,7 @@ const GAME_ICONS: Record<string, typeof Target> = {
   classroomshuffle: Target,
   prioritize: TrendingUp,
   energybudget: Target,
+  principalplaybook: Briefcase,
 };
 
 interface FacilitatorHomeProps {
