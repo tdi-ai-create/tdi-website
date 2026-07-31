@@ -20,6 +20,8 @@ import { LeanOnTdi } from '@/app/paragametools/components/LeanOnTdi'
 import { ResetRoulette } from '@/app/paragametools/components/ResetRoulette'
 import { FirstFiveDays } from '@/app/paragametools/components/FirstFiveDays'
 import { PlanYourYear } from '@/app/paragametools/components/PlanYourYear'
+import { ThisOrThat } from '@/app/paragametools/components/ThisOrThat'
+import { SortItOut } from '@/app/paragametools/components/SortItOut'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub'
@@ -115,6 +117,16 @@ const PRACTICE_TOOLS: Record<string, {
     component: PlanYourYear,
     title: 'Plan Your Year',
     category: 'Time Savers',
+  },
+  'this-or-that': {
+    component: ThisOrThat,
+    title: 'This or That',
+    category: 'Classroom Scenarios',
+  },
+  'sort-it-out': {
+    component: SortItOut,
+    title: 'Sort It Out',
+    category: 'Feedback Practice',
   },
 }
 
