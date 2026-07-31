@@ -1,6 +1,6 @@
 // Game configuration and shared utilities
 
-export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook' | 'conversationcompass' | 'partnerup' | 'boundarygame' | 'leanontdi' | 'resetroulette' | 'firstfivedays';
+export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook' | 'conversationcompass' | 'partnerup' | 'boundarygame' | 'leanontdi' | 'resetroulette' | 'firstfivedays' | 'planyouryear';
 
 export interface GameConfig {
   id: GameId;
@@ -8,7 +8,7 @@ export interface GameConfig {
   description: string;
   time: string;
   duration: number; // default minutes for facilitator timer
-  color: 'orange' | 'yellow' | 'green' | 'purple' | 'red' | 'gold' | 'teal' | 'rose' | 'amber';
+  color: 'orange' | 'yellow' | 'green' | 'purple' | 'red' | 'gold' | 'teal' | 'rose' | 'amber' | 'blue';
   rounds: string;
 }
 
@@ -120,6 +120,15 @@ export const GAMES: GameConfig[] = [
     duration: 10,
     color: 'amber',
     rounds: '12 priorities, pick 8',
+  },
+  {
+    id: 'planyouryear',
+    title: 'Plan Your Year',
+    description: 'Nine months. Limited energy. Each month brings 4 demands but you can only focus on 2.',
+    time: '~12 min',
+    duration: 12,
+    color: 'blue',
+    rounds: '9 months',
   },
 ];
 

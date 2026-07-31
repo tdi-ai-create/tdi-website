@@ -44,6 +44,7 @@ const GAME_ICONS: Record<GameId, typeof Target> = {
   leanontdi: Handshake,
   resetroulette: RotateCcw,
   firstfivedays: Calendar,
+  planyouryear: TrendingUp,
 };
 
 interface FacilitatorDashboardProps {

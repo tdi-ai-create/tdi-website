@@ -19,6 +19,7 @@ import { BoundaryGame } from '@/app/paragametools/components/BoundaryGame'
 import { LeanOnTdi } from '@/app/paragametools/components/LeanOnTdi'
 import { ResetRoulette } from '@/app/paragametools/components/ResetRoulette'
 import { FirstFiveDays } from '@/app/paragametools/components/FirstFiveDays'
+import { PlanYourYear } from '@/app/paragametools/components/PlanYourYear'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub'
@@ -109,6 +110,11 @@ const PRACTICE_TOOLS: Record<string, {
     component: FirstFiveDays,
     title: 'First Five Days',
     category: 'Classroom Setup',
+  },
+  'plan-your-year': {
+    component: PlanYourYear,
+    title: 'Plan Your Year',
+    category: 'Time Savers',
   },
 }
 

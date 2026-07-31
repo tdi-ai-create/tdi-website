@@ -61,6 +61,12 @@ export const GROUP_MOMENTS_BY_GAME = {
     "What is one essential task you almost skipped? Why did it not feel urgent?",
     "Share with your table: what is one thing you will do differently this year in Week 1?",
   ] as string[],
+  planyouryear: [
+    "Which month surprised you? Where did the research disagree with your instinct?",
+    "Raise your hand if you picked test prep in March. You are not alone.",
+    "What is one month where you typically run out of energy? Did this game confirm it?",
+    "Share with your table: what is one thing you will do differently to protect your energy this year?",
+  ] as string[],
   resetroulette: [
     "Which category surprised you? Did it work better than you expected?",
     "Raise your hand if you were holding tension somewhere you did not realize.",

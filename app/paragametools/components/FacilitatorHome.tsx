@@ -21,6 +21,7 @@ const GAME_ICONS: Record<string, typeof Target> = {
   leanontdi: Handshake,
   resetroulette: RotateCcw,
   firstfivedays: Calendar,
+  planyouryear: TrendingUp,
 };
 
 interface FacilitatorHomeProps {

@@ -75,6 +75,14 @@ export const TIPS_BY_GAME = {
     "Content can wait five days. Culture cannot.",
     "The first week sets the tone for the entire year. Invest it wisely.",
   ] as string[],
+  planyouryear: [
+    "September and January are your two reset months. Invest them wisely.",
+    "February and November are the highest burnout risk. Protect those months.",
+    "Good teaching all year is the best test prep. March cramming increases anxiety.",
+    "Students who feel known by Week 3 of September have better outcomes all year.",
+    "January is your second September. Use it to re-teach and reset.",
+    "The educators who last are the ones who protect their energy in the hard months.",
+  ] as string[],
   resetroulette: [
     "This is not scored. There is no right or wrong. Just pause and do it.",
     "If someone looks uncomfortable, remind them: they can close their eyes or just sit quietly.",

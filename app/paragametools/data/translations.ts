@@ -133,6 +133,14 @@ export const UI_TRANSLATIONS = {
       },
       format: { en: 'Priority Selection', es: 'Seleccion de Prioridades' },
     },
+    planyouryear: {
+      title: { en: 'Plan Your Year', es: 'Planifica Tu Ano' },
+      description: {
+        en: 'Nine months. Limited energy. Each month brings 4 demands but you can only focus on 2.',
+        es: 'Nueve meses. Energia limitada. Cada mes trae 4 demandas pero solo puedes enfocarte en 2.',
+      },
+      format: { en: '9 months', es: '9 meses' },
+    },
   },
 
   // Common Game UI
