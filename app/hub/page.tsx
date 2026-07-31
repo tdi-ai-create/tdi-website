@@ -1792,7 +1792,7 @@ export default function HubDashboard() {
                 className="inline-flex items-center gap-1.5 text-xs font-semibold mt-3 hover:underline"
                 style={{ color: '#E8B84B' }}
               >
-                {tUI('All 9 games')}
+                {tUI('All 19 games')}
                 <ArrowRight size={12} />
               </Link>
             </div>
