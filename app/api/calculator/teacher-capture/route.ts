@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     const ghlLocationId = process.env.GHL_LOCATION_ID;
 
     if (ghlApiKey && ghlLocationId) {
-      await fetch('https://services.leadconnectorhq.com/contacts/', {
+      const ghlRes = await fetch('https://services.leadconnectorhq.com/contacts/', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${ghlApiKey}`,
@@ -43,6 +43,10 @@ export async function POST(req: NextRequest) {
           source: 'calculator',
         }),
       });
+      if (!ghlRes.ok) {
+        const ghlErr = await ghlRes.text().catch(() => '');
+        console.error(`[teacher-capture] GHL sync failed (${ghlRes.status}):`, ghlErr);
+      }
     }
 
     // Write to Supabase as backup record

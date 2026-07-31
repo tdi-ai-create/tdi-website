@@ -96,11 +96,39 @@ export async function GET() {
     issues.push(`RLS sanity check failed: ${String(err)}`);
   }
 
+  // Check 5: Clean up video staging files older than 1 hour
+  let stagingCleaned = 0;
+  try {
+    const serviceSupabase = createClient(supabaseUrl, process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY || supabaseKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    const { data: stagingFiles } = await serviceSupabase.storage
+      .from('lesson-resources')
+      .list('video-staging');
+
+    if (stagingFiles && stagingFiles.length > 0) {
+      const oneHourAgo = Date.now() - 60 * 60 * 1000;
+      const oldFiles = stagingFiles.filter(f => {
+        const created = new Date(f.created_at).getTime();
+        return created < oneHourAgo;
+      });
+
+      if (oldFiles.length > 0) {
+        const paths = oldFiles.map(f => `video-staging/${f.name}`);
+        await serviceSupabase.storage.from('lesson-resources').remove(paths);
+        stagingCleaned = oldFiles.length;
+      }
+    }
+  } catch (err) {
+    console.error('[hub-content-health] Staging cleanup error:', err);
+  }
+
   // If no issues, all good
   if (issues.length === 0) {
     return NextResponse.json({
       status: 'healthy',
       message: 'All Hub content checks passed',
+      stagingCleaned,
       timestamp,
     });
   }
