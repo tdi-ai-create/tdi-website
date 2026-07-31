@@ -34,7 +34,8 @@ function HubLayoutInner({ children }: { children: React.ReactNode }) {
       !path.includes('/login') &&
       !path.includes('/onboarding') &&
       !path.includes('/admin') &&
-      !path.includes('/verify');
+      !path.includes('/verify') &&
+      !path.includes('/practice');
 
     if (!isHubPage) return;
 
