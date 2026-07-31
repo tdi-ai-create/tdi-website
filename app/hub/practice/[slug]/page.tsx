@@ -17,6 +17,7 @@ import { ConversationCompass } from '@/app/paragametools/components/Conversation
 import { PartnerUp } from '@/app/paragametools/components/PartnerUp'
 import { BoundaryGame } from '@/app/paragametools/components/BoundaryGame'
 import { LeanOnTdi } from '@/app/paragametools/components/LeanOnTdi'
+import { ResetRoulette } from '@/app/paragametools/components/ResetRoulette'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub'
@@ -97,6 +98,11 @@ const PRACTICE_TOOLS: Record<string, {
     component: LeanOnTdi,
     title: 'Lean on Your TDI Team',
     category: 'Onboarding',
+  },
+  'reset-roulette': {
+    component: ResetRoulette,
+    title: 'Reset Roulette',
+    category: 'Self-Care',
   },
 }
 

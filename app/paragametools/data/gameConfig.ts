@@ -1,6 +1,6 @@
 // Game configuration and shared utilities
 
-export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook' | 'conversationcompass' | 'partnerup' | 'boundarygame' | 'leanontdi';
+export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook' | 'conversationcompass' | 'partnerup' | 'boundarygame' | 'leanontdi' | 'resetroulette';
 
 export interface GameConfig {
   id: GameId;
@@ -102,6 +102,15 @@ export const GAMES: GameConfig[] = [
     duration: 12,
     color: 'gold',
     rounds: '8 scenarios per role',
+  },
+  {
+    id: 'resetroulette',
+    title: 'Reset Roulette',
+    description: 'Spin a category, get a guided reset activity, actually do it. Your body keeps score.',
+    time: '~8 min',
+    duration: 8,
+    color: 'rose',
+    rounds: '4 spins',
   },
 ];
 

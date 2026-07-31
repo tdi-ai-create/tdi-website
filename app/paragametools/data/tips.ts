@@ -67,4 +67,12 @@ export const TIPS_BY_GAME = {
     "The best use of your time is the thing only you can do. Everything else, lean.",
     "This game doubles as onboarding. Share the link with new staff.",
   ] as string[],
+  resetroulette: [
+    "This is not scored. There is no right or wrong. Just pause and do it.",
+    "If someone looks uncomfortable, remind them: they can close their eyes or just sit quietly.",
+    "Two minutes is enough. Research shows micro-resets are more effective than long breaks.",
+    "Model participation. If you do it, they will do it.",
+    "Works great as a staff meeting opener. Sets the tone for the whole session.",
+    "If the group lands on Laugh Break, let the energy stay high. Do not rush back to business.",
+  ] as string[],
 } as const;

@@ -117,6 +117,14 @@ export const UI_TRANSLATIONS = {
       },
       format: { en: 'Role-Based Quiz', es: 'Quiz por Rol' },
     },
+    resetroulette: {
+      title: { en: 'Reset Roulette', es: 'Ruleta de Reinicio' },
+      description: {
+        en: 'Spin a category, get a guided reset activity, actually do it. Your body keeps score.',
+        es: 'Gira una categoria, recibe una actividad guiada de reinicio, hazla de verdad. Tu cuerpo lleva la cuenta.',
+      },
+      format: { en: 'Guided Activity', es: 'Actividad Guiada' },
+    },
   },
 
   // Common Game UI

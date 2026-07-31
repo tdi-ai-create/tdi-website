@@ -23,6 +23,7 @@ export const GAME_ICONS = {
   partnerup: Users,
   boundarygame: Shield,
   leanontdi: Handshake,
+  resetroulette: RotateCcw,
 } as const;
 
 interface GameWrapperProps {

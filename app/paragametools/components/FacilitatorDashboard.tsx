@@ -41,6 +41,7 @@ const GAME_ICONS: Record<GameId, typeof Target> = {
   partnerup: UsersIcon,
   boundarygame: Shield,
   leanontdi: Handshake,
+  resetroulette: RotateCcw,
 };
 
 interface FacilitatorDashboardProps {

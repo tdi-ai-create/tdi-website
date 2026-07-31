@@ -22,6 +22,7 @@ const GAME_CARDS: {
   { id: 'partnerup', icon: '🤝', color: 'green' },
   { id: 'boundarygame', icon: '🛡️', color: 'rose' },
   { id: 'leanontdi', icon: '🤲', color: 'gold' },
+  { id: 'resetroulette', icon: '🔄', color: 'rose' },
 ];
 
 const TIMES: Record<GameId, string> = {
@@ -39,6 +40,7 @@ const TIMES: Record<GameId, string> = {
   partnerup: '~15 min',
   boundarygame: '~12 min',
   leanontdi: '~12 min',
+  resetroulette: '~8 min',
 };
 
 interface HomeScreenProps {

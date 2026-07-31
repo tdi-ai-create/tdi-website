@@ -55,4 +55,10 @@ export const GROUP_MOMENTS_BY_GAME = {
     "What is one thing you learned TDI offers that you were not using?",
     "Share with your table: which lean type are you most likely to miss? Team, platform, or community?",
   ] as string[],
+  resetroulette: [
+    "Which category surprised you? Did it work better than you expected?",
+    "Raise your hand if you were holding tension somewhere you did not realize.",
+    "What reset would you use mid-day, right after a hard class?",
+    "Share with your table: when was the last time you paused on purpose during a school day?",
+  ] as string[],
 } as const;
