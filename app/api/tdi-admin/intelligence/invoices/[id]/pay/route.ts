@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
+import { invoicePaid } from '@/lib/billing-slack'
 
 function getSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -132,6 +133,13 @@ export async function POST(
         }).catch(err => console.error('[invoice-pay] Payment confirmation email failed:', err))
       }
     }
+
+    // Slack notification to #financials
+    invoicePaid(
+      invoiceData?.invoice_number || id,
+      invoiceData?.school_name || 'Unknown school',
+      amount_received ? parseFloat(amount_received) : Number(invoiceData?.amount || 0)
+    )
 
     return NextResponse.json({
       success: true,

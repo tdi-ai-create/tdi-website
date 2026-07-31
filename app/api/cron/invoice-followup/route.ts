@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
+import { slackNotify } from '@/lib/slack-notify';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
@@ -126,6 +127,15 @@ export async function GET(request: NextRequest) {
     }
 
     const backlog = await checkBacklog(supabase);
+
+    // Slack summary if anything happened
+    if (reminders > 0 || escalations > 0 || (backlog && backlog.uninvoiced_services > 0)) {
+      const parts = []
+      if (reminders > 0) parts.push(`${reminders} reminder${reminders > 1 ? 's' : ''} sent`)
+      if (escalations > 0) parts.push(`${escalations} escalation${escalations > 1 ? 's' : ''}`)
+      if (backlog?.uninvoiced_services > 0) parts.push(`${backlog.uninvoiced_services} delivered but not yet invoiced`)
+      slackNotify('financials', `Invoice followup: ${parts.join(', ')}. ${invoices.length} unpaid invoice${invoices.length > 1 ? 's' : ''} total.`)
+    }
 
     return NextResponse.json({
       success: true,
