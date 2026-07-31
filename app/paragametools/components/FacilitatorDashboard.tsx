@@ -21,6 +21,7 @@ import {
   Users as UsersIcon,
   Shield,
   Handshake,
+  Calendar,
 } from 'lucide-react';
 import { GAMES, COLORS, type GameId } from '../data/gameConfig';
 import { TIPS_BY_GAME } from '../data/tips';
@@ -42,6 +43,7 @@ const GAME_ICONS: Record<GameId, typeof Target> = {
   boundarygame: Shield,
   leanontdi: Handshake,
   resetroulette: RotateCcw,
+  firstfivedays: Calendar,
 };
 
 interface FacilitatorDashboardProps {

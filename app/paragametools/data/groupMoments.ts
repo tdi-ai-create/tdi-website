@@ -55,6 +55,12 @@ export const GROUP_MOMENTS_BY_GAME = {
     "What is one thing you learned TDI offers that you were not using?",
     "Share with your table: which lean type are you most likely to miss? Team, platform, or community?",
   ] as string[],
+  firstfivedays: [
+    "Which task did you pick that the research says can wait? What surprised you?",
+    "Raise your hand if you picked 'decorate bulletin boards' or 'organize supplies.' You are not alone.",
+    "What is one essential task you almost skipped? Why did it not feel urgent?",
+    "Share with your table: what is one thing you will do differently this year in Week 1?",
+  ] as string[],
   resetroulette: [
     "Which category surprised you? Did it work better than you expected?",
     "Raise your hand if you were holding tension somewhere you did not realize.",

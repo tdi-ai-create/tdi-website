@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, RotateCcw, Target, Zap, TrendingUp, Smile, Wrench, Crosshair, Award, Check, X, Shuffle, ListOrdered, Battery, Briefcase, MessageCircle, Users, Shield, Handshake } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Target, Zap, TrendingUp, Smile, Wrench, Crosshair, Award, Check, X, Shuffle, ListOrdered, Battery, Briefcase, MessageCircle, Users, Shield, Handshake, Calendar } from 'lucide-react';
 import { CommunityNudge } from './CommunityNudge';
 import { COLORS, type GameId } from '../data/gameConfig';
 import { ConfettiBurst } from './ConfettiBurst';
@@ -24,6 +24,7 @@ export const GAME_ICONS = {
   boundarygame: Shield,
   leanontdi: Handshake,
   resetroulette: RotateCcw,
+  firstfivedays: Calendar,
 } as const;
 
 interface GameWrapperProps {

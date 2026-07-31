@@ -18,6 +18,7 @@ import { PartnerUp } from '@/app/paragametools/components/PartnerUp'
 import { BoundaryGame } from '@/app/paragametools/components/BoundaryGame'
 import { LeanOnTdi } from '@/app/paragametools/components/LeanOnTdi'
 import { ResetRoulette } from '@/app/paragametools/components/ResetRoulette'
+import { FirstFiveDays } from '@/app/paragametools/components/FirstFiveDays'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub'
@@ -103,6 +104,11 @@ const PRACTICE_TOOLS: Record<string, {
     component: ResetRoulette,
     title: 'Reset Roulette',
     category: 'Self-Care',
+  },
+  'first-five-days': {
+    component: FirstFiveDays,
+    title: 'First Five Days',
+    category: 'Classroom Setup',
   },
 }
 

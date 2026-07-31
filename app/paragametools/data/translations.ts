@@ -125,6 +125,14 @@ export const UI_TRANSLATIONS = {
       },
       format: { en: 'Guided Activity', es: 'Actividad Guiada' },
     },
+    firstfivedays: {
+      title: { en: 'First Five Days', es: 'Primeros Cinco Dias' },
+      description: {
+        en: 'You cannot do everything. Do the right things. 12 priorities, pick 8.',
+        es: 'No puedes hacerlo todo. Haz lo correcto. 12 prioridades, elige 8.',
+      },
+      format: { en: 'Priority Selection', es: 'Seleccion de Prioridades' },
+    },
   },
 
   // Common Game UI

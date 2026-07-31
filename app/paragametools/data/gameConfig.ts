@@ -1,6 +1,6 @@
 // Game configuration and shared utilities
 
-export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook' | 'conversationcompass' | 'partnerup' | 'boundarygame' | 'leanontdi' | 'resetroulette';
+export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook' | 'conversationcompass' | 'partnerup' | 'boundarygame' | 'leanontdi' | 'resetroulette' | 'firstfivedays';
 
 export interface GameConfig {
   id: GameId;
@@ -8,7 +8,7 @@ export interface GameConfig {
   description: string;
   time: string;
   duration: number; // default minutes for facilitator timer
-  color: 'orange' | 'yellow' | 'green' | 'purple' | 'red' | 'gold' | 'teal' | 'rose';
+  color: 'orange' | 'yellow' | 'green' | 'purple' | 'red' | 'gold' | 'teal' | 'rose' | 'amber';
   rounds: string;
 }
 
@@ -112,6 +112,15 @@ export const GAMES: GameConfig[] = [
     color: 'rose',
     rounds: '4 spins',
   },
+  {
+    id: 'firstfivedays',
+    title: 'First Five Days',
+    description: 'You cannot do everything. Do the right things. 12 priorities, pick 8.',
+    time: '~10 min',
+    duration: 10,
+    color: 'amber',
+    rounds: '12 priorities, pick 8',
+  },
 ];
 
 // Color system
@@ -169,6 +178,12 @@ export const COLORS = {
     bg: 'rgba(244, 63, 94, 0.1)',
     bgHover: 'rgba(244, 63, 94, 0.15)',
     border: 'rgba(244, 63, 94, 0.4)',
+  },
+  amber: {
+    accent: '#F59E0B',
+    bg: 'rgba(245, 158, 11, 0.1)',
+    bgHover: 'rgba(245, 158, 11, 0.15)',
+    border: 'rgba(245, 158, 11, 0.4)',
   },
 } as const;
 

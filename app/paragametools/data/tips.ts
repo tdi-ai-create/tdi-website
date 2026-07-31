@@ -67,6 +67,14 @@ export const TIPS_BY_GAME = {
     "The best use of your time is the thing only you can do. Everything else, lean.",
     "This game doubles as onboarding. Share the link with new staff.",
   ] as string[],
+  firstfivedays: [
+    "Relationships and routines beat content and decoration. Every time.",
+    "A student who hears their name in the first three days feels seen.",
+    "Any seating chart you make before Day 1 is based on assumptions, not data.",
+    "Paras who start without a planning meeting report feeling invisible.",
+    "Content can wait five days. Culture cannot.",
+    "The first week sets the tone for the entire year. Invest it wisely.",
+  ] as string[],
   resetroulette: [
     "This is not scored. There is no right or wrong. Just pause and do it.",
     "If someone looks uncomfortable, remind them: they can close their eyes or just sit quietly.",
