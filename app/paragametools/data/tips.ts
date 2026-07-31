@@ -59,4 +59,12 @@ export const TIPS_BY_GAME = {
   conversationcompass: [] as string[],
   partnerup: [] as string[],
   boundarygame: [] as string[],
+  leanontdi: [
+    "If you are spending hours solving something TDI already handles, that is a sign to lean.",
+    "There is no wrong answer here. Only the question: do you have to do this alone?",
+    "Three types of lean: human support, platform features, and community connection.",
+    "Knowing what services exist is half the battle. This game teaches the other half.",
+    "The best use of your time is the thing only you can do. Everything else, lean.",
+    "This game doubles as onboarding. Share the link with new staff.",
+  ] as string[],
 } as const;

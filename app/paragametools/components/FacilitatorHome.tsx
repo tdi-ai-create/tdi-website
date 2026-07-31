@@ -1,6 +1,6 @@
 'use client';
 
-import { Target, Zap, TrendingUp, Smile, Wrench, Crosshair, ArrowLeft, Monitor, Coffee, Briefcase, MessageCircle, Users, Shield } from 'lucide-react';
+import { Target, Zap, TrendingUp, Smile, Wrench, Crosshair, ArrowLeft, Monitor, Coffee, Briefcase, MessageCircle, Users, Shield, Handshake } from 'lucide-react';
 import { GAMES, COLORS, type GameId } from '../data/gameConfig';
 
 // Icon map for home screen
@@ -18,6 +18,7 @@ const GAME_ICONS: Record<string, typeof Target> = {
   conversationcompass: MessageCircle,
   partnerup: Users,
   boundarygame: Shield,
+  leanontdi: Handshake,
 };
 
 interface FacilitatorHomeProps {

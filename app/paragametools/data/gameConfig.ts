@@ -1,6 +1,6 @@
 // Game configuration and shared utilities
 
-export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook' | 'conversationcompass' | 'partnerup' | 'boundarygame';
+export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook' | 'conversationcompass' | 'partnerup' | 'boundarygame' | 'leanontdi';
 
 export interface GameConfig {
   id: GameId;
@@ -93,6 +93,15 @@ export const GAMES: GameConfig[] = [
     duration: 12,
     color: 'rose',
     rounds: '10 scenarios',
+  },
+  {
+    id: 'leanontdi',
+    title: 'Lean on Your TDI Team',
+    description: 'You hit a wall. You could solve it yourself, or lean on the team you already have.',
+    time: '~12 min',
+    duration: 12,
+    color: 'gold',
+    rounds: '8 scenarios per role',
   },
 ];
 

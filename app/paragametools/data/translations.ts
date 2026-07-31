@@ -109,6 +109,14 @@ export const UI_TRANSLATIONS = {
       },
       format: { en: 'Solo Quiz', es: 'Quiz Individual' },
     },
+    leanontdi: {
+      title: { en: 'Lean on Your TDI Team', es: 'Apóyate en Tu Equipo TDI' },
+      description: {
+        en: 'You hit a wall. You could solve it yourself, or lean on the team you already have.',
+        es: 'Te topaste con un muro. Podrías resolverlo solo, o apoyarte en el equipo que ya tienes.',
+      },
+      format: { en: 'Role-Based Quiz', es: 'Quiz por Rol' },
+    },
   },
 
   // Common Game UI

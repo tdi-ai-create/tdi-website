@@ -49,4 +49,10 @@ export const GROUP_MOMENTS_BY_GAME = {
   conversationcompass: [] as string[],
   partnerup: [] as string[],
   boundarygame: [] as string[],
+  leanontdi: [
+    "Which scenario surprised you? Where you did not realize TDI already had a solution?",
+    "Raise your hand if you picked 'do it yourself' more than half the time.",
+    "What is one thing you learned TDI offers that you were not using?",
+    "Share with your table: which lean type are you most likely to miss? Team, platform, or community?",
+  ] as string[],
 } as const;

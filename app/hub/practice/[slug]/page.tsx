@@ -16,6 +16,7 @@ import { PrincipalPlaybook } from '@/app/paragametools/components/PrincipalPlayb
 import { ConversationCompass } from '@/app/paragametools/components/ConversationCompass'
 import { PartnerUp } from '@/app/paragametools/components/PartnerUp'
 import { BoundaryGame } from '@/app/paragametools/components/BoundaryGame'
+import { LeanOnTdi } from '@/app/paragametools/components/LeanOnTdi'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub'
@@ -91,6 +92,11 @@ const PRACTICE_TOOLS: Record<string, {
     component: BoundaryGame,
     title: 'The Boundary Game',
     category: 'Self-Care',
+  },
+  'lean-on-tdi': {
+    component: LeanOnTdi,
+    title: 'Lean on Your TDI Team',
+    category: 'Onboarding',
   },
 }
 
