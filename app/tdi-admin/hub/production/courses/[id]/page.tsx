@@ -2534,7 +2534,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                         requested++;
                       }
                       setBulkTranscriptStatus(`Step 1/2: Requested ${requested + skipped}/${total}${skipped > 0 ? ` (${skipped} skipped -- no audio)` : ''}`);
-                    } catch {
+                    } catch (err) {
+                      console.error(`[bulk-transcribe] Request failed for ${videoId}:`, err);
                       skipped++;
                     }
                   }
@@ -2587,13 +2588,15 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
 
                     if (Object.keys(updates).length > 0) {
                       try {
-                        await fetch('/api/tdi-admin/lessons', {
+                        const saveRes = await fetch('/api/tdi-admin/lessons', {
                           method: 'PATCH',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ id: lesson.id, ...updates }),
                         });
+                        if (!saveRes.ok) throw new Error(`Save failed (${saveRes.status})`);
                         saved++;
-                      } catch {
+                      } catch (err) {
+                        console.error(`[bulk-transcribe] Save failed for lesson ${lesson.id}:`, err);
                         failed++;
                       }
                     } else {
