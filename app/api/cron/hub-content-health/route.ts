@@ -109,7 +109,7 @@ export async function GET() {
     if (stagingFiles && stagingFiles.length > 0) {
       const oneHourAgo = Date.now() - 60 * 60 * 1000;
       const oldFiles = stagingFiles.filter(f => {
-        const created = new Date(f.created_at).getTime();
+        const created = new Date(String(f.created_at)).getTime();
         return created < oneHourAgo;
       });
 

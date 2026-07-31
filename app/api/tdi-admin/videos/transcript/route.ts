@@ -66,18 +66,15 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Download the actual VTT content
+    // Download the actual VTT content (note: /vtt suffix required for text)
     const vttRes = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/stream/${uid}/captions/${lang}`,
+      `https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/stream/${uid}/captions/${lang}/vtt`,
       {
         headers: { 'Authorization': `Bearer ${cfToken}` },
       }
     )
 
     if (!vttRes.ok) {
-      if (track.text) {
-        return NextResponse.json({ transcript: track.text, status: 'ready' })
-      }
       return NextResponse.json({
         transcript: null,
         status: 'not_ready',
@@ -85,32 +82,16 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    const vttData = await vttRes.json()
-    let transcript = ''
-    const result = vttData.result
-
-    if (typeof result === 'string') {
-      transcript = result
-        .replace(/WEBVTT\n\n/g, '')
-        .replace(/\d+\n/g, '')
-        .replace(/\d{2}:\d{2}:\d{2}\.\d{3} --> \d{2}:\d{2}:\d{2}\.\d{3}\n?/g, '')
-        .replace(/\n\n+/g, ' ')
-        .replace(/\n/g, ' ')
-        .trim()
-    } else if (Array.isArray(result)) {
-      transcript = result.map((c: any) => c.text || '').join(' ').trim()
-    } else if (result && typeof result === 'object') {
-      if (result.text) transcript = result.text
-      else if (result.vtt) {
-        transcript = result.vtt
-          .replace(/WEBVTT\n\n/g, '')
-          .replace(/\d+\n/g, '')
-          .replace(/\d{2}:\d{2}:\d{2}\.\d{3} --> \d{2}:\d{2}:\d{2}\.\d{3}\n?/g, '')
-          .replace(/\n\n+/g, ' ')
-          .replace(/\n/g, ' ')
-          .trim()
-      }
-    }
+    // The /vtt endpoint returns raw VTT text, not JSON
+    const vttText = await vttRes.text()
+    let transcript = vttText
+      .replace(/WEBVTT\n\n?/g, '')
+      .replace(/^\d+\n/gm, '')
+      .replace(/\d{2}:\d{2}:\d{2}\.\d{3} --> \d{2}:\d{2}:\d{2}\.\d{3}\n?/g, '')
+      .replace(/\n\n+/g, ' ')
+      .replace(/\n/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
 
     return NextResponse.json({
       transcript: transcript || null,
