@@ -286,7 +286,7 @@ export async function GET(request: NextRequest) {
     for (let i = 0; i < profiles.length; i += batchSize) {
       const batch = profiles.slice(i, i + batchSize);
 
-      const emailPromises = batch.map(async (profile) => {
+      const emailPromises = batch.map(async (profile: { id: string; email: string | null; display_name: string | null }) => {
         if (!profile.email) return;
         const firstName = (profile.display_name || profile.email.split('@')[0] || '').split(' ')[0] || 'there';
 
