@@ -14,11 +14,12 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    // active_tier_overrides lives in the Learning Hub Supabase, not the main one
+    const supabaseUrl = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL;
+    const serviceRoleKey = process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY;
 
     if (!supabaseUrl || !serviceRoleKey) {
-      return NextResponse.json({ error: 'Missing credentials' }, { status: 500 });
+      return NextResponse.json({ error: 'Missing Hub credentials' }, { status: 500 });
     }
 
     const supabase = createClient(supabaseUrl, serviceRoleKey, {
