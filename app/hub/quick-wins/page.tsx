@@ -23,6 +23,7 @@ import QuizNudge from '@/components/hub/QuizNudge';
 import HubFilterBar from '@/components/hub/HubFilterBar';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
 import ToolRequestBoard from '@/components/hub/ToolRequestBoard';
+import { getPracticeToolsForBrowse, PRACTICE_GAME_SLUGS } from '@/lib/hub/practice-games';
 
 // Filter categories for Quick Wins
 const FILTER_CATEGORIES = [
@@ -42,224 +43,9 @@ const FILTER_CATEGORIES = [
   'Vocational',
 ];
 
-// Interactive practice tools (migrated from paragametools)
-const PRACTICE_TOOLS: QuickWin[] = [
-  {
-    id: 'practice-question-knockout',
-    slug: 'question-knockout',
-    title: 'Question Knockout',
-    description: 'Real scenarios. Questions only. Can you resist telling? Practice responding with ONLY questions.',
-    category: 'Games',
-    estimated_minutes: 15,
-    content_type: 'activity',
-    thumbnail_url: 'https://asdwpkcsbcnpknklchdq.supabase.co/storage/v1/object/public/cover-images/practice-tools/question-knockout/thumbnail.svg',
-    access_tier: 'professional',
-    capacity: 'medium',
-  },
-  {
-    id: 'practice-tell-or-ask',
-    slug: 'tell-or-ask',
-    title: 'Tell or Ask?',
-    description: 'Is it really a question... or a command in disguise? Test your ear for the difference.',
-    category: 'Games',
-    estimated_minutes: 10,
-    content_type: 'activity',
-    thumbnail_url: 'https://asdwpkcsbcnpknklchdq.supabase.co/storage/v1/object/public/cover-images/practice-tools/tell-or-ask/thumbnail.svg',
-    access_tier: 'free',
-    capacity: 'low',
-  },
-  {
-    id: 'practice-feedback-level-up',
-    slug: 'feedback-level-up',
-    title: 'Feedback Level Up',
-    description: 'Rate feedback on a 1-4 scale. Can you spot the Level 2 trap?',
-    category: 'Games',
-    estimated_minutes: 12,
-    content_type: 'activity',
-    thumbnail_url: 'https://asdwpkcsbcnpknklchdq.supabase.co/storage/v1/object/public/cover-images/practice-tools/feedback-level-up/thumbnail.svg',
-    access_tier: 'essentials',
-    capacity: 'low',
-  },
-  {
-    id: 'practice-feedback-madlibs',
-    slug: 'feedback-madlibs',
-    title: 'Feedback Madlibs',
-    description: 'Learn the Notice, Name, Next Step formula through silly and real practice rounds.',
-    category: 'Games',
-    estimated_minutes: 10,
-    content_type: 'activity',
-    thumbnail_url: 'https://asdwpkcsbcnpknklchdq.supabase.co/storage/v1/object/public/cover-images/practice-tools/feedback-madlibs/thumbnail.svg',
-    access_tier: 'all_access',
-    capacity: 'low',
-  },
-  {
-    id: 'practice-feedback-makeover',
-    slug: 'feedback-makeover',
-    title: 'Feedback Makeover',
-    description: 'Terrible feedback + real context. Race the clock to transform it.',
-    category: 'Games',
-    estimated_minutes: 15,
-    content_type: 'activity',
-    thumbnail_url: 'https://asdwpkcsbcnpknklchdq.supabase.co/storage/v1/object/public/cover-images/practice-tools/feedback-makeover/thumbnail.svg',
-    access_tier: 'professional',
-    capacity: 'medium',
-  },
-  {
-    id: 'practice-whats-your-move',
-    slug: 'whats-your-move',
-    title: "What's Your Move?",
-    description: 'Real classroom scenarios with 3 choices. Pick the best response and see why.',
-    category: 'Games',
-    estimated_minutes: 10,
-    content_type: 'activity',
-    thumbnail_url: 'https://asdwpkcsbcnpknklchdq.supabase.co/storage/v1/object/public/cover-images/practice-tools/whats-your-move/thumbnail.svg',
-    access_tier: 'free',
-    capacity: 'low',
-  },
-  {
-    id: 'practice-classroom-shuffle',
-    slug: 'classroom-shuffle',
-    title: 'Classroom Scenario Shuffle',
-    description: '8 real classroom situations. Pick the best response. Learn why it works.',
-    category: 'Games',
-    estimated_minutes: 10,
-    content_type: 'activity',
-    access_tier: 'essentials',
-    capacity: 'low',
-  },
-  {
-    id: 'practice-prioritize-this',
-    slug: 'prioritize-this',
-    title: 'Prioritize This',
-    description: 'Rank 4 tasks by priority. See how experienced educators would handle it.',
-    category: 'Games',
-    estimated_minutes: 10,
-    content_type: 'activity',
-    access_tier: 'all_access',
-    capacity: 'medium',
-  },
-  {
-    id: 'practice-energy-budget',
-    slug: 'energy-budget',
-    title: 'Energy Budget',
-    description: 'You have 100 energy points. How do you spend your day? Compare with experienced educators.',
-    category: 'Games',
-    estimated_minutes: 10,
-    content_type: 'activity',
-    access_tier: 'essentials',
-    capacity: 'low',
-  },
-  {
-    id: 'practice-this-or-that',
-    slug: 'this-or-that',
-    title: 'This or That',
-    description: 'Two approaches. No right answer. Pick yours, then see how other educators respond.',
-    category: 'Games',
-    estimated_minutes: 12,
-    content_type: 'activity',
-    access_tier: 'all_access',
-    capacity: 'low',
-  },
-  {
-    id: 'practice-sort-it-out',
-    slug: 'sort-it-out',
-    title: 'Sort It Out',
-    description: 'Drag items into the right category. Feedback vs praise, proactive vs reactive, and more.',
-    category: 'Games',
-    estimated_minutes: 15,
-    content_type: 'activity',
-    access_tier: 'all_access',
-    capacity: 'low',
-  },
-  {
-    id: 'practice-principal-playbook',
-    slug: 'principal-playbook',
-    title: 'Principal Playbook',
-    description: 'Step into the principal role. Handle real leadership decisions and see how your choices compare.',
-    category: 'Games',
-    estimated_minutes: 12,
-    content_type: 'activity',
-    access_tier: 'professional',
-    capacity: 'medium',
-  },
-  {
-    id: 'practice-conversation-compass',
-    slug: 'conversation-compass',
-    title: 'Conversation Compass',
-    description: 'Navigate tough conversations with colleagues, parents, and administrators. Pick your path.',
-    category: 'Games',
-    estimated_minutes: 10,
-    content_type: 'activity',
-    access_tier: 'professional',
-    capacity: 'medium',
-  },
-  {
-    id: 'practice-partner-up',
-    slug: 'partner-up',
-    title: 'Partner Up',
-    description: 'Match instructional strategies to classroom scenarios. Build your co-teaching toolkit.',
-    category: 'Games',
-    estimated_minutes: 10,
-    content_type: 'activity',
-    access_tier: 'professional',
-    capacity: 'low',
-  },
-  {
-    id: 'practice-boundary-game',
-    slug: 'boundary-game',
-    title: 'The Boundary Game',
-    description: 'Practice setting healthy boundaries at work. Real scenarios, real choices, real growth.',
-    category: 'Games',
-    estimated_minutes: 10,
-    content_type: 'activity',
-    access_tier: 'professional',
-    capacity: 'low',
-  },
-  {
-    id: 'practice-lean-on-tdi',
-    slug: 'lean-on-tdi',
-    title: 'When to Lean on Your TDI Team',
-    description: 'Know when and how to tap into your TDI support team. Scenarios from real partnerships.',
-    category: 'Games',
-    estimated_minutes: 8,
-    content_type: 'activity',
-    access_tier: 'free',
-    capacity: 'low',
-  },
-  {
-    id: 'practice-reset-roulette',
-    slug: 'reset-roulette',
-    title: 'Reset Roulette',
-    description: 'Spin the wheel for a quick stress reset activity. Different every time.',
-    category: 'Games',
-    estimated_minutes: 5,
-    content_type: 'activity',
-    access_tier: 'free',
-    capacity: 'low',
-  },
-  {
-    id: 'practice-first-five-days',
-    slug: 'first-five-days',
-    title: 'First Five Days',
-    description: 'Plan your first week back to school. Prioritize what matters most, day by day.',
-    category: 'Games',
-    estimated_minutes: 15,
-    content_type: 'activity',
-    access_tier: 'professional',
-    capacity: 'medium',
-  },
-  {
-    id: 'practice-plan-your-year',
-    slug: 'plan-your-year',
-    title: 'Plan Your Year',
-    description: 'Map out your professional growth goals month by month. Build a plan that sticks.',
-    category: 'Games',
-    estimated_minutes: 15,
-    content_type: 'activity',
-    access_tier: 'professional',
-    capacity: 'medium',
-  },
-];
+// Practice tools derived from the single source of truth in lib/hub/practice-games.ts
+// To add a new game, update PRACTICE_GAME_REGISTRY there. This list auto-generates.
+const PRACTICE_TOOLS: QuickWin[] = getPracticeToolsForBrowse();
 
 
 interface QuickWin {
@@ -390,9 +176,8 @@ export default function QuickWinsPage() {
   }, [language, quickWins.length, isLoading, loadQuickWins]);
 
   // Merge practice tools with database quick wins
-  // Deduplicate: PRACTICE_TOOLS take priority over DB entries with same slug
-  const practiceSlugs = new Set(PRACTICE_TOOLS.map((pt) => pt.slug));
-  const deduplicatedQuickWins = quickWins.filter((qw) => !practiceSlugs.has(qw.slug));
+  // Deduplicate: practice games take priority over DB entries with same slug
+  const deduplicatedQuickWins = quickWins.filter((qw) => !PRACTICE_GAME_SLUGS.has(qw.slug));
   const allQuickWins = [...deduplicatedQuickWins, ...PRACTICE_TOOLS];
   const totalCount = allQuickWins.length;
 
