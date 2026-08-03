@@ -122,16 +122,36 @@ export async function GET(request: NextRequest) {
       .select('id', { count: 'exact', head: true })
       .gte('created_at', thirtyDaysAgo);
 
-    // ── Get active members (logged in within 60 days) ──
+    // ── Get active members (signed in within 60 days) ──
+    // Login data lives in auth.users, not hub_profiles
+    const { data: activeProfiles } = await hubSupabase.rpc('get_active_hub_members', {
+      since_date: sixtyDaysAgo,
+      max_results: 2000,
+    }).then(res => res, () => ({ data: null }));
 
-    const { data: activeProfiles } = await hubSupabase
-      .from('hub_profiles')
-      .select('id, email, display_name')
-      .gte('last_login', sixtyDaysAgo)
-      .not('email', 'is', null)
-      .limit(2000);
+    // Fallback: if RPC doesn't exist, query hub_activity_log for recent logins
+    let profiles = activeProfiles;
+    if (!profiles || profiles.length === 0) {
+      const { data: recentLogins } = await hubSupabase
+        .from('hub_activity_log')
+        .select('user_id')
+        .eq('action', 'hub_login')
+        .gte('created_at', sixtyDaysAgo)
+        .limit(2000);
 
-    if (!activeProfiles || activeProfiles.length === 0) {
+      const uniqueIds = [...new Set((recentLogins || []).map(l => l.user_id).filter(Boolean))];
+
+      if (uniqueIds.length > 0) {
+        const { data: loginProfiles } = await hubSupabase
+          .from('hub_profiles')
+          .select('id, email, display_name')
+          .in('id', uniqueIds)
+          .not('email', 'is', null);
+        profiles = loginProfiles;
+      }
+    }
+
+    if (!profiles || profiles.length === 0) {
       return NextResponse.json({ success: true, sent: 0, message: 'No active members to email' });
     }
 
@@ -263,8 +283,8 @@ export async function GET(request: NextRequest) {
     let sent = 0;
     const batchSize = 50;
 
-    for (let i = 0; i < activeProfiles.length; i += batchSize) {
-      const batch = activeProfiles.slice(i, i + batchSize);
+    for (let i = 0; i < profiles.length; i += batchSize) {
+      const batch = profiles.slice(i, i + batchSize);
 
       const emailPromises = batch.map(async (profile) => {
         if (!profile.email) return;
@@ -296,10 +316,10 @@ export async function GET(request: NextRequest) {
     await hubSupabase.from('hub_activity_log').insert({
       user_id: '00000000-0000-0000-0000-000000000000',
       action: `community_digest_${monthKey}`,
-      metadata: { sent, total_profiles: activeProfiles.length, month: monthKey },
+      metadata: { sent, total_profiles: profiles.length, month: monthKey },
     });
 
-    return NextResponse.json({ success: true, sent, total: activeProfiles.length, month: monthKey });
+    return NextResponse.json({ success: true, sent, total: profiles.length, month: monthKey });
   } catch (error) {
     console.error('[community-monthly-digest] Error:', error);
     return NextResponse.json({ error: String(error) }, { status: 500 });
