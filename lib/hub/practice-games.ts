@@ -1,0 +1,603 @@
+/**
+ * SINGLE SOURCE OF TRUTH for all practice games.
+ *
+ * To add a new game:
+ *   1. Build the React component in app/paragametools/components/
+ *   2. Add an entry to PRACTICE_GAME_REGISTRY below
+ *   3. Add the component import + mapping in app/hub/quick-wins/[slug]/page.tsx
+ *      inside PRACTICE_GAME_COMPONENTS
+ *
+ * That's it. The browse page auto-generates from this registry.
+ * The detail page merges this registry with the component map.
+ * No other files need updating.
+ */
+
+import type { MembershipTier } from '@/lib/hub/use-membership';
+
+type Bilingual = { en: string; es: string };
+
+export interface PracticeGameEntry {
+  /** Must match the URL slug and the component map key */
+  slug: string;
+  id: string;
+  contentUuid: string;
+  title: Bilingual;
+  description: Bilingual;
+  howToPlay: Bilingual[];
+  whatYouNeed: Bilingual[];
+  bestFor: Bilingual;
+  time: string;
+  rounds: Bilingual;
+  color: string;
+  format: 'solo' | 'group' | 'both';
+  requiredTier: MembershipTier;
+  /** Browse page fields */
+  category: string;
+  estimated_minutes: number;
+  capacity: 'low' | 'medium' | 'high';
+  access_tier: string;
+  thumbnail_url?: string;
+}
+
+/**
+ * Every practice game in the system. Add new games here.
+ */
+export const PRACTICE_GAME_REGISTRY: PracticeGameEntry[] = [
+  {
+    slug: 'question-knockout',
+    id: 'practice-question-knockout',
+    contentUuid: 'a1000001-0000-0000-0000-000000000001',
+    title: { en: 'Question Knockout', es: 'Nocaut de Preguntas' },
+    description: { en: 'You see a real classroom scenario. Your only tool? Questions. No telling, no directing, no hinting. Just questions. If you slip and tell, hit the buzzer. It is harder than you think.', es: 'Ves un escenario real del salon. Tu unica herramienta? Preguntas. Sin decir, sin dirigir, sin insinuar. Solo preguntas. Si se te escapa una orden, presiona el timbre. Es mas dificil de lo que crees.' },
+    howToPlay: [
+      { en: 'Read each classroom scenario', es: 'Lee cada escenario del salon' },
+      { en: 'Respond using ONLY questions', es: 'Responde usando SOLO preguntas' },
+      { en: 'You have 90 seconds per scenario', es: 'Tienes 90 segundos por escenario' },
+      { en: 'If you catch yourself telling, hit the buzzer', es: 'Si te descubres dando ordenes, presiona el timbre' },
+      { en: 'At round 5, switch roles with your partner', es: 'En la ronda 5, cambia de rol con tu companero' },
+    ],
+    whatYouNeed: [
+      { en: 'A partner (or play solo to practice internally)', es: 'Un companero (o juega solo para practicar internamente)' },
+      { en: 'A quiet space to think out loud', es: 'Un espacio tranquilo para pensar en voz alta' },
+    ],
+    bestFor: { en: 'Paraprofessionals, teachers, coaches -- anyone who works directly with students', es: 'Paraprofesionales, maestros, coaches -- cualquiera que trabaje directamente con estudiantes' },
+    time: '~15 min',
+    rounds: { en: '10 rounds', es: '10 rondas' },
+    color: '#FF7847',
+    format: 'both',
+    requiredTier: 'professional',
+    category: 'Games',
+    estimated_minutes: 15,
+    capacity: 'medium',
+    access_tier: 'professional',
+    thumbnail_url: 'https://asdwpkcsbcnpknklchdq.supabase.co/storage/v1/object/public/cover-images/practice-tools/question-knockout/thumbnail.svg',
+  },
+  {
+    slug: 'tell-or-ask',
+    id: 'practice-tell-or-ask',
+    contentUuid: 'a1000002-0000-0000-0000-000000000002',
+    title: { en: 'Tell or Ask?', es: 'Decir o Preguntar?' },
+    description: { en: 'You will see statements educators say every day. Some are real questions that open thinking. Others are commands disguised with a question mark. Can you spot the difference? It is trickier than it sounds.', es: 'Veras frases que los educadores dicen todos los dias. Algunas son preguntas reales que abren el pensamiento. Otras son ordenes disfrazadas con un signo de interrogacion. Puedes notar la diferencia? Es mas complicado de lo que parece.' },
+    howToPlay: [
+      { en: 'Read each statement an educator might say', es: 'Lee cada frase que un educador podria decir' },
+      { en: 'Rate your confidence (1-5) before answering', es: 'Califica tu confianza (1-5) antes de responder' },
+      { en: 'Decide: is this a TELL (command) or an ASK (real question)?', es: 'Decide: es DECIR (orden) o PREGUNTAR (pregunta real)?' },
+      { en: 'See the reveal and learn why', es: 'Ve la respuesta y aprende por que' },
+      { en: 'Build a streak of correct answers', es: 'Construye una racha de respuestas correctas' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself -- this is a solo game', es: 'Solo tu -- este es un juego individual' },
+      { en: 'Optional: play with a partner and debate before revealing', es: 'Opcional: juega con un companero y debatan antes de revelar' },
+    ],
+    bestFor: { en: 'All educators -- especially powerful for paraprofessionals learning questioning techniques', es: 'Todos los educadores -- especialmente poderoso para paraprofesionales aprendiendo tecnicas de cuestionamiento' },
+    time: '~10 min',
+    rounds: { en: '14 rounds', es: '14 rondas' },
+    color: '#F1C40F',
+    format: 'both',
+    requiredTier: 'free',
+    category: 'Games',
+    estimated_minutes: 10,
+    capacity: 'low',
+    access_tier: 'free',
+    thumbnail_url: 'https://asdwpkcsbcnpknklchdq.supabase.co/storage/v1/object/public/cover-images/practice-tools/tell-or-ask/thumbnail.svg',
+  },
+  {
+    slug: 'feedback-level-up',
+    id: 'practice-feedback-level-up',
+    contentUuid: 'a1000003-0000-0000-0000-000000000003',
+    title: { en: 'Feedback Level Up', es: 'Sube de Nivel tu Retroalimentacion' },
+    description: { en: 'Not all feedback is created equal. You will see real examples of feedback given to students and categorize them from Level 1 (vague) to Level 4 (exceptional). Watch out for the Level 2 trap -- it catches most people.', es: 'No toda la retroalimentacion es igual. Veras ejemplos reales de retroalimentacion dada a estudiantes y los categorizaras del Nivel 1 (vago) al Nivel 4 (excepcional). Cuidado con la trampa del Nivel 2 -- atrapa a la mayoria.' },
+    howToPlay: [
+      { en: 'Read each piece of student feedback', es: 'Lee cada ejemplo de retroalimentacion' },
+      { en: 'Categorize it: Level 1 (Vague), 2 (Partial), 3 (Complete), or 4 (Exceptional)', es: 'Clasificalo: Nivel 1 (Vago), 2 (Parcial), 3 (Completo) o 4 (Excepcional)' },
+      { en: 'See the correct level and learn why', es: 'Ve el nivel correcto y aprende por que' },
+      { en: 'Watch for the "Level 2 trap" -- vague praise that feels specific', es: 'Cuidado con la "trampa del Nivel 2" -- elogios vagos que parecen especificos' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Optional: play at a table group and debate levels before revealing', es: 'Opcional: juega en grupo y debatan los niveles antes de revelar' },
+    ],
+    bestFor: { en: 'Teachers and paras who give feedback to students daily', es: 'Maestros y paraprofesionales que dan retroalimentacion a estudiantes diariamente' },
+    time: '~12 min',
+    rounds: { en: '12 rounds', es: '12 rondas' },
+    color: '#27AE60',
+    format: 'both',
+    requiredTier: 'essentials',
+    category: 'Games',
+    estimated_minutes: 12,
+    capacity: 'low',
+    access_tier: 'essentials',
+    thumbnail_url: 'https://asdwpkcsbcnpknklchdq.supabase.co/storage/v1/object/public/cover-images/practice-tools/feedback-level-up/thumbnail.svg',
+  },
+  {
+    slug: 'feedback-madlibs',
+    id: 'practice-feedback-madlibs',
+    contentUuid: 'a1000004-0000-0000-0000-000000000004',
+    title: { en: 'Feedback Madlibs', es: 'Retroalimentacion Loca' },
+    description: { en: 'Learn the Notice + Name + Next Step feedback formula through play. First, you fill in blanks blindly for laughs. Then you practice the real formula with actual student scenarios. Silly first, serious second.', es: 'Aprende la formula de retroalimentacion Observar + Nombrar + Siguiente Paso a traves del juego. Primero, llenas espacios en blanco a ciegas para reir. Luego practicas la formula real con escenarios de estudiantes.' },
+    howToPlay: [
+      { en: 'Silly rounds: fill in blanks WITHOUT seeing the sentence', es: 'Rondas divertidas: llena los espacios SIN ver la oracion' },
+      { en: 'Reveal your silly version and laugh', es: 'Revela tu version divertida y rie' },
+      { en: 'Then see the real Level 3 feedback version', es: 'Luego ve la version real de retroalimentacion Nivel 3' },
+      { en: 'Real rounds: practice writing Notice + Name + Next Step feedback', es: 'Rondas reales: practica escribir retroalimentacion Observar + Nombrar + Siguiente Paso' },
+      { en: 'Compare your version to the expert example', es: 'Compara tu version con el ejemplo experto' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Best played in a group for the silly rounds -- more laughs', es: 'Mejor en grupo para las rondas divertidas -- mas risas' },
+    ],
+    bestFor: { en: 'Educators learning the feedback formula for the first time, or anyone who wants a refresher', es: 'Educadores aprendiendo la formula de retroalimentacion por primera vez, o cualquiera que quiera repasarla' },
+    time: '~10 min',
+    rounds: { en: '6 rounds (3 silly + 3 real)', es: '6 rondas (3 divertidas + 3 reales)' },
+    color: '#9333EA',
+    format: 'both',
+    requiredTier: 'all_access',
+    category: 'Games',
+    estimated_minutes: 10,
+    capacity: 'low',
+    access_tier: 'all_access',
+  },
+  {
+    slug: 'feedback-makeover',
+    id: 'practice-feedback-makeover',
+    contentUuid: 'a1000005-0000-0000-0000-000000000005',
+    title: { en: 'Feedback Makeover', es: 'Transformacion de Retroalimentacion' },
+    description: { en: 'You get terrible feedback and the real context behind it. Your job: transform it into Level 3 feedback using Notice + Name + Next Step. You are on the clock -- 120 seconds per makeover.', es: 'Recibes retroalimentacion terrible y el contexto real detras de ella. Tu trabajo: transformarla en retroalimentacion Nivel 3 usando Observar + Nombrar + Siguiente Paso. Tienes 120 segundos por transformacion.' },
+    howToPlay: [
+      { en: 'Read the bad feedback an educator gave', es: 'Lee la mala retroalimentacion que dio un educador' },
+      { en: 'Read the context of what the student actually did', es: 'Lee el contexto de lo que el estudiante realmente hizo' },
+      { en: 'Start the timer -- you have 120 seconds', es: 'Inicia el temporizador -- tienes 120 segundos' },
+      { en: 'Write your Level 3 makeover (Notice + Name + Next Step)', es: 'Escribe tu transformacion Nivel 3 (Observar + Nombrar + Siguiente Paso)' },
+      { en: 'Use the hint if you get stuck', es: 'Usa la pista si te atascas' },
+      { en: 'View your before/after transformation', es: 'Ve tu transformacion antes/despues' },
+    ],
+    whatYouNeed: [
+      { en: 'A device to type on', es: 'Un dispositivo para escribir' },
+      { en: 'Best solo, but can be done as a table challenge', es: 'Mejor individual, pero puede hacerse como desafio en mesa' },
+    ],
+    bestFor: { en: 'Educators who know the feedback formula and want to practice applying it under pressure', es: 'Educadores que conocen la formula y quieren practicar aplicandola bajo presion' },
+    time: '~15 min',
+    rounds: { en: '6 rounds', es: '6 rondas' },
+    color: '#E74C3C',
+    format: 'both',
+    requiredTier: 'professional',
+    category: 'Games',
+    estimated_minutes: 15,
+    capacity: 'medium',
+    access_tier: 'professional',
+    thumbnail_url: 'https://asdwpkcsbcnpknklchdq.supabase.co/storage/v1/object/public/cover-images/practice-tools/feedback-makeover/thumbnail.svg',
+  },
+  {
+    slug: 'whats-your-move',
+    id: 'practice-whats-your-move',
+    contentUuid: 'a1000006-0000-0000-0000-000000000006',
+    title: { en: "What's Your Move?", es: 'Cual Es Tu Movimiento?' },
+    description: { en: 'Real classroom scenarios with three response options. Only one is the best move. Choose wisely, get instant feedback on why it works (or why it does not), and sharpen your instincts for the moments that matter.', es: 'Escenarios reales del salon con tres opciones de respuesta. Solo una es el mejor movimiento. Elige sabiamente, recibe retroalimentacion instantanea sobre por que funciona (o no), y afila tus instintos para los momentos que importan.' },
+    howToPlay: [
+      { en: 'Read a real classroom scenario', es: 'Lee un escenario real del salon' },
+      { en: 'Choose the best response from three options', es: 'Elige la mejor respuesta de tres opciones' },
+      { en: 'See instant feedback on your choice', es: 'Ve retroalimentacion instantanea sobre tu eleccion' },
+      { en: 'Learn the reasoning behind the best move', es: 'Aprende el razonamiento detras del mejor movimiento' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great for table discussions in PD sessions', es: 'Excelente para discusiones en mesa durante sesiones de PD' },
+    ],
+    bestFor: { en: 'Paraprofessionals and new teachers building classroom instincts', es: 'Paraprofesionales y maestros nuevos construyendo instintos del salon' },
+    time: '~10 min',
+    rounds: { en: '6 scenarios', es: '6 escenarios' },
+    color: '#22b8bd',
+    format: 'both',
+    requiredTier: 'free',
+    category: 'Games',
+    estimated_minutes: 10,
+    capacity: 'low',
+    access_tier: 'free',
+    thumbnail_url: 'https://asdwpkcsbcnpknklchdq.supabase.co/storage/v1/object/public/cover-images/practice-tools/whats-your-move/thumbnail.svg',
+  },
+  {
+    slug: 'classroom-shuffle',
+    id: 'practice-classroom-shuffle',
+    contentUuid: 'a1000007-0000-0000-0000-000000000007',
+    title: { en: 'Classroom Scenario Shuffle', es: 'Escenarios del Salon' },
+    description: { en: 'Realistic classroom management scenarios drawn from real schools. Read the situation, choose your response, and learn why the best move works. Covers everything from student behavior to parent communication to colleague dynamics.', es: 'Escenarios realistas de manejo del salon tomados de escuelas reales. Lee la situacion, elige tu respuesta, y aprende por que funciona el mejor movimiento. Cubre desde comportamiento estudiantil hasta comunicacion con padres y dinamicas con colegas.' },
+    howToPlay: [
+      { en: 'Read the classroom scenario', es: 'Lee el escenario del salon' },
+      { en: 'Choose the best response from three options', es: 'Elige la mejor respuesta de tres opciones' },
+      { en: 'See whether you were right and learn why', es: 'Ve si acertaste y aprende por que' },
+      { en: 'Track your score across all scenarios', es: 'Sigue tu puntuacion en todos los escenarios' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Powerful as a group discussion tool in PD', es: 'Poderoso como herramienta de discusion grupal en PD' },
+    ],
+    bestFor: { en: 'All educators -- scenarios range from K-2 to high school, teacher to admin', es: 'Todos los educadores -- escenarios desde K-2 hasta preparatoria, maestros hasta administradores' },
+    time: '~12 min',
+    rounds: { en: '8 scenarios', es: '8 escenarios' },
+    color: '#3498DB',
+    format: 'both',
+    requiredTier: 'essentials',
+    category: 'Games',
+    estimated_minutes: 10,
+    capacity: 'low',
+    access_tier: 'essentials',
+  },
+  {
+    slug: 'prioritize-this',
+    id: 'practice-prioritize-this',
+    contentUuid: 'a1000008-0000-0000-0000-000000000008',
+    title: { en: 'Prioritize This', es: 'Prioriza Esto' },
+    description: { en: 'You are given a real school situation and four tasks that all need to happen. Rank them from most to least urgent. Then see how experienced educators would prioritize and learn why order matters.', es: 'Te dan una situacion real de escuela y cuatro tareas que todas necesitan hacerse. Ordenalas de mas a menos urgente. Luego ve como educadores experimentados priorizarian y aprende por que el orden importa.' },
+    howToPlay: [
+      { en: 'Read the situation', es: 'Lee la situacion' },
+      { en: 'Use the up/down arrows to rank 4 tasks by priority', es: 'Usa las flechas arriba/abajo para ordenar 4 tareas por prioridad' },
+      { en: 'Lock in your ranking', es: 'Confirma tu orden' },
+      { en: 'See the expert ranking with explanations for each position', es: 'Ve el orden experto con explicaciones para cada posicion' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great debate starter for team meetings', es: 'Excelente para iniciar debates en reuniones de equipo' },
+    ],
+    bestFor: { en: 'Teachers, paras, and leaders practicing triage and decision-making', es: 'Maestros, paraprofesionales y lideres practicando triaje y toma de decisiones' },
+    time: '~10 min',
+    rounds: { en: '3 rounds', es: '3 rondas' },
+    color: '#9333EA',
+    format: 'both',
+    requiredTier: 'all_access',
+    category: 'Games',
+    estimated_minutes: 10,
+    capacity: 'medium',
+    access_tier: 'all_access',
+  },
+  {
+    slug: 'energy-budget',
+    id: 'practice-energy-budget',
+    contentUuid: 'a1000009-0000-0000-0000-000000000009',
+    title: { en: 'Energy Budget', es: 'Presupuesto de Energia' },
+    description: { en: 'You have 100 energy points to spend across your day. How do you allocate them? Distribute your energy across competing demands, then see how experienced educators would budget theirs. The gaps reveal your growth areas.', es: 'Tienes 100 puntos de energia para gastar en tu dia. Como los distribuyes? Reparte tu energia entre demandas competidoras, luego ve como educadores experimentados distribuirian la suya. Las diferencias revelan tus areas de crecimiento.' },
+    howToPlay: [
+      { en: 'Read the day scenario', es: 'Lee el escenario del dia' },
+      { en: 'Distribute 100 energy points across the tasks using + and - buttons', es: 'Distribuye 100 puntos de energia entre las tareas usando los botones + y -' },
+      { en: 'Use all 100 points (no leftovers)', es: 'Usa todos los 100 puntos (sin sobrantes)' },
+      { en: 'Lock in your budget', es: 'Confirma tu presupuesto' },
+      { en: 'Compare your allocation to the expert recommendation', es: 'Compara tu distribucion con la recomendacion experta' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Helpful for self-care and sustainability conversations in PD', es: 'Util para conversaciones de autocuidado y sostenibilidad en PD' },
+    ],
+    bestFor: { en: 'All educators -- especially those struggling with burnout or overcommitment', es: 'Todos los educadores -- especialmente quienes luchan con el agotamiento o el exceso de compromisos' },
+    time: '~10 min',
+    rounds: { en: '3 rounds', es: '3 rondas' },
+    color: '#22b8bd',
+    format: 'both',
+    requiredTier: 'essentials',
+    category: 'Games',
+    estimated_minutes: 10,
+    capacity: 'low',
+    access_tier: 'essentials',
+  },
+  {
+    slug: 'this-or-that',
+    id: 'practice-this-or-that',
+    contentUuid: 'a1000010-0000-0000-0000-000000000010',
+    title: { en: 'This or That', es: 'Esto o Aquello' },
+    description: { en: 'Two approaches to the same classroom moment. No right answer. Pick yours, then see how other educators respond. The splits reveal what your instincts say about your teaching.', es: 'Dos enfoques para el mismo momento en el salon. Sin respuesta correcta. Elige el tuyo, luego ve como responden otros educadores. Las divisiones revelan lo que tus instintos dicen sobre tu ensenanza.' },
+    howToPlay: [
+      { en: 'Choose your grade band to compare with similar educators', es: 'Elige tu nivel de grado para comparar con educadores similares' },
+      { en: 'Read a real classroom scenario', es: 'Lee un escenario real del salon' },
+      { en: 'Pick between two legitimate approaches', es: 'Elige entre dos enfoques legitimos' },
+      { en: 'See how other educators responded', es: 'Ve como respondieron otros educadores' },
+      { en: 'Read research and reflection for each round', es: 'Lee investigacion y reflexion para cada ronda' },
+      { en: 'Discover your educator profile at the end', es: 'Descubre tu perfil de educador al final' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Powerful for group PD -- discuss the rounds where the room is most split', es: 'Poderoso para PD grupal -- discutan las rondas donde el grupo esta mas dividido' },
+    ],
+    bestFor: { en: 'All educators. The peer compare data makes every play unique. Great conversation starter for PD sessions.', es: 'Todos los educadores. Los datos de comparacion hacen cada partida unica. Excelente para iniciar conversaciones en sesiones de PD.' },
+    time: '~12 min',
+    rounds: { en: '8 rounds', es: '8 rondas' },
+    color: '#E8B84B',
+    format: 'both',
+    requiredTier: 'all_access',
+    category: 'Games',
+    estimated_minutes: 12,
+    capacity: 'low',
+    access_tier: 'all_access',
+  },
+  {
+    slug: 'sort-it-out',
+    id: 'practice-sort-it-out',
+    contentUuid: 'a1000011-0000-0000-0000-000000000011',
+    title: { en: 'Sort It Out', es: 'Clasifica Esto' },
+    description: { en: 'Items appear. Buckets wait. Drag each one into the right category. Sounds simple until you hit the tricky ones. Covers feedback, mindset, management strategies, accommodations, and para responsibilities.', es: 'Aparecen items. Los cubos esperan. Arrastra cada uno a la categoria correcta. Suena simple hasta que llegas a los complicados. Cubre retroalimentacion, mentalidad, estrategias de manejo, acomodaciones y responsabilidades del para.' },
+    howToPlay: [
+      { en: 'Read each item carefully', es: 'Lee cada item con cuidado' },
+      { en: 'Tap to select, then tap a bucket to place it', es: 'Toca para seleccionar, luego toca un cubo para colocarlo' },
+      { en: 'You can move items between buckets before submitting', es: 'Puedes mover items entre cubos antes de enviar' },
+      { en: 'Submit when all items are sorted', es: 'Envia cuando todos los items esten clasificados' },
+      { en: 'See which ones you got right, with explanations for wrong placements', es: 'Ve cuales acertaste, con explicaciones para los que no' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great for team discussions about where items belong and why', es: 'Excelente para discusiones en equipo sobre donde pertenecen los items y por que' },
+    ],
+    bestFor: { en: 'All educators. The para responsibilities set is specifically designed for paraprofessionals. Accommodation vs modification set is essential for anyone supporting IEP students.', es: 'Todos los educadores. El set de responsabilidades del para esta especificamente disenado para paraprofesionales.' },
+    time: '~15 min',
+    rounds: { en: '5 categories, 10 items each', es: '5 categorias, 10 items cada una' },
+    color: '#2563EB',
+    format: 'both',
+    requiredTier: 'all_access',
+    category: 'Games',
+    estimated_minutes: 15,
+    capacity: 'low',
+    access_tier: 'all_access',
+  },
+  {
+    slug: 'principal-playbook',
+    id: 'practice-principal-playbook',
+    contentUuid: 'a1000012-0000-0000-0000-000000000012',
+    title: { en: 'Principal Playbook', es: 'Manual del Director' },
+    description: { en: 'Step into the principal role. You will face real leadership decisions about staffing, discipline, parent conflicts, and school culture. Choose your response and see how experienced leaders would handle it. The leadership lenses reveal your instincts.', es: 'Ponte en el papel del director. Enfrentaras decisiones reales de liderazgo sobre personal, disciplina, conflictos con padres y cultura escolar. Elige tu respuesta y ve como lideres experimentados lo manejarian.' },
+    howToPlay: [
+      { en: 'Read the leadership scenario', es: 'Lee el escenario de liderazgo' },
+      { en: 'Choose the best response from the options', es: 'Elige la mejor respuesta de las opciones' },
+      { en: 'See instant feedback and the leadership lens', es: 'Ve retroalimentacion instantanea y la lente de liderazgo' },
+      { en: 'Track your score and leadership lens breakdown', es: 'Sigue tu puntuacion y desglose de lentes de liderazgo' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great for aspiring leaders and leadership PD sessions', es: 'Excelente para aspirantes a lideres y sesiones de PD de liderazgo' },
+    ],
+    bestFor: { en: 'Principals, assistant principals, aspiring leaders, and instructional coaches', es: 'Directores, subdirectores, aspirantes a lideres y coaches instruccionales' },
+    time: '~12 min',
+    rounds: { en: '10 scenarios', es: '10 escenarios' },
+    color: '#E8B84B',
+    format: 'solo',
+    requiredTier: 'professional',
+    category: 'Games',
+    estimated_minutes: 12,
+    capacity: 'medium',
+    access_tier: 'professional',
+  },
+  {
+    slug: 'conversation-compass',
+    id: 'practice-conversation-compass',
+    contentUuid: 'a1000013-0000-0000-0000-000000000013',
+    title: { en: 'Conversation Compass', es: 'Brujula de Conversacion' },
+    description: { en: 'Navigate tough conversations with colleagues, parents, and administrators. Read the situation, choose your approach, and learn which communication skills make or break the moment. Your skill breakdown shows your natural strengths.', es: 'Navega conversaciones dificiles con colegas, padres y administradores. Lee la situacion, elige tu enfoque y aprende que habilidades de comunicacion definen el momento.' },
+    howToPlay: [
+      { en: 'Read the conversation scenario', es: 'Lee el escenario de conversacion' },
+      { en: 'Choose the best response', es: 'Elige la mejor respuesta' },
+      { en: 'See feedback and the communication skill involved', es: 'Ve retroalimentacion y la habilidad de comunicacion involucrada' },
+      { en: 'Track your skill breakdown at the end', es: 'Ve tu desglose de habilidades al final' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Powerful for role-playing tough conversations in PD', es: 'Poderoso para practicar conversaciones dificiles en PD' },
+    ],
+    bestFor: { en: 'All educators who navigate difficult conversations with colleagues, parents, or administrators', es: 'Todos los educadores que navegan conversaciones dificiles con colegas, padres o administradores' },
+    time: '~10 min',
+    rounds: { en: '10 scenarios', es: '10 escenarios' },
+    color: '#22b8bd',
+    format: 'both',
+    requiredTier: 'professional',
+    category: 'Games',
+    estimated_minutes: 10,
+    capacity: 'medium',
+    access_tier: 'professional',
+  },
+  {
+    slug: 'partner-up',
+    id: 'practice-partner-up',
+    contentUuid: 'a1000014-0000-0000-0000-000000000014',
+    title: { en: 'Partner Up', es: 'En Equipo' },
+    description: { en: 'See classroom scenarios from both the para and teacher perspective. Choose the best response from each role, then get the insight that connects both. Build your co-teaching toolkit by understanding both sides.', es: 'Ve escenarios del salon desde la perspectiva del para y del maestro. Elige la mejor respuesta de cada rol, luego obtiene la perspectiva que conecta ambos. Construye tu kit de co-ensenanza entendiendo ambos lados.' },
+    howToPlay: [
+      { en: 'Read the classroom scenario', es: 'Lee el escenario del salon' },
+      { en: 'Choose the best response from the para perspective', es: 'Elige la mejor respuesta desde la perspectiva del para' },
+      { en: 'Then choose from the teacher perspective', es: 'Luego elige desde la perspectiva del maestro' },
+      { en: 'See the insight that connects both roles', es: 'Ve la perspectiva que conecta ambos roles' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself, or play with your co-teaching partner', es: 'Solo tu, o juega con tu companero de co-ensenanza' },
+      { en: 'Best when a teacher and para play together', es: 'Mejor cuando un maestro y un para juegan juntos' },
+    ],
+    bestFor: { en: 'Paraprofessionals and teachers building co-teaching partnerships', es: 'Paraprofesionales y maestros construyendo alianzas de co-ensenanza' },
+    time: '~10 min',
+    rounds: { en: '10 scenarios (2 perspectives each)', es: '10 escenarios (2 perspectivas cada uno)' },
+    color: '#27AE60',
+    format: 'both',
+    requiredTier: 'professional',
+    category: 'Games',
+    estimated_minutes: 10,
+    capacity: 'low',
+    access_tier: 'professional',
+  },
+  {
+    slug: 'boundary-game',
+    id: 'practice-boundary-game',
+    contentUuid: 'a1000015-0000-0000-0000-000000000015',
+    title: { en: 'The Boundary Game', es: 'El Juego de Limites' },
+    description: { en: 'Practice setting healthy boundaries at work. Real scenarios about overcommitting, saying no to colleagues, protecting your time, and managing expectations. Choose your response and learn which boundary type you are building.', es: 'Practica establecer limites saludables en el trabajo. Escenarios reales sobre comprometerte de mas, decir no a colegas, proteger tu tiempo y manejar expectativas.' },
+    howToPlay: [
+      { en: 'Read the boundary scenario', es: 'Lee el escenario de limites' },
+      { en: 'Choose the best response', es: 'Elige la mejor respuesta' },
+      { en: 'See feedback and the boundary type', es: 'Ve retroalimentacion y el tipo de limite' },
+      { en: 'Track your boundary type breakdown', es: 'Ve tu desglose por tipo de limite' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great for self-care conversations in PD', es: 'Excelente para conversaciones de autocuidado en PD' },
+    ],
+    bestFor: { en: 'All educators, especially those struggling with overcommitment or burnout', es: 'Todos los educadores, especialmente quienes luchan con el exceso de compromisos o el agotamiento' },
+    time: '~10 min',
+    rounds: { en: '10 scenarios', es: '10 escenarios' },
+    color: '#F43F5E',
+    format: 'solo',
+    requiredTier: 'professional',
+    category: 'Games',
+    estimated_minutes: 10,
+    capacity: 'low',
+    access_tier: 'professional',
+  },
+  {
+    slug: 'lean-on-tdi',
+    id: 'practice-lean-on-tdi',
+    contentUuid: 'a1000016-0000-0000-0000-000000000016',
+    title: { en: 'When to Lean on Your TDI Team', es: 'Cuando Apoyarte en Tu Equipo TDI' },
+    description: { en: 'Know when and how to tap into your TDI support team. Choose your role, then face real scenarios where you decide whether to lean on your TDI team, use the platform, or connect with the community. Learn which support channels match each situation.', es: 'Sabe cuando y como recurrir a tu equipo de apoyo TDI. Elige tu rol, luego enfrenta escenarios reales donde decides si apoyarte en tu equipo TDI, usar la plataforma o conectarte con la comunidad.' },
+    howToPlay: [
+      { en: 'Choose your role: Leader, Teacher, Para, or Coach', es: 'Elige tu rol: Lider, Maestro, Para o Coach' },
+      { en: 'Read each scenario', es: 'Lee cada escenario' },
+      { en: 'Decide: Lean on TDI team, use platform, or connect with community', es: 'Decide: apoyarte en el equipo TDI, usar la plataforma o conectarte con la comunidad' },
+      { en: 'See the best support channel and why', es: 'Ve el mejor canal de apoyo y por que' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great for new TDI partnership onboarding', es: 'Excelente para incorporacion de nuevas alianzas TDI' },
+    ],
+    bestFor: { en: 'Educators in TDI partnerships learning how to maximize their support', es: 'Educadores en alianzas TDI aprendiendo como maximizar su apoyo' },
+    time: '~8 min',
+    rounds: { en: '8 scenarios', es: '8 escenarios' },
+    color: '#E8B84B',
+    format: 'solo',
+    requiredTier: 'free',
+    category: 'Games',
+    estimated_minutes: 8,
+    capacity: 'low',
+    access_tier: 'free',
+  },
+  {
+    slug: 'reset-roulette',
+    id: 'practice-reset-roulette',
+    contentUuid: 'a1000017-0000-0000-0000-000000000017',
+    title: { en: 'Reset Roulette', es: 'Ruleta de Reinicio' },
+    description: { en: 'Spin the wheel for a quick stress reset activity. Land on breathwork, movement, gratitude, grounding, laughter, or reframing. Each spin gives you a guided micro-activity. Different every time.', es: 'Gira la rueda para una actividad rapida de reinicio del estres. Cae en respiracion, movimiento, gratitud, conexion a tierra, risa o reencuadre. Cada giro te da una micro-actividad guiada.' },
+    howToPlay: [
+      { en: 'Spin the wheel', es: 'Gira la rueda' },
+      { en: 'Land on a reset category', es: 'Cae en una categoria de reinicio' },
+      { en: 'Follow the guided micro-activity', es: 'Sigue la micro-actividad guiada' },
+      { en: 'Spin again or check in with how you feel', es: 'Gira otra vez o reflexiona sobre como te sientes' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself and 2-3 minutes', es: 'Solo tu y 2-3 minutos' },
+      { en: 'Perfect for between classes or during a break', es: 'Perfecto entre clases o durante un descanso' },
+    ],
+    bestFor: { en: 'Any educator needing a quick mental reset during a tough day', es: 'Cualquier educador que necesite un reinicio mental rapido durante un dia dificil' },
+    time: '~5 min',
+    rounds: { en: 'Unlimited spins', es: 'Giros ilimitados' },
+    color: '#F43F5E',
+    format: 'solo',
+    requiredTier: 'free',
+    category: 'Games',
+    estimated_minutes: 5,
+    capacity: 'low',
+    access_tier: 'free',
+  },
+  {
+    slug: 'first-five-days',
+    id: 'practice-first-five-days',
+    contentUuid: 'a1000018-0000-0000-0000-000000000018',
+    title: { en: 'First Five Days', es: 'Los Primeros Cinco Dias' },
+    description: { en: 'Plan your first week back to school. You see a list of things that need to happen during the first five days. Pick the 8 most important ones and see how they compare to what experienced educators prioritize. The gaps reveal what you might be overlooking.', es: 'Planifica tu primera semana de regreso a clases. Ves una lista de cosas que deben pasar durante los primeros cinco dias. Elige las 8 mas importantes y ve como se comparan con lo que educadores experimentados priorizan.' },
+    howToPlay: [
+      { en: 'Choose your role: Teacher, Para, or Leader', es: 'Elige tu rol: Maestro, Para o Lider' },
+      { en: 'Review the list of first-week priorities', es: 'Revisa la lista de prioridades de la primera semana' },
+      { en: 'Select the 8 most important items', es: 'Selecciona los 8 items mas importantes' },
+      { en: 'See how your picks compare to expert priorities', es: 'Ve como tus selecciones se comparan con las prioridades expertas' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great for back-to-school PD sessions', es: 'Excelente para sesiones de PD de regreso a clases' },
+    ],
+    bestFor: { en: 'All educators preparing for the start of a new school year', es: 'Todos los educadores preparandose para el inicio de un nuevo ano escolar' },
+    time: '~15 min',
+    rounds: { en: '1 round, 8 picks', es: '1 ronda, 8 selecciones' },
+    color: '#F59E0B',
+    format: 'solo',
+    requiredTier: 'professional',
+    category: 'Games',
+    estimated_minutes: 15,
+    capacity: 'medium',
+    access_tier: 'professional',
+  },
+  {
+    slug: 'plan-your-year',
+    id: 'practice-plan-your-year',
+    contentUuid: 'a1000019-0000-0000-0000-000000000019',
+    title: { en: 'Plan Your Year', es: 'Planifica Tu Ano' },
+    description: { en: 'Map out your professional growth goals month by month. Each month presents competing priorities. Choose 2 per month and see how your plan balances across the year. The burnout risk meter shows if your plan is sustainable.', es: 'Traza tus metas de crecimiento profesional mes a mes. Cada mes presenta prioridades en competencia. Elige 2 por mes y ve como tu plan se equilibra a lo largo del ano. El medidor de riesgo de agotamiento muestra si tu plan es sostenible.' },
+    howToPlay: [
+      { en: 'Navigate through 9 school months (September to May)', es: 'Navega por 9 meses escolares (septiembre a mayo)' },
+      { en: 'Select 2 priority items per month', es: 'Selecciona 2 items prioritarios por mes' },
+      { en: 'See insights about your monthly choices', es: 'Ve perspectivas sobre tus elecciones mensuales' },
+      { en: 'Review your full-year plan and burnout risk', es: 'Revisa tu plan anual y riesgo de agotamiento' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great for goal-setting PD at the start of the year', es: 'Excelente para PD de establecimiento de metas al inicio del ano' },
+    ],
+    bestFor: { en: 'All educators planning their professional growth for the year', es: 'Todos los educadores planificando su crecimiento profesional para el ano' },
+    time: '~15 min',
+    rounds: { en: '9 months', es: '9 meses' },
+    color: '#3498DB',
+    format: 'solo',
+    requiredTier: 'professional',
+    category: 'Games',
+    estimated_minutes: 15,
+    capacity: 'medium',
+    access_tier: 'professional',
+  },
+];
+
+/** Set of all practice game slugs, for deduplication */
+export const PRACTICE_GAME_SLUGS = new Set(PRACTICE_GAME_REGISTRY.map((g) => g.slug));
+
+/** Browse-page representation derived from the registry */
+export function getPracticeToolsForBrowse(): Array<{
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  category: string;
+  estimated_minutes: number;
+  content_type: 'activity';
+  thumbnail_url?: string;
+  access_tier: string;
+  capacity: 'low' | 'medium' | 'high';
+}> {
+  return PRACTICE_GAME_REGISTRY.map((g) => ({
+    id: g.id,
+    slug: g.slug,
+    title: g.title.en,
+    description: g.description.en,
+    category: g.category,
+    estimated_minutes: g.estimated_minutes,
+    content_type: 'activity' as const,
+    thumbnail_url: g.thumbnail_url,
+    access_tier: g.access_tier,
+    capacity: g.capacity,
+  }));
+}
