@@ -592,11 +592,11 @@ export const PRACTICE_GAME_REGISTRY: PracticeGameEntry[] = [
     rounds: { en: '8 scenarios', es: '8 escenarios' },
     color: '#22b8bd',
     format: 'solo',
-    requiredTier: 'free',
+    requiredTier: 'essentials',
     category: 'Games',
     estimated_minutes: 12,
     capacity: 'medium',
-    access_tier: 'free',
+    access_tier: 'essentials',
   },
 ];
 
