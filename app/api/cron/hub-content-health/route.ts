@@ -96,7 +96,26 @@ export async function GET() {
     issues.push(`RLS sanity check failed: ${String(err)}`);
   }
 
-  // Check 5: Clean up video staging files older than 1 hour
+  // Check 5: Alert on stale drafts (content created by agents but not uploaded/published)
+  try {
+    const { data: staleDrafts } = await supabase
+      .from('hub_quick_wins')
+      .select('id, title, created_at')
+      .eq('is_published', false)
+      .is('pdf_url', null)
+      .lt('created_at', new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString());
+
+    if (staleDrafts && staleDrafts.length > 0) {
+      issues.push(
+        `${staleDrafts.length} draft Quick Win${staleDrafts.length > 1 ? 's' : ''} created over 48 hours ago with no PDF uploaded. ` +
+        `These may be stuck in the Paperclip pipeline. Titles: ${staleDrafts.slice(0, 5).map(d => d.title).join(', ')}${staleDrafts.length > 5 ? '...' : ''}`
+      );
+    }
+  } catch (err) {
+    issues.push(`Stale draft check failed: ${String(err)}`);
+  }
+
+  // Check 6: Clean up video staging files older than 1 hour
   let stagingCleaned = 0;
   try {
     const serviceSupabase = createClient(supabaseUrl, process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY || supabaseKey, {
