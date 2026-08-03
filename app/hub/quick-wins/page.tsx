@@ -390,7 +390,10 @@ export default function QuickWinsPage() {
   }, [language, quickWins.length, isLoading, loadQuickWins]);
 
   // Merge practice tools with database quick wins
-  const allQuickWins = [...quickWins, ...PRACTICE_TOOLS];
+  // Deduplicate: PRACTICE_TOOLS take priority over DB entries with same slug
+  const practiceSlugs = new Set(PRACTICE_TOOLS.map((pt) => pt.slug));
+  const deduplicatedQuickWins = quickWins.filter((qw) => !practiceSlugs.has(qw.slug));
+  const allQuickWins = [...deduplicatedQuickWins, ...PRACTICE_TOOLS];
   const totalCount = allQuickWins.length;
 
   // Filter quick wins by category and capacity
