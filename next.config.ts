@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: '/hub/subscribe',
+        destination: '/hub/membership',
+        permanent: true,
+      },
+      {
         source: '/for-schools/schedule-call',
         destination: '/contact',
         permanent: true,
